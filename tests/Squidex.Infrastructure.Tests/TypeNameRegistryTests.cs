@@ -30,7 +30,7 @@ namespace Squidex.Infrastructure
         [Fact]
         public void Should_register_and_retrieve_types()
         {
-            sut.Map(typeof(int), "NumberField");
+            sut.MapUnmapped(typeof(int), "NumberField");
 
             Assert.Equal("NumberField", sut.GetName<int>());
             Assert.Equal("NumberField", sut.GetName(typeof(int)));
@@ -42,7 +42,7 @@ namespace Squidex.Infrastructure
         [Fact]
         public void Should_register_from_attribute()
         {
-            sut.Map(typeof(MyType));
+            sut.MapUnmapped(typeof(MyType));
 
             Assert.Equal("my", sut.GetName<MyType>());
             Assert.Equal("my", sut.GetName(typeof(MyType)));
@@ -54,7 +54,7 @@ namespace Squidex.Infrastructure
         [Fact]
         public void Should_register_from_assembly()
         {
-            sut.Map(typeof(TypeNameRegistryTests).GetTypeInfo().Assembly);
+            sut.MapUnmapped(typeof(TypeNameRegistryTests).GetTypeInfo().Assembly);
 
             Assert.Equal("my", sut.GetName<MyType>());
             Assert.Equal("my", sut.GetName(typeof(MyType)));
@@ -66,7 +66,7 @@ namespace Squidex.Infrastructure
         [Fact]
         public void Should_register_event_type_from_assembly()
         {
-            sut.Map(typeof(TypeNameRegistryTests).GetTypeInfo().Assembly);
+            sut.MapUnmapped(typeof(TypeNameRegistryTests).GetTypeInfo().Assembly);
 
             Assert.Equal("MyAddedEventV2", sut.GetName<MyAdded>());
             Assert.Equal("MyAddedEventV2", sut.GetName(typeof(MyAdded)));
@@ -78,7 +78,7 @@ namespace Squidex.Infrastructure
         [Fact]
         public void Should_register_fallback_name()
         {
-            sut.Map(typeof(MyType));
+            sut.MapUnmapped(typeof(MyType));
             sut.MapObsolete(typeof(MyType), "my-old");
 
             Assert.Equal(typeof(MyType), sut.GetType("my"));
@@ -88,24 +88,24 @@ namespace Squidex.Infrastructure
         [Fact]
         public void Should_not_throw_exception_if_type_is_already_registered_with_same_name()
         {
-            sut.Map(typeof(long), "long");
-            sut.Map(typeof(long), "long");
+            sut.MapUnmapped(typeof(long), "long");
+            sut.MapUnmapped(typeof(long), "long");
         }
 
         [Fact]
         public void Should_throw_exception_if_type_is_already_registered()
         {
-            sut.Map(typeof(long), "long");
+            sut.MapUnmapped(typeof(long), "long");
 
-            Assert.Throws<ArgumentException>(() => sut.Map(typeof(long), "longer"));
+            Assert.Throws<ArgumentException>(() => sut.MapUnmapped(typeof(long), "longer"));
         }
 
         [Fact]
         public void Should_throw_exception_if_name_is_already_registered()
         {
-            sut.Map(typeof(short), "short");
+            sut.MapUnmapped(typeof(short), "short");
 
-            Assert.Throws<ArgumentException>(() => sut.Map(typeof(byte), "short"));
+            Assert.Throws<ArgumentException>(() => sut.MapUnmapped(typeof(byte), "short"));
         }
 
         [Fact]

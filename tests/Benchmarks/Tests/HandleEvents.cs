@@ -21,7 +21,7 @@ namespace Benchmarks.Tests
     public sealed class HandleEvents : IBenchmark
     {
         private const int NumEvents = 5000;
-        private readonly TypeNameRegistry typeNameRegistry = new TypeNameRegistry().Map(typeof(MyEvent));
+        private readonly TypeNameRegistry typeNameRegistry = new TypeNameRegistry().MapUnmapped(typeof(MyEvent));
         private readonly EventDataFormatter formatter;
         private readonly JsonSerializerSettings serializerSettings = new JsonSerializerSettings();
         private IMongoClient mongoClient;

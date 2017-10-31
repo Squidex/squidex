@@ -11,10 +11,13 @@ import {
     AppComponentBase,
     AppsStoreService,
     AuthService,
+    DateTime,
     DialogService,
     fadeAnimation,
     ImmutableArray,
     ModalView,
+    ruleActions,
+    ruleTriggers,
     RuleDto,
     RulesService,
     SchemaDto,
@@ -30,7 +33,10 @@ import {
     ]
 })
 export class RulesPageComponent extends AppComponentBase implements OnInit {
-    public addRuleDialog = new ModalView(true, false);
+    public ruleActions = ruleActions;
+    public ruleTriggers = ruleTriggers;
+
+    public addRuleDialog = new ModalView();
 
     public rules: ImmutableArray<RuleDto>;
     public schemas: SchemaDto[];
@@ -59,6 +65,42 @@ export class RulesPageComponent extends AppComponentBase implements OnInit {
                 if (showInfo) {
                     this.notifyInfo('Rules reloaded.');
                 }
+            }, error => {
+                this.notifyError(error);
+            });
+    }
+
+    public onRuleCreated(rule: RuleDto) {
+        this.rules = this.rules.push(rule);
+
+        this.addRuleDialog.hide();
+    }
+
+    public toggleRule(rule: RuleDto) {
+        if (rule.isEnabled) {
+            this.appNameOnce()
+                .switchMap(app => this.rulesService.disableRule(app, rule.id, rule.version))
+                .subscribe(dto => {
+                    this.rules = this.rules.replace(rule, rule.disable(this.authService.user.id, dto.version, DateTime.now()));
+                }, error => {
+                    this.notifyError(error);
+                });
+        } else {
+            this.appNameOnce()
+                .switchMap(app => this.rulesService.enableRule(app, rule.id, rule.version))
+                .subscribe(dto => {
+                    this.rules = this.rules.replace(rule, rule.enable(this.authService.user.id, dto.version, DateTime.now()));
+                }, error => {
+                    this.notifyError(error);
+                });
+        }
+    }
+
+    public deleteRule(rule: RuleDto) {
+        this.appNameOnce()
+            .switchMap(app => this.rulesService.deleteRule(app, rule.id, rule.version))
+            .subscribe(dto => {
+                this.rules = this.rules.remove(rule);
             }, error => {
                 this.notifyError(error);
             });

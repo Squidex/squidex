@@ -23,7 +23,7 @@ namespace Benchmarks.Tests
     {
         private const int NumCommits = 200;
         private const int NumStreams = 10;
-        private readonly TypeNameRegistry typeNameRegistry = new TypeNameRegistry().Map(typeof(MyEvent));
+        private readonly TypeNameRegistry typeNameRegistry = new TypeNameRegistry().MapUnmapped(typeof(MyEvent));
         private readonly EventDataFormatter formatter;
         private readonly JsonSerializerSettings serializerSettings = new JsonSerializerSettings();
         private IMongoClient mongoClient;

@@ -6,18 +6,18 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using NodaTime;
 using NodaTime.Serialization.JsonNet;
+using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Apps.Json;
+using Squidex.Domain.Apps.Core.Rules.Json;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Schemas.Json;
 using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.MongoDb;
 
@@ -45,6 +45,7 @@ namespace Squidex.Config.Domain
                 new NamedStringIdConverter(),
                 new PropertiesBagConverter(),
                 new RefTokenConverter(),
+                new RuleConverter(),
                 new SchemaConverter(FieldRegistry),
                 new StringEnumConverter());
 
@@ -62,8 +63,9 @@ namespace Squidex.Config.Domain
 
         static Serializers()
         {
-            TypeNameRegistry.Map(typeof(SquidexEvent).GetTypeInfo().Assembly);
-            TypeNameRegistry.Map(typeof(NoopEvent).GetTypeInfo().Assembly);
+            TypeNameRegistry.MapUnmapped(typeof(SquidexCoreModel).Assembly);
+            TypeNameRegistry.MapUnmapped(typeof(SquidexEvents).Assembly);
+            TypeNameRegistry.MapUnmapped(typeof(SquidexInfrastructure).Assembly);
 
             ConfigureJson(SerializerSettings, TypeNameHandling.Auto);
 

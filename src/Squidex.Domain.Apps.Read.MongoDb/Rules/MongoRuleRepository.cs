@@ -55,7 +55,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Rules
         {
             await EnsureRulesLoadedAsync();
 
-            return inMemoryRules.GetOrDefault(appId) ?? EmptyRules;
+            return inMemoryRules.GetOrDefault(appId)?.ToList() ?? EmptyRules;
         }
 
         private async Task EnsureRulesLoadedAsync()

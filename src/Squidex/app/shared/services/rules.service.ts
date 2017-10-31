@@ -25,7 +25,7 @@ export const ruleTriggers: any = {
 };
 
 export const ruleActions: any = {
-    'Webhook': 'Send Webhooks'
+    'Webhook': 'Send Webhook'
 };
 
 export class RuleDto {
@@ -52,9 +52,9 @@ export class RuleDto {
             version,
             this.isEnabled,
             update.trigger,
-            update.trigger['triggerType'],
+            update.trigger.triggerType,
             update.action,
-            update.action['actionType']);
+            update.action.actionType);
     }
 
     public enable(user: string, version: Version, now?: DateTime): RuleDto {
