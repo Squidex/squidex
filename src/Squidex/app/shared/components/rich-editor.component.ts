@@ -5,15 +5,12 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { AfterViewInit, Component, forwardRef, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, forwardRef, ElementRef, OnDestroy, ViewChild } from '@angular/core';
 import { ControlValueAccessor,  NG_VALUE_ACCESSOR, FormBuilder } from '@angular/forms';
 
-import { Types } from './../utils/types';
-
-import { ResourceLoaderService } from './../services/resource-loader.service';
-
-import { AppComponentBase } from './../../shared/components/app.component-base';
-import { ModalView, AppsStoreService, AssetDto, AssetsService, ImmutableArray, DialogService, AuthService, Pager } from './../../shared/declarations-base';
+import { Types, ResourceLoaderService } from 'framework';
+import { AppComponentBase } from './app.component-base';
+import { ModalView, AppsStoreService, AssetDto, AssetsService, ImmutableArray, DialogService, AuthService, Pager } from './../declarations-base';
 
 declare var tinymce: any;
 
@@ -27,7 +24,7 @@ export const SQX_RICH_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     templateUrl: './rich-editor.component.html',
     providers: [SQX_RICH_EDITOR_CONTROL_VALUE_ACCESSOR]
 })
-export class RichEditorComponent extends AppComponentBase implements ControlValueAccessor, AfterViewInit, OnDestroy, OnInit {
+export class RichEditorComponent extends AppComponentBase implements ControlValueAccessor, AfterViewInit, OnDestroy {
     private callChange = (v: any) => { /* NOOP */ };
     private callTouched = () => { /* NOOP */ };
     private tinyEditor: any;
@@ -53,8 +50,7 @@ export class RichEditorComponent extends AppComponentBase implements ControlValu
         super(dialogs, apps, authService);
     }
 
-    public ngOnInit() {
-
+    private load() {
         this.appNameOnce()
             .switchMap(app => this.assetsService.getAssets(app, this.assetsPager.pageSize, this.assetsPager.skip))
             .subscribe(dtos => {
@@ -100,6 +96,7 @@ export class RichEditorComponent extends AppComponentBase implements ControlValu
                         }, 500);
                 },
                 removed_menuitems: 'newdocument', plugins: 'code,image', target: this.editor.nativeElement, file_picker_types: 'image', file_picker_callback: (cb: any, value: any, meta: any) => {
+                    self.load();
                     self.assetsDialog.show();
                 }
             });
@@ -137,5 +134,10 @@ export class RichEditorComponent extends AppComponentBase implements ControlValu
     public cancelSelectAsset() {
         console.log('asset selection canceled');
         this.assetsDialog.hide();
+    }
+
+    public onAssetClicked(asset: AssetDto) {
+        console.log('Asset clicked on');
+        console.log(asset);
     }
 }

@@ -13,5 +13,6 @@ export * from './components/help.component';
 export * from './components/history.component';
 export * from './components/language-selector.component';
 export * from './components/pipes';
+export * from './components/rich-editor.component';
 
 export * from './declarations-base';

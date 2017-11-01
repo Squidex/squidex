@@ -14,16 +14,8 @@
 
             <div class="modal-body">
                 <form [formGroup]="assetsForm" (ngSubmit)="selecteAsset()">
-                    <div class="form-group">
-                        <label for="asset-name">Name</label>
-
-                        <sqx-control-errors for="name" [submitted]="selecteAsset"></sqx-control-errors>
-
-                        <input type="text" class="form-control" id="asset-name" formControlName="name" autocomplete="off" sqxFocusOnInit />
-                    </div>
-
                     <div class="row">
-                        <sqx-asset class="col-3" *ngFor="let asset of assetsItems" [asset]="asset"></sqx-asset>
+                        <sqx-asset class="col-3" *ngFor="let asset of assetsItems" [asset]="asset" (updated)="onAssetClicked($event)" ></sqx-asset>
                     </div>
 
                     <div class="form-group clearfix text-right">
