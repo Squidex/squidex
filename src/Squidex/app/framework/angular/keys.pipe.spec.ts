@@ -21,6 +21,6 @@ describe('KeysPipe', () => {
         const actual = pipe.transform(value);
         const expected = ['key1', 'key2'];
 
-        expect(actual).toBe(expected);
+        expect(actual).toEqual(expected);
     });
 });

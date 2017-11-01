@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'icomoon';
-  src:  url('fonts/icomoon.eot?5mo1zc');
-  src:  url('fonts/icomoon.eot?5mo1zc#iefix') format('embedded-opentype'),
-    url('fonts/icomoon.ttf?5mo1zc') format('truetype'),
-    url('fonts/icomoon.woff?5mo1zc') format('woff'),
-    url('fonts/icomoon.svg?5mo1zc#icomoon') format('svg');
+  src:  url('fonts/icomoon.eot?3jhi32');
+  src:  url('fonts/icomoon.eot?3jhi32#iefix') format('embedded-opentype'),
+    url('fonts/icomoon.ttf?3jhi32') format('truetype'),
+    url('fonts/icomoon.woff?3jhi32') format('woff'),
+    url('fonts/icomoon.svg?3jhi32#icomoon') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -24,6 +24,15 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.icon-action-Webhook:before {
+  content: "\e94b";
+}
+.icon-control-RichText:before {
+  content: "\e939";
+}
+.icon-download:before {
+  content: "\e93e";
+}
 .icon-type-Tags:before {
   content: "\e94a";
   color: #c1c6c8;
@@ -232,13 +241,7 @@
 .icon-user-o:before {
   content: "\e932";
 }
-.icon-webhooks:before {
-  content: "\e947";
-}
 .icon-rules:before {
-  content: "\e947";
-}
-.icon-action-Webhook:before {
   content: "\e947";
 }
 .icon-bin2:before {
@@ -285,12 +288,6 @@
 }
 .icon-control-Stars:before {
   content: "\e93a";
-}
-.icon-control-RichText:before {
-  content: "\e939";
-}
-.icon-download:before {
-  content: "\e93e";
 }
 .icon-info:before {
   content: "\e93c";

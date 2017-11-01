@@ -30,16 +30,27 @@ describe('RuleDto', () => {
     const version = new Version('1');
     const newVersion = new Version('2');
 
-    it('should update trigger and action', () => {
-        const update = new UpdateRuleDto({ param1: 1, triggerType: 'NewType' }, { param2: 2, actionType: 'NewType' });
+    it('should update trigger', () => {
+        const trigger = { param2: 2, triggerType: 'NewType' };
 
         const rule_1 = new RuleDto('id1', creator, creator, creation, creation, version, true, {}, 'contentChanged', {}, 'webhook');
-        const rule_2 = rule_1.update(update, modifier, newVersion, modified);
+        const rule_2 = rule_1.updateTrigger(trigger, modifier, newVersion, modified);
 
-        expect(rule_2.trigger).toEqual(update.trigger);
-        expect(rule_2.triggerType).toEqual(update.trigger.triggerType);
-        expect(rule_2.action).toEqual(update.action);
-        expect(rule_2.actionType).toEqual(update.action.actionType);
+        expect(rule_2.trigger).toEqual(trigger);
+        expect(rule_2.triggerType).toEqual(trigger.triggerType);
+        expect(rule_2.lastModified).toEqual(modified);
+        expect(rule_2.lastModifiedBy).toEqual(modifier);
+        expect(rule_2.version).toEqual(newVersion);
+    });
+
+    it('should update action', () => {
+        const action = { param2: 2, actionType: 'NewType' };
+
+        const rule_1 = new RuleDto('id1', creator, creator, creation, creation, version, true, {}, 'contentChanged', {}, 'webhook');
+        const rule_2 = rule_1.updateAction(action, modifier, newVersion, modified);
+
+        expect(rule_2.action).toEqual(action);
+        expect(rule_2.actionType).toEqual(action.actionType);
         expect(rule_2.lastModified).toEqual(modified);
         expect(rule_2.lastModifiedBy).toEqual(modifier);
         expect(rule_2.version).toEqual(newVersion);
@@ -133,12 +144,14 @@ describe('RulesService', () => {
                 true,
                 {
                     param1: 1,
-                    param2: 2
+                    param2: 2,
+                    triggerType: 'ContentChanged'
                 },
                 'ContentChanged',
                 {
                     param3: 3,
-                    param4: 4
+                    param4: 4,
+                    actionType: 'Webhook'
                 },
                 'Webhook')
         ]);
@@ -175,19 +188,19 @@ describe('RulesService', () => {
         });
 
         expect(rule).toEqual(
-            new RuleDto('id1', 'CreatedBy1', 'LastModifiedBy1',
-                DateTime.parseISO_UTC('2016-12-12T10:10'),
-                DateTime.parseISO_UTC('2017-12-12T10:10'),
+            new RuleDto('id1', user, user, now, now,
                 version,
                 true,
                 {
                     param1: 1,
-                    param2: 2
+                    param2: 2,
+                    triggerType: 'ContentChanged'
                 },
                 'ContentChanged',
                 {
                     param3: 3,
-                    param4: 4
+                    param4: 4,
+                    actionType: 'Webhook'
                 },
                 'Webhook'));
     }));

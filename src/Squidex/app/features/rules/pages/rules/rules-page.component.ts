@@ -41,6 +41,9 @@ export class RulesPageComponent extends AppComponentBase implements OnInit {
     public rules: ImmutableArray<RuleDto>;
     public schemas: SchemaDto[];
 
+    public wizardMode = 'Wizard';
+    public wizardRule: RuleDto;
+
     constructor(apps: AppsStoreService, dialogs: DialogService, authService: AuthService,
         private readonly schemasService: SchemasService,
         private readonly rulesService: RulesService
@@ -68,6 +71,27 @@ export class RulesPageComponent extends AppComponentBase implements OnInit {
             }, error => {
                 this.notifyError(error);
             });
+    }
+
+    public createNew() {
+        this.wizardMode = 'Wizard';
+        this.wizardRule = null;
+
+        this.addRuleDialog.show();
+    }
+
+    public editTrigger(rule: RuleDto) {
+        this.wizardMode = 'EditTrigger';
+        this.wizardRule = rule;
+
+        this.addRuleDialog.show();
+    }
+
+    public editAction(rule: RuleDto) {
+        this.wizardMode = 'EditAction';
+        this.wizardRule = rule;
+
+        this.addRuleDialog.show();
     }
 
     public onRuleCreated(rule: RuleDto) {

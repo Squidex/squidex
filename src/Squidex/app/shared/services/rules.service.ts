@@ -44,17 +44,30 @@ export class RuleDto {
     ) {
     }
 
-    public update(update: UpdateRuleDto, user: string, version: Version, now?: DateTime): RuleDto {
+    public updateTrigger(trigger: any, user: string, version: Version, now?: DateTime): RuleDto {
         return new RuleDto(
             this.id,
             this.createdBy, user,
             this.created, now || DateTime.now(),
             version,
             this.isEnabled,
-            update.trigger,
-            update.trigger.triggerType,
-            update.action,
-            update.action.actionType);
+            trigger,
+            trigger.triggerType,
+            this.action,
+            this.action.actionType);
+    }
+
+    public updateAction(action: any, user: string, version: Version, now?: DateTime): RuleDto {
+        return new RuleDto(
+            this.id,
+            this.createdBy, user,
+            this.created, now || DateTime.now(),
+            version,
+            this.isEnabled,
+            this.trigger,
+            this.trigger.triggerType,
+            action,
+            action.actionType);
     }
 
     public enable(user: string, version: Version, now?: DateTime): RuleDto {
@@ -76,7 +89,7 @@ export class RuleDto {
             this.createdBy, user,
             this.created, now || DateTime.now(),
             version,
-            true,
+            false,
             this.trigger,
             this.triggerType,
             this.action,
