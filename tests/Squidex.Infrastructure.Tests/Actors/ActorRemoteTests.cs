@@ -49,7 +49,7 @@ namespace Squidex.Infrastructure.Actors
 
         public ActorRemoteTests()
         {
-            registry.MapUnmapped(typeof(SuccessMessage));
+            registry.Map(typeof(SuccessMessage));
 
             actors = new RemoteActors(new DefaultRemoteActorChannel(new InMemoryPubSub(), registry));
             actors.Connect("my", actor);

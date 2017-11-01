@@ -40,8 +40,8 @@ namespace Squidex.Infrastructure.CQRS.Events
         {
             serializerSettings.Converters.Add(new PropertiesBagConverter());
 
-            typeNameRegistry.MapUnmapped(typeof(MyEvent), "Event");
-            typeNameRegistry.MapUnmapped(typeof(MyOldEvent), "OldEvent");
+            typeNameRegistry.Map(typeof(MyEvent), "Event");
+            typeNameRegistry.Map(typeof(MyOldEvent), "OldEvent");
 
             sut = new EventDataFormatter(typeNameRegistry, serializerSettings);
         }

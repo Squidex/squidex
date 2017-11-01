@@ -30,7 +30,7 @@ namespace Squidex.Infrastructure
         [Fact]
         public void Should_register_and_retrieve_types()
         {
-            sut.MapUnmapped(typeof(int), "NumberField");
+            sut.Map(typeof(int), "NumberField");
 
             Assert.Equal("NumberField", sut.GetName<int>());
             Assert.Equal("NumberField", sut.GetName(typeof(int)));
@@ -42,7 +42,7 @@ namespace Squidex.Infrastructure
         [Fact]
         public void Should_register_from_attribute()
         {
-            sut.MapUnmapped(typeof(MyType));
+            sut.Map(typeof(MyType));
 
             Assert.Equal("my", sut.GetName<MyType>());
             Assert.Equal("my", sut.GetName(typeof(MyType)));
@@ -78,7 +78,7 @@ namespace Squidex.Infrastructure
         [Fact]
         public void Should_register_fallback_name()
         {
-            sut.MapUnmapped(typeof(MyType));
+            sut.Map(typeof(MyType));
             sut.MapObsolete(typeof(MyType), "my-old");
 
             Assert.Equal(typeof(MyType), sut.GetType("my"));
@@ -88,24 +88,24 @@ namespace Squidex.Infrastructure
         [Fact]
         public void Should_not_throw_exception_if_type_is_already_registered_with_same_name()
         {
-            sut.MapUnmapped(typeof(long), "long");
-            sut.MapUnmapped(typeof(long), "long");
+            sut.Map(typeof(long), "long");
+            sut.Map(typeof(long), "long");
         }
 
         [Fact]
         public void Should_throw_exception_if_type_is_already_registered()
         {
-            sut.MapUnmapped(typeof(long), "long");
+            sut.Map(typeof(long), "long");
 
-            Assert.Throws<ArgumentException>(() => sut.MapUnmapped(typeof(long), "longer"));
+            Assert.Throws<ArgumentException>(() => sut.Map(typeof(long), "longer"));
         }
 
         [Fact]
         public void Should_throw_exception_if_name_is_already_registered()
         {
-            sut.MapUnmapped(typeof(short), "short");
+            sut.Map(typeof(short), "short");
 
-            Assert.Throws<ArgumentException>(() => sut.MapUnmapped(typeof(byte), "short"));
+            Assert.Throws<ArgumentException>(() => sut.Map(typeof(byte), "short"));
         }
 
         [Fact]
