@@ -43,7 +43,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Triggers
                 (schema.SendCreate && @event is ContentCreated) ||
                 (schema.SendUpdate && @event is ContentUpdated) ||
                 (schema.SendDelete && @event is ContentDeleted) ||
-                (schema.SendChange && @event is ContentStatusChanged statusChanged && statusChanged.Status == Status.Published);
+                (schema.SendPublish && @event is ContentStatusChanged statusChanged && statusChanged.Status == Status.Published);
         }
     }
 }

@@ -58,10 +58,7 @@ export class RuleWizardComponent extends AppComponentBase implements OnInit {
     public created = new EventEmitter<RuleDto>();
 
     @Output()
-    public ruleTriggerSaved = new EventEmitter<any>();
-
-    @Output()
-    public ruleActionSaved = new EventEmitter<any>();
+    public updated = new EventEmitter<RuleDto>();
 
     @Input()
     public schemas: SchemaDto[];
@@ -81,12 +78,18 @@ export class RuleWizardComponent extends AppComponentBase implements OnInit {
     public ngOnInit() {
         if (this.mode === MODE_EDIT_ACTION) {
             this.step = 4;
-            this.action = this.rule.action;
+
+            this.action = Object.assign({}, this.rule.action);
             this.actionType = this.rule.actionType;
+
+            delete this.action.actionType;
         } else if (this.mode === MODE_EDIT_TRIGGER) {
             this.step = 2;
-            this.trigger = this.rule.trigger;
+
+            this.trigger = Object.assign({}, this.rule.trigger);
             this.triggerType = this.rule.triggerType;
+
+            delete this.trigger.triggerType;
         }
     }
 
@@ -106,15 +109,7 @@ export class RuleWizardComponent extends AppComponentBase implements OnInit {
         if (this.mode === MODE_WIZARD) {
             this.step++;
         } else {
-            const requestDto = new UpdateRuleDto(this.trigger, null);
-
-            this.appNameOnce()
-                .switchMap(app => this.rulesService.putRule(app, this.rule.id, requestDto, this.rule.version))
-                .subscribe(dto => {
-                    this.ruleTriggerSaved.emit(this.action);
-                }, error => {
-                    this.notifyError(error);
-                });
+            this.updateTrigger();
         }
     }
 
@@ -122,26 +117,49 @@ export class RuleWizardComponent extends AppComponentBase implements OnInit {
         this.action = Object.assign({}, value, { actionType: this.actionType });
 
         if (this.mode === MODE_WIZARD) {
-            const requestDto = new CreateRuleDto(this.trigger, this.action);
-
-            this.appNameOnce()
-                .switchMap(app => this.rulesService.postRule(app, requestDto, this.authService.user!.id, DateTime.now()))
-                .subscribe(dto => {
-                    this.created.emit(dto);
-                }, error => {
-                    this.notifyError(error);
-                });
+            this.createRule();
         } else {
-            const requestDto = new UpdateRuleDto(null, this.action);
-
-            this.appNameOnce()
-                .switchMap(app => this.rulesService.putRule(app, this.rule.id, requestDto, this.rule.version))
-                .subscribe(dto => {
-                    this.ruleActionSaved.emit(this.action);
-                }, error => {
-                    this.notifyError(error);
-                });
+            this.updateAction();
         }
+    }
+
+    private createRule() {
+        const requestDto = new CreateRuleDto(this.trigger, this.action);
+
+        this.appNameOnce()
+            .switchMap(app => this.rulesService.postRule(app, requestDto, this.authService.user!.id, DateTime.now()))
+            .subscribe(dto => {
+                this.created.emit(dto);
+            }, error => {
+                this.notifyError(error);
+            });
+    }
+
+    private updateTrigger() {
+        const requestDto = new UpdateRuleDto(this.trigger, null);
+
+        this.appNameOnce()
+            .switchMap(app => this.rulesService.putRule(app, this.rule.id, requestDto, this.rule.version))
+            .subscribe(dto => {
+                const rule = this.rule.updateTrigger(this.trigger, this.authService.user.id, dto.version, DateTime.now());
+                this.updated.emit(rule);
+            }, error => {
+                this.notifyError(error);
+            });
+    }
+
+    private updateAction() {
+        const requestDto = new UpdateRuleDto(null, this.action);
+
+        this.appNameOnce()
+            .switchMap(app => this.rulesService.putRule(app, this.rule.id, requestDto, this.rule.version))
+            .subscribe(dto => {
+                const rule = this.rule.updateAction(this.action, this.authService.user.id, dto.version, DateTime.now());
+
+                this.updated.emit(rule);
+            }, error => {
+                this.notifyError(error);
+            });
     }
 
     public cancel() {

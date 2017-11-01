@@ -25,8 +25,8 @@
         <th class="text-center" title="Deleted">
             D
         </th>
-        <th class="text-center" title="Changed">
-            C
+        <th class="text-center" title="Published">
+            P
         </th>
         <th></th>
     </tr>
@@ -48,7 +48,7 @@
             <input type="checkbox" [ngModel]="schema.sendDelete" (ngModelChange)="toggle(schema, 'sendDelete')" />
         </td>
         <td class="text-center" title="Published">
-            <input type="checkbox" [ngModel]="schema.sendChange" (ngModelChange)="toggle(schema, 'sendChange')" />
+            <input type="checkbox" [ngModel]="schema.sendPublish" (ngModelChange)="toggle(schema, 'sendPublish')" />
         </td>
         <td class="text-center">
             <button type="button" class="btn btn-link btn-secondary" (click)="removeSchema(schema)">

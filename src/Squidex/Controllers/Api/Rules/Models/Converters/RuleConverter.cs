@@ -6,6 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using Squidex.Domain.Apps.Read.Rules;
 using Squidex.Domain.Apps.Write.Rules.Commands;
 using Squidex.Infrastructure.Reflection;
@@ -34,22 +35,36 @@ namespace Squidex.Controllers.Api.Rules.Models.Converters
             return dto;
         }
 
-        public static UpdateRule ToCommand(this UpdateRuleDto dto)
+        public static UpdateRule ToCommand(this UpdateRuleDto dto, Guid id)
         {
-            var command = new UpdateRule
+            var command = new UpdateRule { RuleId = id };
+
+            if (dto.Action != null)
             {
-                Trigger = dto.Trigger?.ToTrigger(), Action = dto.Action?.ToAction()
-            };
+                command.Action = dto.Action.ToAction();
+            }
+
+            if (dto.Trigger != null)
+            {
+                command.Trigger = dto.Trigger.ToTrigger();
+            }
 
             return command;
         }
 
         public static CreateRule ToCommand(this CreateRuleDto dto)
         {
-            var command = new CreateRule
+            var command = new CreateRule();
+
+            if (dto.Action != null)
             {
-                Trigger = dto.Trigger.ToTrigger(), Action = dto.Action.ToAction()
-            };
+                command.Action = dto.Action.ToAction();
+            }
+
+            if (dto.Trigger != null)
+            {
+                command.Trigger = dto.Trigger.ToTrigger();
+            }
 
             return command;
         }

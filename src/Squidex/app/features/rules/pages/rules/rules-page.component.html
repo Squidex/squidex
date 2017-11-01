@@ -99,6 +99,7 @@
     <div class="modal-backdrop"></div>
     
     <sqx-rule-wizard [schemas]="schemas" [rule]="wizardRule" [mode]="wizardMode"
+        (updated)="onRuleUpdated($event)"
         (cancelled)="addRuleDialog.hide()"
         (created)="onRuleCreated($event)">
     </sqx-rule-wizard>

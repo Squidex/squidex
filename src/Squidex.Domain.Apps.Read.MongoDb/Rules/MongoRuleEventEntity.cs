@@ -24,10 +24,6 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Rules
 
         [BsonRequired]
         [BsonElement]
-        public string EventName { get; set; }
-
-        [BsonRequired]
-        [BsonElement]
         public string LastDump { get; set; }
 
         [BsonRequired]

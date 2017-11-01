@@ -18,7 +18,7 @@ export interface TriggerSchemaForm {
     sendCreate: boolean;
     sendUpdate: boolean;
     sendDelete: boolean;
-    sendChange: boolean;
+    sendPublish: boolean;
 }
 
 @Component({
@@ -60,7 +60,7 @@ export class ContentChangedTriggerComponent implements OnInit {
                             sendCreate: triggerSchema.sendCreate,
                             sendUpdate: triggerSchema.sendUpdate,
                             sendDelete: triggerSchema.sendDelete,
-                            sendChange: triggerSchema.sendChange
+                            sendPublish: triggerSchema.sendPublish
                         });
                     } else {
                         return null;
@@ -84,7 +84,7 @@ export class ContentChangedTriggerComponent implements OnInit {
                     sendCreate: s.sendCreate,
                     sendUpdate: s.sendUpdate,
                     sendDelete: s.sendDelete,
-                    sendChange: s.sendChange
+                    sendPublish: s.sendPublish
                 };
             });
 
@@ -107,7 +107,7 @@ export class ContentChangedTriggerComponent implements OnInit {
                     sendCreate: false,
                     sendUpdate: false,
                     sendDelete: false,
-                    sendChange: false
+                    sendPublish: false
                 })).sortByStringAsc(x => x.schema.name);
 
         this.schemasToAdd = this.schemasToAdd.remove(this.schemaToAdd).sortByStringAsc(x => x.name);
@@ -131,7 +131,7 @@ export class ContentChangedTriggerComponent implements OnInit {
         schemaForm.sendCreate = value;
         schemaForm.sendUpdate = value;
         schemaForm.sendDelete = value;
-        schemaForm.sendChange = value;
+        schemaForm.sendPublish = value;
         return schemaForm;
     }
 
@@ -140,7 +140,7 @@ export class ContentChangedTriggerComponent implements OnInit {
             schemaForm.sendCreate &&
             schemaForm.sendUpdate &&
             schemaForm.sendDelete &&
-            schemaForm.sendChange;
+            schemaForm.sendPublish;
 
         return schemaForm;
     }

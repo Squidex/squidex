@@ -94,6 +94,12 @@ export class RulesPageComponent extends AppComponentBase implements OnInit {
         this.addRuleDialog.show();
     }
 
+    public onRuleUpdated(rule: RuleDto) {
+        this.rules = this.rules.replaceBy('id', rule);
+
+        this.addRuleDialog.hide();
+    }
+
     public onRuleCreated(rule: RuleDto) {
         this.rules = this.rules.push(rule);
 

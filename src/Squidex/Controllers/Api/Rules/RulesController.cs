@@ -112,7 +112,7 @@ namespace Squidex.Controllers.Api.Rules
         [ApiCosts(1)]
         public async Task<IActionResult> PutRule(string app, Guid id, [FromBody] UpdateRuleDto request)
         {
-            var command = request.ToCommand();
+            var command = request.ToCommand(id);
 
             await CommandBus.PublishAsync(command);
 
@@ -239,7 +239,7 @@ namespace Squidex.Controllers.Api.Rules
 
             await ruleEventsRepository.EnqueueAsync(id, SystemClock.Instance.GetCurrentInstant());
 
-            return Ok();
+            return NoContent();
         }
     }
 }
