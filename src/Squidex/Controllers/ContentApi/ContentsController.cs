@@ -16,7 +16,9 @@ using NSwag.Annotations;
 using Squidex.Controllers.ContentApi.Models;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.ConvertContent;
+using Squidex.Domain.Apps.Read.Assets.Repositories;
 using Squidex.Domain.Apps.Read.Contents;
+using Squidex.Domain.Apps.Read.Contents.CustomQueries;
 using Squidex.Domain.Apps.Read.Contents.GraphQL;
 using Squidex.Domain.Apps.Write.Contents;
 using Squidex.Domain.Apps.Write.Contents.Commands;
@@ -34,16 +36,22 @@ namespace Squidex.Controllers.ContentApi
     {
         private readonly IContentQueryService contentQuery;
         private readonly IContentVersionLoader contentVersionLoader;
+        private readonly ICustomQueryProvider customQueryProvider;
+        private readonly IAssetRepository assetRepository;
         private readonly IGraphQLService graphQl;
 
         public ContentsController(ICommandBus commandBus,
+            IAssetRepository assetRepository,
             IContentQueryService contentQuery,
             IContentVersionLoader contentVersionLoader,
+            ICustomQueryProvider customQueryProvider,
             IGraphQLService graphQl)
             : base(commandBus)
         {
+            this.assetRepository = assetRepository;
             this.contentQuery = contentQuery;
             this.contentVersionLoader = contentVersionLoader;
+            this.customQueryProvider = customQueryProvider;
 
             this.graphQl = graphQl;
         }
@@ -110,6 +118,47 @@ namespace Squidex.Controllers.ContentApi
                     return itemModel;
                 }).ToArray()
             };
+
+            return Ok(response);
+        }
+
+        [MustBeAppReader]
+        [HttpGet]
+        [Route("content/{app}/{name}/queries/{queryName}")]
+        [ApiCosts(2)]
+        public async Task<IActionResult> GetCustomQueryContent(string name, string queryName)
+        {
+            var schema = await contentQuery.FindSchemaAsync(App, name);
+
+            if (schema == null)
+            {
+                return NotFound();
+            }
+
+            var customQueries = await customQueryProvider.GetQueriesAsync(App, schema);
+            var customQuery = customQueries.FirstOrDefault(x => string.Equals(x.Name, queryName, StringComparison.OrdinalIgnoreCase));
+
+            if (customQuery == null)
+            {
+                return NotFound();
+            }
+
+            var arguments = HttpContext.Request.Query.ToDictionary(x => x.Key, x => x.Value.ToString());
+
+            var context = new QueryContext(App, assetRepository, contentQuery, User);
+            var contents = await customQuery.ExecuteAsync(schema, context, arguments);
+
+            var response = contents.Take(200).Select(item =>
+            {
+                var itemModel = SimpleMapper.Map(item, new ContentDto());
+
+                if (item.Data != null)
+                {
+                    itemModel.Data = item.Data.ToApiModel(schema.SchemaDef, App.LanguagesConfig, !User.IsFrontendClient());
+                }
+
+                return itemModel;
+            }).ToList();
 
             return Ok(response);
         }

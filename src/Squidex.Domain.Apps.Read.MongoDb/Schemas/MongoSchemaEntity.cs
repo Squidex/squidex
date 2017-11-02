@@ -16,6 +16,7 @@ using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Domain.Apps.Read.MongoDb.Schemas
 {
+    [BsonIgnoreExtraElements]
     public sealed class MongoSchemaEntity : MongoEntity, ISchemaEntity
     {
         [BsonRequired]

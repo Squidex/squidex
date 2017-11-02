@@ -17,6 +17,7 @@ using NSwag.AspNetCore;
 using NSwag.SwaggerGeneration;
 using Squidex.Config;
 using Squidex.Domain.Apps.Read.Apps;
+using Squidex.Domain.Apps.Read.Contents.CustomQueries;
 using Squidex.Domain.Apps.Read.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Pipeline.Swagger;
@@ -28,16 +29,19 @@ namespace Squidex.Controllers.ContentApi.Generator
         private readonly HttpContext context;
         private readonly SwaggerSettings settings;
         private readonly MyUrlsOptions urlOptions;
+        private readonly ICustomQueryProvider customQueryProvider;
+        private SwaggerDocument document;
+        private SwaggerGenerator swaggerGenerator;
         private SwaggerJsonSchemaGenerator schemaGenerator;
         private JsonSchemaResolver schemaResolver;
-        private SwaggerGenerator swaggerGenerator;
-        private SwaggerDocument document;
 
-        public SchemasSwaggerGenerator(IHttpContextAccessor context, SwaggerSettings settings, IOptions<MyUrlsOptions> urlOptions)
+        public SchemasSwaggerGenerator(IHttpContextAccessor context, SwaggerSettings settings,
+            IOptions<MyUrlsOptions> urlOptions, ICustomQueryProvider customQueryProvider)
         {
             this.context = context.HttpContext;
             this.settings = settings;
             this.urlOptions = urlOptions.Value;
+            this.customQueryProvider = customQueryProvider;
         }
 
         public async Task<SwaggerDocument> Generate(IAppEntity app, IEnumerable<ISchemaEntity> schemas)
@@ -49,21 +53,33 @@ namespace Squidex.Controllers.ContentApi.Generator
 
             swaggerGenerator = new SwaggerGenerator(schemaGenerator, settings, schemaResolver);
 
-            GenerateSchemasOperations(schemas, app);
-
+            await GenerateSchemasOperationsAsync(schemas, app);
             await GenerateDefaultErrorsAsync();
 
             return document;
         }
 
-        private void GenerateSchemasOperations(IEnumerable<ISchemaEntity> schemas, IAppEntity app)
+        private Task GenerateSchemasOperationsAsync(IEnumerable<ISchemaEntity> schemas, IAppEntity app)
         {
-            var appBasePath = $"/content/{app.Name}";
+            var path = $"/content/{app.Name}";
 
-            foreach (var schema in schemas.Where(x => x.IsPublished).Select(x => x.SchemaDef))
+            var tasks = new List<Task>();
+
+            foreach (var schema in schemas.Where(x => x.IsPublished))
             {
-                new SchemaSwaggerGenerator(document, appBasePath, schema, AppendSchema, app.PartitionResolver).GenerateSchemaOperations();
+                tasks.Add(GenerateSchemaOperationsAsync(app, schema, path));
             }
+
+            return Task.WhenAll(tasks);
+        }
+
+        private async Task GenerateSchemaOperationsAsync(IAppEntity app, ISchemaEntity schema, string path)
+        {
+            var customQueries = await customQueryProvider.GetQueriesAsync(app, schema);
+
+            var generator = new SchemaSwaggerGenerator(document, path, schema.SchemaDef, AppendSchema, app.PartitionResolver);
+
+            generator.GenerateSchemaOperations(customQueries);
         }
 
         private async Task GenerateDefaultErrorsAsync()
