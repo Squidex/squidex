@@ -1,0 +1,40 @@
+<div class="editor" #editor></div>
+
+<div class="modal asset-selector" *sqxModalView="assetsDialog;onRoot:true">
+    <div class="modal-backdrop"></div>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title mce-title">Select an asset</h4>
+
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="closeAssetDialog()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <form [formGroup]="assetsForm" (ngSubmit)="closeAssetDialog()">
+                    <div class="row">
+                        <sqx-asset class="col-3" *ngFor="let asset of assetsItems" [asset]="asset" (clicked)="onAssetClicked($event)" ></sqx-asset>
+                    </div>
+                    <div class="clearfix" *ngIf="assetsPager.numberOfItems > 0">
+                        <div class="float-right pagination">
+                            <span class="pagination-text">{{assetsPager.itemFirst}}-{{assetsPager.itemLast}} of {{assetsPager.numberOfItems}}</span>
+
+                            <button class="btn btn-link btn-decent pagination-button" [disabled]="!assetsPager.canGoPrev" (click)="goPrev()">
+                                <i class="icon-angle-left"></i>
+                            </button>
+                            <button class="btn btn-link btn-decent pagination-button" [disabled]="!assetsPager.canGoNext" (click)="goNext()">
+                                <i class="icon-angle-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-group clearfix text-right">
+                        <button type="submit" class="btn btn-sm btn-secondary" (click)="closeAssetDialog()">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
