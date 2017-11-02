@@ -18,6 +18,8 @@ namespace Squidex.Domain.Apps.Write.Schemas
     public class GuardSchemaFieldTests
     {
         private readonly Schema schema = new Schema("my-schema");
+        private readonly StringFieldProperties validProperties = new StringFieldProperties();
+        private readonly StringFieldProperties invalidProperties = new StringFieldProperties { MinLength = 10, MaxLength = 5 };
 
         public GuardSchemaFieldTests()
         {
@@ -210,7 +212,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
         [Fact]
         public void CanAdd_should_throw_exception_if_name_not_valid()
         {
-            var command = new AddField { Name = "INVALID_NAME", Properties = new StringFieldProperties() };
+            var command = new AddField { Name = "INVALID_NAME", Properties = validProperties };
 
             Assert.Throws<ValidationException>(() => GuardSchemaField.CanAdd(schema, command));
         }
@@ -218,7 +220,15 @@ namespace Squidex.Domain.Apps.Write.Schemas
         [Fact]
         public void CanAdd_should_throw_exception_if_properties_not_valid()
         {
-            var command = new AddField { Name = "field3", Properties = new StringFieldProperties { MinLength = 10, MaxLength = 5 } };
+            var command = new AddField { Name = "field3", Properties = invalidProperties };
+
+            Assert.Throws<ValidationException>(() => GuardSchemaField.CanAdd(schema, command));
+        }
+
+        [Fact]
+        public void CanAdd_should_throw_exception_if_partitioning_not_valid()
+        {
+            var command = new AddField { Name = "field3", Partitioning = "INVALID_PARTITIONING", Properties = validProperties };
 
             Assert.Throws<ValidationException>(() => GuardSchemaField.CanAdd(schema, command));
         }
