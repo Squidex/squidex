@@ -8,9 +8,9 @@
 import { AfterViewInit, Component, forwardRef, ElementRef, OnDestroy, ViewChild } from '@angular/core';
 import { ControlValueAccessor,  NG_VALUE_ACCESSOR, FormBuilder } from '@angular/forms';
 
-import { Types, ResourceLoaderService } from 'framework';
 import { AppComponentBase } from './app.component-base';
-import { ModalView, AppsStoreService, AssetDto, AssetsService, ImmutableArray, DialogService, AuthService, Pager } from './../declarations-base';
+import { AssetUrlPipe } from './pipes';
+import { ApiUrlConfig, ModalView, AppsStoreService, AssetDto, AssetsService, ImmutableArray, DialogService, AuthService, Pager, Types, ResourceLoaderService } from './../declarations-base';
 
 declare var tinymce: any;
 
@@ -31,8 +31,10 @@ export class RichEditorComponent extends AppComponentBase implements ControlValu
     private tinyInitTimer: any;
     private value: string;
     private isDisabled = false;
+    private assetSelectorClickHandler: any = null;
     public assetsItems: ImmutableArray<AssetDto>;
     public assetsPager = new Pager(0, 0, 12);
+    private assetUrlGenerator: AssetUrlPipe;
 
     @ViewChild('editor')
     public editor: ElementRef;
@@ -45,9 +47,11 @@ export class RichEditorComponent extends AppComponentBase implements ControlValu
     constructor(dialogs: DialogService, apps: AppsStoreService, authService: AuthService,
         private readonly resourceLoader: ResourceLoaderService,
         private readonly formBuilder: FormBuilder,
-        private readonly assetsService: AssetsService
+        private readonly assetsService: AssetsService,
+        private readonly apiUrlConfig: ApiUrlConfig
     ) {
         super(dialogs, apps, authService);
+        this.assetUrlGenerator = new AssetUrlPipe(this.apiUrlConfig);
     }
 
     private load() {
@@ -59,6 +63,18 @@ export class RichEditorComponent extends AppComponentBase implements ControlValu
             }, error => {
                 this.notifyError(error);
             });
+    }
+
+    public goNext() {
+        this.assetsPager = this.assetsPager.goNext();
+
+        this.load();
+    }
+
+    public goPrev() {
+        this.assetsPager = this.assetsPager.goPrev();
+
+        this.load();
     }
 
     public ngOnDestroy() {
@@ -98,6 +114,10 @@ export class RichEditorComponent extends AppComponentBase implements ControlValu
                 removed_menuitems: 'newdocument', plugins: 'code,image', target: this.editor.nativeElement, file_picker_types: 'image', file_picker_callback: (cb: any, value: any, meta: any) => {
                     self.load();
                     self.assetsDialog.show();
+                    self.assetSelectorClickHandler = {
+                        cb: cb,
+                        meta: meta
+                    };
                 }
             });
         });
@@ -127,17 +147,19 @@ export class RichEditorComponent extends AppComponentBase implements ControlValu
         this.callTouched = fn;
     }
 
-    public selecteAsset() {
-        console.log('Selecting asset ' + this.assetsForm.controls['name'].value);
-    }
-
-    public cancelSelectAsset() {
-        console.log('asset selection canceled');
+    public closeAssetDialog() {
         this.assetsDialog.hide();
+        this.assetSelectorClickHandler = null;
     }
 
     public onAssetClicked(asset: AssetDto) {
-        console.log('Asset clicked on');
-        console.log(asset);
+        if (this.assetSelectorClickHandler != null) {
+            this.assetSelectorClickHandler.cb(this.assetUrlGenerator.transform(asset), {
+                description: asset.fileName,
+                width: asset.pixelWidth,
+                height: asset.pixelHeight
+            });
+            this.closeAssetDialog();
+        }
     }
 }

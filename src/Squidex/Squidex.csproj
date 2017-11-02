@@ -23,10 +23,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="app\shell\pages\media\media-page.ts" />
-  </ItemGroup>
-
-  <ItemGroup>
 	  <None Update="dockerfile">
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </None>
@@ -83,10 +79,6 @@
     <PackageReference Include="StyleCop.Analyzers" Version="1.0.2" />
     <PackageReference Include="System.Linq" Version="4.3.0" />
     <PackageReference Include="System.ValueTuple" Version="4.4.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <TypeScriptCompile Include="app\shell\pages\media\media-page.ts" />
   </ItemGroup>
 
   <Target Name="IncludeDocFile" BeforeTargets="PrepareForPublish">
