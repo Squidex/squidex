@@ -11,6 +11,9 @@ using System.Linq;
 using Autofac;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
+using Squidex.Domain.Apps.Core.HandleRules;
+using Squidex.Domain.Apps.Core.HandleRules.ActionHandlers;
+using Squidex.Domain.Apps.Core.HandleRules.Triggers;
 using Squidex.Domain.Apps.Read.Apps;
 using Squidex.Domain.Apps.Read.Apps.Services;
 using Squidex.Domain.Apps.Read.Apps.Services.Implementations;
@@ -18,10 +21,10 @@ using Squidex.Domain.Apps.Read.Contents;
 using Squidex.Domain.Apps.Read.Contents.Edm;
 using Squidex.Domain.Apps.Read.Contents.GraphQL;
 using Squidex.Domain.Apps.Read.History;
+using Squidex.Domain.Apps.Read.Rules;
 using Squidex.Domain.Apps.Read.Schemas;
 using Squidex.Domain.Apps.Read.Schemas.Services;
 using Squidex.Domain.Apps.Read.Schemas.Services.Implementations;
-using Squidex.Domain.Apps.Read.Webhooks;
 using Squidex.Domain.Users;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
@@ -104,17 +107,27 @@ namespace Squidex.Config.Domain
                 .AsSelf()
                 .InstancePerDependency();
 
-            builder.RegisterType<WebhookDequeuer>()
+            builder.RegisterType<RuleDequeuer>()
                 .As<IExternalSystem>()
                 .AsSelf()
                 .InstancePerDependency();
 
-            builder.RegisterType<WebhookEnqueuer>()
+            builder.RegisterType<RuleEnqueuer>()
                 .As<IEventConsumer>()
                 .AsSelf()
                 .InstancePerDependency();
 
-            builder.RegisterType<WebhookSender>()
+            builder.RegisterType<ContentChangedTriggerHandler>()
+                .As<IRuleTriggerHandler>()
+                .AsSelf()
+                .SingleInstance();
+
+            builder.RegisterType<WebhookActionHandler>()
+                .As<IRuleActionHandler>()
+                .AsSelf()
+                .SingleInstance();
+
+            builder.RegisterType<RuleService>()
                 .AsSelf()
                 .SingleInstance();
 

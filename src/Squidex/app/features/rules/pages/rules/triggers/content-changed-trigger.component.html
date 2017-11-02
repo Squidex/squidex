@@ -1,0 +1,71 @@
+<table class="table table-middle table-sm table-fixed table-borderless">
+    <colgroup>
+        <col style="width: 100%" />
+        <col style="width: 40px" />
+        <col style="width: 40px" />
+        <col style="width: 40px" />
+        <col style="width: 40px" />
+        <col style="width: 40px" />
+        <col style="width: 40px" />
+    </colgroup>
+
+    <tr>
+        <th>
+            Schema
+        </th>
+        <th class="text-center" title="All">
+            All
+        </th>
+        <th class="text-center" title="Created">
+            C
+        </th>
+        <th class="text-center" title="Updated">
+            U
+        </th>
+        <th class="text-center" title="Deleted">
+            D
+        </th>
+        <th class="text-center" title="Published">
+            P
+        </th>
+        <th></th>
+    </tr>
+
+    <tr *ngFor="let schema of triggerSchemas">
+        <td>
+            <span class="truncate">{{schema.schema.name}}</span>
+        </td>
+        <td class="text-center" title="Created">
+            <input type="checkbox" [ngModel]="schema.sendAll" (ngModelChange)="toggleAll(schema)" />
+        </td>
+        <td class="text-center" title="Created">
+            <input type="checkbox" [ngModel]="schema.sendCreate" (ngModelChange)="toggle(schema, 'sendCreate')" />
+        </td>
+        <td class="text-center" title="Updated">
+            <input type="checkbox" [ngModel]="schema.sendUpdate" (ngModelChange)="toggle(schema, 'sendUpdate')" />
+        </td>
+        <td class="text-center" title="Deleted">
+            <input type="checkbox" [ngModel]="schema.sendDelete" (ngModelChange)="toggle(schema, 'sendDelete')" />
+        </td>
+        <td class="text-center" title="Published">
+            <input type="checkbox" [ngModel]="schema.sendPublish" (ngModelChange)="toggle(schema, 'sendPublish')" />
+        </td>
+        <td class="text-center">
+            <button type="button" class="btn btn-link btn-secondary" (click)="removeSchema(schema)">
+                <i class="icon-close"></i>
+            </button>
+        </td>
+    </tr>
+</table>
+
+<div class="section" *ngIf="schemasToAdd.length > 0">
+    <form class="form-inline" (ngSubmit)="addSchema()">
+        <div class="form-group mr-1">
+            <select class="form-control schemas-control" [(ngModel)]="schemaToAdd" name="schema">
+                <option *ngFor="let schema of schemasToAdd" [ngValue]="schema">{{schema.name}}</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-success" [disabled]="!hasSchema">Add Schema</button>
+    </form>
+</div>

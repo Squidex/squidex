@@ -17,20 +17,6 @@ namespace Squidex.Infrastructure
         private readonly Dictionary<Type, string> namesByType = new Dictionary<Type, string>();
         private readonly Dictionary<string, Type> typesByName = new Dictionary<string, Type>(StringComparer.OrdinalIgnoreCase);
 
-        public TypeNameRegistry Map(Type type)
-        {
-            Guard.NotNull(type, nameof(type));
-
-            var typeNameAttribute = type.GetTypeInfo().GetCustomAttribute<TypeNameAttribute>();
-
-            if (typeNameAttribute != null)
-            {
-                Map(type, typeNameAttribute.TypeName);
-            }
-
-            return this;
-        }
-
         public TypeNameRegistry MapObsolete(Type type, string name)
         {
             Guard.NotNull(type, nameof(type));
@@ -51,6 +37,20 @@ namespace Squidex.Infrastructure
                         throw new ArgumentException(message, nameof(type));
                     }
                 }
+            }
+
+            return this;
+        }
+
+        public TypeNameRegistry Map(Type type)
+        {
+            Guard.NotNull(type, nameof(type));
+
+            var typeNameAttribute = type.GetTypeInfo().GetCustomAttribute<TypeNameAttribute>();
+
+            if (!string.IsNullOrWhiteSpace(typeNameAttribute?.TypeName))
+            {
+                Map(type, typeNameAttribute.TypeName);
             }
 
             return this;
@@ -95,15 +95,13 @@ namespace Squidex.Infrastructure
             return this;
         }
 
-        public TypeNameRegistry Map(Assembly assembly)
+        public TypeNameRegistry MapUnmapped(Assembly assembly)
         {
             foreach (var type in assembly.GetTypes())
             {
-                var typeNameAttribute = type.GetTypeInfo().GetCustomAttribute<TypeNameAttribute>();
-
-                if (!string.IsNullOrWhiteSpace(typeNameAttribute?.TypeName))
+                if (!namesByType.ContainsKey(type))
                 {
-                    Map(type, typeNameAttribute.TypeName);
+                    Map(type);
                 }
             }
 

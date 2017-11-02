@@ -1,0 +1,26 @@
+@import '_vars';
+@import '_mixins';
+
+sqx-toggle {
+    display: inline-block;
+}
+
+.table-items {
+    tbody {
+        td {
+            padding-bottom: .5rem;
+        }
+    }
+}
+
+.step-if {
+    padding-left: 1.25rem;
+    padding-right: 0;
+    text-align: left;
+}
+
+.step-then {
+    padding-left: 0;
+    padding-right: 0;
+    text-align: center;
+}

@@ -15,7 +15,6 @@ using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Read.Apps;
 using Squidex.Domain.Apps.Read.Assets.Repositories;
 using Squidex.Domain.Apps.Read.Schemas.Repositories;
-using Squidex.Domain.Apps.Read.Utils;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Tasks;

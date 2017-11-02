@@ -13,8 +13,8 @@ using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Write.Apps;
 using Squidex.Domain.Apps.Write.Assets;
 using Squidex.Domain.Apps.Write.Contents;
+using Squidex.Domain.Apps.Write.Rules;
 using Squidex.Domain.Apps.Write.Schemas;
-using Squidex.Domain.Apps.Write.Webhooks;
 using Squidex.Domain.Users;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Pipeline.CommandMiddlewares;
@@ -80,7 +80,7 @@ namespace Squidex.Config.Domain
                 .As<ICommandMiddleware>()
                 .SingleInstance();
 
-            builder.RegisterType<WebhookCommandMiddleware>()
+            builder.RegisterType<RuleCommandMiddleware>()
                 .As<ICommandMiddleware>()
                 .SingleInstance();
 
@@ -96,7 +96,7 @@ namespace Squidex.Config.Domain
                 .AsSelf()
                 .SingleInstance();
 
-            builder.Register<DomainObjectFactoryFunction<WebhookDomainObject>>(c => (id => new WebhookDomainObject(id, -1)))
+            builder.Register<DomainObjectFactoryFunction<RuleDomainObject>>(c => (id => new RuleDomainObject(id, -1)))
                 .AsSelf()
                 .SingleInstance();
 

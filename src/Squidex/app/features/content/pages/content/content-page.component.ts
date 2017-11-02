@@ -208,8 +208,12 @@ export class ContentPageComponent extends AppComponentBase implements CanCompone
     private enableContentForm() {
         this.contentForm.markAsPristine();
 
-        for (const field of this.schema.fields.filter(f => !f.isDisabled)) {
-            this.contentForm.controls[field.name].enable();
+        if (this.schema.fields.length === 0) {
+            this.contentForm.enable();
+        } else {
+            for (const field of this.schema.fields.filter(f => !f.isDisabled)) {
+                this.contentForm.controls[field.name].enable();
+            }
         }
     }
 
