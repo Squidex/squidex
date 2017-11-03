@@ -352,7 +352,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
             var fallbackConfig =
                 LanguagesConfig.Build(
                     new LanguageConfig(Language.EN),
-                    new LanguageConfig(Language.DE, false, new[] { Language.EN }));
+                    new LanguageConfig(Language.DE, false, Language.EN));
 
             var output = (Dictionary<string, JToken>)data.ToLanguageModel(fallbackConfig, new List<Language> { Language.DE });
 

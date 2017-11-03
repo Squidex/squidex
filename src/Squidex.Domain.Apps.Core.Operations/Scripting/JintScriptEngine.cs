@@ -116,11 +116,11 @@ namespace Squidex.Domain.Apps.Core.Scripting
             }
             catch (ParserException ex)
             {
-                throw new ValidationException($"Failed to execute script with javascript syntaxs error.", new ValidationError(ex.Message));
+                throw new ValidationException("Failed to execute script with javascript syntaxs error.", new ValidationError(ex.Message));
             }
             catch (JavaScriptException ex)
             {
-                throw new ValidationException($"Failed to execute script with javascript error.", new ValidationError(ex.Message));
+                throw new ValidationException("Failed to execute script with javascript error.", new ValidationError(ex.Message));
             }
         }
 
@@ -171,7 +171,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
             {
                 var errors = !string.IsNullOrWhiteSpace(message) ? new[] { new ValidationError(message) } : null;
 
-                throw new ValidationException($"Script rejected the operation.", errors);
+                throw new ValidationException("Script rejected the operation.", errors);
             }));
         }
     }

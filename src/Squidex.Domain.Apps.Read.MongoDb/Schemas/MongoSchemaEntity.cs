@@ -7,7 +7,6 @@
 // ==========================================================================
 
 using System;
-using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Read.Schemas;

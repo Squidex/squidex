@@ -64,7 +64,7 @@ namespace Squidex.Domain.Apps.Core.Apps
         {
             Guard.NotNull(languages, nameof(languages));
 
-            return new LanguagesConfig(languages.Select(x => new LanguageConfig(x, false)).ToList());
+            return new LanguagesConfig(languages.Select(x => new LanguageConfig(x)).ToList());
         }
 
         public void MakeMaster(Language language)

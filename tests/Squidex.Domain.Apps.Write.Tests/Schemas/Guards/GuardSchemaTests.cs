@@ -66,13 +66,13 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards
                     {
                         Name = null,
                         Properties = null,
-                        Partitioning = "invalid",
+                        Partitioning = "invalid"
                     },
                     new CreateSchemaField
                     {
                         Name = null,
                         Properties = InvalidProperties(),
-                        Partitioning = "invalid",
+                        Partitioning = "invalid"
                     }
                 },
                 Name = "new-schema"

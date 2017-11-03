@@ -25,14 +25,14 @@ namespace Squidex.Infrastructure.Json
                         new[]
                         {
                             new Claim("email", "me@email.de"),
-                            new Claim("username", "me@email.de"),
+                            new Claim("username", "me@email.de")
                         },
                         "Cookie"),
                     new ClaimsIdentity(
                         new[]
                         {
                             new Claim("user_id", "12345"),
-                            new Claim("login", "me"),
+                            new Claim("login", "me")
                         },
                         "Google")
                 });

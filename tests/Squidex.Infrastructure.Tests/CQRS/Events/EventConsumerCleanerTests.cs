@@ -30,7 +30,7 @@ namespace Squidex.Infrastructure.CQRS.Events
 
             await sut.CleanAsync();
 
-            A.CallTo(() => repository.ClearAsync(A<IEnumerable<string>>.That.IsSameSequenceAs(new string[] { "consumer1", "consumer2" }))).MustHaveHappened();
+            A.CallTo(() => repository.ClearAsync(A<IEnumerable<string>>.That.IsSameSequenceAs("consumer1", "consumer2"))).MustHaveHappened();
         }
     }
 }

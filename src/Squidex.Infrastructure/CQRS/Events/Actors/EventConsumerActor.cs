@@ -184,16 +184,16 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
         {
             switch (message)
             {
-                case StopConsumerMessage stop:
-                    dispatcher.DispatchAsync(() => HandleStopAsync()).Forget();
+                case StopConsumerMessage _:
+                    dispatcher.DispatchAsync(HandleStopAsync).Forget();
                     break;
 
-                case StartConsumerMessage stop:
-                    dispatcher.DispatchAsync(() => HandleStartAsync()).Forget();
+                case StartConsumerMessage _:
+                    dispatcher.DispatchAsync(HandleStartAsync).Forget();
                     break;
 
-                case ResetConsumerMessage stop:
-                    dispatcher.DispatchAsync(() => HandleResetInternalAsync()).Forget();
+                case ResetConsumerMessage _:
+                    dispatcher.DispatchAsync(HandleResetInternalAsync).Forget();
                     break;
             }
         }

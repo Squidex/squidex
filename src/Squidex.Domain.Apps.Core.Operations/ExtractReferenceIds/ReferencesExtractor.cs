@@ -30,9 +30,9 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
             return Enumerable.Empty<Guid>();
         }
 
-        public static IEnumerable<Guid> Visit(AssetsField field, JToken value)
+        private static IEnumerable<Guid> Visit(AssetsField field, JToken value)
         {
-            IEnumerable<Guid> result = null;
+            IEnumerable<Guid> result;
             try
             {
                 result = value?.ToObject<List<Guid>>();
@@ -47,7 +47,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 
         private static IEnumerable<Guid> Visit(ReferencesField field, JToken value)
         {
-            IEnumerable<Guid> result = null;
+            IEnumerable<Guid> result;
             try
             {
                 result = value?.ToObject<List<Guid>>() ?? Enumerable.Empty<Guid>();

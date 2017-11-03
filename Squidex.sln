@@ -58,14 +58,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex.Infrastructure.GetE
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex.Infrastructure.Azure", "src\Squidex.Infrastructure.Azure\Squidex.Infrastructure.Azure.csproj", "{7931187E-A1E6-4F89-8BC8-20A1E445579F}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex.Domain.Apps.Core.Model", "src\Squidex.Domain.Apps.Core.Model\Squidex.Domain.Apps.Core.Model.csproj", "{F0A83301-50A5-40EA-A1A2-07C7858F5A3F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex.Domain.Apps.Core.Operations", "src\Squidex.Domain.Apps.Core.Operations\Squidex.Domain.Apps.Core.Operations.csproj", "{6B3F75B6-5888-468E-BA4F-4FC725DAEF31}"
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{360C300D-0F7E-439D-A437-714C959E3CAD}"
 	ProjectSection(SolutionItems) = preProject
 		stylecop.json = stylecop.json
 	EndProjectSection
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex.Domain.Apps.Core.Model", "src\Squidex.Domain.Apps.Core.Model\Squidex.Domain.Apps.Core.Model.csproj", "{F0A83301-50A5-40EA-A1A2-07C7858F5A3F}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex.Domain.Apps.Core.Operations", "src\Squidex.Domain.Apps.Core.Operations\Squidex.Domain.Apps.Core.Operations.csproj", "{6B3F75B6-5888-468E-BA4F-4FC725DAEF31}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -345,12 +345,8 @@ Global
 		{42184546-E3CB-4D4F-9495-43979B9C63B9} = {C0D540F0-9158-4528-BFD8-BEAE6EAE45EA}
 		{EF75E488-1324-4E18-A1BD-D3A05AE67B1F} = {8CF53B92-5EB1-461D-98F8-70DA9B603FBF}
 		{7931187E-A1E6-4F89-8BC8-20A1E445579F} = {8CF53B92-5EB1-461D-98F8-70DA9B603FBF}
-<<<<<<< HEAD
 		{F0A83301-50A5-40EA-A1A2-07C7858F5A3F} = {C9809D59-6665-471E-AD87-5AC624C65892}
 		{6B3F75B6-5888-468E-BA4F-4FC725DAEF31} = {C9809D59-6665-471E-AD87-5AC624C65892}
-=======
-		{DCA29FF5-1304-4C7C-8F0F-24D6CD25E1D1} = {761C1116-5E20-4B1A-8287-1CE3AD2C1820}
->>>>>>> 92263b6a0b9ecf8ac04cc5452b2ead5d5eefb22f
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {02F2E872-3141-44F5-BD6A-33CD84E9FE08}
