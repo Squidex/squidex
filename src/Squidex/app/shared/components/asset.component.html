@@ -15,17 +15,17 @@
             <div class="file-overlay">
                 <div class="file-overlay-background"></div>
                 
-                <a class="file-edit" (click)="renameDialog.show()">
+                <a class="file-edit" (click)="renameDialog.show()" *ngIf="!hideIcons">
                     <i class="icon-pencil"></i>
                 </a>
-                <a class="file-download" [attr.href]="asset | sqxAssetUrl" target="_blank">
+                <a class="file-download" [attr.href]="asset | sqxAssetUrl" target="_blank" *ngIf="!hideIcons">
                     <i class="icon-download"></i>
                 </a>
 
-                <a class="file-delete" (click)="deleting.emit(asset)" *ngIf="!closeMode">
+                <a class="file-delete" (click)="deleting.emit(asset)" *ngIf="!closeMode && !hideIcons">
                     <i class="icon-delete"></i>
                 </a>
-                <a class="file-delete" (click)="closing.emit(asset)" *ngIf="closeMode">
+                <a class="file-delete" (click)="closing.emit(asset)" *ngIf="closeMode && !hideIcons">
                     <i class="icon-close"></i>
                 </a>
 

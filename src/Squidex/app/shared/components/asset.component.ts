@@ -44,6 +44,9 @@ export class AssetComponent extends AppComponentBase implements OnInit {
     @Input()
     public closeMode = false;
 
+    @Input()
+    public hideIcons = false;
+
     @Output()
     public loaded = new EventEmitter<AssetDto>();
 

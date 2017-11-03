@@ -15,7 +15,7 @@
             <div class="modal-body">
                 <form [formGroup]="assetsForm" (ngSubmit)="closeAssetDialog()">
                     <div class="row">
-                        <sqx-asset class="col-3" *ngFor="let asset of assetsItems" [asset]="asset" (clicked)="onAssetClicked($event)" ></sqx-asset>
+                        <sqx-asset class="col-3" *ngFor="let asset of assetsItems" [asset]="asset" [hideIcons]="true"  (clicked)="onAssetClicked($event)" ></sqx-asset>
                     </div>
                     <div class="clearfix" *ngIf="assetsPager.numberOfItems > 0">
                         <div class="float-right pagination">
