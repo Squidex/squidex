@@ -35,6 +35,7 @@ export class RichEditorComponent extends AppComponentBase implements ControlValu
     public assetsItems: ImmutableArray<AssetDto>;
     public assetsPager = new Pager(0, 0, 12);
     private assetUrlGenerator: AssetUrlPipe;
+    private assetsMimeTypes: Array<string> = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif'];
 
     @ViewChild('editor')
     public editor: ElementRef;
@@ -56,7 +57,7 @@ export class RichEditorComponent extends AppComponentBase implements ControlValu
 
     private load() {
         this.appNameOnce()
-            .switchMap(app => this.assetsService.getAssets(app, this.assetsPager.pageSize, this.assetsPager.skip))
+            .switchMap(app => this.assetsService.getAssets(app, this.assetsPager.pageSize, this.assetsPager.skip, undefined, this.assetsMimeTypes))
             .subscribe(dtos => {
                 this.assetsItems = ImmutableArray.of(dtos.items);
                 this.assetsPager = this.assetsPager.setCount(dtos.total);
@@ -111,7 +112,7 @@ export class RichEditorComponent extends AppComponentBase implements ControlValu
                             self.tinyEditor.setContent(this.value || '');
                         }, 500);
                 },
-                removed_menuitems: 'newdocument', plugins: 'code,image', target: this.editor.nativeElement, file_picker_types: 'image', file_picker_callback: (cb: any, value: any, meta: any) => {
+                removed_menuitems: 'newdocument', plugins: 'code,image', target: this.editor.nativeElement, file_picker_types: 'image', convert_urls: false, file_picker_callback: (cb: any, value: any, meta: any) => {
                     self.load();
                     self.assetsDialog.show();
                     self.assetSelectorClickHandler = {
