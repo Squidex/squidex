@@ -124,18 +124,11 @@ namespace Squidex.Controllers.ContentApi
 
         [MustBeAppReader]
         [HttpGet]
-        [Route("content/{app}/{name}/queries/{queryName}")]
+        [Route("content/{app}/queries/{queryName}")]
         [ApiCosts(2)]
         public async Task<IActionResult> GetCustomQueryContent(string name, string queryName)
         {
-            var schema = await contentQuery.FindSchemaAsync(App, name);
-
-            if (schema == null)
-            {
-                return NotFound();
-            }
-
-            var customQueries = await customQueryProvider.GetQueriesAsync(App, schema);
+            var customQueries = await customQueryProvider.GetQueriesAsync(App);
             var customQuery = customQueries.FirstOrDefault(x => string.Equals(x.Name, queryName, StringComparison.OrdinalIgnoreCase));
 
             if (customQuery == null)
@@ -146,21 +139,9 @@ namespace Squidex.Controllers.ContentApi
             var arguments = HttpContext.Request.Query.ToDictionary(x => x.Key, x => x.Value.ToString());
 
             var context = new QueryContext(App, assetRepository, contentQuery, User);
-            var contents = await customQuery.ExecuteAsync(schema, context, arguments);
+            var content = await customQuery.ExecuteAsync(context, arguments);
 
-            var response = contents.Take(200).Select(item =>
-            {
-                var itemModel = SimpleMapper.Map(item, new ContentDto());
-
-                if (item.Data != null)
-                {
-                    itemModel.Data = item.Data.ToApiModel(schema.SchemaDef, App.LanguagesConfig, !User.IsFrontendClient());
-                }
-
-                return itemModel;
-            }).ToList();
-
-            return Ok(response);
+            return Ok(content);
         }
 
         [MustBeAppReader]

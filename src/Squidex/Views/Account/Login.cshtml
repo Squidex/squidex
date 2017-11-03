@@ -55,9 +55,9 @@
 
     @if (@Model.HasPasswordAuth)
     {
-        @if (Model.IsLogin)
-         {
-            @if (Model.IsFailed)
+        if (Model.IsLogin)
+        {
+            if (Model.IsFailed)
             {
                 <div class="form-alert form-alert-error">Email or password not correct.</div>
             }

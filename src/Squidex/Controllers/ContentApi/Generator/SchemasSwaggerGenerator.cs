@@ -29,57 +29,75 @@ namespace Squidex.Controllers.ContentApi.Generator
         private readonly HttpContext context;
         private readonly SwaggerSettings settings;
         private readonly MyUrlsOptions urlOptions;
-        private readonly ICustomQueryProvider customQueryProvider;
         private SwaggerDocument document;
-        private SwaggerGenerator swaggerGenerator;
         private SwaggerJsonSchemaGenerator schemaGenerator;
         private JsonSchemaResolver schemaResolver;
 
-        public SchemasSwaggerGenerator(IHttpContextAccessor context, SwaggerSettings settings,
-            IOptions<MyUrlsOptions> urlOptions, ICustomQueryProvider customQueryProvider)
+        public SchemasSwaggerGenerator(IHttpContextAccessor context, SwaggerSettings settings, IOptions<MyUrlsOptions> urlOptions)
         {
             this.context = context.HttpContext;
             this.settings = settings;
             this.urlOptions = urlOptions.Value;
-            this.customQueryProvider = customQueryProvider;
         }
 
-        public async Task<SwaggerDocument> Generate(IAppEntity app, IEnumerable<ISchemaEntity> schemas)
+        public async Task<SwaggerDocument> GenerateAsync(
+            IAppEntity app,
+            IEnumerable<ISchemaEntity> schemas,
+            IEnumerable<ICustomQuery> queries)
         {
             document = SwaggerHelper.CreateApiDocument(context, urlOptions, app.Name);
 
             schemaGenerator = new SwaggerJsonSchemaGenerator(settings);
             schemaResolver = new SwaggerSchemaResolver(document, settings);
 
-            swaggerGenerator = new SwaggerGenerator(schemaGenerator, settings, schemaResolver);
+            var path = $"/content/{app.Name}";
 
-            await GenerateSchemasOperationsAsync(schemas, app);
+            foreach (var schema in schemas)
+            {
+                GenerateSchemaOperations(app, path, schema);
+            }
+
+            foreach (var query in queries)
+            {
+                GenerateQueryOperation(query, path);
+            }
+
             await GenerateDefaultErrorsAsync();
 
             return document;
         }
 
-        private Task GenerateSchemasOperationsAsync(IEnumerable<ISchemaEntity> schemas, IAppEntity app)
+        private void GenerateSchemaOperations(IAppEntity app, string path, ISchemaEntity schema)
         {
-            var path = $"/content/{app.Name}";
-
-            var tasks = new List<Task>();
-
-            foreach (var schema in schemas.Where(x => x.IsPublished))
-            {
-                tasks.Add(GenerateSchemaOperationsAsync(app, schema, path));
-            }
-
-            return Task.WhenAll(tasks);
-        }
-
-        private async Task GenerateSchemaOperationsAsync(IAppEntity app, ISchemaEntity schema, string path)
-        {
-            var customQueries = await customQueryProvider.GetQueriesAsync(app, schema);
-
             var generator = new SchemaSwaggerGenerator(document, path, schema.SchemaDef, AppendSchema, app.PartitionResolver);
 
-            generator.GenerateSchemaOperations(customQueries);
+            generator.GenerateSchemaOperations();
+        }
+
+        public void GenerateQueryOperation(ICustomQuery query, string path)
+        {
+            var operation = new SwaggerOperation
+            {
+                Description = query.Description,
+                OperationId = $"CustomQuery{query.Name}Contents",
+                Summary = query.Summary,
+                Security = Definitions.ReaderSecurity,
+                Tags = new List<string> { "CustomQueries" }
+            };
+
+            foreach (var argument in query.ArgumentOptions)
+            {
+                operation.AddQueryParameter(argument.Name, JsonObjectType.String, argument.Description);
+            }
+
+            operation.AddResponse("200", $"{query.Name} content retrieved.");
+
+            var queryPath = $"{path}/queries/{query.Name}";
+
+            document.Paths[queryPath] = new SwaggerOperations
+            {
+                [SwaggerOperationMethod.Get] = operation
+            };
         }
 
         private async Task GenerateDefaultErrorsAsync()

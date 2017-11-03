@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  IQuery.cs
+//  ICustomQuery.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -8,7 +8,7 @@
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Squidex.Domain.Apps.Read.Schemas;
+using Newtonsoft.Json.Linq;
 
 namespace Squidex.Domain.Apps.Read.Contents.CustomQueries
 {
@@ -22,6 +22,6 @@ namespace Squidex.Domain.Apps.Read.Contents.CustomQueries
 
         IReadOnlyList<QueryArgumentOption> ArgumentOptions { get; }
 
-        Task<IReadOnlyList<IContentEntity>> ExecuteAsync(ISchemaEntity schema, QueryContext context, IDictionary<string, string> arguments);
+        Task<JToken> ExecuteAsync(QueryContext context, IDictionary<string, string> arguments);
     }
 }

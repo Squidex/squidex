@@ -80,13 +80,13 @@ namespace Squidex
             builder.RegisterModule(new AssetStoreModule(Configuration));
             builder.RegisterModule(new EventPublishersModule(Configuration));
             builder.RegisterModule(new EventStoreModule(Configuration));
+            builder.RegisterModule(new CustomQueriesModule(Configuration));
             builder.RegisterModule(new InfrastructureModule(Configuration));
             builder.RegisterModule(new PubSubModule(Configuration));
             builder.RegisterModule(new ReadModule(Configuration));
             builder.RegisterModule(new StoreModule(Configuration));
             builder.RegisterModule(new WebModule(Configuration));
             builder.RegisterModule(new WriteModule(Configuration));
-            builder.RegisterModule(new CustomQueriesModule());
 
             var container = builder.Build();
 

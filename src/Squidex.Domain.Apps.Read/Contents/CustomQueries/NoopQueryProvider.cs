@@ -15,7 +15,7 @@ namespace Squidex.Domain.Apps.Read.Contents.CustomQueries
 {
     public sealed class NoopQueryProvider : ICustomQueryProvider
     {
-        public Task<IReadOnlyList<ICustomQuery>> GetQueriesAsync(IAppEntity app, ISchemaEntity schema)
+        public Task<IReadOnlyList<ICustomQuery>> GetQueriesAsync(IAppEntity app)
         {
             return Task.FromResult<IReadOnlyList<ICustomQuery>>(new List<ICustomQuery>());
         }
