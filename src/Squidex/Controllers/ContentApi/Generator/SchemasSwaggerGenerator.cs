@@ -22,6 +22,8 @@ using Squidex.Domain.Apps.Read.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Pipeline.Swagger;
 
+#pragma warning disable IDE0017 // Simplify object initialization
+
 namespace Squidex.Controllers.ContentApi.Generator
 {
     public sealed class SchemasSwaggerGenerator
@@ -76,14 +78,14 @@ namespace Squidex.Controllers.ContentApi.Generator
 
         public void GenerateQueryOperation(ICustomQuery query, string path)
         {
-            var operation = new SwaggerOperation
-            {
-                Description = query.Description,
-                OperationId = $"CustomQuery{query.Name}Contents",
-                Summary = query.Summary,
-                Security = Definitions.ReaderSecurity,
-                Tags = new List<string> { "CustomQueries" }
-            };
+            var operation = new SwaggerOperation();
+
+            operation.OperationId = $"CustomQuery{query.Name}Contents";
+            operation.Summary = query.Summary;
+            operation.Security = Definitions.ReaderSecurity;
+            operation.Description = query.Description;
+
+            operation.Tags = new List<string> { "CustomQueries" };
 
             foreach (var argument in query.ArgumentOptions)
             {
