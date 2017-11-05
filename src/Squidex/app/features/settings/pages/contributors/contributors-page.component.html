@@ -1,6 +1,6 @@
-<sqx-title message="{app} | Contributors | Settings" parameter1="app" value1="{{appName() | async}}"></sqx-title>
+<sqx-title message="{app} | Contributors | Settings" parameter1="app" [value1]="ctx.appName"></sqx-title>
 
-<sqx-panel panelWidth="50rem">
+<sqx-panel desiredWidth="50rem">
     <div class="panel-header">
         <div class="panel-title-row">
             <h3 class="panel-title">Contributors</h3>
@@ -39,12 +39,12 @@
                                 <span class="user-email table-cell">{{contributor.contributorId | sqxUserEmail}}</span>
                             </td>
                             <td>
-                                <select class="form-control" [ngModel]="contributor.permission" (ngModelChange)="changePermission(contributor, $event)" [disabled]="currentUserId === contributor.contributorId">
+                                <select class="form-control" [ngModel]="contributor.permission" (ngModelChange)="changePermission(contributor, $event)" [disabled]="userId === contributor.contributorId">
                                     <option *ngFor="let permission of usersPermissions" [ngValue]="permission">{{permission}}</option>
                                 </select>
                             </td>
                             <td>
-                                <button type="button" class="btn btn-link btn-danger" [disabled]="currentUserId === contributor.contributorId" (click)="removeContributor(contributor)">
+                                <button type="button" class="btn btn-link btn-danger" [disabled]="userId === contributor.contributorId" (click)="removeContributor(contributor)">
                                     <i class="icon-bin2"></i>
                                 </button>
                             </td>

@@ -7,7 +7,7 @@
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { Observable, Subscription } from 'rxjs';
 
 import {
@@ -20,16 +20,12 @@ import {
 } from './../messages';
 
 import {
-    AppComponentBase,
+    AppContext,
     AppLanguageDto,
-    AppsStoreService,
     allData,
-    AuthService,
     CanComponentDeactivate,
     ContentDto,
     ContentsService,
-    DialogService,
-    MessageBus,
     SchemaDetailsDto,
     Version
 } from 'shared';
@@ -37,9 +33,12 @@ import {
 @Component({
     selector: 'sqx-content-page',
     styleUrls: ['./content-page.component.scss'],
-    templateUrl: './content-page.component.html'
+    templateUrl: './content-page.component.html',
+    providers: [
+        AppContext
+    ]
 })
-export class ContentPageComponent extends AppComponentBase implements CanComponentDeactivate, OnDestroy, OnInit {
+export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, OnInit {
     private contentPublishedSubscription: Subscription;
     private contentUnpublishedSubscription: Subscription;
     private contentDeletedSubscription: Subscription;
@@ -55,13 +54,10 @@ export class ContentPageComponent extends AppComponentBase implements CanCompone
 
     public languages: AppLanguageDto[] = [];
 
-    constructor(apps: AppsStoreService, dialogs: DialogService, authService: AuthService,
+    constructor(public readonly ctx: AppContext,
         private readonly contentsService: ContentsService,
-        private readonly route: ActivatedRoute,
-        private readonly router: Router,
-        private readonly messageBus: MessageBus
+        private readonly router: Router
     ) {
-        super(dialogs, apps, authService);
     }
 
     public ngOnDestroy() {
@@ -72,18 +68,18 @@ export class ContentPageComponent extends AppComponentBase implements CanCompone
     }
 
     public ngOnInit() {
-        const routeData = allData(this.route);
+        const routeData = allData(this.ctx.route);
 
         this.languages = routeData['appLanguages'];
 
         this.contentVersionSelectedSubscription =
-            this.messageBus.of(ContentVersionSelected)
+            this.ctx.bus.of(ContentVersionSelected)
                 .subscribe(message => {
                     this.loadVersion(message.version);
                 });
 
         this.contentPublishedSubscription =
-            this.messageBus.of(ContentPublished)
+            this.ctx.bus.of(ContentPublished)
                 .subscribe(message => {
                     if (this.content && message.content.id === this.content.id) {
                         this.content = this.content.publish(message.content.lastModifiedBy, message.content.version, message.content.lastModified);
@@ -91,7 +87,7 @@ export class ContentPageComponent extends AppComponentBase implements CanCompone
                 });
 
         this.contentUnpublishedSubscription =
-            this.messageBus.of(ContentUnpublished)
+            this.ctx.bus.of(ContentUnpublished)
                 .subscribe(message => {
                     if (this.content && message.content.id === this.content.id) {
                         this.content = this.content.unpublish(message.content.lastModifiedBy, message.content.version, message.content.lastModified);
@@ -99,16 +95,16 @@ export class ContentPageComponent extends AppComponentBase implements CanCompone
                 });
 
         this.contentDeletedSubscription =
-            this.messageBus.of(ContentRemoved)
+            this.ctx.bus.of(ContentRemoved)
                 .subscribe(message => {
                     if (this.content && message.content.id === this.content.id) {
-                        this.router.navigate(['../'], { relativeTo: this.route });
+                        this.router.navigate(['../'], { relativeTo: this.ctx.route });
                     }
                 });
 
         this.setupContentForm(routeData['schema']);
 
-        this.route.data.map(p => p['content'])
+        this.ctx.route.data.map(d => d.content)
             .subscribe((content: ContentDto) => {
                 this.content = content;
 
@@ -120,7 +116,7 @@ export class ContentPageComponent extends AppComponentBase implements CanCompone
         if (!this.contentForm.dirty || this.isNewMode) {
             return Observable.of(true);
         } else {
-            return this.dialogs.confirmUnsavedChanges();
+            return this.ctx.confirmUnsavedChanges();
         }
     }
 
@@ -141,64 +137,66 @@ export class ContentPageComponent extends AppComponentBase implements CanCompone
             const requestDto = this.contentForm.value;
 
             if (this.isNewMode) {
-                this.appNameOnce()
-                    .switchMap(app => this.contentsService.postContent(app, this.schema.name, requestDto, publish))
+                this.contentsService.postContent(this.ctx.appName, this.schema.name, requestDto, publish)
                     .subscribe(dto => {
                         this.content = dto;
 
+                        this.ctx.notifyInfo('Content created successfully.');
+
                         this.emitContentCreated(this.content);
-                        this.notifyInfo('Content created successfully.');
                         this.back();
                     }, error => {
-                        this.notifyError(error);
+                        this.ctx.notifyError(error);
+
                         this.enableContentForm();
                     });
             } else {
-                this.appNameOnce()
-                    .switchMap(app => this.contentsService.putContent(app, this.schema.name, this.content.id, requestDto, this.content.version))
+                this.contentsService.putContent(this.ctx.appName, this.schema.name, this.content.id, requestDto, this.content.version)
                     .subscribe(dto => {
-                        this.content = this.content.update(dto.payload, this.userToken, dto.version);
+                        this.content = this.content.update(dto.payload, this.ctx.userToken, dto.version);
+
+                        this.ctx.notifyInfo('Content saved successfully.');
 
                         this.emitContentUpdated(this.content);
-                        this.notifyInfo('Content saved successfully.');
                         this.enableContentForm();
                         this.populateContentForm();
                     }, error => {
-                        this.notifyError(error);
+                        this.ctx.notifyError(error);
+
                         this.enableContentForm();
                     });
             }
         } else {
-            this.notifyError('Content element not valid, please check the field with the red bar on the left in all languages (if localizable).');
+            this.ctx.notifyError('Content element not valid, please check the field with the red bar on the left in all languages (if localizable).');
         }
     }
 
     private loadVersion(version: number) {
         if (!this.isNewMode && this.content) {
-            this.appNameOnce()
-                .switchMap(app => this.contentsService.getVersionData(app, this.schema.name, this.content.id, new Version(version.toString())))
+           this.contentsService.getVersionData(this.ctx.appName, this.schema.name, this.content.id, new Version(version.toString()))
                 .subscribe(dto => {
                     this.content = this.content.setData(dto);
 
+                    this.ctx.notifyInfo('Content version loaded successfully.');
+
                     this.emitContentUpdated(this.content);
-                    this.notifyInfo('Content version loaded successfully.');
                     this.populateContentForm();
                 }, error => {
-                    this.notifyError(error);
+                    this.ctx.notifyError(error);
                 });
         }
     }
 
     private back() {
-        this.router.navigate(['../'], { relativeTo: this.route, replaceUrl: true });
+        this.router.navigate(['../'], { relativeTo: this.ctx.route, replaceUrl: true });
     }
 
     private emitContentCreated(content: ContentDto) {
-        this.messageBus.emit(new ContentCreated(content));
+        this.ctx.bus.emit(new ContentCreated(content));
     }
 
     private emitContentUpdated(content: ContentDto) {
-        this.messageBus.emit(new ContentUpdated(content));
+        this.ctx.bus.emit(new ContentUpdated(content));
     }
 
     private disableContentForm() {

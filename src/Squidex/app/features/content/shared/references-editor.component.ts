@@ -11,14 +11,12 @@ import { Component, forwardRef, Input, OnInit } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import {
-    AppComponentBase,
-    AppsStoreService,
-    AuthService,
+    AppContext,
     ContentDto,
     ContentsService,
-    DialogService,
     FieldDto,
     ImmutableArray,
+    MathHelper,
     SchemaDetailsDto,
     SchemasService,
     Types
@@ -32,9 +30,12 @@ export const SQX_REFERENCES_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     selector: 'sqx-references-editor',
     styleUrls: ['./references-editor.component.scss'],
     templateUrl: './references-editor.component.html',
-    providers: [SQX_REFERENCES_EDITOR_CONTROL_VALUE_ACCESSOR]
+    providers: [
+        AppContext,
+        SQX_REFERENCES_EDITOR_CONTROL_VALUE_ACCESSOR
+    ]
 })
-export class ReferencesEditorComponent extends AppComponentBase implements ControlValueAccessor, OnInit {
+export class ReferencesEditorComponent implements ControlValueAccessor, OnInit {
     private callChange = (v: any) => { /* NOOP */ };
     private callTouched = () => { /* NOOP */ };
 
@@ -54,16 +55,18 @@ export class ReferencesEditorComponent extends AppComponentBase implements Contr
     public isDisabled = false;
     public isInvalidSchema = false;
 
-    constructor(apps: AppsStoreService, dialogs: DialogService, authService: AuthService,
+    constructor(public readonly ctx: AppContext,
         private readonly contentsService: ContentsService,
         private readonly schemasService: SchemasService
     ) {
-        super(dialogs, apps, authService);
     }
 
     public ngOnInit() {
-        this.appNameOnce()
-            .switchMap(app => this.schemasService.getSchema(app, this.schemaId))
+        if (this.schemaId === MathHelper.EMPTY_GUID) {
+            return;
+        }
+
+        this.schemasService.getSchema(this.ctx.appName, this.schemaId)
             .subscribe(dto => {
                 this.schema = dto;
 
@@ -79,8 +82,7 @@ export class ReferencesEditorComponent extends AppComponentBase implements Contr
         if (Types.isArrayOfString(value) && value.length > 0) {
             const contentIds: string[] = value;
 
-            this.appNameOnce()
-                .switchMap(app => this.contentsService.getContents(app, this.schemaId, 10000, 0, undefined, contentIds))
+            this.contentsService.getContents(this.ctx.appName, this.schemaId, 10000, 0, undefined, contentIds)
                 .subscribe(dtos => {
                     this.contentItems = ImmutableArray.of(contentIds.map(id => dtos.items.find(c => c.id === id)).filter(c => !!c));
                 });

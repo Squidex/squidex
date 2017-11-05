@@ -1,6 +1,6 @@
-<sqx-title message="{app} | Clients | Settings" parameter1="app" value1="{{appName() | async}}"></sqx-title>
+<sqx-title message="{app} | Clients | Settings" parameter1="app" [value1]="ctx.appName"></sqx-title>
 
-<sqx-panel panelWidth="44rem">
+<sqx-panel desiredWidth="44rem">
     <div class="panel-header">
         <div class="panel-title-row">
             <h3 class="panel-title">Clients</h3>
@@ -18,7 +18,7 @@
             </div>
 
             <div *ngFor="let client of appClients?.clients">
-                <sqx-client [client]="client" [appName]="appName() | async"
+                <sqx-client [client]="client"
                     (updating)="updateClient(client, $event)"
                     (renaming)="renameClient(client, $event)" 
                     (revoking)="revokeClient(client)"></sqx-client>

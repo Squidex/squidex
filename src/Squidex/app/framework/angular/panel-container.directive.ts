@@ -67,12 +67,12 @@ export class PanelContainerDirective implements AfterViewInit, OnDestroy {
         for (let panel of this.panels) {
             const panelRoot = panel.panel.nativeElement;
 
-            let width = panel.clientWidth;
+            let width = panel.desiredWidth;
 
-            if (panel.expand && panel === last) {
-                width = this.containerWidth - currentPosition;
+            if (panel.desiredWidth === '*' && panel === last) {
+                panel.actualWidth = this.containerWidth - currentPosition;
 
-                panel.panelWidth = width + 'px';
+                panel.desiredWidth = width + 'px';
             }
 
             this.renderer.setElementStyle(panelRoot, 'top', '0px');
@@ -81,7 +81,7 @@ export class PanelContainerDirective implements AfterViewInit, OnDestroy {
             this.renderer.setElementStyle(panelRoot, 'position', 'absolute');
             this.renderer.setElementStyle(panelRoot, 'z-index', currentLayer.toString());
 
-            currentPosition += width;
+            currentPosition += panel.actualWidth;
             currentLayer -= 10;
         }
 

@@ -10,16 +10,12 @@ import { FormBuilder, Validators } from '@angular/forms';
 
 import {
     AddAppLanguageDto,
-    AppComponentBase,
+    AppContext,
     AppLanguageDto,
     AppLanguagesDto,
     AppLanguagesService,
-    AppsStoreService,
-    AuthService,
-    DialogService,
     HistoryChannelUpdated,
     ImmutableArray,
-    MessageBus,
     LanguageDto,
     LanguagesService
 } from 'shared';
@@ -27,9 +23,12 @@ import {
 @Component({
     selector: 'sqx-languages-page',
     styleUrls: ['./languages-page.component.scss'],
-    templateUrl: './languages-page.component.html'
+    templateUrl: './languages-page.component.html',
+    providers: [
+        AppContext
+    ]
 })
-export class LanguagesPageComponent extends AppComponentBase implements OnInit {
+export class LanguagesPageComponent implements OnInit {
     public allLanguages: LanguageDto[] = [];
     public newLanguages: LanguageDto[] = [];
     public appLanguages: AppLanguagesDto;
@@ -41,13 +40,11 @@ export class LanguagesPageComponent extends AppComponentBase implements OnInit {
             ]
         });
 
-    constructor(apps: AppsStoreService, dialogs: DialogService, authService: AuthService,
+    constructor(public readonly ctx: AppContext,
         private readonly appLanguagesService: AppLanguagesService,
         private readonly languagesService: LanguagesService,
-        private readonly messageBus: MessageBus,
         private readonly formBuilder: FormBuilder
     ) {
-        super(dialogs, apps, authService);
     }
 
     public ngOnInit() {
@@ -56,55 +53,51 @@ export class LanguagesPageComponent extends AppComponentBase implements OnInit {
     }
 
     public load() {
-        this.appNameOnce()
-            .switchMap(app => this.appLanguagesService.getLanguages(app).retry(2))
+        this.appLanguagesService.getLanguages(this.ctx.appName)
             .subscribe(dto => {
                 this.updateLanguages(dto);
             }, error => {
-                this.notifyError(error);
+                this.ctx.notifyError(error);
             });
     }
 
     public removeLanguage(language: AppLanguageDto) {
-        this.appNameOnce()
-            .switchMap(app => this.appLanguagesService.deleteLanguage(app, language.iso2Code, this.appLanguages.version))
+        this.appLanguagesService.deleteLanguage(this.ctx.appName, language.iso2Code, this.appLanguages.version)
             .subscribe(dto => {
                 this.updateLanguages(this.appLanguages.removeLanguage(language, dto.version));
             }, error => {
-                this.notifyError(error);
+                this.ctx.notifyError(error);
             });
     }
 
     public addLanguage() {
         const requestDto = new AddAppLanguageDto(this.addLanguageForm.controls['language'].value.iso2Code);
 
-        this.appNameOnce()
-            .switchMap(app => this.appLanguagesService.postLanguages(app, requestDto, this.appLanguages.version))
+        this.appLanguagesService.postLanguages(this.ctx.appName, requestDto, this.appLanguages.version)
             .subscribe(dto => {
                 this.updateLanguages(this.appLanguages.addLanguage(dto.payload, dto.version));
             }, error => {
-                this.notifyError(error);
+                this.ctx.notifyError(error);
             });
     }
 
     public updateLanguage(language: AppLanguageDto) {
-        this.appNameOnce()
-            .switchMap(app => this.appLanguagesService.updateLanguage(app, language.iso2Code, language, this.appLanguages.version))
+        this.appLanguagesService.updateLanguage(this.ctx.appName, language.iso2Code, language, this.appLanguages.version)
             .subscribe(dto => {
                 this.updateLanguages(this.appLanguages.updateLanguage(language, dto.version));
             }, error => {
-                this.notifyError(error);
+                this.ctx.notifyError(error);
             });
     }
 
     private loadAllLanguages() {
-        this.languagesService.getLanguages().retry(2)
+        this.languagesService.getLanguages()
             .subscribe(languages => {
                 this.allLanguages = ImmutableArray.of(languages).sortByStringAsc(l => l.englishName).values;
 
                 this.updateNewLanguages();
             }, error => {
-                this.notifyError(error);
+                this.ctx.notifyError(error);
             });
     }
 
@@ -132,7 +125,7 @@ export class LanguagesPageComponent extends AppComponentBase implements OnInit {
 
         this.updateNewLanguages();
 
-        this.messageBus.emit(new HistoryChannelUpdated());
+        this.ctx.bus.emit(new HistoryChannelUpdated());
     }
 
     private updateNewLanguages() {

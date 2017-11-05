@@ -18,9 +18,9 @@ import {
 } from './shell';
 
 import {
-    AppMustExistGuard,
     MustBeAuthenticatedGuard,
-    MustBeNotAuthenticatedGuard
+    MustBeNotAuthenticatedGuard,
+    ResolveAppGuard
 } from './shared';
 
 export const routes: Routes = [
@@ -45,7 +45,9 @@ export const routes: Routes = [
             {
                 path: ':appName',
                 component: AppAreaComponent,
-                canActivate: [AppMustExistGuard],
+                resolve: {
+                    app: ResolveAppGuard
+                },
                 children: [
                     {
                         path: '',

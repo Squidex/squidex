@@ -10,10 +10,7 @@ import { FormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
 
 import {
-    AppComponentBase,
-    AppsStoreService,
-    AuthService,
-    DialogService,
+    AppContext,
     SchemaDto,
     SchemasService
 } from 'shared';
@@ -21,9 +18,12 @@ import {
 @Component({
     selector: 'sqx-schemas-page',
     styleUrls: ['./schemas-page.component.scss'],
-    templateUrl: './schemas-page.component.html'
+    templateUrl: './schemas-page.component.html',
+    providers: [
+        AppContext
+    ]
 })
-export class SchemasPageComponent extends AppComponentBase {
+export class SchemasPageComponent {
     public schemasFilter = new FormControl();
     public schemasFiltered =
         this.schemasFilter.valueChanges
@@ -53,17 +53,15 @@ export class SchemasPageComponent extends AppComponentBase {
                 });
             });
 
-    constructor(apps: AppsStoreService, dialogs: DialogService, authService: AuthService,
+    constructor(public readonly ctx: AppContext,
         private readonly schemasService: SchemasService
     ) {
-        super(dialogs, apps, authService);
     }
 
     private loadSchemas(): Observable<SchemaDto[]> {
-        return this.appNameOnce()
-            .switchMap(app => this.schemasService.getSchemas(app).retry(2))
+        return this.schemasService.getSchemas(this.ctx.appName)
             .catch(error => {
-                this.notifyError(error);
+                this.ctx.notifyError(error);
                 return [];
             });
     }

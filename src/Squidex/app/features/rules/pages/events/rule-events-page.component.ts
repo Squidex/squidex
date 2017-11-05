@@ -8,10 +8,7 @@
 import { Component, OnInit } from '@angular/core';
 
 import {
-    AppComponentBase,
-    AppsStoreService,
-    AuthService,
-    DialogService,
+    AppContext,
     ImmutableArray,
     Pager,
     RuleEventDto,
@@ -21,18 +18,20 @@ import {
 @Component({
     selector: 'sqx-rule-events-page',
     styleUrls: ['./rule-events-page.component.scss'],
-    templateUrl: './rule-events-page.component.html'
+    templateUrl: './rule-events-page.component.html',
+    providers: [
+        AppContext
+    ]
 })
-export class RuleEventsPageComponent extends AppComponentBase implements OnInit {
+export class RuleEventsPageComponent implements OnInit {
     public eventsItems = ImmutableArray.empty<RuleEventDto>();
     public eventsPager = new Pager(0);
 
     public selectedEventId: string | null = null;
 
-    constructor(dialogs: DialogService, appsStore: AppsStoreService, authService: AuthService,
+    constructor(public readonly ctx: AppContext,
         private readonly rulesService: RulesService
     ) {
-        super(dialogs, appsStore, authService);
     }
 
     public ngOnInit() {
@@ -40,27 +39,25 @@ export class RuleEventsPageComponent extends AppComponentBase implements OnInit 
     }
 
     public load(showInfo = false) {
-        this.appNameOnce()
-            .switchMap(app => this.rulesService.getEvents(app, this.eventsPager.pageSize, this.eventsPager.skip))
+        this.rulesService.getEvents(this.ctx.appName, this.eventsPager.pageSize, this.eventsPager.skip)
             .subscribe(dtos => {
                 this.eventsItems = ImmutableArray.of(dtos.items);
                 this.eventsPager = this.eventsPager.setCount(dtos.total);
 
                 if (showInfo) {
-                    this.notifyInfo('Events reloaded.');
+                    this.ctx.notifyInfo('Events reloaded.');
                 }
             }, error => {
-                this.notifyError(error);
+                this.ctx.notifyError(error);
             });
     }
 
     public enqueueEvent(event: RuleEventDto) {
-        this.appNameOnce()
-            .switchMap(app => this.rulesService.enqueueEvent(app, event.id))
+        this.rulesService.enqueueEvent(this.ctx.appName, event.id)
             .subscribe(() => {
-                this.notifyInfo('Events enqueued. Will be resend in a few seconds.');
+                this.ctx.notifyInfo('Events enqueued. Will be resend in a few seconds.');
             }, error => {
-                this.notifyError(error);
+                this.ctx.notifyError(error);
             });
     }
 

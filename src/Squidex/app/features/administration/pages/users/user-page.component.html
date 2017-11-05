@@ -3,7 +3,7 @@
 <form [formGroup]="userForm" (ngSubmit)="save()">
     <input style="display:none" type="password" name="foilautofill"/>
 
-    <sqx-panel panelWidth="26rem">
+    <sqx-panel desiredWidth="26rem">
         <div class="panel-header">
             <div class="panel-title-row">
                 <div class="float-right">
@@ -52,7 +52,7 @@
                     <input type="text" class="form-control" id="displayName" maxlength="100" formControlName="displayName" autocomplete="false"  />
                 </div>
 
-                <div class="form-group form-group-password" [class.hidden]="isCurrentUser">
+                <div class="form-group form-group-password" [class.hidden]="user.id === ctx.userId">
                     <div class="form-group">
                         <label for="password">Password</label>
 

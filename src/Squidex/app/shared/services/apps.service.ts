@@ -7,7 +7,7 @@
 
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, ReplaySubject } from 'rxjs';
 
 import 'framework/angular/http-extensions';
 
@@ -38,6 +38,8 @@ export class CreateAppDto {
 
 @Injectable()
 export class AppsService {
+    private apps$: ReplaySubject<AppDto[]> | null = null;
+
     constructor(
         private readonly http: HttpClient,
         private readonly apiUrl: ApiUrlConfig,
@@ -46,24 +48,38 @@ export class AppsService {
     }
 
     public getApps(): Observable<AppDto[]> {
-        const url = this.apiUrl.buildUrl('/api/apps');
+        if (this.apps$ === null) {
+            const url = this.apiUrl.buildUrl('/api/apps');
 
-        return HTTP.getVersioned<any>(this.http, url)
-                .map(response => {
-                    const body = response.payload.body;
+            const loadedApps =
+                HTTP.getVersioned<any>(this.http, url)
+                    .map(response => {
+                        const body = response.payload.body;
 
-                    const items: any[] = body;
+                        const items: any[] = body;
 
-                    return items.map(item => {
-                        return new AppDto(
-                            item.id,
-                            item.name,
-                            item.permission,
-                            DateTime.parseISO(item.created),
-                            DateTime.parseISO(item.lastModified));
-                    });
-                })
-                .pretifyError('Failed to load apps. Please reload.');
+                        return items.map(item => {
+                            return new AppDto(
+                                item.id,
+                                item.name,
+                                item.permission,
+                                DateTime.parseISO(item.created),
+                                DateTime.parseISO(item.lastModified));
+                        });
+                    })
+                    .pretifyError('Failed to load apps. Please reload.');
+
+            this.apps$ = new ReplaySubject<AppDto[]>(1);
+
+            loadedApps
+                .subscribe(apps => {
+                    this.apps$.next(apps);
+                }, error => {
+                    this.apps$.error(loadedApps);
+                });
+        }
+
+        return this.apps$;
     }
 
     public postApp(dto: CreateAppDto, now?: DateTime): Observable<AppDto> {
@@ -77,8 +93,14 @@ export class AppsService {
 
                     return new AppDto(body.id, dto.name, 'Owner', now, now);
                 })
-                .do(() => {
+                .do(app => {
                     this.analytics.trackEvent('App', 'Created', dto.name);
+
+                    if (this.apps$) {
+                        this.apps$.first().subscribe(apps => {
+                            this.apps$.next(apps.concat([app]));
+                        });
+                    }
                 })
                 .pretifyError('Failed to create app. Please reload.');
     }

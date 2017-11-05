@@ -8,11 +8,8 @@
 import { Component, OnInit } from '@angular/core';
 
 import {
-    AppComponentBase,
-    AppsStoreService,
-    AuthService,
+    AppContext,
     DateTime,
-    DialogService,
     fadeAnimation,
     ImmutableArray,
     ModalView,
@@ -28,11 +25,14 @@ import {
     selector: 'sqx-rules-page',
     styleUrls: ['./rules-page.component.scss'],
     templateUrl: './rules-page.component.html',
+    providers: [
+        AppContext
+    ],
     animations: [
         fadeAnimation
     ]
 })
-export class RulesPageComponent extends AppComponentBase implements OnInit {
+export class RulesPageComponent implements OnInit {
     public ruleActions = ruleActions;
     public ruleTriggers = ruleTriggers;
 
@@ -44,11 +44,10 @@ export class RulesPageComponent extends AppComponentBase implements OnInit {
     public wizardMode = 'Wizard';
     public wizardRule: RuleDto;
 
-    constructor(apps: AppsStoreService, dialogs: DialogService, authService: AuthService,
+    constructor(public readonly ctx: AppContext,
         private readonly schemasService: SchemasService,
         private readonly rulesService: RulesService
     ) {
-        super(dialogs, apps, authService);
     }
 
     public ngOnInit() {
@@ -56,20 +55,17 @@ export class RulesPageComponent extends AppComponentBase implements OnInit {
     }
 
     public load(showInfo = false) {
-        this.appNameOnce()
-            .switchMap(app =>
-                this.schemasService.getSchemas(app)
-                    .combineLatest(this.rulesService.getRules(app),
-                        (s, w) => { return { rules: w, schemas: s }; }))
+        this.schemasService.getSchemas(this.ctx.appName)
+                .combineLatest(this.rulesService.getRules(this.ctx.appName), (s, w) => { return { rules: w, schemas: s }; })
             .subscribe(dtos => {
                 this.schemas = dtos.schemas;
                 this.rules = ImmutableArray.of(dtos.rules);
 
                 if (showInfo) {
-                    this.notifyInfo('Rules reloaded.');
+                    this.ctx.notifyInfo('Rules reloaded.');
                 }
             }, error => {
-                this.notifyError(error);
+                this.ctx.notifyError(error);
             });
     }
 
@@ -108,31 +104,28 @@ export class RulesPageComponent extends AppComponentBase implements OnInit {
 
     public toggleRule(rule: RuleDto) {
         if (rule.isEnabled) {
-            this.appNameOnce()
-                .switchMap(app => this.rulesService.disableRule(app, rule.id, rule.version))
+            this.rulesService.disableRule(this.ctx.appName, rule.id, rule.version)
                 .subscribe(dto => {
-                    this.rules = this.rules.replace(rule, rule.disable(this.authService.user.id, dto.version, DateTime.now()));
+                    this.rules = this.rules.replace(rule, rule.disable(this.ctx.userToken, dto.version, DateTime.now()));
                 }, error => {
-                    this.notifyError(error);
+                    this.ctx.notifyError(error);
                 });
         } else {
-            this.appNameOnce()
-                .switchMap(app => this.rulesService.enableRule(app, rule.id, rule.version))
+            this.rulesService.enableRule(this.ctx.appName, rule.id, rule.version)
                 .subscribe(dto => {
-                    this.rules = this.rules.replace(rule, rule.enable(this.authService.user.id, dto.version, DateTime.now()));
+                    this.rules = this.rules.replace(rule, rule.enable(this.ctx.userToken, dto.version, DateTime.now()));
                 }, error => {
-                    this.notifyError(error);
+                    this.ctx.notifyError(error);
                 });
         }
     }
 
     public deleteRule(rule: RuleDto) {
-        this.appNameOnce()
-            .switchMap(app => this.rulesService.deleteRule(app, rule.id, rule.version))
+        this.rulesService.deleteRule(this.ctx.appName, rule.id, rule.version)
             .subscribe(dto => {
                 this.rules = this.rules.remove(rule);
             }, error => {
-                this.notifyError(error);
+                this.ctx.notifyError(error);
             });
     }
 }

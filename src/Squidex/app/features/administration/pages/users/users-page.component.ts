@@ -10,11 +10,8 @@ import { FormControl } from '@angular/forms';
 import { Subscription } from 'rxjs';
 
 import {
-    AuthService,
-    ComponentBase,
-    DialogService,
+    AppContext,
     ImmutableArray,
-    MessageBus,
     Pager,
     UserDto,
     UserManagementService
@@ -25,25 +22,23 @@ import { UserCreated, UserUpdated } from './../messages';
 @Component({
     selector: 'sqx-users-page',
     styleUrls: ['./users-page.component.scss'],
-    templateUrl: './users-page.component.html'
+    templateUrl: './users-page.component.html',
+    providers: [
+        AppContext
+    ]
 })
-export class UsersPageComponent extends ComponentBase implements OnDestroy, OnInit {
+export class UsersPageComponent implements OnDestroy, OnInit {
     private userCreatedSubscription: Subscription;
     private userUpdatedSubscription: Subscription;
-
-    public currentUserId: string;
 
     public usersItems = ImmutableArray.empty<UserDto>();
     public usersPager = new Pager(0);
     public usersFilter = new FormControl();
     public usersQuery = '';
 
-    constructor(dialogs: DialogService,
-        private readonly userManagementService: UserManagementService,
-        private readonly authService: AuthService,
-        private readonly messageBus: MessageBus
+    constructor(public readonly ctx: AppContext,
+        private readonly userManagementService: UserManagementService
     ) {
-        super(dialogs);
     }
 
     public ngOnDestroy() {
@@ -53,19 +48,17 @@ export class UsersPageComponent extends ComponentBase implements OnDestroy, OnIn
 
     public ngOnInit() {
         this.userCreatedSubscription =
-            this.messageBus.of(UserCreated)
+            this.ctx.bus.of(UserCreated)
                 .subscribe(message => {
                     this.usersItems = this.usersItems.pushFront(message.user);
                     this.usersPager = this.usersPager.incrementCount();
                 });
 
         this.userUpdatedSubscription =
-            this.messageBus.of(UserUpdated)
+            this.ctx.bus.of(UserUpdated)
                 .subscribe(message => {
                     this.usersItems = this.usersItems.replaceBy('id', message.user);
                 });
-
-        this.currentUserId = this.authService.user!.id;
 
         this.load();
     }
@@ -84,10 +77,10 @@ export class UsersPageComponent extends ComponentBase implements OnDestroy, OnIn
                 this.usersPager = this.usersPager.setCount(dtos.total);
 
                 if (showInfo) {
-                    this.notifyInfo('Users reloaded.');
+                    this.ctx.notifyInfo('Users reloaded.');
                 }
             }, error => {
-                this.notifyError(error);
+                this.ctx.notifyError(error);
             });
     }
 
@@ -96,7 +89,7 @@ export class UsersPageComponent extends ComponentBase implements OnDestroy, OnIn
             .subscribe(() => {
                 this.usersItems = this.usersItems.replaceBy('id', user.lock());
             }, error => {
-                this.notifyError(error);
+                this.ctx.notifyError(error);
             });
     }
 
@@ -105,7 +98,7 @@ export class UsersPageComponent extends ComponentBase implements OnDestroy, OnIn
             .subscribe(() => {
                 this.usersItems = this.usersItems.replaceBy('id', user.unlock());
             }, error => {
-                this.notifyError(error);
+                this.ctx.notifyError(error);
             });
     }
 

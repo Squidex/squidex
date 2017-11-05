@@ -7,13 +7,10 @@
 
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 
 import {
-    AuthService,
-    ComponentBase,
-    DialogService,
-    MessageBus,
+    AppContext,
     UserDto,
     UserManagementService,
     ValidatorsEx
@@ -24,12 +21,14 @@ import { UserCreated, UserUpdated } from './../messages';
 @Component({
     selector: 'sqx-user-page',
     styleUrls: ['./user-page.component.scss'],
-    templateUrl: './user-page.component.html'
+    templateUrl: './user-page.component.html',
+    providers: [
+        AppContext
+    ]
 })
-export class UserPageComponent extends ComponentBase implements OnInit {
+export class UserPageComponent  implements OnInit {
     private user: UserDto;
 
-    public currentUserId: string;
     public userFormSubmitted = false;
     public userForm: FormGroup;
     public userFormError? = '';
@@ -37,21 +36,15 @@ export class UserPageComponent extends ComponentBase implements OnInit {
     public isCurrentUser = false;
     public isNewMode = false;
 
-    constructor(dialogs: DialogService,
-        private readonly authService: AuthService,
+    constructor(public readonly ctx: AppContext,
         private readonly formBuilder: FormBuilder,
-        private readonly messageBus: MessageBus,
-        private readonly route: ActivatedRoute,
         private readonly router: Router,
         private readonly userManagementService: UserManagementService
     ) {
-        super(dialogs);
     }
 
     public ngOnInit() {
-        this.currentUserId = this.authService.user!.id;
-
-        this.route.data.map(p => p['user'])
+        this.ctx.route.data.map(d => d.user)
             .subscribe((user: UserDto) => {
                 this.user = user;
 
@@ -78,8 +71,9 @@ export class UserPageComponent extends ComponentBase implements OnInit {
                                 created.pictureUrl!,
                                 false);
 
+                        this.ctx.notifyInfo('User created successfully.');
+
                         this.emitUserCreated(this.user);
-                        this.notifyInfo('User created successfully.');
                         this.back();
                     }, error => {
                         this.resetUserForm(error.displayMessage);
@@ -92,8 +86,9 @@ export class UserPageComponent extends ComponentBase implements OnInit {
                                 requestDto.email,
                                 requestDto.displayMessage);
 
+                        this.ctx.notifyInfo('User saved successfully.');
+
                         this.emitUserUpdated(this.user);
-                        this.notifyInfo('User saved successfully.');
                         this.resetUserForm();
                     }, error => {
                         this.resetUserForm(error.displayMessage);
@@ -103,15 +98,15 @@ export class UserPageComponent extends ComponentBase implements OnInit {
     }
 
     private back() {
-        this.router.navigate(['../'], { relativeTo: this.route, replaceUrl: true });
+        this.router.navigate(['../'], { relativeTo: this.ctx.route, replaceUrl: true });
     }
 
     private emitUserCreated(user: UserDto) {
-        this.messageBus.emit(new UserCreated(user));
+        this.ctx.bus.emit(new UserCreated(user));
     }
 
     private emitUserUpdated(user: UserDto) {
-        this.messageBus.emit(new UserUpdated(user));
+        this.ctx.bus.emit(new UserUpdated(user));
     }
 
     private setupAndPopulateForm() {
@@ -141,7 +136,7 @@ export class UserPageComponent extends ComponentBase implements OnInit {
                     ]]
             });
 
-        this.isCurrentUser = this.user && this.user.id === this.currentUserId;
+        this.isCurrentUser = this.user && this.user.id === this.ctx.userId;
 
         this.resetUserForm();
     }

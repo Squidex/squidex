@@ -7,7 +7,6 @@
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 
 import {
@@ -20,16 +19,12 @@ import {
 
 import {
     allData,
-    AppComponentBase,
+    AppContext,
     AppLanguageDto,
-    AppsStoreService,
-    AuthService,
     ContentDto,
     ContentsService,
-    DialogService,
     FieldDto,
     ImmutableArray,
-    MessageBus,
     ModalView,
     Pager,
     SchemaDetailsDto
@@ -38,9 +33,12 @@ import {
 @Component({
     selector: 'sqx-contents-page',
     styleUrls: ['./contents-page.component.scss'],
-    templateUrl: './contents-page.component.html'
+    templateUrl: './contents-page.component.html',
+    providers: [
+        AppContext
+    ]
 })
-export class ContentsPageComponent extends AppComponentBase implements OnDestroy, OnInit {
+export class ContentsPageComponent implements OnDestroy, OnInit {
     private contentCreatedSubscription: Subscription;
     private contentUpdatedSubscription: Subscription;
 
@@ -63,12 +61,9 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
 
     public columnWidth: number;
 
-    constructor(apps: AppsStoreService, dialogs: DialogService, authService: AuthService,
-        private readonly contentsService: ContentsService,
-        private readonly route: ActivatedRoute,
-        private readonly messageBus: MessageBus
+    constructor(public readonly ctx: AppContext,
+        private readonly contentsService: ContentsService
     ) {
-        super(dialogs, apps, authService);
     }
 
     public ngOnDestroy() {
@@ -77,29 +72,29 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
     }
 
     public ngOnInit() {
-        const routeData = allData(this.route);
+        const routeData = allData(this.ctx.route);
 
         this.languages = routeData['appLanguages'];
 
         this.contentCreatedSubscription =
-            this.messageBus.of(ContentCreated)
+            this.ctx.bus.of(ContentCreated)
                 .subscribe(message => {
                     this.contentItems = this.contentItems.pushFront(message.content);
                     this.contentsPager = this.contentsPager.incrementCount();
                 });
 
         this.contentUpdatedSubscription =
-            this.messageBus.of(ContentUpdated)
+            this.ctx.bus.of(ContentUpdated)
                 .subscribe(message => {
                     this.contentItems = this.contentItems.replaceBy('id', message.content, (o, n) => o.update(n.data, n.lastModifiedBy, n.version, n.lastModified));
                 });
 
-        this.route.params.map(p => <string> p['language'])
+        this.ctx.route.params.map(p => p.language)
             .subscribe(language => {
                 this.languageSelected = this.languages.find(l => l.iso2Code === language) || this.languages.find(l => l.isMaster) || this.languages[0];
             });
 
-        this.route.data.map(p => p['schemaOverride'] || p['schema'])
+        this.ctx.route.data.map(d => d.schemaOverride || d.schema)
             .subscribe(schema => {
                 this.schema = schema;
 
@@ -115,79 +110,73 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
     }
 
     public publishContent(content: ContentDto) {
-        this.appNameOnce()
-            .switchMap(app => this.contentsService.publishContent(app, this.schema.name, content.id, content.version))
+        this.contentsService.publishContent(this.ctx.appName, this.schema.name, content.id, content.version)
             .subscribe(dto => {
-                content = content.publish(this.userToken, dto.version);
+                content = content.publish(this.ctx.userToken, dto.version);
 
                 this.contentItems = this.contentItems.replaceBy('id', content);
 
                 this.emitContentPublished(content);
             }, error => {
-                this.notifyError(error);
+                this.ctx.notifyError(error);
             });
     }
 
     public unpublishContent(content: ContentDto) {
-        this.appNameOnce()
-            .switchMap(app => this.contentsService.unpublishContent(app, this.schema.name, content.id, content.version))
+        this.contentsService.unpublishContent(this.ctx.appName, this.schema.name, content.id, content.version)
             .subscribe(dto => {
-                content = content.unpublish(this.userToken, dto.version);
+                content = content.unpublish(this.ctx.userToken, dto.version);
 
                 this.contentItems = this.contentItems.replaceBy('id', content);
 
                 this.emitContentUnpublished(content);
             }, error => {
-                this.notifyError(error);
+                this.ctx.notifyError(error);
             });
     }
 
     public archiveContent(content: ContentDto) {
-        this.appNameOnce()
-            .switchMap(app => this.contentsService.archiveContent(app, this.schema.name, content.id, content.version))
+        this.contentsService.archiveContent(this.ctx.appName, this.schema.name, content.id, content.version)
             .subscribe(dto => {
-                content = content.archive(this.userToken, dto.version);
+                content = content.archive(this.ctx.userToken, dto.version);
 
                 this.removeContent(content);
             }, error => {
-                this.notifyError(error);
+                this.ctx.notifyError(error);
             });
     }
 
     public restoreContent(content: ContentDto) {
-        this.appNameOnce()
-            .switchMap(app => this.contentsService.restoreContent(app, this.schema.name, content.id, content.version))
+        this.contentsService.restoreContent(this.ctx.appName, this.schema.name, content.id, content.version)
             .subscribe(dto => {
-                content = content.restore(this.userToken, dto.version);
+                content = content.restore(this.ctx.userToken, dto.version);
 
                 this.removeContent(content);
             }, error => {
-                this.notifyError(error);
+                this.ctx.notifyError(error);
             });
     }
 
     public deleteContent(content: ContentDto) {
-        this.appNameOnce()
-            .switchMap(app => this.contentsService.deleteContent(app, this.schema.name, content.id, content.version))
+        this.contentsService.deleteContent(this.ctx.appName, this.schema.name, content.id, content.version)
             .subscribe(() => {
                 this.removeContent(content);
             }, error => {
-                this.notifyError(error);
+                this.ctx.notifyError(error);
             });
     }
 
     public load(showInfo = false) {
-        this.appNameOnce()
-            .switchMap(app => this.contentsService.getContents(app, this.schema.name, this.contentsPager.pageSize, this.contentsPager.skip, this.contentsQuery, null, this.isArchive))
+        this.contentsService.getContents(this.ctx.appName, this.schema.name, this.contentsPager.pageSize, this.contentsPager.skip, this.contentsQuery, null, this.isArchive)
             .subscribe(dtos => {
                 this.contentItems = ImmutableArray.of(dtos.items);
                 this.contentsPager = this.contentsPager.setCount(dtos.total);
 
                 if (showInfo) {
-                    this.notifyInfo('Contents reloaded.');
+                    this.ctx.notifyInfo('Contents reloaded.');
                 }
             }, error => {
-                this.notifyError(error);
+                this.ctx.notifyError(error);
             });
     }
 
@@ -226,15 +215,15 @@ export class ContentsPageComponent extends AppComponentBase implements OnDestroy
     }
 
     private emitContentPublished(content: ContentDto) {
-        this.messageBus.emit(new ContentPublished(content));
+        this.ctx.bus.emit(new ContentPublished(content));
     }
 
     private emitContentUnpublished(content: ContentDto) {
-        this.messageBus.emit(new ContentUnpublished(content));
+        this.ctx.bus.emit(new ContentUnpublished(content));
     }
 
     private emitContentRemoved(content: ContentDto) {
-        this.messageBus.emit(new ContentRemoved(content));
+        this.ctx.bus.emit(new ContentRemoved(content));
     }
 
     private resetContents() {

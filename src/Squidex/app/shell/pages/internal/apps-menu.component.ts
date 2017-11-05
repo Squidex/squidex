@@ -9,18 +9,20 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 
 import {
+    AppContext,
     AppDto,
-    AppsStoreService,
+    AppsService,
     fadeAnimation,
     ModalView
 } from 'shared';
-
-const FALLBACK_NAME = 'Apps Overview';
 
 @Component({
     selector: 'sqx-apps-menu',
     styleUrls: ['./apps-menu.component.scss'],
     templateUrl: './apps-menu.component.html',
+    providers: [
+        AppContext
+    ],
     animations: [
         fadeAnimation
     ]
@@ -34,10 +36,8 @@ export class AppsMenuComponent implements OnDestroy, OnInit {
 
     public apps: AppDto[] = [];
 
-    public appName = FALLBACK_NAME;
-
-    constructor(
-        private readonly appsStore: AppsStoreService
+    constructor(public readonly ctx: AppContext,
+        private readonly appsService: AppsService
     ) {
     }
 
@@ -48,12 +48,9 @@ export class AppsMenuComponent implements OnDestroy, OnInit {
 
     public ngOnInit() {
         this.appsSubscription =
-            this.appsStore.apps.subscribe(apps => {
+            this.appsService.getApps().subscribe(apps => {
                 this.apps = apps;
             });
-
-        this.appSubscription =
-            this.appsStore.selectedApp.subscribe(selectedApp => this.appName = selectedApp ? selectedApp.name : FALLBACK_NAME);
     }
 
     public createApp() {

@@ -10,16 +10,12 @@ import { FormBuilder, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
 
 import {
-    AppComponentBase,
+    AppContext,
     AppContributorDto,
     AppContributorsDto,
     AppContributorsService,
-    AppsStoreService,
-    AuthService,
     AutocompleteSource,
-    DialogService,
     HistoryChannelUpdated,
-    MessageBus,
     UsersService
 } from 'shared';
 
@@ -48,12 +44,13 @@ export class UsersDataSource implements AutocompleteSource {
 @Component({
     selector: 'sqx-contributors-page',
     styleUrls: ['./contributors-page.component.scss'],
-    templateUrl: './contributors-page.component.html'
+    templateUrl: './contributors-page.component.html',
+    providers: [
+        AppContext
+    ]
 })
-export class ContributorsPageComponent extends AppComponentBase implements OnInit {
+export class ContributorsPageComponent implements OnInit {
     public appContributors: AppContributorsDto;
-
-    public currentUserId: string;
 
     public maxContributors = -1;
 
@@ -72,64 +69,56 @@ export class ContributorsPageComponent extends AppComponentBase implements OnIni
                 ]]
         });
 
-    constructor(apps: AppsStoreService, dialogs: DialogService, usersService: UsersService, authService: AuthService,
+    constructor(public readonly ctx: AppContext, usersService: UsersService,
         private readonly appContributorsService: AppContributorsService,
-        private readonly messageBus: MessageBus,
         private readonly formBuilder: FormBuilder
     ) {
-        super(dialogs, apps, authService);
-
         this.usersDataSource = new UsersDataSource(usersService, this);
     }
 
     public ngOnInit() {
-        this.currentUserId = this.authService.user!.id;
-
         this.load();
     }
 
     public load() {
-        this.appNameOnce()
-            .switchMap(app => this.appContributorsService.getContributors(app).retry(2))
+        this.appContributorsService.getContributors(this.ctx.appName)
             .subscribe(dto => {
                 this.updateContributorsFromDto(dto);
             }, error => {
-                this.notifyError(error);
+                this.ctx.notifyError(error);
             });
     }
 
     public removeContributor(contributor: AppContributorDto) {
-        this.appNameOnce()
-            .switchMap(app => this.appContributorsService.deleteContributor(app, contributor.contributorId, this.appContributors.version))
+        this.appContributorsService.deleteContributor(this.ctx.appName, contributor.contributorId, this.appContributors.version)
             .subscribe(dto => {
                 this.updateContributors(this.appContributors.removeContributor(contributor, dto.version));
             }, error => {
-                this.notifyError(error);
+                this.ctx.notifyError(error);
             });
     }
 
     public changePermission(contributor: AppContributorDto, permission: string) {
         const requestDto = contributor.changePermission(permission);
 
-        this.appNameOnce()
-            .switchMap(app => this.appContributorsService.postContributor(app, requestDto, this.appContributors.version))
+        this.appContributorsService.postContributor(this.ctx.appName, requestDto, this.appContributors.version)
             .subscribe(dto => {
                 this.updateContributors(this.appContributors.updateContributor(contributor, dto.version));
             }, error => {
-                this.notifyError(error);
+                this.ctx.notifyError(error);
             });
     }
 
     public assignContributor() {
         const requestDto = new AppContributorDto(this.addContributorForm.controls['user'].value.id, 'Editor');
 
-        this.appNameOnce()
-            .switchMap(app => this.appContributorsService.postContributor(app, requestDto, this.appContributors.version))
+        this.appContributorsService.postContributor(this.ctx.appName, requestDto, this.appContributors.version)
             .subscribe(dto => {
                 this.updateContributors(this.appContributors.addContributor(requestDto, dto.version));
                 this.resetContributorForm();
             }, error => {
-                this.notifyError(error);
+                this.ctx.notifyError(error);
+
                 this.resetContributorForm();
             });
     }
@@ -147,6 +136,6 @@ export class ContributorsPageComponent extends AppComponentBase implements OnIni
     private updateContributors(appContributors: AppContributorsDto) {
         this.appContributors = appContributors;
 
-        this.messageBus.emit(new HistoryChannelUpdated());
+        this.ctx.bus.emit(new HistoryChannelUpdated());
     }
 }

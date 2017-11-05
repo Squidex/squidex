@@ -16,10 +16,7 @@ const GraphiQL = require('graphiql');
 /* tslint:disable:use-view-encapsulation */
 
 import {
-    AppComponentBase,
-    AppsStoreService,
-    AuthService,
-    DialogService,
+    AppContext,
     GraphQlService,
     LocalStoreService
 } from 'shared';
@@ -28,17 +25,19 @@ import {
     selector: 'sqx-graphql-page',
     styleUrls: ['./graphql-page.component.scss'],
     templateUrl: './graphql-page.component.html',
+    providers: [
+        AppContext
+    ],
     encapsulation: ViewEncapsulation.None
 })
-export class GraphQLPageComponent extends AppComponentBase implements OnInit {
+export class GraphQLPageComponent implements OnInit {
     @ViewChild('graphiQLContainer')
     public graphiQLContainer: ElementRef;
 
-    constructor(apps: AppsStoreService, dialogs: DialogService, authService: AuthService,
+    constructor(public readonly ctx: AppContext,
         private readonly graphQlService: GraphQlService,
         private readonly localStoreService: LocalStoreService
     ) {
-        super(dialogs, apps, authService);
     }
 
     public ngOnInit() {
@@ -57,9 +56,7 @@ export class GraphQLPageComponent extends AppComponentBase implements OnInit {
     }
 
     private request(params: any) {
-        return this.appNameOnce()
-            .switchMap(app => this.graphQlService.query(app, params).catch(response => Observable.of(response.error)))
-            .toPromise();
+        return this.graphQlService.query(this.ctx.appName, params).catch(response => Observable.of(response.error)).toPromise();
     }
 }
 

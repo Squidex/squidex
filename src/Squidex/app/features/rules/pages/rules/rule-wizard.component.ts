@@ -8,12 +8,9 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 
 import {
-    AppComponentBase,
-    AppsStoreService,
-    AuthService,
+    AppContext,
     CreateRuleDto,
     DateTime,
-    DialogService,
     fadeAnimation,
     ruleActions,
     ruleTriggers,
@@ -31,11 +28,14 @@ export const MODE_EDIT_ACTION  = 'EditAction';
     selector: 'sqx-rule-wizard',
     styleUrls: ['./rule-wizard.component.scss'],
     templateUrl: './rule-wizard.component.html',
+    providers: [
+        AppContext
+    ],
     animations: [
         fadeAnimation
     ]
 })
-export class RuleWizardComponent extends AppComponentBase implements OnInit {
+export class RuleWizardComponent implements OnInit {
     public ruleActions = ruleActions;
     public ruleTriggers = ruleTriggers;
 
@@ -69,10 +69,9 @@ export class RuleWizardComponent extends AppComponentBase implements OnInit {
     @Input()
     public mode = MODE_WIZARD;
 
-    constructor(apps: AppsStoreService, dialogs: DialogService, authService: AuthService,
+    constructor(public readonly ctx: AppContext,
         private readonly rulesService: RulesService
     ) {
-        super(dialogs, apps, authService);
     }
 
     public ngOnInit() {
@@ -126,39 +125,36 @@ export class RuleWizardComponent extends AppComponentBase implements OnInit {
     private createRule() {
         const requestDto = new CreateRuleDto(this.trigger, this.action);
 
-        this.appNameOnce()
-            .switchMap(app => this.rulesService.postRule(app, requestDto, this.authService.user!.id, DateTime.now()))
+        this.rulesService.postRule(this.ctx.appName, requestDto, this.ctx.userToken, DateTime.now())
             .subscribe(dto => {
                 this.created.emit(dto);
             }, error => {
-                this.notifyError(error);
+                this.ctx.notifyError(error);
             });
     }
 
     private updateTrigger() {
         const requestDto = new UpdateRuleDto(this.trigger, null);
 
-        this.appNameOnce()
-            .switchMap(app => this.rulesService.putRule(app, this.rule.id, requestDto, this.rule.version))
+        this.rulesService.putRule(this.ctx.appName, this.rule.id, requestDto, this.rule.version)
             .subscribe(dto => {
-                const rule = this.rule.updateTrigger(this.trigger, this.authService.user.id, dto.version, DateTime.now());
+                const rule = this.rule.updateTrigger(this.trigger, this.ctx.userToken, dto.version, DateTime.now());
                 this.updated.emit(rule);
             }, error => {
-                this.notifyError(error);
+                this.ctx.notifyError(error);
             });
     }
 
     private updateAction() {
         const requestDto = new UpdateRuleDto(null, this.action);
 
-        this.appNameOnce()
-            .switchMap(app => this.rulesService.putRule(app, this.rule.id, requestDto, this.rule.version))
+        this.rulesService.putRule(this.ctx.appName, this.rule.id, requestDto, this.rule.version)
             .subscribe(dto => {
-                const rule = this.rule.updateAction(this.action, this.authService.user.id, dto.version, DateTime.now());
+                const rule = this.rule.updateAction(this.action, this.ctx.userToken, dto.version, DateTime.now());
 
                 this.updated.emit(rule);
             }, error => {
-                this.notifyError(error);
+                this.ctx.notifyError(error);
             });
     }
 

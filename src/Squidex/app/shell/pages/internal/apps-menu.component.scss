@@ -57,6 +57,6 @@ $color-apps-border: #65a6ff;
     }
 
     &-pill {
-        @include absolute(.8rem, .625rem, auto, auto);
+        @include absolute(.5rem, .625rem, auto, auto);
     }
 }

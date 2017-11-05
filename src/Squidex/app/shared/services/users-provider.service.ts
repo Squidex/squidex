@@ -27,7 +27,7 @@ export class UsersProviderService {
 
         if (!result) {
             const request =
-                this.usersService.getUser(id).retry(2)
+                this.usersService.getUser(id)
                     .catch(error => {
                         return Observable.of(new UserDto('NOT FOUND', 'NOT FOUND', 'NOT FOUND', null, false));
                     })
