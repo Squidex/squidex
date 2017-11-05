@@ -50,7 +50,7 @@
         <tr>
             <td>Client Id:</td>
             <td>
-                <input readonly class="form-control" value="{{appName}}:{{client.id}}" #inputName />
+                <input readonly class="form-control" value="{{ctx.appName}}:{{client.id}}" #inputName />
             </td>
             <td>
                 <button type="button" class="btn btn-primary btn-link" [sqxCopy]="inputName">

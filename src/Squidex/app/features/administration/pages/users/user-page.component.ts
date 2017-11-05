@@ -27,7 +27,7 @@ import { UserCreated, UserUpdated } from './../messages';
     ]
 })
 export class UserPageComponent  implements OnInit {
-    private user: UserDto;
+    public user: UserDto;
 
     public userFormSubmitted = false;
     public userForm: FormGroup;
