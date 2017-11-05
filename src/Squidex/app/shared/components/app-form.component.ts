@@ -12,7 +12,7 @@ import { ApiUrlConfig, ValidatorsEx } from 'framework';
 
 import {
     AppDto,
-    AppsService,
+    AppsStoreService,
     CreateAppDto
 } from './../declarations-base';
 
@@ -48,7 +48,7 @@ export class AppFormComponent {
 
     constructor(
         public readonly apiUrl: ApiUrlConfig,
-        private readonly appsService: AppsService,
+        private readonly appsStore: AppsStoreService,
         private readonly formBuilder: FormBuilder
     ) {
     }
@@ -66,7 +66,7 @@ export class AppFormComponent {
 
             const request = new CreateAppDto(this.createForm.controls['name'].value);
 
-            this.appsService.postApp(request)
+            this.appsStore.createApp(request)
                 .subscribe(dto => {
                     this.resetCreateForm();
                     this.emitCreated(dto);

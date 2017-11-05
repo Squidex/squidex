@@ -80,6 +80,13 @@
     display: inline-flex;
 }
 
+@mixin flex-direction($direction) {
+    -webkit-flex-direction: $direction;
+       -moz-flex-direction: $direction;
+        -ms-flex-direction: $direction;
+            flex-direction: $direction;
+}
+
 @mixin flex-flow($values: (row nowrap)) {
     -webkit-flex-flow: $values;
        -moz-flex-flow: $values;

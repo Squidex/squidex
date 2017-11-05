@@ -11,7 +11,7 @@ import { Subscription } from 'rxjs';
 import {
     AppContext,
     AppDto,
-    AppsService,
+    AppsStoreService,
     fadeAnimation,
     ModalView
 } from 'shared';
@@ -29,7 +29,6 @@ import {
 })
 export class AppsMenuComponent implements OnDestroy, OnInit {
     private appsSubscription: Subscription;
-    private appSubscription: Subscription;
 
     public modalMenu = new ModalView(false, true);
     public modalDialog = new ModalView();
@@ -37,18 +36,17 @@ export class AppsMenuComponent implements OnDestroy, OnInit {
     public apps: AppDto[] = [];
 
     constructor(public readonly ctx: AppContext,
-        private readonly appsService: AppsService
+        private readonly appsStore: AppsStoreService
     ) {
     }
 
     public ngOnDestroy() {
         this.appsSubscription.unsubscribe();
-        this.appSubscription.unsubscribe();
     }
 
     public ngOnInit() {
         this.appsSubscription =
-            this.appsService.getApps().subscribe(apps => {
+            this.appsStore.apps.subscribe(apps => {
                 this.apps = apps;
             });
     }

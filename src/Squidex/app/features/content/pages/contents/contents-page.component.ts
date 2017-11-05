@@ -72,10 +72,6 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
     }
 
     public ngOnInit() {
-        const routeData = allData(this.ctx.route);
-
-        this.languages = routeData['appLanguages'];
-
         this.contentCreatedSubscription =
             this.ctx.bus.of(ContentCreated)
                 .subscribe(message => {
@@ -89,20 +85,27 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
                     this.contentItems = this.contentItems.replaceBy('id', message.content, (o, n) => o.update(n.data, n.lastModifiedBy, n.version, n.lastModified));
                 });
 
+        const routeData = allData(this.ctx.route);
+
+        this.languages = routeData.appLanguages;
+
+        this.ctx.route.data.map(p => p.isReadOnly)
+            .subscribe(isReadOnly => {
+                this.isReadOnly = isReadOnly;
+            });
+
         this.ctx.route.params.map(p => p.language)
             .subscribe(language => {
                 this.languageSelected = this.languages.find(l => l.iso2Code === language) || this.languages.find(l => l.isMaster) || this.languages[0];
             });
 
-        this.ctx.route.data.map(d => d.schemaOverride || d.schema)
+        this.ctx.route.data.map(d => d.schema)
             .subscribe(schema => {
                 this.schema = schema;
 
                 this.resetContents();
                 this.load();
             });
-
-        this.isReadOnly = routeData['isReadOnly'];
     }
 
     public dropData(content: ContentDto) {

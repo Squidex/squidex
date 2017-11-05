@@ -68,9 +68,6 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
     }
 
     public ngOnInit() {
-        const routeData = allData(this.ctx.route);
-
-        this.languages = routeData['appLanguages'];
 
         this.contentVersionSelectedSubscription =
             this.ctx.bus.of(ContentVersionSelected)
@@ -102,7 +99,11 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
                     }
                 });
 
-        this.setupContentForm(routeData['schema']);
+        const routeData = allData(this.ctx.route);
+
+        this.languages = routeData.appLanguages;
+
+        this.setupContentForm(routeData.schema);
 
         this.ctx.route.data.map(d => d.content)
             .subscribe((content: ContentDto) => {

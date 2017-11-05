@@ -18,9 +18,10 @@ import {
 } from './shell';
 
 import {
+    AppMustExistGuard,
     MustBeAuthenticatedGuard,
     MustBeNotAuthenticatedGuard,
-    ResolveAppGuard
+    UnsetAppGuard
 } from './shared';
 
 export const routes: Routes = [
@@ -36,7 +37,8 @@ export const routes: Routes = [
         children: [
             {
                 path: '',
-                loadChildren: './features/apps/module#SqxFeatureAppsModule'
+                loadChildren: './features/apps/module#SqxFeatureAppsModule',
+                canActivate: [UnsetAppGuard]
             },
             {
                 path: 'administration',
@@ -45,9 +47,7 @@ export const routes: Routes = [
             {
                 path: ':appName',
                 component: AppAreaComponent,
-                resolve: {
-                    app: ResolveAppGuard
-                },
+                canActivate: [AppMustExistGuard],
                 children: [
                     {
                         path: '',

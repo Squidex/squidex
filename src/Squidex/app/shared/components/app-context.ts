@@ -5,14 +5,15 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Injectable, OnDestroy } from '@angular/core';
+import { Observable, Subscription } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 
 import { MessageBus } from 'framework';
 
 import {
     AppDto,
+    AppsStoreService,
     AuthService,
     DialogService,
     ErrorDto,
@@ -21,7 +22,8 @@ import {
 } from './../declarations-base';
 
 @Injectable()
-export class AppContext {
+export class AppContext implements OnDestroy {
+    private readonly appSubscription: Subscription;
     private appField: AppDto;
 
     public get app(): AppDto {
@@ -29,7 +31,7 @@ export class AppContext {
     }
 
     public get appName(): string {
-        return this.appField.name;
+        return this.appField ? this.appField.name : '';
     }
 
     public get userToken(): string {
@@ -47,13 +49,18 @@ export class AppContext {
     constructor(
         public readonly dialogs: DialogService,
         public readonly authService: AuthService,
+        public readonly appsStore: AppsStoreService,
         public readonly route: ActivatedRoute,
         public readonly bus: MessageBus
     ) {
-        Observable.merge(...this.route.pathFromRoot.map(r => r.data)).map(d => d.app).filter(a => !!a)
-            .subscribe((app: AppDto) => {
+        this.appSubscription =
+            this.appsStore.selectedApp.subscribe(app => {
                 this.appField = app;
             });
+    }
+
+    public ngOnDestroy() {
+        this.appSubscription.unsubscribe();
     }
 
     public confirmUnsavedChanges(): Observable<boolean> {

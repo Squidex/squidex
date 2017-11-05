@@ -10,7 +10,7 @@ import { Subscription } from 'rxjs';
 
 import {
     AppDto,
-    AppsService,
+    AppsStoreService,
     fadeAnimation,
     ModalView,
     OnboardingService
@@ -33,7 +33,7 @@ export class AppsPageComponent implements OnDestroy, OnInit {
     public onboardingModal = new ModalView();
 
     constructor(
-        private readonly appsService: AppsService,
+        private readonly appsStore: AppsStoreService,
         private readonly onboardingService: OnboardingService
     ) {
     }
@@ -44,7 +44,7 @@ export class AppsPageComponent implements OnDestroy, OnInit {
 
     public ngOnInit() {
         this.appsSubscription =
-            this.appsService.getApps()
+            this.appsStore.apps
                 .subscribe(apps => {
                     if (apps.length === 0 && this.onboardingService.shouldShow('dialog')) {
                         this.onboardingService.disable('dialog');
