@@ -30,6 +30,10 @@ export class AppContext implements OnDestroy {
         return this.appField;
     }
 
+    public get appChanges(): Observable<AppDto> {
+        return this.appsStore.selectedApp;
+    }
+
     public get appName(): string {
         return this.appField ? this.appField.name : '';
     }

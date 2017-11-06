@@ -31,9 +31,9 @@ describe('UnsetAppGuard', () => {
             .subscribe(value => {
                 result = value;
             });
-        
+
         expect(result).toBeTruthy();
-        
+
         appStoreService.verify(x => x.selectApp(null), Times.once());
     });
 });
