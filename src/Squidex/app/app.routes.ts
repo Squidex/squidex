@@ -42,7 +42,8 @@ export const routes: Routes = [
             },
             {
                 path: 'administration',
-                loadChildren: './features/administration/module#SqxFeatureAdministrationModule'
+                loadChildren: './features/administration/module#SqxFeatureAdministrationModule',
+                canActivate: [UnsetAppGuard]
             },
             {
                 path: ':appName',

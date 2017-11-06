@@ -7,6 +7,7 @@
 
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivate, RouterStateSnapshot } from '@angular/router';
+import { Observable } from 'rxjs';
 
 import { AppsStoreService } from './../services/apps-store.service';
 
@@ -17,9 +18,7 @@ export class UnsetAppGuard implements CanActivate {
     ) {
     }
 
-    public canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
-        this.appsStore.selectApp(null);
-
-        return true;
+    public canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> {
+        return this.appsStore.selectApp(null).map(a => !a);
     }
 }
