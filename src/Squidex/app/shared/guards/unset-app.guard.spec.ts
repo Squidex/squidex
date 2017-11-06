@@ -6,6 +6,7 @@
  */
 
 import { IMock, Mock, Times } from 'typemoq';
+import { Observable } from 'rxjs';
 
 import { AppsStoreService } from 'shared';
 
@@ -19,10 +20,20 @@ describe('UnsetAppGuard', () => {
     });
 
     it('should unselect app', () => {
+        appStoreService.setup(x => x.selectApp(null))
+            .returns(() => Observable.of(false));
+
         const guard = new UnsetAppGuard(appStoreService.object);
 
-        expect(guard.canActivate(<any>{}, <any>{})).toBeTruthy();
+        let result: boolean = undefined;
 
+        guard.canActivate(null, null)
+            .subscribe(value => {
+                result = value;
+            });
+        
+        expect(result).toBeTruthy();
+        
         appStoreService.verify(x => x.selectApp(null), Times.once());
     });
 });
