@@ -314,6 +314,8 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
             }
             catch (TypeNameNotFoundException)
             {
+                log.LogDebug(w => w.WriteProperty("oldEventFound", message.Data.Type));
+
                 return null;
             }
         }
