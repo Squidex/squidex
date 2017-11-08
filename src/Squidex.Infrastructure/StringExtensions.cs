@@ -326,14 +326,36 @@ namespace Squidex.Infrastructure
 
         public static string ToPascalCase(this string value)
         {
-            return string.Concat(value.Split(new[] { '-', '_', ' ' }, StringSplitOptions.RemoveEmptyEntries).Select(c => char.ToUpper(c[0]) + c.Substring(1)));
+            var sb = new StringBuilder();
+
+            foreach (var part in value.Split(new[] { '-', '_', ' ' }))
+            {
+                if (part.Length < 2)
+                {
+                    sb.Append(part.ToUpper());
+                }
+                else
+                {
+                    sb.Append(char.ToUpper(part[0]));
+                    sb.Append(part.Substring(1));
+                }
+            }
+
+            return sb.ToString();
         }
 
         public static string ToCamelCase(this string value)
         {
             value = value.ToPascalCase();
 
-            return char.ToLower(value[0]) + value.Substring(1);
+            if (value.Length < 2)
+            {
+                return value.ToLower();
+            }
+            else
+            {
+                return char.ToLower(value[0]) + value.Substring(1);
+            }
         }
 
         public static string Simplify(this string value, ISet<char> preserveHash = null, bool singleCharDiactric = false, char separator = '-')

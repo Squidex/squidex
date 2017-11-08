@@ -23,6 +23,9 @@ namespace Squidex.Infrastructure
         }
 
         [Theory]
+        [InlineData("", "")]
+        [InlineData("m", "M")]
+        [InlineData("m-y", "MY")]
         [InlineData("my", "My")]
         [InlineData("myProperty ", "MyProperty")]
         [InlineData("my property", "MyProperty")]
@@ -34,7 +37,10 @@ namespace Squidex.Infrastructure
         }
 
         [Theory]
+        [InlineData("", "")]
+        [InlineData("M", "m")]
         [InlineData("My", "my")]
+        [InlineData("M-y", "mY")]
         [InlineData("MyProperty ", "myProperty")]
         [InlineData("My property", "myProperty")]
         [InlineData("My_property", "myProperty")]
@@ -105,9 +111,9 @@ namespace Squidex.Infrastructure
         }
 
         [Theory]
-        [InlineData("http://squidex.io/base/",  "path/to/res", false, "http://squidex.io/base/path/to/res")]
-        [InlineData("http://squidex.io/base/",  "path/to/res", true,  "http://squidex.io/base/path/to/res/")]
-        [InlineData("http://squidex.io/base/", "/path/to/res", true,  "http://squidex.io/base/path/to/res/")]
+        [InlineData("http://squidex.io/base/", "path/to/res", false, "http://squidex.io/base/path/to/res")]
+        [InlineData("http://squidex.io/base/", "path/to/res", true, "http://squidex.io/base/path/to/res/")]
+        [InlineData("http://squidex.io/base/", "/path/to/res", true, "http://squidex.io/base/path/to/res/")]
         public void Should_provide_full_url_without_query_or_fragment(string baseUrl, string path, bool trailingSlash, string output)
         {
             var result = baseUrl.BuildFullUrl(path, trailingSlash);
@@ -117,8 +123,8 @@ namespace Squidex.Infrastructure
 
         [Theory]
         [InlineData("http://squidex.io/base/", "path/to/res?query=1", false, "http://squidex.io/base/path/to/res?query=1")]
-        [InlineData("http://squidex.io/base/", "path/to/res#query=1", true,  "http://squidex.io/base/path/to/res#query=1")]
-        [InlineData("http://squidex.io/base/", "path/to/res;query=1", true,  "http://squidex.io/base/path/to/res;query=1")]
+        [InlineData("http://squidex.io/base/", "path/to/res#query=1", true, "http://squidex.io/base/path/to/res#query=1")]
+        [InlineData("http://squidex.io/base/", "path/to/res;query=1", true, "http://squidex.io/base/path/to/res;query=1")]
         public void Should_provide_full_url_wit_query_or_fragment(string baseUrl, string path, bool trailingSlash, string output)
         {
             var result = baseUrl.BuildFullUrl(path, trailingSlash);
