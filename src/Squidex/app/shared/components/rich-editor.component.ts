@@ -8,8 +8,7 @@
 import { AfterViewInit, Component, forwardRef, ElementRef, OnDestroy, ViewChild, Input } from '@angular/core';
 import { ControlValueAccessor,  NG_VALUE_ACCESSOR, FormBuilder } from '@angular/forms';
 
-import { AppComponentBase } from './app.component-base';
-import { ApiUrlConfig, ModalView, AppsStoreService, MessageBus, AssetDragged, DialogService, AuthService, Types, ResourceLoaderService } from './../declarations-base';
+import { ApiUrlConfig, MessageBus, AssetDragged, Types, ResourceLoaderService } from './../declarations-base';
 import { AssetDropHandler } from './asset-drop.handler';
 
 declare var tinymce: any;
@@ -24,7 +23,7 @@ export const SQX_RICH_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     templateUrl: './rich-editor.component.html',
     providers: [SQX_RICH_EDITOR_CONTROL_VALUE_ACCESSOR]
 })
-export class RichEditorComponent extends AppComponentBase implements ControlValueAccessor, AfterViewInit, OnDestroy {
+export class RichEditorComponent implements ControlValueAccessor, AfterViewInit, OnDestroy {
     private callChange = (v: any) => { /* NOOP */ };
     private callTouched = () => { /* NOOP */ };
     private tinyEditor: any;
@@ -41,18 +40,15 @@ export class RichEditorComponent extends AppComponentBase implements ControlValu
     @Input()
     public editorOptions: any;
 
-    public assetsDialog = new ModalView();
     public assetsForm = this.formBuilder.group({
         name: ['']
     });
 
-    constructor(dialogs: DialogService, apps: AppsStoreService, authService: AuthService,
-        private readonly resourceLoader: ResourceLoaderService,
+    constructor(private readonly resourceLoader: ResourceLoaderService,
         private readonly formBuilder: FormBuilder,
         private readonly apiUrlConfig: ApiUrlConfig,
         private readonly messageBus: MessageBus
     ) {
-        super(dialogs, apps, authService);
         this.assetDropHandler = new AssetDropHandler(this.apiUrlConfig);
 
         this.assetDraggedSubscription = this.messageBus.of(AssetDragged).subscribe(message => {
