@@ -451,9 +451,9 @@ export class DateTimeFieldPropertiesDto extends FieldPropertiesDto {
             const parsed = DateTime.parseISO_UTC(value);
 
             if (this.editor === 'Date') {
-                return parsed.toStringFormat('YYYY-MM-DD');
+                return parsed.toUTCStringFormat('YYYY-MM-DD');
             } else {
-                return parsed.toStringFormat('YYYY-MM-DD HH:mm:ss');
+                return parsed.toUTCStringFormat('YYYY-MM-DD HH:mm:ss');
             }
         } catch (ex) {
             return value;
