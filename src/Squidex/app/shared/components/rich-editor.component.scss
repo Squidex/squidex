@@ -6,31 +6,29 @@
     border: 1px solid $color-input;
     height: 30rem;
 }
-.asset-selector {
-    z-index: 65560;
+.editor-container {
+    position: relative;
 
-    .modal-header {
-        background: transparent;
-        border-bottom: 1px solid #c5c5c5;
-
-        .modal-title {
-            text-decoration: none;
-            color: #333;
-            font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
-            text-shadow: none;
-        }
+    .drop-zone {
+        background: rgba(238, 241, 244, 0.89);
+        z-index: 5000;
+        position: absolute;
+        top: 92px;
+        left: 20px;
+        right: 30px;
+        border-color: #c8d2db;
+        border-style: dashed;
+        opacity: 0;
+        display: none;
     }
 
-    .modal-content {
-        width: 100%;
-        border-radius: 0;
-        -webkit-border-radius: 0;
-    }
-    .modal-dialog {
-        max-width: 900px;
+    h3 {
+        text-align: center;
+        padding-top: 35%;
     }
 
-    .btn {
-        border-radius: 0;
+    .drop-zone.active {
+        opacity: 1;
+        display:block;
     }
 }

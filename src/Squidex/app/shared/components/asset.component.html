@@ -1,4 +1,4 @@
-<div class="card" (sqxFileDrop)="updateFile($event)" dnd-draggable [dragEnabled]="!!asset" [dragData]="asset" (click)="clicked.emit(asset)">
+<div class="card" (sqxFileDrop)="updateFile($event)" dnd-draggable [dragEnabled]="!!asset" [dragData]="asset">
     <div class="card-block">
         <div class="file-preview" *ngIf="asset && progress == 0" @fade>
             <span class="file-type" *ngIf="asset.fileType">

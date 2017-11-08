@@ -1,6 +1,14 @@
-<div class="editor" #editor></div>
+<div class="editor-container">
+    <div class="file-drop drag drop-zone" [class.active]="draggedOver" dnd-droppable 
+         (onDropSuccess)="onItemDropped($event)" 
+         (onDragEnter)="draggedOver=true"
+         (onDragLeave)="draggedOver=false">
+        <h3>Drop asset in this zone to insert into content</h3>
+    </div>
+    <div class="editor" #editor></div>
+</div>
 
-<div class="modal asset-selector" *sqxModalView="assetsDialog;onRoot:true">
+<!--<div class="modal asset-selector" *sqxModalView="assetsDialog;onRoot:true">
     <div class="modal-backdrop"></div>
     <div class="modal-dialog">
         <div class="modal-content">
@@ -37,4 +45,4 @@
             </div>
         </div>
     </div>
-</div>
+</div>-->

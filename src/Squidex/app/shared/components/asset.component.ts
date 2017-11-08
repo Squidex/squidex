@@ -60,9 +60,6 @@ export class AssetComponent extends AppComponentBase implements OnInit {
     public deleting = new EventEmitter<AssetDto>();
 
     @Output()
-    public clicked = new EventEmitter<AssetDto>();
-
-    @Output()
     public failed = new EventEmitter();
 
     public renameDialog = new ModalView();

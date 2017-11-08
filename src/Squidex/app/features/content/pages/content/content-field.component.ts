@@ -5,7 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
 import { AppLanguageDto, FieldDto } from 'shared';
@@ -32,6 +32,30 @@ export class ContentFieldComponent implements OnInit {
 
     public fieldPartitions: string[];
     public fieldPartition: string;
+    public richTextEditorOptions: any;
+
+    @ViewChild('assets')
+    public assetLink: ElementRef;
+
+    private buildRichTextEditorOptions() {
+        // const self = this;
+        return {
+            toolbar: 'undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | image assets',
+            plugins: 'code,image',
+            file_picker_types: 'image',
+            convert_urls: false,
+            onSetup: (editor: any) => {
+                 editor.addButton('assets', {
+                    text: '',
+                    icon: 'browse',
+                    tooltip: 'Insert Assets',
+                    onclick: () => {
+                        console.log(this.assetLink);
+                    }
+                 });
+            }
+        };
+    }
 
     public selectLanguage(language: AppLanguageDto) {
         this.fieldPartition = language.iso2Code;
@@ -39,6 +63,7 @@ export class ContentFieldComponent implements OnInit {
 
     public ngOnInit() {
         this.masterLanguageCode = this.languages.find(l => l.isMaster).iso2Code;
+        this.richTextEditorOptions = this.buildRichTextEditorOptions();
 
         if (this.field.isDisabled) {
             this.fieldForm.disable();

@@ -5,12 +5,13 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { AfterViewInit, Component, forwardRef, ElementRef, OnDestroy, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, forwardRef, ElementRef, OnDestroy, ViewChild, Input } from '@angular/core';
 import { ControlValueAccessor,  NG_VALUE_ACCESSOR, FormBuilder } from '@angular/forms';
 
 import { AppComponentBase } from './app.component-base';
 import { AssetUrlPipe } from './pipes';
 import { ApiUrlConfig, ModalView, AppsStoreService, AssetDto, AssetsService, ImmutableArray, DialogService, AuthService, Pager, Types, ResourceLoaderService } from './../declarations-base';
+import { AssetDropHandler } from './asset-drop.handler';
 
 declare var tinymce: any;
 
@@ -36,9 +37,13 @@ export class RichEditorComponent extends AppComponentBase implements ControlValu
     public assetsPager = new Pager(0, 0, 12);
     private assetUrlGenerator: AssetUrlPipe;
     private assetsMimeTypes: Array<string> = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif'];
+    private assetDropHandler: AssetDropHandler;
+    public draggedOver = false;
 
     @ViewChild('editor')
     public editor: ElementRef;
+    @Input()
+    public editorOptions: any;
 
     public assetsDialog = new ModalView();
     public assetsForm = this.formBuilder.group({
@@ -53,6 +58,7 @@ export class RichEditorComponent extends AppComponentBase implements ControlValu
     ) {
         super(dialogs, apps, authService);
         this.assetUrlGenerator = new AssetUrlPipe(this.apiUrlConfig);
+        this.assetDropHandler = new AssetDropHandler(this.apiUrlConfig);
     }
 
     private load() {
@@ -64,6 +70,61 @@ export class RichEditorComponent extends AppComponentBase implements ControlValu
             }, error => {
                 this.notifyError(error);
             });
+    }
+
+    private editorDefaultOptions() {
+        const self = this;
+        return {
+            setup: (editor: any) => {
+                self.tinyEditor = editor;
+                self.tinyEditor.setMode(this.isDisabled ? 'readonly' : 'design');
+
+                self.tinyEditor.on('change', () => {
+                    const value = editor.getContent();
+
+                    if (this.value !== value) {
+                        this.value = value;
+
+                        self.callChange(value);
+                    }
+                });
+
+                self.tinyEditor.on('blur', () => {
+                    self.callTouched();
+                });
+
+                self.tinyEditor.on('init', () => {
+                    let editorDoc = self.tinyEditor.iframeElement;
+                    let dragTarget: any = null;
+
+                    editorDoc.ondragenter = (event: any) => {
+                        console.log('dragenter');
+                        self.draggedOver = true;
+                        dragTarget = event.target;
+                    };
+
+                    editorDoc.ondragleave = (event: any) => {
+                        if (event.target === dragTarget) {
+                            self.draggedOver = false;
+                            console.log('dragleave');
+                        } else {
+                            self.draggedOver = true;
+                        }
+                    };
+                });
+
+                // TODO: expose an observable to which we can subscribe to
+                if (Types.isFunction(self.editorOptions.onSetup)) {
+                    self.editorOptions.onSetup(editor);
+                }
+
+                this.tinyInitTimer =
+                    setTimeout(() => {
+                        self.tinyEditor.setContent(this.value || '');
+                    }, 500);
+            },
+            removed_menuitems: 'newdocument', target: this.editor.nativeElement
+        };
     }
 
     public goNext() {
@@ -88,39 +149,9 @@ export class RichEditorComponent extends AppComponentBase implements ControlValu
         const self = this;
 
         this.resourceLoader.loadScript('https://cdnjs.cloudflare.com/ajax/libs/tinymce/4.5.4/tinymce.min.js').then(() => {
-            tinymce.init({
-                setup: (editor: any) => {
-                    self.tinyEditor = editor;
-                    self.tinyEditor.setMode(this.isDisabled ? 'readonly' : 'design');
-
-                    self.tinyEditor.on('change', () => {
-                        const value = editor.getContent();
-
-                        if (this.value !== value) {
-                            this.value = value;
-
-                            self.callChange(value);
-                        }
-                    });
-
-                    self.tinyEditor.on('blur', () => {
-                        self.callTouched();
-                    });
-
-                    this.tinyInitTimer =
-                        setTimeout(() => {
-                            self.tinyEditor.setContent(this.value || '');
-                        }, 500);
-                },
-                removed_menuitems: 'newdocument', plugins: 'code,image', target: this.editor.nativeElement, file_picker_types: 'image', convert_urls: false, file_picker_callback: (cb: any, value: any, meta: any) => {
-                    self.load();
-                    self.assetsDialog.show();
-                    self.assetSelectorClickHandler = {
-                        cb: cb,
-                        meta: meta
-                    };
-                }
-            });
+            let editorOptions = { ...self.editorDefaultOptions(), ...self.editorOptions };
+            console.log(editorOptions);
+            tinymce.init(editorOptions);
         });
     }
 
@@ -161,6 +192,14 @@ export class RichEditorComponent extends AppComponentBase implements ControlValu
                 height: asset.pixelHeight
             });
             this.closeAssetDialog();
+        }
+    }
+
+    public onItemDropped(event: any) {
+        this.draggedOver = false;
+        let content = this.assetDropHandler.buildDroppedAssetData(event.dragData, event.mouseEvent);
+        if (content) {
+            this.tinyEditor.execCommand('mceInsertContent', false, content);
         }
     }
 }
