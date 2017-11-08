@@ -1,6 +1,6 @@
 <ul class="nav navbar-nav" *ngIf="apps">
     <li class="nav-item dropdown">
-        <span class="nav-link dropdown-toggle" id="app-name" (click)="modalMenu.toggle()">{{appName}}</span>
+        <span class="nav-link dropdown-toggle" id="app-name" (click)="modalMenu.toggle()">{{ctx.app ? ctx.app.name : 'Apps Overview'}}</span>
 
         <div class="dropdown-menu" *sqxModalView="modalMenu" closeAlways="true" @fade>
             <a class="dropdown-item all-apps" routerLink="/app">
@@ -21,6 +21,17 @@
             </div>
         </div>
     </li>
+
+    <li class="nav-item" *ngIf="ctx.app && ctx.app.planUpgrade && ctx.app.planName && ctx.app.permission === 'Owner'">
+        <div class="btn-group app-upgrade">
+            <button type="button" class="btn btn-primary">
+                You are on the <strong>{{ctx.app.planName}}</strong> plan.
+            </button>
+            <button type="button" class="btn btn-warning" [routerLink]="['/app', ctx.app.name, 'settings', 'plans']">
+                Upgrade!
+            </button>
+        </div>
+    </li>
 </ul>
 
 <div class="modal" *sqxModalView="modalDialog;onRoot:true" @fade>
@@ -36,7 +47,10 @@
             </div>
 
             <div class="modal-body">
-                <sqx-app-form (created)="modalDialog.hide()" (cancelled)="modalDialog.hide()"></sqx-app-form>
+                <sqx-app-form 
+                    (created)="modalDialog.hide()" 
+                    (cancelled)="modalDialog.hide()">
+                </sqx-app-form>
             </div>
         </div>
     </div>

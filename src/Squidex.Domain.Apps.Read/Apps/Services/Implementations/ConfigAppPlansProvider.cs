@@ -24,18 +24,25 @@ namespace Squidex.Domain.Apps.Read.Apps.Services.Implementations
             MaxContributors = -1
         };
 
-        private readonly Dictionary<string, ConfigAppLimitsPlan> config;
+        private readonly Dictionary<string, ConfigAppLimitsPlan> plansById;
+        private readonly List<ConfigAppLimitsPlan> plansList;
 
         public ConfigAppPlansProvider(IEnumerable<ConfigAppLimitsPlan> config)
         {
             Guard.NotNull(config, nameof(config));
 
-            this.config = config.Select(c => c.Clone()).OrderBy(x => x.MaxApiCalls).ToDictionary(c => c.Id, StringComparer.OrdinalIgnoreCase);
+            plansList = config.Select(c => c.Clone()).OrderBy(x => x.MaxApiCalls).ToList();
+            plansById = plansList.ToDictionary(c => c.Id, StringComparer.OrdinalIgnoreCase);
         }
 
         public IEnumerable<IAppLimitsPlan> GetAvailablePlans()
         {
-            return config.Values;
+            return plansList;
+        }
+
+        public bool IsConfiguredPlan(string planId)
+        {
+            return planId != null && plansById.ContainsKey(planId);
         }
 
         public IAppLimitsPlan GetPlanForApp(IAppEntity app)
@@ -47,12 +54,33 @@ namespace Squidex.Domain.Apps.Read.Apps.Services.Implementations
 
         public IAppLimitsPlan GetPlan(string planId)
         {
-            return config.GetOrDefault(planId ?? string.Empty) ?? config.Values.FirstOrDefault() ?? Infinite;
+            return GetPlanCore(planId);
         }
 
-        public bool IsConfiguredPlan(string planId)
+        public IAppLimitsPlan GetPlanUpgradeForApp(IAppEntity app)
         {
-            return planId != null && config.ContainsKey(planId);
+            Guard.NotNull(app, nameof(app));
+
+            return GetPlanUpgrade(app.PlanId);
+        }
+
+        public IAppLimitsPlan GetPlanUpgrade(string planId)
+        {
+            var plan = GetPlanCore(planId);
+
+            var nextPlanIndex = plansList.IndexOf(plan);
+
+            if (nextPlanIndex >= 0 && nextPlanIndex < plansList.Count - 1)
+            {
+                return plansList[nextPlanIndex + 1];
+            }
+
+            return null;
+        }
+
+        private ConfigAppLimitsPlan GetPlanCore(string planId)
+        {
+            return plansById.GetOrDefault(planId ?? string.Empty) ?? plansById.Values.FirstOrDefault() ?? Infinite;
         }
     }
 }

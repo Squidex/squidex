@@ -173,6 +173,14 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         }
 
         [Fact]
+        public void Should_hrow_exception_if_language_to_remove_is_master()
+        {
+            var config = LanguagesConfig.Build(Language.DE);
+
+            Assert.Throws<InvalidOperationException>(() => config.Remove(Language.DE));
+        }
+
+        [Fact]
         public void Should_update_language()
         {
             var config = LanguagesConfig.Build(Language.DE);

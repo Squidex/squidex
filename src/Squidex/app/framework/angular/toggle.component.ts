@@ -28,7 +28,7 @@ export class ToggleComponent implements ControlValueAccessor {
     public isDisabled = false;
 
     public writeValue(value: boolean | null | undefined) {
-        this.isChecked = Types.isBoolean(value) ? value || null : null;
+        this.isChecked = Types.isBoolean(value) ? value : null;
     }
 
     public setDisabledState(isDisabled: boolean): void {

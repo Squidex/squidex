@@ -12,7 +12,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using Squidex.Controllers.Api.Apps.Models;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Read.Apps.Repositories;
+using Squidex.Domain.Apps.Read.Apps.Services;
 using Squidex.Domain.Apps.Write.Apps.Commands;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Reflection;
@@ -30,11 +32,15 @@ namespace Squidex.Controllers.Api.Apps
     public sealed class AppsController : ControllerBase
     {
         private readonly IAppRepository appRepository;
+        private readonly IAppPlansProvider appPlansProvider;
 
-        public AppsController(ICommandBus commandBus, IAppRepository appRepository)
+        public AppsController(ICommandBus commandBus,
+            IAppRepository appRepository,
+            IAppPlansProvider appPlansProvider)
             : base(commandBus)
         {
             this.appRepository = appRepository;
+            this.appPlansProvider = appPlansProvider;
         }
 
         /// <summary>
@@ -57,11 +63,14 @@ namespace Squidex.Controllers.Api.Apps
 
             var apps = await appRepository.QueryAllAsync(subject);
 
-            var response = apps.Select(s =>
+            var response = apps.Select(a =>
             {
-                var dto = SimpleMapper.Map(s, new AppDto());
+                var dto = SimpleMapper.Map(a, new AppDto());
 
-                dto.Permission = s.Contributors[subject];
+                dto.Permission = a.Contributors[subject];
+
+                dto.PlanName = appPlansProvider.GetPlanForApp(a)?.Name;
+                dto.PlanUpgrade = appPlansProvider.GetPlanUpgradeForApp(a)?.Name;
 
                 return dto;
             }).ToList();
@@ -84,7 +93,7 @@ namespace Squidex.Controllers.Api.Apps
         /// </remarks>
         [HttpPost]
         [Route("apps/")]
-        [ProducesResponseType(typeof(EntityCreatedDto), 201)]
+        [ProducesResponseType(typeof(AppCreatedDto), 201)]
         [ProducesResponseType(typeof(ErrorDto), 400)]
         [ProducesResponseType(typeof(ErrorDto), 409)]
         [ApiCosts(1)]
@@ -95,7 +104,12 @@ namespace Squidex.Controllers.Api.Apps
             var context = await CommandBus.PublishAsync(command);
 
             var result = context.Result<EntityCreatedResult<Guid>>();
-            var response = new EntityCreatedDto { Id = result.IdOrValue.ToString(), Version = result.Version };
+            var response = new AppCreatedDto { Id = result.IdOrValue.ToString(), Version = result.Version };
+
+            response.Permission = AppContributorPermission.Owner;
+
+            response.PlanName = appPlansProvider.GetPlan(null)?.Name;
+            response.PlanUpgrade = appPlansProvider.GetPlanUpgrade(null)?.Name;
 
             return CreatedAtAction(nameof(GetApps), response);
         }

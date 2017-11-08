@@ -1,6 +1,6 @@
-<sqx-title message="{app} | Languages | Settings" parameter1="app" value1="{{appName() | async}}"></sqx-title>
+<sqx-title message="{app} | Languages | Settings" parameter1="app" [value1]="ctx.appName"></sqx-title>
 
-<sqx-panel panelWidth="42rem">
+<sqx-panel desiredWidth="42rem">
     <div class="panel-header">
         <div class="panel-title-row">
             <h3 class="panel-title">Languages</h3>

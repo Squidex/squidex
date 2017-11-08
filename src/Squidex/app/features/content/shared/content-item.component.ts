@@ -8,11 +8,8 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
 
 import {
-    AppComponentBase,
-    AppsStoreService,
-    AuthService,
+    AppContext,
     ContentDto,
-    DialogService,
     fadeAnimation,
     FieldDto,
     ModalView,
@@ -25,11 +22,14 @@ import {
     selector: '[sqxContent]',
     styleUrls: ['./content-item.component.scss'],
     templateUrl: './content-item.component.html',
+    providers: [
+        AppContext
+    ],
     animations: [
         fadeAnimation
     ]
 })
-export class ContentItemComponent extends AppComponentBase implements OnInit, OnChanges {
+export class ContentItemComponent implements OnInit, OnChanges {
     @Output()
     public publishing = new EventEmitter();
 
@@ -67,8 +67,8 @@ export class ContentItemComponent extends AppComponentBase implements OnInit, On
 
     public values: any[] = [];
 
-    constructor(apps: AppsStoreService, dialogs: DialogService, authService: AuthService) {
-        super(dialogs, apps, authService);
+    constructor(public readonly ctx: AppContext
+    ) {
     }
 
     public ngOnChanges() {

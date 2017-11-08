@@ -7,22 +7,18 @@
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 
 import {
     AddFieldDto,
-    AppComponentBase,
-    AppsStoreService,
-    AuthService,
+    AppContext,
     createProperties,
-    DialogService,
     fadeAnimation,
     FieldDto,
     fieldTypes,
     HistoryChannelUpdated,
     ImmutableArray,
-    MessageBus,
     ModalView,
     SchemaDetailsDto,
     SchemaDto,
@@ -44,11 +40,14 @@ import {
     selector: 'sqx-schema-page',
     styleUrls: ['./schema-page.component.scss'],
     templateUrl: './schema-page.component.html',
+    providers: [
+        AppContext
+    ],
     animations: [
         fadeAnimation
     ]
 })
-export class SchemaPageComponent extends AppComponentBase implements OnDestroy, OnInit {
+export class SchemaPageComponent implements OnDestroy, OnInit {
     private schemaCreatedSubscription: Subscription;
 
     public fieldTypes = fieldTypes;
@@ -83,14 +82,11 @@ export class SchemaPageComponent extends AppComponentBase implements OnDestroy, 
         return this.addFieldForm.controls['name'].value && this.addFieldForm.controls['name'].value.length > 0;
     }
 
-    constructor(apps: AppsStoreService, dialogs: DialogService, authService: AuthService,
+    constructor(public readonly ctx: AppContext,
         private readonly formBuilder: FormBuilder,
-        private readonly messageBus: MessageBus,
-        private readonly route: ActivatedRoute,
         private readonly router: Router,
         private readonly schemasService: SchemasService
     ) {
-        super(dialogs, apps, authService);
     }
 
     public ngOnDestroy() {
@@ -99,14 +95,14 @@ export class SchemaPageComponent extends AppComponentBase implements OnDestroy, 
 
     public ngOnInit() {
         this.schemaCreatedSubscription =
-            this.messageBus.of(SchemaCreated)
+            this.ctx.bus.of(SchemaCreated)
                 .subscribe(message => {
                     if (this.schemas) {
                         this.schemas = this.schemas.push(message.schema);
                     }
                 });
 
-        this.route.data.map(p => p['schema'])
+        this.ctx.route.data.map(d => d.schema)
             .subscribe((schema: SchemaDetailsDto) => {
                 this.schema = schema;
 
@@ -117,125 +113,113 @@ export class SchemaPageComponent extends AppComponentBase implements OnDestroy, 
     }
 
     private load() {
-        this.appNameOnce()
-            .switchMap(app => this.schemasService.getSchemas(app))
+        this.schemasService.getSchemas(this.ctx.appName)
             .subscribe(dtos => {
                 this.schemas = ImmutableArray.of(dtos);
             }, error => {
-                this.notifyError(error);
+                this.ctx.notifyError(error);
             });
     }
 
     public publish() {
-        this.appNameOnce()
-            .switchMap(app => this.schemasService.publishSchema(app, this.schema.name, this.schema.version)).retry(2)
+        this.schemasService.publishSchema(this.ctx.appName, this.schema.name, this.schema.version)
             .subscribe(dto => {
-                this.updateSchema(this.schema.publish(this.userToken, dto.version));
+                this.updateSchema(this.schema.publish(this.ctx.userToken, dto.version));
             }, error => {
-                this.notifyError(error);
+                this.ctx.notifyError(error);
             });
     }
 
     public unpublish() {
-        this.appNameOnce()
-            .switchMap(app => this.schemasService.unpublishSchema(app, this.schema.name, this.schema.version)).retry(2)
+        this.schemasService.unpublishSchema(this.ctx.appName, this.schema.name, this.schema.version)
             .subscribe(dto => {
-                this.updateSchema(this.schema.unpublish(this.userToken, dto.version));
+                this.updateSchema(this.schema.unpublish(this.ctx.userToken, dto.version));
             }, error => {
-                this.notifyError(error);
+                this.ctx.notifyError(error);
             });
     }
 
     public enableField(field: FieldDto) {
-        this.appNameOnce()
-            .switchMap(app => this.schemasService.enableField(app, this.schema.name, field.fieldId, this.schema.version)).retry(2)
+        this.schemasService.enableField(this.ctx.appName, this.schema.name, field.fieldId, this.schema.version)
             .subscribe(dto => {
-                this.updateSchema(this.schema.updateField(field.enable(), this.userToken, dto.version));
+                this.updateSchema(this.schema.updateField(field.enable(), this.ctx.userToken, dto.version));
             }, error => {
-                this.notifyError(error);
+                this.ctx.notifyError(error);
             });
     }
 
     public disableField(field: FieldDto) {
-        this.appNameOnce()
-            .switchMap(app => this.schemasService.disableField(app, this.schema.name, field.fieldId, this.schema.version)).retry(2)
+        this.schemasService.disableField(this.ctx.appName, this.schema.name, field.fieldId, this.schema.version)
             .subscribe(dto => {
-                this.updateSchema(this.schema.updateField(field.disable(), this.userToken, dto.version));
+                this.updateSchema(this.schema.updateField(field.disable(), this.ctx.userToken, dto.version));
             }, error => {
-                this.notifyError(error);
+                this.ctx.notifyError(error);
             });
     }
 
     public lockField(field: FieldDto) {
-        this.appNameOnce()
-            .switchMap(app => this.schemasService.lockField(app, this.schema.name, field.fieldId, this.schema.version)).retry(2)
+        this.schemasService.lockField(this.ctx.appName, this.schema.name, field.fieldId, this.schema.version)
             .subscribe(dto => {
-                this.updateSchema(this.schema.updateField(field.lock(), this.userToken, dto.version));
+                this.updateSchema(this.schema.updateField(field.lock(), this.ctx.userToken, dto.version));
             }, error => {
-                this.notifyError(error);
+                this.ctx.notifyError(error);
             });
     }
 
     public showField(field: FieldDto) {
-        this.appNameOnce()
-            .switchMap(app => this.schemasService.showField(app, this.schema.name, field.fieldId, this.schema.version)).retry(2)
+        this.schemasService.showField(this.ctx.appName, this.schema.name, field.fieldId, this.schema.version)
             .subscribe(dto => {
-                this.updateSchema(this.schema.updateField(field.show(), this.userToken, dto.version));
+                this.updateSchema(this.schema.updateField(field.show(), this.ctx.userToken, dto.version));
             }, error => {
-                this.notifyError(error);
+                this.ctx.notifyError(error);
             });
     }
 
     public hideField(field: FieldDto) {
-        this.appNameOnce()
-            .switchMap(app => this.schemasService.hideField(app, this.schema.name, field.fieldId, this.schema.version)).retry(2)
+        this.schemasService.hideField(this.ctx.appName, this.schema.name, field.fieldId, this.schema.version)
             .subscribe(dto => {
-                this.updateSchema(this.schema.updateField(field.hide(), this.userToken, dto.version));
+                this.updateSchema(this.schema.updateField(field.hide(), this.ctx.userToken, dto.version));
             }, error => {
-                this.notifyError(error);
+                this.ctx.notifyError(error);
             });
     }
 
     public deleteField(field: FieldDto) {
-        this.appNameOnce()
-            .switchMap(app => this.schemasService.deleteField(app, this.schema.name, field.fieldId, this.schema.version)).retry(2)
+        this.schemasService.deleteField(this.ctx.appName, this.schema.name, field.fieldId, this.schema.version)
             .subscribe(dto => {
-                this.updateSchema(this.schema.removeField(field, this.userToken, dto.version));
+                this.updateSchema(this.schema.removeField(field, this.ctx.userToken, dto.version));
             }, error => {
-                this.notifyError(error);
+                this.ctx.notifyError(error);
             });
     }
 
     public sortFields(fields: FieldDto[]) {
-        this.appNameOnce()
-            .switchMap(app => this.schemasService.putFieldOrdering(app, this.schema.name, fields.map(t => t.fieldId), this.schema.version)).retry(2)
+        this.schemasService.putFieldOrdering(this.ctx.appName, this.schema.name, fields.map(t => t.fieldId), this.schema.version)
             .subscribe(dto => {
-                this.updateSchema(this.schema.replaceFields(fields, this.userToken, dto.version));
+                this.updateSchema(this.schema.replaceFields(fields, this.ctx.userToken, dto.version));
             }, error => {
-                this.notifyError(error);
+                this.ctx.notifyError(error);
             });
     }
 
     public saveField(field: FieldDto) {
         const requestDto = new UpdateFieldDto(field.properties);
 
-        this.appNameOnce()
-            .switchMap(app => this.schemasService.putField(app, this.schema.name, field.fieldId, requestDto, this.schema.version)).retry(2)
+        this.schemasService.putField(this.ctx.appName, this.schema.name, field.fieldId, requestDto, this.schema.version)
             .subscribe(dto => {
-                this.updateSchema(this.schema.updateField(field, this.userToken, dto.version));
+                this.updateSchema(this.schema.updateField(field, this.ctx.userToken, dto.version));
             }, error => {
-                this.notifyError(error);
+                this.ctx.notifyError(error);
             });
     }
 
     public deleteSchema() {
-        this.appNameOnce()
-            .switchMap(app => this.schemasService.deleteSchema(app, this.schema.name, this.schema.version)).retry(2)
+        this.schemasService.deleteSchema(this.ctx.appName, this.schema.name, this.schema.version)
             .subscribe(() => {
                 this.onSchemaRemoved(this.schema);
                 this.back();
             }, error => {
-                this.notifyError(error);
+                this.ctx.notifyError(error);
             });
     }
 
@@ -250,13 +234,12 @@ export class SchemaPageComponent extends AppComponentBase implements OnDestroy, 
 
             const requestDto = new AddFieldDto(this.addFieldForm.controls['name'].value, partitioning, properties);
 
-            this.appNameOnce()
-                .switchMap(app => this.schemasService.postField(app, this.schema.name, requestDto, this.schema.version))
+            this.schemasService.postField(this.ctx.appName, this.schema.name, requestDto, this.schema.version)
                 .subscribe(dto => {
-                    this.updateSchema(this.schema.addField(dto.payload, this.userToken, dto.version));
+                    this.updateSchema(this.schema.addField(dto.payload, this.ctx.userToken, dto.version));
                     this.resetFieldForm();
                 }, error => {
-                    this.notifyError(error);
+                    this.ctx.notifyError(error);
                     this.resetFieldForm();
                 });
         }
@@ -267,13 +250,13 @@ export class SchemaPageComponent extends AppComponentBase implements OnDestroy, 
     }
 
     public onSchemaSaved(properties: SchemaPropertiesDto, version: Version) {
-        this.updateSchema(this.schema.update(properties, this.userToken, version));
+        this.updateSchema(this.schema.update(properties, this.ctx.userToken, version));
 
         this.editSchemaDialog.hide();
     }
 
     public onSchemaScriptsSaved(scripts: UpdateSchemaScriptsDto, version: Version) {
-        this.updateSchema(this.schema.configureScripts(scripts, this.userToken, version));
+        this.updateSchema(this.schema.configureScripts(scripts, this.ctx.userToken, version));
 
         this.configureScriptsDialog.hide();
     }
@@ -295,7 +278,7 @@ export class SchemaPageComponent extends AppComponentBase implements OnDestroy, 
         this.schemas = this.schemas.replaceBy('id', schema);
 
         this.emitSchemaUpdated(schema);
-        this.notify();
+        this.emitHistoryUpdate();
         this.export();
     }
 
@@ -331,19 +314,19 @@ export class SchemaPageComponent extends AppComponentBase implements OnDestroy, 
     }
 
     private back() {
-        this.router.navigate(['../'], { relativeTo: this.route });
+        this.router.navigate(['../'], { relativeTo: this.ctx.route });
     }
 
     private emitSchemaDeleted(schema: SchemaDto) {
-        this.messageBus.emit(new SchemaDeleted(schema));
+        this.ctx.bus.emit(new SchemaDeleted(schema));
     }
 
     private emitSchemaUpdated(schema: SchemaDto) {
-        this.messageBus.emit(new SchemaUpdated(schema));
+        this.ctx.bus.emit(new SchemaUpdated(schema));
     }
 
-    private notify() {
-        this.messageBus.emit(new HistoryChannelUpdated());
+    private emitHistoryUpdate() {
+        this.ctx.bus.emit(new HistoryChannelUpdated());
     }
 }
 

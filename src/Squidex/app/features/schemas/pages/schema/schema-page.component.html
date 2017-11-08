@@ -1,6 +1,6 @@
-<sqx-title message="{app} | {schema}" parameter1="app" value1="{{appName() | async}}" parameter2="schema" value2="{{schema.name}}"></sqx-title>
+<sqx-title message="{app} | {schema}" parameter1="app" [value1]="ctx.appName" parameter2="schema" [value2]="schema?.name"></sqx-title>
 
-<sqx-panel panelWidth="48rem">
+<sqx-panel desiredWidth="48rem">
     <div class="panel-header">
         <div class="panel-title-row">
             <div class="float-right">
@@ -138,7 +138,7 @@
             </div>
 
             <div class="modal-body">
-                <sqx-schema-edit-form [appName]="appName() | async" [name]="schema.name" [properties]="schema.properties" [version]="schema.version" (saved)="onSchemaSaved($event)" (cancelled)="editSchemaDialog.hide()"></sqx-schema-edit-form>
+                <sqx-schema-edit-form [name]="schema.name" [properties]="schema.properties" [version]="schema.version" (saved)="onSchemaSaved($event)" (cancelled)="editSchemaDialog.hide()"></sqx-schema-edit-form>
             </div>
         </div>
     </div>
@@ -167,7 +167,7 @@
     <div class="modal-backdrop"></div>
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <sqx-schema-scripts-form [appName]="appName() | async" [schema]="schema" (saved)="onSchemaScriptsSaved($event)" (cancelled)="configureScriptsDialog.hide()"></sqx-schema-scripts-form>
+            <sqx-schema-scripts-form [schema]="schema" (saved)="onSchemaScriptsSaved($event)" (cancelled)="configureScriptsDialog.hide()"></sqx-schema-scripts-form>
         </div>
     </div>
 </div>

@@ -9,6 +9,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 
 import {
+    AppDto,
     AppsStoreService,
     fadeAnimation,
     ModalView,
@@ -24,10 +25,10 @@ import {
     ]
 })
 export class AppsPageComponent implements OnDestroy, OnInit {
-    private onboardingAppsSubscription: Subscription;
+    private appsSubscription: Subscription;
 
     public addAppDialog = new ModalView();
-    public apps = this.appsStore.apps;
+    public apps: AppDto[];
 
     public onboardingModal = new ModalView();
 
@@ -38,19 +39,19 @@ export class AppsPageComponent implements OnDestroy, OnInit {
     }
 
     public ngOnDestroy() {
-        this.onboardingAppsSubscription.unsubscribe();
+        this.appsSubscription.unsubscribe();
     }
 
     public ngOnInit() {
-        this.appsStore.selectApp(null);
-
-        this.onboardingAppsSubscription =
+        this.appsSubscription =
             this.appsStore.apps
                 .subscribe(apps => {
                     if (apps.length === 0 && this.onboardingService.shouldShow('dialog')) {
                         this.onboardingService.disable('dialog');
                         this.onboardingModal.show();
                     }
+
+                    this.apps = apps;
                 });
     }
 }

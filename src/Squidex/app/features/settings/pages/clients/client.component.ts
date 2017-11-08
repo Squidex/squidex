@@ -10,10 +10,9 @@ import { FormBuilder, Validators } from '@angular/forms';
 
 import {
     AccessTokenDto,
+    AppContext,
     AppClientDto,
     AppClientsService,
-    ComponentBase,
-    DialogService,
     fadeAnimation,
     ModalView
 } from 'shared';
@@ -24,11 +23,14 @@ const ESCAPE_KEY = 27;
     selector: 'sqx-client',
     styleUrls: ['./client.component.scss'],
     templateUrl: './client.component.html',
+    providers: [
+        AppContext
+    ],
     animations: [
         fadeAnimation
     ]
 })
-export class ClientComponent extends ComponentBase {
+export class ClientComponent {
     @Output()
     public renaming = new EventEmitter<string>();
 
@@ -37,9 +39,6 @@ export class ClientComponent extends ComponentBase {
 
     @Output()
     public updating = new EventEmitter<boolean>();
-
-    @Input()
-    public appName: string;
 
     @Input()
     public client: AppClientDto;
@@ -62,11 +61,10 @@ export class ClientComponent extends ComponentBase {
         return this.renameForm.controls['name'].value !== this.client.name;
     }
 
-    constructor(dialogs: DialogService,
+    constructor(public readonly ctx: AppContext,
         private readonly appClientsService: AppClientsService,
         private readonly formBuilder: FormBuilder
     ) {
-        super(dialogs);
     }
 
     public cancelRename() {
@@ -86,12 +84,12 @@ export class ClientComponent extends ComponentBase {
     }
 
     public createToken(client: AppClientDto) {
-        this.appClientsService.createToken(this.appName, client)
+        this.appClientsService.createToken(this.ctx.appName, client)
             .subscribe(dto => {
                 this.token = dto;
                 this.tokenDialog.show();
             }, error => {
-                this.notifyError(error);
+                this.ctx.notifyError(error);
             });
     }
 }

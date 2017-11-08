@@ -8,16 +8,13 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 
-import { AppComponentBase } from './app.component-base';
+import { AppContext } from './app-context';
 
 import {
-    AppsStoreService,
     AssetDto,
     AssetsService,
     AssetDragged,
-    AuthService,
     DateTime,
-    DialogService,
     fadeAnimation,
     ModalView,
     UpdateAssetDto,
@@ -30,11 +27,14 @@ import {
     selector: 'sqx-asset',
     styleUrls: ['./asset.component.scss'],
     templateUrl: './asset.component.html',
+    providers: [
+        AppContext
+    ],
     animations: [
         fadeAnimation
     ]
 })
-export class AssetComponent extends AppComponentBase implements OnInit {
+export class AssetComponent implements OnInit {
     private assetVersion: Version;
 
     @Input()
@@ -79,20 +79,18 @@ export class AssetComponent extends AppComponentBase implements OnInit {
 
     public progress = 0;
 
-    constructor(apps: AppsStoreService, dialogs: DialogService, authService: AuthService,
+    constructor(public readonly ctx: AppContext,
         private readonly formBuilder: FormBuilder,
         private readonly assetsService: AssetsService,
         private readonly messageBus: MessageBus
     ) {
-        super(dialogs, apps, authService);
     }
 
     public ngOnInit() {
         const initFile = this.initFile;
 
         if (initFile) {
-            this.appNameOnce()
-                .switchMap(app => this.assetsService.uploadFile(app, initFile, this.userToken, DateTime.now()))
+            this.assetsService.uploadFile(this.ctx.appName, initFile, this.ctx.userToken, DateTime.now())
                 .subscribe(dto => {
                     if (dto instanceof AssetDto) {
                         this.emitLoaded(dto);
@@ -100,7 +98,8 @@ export class AssetComponent extends AppComponentBase implements OnInit {
                         this.progress = dto;
                     }
                 }, error => {
-                    this.notifyError(error);
+                    this.ctx.notifyError(error);
+
                     this.emitFailed(error);
                 });
         } else {
@@ -110,16 +109,16 @@ export class AssetComponent extends AppComponentBase implements OnInit {
 
     public updateFile(files: FileList) {
         if (files.length === 1) {
-            this.appNameOnce()
-                .switchMap(app => this.assetsService.replaceFile(app, this.asset.id, files[0], this.assetVersion))
+            this.assetsService.replaceFile(this.ctx.appName, this.asset.id, files[0], this.assetVersion)
                 .subscribe(dto => {
                     if (dto instanceof Versioned) {
-                        this.updateAsset(this.asset.update(dto.payload, this.userToken, dto.version), true);
+                        this.updateAsset(this.asset.update(dto.payload, this.ctx.userToken, dto.version), true);
                     } else {
                         this.setProgress(dto);
                     }
                 }, error => {
-                    this.notifyError(error);
+                    this.ctx.notifyError(error);
+
                     this.setProgress();
                 });
         }
@@ -133,13 +132,13 @@ export class AssetComponent extends AppComponentBase implements OnInit {
 
             const requestDto = new UpdateAssetDto(this.renameForm.controls['name'].value);
 
-            this.appNameOnce()
-                .switchMap(app => this.assetsService.putAsset(app, this.asset.id, requestDto, this.assetVersion))
+            this.assetsService.putAsset(this.ctx.appName, this.asset.id, requestDto, this.assetVersion)
                 .subscribe(dto => {
-                    this.updateAsset(this.asset.rename(requestDto.fileName, this.userToken, dto.version), true);
+                    this.updateAsset(this.asset.rename(requestDto.fileName, this.ctx.userToken, dto.version), true);
                     this.resetRenameForm();
                 }, error => {
-                    this.notifyError(error);
+                    this.ctx.notifyError(error);
+
                     this.enableRenameForm();
                 });
         }

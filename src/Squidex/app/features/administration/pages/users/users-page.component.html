@@ -1,6 +1,6 @@
 <sqx-title message="User Management"></sqx-title>
 
-<sqx-panel panelWidth="50rem">
+<sqx-panel desiredWidth="50rem">
     <div class="panel-header">
         <div class="panel-title-row">
             <div class="float-right">
@@ -69,7 +69,7 @@
                                 <span class="user-email table-cell">{{user.email}}</span>
                             </td>
                             <td class="text-right">
-                                <span *ngIf="user.id !== currentUserId">
+                                <span *ngIf="user.id !== ctx.userId">
                                     <button class="btn btn-link" (click)="lock(user); $event.stopPropagation();" *ngIf="!user.isLocked" title="Lock User">
                                         <i class="icon icon-unlocked"></i>
                                     </button>

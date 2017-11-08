@@ -7,21 +7,19 @@
 
 import { Component } from '@angular/core';
 
-import {
-    AppComponentBase,
-    AppsStoreService,
-    AuthService,
-    DialogService
-} from 'shared';
+import { AppContext } from 'shared';
 
 @Component({
     selector: 'sqx-api-area',
     styleUrls: ['./api-area.component.scss'],
-    templateUrl: './api-area.component.html'
+    templateUrl: './api-area.component.html',
+    providers: [
+        AppContext
+    ]
 })
-export class ApiAreaComponent extends AppComponentBase {
-    constructor(apps: AppsStoreService, dialogs: DialogService, authService: AuthService
+export class ApiAreaComponent {
+    constructor(
+        public readonly ctx: AppContext
     ) {
-        super(dialogs, apps, authService);
     }
 }

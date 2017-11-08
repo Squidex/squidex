@@ -5,36 +5,20 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { Component } from '@angular/core';
 
-import { AppsStoreService } from 'shared';
+import { AppContext } from 'shared';
 
 @Component({
     selector: 'sqx-left-menu',
     styleUrls: ['./left-menu.component.scss'],
-    templateUrl: './left-menu.component.html'
+    templateUrl: './left-menu.component.html',
+    providers: [
+        AppContext
+    ]
 })
-export class LeftMenuComponent implements OnDestroy, OnInit {
-    private appSubscription: Subscription;
-
-    public permission: string | null = null;
-
-    constructor(
-        private readonly appsStore: AppsStoreService
+export class LeftMenuComponent {
+    constructor(public readonly ctx: AppContext
     ) {
-    }
-
-    public ngOnDestroy() {
-        this.appSubscription.unsubscribe();
-    }
-
-    public ngOnInit() {
-        this.appSubscription =
-            this.appsStore.selectedApp.subscribe(app => {
-                if (app) {
-                    this.permission = app.permission;
-                }
-            });
     }
 }

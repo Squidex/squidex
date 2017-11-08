@@ -186,6 +186,26 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
         }
 
         [Fact]
+        public async Task Should_ignore_old_events()
+        {
+            A.CallTo(() => formatter.Parse(eventData, true))
+                .Throws(new TypeNameNotFoundException());
+
+            var @event = new StoredEvent(Guid.NewGuid().ToString(), 123, eventData);
+
+            await OnSubscribeAsync();
+            await OnEventAsync(eventSubscription, @event);
+
+            sut.Dispose();
+
+            A.CallTo(() => eventConsumerInfoRepository.SetAsync(consumerName, @event.EventPosition, false, null))
+                .MustHaveHappened(Repeated.Exactly.Once);
+
+            A.CallTo(() => eventConsumer.On(envelope))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
         public async Task Should_not_invoke_and_update_position_when_event_is_from_another_subscription()
         {
             var @event = new StoredEvent(Guid.NewGuid().ToString(), 123, eventData);

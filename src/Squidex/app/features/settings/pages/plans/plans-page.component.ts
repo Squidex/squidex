@@ -6,26 +6,25 @@
  */
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 
 import {
     ApiUrlConfig,
-    AppComponentBase,
+    AppContext,
     AppPlansDto,
-    AppsStoreService,
-    AuthService,
     ChangePlanDto,
-    DialogService,
     PlansService
 } from 'shared';
 
 @Component({
     selector: 'sqx-plans-page',
     styleUrls: ['./plans-page.component.scss'],
-    templateUrl: './plans-page.component.html'
+    templateUrl: './plans-page.component.html',
+    providers: [
+        AppContext
+    ]
 })
-export class PlansPageComponent extends AppComponentBase implements OnDestroy, OnInit {
+export class PlansPageComponent implements OnDestroy, OnInit {
     private queryParamsSubscription: Subscription;
     private overridePlanId: string;
 
@@ -36,12 +35,10 @@ export class PlansPageComponent extends AppComponentBase implements OnDestroy, O
 
     public isDisabled = false;
 
-    constructor(apps: AppsStoreService, dialogs: DialogService, authService: AuthService,
+    constructor(public readonly ctx: AppContext,
         private readonly plansService: PlansService,
-        private readonly route: ActivatedRoute,
         private readonly apiUrl: ApiUrlConfig
     ) {
-        super(dialogs, apps, authService);
     }
 
     public ngOnDestroy() {
@@ -50,7 +47,7 @@ export class PlansPageComponent extends AppComponentBase implements OnDestroy, O
 
     public ngOnInit() {
         this.queryParamsSubscription =
-            this.route.queryParams.subscribe(params => {
+            this.ctx.route.queryParams.subscribe(params => {
                 this.overridePlanId = params['planId'];
             });
 
@@ -58,8 +55,7 @@ export class PlansPageComponent extends AppComponentBase implements OnDestroy, O
     }
 
     public load(showInfo = false) {
-        this.appNameOnce()
-            .switchMap(app => this.plansService.getPlans(app).retry(2))
+        this.plansService.getPlans(this.ctx.appName)
             .subscribe(dto => {
                 if (this.overridePlanId) {
                     this.plans = dto.changePlanId(this.overridePlanId);
@@ -67,21 +63,20 @@ export class PlansPageComponent extends AppComponentBase implements OnDestroy, O
                     this.plans = dto;
                 }
 
-                this.planOwned = !dto.planOwner || (dto.planOwner === this.authService.user!.id);
+                this.planOwned = !dto.planOwner || (dto.planOwner === this.ctx.userId);
 
                 if (showInfo) {
-                    this.notifyInfo('Plans reloaded.');
+                    this.ctx.notifyInfo('Plans reloaded.');
                 }
             }, error => {
-                this.notifyError(error);
+                this.ctx.notifyError(error);
             });
     }
 
     public changePlan(planId: string) {
         this.isDisabled = true;
 
-        this.appNameOnce()
-            .switchMap(app => this.plansService.putPlan(app, new ChangePlanDto(planId), this.plans.version))
+        this.plansService.putPlan(this.ctx.appName, new ChangePlanDto(planId), this.plans.version)
             .subscribe(dto => {
                 if (dto.payload.redirectUri && dto.payload.redirectUri.length > 0) {
                     window.location.href = dto.payload.redirectUri;
@@ -90,7 +85,7 @@ export class PlansPageComponent extends AppComponentBase implements OnDestroy, O
                     this.isDisabled = false;
                 }
             }, error => {
-                this.notifyError(error);
+                this.ctx.notifyError(error);
                 this.isDisabled = false;
             });
     }

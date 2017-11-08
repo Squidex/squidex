@@ -1,13 +1,13 @@
 ﻿<sqx-title message="Apps"></sqx-title>
 
 <div class="apps">
-    <div class="empty text-center" *ngIf="(apps | async)?.length === 0">
+    <div class="empty text-center" *ngIf="apps?.length === 0">
         <h3 class="empty-headline">You are not collaborating to any app yet</h3>
 
         <button class="apps-empty-button btn btn-success" (click)="addAppDialog.show()"><i class="icon-plus"></i> Create New App</button>
     </div>
 
-    <div class="app card float-left" *ngFor="let app of (apps | async)" title="{{app.name}}">
+    <div class="app card float-left" *ngFor="let app of apps" title="{{app.name}}">
         <div class="card-block app-content">
             <h4 class="card-title app-title">{{app.name}}</h4>
 
@@ -31,7 +31,8 @@
             <div class="modal-body">
                 <sqx-app-form 
                     (created)="addAppDialog.hide()"
-                    (cancelled)="addAppDialog.hide()"></sqx-app-form>
+                    (cancelled)="addAppDialog.hide()">
+                </sqx-app-form>
             </div>
         </div>
     </div>

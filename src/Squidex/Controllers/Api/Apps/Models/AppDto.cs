@@ -49,5 +49,15 @@ namespace Squidex.Controllers.Api.Apps.Models
         /// </summary>
         [JsonConverter(typeof(StringEnumConverter))]
         public AppContributorPermission Permission { get; set; }
+
+        /// <summary>
+        /// Gets the current plan name.
+        /// </summary>
+        public string PlanName { get; set; }
+
+        /// <summary>
+        /// Gets the next plan name.
+        /// </summary>
+        public string PlanUpgrade { get; set; }
     }
 }
