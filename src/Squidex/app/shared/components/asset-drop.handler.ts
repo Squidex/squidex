@@ -17,16 +17,10 @@ export class AssetDropHandler {
     }
 
     public buildDroppedAssetData(asset: AssetDto, dragEvent: DragEvent) {
-        switch (asset.mimeType) {
-
-            case 'image/jpeg':
-            case 'image/jpg':
-            case 'image/png':
-            case 'image/gif':
-                return this.handleImageAsset(asset, dragEvent);
-            default:
-                return '';
+        if (asset.isImage) {
+            return this.handleImageAsset(asset, dragEvent);
         }
+        return '';
     }
 
     private handleImageAsset(asset: AssetDto, dragEvent: DragEvent) {

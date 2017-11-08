@@ -9,8 +9,7 @@ import { AfterViewInit, Component, forwardRef, ElementRef, OnDestroy, ViewChild,
 import { ControlValueAccessor,  NG_VALUE_ACCESSOR, FormBuilder } from '@angular/forms';
 
 import { AppComponentBase } from './app.component-base';
-import { AssetUrlPipe } from './pipes';
-import { ApiUrlConfig, ModalView, AppsStoreService, AssetDto, AssetsService, ImmutableArray, DialogService, AuthService, Pager, Types, ResourceLoaderService } from './../declarations-base';
+import { ApiUrlConfig, ModalView, AppsStoreService, MessageBus, AssetDragged, DialogService, AuthService, Types, ResourceLoaderService } from './../declarations-base';
 import { AssetDropHandler } from './asset-drop.handler';
 
 declare var tinymce: any;
@@ -32,13 +31,10 @@ export class RichEditorComponent extends AppComponentBase implements ControlValu
     private tinyInitTimer: any;
     private value: string;
     private isDisabled = false;
-    private assetSelectorClickHandler: any = null;
-    public assetsItems: ImmutableArray<AssetDto>;
-    public assetsPager = new Pager(0, 0, 12);
-    private assetUrlGenerator: AssetUrlPipe;
-    private assetsMimeTypes: Array<string> = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif'];
     private assetDropHandler: AssetDropHandler;
+
     public draggedOver = false;
+    private assetDraggedSubscription: any;
 
     @ViewChild('editor')
     public editor: ElementRef;
@@ -53,23 +49,22 @@ export class RichEditorComponent extends AppComponentBase implements ControlValu
     constructor(dialogs: DialogService, apps: AppsStoreService, authService: AuthService,
         private readonly resourceLoader: ResourceLoaderService,
         private readonly formBuilder: FormBuilder,
-        private readonly assetsService: AssetsService,
-        private readonly apiUrlConfig: ApiUrlConfig
+        private readonly apiUrlConfig: ApiUrlConfig,
+        private readonly messageBus: MessageBus
     ) {
         super(dialogs, apps, authService);
-        this.assetUrlGenerator = new AssetUrlPipe(this.apiUrlConfig);
         this.assetDropHandler = new AssetDropHandler(this.apiUrlConfig);
-    }
 
-    private load() {
-        this.appNameOnce()
-            .switchMap(app => this.assetsService.getAssets(app, this.assetsPager.pageSize, this.assetsPager.skip, undefined, this.assetsMimeTypes))
-            .subscribe(dtos => {
-                this.assetsItems = ImmutableArray.of(dtos.items);
-                this.assetsPager = this.assetsPager.setCount(dtos.total);
-            }, error => {
-                this.notifyError(error);
-            });
+        this.assetDraggedSubscription = this.messageBus.of(AssetDragged).subscribe(message => {
+            // only handle images for now
+            if (message.assetDto.isImage) {
+                if (message.dragEvent === AssetDragged.DRAG_START) {
+                    this.draggedOver = true;
+                } else {
+                    this.draggedOver = false;
+                }
+            }
+        });
     }
 
     private editorDefaultOptions() {
@@ -93,26 +88,6 @@ export class RichEditorComponent extends AppComponentBase implements ControlValu
                     self.callTouched();
                 });
 
-                self.tinyEditor.on('init', () => {
-                    let editorDoc = self.tinyEditor.iframeElement;
-                    let dragTarget: any = null;
-
-                    editorDoc.ondragenter = (event: any) => {
-                        console.log('dragenter');
-                        self.draggedOver = true;
-                        dragTarget = event.target;
-                    };
-
-                    editorDoc.ondragleave = (event: any) => {
-                        if (event.target === dragTarget) {
-                            self.draggedOver = false;
-                            console.log('dragleave');
-                        } else {
-                            self.draggedOver = true;
-                        }
-                    };
-                });
-
                 // TODO: expose an observable to which we can subscribe to
                 if (Types.isFunction(self.editorOptions.onSetup)) {
                     self.editorOptions.onSetup(editor);
@@ -127,22 +102,11 @@ export class RichEditorComponent extends AppComponentBase implements ControlValu
         };
     }
 
-    public goNext() {
-        this.assetsPager = this.assetsPager.goNext();
-
-        this.load();
-    }
-
-    public goPrev() {
-        this.assetsPager = this.assetsPager.goPrev();
-
-        this.load();
-    }
-
     public ngOnDestroy() {
         clearTimeout(this.tinyInitTimer);
 
         tinymce.remove(this.editor);
+        this.assetDraggedSubscription.unsubscribe();
     }
 
     public ngAfterViewInit() {
@@ -150,7 +114,6 @@ export class RichEditorComponent extends AppComponentBase implements ControlValu
 
         this.resourceLoader.loadScript('https://cdnjs.cloudflare.com/ajax/libs/tinymce/4.5.4/tinymce.min.js').then(() => {
             let editorOptions = { ...self.editorDefaultOptions(), ...self.editorOptions };
-            console.log(editorOptions);
             tinymce.init(editorOptions);
         });
     }
@@ -179,24 +142,7 @@ export class RichEditorComponent extends AppComponentBase implements ControlValu
         this.callTouched = fn;
     }
 
-    public closeAssetDialog() {
-        this.assetsDialog.hide();
-        this.assetSelectorClickHandler = null;
-    }
-
-    public onAssetClicked(asset: AssetDto) {
-        if (this.assetSelectorClickHandler != null) {
-            this.assetSelectorClickHandler.cb(this.assetUrlGenerator.transform(asset), {
-                description: asset.fileName,
-                width: asset.pixelWidth,
-                height: asset.pixelHeight
-            });
-            this.closeAssetDialog();
-        }
-    }
-
     public onItemDropped(event: any) {
-        this.draggedOver = false;
         let content = this.assetDropHandler.buildDroppedAssetData(event.dragData, event.mouseEvent);
         if (content) {
             this.tinyEditor.execCommand('mceInsertContent', false, content);

@@ -5,10 +5,11 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { Component, Input, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
 import { AppLanguageDto, FieldDto } from 'shared';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
     selector: 'sqx-content-field',
@@ -16,6 +17,8 @@ import { AppLanguageDto, FieldDto } from 'shared';
     templateUrl: './content-field.component.html'
 })
 export class ContentFieldComponent implements OnInit {
+    constructor(private readonly router: Router, private readonly route: ActivatedRoute) {
+    }
     private masterLanguageCode: string;
 
     @Input()
@@ -34,11 +37,8 @@ export class ContentFieldComponent implements OnInit {
     public fieldPartition: string;
     public richTextEditorOptions: any;
 
-    @ViewChild('assets')
-    public assetLink: ElementRef;
-
     private buildRichTextEditorOptions() {
-        // const self = this;
+        const self = this;
         return {
             toolbar: 'undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | image assets',
             plugins: 'code,image',
@@ -50,7 +50,7 @@ export class ContentFieldComponent implements OnInit {
                     icon: 'browse',
                     tooltip: 'Insert Assets',
                     onclick: () => {
-                        console.log(this.assetLink);
+                        self.router.navigate(['assets'], { relativeTo: self.route })
                     }
                  });
             }

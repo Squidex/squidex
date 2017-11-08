@@ -14,6 +14,7 @@ import {
     AppsStoreService,
     AssetDto,
     AssetsService,
+    AssetDragged,
     AuthService,
     DateTime,
     DialogService,
@@ -21,7 +22,8 @@ import {
     ModalView,
     UpdateAssetDto,
     Version,
-    Versioned
+    Versioned,
+    MessageBus
 } from './../declarations-base';
 
 @Component({
@@ -76,7 +78,8 @@ export class AssetComponent extends AppComponentBase implements OnInit {
 
     constructor(apps: AppsStoreService, dialogs: DialogService, authService: AuthService,
         private readonly formBuilder: FormBuilder,
-        private readonly assetsService: AssetsService
+        private readonly assetsService: AssetsService,
+        private readonly messageBus: MessageBus
     ) {
         super(dialogs, apps, authService);
     }
@@ -180,5 +183,13 @@ export class AssetComponent extends AppComponentBase implements OnInit {
         }
 
         this.resetRenameForm();
+    }
+
+    public onAssetDragStart(event: any) {
+        this.messageBus.emit(new AssetDragged(event.dragData, AssetDragged.DRAG_START, this));
+    }
+
+    public onAssetDragEnd(event: any) {
+        this.messageBus.emit(new AssetDragged(event.dragData, AssetDragged.DRAG_END, this));
     }
 }
