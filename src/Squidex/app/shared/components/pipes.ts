@@ -199,13 +199,8 @@ export class UserPictureRefPipe extends UserAsyncPipe implements PipeTransform {
     pure: true
 })
 export class AssetUrlPipe implements PipeTransform {
-    constructor(
-        private readonly apiUrl: ApiUrlConfig
-    ) {
-    }
-
-    public transform(asset: { id: any }): string {
-        return this.apiUrl.buildUrl(`api/assets/${asset.id}?q=${MathHelper.guid()}`);
+    public transform(asset: { url: any }): string {
+        return `${asset.url}?q=${MathHelper.guid()}`;
     }
 }
 

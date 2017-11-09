@@ -6,29 +6,35 @@
     border: 1px solid $color-input;
     height: 30rem;
 }
+
 .editor-container {
     position: relative;
 
-    .drop-zone {
-        background: rgba(238, 241, 244, 0.89);
-        z-index: 5000;
-        position: absolute;
-        top: 92px;
-        left: 20px;
-        right: 30px;
-        border-color: #c8d2db;
-        border-style: dashed;
-        opacity: 0;
-        display: none;
-    }
+    .drop-area {
+        & {
+            @include absolute(115px, 30px, 66px, 30px);
+            @include border-radius;
+            align-content: center;
+            align-items: center;
+            display: none;
+            border: 2px dashed $color-border;
+            font-size: 1.2rem;
+            font-weight: normal;
+            justify-content: center;
+            color: darken($color-border, 30%);
+        }
 
-    h3 {
-        text-align: center;
-        padding-top: 35%;
-    }
+        &.dragging {
+            @include flex-box;
+        }
 
-    .drop-zone.active {
-        opacity: 1;
-        display:block;
+        &.drag,
+        &.dnd-drag-over,
+        &.dnd-drag-enter {
+            border-color: darken($color-border, 10%);
+            cursor: copy;
+            color: darken($color-border, 40%);
+            text-decoration: none;
+        }
     }
 }

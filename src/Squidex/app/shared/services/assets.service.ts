@@ -19,8 +19,6 @@ import {
     Versioned
 } from 'framework';
 
-import { AssetUrlPipe } from 'shared';
-
 export class AssetsDto {
     constructor(
         public readonly total: number,
@@ -44,6 +42,7 @@ export class AssetDto {
         public readonly isImage: boolean,
         public readonly pixelWidth: number | null,
         public readonly pixelHeight: number | null,
+        public readonly url: string,
         public readonly version: Version
     ) {
     }
@@ -61,6 +60,7 @@ export class AssetDto {
             update.isImage,
             update.pixelWidth,
             update.pixelHeight,
+            this.url,
             version);
     }
 
@@ -77,6 +77,7 @@ export class AssetDto {
             this.isImage,
             this.pixelWidth,
             this.pixelHeight,
+            this.url,
             version);
     }
 }
@@ -102,16 +103,12 @@ export class AssetReplacedDto {
 
 @Injectable()
 export class AssetsService {
-
-    private assetUrlGenerator: AssetUrlPipe;
-
     constructor(
         private readonly http: HttpClient,
         private readonly apiUrl: ApiUrlConfig,
         private readonly analytics: AnalyticsService,
         private readonly localCache: LocalCacheService
     ) {
-        this.assetUrlGenerator = new AssetUrlPipe(this.apiUrl);
     }
 
     public getAssets(appName: string, take: number, skip: number, query?: string, mimeTypes?: string[], ids?: string[]): Observable<AssetsDto> {
@@ -143,6 +140,8 @@ export class AssetsService {
                     const items: any[] = body.items;
 
                     return new AssetsDto(body.total, items.map(item => {
+                        const assetUrl = this.apiUrl.buildUrl(`api/assets/${item.id}`);
+
                         return new AssetDto(
                             item.id,
                             item.createdBy,
@@ -157,6 +156,7 @@ export class AssetsService {
                             item.isImage,
                             item.pixelWidth,
                             item.pixelHeight,
+                            assetUrl,
                             new Version(item.version.toString()));
                     }));
                 })
@@ -181,6 +181,7 @@ export class AssetsService {
                         return percentDone;
                     } else if (event instanceof HttpResponse) {
                         const response: any = event.body;
+                        const assetUrl = this.apiUrl.buildUrl(`api/assets/${response.id}`);
 
                         now = now || DateTime.now();
 
@@ -198,6 +199,7 @@ export class AssetsService {
                             response.isImage,
                             response.pixelWidth,
                             response.pixelHeight,
+                            assetUrl,
                             new Version(event.headers.get('etag')));
 
                         this.localCache.set(`asset.${dto.id}`, dto, 5000);
@@ -218,6 +220,8 @@ export class AssetsService {
                 .map(response => {
                     const body = response.payload.body;
 
+                    const assetUrl = this.apiUrl.buildUrl(`api/assets/${body.id}`);
+
                     return new AssetDto(
                         body.id,
                         body.createdBy,
@@ -232,6 +236,7 @@ export class AssetsService {
                         body.isImage,
                         body.pixelWidth,
                         body.pixelHeight,
+                        assetUrl,
                         response.version);
                 })
                 .catch(error => {
@@ -307,19 +312,6 @@ export class AssetsService {
                     this.analytics.trackEvent('Analytics', 'Updated', appName);
                 })
                 .pretifyError('Failed to delete asset. Please reload.');
-    }
-
-    public buildDroppedAssetData(asset: AssetDto, dragEvent: DragEvent) {
-        if (asset.isImage) {
-            return this.handleImageAsset(asset, dragEvent);
-        }
-        return '';
-    }
-
-    private handleImageAsset(asset: AssetDto, dragEvent: DragEvent) {
-        let res = '<img src="' + this.assetUrlGenerator.transform(asset) + '" ';
-        res += 'width="' + asset.pixelWidth + '" height="' + asset.pixelHeight + '">';
-        return res;
     }
 }
 
