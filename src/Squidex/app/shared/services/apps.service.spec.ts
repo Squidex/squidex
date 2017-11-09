@@ -57,20 +57,24 @@ describe('AppsService', () => {
                 name: 'name1',
                 permission: 'Owner',
                 created: '2016-01-01',
-                lastModified: '2016-02-02'
+                lastModified: '2016-02-02',
+                planName: 'Free',
+                planUpgrade: 'Basic'
             },
             {
                 id: '456',
                 name: 'name2',
                 permission: 'Owner',
                 created: '2017-01-01',
-                lastModified: '2017-02-02'
+                lastModified: '2017-02-02',
+                planName: 'Basic',
+                planUpgrade: 'Enterprise'
             }
         ]);
 
         expect(apps).toEqual([
-            new AppDto('123', 'name1', 'Owner', DateTime.parseISO('2016-01-01'), DateTime.parseISO('2016-02-02')),
-            new AppDto('456', 'name2', 'Owner', DateTime.parseISO('2017-01-01'), DateTime.parseISO('2017-02-02'))
+            new AppDto('123', 'name1', 'Owner', DateTime.parseISO('2016-01-01'), DateTime.parseISO('2016-02-02'), 'Free', 'Basic'),
+            new AppDto('456', 'name2', 'Owner', DateTime.parseISO('2017-01-01'), DateTime.parseISO('2017-02-02'), 'Basic', 'Enterprise')
         ]);
     }));
 
@@ -90,8 +94,13 @@ describe('AppsService', () => {
         expect(req.request.method).toEqual('POST');
         expect(req.request.headers.get('If-Match')).toBeNull();
 
-        req.flush({ id: '123' });
+        req.flush({
+            id: '123',
+            permission: 'Reader',
+            planName: 'Basic',
+            planUpgrade: 'Enterprise'
+        });
 
-        expect(app).toEqual(new AppDto('123', dto.name, 'Owner', now, now));
+        expect(app).toEqual(new AppDto('123', dto.name, 'Reader', now, now, 'Basic', 'Enterprise'));
     }));
 });

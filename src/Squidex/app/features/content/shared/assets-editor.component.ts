@@ -12,15 +12,11 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { Subscription } from 'rxjs';
 
 import {
-    AppComponentBase,
-    AppsStoreService,
+    AppContext,
     AssetDto,
     AssetsService,
     AssetUpdated,
-    AuthService,
-    DialogService,
     ImmutableArray,
-    MessageBus,
     Types
 } from 'shared';
 
@@ -32,9 +28,12 @@ export const SQX_ASSETS_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     selector: 'sqx-assets-editor',
     styleUrls: ['./assets-editor.component.scss'],
     templateUrl: './assets-editor.component.html',
-    providers: [SQX_ASSETS_EDITOR_CONTROL_VALUE_ACCESSOR]
+    providers: [
+        AppContext,
+        SQX_ASSETS_EDITOR_CONTROL_VALUE_ACCESSOR
+    ]
 })
-export class AssetsEditorComponent extends AppComponentBase implements ControlValueAccessor, OnDestroy, OnInit {
+export class AssetsEditorComponent implements ControlValueAccessor, OnDestroy, OnInit {
     private assetUpdatedSubscription: Subscription;
     private callChange = (v: any) => { /* NOOP */ };
     private callTouched = () => { /* NOOP */ };
@@ -44,11 +43,9 @@ export class AssetsEditorComponent extends AppComponentBase implements ControlVa
 
     public isDisabled = false;
 
-    constructor(apps: AppsStoreService, dialogs: DialogService, authService: AuthService,
-        private readonly assetsService: AssetsService,
-        private readonly messageBus: MessageBus
+    constructor(public readonly ctx: AppContext,
+        private readonly assetsService: AssetsService
     ) {
-        super(dialogs, apps, authService);
     }
 
     public ngOnDestroy() {
@@ -57,7 +54,7 @@ export class AssetsEditorComponent extends AppComponentBase implements ControlVa
 
     public ngOnInit() {
         this.assetUpdatedSubscription =
-            this.messageBus.of(AssetUpdated)
+            this.ctx.bus.of(AssetUpdated)
                 .subscribe(event => {
                     if (event.sender !== this) {
                         this.oldAssets = this.oldAssets.replaceBy('id', event.assetDto);
@@ -71,8 +68,7 @@ export class AssetsEditorComponent extends AppComponentBase implements ControlVa
         if (Types.isArrayOfString(value) && value.length > 0) {
             const assetIds: string[] = value;
 
-            this.appNameOnce()
-                .switchMap(app => this.assetsService.getAssets(app, 10000, 0, undefined, undefined, value))
+            this.assetsService.getAssets(this.ctx.appName, 10000, 0, undefined, undefined, value)
                 .subscribe(dtos => {
                     this.oldAssets = ImmutableArray.of(assetIds.map(id => dtos.items.find(x => x.id === id)));
                 });
@@ -129,7 +125,7 @@ export class AssetsEditorComponent extends AppComponentBase implements ControlVa
     }
 
     public onAssetUpdated(asset: AssetDto) {
-        this.messageBus.emit(new AssetUpdated(asset, this));
+        this.ctx.bus.emit(new AssetUpdated(asset, this));
     }
 
     public onAssetFailed(file: File) {

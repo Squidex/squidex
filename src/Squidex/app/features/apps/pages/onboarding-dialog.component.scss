@@ -14,6 +14,11 @@ p {
     line-height: 1.8rem;
 }
 
+.col-image {
+    min-width: 489px;
+    max-width: 489px;
+}
+
 .modal {
     &-content,
     &-dialog {

@@ -99,7 +99,12 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
 
             return DoAndUpdateStateAsync(async () =>
             {
-                await DispatchConsumerAsync(ParseEvent(storedEvent));
+                var @event = ParseKnownEvent(storedEvent);
+
+                if (@event != null)
+                {
+                    await DispatchConsumerAsync(@event);
+                }
 
                 statusError = null;
                 statusPosition = storedEvent.EventPosition;
@@ -296,14 +301,23 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
             }
         }
 
-        private Envelope<IEvent> ParseEvent(StoredEvent message)
+        private Envelope<IEvent> ParseKnownEvent(StoredEvent message)
         {
-            var @event = formatter.Parse(message.Data);
+            try
+            {
+                var @event = formatter.Parse(message.Data);
 
-            @event.SetEventPosition(message.EventPosition);
-            @event.SetEventStreamNumber(message.EventStreamNumber);
+                @event.SetEventPosition(message.EventPosition);
+                @event.SetEventStreamNumber(message.EventStreamNumber);
 
-            return @event;
+                return @event;
+            }
+            catch (TypeNameNotFoundException)
+            {
+                log.LogDebug(w => w.WriteProperty("oldEventFound", message.Data.Type));
+
+                return null;
+            }
         }
     }
 }

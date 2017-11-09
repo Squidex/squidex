@@ -14,7 +14,6 @@ using MongoDB.Driver;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Read.History;
 using Squidex.Domain.Apps.Read.History.Repositories;
-using Squidex.Domain.Apps.Read.MongoDb.Utils;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.MongoDb;
 

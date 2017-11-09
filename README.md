@@ -30,6 +30,7 @@ Current Version 1.0-beta3. Roadmap: https://trello.com/b/KakM4F3S/squidex-roadma
 ### Contributors
 
 * [pushrbx](https://pushrbx.net/): Azure Store Support.
+* [cpmstars](https://www.cpmstars.com): Asset support for rich editor.
 
 ## Contributing
 

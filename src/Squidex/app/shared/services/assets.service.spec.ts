@@ -31,7 +31,7 @@ describe('AssetDto', () => {
     const newVersion = new Version('2');
 
     it('should update name property and user info when renaming', () => {
-        const asset_1 = new AssetDto('1', creator, creator, creation, creation, 'name.png', 'png', 1, 1, 'image/png', false, 1, 1, version);
+        const asset_1 = new AssetDto('1', creator, creator, creation, creation, 'name.png', 'png', 1, 1, 'image/png', false, 1, 1, 'url', version);
         const asset_2 = asset_1.rename('new-name.png', modifier, newVersion, modified);
 
         expect(asset_2.fileName).toEqual('new-name.png');
@@ -43,7 +43,7 @@ describe('AssetDto', () => {
     it('should update file properties when uploading', () => {
         const update = new AssetReplacedDto(2, 2, 'image/jpeg', true, 2, 2);
 
-        const asset_1 = new AssetDto('1', creator, creator, creation, creation, 'name.png', 'png', 1, 1, 'image/png', false, 1, 1, version);
+        const asset_1 = new AssetDto('1', creator, creator, creation, creation, 'name.png', 'png', 1, 1, 'image/png', false, 1, 1, 'url', version);
         const asset_2 = asset_1.update(update, modifier, newVersion, modified);
 
         expect(asset_2.fileSize).toEqual(2);
@@ -147,6 +147,7 @@ describe('AssetsService', () => {
                     true,
                     1024,
                     2048,
+                    'http://service/p/api/assets/id1',
                     new Version('11')),
                 new AssetDto('id2', 'Created2', 'LastModifiedBy2',
                     DateTime.parseISO_UTC('2016-10-12T10:10'),
@@ -159,6 +160,7 @@ describe('AssetsService', () => {
                     true,
                     1024,
                     2048,
+                    'http://service/p/api/assets/id2',
                     new Version('22'))
         ]));
     }));
@@ -210,6 +212,7 @@ describe('AssetsService', () => {
                 true,
                 1024,
                 2048,
+                'http://service/p/api/assets/id1',
                 new Version('2')));
     }));
 
@@ -319,6 +322,7 @@ describe('AssetsService', () => {
                 true,
                 1024,
                 2048,
+                'http://service/p/api/assets/id1',
                 new Version('2')));
     }));
 

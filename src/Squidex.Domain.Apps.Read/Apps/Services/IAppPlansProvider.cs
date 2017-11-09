@@ -16,7 +16,11 @@ namespace Squidex.Domain.Apps.Read.Apps.Services
 
         bool IsConfiguredPlan(string planId);
 
-        IAppLimitsPlan GetPlanForApp(IAppEntity entity);
+        IAppLimitsPlan GetPlanUpgradeForApp(IAppEntity app);
+
+        IAppLimitsPlan GetPlanUpgrade(string planId);
+
+        IAppLimitsPlan GetPlanForApp(IAppEntity app);
 
         IAppLimitsPlan GetPlan(string planId);
     }

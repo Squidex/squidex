@@ -99,7 +99,7 @@ namespace Squidex.Domain.Apps.Core.Apps
             var newMaster =
                 state.Master.Language != language ?
                 state.Master :
-                state.Languages.Values.FirstOrDefault();
+                newLanguages.Values.FirstOrDefault();
 
             state = new State(newLanguages, newMaster);
         }

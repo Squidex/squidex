@@ -9,6 +9,7 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Squidex.Domain.Apps.Core.Apps.Json;
+using Squidex.Domain.Apps.Core.Rules.Json;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Schemas.Json;
 using Squidex.Infrastructure;
@@ -36,6 +37,7 @@ namespace Squidex.Domain.Apps.Core
                     new NamedLongIdConverter(),
                     new NamedStringIdConverter(),
                     new RefTokenConverter(),
+                    new RuleConverter(),
                     new SchemaConverter(new FieldRegistry(typeNameRegistry)),
                     new StringEnumConverter()),
 

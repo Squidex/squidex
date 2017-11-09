@@ -9,8 +9,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
 
 import {
-    ComponentBase,
-    DialogService,
+    AppContext,
     EventConsumerDto,
     EventConsumersService,
     fadeAnimation,
@@ -22,21 +21,23 @@ import {
     selector: 'sqx-event-consumers-page',
     styleUrls: ['./event-consumers-page.component.scss'],
     templateUrl: './event-consumers-page.component.html',
+    providers: [
+        AppContext
+    ],
     animations: [
         fadeAnimation
     ]
 })
-export class EventConsumersPageComponent extends ComponentBase implements OnDestroy, OnInit {
+export class EventConsumersPageComponent implements OnDestroy, OnInit {
     private subscription: Subscription;
 
     public eventConsumerErrorDialog = new ModalView();
     public eventConsumerError = '';
     public eventConsumers = ImmutableArray.empty<EventConsumerDto>();
 
-    constructor(dialogs: DialogService,
+    constructor(public readonly ctx: AppContext,
         private readonly eventConsumersService: EventConsumersService
     ) {
-        super(dialogs);
     }
 
     public ngOnDestroy() {
@@ -58,11 +59,11 @@ export class EventConsumersPageComponent extends ComponentBase implements OnDest
                 this.eventConsumers = ImmutableArray.of(dtos);
 
                 if (showInfo) {
-                    this.notifyInfo('Event Consumers reloaded.');
+                    this.ctx.notifyInfo('Event Consumers reloaded.');
                 }
             }, error => {
                 if (showError) {
-                    this.notifyError(error);
+                    this.ctx.notifyError(error);
                 }
             });
     }
@@ -72,7 +73,7 @@ export class EventConsumersPageComponent extends ComponentBase implements OnDest
             .subscribe(() => {
                 this.eventConsumers = this.eventConsumers.replaceBy('name', consumer.start());
             }, error => {
-                this.notifyError(error);
+                this.ctx.notifyError(error);
             });
     }
 
@@ -81,7 +82,7 @@ export class EventConsumersPageComponent extends ComponentBase implements OnDest
             .subscribe(() => {
                 this.eventConsumers = this.eventConsumers.replaceBy('name', consumer.stop());
             }, error => {
-                this.notifyError(error);
+                this.ctx.notifyError(error);
             });
     }
 
@@ -90,7 +91,7 @@ export class EventConsumersPageComponent extends ComponentBase implements OnDest
             .subscribe(() => {
                 this.eventConsumers = this.eventConsumers.replaceBy('name', consumer.reset());
             }, error => {
-                this.notifyError(error);
+                this.ctx.notifyError(error);
             });
     }
 

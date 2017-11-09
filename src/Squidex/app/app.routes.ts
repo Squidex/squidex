@@ -20,7 +20,8 @@ import {
 import {
     AppMustExistGuard,
     MustBeAuthenticatedGuard,
-    MustBeNotAuthenticatedGuard
+    MustBeNotAuthenticatedGuard,
+    UnsetAppGuard
 } from './shared';
 
 export const routes: Routes = [
@@ -36,11 +37,13 @@ export const routes: Routes = [
         children: [
             {
                 path: '',
-                loadChildren: './features/apps/module#SqxFeatureAppsModule'
+                loadChildren: './features/apps/module#SqxFeatureAppsModule',
+                canActivate: [UnsetAppGuard]
             },
             {
                 path: 'administration',
-                loadChildren: './features/administration/module#SqxFeatureAdministrationModule'
+                loadChildren: './features/administration/module#SqxFeatureAdministrationModule',
+                canActivate: [UnsetAppGuard]
             },
             {
                 path: ':appName',
@@ -64,8 +67,8 @@ export const routes: Routes = [
                         loadChildren: './features/assets/module#SqxFeatureAssetsModule'
                     },
                     {
-                        path: 'webhooks',
-                        loadChildren: './features/webhooks/module#SqxFeatureWebhooksModule'
+                        path: 'rules',
+                        loadChildren: './features/rules/module#SqxFeatureRulesModule'
                     },
                     {
                         path: 'settings',

@@ -14,7 +14,6 @@ using Squidex.Domain.Apps.Core.GenerateEdmSchema;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Read.Apps;
 using Squidex.Domain.Apps.Read.Schemas;
-using Squidex.Domain.Apps.Read.Utils;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Read.Contents.Edm

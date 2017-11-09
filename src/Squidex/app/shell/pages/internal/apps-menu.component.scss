@@ -4,6 +4,10 @@
 $color-apps-border: #65a6ff;
 
 .nav {
+    & {
+        @include flex-direction(row);
+    }
+
     .nav-item {
         .nav-link {
             & {
@@ -16,12 +20,10 @@ $color-apps-border: #65a6ff;
                 color: $color-dark-foreground;
                 border: 1px solid $color-theme-blue-lighter;
                 background: $color-theme-blue;
-                padding-top: .1rem;
+                line-height: 1.25rem;
                 padding-left: 1rem;
                 padding-right: 2rem;
-                padding-bottom: .1rem;
                 min-width: 150px;
-                margin-top: -.1rem;
             }
 
             &:hover {
@@ -57,6 +59,19 @@ $color-apps-border: #65a6ff;
     }
 
     &-pill {
-        @include absolute(.8rem, .625rem, auto, auto);
+        @include absolute(.5rem, .625rem, auto, auto);
+    }
+}
+
+.app-upgrade {
+    & {
+        margin-left: 2rem;
+    }
+
+    .btn-primary {
+        @include box-shadow-inner;
+        background: $color-theme-blue-dark;
+        border: 0;
+        pointer-events: none;
     }
 }

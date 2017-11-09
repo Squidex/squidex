@@ -1,7 +1,7 @@
-<sqx-title message="{app} | {schema} | Content" parameter1="app" parameter2="schema" value1="{{appName() | async}}" value2="{{schema.name}}"></sqx-title>
+<sqx-title message="{app} | {schema} | Content" parameter1="app" parameter2="schema" [value1]="ctx.appName" [value2]="schema?.name"></sqx-title>
 
 <form [formGroup]="contentForm" (ngSubmit)="saveAndPublish()">
-    <sqx-panel panelWidth="53rem">
+    <sqx-panel desiredWidth="53rem">
         <div class="panel-header">
             <div class="panel-title-row">
                 <div class="float-right" *ngIf="!content || content.status !== 'Archived'">

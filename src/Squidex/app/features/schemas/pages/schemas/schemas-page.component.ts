@@ -6,18 +6,13 @@
  */
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
 import { FormControl } from '@angular/forms';
 import { Subscription } from 'rxjs';
 
 import {
-    AppComponentBase,
-    AppsStoreService,
-    AuthService,
-    DialogService,
+    AppContext,
     fadeAnimation,
     ImmutableArray,
-    MessageBus,
     ModalView,
     SchemaDto,
     SchemasService
@@ -33,11 +28,14 @@ import {
     selector: 'sqx-schemas-page',
     styleUrls: ['./schemas-page.component.scss'],
     templateUrl: './schemas-page.component.html',
+    providers: [
+        AppContext
+    ],
     animations: [
         fadeAnimation
     ]
 })
-export class SchemasPageComponent extends AppComponentBase implements OnDestroy, OnInit {
+export class SchemasPageComponent implements OnDestroy, OnInit {
     private schemaUpdatedSubscription: Subscription;
     private schemaDeletedSubscription: Subscription;
 
@@ -48,12 +46,9 @@ export class SchemasPageComponent extends AppComponentBase implements OnDestroy,
     public schemasFilter = new FormControl();
     public schemasFiltered = ImmutableArray.empty<SchemaDto>();
 
-    constructor(apps: AppsStoreService, dialogs: DialogService, authService: AuthService,
-        private readonly schemasService: SchemasService,
-        private readonly messageBus: MessageBus,
-        private readonly route: ActivatedRoute
+    constructor(public readonly ctx: AppContext,
+        private readonly schemasService: SchemasService
     ) {
-        super(dialogs, apps, authService);
     }
 
     public ngOnDestroy() {
@@ -69,7 +64,7 @@ export class SchemasPageComponent extends AppComponentBase implements OnDestroy,
                 this.updateSchemas(this.schemas, this.schemaQuery = q);
             });
 
-        this.route.params.map(q => q['showDialog'])
+        this.ctx.route.params.map(q => q['showDialog'])
             .subscribe(showDialog => {
                 if (showDialog) {
                     this.addSchemaDialog.show();
@@ -77,13 +72,13 @@ export class SchemasPageComponent extends AppComponentBase implements OnDestroy,
             });
 
         this.schemaUpdatedSubscription =
-            this.messageBus.of(SchemaUpdated)
+            this.ctx.bus.of(SchemaUpdated)
                 .subscribe(m => {
                     this.updateSchemas(this.schemas.replaceBy('id', m.schema));
                 });
 
         this.schemaDeletedSubscription =
-            this.messageBus.of(SchemaDeleted)
+            this.ctx.bus.of(SchemaDeleted)
                 .subscribe(m => {
                     this.updateSchemas(this.schemas.filter(s => s.id !== m.schema.id));
                 });
@@ -92,12 +87,11 @@ export class SchemasPageComponent extends AppComponentBase implements OnDestroy,
     }
 
     private load() {
-        this.appNameOnce()
-            .switchMap(app => this.schemasService.getSchemas(app).retry(2))
+        this.schemasService.getSchemas(this.ctx.appName)
             .subscribe(dtos => {
                 this.updateSchemas(ImmutableArray.of(dtos));
             }, error => {
-                this.notifyError(error);
+                this.ctx.notifyError(error);
             });
     }
 
@@ -109,7 +103,7 @@ export class SchemasPageComponent extends AppComponentBase implements OnDestroy,
     }
 
     private emitSchemaCreated(schema: SchemaDto) {
-        this.messageBus.emit(new SchemaCreated(schema));
+        this.ctx.bus.emit(new SchemaCreated(schema));
     }
 
     private updateSchemas(schemas: ImmutableArray<SchemaDto>, query?: string) {

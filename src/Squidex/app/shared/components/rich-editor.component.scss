@@ -1,0 +1,40 @@
+@import '_mixins';
+@import '_vars';
+
+.editor {
+    background: $color-dark-foreground;
+    border: 1px solid $color-input;
+    height: 30rem;
+}
+
+.editor-container {
+    position: relative;
+
+    .drop-area {
+        & {
+            @include absolute(115px, 30px, 66px, 30px);
+            @include border-radius;
+            align-content: center;
+            align-items: center;
+            display: none;
+            border: 2px dashed $color-border;
+            font-size: 1.2rem;
+            font-weight: normal;
+            justify-content: center;
+            color: darken($color-border, 30%);
+        }
+
+        &.dragging {
+            @include flex-box;
+        }
+
+        &.drag,
+        &.dnd-drag-over,
+        &.dnd-drag-enter {
+            border-color: darken($color-border, 10%);
+            cursor: copy;
+            color: darken($color-border, 40%);
+            text-decoration: none;
+        }
+    }
+}

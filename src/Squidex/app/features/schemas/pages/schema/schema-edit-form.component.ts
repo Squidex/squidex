@@ -9,8 +9,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 
 import {
-    ComponentBase,
-    DialogService,
+    AppContext,
     SchemaPropertiesDto,
     SchemasService,
     Version
@@ -19,9 +18,12 @@ import {
 @Component({
     selector: 'sqx-schema-edit-form',
     styleUrls: ['./schema-edit-form.component.scss'],
-    templateUrl: './schema-edit-form.component.html'
+    templateUrl: './schema-edit-form.component.html',
+    providers: [
+        AppContext
+    ]
 })
-export class SchemaEditFormComponent extends ComponentBase implements OnInit {
+export class SchemaEditFormComponent implements OnInit {
     @Output()
     public saved = new EventEmitter<SchemaPropertiesDto>();
 
@@ -37,9 +39,6 @@ export class SchemaEditFormComponent extends ComponentBase implements OnInit {
     @Input()
     public version: Version;
 
-    @Input()
-    public appName: string;
-
     public editFormSubmitted = false;
     public editForm =
         this.formBuilder.group({
@@ -53,11 +52,10 @@ export class SchemaEditFormComponent extends ComponentBase implements OnInit {
                 ]]
         });
 
-    constructor(dialogs: DialogService,
+    constructor(public readonly ctx: AppContext,
         private readonly schemas: SchemasService,
         private readonly formBuilder: FormBuilder
     ) {
-        super(dialogs);
     }
 
     public ngOnInit() {
@@ -77,12 +75,12 @@ export class SchemaEditFormComponent extends ComponentBase implements OnInit {
 
             const requestDto = this.editForm.value;
 
-            this.schemas.putSchema(this.appName, this.name, requestDto, this.version)
+            this.schemas.putSchema(this.ctx.appName, this.name, requestDto, this.version)
                 .subscribe(dto => {
                     this.emitSaved(requestDto);
                     this.resetEditForm();
                 }, error => {
-                    this.notifyError(error);
+                    this.ctx.notifyError(error);
                     this.enableEditForm();
                 });
         }

@@ -13,6 +13,46 @@ namespace Squidex.Domain.Apps.Core.Model
     public sealed class PartitioningTests
     {
         [Fact]
+        public void Should_consider_null_as_valid_partitioning()
+        {
+            string partitioning = null;
+
+            Assert.True(partitioning.IsValidPartitioning());
+        }
+
+        [Fact]
+        public void Should_consider_invariant_as_valid_partitioning()
+        {
+            var partitioning = "invariant";
+
+            Assert.True(partitioning.IsValidPartitioning());
+        }
+
+        [Fact]
+        public void Should_consider_language_as_valid_partitioning()
+        {
+            var partitioning = "language";
+
+            Assert.True(partitioning.IsValidPartitioning());
+        }
+
+        [Fact]
+        public void Should_not_consider_empty_as_valid_partitioning()
+        {
+            var partitioning = string.Empty;
+
+            Assert.False(partitioning.IsValidPartitioning());
+        }
+
+        [Fact]
+        public void Should_not_consider_other_string_as_valid_partitioning()
+        {
+            var partitioning = "invalid";
+
+            Assert.False(partitioning.IsValidPartitioning());
+        }
+
+        [Fact]
         public void Should_provide_invariant_instance()
         {
             Assert.Equal("invariant", Partitioning.Invariant.Key);

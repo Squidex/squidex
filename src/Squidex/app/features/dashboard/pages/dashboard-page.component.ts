@@ -8,11 +8,8 @@
 import { Component, OnInit } from '@angular/core';
 
 import {
-    AppComponentBase,
-    AppsStoreService,
-    AuthService,
+    AppContext,
     DateTime,
-    DialogService,
     fadeAnimation,
     UsagesService
 } from 'shared';
@@ -23,11 +20,14 @@ declare var _urq: any;
     selector: 'sqx-dashboard-page',
     styleUrls: ['./dashboard-page.component.scss'],
     templateUrl: './dashboard-page.component.html',
+    providers: [
+        AppContext
+    ],
     animations: [
         fadeAnimation
     ]
 })
-export class DashboardPageComponent extends AppComponentBase implements OnInit {
+export class DashboardPageComponent implements OnInit {
     public profileDisplayName = '';
 
     public chartStorageCount: any;
@@ -60,29 +60,28 @@ export class DashboardPageComponent extends AppComponentBase implements OnInit {
     public callsCurrent = 0;
     public callsMax = 0;
 
-    constructor(apps: AppsStoreService, dialogs: DialogService, authService: AuthService,
+    constructor(public readonly ctx: AppContext,
         private readonly usagesService: UsagesService
     ) {
-        super(dialogs, apps, authService);
     }
 
     public ngOnInit() {
-        this.appName()
-            .switchMap(app => this.usagesService.getTodayStorage(app))
+        this.ctx.appChanges
+            .switchMap(app => this.usagesService.getTodayStorage(app.name))
             .subscribe(dto => {
                 this.assetsCurrent = dto.size;
                 this.assetsMax = dto.maxAllowed;
             });
 
-        this.appName()
-            .switchMap(app => this.usagesService.getMonthCalls(app))
+        this.ctx.appChanges
+            .switchMap(app => this.usagesService.getMonthCalls(app.name))
             .subscribe(dto => {
                 this.callsCurrent = dto.count;
                 this.callsMax = dto.maxAllowed;
             });
 
-        this.appName()
-            .switchMap(app => this.usagesService.getStorageUsages(app, DateTime.today().addDays(-20), DateTime.today()))
+        this.ctx.appChanges
+            .switchMap(app => this.usagesService.getStorageUsages(app.name, DateTime.today().addDays(-20), DateTime.today()))
             .subscribe(dtos => {
                 this.chartStorageCount = {
                     labels: createLabels(dtos),
@@ -115,8 +114,8 @@ export class DashboardPageComponent extends AppComponentBase implements OnInit {
                 };
             });
 
-        this.appName()
-            .switchMap(app => this.usagesService.getCallsUsages(app, DateTime.today().addDays(-20), DateTime.today()))
+        this.ctx.appChanges
+            .switchMap(app => this.usagesService.getCallsUsages(app.name, DateTime.today().addDays(-20), DateTime.today()))
             .subscribe(dtos => {
                 this.chartCallsCount = {
                     labels: createLabels(dtos),
@@ -144,8 +143,6 @@ export class DashboardPageComponent extends AppComponentBase implements OnInit {
                     ]
                 };
             });
-
-        this.profileDisplayName = this.authService.user!.displayName;
     }
 
     public showForum() {

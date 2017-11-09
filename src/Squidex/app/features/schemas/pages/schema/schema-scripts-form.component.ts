@@ -9,8 +9,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 
 import {
-    ComponentBase,
-    DialogService,
+    AppContext,
     SchemaDetailsDto,
     SchemasService,
     UpdateSchemaScriptsDto
@@ -19,9 +18,12 @@ import {
 @Component({
     selector: 'sqx-schema-scripts-form',
     styleUrls: ['./schema-scripts-form.component.scss'],
-    templateUrl: './schema-scripts-form.component.html'
+    templateUrl: './schema-scripts-form.component.html',
+    providers: [
+        AppContext
+    ]
 })
-export class SchemaScriptsFormComponent extends ComponentBase implements OnInit {
+export class SchemaScriptsFormComponent implements OnInit {
     @Output()
     public saved = new EventEmitter<UpdateSchemaScriptsDto>();
 
@@ -30,9 +32,6 @@ export class SchemaScriptsFormComponent extends ComponentBase implements OnInit 
 
     @Input()
     public schema: SchemaDetailsDto;
-
-    @Input()
-    public appName: string;
 
     public selectedField = 'scriptQuery';
 
@@ -54,11 +53,10 @@ export class SchemaScriptsFormComponent extends ComponentBase implements OnInit 
             scriptChange: ''
         });
 
-    constructor(dialogs: DialogService,
+    constructor(public readonly ctx: AppContext,
         private readonly schemas: SchemasService,
         private readonly formBuilder: FormBuilder
     ) {
-        super(dialogs);
     }
 
     public ngOnInit() {
@@ -84,12 +82,12 @@ export class SchemaScriptsFormComponent extends ComponentBase implements OnInit 
                     this.editForm.controls['scriptDelete'].value,
                     this.editForm.controls['scriptChange'].value);
 
-            this.schemas.putSchemaScripts(this.appName, this.schema.name, requestDto, this.schema.version)
+            this.schemas.putSchemaScripts(this.ctx.appName, this.schema.name, requestDto, this.schema.version)
                 .subscribe(dto => {
                     this.emitSaved(requestDto);
                     this.resetEditForm();
                 }, error => {
-                    this.notifyError(error);
+                    this.ctx.notifyError(error);
                     this.enableEditForm();
                 });
         }

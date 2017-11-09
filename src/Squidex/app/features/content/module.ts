@@ -61,7 +61,7 @@ const routes: Routes = [
                                     isReadOnly: true
                                 },
                                 resolve: {
-                                    schemaOverride: ResolvePublishedSchemaGuard
+                                    schema: ResolvePublishedSchemaGuard
                                 }
                             }
                         ]

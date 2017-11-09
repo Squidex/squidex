@@ -10,9 +10,11 @@ using System;
 using System.Linq;
 using System.Reflection;
 
+#pragma warning disable IDE0033 // Use explicitly provided tuple name
+
 namespace Squidex.Infrastructure.Dispatching
 {
-    public sealed class ActionContextDispatcher<TTarget, TIn, TContext>
+    public static class ActionContextDispatcher<TTarget, TIn, TContext>
     {
         public delegate void ActionContextDelegate<in T>(TTarget target, T input, TContext context) where T : TIn;
 

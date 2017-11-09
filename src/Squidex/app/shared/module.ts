@@ -16,9 +16,9 @@ import {
     AppClientsService,
     AppContributorsService,
     AppLanguagesService,
+    AppMustExistGuard,
     AppsStoreService,
     AppsService,
-    AppMustExistGuard,
     AssetComponent,
     AssetPreviewUrlPipe,
     AssetsService,
@@ -44,7 +44,9 @@ import {
     ResolveSchemaGuard,
     SchemasService,
     ResolveUserGuard,
+    RulesService,
     UIService,
+    UnsetAppGuard,
     UsagesService,
     UserDtoPicture,
     UserEmailPipe,
@@ -57,7 +59,7 @@ import {
     UserManagementService,
     UsersProviderService,
     UsersService,
-    WebhooksService
+    RichEditorComponent
 } from './declarations';
 
 @NgModule({
@@ -81,7 +83,8 @@ import {
         UserNamePipe,
         UserNameRefPipe,
         UserPicturePipe,
-        UserPictureRefPipe
+        UserPictureRefPipe,
+        RichEditorComponent
     ],
     exports: [
         AppFormComponent,
@@ -99,7 +102,8 @@ import {
         UserNamePipe,
         UserNameRefPipe,
         UserPicturePipe,
-        UserPictureRefPipe
+        UserPictureRefPipe,
+        RichEditorComponent
     ]
 })
 export class SqxSharedModule {
@@ -110,9 +114,9 @@ export class SqxSharedModule {
                 AppClientsService,
                 AppContributorsService,
                 AppLanguagesService,
-                AppsStoreService,
-                AppsService,
                 AppMustExistGuard,
+                AppsService,
+                AppsStoreService,
                 AssetsService,
                 AuthService,
                 ContentsService,
@@ -129,13 +133,14 @@ export class SqxSharedModule {
                 ResolvePublishedSchemaGuard,
                 ResolveSchemaGuard,
                 ResolveUserGuard,
+                RulesService,
                 SchemasService,
                 UIService,
+                UnsetAppGuard,
                 UsagesService,
                 UserManagementService,
                 UsersProviderService,
                 UsersService,
-                WebhooksService,
                 {
                     provide: HTTP_INTERCEPTORS,
                     useClass: AuthInterceptor,

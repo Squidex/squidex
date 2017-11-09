@@ -12,24 +12,23 @@ import { FormControl } from '@angular/forms';
 import { Subscription } from 'rxjs';
 
 import {
-    AppComponentBase,
-    AppsStoreService,
+    AppContext,
     AssetDto,
     AssetsService,
     AssetUpdated,
-    AuthService,
-    DialogService,
     ImmutableArray,
-    MessageBus,
     Pager
 } from 'shared';
 
 @Component({
     selector: 'sqx-assets-page',
     styleUrls: ['./assets-page.component.scss'],
-    templateUrl: './assets-page.component.html'
+    templateUrl: './assets-page.component.html',
+    providers: [
+        AppContext
+    ]
 })
-export class AssetsPageComponent extends AppComponentBase implements OnDestroy, OnInit {
+export class AssetsPageComponent implements OnDestroy, OnInit {
     private assetUpdatedSubscription: Subscription;
 
     public newFiles = ImmutableArray.empty<File>();
@@ -39,11 +38,9 @@ export class AssetsPageComponent extends AppComponentBase implements OnDestroy, 
     public assetsFilter = new FormControl();
     public assertQuery = '';
 
-    constructor(apps: AppsStoreService, dialogs: DialogService, authService: AuthService,
-        private readonly assetsService: AssetsService,
-        private readonly messageBus: MessageBus
+    constructor(public readonly ctx: AppContext,
+        private readonly assetsService: AssetsService
     ) {
-        super(dialogs, apps, authService);
     }
 
     public ngOnDestroy() {
@@ -52,7 +49,7 @@ export class AssetsPageComponent extends AppComponentBase implements OnDestroy, 
 
     public ngOnInit() {
         this.assetUpdatedSubscription =
-            this.messageBus.of(AssetUpdated)
+            this.ctx.bus.of(AssetUpdated)
                 .subscribe(event => {
                     if (event.sender !== this) {
                         this.assetsItems = this.assetsItems.replaceBy('id', event.assetDto);
@@ -70,28 +67,26 @@ export class AssetsPageComponent extends AppComponentBase implements OnDestroy, 
     }
 
     public load(showInfo = false) {
-        this.appNameOnce()
-            .switchMap(app => this.assetsService.getAssets(app, this.assetsPager.pageSize, this.assetsPager.skip, this.assertQuery))
+       this.assetsService.getAssets(this.ctx.appName, this.assetsPager.pageSize, this.assetsPager.skip, this.assertQuery)
             .subscribe(dtos => {
                 this.assetsItems = ImmutableArray.of(dtos.items);
                 this.assetsPager = this.assetsPager.setCount(dtos.total);
 
                 if (showInfo) {
-                    this.notifyInfo('Assets reloaded.');
+                    this.ctx.notifyInfo('Assets reloaded.');
                 }
             }, error => {
-                this.notifyError(error);
+                this.ctx.notifyError(error);
             });
     }
 
     public onAssetDeleting(asset: AssetDto) {
-        this.appNameOnce()
-            .switchMap(app => this.assetsService.deleteAsset(app, asset.id, asset.version))
+        this.assetsService.deleteAsset(this.ctx.appName, asset.id, asset.version)
             .subscribe(dto => {
                 this.assetsItems = this.assetsItems.filter(x => x.id !== asset.id);
                 this.assetsPager = this.assetsPager.decrementCount();
             }, error => {
-                this.notifyError(error);
+                this.ctx.notifyError(error);
             });
     }
 
@@ -103,7 +98,7 @@ export class AssetsPageComponent extends AppComponentBase implements OnDestroy, 
     }
 
     public onAssetUpdated(asset: AssetDto) {
-        this.messageBus.emit(new AssetUpdated(asset, this));
+        this.ctx.bus.emit(new AssetUpdated(asset, this));
     }
 
     public onAssetFailed(file: File) {
