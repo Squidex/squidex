@@ -1,0 +1,6 @@
+<div class="editor-container">
+    <div class="file-drop drag drop-zone" [class.active]="draggedOver" dnd-droppable (onDropSuccess)="onItemDropped($event)">
+        <h3>Drop asset in this zone to insert into content</h3>
+    </div>
+    <div class="editor" #editor></div>
+</div>

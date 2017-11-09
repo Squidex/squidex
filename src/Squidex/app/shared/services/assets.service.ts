@@ -19,6 +19,8 @@ import {
     Versioned
 } from 'framework';
 
+import { AssetUrlPipe } from 'shared';
+
 export class AssetsDto {
     constructor(
         public readonly total: number,
@@ -100,12 +102,16 @@ export class AssetReplacedDto {
 
 @Injectable()
 export class AssetsService {
+
+    private assetUrlGenerator: AssetUrlPipe;
+
     constructor(
         private readonly http: HttpClient,
         private readonly apiUrl: ApiUrlConfig,
         private readonly analytics: AnalyticsService,
         private readonly localCache: LocalCacheService
     ) {
+        this.assetUrlGenerator = new AssetUrlPipe(this.apiUrl);
     }
 
     public getAssets(appName: string, take: number, skip: number, query?: string, mimeTypes?: string[], ids?: string[]): Observable<AssetsDto> {
@@ -301,6 +307,19 @@ export class AssetsService {
                     this.analytics.trackEvent('Analytics', 'Updated', appName);
                 })
                 .pretifyError('Failed to delete asset. Please reload.');
+    }
+
+    public buildDroppedAssetData(asset: AssetDto, dragEvent: DragEvent) {
+        if (asset.isImage) {
+            return this.handleImageAsset(asset, dragEvent);
+        }
+        return '';
+    }
+
+    private handleImageAsset(asset: AssetDto, dragEvent: DragEvent) {
+        let res = '<img src="' + this.assetUrlGenerator.transform(asset) + '" ';
+        res += 'width="' + asset.pixelWidth + '" height="' + asset.pixelHeight + '">';
+        return res;
     }
 }
 

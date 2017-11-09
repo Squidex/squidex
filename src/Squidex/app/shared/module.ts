@@ -58,7 +58,8 @@ import {
     UserPictureRefPipe,
     UserManagementService,
     UsersProviderService,
-    UsersService
+    UsersService,
+    RichEditorComponent
 } from './declarations';
 
 @NgModule({
@@ -82,7 +83,8 @@ import {
         UserNamePipe,
         UserNameRefPipe,
         UserPicturePipe,
-        UserPictureRefPipe
+        UserPictureRefPipe,
+        RichEditorComponent
     ],
     exports: [
         AppFormComponent,
@@ -100,7 +102,8 @@ import {
         UserNamePipe,
         UserNameRefPipe,
         UserPicturePipe,
-        UserPictureRefPipe
+        UserPictureRefPipe,
+        RichEditorComponent
     ]
 })
 export class SqxSharedModule {

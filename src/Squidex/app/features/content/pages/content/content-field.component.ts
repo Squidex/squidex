@@ -9,6 +9,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
 import { AppLanguageDto, FieldDto } from 'shared';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
     selector: 'sqx-content-field',
@@ -16,6 +17,8 @@ import { AppLanguageDto, FieldDto } from 'shared';
     templateUrl: './content-field.component.html'
 })
 export class ContentFieldComponent implements OnInit {
+    constructor(private readonly router: Router, private readonly route: ActivatedRoute) {
+    }
     private masterLanguageCode: string;
 
     @Input()
@@ -39,7 +42,6 @@ export class ContentFieldComponent implements OnInit {
 
     public ngOnInit() {
         this.masterLanguageCode = this.languages.find(l => l.isMaster).iso2Code;
-
         if (this.field.isDisabled) {
             this.fieldForm.disable();
         }
@@ -51,6 +53,10 @@ export class ContentFieldComponent implements OnInit {
             this.fieldPartitions = ['iv'];
             this.fieldPartition = 'iv';
         }
+    }
+
+    public richTextEditorAssetPluginClicked(event: any) {
+        this.router.navigate(['assets'], { relativeTo: this.route });
     }
 
     public selectFieldLanguage(partition: string) {

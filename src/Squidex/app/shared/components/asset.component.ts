@@ -13,12 +13,14 @@ import { AppContext } from './app-context';
 import {
     AssetDto,
     AssetsService,
+    AssetDragged,
     DateTime,
     fadeAnimation,
     ModalView,
     UpdateAssetDto,
     Version,
-    Versioned
+    Versioned,
+    MessageBus
 } from './../declarations-base';
 
 @Component({
@@ -57,6 +59,9 @@ export class AssetComponent implements OnInit {
     public deleting = new EventEmitter<AssetDto>();
 
     @Output()
+    public clicked = new EventEmitter<AssetDto>();
+
+    @Output()
     public failed = new EventEmitter();
 
     public renameDialog = new ModalView();
@@ -73,7 +78,8 @@ export class AssetComponent implements OnInit {
 
     constructor(public readonly ctx: AppContext,
         private readonly formBuilder: FormBuilder,
-        private readonly assetsService: AssetsService
+        private readonly assetsService: AssetsService,
+        private readonly messageBus: MessageBus
     ) {
     }
 
@@ -176,5 +182,13 @@ export class AssetComponent implements OnInit {
         }
 
         this.resetRenameForm();
+    }
+
+    public onAssetDragStart(event: any) {
+        this.messageBus.emit(new AssetDragged(event.dragData, AssetDragged.DRAG_START, this));
+    }
+
+    public onAssetDragEnd(event: any) {
+        this.messageBus.emit(new AssetDragged(event.dragData, AssetDragged.DRAG_END, this));
     }
 }
