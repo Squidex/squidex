@@ -53,7 +53,7 @@
                                 <textarea class="form-control" [formControlName]="partition" rows="5"></textarea>
                             </div>
                             <div *ngSwitchCase="'RichText'">
-                                <sqx-rich-editor [formControlName]="partition" [editorOptions]="richTextEditorOptions"></sqx-rich-editor>
+                                <sqx-rich-editor [formControlName]="partition" (assetPluginClicked)="richTextEditorAssetPluginClicked($event)"></sqx-rich-editor>
                             </div>
                             <div *ngSwitchCase="'Markdown'">
                                 <sqx-markdown-editor [formControlName]="partition"></sqx-markdown-editor>

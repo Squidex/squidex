@@ -5,7 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { AfterViewInit, Component, forwardRef, ElementRef, OnDestroy, ViewChild, Input } from '@angular/core';
+import { AfterViewInit, Component, forwardRef, ElementRef, OnDestroy, ViewChild, Output, EventEmitter } from '@angular/core';
 import { ControlValueAccessor,  NG_VALUE_ACCESSOR, FormBuilder } from '@angular/forms';
 
 import { MessageBus, AssetDragged, AssetsService, Types, ResourceLoaderService } from './../declarations-base';
@@ -35,8 +35,9 @@ export class RichEditorComponent implements ControlValueAccessor, AfterViewInit,
 
     @ViewChild('editor')
     public editor: ElementRef;
-    @Input()
-    public editorOptions: any;
+
+    @Output()
+    public assetPluginClicked = new EventEmitter<object>();
 
     public assetsForm = this.formBuilder.group({
         name: ['']
@@ -59,9 +60,13 @@ export class RichEditorComponent implements ControlValueAccessor, AfterViewInit,
         });
     }
 
-    private editorDefaultOptions() {
+    private getEditorOptions() {
         const self = this;
         return {
+            toolbar: 'undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | image media assets',
+            plugins: 'code,image,media',
+            file_picker_types: 'image',
+            convert_urls: false,
             setup: (editor: any) => {
                 self.tinyEditor = editor;
                 self.tinyEditor.setMode(this.isDisabled ? 'readonly' : 'design');
@@ -80,12 +85,16 @@ export class RichEditorComponent implements ControlValueAccessor, AfterViewInit,
                     self.callTouched();
                 });
 
-                // TODO: expose an observable to which we can subscribe to
-                if (Types.isFunction(self.editorOptions.onSetup)) {
-                    self.editorOptions.onSetup(editor);
-                }
+                editor.addButton('assets', {
+                    text: '',
+                    icon: 'browse',
+                    tooltip: 'Insert Assets',
+                    onclick: (event: any) => {
+                        self.assetPluginClicked.emit(event);
+                    }
+                });
 
-                this.tinyInitTimer =
+                self.tinyInitTimer =
                     setTimeout(() => {
                         self.tinyEditor.setContent(this.value || '');
                     }, 500);
@@ -103,10 +112,8 @@ export class RichEditorComponent implements ControlValueAccessor, AfterViewInit,
 
     public ngAfterViewInit() {
         const self = this;
-
         this.resourceLoader.loadScript('https://cdnjs.cloudflare.com/ajax/libs/tinymce/4.5.4/tinymce.min.js').then(() => {
-            let editorOptions = { ...self.editorDefaultOptions(), ...self.editorOptions };
-            tinymce.init(editorOptions);
+            tinymce.init(self.getEditorOptions());
         });
     }
 

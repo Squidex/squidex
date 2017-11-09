@@ -35,27 +35,6 @@ export class ContentFieldComponent implements OnInit {
 
     public fieldPartitions: string[];
     public fieldPartition: string;
-    public richTextEditorOptions: any;
-
-    private buildRichTextEditorOptions() {
-        const self = this;
-        return {
-            toolbar: 'undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | image assets',
-            plugins: 'code,image',
-            file_picker_types: 'image',
-            convert_urls: false,
-            onSetup: (editor: any) => {
-                 editor.addButton('assets', {
-                    text: '',
-                    icon: 'browse',
-                    tooltip: 'Insert Assets',
-                    onclick: () => {
-                        self.router.navigate(['assets'], { relativeTo: self.route })
-                    }
-                 });
-            }
-        };
-    }
 
     public selectLanguage(language: AppLanguageDto) {
         this.fieldPartition = language.iso2Code;
@@ -63,8 +42,6 @@ export class ContentFieldComponent implements OnInit {
 
     public ngOnInit() {
         this.masterLanguageCode = this.languages.find(l => l.isMaster).iso2Code;
-        this.richTextEditorOptions = this.buildRichTextEditorOptions();
-
         if (this.field.isDisabled) {
             this.fieldForm.disable();
         }
@@ -76,6 +53,10 @@ export class ContentFieldComponent implements OnInit {
             this.fieldPartitions = ['iv'];
             this.fieldPartition = 'iv';
         }
+    }
+
+    public richTextEditorAssetPluginClicked(event: any) {
+        this.router.navigate(['assets'], { relativeTo: this.route });
     }
 
     public selectFieldLanguage(partition: string) {

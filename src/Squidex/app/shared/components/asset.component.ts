@@ -45,7 +45,7 @@ export class AssetComponent implements OnInit {
 
     @Input()
     public closeMode = false;
-    
+
     @Output()
     public loaded = new EventEmitter<AssetDto>();
 
