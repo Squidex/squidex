@@ -8,8 +8,7 @@
 import { AfterViewInit, Component, forwardRef, ElementRef, OnDestroy, ViewChild, Input } from '@angular/core';
 import { ControlValueAccessor,  NG_VALUE_ACCESSOR, FormBuilder } from '@angular/forms';
 
-import { ApiUrlConfig, MessageBus, AssetDragged, Types, ResourceLoaderService } from './../declarations-base';
-import { AssetDropHandler } from './asset-drop.handler';
+import { MessageBus, AssetDragged, AssetsService, Types, ResourceLoaderService } from './../declarations-base';
 
 declare var tinymce: any;
 
@@ -30,7 +29,6 @@ export class RichEditorComponent implements ControlValueAccessor, AfterViewInit,
     private tinyInitTimer: any;
     private value: string;
     private isDisabled = false;
-    private assetDropHandler: AssetDropHandler;
 
     public draggedOver = false;
     private assetDraggedSubscription: any;
@@ -46,11 +44,9 @@ export class RichEditorComponent implements ControlValueAccessor, AfterViewInit,
 
     constructor(private readonly resourceLoader: ResourceLoaderService,
         private readonly formBuilder: FormBuilder,
-        private readonly apiUrlConfig: ApiUrlConfig,
-        private readonly messageBus: MessageBus
+        private readonly messageBus: MessageBus,
+        private readonly assetsService: AssetsService
     ) {
-        this.assetDropHandler = new AssetDropHandler(this.apiUrlConfig);
-
         this.assetDraggedSubscription = this.messageBus.of(AssetDragged).subscribe(message => {
             // only handle images for now
             if (message.assetDto.isImage) {
@@ -139,7 +135,7 @@ export class RichEditorComponent implements ControlValueAccessor, AfterViewInit,
     }
 
     public onItemDropped(event: any) {
-        let content = this.assetDropHandler.buildDroppedAssetData(event.dragData, event.mouseEvent);
+        let content = this.assetsService.buildDroppedAssetData(event.dragData, event.mouseEvent);
         if (content) {
             this.tinyEditor.execCommand('mceInsertContent', false, content);
         }
