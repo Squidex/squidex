@@ -35,6 +35,8 @@ export class DashboardPageComponent implements OnInit {
     public chartCallsCount: any;
     public chartCallsPerformance: any;
 
+    public app = this.ctx.appChanges.filter(x => !!x);
+
     public chartOptions = {
         responsive: true,
         scales: {
@@ -66,21 +68,21 @@ export class DashboardPageComponent implements OnInit {
     }
 
     public ngOnInit() {
-        this.ctx.appChanges
+        this.app
             .switchMap(app => this.usagesService.getTodayStorage(app.name))
             .subscribe(dto => {
                 this.assetsCurrent = dto.size;
                 this.assetsMax = dto.maxAllowed;
             });
 
-        this.ctx.appChanges
+        this.app
             .switchMap(app => this.usagesService.getMonthCalls(app.name))
             .subscribe(dto => {
                 this.callsCurrent = dto.count;
                 this.callsMax = dto.maxAllowed;
             });
 
-        this.ctx.appChanges
+        this.app
             .switchMap(app => this.usagesService.getStorageUsages(app.name, DateTime.today().addDays(-20), DateTime.today()))
             .subscribe(dtos => {
                 this.chartStorageCount = {
@@ -114,7 +116,7 @@ export class DashboardPageComponent implements OnInit {
                 };
             });
 
-        this.ctx.appChanges
+        this.app
             .switchMap(app => this.usagesService.getCallsUsages(app.name, DateTime.today().addDays(-20), DateTime.today()))
             .subscribe(dtos => {
                 this.chartCallsCount = {

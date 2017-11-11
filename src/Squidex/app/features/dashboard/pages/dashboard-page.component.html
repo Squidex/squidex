@@ -1,4 +1,4 @@
-<sqx-title message="{app} | Dashboard" parameter1="app" [value1]="ctx.appName"></sqx-title>
+<sqx-title message="{app} | Dashboard" parameter1="app" [value1]="(app | async).name"></sqx-title>
 
 <div class="dashboard" @fade>
     <div class="dashboard-inner">
@@ -7,7 +7,7 @@
         <h1 class="dashboard-title">Hi {{ctx.user.displayName}}</h1>
 
         <div class="subtext">
-            Welcome to <span class="app-name">{{ctx.appName}}</span> dashboard.
+            Welcome to <span class="app-name">{{(app | async).name}}</span> dashboard.
         </div>
     </div>
 
