@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using NodaTime;
 using Squidex.Infrastructure;
@@ -100,9 +101,6 @@ namespace Squidex.Config.Domain
             services.AddSingleton<ImageSharpAssetThumbnailGenerator>()
                 .As<IAssetThumbnailGenerator>();
 
-            services.AddSingleton<InvalidatingMemoryCache>()
-                .As<IMemoryCache>();
-
             services.AddSingleton<DefaultRemoteActorChannel>()
                 .As<IRemoteActorChannel>();
 
@@ -111,6 +109,12 @@ namespace Squidex.Config.Domain
 
             services.AddSingleton<EventConsumerCleaner>();
             services.AddSingleton<EventDataFormatter>();
+
+            services.AddSingleton(c => new InvalidatingMemoryCache(
+                    new MemoryCache(
+                        c.GetRequiredService<IOptions<MemoryCacheOptions>>()),
+                    c.GetRequiredService<IPubSub>()))
+                .As<IMemoryCache>();
         }
     }
 }

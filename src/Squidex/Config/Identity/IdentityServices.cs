@@ -21,7 +21,7 @@ namespace Squidex.Config.Identity
         {
             var dataProtection = services.AddDataProtection().SetApplicationName("Squidex");
 
-            configuration.ConfigureByOption("identity:keyStore:type", new Options
+            configuration.ConfigureByOption("identity:keysStore:type", new Options
             {
                 ["Redis"] = () =>
                 {

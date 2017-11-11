@@ -27,29 +27,32 @@ namespace Squidex.Config
 
             public InterfaceRegistrator<T> As<TInterface>()
             {
-                this.services.AddSingleton(typeof(TInterface), c => c.GetRequiredService<T>());
+                this.services.AddSingleton(typeof(TInterface), c =>
+                {
+                    return c.GetRequiredService<T>();
+                });
 
                 return this;
             }
         }
 
-        public static InterfaceRegistrator<T> AddSingleton<T>(this IServiceCollection services, Func<IServiceProvider, T> factory)
+        public static InterfaceRegistrator<T> AddSingleton<T>(this IServiceCollection services, Func<IServiceProvider, T> factory) where T : class
         {
             services.AddSingleton(typeof(T), factory);
 
             return new InterfaceRegistrator<T>(services);
         }
 
-        public static InterfaceRegistrator<T> AddSingleton<T>(this IServiceCollection services, T instance)
+        public static InterfaceRegistrator<T> AddSingleton<T>(this IServiceCollection services, T instance) where T : class
         {
-            services.AddSingleton(instance);
+            services.AddSingleton(typeof(T), instance);
 
             return new InterfaceRegistrator<T>(services);
         }
 
-        public static InterfaceRegistrator<T> AddSingleton<T>(this IServiceCollection services)
+        public static InterfaceRegistrator<T> AddSingleton<T>(this IServiceCollection services) where T : class
         {
-            services.AddSingleton(typeof(T));
+            services.AddSingleton<T, T>();
 
             return new InterfaceRegistrator<T>(services);
         }
