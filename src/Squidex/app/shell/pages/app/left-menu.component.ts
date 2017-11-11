@@ -5,7 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 
 import { AppContext } from 'shared';
 
@@ -17,14 +17,8 @@ import { AppContext } from 'shared';
         AppContext
     ]
 })
-export class LeftMenuComponent implements OnInit {
-    public permission: string | null = null;
-
+export class LeftMenuComponent {
     constructor(public readonly ctx: AppContext
     ) {
-    }
-
-    public ngOnInit() {
-        this.permission = this.ctx.app.permission;
     }
 }
