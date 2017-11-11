@@ -68,11 +68,13 @@
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="2.0.0" />
     <PackageReference Include="Microsoft.Data.Edm" Version="5.8.2" />
     <PackageReference Include="Microsoft.OData.Core" Version="7.3.1" />
+    <PackageReference Include="Microsoft.Orleans.OrleansRuntime" Version="2.0.0-beta1" />
     <PackageReference Include="MongoDB.Driver" Version="2.4.4" />
     <PackageReference Include="NJsonSchema" Version="9.8.3" />
     <PackageReference Include="NodaTime.Serialization.JsonNet" Version="2.0.0" />
     <PackageReference Include="NSwag.AspNetCore" Version="11.10.0" />
     <PackageReference Include="OpenCover" Version="4.6.519" />
+    <PackageReference Include="Orleans.Providers.MongoDB" Version="2.0.0-preview1" />
     <PackageReference Include="RefactoringEssentials" Version="5.2.0" />
     <PackageReference Include="ReportGenerator" Version="3.0.2" />
     <PackageReference Include="StackExchange.Redis.StrongName" Version="1.2.6" />
