@@ -31,7 +31,7 @@ export class AppContext implements OnDestroy {
     }
 
     public get appChanges(): Observable<AppDto> {
-        return this.appsStore.selectedApp;
+        return this.appsStore.selectedApp.filter(a => !!a).map(a => a);
     }
 
     public get appName(): string {
