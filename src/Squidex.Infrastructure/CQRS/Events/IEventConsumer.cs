@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 
 namespace Squidex.Infrastructure.CQRS.Events
 {
+    public delegate IEventConsumer EventConsumerFactory(string name);
+
     public interface IEventConsumer
     {
         string Name { get; }

@@ -134,6 +134,15 @@ namespace Squidex.Config.Domain
             builder.RegisterType<EdmModelBuilder>()
                 .AsSelf()
                 .SingleInstance();
+
+            builder.Register(c =>
+                {
+                    var eventConsumers = c.Resolve<IEnumerable<IEventConsumer>>();
+
+                    return new EventConsumerFactory(x => eventConsumers.First(e => e.Name == x));
+                })
+                .AsSelf()
+                .SingleInstance();
         }
     }
 }
