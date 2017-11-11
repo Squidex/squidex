@@ -31,7 +31,7 @@ export class AppContext implements OnDestroy {
     }
 
     public get appChanges(): Observable<AppDto> {
-        return this.appsStore.selectedApp;
+        return this.appsStore.selectedApp.first();
     }
 
     public get appName(): string {
@@ -58,7 +58,7 @@ export class AppContext implements OnDestroy {
         public readonly bus: MessageBus
     ) {
         this.appSubscription =
-            this.appsStore.selectedApp.subscribe(app => {
+            this.appsStore.selectedApp.filter(a => !!a).subscribe(app => {
                 this.appField = app;
             });
     }
