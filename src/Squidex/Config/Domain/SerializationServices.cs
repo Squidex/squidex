@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  Serializers.cs
+//  SerializationServices.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -23,7 +23,7 @@ using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Config.Domain
 {
-    public static class Serializers
+    public static class SerializationServices
     {
         private static readonly TypeNameRegistry TypeNameRegistry = new TypeNameRegistry();
         private static readonly JsonSerializerSettings SerializerSettings = new JsonSerializerSettings();
@@ -61,7 +61,7 @@ namespace Squidex.Config.Domain
             return settings;
         }
 
-        static Serializers()
+        static SerializationServices()
         {
             TypeNameRegistry.MapUnmapped(typeof(SquidexCoreModel).Assembly);
             TypeNameRegistry.MapUnmapped(typeof(SquidexEvents).Assembly);
@@ -72,7 +72,7 @@ namespace Squidex.Config.Domain
             BsonJsonConvention.Register(JsonSerializer.Create(SerializerSettings));
         }
 
-        public static IServiceCollection AddMyEventFormatter(this IServiceCollection services)
+        public static IServiceCollection AddMySerializers(this IServiceCollection services)
         {
             services.AddSingleton(t => TypeNameRegistry);
             services.AddSingleton(t => FieldRegistry);

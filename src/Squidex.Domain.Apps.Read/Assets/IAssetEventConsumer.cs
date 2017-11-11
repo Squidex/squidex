@@ -1,21 +1,16 @@
 ﻿// ==========================================================================
-//  WebDependencies.cs
+//  IAssetEventConsumer.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using Microsoft.Extensions.DependencyInjection;
-using Squidex.Config.Domain;
+using Squidex.Infrastructure.CQRS.Events;
 
-namespace Squidex.Config.Web
+namespace Squidex.Domain.Apps.Read.Assets
 {
-    public static class WebDependencies
+    public interface IAssetEventConsumer : IEventConsumer
     {
-        public static void AddMyMvc(this IServiceCollection services)
-        {
-            services.AddMvc().AddMySerializers();
-        }
     }
 }

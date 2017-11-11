@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  WebpackUsages.cs
+//  WebpackExtensions.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -11,7 +11,7 @@ using Squidex.Pipeline;
 
 namespace Squidex.Config.Web
 {
-    public static class WebpackUsages
+    public static class WebpackExtensions
     {
         public static IApplicationBuilder UseWebpackProxy(this IApplicationBuilder app)
         {

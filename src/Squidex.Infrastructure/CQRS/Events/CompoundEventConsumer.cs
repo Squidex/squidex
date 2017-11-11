@@ -6,6 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -22,6 +23,22 @@ namespace Squidex.Infrastructure.CQRS.Events
         public CompoundEventConsumer(IEventConsumer first, params IEventConsumer[] inners)
             : this(first?.Name, first, inners)
         {
+        }
+
+        public CompoundEventConsumer(IEventConsumer[] inners)
+        {
+            Guard.NotNull(inners, nameof(inners));
+            Guard.NotEmpty(inners, nameof(inners));
+
+            this.inners = inners;
+
+            Name = inners.First().Name;
+
+            var innerFilters =
+                this.inners.Where(x => !string.IsNullOrWhiteSpace(x.EventsFilter))
+                    .Select(x => $"({x.EventsFilter})");
+
+            EventsFilter = string.Join("|", innerFilters);
         }
 
         public CompoundEventConsumer(string name, IEventConsumer first, params IEventConsumer[] inners)

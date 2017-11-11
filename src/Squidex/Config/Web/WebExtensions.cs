@@ -15,7 +15,7 @@ using Squidex.Pipeline;
 
 namespace Squidex.Config.Web
 {
-    public static class WebUsages
+    public static class WebExtensions
     {
         public static void UseMyCors(this IApplicationBuilder app)
         {

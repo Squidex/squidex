@@ -16,14 +16,14 @@ namespace Squidex.Config.Identity
 {
     public static class AuthenticationServices
     {
-        public static IServiceCollection AddMyAuthentication(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddMyAuthentication(this IServiceCollection services, IConfiguration config)
         {
-            var identityOptions = configuration.GetSection("identity").Get<MyIdentityOptions>();
+            var identityOptions = config.GetSection("identity").Get<MyIdentityOptions>();
 
             services.AddAuthentication()
                 .AddMyGoogleAuthentication(identityOptions)
                 .AddMyMicrosoftAuthentication(identityOptions)
-                .AddMyApiProtection(identityOptions, configuration);
+                .AddMyApiProtection(identityOptions, config);
 
             return services;
         }

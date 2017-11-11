@@ -18,7 +18,7 @@ using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Domain.Apps.Read.MongoDb.Apps
 {
-    public partial class MongoAppRepository : MongoRepositoryBase<MongoAppEntity>, IAppRepository, IEventConsumer
+    public partial class MongoAppRepository : MongoRepositoryBase<MongoAppEntity>, IAppRepository, IAppEventConsumer
     {
         public MongoAppRepository(IMongoDatabase database)
             : base(database)

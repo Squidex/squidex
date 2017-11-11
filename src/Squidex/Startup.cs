@@ -6,11 +6,8 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System;
 using System.IO;
 using System.Linq;
-using Autofac;
-using Autofac.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -50,21 +47,27 @@ namespace Squidex
             Configuration = config;
         }
 
-        public IServiceProvider ConfigureServices(IServiceCollection services)
+        public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMySwaggerSettings();
-            services.AddMyEventFormatter();
-            services.AddMyDataProtectection(Configuration);
-            services.AddMyAuthentication(Configuration);
-            services.AddMyIdentity();
-            services.AddMyIdentityServer();
-            services.AddMyMvc();
-
-            services.AddCors();
             services.AddLogging();
             services.AddMemoryCache();
             services.AddOptions();
-            services.AddRouting();
+
+            services.AddMyAssetServices(Configuration);
+            services.AddMyAuthentication(Configuration);
+            services.AddMyDataProtectection(Configuration);
+            services.AddMyEventPublishersServices(Configuration);
+            services.AddMyEventStoreServices(Configuration);
+            services.AddMyIdentity();
+            services.AddMyIdentityServer();
+            services.AddMyInfrastructureServices(Configuration);
+            services.AddMyMvc();
+            services.AddMyPubSubServices(Configuration);
+            services.AddMyReadServices(Configuration);
+            services.AddMySerializers();
+            services.AddMyStoreServices(Configuration);
+            services.AddMySwaggerSettings();
+            services.AddMyWriteServices();
 
             services.Configure<MyUrlsOptions>(
                 Configuration.GetSection("urls"));
@@ -74,27 +77,6 @@ namespace Squidex
                 Configuration.GetSection("ui"));
             services.Configure<MyUsageOptions>(
                 Configuration.GetSection("usage"));
-
-            var builder = new ContainerBuilder();
-            builder.Populate(services);
-            builder.RegisterModule(new AssetStoreModule(Configuration));
-            builder.RegisterModule(new EventPublishersModule(Configuration));
-            builder.RegisterModule(new EventStoreModule(Configuration));
-            builder.RegisterModule(new InfrastructureModule(Configuration));
-            builder.RegisterModule(new PubSubModule(Configuration));
-            builder.RegisterModule(new ReadModule(Configuration));
-            builder.RegisterModule(new StoreModule(Configuration));
-            builder.RegisterModule(new WebModule(Configuration));
-            builder.RegisterModule(new WriteModule(Configuration));
-
-            var container = builder.Build();
-
-            container.Resolve<IApplicationLifetime>().ApplicationStopping.Register(() =>
-            {
-                container.Dispose();
-            });
-
-            return new AutofacServiceProvider(container);
         }
 
         public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory)

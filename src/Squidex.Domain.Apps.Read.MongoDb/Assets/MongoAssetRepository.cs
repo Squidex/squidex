@@ -19,7 +19,7 @@ using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Domain.Apps.Read.MongoDb.Assets
 {
-    public partial class MongoAssetRepository : MongoRepositoryBase<MongoAssetEntity>, IAssetRepository, IEventConsumer
+    public partial class MongoAssetRepository : MongoRepositoryBase<MongoAssetEntity>, IAssetRepository, IAssetEventConsumer
     {
         public MongoAssetRepository(IMongoDatabase database)
             : base(database)

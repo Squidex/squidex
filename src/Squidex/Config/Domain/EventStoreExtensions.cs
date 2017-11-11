@@ -1,22 +1,20 @@
 ﻿// ==========================================================================
-//  Usages.cs
+//  EventStoreUsages.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using System.Collections.Generic;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Actors;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.CQRS.Events.Actors;
 
 namespace Squidex.Config.Domain
 {
-    public static class Usages
+    public static class EventStoreExtensions
     {
         public static IApplicationBuilder UseMyEventStore(this IApplicationBuilder app)
         {
@@ -36,18 +34,6 @@ namespace Squidex.Config.Domain
 
                     services.GetService<RemoteActors>().Connect(consumer.Name, actor);
                 }
-            }
-
-            return app;
-        }
-
-        public static IApplicationBuilder TestExternalSystems(this IApplicationBuilder app)
-        {
-            var systems = app.ApplicationServices.GetRequiredService<IEnumerable<IExternalSystem>>();
-
-            foreach (var system in systems)
-            {
-                system.Connect();
             }
 
             return app;

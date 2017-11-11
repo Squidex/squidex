@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  AuthenticationUsage.cs
+//  AuthenticationExtensions.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Builder;
 
 namespace Squidex.Config.Identity
 {
-    public static class AuthenticationUsage
+    public static class AuthenticationExtensions
     {
         public static IApplicationBuilder UseMyAuthentication(this IApplicationBuilder app)
         {

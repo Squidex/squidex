@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  IdentityUsage.cs
+//  IdentityExtensions.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -20,7 +20,7 @@ using Squidex.Shared.Users;
 
 namespace Squidex.Config.Identity
 {
-    public static class IdentityUsage
+    public static class IdentityExtensions
     {
         public static IApplicationBuilder UseMyIdentityServer(this IApplicationBuilder app)
         {

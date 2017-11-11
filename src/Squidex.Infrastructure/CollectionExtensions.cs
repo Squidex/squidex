@@ -30,6 +30,16 @@ namespace Squidex.Infrastructure
             }
         }
 
+        public static IEnumerable<T> OrEmpty<T>(this IEnumerable<T> source)
+        {
+            return source ?? Enumerable.Empty<T>();
+        }
+
+        public static IEnumerable<T> Concat<T>(this IEnumerable<T> source, T value)
+        {
+            return source.Concat(Enumerable.Repeat(value, 1));
+        }
+
         public static int SequentialHashCode<T>(this IEnumerable<T> collection)
         {
             return collection.SequentialHashCode(EqualityComparer<T>.Default);

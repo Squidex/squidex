@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  SwaggerUsage.cs
+//  SwaggerExtensions.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -13,13 +13,13 @@ using NSwag.AspNetCore;
 
 namespace Squidex.Config.Swagger
 {
-    public static class SwaggerUsage
+    public static class SwaggerExtensions
     {
         public static void UseMySwagger(this IApplicationBuilder app)
         {
             var settings = app.ApplicationServices.GetService<SwaggerSettings>();
 
-            app.UseSwagger(typeof(SwaggerUsage).GetTypeInfo().Assembly, settings);
+            app.UseSwagger(typeof(SwaggerExtensions).GetTypeInfo().Assembly, settings);
         }
     }
 }

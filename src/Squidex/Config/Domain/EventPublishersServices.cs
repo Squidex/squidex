@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  EventPublishersModule.cs
+//  EventPublishersServices.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -7,26 +7,19 @@
 // ==========================================================================
 
 using System;
-using Autofac;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
 
 namespace Squidex.Config.Domain
 {
-    public sealed class EventPublishersModule : Module
+    public static class EventPublishersServices
     {
-        private IConfiguration Configuration { get; }
-
-        public EventPublishersModule(IConfiguration configuration)
+        public static void AddMyEventPublishersServices(this IServiceCollection services, IConfiguration configuration)
         {
-            Configuration = configuration;
-        }
-
-        protected override void Load(ContainerBuilder builder)
-        {
-            var eventPublishers = Configuration.GetSection("eventPublishers");
+            var eventPublishers = configuration.GetSection("eventPublishers");
 
             foreach (var child in eventPublishers.GetChildren())
             {
@@ -37,15 +30,15 @@ namespace Squidex.Config.Domain
                     throw new ConfigurationException($"Configure EventPublisher type with 'eventPublishers:{child.Key}:type'.");
                 }
 
-                var eventsFilter = Configuration.GetValue<string>("eventsFilter");
+                var eventsFilter = configuration.GetValue<string>("eventsFilter");
 
                 var enabled = child.GetValue<bool>("enabled");
 
                 if (string.Equals(eventPublisherType, "RabbitMq", StringComparison.OrdinalIgnoreCase))
                 {
-                    var configuration = child.GetValue<string>("configuration");
+                    var publisherConfig = child.GetValue<string>("configuration");
 
-                    if (string.IsNullOrWhiteSpace(configuration))
+                    if (string.IsNullOrWhiteSpace(publisherConfig))
                     {
                         throw new ConfigurationException($"Configure EventPublisher RabbitMq configuration with 'eventPublishers:{child.Key}:configuration'.");
                     }
@@ -61,10 +54,9 @@ namespace Squidex.Config.Domain
 
                     if (enabled)
                     {
-                        builder.Register(c => new RabbitMqEventConsumer(c.Resolve<JsonSerializerSettings>(), name, configuration, exchange, eventsFilter))
+                        services.AddSingleton(c => new RabbitMqEventConsumer(c.GetRequiredService<JsonSerializerSettings>(), name, publisherConfig, exchange, eventsFilter))
                             .As<IEventConsumer>()
-                            .As<IExternalSystem>()
-                            .SingleInstance();
+                            .As<IExternalSystem>();
                     }
                 }
                 else
