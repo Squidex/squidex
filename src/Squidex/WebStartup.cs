@@ -6,6 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using System.IO;
 using System.Linq;
 using Microsoft.AspNetCore.Builder;
@@ -24,8 +25,10 @@ using Squidex.Infrastructure.Log;
 
 namespace Squidex
 {
-    public static class WebApp
+    public class WebStartup : IStartup
     {
+        private readonly IConfiguration configuration;
+        private readonly IHostingEnvironment environment;
         private static readonly string[] IdentityServerPaths =
         {
             "/client-callback-popup",
@@ -34,42 +37,40 @@ namespace Squidex
             "/error"
         };
 
-        public static void ConfigureApp(this IApplicationBuilder app)
+        public WebStartup(IConfiguration configuration, IHostingEnvironment environment)
         {
-            var env = app.ApplicationServices.GetRequiredService<IHostingEnvironment>();
+            this.configuration = configuration;
+            this.environment = environment;
+        }
 
-            app.TestExternalSystems();
+        public IServiceProvider ConfigureServices(IServiceCollection services)
+        {
+            services.AddAppServices(configuration);
+
+            return services.BuildServiceProvider();
+        }
+
+        public void Configure(IApplicationBuilder app)
+        {
+            app.ApplicationServices.LogConfiguration();
+            app.ApplicationServices.TestExternalSystems();
 
             app.UseMyCors();
             app.UseMyForwardingRules();
             app.UseMyTracking();
 
-            app.MapAndUseIdentityServer(env);
-            app.MapAndUseApi(env);
-            app.MapAndUseFrontend(env);
+            MapAndUseIdentityServer(app);
+            MapAndUseApi(app);
+            MapAndUseFrontend(app);
 
-            var log = app.ApplicationServices.GetRequiredService<ISemanticLog>();
-
-            var config = app.ApplicationServices.GetRequiredService<IConfiguration>();
-
-            log.LogInformation(w => w
-                .WriteProperty("message", "Application started")
-                .WriteObject("environment", c =>
-                {
-                    foreach (var kvp in config.AsEnumerable().Where(kvp => kvp.Value != null))
-                    {
-                        c.WriteProperty(kvp.Key, kvp.Value);
-                    }
-                }));
-
-            app.UseMyEventStore();
+            app.ApplicationServices.UseMyEventStore();
         }
 
-        private static void MapAndUseIdentityServer(this IApplicationBuilder app, IHostingEnvironment env)
+        private void MapAndUseIdentityServer(IApplicationBuilder app)
         {
             app.Map(Constants.IdentityPrefix, identityApp =>
             {
-                if (env.IsDevelopment())
+                if (environment.IsDevelopment())
                 {
                     identityApp.UseDeveloperExceptionPage();
                 }
@@ -91,11 +92,11 @@ namespace Squidex
             });
         }
 
-        private static void MapAndUseApi(this IApplicationBuilder app, IHostingEnvironment env)
+        private void MapAndUseApi(IApplicationBuilder app)
         {
             app.Map(Constants.ApiPrefix, appApi =>
             {
-                if (env.IsDevelopment())
+                if (environment.IsDevelopment())
                 {
                     appApi.UseDeveloperExceptionPage();
                 }
@@ -109,9 +110,9 @@ namespace Squidex
             });
         }
 
-        private static void MapAndUseFrontend(this IApplicationBuilder app, IHostingEnvironment env)
+        private void MapAndUseFrontend(IApplicationBuilder app)
         {
-            if (env.IsDevelopment())
+            if (environment.IsDevelopment())
             {
                 app.UseWebpackProxy();
 

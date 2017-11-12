@@ -46,8 +46,7 @@ namespace Squidex.Config.Domain
                     exposeSourceUrl))
                 .As<IGraphQLUrlGenerator>();
 
-            services.AddSingleton(c => c.GetService<IOptions<MyUsageOptions>>()?.Value?.Plans.OrEmpty())
-                .As<IEnumerable<ConfigAppLimitsPlan>>();
+            services.AddSingleton(c => c.GetService<IOptions<MyUsageOptions>>()?.Value?.Plans.OrEmpty());
 
             services.AddSingleton<CachingGraphQLService>()
                 .As<IGraphQLService>();

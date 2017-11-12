@@ -20,6 +20,7 @@ namespace Squidex
                 .UseKestrel(k => { k.AddServerHeader = false; })
                 .UseContentRoot(Directory.GetCurrentDirectory())
                 .UseIISIntegration()
+                .UseStartup<WebStartup>()
                 .ConfigureLogging(builder =>
                 {
                     builder.AddSemanticLog();
@@ -27,10 +28,6 @@ namespace Squidex
                 .ConfigureAppConfiguration((hostContext, builder) =>
                 {
                     builder.AddAppConfiguration(hostContext.HostingEnvironment.EnvironmentName, args);
-                })
-                .ConfigureServices((context, services) =>
-                {
-                    services.AddAppServices(context.Configuration);
                 })
                 .Build()
                 .Run();

@@ -27,10 +27,13 @@ namespace Squidex.Config
 
             public InterfaceRegistrator<T> As<TInterface>()
             {
-                this.services.AddSingleton(typeof(TInterface), c =>
+                if (typeof(TInterface) != typeof(T))
                 {
-                    return c.GetRequiredService<T>();
-                });
+                    this.services.AddSingleton(typeof(TInterface), c =>
+                    {
+                        return c.GetRequiredService<T>();
+                    });
+                }
 
                 return this;
             }

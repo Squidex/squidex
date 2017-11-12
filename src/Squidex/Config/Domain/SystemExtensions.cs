@@ -6,8 +6,8 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Infrastructure;
 
@@ -15,16 +15,14 @@ namespace Squidex.Config.Domain
 {
     public static class SystemExtensions
     {
-        public static IApplicationBuilder TestExternalSystems(this IApplicationBuilder app)
+        public static void TestExternalSystems(this IServiceProvider services)
         {
-            var systems = app.ApplicationServices.GetRequiredService<IEnumerable<IExternalSystem>>();
+            var systems = services.GetRequiredService<IEnumerable<IExternalSystem>>();
 
             foreach (var system in systems)
             {
                 system.Connect();
             }
-
-            return app;
         }
     }
 }

@@ -50,7 +50,7 @@ namespace Squidex.Config.Domain
                     .As<IExternalSystem>();
             }
 
-            services.AddSingleton(c => new ApplicationInfoLogAppender(typeof(Startup).Assembly, Guid.NewGuid()))
+            services.AddSingleton(c => new ApplicationInfoLogAppender(typeof(Program).Assembly, Guid.NewGuid()))
                 .As<ILogAppender>();
 
             services.AddSingleton<ActionContextLogAppender>()

@@ -15,9 +15,12 @@ namespace Squidex
         public static void AddAppConfiguration(this IConfigurationBuilder builder, string environmentName, string[] args)
         {
             builder.Sources.Clear();
+
             builder.AddJsonFile("appsettings.json", true, true);
             builder.AddJsonFile($"appsettings.{environmentName}.json", true);
+
             builder.AddEnvironmentVariables();
+
             builder.AddCommandLine(args);
         }
     }
