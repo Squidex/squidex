@@ -1,21 +1,20 @@
 ﻿// ==========================================================================
-//  Helper.cs
+//  AppEntityExtensions.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using System;
-using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Domain.Apps.Core;
 
-namespace Benchmarks.Utils
+namespace Squidex.Domain.Apps.Read.Apps
 {
-    public static class Helper
+    public static class AppEntityExtensions
     {
-        public static EventData CreateEventData()
+        public static PartitionResolver PartitionResolver(this IAppEntity entity)
         {
-            return new EventData { EventId = Guid.NewGuid(), Metadata = "EventMetdata", Payload = "EventPayload", Type = "MyEvent" };
+            return entity.LanguagesConfig.ToResolver();
         }
     }
 }

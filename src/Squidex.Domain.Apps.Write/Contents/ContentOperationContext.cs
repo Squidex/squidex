@@ -23,6 +23,8 @@ using Squidex.Domain.Apps.Write.Contents.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Tasks;
 
+#pragma warning disable IDE0017 // Simplify object initialization
+
 namespace Squidex.Domain.Apps.Write.Contents
 {
     public sealed class ContentOperationContext
@@ -69,7 +71,7 @@ namespace Squidex.Domain.Apps.Write.Contents
         {
             if (command is ContentDataCommand dataCommand)
             {
-                dataCommand.Data.Enrich(schemaEntity.SchemaDef, appEntity.PartitionResolver);
+                dataCommand.Data.Enrich(schemaEntity.SchemaDef, appEntity.PartitionResolver());
             }
 
             return TaskHelper.Done;
@@ -96,11 +98,11 @@ namespace Squidex.Domain.Apps.Write.Contents
 
                 if (partial)
                 {
-                    await dataCommand.Data.ValidatePartialAsync(ctx, schemaEntity.SchemaDef, appEntity.PartitionResolver, errors);
+                    await dataCommand.Data.ValidatePartialAsync(ctx, schemaEntity.SchemaDef, appEntity.PartitionResolver(), errors);
                 }
                 else
                 {
-                    await dataCommand.Data.ValidateAsync(ctx, schemaEntity.SchemaDef, appEntity.PartitionResolver, errors);
+                    await dataCommand.Data.ValidateAsync(ctx, schemaEntity.SchemaDef, appEntity.PartitionResolver(), errors);
                 }
 
                 if (errors.Count > 0)

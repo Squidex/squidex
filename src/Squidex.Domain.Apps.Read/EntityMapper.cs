@@ -6,15 +6,15 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure.CQRS.Events;
-using Squidex.Infrastructure.MongoDb;
 
-namespace Squidex.Domain.Apps.Read.MongoDb
+namespace Squidex.Domain.Apps.Read
 {
     public static class EntityMapper
     {
-        public static T Create<T>(SquidexEvent @event, EnvelopeHeaders headers) where T : IMongoEntity, new()
+        public static T Create<T>(SquidexEvent @event, EnvelopeHeaders headers, Action<T> updater) where T : IEntity, new()
         {
             var entity = new T();
 
@@ -26,34 +26,36 @@ namespace Squidex.Domain.Apps.Read.MongoDb
 
             SetAppId(@event, entity);
 
-            return Update(@event, headers, entity);
+            return entity.Update(@event, headers, updater);
         }
 
-        public static T Update<T>(SquidexEvent @event, EnvelopeHeaders headers, T entity) where T : IMongoEntity, new()
+        public static T Update<T>(this T entity, SquidexEvent @event, EnvelopeHeaders headers, Action<T> updater) where T : IEntity, new()
         {
             SetVersion(headers, entity);
             SetLastModified(headers, entity);
             SetLastModifiedBy(@event, entity);
 
+            updater(entity);
+
             return entity;
         }
 
-        private static void SetId(EnvelopeHeaders headers, IMongoEntity entity)
+        private static void SetId(EnvelopeHeaders headers, IEntity entity)
         {
             entity.Id = headers.AggregateId();
         }
 
-        private static void SetCreated(EnvelopeHeaders headers, IMongoEntity entity)
+        private static void SetCreated(EnvelopeHeaders headers, IEntity entity)
         {
             entity.Created = headers.Timestamp();
         }
 
-        private static void SetLastModified(EnvelopeHeaders headers, IMongoEntity entity)
+        private static void SetLastModified(EnvelopeHeaders headers, IEntity entity)
         {
             entity.LastModified = headers.Timestamp();
         }
 
-        private static void SetVersion(EnvelopeHeaders headers, IMongoEntity entity)
+        private static void SetVersion(EnvelopeHeaders headers, IEntity entity)
         {
             if (entity is IEntityWithVersion withVersion)
             {
@@ -61,7 +63,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb
             }
         }
 
-        private static void SetCreatedBy(SquidexEvent @event, IMongoEntity entity)
+        private static void SetCreatedBy(SquidexEvent @event, IEntity entity)
         {
             if (entity is IEntityWithCreatedBy withCreatedBy)
             {
@@ -69,7 +71,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb
             }
         }
 
-        private static void SetLastModifiedBy(SquidexEvent @event, IMongoEntity entity)
+        private static void SetLastModifiedBy(SquidexEvent @event, IEntity entity)
         {
             if (entity is IEntityWithLastModifiedBy withModifiedBy)
             {
@@ -77,7 +79,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb
             }
         }
 
-        private static void SetAppId(SquidexEvent @event, IMongoEntity entity)
+        private static void SetAppId(SquidexEvent @event, IEntity entity)
         {
             if (entity is IAppRefEntity app && @event is AppEvent appEvent)
             {

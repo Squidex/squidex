@@ -19,13 +19,20 @@ namespace Squidex.Infrastructure.Log.Internal
             this.logToStdError = logToStdError;
         }
 
-        public void WriteLine(bool isError, string message)
+        public void WriteLine(int color, string message)
         {
-            if (isError)
+            if (color != 0)
             {
                 try
                 {
-                    Console.ForegroundColor = ConsoleColor.Red;
+                    if (color == 0xffff00)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                    }
+                    else
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                    }
 
                     if (logToStdError)
                     {

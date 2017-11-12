@@ -24,7 +24,7 @@ namespace Squidex.Infrastructure.Log.Internal
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                console = new WindowsLogConsole(false);
+                console = new WindowsLogConsole(true);
             }
             else
             {
@@ -43,7 +43,7 @@ namespace Squidex.Infrastructure.Log.Internal
         {
             foreach (var entry in messageQueue.GetConsumingEnumerable())
             {
-                console.WriteLine(entry.IsError, entry.Message);
+                console.WriteLine(entry.Color, entry.Message);
             }
         }
 

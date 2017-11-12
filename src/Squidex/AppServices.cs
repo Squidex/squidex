@@ -11,7 +11,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Squidex.Config;
 using Squidex.Config.Domain;
 using Squidex.Config.Identity;
-using Squidex.Config.Orleans;
 using Squidex.Config.Swagger;
 using Squidex.Config.Web;
 

@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  MongoEntity.cs
+//  JsonEntity.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -7,25 +7,23 @@
 // ==========================================================================
 
 using System;
-using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
+using Newtonsoft.Json;
 using NodaTime;
 
-namespace Squidex.Infrastructure.MongoDb
+namespace Squidex.Domain.Apps.Read.State.Orleans.Grains.Implementations
 {
-    public abstract class MongoEntity
+    public abstract class JsonEntity
     {
-        [BsonId]
-        [BsonElement]
-        [BsonRepresentation(BsonType.String)]
+        [JsonProperty]
         public Guid Id { get; set; }
 
-        [BsonRequired]
-        [BsonElement]
+        [JsonProperty]
         public Instant Created { get; set; }
 
-        [BsonRequired]
-        [BsonElement]
+        [JsonProperty]
         public Instant LastModified { get; set; }
+
+        [JsonProperty]
+        public long Version { get; set; }
     }
 }

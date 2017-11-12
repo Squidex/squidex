@@ -9,16 +9,26 @@
 using System.Linq;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 using Orleans;
+using Orleans.Providers;
+using Orleans.Providers.MongoDB.StorageProviders;
 using Orleans.Runtime.Configuration;
-using Squidex.Infrastructure.CQRS.Events;
-using Squidex.Infrastructure.CQRS.Events.Orleans;
+using Squidex.Config.Domain;
 using Squidex.Infrastructure.CQRS.Events.Orleans.Grains;
 
 namespace Squidex.Config.Orleans
 {
     public static class SiloServices
     {
+        public sealed class CustomMongoDbStorageProvider : MongoStorageProvider
+        {
+            protected override JsonSerializerSettings ReturnSerializerSettings(IProviderRuntime providerRuntime, IProviderConfiguration config)
+            {
+                return SerializationServices.DefaultJsonSettings;
+            }
+        }
+
         public static void AddAppSiloServices(this IServiceCollection services, IConfiguration config)
         {
             var mongoConfiguration = config.GetRequiredValue("store:mongoDb:configuration");
@@ -41,7 +51,7 @@ namespace Squidex.Config.Orleans
                 {
                     if (clusterConfiguration != null)
                     {
-                        clusterConfiguration.AddMongoDBStorageProvider("Default", c =>
+                        clusterConfiguration.AddMongoDBStorageProvider<CustomMongoDbStorageProvider>("Default", c =>
                         {
                             c.ConnectionString = mongoConfiguration;
                             c.CollectionPrefix = "Orleans_";
@@ -57,21 +67,21 @@ namespace Squidex.Config.Orleans
                         });
                     }
 
-                    services.UseMongoDBGatewayListProvider(c =>
+                    services.AddMongoDBGatewayListProvider(c =>
                     {
                         c.ConnectionString = mongoConfiguration;
                         c.CollectionPrefix = "Orleans_";
                         c.DatabaseName = mongoDatabaseName;
                     });
 
-                    services.UseMongoDBMembershipTable(c =>
+                    services.AddMongoDBMembershipTable(c =>
                     {
                         c.ConnectionString = mongoConfiguration;
                         c.CollectionPrefix = "Orleans_";
                         c.DatabaseName = mongoDatabaseName;
                     });
 
-                    services.UseMongoDBReminders(c =>
+                    services.AddMongoDBReminders(c =>
                     {
                         c.ConnectionString = mongoConfiguration;
                         c.CollectionPrefix = "Orleans_";
@@ -79,9 +89,6 @@ namespace Squidex.Config.Orleans
                     });
                 }
             });
-
-            services.AddSingleton<OrleansSiloEventNotifier>()
-                .As<IEventNotifier>();
         }
     }
 }

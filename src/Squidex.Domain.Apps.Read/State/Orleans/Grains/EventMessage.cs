@@ -1,27 +1,19 @@
 ﻿// ==========================================================================
-//  IBenchmark.cs
+//  EventMessage.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-namespace Benchmarks
+using Orleans.Concurrency;
+using Squidex.Infrastructure.CQRS.Events;
+
+namespace Squidex.Domain.Apps.Read.State.Orleans.Grains
 {
-    public interface IBenchmark
+    [Immutable]
+    public sealed class EventMessage
     {
-        string Id { get; }
-
-        string Name { get; }
-
-        void Initialize();
-
-        void RunInitialize();
-
-        long Run();
-
-        void RunCleanup();
-
-        void Cleanup();
+        public Envelope<IEvent> Event { get; set; }
     }
 }

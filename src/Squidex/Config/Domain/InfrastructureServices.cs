@@ -21,7 +21,6 @@ using Squidex.Infrastructure.Assets.ImageSharp;
 using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.CQRS.Events;
-using Squidex.Infrastructure.CQRS.Events.Orleans;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.UsageTracking;
 using Squidex.Pipeline;

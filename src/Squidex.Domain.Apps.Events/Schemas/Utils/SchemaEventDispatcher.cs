@@ -9,6 +9,7 @@
 using System;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Events.Schemas.Utils
 {
@@ -145,6 +146,11 @@ namespace Squidex.Domain.Apps.Events.Schemas.Utils
         public static void Apply(this Schema schema, SchemaUnpublished @event)
         {
             schema.Unpublish();
+        }
+
+        public static void Apply(this Schema schema, ScriptsConfigured @event)
+        {
+            SimpleMapper.Map(@event, schema);
         }
     }
 }

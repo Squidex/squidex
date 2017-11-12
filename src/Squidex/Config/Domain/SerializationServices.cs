@@ -29,6 +29,11 @@ namespace Squidex.Config.Domain
         private static readonly JsonSerializerSettings SerializerSettings = new JsonSerializerSettings();
         private static readonly FieldRegistry FieldRegistry = new FieldRegistry(TypeNameRegistry);
 
+        public static JsonSerializerSettings DefaultJsonSettings
+        {
+            get { return SerializerSettings; }
+        }
+
         private static JsonSerializerSettings ConfigureJson(JsonSerializerSettings settings, TypeNameHandling typeNameHandling)
         {
             settings.SerializationBinder = new TypeNameSerializationBinder(TypeNameRegistry);

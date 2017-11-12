@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  OrleansClientEventNotifier.cs
+//  OrleansEventNotifier.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -11,15 +11,15 @@ using Squidex.Infrastructure.CQRS.Events.Orleans.Grains;
 
 namespace Squidex.Infrastructure.CQRS.Events.Orleans
 {
-    public sealed class OrleansClientEventNotifier : IEventNotifier
+    public sealed class OrleansEventNotifier : IEventNotifier
     {
         private readonly IEventConsumerRegistryGrain eventConsumerRegistryGrain;
 
-        public OrleansClientEventNotifier(IClusterClient orleans)
+        public OrleansEventNotifier(IGrainFactory factory)
         {
-            Guard.NotNull(orleans, nameof(orleans));
+            Guard.NotNull(factory, nameof(factory));
 
-            eventConsumerRegistryGrain = orleans.GetGrain<IEventConsumerRegistryGrain>("Default");
+            eventConsumerRegistryGrain = factory.GetGrain<IEventConsumerRegistryGrain>("Default");
         }
 
         public void NotifyEventsStored(string streamName)

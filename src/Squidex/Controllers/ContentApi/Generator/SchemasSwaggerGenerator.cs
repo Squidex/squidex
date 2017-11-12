@@ -62,7 +62,7 @@ namespace Squidex.Controllers.ContentApi.Generator
 
             foreach (var schema in schemas.Where(x => x.IsPublished).Select(x => x.SchemaDef))
             {
-                new SchemaSwaggerGenerator(document, appBasePath, schema, AppendSchema, app.PartitionResolver).GenerateSchemaOperations();
+                new SchemaSwaggerGenerator(document, appBasePath, schema, AppendSchema, app.PartitionResolver()).GenerateSchemaOperations();
             }
         }
 

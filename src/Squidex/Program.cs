@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Hosting;
 using Orleans.Hosting;
 using Orleans.Runtime.Configuration;
 using Squidex.Config.Orleans;
+using Squidex.Domain.Apps.Read.State.Orleans.Grains.Implementations;
 using Squidex.Domain.Users.DataProtection.Orleans.Grains.Implementations;
 using Squidex.Infrastructure.CQRS.Events.Orleans.Grains.Implementation;
 using Squidex.Infrastructure.Log.Adapter;
@@ -23,6 +24,7 @@ namespace Squidex
         public static void Main(string[] args)
         {
             var silo = new SiloHostBuilder()
+                .AddApplicationPartsFromReferences(typeof(AppStateGrain).Assembly)
                 .AddApplicationPartsFromReferences(typeof(EventConsumerGrain).Assembly)
                 .AddApplicationPartsFromReferences(typeof(XmlRepositoryGrain).Assembly)
                 .UseConfiguration(ClusterConfiguration.LocalhostPrimarySilo(33333))

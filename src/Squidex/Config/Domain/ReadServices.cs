@@ -25,10 +25,12 @@ using Squidex.Domain.Apps.Read.Rules;
 using Squidex.Domain.Apps.Read.Schemas;
 using Squidex.Domain.Apps.Read.Schemas.Services;
 using Squidex.Domain.Apps.Read.Schemas.Services.Implementations;
+using Squidex.Domain.Apps.Read.State;
 using Squidex.Domain.Users;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure.CQRS.Events.Orleans;
 using Squidex.Pipeline;
 
 namespace Squidex.Config.Domain
@@ -77,8 +79,14 @@ namespace Squidex.Config.Domain
             services.AddSingleton<NoopAppPlanBillingManager>()
                 .As<IAppPlanBillingManager>();
 
+            services.AddSingleton<OrleansEventNotifier>()
+                .As<IEventNotifier>();
+
             services.AddSingleton<RuleDequeuer>()
                 .As<IExternalSystem>();
+
+            services.AddSingleton<AppStateEventConsumer>()
+                .As<IEventConsumer>();
 
             services.AddSingleton<RuleEnqueuer>()
                 .As<IEventConsumer>();

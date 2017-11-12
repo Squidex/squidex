@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  IMongoEntity.cs
+//  IAppUserGrain.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -7,16 +7,18 @@
 // ==========================================================================
 
 using System;
-using NodaTime;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Orleans;
 
-namespace Squidex.Infrastructure.MongoDb
+namespace Squidex.Domain.Apps.Read.State.Orleans.Grains
 {
-    public interface IMongoEntity
+    public interface IAppUserGrain : IGrainWithStringKey
     {
-        Guid Id { get; set; }
+        Task<List<Guid>> GetSchemaIdsAsync();
 
-        Instant Created { get; set; }
+        Task AddSchemaAsync(Guid schemaId);
 
-        Instant LastModified { get; set; }
+        Task RemoveSchemaAsync(Guid schemaId);
     }
 }

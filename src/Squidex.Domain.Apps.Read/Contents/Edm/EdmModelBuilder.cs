@@ -35,7 +35,7 @@ namespace Squidex.Domain.Apps.Read.Contents.Edm
             {
                 entry.AbsoluteExpiration = DateTimeOffset.UtcNow.AddMinutes(60);
 
-                return BuildEdmModel(schema.SchemaDef, app.PartitionResolver);
+                return BuildEdmModel(schema.SchemaDef, app.PartitionResolver());
             });
 
             return result;

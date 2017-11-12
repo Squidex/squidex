@@ -10,7 +10,7 @@ namespace Squidex.Infrastructure.Log.Internal
 {
     public struct LogMessageEntry
     {
-        public bool IsError;
+        public int Color;
 
         public string Message;
     }

@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>Orleans.Providers.MongoDB</id>
+    <version>2.0.0-preview2</version>
+    <authors>laredoza</authors>
+    <owners>laredoza</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <licenseUrl>https://github.com/dotnet/Orleans#license</licenseUrl>
+    <projectUrl>https://github.com/OrleansContrib/Orleans.Providers.MongoDB</projectUrl>
+    <description>A MongoDb implementation of the Orleans Providers. This includes the Membership (IMembershipTable and IGatewayListProvider), Reminder (IReminderTable), MongoStatisticsPublisher and IStorageProvider providers.</description>
+    <releaseNotes>Binary serialization added to the Storage Provider by https://github.com/orthrus. The UseJsonFormat="true" parameter controls this. 
+
+Switching between formats while there is data in the storage tables will end in tears (data will be lost). So don't do it.
+ 
+Feedback would be appreciated.</releaseNotes>
+    <copyright>MIT</copyright>
+    <tags>Orleans OrleansProviders MongoDB</tags>
+    <dependencies>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="Microsoft.Orleans.OrleansProviders" version="2.0.0-beta1" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Orleans.OrleansRuntime" version="2.0.0-beta1" exclude="Build,Analyzers" />
+        <dependency id="MongoDB.Driver" version="2.4.4" exclude="Build,Analyzers" />
+        <dependency id="System.Reflection.Metadata" version="1.5.0" exclude="Build,Analyzers" />
+        <dependency id="System.ValueTuple" version="4.4.0" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>
