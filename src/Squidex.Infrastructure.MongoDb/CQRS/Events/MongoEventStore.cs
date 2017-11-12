@@ -60,7 +60,7 @@ namespace Squidex.Infrastructure.CQRS.Events
             Guard.NotNull(subscriber, nameof(subscriber));
             Guard.NotNullOrEmpty(streamFilter, nameof(streamFilter));
 
-            return new PollingSubscription(this, notifier, subscriber, streamFilter, position);
+            return new EventStoreSubscription(this, subscriber, streamFilter, position);
         }
 
         public async Task<IReadOnlyList<StoredEvent>> GetEventsAsync(string streamName)

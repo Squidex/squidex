@@ -6,36 +6,82 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System.Collections.Generic;
-using Microsoft.AspNetCore.Hosting;
+using System.Linq;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Orleans;
-using Orleans.Hosting;
 using Orleans.Runtime.Configuration;
+using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure.CQRS.Events.Orleans;
+using Squidex.Infrastructure.CQRS.Events.Orleans.Grains;
 
 namespace Squidex.Config.Orleans
 {
     public static class SiloServices
     {
-        public static IServiceCollection AddOrleans(this IServiceCollection services, IConfiguration configuration, IHostingEnvironment hostingEnvironment)
+        public static void AddAppSiloServices(this IServiceCollection services, IConfiguration config)
         {
-            var properties = new Dictionary<object, object>();
+            var mongoConfiguration = config.GetRequiredValue("store:mongoDb:configuration");
+            var mongoDatabaseName = config.GetRequiredValue("store:mongoDb:database");
 
-            var hostBuilderContext = new HostBuilderContext(new Dictionary<object, object>())
+            var clusterConfiguration =
+                services.Where(x => x.ServiceType == typeof(ClusterConfiguration))
+                    .Select(x => x.ImplementationInstance)
+                    .Select(x => (ClusterConfiguration)x)
+                    .FirstOrDefault();
+
+            if (clusterConfiguration != null)
             {
-                Configuration = configuration
-            };
+                clusterConfiguration.Globals.RegisterBootstrapProvider<EventConsumerBootstrap>("EventConsumers");
+            }
 
-            var orleansConfig = configuration.GetSection("orleans");
+            config.ConfigureByOption("store:type", new Options
+            {
+                ["MongoDB"] = () =>
+                {
+                    if (clusterConfiguration != null)
+                    {
+                        clusterConfiguration.AddMongoDBStorageProvider("Default", c =>
+                        {
+                            c.ConnectionString = mongoConfiguration;
+                            c.CollectionPrefix = "Orleans_";
+                            c.DatabaseName = mongoDatabaseName;
+                            c.UseJsonFormat = true;
+                        });
 
-            var clusterConfiguration = ClusterConfiguration.LocalhostPrimarySilo(33333);
-            clusterConfiguration.AddMongoDBStatisticsProvider("Default", orleansConfig);
-            clusterConfiguration.AddMongoDBStorageProvider("Default", orleansConfig);
+                        clusterConfiguration.AddMongoDBStatisticsProvider("Default", c =>
+                        {
+                            c.ConnectionString = mongoConfiguration;
+                            c.CollectionPrefix = "Orleans_";
+                            c.DatabaseName = mongoDatabaseName;
+                        });
+                    }
 
-            services.AddD
+                    services.UseMongoDBGatewayListProvider(c =>
+                    {
+                        c.ConnectionString = mongoConfiguration;
+                        c.CollectionPrefix = "Orleans_";
+                        c.DatabaseName = mongoDatabaseName;
+                    });
 
-            return services;
+                    services.UseMongoDBMembershipTable(c =>
+                    {
+                        c.ConnectionString = mongoConfiguration;
+                        c.CollectionPrefix = "Orleans_";
+                        c.DatabaseName = mongoDatabaseName;
+                    });
+
+                    services.UseMongoDBReminders(c =>
+                    {
+                        c.ConnectionString = mongoConfiguration;
+                        c.CollectionPrefix = "Orleans_";
+                        c.DatabaseName = mongoDatabaseName;
+                    });
+                }
+            });
+
+            services.AddSingleton<OrleansSiloEventNotifier>()
+                .As<IEventNotifier>();
         }
     }
 }

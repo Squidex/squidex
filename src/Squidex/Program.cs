@@ -6,31 +6,73 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using System.IO;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
+using Orleans.Hosting;
+using Orleans.Runtime.Configuration;
+using Squidex.Config.Orleans;
+using Squidex.Domain.Users.DataProtection.Orleans.Grains.Implementations;
+using Squidex.Infrastructure.CQRS.Events.Orleans.Grains.Implementation;
+using Squidex.Infrastructure.Log.Adapter;
 
 namespace Squidex
 {
-    public class Program
+    public static class Program
     {
         public static void Main(string[] args)
         {
-            new WebHostBuilder()
-                .UseKestrel(k => { k.AddServerHeader = false; })
+            var silo = new SiloHostBuilder()
+                .AddApplicationPartsFromReferences(typeof(EventConsumerGrain).Assembly)
+                .AddApplicationPartsFromReferences(typeof(XmlRepositoryGrain).Assembly)
+                .UseConfiguration(ClusterConfiguration.LocalhostPrimarySilo(33333))
                 .UseContentRoot(Directory.GetCurrentDirectory())
-                .UseIISIntegration()
-                .UseStartup<Startup>()
-                .ConfigureAppConfiguration((hostContext, options) =>
+                .ConfigureServices((context, services) =>
                 {
-                    options.Sources.Clear();
-                    options.AddJsonFile("appsettings.json", true, true);
-                    options.AddJsonFile($"appsettings.{hostContext.HostingEnvironment.EnvironmentName}.json", true);
-                    options.AddEnvironmentVariables();
-                    options.AddCommandLine(args);
+                    services.AddAppSiloServices(context.Configuration);
+                    services.AddAppServices(context.Configuration);
                 })
-                .Build()
-                .Run();
+                .ConfigureLogging(builder =>
+                {
+                    builder.AddSemanticLog();
+                })
+                .ConfigureAppConfiguration((hostContext, builder) =>
+                {
+                    builder.AddAppConfiguration(GetEnvironment(), args);
+                })
+                .Build();
+
+            silo.StartAsync().Wait();
+
+            try
+            {
+                new WebHostBuilder()
+                    .UseKestrel(k => { k.AddServerHeader = false; })
+                    .UseContentRoot(Directory.GetCurrentDirectory())
+                    .UseIISIntegration()
+                    .UseStartup<WebStartup>()
+                    .ConfigureLogging(builder =>
+                    {
+                        builder.AddSemanticLog();
+                    })
+                    .ConfigureAppConfiguration((hostContext, builder) =>
+                    {
+                        builder.AddAppConfiguration(hostContext.HostingEnvironment.EnvironmentName, args);
+                    })
+                    .Build()
+                    .Run();
+            }
+            finally
+            {
+                silo.StopAsync().Wait();
+            }
+        }
+
+        private static string GetEnvironment()
+        {
+            var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+
+            return environment ?? "Development";
         }
     }
 }

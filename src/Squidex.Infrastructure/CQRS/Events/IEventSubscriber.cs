@@ -16,5 +16,7 @@ namespace Squidex.Infrastructure.CQRS.Events
         Task OnEventAsync(IEventSubscription subscription, StoredEvent storedEvent);
 
         Task OnErrorAsync(IEventSubscription subscription, Exception exception);
+
+        Task OnClosedAsync(IEventSubscription subscription);
     }
 }

@@ -9,7 +9,6 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Squidex.Infrastructure.Actors;
 using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.CQRS.Events
@@ -50,6 +49,7 @@ namespace Squidex.Infrastructure.CQRS.Events
         private void Unsubscribe()
         {
             currentSubscription?.StopAsync().Forget();
+            currentSubscription = null;
         }
 
         private async Task HandleEventAsync(IEventSubscription subscription, StoredEvent storedEvent)
@@ -62,12 +62,21 @@ namespace Squidex.Infrastructure.CQRS.Events
             }
         }
 
+        private async Task HandleClosedAsync(IEventSubscription subscription)
+        {
+            if (subscription == currentSubscription)
+            {
+                await eventSubscriber.OnClosedAsync(this);
+
+                Unsubscribe();
+            }
+        }
+
         private async Task HandleErrorAsync(IEventSubscription subscription, Exception exception)
         {
             if (subscription == currentSubscription)
             {
-                subscription.StopAsync().Forget();
-                subscription = null;
+                Unsubscribe();
 
                 if (retryWindow.CanRetryAfterFailure())
                 {
@@ -91,6 +100,11 @@ namespace Squidex.Infrastructure.CQRS.Events
         Task IEventSubscriber.OnErrorAsync(IEventSubscription subscription, Exception exception)
         {
             return dispatcher.DispatchAsync(() => HandleErrorAsync(subscription, exception));
+        }
+
+        Task IEventSubscriber.OnClosedAsync(IEventSubscription subscription)
+        {
+            return dispatcher.DispatchAsync(() => HandleClosedAsync(subscription));
         }
 
         public async Task StopAsync()

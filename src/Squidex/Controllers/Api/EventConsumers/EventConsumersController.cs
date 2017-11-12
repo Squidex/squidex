@@ -10,10 +10,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
+using Orleans;
 using Squidex.Controllers.Api.EventConsumers.Models;
-using Squidex.Infrastructure.Actors;
-using Squidex.Infrastructure.CQRS.Events;
-using Squidex.Infrastructure.CQRS.Events.Actors.Messages;
+using Squidex.Infrastructure.CQRS.Events.Orleans.Grains;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
 
@@ -25,14 +24,11 @@ namespace Squidex.Controllers.Api.EventConsumers
     [SwaggerIgnore]
     public sealed class EventConsumersController : Controller
     {
-        private readonly IEventConsumerInfoRepository eventConsumerRepository;
-        private readonly IActors actors;
+        private readonly IEventConsumerRegistryGrain eventConsumerRegistryGrain;
 
-        public EventConsumersController(IEventConsumerInfoRepository eventConsumerRepository, IActors actors)
+        public EventConsumersController(IClusterClient orleans)
         {
-            this.eventConsumerRepository = eventConsumerRepository;
-
-            this.actors = actors;
+            eventConsumerRegistryGrain = orleans.GetGrain<IEventConsumerRegistryGrain>("Default");
         }
 
         [HttpGet]
@@ -40,7 +36,7 @@ namespace Squidex.Controllers.Api.EventConsumers
         [ApiCosts(0)]
         public async Task<IActionResult> GetEventConsumers()
         {
-            var entities = await eventConsumerRepository.QueryAsync();
+            var entities = await eventConsumerRegistryGrain.GetConsumersAsync();
 
             var models = entities.Select(x => SimpleMapper.Map(x, new EventConsumerDto())).ToList();
 
@@ -50,11 +46,9 @@ namespace Squidex.Controllers.Api.EventConsumers
         [HttpPut]
         [Route("event-consumers/{name}/start/")]
         [ApiCosts(0)]
-        public IActionResult Start(string name)
+        public async Task<IActionResult> Start(string name)
         {
-            var actor = actors.Get(name);
-
-            actor?.Tell(new StartConsumerMessage());
+            await eventConsumerRegistryGrain.StartAsync(name);
 
             return NoContent();
         }
@@ -62,11 +56,9 @@ namespace Squidex.Controllers.Api.EventConsumers
         [HttpPut]
         [Route("event-consumers/{name}/stop/")]
         [ApiCosts(0)]
-        public IActionResult Stop(string name)
+        public async Task<IActionResult> Stop(string name)
         {
-            var actor = actors.Get(name);
-
-            actor?.Tell(new StopConsumerMessage());
+            await eventConsumerRegistryGrain.StopAsync(name);
 
             return NoContent();
         }
@@ -74,11 +66,9 @@ namespace Squidex.Controllers.Api.EventConsumers
         [HttpPut]
         [Route("event-consumers/{name}/reset/")]
         [ApiCosts(0)]
-        public IActionResult Reset(string name)
+        public async Task<IActionResult> Reset(string name)
         {
-            var actor = actors.Get(name);
-
-            actor?.Tell(new ResetConsumerMessage());
+            await eventConsumerRegistryGrain.ResetAsync(name);
 
             return NoContent();
         }

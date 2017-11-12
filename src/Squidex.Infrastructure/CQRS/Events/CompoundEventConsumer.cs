@@ -24,6 +24,22 @@ namespace Squidex.Infrastructure.CQRS.Events
         {
         }
 
+        public CompoundEventConsumer(IEventConsumer[] inners)
+        {
+            Guard.NotNull(inners, nameof(inners));
+            Guard.NotEmpty(inners, nameof(inners));
+
+            this.inners = inners;
+
+            Name = inners.First().Name;
+
+            var innerFilters =
+                this.inners.Where(x => !string.IsNullOrWhiteSpace(x.EventsFilter))
+                    .Select(x => $"({x.EventsFilter})");
+
+            EventsFilter = string.Join("|", innerFilters);
+        }
+
         public CompoundEventConsumer(string name, IEventConsumer first, params IEventConsumer[] inners)
         {
             Guard.NotNull(first, nameof(first));

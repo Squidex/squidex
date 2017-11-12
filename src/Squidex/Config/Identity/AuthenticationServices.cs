@@ -16,23 +16,21 @@ namespace Squidex.Config.Identity
 {
     public static class AuthenticationServices
     {
-        public static IServiceCollection AddMyAuthentication(this IServiceCollection services, IConfiguration configuration)
+        public static void AddMyAuthentication(this IServiceCollection services, IConfiguration config)
         {
-            var identityOptions = configuration.GetSection("identity").Get<MyIdentityOptions>();
+            var identityOptions = config.GetSection("identity").Get<MyIdentityOptions>();
 
             services.AddAuthentication()
                 .AddMyGoogleAuthentication(identityOptions)
                 .AddMyMicrosoftAuthentication(identityOptions)
-                .AddMyApiProtection(identityOptions, configuration);
-
-            return services;
+                .AddMyApiProtection(identityOptions, config);
         }
 
-        public static AuthenticationBuilder AddMyApiProtection(this AuthenticationBuilder authBuilder, MyIdentityOptions identityOptions, IConfiguration configuration)
+        public static AuthenticationBuilder AddMyApiProtection(this AuthenticationBuilder authBuilder, MyIdentityOptions identityOptions, IConfiguration config)
         {
             var apiScope = Constants.ApiScope;
 
-            var urlsOptions = configuration.GetSection("urls").Get<MyUrlsOptions>();
+            var urlsOptions = config.GetSection("urls").Get<MyUrlsOptions>();
 
             if (!string.IsNullOrWhiteSpace(urlsOptions.BaseUrl))
             {

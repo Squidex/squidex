@@ -276,7 +276,9 @@ namespace Squidex.Infrastructure.Log
         {
             var exception = new InvalidOperationException();
 
-            var loggerFactory = new LoggerFactory().AddSemanticLog(Log);
+            var loggerFactory =
+                new LoggerFactory()
+                    .AddSemanticLog(Log);
             var loggerInstance = loggerFactory.CreateLogger<SemanticLogTests>();
 
             loggerInstance.LogCritical(new EventId(123, "EventName"), exception, "Log {0}", 123);

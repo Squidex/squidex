@@ -14,12 +14,11 @@ using MongoDB.Driver;
 using Squidex.Domain.Apps.Read.Assets;
 using Squidex.Domain.Apps.Read.Assets.Repositories;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Domain.Apps.Read.MongoDb.Assets
 {
-    public partial class MongoAssetStatsRepository : MongoRepositoryBase<MongoAssetStatsEntity>, IAssetStatsRepository, IEventConsumer
+    public partial class MongoAssetStatsRepository : MongoRepositoryBase<MongoAssetStatsEntity>, IAssetStatsRepository, IAssetEventConsumer
     {
         public MongoAssetStatsRepository(IMongoDatabase database)
             : base(database)
