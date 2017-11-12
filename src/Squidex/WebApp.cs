@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  Startup.cs
+//  WebApp.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -13,20 +13,18 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Squidex.Config;
 using Squidex.Config.Domain;
 using Squidex.Config.Identity;
 using Squidex.Config.Swagger;
 using Squidex.Config.Web;
 using Squidex.Infrastructure.Log;
-using Squidex.Infrastructure.Log.Adapter;
 
 #pragma warning disable RECS0002 // Convert anonymous method to method group
 
 namespace Squidex
 {
-    public class Startup
+    public static class WebApp
     {
         private static readonly string[] IdentityServerPaths =
         {
@@ -36,52 +34,9 @@ namespace Squidex
             "/error"
         };
 
-        private IConfiguration Configuration { get; }
-
-        private IHostingEnvironment Environment { get; }
-
-        public Startup(IHostingEnvironment env, IConfiguration config)
+        public static void ConfigureApp(this IApplicationBuilder app)
         {
-            Environment = env;
-
-            Configuration = config;
-        }
-
-        public void ConfigureServices(IServiceCollection services)
-        {
-            services.AddLogging();
-            services.AddMemoryCache();
-            services.AddOptions();
-
-            services.AddMyAssetServices(Configuration);
-            services.AddMyAuthentication(Configuration);
-            services.AddMyDataProtectection(Configuration);
-            services.AddMyEventPublishersServices(Configuration);
-            services.AddMyEventStoreServices(Configuration);
-            services.AddMyIdentity();
-            services.AddMyIdentityServer();
-            services.AddMyInfrastructureServices(Configuration);
-            services.AddMyMvc();
-            services.AddMyPubSubServices(Configuration);
-            services.AddMyReadServices(Configuration);
-            services.AddMySerializers();
-            services.AddMyStoreServices(Configuration);
-            services.AddMySwaggerSettings();
-            services.AddMyWriteServices();
-
-            services.Configure<MyUrlsOptions>(
-                Configuration.GetSection("urls"));
-            services.Configure<MyIdentityOptions>(
-                Configuration.GetSection("identity"));
-            services.Configure<MyUIOptions>(
-                Configuration.GetSection("ui"));
-            services.Configure<MyUsageOptions>(
-                Configuration.GetSection("usage"));
-        }
-
-        public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory)
-        {
-            loggerFactory.AddSemanticLog(app.ApplicationServices.GetRequiredService<ISemanticLog>());
+            var env = app.ApplicationServices.GetRequiredService<IHostingEnvironment>();
 
             app.TestExternalSystems();
 
@@ -89,30 +44,32 @@ namespace Squidex
             app.UseMyForwardingRules();
             app.UseMyTracking();
 
-            MapAndUseIdentity(app);
-            MapAndUseApi(app);
-            MapAndUseFrontend(app);
-
-            app.UseMyEventStore();
+            app.MapAndUseIdentityServer(env);
+            app.MapAndUseApi(env);
+            app.MapAndUseFrontend(env);
 
             var log = app.ApplicationServices.GetRequiredService<ISemanticLog>();
+
+            var config = app.ApplicationServices.GetRequiredService<IConfiguration>();
 
             log.LogInformation(w => w
                 .WriteProperty("message", "Application started")
                 .WriteObject("environment", c =>
                 {
-                    foreach (var kvp in Configuration.AsEnumerable().Where(kvp => kvp.Value != null))
+                    foreach (var kvp in config.AsEnumerable().Where(kvp => kvp.Value != null))
                     {
                         c.WriteProperty(kvp.Key, kvp.Value);
                     }
                 }));
+
+            app.UseMyEventStore();
         }
 
-        private void MapAndUseIdentity(IApplicationBuilder app)
+        private static void MapAndUseIdentityServer(this IApplicationBuilder app, IHostingEnvironment env)
         {
             app.Map(Constants.IdentityPrefix, identityApp =>
             {
-                if (Environment.IsDevelopment())
+                if (env.IsDevelopment())
                 {
                     identityApp.UseDeveloperExceptionPage();
                 }
@@ -127,18 +84,18 @@ namespace Squidex
                 identityApp.UseMyAdmin();
                 identityApp.UseStaticFiles();
 
-                identityApp.MapWhen(x => IsIdentityRequest(x), mvcApp =>
+                identityApp.MapWhen(IsIdentityRequest, mvcApp =>
                 {
                     mvcApp.UseMvc();
                 });
             });
         }
 
-        private void MapAndUseApi(IApplicationBuilder app)
+        private static void MapAndUseApi(this IApplicationBuilder app, IHostingEnvironment env)
         {
             app.Map(Constants.ApiPrefix, appApi =>
             {
-                if (Environment.IsDevelopment())
+                if (env.IsDevelopment())
                 {
                     appApi.UseDeveloperExceptionPage();
                 }
@@ -152,9 +109,9 @@ namespace Squidex
             });
         }
 
-        private void MapAndUseFrontend(IApplicationBuilder app)
+        private static void MapAndUseFrontend(this IApplicationBuilder app, IHostingEnvironment env)
         {
-            if (Environment.IsDevelopment())
+            if (env.IsDevelopment())
             {
                 app.UseWebpackProxy();
 

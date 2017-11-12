@@ -28,11 +28,11 @@ namespace Squidex.Config.Identity
             return services;
         }
 
-        public static AuthenticationBuilder AddMyApiProtection(this AuthenticationBuilder authBuilder, MyIdentityOptions identityOptions, IConfiguration configuration)
+        public static AuthenticationBuilder AddMyApiProtection(this AuthenticationBuilder authBuilder, MyIdentityOptions identityOptions, IConfiguration config)
         {
             var apiScope = Constants.ApiScope;
 
-            var urlsOptions = configuration.GetSection("urls").Get<MyUrlsOptions>();
+            var urlsOptions = config.GetSection("urls").Get<MyUrlsOptions>();
 
             if (!string.IsNullOrWhiteSpace(urlsOptions.BaseUrl))
             {

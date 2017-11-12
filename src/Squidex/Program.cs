@@ -8,7 +8,7 @@
 
 using System.IO;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
+using Squidex.Infrastructure.Log.Adapter;
 
 namespace Squidex
 {
@@ -20,14 +20,17 @@ namespace Squidex
                 .UseKestrel(k => { k.AddServerHeader = false; })
                 .UseContentRoot(Directory.GetCurrentDirectory())
                 .UseIISIntegration()
-                .UseStartup<Startup>()
-                .ConfigureAppConfiguration((hostContext, options) =>
+                .ConfigureLogging(builder =>
                 {
-                    options.Sources.Clear();
-                    options.AddJsonFile("appsettings.json", true, true);
-                    options.AddJsonFile($"appsettings.{hostContext.HostingEnvironment.EnvironmentName}.json", true);
-                    options.AddEnvironmentVariables();
-                    options.AddCommandLine(args);
+                    builder.AddSemanticLog();
+                })
+                .ConfigureAppConfiguration((hostContext, builder) =>
+                {
+                    builder.AddAppConfiguration(hostContext.HostingEnvironment.EnvironmentName, args);
+                })
+                .ConfigureServices((context, services) =>
+                {
+                    services.AddAppServices(context.Configuration);
                 })
                 .Build()
                 .Run();

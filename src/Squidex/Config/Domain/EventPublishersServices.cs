@@ -17,9 +17,9 @@ namespace Squidex.Config.Domain
 {
     public static class EventPublishersServices
     {
-        public static void AddMyEventPublishersServices(this IServiceCollection services, IConfiguration configuration)
+        public static void AddMyEventPublishersServices(this IServiceCollection services, IConfiguration config)
         {
-            var eventPublishers = configuration.GetSection("eventPublishers");
+            var eventPublishers = config.GetSection("eventPublishers");
 
             foreach (var child in eventPublishers.GetChildren())
             {
@@ -30,7 +30,7 @@ namespace Squidex.Config.Domain
                     throw new ConfigurationException($"Configure EventPublisher type with 'eventPublishers:{child.Key}:type'.");
                 }
 
-                var eventsFilter = configuration.GetValue<string>("eventsFilter");
+                var eventsFilter = config.GetValue<string>("eventsFilter");
 
                 var enabled = child.GetValue<bool>("enabled");
 

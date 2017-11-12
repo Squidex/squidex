@@ -17,15 +17,15 @@ namespace Squidex.Config.Identity
 {
     public static class IdentityServices
     {
-        public static IServiceCollection AddMyDataProtectection(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddMyDataProtectection(this IServiceCollection services, IConfiguration config)
         {
             var dataProtection = services.AddDataProtection().SetApplicationName("Squidex");
 
-            configuration.ConfigureByOption("identity:keysStore:type", new Options
+            config.ConfigureByOption("identity:keysStore:type", new Options
             {
                 ["Redis"] = () =>
                 {
-                    var redisConfiguration = configuration.GetRequiredValue("identity:keysStore:redis:configuration");
+                    var redisConfiguration = config.GetRequiredValue("identity:keysStore:redis:configuration");
 
                     var connectionMultiplexer = Singletons<ConnectionMultiplexer>.GetOrAdd(redisConfiguration, s => ConnectionMultiplexer.Connect(s));
 
@@ -33,7 +33,7 @@ namespace Squidex.Config.Identity
                 },
                 ["Folder"] = () =>
                 {
-                    var folderPath = configuration.GetRequiredValue("identity:keysStore:folder:path");
+                    var folderPath = config.GetRequiredValue("identity:keysStore:folder:path");
 
                     dataProtection.PersistKeysToFileSystem(new DirectoryInfo(folderPath));
                 },
