@@ -93,8 +93,8 @@ namespace Squidex.Config.Domain
             services.AddSingleton<WebhookActionHandler>()
                 .As<IRuleActionHandler>();
 
-            services.AddSingleton(c => new CompoundEventConsumer(c.GetServices<IAssetEventConsumer>().ToArray()))
-                .As<IEventConsumer>();
+            services.AddSingleton<IEventConsumer>(c =>
+                new CompoundEventConsumer(c.GetServices<IAssetEventConsumer>().ToArray()));
 
             services.AddSingleton(c =>
             {
