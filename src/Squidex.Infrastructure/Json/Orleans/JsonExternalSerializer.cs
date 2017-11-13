@@ -9,8 +9,8 @@
 using System;
 using System.IO;
 using System.Linq;
-using System.Text;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Orleans.Runtime;
 using Orleans.Serialization;
 
@@ -38,15 +38,13 @@ namespace Squidex.Infrastructure.Json.Orleans
 
         public object DeepCopy(object source, ICopyContext context)
         {
-            return source;
+            return source != null ? JObject.FromObject(source, jsonSerializer).ToObject(source.GetType(), jsonSerializer) : null;
         }
 
         public object Deserialize(Type expectedType, IDeserializationContext context)
         {
             var outLength = context.StreamReader.ReadInt();
             var outBytes = context.StreamReader.ReadBytes(outLength);
-
-            var json = Encoding.Default.GetString(outBytes);
 
             var stream = new MemoryStream(outBytes);
 
@@ -68,8 +66,6 @@ namespace Squidex.Infrastructure.Json.Orleans
             }
 
             var outBytes = stream.ToArray();
-
-            var json = Encoding.Default.GetString(outBytes, 0, outBytes.Length);
 
             context.StreamWriter.Write(outBytes.Length);
             context.StreamWriter.Write(outBytes);

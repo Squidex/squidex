@@ -62,7 +62,7 @@ namespace Squidex.Infrastructure.Reflection
                 }
             }
 
-            public static T Copy(T source)
+            public static T CopyThis(T source)
             {
                 var destination = new T();
 
@@ -75,11 +75,11 @@ namespace Squidex.Infrastructure.Reflection
             }
         }
 
-        public static T Clone<T>(T source) where T : class, new()
+        public static T Copy<T>(this T source) where T : class, new()
         {
             Guard.NotNull(source, nameof(source));
 
-            return ClassCopier<T>.Copy(source);
+            return ClassCopier<T>.CopyThis(source);
         }
     }
 }
