@@ -6,7 +6,6 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -90,21 +89,19 @@ namespace Squidex.Config.Domain
             services.AddSingleton<WebhookActionHandler>()
                 .As<IRuleActionHandler>();
 
-            services.AddSingleton(c => new CompoundEventConsumer(c.GetServices<IAssetEventConsumer>().ToArray()))
-                .As<IEventConsumer>();
+            services.AddSingleton<IEventConsumer>(c =>
+                new CompoundEventConsumer(c.GetServices<IAssetEventConsumer>().ToArray()));
 
-            services.AddSingleton(c =>
-                    new CompoundEventConsumer(
-                        c.GetServices<IAppEventConsumer>().OfType<IEventConsumer>()
-                            .Concat(c.GetRequiredService<CachingAppProvider>()).ToArray()))
-                .As<IEventConsumer>();
+            services.AddSingleton<IEventConsumer>(c =>
+                new CompoundEventConsumer(
+                    c.GetServices<IAppEventConsumer>().OfType<IEventConsumer>()
+                        .Concat(c.GetRequiredService<CachingAppProvider>()).ToArray()));
 
-            services.AddSingleton(c =>
-                    new CompoundEventConsumer(
-                        c.GetServices<ISchemaEventConsumer>().OfType<IEventConsumer>()
-                            .Concat(c.GetRequiredService<CachingGraphQLService>())
-                            .Concat(c.GetRequiredService<CachingSchemaProvider>()).ToArray()))
-                .As<IEventConsumer>();
+            services.AddSingleton<IEventConsumer>(c =>
+                new CompoundEventConsumer(
+                    c.GetServices<ISchemaEventConsumer>().OfType<IEventConsumer>()
+                        .Concat(c.GetRequiredService<CachingGraphQLService>())
+                        .Concat(c.GetRequiredService<CachingSchemaProvider>()).ToArray()));
 
             services.AddSingleton<RuleService>();
             services.AddSingleton<EdmModelBuilder>();

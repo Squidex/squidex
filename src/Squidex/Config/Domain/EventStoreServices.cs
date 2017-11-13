@@ -58,7 +58,7 @@ namespace Squidex.Config.Domain
                 }
             });
 
-            services.AddSingleton<EventConsumerActor>();
+            services.AddTransient<EventConsumerActor>();
         }
     }
 }
