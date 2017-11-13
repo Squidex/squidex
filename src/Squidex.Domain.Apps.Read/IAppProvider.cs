@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  IAppState.cs
+//  IApps.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -15,17 +15,19 @@ using Squidex.Domain.Apps.Read.Schemas;
 
 namespace Squidex.Domain.Apps.Read
 {
-    public interface IAppState
+    public interface IAppProvider
     {
-        Task<IAppEntity> GetAppAsync(Guid appId);
+        Task<(IAppEntity, ISchemaEntity)> GetAppWithSchemaAsync(string appName, Guid id);
 
-        Task<ISchemaEntity> GetSchemaAsync(Guid appId, Guid id, bool provideDeleted = false);
+        Task<IAppEntity> GetAppAsync(string appName);
 
-        Task<ISchemaEntity> GetSchemaAsync(Guid appId, string name, bool provideDeleted = false);
+        Task<ISchemaEntity> GetSchemaAsync(string appName, Guid id, bool provideDeleted = false);
 
-        Task<List<ISchemaEntity>> GetSchemasAsync(Guid appId);
+        Task<ISchemaEntity> GetSchemaAsync(string appName, string name, bool provideDeleted = false);
 
-        Task<List<IRuleEntity>> GetRulesAsync(Guid appId);
+        Task<List<ISchemaEntity>> GetSchemasAsync(string appName);
+
+        Task<List<IRuleEntity>> GetRulesAsync(string appName);
 
         Task<List<IAppEntity>> GetUserApps(string userId);
     }

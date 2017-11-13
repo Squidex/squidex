@@ -6,6 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Orleans;
 using Orleans.Runtime.Configuration;
@@ -24,8 +25,10 @@ namespace Squidex.Config.Orleans
 
             services.AddSingleton(c =>
             {
+                var configuration = ClientConfiguration.LocalhostSilo();
+
                 var client = new ClientBuilder()
-                    .UseConfiguration(ClientConfiguration.LocalhostSilo())
+                    .UseConfiguration(ClientConfiguration.LocalhostSilo().WithJsonSerializer())
                     .AddApplicationPartsFromReferences(typeof(AppStateGrain).Assembly)
                     .AddApplicationPartsFromReferences(typeof(EventConsumerGrain).Assembly)
                     .AddApplicationPartsFromReferences(typeof(XmlRepositoryGrain).Assembly)
@@ -35,6 +38,13 @@ namespace Squidex.Config.Orleans
 
                 return client;
             });
+        }
+
+        public static ClientConfiguration WithJsonSerializer(this ClientConfiguration config)
+        {
+            config.SerializationProviders.Add(typeof(CustomJsonSerializer).GetTypeInfo());
+
+            return config;
         }
     }
 }

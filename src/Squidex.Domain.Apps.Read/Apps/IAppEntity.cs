@@ -12,6 +12,8 @@ namespace Squidex.Domain.Apps.Read.Apps
 {
     public interface IAppEntity : IEntity, IEntityWithVersion
     {
+        string Etag { get; }
+
         string Name { get; }
 
         string PlanId { get; }

@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using Squidex.Controllers.ContentApi.Generator;
-using Squidex.Domain.Apps.Read.Schemas.Repositories;
+using Squidex.Domain.Apps.Read;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Pipeline;
 
@@ -21,13 +21,14 @@ namespace Squidex.Controllers.ContentApi
     [SwaggerIgnore]
     public sealed class ContentSwaggerController : ControllerBase
     {
-        private readonly ISchemaRepository schemaRepository;
+        private readonly IAppProvider appProvider;
         private readonly SchemasSwaggerGenerator schemasSwaggerGenerator;
 
-        public ContentSwaggerController(ICommandBus commandBus, ISchemaRepository schemaRepository, SchemasSwaggerGenerator schemasSwaggerGenerator)
+        public ContentSwaggerController(ICommandBus commandBus, IAppProvider appProvider, SchemasSwaggerGenerator schemasSwaggerGenerator)
             : base(commandBus)
         {
-            this.schemaRepository = schemaRepository;
+            this.appProvider = appProvider;
+
             this.schemasSwaggerGenerator = schemasSwaggerGenerator;
         }
 
@@ -46,7 +47,7 @@ namespace Squidex.Controllers.ContentApi
         [ApiCosts(0)]
         public async Task<IActionResult> GetSwagger(string app)
         {
-            var schemas = await schemaRepository.QueryAllAsync(App.Id);
+            var schemas = await appProvider.GetSchemasAsync(AppName);
 
             var swaggerDocument = await schemasSwaggerGenerator.Generate(App, schemas);
 

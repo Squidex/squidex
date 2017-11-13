@@ -6,8 +6,10 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Orleans.Hosting;
+using Orleans.Runtime.Configuration;
 
 namespace Squidex.Config.Orleans
 {
@@ -21,6 +23,13 @@ namespace Squidex.Config.Orleans
             });
 
             return builder;
+        }
+
+        public static ClusterConfiguration WithJsonSerializer(this ClusterConfiguration config)
+        {
+            config.Globals.SerializationProviders.Add(typeof(CustomJsonSerializer).GetTypeInfo());
+
+            return config;
         }
     }
 }

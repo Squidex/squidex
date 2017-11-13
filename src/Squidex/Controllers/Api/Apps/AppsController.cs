@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using Squidex.Controllers.Api.Apps.Models;
 using Squidex.Domain.Apps.Core.Apps;
-using Squidex.Domain.Apps.Read.Apps.Repositories;
+using Squidex.Domain.Apps.Read;
 using Squidex.Domain.Apps.Read.Apps.Services;
 using Squidex.Domain.Apps.Write.Apps.Commands;
 using Squidex.Infrastructure.CQRS.Commands;
@@ -31,15 +31,15 @@ namespace Squidex.Controllers.Api.Apps
     [SwaggerTag(nameof(Apps))]
     public sealed class AppsController : ControllerBase
     {
-        private readonly IAppRepository appRepository;
+        private readonly IAppProvider appProvider;
         private readonly IAppPlansProvider appPlansProvider;
 
         public AppsController(ICommandBus commandBus,
-            IAppRepository appRepository,
+            IAppProvider appProvider,
             IAppPlansProvider appPlansProvider)
             : base(commandBus)
         {
-            this.appRepository = appRepository;
+            this.appProvider = appProvider;
             this.appPlansProvider = appPlansProvider;
         }
 
@@ -61,7 +61,7 @@ namespace Squidex.Controllers.Api.Apps
         {
             var subject = HttpContext.User.OpenIdSubject();
 
-            var apps = await appRepository.QueryAllAsync(subject);
+            var apps = await appProvider.GetUserApps(subject);
 
             var response = apps.Select(a =>
             {

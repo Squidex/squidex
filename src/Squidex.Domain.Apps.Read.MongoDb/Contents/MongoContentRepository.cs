@@ -19,7 +19,6 @@ using Squidex.Domain.Apps.Read.Contents;
 using Squidex.Domain.Apps.Read.Contents.Repositories;
 using Squidex.Domain.Apps.Read.MongoDb.Contents.Visitors;
 using Squidex.Domain.Apps.Read.Schemas;
-using Squidex.Domain.Apps.Read.Schemas.Services;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
 
@@ -29,7 +28,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
     {
         private const string Prefix = "Projections_Content_";
         private readonly IMongoDatabase database;
-        private readonly ISchemaProvider schemas;
+        private readonly IAppProvider appProvider;
 
         protected static FilterDefinitionBuilder<MongoContentEntity> Filter
         {
@@ -63,13 +62,13 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
             }
         }
 
-        public MongoContentRepository(IMongoDatabase database, ISchemaProvider schemas)
+        public MongoContentRepository(IMongoDatabase database, IAppProvider appProvider)
         {
             Guard.NotNull(database, nameof(database));
-            Guard.NotNull(schemas, nameof(schemas));
+            Guard.NotNull(appProvider, nameof(appProvider));
 
             this.database = database;
-            this.schemas = schemas;
+            this.appProvider = appProvider;
         }
 
         public async Task<IReadOnlyList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, Status[] status, ODataUriParser odataQuery)
@@ -177,11 +176,11 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
             return contentEntity;
         }
 
-        private async Task ForSchemaAsync(Guid appId, Guid schemaId, Func<IMongoCollection<MongoContentEntity>, ISchemaEntity, Task> action)
+        private async Task ForSchemaAsync(NamedId<Guid> appId, Guid schemaId, Func<IMongoCollection<MongoContentEntity>, ISchemaEntity, Task> action)
         {
-            var collection = GetCollection(appId);
+            var collection = GetCollection(appId.Id);
 
-            var schema = await schemas.FindSchemaByIdAsync(schemaId, true);
+            var schema = await appProvider.GetSchemaAsync(appId.Name, schemaId, true);
 
             if (schema == null)
             {

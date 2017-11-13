@@ -9,7 +9,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Squidex.Domain.Apps.Read.Schemas.Services;
+using Squidex.Domain.Apps.Read;
 using Squidex.Domain.Apps.Write.Schemas.Commands;
 using Squidex.Domain.Apps.Write.Schemas.Guards;
 using Squidex.Infrastructure;
@@ -20,23 +20,24 @@ namespace Squidex.Domain.Apps.Write.Schemas
 {
     public class SchemaCommandMiddleware : ICommandMiddleware
     {
-        private readonly ISchemaProvider schemas;
+        private readonly IAppProvider appProvider;
         private readonly IAggregateHandler handler;
 
-        public SchemaCommandMiddleware(IAggregateHandler handler, ISchemaProvider schemas)
+        public SchemaCommandMiddleware(IAggregateHandler handler, IAppProvider appProvider)
         {
             Guard.NotNull(handler, nameof(handler));
-            Guard.NotNull(schemas, nameof(schemas));
+            Guard.NotNull(appProvider, nameof(appProvider));
 
             this.handler = handler;
-            this.schemas = schemas;
+
+            this.appProvider = appProvider;
         }
 
         protected Task On(CreateSchema command, CommandContext context)
         {
             return handler.CreateAsync<SchemaDomainObject>(context, async s =>
             {
-                await GuardSchema.CanCreate(command, schemas);
+                await GuardSchema.CanCreate(command, appProvider);
 
                 s.Create(command);
 

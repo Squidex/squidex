@@ -11,24 +11,17 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
-using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Domain.Apps.Read.Apps;
-using Squidex.Domain.Apps.Read.Apps.Repositories;
+using Squidex.Domain.Apps.Read;
 using Squidex.Domain.Apps.Read.Assets;
 using Squidex.Domain.Apps.Read.Assets.Repositories;
 using Squidex.Domain.Apps.Read.Contents.Repositories;
 using Squidex.Domain.Apps.Read.History;
 using Squidex.Domain.Apps.Read.History.Repositories;
-using Squidex.Domain.Apps.Read.MongoDb.Apps;
 using Squidex.Domain.Apps.Read.MongoDb.Assets;
 using Squidex.Domain.Apps.Read.MongoDb.Contents;
 using Squidex.Domain.Apps.Read.MongoDb.History;
 using Squidex.Domain.Apps.Read.MongoDb.Rules;
-using Squidex.Domain.Apps.Read.MongoDb.Schemas;
 using Squidex.Domain.Apps.Read.Rules.Repositories;
-using Squidex.Domain.Apps.Read.Schemas;
-using Squidex.Domain.Apps.Read.Schemas.Repositories;
-using Squidex.Domain.Apps.Read.Schemas.Services;
 using Squidex.Domain.Users;
 using Squidex.Domain.Users.MongoDb;
 using Squidex.Domain.Users.MongoDb.Infrastructure;
@@ -74,7 +67,7 @@ namespace Squidex.Config.Domain
                         .As<IUsageStore>()
                         .As<IExternalSystem>();
 
-                    services.AddSingleton(c => new MongoContentRepository(mongoContentDatabase, c.GetService<ISchemaProvider>()))
+                    services.AddSingleton(c => new MongoContentRepository(mongoContentDatabase, c.GetService<IAppProvider>()))
                         .As<IContentRepository>()
                         .As<IEventConsumer>();
 
@@ -85,16 +78,6 @@ namespace Squidex.Config.Domain
                     services.AddSingleton(c => new MongoHistoryEventRepository(mongoDatabase, c.GetServices<IHistoryEventsCreator>()))
                         .As<IHistoryEventRepository>()
                         .As<IEventConsumer>()
-                        .As<IExternalSystem>();
-
-                    services.AddSingleton(c => new MongoAppRepository(mongoDatabase))
-                        .As<IAppRepository>()
-                        .As<IAppEventConsumer>()
-                        .As<IExternalSystem>();
-
-                    services.AddSingleton(c => new MongoSchemaRepository(mongoDatabase, c.GetRequiredService<FieldRegistry>()))
-                        .As<ISchemaRepository>()
-                        .As<ISchemaEventConsumer>()
                         .As<IExternalSystem>();
 
                     services.AddSingleton(c => new MongoAssetStatsRepository(mongoDatabase))

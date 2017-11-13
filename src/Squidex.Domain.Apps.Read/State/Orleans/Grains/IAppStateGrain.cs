@@ -13,21 +13,25 @@ using Orleans;
 using Squidex.Domain.Apps.Read.Apps;
 using Squidex.Domain.Apps.Read.Rules;
 using Squidex.Domain.Apps.Read.Schemas;
+using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure.Json.Orleans;
 
 namespace Squidex.Domain.Apps.Read.State.Orleans.Grains
 {
-    public interface IAppStateGrain : IGrainWithGuidKey
+    public interface IAppStateGrain : IGrainWithStringKey
     {
-        Task<IAppEntity> GetAppAsync();
+        Task<J<(IAppEntity, ISchemaEntity)>> GetAppWithSchemaAsync(Guid id);
 
-        Task<ISchemaEntity> GetSchemaAsync(Guid id, bool provideDeleted = false);
+        Task<J<IAppEntity>> GetAppAsync();
 
-        Task<ISchemaEntity> GetSchemaAsync(string name, bool provideDeleted = false);
+        Task<J<ISchemaEntity>> GetSchemaAsync(Guid id, bool provideDeleted = false);
 
-        Task<List<ISchemaEntity>> GetSchemasAsync();
+        Task<J<ISchemaEntity>> GetSchemaAsync(string name, bool provideDeleted = false);
 
-        Task<List<IRuleEntity>> GetRulesAsync();
+        Task<J<List<ISchemaEntity>>> GetSchemasAsync();
 
-        Task HandleAsync(EventMessage message);
+        Task<J<List<IRuleEntity>>> GetRulesAsync();
+
+        Task HandleAsync(J<Envelope<IEvent>> message);
     }
 }

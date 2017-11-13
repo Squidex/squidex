@@ -12,6 +12,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Orleans;
+using Orleans.Concurrency;
 using Orleans.Runtime;
 using Squidex.Infrastructure.Tasks;
 
@@ -48,14 +49,14 @@ namespace Squidex.Infrastructure.CQRS.Events.Orleans.Grains.Implementation
             return Task.WhenAll(tasks);
         }
 
-        public Task<List<EventConsumerInfo>> GetConsumersAsync()
+        public Task<Immutable<List<EventConsumerInfo>>> GetConsumersAsync()
         {
             var tasks =
                 eventConsumers
                     .Select(c => GrainFactory.GetGrain<IEventConsumerGrain>(c.Name))
                     .Select(c => c.GetStateAsync());
 
-            return Task.WhenAll(tasks).ContinueWith(x => x.Result.ToList());
+            return Task.WhenAll(tasks).ContinueWith(x => new Immutable<List<EventConsumerInfo>>(x.Result.Select(r => r.Value).ToList()));
         }
 
         public Task ReceiveReminder(string reminderName, TickStatus status)

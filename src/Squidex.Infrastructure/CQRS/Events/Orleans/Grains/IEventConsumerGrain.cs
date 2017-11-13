@@ -8,12 +8,13 @@
 
 using System.Threading.Tasks;
 using Orleans;
+using Orleans.Concurrency;
 
 namespace Squidex.Infrastructure.CQRS.Events.Orleans.Grains
 {
     public interface IEventConsumerGrain : IGrainWithStringKey, IEventSubscriber
     {
-        Task<EventConsumerInfo> GetStateAsync();
+        Task<Immutable<EventConsumerInfo>> GetStateAsync();
 
         Task ActivateAsync();
 

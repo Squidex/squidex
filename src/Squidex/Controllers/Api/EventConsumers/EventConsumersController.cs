@@ -38,7 +38,7 @@ namespace Squidex.Controllers.Api.EventConsumers
         {
             var entities = await eventConsumerRegistryGrain.GetConsumersAsync();
 
-            var models = entities.Select(x => SimpleMapper.Map(x, new EventConsumerDto())).ToList();
+            var models = entities.Value.Select(x => SimpleMapper.Map(x, new EventConsumerDto())).ToList();
 
             return Ok(models);
         }

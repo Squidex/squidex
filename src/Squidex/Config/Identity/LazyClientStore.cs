@@ -14,22 +14,22 @@ using IdentityServer4.Models;
 using IdentityServer4.Stores;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core.Apps;
-using Squidex.Domain.Apps.Read.Apps.Services;
+using Squidex.Domain.Apps.Read;
 using Squidex.Infrastructure;
 
 namespace Squidex.Config.Identity
 {
     public class LazyClientStore : IClientStore
     {
-        private readonly IAppProvider appProvider;
+        private readonly IAppProvider appState;
         private readonly Dictionary<string, Client> staticClients = new Dictionary<string, Client>(StringComparer.OrdinalIgnoreCase);
 
-        public LazyClientStore(IOptions<MyUrlsOptions> urlsOptions, IAppProvider appProvider)
+        public LazyClientStore(IOptions<MyUrlsOptions> urlsOptions, IAppProvider appState)
         {
             Guard.NotNull(urlsOptions, nameof(urlsOptions));
-            Guard.NotNull(appProvider, nameof(appProvider));
+            Guard.NotNull(appState, nameof(appState));
 
-            this.appProvider = appProvider;
+            this.appState = appState;
 
             CreateStaticClients(urlsOptions);
         }
@@ -50,7 +50,7 @@ namespace Squidex.Config.Identity
                 return null;
             }
 
-            var app = await appProvider.FindAppByNameAsync(token[0]);
+            var app = await appState.GetAppAsync(token[0]);
 
             var appClient = app?.Clients.GetOrDefault(token[1]);
 

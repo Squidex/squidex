@@ -9,6 +9,7 @@
 using System;
 using System.Threading.Tasks;
 using Orleans;
+using Orleans.Concurrency;
 using Orleans.Providers;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Tasks;
@@ -170,9 +171,9 @@ namespace Squidex.Infrastructure.CQRS.Events.Orleans.Grains.Implementation
             return dispatcher.StartNew(() => this.HandleClosedAsync(subscription)).Unwrap();
         }
 
-        public Task<EventConsumerInfo> GetStateAsync()
+        public Task<Immutable<EventConsumerInfo>> GetStateAsync()
         {
-            return Task.FromResult(State.ToInfo(this.GetPrimaryKeyString()));
+            return Task.FromResult(new Immutable<EventConsumerInfo>(State.ToInfo(this.GetPrimaryKeyString())));
         }
 
         private Task DoAndUpdateStateAsync(Action action)

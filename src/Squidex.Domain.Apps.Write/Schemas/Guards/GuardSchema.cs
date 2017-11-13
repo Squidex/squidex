@@ -10,7 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Domain.Apps.Read.Schemas.Services;
+using Squidex.Domain.Apps.Read;
 using Squidex.Domain.Apps.Write.Schemas.Commands;
 using Squidex.Infrastructure;
 
@@ -18,7 +18,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards
 {
     public static class GuardSchema
     {
-        public static Task CanCreate(CreateSchema command, ISchemaProvider schemas)
+        public static Task CanCreate(CreateSchema command, IAppProvider appProvider)
         {
             Guard.NotNull(command, nameof(command));
 
@@ -29,7 +29,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards
                     error(new ValidationError("Name must be a valid slug.", nameof(command.Name)));
                 }
 
-                if (await schemas.FindSchemaByNameAsync(command.AppId.Id, command.Name) != null)
+                if (await appProvider.GetSchemaAsync(command.AppId.Name, command.Name) != null)
                 {
                     error(new ValidationError($"A schema with name '{command.Name}' already exists", nameof(command.Name)));
                 }

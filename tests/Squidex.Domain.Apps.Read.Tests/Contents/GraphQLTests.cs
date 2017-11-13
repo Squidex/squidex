@@ -17,6 +17,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NodaTime.Extensions;
 using Squidex.Domain.Apps.Core;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Read.Apps;
@@ -77,7 +78,7 @@ namespace Squidex.Domain.Apps.Read.Contents
                 new GeolocationFieldProperties()));
 
             A.CallTo(() => app.Id).Returns(appId);
-            A.CallTo(() => app.PartitionResolver).Returns(x => InvariantPartitioning.Instance);
+            A.CallTo(() => app.LanguagesConfig).Returns(LanguagesConfig.Build(Language.DE));
 
             A.CallTo(() => schema.Id).Returns(schemaId);
             A.CallTo(() => schema.Name).Returns(schemaDef.Name);

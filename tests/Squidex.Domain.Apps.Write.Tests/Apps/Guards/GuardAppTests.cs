@@ -9,6 +9,7 @@
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Domain.Apps.Read;
 using Squidex.Domain.Apps.Read.Apps;
 using Squidex.Domain.Apps.Read.Apps.Services;
 using Squidex.Domain.Apps.Write.Apps.Commands;
@@ -26,7 +27,7 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
 
         public GuardAppTests()
         {
-            A.CallTo(() => apps.FindAppByNameAsync("new-app"))
+            A.CallTo(() => apps.GetAppAsync("new-app"))
                 .Returns(Task.FromResult<IAppEntity>(null));
 
             A.CallTo(() => users.FindByIdAsync(A<string>.Ignored))
@@ -39,7 +40,7 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
         [Fact]
         public Task CanCreate_should_throw_exception_if_name_already_in_use()
         {
-            A.CallTo(() => apps.FindAppByNameAsync("new-app"))
+            A.CallTo(() => apps.GetAppAsync("new-app"))
                 .Returns(A.Fake<IAppEntity>());
 
             var command = new CreateApp { Name = "new-app" };

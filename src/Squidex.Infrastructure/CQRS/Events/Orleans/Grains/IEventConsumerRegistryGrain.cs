@@ -9,6 +9,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Orleans;
+using Orleans.Concurrency;
 
 namespace Squidex.Infrastructure.CQRS.Events.Orleans.Grains
 {
@@ -22,6 +23,6 @@ namespace Squidex.Infrastructure.CQRS.Events.Orleans.Grains
 
         Task ResetAsync(string consumerName);
 
-        Task<List<EventConsumerInfo>> GetConsumersAsync();
+        Task<Immutable<List<EventConsumerInfo>>> GetConsumersAsync();
     }
 }

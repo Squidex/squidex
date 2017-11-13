@@ -14,7 +14,7 @@ namespace Squidex.Domain.Apps.Read
 {
     public static class EntityMapper
     {
-        public static T Create<T>(SquidexEvent @event, EnvelopeHeaders headers, Action<T> updater) where T : IEntity, new()
+        public static T Create<T>(SquidexEvent @event, EnvelopeHeaders headers, Action<T> updater = null) where T : IEntity, new()
         {
             var entity = new T();
 
@@ -29,13 +29,13 @@ namespace Squidex.Domain.Apps.Read
             return entity.Update(@event, headers, updater);
         }
 
-        public static T Update<T>(this T entity, SquidexEvent @event, EnvelopeHeaders headers, Action<T> updater) where T : IEntity, new()
+        public static T Update<T>(this T entity, SquidexEvent @event, EnvelopeHeaders headers, Action<T> updater = null) where T : IEntity, new()
         {
             SetVersion(headers, entity);
             SetLastModified(headers, entity);
             SetLastModifiedBy(@event, entity);
 
-            updater(entity);
+            updater?.Invoke(entity);
 
             return entity;
         }

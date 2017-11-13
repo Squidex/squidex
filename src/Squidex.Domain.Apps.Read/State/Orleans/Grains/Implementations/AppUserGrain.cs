@@ -6,36 +6,34 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Orleans;
 using Orleans.Providers;
-using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Read.State.Orleans.Grains.Implementations
 {
     [StorageProvider(ProviderName = "Default")]
-    public sealed class AppUserGrain : Grain<HashSet<Guid>>, IAppUserGrain
+    public sealed class AppUserGrain : Grain<AppUserGrainState>, IAppUserGrain
     {
-        public Task AddSchemaAsync(Guid schemaId)
+        public Task AddAppAsync(string appName)
         {
-            State.Add(schemaId);
+            State.AppNames.Add(appName);
 
-            return TaskHelper.Done;
+            return WriteStateAsync();
         }
 
-        public Task RemoveSchemaAsync(Guid schemaId)
+        public Task RemoveAppAsync(string appName)
         {
-            State.Remove(schemaId);
+            State.AppNames.Remove(appName);
 
-            return TaskHelper.Done;
+            return WriteStateAsync();
         }
 
-        public Task<List<Guid>> GetSchemaIdsAsync()
+        public Task<List<string>> GetSchemaNamesAsync()
         {
-            return Task.FromResult(State.ToList());
+            return Task.FromResult(State.AppNames.ToList());
         }
     }
 }

@@ -17,13 +17,13 @@ namespace Squidex.Pipeline
 {
     public sealed class AppApiFilter : IAsyncActionFilter
     {
-        private readonly IAppProvider appProvider;
+        private readonly Domain.Apps.Read.IAppProvider appState;
         private readonly IAppPlansProvider appPlanProvider;
         private readonly IUsageTracker usageTracker;
 
-        public AppApiFilter(IAppProvider appProvider, IAppPlansProvider appPlanProvider, IUsageTracker usageTracker)
+        public AppApiFilter(Domain.Apps.Read.IAppProvider appState, IAppPlansProvider appPlanProvider, IUsageTracker usageTracker)
         {
-            this.appProvider = appProvider;
+            this.appState = appState;
             this.appPlanProvider = appPlanProvider;
 
             this.usageTracker = usageTracker;
@@ -35,7 +35,7 @@ namespace Squidex.Pipeline
 
             if (!string.IsNullOrWhiteSpace(appName))
             {
-                var app = await appProvider.FindAppByNameAsync(appName);
+                var app = await appState.GetAppAsync(appName);
 
                 if (app == null)
                 {

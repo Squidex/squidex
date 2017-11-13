@@ -9,26 +9,14 @@
 using System.Linq;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
 using Orleans;
-using Orleans.Providers;
-using Orleans.Providers.MongoDB.StorageProviders;
 using Orleans.Runtime.Configuration;
-using Squidex.Config.Domain;
 using Squidex.Infrastructure.CQRS.Events.Orleans.Grains;
 
 namespace Squidex.Config.Orleans
 {
     public static class SiloServices
     {
-        public sealed class CustomMongoDbStorageProvider : MongoStorageProvider
-        {
-            protected override JsonSerializerSettings ReturnSerializerSettings(IProviderRuntime providerRuntime, IProviderConfiguration config)
-            {
-                return SerializationServices.DefaultJsonSettings;
-            }
-        }
-
         public static void AddAppSiloServices(this IServiceCollection services, IConfiguration config)
         {
             var mongoConfiguration = config.GetRequiredValue("store:mongoDb:configuration");
@@ -54,7 +42,7 @@ namespace Squidex.Config.Orleans
                         clusterConfiguration.AddMongoDBStorageProvider<CustomMongoDbStorageProvider>("Default", c =>
                         {
                             c.ConnectionString = mongoConfiguration;
-                            c.CollectionPrefix = "Orleans_";
+                            c.CollectionPrefix = "States_";
                             c.DatabaseName = mongoDatabaseName;
                             c.UseJsonFormat = true;
                         });

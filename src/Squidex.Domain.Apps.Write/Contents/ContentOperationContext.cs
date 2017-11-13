@@ -13,12 +13,11 @@ using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.EnrichContent;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Core.ValidateContent;
+using Squidex.Domain.Apps.Read;
 using Squidex.Domain.Apps.Read.Apps;
-using Squidex.Domain.Apps.Read.Apps.Services;
 using Squidex.Domain.Apps.Read.Assets.Repositories;
 using Squidex.Domain.Apps.Read.Contents.Repositories;
 using Squidex.Domain.Apps.Read.Schemas;
-using Squidex.Domain.Apps.Read.Schemas.Services;
 using Squidex.Domain.Apps.Write.Contents.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Tasks;
@@ -43,25 +42,21 @@ namespace Squidex.Domain.Apps.Write.Contents
             ContentDomainObject content,
             ContentCommand command,
             IAppProvider appProvider,
-            ISchemaProvider schemas,
             IScriptEngine scriptEngine,
             IAssetRepository assetRepository,
             Func<string> message)
         {
-            var taskForApp = appProvider.FindAppByIdAsync(command.AppId.Id);
-            var taskForSchema = schemas.FindSchemaByIdAsync(command.SchemaId.Id);
-
-            await Task.WhenAll(taskForApp, taskForSchema);
+            var (appEntity, schemaEntity) = await appProvider.GetAppWithSchemaAsync(command.AppId.Name, command.SchemaId.Id);
 
             var context = new ContentOperationContext();
 
-            context.appEntity = taskForApp.Result;
+            context.appEntity = appEntity;
             context.assetRepository = assetRepository;
             context.contentRepository = contentRepository;
             context.content = content;
             context.command = command;
             context.message = message;
-            context.schemaEntity = taskForSchema.Result;
+            context.schemaEntity = schemaEntity;
             context.scriptEngine = scriptEngine;
 
             return context;

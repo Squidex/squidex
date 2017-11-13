@@ -9,6 +9,7 @@
 using System;
 using System.Threading.Tasks;
 using FakeItEasy;
+using Squidex.Domain.Apps.Read;
 using Squidex.Domain.Apps.Read.Apps;
 using Squidex.Domain.Apps.Read.Apps.Services;
 using Squidex.Domain.Apps.Read.Apps.Services.Implementations;
@@ -37,7 +38,7 @@ namespace Squidex.Domain.Apps.Write.Apps
         {
             app = new AppDomainObject(AppId, -1);
 
-            A.CallTo(() => appProvider.FindAppByNameAsync(AppName))
+            A.CallTo(() => appProvider.GetAppAsync(AppName))
                 .Returns((IAppEntity)null);
 
             A.CallTo(() => userResolver.FindByIdAsync(contributorId))

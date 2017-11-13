@@ -1,23 +1,19 @@
 ﻿// ==========================================================================
-//  ISchemaRepository.cs
+//  AppUserGrainState.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using Newtonsoft.Json;
 
-namespace Squidex.Domain.Apps.Read.Schemas.Repositories
+namespace Squidex.Domain.Apps.Read.State.Orleans.Grains.Implementations
 {
-    public interface ISchemaRepository
+    public sealed class AppUserGrainState
     {
-        Task<IReadOnlyList<ISchemaEntity>> QueryAllAsync(Guid appId);
-
-        Task<ISchemaEntity> FindSchemaAsync(Guid appId, string name);
-
-        Task<ISchemaEntity> FindSchemaAsync(Guid schemaId);
+        [JsonProperty]
+        public HashSet<string> AppNames { get; set; } = new HashSet<string>();
     }
 }

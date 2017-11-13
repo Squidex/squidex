@@ -27,7 +27,7 @@ namespace Squidex
                 .AddApplicationPartsFromReferences(typeof(AppStateGrain).Assembly)
                 .AddApplicationPartsFromReferences(typeof(EventConsumerGrain).Assembly)
                 .AddApplicationPartsFromReferences(typeof(XmlRepositoryGrain).Assembly)
-                .UseConfiguration(ClusterConfiguration.LocalhostPrimarySilo(33333))
+                .UseConfiguration(ClusterConfiguration.LocalhostPrimarySilo(33333).WithJsonSerializer())
                 .UseContentRoot(Directory.GetCurrentDirectory())
                 .ConfigureServices((context, services) =>
                 {

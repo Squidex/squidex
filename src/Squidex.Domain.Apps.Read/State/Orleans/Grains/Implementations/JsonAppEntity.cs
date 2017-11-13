@@ -21,6 +21,9 @@ namespace Squidex.Domain.Apps.Read.State.Orleans.Grains.Implementations
         public string PlanId { get; set; }
 
         [JsonProperty]
+        public string Etag { get; set; }
+
+        [JsonProperty]
         public string PlanOwner { get; set; }
 
         [JsonProperty]

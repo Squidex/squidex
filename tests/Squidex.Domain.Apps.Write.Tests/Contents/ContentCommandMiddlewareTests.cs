@@ -15,8 +15,8 @@ using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Scripting;
+using Squidex.Domain.Apps.Read;
 using Squidex.Domain.Apps.Read.Apps;
-using Squidex.Domain.Apps.Read.Apps.Services;
 using Squidex.Domain.Apps.Read.Assets.Repositories;
 using Squidex.Domain.Apps.Read.Contents.Repositories;
 using Squidex.Domain.Apps.Read.Schemas;
@@ -73,9 +73,8 @@ namespace Squidex.Domain.Apps.Write.Contents
             sut = new ContentCommandMiddleware(Handler, appProvider, A.Dummy<IAssetRepository>(), schemas, scriptEngine, A.Dummy<IContentRepository>());
 
             A.CallTo(() => app.LanguagesConfig).Returns(languagesConfig);
-            A.CallTo(() => app.PartitionResolver).Returns(languagesConfig.ToResolver());
 
-            A.CallTo(() => appProvider.FindAppByIdAsync(AppId)).Returns(app);
+            A.CallTo(() => appProvider.GetAppAsync(AppName)).Returns(app);
 
             A.CallTo(() => schema.SchemaDef).Returns(schemaDef);
             A.CallTo(() => schema.ScriptCreate).Returns("<create-script>");

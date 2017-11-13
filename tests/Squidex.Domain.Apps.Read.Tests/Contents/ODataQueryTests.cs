@@ -77,7 +77,7 @@ namespace Squidex.Domain.Apps.Read.Contents
             var app = A.Dummy<IAppEntity>();
             A.CallTo(() => app.Id).Returns(Guid.NewGuid());
             A.CallTo(() => app.Version).Returns(3);
-            A.CallTo(() => app.PartitionResolver).Returns(languagesConfig.ToResolver());
+            A.CallTo(() => app.LanguagesConfig).Returns(languagesConfig);
 
             edmModel = builder.BuildEdmModel(schema, app);
         }

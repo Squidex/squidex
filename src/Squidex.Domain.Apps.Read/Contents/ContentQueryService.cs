@@ -20,7 +20,6 @@ using Squidex.Domain.Apps.Read.Apps;
 using Squidex.Domain.Apps.Read.Contents.Edm;
 using Squidex.Domain.Apps.Read.Contents.Repositories;
 using Squidex.Domain.Apps.Read.Schemas;
-using Squidex.Domain.Apps.Read.Schemas.Services;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Security;
@@ -30,23 +29,23 @@ namespace Squidex.Domain.Apps.Read.Contents
     public sealed class ContentQueryService : IContentQueryService
     {
         private readonly IContentRepository contentRepository;
-        private readonly ISchemaProvider schemas;
+        private readonly IAppProvider appProvider;
         private readonly IScriptEngine scriptEngine;
         private readonly EdmModelBuilder modelBuilder;
 
         public ContentQueryService(
             IContentRepository contentRepository,
-            ISchemaProvider schemas,
+            IAppProvider appProvider,
             IScriptEngine scriptEngine,
             EdmModelBuilder modelBuilder)
         {
             Guard.NotNull(contentRepository, nameof(contentRepository));
             Guard.NotNull(scriptEngine, nameof(scriptEngine));
             Guard.NotNull(modelBuilder, nameof(modelBuilder));
-            Guard.NotNull(schemas, nameof(schemas));
+            Guard.NotNull(appProvider, nameof(appProvider));
 
             this.contentRepository = contentRepository;
-            this.schemas = schemas;
+            this.appProvider = appProvider;
             this.scriptEngine = scriptEngine;
             this.modelBuilder = modelBuilder;
         }
@@ -156,12 +155,12 @@ namespace Squidex.Domain.Apps.Read.Contents
 
             if (Guid.TryParse(schemaIdOrName, out var id))
             {
-                schema = await schemas.FindSchemaByIdAsync(id);
+                schema = await appProvider.GetSchemaAsync(app.Name, id);
             }
 
             if (schema == null)
             {
-                schema = await schemas.FindSchemaByNameAsync(app.Id, schemaIdOrName);
+                schema = await appProvider.GetSchemaAsync(app.Name, schemaIdOrName);
             }
 
             if (schema == null)

@@ -9,6 +9,7 @@
 using System;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Domain.Apps.Read;
 using Squidex.Domain.Apps.Read.Apps.Services;
 using Squidex.Domain.Apps.Write.Apps.Commands;
 using Squidex.Infrastructure;
@@ -17,13 +18,13 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
 {
     public static class GuardApp
     {
-        public static Task CanCreate(CreateApp command, IAppProvider apps)
+        public static Task CanCreate(CreateApp command, IAppProvider appProvider)
         {
             Guard.NotNull(command, nameof(command));
 
             return Validate.It(() => "Cannot create app.", async error =>
             {
-                if (await apps.FindAppByNameAsync(command.Name) != null)
+                if (await appProvider.GetAppAsync(command.Name) != null)
                 {
                     error(new ValidationError($"An app with name '{command.Name}' already exists", nameof(command.Name)));
                 }

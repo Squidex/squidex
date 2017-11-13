@@ -6,7 +6,6 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Orleans;
@@ -15,10 +14,10 @@ namespace Squidex.Domain.Apps.Read.State.Orleans.Grains
 {
     public interface IAppUserGrain : IGrainWithStringKey
     {
-        Task<List<Guid>> GetSchemaIdsAsync();
+        Task<List<string>> GetSchemaNamesAsync();
 
-        Task AddSchemaAsync(Guid schemaId);
+        Task AddAppAsync(string appName);
 
-        Task RemoveSchemaAsync(Guid schemaId);
+        Task RemoveAppAsync(string appName);
     }
 }

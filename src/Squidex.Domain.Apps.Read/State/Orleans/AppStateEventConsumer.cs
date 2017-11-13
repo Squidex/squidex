@@ -15,7 +15,7 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Tasks;
 
-namespace Squidex.Domain.Apps.Read.State
+namespace Squidex.Domain.Apps.Read.State.Orleans
 {
     public sealed class AppStateEventConsumer : IEventConsumer
     {
@@ -47,23 +47,23 @@ namespace Squidex.Domain.Apps.Read.State
         {
             if (@event.Payload is AppEvent appEvent)
             {
-                var appGrain = factory.GetGrain<IAppStateGrain>(appEvent.AppId.Id);
+                var appGrain = factory.GetGrain<IAppStateGrain>(appEvent.AppId.Name);
 
-                await appGrain.HandleAsync(new EventMessage { Event = @event });
+                await appGrain.HandleAsync(@event);
             }
 
             if (@event.Payload is AppContributorAssigned contributorAssigned)
             {
                 var userGrain = factory.GetGrain<IAppUserGrain>(contributorAssigned.ContributorId);
 
-                await userGrain.AddSchemaAsync(contributorAssigned.AppId.Id);
+                await userGrain.AddAppAsync(contributorAssigned.AppId.Name);
             }
 
             if (@event.Payload is AppContributorRemoved contributorRemoved)
             {
                 var userGrain = factory.GetGrain<IAppUserGrain>(contributorRemoved.ContributorId);
 
-                await userGrain.RemoveSchemaAsync(contributorRemoved.AppId.Id);
+                await userGrain.RemoveAppAsync(contributorRemoved.AppId.Name);
             }
         }
     }

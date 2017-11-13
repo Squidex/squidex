@@ -15,8 +15,8 @@ using NSwag.Annotations;
 using Squidex.Controllers.Api.Schemas.Models;
 using Squidex.Controllers.Api.Schemas.Models.Converters;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Read;
 using Squidex.Domain.Apps.Read.Schemas;
-using Squidex.Domain.Apps.Read.Schemas.Repositories;
 using Squidex.Domain.Apps.Write.Schemas.Commands;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Reflection;
@@ -33,12 +33,12 @@ namespace Squidex.Controllers.Api.Schemas
     [SwaggerTag(nameof(Schemas))]
     public sealed class SchemasController : ControllerBase
     {
-        private readonly ISchemaRepository schemaRepository;
+        private readonly IAppProvider appProvider;
 
-        public SchemasController(ICommandBus commandBus, ISchemaRepository schemaRepository)
+        public SchemasController(ICommandBus commandBus, IAppProvider appProvider)
             : base(commandBus)
         {
-            this.schemaRepository = schemaRepository;
+            this.appProvider = appProvider;
         }
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace Squidex.Controllers.Api.Schemas
         [ApiCosts(0)]
         public async Task<IActionResult> GetSchemas(string app)
         {
-            var schemas = await schemaRepository.QueryAllAsync(AppId);
+            var schemas = await appProvider.GetSchemasAsync(AppName);
 
             var response = schemas.Select(s => s.ToModel()).ToList();
 
@@ -83,11 +83,11 @@ namespace Squidex.Controllers.Api.Schemas
 
             if (Guid.TryParse(name, out var id))
             {
-                entity = await schemaRepository.FindSchemaAsync(id);
+                entity = await appProvider.GetSchemaAsync(AppName, id);
             }
             else
             {
-                entity = await schemaRepository.FindSchemaAsync(AppId, name);
+                entity = await appProvider.GetSchemaAsync(AppName, name);
             }
 
             if (entity == null || entity.IsDeleted)

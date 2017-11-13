@@ -41,12 +41,9 @@ namespace Squidex.Controllers
             }
         }
 
-        protected Guid AppId
+        protected string AppName
         {
-            get
-            {
-                return App.Id;
-            }
+            get { return App.Name; }
         }
     }
 }

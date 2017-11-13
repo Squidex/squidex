@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -18,6 +19,9 @@ using Squidex.Domain.Apps.Events.Rules.Utils;
 using Squidex.Domain.Apps.Events.Schemas;
 using Squidex.Domain.Apps.Events.Schemas.Old;
 using Squidex.Domain.Apps.Events.Schemas.Utils;
+using Squidex.Domain.Apps.Read.Apps;
+using Squidex.Domain.Apps.Read.Rules;
+using Squidex.Domain.Apps.Read.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Reflection;
@@ -37,6 +41,26 @@ namespace Squidex.Domain.Apps.Read.State.Orleans.Grains.Implementations
         [JsonProperty]
         public Dictionary<Guid, JsonSchemaEntity> Schemas { get; set; }
 
+        public IAppEntity GetApp()
+        {
+            return App;
+        }
+
+        public ISchemaEntity FindSchema(Func<JsonSchemaEntity, bool> filter)
+        {
+            return Schemas.Values.FirstOrDefault(filter);
+        }
+
+        public List<IRuleEntity> FindRules()
+        {
+            return Rules.Values.OfType<IRuleEntity>().ToList();
+        }
+
+        public List<ISchemaEntity> FindSchemas(Func<JsonSchemaEntity, bool> filter)
+        {
+            return Schemas.Values.Where(filter).OfType<ISchemaEntity>().ToList();
+        }
+
         public void Reset()
         {
             Rules = new Dictionary<Guid, JsonRuleEntity>();
@@ -54,7 +78,7 @@ namespace Squidex.Domain.Apps.Read.State.Orleans.Grains.Implementations
 
                     App = EntityMapper.Create<JsonAppEntity>(@event, envelope.Headers, a =>
                     {
-                        SimpleMapper.Map(envelope, a);
+                        SimpleMapper.Map(@event, a);
 
                         a.Clients = new AppClients();
                         a.Contributors = new AppContributors();
@@ -68,7 +92,7 @@ namespace Squidex.Domain.Apps.Read.State.Orleans.Grains.Implementations
                 case AppPlanChanged @event:
                     App.Update(@event, envelope.Headers, a =>
                     {
-                        SimpleMapper.Map(envelope, a);
+                        SimpleMapper.Map(@event, a);
                     });
                     break;
 
@@ -258,18 +282,17 @@ namespace Squidex.Domain.Apps.Read.State.Orleans.Grains.Implementations
                     break;
 
                 case WebhookAdded @event:
-                    Schemas[@event.SchemaId.Id].Update(@event, envelope.Headers, s =>
-                    {
-                        /* NOOP */
-                    });
+                    Schemas[@event.SchemaId.Id].Update(@event, envelope.Headers);
                     break;
 
                 case WebhookDeleted @event:
-                    Schemas[@event.SchemaId.Id].Update(@event, envelope.Headers, s =>
-                    {
-                        /* NOOP */
-                    });
+                    Schemas[@event.SchemaId.Id].Update(@event, envelope.Headers);
                     break;
+            }
+
+            if (App != null)
+            {
+                App.Etag = Guid.NewGuid().ToString();
             }
         }
     }

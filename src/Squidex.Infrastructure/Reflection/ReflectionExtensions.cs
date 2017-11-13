@@ -64,5 +64,10 @@ namespace Squidex.Infrastructure.Reflection
 
             return flattenProperties.ToArray();
         }
+
+        public static bool Implements<T>(this Type type)
+        {
+            return type.GetInterfaces().Contains(typeof(T));
+        }
     }
 }

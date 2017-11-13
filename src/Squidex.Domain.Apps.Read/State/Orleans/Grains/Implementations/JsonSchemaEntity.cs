@@ -49,6 +49,7 @@ namespace Squidex.Domain.Apps.Read.State.Orleans.Grains.Implementations
         [JsonProperty]
         public Schema SchemaDef { get; set; }
 
+        [JsonIgnore]
         public bool IsPublished
         {
             get { return SchemaDef.IsPublished; }

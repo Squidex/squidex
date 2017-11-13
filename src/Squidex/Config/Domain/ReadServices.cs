@@ -13,6 +13,7 @@ using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.HandleRules.ActionHandlers;
 using Squidex.Domain.Apps.Core.HandleRules.Triggers;
+using Squidex.Domain.Apps.Read;
 using Squidex.Domain.Apps.Read.Apps;
 using Squidex.Domain.Apps.Read.Apps.Services;
 using Squidex.Domain.Apps.Read.Apps.Services.Implementations;
@@ -23,9 +24,7 @@ using Squidex.Domain.Apps.Read.Contents.GraphQL;
 using Squidex.Domain.Apps.Read.History;
 using Squidex.Domain.Apps.Read.Rules;
 using Squidex.Domain.Apps.Read.Schemas;
-using Squidex.Domain.Apps.Read.Schemas.Services;
-using Squidex.Domain.Apps.Read.Schemas.Services.Implementations;
-using Squidex.Domain.Apps.Read.State;
+using Squidex.Domain.Apps.Read.State.Orleans;
 using Squidex.Domain.Users;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
@@ -55,14 +54,8 @@ namespace Squidex.Config.Domain
             services.AddSingleton<ContentQueryService>()
                 .As<IContentQueryService>();
 
-            services.AddSingleton<CachingAppProvider>()
-                .As<IAppProvider>();
-
             services.AddSingleton<ConfigAppPlansProvider>()
                 .As<IAppPlansProvider>();
-
-            services.AddSingleton<CachingSchemaProvider>()
-                .As<ISchemaProvider>();
 
             services.AddSingleton<AssetUserPictureStore>()
                 .As<IUserPictureStore>();
@@ -85,6 +78,9 @@ namespace Squidex.Config.Domain
             services.AddSingleton<RuleDequeuer>()
                 .As<IExternalSystem>();
 
+            services.AddSingleton<OrleansAppProvider>()
+                .As<IAppProvider>();
+
             services.AddSingleton<AppStateEventConsumer>()
                 .As<IEventConsumer>();
 
@@ -98,19 +94,6 @@ namespace Squidex.Config.Domain
                 .As<IRuleActionHandler>();
 
             services.AddSingleton(c => new CompoundEventConsumer(c.GetServices<IAssetEventConsumer>().ToArray()))
-                .As<IEventConsumer>();
-
-            services.AddSingleton(c =>
-                    new CompoundEventConsumer(
-                        c.GetServices<IAppEventConsumer>().OfType<IEventConsumer>()
-                            .Concat(c.GetRequiredService<CachingAppProvider>()).ToArray()))
-                .As<IEventConsumer>();
-
-            services.AddSingleton(c =>
-                    new CompoundEventConsumer(
-                        c.GetServices<ISchemaEventConsumer>().OfType<IEventConsumer>()
-                            .Concat(c.GetRequiredService<CachingGraphQLService>())
-                            .Concat(c.GetRequiredService<CachingSchemaProvider>()).ToArray()))
                 .As<IEventConsumer>();
 
             services.AddSingleton(c =>
