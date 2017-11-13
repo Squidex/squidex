@@ -121,7 +121,7 @@ namespace Squidex.Infrastructure.Reflection
                             new PropertyAccessor(sourceClassType, sourceProperty),
                             new PropertyAccessor(targetClassType, targetProperty)));
                     }
-                    else if (targetType.Implements<IConvertible>() && sourceType.Implements<IConvertible>())
+                    else if (targetType.Implements<IConvertible>())
                     {
                         Mappers.Add(new ConversionPropertyMapper(
                             new PropertyAccessor(sourceClassType, sourceProperty),

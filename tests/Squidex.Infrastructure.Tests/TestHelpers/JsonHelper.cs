@@ -38,10 +38,7 @@ namespace Squidex.Infrastructure.TestHelpers
 
         public static T SerializeAndDeserializeAndReturn<T>(this T value, JsonConverter converter)
         {
-            var serializerSettings = new JsonSerializerSettings();
-
-            serializerSettings.Converters.Add(converter);
-            serializerSettings.NullValueHandling = NullValueHandling.Include;
+            var serializerSettings = CreateSettings<T>(converter);
 
             var result = JsonConvert.SerializeObject(Tuple.Create(value), serializerSettings);
             var output = JsonConvert.DeserializeObject<Tuple<T>>(result, serializerSettings);
@@ -51,12 +48,24 @@ namespace Squidex.Infrastructure.TestHelpers
 
         public static void DoesNotDeserialize<T>(string value, JsonConverter converter)
         {
-            var serializerSettings = new JsonSerializerSettings();
-
-            serializerSettings.Converters.Add(converter);
-            serializerSettings.NullValueHandling = NullValueHandling.Include;
+            var serializerSettings = CreateSettings<T>(converter);
 
             Assert.ThrowsAny<JsonException>(() => JsonConvert.DeserializeObject<Tuple<T>>($"{{ \"Item1\": \"{value}\" }}", serializerSettings));
+        }
+
+        private static JsonSerializerSettings CreateSettings<T>(JsonConverter converter)
+        {
+            var serializerSettings = new JsonSerializerSettings();
+
+            if (converter != null)
+            {
+                serializerSettings.Converters.Add(converter);
+            }
+
+            serializerSettings.NullValueHandling = NullValueHandling.Include;
+            serializerSettings.TypeNameHandling = TypeNameHandling.Auto;
+
+            return serializerSettings;
         }
     }
 }

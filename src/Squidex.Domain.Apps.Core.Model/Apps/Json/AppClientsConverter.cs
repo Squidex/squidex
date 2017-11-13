@@ -6,6 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using Squidex.Infrastructure.Json;
@@ -26,7 +27,7 @@ namespace Squidex.Domain.Apps.Core.Apps.Json
             serializer.Serialize(writer, json);
         }
 
-        protected override AppClients ReadValue(JsonReader reader, JsonSerializer serializer)
+        protected override AppClients ReadValue(JsonReader reader, Type objectType, JsonSerializer serializer)
         {
             var json = serializer.Deserialize<Dictionary<string, JsonAppClient>>(reader);
 

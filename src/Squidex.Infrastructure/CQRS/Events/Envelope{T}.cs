@@ -23,23 +23,12 @@ namespace Squidex.Infrastructure.CQRS.Events
             get { return payload; }
         }
 
-        public Envelope(T payload)
-            : this(payload, new EnvelopeHeaders())
-        {
-        }
-
-        public Envelope(T payload, PropertiesBag bag)
-            : this(payload, new EnvelopeHeaders(bag))
-        {
-        }
-
-        public Envelope(T payload, EnvelopeHeaders headers)
+        public Envelope(T payload, EnvelopeHeaders headers = null)
         {
             Guard.NotNull(payload, nameof(payload));
-            Guard.NotNull(headers, nameof(headers));
 
             this.payload = payload;
-            this.headers = headers;
+            this.headers = headers ?? new EnvelopeHeaders();
         }
 
         public Envelope<TOther> To<TOther>() where TOther : class

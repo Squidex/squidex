@@ -27,7 +27,7 @@ namespace Squidex.Infrastructure.CQRS.Events
 
         public virtual Envelope<IEvent> Parse(EventData eventData, bool migrate = true)
         {
-            var headers = ReadJson<PropertiesBag>(eventData.Metadata);
+            var headers = ReadJson<EnvelopeHeaders>(eventData.Metadata);
 
             var eventType = typeNameRegistry.GetType(eventData.Type);
             var eventPayload = ReadJson<IEvent>(eventData.Payload, eventType);

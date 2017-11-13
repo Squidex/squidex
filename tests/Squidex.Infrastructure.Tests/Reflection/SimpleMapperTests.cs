@@ -70,7 +70,7 @@ namespace Squidex.Infrastructure.Reflection
         }
 
         [Fact]
-        public void Should_to_type()
+        public void Should_map_to_type()
         {
             var class1 = new MyClass1
             {

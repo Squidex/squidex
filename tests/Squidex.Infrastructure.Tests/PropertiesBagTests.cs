@@ -10,9 +10,9 @@ using System;
 using System.Globalization;
 using System.Linq;
 using Microsoft.CSharp.RuntimeBinder;
-using Newtonsoft.Json;
 using NodaTime;
 using Squidex.Infrastructure.Json;
+using Squidex.Infrastructure.TestHelpers;
 using Xunit;
 
 namespace Squidex.Infrastructure
@@ -31,12 +31,7 @@ namespace Squidex.Infrastructure
         [Fact]
         public void Should_serialize_and_deserialize_empty_bag()
         {
-            var serializerSettings = new JsonSerializerSettings();
-
-            serializerSettings.Converters.Add(new PropertiesBagConverter());
-
-            var content = JsonConvert.SerializeObject(bag, serializerSettings);
-            var output = JsonConvert.DeserializeObject<PropertiesBag>(content, serializerSettings);
+            var output = bag.SerializeAndDeserializeAndReturn(new PropertiesBagConverter<PropertiesBag>());
 
             Assert.Equal(bag.Count, output.Count);
         }
@@ -52,19 +47,14 @@ namespace Squidex.Infrastructure
             bag.Set("Key4", true);
             bag.Set("Key5", Guid.NewGuid());
 
-            var serializerSettings = new JsonSerializerSettings();
+            var output = bag.SerializeAndDeserializeAndReturn(new PropertiesBagConverter<PropertiesBag>());
 
-            serializerSettings.Converters.Add(new PropertiesBagConverter());
-
-            var content = JsonConvert.SerializeObject(bag, serializerSettings);
-            var response = JsonConvert.DeserializeObject<PropertiesBag>(content, serializerSettings);
-
-            foreach (var kvp in response.Properties.Take(4))
+            foreach (var kvp in output.Properties.Take(4))
             {
                 Assert.Equal(kvp.Value.RawValue, bag[kvp.Key].RawValue);
             }
 
-            Assert.Equal(bag["Key5"].ToGuid(c), response["Key5"].ToGuid(c));
+            Assert.Equal(bag["Key5"].ToGuid(c), output["Key5"].ToGuid(c));
         }
 
         [Fact]

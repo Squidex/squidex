@@ -18,13 +18,13 @@ namespace Squidex.Infrastructure.Json.Orleans
 {
     public class JsonExternalSerializer : IExternalSerializer
     {
-        private readonly JsonSerializer jsonSerializer;
+        private readonly JsonSerializer serializer;
 
-        public JsonExternalSerializer(JsonSerializer jsonSerializer)
+        public JsonExternalSerializer(JsonSerializer serializer)
         {
-            Guard.NotNull(jsonSerializer, nameof(jsonSerializer));
+            Guard.NotNull(serializer, nameof(serializer));
 
-            this.jsonSerializer = jsonSerializer;
+            this.serializer = serializer;
         }
 
         public void Initialize(Logger logger)
@@ -38,7 +38,7 @@ namespace Squidex.Infrastructure.Json.Orleans
 
         public object DeepCopy(object source, ICopyContext context)
         {
-            return source != null ? JObject.FromObject(source, jsonSerializer).ToObject(source.GetType(), jsonSerializer) : null;
+            return source != null ? JObject.FromObject(source, serializer).ToObject(source.GetType(), serializer) : null;
         }
 
         public object Deserialize(Type expectedType, IDeserializationContext context)
@@ -50,7 +50,7 @@ namespace Squidex.Infrastructure.Json.Orleans
 
             using (var reader = new JsonTextReader(new StreamReader(stream)))
             {
-                return jsonSerializer.Deserialize(reader, expectedType);
+                return serializer.Deserialize(reader, expectedType);
             }
         }
 
@@ -60,7 +60,7 @@ namespace Squidex.Infrastructure.Json.Orleans
 
             using (var writer = new JsonTextWriter(new StreamWriter(stream)))
             {
-                jsonSerializer.Serialize(writer, item);
+                serializer.Serialize(writer, item);
 
                 writer.Flush();
             }

@@ -6,6 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using Newtonsoft.Json;
 
 namespace Squidex.Infrastructure.Json
@@ -17,7 +18,7 @@ namespace Squidex.Infrastructure.Json
             writer.WriteValue(value.Iso2Code);
         }
 
-        protected override Language ReadValue(JsonReader reader, JsonSerializer serializer)
+        protected override Language ReadValue(JsonReader reader, Type objectType, JsonSerializer serializer)
         {
             if (reader.TokenType != JsonToken.String)
             {

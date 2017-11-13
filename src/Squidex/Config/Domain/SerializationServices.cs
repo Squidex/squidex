@@ -18,6 +18,7 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Schemas.Json;
 using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.MongoDb;
 
@@ -48,7 +49,8 @@ namespace Squidex.Config.Domain
                 new NamedGuidIdConverter(),
                 new NamedLongIdConverter(),
                 new NamedStringIdConverter(),
-                new PropertiesBagConverter(),
+                new PropertiesBagConverter<EnvelopeHeaders>(),
+                new PropertiesBagConverter<PropertiesBag>(),
                 new RefTokenConverter(),
                 new RuleConverter(),
                 new SchemaConverter(FieldRegistry),
