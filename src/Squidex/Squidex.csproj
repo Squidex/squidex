@@ -15,15 +15,15 @@
     <EmbeddedResource Include="Config\Identity\Cert\*.*;Docs\*.md" />
     <EmbeddedResource Include="Controllers\Api\Users\Assets\Avatar.png" />
     <EmbeddedResource Remove="Assets\**" />
-	
+
     <Compile Remove="Assets\**" />
     <Content Remove="Assets\**" />
-	
+
     <None Remove="Assets\**" />
   </ItemGroup>
 
   <ItemGroup>
-	  <None Update="dockerfile">
+    <None Update="dockerfile">
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </None>
   </ItemGroup>
@@ -60,7 +60,7 @@
     <PackageReference Include="Microsoft.AspNetCore.HttpOverrides" Version="2.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.0.0" />
-	  <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.ViewCompilation" Version="2.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.ViewCompilation" Version="2.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="2.0.0" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="2.0.0" />
@@ -85,9 +85,9 @@
       <ContentWithTargetPath Include="@(_DocumentationFile->'%(FullPath)')" RelativePath="%(_DocumentationFile.Identity)" TargetPath="%(_DocumentationFile.Filename)%(_DocumentationFile.Extension)" CopyToPublishDirectory="PreserveNewest" />
     </ItemGroup>
   </Target>
-    
+
   <PropertyGroup>
     <CodeAnalysisRuleSet>..\..\Squidex.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
-  
- </Project>
+
+</Project>
