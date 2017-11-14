@@ -11,20 +11,21 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
+using Squidex.Domain.Apps.Read;
 using Squidex.Domain.Apps.Read.Schemas;
-using Squidex.Domain.Apps.Read.Schemas.Services;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Write.Rules.Guards.Triggers
 {
     public class ContentChangedTriggerTests
     {
-        private readonly ISchemaProvider schemas = A.Fake<ISchemaProvider>();
+        private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
+        private readonly string appName = "my-app";
 
         [Fact]
         public async Task Should_add_error_if_schemas_ids_are_not_valid()
         {
-            A.CallTo(() => schemas.FindSchemaByIdAsync(A<Guid>.Ignored, false))
+            A.CallTo(() => appProvider.GetSchemaAsync(appName, A<Guid>.Ignored, false))
                 .Returns(Task.FromResult<ISchemaEntity>(null));
 
             var trigger = new ContentChangedTrigger
@@ -35,7 +36,7 @@ namespace Squidex.Domain.Apps.Write.Rules.Guards.Triggers
                 }
             };
 
-            var errors = await RuleTriggerValidator.ValidateAsync(trigger, schemas);
+            var errors = await RuleTriggerValidator.ValidateAsync(appName, trigger, appProvider);
 
             Assert.NotEmpty(errors);
         }
@@ -45,7 +46,7 @@ namespace Squidex.Domain.Apps.Write.Rules.Guards.Triggers
         {
             var trigger = new ContentChangedTrigger();
 
-            var errors = await RuleTriggerValidator.ValidateAsync(trigger, schemas);
+            var errors = await RuleTriggerValidator.ValidateAsync(appName, trigger, appProvider);
 
             Assert.Empty(errors);
         }
@@ -58,7 +59,7 @@ namespace Squidex.Domain.Apps.Write.Rules.Guards.Triggers
                 Schemas = new List<ContentChangedTriggerSchema>()
             };
 
-            var errors = await RuleTriggerValidator.ValidateAsync(trigger, schemas);
+            var errors = await RuleTriggerValidator.ValidateAsync(appName, trigger, appProvider);
 
             Assert.Empty(errors);
         }
@@ -66,7 +67,7 @@ namespace Squidex.Domain.Apps.Write.Rules.Guards.Triggers
         [Fact]
         public async Task Should_not_add_error_if_schemas_ids_are_valid()
         {
-            A.CallTo(() => schemas.FindSchemaByIdAsync(A<Guid>.Ignored, false))
+            A.CallTo(() => appProvider.GetSchemaAsync(appName, A<Guid>.Ignored, false))
                 .Returns(A.Fake<ISchemaEntity>());
 
             var trigger = new ContentChangedTrigger
@@ -77,7 +78,7 @@ namespace Squidex.Domain.Apps.Write.Rules.Guards.Triggers
                 }
             };
 
-            var errors = await RuleTriggerValidator.ValidateAsync(trigger, schemas);
+            var errors = await RuleTriggerValidator.ValidateAsync(appName, trigger, appProvider);
 
             Assert.Empty(errors);
         }

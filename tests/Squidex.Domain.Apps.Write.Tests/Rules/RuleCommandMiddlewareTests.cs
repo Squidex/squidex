@@ -12,8 +12,8 @@ using FakeItEasy;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Actions;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
+using Squidex.Domain.Apps.Read;
 using Squidex.Domain.Apps.Read.Schemas;
-using Squidex.Domain.Apps.Read.Schemas.Services;
 using Squidex.Domain.Apps.Write.Rules.Commands;
 using Squidex.Domain.Apps.Write.TestHelpers;
 using Squidex.Infrastructure.CQRS.Commands;
@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Write.Rules
 {
     public class RuleCommandMiddlewareTests : HandlerTestBase<RuleDomainObject>
     {
-        private readonly ISchemaProvider schemas = A.Fake<ISchemaProvider>();
+        private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
         private readonly RuleCommandMiddleware sut;
         private readonly RuleDomainObject rule;
         private readonly RuleTrigger ruleTrigger = new ContentChangedTrigger();
@@ -32,12 +32,12 @@ namespace Squidex.Domain.Apps.Write.Rules
 
         public RuleCommandMiddlewareTests()
         {
-            A.CallTo(() => schemas.FindSchemaByIdAsync(A<Guid>.Ignored, false))
+            A.CallTo(() => appProvider.GetSchemaAsync(A<string>.Ignored, A<Guid>.Ignored, false))
                 .Returns(A.Fake<ISchemaEntity>());
 
             rule = new RuleDomainObject(ruleId, -1);
 
-            sut = new RuleCommandMiddleware(Handler, schemas);
+            sut = new RuleCommandMiddleware(Handler, appProvider);
         }
 
         [Fact]

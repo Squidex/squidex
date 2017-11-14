@@ -12,8 +12,8 @@ using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Read;
 using Squidex.Domain.Apps.Read.Schemas;
-using Squidex.Domain.Apps.Read.Schemas.Services;
 using Squidex.Domain.Apps.Write.Schemas.Commands;
 using Squidex.Infrastructure;
 using Xunit;
@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards
 {
     public class GuardSchemaTests
     {
-        private readonly ISchemaProvider schemas = A.Fake<ISchemaProvider>();
+        private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
         private readonly Schema schema = new Schema("my-schema");
         private readonly NamedId<Guid> appId = new NamedId<Guid>(Guid.NewGuid(), "my-app");
 
@@ -31,7 +31,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards
             schema.AddField(new StringField(1, "field1", Partitioning.Invariant));
             schema.AddField(new StringField(2, "field2", Partitioning.Invariant));
 
-            A.CallTo(() => schemas.FindSchemaByNameAsync(A<Guid>.Ignored, "new-schema"))
+            A.CallTo(() => appProvider.GetSchemaAsync(A<string>.Ignored, "new-schema", false))
                 .Returns(Task.FromResult<ISchemaEntity>(null));
         }
 
@@ -40,18 +40,18 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards
         {
             var command = new CreateSchema { AppId = appId, Name = "INVALID NAME" };
 
-            return Assert.ThrowsAsync<ValidationException>(() => GuardSchema.CanCreate(command, schemas));
+            return Assert.ThrowsAsync<ValidationException>(() => GuardSchema.CanCreate(command, appProvider));
         }
 
         [Fact]
         public Task CanCreate_should_throw_exception_if_name_already_in_use()
         {
-            A.CallTo(() => schemas.FindSchemaByNameAsync(A<Guid>.Ignored, "new-schema"))
+            A.CallTo(() => appProvider.GetSchemaAsync(A<string>.Ignored, "new-schema", false))
                 .Returns(Task.FromResult(A.Fake<ISchemaEntity>()));
 
             var command = new CreateSchema { AppId = appId, Name = "new-schema" };
 
-            return Assert.ThrowsAsync<ValidationException>(() => GuardSchema.CanCreate(command, schemas));
+            return Assert.ThrowsAsync<ValidationException>(() => GuardSchema.CanCreate(command, appProvider));
         }
 
         [Fact]
@@ -78,7 +78,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards
                 Name = "new-schema"
             };
 
-            return Assert.ThrowsAsync<ValidationException>(() => GuardSchema.CanCreate(command, schemas));
+            return Assert.ThrowsAsync<ValidationException>(() => GuardSchema.CanCreate(command, appProvider));
         }
 
         [Fact]
@@ -105,7 +105,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards
                 Name = "new-schema"
             };
 
-            return Assert.ThrowsAsync<ValidationException>(() => GuardSchema.CanCreate(command, schemas));
+            return Assert.ThrowsAsync<ValidationException>(() => GuardSchema.CanCreate(command, appProvider));
         }
 
         [Fact]
@@ -113,7 +113,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards
         {
             var command = new CreateSchema { AppId = appId, Name = "new-schema" };
 
-            return GuardSchema.CanCreate(command, schemas);
+            return GuardSchema.CanCreate(command, appProvider);
         }
 
         [Fact]

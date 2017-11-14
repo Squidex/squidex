@@ -26,7 +26,6 @@ using Squidex.Domain.Apps.Read.Assets.Repositories;
 using Squidex.Domain.Apps.Read.Contents.GraphQL;
 using Squidex.Domain.Apps.Read.Contents.TestData;
 using Squidex.Domain.Apps.Read.Schemas;
-using Squidex.Domain.Apps.Read.Schemas.Repositories;
 using Squidex.Infrastructure;
 using Xunit;
 
@@ -38,12 +37,13 @@ namespace Squidex.Domain.Apps.Read.Contents
     {
         private static readonly Guid schemaId = Guid.NewGuid();
         private static readonly Guid appId = Guid.NewGuid();
+        private static readonly string appName = "my-app";
         private readonly Schema schemaDef = new Schema("my-schema");
         private readonly IContentQueryService contentQuery = A.Fake<IContentQueryService>();
-        private readonly ISchemaRepository schemaRepository = A.Fake<ISchemaRepository>();
         private readonly IAssetRepository assetRepository = A.Fake<IAssetRepository>();
         private readonly ISchemaEntity schema = A.Fake<ISchemaEntity>();
         private readonly IMemoryCache cache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
+        private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
         private readonly IAppEntity app = A.Dummy<IAppEntity>();
         private readonly ClaimsPrincipal user = new ClaimsPrincipal();
         private readonly IGraphQLService sut;
@@ -78,6 +78,7 @@ namespace Squidex.Domain.Apps.Read.Contents
                 new GeolocationFieldProperties()));
 
             A.CallTo(() => app.Id).Returns(appId);
+            A.CallTo(() => app.Name).Returns(appName);
             A.CallTo(() => app.LanguagesConfig).Returns(LanguagesConfig.Build(Language.DE));
 
             A.CallTo(() => schema.Id).Returns(schemaId);
@@ -88,9 +89,9 @@ namespace Squidex.Domain.Apps.Read.Contents
 
             var allSchemas = new List<ISchemaEntity> { schema };
 
-            A.CallTo(() => schemaRepository.QueryAllAsync(appId)).Returns(allSchemas);
+            A.CallTo(() => appProvider.GetSchemasAsync(appName)).Returns(allSchemas);
 
-            sut = new CachingGraphQLService(cache, assetRepository, contentQuery, new FakeUrlGenerator(), schemaRepository);
+            sut = new CachingGraphQLService(cache, appProvider, assetRepository, contentQuery, new FakeUrlGenerator());
         }
 
         [Theory]
@@ -240,7 +241,7 @@ namespace Squidex.Domain.Apps.Read.Contents
         }
 
         [Fact]
-        public async Task Should_return_multiple_contens_when_querying_contents()
+        public async Task Should_return_multiple_contents_when_querying_contents()
         {
             const string query = @"
                 query {
@@ -254,7 +255,7 @@ namespace Squidex.Domain.Apps.Read.Contents
                     url
                     data {
                       myString {
-                        iv
+                        de
                       }
                       myNumber {
                         iv
@@ -303,7 +304,7 @@ namespace Squidex.Domain.Apps.Read.Contents
                             {
                                 myString = new
                                 {
-                                    iv = "value"
+                                    de = "value"
                                 },
                                 myNumber = new
                                 {
@@ -359,7 +360,7 @@ namespace Squidex.Domain.Apps.Read.Contents
                     url
                     data {{
                       myString {{
-                        iv
+                        de
                       }}
                       myNumber {{
                         iv
@@ -402,7 +403,7 @@ namespace Squidex.Domain.Apps.Read.Contents
                         {
                             myString = new
                             {
-                                iv = "value"
+                                de = "value"
                             },
                             myNumber = new
                             {
@@ -560,7 +561,7 @@ namespace Squidex.Domain.Apps.Read.Contents
         }
 
         [Fact]
-        public async Task Should_not_return_value_when_field_not_part_of_content()
+        public async Task Should_not_return_data_when_field_not_part_of_content()
         {
             var contentId = Guid.NewGuid();
             var content = CreateContent(contentId, Guid.Empty, Guid.Empty, new NamedContentData());
@@ -576,7 +577,7 @@ namespace Squidex.Domain.Apps.Read.Contents
                     lastModifiedBy
                     url
                     data {{
-                      myString {{
+                      myInvalid {{
                         iv
                       }}
                     }}
@@ -590,23 +591,7 @@ namespace Squidex.Domain.Apps.Read.Contents
 
             var expected = new
             {
-                data = new
-                {
-                    findMySchemaContent = new
-                    {
-                        id = content.Id,
-                        version = 1,
-                        created = content.Created.ToDateTimeUtc(),
-                        createdBy = "subject:user1",
-                        lastModified = content.LastModified.ToDateTimeUtc(),
-                        lastModifiedBy = "subject:user2",
-                        url = $"contents/my-schema/{content.Id}",
-                        data = new
-                        {
-                            myString = (object)null
-                        }
-                    }
-                }
+                data = (object)null
             };
 
             AssertJson(expected, new { data = result.Data });
@@ -621,7 +606,7 @@ namespace Squidex.Domain.Apps.Read.Contents
                     .AddField("my-json",
                         new ContentFieldData().AddValue("iv", JToken.FromObject(new { value = 1 })))
                     .AddField("my-string",
-                        new ContentFieldData().AddValue("iv", "value"))
+                        new ContentFieldData().AddValue("de", "value"))
                     .AddField("my-assets",
                         new ContentFieldData().AddValue("iv", JToken.FromObject(new[] { assetId })))
                     .AddField("my-number",

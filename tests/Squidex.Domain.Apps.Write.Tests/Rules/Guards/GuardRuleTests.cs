@@ -13,8 +13,8 @@ using FakeItEasy;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Actions;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
+using Squidex.Domain.Apps.Read;
 using Squidex.Domain.Apps.Read.Schemas;
-using Squidex.Domain.Apps.Read.Schemas.Services;
 using Squidex.Domain.Apps.Write.Rules.Commands;
 using Squidex.Infrastructure;
 using Xunit;
@@ -25,11 +25,12 @@ namespace Squidex.Domain.Apps.Write.Rules.Guards
     {
         private readonly Uri validUrl = new Uri("https://squidex.io");
         private readonly Rule rule = new Rule(new ContentChangedTrigger(), new WebhookAction());
-        private readonly ISchemaProvider schemas = A.Fake<ISchemaProvider>();
+        private readonly NamedId<Guid> appId = new NamedId<Guid>(Guid.NewGuid(), "my-app");
+        private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
 
         public GuardRuleTests()
         {
-            A.CallTo(() => schemas.FindSchemaByIdAsync(A<Guid>.Ignored, false))
+            A.CallTo(() => appProvider.GetSchemaAsync(appId.Name, A<Guid>.Ignored, false))
                 .Returns(A.Fake<ISchemaEntity>());
         }
 
@@ -42,10 +43,11 @@ namespace Squidex.Domain.Apps.Write.Rules.Guards
                 Action = new WebhookAction
                 {
                     Url = validUrl
-                }
+                },
+                AppId = appId
             };
 
-            await Assert.ThrowsAsync<ValidationException>(() => GuardRule.CanCreate(command, schemas));
+            await Assert.ThrowsAsync<ValidationException>(() => GuardRule.CanCreate(command, appProvider));
         }
 
         [Fact]
@@ -57,10 +59,11 @@ namespace Squidex.Domain.Apps.Write.Rules.Guards
                 {
                     Schemas = new List<ContentChangedTriggerSchema>()
                 },
-                Action = null
+                Action = null,
+                AppId = appId
             };
 
-            await Assert.ThrowsAsync<ValidationException>(() => GuardRule.CanCreate(command, schemas));
+            await Assert.ThrowsAsync<ValidationException>(() => GuardRule.CanCreate(command, appProvider));
         }
 
         [Fact]
@@ -75,10 +78,11 @@ namespace Squidex.Domain.Apps.Write.Rules.Guards
                 Action = new WebhookAction
                 {
                     Url = validUrl
-                }
+                },
+                AppId = appId
             };
 
-            await GuardRule.CanCreate(command, schemas);
+            await GuardRule.CanCreate(command, appProvider);
         }
 
         [Fact]
@@ -86,7 +90,7 @@ namespace Squidex.Domain.Apps.Write.Rules.Guards
         {
             var command = new UpdateRule();
 
-            await Assert.ThrowsAsync<ValidationException>(() => GuardRule.CanUpdate(command, schemas));
+            await Assert.ThrowsAsync<ValidationException>(() => GuardRule.CanUpdate(command, appProvider));
         }
 
         [Fact]
@@ -101,10 +105,11 @@ namespace Squidex.Domain.Apps.Write.Rules.Guards
                 Action = new WebhookAction
                 {
                     Url = validUrl
-                }
+                },
+                AppId = appId
             };
 
-            await GuardRule.CanUpdate(command, schemas);
+            await GuardRule.CanUpdate(command, appProvider);
         }
 
         [Fact]

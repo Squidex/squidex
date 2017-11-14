@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Read.Rules
     {
         private readonly IClock clock = A.Fake<IClock>();
         private readonly ISemanticLog log = A.Fake<ISemanticLog>();
-        private readonly IRuleRepository ruleRepository = A.Fake<IRuleRepository>();
+        private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
         private readonly IRuleEventRepository ruleEventRepository = A.Fake<IRuleEventRepository>();
         private readonly RuleService ruleService = A.Fake<RuleService>();
         private readonly Instant now = SystemClock.Instance.GetCurrentInstant();

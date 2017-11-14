@@ -42,8 +42,8 @@ namespace Squidex.Domain.Apps.Write.Contents
             ContentDomainObject content,
             ContentCommand command,
             IAppProvider appProvider,
-            IScriptEngine scriptEngine,
             IAssetRepository assetRepository,
+            IScriptEngine scriptEngine,
             Func<string> message)
         {
             var (appEntity, schemaEntity) = await appProvider.GetAppWithSchemaAsync(command.AppId.Name, command.SchemaId.Id);

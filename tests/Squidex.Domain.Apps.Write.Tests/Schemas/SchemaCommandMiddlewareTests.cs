@@ -11,8 +11,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Read;
 using Squidex.Domain.Apps.Read.Schemas;
-using Squidex.Domain.Apps.Read.Schemas.Services;
 using Squidex.Domain.Apps.Write.Schemas.Commands;
 using Squidex.Domain.Apps.Write.TestHelpers;
 using Squidex.Infrastructure;
@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
 {
     public class SchemaCommandMiddlewareTests : HandlerTestBase<SchemaDomainObject>
     {
-        private readonly ISchemaProvider schemas = A.Fake<ISchemaProvider>();
+        private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
         private readonly SchemaCommandMiddleware sut;
         private readonly SchemaDomainObject schema;
         private readonly FieldRegistry registry = new FieldRegistry(new TypeNameRegistry());
@@ -33,9 +33,9 @@ namespace Squidex.Domain.Apps.Write.Schemas
         {
             schema = new SchemaDomainObject(SchemaId, -1, registry);
 
-            sut = new SchemaCommandMiddleware(Handler, schemas);
+            sut = new SchemaCommandMiddleware(Handler, appProvider);
 
-            A.CallTo(() => schemas.FindSchemaByNameAsync(AppId, SchemaName))
+            A.CallTo(() => appProvider.GetSchemaAsync(AppName, SchemaName, false))
                 .Returns((ISchemaEntity)null);
         }
 
@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
 
             Assert.Equal(SchemaId, context.Result<EntityCreatedResult<Guid>>().IdOrValue);
 
-            A.CallTo(() => schemas.FindSchemaByNameAsync(AppId, SchemaName)).MustHaveHappened();
+            A.CallTo(() => appProvider.GetSchemaAsync(AppName, SchemaName, false)).MustHaveHappened();
         }
 
         [Fact]

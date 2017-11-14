@@ -20,7 +20,6 @@ using Squidex.Domain.Apps.Read.Apps;
 using Squidex.Domain.Apps.Read.Assets.Repositories;
 using Squidex.Domain.Apps.Read.Contents.Repositories;
 using Squidex.Domain.Apps.Read.Schemas;
-using Squidex.Domain.Apps.Read.Schemas.Services;
 using Squidex.Domain.Apps.Write.Contents.Commands;
 using Squidex.Domain.Apps.Write.TestHelpers;
 using Squidex.Infrastructure;
@@ -33,7 +32,6 @@ namespace Squidex.Domain.Apps.Write.Contents
     {
         private readonly ContentCommandMiddleware sut;
         private readonly ContentDomainObject content;
-        private readonly ISchemaProvider schemas = A.Fake<ISchemaProvider>();
         private readonly ISchemaEntity schema = A.Fake<ISchemaEntity>();
         private readonly IScriptEngine scriptEngine = A.Fake<IScriptEngine>();
         private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
@@ -70,7 +68,7 @@ namespace Squidex.Domain.Apps.Write.Contents
 
             content = new ContentDomainObject(contentId, -1);
 
-            sut = new ContentCommandMiddleware(Handler, appProvider, A.Dummy<IAssetRepository>(), schemas, scriptEngine, A.Dummy<IContentRepository>());
+            sut = new ContentCommandMiddleware(Handler, appProvider, A.Dummy<IAssetRepository>(), scriptEngine, A.Dummy<IContentRepository>());
 
             A.CallTo(() => app.LanguagesConfig).Returns(languagesConfig);
 
@@ -82,7 +80,7 @@ namespace Squidex.Domain.Apps.Write.Contents
             A.CallTo(() => schema.ScriptUpdate).Returns("<update-script>");
             A.CallTo(() => schema.ScriptDelete).Returns("<delete-script>");
 
-            A.CallTo(() => schemas.FindSchemaByIdAsync(SchemaId, false)).Returns(schema);
+            A.CallTo(() => appProvider.GetAppWithSchemaAsync(AppName, SchemaId)).Returns((app, schema));
         }
 
         [Fact]

@@ -149,8 +149,8 @@ namespace Squidex.Domain.Apps.Write.Contents
                     content,
                     command,
                     appProvider,
-                    scriptEngine,
                     assetRepository,
+                    scriptEngine,
                     message);
 
             return operationContext;
