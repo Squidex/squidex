@@ -89,11 +89,6 @@ namespace Squidex.Config.Domain
                         .As<IAssetRepository>()
                         .As<IAssetEventConsumer>()
                         .As<IExternalSystem>();
-
-                    services.AddSingleton(c => new MongoRuleRepository(mongoDatabase))
-                        .As<IRuleRepository>()
-                        .As<IEventConsumer>()
-                        .As<IExternalSystem>();
                 }
             });
         }

@@ -10,11 +10,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Orleans;
-using Orleans.Providers;
 
 namespace Squidex.Domain.Apps.Read.State.Orleans.Grains.Implementations
 {
-    [StorageProvider(ProviderName = "Default")]
     public sealed class AppUserGrain : Grain<AppUserGrainState>, IAppUserGrain
     {
         public Task AddAppAsync(string appName)

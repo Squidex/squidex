@@ -11,5 +11,7 @@ namespace Squidex.Infrastructure.Json.Orleans
     public interface IJsonValue
     {
         object Value { get; }
+
+        bool IsImmutable { get; }
     }
 }

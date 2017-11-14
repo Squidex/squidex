@@ -14,10 +14,16 @@ namespace Squidex.Infrastructure.Json.Orleans
     public struct J<T> : IJsonValue
     {
         private readonly T value;
+        private readonly bool isImmutable;
 
         public T Value
         {
             get { return value; }
+        }
+
+        bool IJsonValue.IsImmutable
+        {
+            get { return isImmutable; }
         }
 
         object IJsonValue.Value
@@ -26,9 +32,11 @@ namespace Squidex.Infrastructure.Json.Orleans
         }
 
         [JsonConstructor]
-        public J(T value)
+        public J(T value, bool isImmutable = false)
         {
             this.value = value;
+
+            this.isImmutable = isImmutable;
         }
 
         public static implicit operator T(J<T> value)

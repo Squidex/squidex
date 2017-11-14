@@ -52,6 +52,17 @@ namespace Squidex.Infrastructure.CQRS.Events
         }
 
         [Fact]
+        public void Should_return_compound_filter_from_array()
+        {
+            A.CallTo(() => consumer1.EventsFilter).Returns("filter1");
+            A.CallTo(() => consumer2.EventsFilter).Returns("filter2");
+
+            var sut = new CompoundEventConsumer(new[] { consumer1, consumer2 });
+
+            Assert.Equal("(filter1)|(filter2)", sut.EventsFilter);
+        }
+
+        [Fact]
         public void Should_ignore_empty_filters()
         {
             A.CallTo(() => consumer1.EventsFilter).Returns("filter1");

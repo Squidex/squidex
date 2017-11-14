@@ -10,13 +10,13 @@ using System;
 using System.Threading.Tasks;
 using Orleans;
 using Orleans.Concurrency;
-using Orleans.Providers;
+using Orleans.Core;
+using Orleans.Runtime;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.CQRS.Events.Orleans.Grains.Implementation
 {
-    [StorageProvider(ProviderName = "Default")]
     public class EventConsumerGrain : Grain<EventConsumerGrainState>, IEventSubscriber, IEventConsumerGrain
     {
         private readonly EventDataFormatter eventFormatter;
@@ -32,6 +32,19 @@ namespace Squidex.Infrastructure.CQRS.Events.Orleans.Grains.Implementation
             EventConsumerFactory eventConsumerFactory,
             IEventStore eventStore,
             ISemanticLog log)
+            : this(eventFormatter, eventConsumerFactory, eventStore, log, null, null, null)
+        {
+        }
+
+        protected EventConsumerGrain(
+            EventDataFormatter eventFormatter,
+            EventConsumerFactory eventConsumerFactory,
+            IEventStore eventStore,
+            ISemanticLog log,
+            IGrainIdentity identity,
+            IGrainRuntime runtime,
+            IStorage<EventConsumerGrainState> storage)
+            : base(identity, runtime, storage)
         {
             Guard.NotNull(log, nameof(log));
             Guard.NotNull(eventStore, nameof(eventStore));

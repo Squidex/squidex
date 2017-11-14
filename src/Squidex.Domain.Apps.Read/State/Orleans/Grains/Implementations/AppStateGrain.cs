@@ -10,7 +10,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Orleans;
-using Orleans.Providers;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Read.Apps;
 using Squidex.Domain.Apps.Read.Rules;
@@ -21,7 +20,6 @@ using Squidex.Infrastructure.Json.Orleans;
 
 namespace Squidex.Domain.Apps.Read.State.Orleans.Grains.Implementations
 {
-    [StorageProvider(ProviderName = "Default")]
     public sealed class AppStateGrain : Grain<AppStateGrainState>, IAppStateGrain
     {
         private readonly FieldRegistry fieldRegistry;

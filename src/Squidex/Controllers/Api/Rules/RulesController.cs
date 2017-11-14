@@ -14,6 +14,7 @@ using NodaTime;
 using NSwag.Annotations;
 using Squidex.Controllers.Api.Rules.Models;
 using Squidex.Controllers.Api.Rules.Models.Converters;
+using Squidex.Domain.Apps.Read;
 using Squidex.Domain.Apps.Read.Rules.Repositories;
 using Squidex.Domain.Apps.Write.Rules.Commands;
 using Squidex.Infrastructure.CQRS.Commands;
@@ -32,15 +33,15 @@ namespace Squidex.Controllers.Api.Rules
     [MustBeAppDeveloper]
     public sealed class RulesController : ControllerBase
     {
-        private readonly IRuleRepository rulesRepository;
+        private readonly IAppProvider appProvider;
         private readonly IRuleEventRepository ruleEventsRepository;
 
-        public RulesController(ICommandBus commandBus,
-            IRuleRepository rulesRepository,
+        public RulesController(ICommandBus commandBus, IAppProvider appProvider,
             IRuleEventRepository ruleEventsRepository)
             : base(commandBus)
         {
-            this.rulesRepository = rulesRepository;
+            this.appProvider = appProvider;
+
             this.ruleEventsRepository = ruleEventsRepository;
         }
 
@@ -58,7 +59,7 @@ namespace Squidex.Controllers.Api.Rules
         [ApiCosts(1)]
         public async Task<IActionResult> GetRules(string app)
         {
-            var rules = await rulesRepository.QueryByAppAsync(App.Id);
+            var rules = await appProvider.GetRulesAsync(AppName);
 
             var response = rules.Select(r => r.ToModel());
 

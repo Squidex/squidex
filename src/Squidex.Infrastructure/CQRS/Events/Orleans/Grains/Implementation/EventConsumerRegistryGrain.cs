@@ -13,26 +13,41 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Orleans;
 using Orleans.Concurrency;
+using Orleans.Core;
 using Orleans.Runtime;
-using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.CQRS.Events.Orleans.Grains.Implementation
 {
-    public sealed class EventConsumerRegistryGrain : Grain, IEventConsumerRegistryGrain, IRemindable
+    public class EventConsumerRegistryGrain : Grain, IEventConsumerRegistryGrain, IRemindable
     {
         private readonly IEnumerable<IEventConsumer> eventConsumers;
 
         public EventConsumerRegistryGrain(IEnumerable<IEventConsumer> eventConsumers)
+            : this(eventConsumers, null, null)
+        {
+        }
+
+        protected EventConsumerRegistryGrain(
+            IEnumerable<IEventConsumer> eventConsumers,
+            IGrainIdentity identity,
+            IGrainRuntime runtime)
+            : base(identity, runtime)
         {
             Guard.NotNull(eventConsumers, nameof(eventConsumers));
 
             this.eventConsumers = eventConsumers;
         }
 
+        public Task ReceiveReminder(string reminderName, TickStatus status)
+        {
+            return ActivateAsync(null);
+        }
+
         public override Task OnActivateAsync()
         {
             DelayDeactivation(TimeSpan.FromDays(1));
 
+            RegisterOrUpdateReminder("Default", TimeSpan.Zero, TimeSpan.FromMinutes(10));
             RegisterTimer(x => ActivateAsync(null), null, TimeSpan.Zero, TimeSpan.FromSeconds(10));
 
             return Task.FromResult(true);
@@ -57,11 +72,6 @@ namespace Squidex.Infrastructure.CQRS.Events.Orleans.Grains.Implementation
                     .Select(c => c.GetStateAsync());
 
             return Task.WhenAll(tasks).ContinueWith(x => new Immutable<List<EventConsumerInfo>>(x.Result.Select(r => r.Value).ToList()));
-        }
-
-        public Task ReceiveReminder(string reminderName, TickStatus status)
-        {
-            return TaskHelper.Done;
         }
 
         public Task ResetAsync(string consumerName)

@@ -38,7 +38,24 @@ namespace Squidex.Infrastructure.Json.Orleans
 
         public object DeepCopy(object source, ICopyContext context)
         {
-            return source != null ? JObject.FromObject(source, serializer).ToObject(source.GetType(), serializer) : null;
+            var jsonValue = source as IJsonValue;
+
+            if (jsonValue == null)
+            {
+                return null;
+            }
+            else if (jsonValue.IsImmutable)
+            {
+                return jsonValue;
+            }
+            else if (jsonValue.Value == null)
+            {
+                return jsonValue;
+            }
+            else
+            {
+                return JObject.FromObject(source, serializer).ToObject(source.GetType(), serializer);
+            }
         }
 
         public object Deserialize(Type expectedType, IDeserializationContext context)

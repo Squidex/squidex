@@ -38,7 +38,7 @@ namespace Squidex.Infrastructure.TestHelpers
 
         public static T SerializeAndDeserializeAndReturn<T>(this T value, JsonConverter converter)
         {
-            var serializerSettings = CreateSettings<T>(converter);
+            var serializerSettings = CreateSettings(converter);
 
             var result = JsonConvert.SerializeObject(Tuple.Create(value), serializerSettings);
             var output = JsonConvert.DeserializeObject<Tuple<T>>(result, serializerSettings);
@@ -48,12 +48,12 @@ namespace Squidex.Infrastructure.TestHelpers
 
         public static void DoesNotDeserialize<T>(string value, JsonConverter converter)
         {
-            var serializerSettings = CreateSettings<T>(converter);
+            var serializerSettings = CreateSettings(converter);
 
             Assert.ThrowsAny<JsonException>(() => JsonConvert.DeserializeObject<Tuple<T>>($"{{ \"Item1\": \"{value}\" }}", serializerSettings));
         }
 
-        private static JsonSerializerSettings CreateSettings<T>(JsonConverter converter)
+        private static JsonSerializerSettings CreateSettings(JsonConverter converter)
         {
             var serializerSettings = new JsonSerializerSettings();
 
