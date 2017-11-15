@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb
     {
         public static Task CreateAsync<T>(this IMongoCollection<T> collection, SquidexEvent @event, EnvelopeHeaders headers, Action<T> updater) where T : class, IEntity, new()
         {
-            var entity = EntityMapper.Create<T>(@event, headers, updater);
+            var entity = EntityMapper.Create(@event, headers, updater);
 
             return collection.InsertOneIfNotExistsAsync(entity);
         }

@@ -20,7 +20,7 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Http;
 
-namespace Squidex.Domain.Apps.Core.HandleRules.ActionHandlers
+namespace Squidex.Domain.Apps.Core.HandleRules.Actions
 {
     public sealed class WebhookActionHandler : RuleActionHandler<WebhookAction>
     {

@@ -15,7 +15,7 @@ using Xunit;
 
 #pragma warning disable SA1310 // Field names must not contain underscore
 
-namespace Squidex.Domain.Apps.Write.Schemas
+namespace Squidex.Domain.Apps.Write.Schemas.Guards
 {
     public class GuardSchemaFieldTests
     {

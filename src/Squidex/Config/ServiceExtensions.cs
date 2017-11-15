@@ -62,7 +62,7 @@ namespace Squidex.Config
 
         public static T GetOptionalValue<T>(this IConfiguration config, string path, T defaultValue = default(T))
         {
-            var value = config.GetValue<T>(path, defaultValue);
+            var value = config.GetValue(path, defaultValue);
 
             return value;
         }

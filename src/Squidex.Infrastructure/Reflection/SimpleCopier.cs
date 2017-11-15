@@ -53,7 +53,7 @@ namespace Squidex.Infrastructure.Reflection
 
                     if (property.PropertyType.Implements<ICloneable>())
                     {
-                        Mappers.Add(new PropertyMapper(accessor, x => x == null ? x : ((ICloneable)x).Clone()));
+                        Mappers.Add(new PropertyMapper(accessor, x => ((ICloneable)x)?.Clone()));
                     }
                     else
                     {

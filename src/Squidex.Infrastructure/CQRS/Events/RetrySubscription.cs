@@ -15,7 +15,7 @@ namespace Squidex.Infrastructure.CQRS.Events
 {
     public sealed class RetrySubscription : IEventSubscription, IEventSubscriber
     {
-        private readonly SingleThreadedDispatcher dispatcher = new SingleThreadedDispatcher(10);
+        private readonly SingleThreadedDispatcher dispatcher = new SingleThreadedDispatcher();
         private readonly CancellationTokenSource disposeCts = new CancellationTokenSource();
         private readonly RetryWindow retryWindow = new RetryWindow(TimeSpan.FromMinutes(5), 5);
         private readonly IEventStore eventStore;

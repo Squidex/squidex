@@ -14,7 +14,7 @@ namespace Squidex.Infrastructure
     {
         protected T Clone(Action<T> updater)
         {
-            return base.Clone<T>(updater);
+            return base.Clone(updater);
         }
     }
 }

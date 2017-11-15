@@ -10,7 +10,7 @@ using Squidex.Domain.Apps.Core.Rules.Actions;
 
 namespace Squidex.Domain.Apps.Core.Rules
 {
-    public interface IRuleActionVisitor<T>
+    public interface IRuleActionVisitor<out T>
     {
         T Visit(WebhookAction action);
     }

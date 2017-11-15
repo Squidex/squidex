@@ -68,7 +68,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules.Triggers
         {
             var trigger = new ContentChangedTrigger
             {
-                Schemas = ImmutableList.Create<ContentChangedTriggerSchema>(
+                Schemas = ImmutableList.Create(
                     new ContentChangedTriggerSchema
                     {
                         SendCreate = sendCreate == 1,

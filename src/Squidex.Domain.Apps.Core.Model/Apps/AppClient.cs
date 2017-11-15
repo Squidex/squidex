@@ -13,8 +13,8 @@ namespace Squidex.Domain.Apps.Core.Apps
     public sealed class AppClient
     {
         private readonly string secret;
-        private string name;
-        private AppClientPermission permission;
+        private readonly string name;
+        private readonly AppClientPermission permission;
 
         public string Name
         {

@@ -85,7 +85,7 @@ namespace Squidex.Domain.Apps.Core.Apps
 
         public static LanguagesConfig Build(params Language[] languages)
         {
-            return Build(languages?.Select(x => new LanguageConfig(x, false))?.ToList());
+            return Build(languages?.Select(x => new LanguageConfig(x)).ToList());
         }
 
         public LanguagesConfig MakeMaster(Language language)

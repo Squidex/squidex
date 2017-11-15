@@ -59,7 +59,7 @@ namespace Squidex.Infrastructure.CQRS.Events.Grains
 
         public EventConsumerGrainTests()
         {
-            factory = new EventConsumerFactory(x => eventConsumer);
+            factory = x => eventConsumer;
 
             state.Position = Guid.NewGuid().ToString();
             consumerName = eventConsumer.GetType().Name;

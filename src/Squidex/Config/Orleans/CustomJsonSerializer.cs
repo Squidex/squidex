@@ -8,6 +8,7 @@
 
 using Newtonsoft.Json;
 using Squidex.Config.Domain;
+using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Json.Orleans;
 
 namespace Squidex.Config.Orleans
@@ -15,7 +16,8 @@ namespace Squidex.Config.Orleans
     public class CustomJsonSerializer : JsonExternalSerializer
     {
         public CustomJsonSerializer()
-            : base(JsonSerializer.Create(SerializationServices.DefaultJsonSettings))
+            : base(JsonSerializer.Create(SerializationServices.DefaultJsonSettings),
+                  typeof(Envelope<IEvent>))
         {
         }
     }
