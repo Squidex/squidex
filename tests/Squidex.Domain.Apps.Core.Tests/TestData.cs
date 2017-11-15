@@ -6,7 +6,10 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using System.Collections.Immutable;
+using System.Linq;
+using System.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Squidex.Domain.Apps.Core.Apps.Json;
@@ -15,6 +18,7 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Schemas.Json;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
+using Xunit;
 
 namespace Squidex.Domain.Apps.Core
 {
@@ -95,6 +99,47 @@ namespace Squidex.Domain.Apps.Core
             schema = schema.DisableField(9);
 
             return schema;
+        }
+
+        public static void TestFreeze(Freezable freezable)
+        {
+            var sut = new AssetsFieldProperties();
+
+            foreach (var property in sut.GetType().GetRuntimeProperties().Where(x => x.Name != "IsFrozen"))
+            {
+                var value =
+                    property.PropertyType.GetTypeInfo().IsValueType ?
+                        Activator.CreateInstance(property.PropertyType) :
+                        null;
+
+                property.SetValue(sut, value);
+
+                var result = property.GetValue(sut);
+
+                Assert.Equal(value, result);
+            }
+
+            sut.Freeze();
+
+            foreach (var property in sut.GetType().GetRuntimeProperties().Where(x => x.Name != "IsFrozen"))
+            {
+                var value =
+                    property.PropertyType.GetTypeInfo().IsValueType ?
+                        Activator.CreateInstance(property.PropertyType) :
+                        null;
+
+                Assert.Throws<InvalidOperationException>(() =>
+                {
+                    try
+                    {
+                        property.SetValue(sut, value);
+                    }
+                    catch (Exception ex)
+                    {
+                        throw ex.InnerException;
+                    }
+                });
+            }
         }
     }
 }

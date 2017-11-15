@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         private readonly LanguagesConfig languagesConfig = LanguagesConfig.Build(Language.DE, Language.EN);
         private readonly List<ValidationError> errors = new List<ValidationError>();
         private readonly ValidationContext context = ValidationTestExtensions.ValidContext;
-        private readonly Schema schema = new Schema("my-schema");
+        private Schema schema = new Schema("my-schema");
 
         [Fact]
         public async Task Should_add_error_if_validating_data_with_unknown_field()
@@ -45,7 +45,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_add_error_if_validating_data_with_invalid_field()
         {
-            schema.AddField(new NumberField(1, "my-field", Partitioning.Invariant,
+            schema = schema.AddField(new NumberField(1, "my-field", Partitioning.Invariant,
                 new NumberFieldProperties { MaxValue = 100 }));
 
             var data =
@@ -66,7 +66,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_add_error_if_non_localizable_data_field_contains_language()
         {
-            schema.AddField(new NumberField(1, "my-field", Partitioning.Invariant));
+            schema = schema.AddField(new NumberField(1, "my-field", Partitioning.Invariant));
 
             var data =
                 new NamedContentData()
@@ -88,7 +88,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_add_error_if_validating_data_with_invalid_localizable_field()
         {
-            schema.AddField(new NumberField(1, "my-field", Partitioning.Language,
+            schema = schema.AddField(new NumberField(1, "my-field", Partitioning.Language,
                 new NumberFieldProperties { IsRequired = true }));
 
             var data =
@@ -107,7 +107,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_add_error_if_required_data_field_is_not_in_bag()
         {
-            schema.AddField(new NumberField(1, "my-field", Partitioning.Invariant,
+            schema = schema.AddField(new NumberField(1, "my-field", Partitioning.Invariant,
                 new NumberFieldProperties { IsRequired = true }));
 
             var data =
@@ -125,7 +125,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_add_error_if_data_contains_invalid_language()
         {
-            schema.AddField(new NumberField(1, "my-field", Partitioning.Language));
+            schema = schema.AddField(new NumberField(1, "my-field", Partitioning.Language));
 
             var data =
                 new NamedContentData()
@@ -151,7 +151,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                     new LanguageConfig(Language.ES, false),
                     new LanguageConfig(Language.IT, true));
 
-            schema.AddField(new StringField(1, "my-field", Partitioning.Language,
+            schema = schema.AddField(new StringField(1, "my-field", Partitioning.Language,
                 new StringFieldProperties { IsRequired = true }));
 
             var data =
@@ -168,7 +168,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_add_error_if_data_contains_unsupported_language()
         {
-            schema.AddField(new NumberField(1, "my-field", Partitioning.Language));
+            schema = schema.AddField(new NumberField(1, "my-field", Partitioning.Language));
 
             var data =
                 new NamedContentData()
@@ -207,7 +207,8 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_add_error_if_validating_partial_data_with_invalid_field()
         {
-            schema.AddField(new NumberField(1, "my-field", Partitioning.Invariant, new NumberFieldProperties { MaxValue = 100 }));
+            schema = schema.AddField(new NumberField(1, "my-field", Partitioning.Invariant,
+                new NumberFieldProperties { MaxValue = 100 }));
 
             var data =
                 new NamedContentData()
@@ -227,7 +228,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_add_error_if_non_localizable_partial_data_field_contains_language()
         {
-            schema.AddField(new NumberField(1, "my-field", Partitioning.Invariant));
+            schema = schema.AddField(new NumberField(1, "my-field", Partitioning.Invariant));
 
             var data =
                 new NamedContentData()
@@ -249,7 +250,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_not_add_error_if_validating_partial_data_with_invalid_localizable_field()
         {
-            schema.AddField(new NumberField(1, "my-field", Partitioning.Language,
+            schema = schema.AddField(new NumberField(1, "my-field", Partitioning.Language,
                 new NumberFieldProperties { IsRequired = true }));
 
             var data =
@@ -263,7 +264,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_not_add_error_if_required_partial_data_field_is_not_in_bag()
         {
-            schema.AddField(new NumberField(1, "my-field", Partitioning.Invariant,
+            schema = schema.AddField(new NumberField(1, "my-field", Partitioning.Invariant,
                 new NumberFieldProperties { IsRequired = true }));
 
             var data =
@@ -277,7 +278,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_add_error_if_partial_data_contains_invalid_language()
         {
-            schema.AddField(new NumberField(1, "my-field", Partitioning.Language));
+            schema = schema.AddField(new NumberField(1, "my-field", Partitioning.Language));
 
             var data =
                 new NamedContentData()
@@ -298,7 +299,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_add_error_if_partial_data_contains_unsupported_language()
         {
-            schema.AddField(new NumberField(1, "my-field", Partitioning.Language));
+            schema = schema.AddField(new NumberField(1, "my-field", Partitioning.Language));
 
             var data =
                 new NamedContentData()

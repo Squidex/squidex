@@ -40,10 +40,10 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
             var typedProperties = ValidateProperties(newProperties);
 
-            return Clone<Field>(clone =>
+            return Clone<Field<T>>(clone =>
             {
-                properties = typedProperties;
-                properties.Freeze();
+                clone.properties = typedProperties;
+                clone.properties.Freeze();
             });
         }
 

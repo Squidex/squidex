@@ -28,19 +28,16 @@ namespace Squidex.Domain.Apps.Core.Operations.EnrichContent
 
         public ContentEnrichmentTests()
         {
-            schema = new Schema("my-schema");
-
-            schema.AddField(new StringField(1, "my-string", Partitioning.Language,
-                new StringFieldProperties { DefaultValue = "en-string" }));
-
-            schema.AddField(new NumberField(2, "my-number", Partitioning.Invariant,
-                new NumberFieldProperties()));
-
-            schema.AddField(new DateTimeField(3, "my-datetime", Partitioning.Invariant,
-                new DateTimeFieldProperties { DefaultValue = Now }));
-
-            schema.AddField(new BooleanField(4, "my-boolean", Partitioning.Invariant,
-                new BooleanFieldProperties { DefaultValue = true }));
+            schema =
+                new Schema("my-schema")
+                    .AddField(new StringField(1, "my-string", Partitioning.Language,
+                        new StringFieldProperties { DefaultValue = "en-string" }))
+                    .AddField(new NumberField(2, "my-number", Partitioning.Invariant,
+                        new NumberFieldProperties()))
+                    .AddField(new DateTimeField(3, "my-datetime", Partitioning.Invariant,
+                            new DateTimeFieldProperties { DefaultValue = Now }))
+                    .AddField(new BooleanField(4, "my-boolean", Partitioning.Invariant,
+                        new BooleanFieldProperties { DefaultValue = true }));
         }
 
         [Fact]

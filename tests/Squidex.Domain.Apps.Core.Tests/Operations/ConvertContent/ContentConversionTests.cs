@@ -21,21 +21,20 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
 {
     public class ContentConversionTests
     {
-        private readonly Schema schema = new Schema("my-schema");
+        private readonly Schema schema;
         private readonly LanguagesConfig languagesConfig = LanguagesConfig.Build(Language.EN, Language.DE);
 
         public ContentConversionTests()
         {
-            schema.AddField(new NumberField(1, "field1", Partitioning.Language));
-            schema.AddField(new NumberField(2, "field2", Partitioning.Invariant));
-            schema.AddField(new NumberField(3, "field3", Partitioning.Invariant));
-
-            schema.AddField(new AssetsField(5, "assets1", Partitioning.Invariant));
-            schema.AddField(new AssetsField(6, "assets2", Partitioning.Invariant));
-
-            schema.AddField(new JsonField(4, "json", Partitioning.Language));
-
-            schema.FieldsById[3].Hide();
+            schema =
+                new Schema("my-schema")
+                    .AddField(new NumberField(1, "field1", Partitioning.Language))
+                    .AddField(new NumberField(2, "field2", Partitioning.Invariant))
+                    .AddField(new NumberField(3, "field3", Partitioning.Invariant))
+                    .AddField(new AssetsField(5, "assets1", Partitioning.Invariant))
+                    .AddField(new AssetsField(6, "assets2", Partitioning.Invariant))
+                    .AddField(new JsonField(4, "json", Partitioning.Language))
+                    .HideField(3);
         }
 
         [Fact]

@@ -21,7 +21,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         private ImmutableList<Field> fieldsOrdered = ImmutableList<Field>.Empty;
         private ImmutableDictionary<long, Field> fieldsById = ImmutableDictionary<long, Field>.Empty;
         private ImmutableDictionary<string, Field> fieldsByName = ImmutableDictionary<string, Field>.Empty;
-        private SchemaProperties properties = new SchemaProperties();
+        private SchemaProperties properties;
         private bool isPublished;
 
         public string Name
@@ -54,30 +54,42 @@ namespace Squidex.Domain.Apps.Core.Schemas
             get { return properties; }
         }
 
-        public Schema(string name)
+        public Schema(string name, SchemaProperties properties = null)
         {
             Guard.NotNullOrEmpty(name, nameof(name));
 
             this.name = name;
+
+            this.properties = properties ?? new SchemaProperties();
+            this.properties.Freeze();
+
+            OnCloned();
         }
 
         public Schema(string name, IEnumerable<Field> fields, SchemaProperties properties, bool isPublished)
-            : this(name)
+            : this(name, properties)
         {
             Guard.NotNullOrEmpty(name, nameof(name));
 
             this.isPublished = isPublished;
 
-            this.properties = properties ?? new SchemaProperties();
-            this.properties.Freeze();
-
             fieldsOrdered = ImmutableList<Field>.Empty.AddRange(fields);
+
+            OnCloned();
         }
 
         protected override void OnCloned()
         {
-            fieldsById = fieldsOrdered.ToImmutableDictionary(x => x.Id);
-            fieldsByName = fieldsOrdered.ToImmutableDictionary(x => x.Name);
+            if (fieldsOrdered.Count > 0)
+            {
+                fieldsById = fieldsOrdered.ToImmutableDictionary(x => x.Id);
+                fieldsByName = fieldsOrdered.ToImmutableDictionary(x => x.Name);
+            }
+            else
+            {
+                fieldsById = ImmutableDictionary<long, Field>.Empty;
+                fieldsByName = ImmutableDictionary<string, Field>.Empty;
+            }
         }
 
         [Pure]
@@ -87,8 +99,8 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
             return Clone(clone =>
             {
-                properties = newProperties;
-                properties.Freeze();
+                clone.properties = newProperties;
+                clone.properties.Freeze();
             });
         }
 
@@ -151,7 +163,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
             return Clone(clone =>
             {
-                isPublished = true;
+                clone.isPublished = true;
             });
         }
 
@@ -160,7 +172,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
             return Clone(clone =>
             {
-                isPublished = false;
+                clone.isPublished = false;
             });
         }
 
