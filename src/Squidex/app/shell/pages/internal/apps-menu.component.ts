@@ -31,10 +31,11 @@ export class AppsMenuComponent implements OnDestroy, OnInit {
     private appsSubscription: Subscription;
     private appSubscription: Subscription;
 
-    public modalMenu = new ModalView(false, true);
-    public modalDialog = new ModalView();
+    public addAppDialog = new ModalView();
 
+    public appsMenu = new ModalView(false, true);
     public apps: AppDto[] = [];
+
     public selectedApp: AppDto;
 
     constructor(
@@ -60,7 +61,7 @@ export class AppsMenuComponent implements OnDestroy, OnInit {
     }
 
     public createApp() {
-        this.modalMenu.hide();
-        this.modalDialog.show();
+        this.appsMenu.hide();
+        this.addAppDialog.show();
     }
 }

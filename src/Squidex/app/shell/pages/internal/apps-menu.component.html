@@ -1,8 +1,8 @@
 <ul class="nav navbar-nav" *ngIf="apps">
     <li class="nav-item dropdown">
-        <span class="nav-link dropdown-toggle" id="app-name" (click)="modalMenu.toggle()">{{selectedApp ? selectedApp.name : 'Apps Overview'}}</span>
+        <span class="nav-link dropdown-toggle" id="app-name" (click)="appsMenu.toggle()">{{selectedApp ? selectedApp.name : 'Apps Overview'}}</span>
 
-        <div class="dropdown-menu" *sqxModalView="modalMenu" closeAlways="true" @fade>
+        <div class="dropdown-menu" *sqxModalView="appsMenu" closeAlways="true" @fade>
             <a class="dropdown-item all-apps" routerLink="/app">
                 <span class="all-apps-text">All Apps</span> 
                 <span class="all-apps-pill badge badge-pill badge-primary">{{apps.length}}</span>
@@ -34,22 +34,22 @@
     </li>
 </ul>
 
-<div class="modal" *sqxModalView="modalDialog;onRoot:true" @fade>
+<div class="modal" *sqxModalView="addAppDialog;onRoot:true" @fade>
     <div class="modal-backdrop"></div>
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title">Create App</h4>
 
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="modalDialog.hide()">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="addAppDialog.hide()">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
 
             <div class="modal-body">
                 <sqx-app-form 
-                    (created)="modalDialog.hide()" 
-                    (cancelled)="modalDialog.hide()">
+                    (created)="addAppDialog.hide()" 
+                    (cancelled)="addAppDialog.hide()">
                 </sqx-app-form>
             </div>
         </div>
