@@ -29,25 +29,33 @@ import {
 })
 export class AppsMenuComponent implements OnDestroy, OnInit {
     private appsSubscription: Subscription;
+    private appSubscription: Subscription;
 
     public modalMenu = new ModalView(false, true);
     public modalDialog = new ModalView();
 
     public apps: AppDto[] = [];
+    public selectedApp: AppDto;
 
-    constructor(public readonly ctx: AppContext,
+    constructor(
         private readonly appsStore: AppsStoreService
     ) {
     }
 
     public ngOnDestroy() {
         this.appsSubscription.unsubscribe();
+        this.appSubscription.unsubscribe();
     }
 
     public ngOnInit() {
         this.appsSubscription =
             this.appsStore.apps.subscribe(apps => {
                 this.apps = apps;
+            });
+
+        this.appSubscription =
+            this.appsStore.selectedApp.subscribe(app => {
+                this.selectedApp = app;
             });
     }
 
