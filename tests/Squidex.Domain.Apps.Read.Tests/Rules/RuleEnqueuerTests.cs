@@ -74,9 +74,9 @@ namespace Squidex.Domain.Apps.Read.Rules
             var ruleEntity2 = A.Fake<IRuleEntity>();
             var ruleEntity3 = A.Fake<IRuleEntity>();
 
-            A.CallTo(() => ruleEntity1.Rule).Returns(rule1);
-            A.CallTo(() => ruleEntity2.Rule).Returns(rule2);
-            A.CallTo(() => ruleEntity3.Rule).Returns(rule3);
+            A.CallTo(() => ruleEntity1.RuleDef).Returns(rule1);
+            A.CallTo(() => ruleEntity2.RuleDef).Returns(rule2);
+            A.CallTo(() => ruleEntity3.RuleDef).Returns(rule3);
 
             A.CallTo(() => appProvider.GetRulesAsync(appId.Name))
                 .Returns(new List<IRuleEntity> { ruleEntity1, ruleEntity2, ruleEntity3 });

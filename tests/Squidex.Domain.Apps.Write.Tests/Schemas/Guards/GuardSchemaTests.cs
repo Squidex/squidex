@@ -18,18 +18,22 @@ using Squidex.Domain.Apps.Write.Schemas.Commands;
 using Squidex.Infrastructure;
 using Xunit;
 
+#pragma warning disable SA1310 // Field names must not contain underscore
+
 namespace Squidex.Domain.Apps.Write.Schemas.Guards
 {
     public class GuardSchemaTests
     {
         private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
-        private readonly Schema schema = new Schema("my-schema");
+        private readonly Schema schema_0;
         private readonly NamedId<Guid> appId = new NamedId<Guid>(Guid.NewGuid(), "my-app");
 
         public GuardSchemaTests()
         {
-            schema.AddField(new StringField(1, "field1", Partitioning.Invariant));
-            schema.AddField(new StringField(2, "field2", Partitioning.Invariant));
+            schema_0 =
+                new Schema("my-schema")
+                    .AddField(new StringField(1, "field1", Partitioning.Invariant))
+                    .AddField(new StringField(2, "field2", Partitioning.Invariant));
 
             A.CallTo(() => appProvider.GetSchemaAsync(A<string>.Ignored, "new-schema", false))
                 .Returns(Task.FromResult<ISchemaEntity>(null));
@@ -121,9 +125,9 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards
         {
             var command = new PublishSchema();
 
-            schema.Publish();
+            var schema_1 = schema_0.Publish();
 
-            Assert.Throws<DomainException>(() => GuardSchema.CanPublish(schema, command));
+            Assert.Throws<DomainException>(() => GuardSchema.CanPublish(schema_1, command));
         }
 
         [Fact]
@@ -131,7 +135,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards
         {
             var command = new PublishSchema();
 
-            GuardSchema.CanPublish(schema, command);
+            GuardSchema.CanPublish(schema_0, command);
         }
 
         [Fact]
@@ -139,7 +143,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards
         {
             var command = new UnpublishSchema();
 
-            Assert.Throws<DomainException>(() => GuardSchema.CanUnpublish(schema, command));
+            Assert.Throws<DomainException>(() => GuardSchema.CanUnpublish(schema_0, command));
         }
 
         [Fact]
@@ -147,9 +151,9 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards
         {
             var command = new UnpublishSchema();
 
-            schema.Publish();
+            var schema_1 = schema_0.Publish();
 
-            GuardSchema.CanUnpublish(schema, command);
+            GuardSchema.CanUnpublish(schema_1, command);
         }
 
         [Fact]
@@ -157,7 +161,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards
         {
             var command = new ReorderFields { FieldIds = new List<long> { 1, 3 } };
 
-            Assert.Throws<ValidationException>(() => GuardSchema.CanReorder(schema, command));
+            Assert.Throws<ValidationException>(() => GuardSchema.CanReorder(schema_0, command));
         }
 
         [Fact]
@@ -165,7 +169,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards
         {
             var command = new ReorderFields { FieldIds = new List<long> { 1 } };
 
-            Assert.Throws<ValidationException>(() => GuardSchema.CanReorder(schema, command));
+            Assert.Throws<ValidationException>(() => GuardSchema.CanReorder(schema_0, command));
         }
 
         [Fact]
@@ -173,7 +177,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards
         {
             var command = new ReorderFields { FieldIds = new List<long> { 1, 2 } };
 
-            GuardSchema.CanReorder(schema, command);
+            GuardSchema.CanReorder(schema_0, command);
         }
 
         [Fact]
@@ -181,7 +185,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards
         {
             var command = new DeleteSchema();
 
-            GuardSchema.CanDelete(schema, command);
+            GuardSchema.CanDelete(schema_0, command);
         }
 
         private static StringFieldProperties ValidProperties()

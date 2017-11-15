@@ -13,18 +13,22 @@ using Squidex.Domain.Apps.Write.Schemas.Guards;
 using Squidex.Infrastructure;
 using Xunit;
 
+#pragma warning disable SA1310 // Field names must not contain underscore
+
 namespace Squidex.Domain.Apps.Write.Schemas
 {
     public class GuardSchemaFieldTests
     {
-        private readonly Schema schema = new Schema("my-schema");
+        private readonly Schema schema_0;
         private readonly StringFieldProperties validProperties = new StringFieldProperties();
         private readonly StringFieldProperties invalidProperties = new StringFieldProperties { MinLength = 10, MaxLength = 5 };
 
         public GuardSchemaFieldTests()
         {
-            schema.AddField(new StringField(1, "field1", Partitioning.Invariant));
-            schema.AddField(new StringField(2, "field2", Partitioning.Invariant));
+            schema_0 =
+                new Schema("my-schema")
+                    .AddField(new StringField(1, "field1", Partitioning.Invariant))
+                    .AddField(new StringField(2, "field2", Partitioning.Invariant));
         }
 
         [Fact]
@@ -32,9 +36,9 @@ namespace Squidex.Domain.Apps.Write.Schemas
         {
             var command = new HideField { FieldId = 1 };
 
-            schema.FieldsById[1].Hide();
+            var schema_1 = schema_0.HideField(1);
 
-            Assert.Throws<DomainException>(() => GuardSchemaField.CanHide(schema, command));
+            Assert.Throws<DomainException>(() => GuardSchemaField.CanHide(schema_1, command));
         }
 
         [Fact]
@@ -42,7 +46,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
         {
             var command = new HideField { FieldId = 3 };
 
-            Assert.Throws<DomainObjectNotFoundException>(() => GuardSchemaField.CanHide(schema, command));
+            Assert.Throws<DomainObjectNotFoundException>(() => GuardSchemaField.CanHide(schema_0, command));
         }
 
         [Fact]
@@ -50,7 +54,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
         {
             var command = new HideField { FieldId = 1 };
 
-            GuardSchemaField.CanHide(schema, command);
+            GuardSchemaField.CanHide(schema_0, command);
         }
 
         [Fact]
@@ -58,9 +62,9 @@ namespace Squidex.Domain.Apps.Write.Schemas
         {
             var command = new DisableField { FieldId = 1 };
 
-            schema.FieldsById[1].Disable();
+            var schema_1 = schema_0.DisableField(1);
 
-            Assert.Throws<DomainException>(() => GuardSchemaField.CanDisable(schema, command));
+            Assert.Throws<DomainException>(() => GuardSchemaField.CanDisable(schema_1, command));
         }
 
         [Fact]
@@ -68,7 +72,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
         {
             var command = new DisableField { FieldId = 3 };
 
-            Assert.Throws<DomainObjectNotFoundException>(() => GuardSchemaField.CanDisable(schema, command));
+            Assert.Throws<DomainObjectNotFoundException>(() => GuardSchemaField.CanDisable(schema_0, command));
         }
 
         [Fact]
@@ -76,7 +80,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
         {
             var command = new DisableField { FieldId = 1 };
 
-            GuardSchemaField.CanDisable(schema, command);
+            GuardSchemaField.CanDisable(schema_0, command);
         }
 
         [Fact]
@@ -84,7 +88,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
         {
             var command = new ShowField { FieldId = 1 };
 
-            Assert.Throws<DomainException>(() => GuardSchemaField.CanShow(schema, command));
+            Assert.Throws<DomainException>(() => GuardSchemaField.CanShow(schema_0, command));
         }
 
         [Fact]
@@ -92,7 +96,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
         {
             var command = new ShowField { FieldId = 3 };
 
-            Assert.Throws<DomainObjectNotFoundException>(() => GuardSchemaField.CanShow(schema, command));
+            Assert.Throws<DomainObjectNotFoundException>(() => GuardSchemaField.CanShow(schema_0, command));
         }
 
         [Fact]
@@ -100,9 +104,9 @@ namespace Squidex.Domain.Apps.Write.Schemas
         {
             var command = new ShowField { FieldId = 1 };
 
-            schema.FieldsById[1].Hide();
+            var schema_1 = schema_0.HideField(1);
 
-            GuardSchemaField.CanShow(schema, command);
+            GuardSchemaField.CanShow(schema_1, command);
         }
 
         [Fact]
@@ -110,7 +114,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
         {
             var command = new EnableField { FieldId = 1 };
 
-            Assert.Throws<DomainException>(() => GuardSchemaField.CanEnable(schema, command));
+            Assert.Throws<DomainException>(() => GuardSchemaField.CanEnable(schema_0, command));
         }
 
         [Fact]
@@ -118,7 +122,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
         {
             var command = new EnableField { FieldId = 3 };
 
-            Assert.Throws<DomainObjectNotFoundException>(() => GuardSchemaField.CanEnable(schema, command));
+            Assert.Throws<DomainObjectNotFoundException>(() => GuardSchemaField.CanEnable(schema_0, command));
         }
 
         [Fact]
@@ -126,9 +130,9 @@ namespace Squidex.Domain.Apps.Write.Schemas
         {
             var command = new EnableField { FieldId = 1 };
 
-            schema.FieldsById[1].Disable();
+            var schema_1 = schema_0.DisableField(1);
 
-            GuardSchemaField.CanEnable(schema, command);
+            GuardSchemaField.CanEnable(schema_1, command);
         }
 
         [Fact]
@@ -136,9 +140,9 @@ namespace Squidex.Domain.Apps.Write.Schemas
         {
             var command = new LockField { FieldId = 1 };
 
-            schema.FieldsById[1].Lock();
+            var schema_1 = schema_0.LockField(1);
 
-            Assert.Throws<DomainException>(() => GuardSchemaField.CanLock(schema, command));
+            Assert.Throws<DomainException>(() => GuardSchemaField.CanLock(schema_1, command));
         }
 
         [Fact]
@@ -146,7 +150,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
         {
             var command = new LockField { FieldId = 3 };
 
-            Assert.Throws<DomainObjectNotFoundException>(() => GuardSchemaField.CanLock(schema, command));
+            Assert.Throws<DomainObjectNotFoundException>(() => GuardSchemaField.CanLock(schema_0, command));
         }
 
         [Fact]
@@ -154,7 +158,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
         {
             var command = new LockField { FieldId = 1 };
 
-            GuardSchemaField.CanLock(schema, command);
+            GuardSchemaField.CanLock(schema_0, command);
         }
 
         [Fact]
@@ -162,7 +166,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
         {
             var command = new DeleteField { FieldId = 3 };
 
-            Assert.Throws<DomainObjectNotFoundException>(() => GuardSchemaField.CanDelete(schema, command));
+            Assert.Throws<DomainObjectNotFoundException>(() => GuardSchemaField.CanDelete(schema_0, command));
         }
 
         [Fact]
@@ -170,9 +174,9 @@ namespace Squidex.Domain.Apps.Write.Schemas
         {
             var command = new DeleteField { FieldId = 1 };
 
-            schema.FieldsById[1].Lock();
+            var schema_1 = schema_0.LockField(1);
 
-            Assert.Throws<DomainException>(() => GuardSchemaField.CanDelete(schema, command));
+            Assert.Throws<DomainException>(() => GuardSchemaField.CanDelete(schema_1, command));
         }
 
         [Fact]
@@ -180,7 +184,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
         {
             var command = new DeleteField { FieldId = 1 };
 
-            GuardSchemaField.CanDelete(schema, command);
+            GuardSchemaField.CanDelete(schema_0, command);
         }
 
         [Fact]
@@ -188,9 +192,9 @@ namespace Squidex.Domain.Apps.Write.Schemas
         {
             var command = new UpdateField { FieldId = 1, Properties = new StringFieldProperties() };
 
-            schema.FieldsById[1].Lock();
+            var schema_1 = schema_0.LockField(1);
 
-            Assert.Throws<DomainException>(() => GuardSchemaField.CanUpdate(schema, command));
+            Assert.Throws<DomainException>(() => GuardSchemaField.CanUpdate(schema_1, command));
         }
 
         [Fact]
@@ -198,7 +202,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
         {
             var command = new UpdateField { FieldId = 1, Properties = new StringFieldProperties() };
 
-            GuardSchemaField.CanUpdate(schema, command);
+            GuardSchemaField.CanUpdate(schema_0, command);
         }
 
         [Fact]
@@ -206,7 +210,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
         {
             var command = new AddField { Name = "field1", Properties = new StringFieldProperties() };
 
-            Assert.Throws<ValidationException>(() => GuardSchemaField.CanAdd(schema, command));
+            Assert.Throws<ValidationException>(() => GuardSchemaField.CanAdd(schema_0, command));
         }
 
         [Fact]
@@ -214,7 +218,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
         {
             var command = new AddField { Name = "INVALID_NAME", Properties = validProperties };
 
-            Assert.Throws<ValidationException>(() => GuardSchemaField.CanAdd(schema, command));
+            Assert.Throws<ValidationException>(() => GuardSchemaField.CanAdd(schema_0, command));
         }
 
         [Fact]
@@ -222,7 +226,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
         {
             var command = new AddField { Name = "field3", Properties = invalidProperties };
 
-            Assert.Throws<ValidationException>(() => GuardSchemaField.CanAdd(schema, command));
+            Assert.Throws<ValidationException>(() => GuardSchemaField.CanAdd(schema_0, command));
         }
 
         [Fact]
@@ -230,7 +234,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
         {
             var command = new AddField { Name = "field3", Partitioning = "INVALID_PARTITIONING", Properties = validProperties };
 
-            Assert.Throws<ValidationException>(() => GuardSchemaField.CanAdd(schema, command));
+            Assert.Throws<ValidationException>(() => GuardSchemaField.CanAdd(schema_0, command));
         }
 
         [Fact]
@@ -238,7 +242,7 @@ namespace Squidex.Domain.Apps.Write.Schemas
         {
             var command = new AddField { Name = "field3", Properties = new StringFieldProperties() };
 
-            GuardSchemaField.CanAdd(schema, command);
+            GuardSchemaField.CanAdd(schema_0, command);
         }
     }
 }

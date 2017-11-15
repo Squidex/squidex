@@ -13,53 +13,47 @@ namespace Squidex.Domain.Apps.Events.Apps.Utils
 {
     public static class AppEventDispatcher
     {
-        public static void Apply(this AppContributors contributors, AppContributorRemoved @event)
+        public static AppContributors Apply(this AppContributors contributors, AppContributorRemoved @event)
         {
-            contributors.Remove(@event.ContributorId);
+            return contributors.Remove(@event.ContributorId);
         }
 
-        public static void Apply(this AppContributors contributors, AppContributorAssigned @event)
+        public static AppContributors Apply(this AppContributors contributors, AppContributorAssigned @event)
         {
-            contributors.Assign(@event.ContributorId, @event.Permission);
+            return contributors.Assign(@event.ContributorId, @event.Permission);
         }
 
-        public static void Apply(this LanguagesConfig languagesConfig, AppLanguageAdded @event)
+        public static LanguagesConfig Apply(this LanguagesConfig languagesConfig, AppLanguageAdded @event)
         {
-            languagesConfig.Set(new LanguageConfig(@event.Language));
+            return languagesConfig.Set(new LanguageConfig(@event.Language));
         }
 
-        public static void Apply(this LanguagesConfig languagesConfig, AppLanguageRemoved @event)
+        public static LanguagesConfig Apply(this LanguagesConfig languagesConfig, AppLanguageRemoved @event)
         {
-            languagesConfig.Remove(@event.Language);
+            return languagesConfig.Remove(@event.Language);
         }
 
-        public static void Apply(this AppClients clients, AppClientAttached @event)
+        public static AppClients Apply(this AppClients clients, AppClientAttached @event)
         {
-            clients.Add(@event.Id, @event.Secret);
+            return clients.Add(@event.Id, @event.Secret);
         }
 
-        public static void Apply(this AppClients clients, AppClientRevoked @event)
+        public static AppClients Apply(this AppClients clients, AppClientRevoked @event)
         {
-            clients.Revoke(@event.Id);
+            return clients.Revoke(@event.Id);
         }
 
-        public static void Apply(this AppClients clients, AppClientRenamed @event)
+        public static AppClients Apply(this AppClients clients, AppClientRenamed @event)
         {
-            if (clients.TryGetValue(@event.Id, out var client))
-            {
-                client.Rename(@event.Name);
-            }
+            return clients.Rename(@event.Id, @event.Name);
         }
 
-        public static void Apply(this AppClients clients, AppClientUpdated @event)
+        public static AppClients Apply(this AppClients clients, AppClientUpdated @event)
         {
-            if (clients.TryGetValue(@event.Id, out var client))
-            {
-                client.Update(@event.Permission);
-            }
+            return clients.Update(@event.Id, @event.Permission);
         }
 
-        public static void Apply(this LanguagesConfig languagesConfig, AppLanguageUpdated @event)
+        public static LanguagesConfig Apply(this LanguagesConfig languagesConfig, AppLanguageUpdated @event)
         {
             var fallback = @event.Fallback;
 
@@ -70,12 +64,14 @@ namespace Squidex.Domain.Apps.Events.Apps.Utils
                 fallback = fallback.Intersect(existingLangauges).ToList();
             }
 
-            languagesConfig.Set(new LanguageConfig(@event.Language, @event.IsOptional, fallback));
+            languagesConfig = languagesConfig.Set(new LanguageConfig(@event.Language, @event.IsOptional, fallback));
 
             if (@event.IsMaster)
             {
-                languagesConfig.MakeMaster(@event.Language);
+                languagesConfig = languagesConfig.MakeMaster(@event.Language);
             }
+
+            return languagesConfig;
         }
     }
 }

@@ -22,10 +22,9 @@ namespace Squidex.Domain.Apps.Write.Apps
 {
     public class AppDomainObject : DomainObjectBase
     {
-        private static readonly Language DefaultLanguage = Language.EN;
-        private readonly AppContributors contributors = new AppContributors();
-        private readonly AppClients clients = new AppClients();
-        private readonly LanguagesConfig languagesConfig = LanguagesConfig.Build(DefaultLanguage);
+        private AppContributors contributors = AppContributors.Empty;
+        private AppClients clients = AppClients.Empty;
+        private LanguagesConfig languagesConfig = LanguagesConfig.English;
         private AppPlan plan;
         private string name;
 
@@ -66,47 +65,47 @@ namespace Squidex.Domain.Apps.Write.Apps
 
         protected void On(AppContributorAssigned @event)
         {
-            contributors.Apply(@event);
+            contributors = contributors.Apply(@event);
         }
 
         protected void On(AppContributorRemoved @event)
         {
-            contributors.Apply(@event);
+            contributors = contributors.Apply(@event);
         }
 
         protected void On(AppClientAttached @event)
         {
-            clients.Apply(@event);
+            clients = clients.Apply(@event);
         }
 
         protected void On(AppClientUpdated @event)
         {
-            clients.Apply(@event);
+            clients = clients.Apply(@event);
         }
 
         protected void On(AppClientRenamed @event)
         {
-            clients.Apply(@event);
+            clients = clients.Apply(@event);
         }
 
         protected void On(AppClientRevoked @event)
         {
-            clients.Apply(@event);
+            clients = clients.Apply(@event);
         }
 
         protected void On(AppLanguageAdded @event)
         {
-            languagesConfig.Apply(@event);
+            languagesConfig = languagesConfig.Apply(@event);
         }
 
         protected void On(AppLanguageRemoved @event)
         {
-            languagesConfig.Apply(@event);
+            languagesConfig = languagesConfig.Apply(@event);
         }
 
         protected void On(AppLanguageUpdated @event)
         {
-            languagesConfig.Apply(@event);
+            languagesConfig = languagesConfig.Apply(@event);
         }
 
         protected void On(AppPlanChanged @event)
@@ -234,7 +233,7 @@ namespace Squidex.Domain.Apps.Write.Apps
 
         private static AppLanguageAdded CreateInitialLanguage(NamedId<Guid> id)
         {
-            return new AppLanguageAdded { AppId = id, Language = DefaultLanguage };
+            return new AppLanguageAdded { AppId = id, Language = Language.EN };
         }
 
         private static AppContributorAssigned CreateInitialOwner(NamedId<Guid> id, SquidexCommand command)

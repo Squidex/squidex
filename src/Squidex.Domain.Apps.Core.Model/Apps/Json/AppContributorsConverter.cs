@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using Newtonsoft.Json;
 using Squidex.Infrastructure.Json;
 
@@ -31,14 +32,7 @@ namespace Squidex.Domain.Apps.Core.Apps.Json
         {
             var json = serializer.Deserialize<Dictionary<string, AppContributorPermission>>(reader);
 
-            var contributors = new AppContributors();
-
-            foreach (var contributor in json)
-            {
-                contributors.Assign(contributor.Key, contributor.Value);
-            }
-
-            return contributors;
+            return new AppContributors(json.ToImmutableDictionary());
         }
     }
 }

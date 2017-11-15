@@ -20,16 +20,16 @@ namespace Squidex.Controllers.Api.Rules.Models.Converters
             var dto = new RuleDto();
 
             SimpleMapper.Map(entity, dto);
-            SimpleMapper.Map(entity.Rule, dto);
+            SimpleMapper.Map(entity.RuleDef, dto);
 
-            if (entity.Rule.Trigger != null)
+            if (entity.RuleDef.Trigger != null)
             {
-                dto.Trigger = RuleTriggerDtoFactory.Create(entity.Rule.Trigger);
+                dto.Trigger = RuleTriggerDtoFactory.Create(entity.RuleDef.Trigger);
             }
 
-            if (entity.Rule.Action != null)
+            if (entity.RuleDef.Action != null)
             {
-                dto.Action = RuleActionDtoFactory.Create(entity.Rule.Action);
+                dto.Action = RuleActionDtoFactory.Create(entity.RuleDef.Action);
             }
 
             return dto;

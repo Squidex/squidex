@@ -42,18 +42,18 @@ namespace Squidex.Domain.Apps.Core.Apps
             this.permission = permission;
         }
 
-        public void Update(AppClientPermission newPermission)
+        public AppClient Update(AppClientPermission newPermission)
         {
             Guard.Enum(newPermission, nameof(newPermission));
 
-            permission = newPermission;
+            return new AppClient(name, secret, newPermission);
         }
 
-        public void Rename(string newName)
+        public AppClient Rename(string newName)
         {
             Guard.NotNullOrEmpty(newName, nameof(newName));
 
-            name = newName;
+            return new AppClient(newName, secret, permission);
         }
     }
 }

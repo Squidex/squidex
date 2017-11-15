@@ -7,6 +7,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -77,7 +78,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards.FieldProperties
         [Fact]
         public void Should_add_error_if_allowed_values_and_max_value_is_specified()
         {
-            var sut = new NumberFieldProperties { MaxValue = 10, AllowedValues = new[] { 4d } };
+            var sut = new NumberFieldProperties { MaxValue = 10, AllowedValues = ImmutableList.Create(4d) };
 
             var errors = FieldPropertiesValidator.Validate(sut).ToList();
 
@@ -91,7 +92,7 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards.FieldProperties
         [Fact]
         public void Should_add_error_if_allowed_values_and_min_value_is_specified()
         {
-            var sut = new NumberFieldProperties { MinValue = 10, AllowedValues = new[] { 4d } };
+            var sut = new NumberFieldProperties { MinValue = 10, AllowedValues = ImmutableList.Create(4d) };
 
             var errors = FieldPropertiesValidator.Validate(sut).ToList();
 

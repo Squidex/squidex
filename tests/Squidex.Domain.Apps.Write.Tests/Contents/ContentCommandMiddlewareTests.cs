@@ -59,12 +59,12 @@ namespace Squidex.Domain.Apps.Write.Contents
 
         public ContentCommandMiddlewareTests()
         {
-            var schemaDef = new Schema("my-schema");
-
-            schemaDef.AddField(new NumberField(1, "my-field1", Partitioning.Invariant,
-                new NumberFieldProperties { IsRequired = true }));
-            schemaDef.AddField(new NumberField(2, "my-field2", Partitioning.Invariant,
-                new NumberFieldProperties { IsRequired = false }));
+            var schemaDef =
+                new Schema("my-schema")
+                    .AddField(new NumberField(1, "my-field1", Partitioning.Invariant,
+                        new NumberFieldProperties { IsRequired = true }))
+                    .AddField(new NumberField(2, "my-field2", Partitioning.Invariant,
+                        new NumberFieldProperties { IsRequired = false }));
 
             content = new ContentDomainObject(contentId, -1);
 

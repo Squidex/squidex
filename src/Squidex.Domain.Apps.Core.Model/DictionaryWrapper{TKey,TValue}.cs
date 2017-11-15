@@ -8,12 +8,13 @@
 
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 
 namespace Squidex.Domain.Apps.Core
 {
-    public abstract class DictionaryBase<TKey, TValue> : IReadOnlyDictionary<TKey, TValue>
+    public abstract class DictionaryWrapper<TKey, TValue> : IReadOnlyDictionary<TKey, TValue>
     {
-        private readonly Dictionary<TKey, TValue> inner = new Dictionary<TKey, TValue>();
+        private readonly ImmutableDictionary<TKey, TValue> inner;
 
         public TValue this[TKey key]
         {
@@ -35,9 +36,14 @@ namespace Squidex.Domain.Apps.Core
             get { return inner.Count; }
         }
 
-        protected Dictionary<TKey, TValue> Inner
+        protected ImmutableDictionary<TKey, TValue> Inner
         {
             get { return inner; }
+        }
+
+        protected DictionaryWrapper(ImmutableDictionary<TKey, TValue> inner)
+        {
+            this.inner = inner;
         }
 
         public bool ContainsKey(TKey key)

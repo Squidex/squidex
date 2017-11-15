@@ -31,6 +31,13 @@ namespace Squidex.Domain.Apps.Read.State.Orleans.Grains.Implementations
             this.fieldRegistry = fieldRegistry;
         }
 
+        public override Task OnActivateAsync()
+        {
+            State.SetRegistry(fieldRegistry);
+
+            return base.OnActivateAsync();
+        }
+
         public Task<Immutable<(IAppEntity, ISchemaEntity)>> GetAppWithSchemaAsync(Guid id)
         {
             var schema = State.FindSchema(x => x.Id == id && !x.IsDeleted);
@@ -75,7 +82,7 @@ namespace Squidex.Domain.Apps.Read.State.Orleans.Grains.Implementations
 
         public Task HandleAsync(Immutable<Envelope<IEvent>> message)
         {
-            State.Apply(message.Value, fieldRegistry);
+            State.Apply(message.Value);
 
             return WriteStateAsync();
         }

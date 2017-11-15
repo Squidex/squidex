@@ -6,25 +6,38 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System.Collections.Immutable;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Apps
 {
-    public sealed class AppContributors : DictionaryBase<string, AppContributorPermission>
+    public sealed class AppContributors : DictionaryWrapper<string, AppContributorPermission>
     {
-        public void Assign(string contributorId, AppContributorPermission permission)
+        public static readonly AppContributors Empty = new AppContributors();
+
+        private AppContributors()
+            : base(ImmutableDictionary<string, AppContributorPermission>.Empty)
+        {
+        }
+
+        public AppContributors(ImmutableDictionary<string, AppContributorPermission> inner)
+            : base(inner)
+        {
+        }
+
+        public AppContributors Assign(string contributorId, AppContributorPermission permission)
         {
             Guard.NotNullOrEmpty(contributorId, nameof(contributorId));
             Guard.Enum(permission, nameof(permission));
 
-            Inner[contributorId] = permission;
+            return new AppContributors(Inner.SetItem(contributorId, permission));
         }
 
-        public void Remove(string contributorId)
+        public AppContributors Remove(string contributorId)
         {
             Guard.NotNullOrEmpty(contributorId, nameof(contributorId));
 
-            Inner.Remove(contributorId);
+            return new AppContributors(Inner.Remove(contributorId));
         }
     }
 }

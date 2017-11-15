@@ -12,18 +12,20 @@ using Squidex.Domain.Apps.Write.Apps.Commands;
 using Squidex.Infrastructure;
 using Xunit;
 
+#pragma warning disable SA1310 // Field names must not contain underscore
+
 namespace Squidex.Domain.Apps.Write.Apps.Guards
 {
     public class GuardAppLanguagesTests
     {
-        private readonly LanguagesConfig languages = LanguagesConfig.Build(Language.DE);
+        private readonly LanguagesConfig languages_0 = LanguagesConfig.Build(Language.DE);
 
         [Fact]
         public void CanAddLanguage_should_throw_exception_if_language_is_null()
         {
             var command = new AddLanguage();
 
-            Assert.Throws<ValidationException>(() => GuardAppLanguages.CanAdd(languages, command));
+            Assert.Throws<ValidationException>(() => GuardAppLanguages.CanAdd(languages_0, command));
         }
 
         [Fact]
@@ -31,7 +33,7 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
         {
             var command = new AddLanguage { Language = Language.DE };
 
-            Assert.Throws<ValidationException>(() => GuardAppLanguages.CanAdd(languages, command));
+            Assert.Throws<ValidationException>(() => GuardAppLanguages.CanAdd(languages_0, command));
         }
 
         [Fact]
@@ -39,7 +41,7 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
         {
             var command = new AddLanguage { Language = Language.EN };
 
-            GuardAppLanguages.CanAdd(languages, command);
+            GuardAppLanguages.CanAdd(languages_0, command);
         }
 
         [Fact]
@@ -47,7 +49,7 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
         {
             var command = new RemoveLanguage();
 
-            Assert.Throws<ValidationException>(() => GuardAppLanguages.CanRemove(languages, command));
+            Assert.Throws<ValidationException>(() => GuardAppLanguages.CanRemove(languages_0, command));
         }
 
         [Fact]
@@ -55,7 +57,7 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
         {
             var command = new RemoveLanguage { Language = Language.EN };
 
-            Assert.Throws<DomainObjectNotFoundException>(() => GuardAppLanguages.CanRemove(languages, command));
+            Assert.Throws<DomainObjectNotFoundException>(() => GuardAppLanguages.CanRemove(languages_0, command));
         }
 
         [Fact]
@@ -63,7 +65,7 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
         {
             var command = new RemoveLanguage { Language = Language.DE };
 
-            Assert.Throws<ValidationException>(() => GuardAppLanguages.CanRemove(languages, command));
+            Assert.Throws<ValidationException>(() => GuardAppLanguages.CanRemove(languages_0, command));
         }
 
         [Fact]
@@ -71,9 +73,9 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
         {
             var command = new RemoveLanguage { Language = Language.EN };
 
-            languages.Set(new LanguageConfig(Language.EN));
+            var languages_1 = languages_0.Set(new LanguageConfig(Language.EN));
 
-            GuardAppLanguages.CanRemove(languages, command);
+            GuardAppLanguages.CanRemove(languages_1, command);
         }
 
         [Fact]
@@ -81,9 +83,9 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
         {
             var command = new UpdateLanguage();
 
-            languages.Set(new LanguageConfig(Language.EN));
+            var languages_1 = languages_0.Set(new LanguageConfig(Language.EN));
 
-            Assert.Throws<ValidationException>(() => GuardAppLanguages.CanUpdate(languages, command));
+            Assert.Throws<ValidationException>(() => GuardAppLanguages.CanUpdate(languages_1, command));
         }
 
         [Fact]
@@ -91,9 +93,9 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
         {
             var command = new UpdateLanguage { Language = Language.DE, IsOptional = true };
 
-            languages.Set(new LanguageConfig(Language.EN));
+            var languages_1 = languages_0.Set(new LanguageConfig(Language.EN));
 
-            Assert.Throws<ValidationException>(() => GuardAppLanguages.CanUpdate(languages, command));
+            Assert.Throws<ValidationException>(() => GuardAppLanguages.CanUpdate(languages_1, command));
         }
 
         [Fact]
@@ -101,9 +103,9 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
         {
             var command = new UpdateLanguage { Language = Language.DE, Fallback = new List<Language> { Language.IT } };
 
-            languages.Set(new LanguageConfig(Language.EN));
+            var languages_1 = languages_0.Set(new LanguageConfig(Language.EN));
 
-            Assert.Throws<ValidationException>(() => GuardAppLanguages.CanUpdate(languages, command));
+            Assert.Throws<ValidationException>(() => GuardAppLanguages.CanUpdate(languages_1, command));
         }
 
         [Fact]
@@ -111,9 +113,9 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
         {
             var command = new UpdateLanguage { Language = Language.IT };
 
-            languages.Set(new LanguageConfig(Language.EN));
+            var languages_1 = languages_0.Set(new LanguageConfig(Language.EN));
 
-            Assert.Throws<DomainObjectNotFoundException>(() => GuardAppLanguages.CanUpdate(languages, command));
+            Assert.Throws<DomainObjectNotFoundException>(() => GuardAppLanguages.CanUpdate(languages_1, command));
         }
 
         [Fact]
@@ -121,9 +123,9 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
         {
             var command = new UpdateLanguage { Language = Language.DE, Fallback = new List<Language> { Language.EN } };
 
-            languages.Set(new LanguageConfig(Language.EN));
+            var languages_1 = languages_0.Set(new LanguageConfig(Language.EN));
 
-            GuardAppLanguages.CanUpdate(languages, command);
+            GuardAppLanguages.CanUpdate(languages_1, command);
         }
     }
 }

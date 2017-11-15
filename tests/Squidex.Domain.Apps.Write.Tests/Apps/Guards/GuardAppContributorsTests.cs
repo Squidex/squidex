@@ -15,13 +15,15 @@ using Squidex.Infrastructure;
 using Squidex.Shared.Users;
 using Xunit;
 
+#pragma warning disable SA1310 // Field names must not contain underscore
+
 namespace Squidex.Domain.Apps.Write.Apps.Guards
 {
     public class GuardAppContributorsTests
     {
         private readonly IUserResolver users = A.Fake<IUserResolver>();
         private readonly IAppLimitsPlan appPlan = A.Fake<IAppLimitsPlan>();
-        private readonly AppContributors contributors = new AppContributors();
+        private readonly AppContributors contributors_0 = AppContributors.Empty;
 
         public GuardAppContributorsTests()
         {
@@ -37,7 +39,7 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
         {
             var command = new AssignContributor();
 
-            return Assert.ThrowsAsync<ValidationException>(() => GuardAppContributors.CanAssign(contributors, command, users, appPlan));
+            return Assert.ThrowsAsync<ValidationException>(() => GuardAppContributors.CanAssign(contributors_0, command, users, appPlan));
         }
 
         [Fact]
@@ -45,7 +47,7 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
         {
             var command = new AssignContributor { ContributorId = "1", Permission = (AppContributorPermission)10 };
 
-            return Assert.ThrowsAsync<ValidationException>(() => GuardAppContributors.CanAssign(contributors, command, users, appPlan));
+            return Assert.ThrowsAsync<ValidationException>(() => GuardAppContributors.CanAssign(contributors_0, command, users, appPlan));
         }
 
         [Fact]
@@ -53,9 +55,9 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
         {
             var command = new AssignContributor { ContributorId = "1" };
 
-            contributors.Assign("1", AppContributorPermission.Owner);
+            var contributors_1 = contributors_0.Assign("1", AppContributorPermission.Owner);
 
-            return Assert.ThrowsAsync<ValidationException>(() => GuardAppContributors.CanAssign(contributors, command, users, appPlan));
+            return Assert.ThrowsAsync<ValidationException>(() => GuardAppContributors.CanAssign(contributors_1, command, users, appPlan));
         }
 
         [Fact]
@@ -66,7 +68,7 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
 
             var command = new AssignContributor { ContributorId = "1", Permission = (AppContributorPermission)10 };
 
-            return Assert.ThrowsAsync<ValidationException>(() => GuardAppContributors.CanAssign(contributors, command, users, appPlan));
+            return Assert.ThrowsAsync<ValidationException>(() => GuardAppContributors.CanAssign(contributors_0, command, users, appPlan));
         }
 
         [Fact]
@@ -77,10 +79,10 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
 
             var command = new AssignContributor { ContributorId = "3" };
 
-            contributors.Assign("1", AppContributorPermission.Owner);
-            contributors.Assign("2", AppContributorPermission.Editor);
+            var contributors_1 = contributors_0.Assign("1", AppContributorPermission.Owner);
+            var contributors_2 = contributors_1.Assign("2", AppContributorPermission.Editor);
 
-            return Assert.ThrowsAsync<ValidationException>(() => GuardAppContributors.CanAssign(contributors, command, users, appPlan));
+            return Assert.ThrowsAsync<ValidationException>(() => GuardAppContributors.CanAssign(contributors_2, command, users, appPlan));
         }
 
         [Fact]
@@ -88,7 +90,7 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
         {
             var command = new AssignContributor { ContributorId = "1" };
 
-            return GuardAppContributors.CanAssign(contributors, command, users, appPlan);
+            return GuardAppContributors.CanAssign(contributors_0, command, users, appPlan);
         }
 
         [Fact]
@@ -96,9 +98,9 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
         {
             var command = new AssignContributor { ContributorId = "1" };
 
-            contributors.Assign("1", AppContributorPermission.Editor);
+            var contributors_1 = contributors_0.Assign("1", AppContributorPermission.Editor);
 
-            return GuardAppContributors.CanAssign(contributors, command, users, appPlan);
+            return GuardAppContributors.CanAssign(contributors_1, command, users, appPlan);
         }
 
         [Fact]
@@ -109,10 +111,10 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
 
             var command = new AssignContributor { ContributorId = "1" };
 
-            contributors.Assign("1", AppContributorPermission.Editor);
-            contributors.Assign("2", AppContributorPermission.Editor);
+            var contributors_1 = contributors_0.Assign("1", AppContributorPermission.Editor);
+            var contributors_2 = contributors_1.Assign("2", AppContributorPermission.Editor);
 
-            return GuardAppContributors.CanAssign(contributors, command, users, appPlan);
+            return GuardAppContributors.CanAssign(contributors_2, command, users, appPlan);
         }
 
         [Fact]
@@ -120,7 +122,7 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
         {
             var command = new RemoveContributor();
 
-            Assert.Throws<ValidationException>(() => GuardAppContributors.CanRemove(contributors, command));
+            Assert.Throws<ValidationException>(() => GuardAppContributors.CanRemove(contributors_0, command));
         }
 
         [Fact]
@@ -128,7 +130,7 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
         {
             var command = new RemoveContributor { ContributorId = "1" };
 
-            Assert.Throws<DomainObjectNotFoundException>(() => GuardAppContributors.CanRemove(contributors, command));
+            Assert.Throws<DomainObjectNotFoundException>(() => GuardAppContributors.CanRemove(contributors_0, command));
         }
 
         [Fact]
@@ -136,10 +138,10 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
         {
             var command = new RemoveContributor { ContributorId = "1" };
 
-            contributors.Assign("1", AppContributorPermission.Owner);
-            contributors.Assign("2", AppContributorPermission.Editor);
+            var contributors_1 = contributors_0.Assign("1", AppContributorPermission.Owner);
+            var contributors_2 = contributors_1.Assign("2", AppContributorPermission.Editor);
 
-            Assert.Throws<ValidationException>(() => GuardAppContributors.CanRemove(contributors, command));
+            Assert.Throws<ValidationException>(() => GuardAppContributors.CanRemove(contributors_2, command));
         }
 
         [Fact]
@@ -147,10 +149,10 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
         {
             var command = new RemoveContributor { ContributorId = "1" };
 
-            contributors.Assign("1", AppContributorPermission.Owner);
-            contributors.Assign("2", AppContributorPermission.Owner);
+            var contributors_1 = contributors_0.Assign("1", AppContributorPermission.Owner);
+            var contributors_2 = contributors_1.Assign("2", AppContributorPermission.Owner);
 
-            GuardAppContributors.CanRemove(contributors, command);
+            GuardAppContributors.CanRemove(contributors_2, command);
         }
     }
 }

@@ -17,45 +17,18 @@ namespace Squidex.Infrastructure.Json.Orleans
 {
     public class JsonExternalSerializerTests
     {
-        /*
-        class Context : ISerializationContext
-        {
-            public IBinaryTokenStreamWriter StreamWriter => throw new NotImplementedException();
-
-            public int CurrentOffset => throw new NotImplementedException();
-
-            public IServiceProvider ServiceProvider => throw new NotImplementedException();
-
-            public object AdditionalContext => throw new NotImplementedException();
-
-            public int CheckObjectWhileSerializing(object raw)
-            {
-                return 0;
-            }
-
-            public void RecordObject(object original, int offset)
-            {
-            }
-
-            public void SerializeInner(object obj, Type expected)
-            {
-            }
-        }*/
-
         private readonly JsonExternalSerializer sut = new JsonExternalSerializer(JsonSerializer.CreateDefault());
-
-        public JsonExternalSerializerTests()
-        {
-        }
 
         [Fact]
         public void Should_serialize_js_only()
         {
-            Assert.True(sut.IsSupportedType(typeof(J<int>)));
-            Assert.True(sut.IsSupportedType(typeof(J<List<int>>)));
+            var serializer = new JsonExternalSerializer(JsonSerializer.CreateDefault(), typeof(int), typeof(bool));
 
-            Assert.False(sut.IsSupportedType(typeof(int)));
-            Assert.False(sut.IsSupportedType(typeof(List<int>)));
+            Assert.True(sut.IsSupportedType(typeof(int)));
+            Assert.True(sut.IsSupportedType(typeof(bool)));
+
+            Assert.False(sut.IsSupportedType(typeof(float)));
+            Assert.False(sut.IsSupportedType(typeof(double)));
         }
 
         [Fact]
@@ -68,37 +41,19 @@ namespace Squidex.Infrastructure.Json.Orleans
         }
 
         [Fact]
-        public void Should_copy_null_json()
-        {
-            var value = new J<List<int>>(null);
-            var copy = (J<List<int>>)sut.DeepCopy(value, null);
-
-            Assert.Null(copy.Value);
-        }
-
-        [Fact]
-        public void Should_not_copy_immutable_values()
-        {
-            var value = new J<List<int>>(new List<int> { 1, 2, 3 }, true);
-            var copy = (J<List<int>>)sut.DeepCopy(value, null);
-
-            Assert.Same(value.Value, copy.Value);
-        }
-
-        [Fact]
         public void Should_copy_non_immutable_values()
         {
-            var value = new J<List<int>>(new List<int> { 1, 2, 3 });
-            var copy = (J<List<int>>)sut.DeepCopy(value, null);
+            var value = new List<int> { 1, 2, 3 };
+            var copy = (List<int>)sut.DeepCopy(value, null);
 
-            Assert.Equal(value.Value, copy.Value);
-            Assert.NotSame(value.Value, copy.Value);
+            Assert.Equal(value, copy);
+            Assert.NotSame(value, copy);
         }
 
         [Fact]
         public void Should_serialize_and_deserialize_value()
         {
-            var value = new J<List<int>>(new List<int> { 1, 2, 3 });
+            var value = new List<int>(new List<int> { 1, 2, 3 });
 
             var writtenLength = 0;
             var writtenBuffer = (byte[])null;
@@ -123,10 +78,10 @@ namespace Squidex.Infrastructure.Json.Orleans
             A.CallTo(() => reader.ReadBytes(writtenLength))
                 .Returns(writtenBuffer);
 
-            var copy = (J<List<int>>)sut.Deserialize(value.GetType(), readerContext);
+            var copy = (List<int>)sut.Deserialize(value.GetType(), readerContext);
 
-            Assert.Equal(value.Value, copy.Value);
-            Assert.NotSame(value.Value, copy.Value);
+            Assert.Equal(value, copy);
+            Assert.NotSame(value, copy);
         }
     }
 }

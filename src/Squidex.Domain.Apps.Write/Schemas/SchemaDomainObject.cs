@@ -56,62 +56,62 @@ namespace Squidex.Domain.Apps.Write.Schemas
         {
             totalFields++;
 
-            schema.Apply(@event, registry);
+            schema = schema.Apply(@event, registry);
         }
 
         protected void On(FieldUpdated @event)
         {
-            schema.Apply(@event);
+            schema = schema.Apply(@event);
         }
 
         protected void On(FieldLocked @event)
         {
-            schema.Apply(@event);
+            schema = schema.Apply(@event);
         }
 
         protected void On(FieldHidden @event)
         {
-            schema.Apply(@event);
+            schema = schema.Apply(@event);
         }
 
         protected void On(FieldShown @event)
         {
-            schema.Apply(@event);
+            schema = schema.Apply(@event);
         }
 
         protected void On(FieldDisabled @event)
         {
-            schema.Apply(@event);
+            schema = schema.Apply(@event);
         }
 
         protected void On(FieldEnabled @event)
         {
-            schema.Apply(@event);
+            schema = schema.Apply(@event);
         }
 
         protected void On(SchemaUpdated @event)
         {
-            schema.Apply(@event);
+            schema = schema.Apply(@event);
         }
 
         protected void On(FieldDeleted @event)
         {
-            schema.Apply(@event);
+            schema = schema.Apply(@event);
         }
 
         protected void On(SchemaFieldsReordered @event)
         {
-            schema.Apply(@event);
+            schema = schema.Apply(@event);
         }
 
         protected void On(SchemaPublished @event)
         {
-            schema.Apply(@event);
+            schema = schema.Apply(@event);
         }
 
         protected void On(SchemaUnpublished @event)
         {
-            schema.Apply(@event);
+            schema = schema.Apply(@event);
         }
 
         protected void On(SchemaDeleted @event)

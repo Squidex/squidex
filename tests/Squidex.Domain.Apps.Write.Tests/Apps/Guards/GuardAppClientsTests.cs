@@ -11,18 +11,20 @@ using Squidex.Domain.Apps.Write.Apps.Commands;
 using Squidex.Infrastructure;
 using Xunit;
 
+#pragma warning disable SA1310 // Field names must not contain underscore
+
 namespace Squidex.Domain.Apps.Write.Apps.Guards
 {
     public class GuardAppClientsTests
     {
-        private readonly AppClients clients = new AppClients();
+        private readonly AppClients clients_0 = AppClients.Empty;
 
         [Fact]
         public void CanAttach_should_throw_execption_if_client_id_is_null()
         {
             var command = new AttachClient();
 
-            Assert.Throws<ValidationException>(() => GuardAppClients.CanAttach(clients, command));
+            Assert.Throws<ValidationException>(() => GuardAppClients.CanAttach(clients_0, command));
         }
 
         [Fact]
@@ -30,9 +32,9 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
         {
             var command = new AttachClient { Id = "android" };
 
-            clients.Add("android", "secret");
+            var clients_1 = clients_0.Add("android", "secret");
 
-            Assert.Throws<ValidationException>(() => GuardAppClients.CanAttach(clients, command));
+            Assert.Throws<ValidationException>(() => GuardAppClients.CanAttach(clients_1, command));
         }
 
         [Fact]
@@ -40,9 +42,9 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
         {
             var command = new AttachClient { Id = "ios" };
 
-            clients.Add("android", "secret");
+            var clients_1 = clients_0.Add("android", "secret");
 
-            GuardAppClients.CanAttach(clients, command);
+            GuardAppClients.CanAttach(clients_1, command);
         }
 
         [Fact]
@@ -50,7 +52,7 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
         {
             var command = new RevokeClient();
 
-            Assert.Throws<ValidationException>(() => GuardAppClients.CanRevoke(clients, command));
+            Assert.Throws<ValidationException>(() => GuardAppClients.CanRevoke(clients_0, command));
         }
 
         [Fact]
@@ -58,7 +60,7 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
         {
             var command = new RevokeClient { Id = "ios" };
 
-            Assert.Throws<DomainObjectNotFoundException>(() => GuardAppClients.CanRevoke(clients, command));
+            Assert.Throws<DomainObjectNotFoundException>(() => GuardAppClients.CanRevoke(clients_0, command));
         }
 
         [Fact]
@@ -66,9 +68,9 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
         {
             var command = new RevokeClient { Id = "ios" };
 
-            clients.Add("ios", "secret");
+            var clients_1 = clients_0.Add("ios", "secret");
 
-            GuardAppClients.CanRevoke(clients, command);
+            GuardAppClients.CanRevoke(clients_1, command);
         }
 
         [Fact]
@@ -76,7 +78,7 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
         {
             var command = new UpdateClient();
 
-            Assert.Throws<ValidationException>(() => GuardAppClients.CanUpdate(clients, command));
+            Assert.Throws<ValidationException>(() => GuardAppClients.CanUpdate(clients_0, command));
         }
 
         [Fact]
@@ -84,7 +86,7 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
         {
             var command = new UpdateClient { Id = "ios", Name = "iOS" };
 
-            Assert.Throws<DomainObjectNotFoundException>(() => GuardAppClients.CanUpdate(clients, command));
+            Assert.Throws<DomainObjectNotFoundException>(() => GuardAppClients.CanUpdate(clients_0, command));
         }
 
         [Fact]
@@ -92,9 +94,9 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
         {
             var command = new UpdateClient { Id = "ios" };
 
-            clients.Add("ios", "secret");
+            var clients_1 = clients_0.Add("ios", "secret");
 
-            Assert.Throws<ValidationException>(() => GuardAppClients.CanUpdate(clients, command));
+            Assert.Throws<ValidationException>(() => GuardAppClients.CanUpdate(clients_1, command));
         }
 
         [Fact]
@@ -102,9 +104,9 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
         {
             var command = new UpdateClient { Id = "ios", Permission = (AppClientPermission)10 };
 
-            clients.Add("ios", "secret");
+            var clients_1 = clients_0.Add("ios", "secret");
 
-            Assert.Throws<ValidationException>(() => GuardAppClients.CanUpdate(clients, command));
+            Assert.Throws<ValidationException>(() => GuardAppClients.CanUpdate(clients_1, command));
         }
 
         [Fact]
@@ -112,9 +114,9 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
         {
             var command = new UpdateClient { Id = "ios", Name = "ios" };
 
-            clients.Add("ios", "secret");
+            var clients_1 = clients_0.Add("ios", "secret");
 
-            Assert.Throws<ValidationException>(() => GuardAppClients.CanUpdate(clients, command));
+            Assert.Throws<ValidationException>(() => GuardAppClients.CanUpdate(clients_1, command));
         }
 
         [Fact]
@@ -122,9 +124,9 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
         {
             var command = new UpdateClient { Id = "ios", Permission = AppClientPermission.Editor };
 
-            clients.Add("ios", "secret");
+            var clients_1 = clients_0.Add("ios", "secret");
 
-            Assert.Throws<ValidationException>(() => GuardAppClients.CanUpdate(clients, command));
+            Assert.Throws<ValidationException>(() => GuardAppClients.CanUpdate(clients_1, command));
         }
 
         [Fact]
@@ -132,9 +134,9 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
         {
             var command = new UpdateClient { Id = "ios", Name = "iOS", Permission = AppClientPermission.Reader };
 
-            clients.Add("ios", "secret");
+            var clients_1 = clients_0.Add("ios", "secret");
 
-            GuardAppClients.CanUpdate(clients, command);
+            GuardAppClients.CanUpdate(clients_1, command);
         }
     }
 }

@@ -14,7 +14,10 @@ using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Domain.Apps.Read.MongoDb.History
 {
-    public sealed class MongoHistoryEventEntity : MongoEntity, IAppRefEntity, IEntityWithCreatedBy
+    public sealed class MongoHistoryEventEntity : MongoEntity,
+        IEntityWithAppRef,
+        IUpdateableEntityWithVersion,
+        IUpdateableEntityWithCreatedBy
     {
         [BsonRequired]
         [BsonElement]
@@ -40,7 +43,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.History
         [BsonElement]
         public Dictionary<string, string> Parameters { get; set; }
 
-        RefToken IEntityWithCreatedBy.CreatedBy
+        RefToken IUpdateableEntityWithCreatedBy.CreatedBy
         {
             get
             {

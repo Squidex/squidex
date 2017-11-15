@@ -7,7 +7,7 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
@@ -30,10 +30,9 @@ namespace Squidex.Domain.Apps.Write.Rules.Guards.Triggers
 
             var trigger = new ContentChangedTrigger
             {
-                Schemas = new List<ContentChangedTriggerSchema>
-                {
+                Schemas = ImmutableList.Create(
                     new ContentChangedTriggerSchema()
-                }
+                )
             };
 
             var errors = await RuleTriggerValidator.ValidateAsync(appName, trigger, appProvider);
@@ -56,7 +55,7 @@ namespace Squidex.Domain.Apps.Write.Rules.Guards.Triggers
         {
             var trigger = new ContentChangedTrigger
             {
-                Schemas = new List<ContentChangedTriggerSchema>()
+                Schemas = ImmutableList<ContentChangedTriggerSchema>.Empty
             };
 
             var errors = await RuleTriggerValidator.ValidateAsync(appName, trigger, appProvider);
@@ -72,10 +71,9 @@ namespace Squidex.Domain.Apps.Write.Rules.Guards.Triggers
 
             var trigger = new ContentChangedTrigger
             {
-                Schemas = new List<ContentChangedTriggerSchema>
-                {
+                Schemas = ImmutableList.Create(
                     new ContentChangedTriggerSchema()
-                }
+                )
             };
 
             var errors = await RuleTriggerValidator.ValidateAsync(appName, trigger, appProvider);

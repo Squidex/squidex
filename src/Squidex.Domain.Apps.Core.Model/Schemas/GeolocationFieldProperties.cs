@@ -6,8 +6,6 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System.Collections.Generic;
-using Newtonsoft.Json.Linq;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Schemas

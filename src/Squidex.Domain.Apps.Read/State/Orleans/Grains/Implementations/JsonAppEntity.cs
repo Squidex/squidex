@@ -29,10 +29,10 @@ namespace Squidex.Domain.Apps.Read.State.Orleans.Grains.Implementations
         public string PlanOwner { get; set; }
 
         [JsonProperty]
-        public AppClients Clients { get; set; }
+        public AppClients Clients { get; set; } = AppClients.Empty;
 
         [JsonProperty]
-        public AppContributors Contributors { get; set; }
+        public AppContributors Contributors { get; set; } = AppContributors.Empty;
 
         [JsonProperty]
         public LanguagesConfig LanguagesConfig { get; set; }

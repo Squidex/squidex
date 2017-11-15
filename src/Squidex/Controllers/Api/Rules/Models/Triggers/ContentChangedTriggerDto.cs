@@ -7,6 +7,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using NJsonSchema.Annotations;
@@ -29,7 +30,7 @@ namespace Squidex.Controllers.Api.Rules.Models.Triggers
         {
             return new ContentChangedTrigger
             {
-                Schemas = Schemas.Select(x => SimpleMapper.Map(x, new ContentChangedTriggerSchema())).ToList()
+                Schemas = Schemas.Select(x => SimpleMapper.Map(x, new ContentChangedTriggerSchema())).ToImmutableList()
             };
         }
     }
