@@ -54,7 +54,7 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
 
         public Schema ToSchema(FieldRegistry fieldRegistry)
         {
-            var schema = new Schema(Name);
+            var fields = new List<Field>();
 
             if (Fields != null)
             {
@@ -66,34 +66,24 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
 
                     if (fieldModel.IsDisabled)
                     {
-                        field.Disable();
+                        field = field.Disable();
                     }
 
                     if (fieldModel.IsLocked)
                     {
-                        field.Lock();
+                        field = field.Lock();
                     }
 
                     if (fieldModel.IsHidden)
                     {
-                        field.Hide();
+                        field = field.Hide();
                     }
 
-                    schema.AddField(field);
+                    fields.Add(field);
                 }
             }
 
-            if (IsPublished)
-            {
-                schema.Publish();
-            }
-
-            if (Properties != null)
-            {
-                schema.Update(Properties);
-            }
-
-            return schema;
+            return new Schema(Name, fields, Properties, IsPublished);
         }
     }
 }

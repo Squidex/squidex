@@ -7,6 +7,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Newtonsoft.Json.Linq;
@@ -73,7 +74,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_add_errors_if_string_not_allowed()
         {
-            var sut = new StringField(1, "my-string", Partitioning.Invariant, new StringFieldProperties { AllowedValues = new[] { "Foo" } });
+            var sut = new StringField(1, "my-string", Partitioning.Invariant, new StringFieldProperties { AllowedValues = ImmutableList.Create("Foo") });
 
             await sut.ValidateAsync(CreateValue("Bar"), errors);
 

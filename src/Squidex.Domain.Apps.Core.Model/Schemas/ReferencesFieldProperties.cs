@@ -7,6 +7,8 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Schemas
@@ -14,11 +16,51 @@ namespace Squidex.Domain.Apps.Core.Schemas
     [TypeName(nameof(ReferencesField))]
     public sealed class ReferencesFieldProperties : FieldProperties
     {
-        public int? MinItems { get; set; }
+        private int? minItems;
+        private int? maxItems;
+        private Guid schemaId;
 
-        public int? MaxItems { get; set; }
+        public int? MinItems
+        {
+            get
+            {
+                return minItems;
+            }
+            set
+            {
+                ThrowIfFrozen();
 
-        public Guid SchemaId { get; set; }
+                minItems = value;
+            }
+        }
+
+        public int? MaxItems
+        {
+            get
+            {
+                return maxItems;
+            }
+            set
+            {
+                ThrowIfFrozen();
+
+                maxItems = value;
+            }
+        }
+
+        public Guid SchemaId
+        {
+            get
+            {
+                return schemaId;
+            }
+            set
+            {
+                ThrowIfFrozen();
+
+                schemaId = value;
+            }
+        }
 
         public override T Accept<T>(IFieldPropertiesVisitor<T> visitor)
         {

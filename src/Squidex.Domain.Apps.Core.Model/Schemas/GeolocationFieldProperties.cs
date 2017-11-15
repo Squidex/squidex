@@ -6,6 +6,8 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Schemas
@@ -13,7 +15,21 @@ namespace Squidex.Domain.Apps.Core.Schemas
     [TypeName(nameof(GeolocationField))]
     public sealed class GeolocationFieldProperties : FieldProperties
     {
-        public GeolocationFieldEditor Editor { get; set; }
+        private GeolocationFieldEditor editor;
+
+        public GeolocationFieldEditor Editor
+        {
+            get
+            {
+                return editor;
+            }
+            set
+            {
+                ThrowIfFrozen();
+
+                editor = value;
+            }
+        }
 
         public override T Accept<T>(IFieldPropertiesVisitor<T> visitor)
         {

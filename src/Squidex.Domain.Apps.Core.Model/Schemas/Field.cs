@@ -6,11 +6,12 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System.Diagnostics.Contracts;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    public abstract class Field
+    public abstract class Field : Cloneable<Field>
     {
         private readonly long fieldId;
         private readonly Partitioning partitioning;
@@ -63,32 +64,52 @@ namespace Squidex.Domain.Apps.Core.Schemas
             this.partitioning = partitioning;
         }
 
-        public void Lock()
+        [Pure]
+        public Field Lock()
         {
-            isLocked = true;
+            return Clone<Field>(clone =>
+            {
+                clone.isLocked = true;
+            });
         }
 
-        public void Hide()
+        [Pure]
+        public Field Hide()
         {
-            isHidden = true;
+            return Clone(clone =>
+            {
+                clone.isHidden = true;
+            });
         }
 
-        public void Show()
+        [Pure]
+        public Field Show()
         {
-            isHidden = false;
+            return Clone(clone =>
+            {
+                clone.isHidden = false;
+            });
         }
 
-        public void Disable()
+        [Pure]
+        public Field Disable()
         {
-            isDisabled = true;
+            return Clone(clone =>
+            {
+                clone.isDisabled = true;
+            });
         }
 
-        public void Enable()
+        [Pure]
+        public Field Enable()
         {
-            isDisabled = false;
+            return Clone(clone =>
+            {
+                clone.isDisabled = false;
+            });
         }
 
-        public abstract void Update(FieldProperties newProperties);
+        public abstract Field Update(FieldProperties newProperties);
 
         public abstract T Accept<T>(IFieldVisitor<T> visitor);
     }

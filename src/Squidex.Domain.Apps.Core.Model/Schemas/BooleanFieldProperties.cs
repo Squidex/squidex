@@ -6,6 +6,8 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Schemas
@@ -13,9 +15,36 @@ namespace Squidex.Domain.Apps.Core.Schemas
     [TypeName(nameof(BooleanField))]
     public sealed class BooleanFieldProperties : FieldProperties
     {
-        public bool? DefaultValue { get; set; }
+        private BooleanFieldEditor editor;
+        private bool? defaultValue;
 
-        public BooleanFieldEditor Editor { get; set; }
+        public bool? DefaultValue
+        {
+            get
+            {
+                return defaultValue;
+            }
+            set
+            {
+                ThrowIfFrozen();
+
+                defaultValue = value;
+            }
+        }
+
+        public BooleanFieldEditor Editor
+        {
+            get
+            {
+                return editor;
+            }
+            set
+            {
+                ThrowIfFrozen();
+
+                editor = value;
+            }
+        }
 
         public override T Accept<T>(IFieldPropertiesVisitor<T> visitor)
         {

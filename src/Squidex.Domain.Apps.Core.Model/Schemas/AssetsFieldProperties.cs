@@ -6,6 +6,8 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Schemas
@@ -13,9 +15,36 @@ namespace Squidex.Domain.Apps.Core.Schemas
     [TypeName(nameof(AssetsField))]
     public sealed class AssetsFieldProperties : FieldProperties
     {
-        public int? MinItems { get; set; }
+        private int? minItems;
+        private int? maxItems;
 
-        public int? MaxItems { get; set; }
+        public int? MinItems
+        {
+            get
+            {
+                return minItems;
+            }
+            set
+            {
+                ThrowIfFrozen();
+
+                minItems = value;
+            }
+        }
+
+        public int? MaxItems
+        {
+            get
+            {
+                return maxItems;
+            }
+            set
+            {
+                ThrowIfFrozen();
+
+                maxItems = value;
+            }
+        }
 
         public override T Accept<T>(IFieldPropertiesVisitor<T> visitor)
         {
