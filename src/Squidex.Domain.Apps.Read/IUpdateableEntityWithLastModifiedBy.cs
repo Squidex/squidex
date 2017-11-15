@@ -1,17 +1,17 @@
 ﻿// ==========================================================================
-//  IRuleEntity.cs
+//  IUpdateableEntityWithLastModifiedBy.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Core.Rules;
+using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Read.Rules
+namespace Squidex.Domain.Apps.Read
 {
-    public interface IRuleEntity : IEntityWithAppRef, IEntityWithCreatedBy, IEntityWithLastModifiedBy, IEntityWithVersion
+    public interface IUpdateableEntityWithLastModifiedBy
     {
-        Rule RuleDef { get; }
+        RefToken LastModifiedBy { get; set; }
     }
 }

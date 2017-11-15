@@ -10,13 +10,13 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Orleans;
+using Orleans.Concurrency;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Read.Apps;
 using Squidex.Domain.Apps.Read.Rules;
 using Squidex.Domain.Apps.Read.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
-using Squidex.Infrastructure.Json.Orleans;
 
 namespace Squidex.Domain.Apps.Read.State.Orleans.Grains.Implementations
 {
@@ -31,51 +31,51 @@ namespace Squidex.Domain.Apps.Read.State.Orleans.Grains.Implementations
             this.fieldRegistry = fieldRegistry;
         }
 
-        public Task<J<(IAppEntity, ISchemaEntity)>> GetAppWithSchemaAsync(Guid id)
+        public Task<Immutable<(IAppEntity, ISchemaEntity)>> GetAppWithSchemaAsync(Guid id)
         {
             var schema = State.FindSchema(x => x.Id == id && !x.IsDeleted);
 
-            return J<(IAppEntity AppEntity, ISchemaEntity SchemaEntity)>.AsTask((State.GetApp(), schema));
+            return Task.FromResult((State.GetApp(), schema).AsImmutable());
         }
 
-        public Task<J<IAppEntity>> GetAppAsync()
+        public Task<Immutable<IAppEntity>> GetAppAsync()
         {
             var value = State.GetApp();
 
-            return J<IAppEntity>.AsTask(value);
+            return Task.FromResult(value.AsImmutable());
         }
 
-        public Task<J<List<IRuleEntity>>> GetRulesAsync()
+        public Task<Immutable<List<IRuleEntity>>> GetRulesAsync()
         {
             var value = State.FindRules();
 
-            return J<List<IRuleEntity>>.AsTask(value);
+            return Task.FromResult(value.AsImmutable());
         }
 
-        public Task<J<List<ISchemaEntity>>> GetSchemasAsync()
+        public Task<Immutable<List<ISchemaEntity>>> GetSchemasAsync()
         {
             var value = State.FindSchemas(x => !x.IsDeleted);
 
-            return J<List<ISchemaEntity>>.AsTask(value);
+            return Task.FromResult(value.AsImmutable());
         }
 
-        public Task<J<ISchemaEntity>> GetSchemaAsync(Guid id, bool provideDeleted = false)
+        public Task<Immutable<ISchemaEntity>> GetSchemaAsync(Guid id, bool provideDeleted = false)
         {
             var value = State.FindSchema(x => x.Id == id && (!x.IsDeleted || provideDeleted));
 
-            return J<ISchemaEntity>.AsTask(value);
+            return Task.FromResult(value.AsImmutable());
         }
 
-        public Task<J<ISchemaEntity>> GetSchemaAsync(string name, bool provideDeleted = false)
+        public Task<Immutable<ISchemaEntity>> GetSchemaAsync(string name, bool provideDeleted = false)
         {
             var value = State.FindSchema(x => string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase) && (!x.IsDeleted || provideDeleted));
 
-            return J<ISchemaEntity>.AsTask(value);
+            return Task.FromResult(value.AsImmutable());
         }
 
-        public Task HandleAsync(J<Envelope<IEvent>> message)
+        public Task HandleAsync(Immutable<Envelope<IEvent>> message)
         {
-            State.Apply(message, fieldRegistry);
+            State.Apply(message.Value, fieldRegistry);
 
             return WriteStateAsync();
         }

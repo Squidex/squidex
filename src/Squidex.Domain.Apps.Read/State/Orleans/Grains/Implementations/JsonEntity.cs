@@ -9,10 +9,13 @@
 using System;
 using Newtonsoft.Json;
 using NodaTime;
+using Orleans.Concurrency;
+using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Read.State.Orleans.Grains.Implementations
 {
-    public abstract class JsonEntity
+    [Immutable]
+    public abstract class JsonEntity<T> : Cloneable<T>, IUpdateableEntityWithVersion where T : Cloneable
     {
         [JsonProperty]
         public Guid Id { get; set; }
@@ -25,5 +28,10 @@ namespace Squidex.Domain.Apps.Read.State.Orleans.Grains.Implementations
 
         [JsonProperty]
         public long Version { get; set; }
+
+        public T Clone()
+        {
+            return Clone(x => { });
+        }
     }
 }

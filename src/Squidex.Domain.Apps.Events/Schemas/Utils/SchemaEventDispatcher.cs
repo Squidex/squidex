@@ -9,7 +9,6 @@
 using System;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Events.Schemas.Utils
 {
@@ -61,7 +60,7 @@ namespace Squidex.Domain.Apps.Events.Schemas.Utils
             return schema;
         }
 
-        public static void Apply(this Schema schema, FieldAdded @event, FieldRegistry registry)
+        public static Schema Apply(this Schema schema, FieldAdded @event, FieldRegistry registry)
         {
             var partitioning =
                 string.Equals(@event.Partitioning, Partitioning.Language.Key, StringComparison.OrdinalIgnoreCase) ?
@@ -71,86 +70,65 @@ namespace Squidex.Domain.Apps.Events.Schemas.Utils
             var fieldId = @event.FieldId.Id;
             var field = registry.CreateField(fieldId, @event.Name, partitioning, @event.Properties);
 
-            schema.DeleteField(fieldId);
-            schema.AddField(field);
+            schema = schema.DeleteField(fieldId);
+            schema = schema.AddField(field);
+
+            return schema;
         }
 
-        public static void Apply(this Schema schema, FieldUpdated @event)
+        public static Schema Apply(this Schema schema, FieldUpdated @event)
         {
-            if (schema.FieldsById.TryGetValue(@event.FieldId.Id, out var field))
-            {
-                field.Update(@event.Properties);
-            }
+            return schema.UpdateField(@event.FieldId.Id, @event.Properties);
         }
 
-        public static void Apply(this Schema schema, FieldLocked @event)
+        public static Schema Apply(this Schema schema, FieldLocked @event)
         {
-            if (schema.FieldsById.TryGetValue(@event.FieldId.Id, out var field))
-            {
-                field.Lock();
-            }
+            return schema.LockField(@event.FieldId.Id);
         }
 
-        public static void Apply(this Schema schema, FieldHidden @event)
+        public static Schema Apply(this Schema schema, FieldHidden @event)
         {
-            if (schema.FieldsById.TryGetValue(@event.FieldId.Id, out var field))
-            {
-                field.Hide();
-            }
+            return schema.HideField(@event.FieldId.Id);
         }
 
-        public static void Apply(this Schema schema, FieldShown @event)
+        public static Schema Apply(this Schema schema, FieldShown @event)
         {
-            if (schema.FieldsById.TryGetValue(@event.FieldId.Id, out var field))
-            {
-                field.Show();
-            }
+            return schema.ShowField(@event.FieldId.Id);
         }
 
-        public static void Apply(this Schema schema, FieldDisabled @event)
+        public static Schema Apply(this Schema schema, FieldDisabled @event)
         {
-            if (schema.FieldsById.TryGetValue(@event.FieldId.Id, out var field))
-            {
-                field.Disable();
-            }
+            return schema.DisableField(@event.FieldId.Id);
         }
 
-        public static void Apply(this Schema schema, FieldEnabled @event)
+        public static Schema Apply(this Schema schema, FieldEnabled @event)
         {
-            if (schema.FieldsById.TryGetValue(@event.FieldId.Id, out var field))
-            {
-                field.Enable();
-            }
+            return schema.EnableField(@event.FieldId.Id);
         }
 
-        public static void Apply(this Schema schema, SchemaUpdated @event)
+        public static Schema Apply(this Schema schema, SchemaUpdated @event)
         {
-            schema.Update(@event.Properties);
+            return schema.Update(@event.Properties);
         }
 
-        public static void Apply(this Schema schema, SchemaFieldsReordered @event)
+        public static Schema Apply(this Schema schema, SchemaFieldsReordered @event)
         {
-            schema.ReorderFields(@event.FieldIds);
+            return schema.ReorderFields(@event.FieldIds);
         }
 
-        public static void Apply(this Schema schema, FieldDeleted @event)
+        public static Schema Apply(this Schema schema, FieldDeleted @event)
         {
-            schema.DeleteField(@event.FieldId.Id);
+            return schema.DeleteField(@event.FieldId.Id);
         }
 
-        public static void Apply(this Schema schema, SchemaPublished @event)
+        public static Schema Apply(this Schema schema, SchemaPublished @event)
         {
-            schema.Publish();
+            return schema.Publish();
         }
 
-        public static void Apply(this Schema schema, SchemaUnpublished @event)
+        public static Schema Apply(this Schema schema, SchemaUnpublished @event)
         {
-            schema.Unpublish();
-        }
-
-        public static void Apply(this Schema schema, ScriptsConfigured @event)
-        {
-            SimpleMapper.Map(@event, schema);
+            return schema.Unpublish();
         }
     }
 }

@@ -8,7 +8,7 @@
 
 namespace Squidex.Domain.Apps.Read.Assets
 {
-    public interface IAssetEntity : IAppRefEntity, IEntityWithCreatedBy, IEntityWithLastModifiedBy, IEntityWithVersion
+    public interface IAssetEntity : IEntityWithAppRef, IEntityWithCreatedBy, IEntityWithLastModifiedBy, IEntityWithVersion
     {
         string MimeType { get; }
 

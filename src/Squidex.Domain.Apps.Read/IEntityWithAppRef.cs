@@ -1,17 +1,17 @@
 ﻿// ==========================================================================
-//  IJsonValue.cs
+//  IEntityWithAppRef.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.Json.Orleans
-{
-    public interface IJsonValue
-    {
-        object Value { get; }
+using System;
 
-        bool IsImmutable { get; }
+namespace Squidex.Domain.Apps.Read
+{
+    public interface IEntityWithAppRef : IEntity
+    {
+        Guid AppId { get; }
     }
 }

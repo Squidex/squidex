@@ -57,7 +57,7 @@ namespace Squidex.Domain.Apps.Read
 
         private static void SetVersion(EnvelopeHeaders headers, IEntity entity)
         {
-            if (entity is IEntityWithVersion withVersion)
+            if (entity is IUpdateableEntityWithVersion withVersion)
             {
                 withVersion.Version = headers.EventStreamNumber();
             }
@@ -65,7 +65,7 @@ namespace Squidex.Domain.Apps.Read
 
         private static void SetCreatedBy(SquidexEvent @event, IEntity entity)
         {
-            if (entity is IEntityWithCreatedBy withCreatedBy)
+            if (entity is IUpdateableEntityWithCreatedBy withCreatedBy)
             {
                 withCreatedBy.CreatedBy = @event.Actor;
             }
@@ -73,7 +73,7 @@ namespace Squidex.Domain.Apps.Read
 
         private static void SetLastModifiedBy(SquidexEvent @event, IEntity entity)
         {
-            if (entity is IEntityWithLastModifiedBy withModifiedBy)
+            if (entity is IUpdateableEntityWithLastModifiedBy withModifiedBy)
             {
                 withModifiedBy.LastModifiedBy = @event.Actor;
             }
@@ -81,7 +81,7 @@ namespace Squidex.Domain.Apps.Read
 
         private static void SetAppId(SquidexEvent @event, IEntity entity)
         {
-            if (entity is IAppRefEntity app && @event is AppEvent appEvent)
+            if (entity is IUpdateableEntityWithAppRef app && @event is AppEvent appEvent)
             {
                 app.AppId = appEvent.AppId.Id;
             }

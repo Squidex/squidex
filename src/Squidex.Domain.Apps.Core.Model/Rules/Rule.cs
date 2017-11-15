@@ -11,7 +11,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Rules
 {
-    public sealed class Rule
+    public sealed class Rule : Cloneable<Rule>
     {
         private RuleTrigger trigger;
         private RuleAction action;
@@ -41,17 +41,23 @@ namespace Squidex.Domain.Apps.Core.Rules
             this.action = action;
         }
 
-        public void Enable()
+        public Rule Enable()
         {
-            this.isEnabled = true;
+            return Clone(clone =>
+            {
+                clone.isEnabled = true;
+            });
         }
 
-        public void Disable()
+        public Rule Disable()
         {
-            this.isEnabled = false;
+            return Clone(clone =>
+            {
+                clone.isEnabled = false;
+            });
         }
 
-        public void Update(RuleTrigger newTrigger)
+        public Rule Update(RuleTrigger newTrigger)
         {
             Guard.NotNull(newTrigger, nameof(newTrigger));
 
@@ -60,10 +66,13 @@ namespace Squidex.Domain.Apps.Core.Rules
                 throw new ArgumentException("New trigger has another type.", nameof(newTrigger));
             }
 
-            trigger = newTrigger;
+            return Clone(clone =>
+            {
+                clone.trigger = newTrigger;
+            });
         }
 
-        public void Update(RuleAction newAction)
+        public Rule Update(RuleAction newAction)
         {
             Guard.NotNull(newAction, nameof(newAction));
 
@@ -72,7 +81,10 @@ namespace Squidex.Domain.Apps.Core.Rules
                 throw new ArgumentException("New action has another type.", nameof(newAction));
             }
 
-            action = newAction;
+            return Clone(clone =>
+            {
+                clone.action = newAction;
+            });
         }
     }
 }

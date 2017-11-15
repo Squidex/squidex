@@ -1,17 +1,15 @@
 ﻿// ==========================================================================
-//  IRuleEntity.cs
+//  IUpdateableEntityWithVersion.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Core.Rules;
-
-namespace Squidex.Domain.Apps.Read.Rules
+namespace Squidex.Domain.Apps.Read
 {
-    public interface IRuleEntity : IEntityWithAppRef, IEntityWithCreatedBy, IEntityWithLastModifiedBy, IEntityWithVersion
+    public interface IUpdateableEntityWithVersion
     {
-        Rule RuleDef { get; }
+        long Version { get; set; }
     }
 }

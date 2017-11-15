@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  IAppRefEntity.cs
+//  IUpdateableEntityWithAppRef.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -10,7 +10,7 @@ using System;
 
 namespace Squidex.Domain.Apps.Read
 {
-    public interface IAppRefEntity : IEntity
+    public interface IUpdateableEntityWithAppRef
     {
         Guid AppId { get; set; }
     }

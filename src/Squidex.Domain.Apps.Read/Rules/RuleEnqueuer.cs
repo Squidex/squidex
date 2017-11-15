@@ -60,7 +60,7 @@ namespace Squidex.Domain.Apps.Read.Rules
 
                 foreach (var ruleEntity in rules)
                 {
-                    var job = ruleService.CreateJob(ruleEntity.Rule, @event);
+                    var job = ruleService.CreateJob(ruleEntity.RuleDef, @event);
 
                     if (job != null)
                     {

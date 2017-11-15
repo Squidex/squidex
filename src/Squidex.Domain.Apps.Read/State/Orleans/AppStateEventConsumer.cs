@@ -8,6 +8,7 @@
 
 using System.Threading.Tasks;
 using Orleans;
+using Orleans.Concurrency;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Domain.Apps.Read.State.Orleans.Grains;
@@ -49,7 +50,7 @@ namespace Squidex.Domain.Apps.Read.State.Orleans
             {
                 var appGrain = factory.GetGrain<IAppStateGrain>(appEvent.AppId.Name);
 
-                await appGrain.HandleAsync(@event);
+                await appGrain.HandleAsync(new Immutable<Envelope<IEvent>>(@event));
             }
 
             if (@event.Payload is AppContributorAssigned contributorAssigned)

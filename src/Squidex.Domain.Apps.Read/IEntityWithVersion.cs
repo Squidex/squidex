@@ -10,6 +10,6 @@ namespace Squidex.Domain.Apps.Read
 {
     public interface IEntityWithVersion
     {
-        long Version { get; set; }
+        long Version { get; }
     }
 }

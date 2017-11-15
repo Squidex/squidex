@@ -163,21 +163,21 @@ namespace Squidex.Domain.Apps.Read.State.Orleans.Grains.Implementations
                 case RuleCreated @event:
                     Rules[@event.RuleId] = EntityMapper.Create<JsonRuleEntity>(@event, envelope.Headers, r =>
                     {
-                        r.Rule = RuleEventDispatcher.Create(@event);
+                        r.RuleDef = RuleEventDispatcher.Create(@event);
                     });
                     break;
 
                 case RuleUpdated @event:
                     UpdateRule(envelope, r =>
                     {
-                        r.Rule.Apply(@event);
+                        r.RuleDef = r.RuleDef.Apply(@event);
                     });
                     break;
 
                 case RuleEnabled @event:
                     UpdateRule(envelope, r =>
                     {
-                        r.Rule.Apply(@event);
+                        r.RuleDef = r.RuleDef.Apply(@event);
                     });
                     break;
 
@@ -197,84 +197,84 @@ namespace Squidex.Domain.Apps.Read.State.Orleans.Grains.Implementations
                 case FieldAdded @event:
                     UpdateSchema(envelope, s =>
                     {
-                        s.SchemaDef.Apply(@event, registry);
+                        s.SchemaDef = s.SchemaDef.Apply(@event, registry);
                     });
                     break;
 
                 case FieldDeleted @event:
                     UpdateSchema(envelope, s =>
                     {
-                        s.SchemaDef.Apply(@event);
+                        s.SchemaDef = s.SchemaDef.Apply(@event);
                     });
                     break;
 
                 case FieldLocked @event:
                     UpdateSchema(envelope, s =>
                     {
-                        s.SchemaDef.Apply(@event);
+                        s.SchemaDef = s.SchemaDef.Apply(@event);
                     });
                     break;
 
                 case FieldHidden @event:
                     UpdateSchema(envelope, s =>
                     {
-                        s.SchemaDef.Apply(@event);
+                        s.SchemaDef = s.SchemaDef.Apply(@event);
                     });
                     break;
 
                 case FieldShown @event:
                     UpdateSchema(envelope, s =>
                     {
-                        s.SchemaDef.Apply(@event);
+                        s.SchemaDef = s.SchemaDef.Apply(@event);
                     });
                     break;
 
                 case FieldDisabled @event:
                     UpdateSchema(envelope, s =>
                     {
-                        s.SchemaDef.Apply(@event);
+                        s.SchemaDef = s.SchemaDef.Apply(@event);
                     });
                     break;
 
                 case FieldEnabled @event:
                     UpdateSchema(envelope, s =>
                     {
-                        s.SchemaDef.Apply(@event);
+                        s.SchemaDef = s.SchemaDef.Apply(@event);
                     });
                     break;
 
                 case FieldUpdated @event:
                     UpdateSchema(envelope, s =>
                     {
-                        s.SchemaDef.Apply(@event);
+                        s.SchemaDef = s.SchemaDef.Apply(@event);
                     });
                     break;
 
                 case SchemaFieldsReordered @event:
                     UpdateSchema(envelope, s =>
                     {
-                        s.SchemaDef.Apply(@event);
+                        s.SchemaDef = s.SchemaDef.Apply(@event);
                     });
                     break;
 
                 case SchemaUpdated @event:
                     UpdateSchema(envelope, s =>
                     {
-                        s.SchemaDef.Apply(@event);
+                        s.SchemaDef = s.SchemaDef.Apply(@event);
                     });
                     break;
 
                 case SchemaPublished @event:
                     UpdateSchema(envelope, s =>
                     {
-                        s.SchemaDef.Apply(@event);
+                        s.SchemaDef = s.SchemaDef.Apply(@event);
                     });
                     break;
 
                 case ScriptsConfigured @event:
                     UpdateSchema(envelope, s =>
                     {
-                        s.SchemaDef.Apply(@event);
+                        SimpleMapper.Map(s, @event);
                     });
                     break;
 
@@ -308,14 +308,14 @@ namespace Squidex.Domain.Apps.Read.State.Orleans.Grains.Implementations
         {
             var e = envelope.To<RuleEvent>();
 
-            Rules[e.Payload.RuleId].Update(e.Payload, e.Headers, updater);
+            Rules[e.Payload.RuleId].Clone().Update(e.Payload, e.Headers, updater);
         }
 
         private void UpdateSchema(Envelope<IEvent> envelope, Action<JsonSchemaEntity> updater = null)
         {
             var e = envelope.To<SchemaEvent>();
 
-            Schemas[e.Payload.SchemaId.Id].Copy().Update(e.Payload, e.Headers, updater);
+            Schemas[e.Payload.SchemaId.Id].Clone().Update(e.Payload, e.Headers, updater);
         }
     }
 }
