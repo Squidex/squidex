@@ -76,6 +76,9 @@ namespace Squidex.Domain.Apps.Read.Contents
             schemaDef.AddField(new GeolocationField(10, "my-geolocation", Partitioning.Invariant,
                 new GeolocationFieldProperties()));
 
+            schemaDef.AddField(new TagsField(11, "my-tags", Partitioning.Invariant,
+                new TagsFieldProperties()));
+
             A.CallTo(() => app.Id).Returns(appId);
             A.CallTo(() => app.PartitionResolver).Returns(x => InvariantPartitioning.Instance);
 
@@ -270,6 +273,9 @@ namespace Squidex.Domain.Apps.Read.Contents
                       myGeolocation {
                         iv
                       }
+                      myTags {
+                        iv
+                      }
                     }
                   }
                 }";
@@ -330,6 +336,14 @@ namespace Squidex.Domain.Apps.Read.Contents
                                         latitude = 10,
                                         longitude = 20
                                     }
+                                },
+                                myTags = new
+                                {
+                                    iv = new[]
+                                    {
+                                        "tag1",
+                                        "tag2"
+                                    }
                                 }
                             }
                         }
@@ -373,6 +387,9 @@ namespace Squidex.Domain.Apps.Read.Contents
                         iv
                       }}
                       myGeolocation {{
+                        iv
+                      }}
+                      myTags {{
                         iv
                       }}
                     }}
@@ -428,6 +445,14 @@ namespace Squidex.Domain.Apps.Read.Contents
                                 {
                                     latitude = 10,
                                     longitude = 20
+                                }
+                            },
+                            myTags = new
+                            {
+                                iv = new[]
+                                {
+                                    "tag1",
+                                    "tag2"
                                 }
                             }
                         }
@@ -629,6 +654,8 @@ namespace Squidex.Domain.Apps.Read.Contents
                         new ContentFieldData().AddValue("iv", true))
                     .AddField("my-datetime",
                         new ContentFieldData().AddValue("iv", now.ToDateTimeUtc()))
+                    .AddField("my-tags",
+                        new ContentFieldData().AddValue("iv", JToken.FromObject(new[] { "tag1", "tag2" })))
                     .AddField("my-references",
                         new ContentFieldData().AddValue("iv", JToken.FromObject(new[] { refId })))
                     .AddField("my-geolocation",

@@ -72,6 +72,10 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
                     field => ResolveDefault("Json")
                 },
                 {
+                    typeof(TagsField),
+                    field => ResolveDefault("String")
+                },
+                {
                     typeof(GeolocationField),
                     field => ResolveDefault("Geolocation")
                 },
