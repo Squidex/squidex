@@ -17,16 +17,52 @@ namespace Squidex.Infrastructure.Tasks
         private readonly ActionBlock<Func<Task>> block;
         private bool isStopped;
 
-        public SingleThreadedDispatcher(int capacity = 10)
+        public SingleThreadedDispatcher(int capacity = 1, TaskScheduler scheduler = null)
         {
             var options = new ExecutionDataflowBlockOptions
             {
+                BoundedCapacity = capacity,
                 MaxMessagesPerTask = -1,
                 MaxDegreeOfParallelism = 1,
-                BoundedCapacity = capacity
+                TaskScheduler = scheduler ?? TaskScheduler.Default
             };
 
             block = new ActionBlock<Func<Task>>(Handle, options);
+        }
+
+        public Task DispatchAndUnwrapAsync(Func<Task> action)
+        {
+            Guard.NotNull(action, nameof(action));
+
+            var cts = new TaskCompletionSource<bool>();
+
+            block.SendAsync(async () =>
+            {
+                try
+                {
+                    await action();
+
+                    cts.SetResult(true);
+                }
+                catch (Exception ex)
+                {
+                    cts.TrySetException(ex);
+                }
+            });
+
+            return cts.Task;
+        }
+
+        public Task DispatchAndUnwrapAsync(Action action)
+        {
+            Guard.NotNull(action, nameof(action));
+
+            return DispatchAndUnwrapAsync(() =>
+            {
+                action();
+
+                return TaskHelper.Done;
+            });
         }
 
         public Task DispatchAsync(Func<Task> action)

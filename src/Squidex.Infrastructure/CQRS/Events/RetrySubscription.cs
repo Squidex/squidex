@@ -15,8 +15,8 @@ namespace Squidex.Infrastructure.CQRS.Events
 {
     public sealed class RetrySubscription : IEventSubscription, IEventSubscriber
     {
-        private readonly SingleThreadedDispatcher dispatcher = new SingleThreadedDispatcher();
-        private readonly CancellationTokenSource disposeCts = new CancellationTokenSource();
+        private readonly SingleThreadedDispatcher dispatcher = new SingleThreadedDispatcher(10);
+        private readonly CancellationTokenSource timerCts = new CancellationTokenSource();
         private readonly RetryWindow retryWindow = new RetryWindow(TimeSpan.FromMinutes(5), 5);
         private readonly IEventStore eventStore;
         private readonly IEventSubscriber eventSubscriber;
@@ -43,7 +43,10 @@ namespace Squidex.Infrastructure.CQRS.Events
 
         private void Subscribe()
         {
-            currentSubscription = eventStore.CreateSubscription(this, streamFilter, position);
+            if (currentSubscription == null)
+            {
+                currentSubscription = eventStore.CreateSubscription(this, streamFilter, position);
+            }
         }
 
         private void Unsubscribe()
@@ -80,7 +83,7 @@ namespace Squidex.Infrastructure.CQRS.Events
 
                 if (retryWindow.CanRetryAfterFailure())
                 {
-                    Task.Delay(ReconnectWaitMs, disposeCts.Token).ContinueWith(t =>
+                    Task.Delay(ReconnectWaitMs, timerCts.Token).ContinueWith(t =>
                     {
                         dispatcher.DispatchAsync(() => Subscribe());
                     }).Forget();
@@ -112,7 +115,7 @@ namespace Squidex.Infrastructure.CQRS.Events
             await dispatcher.DispatchAsync(() => Unsubscribe());
             await dispatcher.StopAndWaitAsync();
 
-            disposeCts.Cancel();
+            timerCts.Cancel();
         }
     }
 }

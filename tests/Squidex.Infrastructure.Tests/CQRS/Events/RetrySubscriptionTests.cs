@@ -26,20 +26,22 @@ namespace Squidex.Infrastructure.CQRS.Events
         {
             A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(eventSubscription);
 
-            sut = new RetrySubscription(eventStore, eventSubscriber, streamFilter, null) { ReconnectWaitMs = 0 };
+            sut = new RetrySubscription(eventStore, eventSubscriber, streamFilter, null) { ReconnectWaitMs = 100 };
 
             sutSubscriber = sut;
         }
 
         [Fact]
-        public void Should_subscribe_after_constructor()
+        public async Task Should_subscribe_after_constructor()
         {
+            await sut.StopAsync();
+
             A.CallTo(() => eventStore.CreateSubscription(sut, streamFilter, null))
                 .MustHaveHappened();
         }
 
         [Fact]
-        public async Task Should_reopen_subscription_when_exception_is_retrieved()
+        public async Task Should_reopen_subscription_once_when_exception_is_retrieved()
         {
             await OnErrorAsync(eventSubscription, new InvalidOperationException());
 

@@ -26,7 +26,7 @@ namespace Squidex.Infrastructure.CQRS.Events.Orleans.Grains.Implementation
         private readonly ISemanticLog log;
         private IEventSubscription currentSubscription;
         private IEventConsumer eventConsumer;
-        private TaskFactory dispatcher;
+        private SingleThreadedDispatcher dispatcher;
 
         public EventConsumerGrain(
             EventDataFormatter eventFormatter,
@@ -62,21 +62,29 @@ namespace Squidex.Infrastructure.CQRS.Events.Orleans.Grains.Implementation
 
         public override Task OnActivateAsync()
         {
-            eventConsumer = eventConsumerFactory(this.GetPrimaryKeyString());
+            dispatcher = new SingleThreadedDispatcher(1, TaskScheduler.Current);
 
-            dispatcher = new TaskFactory(TaskScheduler.Current);
+            eventConsumer = eventConsumerFactory(this.GetPrimaryKeyString());
 
             return TaskHelper.Done;
         }
 
+        public override Task OnDeactivateAsync()
+        {
+            return dispatcher.StopAndWaitAsync();
+        }
+
         public Task ActivateAsync()
         {
-            if (!State.IsStopped)
+            return dispatcher.DispatchAndUnwrapAsync(() =>
             {
-                Subscribe(State.Position);
-            }
+                if (!State.IsStopped)
+                {
+                    Subscribe(State.Position);
+                }
 
-            return TaskHelper.Done;
+                return TaskHelper.Done;
+            });
         }
 
         private Task HandleEventAsync(IEventSubscription subscription, StoredEvent storedEvent)
@@ -129,61 +137,70 @@ namespace Squidex.Infrastructure.CQRS.Events.Orleans.Grains.Implementation
 
         public Task StartAsync()
         {
-            if (!State.IsStopped)
+            return dispatcher.DispatchAndUnwrapAsync(() =>
             {
-                return TaskHelper.Done;
-            }
+                if (!State.IsStopped)
+                {
+                    return TaskHelper.Done;
+                }
 
-            return DoAndUpdateStateAsync(() =>
-            {
-                Subscribe(State.Position);
+                return DoAndUpdateStateAsync(() =>
+                {
+                    Subscribe(State.Position);
 
-                State = State.Started();
+                    State = State.Started();
+                });
             });
         }
 
         public Task StopAsync()
         {
-            if (State.IsStopped)
+            return dispatcher.DispatchAndUnwrapAsync(() =>
             {
-                return TaskHelper.Done;
-            }
+                if (State.IsStopped)
+                {
+                    return TaskHelper.Done;
+                }
 
-            return DoAndUpdateStateAsync(() =>
-            {
-                Unsubscribe();
+                return DoAndUpdateStateAsync(() =>
+                {
+                    Unsubscribe();
 
-                State = State.Stopped();
+                    State = State.Stopped();
+                });
             });
         }
 
         public Task ResetAsync()
         {
-            return DoAndUpdateStateAsync(async () =>
+            return dispatcher.DispatchAndUnwrapAsync(() =>
             {
-                Unsubscribe();
+                return DoAndUpdateStateAsync(async () =>
+                {
+                    Unsubscribe();
 
-                await ClearAsync();
+                    await ClearAsync();
 
-                Subscribe(null);
+                    Subscribe(null);
 
-                State = EventConsumerGrainState.Initial();
+                    State = EventConsumerGrainState.Initial();
+                });
             });
         }
 
         Task IEventSubscriber.OnEventAsync(IEventSubscription subscription, StoredEvent storedEvent)
         {
-            return dispatcher.StartNew(() => HandleEventAsync(subscription, storedEvent)).Unwrap();
+            return dispatcher.DispatchAndUnwrapAsync(() => HandleEventAsync(subscription, storedEvent));
         }
 
         Task IEventSubscriber.OnErrorAsync(IEventSubscription subscription, Exception exception)
         {
-            return dispatcher.StartNew(() => HandleErrorAsync(subscription, exception)).Unwrap();
+            return dispatcher.DispatchAndUnwrapAsync(() => HandleErrorAsync(subscription, exception));
         }
 
         Task IEventSubscriber.OnClosedAsync(IEventSubscription subscription)
         {
-            return dispatcher.StartNew(() => HandleClosedAsync(subscription)).Unwrap();
+            return dispatcher.DispatchAndUnwrapAsync(() => HandleClosedAsync(subscription));
         }
 
         public Task<Immutable<EventConsumerInfo>> GetStateAsync()
