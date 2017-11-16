@@ -106,16 +106,7 @@ export class LanguagesPageComponent implements OnInit {
 
         this.appLanguages =
             new AppLanguagesDto(
-                appLanguages.languages.map(l => {
-                    const isMaster = masterId ? l.iso2Code === masterId : l.isMaster;
-
-                    return new AppLanguageDto(
-                        l.iso2Code,
-                        l.englishName, isMaster,
-                        l.isOptional,
-                        l.fallback.filter(f => !!appLanguages.languages.find(l2 => l2.iso2Code === f))
-                    );
-                }).sort((a, b) => {
+                appLanguages.languages.sort((a, b) => {
                     if (a.isMaster === b.isMaster) {
                         return a.iso2Code.localeCompare(b.iso2Code);
                     } else {

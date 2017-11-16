@@ -6,7 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System.Collections.Generic;
+using System;
 using Newtonsoft.Json;
 using Squidex.Infrastructure.Json;
 
@@ -16,30 +16,16 @@ namespace Squidex.Domain.Apps.Core.Apps.Json
     {
         protected override void WriteValue(JsonWriter writer, LanguagesConfig value, JsonSerializer serializer)
         {
-            var json = new Dictionary<string, JsonLanguageConfig>(value.Count);
-
-            foreach (LanguageConfig config in value)
-            {
-                json.Add(config.Language, new JsonLanguageConfig(config));
-            }
+            var json = new JsonLanguagesConfig(value);
 
             serializer.Serialize(writer, json);
         }
 
         protected override LanguagesConfig ReadValue(JsonReader reader, JsonSerializer serializer)
         {
-            var json = serializer.Deserialize<Dictionary<string, JsonLanguageConfig>>(reader);
+            var json = serializer.Deserialize<JsonLanguagesConfig>(reader);
 
-            var languagesConfig = new LanguageConfig[json.Count];
-
-            var i = 0;
-
-            foreach (var config in json)
-            {
-                languagesConfig[i++] = config.Value.ToConfig(config.Key);
-            }
-
-            return LanguagesConfig.Build(languagesConfig);
+            return json.ToConfig();
         }
     }
 }

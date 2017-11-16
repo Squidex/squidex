@@ -6,6 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System.Linq;
 using FluentAssertions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -27,9 +28,13 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
                 new LanguageConfig(Language.DE, true, Language.EN),
                 new LanguageConfig(Language.IT, false, Language.DE));
 
+            sut.MakeMaster(Language.IT);
+
             var serialized = JToken.FromObject(sut, serializer).ToObject<LanguagesConfig>(serializer);
 
             serialized.ShouldBeEquivalentTo(sut);
+
+            Assert.Same(serialized.FirstOrDefault(x => x.Key == "it"), serialized.Master);
         }
     }
 }

@@ -20,34 +20,56 @@ import {
 } from './../';
 
 describe('AppLanguageDto', () => {
-    const language1 = new AppLanguageDto('de', 'English', false, false, []);
-    const language2 = new AppLanguageDto('en', 'English', false, false, []);
-    const language2_new = new AppLanguageDto('en', 'English (United States)', false, false, []);
     const version = new Version('1');
     const newVersion = new Version('2');
 
     it('should update languages when adding language', () => {
-        const languages_1 = new AppLanguagesDto([language1], version);
-        const languages_2 = languages_1.addLanguage(language2, newVersion);
+        const language1_1 = new AppLanguageDto('de', 'English', true, false, []);
+        const language2_1 = new AppLanguageDto('it', 'Italien', false, false, []);
 
-        expect(languages_2.languages).toEqual([language1, language2]);
+        const languages_1 = new AppLanguagesDto([language1_1], version);
+        const languages_2 = languages_1.addLanguage(language2_1, newVersion);
+
+        expect(languages_2.languages).toEqual([language1_1, language2_1]);
         expect(languages_2.version).toEqual(newVersion);
     });
 
     it('should update languages when removing language', () => {
-        const languages_1 = new AppLanguagesDto([language1, language2], version);
-        const languages_2 = languages_1.removeLanguage(language1, newVersion);
+        const language1_1 = new AppLanguageDto('de', 'English', true, false, ['it']);
+        const language1_2 = new AppLanguageDto('de', 'English', true, false, []);
+        const language2_1 = new AppLanguageDto('it', 'Italien', false, false, []);
 
-        expect(languages_2.languages).toEqual([language2]);
+        const languages_1 = new AppLanguagesDto([language1_1, language2_1], version);
+        const languages_2 = languages_1.removeLanguage(language2_1, newVersion);
+
+        expect(languages_2.languages).toEqual([language1_2]);
         expect(languages_2.version).toEqual(newVersion);
     });
 
     it('should update languages when updating language', () => {
-        const languages_1 = new AppLanguagesDto([language1, language2], version);
-        const languages_2 = languages_1.updateLanguage(language2_new, newVersion);
+        const language1_1 = new AppLanguageDto('de', 'English', true, false, ['it']);
+        const language2_1 = new AppLanguageDto('it', 'Italien', false, false, []);
+        const language2_2 = new AppLanguageDto('it', 'Italien', false, false, ['de']);
 
-        expect(languages_2.languages).toEqual([language1, language2_new]);
+        const languages_1 = new AppLanguagesDto([language1_1, language2_1], version);
+        const languages_2 = languages_1.updateLanguage(language2_2, newVersion);
+
+        expect(languages_2.languages).toEqual([language1_1, language2_2]);
         expect(languages_2.version).toEqual(newVersion);
+    });
+
+    it('should update master language when updating language', () => {
+        const language1_1 = new AppLanguageDto('de', 'English', true, false, ['it']);
+        const language1_2 = new AppLanguageDto('de', 'English', false, false, ['it']);
+        const language2_1 = new AppLanguageDto('it', 'Italien', false, false, []);
+        const language2_2 = new AppLanguageDto('it', 'Italien', true, false, ['de']);
+
+        const languages_1 = new AppLanguagesDto([language1_1, language2_1], version);
+        const languages_2 = languages_1.updateLanguage(language2_2, newVersion);
+
+        expect(languages_2.languages).toEqual([language1_2, language2_2]);
+        expect(languages_2.version).toEqual(newVersion);
+        expect(languages_2.languages[0].isMaster).toBeFalsy();
     });
 });
 
