@@ -22,9 +22,9 @@ namespace Squidex.Config.Domain
         {
             var consumeEvents = config.GetOptionalValue("eventStore:consume", false);
 
-            if (!consumeEvents)
+            if (consumeEvents)
             {
-                return;
+				services.AddTransient<EventConsumerActor>();
             }
 
             config.ConfigureByOption("eventStore:type", new Options
@@ -57,8 +57,6 @@ namespace Squidex.Config.Domain
                         .As<IEventStore>();
                 }
             });
-
-            services.AddTransient<EventConsumerActor>();
         }
     }
 }
