@@ -31,7 +31,6 @@
       true,
       "spaces"
     ],
-    "invoke-injectable": true,
     "label-position": true,
     "max-line-length": [
       true,
@@ -99,11 +98,10 @@
     ],
     "radix": true,
     "semicolon": [
+      true,
       "always"
     ],
     "templates-no-negated-async": true,
-    "templates-use-public": true,
-    "template-to-ng-template": true,
     "trailing-comma": [
       true,
       {

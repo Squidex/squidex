@@ -9,41 +9,38 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Orleans;
 using Orleans.Concurrency;
 using Orleans.Runtime;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Domain.Apps.Read.Apps;
 using Squidex.Domain.Apps.Read.Rules;
 using Squidex.Domain.Apps.Read.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure.Orleans;
 
 namespace Squidex.Domain.Apps.Read.State.Orleans.Grains.Implementations
 {
-    public sealed class AppStateGrain : Grain<AppStateGrainState>, IAppStateGrain
+    public sealed class AppStateGrain : GrainV2<AppStateGrainState>, IAppStateGrain
     {
         private readonly FieldRegistry fieldRegistry;
         private Exception exception;
 
-        public AppStateGrain(FieldRegistry fieldRegistry)
+        public AppStateGrain(FieldRegistry fieldRegistry, IGrainRuntime runtime)
+            : base(runtime)
         {
             Guard.NotNull(fieldRegistry, nameof(fieldRegistry));
+            Guard.NotNull(runtime, nameof(runtime));
 
             this.fieldRegistry = fieldRegistry;
         }
 
-        public override void Participate(IGrainLifecycle lifecycle)
-        {
-            lifecycle.Subscribe(GrainLifecycleStage.Activate, ct => OnActivateAsync(), ct => OnDeactivateAsync());
-            lifecycle.Subscribe(GrainLifecycleStage.SetupState, ct => LoadStateAsync());
-        }
-
-        private async Task LoadStateAsync()
+        protected override async Task ReadStateAsync()
         {
             try
             {
-                await this.ReadStateAsync();
+                await base.ReadStateAsync();
             }
             catch (Exception ex)
             {
@@ -104,6 +101,18 @@ namespace Squidex.Domain.Apps.Read.State.Orleans.Grains.Implementations
 
         public Task HandleAsync(Immutable<Envelope<IEvent>> message)
         {
+            if (exception != null)
+            {
+                if (message.Value.Payload is AppCreated)
+                {
+                    exception = null;
+                }
+                else
+                {
+                    throw exception;
+                }
+            }
+
             State.Apply(message.Value);
 
             return WriteStateAsync();

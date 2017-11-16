@@ -54,7 +54,7 @@ namespace Squidex.Domain.Apps.Read.State.Orleans.Grains.Implementations
 
         private void UpdateRule(RuleEvent @event, EnvelopeHeaders headers, Action<JsonRuleEntity> updater = null)
         {
-            Rules[@event.RuleId].Clone().Update(@event, headers, updater);
+            Rules[@event.RuleId] = Rules[@event.RuleId].Clone().Update(@event, headers, updater);
         }
     }
 }

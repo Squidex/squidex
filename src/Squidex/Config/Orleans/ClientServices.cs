@@ -35,7 +35,7 @@ namespace Squidex.Config.Orleans
                     .AddApplicationPartsFromReferences(typeof(XmlRepositoryGrain).Assembly)
                     .UseStaticGatewayListProvider(options =>
                     {
-                        options.Gateways.Add(new Uri("gwy.tcp://localhost:40000/0"));
+                        options.Gateways.Add(new Uri("gwy.tcp://127.0.0.1:40000/0"));
                     })
                     .Build();
 

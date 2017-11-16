@@ -29,9 +29,9 @@ namespace Squidex.Infrastructure.CQRS.Events.Orleans.Grains.Implementation
             return new EventConsumerGrainState { Position = position };
         }
 
-        public static EventConsumerGrainState Failed(Exception ex)
+        public EventConsumerGrainState Failed(Exception ex)
         {
-            return new EventConsumerGrainState { IsStopped = true, Error = ex?.ToString() };
+            return new EventConsumerGrainState { Position = Position, IsStopped = true, Error = ex?.ToString() };
         }
 
         public EventConsumerGrainState Stopped()

@@ -13,11 +13,12 @@ using Orleans.Concurrency;
 using Orleans.Core;
 using Orleans.Runtime;
 using Squidex.Infrastructure.Log;
+using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.CQRS.Events.Orleans.Grains.Implementation
 {
-    public class EventConsumerGrain : Grain<EventConsumerGrainState>, IEventSubscriber, IEventConsumerGrain
+    public class EventConsumerGrain : GrainV2<EventConsumerGrainState>, IEventSubscriber, IEventConsumerGrain
     {
         private readonly EventDataFormatter eventFormatter;
         private readonly EventConsumerFactory eventConsumerFactory;
@@ -31,8 +32,9 @@ namespace Squidex.Infrastructure.CQRS.Events.Orleans.Grains.Implementation
             EventDataFormatter eventFormatter,
             EventConsumerFactory eventConsumerFactory,
             IEventStore eventStore,
-            ISemanticLog log)
-            : this(eventFormatter, eventConsumerFactory, eventStore, log, null, null, null)
+            ISemanticLog log,
+            IGrainRuntime runtime)
+            : this(eventFormatter, eventConsumerFactory, eventStore, log, null, runtime, null)
         {
         }
 
@@ -121,7 +123,7 @@ namespace Squidex.Infrastructure.CQRS.Events.Orleans.Grains.Implementation
             {
                 Unsubscribe();
 
-                State = EventConsumerGrainState.Failed(exception);
+                State = State.Failed(exception);
             });
         }
 
@@ -216,7 +218,7 @@ namespace Squidex.Infrastructure.CQRS.Events.Orleans.Grains.Implementation
                     .WriteProperty("state", "Failed")
                     .WriteProperty("eventConsumer", eventConsumer.Name));
 
-                State = EventConsumerGrainState.Failed(ex);
+                State = State.Failed(ex);
             }
 
             await WriteStateAsync();

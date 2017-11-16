@@ -9,12 +9,18 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Orleans;
+using Orleans.Runtime;
+using Squidex.Infrastructure.Orleans;
 
 namespace Squidex.Domain.Apps.Read.State.Orleans.Grains.Implementations
 {
-    public sealed class AppUserGrain : Grain<AppUserGrainState>, IAppUserGrain
+    public sealed class AppUserGrain : GrainV2<AppUserGrainState>, IAppUserGrain
     {
+        public AppUserGrain(IGrainRuntime runtime)
+            : base(runtime)
+        {
+        }
+
         public Task AddAppAsync(string appName)
         {
             State.AppNames.Add(appName);

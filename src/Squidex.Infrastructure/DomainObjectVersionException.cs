@@ -7,11 +7,12 @@
 // ==========================================================================
 
 using System;
+using System.Runtime.Serialization;
 
 namespace Squidex.Infrastructure
 {
     [Serializable]
-    public sealed class DomainObjectVersionException : DomainObjectException
+    public class DomainObjectVersionException : DomainObjectException
     {
         private readonly long currentVersion;
         private readonly long expectedVersion;

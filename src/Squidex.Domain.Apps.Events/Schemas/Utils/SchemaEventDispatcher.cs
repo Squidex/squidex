@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Events.Schemas.Utils
 
             if (@event.Properties != null)
             {
-                schema.Update(@event.Properties);
+                schema = schema.Update(@event.Properties);
             }
 
             if (@event.Fields != null)
@@ -38,20 +38,20 @@ namespace Squidex.Domain.Apps.Events.Schemas.Utils
 
                     if (eventField.IsHidden)
                     {
-                        field.Hide();
+                        field = field.Hide();
                     }
 
                     if (eventField.IsDisabled)
                     {
-                        field.Disable();
+                        field = field.Disable();
                     }
 
                     if (eventField.IsLocked)
                     {
-                        field.Lock();
+                        field = field.Lock();
                     }
 
-                    schema.AddField(field);
+                    schema = schema.AddField(field);
 
                     fieldId++;
                 }
@@ -67,10 +67,9 @@ namespace Squidex.Domain.Apps.Events.Schemas.Utils
                     Partitioning.Language :
                     Partitioning.Invariant;
 
-            var fieldId = @event.FieldId.Id;
-            var field = registry.CreateField(fieldId, @event.Name, partitioning, @event.Properties);
+            var field = registry.CreateField(@event.FieldId.Id, @event.Name, partitioning, @event.Properties);
 
-            schema = schema.DeleteField(fieldId);
+            schema = schema.DeleteField(@event.FieldId.Id);
             schema = schema.AddField(field);
 
             return schema;
