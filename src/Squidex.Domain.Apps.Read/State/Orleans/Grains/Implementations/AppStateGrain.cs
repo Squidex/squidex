@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Orleans;
 using Orleans.Concurrency;
+using Orleans.Runtime;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Read.Apps;
 using Squidex.Domain.Apps.Read.Rules;
@@ -23,12 +24,33 @@ namespace Squidex.Domain.Apps.Read.State.Orleans.Grains.Implementations
     public sealed class AppStateGrain : Grain<AppStateGrainState>, IAppStateGrain
     {
         private readonly FieldRegistry fieldRegistry;
+        private Exception exception;
 
         public AppStateGrain(FieldRegistry fieldRegistry)
         {
             Guard.NotNull(fieldRegistry, nameof(fieldRegistry));
 
             this.fieldRegistry = fieldRegistry;
+        }
+
+        public override void Participate(IGrainLifecycle lifecycle)
+        {
+            lifecycle.Subscribe(GrainLifecycleStage.Activate, ct => OnActivateAsync(), ct => OnDeactivateAsync());
+            lifecycle.Subscribe(GrainLifecycleStage.SetupState, ct => LoadStateAsync());
+        }
+
+        private async Task LoadStateAsync()
+        {
+            try
+            {
+                await this.ReadStateAsync();
+            }
+            catch (Exception ex)
+            {
+                exception = ex;
+
+                State = new AppStateGrainState();
+            }
         }
 
         public override Task OnActivateAsync()

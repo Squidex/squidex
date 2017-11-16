@@ -55,13 +55,6 @@ namespace Squidex.Config.Orleans
                         });
                     }
 
-                    services.AddMongoDBGatewayListProvider(c =>
-                    {
-                        c.ConnectionString = mongoConfiguration;
-                        c.CollectionPrefix = "Orleans_";
-                        c.DatabaseName = mongoDatabaseName;
-                    });
-
                     services.AddMongoDBMembershipTable(c =>
                     {
                         c.ConnectionString = mongoConfiguration;

@@ -44,17 +44,17 @@ namespace Squidex.Domain.Apps.Read.State.Orleans.Grains.Implementations
 
         public ISchemaEntity FindSchema(Func<JsonSchemaEntity, bool> filter)
         {
-            return Schemas.Values.FirstOrDefault(filter);
+            return Schemas.Values?.FirstOrDefault(filter);
         }
 
         public List<IRuleEntity> FindRules()
         {
-            return Rules.Values.OfType<IRuleEntity>().ToList();
+            return Rules.Values?.OfType<IRuleEntity>().ToList() ?? new List<IRuleEntity>();
         }
 
         public List<ISchemaEntity> FindSchemas(Func<JsonSchemaEntity, bool> filter)
         {
-            return Schemas.Values.Where(filter).OfType<ISchemaEntity>().ToList();
+            return Schemas.Values?.Where(filter).OfType<ISchemaEntity>().ToList() ?? new List<ISchemaEntity>();
         }
 
         public void Reset()

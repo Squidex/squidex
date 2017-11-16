@@ -6,6 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Orleans;
@@ -32,6 +33,10 @@ namespace Squidex.Config.Orleans
                     .AddApplicationPartsFromReferences(typeof(AppStateGrain).Assembly)
                     .AddApplicationPartsFromReferences(typeof(EventConsumerGrain).Assembly)
                     .AddApplicationPartsFromReferences(typeof(XmlRepositoryGrain).Assembly)
+                    .UseStaticGatewayListProvider(options =>
+                    {
+                        options.Gateways.Add(new Uri("gwy.tcp://localhost:40000/0"));
+                    })
                     .Build();
 
                 client.Connect().Wait();
