@@ -77,7 +77,7 @@ namespace Squidex.Infrastructure.Orleans
 
         private async Task OnSetupState()
         {
-            await this.ReadStateAsync();
+            await ReadStateAsync();
         }
     }
 }

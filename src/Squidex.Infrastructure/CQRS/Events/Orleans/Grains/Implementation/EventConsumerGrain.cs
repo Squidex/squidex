@@ -173,17 +173,17 @@ namespace Squidex.Infrastructure.CQRS.Events.Orleans.Grains.Implementation
 
         Task IEventSubscriber.OnEventAsync(IEventSubscription subscription, StoredEvent storedEvent)
         {
-            return dispatcher.StartNew(() => this.HandleEventAsync(subscription, storedEvent)).Unwrap();
+            return dispatcher.StartNew(() => HandleEventAsync(subscription, storedEvent)).Unwrap();
         }
 
         Task IEventSubscriber.OnErrorAsync(IEventSubscription subscription, Exception exception)
         {
-            return dispatcher.StartNew(() => this.HandleErrorAsync(subscription, exception)).Unwrap();
+            return dispatcher.StartNew(() => HandleErrorAsync(subscription, exception)).Unwrap();
         }
 
         Task IEventSubscriber.OnClosedAsync(IEventSubscription subscription)
         {
-            return dispatcher.StartNew(() => this.HandleClosedAsync(subscription)).Unwrap();
+            return dispatcher.StartNew(() => HandleClosedAsync(subscription)).Unwrap();
         }
 
         public Task<Immutable<EventConsumerInfo>> GetStateAsync()
