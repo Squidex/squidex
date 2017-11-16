@@ -7,8 +7,8 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Orleans.Runtime;
@@ -19,15 +19,12 @@ namespace Squidex.Infrastructure.Json.Orleans
     public class JsonExternalSerializer : IExternalSerializer
     {
         private readonly JsonSerializer serializer;
-        private readonly HashSet<Type> types;
 
-        public JsonExternalSerializer(JsonSerializer serializer, params Type[] types)
+        public JsonExternalSerializer(JsonSerializer serializer)
         {
             Guard.NotNull(serializer, nameof(serializer));
 
             this.serializer = serializer;
-
-            this.types = new HashSet<Type>(types);
         }
 
         public void Initialize(Logger logger)
@@ -36,14 +33,24 @@ namespace Squidex.Infrastructure.Json.Orleans
 
         public bool IsSupportedType(Type itemType)
         {
-            return types.Contains(itemType);
+            return itemType.GetInterfaces().Contains(typeof(IJsonValue));
         }
 
         public object DeepCopy(object source, ICopyContext context)
         {
-            if (source == null)
+            var jsonValue = source as IJsonValue;
+
+            if (jsonValue == null)
             {
                 return null;
+            }
+            else if (jsonValue.IsImmutable)
+            {
+                return jsonValue;
+            }
+            else if (jsonValue.Value == null)
+            {
+                return jsonValue;
             }
             else
             {

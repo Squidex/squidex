@@ -10,28 +10,28 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Orleans;
-using Orleans.Concurrency;
 using Squidex.Domain.Apps.Read.Apps;
 using Squidex.Domain.Apps.Read.Rules;
 using Squidex.Domain.Apps.Read.Schemas;
 using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure.Json.Orleans;
 
 namespace Squidex.Domain.Apps.Read.State.Orleans.Grains
 {
     public interface IAppStateGrain : IGrainWithStringKey
     {
-        Task<Immutable<(IAppEntity, ISchemaEntity)>> GetAppWithSchemaAsync(Guid id);
+        Task<J<(IAppEntity, ISchemaEntity)>> GetAppWithSchemaAsync(Guid id);
 
-        Task<Immutable<IAppEntity>> GetAppAsync();
+        Task<J<IAppEntity>> GetAppAsync();
 
-        Task<Immutable<ISchemaEntity>> GetSchemaAsync(Guid id, bool provideDeleted = false);
+        Task<J<ISchemaEntity>> GetSchemaAsync(Guid id, bool provideDeleted = false);
 
-        Task<Immutable<ISchemaEntity>> GetSchemaAsync(string name, bool provideDeleted = false);
+        Task<J<ISchemaEntity>> GetSchemaAsync(string name, bool provideDeleted = false);
 
-        Task<Immutable<List<ISchemaEntity>>> GetSchemasAsync();
+        Task<J<List<ISchemaEntity>>> GetSchemasAsync();
 
-        Task<Immutable<List<IRuleEntity>>> GetRulesAsync();
+        Task<J<List<IRuleEntity>>> GetRulesAsync();
 
-        Task HandleAsync(Immutable<Envelope<IEvent>> message);
+        Task HandleAsync(J<Envelope<IEvent>> message);
     }
 }

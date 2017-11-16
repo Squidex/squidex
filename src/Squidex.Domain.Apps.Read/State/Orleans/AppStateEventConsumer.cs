@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  StateEventConsumer.cs
+//  AppStateEventConsumer.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -8,12 +8,12 @@
 
 using System.Threading.Tasks;
 using Orleans;
-using Orleans.Concurrency;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Domain.Apps.Read.State.Orleans.Grains;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure.Json.Orleans;
 using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Read.State.Orleans
@@ -50,7 +50,7 @@ namespace Squidex.Domain.Apps.Read.State.Orleans
             {
                 var appGrain = factory.GetGrain<IAppStateGrain>(appEvent.AppId.Name);
 
-                await appGrain.HandleAsync(new Immutable<Envelope<IEvent>>(@event));
+                await appGrain.HandleAsync(@event.AsJ());
             }
 
             if (@event.Payload is AppContributorAssigned contributorAssigned)

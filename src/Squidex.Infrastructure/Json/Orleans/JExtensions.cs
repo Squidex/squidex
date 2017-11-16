@@ -1,22 +1,18 @@
 ﻿// ==========================================================================
-//  CustomJsonSerializer.cs
+//  JExtensions.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using Newtonsoft.Json;
-using Squidex.Config.Domain;
-using Squidex.Infrastructure.Json.Orleans;
-
-namespace Squidex.Config.Orleans
+namespace Squidex.Infrastructure.Json.Orleans
 {
-    public class CustomJsonSerializer : JsonExternalSerializer
+    public static class JExtensions
     {
-        public CustomJsonSerializer()
-            : base(JsonSerializer.Create(SerializationServices.DefaultJsonSettings))
+        public static J<T> AsJ<T>(this T value, bool immutable = true)
         {
+            return new J<T>(value, immutable);
         }
     }
 }

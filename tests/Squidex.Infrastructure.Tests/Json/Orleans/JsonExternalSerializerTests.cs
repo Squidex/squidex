@@ -22,38 +22,54 @@ namespace Squidex.Infrastructure.Json.Orleans
         [Fact]
         public void Should_serialize_js_only()
         {
-            var serializer = new JsonExternalSerializer(JsonSerializer.CreateDefault(), typeof(int), typeof(bool));
+            Assert.True(sut.IsSupportedType(typeof(J<int>)));
+            Assert.True(sut.IsSupportedType(typeof(J<List<int>>)));
 
-            Assert.True(sut.IsSupportedType(typeof(int)));
-            Assert.True(sut.IsSupportedType(typeof(bool)));
-
-            Assert.False(sut.IsSupportedType(typeof(float)));
-            Assert.False(sut.IsSupportedType(typeof(double)));
+            Assert.False(sut.IsSupportedType(typeof(int)));
+            Assert.False(sut.IsSupportedType(typeof(List<int>)));
         }
 
         [Fact]
         public void Should_copy_null()
         {
-            var value = (string)null;
-            var copy = sut.DeepCopy(value, null);
+            var v = (string)null;
+            var c = DeepCopy(v);
 
-            Assert.Null(copy);
+            Assert.Null(c);
+        }
+
+        [Fact]
+        public void Should_copy_null_json()
+        {
+            var v = new J<List<int>>(null);
+            var c = DeepCopy(v);
+
+            Assert.Null(c.Value);
+        }
+
+        [Fact]
+        public void Should_not_copy_immutable_values()
+        {
+            var v = new List<int> { 1, 2, 3 }.AsJ(true);
+            var c = DeepCopy(v);
+
+            Assert.Same(v.Value, c.Value);
         }
 
         [Fact]
         public void Should_copy_non_immutable_values()
         {
-            var value = new List<int> { 1, 2, 3 };
-            var copy = (List<int>)sut.DeepCopy(value, null);
+            var value = new J<List<int>>(new List<int> { 1, 2, 3 });
+            var copy = (J<List<int>>)sut.DeepCopy(value, null);
 
-            Assert.Equal(value, copy);
-            Assert.NotSame(value, copy);
+            Assert.Equal(value.Value, copy.Value);
+            Assert.NotSame(value.Value, copy.Value);
         }
 
         [Fact]
         public void Should_serialize_and_deserialize_value()
         {
-            var value = new List<int>(new List<int> { 1, 2, 3 });
+            var value = new J<List<int>>(new List<int> { 1, 2, 3 });
 
             var writtenLength = 0;
             var writtenBuffer = (byte[])null;
@@ -78,10 +94,15 @@ namespace Squidex.Infrastructure.Json.Orleans
             A.CallTo(() => reader.ReadBytes(writtenLength))
                 .Returns(writtenBuffer);
 
-            var copy = (List<int>)sut.Deserialize(value.GetType(), readerContext);
+            var copy = (J<List<int>>)sut.Deserialize(value.GetType(), readerContext);
 
-            Assert.Equal(value, copy);
-            Assert.NotSame(value, copy);
+            Assert.Equal(value.Value, copy.Value);
+            Assert.NotSame(value.Value, copy.Value);
+        }
+
+        private T DeepCopy<T>(T value)
+        {
+            return (T)sut.DeepCopy(value, null);
         }
     }
 }
