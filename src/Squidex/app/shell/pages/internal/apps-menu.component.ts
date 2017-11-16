@@ -29,19 +29,23 @@ import {
 })
 export class AppsMenuComponent implements OnDestroy, OnInit {
     private appsSubscription: Subscription;
+    private appSubscription: Subscription;
 
-    public modalMenu = new ModalView(false, true);
-    public modalDialog = new ModalView();
+    public addAppDialog = new ModalView();
 
+    public appsMenu = new ModalView(false, true);
     public apps: AppDto[] = [];
 
-    constructor(public readonly ctx: AppContext,
+    public selectedApp: AppDto;
+
+    constructor(
         private readonly appsStore: AppsStoreService
     ) {
     }
 
     public ngOnDestroy() {
         this.appsSubscription.unsubscribe();
+        this.appSubscription.unsubscribe();
     }
 
     public ngOnInit() {
@@ -49,10 +53,15 @@ export class AppsMenuComponent implements OnDestroy, OnInit {
             this.appsStore.apps.subscribe(apps => {
                 this.apps = apps;
             });
+
+        this.appSubscription =
+            this.appsStore.selectedApp.subscribe(app => {
+                this.selectedApp = app;
+            });
     }
 
     public createApp() {
-        this.modalMenu.hide();
-        this.modalDialog.show();
+        this.appsMenu.hide();
+        this.addAppDialog.show();
     }
 }

@@ -130,7 +130,7 @@ export class LanguageComponent implements OnInit, OnChanges, OnDestroy {
                 this.allLanguages.filter(l =>
                     this.language.iso2Code !== l.iso2Code &&
                     this.language.fallback.indexOf(l.iso2Code) < 0);
-            this.otherLanguage = this.otherLanguages.values[0];
+            this.otherLanguage = this.otherLanguages[0];
         }
 
         if (this.language) {

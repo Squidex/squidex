@@ -213,7 +213,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
             if (fieldsByName.ContainsKey(field.Name) || fieldsById.ContainsKey(field.Id))
             {
-                throw new ArgumentException($"A field with name '{field.Name}' already exists.", nameof(field));
+                throw new ArgumentException($"A field with name '{field.Name}' and id {field.Id} already exists.", nameof(field));
             }
 
             return Clone(clone =>

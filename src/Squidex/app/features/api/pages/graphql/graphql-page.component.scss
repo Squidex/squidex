@@ -9,4 +9,8 @@
 
 .graphiql-container > * {
     box-sizing: content-box;
+    
+    & .editorWrap {
+        overflow: hidden;
+    }
 }

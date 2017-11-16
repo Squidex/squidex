@@ -25,6 +25,7 @@ namespace Squidex.Controllers.Api.Ping
         /// <summary>
         /// Get ping status.
         /// </summary>
+        /// <param name="app">The name of the app.</param>
         /// <returns>
         /// 204 => Service ping successful.
         /// </returns>
@@ -34,7 +35,7 @@ namespace Squidex.Controllers.Api.Ping
         [HttpGet]
         [Route("ping/{app}/")]
         [ApiCosts(0)]
-        public IActionResult GetPing()
+        public IActionResult GetPing(string app)
         {
             return NoContent();
         }

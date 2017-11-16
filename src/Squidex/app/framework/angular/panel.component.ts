@@ -14,7 +14,7 @@ import { PanelContainerDirective } from './panel-container.directive';
 @Component({
     selector: 'sqx-panel',
     template: `
-        <div [style.width]="desiredWidth" [attr.expand]="expand" #panel>
+        <div #panel>
             <div class="panel panel-{{theme}}" [@slideRight]>
                 <ng-content></ng-content>
             </div>
@@ -24,16 +24,13 @@ import { PanelContainerDirective } from './panel-container.directive';
     ]
 })
 export class PanelComponent implements AfterViewInit, OnDestroy, OnInit {
-    public actualWidth = 0;
+    public renderWidth = 0;
 
     @Input()
     public theme = 'light';
 
     @Input()
     public desiredWidth = '10rem';
-
-    @Input()
-    public expand = false;
 
     @ViewChild('panel')
     public panel: ElementRef;
@@ -52,7 +49,7 @@ export class PanelComponent implements AfterViewInit, OnDestroy, OnInit {
     }
 
     public ngAfterViewInit() {
-        this.actualWidth = this.panel.nativeElement.getBoundingClientRect().width;
+        this.renderWidth = this.panel.nativeElement.getBoundingClientRect().width;
 
         this.container.invalidate();
     }

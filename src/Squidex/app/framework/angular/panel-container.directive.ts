@@ -25,7 +25,7 @@ export class PanelContainerDirective implements AfterViewInit, OnDestroy {
 
     @HostListener('window:resize')
     public onResize() {
-        this.invalidate();
+        this.invalidate(true);
     }
 
     public ngOnDestroy() {
@@ -33,7 +33,7 @@ export class PanelContainerDirective implements AfterViewInit, OnDestroy {
     }
 
     public ngAfterViewInit() {
-        this.invalidate({ force: true, resize: true });
+        this.invalidate(true);
     }
 
     public push(panel: PanelComponent) {
@@ -48,14 +48,8 @@ export class PanelContainerDirective implements AfterViewInit, OnDestroy {
         this.invalidate();
     }
 
-    public invalidate(params?: { force: boolean, resize: boolean }) {
-        this.isInit = this.isInit || (params && params.force) === true;
-
-        if (!this.isInit) {
-            return;
-        }
-
-        if (params && params.resize) {
+    public invalidate(resize = false) {
+        if (resize) {
             this.containerWidth = this.element.nativeElement.getBoundingClientRect().width;
         }
 
@@ -67,21 +61,22 @@ export class PanelContainerDirective implements AfterViewInit, OnDestroy {
         for (let panel of this.panels) {
             const panelRoot = panel.panel.nativeElement;
 
-            let width = panel.desiredWidth;
+            let layoutWidth = '';
 
             if (panel.desiredWidth === '*' && panel === last) {
-                panel.actualWidth = this.containerWidth - currentPosition;
-
-                panel.desiredWidth = width + 'px';
+                layoutWidth = (this.containerWidth - currentPosition) + 'px';
+            } else {
+                layoutWidth = panel.desiredWidth;
             }
 
             this.renderer.setElementStyle(panelRoot, 'top', '0px');
             this.renderer.setElementStyle(panelRoot, 'left', currentPosition + 'px');
+            this.renderer.setElementStyle(panelRoot, 'width', layoutWidth);
             this.renderer.setElementStyle(panelRoot, 'bottom', '0px');
             this.renderer.setElementStyle(panelRoot, 'position', 'absolute');
             this.renderer.setElementStyle(panelRoot, 'z-index', currentLayer.toString());
 
-            currentPosition += panel.actualWidth;
+            currentPosition += panel.renderWidth;
             currentLayer -= 10;
         }
 

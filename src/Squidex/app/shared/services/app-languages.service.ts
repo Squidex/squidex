@@ -30,12 +30,29 @@ export class AppLanguagesDto {
         return new AppLanguagesDto([...this.languages, language], version);
     }
 
-    public updateLanguage(language: AppLanguageDto, version: Version) {
-        return new AppLanguagesDto(this.languages.map(l => l.iso2Code === language.iso2Code ? language : l), version);
+    public removeLanguage(language: AppLanguageDto, version: Version) {
+        return new AppLanguagesDto(
+            this.languages.filter(l => l.iso2Code !== language.iso2Code).map(l => {
+                return new AppLanguageDto(
+                    l.iso2Code,
+                    l.englishName,
+                    l.isMaster,
+                    l.isOptional,
+                    l.fallback.filter(f => f !== language.iso2Code));
+            }), version);
     }
 
-    public removeLanguage(language: AppLanguageDto, version: Version) {
-        return new AppLanguagesDto(this.languages.filter(l => l.iso2Code !== language.iso2Code), version);
+    public updateLanguage(language: AppLanguageDto, version: Version) {
+        return new AppLanguagesDto(
+            this.languages.map(l => {
+                if (l.iso2Code === language.iso2Code) {
+                    return language;
+                } else if (l.isMaster && language.isMaster) {
+                    return  new AppLanguageDto(l.iso2Code, l.englishName, false, l.isOptional, l.fallback);
+                } else {
+                    return l;
+                }
+            }), version);
     }
 }
 
