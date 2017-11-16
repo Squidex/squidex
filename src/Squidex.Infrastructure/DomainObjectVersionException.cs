@@ -10,7 +10,8 @@ using System;
 
 namespace Squidex.Infrastructure
 {
-    public class DomainObjectVersionException : DomainObjectException
+    [Serializable]
+    public sealed class DomainObjectVersionException : DomainObjectException
     {
         private readonly long currentVersion;
         private readonly long expectedVersion;
@@ -31,6 +32,11 @@ namespace Squidex.Infrastructure
             this.currentVersion = currentVersion;
 
             this.expectedVersion = expectedVersion;
+        }
+
+        protected DomainObjectVersionException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        {
         }
 
         private static string FormatMessage(string id, Type type, long currentVersion, long expectedVersion)

@@ -7,9 +7,11 @@
 // ==========================================================================
 
 using System;
+using System.Runtime.Serialization;
 
 namespace Squidex.Infrastructure
 {
+    [Serializable]
     public class TypeNameNotFoundException : Exception
     {
         public TypeNameNotFoundException()
@@ -23,6 +25,11 @@ namespace Squidex.Infrastructure
 
         public TypeNameNotFoundException(string message, Exception inner)
             : base(message, inner)
+        {
+        }
+
+        protected TypeNameNotFoundException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
         {
         }
     }

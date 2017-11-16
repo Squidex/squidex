@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  ConfigurationException.cs
+//  OrleansException.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -9,26 +9,28 @@
 using System;
 using System.Runtime.Serialization;
 
-namespace Squidex.Infrastructure
+namespace Squidex.Infrastructure.Orleans
 {
     [Serializable]
-    public class ConfigurationException : Exception
+    public class OrleansException : Exception
     {
-        public ConfigurationException()
+        public OrleansException()
         {
         }
 
-        public ConfigurationException(string message)
+        public OrleansException(string message)
             : base(message)
         {
         }
 
-        public ConfigurationException(string message, Exception inner)
+        public OrleansException(string message, Exception inner)
             : base(message, inner)
         {
         }
 
-        protected ConfigurationException(SerializationInfo info, StreamingContext context)
+        protected OrleansException(
+            SerializationInfo info,
+            StreamingContext context)
             : base(info, context)
         {
         }

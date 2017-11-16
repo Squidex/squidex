@@ -7,6 +7,7 @@
 // ==========================================================================
 
 using System;
+using System.Runtime.Serialization;
 
 namespace Squidex.Infrastructure.CQRS.Events
 {
@@ -31,6 +32,11 @@ namespace Squidex.Infrastructure.CQRS.Events
             this.currentVersion = currentVersion;
 
             this.expectedVersion = expectedVersion;
+        }
+
+        protected WrongEventVersionException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        {
         }
 
         private static string FormatMessage(long currentVersion, long expectedVersion)

@@ -7,9 +7,11 @@
 // ==========================================================================
 
 using System;
+using System.Runtime.Serialization;
 
 namespace Squidex.Infrastructure
 {
+    [Serializable]
     public class DomainObjectNotFoundException : DomainObjectException
     {
         public DomainObjectNotFoundException(string id, Type type)
@@ -19,6 +21,11 @@ namespace Squidex.Infrastructure
 
         public DomainObjectNotFoundException(string id, string collection, Type type)
             : base(FormatMessage(id, collection, type), id, type)
+        {
+        }
+
+        protected DomainObjectNotFoundException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
         {
         }
 
