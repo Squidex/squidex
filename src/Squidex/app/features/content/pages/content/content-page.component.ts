@@ -253,7 +253,7 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
                         fieldForm.controls[language.iso2Code].setValue(fieldValue[language.iso2Code]);
                     }
                 } else {
-                    fieldForm.controls['iv'].setValue(fieldValue['iv']);
+                    fieldForm.controls['iv'].setValue(fieldValue['iv'] === undefined ? null : fieldValue['iv']);
                 }
             }
 

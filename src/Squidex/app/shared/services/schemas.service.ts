@@ -378,7 +378,11 @@ export class StringFieldPropertiesDto extends FieldPropertiesDto {
         }
 
         if (this.allowedValues && this.allowedValues.length > 0) {
-            validators.push(ValidatorsEx.validValues(this.allowedValues));
+            if (this.isRequired && !isOptional) {
+                validators.push(ValidatorsEx.validValues(this.allowedValues));
+            } else {
+                validators.push(ValidatorsEx.validValues(this.allowedValues.concat([null])));
+            }
         }
 
         return validators;
