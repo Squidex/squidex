@@ -100,7 +100,7 @@ export class FileDropDirective {
 
 function isFunction(obj: any): boolean {
     return !!(obj && obj.constructor && obj.call && obj.apply);
-};
+}
 
 interface DragDropEvent extends MouseEvent {
     readonly dataTransfer: DataTransfer;

@@ -151,7 +151,9 @@ namespace Squidex.Domain.Apps.Read.State.Orleans.Grains.Implementations
 
         private void UpdateSchema(SchemaEvent @event, EnvelopeHeaders headers, Action<JsonSchemaEntity> updater = null)
         {
-            Schemas[@event.SchemaId.Id].Clone().Update(@event, headers, updater);
+            var id = @event.SchemaId.Id;
+
+            Schemas[id] = Schemas[id].Clone().Update(@event, headers, updater);
         }
     }
 }

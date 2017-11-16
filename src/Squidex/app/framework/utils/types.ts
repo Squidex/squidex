@@ -28,7 +28,7 @@ export module Types {
 
     export function isBoolean(value: any): boolean {
         return typeof value === 'boolean';
-    };
+    }
 
     export function isNull(value: any): boolean {
         return value === null;

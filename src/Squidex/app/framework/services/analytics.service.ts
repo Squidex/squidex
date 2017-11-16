@@ -15,7 +15,7 @@ import { ResourceLoaderService } from './resource-loader.service';
 
 export const AnalyticsServiceFactory = (analyticsId: AnalyticsIdConfig, router: Router, resourceLoader: ResourceLoaderService) => {
     return new AnalyticsService(analyticsId, router, resourceLoader);
-}
+};
 
 @Injectable()
 export class AnalyticsService {
