@@ -94,7 +94,7 @@
     }
 </div>
 
-@if (!Model.HasPasswordAuth && Model.ExternalProviders.Count() == 1)
+@if (!Model.HasPasswordAuth && Model.ExternalProviders.Count == 1)
 {
     <script>
         var redirectButtons = document.getElementsByClassName("redirect-button");

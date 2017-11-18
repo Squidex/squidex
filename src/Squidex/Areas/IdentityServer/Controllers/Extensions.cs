@@ -6,8 +6,11 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Squidex.Shared.Users;
 
@@ -22,6 +25,17 @@ namespace Squidex.Areas.IdentityServer.Controllers
             externalLogin.ProviderDisplayName = externalLogin.Principal.FindFirst(ClaimTypes.Email).Value;
 
             return externalLogin;
+        }
+
+        public static async Task<List<ExternalProvider>> GetExternalProvidersAsync(this SignInManager<IUser> signInManager)
+        {
+            var externalSchemes = await signInManager.GetExternalAuthenticationSchemesAsync();
+            var externalProviders =
+                externalSchemes
+                    .Where(x => x.Name != CookieAuthenticationDefaults.AuthenticationScheme)
+                    .Select(x => new ExternalProvider(x.Name, x.DisplayName)).ToList();
+
+            return externalProviders;
         }
     }
 }

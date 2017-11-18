@@ -158,8 +158,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
         {
             var allowPasswordAuth = identityOptions.Value.AllowPasswordAuth;
 
-            var externalSchemes = await signInManager.GetExternalAuthenticationSchemesAsync();
-            var externalProviders = externalSchemes.Select(x => new ExternalProvider(x.Name, x.DisplayName)).ToList();
+            var externalProviders = await signInManager.GetExternalProvidersAsync();
 
             var vm = new LoginVM
             {

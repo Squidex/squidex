@@ -16,12 +16,9 @@ namespace Squidex.Areas.Portal.Middlewares
     public sealed class PortalRedirectMiddleware
     {
         private readonly IAppPlanBillingManager appPlansBillingManager;
-        private readonly RequestDelegate next;
 
-        public PortalRedirectMiddleware(RequestDelegate next, IAppPlanBillingManager appPlansBillingManager)
+        public PortalRedirectMiddleware(IAppPlanBillingManager appPlansBillingManager)
         {
-            this.next = next;
-
             this.appPlansBillingManager = appPlansBillingManager;
         }
 

@@ -35,7 +35,7 @@ namespace Squidex.Config.Domain
             get { return SerializerSettings; }
         }
 
-        private static JsonSerializerSettings ConfigureJson(JsonSerializerSettings settings, TypeNameHandling typeNameHandling)
+        private static void ConfigureJson(JsonSerializerSettings settings, TypeNameHandling typeNameHandling)
         {
             settings.SerializationBinder = new TypeNameSerializationBinder(TypeNameRegistry);
 
@@ -64,8 +64,6 @@ namespace Squidex.Config.Domain
             settings.TypeNameHandling = typeNameHandling;
 
             settings.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
-
-            return settings;
         }
 
         static SerializationServices()

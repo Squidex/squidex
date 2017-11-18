@@ -30,7 +30,6 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
         private readonly MyUrlsOptions urlOptions;
         private SwaggerJsonSchemaGenerator schemaGenerator;
         private JsonSchemaResolver schemaResolver;
-        private SwaggerGenerator swaggerGenerator;
         private SwaggerDocument document;
 
         public SchemasSwaggerGenerator(IHttpContextAccessor context, SwaggerSettings settings, IOptions<MyUrlsOptions> urlOptions)
@@ -46,8 +45,6 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
 
             schemaGenerator = new SwaggerJsonSchemaGenerator(settings);
             schemaResolver = new SwaggerSchemaResolver(document, settings);
-
-            swaggerGenerator = new SwaggerGenerator(schemaGenerator, settings, schemaResolver);
 
             GenerateSchemasOperations(schemas, app);
 

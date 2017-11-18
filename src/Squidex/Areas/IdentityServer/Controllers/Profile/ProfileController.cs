@@ -180,8 +180,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
 
         private async Task<ProfileVM> GetProfileVM(IUser user, ChangeProfileModel model = null, string errorMessage = null, string successMessage = null)
         {
-            var externalSchemes = await signInManager.GetExternalAuthenticationSchemesAsync();
-            var externalProviders = externalSchemes.Select(x => new ExternalProvider(x.Name, x.DisplayName)).ToList();
+            var externalProviders = await signInManager.GetExternalProvidersAsync();
 
             var result = new ProfileVM
             {

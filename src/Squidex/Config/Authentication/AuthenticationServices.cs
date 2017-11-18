@@ -57,13 +57,13 @@ namespace Squidex.Config.Authentication
 
                 authBuilder.AddOpenIdConnect(options =>
                 {
+                    options.Authority = apiAuthorityUrl;
                     options.ClientId = Constants.InternalClientId;
                     options.ClientSecret = Constants.InternalClientSecret;
-                    options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                    options.Authority = apiAuthorityUrl;
                     options.RequireHttpsMetadata = identityOptions.RequiresHttps;
-                    options.Scope.Add(Constants.RoleScope);
                     options.SaveTokens = true;
+                    options.Scope.Add(Constants.RoleScope);
+                    options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                 });
             }
 

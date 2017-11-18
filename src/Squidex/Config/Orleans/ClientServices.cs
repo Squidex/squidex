@@ -31,8 +31,6 @@ namespace Squidex.Config.Orleans
 
             services.AddSingletonAs(c =>
             {
-                var configuration = ClientConfiguration.LocalhostSilo();
-
                 var client = new ClientBuilder()
                     .UseConfiguration(ClientConfiguration.LocalhostSilo().WithJsonSerializer())
                     .UseDashboard()
