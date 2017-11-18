@@ -13,13 +13,6 @@ namespace Squidex.Config.Web
 {
     public static class WebpackExtensions
     {
-        public static IApplicationBuilder UseWebpackProxy(this IApplicationBuilder app)
-        {
-            app.UseMiddleware<WebpackMiddleware>();
-
-            return app;
-        }
-
         public static IApplicationBuilder UseMyTracking(this IApplicationBuilder app)
         {
             app.UseMiddleware<LogPerformanceMiddleware>();

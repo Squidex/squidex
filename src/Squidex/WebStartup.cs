@@ -7,14 +7,14 @@
 // ==========================================================================
 
 using System;
-using System.IO;
 using System.Linq;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Orleans;
+using Squidex.Areas.Frontend;
+using Squidex.Areas.OrleansDashboard;
 using Squidex.Config;
 using Squidex.Config.Domain;
 using Squidex.Config.Identity;
@@ -60,15 +60,13 @@ namespace Squidex
             app.UseMyCors();
             app.UseMyForwardingRules();
             app.UseMyTracking();
+            app.UseMyAuthentication();
 
             MapAndUseIdentityServer(app);
             MapAndUseApi(app);
-            MapAndUseOrleans(app);
-            MapAndUseFrontend(app);
-        }
 
-        private void MapAndUseOrleans(IApplicationBuilder app)
-        {
+            app.ConfigureOrleansDashboard();
+            app.ConfigureFrontend();
         }
 
         private void MapAndUseIdentityServer(IApplicationBuilder app)
@@ -84,7 +82,6 @@ namespace Squidex
                     identityApp.UseExceptionHandler("/error");
                 }
 
-                identityApp.UseMyAuthentication();
                 identityApp.UseMyIdentityServer();
                 identityApp.UseMyAdminRole();
                 identityApp.UseMyAdmin();
@@ -93,11 +90,6 @@ namespace Squidex
                 identityApp.MapWhen(IsIdentityRequest, mvcApp =>
                 {
                     mvcApp.UseMvc();
-                });
-
-                identityApp.Map(Constants.OrleansPrefix, orleansApp =>
-                {
-                    orleansApp.UseMyOrleansDashboard();
                 });
             });
         }
@@ -118,37 +110,6 @@ namespace Squidex
                     mvcApp.UseMvc();
                 });
             });
-        }
-
-        private void MapAndUseFrontend(IApplicationBuilder app)
-        {
-            if (environment.IsDevelopment())
-            {
-                app.UseWebpackProxy();
-
-                app.Use((context, next) =>
-                {
-                    if (!Path.HasExtension(context.Request.Path.Value))
-                    {
-                        context.Request.Path = new PathString("/index.html");
-                    }
-                    return next();
-                });
-            }
-            else
-            {
-                app.Use((context, next) =>
-                {
-                    if (!Path.HasExtension(context.Request.Path.Value))
-                    {
-                        context.Request.Path = new PathString("/build/index.html");
-                    }
-
-                    return next();
-                });
-            }
-
-            app.UseMyCachedStaticFiles();
         }
 
         private static bool IsIdentityRequest(HttpContext context)

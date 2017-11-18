@@ -41,7 +41,7 @@ namespace Squidex
                 })
                 .ConfigureLogging(builder =>
                 {
-                    builder.AddSemanticLog();
+                    // builder.AddSemanticLog();
                 })
                 .ConfigureAppConfiguration((hostContext, builder) =>
                 {

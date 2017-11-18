@@ -7,6 +7,7 @@
 // ==========================================================================
 
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,6 +22,7 @@ namespace Squidex.Config.Identity
             var identityOptions = config.GetSection("identity").Get<MyIdentityOptions>();
 
             services.AddAuthentication()
+                .AddCookie()
                 .AddMyGoogleAuthentication(identityOptions)
                 .AddMyMicrosoftAuthentication(identityOptions)
                 .AddMyApiProtection(identityOptions, config);
@@ -51,6 +53,17 @@ namespace Squidex.Config.Identity
                     options.ApiName = apiScope;
                     options.ApiSecret = null;
                     options.RequireHttpsMetadata = identityOptions.RequiresHttps;
+                });
+
+                authBuilder.AddOpenIdConnect(options =>
+                {
+                    options.ClientId = Constants.InternalClientId;
+                    options.ClientSecret = Constants.InternalClientSecret;
+                    options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                    options.Authority = apiAuthorityUrl;
+                    options.RequireHttpsMetadata = identityOptions.RequiresHttps;
+                    options.Scope.Add(Constants.RoleScope);
+                    options.SaveTokens = true;
                 });
             }
 

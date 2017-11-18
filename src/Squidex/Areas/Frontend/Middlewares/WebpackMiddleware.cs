@@ -11,7 +11,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 
-namespace Squidex.Pipeline
+namespace Squidex.Areas.Frontend.Middlewares
 {
     public sealed class WebpackMiddleware
     {

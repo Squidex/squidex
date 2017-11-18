@@ -6,11 +6,8 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.Net.Http.Headers;
 using Squidex.Pipeline;
 
 namespace Squidex.Config.Web
@@ -36,35 +33,6 @@ namespace Squidex.Config.Web
             });
 
             app.UseMiddleware<EnforceHttpsMiddleware>();
-        }
-
-        public static void UseMyCachedStaticFiles(this IApplicationBuilder app)
-        {
-            app.UseStaticFiles(new StaticFileOptions
-            {
-                OnPrepareResponse = context =>
-                {
-                    context.Context.Request.GetTypedHeaders();
-                    var response = context.Context.Response;
-
-                    var headers = response.GetTypedHeaders();
-
-                    if (!string.Equals(response.ContentType, "text/html", StringComparison.OrdinalIgnoreCase))
-                    {
-                        headers.CacheControl = new CacheControlHeaderValue
-                        {
-                            MaxAge = TimeSpan.FromDays(60)
-                        };
-                    }
-                    else
-                    {
-                        headers.CacheControl = new CacheControlHeaderValue
-                        {
-                            NoCache = true
-                        };
-                    }
-                }
-            });
         }
     }
 }

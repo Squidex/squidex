@@ -91,17 +91,17 @@ namespace Squidex.Config.Identity
 
         private static IEnumerable<Client> CreateStaticClients(MyUrlsOptions urlsOptions)
         {
-            var id = Constants.FrontendClient;
+            var frontendId = Constants.FrontendClient;
 
             yield return new Client
             {
-                ClientId = id,
-                ClientName = id,
+                ClientId = frontendId,
+                ClientName = frontendId,
                 RedirectUris = new List<string>
                 {
                     urlsOptions.BuildUrl("login;"),
-                    urlsOptions.BuildUrl("identity-server/client-callback-silent/"),
-                    urlsOptions.BuildUrl("identity-server/client-callback-popup/")
+                    urlsOptions.BuildUrl("client-callback-silent", false),
+                    urlsOptions.BuildUrl("client-callback-popup", false)
                 },
                 PostLogoutRedirectUris = new List<string>
                 {
@@ -109,6 +109,32 @@ namespace Squidex.Config.Identity
                 },
                 AllowAccessTokensViaBrowser = true,
                 AllowedGrantTypes = GrantTypes.Implicit,
+                AllowedScopes = new List<string>
+                {
+                    IdentityServerConstants.StandardScopes.OpenId,
+                    IdentityServerConstants.StandardScopes.Profile,
+                    IdentityServerConstants.StandardScopes.Email,
+                    Constants.ApiScope,
+                    Constants.ProfileScope,
+                    Constants.RoleScope
+                },
+                RequireConsent = false
+            };
+
+            var internalClient = Constants.InternalClientId;
+
+            yield return new Client
+            {
+                ClientId = internalClient,
+                ClientName = internalClient,
+                ClientSecrets = new List<Secret> { new Secret(Constants.InternalClientSecret) },
+                RedirectUris = new List<string>
+                {
+                    urlsOptions.BuildUrl("orleans/signin-oidc", false),
+                    urlsOptions.BuildUrl("portal/signin-oidc", false)
+                },
+                AccessTokenLifetime = (int)TimeSpan.FromDays(30).TotalSeconds,
+                AllowedGrantTypes = GrantTypes.ImplicitAndClientCredentials,
                 AllowedScopes = new List<string>
                 {
                     IdentityServerConstants.StandardScopes.OpenId,

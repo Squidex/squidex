@@ -62,20 +62,6 @@ namespace Squidex.Controllers.UI.Account
         }
 
         [HttpGet]
-        [Route("client-callback-silent/")]
-        public IActionResult ClientSilent()
-        {
-            return View();
-        }
-
-        [HttpGet]
-        [Route("client-callback-popup/")]
-        public IActionResult ClientPopup()
-        {
-            return View();
-        }
-
-        [HttpGet]
         [Route("account/forbidden/")]
         public IActionResult Forbidden()
         {
