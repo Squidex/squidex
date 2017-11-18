@@ -35,8 +35,10 @@ namespace Squidex.Areas.OrleansDashboard.Middlewares
                     RedirectUri = context.Request.PathBase + context.Request.Path
                 });
             }
-
-            await next(context);
+            else
+            {
+                await next(context);
+            }
         }
     }
 }
