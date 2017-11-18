@@ -8,7 +8,7 @@
 
 using System;
 
-namespace Squidex.Controllers.Api.Statistics.Models
+namespace Squidex.Areas.Api.Controllers.Statistics.Models
 {
     public sealed class CallsUsageDto
     {

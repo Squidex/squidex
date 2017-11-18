@@ -10,7 +10,7 @@ using NJsonSchema.Annotations;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure.Reflection;
 
-namespace Squidex.Controllers.Api.Schemas.Models.Fields
+namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
 {
     [JsonSchema("Tags")]
     public sealed class TagsFieldPropertiesDto : FieldPropertiesDto

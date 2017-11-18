@@ -21,7 +21,7 @@ using Squidex.Domain.Apps.Read.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Pipeline.Swagger;
 
-namespace Squidex.Controllers.ContentApi.Generator
+namespace Squidex.Areas.Api.Controllers.Contents.Generator
 {
     public sealed class SchemasSwaggerGenerator
     {

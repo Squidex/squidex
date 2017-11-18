@@ -8,13 +8,19 @@
 
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
+using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Pipeline;
 
-namespace Squidex.Controllers.Api.Docs
+namespace Squidex.Areas.Api.Controllers.Docs
 {
     [SwaggerIgnore]
-    public sealed class DocsController : Controller
+    public sealed class DocsController : ApiController
     {
+        public DocsController(ICommandBus commandBus)
+            : base(commandBus)
+        {
+        }
+
         [HttpGet]
         [Route("docs/")]
         [ApiCosts(0)]

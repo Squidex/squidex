@@ -11,7 +11,7 @@ using NJsonSchema.Annotations;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure.Reflection;
 
-namespace Squidex.Controllers.Api.Schemas.Models.Fields
+namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
 {
     [JsonSchema("References")]
     public sealed class ReferencesFieldPropertiesDto : FieldPropertiesDto

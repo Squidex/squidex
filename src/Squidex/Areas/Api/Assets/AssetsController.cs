@@ -15,7 +15,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using NSwag.Annotations;
-using Squidex.Controllers.Api.Assets.Models;
+using Squidex.Areas.Api.Controllers.Assets.Models;
 using Squidex.Domain.Apps.Read.Apps.Services;
 using Squidex.Domain.Apps.Read.Assets.Repositories;
 using Squidex.Domain.Apps.Write.Assets;
@@ -26,7 +26,7 @@ using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
 
-namespace Squidex.Controllers.Api.Assets
+namespace Squidex.Areas.Api.Controllers.Assets
 {
     /// <summary>
     /// Uploads and retrieves assets.
@@ -35,7 +35,7 @@ namespace Squidex.Controllers.Api.Assets
     [ApiExceptionFilter]
     [AppApi]
     [SwaggerTag(nameof(Assets))]
-    public sealed class AssetsController : ControllerBase
+    public sealed class AssetsController : ApiController
     {
         private readonly IAssetRepository assetRepository;
         private readonly IAssetStatsRepository assetStatsRepository;

@@ -12,8 +12,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 using NSwag.Annotations;
-using Squidex.Controllers.Api.Schemas.Models;
-using Squidex.Controllers.Api.Schemas.Models.Converters;
+using Squidex.Areas.Api.Controllers.Schemas.Models;
+using Squidex.Areas.Api.Controllers.Schemas.Models.Converters;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Read;
 using Squidex.Domain.Apps.Read.Schemas;
@@ -22,7 +22,7 @@ using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
 
-namespace Squidex.Controllers.Api.Schemas
+namespace Squidex.Areas.Api.Controllers.Schemas
 {
     /// <summary>
     /// Manages and retrieves information about schemas.
@@ -31,7 +31,7 @@ namespace Squidex.Controllers.Api.Schemas
     [ApiExceptionFilter]
     [AppApi]
     [SwaggerTag(nameof(Schemas))]
-    public sealed class SchemasController : ControllerBase
+    public sealed class SchemasController : ApiController
     {
         private readonly IAppProvider appProvider;
 

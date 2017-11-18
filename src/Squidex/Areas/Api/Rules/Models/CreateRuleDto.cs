@@ -8,7 +8,7 @@
 
 using System.ComponentModel.DataAnnotations;
 
-namespace Squidex.Controllers.Api.Rules.Models
+namespace Squidex.Areas.Api.Controllers.Rules.Models
 {
     public sealed class CreateRuleDto
     {

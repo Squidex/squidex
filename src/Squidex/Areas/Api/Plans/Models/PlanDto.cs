@@ -6,7 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
-namespace Squidex.Controllers.Api.Plans.Models
+namespace Squidex.Areas.Api.Controllers.Plans.Models
 {
     public sealed class PlanDto
     {

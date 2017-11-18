@@ -18,7 +18,7 @@ using Squidex.Pipeline;
 
 #pragma warning disable 1573
 
-namespace Squidex.Controllers.Api.Assets
+namespace Squidex.Areas.Api.Controllers.Assets
 {
     /// <summary>
     /// Uploads and retrieves assets.
@@ -26,7 +26,7 @@ namespace Squidex.Controllers.Api.Assets
     [ApiExceptionFilter]
     [AppApi]
     [SwaggerTag(nameof(Assets))]
-    public sealed class AssetContentController : ControllerBase
+    public sealed class AssetContentController : ApiController
     {
         private readonly IAssetStore assetStorage;
         private readonly IAssetRepository assetRepository;

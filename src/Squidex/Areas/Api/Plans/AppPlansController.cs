@@ -11,14 +11,14 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 using NSwag.Annotations;
-using Squidex.Controllers.Api.Plans.Models;
+using Squidex.Areas.Api.Controllers.Plans.Models;
 using Squidex.Domain.Apps.Read.Apps.Services;
 using Squidex.Domain.Apps.Write.Apps.Commands;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
 
-namespace Squidex.Controllers.Api.Plans
+namespace Squidex.Areas.Api.Controllers.Plans
 {
     /// <summary>
     /// Manages and configures plans.
@@ -27,7 +27,7 @@ namespace Squidex.Controllers.Api.Plans
     [ApiExceptionFilter]
     [AppApi]
     [SwaggerTag(nameof(Plans))]
-    public sealed class AppPlansController : ControllerBase
+    public sealed class AppPlansController : ApiController
     {
         private readonly IAppPlansProvider appPlansProvider;
         private readonly IAppPlanBillingManager appPlansBillingManager;

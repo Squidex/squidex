@@ -10,7 +10,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using NodaTime;
 
-namespace Squidex.Controllers.Api.History.Models
+namespace Squidex.Areas.Api.Controllers.History.Models
 {
     public sealed class HistoryEventDto
     {

@@ -10,13 +10,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
-using Squidex.Controllers.Api.History.Models;
+using Squidex.Areas.Api.Controllers.History.Models;
 using Squidex.Domain.Apps.Read.History.Repositories;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
 
-namespace Squidex.Controllers.Api.History
+namespace Squidex.Areas.Api.Controllers.History
 {
     /// <summary>
     /// Readonly API to get an event stream.
@@ -26,7 +26,7 @@ namespace Squidex.Controllers.Api.History
     [AppApi]
     [MustBeAppEditor]
     [SwaggerTag(nameof(History))]
-    public sealed class HistoryController : ControllerBase
+    public sealed class HistoryController : ApiController
     {
         private readonly IHistoryEventRepository historyEventRepository;
 

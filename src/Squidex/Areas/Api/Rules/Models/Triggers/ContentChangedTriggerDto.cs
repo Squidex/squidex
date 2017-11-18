@@ -15,7 +15,7 @@ using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Infrastructure.Reflection;
 
-namespace Squidex.Controllers.Api.Rules.Models.Triggers
+namespace Squidex.Areas.Api.Controllers.Rules.Models.Triggers
 {
     [JsonSchema("ContentChanged")]
     public sealed class ContentChangedTriggerDto : RuleTriggerDto

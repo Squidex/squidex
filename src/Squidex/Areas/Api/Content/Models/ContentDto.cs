@@ -14,7 +14,7 @@ using Squidex.Domain.Apps.Write.Contents.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Commands;
 
-namespace Squidex.Controllers.ContentApi.Models
+namespace Squidex.Areas.Api.Controllers.Contents.Models
 {
     public sealed class ContentDto
     {

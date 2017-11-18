@@ -7,12 +7,12 @@
 // ==========================================================================
 
 using System.Linq;
-using Squidex.Controllers.Api.Rules.Models.Triggers;
+using Squidex.Areas.Api.Controllers.Rules.Models.Triggers;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Infrastructure.Reflection;
 
-namespace Squidex.Controllers.Api.Rules.Models.Converters
+namespace Squidex.Areas.Api.Controllers.Rules.Models.Converters
 {
     public sealed class RuleTriggerDtoFactory : IRuleTriggerVisitor<RuleTriggerDto>
     {

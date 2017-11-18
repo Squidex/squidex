@@ -11,7 +11,7 @@ using System.ComponentModel.DataAnnotations;
 using NodaTime;
 using Squidex.Infrastructure;
 
-namespace Squidex.Controllers.Api.Schemas.Models
+namespace Squidex.Areas.Api.Controllers.Schemas.Models
 {
     public sealed class SchemaDto
     {

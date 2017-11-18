@@ -8,10 +8,10 @@
 
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
-using Squidex.Controllers.Api.Rules.Models.Actions;
+using Squidex.Areas.Api.Controllers.Rules.Models.Actions;
 using Squidex.Domain.Apps.Core.Rules;
 
-namespace Squidex.Controllers.Api.Rules.Models
+namespace Squidex.Areas.Api.Controllers.Rules.Models
 {
     [JsonConverter(typeof(JsonInheritanceConverter), "actionType")]
     [KnownType(typeof(WebhookActionDto))]

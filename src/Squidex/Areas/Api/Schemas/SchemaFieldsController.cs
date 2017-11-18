@@ -9,12 +9,12 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
-using Squidex.Controllers.Api.Schemas.Models;
+using Squidex.Areas.Api.Controllers.Schemas.Models;
 using Squidex.Domain.Apps.Write.Schemas.Commands;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Pipeline;
 
-namespace Squidex.Controllers.Api.Schemas
+namespace Squidex.Areas.Api.Controllers.Schemas
 {
     /// <summary>
     /// Manages and retrieves information about schemas.
@@ -24,7 +24,7 @@ namespace Squidex.Controllers.Api.Schemas
     [AppApi]
     [MustBeAppDeveloper]
     [SwaggerTag(nameof(Schemas))]
-    public sealed class SchemaFieldsController : ControllerBase
+    public sealed class SchemaFieldsController : ApiController
     {
         public SchemaFieldsController(ICommandBus commandBus)
             : base(commandBus)

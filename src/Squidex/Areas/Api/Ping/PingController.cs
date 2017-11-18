@@ -8,9 +8,10 @@
 
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
+using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Pipeline;
 
-namespace Squidex.Controllers.Api.Ping
+namespace Squidex.Areas.Api.Controllers.Ping
 {
     /// <summary>
     /// Makes a ping request.
@@ -20,8 +21,13 @@ namespace Squidex.Controllers.Api.Ping
     [AppApi]
     [MustBeAppReader]
     [SwaggerTag(nameof(Ping))]
-    public sealed class PingController : Controller
+    public sealed class PingController : ApiController
     {
+        public PingController(ICommandBus commandBus)
+            : base(commandBus)
+        {
+        }
+
         /// <summary>
         /// Get ping status.
         /// </summary>

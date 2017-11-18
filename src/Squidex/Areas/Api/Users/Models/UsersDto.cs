@@ -6,7 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
-namespace Squidex.Controllers.Api.Users.Models
+namespace Squidex.Areas.Api.Controllers.Users.Models
 {
     public sealed class UsersDto
     {

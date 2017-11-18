@@ -10,10 +10,11 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
 
-namespace Squidex.Controllers.Api.Languages
+namespace Squidex.Areas.Api.Controllers.Languages
 {
     /// <summary>
     /// Readonly API to the supported langauges.
@@ -21,8 +22,13 @@ namespace Squidex.Controllers.Api.Languages
     [ApiAuthorize]
     [ApiExceptionFilter]
     [SwaggerTag(nameof(Languages))]
-    public sealed class LanguagesController : Controller
+    public sealed class LanguagesController : ApiController
     {
+        public LanguagesController(ICommandBus commandBus)
+            : base(commandBus)
+        {
+        }
+
         /// <summary>
         /// Get supported languages.
         /// </summary>

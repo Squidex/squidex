@@ -8,10 +8,10 @@
 
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
-using Squidex.Controllers.Api.Rules.Models.Triggers;
+using Squidex.Areas.Api.Controllers.Rules.Models.Triggers;
 using Squidex.Domain.Apps.Core.Rules;
 
-namespace Squidex.Controllers.Api.Rules.Models
+namespace Squidex.Areas.Api.Controllers.Rules.Models
 {
     [JsonConverter(typeof(JsonInheritanceConverter), "triggerType")]
     [KnownType(typeof(ContentChangedTriggerDto))]

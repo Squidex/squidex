@@ -16,7 +16,7 @@ using NJsonSchema.Annotations;
 
 #pragma warning disable SA1306 // Field names must begin with lower-case letter
 
-namespace Squidex.Controllers
+namespace Squidex.Areas.Api.Controllers
 {
     public sealed class JsonInheritanceConverter : JsonConverter
     {

@@ -11,14 +11,14 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 using NSwag.Annotations;
-using Squidex.Controllers.Api.Apps.Models;
+using Squidex.Areas.Api.Controllers.Apps.Models;
 using Squidex.Domain.Apps.Read.Apps.Services;
 using Squidex.Domain.Apps.Write.Apps.Commands;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
 
-namespace Squidex.Controllers.Api.Apps
+namespace Squidex.Areas.Api.Controllers.Apps
 {
     /// <summary>
     /// Manages and configures apps.
@@ -28,7 +28,7 @@ namespace Squidex.Controllers.Api.Apps
     [AppApi]
     [MustBeAppOwner]
     [SwaggerTag(nameof(Apps))]
-    public sealed class AppContributorsController : ControllerBase
+    public sealed class AppContributorsController : ApiController
     {
         private readonly IAppPlansProvider appPlansProvider;
 

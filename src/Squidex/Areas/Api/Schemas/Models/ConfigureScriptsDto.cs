@@ -6,7 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
-namespace Squidex.Controllers.Api.Schemas.Models
+namespace Squidex.Areas.Api.Controllers.Schemas.Models
 {
     public sealed class ConfigureScriptsDto
     {

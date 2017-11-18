@@ -12,8 +12,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using NodaTime;
 using NSwag.Annotations;
-using Squidex.Controllers.Api.Rules.Models;
-using Squidex.Controllers.Api.Rules.Models.Converters;
+using Squidex.Areas.Api.Controllers.Rules.Models;
+using Squidex.Areas.Api.Controllers.Rules.Models.Converters;
 using Squidex.Domain.Apps.Read;
 using Squidex.Domain.Apps.Read.Rules.Repositories;
 using Squidex.Domain.Apps.Write.Rules.Commands;
@@ -21,7 +21,7 @@ using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
 
-namespace Squidex.Controllers.Api.Rules
+namespace Squidex.Areas.Api.Controllers.Rules
 {
     /// <summary>
     /// Manages and retrieves information about schemas.
@@ -31,7 +31,7 @@ namespace Squidex.Controllers.Api.Rules
     [AppApi]
     [SwaggerTag(nameof(Rules))]
     [MustBeAppDeveloper]
-    public sealed class RulesController : ControllerBase
+    public sealed class RulesController : ApiController
     {
         private readonly IAppProvider appProvider;
         private readonly IRuleEventRepository ruleEventsRepository;

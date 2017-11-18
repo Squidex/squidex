@@ -8,14 +8,15 @@
 
 using System;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Squidex.Domain.Apps.Read.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Pipeline;
 
-namespace Squidex.Controllers
+namespace Squidex.Areas.Api.Controllers
 {
-    public abstract class ControllerBase : Controller
+    public abstract class ApiController : Controller
     {
         protected ICommandBus CommandBus { get; }
 
@@ -39,11 +40,19 @@ namespace Squidex.Controllers
             get { return App.Name; }
         }
 
-        protected ControllerBase(ICommandBus commandBus)
+        protected ApiController(ICommandBus commandBus)
         {
             Guard.NotNull(commandBus, nameof(commandBus));
 
             CommandBus = commandBus;
+        }
+
+        public override void OnActionExecuting(ActionExecutingContext context)
+        {
+            if (!context.HttpContext.Request.PathBase.StartsWithSegments("/api"))
+            {
+                context.Result = new NotFoundResult();
+            }
         }
     }
 }

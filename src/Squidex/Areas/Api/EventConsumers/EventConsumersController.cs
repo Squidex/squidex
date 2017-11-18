@@ -11,22 +11,24 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using Orleans;
-using Squidex.Controllers.Api.EventConsumers.Models;
+using Squidex.Areas.Api.Controllers.EventConsumers.Models;
+using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.CQRS.Events.Orleans.Grains;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
 
-namespace Squidex.Controllers.Api.EventConsumers
+namespace Squidex.Areas.Api.Controllers.EventConsumers
 {
     [ApiAuthorize]
     [ApiExceptionFilter]
     [MustBeAdministrator]
     [SwaggerIgnore]
-    public sealed class EventConsumersController : Controller
+    public sealed class EventConsumersController : ApiController
     {
         private readonly IEventConsumerRegistryGrain eventConsumerRegistryGrain;
 
-        public EventConsumersController(IClusterClient orleans)
+        public EventConsumersController(ICommandBus commandBus, IClusterClient orleans)
+            : base(commandBus)
         {
             eventConsumerRegistryGrain = orleans.GetGrain<IEventConsumerRegistryGrain>("Default");
         }

@@ -11,7 +11,7 @@ using Squidex.Domain.Apps.Read.Schemas;
 using Squidex.Domain.Apps.Write.Schemas.Commands;
 using Squidex.Infrastructure.Reflection;
 
-namespace Squidex.Controllers.Api.Schemas.Models.Converters
+namespace Squidex.Areas.Api.Controllers.Schemas.Models.Converters
 {
     public static class SchemaConverter
     {

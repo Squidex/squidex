@@ -6,7 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
-namespace Squidex.Controllers.Api.Assets
+namespace Squidex.Areas.Api.Controllers.Assets
 {
     public sealed class AssetConfig
     {

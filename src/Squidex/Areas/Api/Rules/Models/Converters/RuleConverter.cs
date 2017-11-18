@@ -11,7 +11,7 @@ using Squidex.Domain.Apps.Read.Rules;
 using Squidex.Domain.Apps.Write.Rules.Commands;
 using Squidex.Infrastructure.Reflection;
 
-namespace Squidex.Controllers.Api.Rules.Models.Converters
+namespace Squidex.Areas.Api.Controllers.Rules.Models.Converters
 {
     public static class RuleConverter
     {

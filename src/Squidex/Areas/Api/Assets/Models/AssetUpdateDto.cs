@@ -8,7 +8,7 @@
 
 using System.ComponentModel.DataAnnotations;
 
-namespace Squidex.Controllers.Api.Assets.Models
+namespace Squidex.Areas.Api.Controllers.Assets.Models
 {
     public sealed class AssetUpdateDto
     {

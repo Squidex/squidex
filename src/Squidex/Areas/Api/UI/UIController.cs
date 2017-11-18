@@ -12,21 +12,23 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using NSwag.Annotations;
 using Squidex.Config;
-using Squidex.Controllers.Api.UI.Models;
+using Squidex.Areas.Api.Controllers.UI.Models;
 using Squidex.Pipeline;
+using Squidex.Infrastructure.CQRS.Commands;
 
-namespace Squidex.Controllers.Api.UI
+namespace Squidex.Areas.Api.Controllers.UI
 {
     /// <summary>
     /// Manages ui settings and configs.
     /// </summary>
     [ApiExceptionFilter]
     [SwaggerTag(nameof(UI))]
-    public sealed class UIController : Controller
+    public sealed class UIController : ApiController
     {
         private readonly MyUIOptions uiOptions;
 
-        public UIController(IOptions<MyUIOptions> uiOptions)
+        public UIController(ICommandBus commandBus, IOptions<MyUIOptions> uiOptions)
+            : base(commandBus)
         {
             this.uiOptions = uiOptions.Value;
         }

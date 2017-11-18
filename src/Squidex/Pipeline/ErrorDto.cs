@@ -8,7 +8,7 @@
 
 using System.ComponentModel.DataAnnotations;
 
-namespace Squidex.Controllers.Api
+namespace Squidex.Pipeline
 {
     public sealed class ErrorDto
     {

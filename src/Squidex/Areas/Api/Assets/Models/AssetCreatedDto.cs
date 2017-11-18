@@ -11,7 +11,7 @@ using System.ComponentModel.DataAnnotations;
 using Squidex.Domain.Apps.Write.Assets.Commands;
 using Squidex.Infrastructure.CQRS.Commands;
 
-namespace Squidex.Controllers.Api.Assets.Models
+namespace Squidex.Areas.Api.Controllers.Assets.Models
 {
     public sealed class AssetCreatedDto
     {

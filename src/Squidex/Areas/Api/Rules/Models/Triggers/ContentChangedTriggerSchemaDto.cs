@@ -8,7 +8,7 @@
 
 using System;
 
-namespace Squidex.Controllers.Api.Rules.Models.Triggers
+namespace Squidex.Areas.Api.Controllers.Rules.Models.Triggers
 {
     public sealed class ContentChangedTriggerSchemaDto
     {

@@ -14,7 +14,7 @@ using NJsonSchema.Generation.TypeMappers;
 using NodaTime;
 using NSwag.AspNetCore;
 using NSwag.SwaggerGeneration.Processors.Security;
-using Squidex.Controllers.ContentApi.Generator;
+using Squidex.Areas.Api.Controllers.Contents.Generator;
 using Squidex.Infrastructure;
 using Squidex.Pipeline.Swagger;
 

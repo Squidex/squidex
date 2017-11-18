@@ -6,7 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
-namespace Squidex.Controllers.ContentApi.Models
+namespace Squidex.Areas.Api.Controllers.Contents.Models
 {
     public sealed class AssetsDto
     {

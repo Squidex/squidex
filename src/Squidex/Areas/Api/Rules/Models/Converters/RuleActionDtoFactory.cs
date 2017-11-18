@@ -6,12 +6,12 @@
 //  All rights reserved.
 // ==========================================================================
 
-using Squidex.Controllers.Api.Rules.Models.Actions;
+using Squidex.Areas.Api.Controllers.Rules.Models.Actions;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Actions;
 using Squidex.Infrastructure.Reflection;
 
-namespace Squidex.Controllers.Api.Rules.Models.Converters
+namespace Squidex.Areas.Api.Controllers.Rules.Models.Converters
 {
     public sealed class RuleActionDtoFactory : IRuleActionVisitor<RuleActionDto>
     {

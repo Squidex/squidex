@@ -8,7 +8,7 @@
 
 using System.ComponentModel.DataAnnotations;
 
-namespace Squidex.Controllers.Api
+namespace Squidex.Areas.Api.Controllers
 {
     public sealed class LanguageDto
     {

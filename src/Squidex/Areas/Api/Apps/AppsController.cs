@@ -11,7 +11,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
-using Squidex.Controllers.Api.Apps.Models;
+using Squidex.Areas.Api.Controllers.Apps.Models;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Read;
 using Squidex.Domain.Apps.Read.Apps.Services;
@@ -21,7 +21,7 @@ using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Security;
 using Squidex.Pipeline;
 
-namespace Squidex.Controllers.Api.Apps
+namespace Squidex.Areas.Api.Controllers.Apps
 {
     /// <summary>
     /// Manages and configures apps.
@@ -29,7 +29,7 @@ namespace Squidex.Controllers.Api.Apps
     [ApiAuthorize]
     [ApiExceptionFilter]
     [SwaggerTag(nameof(Apps))]
-    public sealed class AppsController : ControllerBase
+    public sealed class AppsController : ApiController
     {
         private readonly IAppProvider appProvider;
         private readonly IAppPlansProvider appPlansProvider;

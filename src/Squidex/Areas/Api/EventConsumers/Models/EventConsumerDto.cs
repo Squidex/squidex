@@ -6,7 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
-namespace Squidex.Controllers.Api.EventConsumers.Models
+namespace Squidex.Areas.Api.Controllers.EventConsumers.Models
 {
     public sealed class EventConsumerDto
     {

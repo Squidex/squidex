@@ -19,7 +19,7 @@ using Squidex.Infrastructure;
 using Squidex.Pipeline.Swagger;
 using Squidex.Shared.Identity;
 
-namespace Squidex.Controllers.ContentApi.Generator
+namespace Squidex.Areas.Api.Controllers.Contents.Generator
 {
     public sealed class SchemaSwaggerGenerator
     {

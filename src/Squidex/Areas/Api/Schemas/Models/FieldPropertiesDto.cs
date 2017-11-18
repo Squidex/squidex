@@ -9,10 +9,10 @@
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
-using Squidex.Controllers.Api.Schemas.Models.Fields;
+using Squidex.Areas.Api.Controllers.Schemas.Models.Fields;
 using Squidex.Domain.Apps.Core.Schemas;
 
-namespace Squidex.Controllers.Api.Schemas.Models
+namespace Squidex.Areas.Api.Controllers.Schemas.Models
 {
     [JsonConverter(typeof(JsonInheritanceConverter), "fieldType")]
     [KnownType(typeof(AssetsFieldPropertiesDto))]

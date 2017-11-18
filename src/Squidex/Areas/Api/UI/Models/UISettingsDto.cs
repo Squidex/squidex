@@ -9,7 +9,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace Squidex.Controllers.Api.UI.Models
+namespace Squidex.Areas.Api.Controllers.UI.Models
 {
     public sealed class UISettingsDto
     {

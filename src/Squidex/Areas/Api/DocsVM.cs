@@ -6,7 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
-namespace Squidex.Controllers
+namespace Squidex.Areas.Api.Controllers
 {
     public sealed class DocsVM
     {

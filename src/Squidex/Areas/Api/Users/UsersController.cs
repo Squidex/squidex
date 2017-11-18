@@ -14,20 +14,21 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
-using Squidex.Controllers.Api.Users.Models;
+using Squidex.Areas.Api.Controllers.Users.Models;
 using Squidex.Domain.Users;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
 using Squidex.Shared.Users;
+using Squidex.Infrastructure.CQRS.Commands;
 
-namespace Squidex.Controllers.Api.Users
+namespace Squidex.Areas.Api.Controllers.Users
 {
     /// <summary>
     /// Readonly API to retrieve information about squidex users.
     /// </summary>
     [ApiExceptionFilter]
     [SwaggerTag(nameof(Users))]
-    public sealed class UsersController : Controller
+    public sealed class UsersController : ApiController
     {
         private static readonly byte[] AvatarBytes;
         private readonly UserManager<IUser> userManager;
@@ -37,7 +38,7 @@ namespace Squidex.Controllers.Api.Users
         {
             var assembly = typeof(UsersController).GetTypeInfo().Assembly;
 
-            using (var avatarStream = assembly.GetManifestResourceStream("Squidex.Controllers.Api.Users.Assets.Avatar.png"))
+            using (var avatarStream = assembly.GetManifestResourceStream("Squidex.Areas.Api.Controllers.Users.Assets.Avatar.png"))
             {
                 AvatarBytes = new byte[avatarStream.Length];
 
@@ -45,7 +46,8 @@ namespace Squidex.Controllers.Api.Users
             }
         }
 
-        public UsersController(UserManager<IUser> userManager, IUserPictureStore userPictureStore)
+        public UsersController(ICommandBus commandBus, UserManager<IUser> userManager, IUserPictureStore userPictureStore)
+            : base(commandBus)
         {
             this.userManager = userManager;
             this.userPictureStore = userPictureStore;

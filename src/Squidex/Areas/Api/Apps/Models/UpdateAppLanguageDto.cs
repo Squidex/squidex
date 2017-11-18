@@ -9,7 +9,7 @@
 using System.Collections.Generic;
 using Squidex.Infrastructure;
 
-namespace Squidex.Controllers.Api.Apps.Models
+namespace Squidex.Areas.Api.Controllers.Apps.Models
 {
     public sealed class UpdateAppLanguageDto
     {

@@ -12,26 +12,28 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
-using Squidex.Controllers.Api.Users.Models;
+using Squidex.Areas.Api.Controllers.Users.Models;
 using Squidex.Domain.Users;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Security;
 using Squidex.Pipeline;
 using Squidex.Shared.Users;
+using Squidex.Infrastructure.CQRS.Commands;
 
-namespace Squidex.Controllers.Api.Users
+namespace Squidex.Areas.Api.Controllers.Users
 {
     [ApiAuthorize]
     [ApiExceptionFilter]
     [MustBeAdministrator]
     [SwaggerIgnore]
-    public sealed class UserManagementController : Controller
+    public sealed class UserManagementController : ApiController
     {
         private readonly UserManager<IUser> userManager;
         private readonly IUserFactory userFactory;
 
-        public UserManagementController(UserManager<IUser> userManager, IUserFactory userFactory)
+        public UserManagementController(ICommandBus commandBus, UserManager<IUser> userManager, IUserFactory userFactory)
+            : base(commandBus)
         {
             this.userManager = userManager;
             this.userFactory = userFactory;

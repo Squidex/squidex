@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 using NSwag.Annotations;
-using Squidex.Controllers.ContentApi.Models;
+using Squidex.Areas.Api.Controllers.Contents.Models;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.ConvertContent;
 using Squidex.Domain.Apps.Read.Contents;
@@ -24,13 +24,13 @@ using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
 
-namespace Squidex.Controllers.ContentApi
+namespace Squidex.Areas.Api.Controllers.Contents
 {
     [ApiAuthorize]
     [ApiExceptionFilter]
     [AppApi]
     [SwaggerIgnore]
-    public sealed class ContentsController : ControllerBase
+    public sealed class ContentsController : ApiController
     {
         private readonly IContentQueryService contentQuery;
         private readonly IContentVersionLoader contentVersionLoader;

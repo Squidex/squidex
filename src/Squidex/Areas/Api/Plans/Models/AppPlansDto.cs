@@ -8,7 +8,7 @@
 
 using System.Collections.Generic;
 
-namespace Squidex.Controllers.Api.Plans.Models
+namespace Squidex.Areas.Api.Controllers.Plans.Models
 {
     public sealed class AppPlansDto
     {

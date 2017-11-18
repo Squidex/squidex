@@ -11,7 +11,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Squidex.Domain.Apps.Core.Apps;
 
-namespace Squidex.Controllers.Api.Apps.Models
+namespace Squidex.Areas.Api.Controllers.Apps.Models
 {
     public sealed class AssignAppContributorDto
     {

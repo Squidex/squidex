@@ -13,7 +13,7 @@ using Newtonsoft.Json.Converters;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Apps;
 
-namespace Squidex.Controllers.Api.Apps.Models
+namespace Squidex.Areas.Api.Controllers.Apps.Models
 {
     public sealed class AppDto
     {

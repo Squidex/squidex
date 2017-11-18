@@ -13,7 +13,7 @@ using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Actions;
 using Squidex.Infrastructure.Reflection;
 
-namespace Squidex.Controllers.Api.Rules.Models.Actions
+namespace Squidex.Areas.Api.Controllers.Rules.Models.Actions
 {
     [JsonSchema("Webhook")]
     public sealed class WebhookActionDto : RuleActionDto

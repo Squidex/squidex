@@ -12,7 +12,7 @@ using NodaTime;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Read.Rules;
 
-namespace Squidex.Controllers.Api.Rules.Models
+namespace Squidex.Areas.Api.Controllers.Rules.Models
 {
     public sealed class RuleEventDto
     {

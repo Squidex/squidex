@@ -11,7 +11,7 @@ using System.ComponentModel.DataAnnotations;
 using NodaTime;
 using Squidex.Infrastructure;
 
-namespace Squidex.Controllers.Api.Rules.Models
+namespace Squidex.Areas.Api.Controllers.Rules.Models
 {
     public sealed class RuleDto
     {

@@ -9,17 +9,17 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
-using Squidex.Controllers.ContentApi.Generator;
+using Squidex.Areas.Api.Controllers.Contents.Generator;
 using Squidex.Domain.Apps.Read;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Pipeline;
 
-namespace Squidex.Controllers.ContentApi
+namespace Squidex.Areas.Api.Controllers.Contents
 {
     [ApiExceptionFilter]
     [AppApi]
     [SwaggerIgnore]
-    public sealed class ContentSwaggerController : ControllerBase
+    public sealed class ContentSwaggerController : ApiController
     {
         private readonly IAppProvider appProvider;
         private readonly SchemasSwaggerGenerator schemasSwaggerGenerator;
