@@ -6,7 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
-namespace Squidex.Config.Identity
+namespace Squidex.Config
 {
     public sealed class MyIdentityOptions
     {

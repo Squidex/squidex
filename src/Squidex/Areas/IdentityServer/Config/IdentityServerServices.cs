@@ -13,12 +13,14 @@ using IdentityModel;
 using IdentityServer4.Models;
 using IdentityServer4.Stores;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Squidex.Config;
 using Squidex.Domain.Users;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
 
-namespace Squidex.Config.Identity
+namespace Squidex.Areas.IdentityServer.Config
 {
     public static class IdentityServerServices
     {
@@ -26,9 +28,9 @@ namespace Squidex.Config.Identity
         {
             X509Certificate2 certificate;
 
-            var assembly = typeof(IdentityServices).GetTypeInfo().Assembly;
+            var assembly = typeof(IdentityServerServices).GetTypeInfo().Assembly;
 
-            using (var certStream = assembly.GetManifestResourceStream("Squidex.Config.Identity.Cert.IdentityCert.pfx"))
+            using (var certStream = assembly.GetManifestResourceStream("Squidex.Areas.IdentityServer.Config.Cert.IdentityCert.pfx"))
             {
                 var certData = new byte[certStream.Length];
 
@@ -39,10 +41,12 @@ namespace Squidex.Config.Identity
                     X509KeyStorageFlags.Exportable);
             }
 
-            services.AddSingleton(
-                GetApiResources());
-            services.AddSingleton(
-                GetIdentityResources());
+            services.AddIdentity<IUser, IRole>()
+                .AddDefaultTokenProviders();
+
+            services.AddSingleton(GetApiResources());
+            services.AddSingleton(GetIdentityResources());
+
             services.AddSingleton<IUserClaimsPrincipalFactory<IUser>,
                 UserClaimsPrincipalFactoryWithEmail>();
             services.AddSingleton<IClientStore,
@@ -58,6 +62,21 @@ namespace Squidex.Config.Identity
                 .AddInMemoryApiResources(GetApiResources())
                 .AddInMemoryIdentityResources(GetIdentityResources())
                 .AddSigningCredential(certificate);
+        }
+
+        public static void AddMyDataProtectection(this IServiceCollection services, IConfiguration config)
+        {
+            var dataProtection = services.AddDataProtection().SetApplicationName("Squidex");
+
+            services.AddSingleton<OrleansXmlRepository>();
+
+            services.AddSingleton<IConfigureOptions<KeyManagementOptions>>(s =>
+            {
+                return new ConfigureOptions<KeyManagementOptions>(options =>
+                {
+                    options.XmlRepository = s.GetRequiredService<OrleansXmlRepository>();
+                });
+            });
         }
 
         private static IEnumerable<ApiResource> GetApiResources()

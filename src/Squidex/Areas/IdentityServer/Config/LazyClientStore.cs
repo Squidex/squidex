@@ -13,11 +13,12 @@ using IdentityServer4;
 using IdentityServer4.Models;
 using IdentityServer4.Stores;
 using Microsoft.Extensions.Options;
+using Squidex.Config;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Read;
 using Squidex.Infrastructure;
 
-namespace Squidex.Config.Identity
+namespace Squidex.Areas.IdentityServer.Config
 {
     public class LazyClientStore : IClientStore
     {

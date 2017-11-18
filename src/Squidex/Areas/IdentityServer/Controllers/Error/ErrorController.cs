@@ -9,7 +9,7 @@
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 
-namespace Squidex.Controllers.UI.Error
+namespace Squidex.Areas.IdentityServer.Controllers.Error
 {
     [SwaggerIgnore]
     public sealed class ErrorController : Controller

@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  IdentityExtensions.cs
+//  IdentityServerExtensions.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -13,14 +13,15 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Squidex.Config;
 using Squidex.Domain.Users;
 using Squidex.Infrastructure.Log;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
 
-namespace Squidex.Config.Identity
+namespace Squidex.Areas.IdentityServer.Config
 {
-    public static class IdentityExtensions
+    public static class IdentityServerExtensions
     {
         public static IApplicationBuilder UseMyIdentityServer(this IApplicationBuilder app)
         {

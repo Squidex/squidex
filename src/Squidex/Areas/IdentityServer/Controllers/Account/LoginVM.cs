@@ -8,7 +8,7 @@
 
 using System.Collections.Generic;
 
-namespace Squidex.Controllers.UI.Account
+namespace Squidex.Areas.IdentityServer.Controllers.Account
 {
     public class LoginVM
     {

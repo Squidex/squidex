@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Identity;
 using Squidex.Domain.Users;
 using Squidex.Shared.Users;
 
-namespace Squidex.Controllers.UI
+namespace Squidex.Areas.IdentityServer.Controllers
 {
     public static class Extensions
     {

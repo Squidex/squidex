@@ -6,7 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
-namespace Squidex.Controllers.UI
+namespace Squidex.Areas.IdentityServer.Controllers
 {
     public class ExternalProvider
     {

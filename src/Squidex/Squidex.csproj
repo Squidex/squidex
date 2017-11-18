@@ -12,7 +12,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Config\Identity\Cert\*.*;Docs\*.md" />
+    <EmbeddedResource Include="Areas\IdentityServer\Config\Cert\*.*;Docs\*.md" />
     <EmbeddedResource Include="Controllers\Api\Users\Assets\Avatar.png" />
     <EmbeddedResource Remove="Assets\**" />
 

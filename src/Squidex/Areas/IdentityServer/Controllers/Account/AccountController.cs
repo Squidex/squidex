@@ -27,7 +27,7 @@ using Squidex.Infrastructure.Tasks;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
 
-namespace Squidex.Controllers.UI.Account
+namespace Squidex.Areas.IdentityServer.Controllers.Account
 {
     [SwaggerIgnore]
     public sealed class AccountController : Controller

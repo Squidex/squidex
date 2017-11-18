@@ -24,7 +24,7 @@ using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Shared.Users;
 
-namespace Squidex.Controllers.UI.Profile
+namespace Squidex.Areas.IdentityServer.Controllers.Profile
 {
     [Authorize]
     [SwaggerIgnore]

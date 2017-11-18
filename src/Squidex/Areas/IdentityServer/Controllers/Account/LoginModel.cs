@@ -8,7 +8,7 @@
 
 using System.ComponentModel.DataAnnotations;
 
-namespace Squidex.Controllers.UI.Account
+namespace Squidex.Areas.IdentityServer.Controllers.Account
 {
     public sealed class LoginModel
     {

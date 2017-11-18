@@ -8,7 +8,7 @@
 
 using System.ComponentModel.DataAnnotations;
 
-namespace Squidex.Controllers.UI.Profile
+namespace Squidex.Areas.IdentityServer.Controllers.Profile
 {
     public class ChangePasswordModel
     {

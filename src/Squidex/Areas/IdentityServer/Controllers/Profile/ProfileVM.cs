@@ -9,7 +9,7 @@
 using System.Collections.Generic;
 using Squidex.Shared.Users;
 
-namespace Squidex.Controllers.UI.Profile
+namespace Squidex.Areas.IdentityServer.Controllers.Profile
 {
     public sealed class ProfileVM
     {
