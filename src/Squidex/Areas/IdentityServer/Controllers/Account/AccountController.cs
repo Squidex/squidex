@@ -19,7 +19,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using NSwag.Annotations;
 using Squidex.Config;
-using Squidex.Config.Identity;
+using Squidex.Config.Authentication;
 using Squidex.Domain.Users;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
@@ -30,7 +30,7 @@ using Squidex.Shared.Users;
 namespace Squidex.Areas.IdentityServer.Controllers.Account
 {
     [SwaggerIgnore]
-    public sealed class AccountController : Controller
+    public sealed class AccountController : IdentityServerController
     {
         private readonly SignInManager<IUser> signInManager;
         private readonly UserManager<IUser> userManager;

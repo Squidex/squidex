@@ -33,73 +33,73 @@ namespace Squidex.Config.Domain
         {
             if (config.GetValue<bool>("logging:human"))
             {
-                services.AddSingleton(c => new Func<IObjectWriter>(() => new JsonLogWriter(Formatting.Indented, true)));
+                services.AddSingletonAs(c => new Func<IObjectWriter>(() => new JsonLogWriter(Formatting.Indented, true)));
             }
             else
             {
-                services.AddSingleton(c => new Func<IObjectWriter>(() => new JsonLogWriter()));
+                services.AddSingletonAs(c => new Func<IObjectWriter>(() => new JsonLogWriter()));
             }
 
             var loggingFile = config.GetValue<string>("logging:file");
 
             if (!string.IsNullOrWhiteSpace(loggingFile))
             {
-                services.AddSingleton(new FileChannel(loggingFile))
+                services.AddSingletonAs(new FileChannel(loggingFile))
                     .As<ILogChannel>()
                     .As<IExternalSystem>();
             }
 
-            services.AddSingleton(c => new ApplicationInfoLogAppender(typeof(Program).Assembly, Guid.NewGuid()))
+            services.AddSingletonAs(c => new ApplicationInfoLogAppender(typeof(Program).Assembly, Guid.NewGuid()))
                 .As<ILogAppender>();
 
-            services.AddSingleton<ActionContextLogAppender>()
+            services.AddSingletonAs<ActionContextLogAppender>()
                 .As<ILogAppender>();
 
-            services.AddSingleton<TimestampLogAppender>()
+            services.AddSingletonAs<TimestampLogAppender>()
                 .As<ILogAppender>();
 
-            services.AddSingleton<DebugLogChannel>()
+            services.AddSingletonAs<DebugLogChannel>()
                 .As<ILogChannel>();
 
-            services.AddSingleton<ConsoleLogChannel>()
+            services.AddSingletonAs<ConsoleLogChannel>()
                 .As<ILogChannel>();
 
-            services.AddSingleton<SemanticLog>()
+            services.AddSingletonAs<SemanticLog>()
                 .As<ISemanticLog>();
 
-            services.AddSingleton(SystemClock.Instance)
+            services.AddSingletonAs(SystemClock.Instance)
                 .As<IClock>();
 
-            services.AddSingleton<BackgroundUsageTracker>()
+            services.AddSingletonAs<BackgroundUsageTracker>()
                 .As<IUsageTracker>();
 
-            services.AddSingleton<HttpContextAccessor>()
+            services.AddSingletonAs<HttpContextAccessor>()
                 .As<IHttpContextAccessor>();
 
-            services.AddSingleton<ActionContextAccessor>()
+            services.AddSingletonAs<ActionContextAccessor>()
                 .As<IActionContextAccessor>();
 
-            services.AddSingleton<DefaultDomainObjectRepository>()
+            services.AddSingletonAs<DefaultDomainObjectRepository>()
                 .As<IDomainObjectRepository>();
 
-            services.AddSingleton<DefaultDomainObjectFactory>()
+            services.AddSingletonAs<DefaultDomainObjectFactory>()
                 .As<IDomainObjectFactory>();
 
-            services.AddSingleton<AggregateHandler>()
+            services.AddSingletonAs<AggregateHandler>()
                 .As<IAggregateHandler>();
 
-            services.AddSingleton<InMemoryCommandBus>()
+            services.AddSingletonAs<InMemoryCommandBus>()
                 .As<ICommandBus>();
 
-            services.AddSingleton<DefaultStreamNameResolver>()
+            services.AddSingletonAs<DefaultStreamNameResolver>()
                 .As<IStreamNameResolver>();
 
-            services.AddSingleton<ImageSharpAssetThumbnailGenerator>()
+            services.AddSingletonAs<ImageSharpAssetThumbnailGenerator>()
                 .As<IAssetThumbnailGenerator>();
 
-            services.AddSingleton<EventDataFormatter>();
+            services.AddSingletonAs<EventDataFormatter>();
 
-            services.AddSingleton(c => new InvalidatingMemoryCache(
+            services.AddSingletonAs(c => new InvalidatingMemoryCache(
                     new MemoryCache(
                         c.GetRequiredService<IOptions<MemoryCacheOptions>>()),
                     c.GetRequiredService<IPubSub>()))

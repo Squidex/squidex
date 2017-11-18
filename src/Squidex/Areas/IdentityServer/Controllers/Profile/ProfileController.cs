@@ -18,7 +18,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using NSwag.Annotations;
-using Squidex.Config.Identity;
+using Squidex.Config;
 using Squidex.Domain.Users;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Reflection;
@@ -28,7 +28,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
 {
     [Authorize]
     [SwaggerIgnore]
-    public sealed class ProfileController : Controller
+    public sealed class ProfileController : IdentityServerController
     {
         private readonly SignInManager<IUser> signInManager;
         private readonly UserManager<IUser> userManager;

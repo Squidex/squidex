@@ -18,6 +18,7 @@ namespace Squidex.Areas.OrleansDashboard
         {
             app.Map("/orleans", orleansApp =>
             {
+                orleansApp.UseAuthentication();
                 orleansApp.UseMiddleware<OrleansDashboardAuthenticationMiddleware>();
                 orleansApp.UseOrleansDashboard();
             });

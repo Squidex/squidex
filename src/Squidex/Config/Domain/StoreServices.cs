@@ -48,44 +48,44 @@ namespace Squidex.Config.Domain
                     var mongoDatabase = mongoClient.GetDatabase(mongoDatabaseName);
                     var mongoContentDatabase = mongoClient.GetDatabase(mongoContentDatabaseName);
 
-                    services.AddSingleton(c => new MongoUserStore(mongoDatabase))
+                    services.AddSingletonAs(c => new MongoUserStore(mongoDatabase))
                         .As<IUserStore<IUser>>()
                         .As<IUserFactory>()
                         .As<IUserResolver>()
                         .As<IExternalSystem>();
 
-                    services.AddSingleton(c => new MongoRoleStore(mongoDatabase))
+                    services.AddSingletonAs(c => new MongoRoleStore(mongoDatabase))
                         .As<IRoleStore<IRole>>()
                         .As<IRoleFactory>()
                         .As<IExternalSystem>();
 
-                    services.AddSingleton(c => new MongoPersistedGrantStore(mongoDatabase))
+                    services.AddSingletonAs(c => new MongoPersistedGrantStore(mongoDatabase))
                         .As<IPersistedGrantStore>()
                         .As<IExternalSystem>();
 
-                    services.AddSingleton(c => new MongoUsageStore(mongoDatabase))
+                    services.AddSingletonAs(c => new MongoUsageStore(mongoDatabase))
                         .As<IUsageStore>()
                         .As<IExternalSystem>();
 
-                    services.AddSingleton(c => new MongoContentRepository(mongoContentDatabase, c.GetService<IAppProvider>()))
+                    services.AddSingletonAs(c => new MongoContentRepository(mongoContentDatabase, c.GetService<IAppProvider>()))
                         .As<IContentRepository>()
                         .As<IEventConsumer>();
 
-                    services.AddSingleton(c => new MongoRuleEventRepository(mongoDatabase))
+                    services.AddSingletonAs(c => new MongoRuleEventRepository(mongoDatabase))
                         .As<IRuleEventRepository>()
                         .As<IExternalSystem>();
 
-                    services.AddSingleton(c => new MongoHistoryEventRepository(mongoDatabase, c.GetServices<IHistoryEventsCreator>()))
+                    services.AddSingletonAs(c => new MongoHistoryEventRepository(mongoDatabase, c.GetServices<IHistoryEventsCreator>()))
                         .As<IHistoryEventRepository>()
                         .As<IEventConsumer>()
                         .As<IExternalSystem>();
 
-                    services.AddSingleton(c => new MongoAssetStatsRepository(mongoDatabase))
+                    services.AddSingletonAs(c => new MongoAssetStatsRepository(mongoDatabase))
                         .As<IAssetStatsRepository>()
                         .As<IAssetEventConsumer>()
                         .As<IExternalSystem>();
 
-                    services.AddSingleton(c => new MongoAssetRepository(mongoDatabase))
+                    services.AddSingletonAs(c => new MongoAssetRepository(mongoDatabase))
                         .As<IAssetRepository>()
                         .As<IAssetEventConsumer>()
                         .As<IExternalSystem>();

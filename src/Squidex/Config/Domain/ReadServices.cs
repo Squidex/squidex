@@ -40,71 +40,71 @@ namespace Squidex.Config.Domain
         {
             var exposeSourceUrl = config.GetOptionalValue("assetStore:exposeSourceUrl", true);
 
-            services.AddSingleton(c => new GraphQLUrlGenerator(
+            services.AddSingletonAs(c => new GraphQLUrlGenerator(
                     c.GetRequiredService<IOptions<MyUrlsOptions>>(),
                     c.GetRequiredService<IAssetStore>(),
                     exposeSourceUrl))
                 .As<IGraphQLUrlGenerator>();
 
-            services.AddSingleton(c => c.GetService<IOptions<MyUsageOptions>>()?.Value?.Plans.OrEmpty());
+            services.AddSingletonAs(c => c.GetService<IOptions<MyUsageOptions>>()?.Value?.Plans.OrEmpty());
 
-            services.AddSingleton<CachingGraphQLService>()
+            services.AddSingletonAs<CachingGraphQLService>()
                 .As<IGraphQLService>();
 
-            services.AddSingleton<ContentQueryService>()
+            services.AddSingletonAs<ContentQueryService>()
                 .As<IContentQueryService>();
 
-            services.AddSingleton<ConfigAppPlansProvider>()
+            services.AddSingletonAs<ConfigAppPlansProvider>()
                 .As<IAppPlansProvider>();
 
-            services.AddSingleton<AssetUserPictureStore>()
+            services.AddSingletonAs<AssetUserPictureStore>()
                 .As<IUserPictureStore>();
 
-            services.AddSingleton<AppHistoryEventsCreator>()
+            services.AddSingletonAs<AppHistoryEventsCreator>()
                 .As<IHistoryEventsCreator>();
 
-            services.AddSingleton<ContentHistoryEventsCreator>()
+            services.AddSingletonAs<ContentHistoryEventsCreator>()
                 .As<IHistoryEventsCreator>();
 
-            services.AddSingleton<SchemaHistoryEventsCreator>()
+            services.AddSingletonAs<SchemaHistoryEventsCreator>()
                 .As<IHistoryEventsCreator>();
 
-            services.AddSingleton<NoopAppPlanBillingManager>()
+            services.AddSingletonAs<NoopAppPlanBillingManager>()
                 .As<IAppPlanBillingManager>();
 
-            services.AddSingleton<OrleansEventNotifier>()
+            services.AddSingletonAs<OrleansEventNotifier>()
                 .As<IEventNotifier>();
 
-            services.AddSingleton<RuleDequeuer>()
+            services.AddSingletonAs<RuleDequeuer>()
                 .As<IExternalSystem>();
 
-            services.AddSingleton<OrleansAppProvider>()
+            services.AddSingletonAs<OrleansAppProvider>()
                 .As<IAppProvider>();
 
-            services.AddSingleton<AppStateEventConsumer>()
+            services.AddSingletonAs<AppStateEventConsumer>()
                 .As<IEventConsumer>();
 
-            services.AddSingleton<RuleEnqueuer>()
+            services.AddSingletonAs<RuleEnqueuer>()
                 .As<IEventConsumer>();
 
-            services.AddSingleton<ContentChangedTriggerHandler>()
+            services.AddSingletonAs<ContentChangedTriggerHandler>()
                 .As<IRuleTriggerHandler>();
 
-            services.AddSingleton<WebhookActionHandler>()
+            services.AddSingletonAs<WebhookActionHandler>()
                 .As<IRuleActionHandler>();
 
-            services.AddSingleton<IEventConsumer>(c =>
+            services.AddSingletonAs<IEventConsumer>(c =>
                 new CompoundEventConsumer(c.GetServices<IAssetEventConsumer>().ToArray()));
 
-            services.AddSingleton(c =>
+            services.AddSingletonAs(c =>
             {
                 var allEventConsumers = c.GetServices<IEventConsumer>();
 
                 return new EventConsumerFactory(n => allEventConsumers.FirstOrDefault(x => x.Name == n));
             });
 
-            services.AddSingleton<RuleService>();
-            services.AddSingleton<EdmModelBuilder>();
+            services.AddSingletonAs<RuleService>();
+            services.AddSingletonAs<EdmModelBuilder>();
         }
     }
 }

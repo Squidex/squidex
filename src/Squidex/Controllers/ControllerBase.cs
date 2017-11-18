@@ -19,13 +19,6 @@ namespace Squidex.Controllers
     {
         protected ICommandBus CommandBus { get; }
 
-        protected ControllerBase(ICommandBus commandBus)
-        {
-            Guard.NotNull(commandBus, nameof(commandBus));
-
-            CommandBus = commandBus;
-        }
-
         protected IAppEntity App
         {
             get
@@ -44,6 +37,13 @@ namespace Squidex.Controllers
         protected string AppName
         {
             get { return App.Name; }
+        }
+
+        protected ControllerBase(ICommandBus commandBus)
+        {
+            Guard.NotNull(commandBus, nameof(commandBus));
+
+            CommandBus = commandBus;
         }
     }
 }

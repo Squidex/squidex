@@ -14,7 +14,7 @@ using Microsoft.AspNetCore.Authentication.OAuth;
 using Squidex.Infrastructure.Tasks;
 using Squidex.Shared.Identity;
 
-namespace Squidex.Config.Identity
+namespace Squidex.Config.Authentication
 {
     public sealed class GoogleHandler : OAuthEvents
     {

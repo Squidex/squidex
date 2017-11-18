@@ -33,7 +33,7 @@ namespace Squidex.Config.Domain
                     var mongoConfiguration = config.GetRequiredValue("eventStore:mongoDb:configuration");
                     var mongoDatabaseName = config.GetRequiredValue("eventStore:mongoDb:database");
 
-                    services.AddSingleton(c =>
+                    services.AddSingletonAs(c =>
                         {
                             var mongoClient = Singletons<IMongoClient>.GetOrAdd(mongoConfiguration, s => new MongoClient(s));
                             var mongDatabase = mongoClient.GetDatabase(mongoDatabaseName);
@@ -51,7 +51,7 @@ namespace Squidex.Config.Domain
 
                     var connection = EventStoreConnection.Create(eventStoreConfiguration);
 
-                    services.AddSingleton(c => new GetEventStore(connection, eventStorePrefix, eventStoreProjectionHost))
+                    services.AddSingletonAs(c => new GetEventStore(connection, eventStorePrefix, eventStoreProjectionHost))
                         .As<IExternalSystem>()
                         .As<IEventStore>();
                 }

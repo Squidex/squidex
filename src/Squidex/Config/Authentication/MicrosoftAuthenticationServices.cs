@@ -9,7 +9,7 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Squidex.Config.Identity
+namespace Squidex.Config.Authentication
 {
     public static class MicrosoftAuthenticationServices
     {

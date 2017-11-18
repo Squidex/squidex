@@ -24,51 +24,51 @@ namespace Squidex.Config.Domain
     {
         public static void AddMyWriteServices(this IServiceCollection services)
         {
-            services.AddSingleton<NoopUserEvents>()
+            services.AddSingletonAs<NoopUserEvents>()
                 .As<IUserEvents>();
 
-            services.AddSingleton<JintScriptEngine>()
+            services.AddSingletonAs<JintScriptEngine>()
                 .As<IScriptEngine>();
 
-            services.AddSingleton<ContentVersionLoader>()
+            services.AddSingletonAs<ContentVersionLoader>()
                 .As<IContentVersionLoader>();
 
-            services.AddSingleton<ETagCommandMiddleware>()
+            services.AddSingletonAs<ETagCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
-            services.AddSingleton<EnrichWithTimestampCommandMiddleware>()
+            services.AddSingletonAs<EnrichWithTimestampCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
-            services.AddSingleton<EnrichWithActorCommandMiddleware>()
+            services.AddSingletonAs<EnrichWithActorCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
-            services.AddSingleton<EnrichWithAppIdCommandMiddleware>()
+            services.AddSingletonAs<EnrichWithAppIdCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
-            services.AddSingleton<EnrichWithSchemaIdCommandMiddleware>()
+            services.AddSingletonAs<EnrichWithSchemaIdCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
-            services.AddSingleton<AppCommandMiddleware>()
+            services.AddSingletonAs<AppCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
-            services.AddSingleton<AssetCommandMiddleware>()
+            services.AddSingletonAs<AssetCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
-            services.AddSingleton<ContentCommandMiddleware>()
+            services.AddSingletonAs<ContentCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
-            services.AddSingleton<SchemaCommandMiddleware>()
+            services.AddSingletonAs<SchemaCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
-            services.AddSingleton<RuleCommandMiddleware>()
+            services.AddSingletonAs<RuleCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
-            services.AddSingleton<DomainObjectFactoryFunction<AppDomainObject>>(c => (id => new AppDomainObject(id, -1)));
-            services.AddSingleton<DomainObjectFactoryFunction<RuleDomainObject>>(c => (id => new RuleDomainObject(id, -1)));
-            services.AddSingleton<DomainObjectFactoryFunction<AssetDomainObject>>(c => (id => new AssetDomainObject(id, -1)));
-            services.AddSingleton<DomainObjectFactoryFunction<ContentDomainObject>>(c => (id => new ContentDomainObject(id, -1)));
+            services.AddSingletonAs<DomainObjectFactoryFunction<AppDomainObject>>(c => (id => new AppDomainObject(id, -1)));
+            services.AddSingletonAs<DomainObjectFactoryFunction<RuleDomainObject>>(c => (id => new RuleDomainObject(id, -1)));
+            services.AddSingletonAs<DomainObjectFactoryFunction<AssetDomainObject>>(c => (id => new AssetDomainObject(id, -1)));
+            services.AddSingletonAs<DomainObjectFactoryFunction<ContentDomainObject>>(c => (id => new ContentDomainObject(id, -1)));
 
-            services.AddSingleton<DomainObjectFactoryFunction<SchemaDomainObject>>(c =>
+            services.AddSingletonAs<DomainObjectFactoryFunction<SchemaDomainObject>>(c =>
                 {
                     var fieldRegistry = c.GetRequiredService<FieldRegistry>();
 

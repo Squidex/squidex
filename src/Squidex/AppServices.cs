@@ -8,9 +8,10 @@
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Squidex.Areas.IdentityServer.Config;
 using Squidex.Config;
+using Squidex.Config.Authentication;
 using Squidex.Config.Domain;
-using Squidex.Config.Identity;
 using Squidex.Config.Swagger;
 using Squidex.Config.Web;
 
@@ -26,10 +27,8 @@ namespace Squidex
 
             services.AddMyAssetServices(config);
             services.AddMyAuthentication(config);
-            services.AddMyDataProtectection(config);
             services.AddMyEventPublishersServices(config);
             services.AddMyEventStoreServices(config);
-            services.AddMyIdentity();
             services.AddMyIdentityServer();
             services.AddMyInfrastructureServices(config);
             services.AddMyMvc();

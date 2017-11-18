@@ -16,14 +16,6 @@ namespace Squidex.Areas.IdentityServer.Controllers
 {
     public static class Extensions
     {
-        public static Task<IdentityResult> UpdateAsync(this UserManager<IUser> userManager, IUser user, string email, string displayName)
-        {
-            user.UpdateEmail(email);
-            user.SetDisplayName(displayName);
-
-            return userManager.UpdateAsync(user);
-        }
-
         public static async Task<ExternalLoginInfo> GetExternalLoginInfoWithDisplayNameAsync(this SignInManager<IUser> signInManager, string expectedXsrf = null)
         {
             var externalLogin = await signInManager.GetExternalLoginInfoAsync(expectedXsrf);

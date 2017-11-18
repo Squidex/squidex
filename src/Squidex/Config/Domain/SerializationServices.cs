@@ -81,10 +81,10 @@ namespace Squidex.Config.Domain
 
         public static IServiceCollection AddMySerializers(this IServiceCollection services)
         {
-            services.AddSingleton(t => TypeNameRegistry);
-            services.AddSingleton(t => FieldRegistry);
-            services.AddSingleton(t => SerializerSettings);
-            services.AddSingleton(t => JsonSerializer.Create(SerializerSettings));
+            services.AddSingletonAs(t => TypeNameRegistry);
+            services.AddSingletonAs(t => FieldRegistry);
+            services.AddSingletonAs(t => SerializerSettings);
+            services.AddSingletonAs(t => JsonSerializer.Create(SerializerSettings));
 
             return services;
         }

@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Squidex.Shared.Identity;
 
-namespace Squidex.Config.Identity
+namespace Squidex.Config.Authentication
 {
     public sealed class MicrosoftHandler : OAuthEvents
     {

@@ -30,24 +30,24 @@ namespace Squidex.Areas.IdentityServer.Config
             return app;
         }
 
-        public static IApplicationBuilder UseMyAdminRole(this IApplicationBuilder app)
+        public static IServiceProvider UseMyAdminRole(this IServiceProvider services)
         {
-            var roleManager = app.ApplicationServices.GetRequiredService<RoleManager<IRole>>();
-            var roleFactory = app.ApplicationServices.GetRequiredService<IRoleFactory>();
+            var roleManager = services.GetRequiredService<RoleManager<IRole>>();
+            var roleFactory = services.GetRequiredService<IRoleFactory>();
 
             roleManager.CreateAsync(roleFactory.Create(SquidexRoles.Administrator)).Wait();
 
-            return app;
+            return services;
         }
 
-        public static IApplicationBuilder UseMyAdmin(this IApplicationBuilder app)
+        public static IServiceProvider UseMyAdmin(this IServiceProvider services)
         {
-            var options = app.ApplicationServices.GetService<IOptions<MyIdentityOptions>>().Value;
+            var options = services.GetService<IOptions<MyIdentityOptions>>().Value;
 
-            var userManager = app.ApplicationServices.GetService<UserManager<IUser>>();
-            var userFactory = app.ApplicationServices.GetService<IUserFactory>();
+            var userManager = services.GetService<UserManager<IUser>>();
+            var userFactory = services.GetService<IUserFactory>();
 
-            var log = app.ApplicationServices.GetService<ISemanticLog>();
+            var log = services.GetService<ISemanticLog>();
 
             if (options.IsAdminConfigured())
             {
@@ -74,7 +74,7 @@ namespace Squidex.Areas.IdentityServer.Config
                 }).Wait();
             }
 
-            return app;
+            return services;
         }
     }
 }

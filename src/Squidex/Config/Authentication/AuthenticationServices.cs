@@ -13,7 +13,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Infrastructure;
 
-namespace Squidex.Config.Identity
+namespace Squidex.Config.Authentication
 {
     public static class AuthenticationServices
     {

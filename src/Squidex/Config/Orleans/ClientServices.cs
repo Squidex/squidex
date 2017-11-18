@@ -21,7 +21,7 @@ namespace Squidex.Config.Orleans
     {
         public static void AddAppClient(this IServiceCollection services)
         {
-            services.AddSingleton(c => c.GetRequiredService<IClusterClient>())
+            services.AddSingletonAs(c => c.GetRequiredService<IClusterClient>())
                 .As<IGrainFactory>();
 
             services.AddServicesForSelfHostedDashboard(null, options =>
@@ -29,7 +29,7 @@ namespace Squidex.Config.Orleans
                 options.HideTrace = true;
             });
 
-            services.AddSingleton(c =>
+            services.AddSingletonAs(c =>
             {
                 var configuration = ClientConfiguration.LocalhostSilo();
 

@@ -12,11 +12,14 @@ using System.Security.Cryptography.X509Certificates;
 using IdentityModel;
 using IdentityServer4.Models;
 using IdentityServer4.Stores;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.DataProtection.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Config;
 using Squidex.Domain.Users;
+using Squidex.Domain.Users.DataProtection.Orleans;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
 
@@ -44,9 +47,13 @@ namespace Squidex.Areas.IdentityServer.Config
             services.AddIdentity<IUser, IRole>()
                 .AddDefaultTokenProviders();
 
+            services.AddDataProtection().SetApplicationName("Squidex");
+
             services.AddSingleton(GetApiResources());
             services.AddSingleton(GetIdentityResources());
 
+            services.AddSingleton<IXmlRepository,
+                OrleansXmlRepository>();
             services.AddSingleton<IUserClaimsPrincipalFactory<IUser>,
                 UserClaimsPrincipalFactoryWithEmail>();
             services.AddSingleton<IClientStore,
@@ -62,21 +69,6 @@ namespace Squidex.Areas.IdentityServer.Config
                 .AddInMemoryApiResources(GetApiResources())
                 .AddInMemoryIdentityResources(GetIdentityResources())
                 .AddSigningCredential(certificate);
-        }
-
-        public static void AddMyDataProtectection(this IServiceCollection services, IConfiguration config)
-        {
-            var dataProtection = services.AddDataProtection().SetApplicationName("Squidex");
-
-            services.AddSingleton<OrleansXmlRepository>();
-
-            services.AddSingleton<IConfigureOptions<KeyManagementOptions>>(s =>
-            {
-                return new ConfigureOptions<KeyManagementOptions>(options =>
-                {
-                    options.XmlRepository = s.GetRequiredService<OrleansXmlRepository>();
-                });
-            });
         }
 
         private static IEnumerable<ApiResource> GetApiResources()
