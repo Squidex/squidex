@@ -16,6 +16,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Squidex.Areas.Frontend;
 using Squidex.Areas.IdentityServer;
 using Squidex.Areas.OrleansDashboard;
+using Squidex.Areas.Portal;
 using Squidex.Config;
 using Squidex.Config.Domain;
 using Squidex.Config.Orleans;
@@ -29,14 +30,6 @@ namespace Squidex
     public class WebStartup : IStartup
     {
         private readonly IConfiguration configuration;
-
-        private static readonly string[] IdentityServerPaths =
-        {
-            "/client-callback-popup",
-            "/client-callback-silent",
-            "/account",
-            "/error"
-        };
 
         public WebStartup(IConfiguration configuration)
         {
@@ -63,7 +56,9 @@ namespace Squidex
             MapAndUseApi(app);
 
             app.ConfigureOrleansDashboard();
+            app.ConfigurePortal();
             app.ConfigureIdentityServer();
+
             app.ConfigureFrontend();
         }
 
@@ -72,17 +67,8 @@ namespace Squidex
             app.Map(Constants.ApiPrefix, appApi =>
             {
                 appApi.UseMySwagger();
-
-                appApi.MapWhen(x => !IsIdentityRequest(x), mvcApp =>
-                {
-                    mvcApp.UseMvc();
-                });
+                appApi.UseMvc();
             });
-        }
-
-        private static bool IsIdentityRequest(HttpContext context)
-        {
-            return IdentityServerPaths.Any(p => context.Request.Path.StartsWithSegments(p));
         }
     }
 }
