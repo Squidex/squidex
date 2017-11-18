@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  RuleDequeuerTests.cs
+//  RuleDequeuerGrainTests.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -11,8 +11,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
 using NodaTime;
+using Orleans.Core;
+using Orleans.Runtime;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
+using Squidex.Domain.Apps.Read.Rules.Orleans.Grains.Implementation;
 using Squidex.Domain.Apps.Read.Rules.Repositories;
 using Squidex.Infrastructure.Log;
 using Xunit;
@@ -21,7 +24,7 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Read.Rules
 {
-    public class RuleDequeuerTests
+    public class RuleDequeuerGrainTests
     {
         private readonly IClock clock = A.Fake<IClock>();
         private readonly ISemanticLog log = A.Fake<ISemanticLog>();
@@ -30,7 +33,17 @@ namespace Squidex.Domain.Apps.Read.Rules
         private readonly RuleService ruleService = A.Fake<RuleService>();
         private readonly Instant now = SystemClock.Instance.GetCurrentInstant();
 
-        public RuleDequeuerTests()
+        public sealed class MyRuleDequeuerGrain : RuleDequeuerGrain
+        {
+            public MyRuleDequeuerGrain(RuleService ruleService, IRuleEventRepository ruleEventRepository, ISemanticLog log, IClock clock,
+                IGrainIdentity identity,
+                IGrainRuntime runtime)
+                : base(ruleService, ruleEventRepository, log, clock, identity, runtime)
+            {
+            }
+        }
+
+        public RuleDequeuerGrainTests()
         {
             A.CallTo(() => clock.GetCurrentInstant()).Returns(now);
         }
@@ -42,7 +55,7 @@ namespace Squidex.Domain.Apps.Read.Rules
         [InlineData(2, 360, RuleResult.Failed,  RuleJobResult.Retry)]
         [InlineData(3, 720, RuleResult.Failed,  RuleJobResult.Retry)]
         [InlineData(4, 0,   RuleResult.Failed,  RuleJobResult.Failed)]
-        public void Should_set_next_attempt_based_on_num_calls(int calls, int minutes, RuleResult result, RuleJobResult jobResult)
+        public async Task Should_set_next_attempt_based_on_num_calls(int calls, int minutes, RuleResult result, RuleJobResult jobResult)
         {
             var actionData = new RuleJobData();
             var actionName = "MyAction";
@@ -55,14 +68,17 @@ namespace Squidex.Domain.Apps.Read.Rules
             SetupSender(@event, requestDump, result, requestElapsed);
             SetupPendingEvents(@event);
 
-            var sut = new RuleDequeuer(
+            var sut = new MyRuleDequeuerGrain(
                 ruleService,
                 ruleEventRepository,
                 log,
-                clock);
+                clock,
+                A.Fake<IGrainIdentity>(),
+                A.Fake<IGrainRuntime>());
 
-            sut.Next();
-            sut.Dispose();
+            await sut.OnActivateAsync();
+            await sut.QueryAsync();
+            await sut.OnDeactivateAsync();
 
             Instant? nextCall = null;
 

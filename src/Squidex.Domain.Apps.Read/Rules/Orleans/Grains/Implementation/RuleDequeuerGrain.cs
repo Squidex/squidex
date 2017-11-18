@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  RuleDequeuer.cs
+//  RuleDequeuerGrain.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -11,25 +11,35 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using NodaTime;
+using Orleans;
+using Orleans.Core;
+using Orleans.Runtime;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Read.Rules.Repositories;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
-using Squidex.Infrastructure.Timers;
+using Squidex.Infrastructure.Tasks;
 
-namespace Squidex.Domain.Apps.Read.Rules
+namespace Squidex.Domain.Apps.Read.Rules.Orleans.Grains.Implementation
 {
-    public sealed class RuleDequeuer : DisposableObjectBase, IExternalSystem
+    public class RuleDequeuerGrain : Grain, IRuleDequeuerGrain, IRemindable
     {
-        private readonly ActionBlock<IRuleEventEntity> requestBlock;
-        private readonly TransformBlock<IRuleEventEntity, IRuleEventEntity> blockBlock;
         private readonly IRuleEventRepository ruleEventRepository;
         private readonly RuleService ruleService;
-        private readonly CompletionTimer timer;
         private readonly IClock clock;
         private readonly ISemanticLog log;
+        private ActionBlock<IRuleEventEntity> requestBlock;
+        private TransformBlock<IRuleEventEntity, IRuleEventEntity> blockBlock;
 
-        public RuleDequeuer(RuleService ruleService, IRuleEventRepository ruleEventRepository, ISemanticLog log, IClock clock)
+        public RuleDequeuerGrain(RuleService ruleService, IRuleEventRepository ruleEventRepository, ISemanticLog log, IClock clock)
+            : this(ruleService, ruleEventRepository, log, clock, null, null)
+        {
+        }
+
+        protected RuleDequeuerGrain(RuleService ruleService, IRuleEventRepository ruleEventRepository, ISemanticLog log, IClock clock,
+            IGrainIdentity identity,
+            IGrainRuntime runtime)
+            : base(identity, runtime)
         {
             Guard.NotNull(ruleEventRepository, nameof(ruleEventRepository));
             Guard.NotNull(ruleService, nameof(ruleService));
@@ -42,47 +52,64 @@ namespace Squidex.Domain.Apps.Read.Rules
             this.clock = clock;
 
             this.log = log;
+        }
+
+        public override Task OnActivateAsync()
+        {
+            DelayDeactivation(TimeSpan.FromDays(1));
+
+            RegisterOrUpdateReminder("Default", TimeSpan.Zero, TimeSpan.FromMinutes(10));
+            RegisterTimer(x => QueryAsync(), null, TimeSpan.Zero, TimeSpan.FromSeconds(10));
 
             requestBlock =
                 new ActionBlock<IRuleEventEntity>(MakeRequestAsync,
-                    new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = 32, BoundedCapacity = 32 });
+                    new ExecutionDataflowBlockOptions
+                    {
+                        TaskScheduler = TaskScheduler.Current,
+                        MaxMessagesPerTask = 1,
+                        MaxDegreeOfParallelism = 32,
+                        BoundedCapacity = 32
+                    });
 
             blockBlock =
                 new TransformBlock<IRuleEventEntity, IRuleEventEntity>(x => BlockAsync(x),
-                    new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = 1, BoundedCapacity = 1 });
+                    new ExecutionDataflowBlockOptions
+                    {
+                        TaskScheduler = TaskScheduler.Current,
+                        MaxMessagesPerTask = 1,
+                        MaxDegreeOfParallelism = 1,
+                        BoundedCapacity = 1
+                    });
 
             blockBlock.LinkTo(requestBlock, new DataflowLinkOptions { PropagateCompletion = true });
 
-            timer = new CompletionTimer(5000, QueryAsync);
+            return base.OnActivateAsync();
         }
 
-        protected override void DisposeObject(bool disposing)
+        public Task ReceiveReminder(string reminderName, TickStatus status)
         {
-            if (disposing)
-            {
-                timer.StopAsync().Wait();
-
-                blockBlock.Complete();
-                requestBlock.Completion.Wait();
-            }
+            return QueryAsync();
         }
 
-        public void Connect()
+        public override Task OnDeactivateAsync()
         {
+            blockBlock.Complete();
+
+            return requestBlock.Completion;
         }
 
-        public void Next()
+        public Task ActivateAsync()
         {
-            timer.SkipCurrentDelay();
+            return TaskHelper.Done;
         }
 
-        private async Task QueryAsync(CancellationToken cancellationToken)
+        public async Task QueryAsync()
         {
             try
             {
                 var now = clock.GetCurrentInstant();
 
-                await ruleEventRepository.QueryPendingAsync(now, blockBlock.SendAsync, cancellationToken);
+                await ruleEventRepository.QueryPendingAsync(now, blockBlock.SendAsync, CancellationToken.None);
             }
             catch (Exception ex)
             {

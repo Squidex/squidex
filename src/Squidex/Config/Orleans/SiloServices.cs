@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Orleans;
 using Orleans.Runtime.Configuration;
+using Squidex.Domain.Apps.Read.Rules.Orleans;
 using Squidex.Infrastructure.CQRS.Events.Orleans.Grains;
 
 namespace Squidex.Config.Orleans
@@ -31,6 +32,7 @@ namespace Squidex.Config.Orleans
             if (clusterConfiguration != null)
             {
                 clusterConfiguration.Globals.RegisterBootstrapProvider<EventConsumerBootstrap>("EventConsumers");
+                clusterConfiguration.Globals.RegisterBootstrapProvider<RuleDequeuerBootstrap>("RuleDequeuer");
             }
 
             config.ConfigureByOption("store:type", new Options

@@ -75,9 +75,6 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<OrleansEventNotifier>()
                 .As<IEventNotifier>();
 
-            services.AddSingletonAs<RuleDequeuer>()
-                .As<IExternalSystem>();
-
             services.AddSingletonAs<OrleansAppProvider>()
                 .As<IAppProvider>();
 
