@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Orleans;
 using Squidex.Config;
 using Squidex.Config.Domain;
 using Squidex.Config.Identity;
@@ -62,7 +63,16 @@ namespace Squidex
 
             MapAndUseIdentityServer(app);
             MapAndUseApi(app);
+            MapAndUseOrleans(app);
             MapAndUseFrontend(app);
+        }
+
+        private void MapAndUseOrleans(IApplicationBuilder app)
+        {
+            app.Map(Constants.OrleansPrefix, orleansApp =>
+            {
+                orleansApp.UseOrleansDashboard();
+            });
         }
 
         private void MapAndUseIdentityServer(IApplicationBuilder app)

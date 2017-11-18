@@ -23,5 +23,7 @@ namespace Squidex.Config
         public static readonly string FrontendClient = "squidex-frontend";
 
         public static readonly string IdentityPrefix = "/identity-server";
+
+        public static readonly string OrleansPrefix = "/orleans";
     }
 }

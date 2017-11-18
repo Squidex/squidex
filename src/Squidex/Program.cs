@@ -9,6 +9,7 @@
 using System;
 using System.IO;
 using Microsoft.AspNetCore.Hosting;
+using Orleans;
 using Orleans.Hosting;
 using Orleans.Runtime.Configuration;
 using Squidex.Config.Orleans;
@@ -27,8 +28,12 @@ namespace Squidex
                 .AddApplicationPartsFromReferences(typeof(AppStateGrain).Assembly)
                 .AddApplicationPartsFromReferences(typeof(EventConsumerGrain).Assembly)
                 .AddApplicationPartsFromReferences(typeof(XmlRepositoryGrain).Assembly)
-                .UseConfiguration(ClusterConfiguration.LocalhostPrimarySilo(33333).WithJsonSerializer())
+                .UseDashboard(options => { options.HostSelf = false; })
                 .UseContentRoot(Directory.GetCurrentDirectory())
+                .UseConfiguration(
+                    ClusterConfiguration.LocalhostPrimarySilo(33333)
+                        .WithJsonSerializer()
+                        .WithDashboard())
                 .ConfigureServices((context, services) =>
                 {
                     services.AddAppSiloServices(context.Configuration);

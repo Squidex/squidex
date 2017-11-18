@@ -13,8 +13,8 @@
     <PackageReference Include="Microsoft.Orleans.Core" Version="2.0.0-beta1" />
     <PackageReference Include="Microsoft.Orleans.OrleansCodeGenerator.Build" Version="2.0.0-beta1-fix" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
-    <PackageReference Include="NodaTime" Version="2.2.1" />
-    <PackageReference Include="RefactoringEssentials" Version="5.2.0" />
+    <PackageReference Include="NodaTime" Version="2.2.3" />
+    <PackageReference Include="RefactoringEssentials" Version="5.4.0" />
     <PackageReference Include="SixLabors.ImageSharp" Version="1.0.0-beta0001" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.0.2" />
     <PackageReference Include="System.Linq" Version="4.3.0" />

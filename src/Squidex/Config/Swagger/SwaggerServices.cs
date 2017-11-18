@@ -13,7 +13,7 @@ using NJsonSchema;
 using NJsonSchema.Generation.TypeMappers;
 using NodaTime;
 using NSwag.AspNetCore;
-using NSwag.SwaggerGeneration.WebApi.Processors.Security;
+using NSwag.SwaggerGeneration.Processors.Security;
 using Squidex.Controllers.ContentApi.Generator;
 using Squidex.Infrastructure;
 using Squidex.Pipeline.Swagger;
@@ -42,7 +42,9 @@ namespace Squidex.Config.Swagger
 
         private static SwaggerSettings ConfigureIdentity(this SwaggerSettings settings, MyUrlsOptions urlOptions)
         {
-            settings.DocumentProcessors.Add(new SecurityDefinitionAppender(Constants.SecurityDefinition, SwaggerHelper.CreateOAuthSchema(urlOptions)));
+            settings.DocumentProcessors.Add(
+                new SecurityDefinitionAppender(
+                    Constants.SecurityDefinition, SwaggerHelper.CreateOAuthSchema(urlOptions)));
 
             settings.OperationProcessors.Add(new ScopesProcessor());
 

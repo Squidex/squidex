@@ -8,6 +8,7 @@
 
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
+using Orleans;
 using Orleans.Hosting;
 using Orleans.Runtime.Configuration;
 
@@ -28,6 +29,13 @@ namespace Squidex.Config.Orleans
         public static ClusterConfiguration WithJsonSerializer(this ClusterConfiguration config)
         {
             config.Globals.SerializationProviders.Add(typeof(CustomJsonSerializer).GetTypeInfo());
+
+            return config;
+        }
+
+        public static ClusterConfiguration WithDashboard(this ClusterConfiguration config)
+        {
+            config.RegisterDashboard();
 
             return config;
         }

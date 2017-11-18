@@ -46,13 +46,6 @@ namespace Squidex.Config.Orleans
                             c.DatabaseName = mongoDatabaseName;
                             c.UseJsonFormat = true;
                         });
-
-                        clusterConfiguration.AddMongoDBStatisticsProvider("Default", c =>
-                        {
-                            c.ConnectionString = mongoConfiguration;
-                            c.CollectionPrefix = "Orleans_";
-                            c.DatabaseName = mongoDatabaseName;
-                        });
                     }
 
                     services.AddMongoDBMembershipTable(c =>

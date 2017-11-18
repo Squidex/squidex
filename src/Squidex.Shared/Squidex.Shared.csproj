@@ -7,7 +7,7 @@
     <DebugSymbols>True</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="RefactoringEssentials" Version="5.2.0" />
+    <PackageReference Include="RefactoringEssentials" Version="5.4.0" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.0.2" />
     <PackageReference Include="System.Security.Claims" Version="4.3.0" />
   </ItemGroup>

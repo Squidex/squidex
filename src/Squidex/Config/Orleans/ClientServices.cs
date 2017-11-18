@@ -24,12 +24,18 @@ namespace Squidex.Config.Orleans
             services.AddSingleton(c => c.GetRequiredService<IClusterClient>())
                 .As<IGrainFactory>();
 
+            services.AddServicesForSelfHostedDashboard(null, options =>
+            {
+                options.HideTrace = true;
+            });
+
             services.AddSingleton(c =>
             {
                 var configuration = ClientConfiguration.LocalhostSilo();
 
                 var client = new ClientBuilder()
                     .UseConfiguration(ClientConfiguration.LocalhostSilo().WithJsonSerializer())
+                    .UseDashboard()
                     .AddApplicationPartsFromReferences(typeof(AppStateGrain).Assembly)
                     .AddApplicationPartsFromReferences(typeof(EventConsumerGrain).Assembly)
                     .AddApplicationPartsFromReferences(typeof(XmlRepositoryGrain).Assembly)
