@@ -7,10 +7,13 @@
 // ==========================================================================
 
 using System.Reflection;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Orleans;
 using Orleans.Hosting;
 using Orleans.Runtime.Configuration;
+using Squidex.Shared.Identity;
 
 namespace Squidex.Config.Orleans
 {
@@ -38,6 +41,30 @@ namespace Squidex.Config.Orleans
             config.RegisterDashboard();
 
             return config;
+        }
+
+        public static IApplicationBuilder UseMyOrleansDashboard(this IApplicationBuilder app)
+        {
+            app.Use(async (context, next) =>
+            {
+                var authentication = await context.AuthenticateAsync();
+
+                if (authentication.Succeeded && authentication.Principal.IsInRole(SquidexRoles.Administrator))
+                {
+                    await next();
+                }
+                else
+                {
+                    await context.ChallengeAsync(new AuthenticationProperties
+                    {
+                        RedirectUri = context.Request.PathBase + context.Request.Path
+                    });
+                }
+            });
+
+            app.UseOrleansDashboard();
+
+            return app;
         }
     }
 }

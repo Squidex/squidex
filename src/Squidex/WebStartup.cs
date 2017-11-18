@@ -69,10 +69,6 @@ namespace Squidex
 
         private void MapAndUseOrleans(IApplicationBuilder app)
         {
-            app.Map(Constants.OrleansPrefix, orleansApp =>
-            {
-                orleansApp.UseOrleansDashboard();
-            });
         }
 
         private void MapAndUseIdentityServer(IApplicationBuilder app)
@@ -97,6 +93,11 @@ namespace Squidex
                 identityApp.MapWhen(IsIdentityRequest, mvcApp =>
                 {
                     mvcApp.UseMvc();
+                });
+
+                identityApp.Map(Constants.OrleansPrefix, orleansApp =>
+                {
+                    orleansApp.UseMyOrleansDashboard();
                 });
             });
         }
