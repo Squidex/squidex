@@ -13,9 +13,11 @@ using IdentityModel;
 using IdentityServer4.Models;
 using IdentityServer4.Stores;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.AspNetCore.DataProtection.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Squidex.Config;
 using Squidex.Domain.Users;
 using Squidex.Domain.Users.DataProtection.Orleans;
@@ -47,6 +49,15 @@ namespace Squidex.Areas.IdentityServer.Config
                 .AddDefaultTokenProviders();
 
             services.AddDataProtection().SetApplicationName("Squidex");
+            services.AddSingleton<OrleansXmlRepository>();
+
+            services.AddSingleton<IConfigureOptions<KeyManagementOptions>>(s =>
+            {
+                return new ConfigureOptions<KeyManagementOptions>(options =>
+                {
+                    options.XmlRepository = s.GetRequiredService<OrleansXmlRepository>();
+                });
+            });
 
             services.AddSingleton(GetApiResources());
             services.AddSingleton(GetIdentityResources());

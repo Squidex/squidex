@@ -23,9 +23,9 @@ namespace Squidex.Areas.IdentityServer
 
             var environment = app.ApplicationServices.GetRequiredService<IHostingEnvironment>();
 
-            app.Map(Constants.IdentityPrefix, identityApp =>
+            app.Map(Constants.IdentityServerPrefix, identityApp =>
             {
-                app.UseMyIdentityServer();
+                identityApp.UseMyIdentityServer();
 
                 if (environment.IsDevelopment())
                 {

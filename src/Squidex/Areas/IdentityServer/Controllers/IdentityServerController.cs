@@ -18,7 +18,7 @@ namespace Squidex.Areas.IdentityServer.Controllers
         {
             if (!context.HttpContext.Request.PathBase.StartsWithSegments("/identity-server"))
             {
-                context.Result = new RedirectResult("/");
+                context.Result = new NotFoundResult();
             }
         }
     }

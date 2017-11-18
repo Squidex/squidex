@@ -17,7 +17,7 @@ namespace Squidex.Areas.Portal.Middlewares
     {
         private readonly IAppPlanBillingManager appPlansBillingManager;
 
-        public PortalRedirectMiddleware(IAppPlanBillingManager appPlansBillingManager)
+        public PortalRedirectMiddleware(RequestDelegate next, IAppPlanBillingManager appPlansBillingManager)
         {
             this.appPlansBillingManager = appPlansBillingManager;
         }

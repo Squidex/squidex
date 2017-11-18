@@ -40,11 +40,11 @@ namespace Squidex.Config.Authentication
 
                 if (!string.IsNullOrWhiteSpace(identityOptions.AuthorityUrl))
                 {
-                    apiAuthorityUrl = identityOptions.AuthorityUrl.BuildFullUrl(Constants.IdentityPrefix);
+                    apiAuthorityUrl = identityOptions.AuthorityUrl.BuildFullUrl(Constants.IdentityServerPrefix);
                 }
                 else
                 {
-                    apiAuthorityUrl = urlsOptions.BuildUrl(Constants.IdentityPrefix);
+                    apiAuthorityUrl = urlsOptions.BuildUrl(Constants.IdentityServerPrefix);
                 }
 
                 authBuilder.AddIdentityServerAuthentication(options =>

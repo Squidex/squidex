@@ -51,7 +51,7 @@ namespace Squidex.Areas.Api.Controllers
         {
             if (!context.HttpContext.Request.PathBase.StartsWithSegments("/api"))
             {
-                context.Result = new NotFoundResult();
+                context.Result = new RedirectResult("/");
             }
         }
     }
