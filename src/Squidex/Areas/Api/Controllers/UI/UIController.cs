@@ -11,10 +11,10 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using NSwag.Annotations;
-using Squidex.Config;
 using Squidex.Areas.Api.Controllers.UI.Models;
-using Squidex.Pipeline;
+using Squidex.Config;
 using Squidex.Infrastructure.CQRS.Commands;
+using Squidex.Pipeline;
 
 namespace Squidex.Areas.Api.Controllers.UI
 {

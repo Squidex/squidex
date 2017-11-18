@@ -13,7 +13,7 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Areas\IdentityServer\Config\Cert\*.*;Docs\*.md" />
-    <EmbeddedResource Include="Areas\Api\Users\Assets\Avatar.png" />
+    <EmbeddedResource Include="Areas\Api\Controllers\Users\Assets\Avatar.png" />
     <EmbeddedResource Remove="Assets\**" />
 
     <Compile Remove="Assets\**" />
@@ -80,10 +80,6 @@
     <PackageReference Include="StyleCop.Analyzers" Version="1.0.2" />
     <PackageReference Include="System.Linq" Version="4.3.0" />
     <PackageReference Include="System.ValueTuple" Version="4.4.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Controllers\" />
   </ItemGroup>
 
   <Target Name="IncludeDocFile" BeforeTargets="PrepareForPublish">

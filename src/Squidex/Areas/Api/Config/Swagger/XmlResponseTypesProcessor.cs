@@ -17,7 +17,7 @@ using Squidex.Pipeline.Swagger;
 
 #pragma warning disable RECS0033 // Convert 'if' to '||' expression
 
-namespace Squidex.Config.Swagger
+namespace Squidex.Areas.Api.Config.Swagger
 {
     public sealed class XmlResponseTypesProcessor : IOperationProcessor
     {

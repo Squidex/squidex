@@ -16,10 +16,10 @@ using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using Squidex.Areas.Api.Controllers.Users.Models;
 using Squidex.Domain.Users;
+using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
 using Squidex.Shared.Users;
-using Squidex.Infrastructure.CQRS.Commands;
 
 namespace Squidex.Areas.Api.Controllers.Users
 {

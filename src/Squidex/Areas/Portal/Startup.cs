@@ -7,9 +7,8 @@
 // ==========================================================================
 
 using Microsoft.AspNetCore.Builder;
-using Orleans;
-using Squidex.Areas.OrleansDashboard.Middlewares;
 using Squidex.Areas.Portal.Middlewares;
+using Squidex.Config;
 
 namespace Squidex.Areas.Portal
 {
@@ -17,7 +16,7 @@ namespace Squidex.Areas.Portal
     {
         public static void ConfigurePortal(this IApplicationBuilder app)
         {
-            app.Map("/portal", orleansApp =>
+            app.Map(Constants.PortalPrefix, orleansApp =>
             {
                 orleansApp.UseAuthentication();
                 orleansApp.UseMiddleware<PortalDashboardAuthenticationMiddleware>();

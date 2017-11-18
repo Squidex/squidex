@@ -15,10 +15,11 @@ using NodaTime;
 using NSwag.AspNetCore;
 using NSwag.SwaggerGeneration.Processors.Security;
 using Squidex.Areas.Api.Controllers.Contents.Generator;
+using Squidex.Config;
 using Squidex.Infrastructure;
 using Squidex.Pipeline.Swagger;
 
-namespace Squidex.Config.Swagger
+namespace Squidex.Areas.Api.Config.Swagger
 {
     public static class SwaggerServices
     {

@@ -14,9 +14,10 @@ using Microsoft.AspNetCore.Authorization;
 using NSwag;
 using NSwag.SwaggerGeneration.Processors;
 using NSwag.SwaggerGeneration.Processors.Contexts;
+using Squidex.Config;
 using Squidex.Infrastructure.Tasks;
 
-namespace Squidex.Config.Swagger
+namespace Squidex.Areas.Api.Config.Swagger
 {
     public class ScopesProcessor : IOperationProcessor
     {

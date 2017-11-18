@@ -8,11 +8,11 @@
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Squidex.Areas.Api.Config.Swagger;
 using Squidex.Areas.IdentityServer.Config;
 using Squidex.Config;
 using Squidex.Config.Authentication;
 using Squidex.Config.Domain;
-using Squidex.Config.Swagger;
 using Squidex.Config.Web;
 
 namespace Squidex

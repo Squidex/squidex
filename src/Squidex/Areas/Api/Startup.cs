@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  WebpackExtensions.cs
+//  Startup.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -7,18 +7,20 @@
 // ==========================================================================
 
 using Microsoft.AspNetCore.Builder;
-using Squidex.Pipeline;
+using Squidex.Areas.Api.Config.Swagger;
+using Squidex.Config;
 
-namespace Squidex.Config.Web
+namespace Squidex.Areas.Api
 {
-    public static class WebpackExtensions
+    public static class Startup
     {
-        public static IApplicationBuilder UseMyTracking(this IApplicationBuilder app)
+        public static void ConfigureApi(this IApplicationBuilder app)
         {
-            app.UseMiddleware<LogPerformanceMiddleware>();
-            app.UseMiddleware<AppTrackingMiddleware>();
-
-            return app;
+            app.Map(Constants.ApiPrefix, appApi =>
+            {
+                appApi.UseMySwagger();
+                appApi.UseMvc();
+            });
         }
     }
 }

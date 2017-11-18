@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using NSwag.AspNetCore;
 
-namespace Squidex.Config.Swagger
+namespace Squidex.Areas.Api.Config.Swagger
 {
     public static class SwaggerExtensions
     {

@@ -14,6 +14,14 @@ namespace Squidex.Config.Web
 {
     public static class WebExtensions
     {
+        public static IApplicationBuilder UseMyTracking(this IApplicationBuilder app)
+        {
+            app.UseMiddleware<LogPerformanceMiddleware>();
+            app.UseMiddleware<AppTrackingMiddleware>();
+
+            return app;
+        }
+
         public static void UseMyCors(this IApplicationBuilder app)
         {
             app.UseCors(builder => builder

@@ -9,7 +9,6 @@
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
-using Squidex.Domain.Users;
 using Squidex.Shared.Users;
 
 namespace Squidex.Areas.IdentityServer.Controllers

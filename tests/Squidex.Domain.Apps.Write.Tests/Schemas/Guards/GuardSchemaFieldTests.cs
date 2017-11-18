@@ -9,7 +9,6 @@
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Write.Schemas.Commands;
-using Squidex.Domain.Apps.Write.Schemas.Guards;
 using Squidex.Infrastructure;
 using Xunit;
 

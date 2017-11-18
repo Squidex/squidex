@@ -9,6 +9,7 @@
 using Microsoft.AspNetCore.Builder;
 using Orleans;
 using Squidex.Areas.OrleansDashboard.Middlewares;
+using Squidex.Config;
 
 namespace Squidex.Areas.OrleansDashboard
 {
@@ -16,7 +17,7 @@ namespace Squidex.Areas.OrleansDashboard
     {
         public static void ConfigureOrleansDashboard(this IApplicationBuilder app)
         {
-            app.Map("/orleans", orleansApp =>
+            app.Map(Constants.OrleansPrefix, orleansApp =>
             {
                 orleansApp.UseAuthentication();
                 orleansApp.UseMiddleware<OrleansDashboardAuthenticationMiddleware>();

@@ -18,6 +18,10 @@ namespace Squidex.Config
 
         public static readonly string ApiScope = "squidex-api";
 
+        public static readonly string PortalPrefix = "/prefix";
+
+        public static readonly string OrleansPrefix = "/orleans";
+
         public static readonly string RoleScope = "role";
 
         public static readonly string ProfileScope = "squidex-profile";
@@ -29,7 +33,5 @@ namespace Squidex.Config
         public static readonly string InternalClientSecret = "squidex-internal".Sha256();
 
         public static readonly string IdentityPrefix = "/identity-server";
-
-        public static readonly string OrleansPrefix = "/orleans";
     }
 }

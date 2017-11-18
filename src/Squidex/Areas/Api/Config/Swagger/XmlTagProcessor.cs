@@ -14,7 +14,7 @@ using NSwag.SwaggerGeneration.Processors;
 using NSwag.SwaggerGeneration.Processors.Contexts;
 using Squidex.Infrastructure.Tasks;
 
-namespace Squidex.Config.Swagger
+namespace Squidex.Areas.Api.Config.Swagger
 {
     public sealed class XmlTagProcessor : IOperationProcessor, IDocumentProcessor
     {
