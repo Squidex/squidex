@@ -1,0 +1,38 @@
+version: '3'
+services:
+  mongo:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    networks:
+      - internal
+
+  squidex2:
+    image: "squidex-local"
+    environment:
+      - URLS__BASEURL=http://localhost
+      - EVENTSTORE__MONGODB__CONFIGURATION=mongodb://mongo
+      - ORLEANS__HOSTNAMEORIPADDRESS=FirstOfHost
+      - STORE__MONGODB__CONFIGURATION=mongodb://mongo
+    networks:
+      - internal
+    depends_on:
+      - mongo
+
+  squidex1:
+    image: "squidex-local"
+    ports:
+      - "80:80"
+    environment:
+      - URLS__BASEURL=http://localhost
+      - EVENTSTORE__MONGODB__CONFIGURATION=mongodb://mongo
+      - ORLEANS__HOSTNAMEORIPADDRESS=FirstOfHost
+      - STORE__MONGODB__CONFIGURATION=mongodb://mongo
+    networks:
+      - internal
+    depends_on:
+      - mongo
+    
+networks:
+  internal:
+    driver: bridge

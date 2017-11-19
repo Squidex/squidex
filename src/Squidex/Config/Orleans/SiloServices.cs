@@ -42,7 +42,7 @@ namespace Squidex.Config.Orleans
                 }
 
                 clusterConfiguration.Defaults.PropagateActivityId = true;
-                clusterConfiguration.Defaults.ProxyGatewayEndpoint = new IPEndPoint(IPAddress.Any, 10400);
+                clusterConfiguration.Defaults.ProxyGatewayEndpoint = new IPEndPoint(IPAddress.Any, 40000);
                 clusterConfiguration.Defaults.HostNameOrIPAddress = ipConfig;
             }
 
