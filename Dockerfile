@@ -1,7 +1,7 @@
 #
 # Stage 1, Prebuild
 #
-FROM microsoft/aspnetcore-build:2.0.0-jessie as builder
+FROM microsoft/aspnetcore-build:2.0.3-jessie as builder
 
 # Install runtime dependencies
 RUN apt-get update \
@@ -57,7 +57,7 @@ RUN dotnet publish src/Squidex/Squidex.csproj --output /out/ --configuration Rel
 #
 # Stage 2, Build runtime
 #
-FROM microsoft/aspnetcore:2.0.0-jessie
+FROM microsoft/aspnetcore:2.0.3-jessie
 
 # Default AspNetCore directory
 WORKDIR /app
@@ -66,5 +66,7 @@ WORKDIR /app
 COPY --from=builder /out/ .
 
 EXPOSE 80
+EXPOSE 33333
+EXPOSE 40000
 
 ENTRYPOINT ["dotnet", "Squidex.dll"]
