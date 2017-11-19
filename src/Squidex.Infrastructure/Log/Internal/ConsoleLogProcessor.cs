@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
@@ -36,7 +37,17 @@ namespace Squidex.Infrastructure.Log.Internal
 
         public void EnqueueMessage(LogMessageEntry message)
         {
-            messageQueue.Add(message);
+            try
+            {
+                if (!IsDisposed)
+                {
+                    messageQueue.Add(message);
+                }
+            }
+            catch (ObjectDisposedException)
+            {
+                Debug.WriteLine("Console queue disposed.");
+            }
         }
 
         private void ProcessLogQueue()

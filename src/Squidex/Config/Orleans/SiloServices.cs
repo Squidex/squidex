@@ -7,6 +7,7 @@
 // ==========================================================================
 
 using System.Linq;
+using System.Net;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Orleans;
@@ -20,9 +21,6 @@ namespace Squidex.Config.Orleans
     {
         public static void AddAppSiloServices(this IServiceCollection services, IConfiguration config)
         {
-            var mongoConfiguration = config.GetRequiredValue("store:mongoDb:configuration");
-            var mongoDatabaseName = config.GetRequiredValue("store:mongoDb:database");
-
             var clusterConfiguration =
                 services.Where(x => x.ServiceType == typeof(ClusterConfiguration))
                     .Select(x => x.ImplementationInstance)
@@ -33,12 +31,28 @@ namespace Squidex.Config.Orleans
             {
                 clusterConfiguration.Globals.RegisterBootstrapProvider<EventConsumerBootstrap>("EventConsumers");
                 clusterConfiguration.Globals.RegisterBootstrapProvider<RuleDequeuerBootstrap>("RuleDequeuer");
+
+                var ipConfig = config.GetRequiredValue("orleans:hostNameOrIPAddress");
+
+                if (ipConfig.Equals("FirstOfHost"))
+                {
+                    var ips = Dns.GetHostAddressesAsync(Dns.GetHostName()).Result;
+
+                    ipConfig = ips.FirstOrDefault()?.ToString();
+                }
+
+                clusterConfiguration.Defaults.PropagateActivityId = true;
+                clusterConfiguration.Defaults.ProxyGatewayEndpoint = new IPEndPoint(IPAddress.Any, 10400);
+                clusterConfiguration.Defaults.HostNameOrIPAddress = ipConfig;
             }
 
             config.ConfigureByOption("store:type", new Options
             {
                 ["MongoDB"] = () =>
                 {
+                    var mongoConfiguration = config.GetRequiredValue("store:mongoDb:configuration");
+                    var mongoDatabaseName = config.GetRequiredValue("store:mongoDb:database");
+
                     if (clusterConfiguration != null)
                     {
                         clusterConfiguration.AddMongoDBStorageProvider<CustomMongoDbStorageProvider>("Default", c =>

@@ -98,12 +98,6 @@ namespace Squidex.Config.Domain
                 .As<IAssetThumbnailGenerator>();
 
             services.AddSingletonAs<EventDataFormatter>();
-
-            services.AddSingletonAs(c => new InvalidatingMemoryCache(
-                    new MemoryCache(
-                        c.GetRequiredService<IOptions<MemoryCacheOptions>>()),
-                    c.GetRequiredService<IPubSub>()))
-                .As<IMemoryCache>();
         }
     }
 }
