@@ -25,7 +25,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
     [ApiAuthorize]
     [ApiExceptionFilter]
     [AppApi]
-    [MustBeAppOwner]
+    [MustBeAppEditor]
     [SwaggerTag(nameof(Apps))]
     public sealed class AppClientsController : ApiController
     {

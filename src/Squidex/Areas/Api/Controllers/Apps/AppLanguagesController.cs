@@ -75,7 +75,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// 400 => Language is an invalid language.
         /// 404 => App not found.
         /// </returns>
-        [MustBeAppOwner]
+        [MustBeAppEditor]
         [HttpPost]
         [Route("apps/{app}/languages/")]
         [ProducesResponseType(typeof(AppLanguageDto), 201)]
@@ -101,7 +101,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// 400 => Language object is invalid.
         /// 404 => App not found.
         /// </returns>
-        [MustBeAppOwner]
+        [MustBeAppEditor]
         [HttpPut]
         [Route("apps/{app}/languages/{language}/")]
         [ApiCosts(1)]
@@ -121,7 +121,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// 204 => Language deleted.
         /// 404 => App not found.
         /// </returns>
-        [MustBeAppOwner]
+        [MustBeAppEditor]
         [HttpDelete]
         [Route("apps/{app}/languages/{language}/")]
         [ApiCosts(1)]

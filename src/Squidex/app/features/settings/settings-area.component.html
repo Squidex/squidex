@@ -20,7 +20,7 @@
                         <i class="icon-angle-right"></i>
                     </a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item" *ngIf="ctx.app.permission === 'Owner'">
                     <a class="nav-link" routerLink="contributors" routerLinkActive="active">
                         Contributors
                         <i class="icon-angle-right"></i>
@@ -32,7 +32,7 @@
                         <i class="icon-angle-right"></i>
                     </a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item" *ngIf="ctx.app.permission === 'Owner'">
                     <a class="nav-link" routerLink="plans" routerLinkActive="active">
                         Update Plan
                         <i class="icon-angle-right"></i>
