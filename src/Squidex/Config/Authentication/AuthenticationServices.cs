@@ -6,12 +6,8 @@
 //  All rights reserved.
 // ==========================================================================
 
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Squidex.Infrastructure;
 
 namespace Squidex.Config.Authentication
 {
@@ -22,52 +18,10 @@ namespace Squidex.Config.Authentication
             var identityOptions = config.GetSection("identity").Get<MyIdentityOptions>();
 
             services.AddAuthentication()
-                .AddCookie()
                 .AddMyGoogleAuthentication(identityOptions)
                 .AddMyMicrosoftAuthentication(identityOptions)
-                .AddMyApiProtection(identityOptions, config);
-        }
-
-        public static AuthenticationBuilder AddMyApiProtection(this AuthenticationBuilder authBuilder, MyIdentityOptions identityOptions, IConfiguration config)
-        {
-            var apiScope = Constants.ApiScope;
-
-            var urlsOptions = config.GetSection("urls").Get<MyUrlsOptions>();
-
-            if (!string.IsNullOrWhiteSpace(urlsOptions.BaseUrl))
-            {
-                string apiAuthorityUrl;
-
-                if (!string.IsNullOrWhiteSpace(identityOptions.AuthorityUrl))
-                {
-                    apiAuthorityUrl = identityOptions.AuthorityUrl.BuildFullUrl(Constants.IdentityServerPrefix);
-                }
-                else
-                {
-                    apiAuthorityUrl = urlsOptions.BuildUrl(Constants.IdentityServerPrefix);
-                }
-
-                authBuilder.AddIdentityServerAuthentication(options =>
-                {
-                    options.Authority = apiAuthorityUrl;
-                    options.ApiName = apiScope;
-                    options.ApiSecret = null;
-                    options.RequireHttpsMetadata = identityOptions.RequiresHttps;
-                });
-
-                authBuilder.AddOpenIdConnect(options =>
-                {
-                    options.Authority = apiAuthorityUrl;
-                    options.ClientId = Constants.InternalClientId;
-                    options.ClientSecret = Constants.InternalClientSecret;
-                    options.RequireHttpsMetadata = identityOptions.RequiresHttps;
-                    options.SaveTokens = true;
-                    options.Scope.Add(Constants.RoleScope);
-                    options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                });
-            }
-
-            return authBuilder;
+                .AddMyIdentityServerAuthentication(identityOptions, config)
+                .AddCookie();
         }
     }
 }
