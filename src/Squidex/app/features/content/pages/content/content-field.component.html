@@ -24,7 +24,7 @@
                     <div *ngSwitchCase="'Number'">
                         <div [ngSwitch]="field.properties.editor">
                             <div *ngSwitchCase="'Input'">
-                                <input class="form-control" type="number" [formControlName]="partition" [placeholder]="field.properties.placeholder">
+                                <input class="form-control" type="number" [formControlName]="partition" [placeholder]="field.properties.placeholder || ''">
                             </div>
                             <div *ngSwitchCase="'Stars'">
                                 <sqx-stars [formControlName]="partition" [maximumStars]="field.properties.maxValue"></sqx-stars>
@@ -47,10 +47,10 @@
                     <div *ngSwitchCase="'String'">
                         <div [ngSwitch]="field.properties.editor">
                             <div *ngSwitchCase="'Input'">
-                                <input class="form-control" type="text" [formControlName]="partition" [placeholder]="field.properties.placeholder">
+                                <input class="form-control" type="text" [formControlName]="partition" [placeholder]="field.properties.placeholder || ''">
                             </div>
                             <div *ngSwitchCase="'TextArea'">
-                                <textarea class="form-control" [formControlName]="partition" rows="5" [placeholder]="field.properties.placeholder"></textarea>
+                                <textarea class="form-control" [formControlName]="partition" rows="5" [placeholder]="field.properties.placeholder || ''"></textarea>
                             </div>
                             <div *ngSwitchCase="'RichText'">
                                 <sqx-rich-editor [formControlName]="partition" (assetPluginClicked)="richTextEditorAssetPluginClicked($event)"></sqx-rich-editor>
