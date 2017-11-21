@@ -28,7 +28,7 @@ namespace Squidex
                 .AddApplicationPartsFromReferences(typeof(AppStateGrain).Assembly)
                 .AddApplicationPartsFromReferences(typeof(EventConsumerGrain).Assembly)
                 .AddApplicationPartsFromReferences(typeof(XmlRepositoryGrain).Assembly)
-                .UseDashboard(options => { options.HostSelf = false; })
+                // .UseDashboard(options => { options.HostSelf = false; })
                 .UseContentRoot(Directory.GetCurrentDirectory())
                 .UseConfiguration(
                     ClusterConfiguration.LocalhostPrimarySilo(33333)

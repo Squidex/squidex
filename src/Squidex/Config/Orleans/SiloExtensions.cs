@@ -35,7 +35,7 @@ namespace Squidex.Config.Orleans
 
         public static ClusterConfiguration WithDashboard(this ClusterConfiguration config)
         {
-            config.RegisterDashboard();
+            // config.RegisterDashboard();
 
             return config;
         }
