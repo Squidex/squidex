@@ -7,14 +7,15 @@
 // ==========================================================================
 
 using System;
-using System.Threading;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Threading.Tasks.Dataflow;
 using NodaTime;
 using Orleans;
+using Orleans.Concurrency;
 using Orleans.Core;
 using Orleans.Runtime;
 using Squidex.Domain.Apps.Core.HandleRules;
+using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Read.Rules.Repositories;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
@@ -22,14 +23,15 @@ using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Read.Rules.Orleans.Grains.Implementation
 {
+    [Reentrant]
     public class RuleDequeuerGrain : Grain, IRuleDequeuerGrain, IRemindable
     {
         private readonly IRuleEventRepository ruleEventRepository;
         private readonly RuleService ruleService;
         private readonly IClock clock;
         private readonly ISemanticLog log;
-        private ActionBlock<IRuleEventEntity> requestBlock;
-        private TransformBlock<IRuleEventEntity, IRuleEventEntity> blockBlock;
+        private readonly HashSet<Guid> executing = new HashSet<Guid>();
+        private TaskFactory scheduler;
 
         public RuleDequeuerGrain(RuleService ruleService, IRuleEventRepository ruleEventRepository, ISemanticLog log, IClock clock)
             : this(ruleService, ruleEventRepository, log, clock, null, null)
@@ -56,39 +58,19 @@ namespace Squidex.Domain.Apps.Read.Rules.Orleans.Grains.Implementation
 
         public override Task OnActivateAsync()
         {
+            scheduler = new TaskFactory(TaskScheduler.Current ?? TaskScheduler.Default);
+
             DelayDeactivation(TimeSpan.FromDays(1));
 
             RegisterOrUpdateReminder("Default", TimeSpan.Zero, TimeSpan.FromMinutes(10));
-            RegisterTimer(x => QueryAsync(), null, TimeSpan.Zero, TimeSpan.FromSeconds(10));
-
-            requestBlock =
-                new ActionBlock<IRuleEventEntity>(MakeRequestAsync,
-                    new ExecutionDataflowBlockOptions
-                    {
-                        TaskScheduler = TaskScheduler.Current,
-                        MaxMessagesPerTask = 1,
-                        MaxDegreeOfParallelism = 32,
-                        BoundedCapacity = 32
-                    });
-
-            blockBlock =
-                new TransformBlock<IRuleEventEntity, IRuleEventEntity>(x => BlockAsync(x),
-                    new ExecutionDataflowBlockOptions
-                    {
-                        TaskScheduler = TaskScheduler.Current,
-                        MaxMessagesPerTask = 1,
-                        MaxDegreeOfParallelism = 1,
-                        BoundedCapacity = 1
-                    });
-
-            blockBlock.LinkTo(requestBlock, new DataflowLinkOptions { PropagateCompletion = true });
+            RegisterTimer(x => QueryAsync(), null, TimeSpan.Zero, TimeSpan.FromSeconds(2));
 
             return base.OnActivateAsync();
         }
 
         public Task ReceiveReminder(string reminderName, TickStatus status)
         {
-            return QueryAsync();
+            return TaskHelper.Done;
         }
 
         public Task ActivateAsync()
@@ -100,9 +82,14 @@ namespace Squidex.Domain.Apps.Read.Rules.Orleans.Grains.Implementation
         {
             try
             {
-                var now = clock.GetCurrentInstant();
+                var self = GetSelf();
 
-                await ruleEventRepository.QueryPendingAsync(now, blockBlock.SendAsync, CancellationToken.None);
+                await ruleEventRepository.QueryPendingAsync(clock.GetCurrentInstant(), x =>
+                {
+                    scheduler.StartNew(() => self.HandleAsync(x.AsImmutable()).Forget()).Forget();
+
+                    return TaskHelper.Done;
+                });
             }
             catch (Exception ex)
             {
@@ -112,78 +99,75 @@ namespace Squidex.Domain.Apps.Read.Rules.Orleans.Grains.Implementation
             }
         }
 
-        private async Task<IRuleEventEntity> BlockAsync(IRuleEventEntity @event)
+        public async Task HandleAsync(Immutable<IRuleEventEntity> @event)
         {
+            if (!executing.Add(@event.Value.Id))
+            {
+                return;
+            }
+
             try
             {
-                await ruleEventRepository.MarkSendingAsync(@event.Id);
-
-                return @event;
-            }
-            catch (Exception ex)
-            {
-                log.LogError(ex, w => w
-                    .WriteProperty("action", "BlockWebhookEvent")
-                    .WriteProperty("status", "Failed"));
-
-                throw;
-            }
-        }
-
-        private async Task MakeRequestAsync(IRuleEventEntity @event)
-        {
-            try
-            {
-                var job = @event.Job;
+                var job = @event.Value.Job;
 
                 var response = await ruleService.InvokeAsync(job.ActionName, job.ActionData);
 
-                Instant? nextCall = null;
+                var jobInvoke = ComputeJobInvoke(response.Result, @event, job);
+                var jobResult = ComputeJobResult(response.Result, jobInvoke);
 
-                if (response.Result != RuleResult.Success)
-                {
-                    switch (@event.NumCalls)
-                    {
-                        case 0:
-                            nextCall = job.Created.Plus(Duration.FromMinutes(5));
-                            break;
-                        case 1:
-                            nextCall = job.Created.Plus(Duration.FromHours(1));
-                            break;
-                        case 2:
-                            nextCall = job.Created.Plus(Duration.FromHours(6));
-                            break;
-                        case 3:
-                            nextCall = job.Created.Plus(Duration.FromHours(12));
-                            break;
-                    }
-                }
-
-                RuleJobResult jobResult;
-
-                if (response.Result != RuleResult.Success && !nextCall.HasValue)
-                {
-                    jobResult = RuleJobResult.Failed;
-                }
-                else if (response.Result != RuleResult.Success && nextCall.HasValue)
-                {
-                    jobResult = RuleJobResult.Retry;
-                }
-                else
-                {
-                    jobResult = RuleJobResult.Success;
-                }
-
-                await ruleEventRepository.MarkSentAsync(@event.Id, response.Dump, response.Result, jobResult, response.Elapsed, nextCall);
+                await ruleEventRepository.MarkSentAsync(@event.Value.Id, response.Dump, response.Result, jobResult, response.Elapsed, jobInvoke);
             }
             catch (Exception ex)
             {
                 log.LogError(ex, w => w
                     .WriteProperty("action", "SendWebhookEvent")
                     .WriteProperty("status", "Failed"));
-
-                throw;
             }
+            finally
+            {
+                executing.Remove(@event.Value.Id);
+            }
+        }
+
+        private static RuleJobResult ComputeJobResult(RuleResult result, Instant? nextCall)
+        {
+            if (result != RuleResult.Success && !nextCall.HasValue)
+            {
+                return RuleJobResult.Failed;
+            }
+            else if (result != RuleResult.Success && nextCall.HasValue)
+            {
+                return RuleJobResult.Retry;
+            }
+            else
+            {
+                return RuleJobResult.Success;
+            }
+        }
+
+        private static Instant? ComputeJobInvoke(RuleResult result, Immutable<IRuleEventEntity> @event, RuleJob job)
+        {
+            if (result != RuleResult.Success)
+            {
+                switch (@event.Value.NumCalls)
+                {
+                    case 0:
+                        return job.Created.Plus(Duration.FromMinutes(5));
+                    case 1:
+                        return job.Created.Plus(Duration.FromHours(1));
+                    case 2:
+                        return job.Created.Plus(Duration.FromHours(6));
+                    case 3:
+                        return job.Created.Plus(Duration.FromHours(12));
+                }
+            }
+
+            return null;
+        }
+
+        protected virtual IRuleDequeuerGrain GetSelf()
+        {
+            return this.AsReference<IRuleDequeuerGrain>();
         }
     }
 }

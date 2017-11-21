@@ -17,59 +17,20 @@ namespace Squidex.Infrastructure.Tasks
         private readonly ActionBlock<Func<Task>> block;
         private bool isStopped;
 
-        public SingleThreadedDispatcher(int capacity = 1, TaskScheduler scheduler = null)
+        public SingleThreadedDispatcher(int capacity = 1)
         {
             var options = new ExecutionDataflowBlockOptions
             {
                 BoundedCapacity = capacity,
                 MaxMessagesPerTask = -1,
-                MaxDegreeOfParallelism = 1,
-                TaskScheduler = scheduler ?? TaskScheduler.Default
+                MaxDegreeOfParallelism = 1
             };
 
             block = new ActionBlock<Func<Task>>(Handle, options);
         }
 
-        public Task DispatchAndUnwrapAsync(Func<Task> action)
-        {
-            return Task.CompletedTask;
-            Guard.NotNull(action, nameof(action));
-
-            var cts = new TaskCompletionSource<bool>();
-
-            block.SendAsync(async () =>
-            {
-                try
-                {
-                    await action();
-
-                    cts.SetResult(true);
-                }
-                catch (Exception ex)
-                {
-                    cts.TrySetException(ex);
-                }
-            });
-
-            return cts.Task;
-        }
-
-        public Task DispatchAndUnwrapAsync(Action action)
-        {
-            return Task.CompletedTask;
-            Guard.NotNull(action, nameof(action));
-
-            return DispatchAndUnwrapAsync(() =>
-            {
-                action();
-
-                return TaskHelper.Done;
-            });
-        }
-
         public Task DispatchAsync(Func<Task> action)
         {
-            return Task.CompletedTask;
             Guard.NotNull(action, nameof(action));
 
             return block.SendAsync(action);
@@ -77,7 +38,6 @@ namespace Squidex.Infrastructure.Tasks
 
         public Task DispatchAsync(Action action)
         {
-            return Task.CompletedTask;
             Guard.NotNull(action, nameof(action));
 
             return block.SendAsync(() => { action(); return TaskHelper.Done; });

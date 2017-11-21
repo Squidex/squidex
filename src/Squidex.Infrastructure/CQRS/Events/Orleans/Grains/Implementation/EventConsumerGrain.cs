@@ -18,15 +18,20 @@ using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.CQRS.Events.Orleans.Grains.Implementation
 {
-    public class EventConsumerGrain : GrainV2<EventConsumerGrainState>, IEventSubscriber, IEventConsumerGrain
+    public class EventConsumerGrain : GrainV2<EventConsumerGrainState>, IEventConsumerGrain
     {
         private readonly EventDataFormatter eventFormatter;
         private readonly EventConsumerFactory eventConsumerFactory;
         private readonly IEventStore eventStore;
         private readonly ISemanticLog log;
-        private IEventSubscription currentSubscription;
+        private TaskScheduler scheduler;
         private IEventConsumer eventConsumer;
-        private SingleThreadedDispatcher dispatcher;
+        private IEventSubscription eventSubscription;
+
+        protected IEventStore EventStore
+        {
+            get { return eventStore; }
+        }
 
         public EventConsumerGrain(
             EventDataFormatter eventFormatter,
@@ -62,7 +67,7 @@ namespace Squidex.Infrastructure.CQRS.Events.Orleans.Grains.Implementation
 
         public override Task OnActivateAsync()
         {
-            dispatcher = new SingleThreadedDispatcher(1, TaskScheduler.Current);
+            scheduler = TaskScheduler.Current;
 
             eventConsumer = eventConsumerFactory(this.GetPrimaryKeyString());
 
@@ -71,53 +76,81 @@ namespace Squidex.Infrastructure.CQRS.Events.Orleans.Grains.Implementation
 
         public Task ActivateAsync()
         {
-            return dispatcher.DispatchAndUnwrapAsync(() =>
+            if (!State.IsStopped)
             {
-                if (!State.IsStopped)
-                {
-                    Subscribe(State.Position);
-                }
+                Subscribe(State.Position);
+            }
 
+            return TaskHelper.Done;
+        }
+
+        public Task StartAsync()
+        {
+            if (!State.IsStopped)
+            {
                 return TaskHelper.Done;
+            }
+
+            return DoAndUpdateStateAsync(() =>
+            {
+                Subscribe(State.Position);
+
+                State = State.Started();
             });
         }
 
-        private Task HandleEventAsync(IEventSubscription subscription, StoredEvent storedEvent)
+        public Task StopAsync()
         {
-            if (subscription != currentSubscription)
+            if (State.IsStopped)
+            {
+                return TaskHelper.Done;
+            }
+
+            return DoAndUpdateStateAsync(() =>
+            {
+                Unsubscribe();
+
+                State = State.Stopped();
+            });
+        }
+
+        public Task ResetAsync()
+        {
+            return DoAndUpdateStateAsync(async () =>
+            {
+                Unsubscribe();
+
+                await ClearAsync();
+
+                Subscribe(null);
+
+                State = EventConsumerGrainState.Initial();
+            });
+        }
+
+        public Task OnEventAsync(Immutable<IEventSubscription> subscription, Immutable<StoredEvent> storedEvent)
+        {
+            if (subscription.Value != eventSubscription)
             {
                 return TaskHelper.Done;
             }
 
             return DoAndUpdateStateAsync(async () =>
             {
-                var @event = ParseKnownEvent(storedEvent);
+                var @event = ParseKnownEvent(storedEvent.Value);
 
                 if (@event != null)
                 {
                     await DispatchConsumerAsync(@event);
                 }
 
-                State = EventConsumerGrainState.Handled(storedEvent.EventPosition);
+                State = EventConsumerGrainState.Handled(storedEvent.Value.EventPosition);
             });
         }
 
-        private Task HandleClosedAsync(IEventSubscription subscription)
+        public Task OnErrorAsync(Immutable<IEventSubscription> subscription, Immutable<Exception> exception)
         {
-            if (subscription != currentSubscription)
-            {
-                return TaskHelper.Done;
-            }
-
-            return DoAndUpdateStateAsync(() =>
-            {
-                Unsubscribe();
-            });
-        }
-
-        private Task HandleErrorAsync(IEventSubscription subscription, Exception exception)
-        {
-            if (subscription != currentSubscription)
+            if (subscription.Value != eventSubscription)
             {
                 return TaskHelper.Done;
             }
@@ -126,114 +159,26 @@ namespace Squidex.Infrastructure.CQRS.Events.Orleans.Grains.Implementation
             {
                 Unsubscribe();
 
-                State = State.Failed(exception);
+                State = State.Failed(exception.Value);
             });
         }
 
-        public Task StartAsync()
+        public Task OnClosedAsync(Immutable<IEventSubscription> subscription)
         {
-            return dispatcher.DispatchAndUnwrapAsync(() =>
+            if (subscription.Value != eventSubscription)
             {
-                if (!State.IsStopped)
-                {
-                    return TaskHelper.Done;
-                }
+                return TaskHelper.Done;
+            }
 
-                return DoAndUpdateStateAsync(() =>
-                {
-                    Subscribe(State.Position);
-
-                    State = State.Started();
-                });
-            });
-        }
-
-        public Task StopAsync()
-        {
-            return dispatcher.DispatchAndUnwrapAsync(() =>
+            return DoAndUpdateStateAsync(() =>
             {
-                if (State.IsStopped)
-                {
-                    return TaskHelper.Done;
-                }
-
-                return DoAndUpdateStateAsync(() =>
-                {
-                    Unsubscribe();
-
-                    State = State.Stopped();
-                });
+                Unsubscribe();
             });
-        }
-
-        public Task ResetAsync()
-        {
-            return dispatcher.DispatchAndUnwrapAsync(() =>
-            {
-                return DoAndUpdateStateAsync(async () =>
-                {
-                    Unsubscribe();
-
-                    await ClearAsync();
-
-                    Subscribe(null);
-
-                    State = EventConsumerGrainState.Initial();
-                });
-            });
-        }
-
-        Task IEventSubscriber.OnEventAsync(IEventSubscription subscription, StoredEvent storedEvent)
-        {
-            return dispatcher.DispatchAndUnwrapAsync(() => HandleEventAsync(subscription, storedEvent));
-        }
-
-        Task IEventSubscriber.OnErrorAsync(IEventSubscription subscription, Exception exception)
-        {
-            return dispatcher.DispatchAndUnwrapAsync(() => HandleErrorAsync(subscription, exception));
-        }
-
-        Task IEventSubscriber.OnClosedAsync(IEventSubscription subscription)
-        {
-            return dispatcher.DispatchAndUnwrapAsync(() => HandleClosedAsync(subscription));
         }
 
         public Task<Immutable<EventConsumerInfo>> GetStateAsync()
         {
             return Task.FromResult(new Immutable<EventConsumerInfo>(State.ToInfo(this.GetPrimaryKeyString())));
-        }
-
-        private Task DoAndUpdateStateAsync(Action action)
-        {
-            return DoAndUpdateStateAsync(() => { action(); return TaskHelper.Done; });
-        }
-
-        private async Task DoAndUpdateStateAsync(Func<Task> action)
-        {
-            try
-            {
-                await action();
-            }
-            catch (Exception ex)
-            {
-                try
-                {
-                    Unsubscribe();
-                }
-                catch (Exception unsubscribeException)
-                {
-                    ex = new AggregateException(ex, unsubscribeException);
-                }
-
-                log.LogFatal(ex, w => w
-                    .WriteProperty("action", "HandleEvent")
-                    .WriteProperty("state", "Failed")
-                    .WriteProperty("eventConsumer", eventConsumer.Name));
-
-                State = State.Failed(ex);
-            }
-
-            await WriteStateAsync();
         }
 
         private async Task ClearAsync()
@@ -283,19 +228,19 @@ namespace Squidex.Infrastructure.CQRS.Events.Orleans.Grains.Implementation
 
         private void Unsubscribe()
         {
-            if (currentSubscription != null)
+            if (eventSubscription != null)
             {
-                currentSubscription.StopAsync().Forget();
-                currentSubscription = null;
+                eventSubscription.StopAsync().Forget();
+                eventSubscription = null;
             }
         }
 
         private void Subscribe(string position)
         {
-            if (currentSubscription == null)
+            if (eventSubscription == null)
             {
-                currentSubscription?.StopAsync().Forget();
-                currentSubscription = CreateSubscription(eventStore, eventConsumer.EventsFilter, position);
+                eventSubscription?.StopAsync().Forget();
+                eventSubscription = CreateSubscription(eventConsumer.EventsFilter, position);
             }
         }
 
@@ -318,9 +263,52 @@ namespace Squidex.Infrastructure.CQRS.Events.Orleans.Grains.Implementation
             }
         }
 
-        protected virtual IEventSubscription CreateSubscription(IEventStore eventStore, string streamFilter, string position)
+        protected virtual IEventConsumerGrain GetSelf()
         {
-            return new RetrySubscription(eventStore, this, streamFilter, position);
+            return this.AsReference<IEventConsumerGrain>();
+        }
+
+        protected virtual IEventSubscription CreateSubscription(IEventSubscriber subscriber, string streamFilter, string position)
+        {
+            return new RetrySubscription(EventStore, subscriber, streamFilter, position);
+        }
+
+        private IEventSubscription CreateSubscription(string streamFilter, string position)
+        {
+            return CreateSubscription(new WrapperSubscription(GetSelf(), scheduler), streamFilter, position);
+        }
+
+        private Task DoAndUpdateStateAsync(Action action)
+        {
+            return DoAndUpdateStateAsync(() => { action(); return TaskHelper.Done; });
+        }
+
+        private async Task DoAndUpdateStateAsync(Func<Task> action)
+        {
+            try
+            {
+                await action();
+            }
+            catch (Exception ex)
+            {
+                try
+                {
+                    Unsubscribe();
+                }
+                catch (Exception unsubscribeException)
+                {
+                    ex = new AggregateException(ex, unsubscribeException);
+                }
+
+                log.LogFatal(ex, w => w
+                    .WriteProperty("action", "HandleEvent")
+                    .WriteProperty("state", "Failed")
+                    .WriteProperty("eventConsumer", eventConsumer.Name));
+
+                State = State.Failed(ex);
+            }
+
+            await WriteStateAsync();
         }
     }
 }

@@ -36,14 +36,14 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Rules
         protected override Task SetupCollectionAsync(IMongoCollection<MongoRuleEventEntity> collection)
         {
             return Task.WhenAll(
-                collection.Indexes.CreateOneAsync(Index.Ascending(x => x.NextAttempt).Descending(x => x.IsSending)),
+                collection.Indexes.CreateOneAsync(Index.Ascending(x => x.NextAttempt)),
                 collection.Indexes.CreateOneAsync(Index.Ascending(x => x.AppId).Descending(x => x.Created)),
                 collection.Indexes.CreateOneAsync(Index.Ascending(x => x.Expires), new CreateIndexOptions { ExpireAfter = TimeSpan.Zero }));
         }
 
         public Task QueryPendingAsync(Instant now, Func<IRuleEventEntity, Task> callback, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return Collection.Find(x => x.NextAttempt < now && !x.IsSending).ForEachAsync(callback, cancellationToken);
+            return Collection.Find(x => x.NextAttempt < now).ForEachAsync(callback, cancellationToken);
         }
 
         public async Task<IReadOnlyList<IRuleEventEntity>> QueryByAppAsync(Guid appId, int skip = 0, int take = 20)
@@ -81,18 +81,12 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Rules
             return Collection.InsertOneIfNotExistsAsync(entity);
         }
 
-        public Task MarkSendingAsync(Guid jobId)
-        {
-            return Collection.UpdateOneAsync(x => x.Id == jobId, Update.Set(x => x.IsSending, true));
-        }
-
         public Task MarkSentAsync(Guid jobId, string dump, RuleResult result, RuleJobResult jobResult, TimeSpan elapsed, Instant? nextAttempt)
         {
             return Collection.UpdateOneAsync(x => x.Id == jobId,
                 Update.Set(x => x.Result, result)
                       .Set(x => x.LastDump, dump)
                       .Set(x => x.JobResult, jobResult)
-                      .Set(x => x.IsSending, false)
                       .Set(x => x.NextAttempt, nextAttempt)
                       .Inc(x => x.NumCalls, 1));
         }

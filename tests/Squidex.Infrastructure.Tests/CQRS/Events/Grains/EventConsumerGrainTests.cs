@@ -9,8 +9,10 @@
 using System;
 using System.Threading.Tasks;
 using FakeItEasy;
+using Orleans.Concurrency;
 using Orleans.Core;
 using Orleans.Runtime;
+using Squidex.Infrastructure.CQRS.Events.Orleans.Grains;
 using Squidex.Infrastructure.CQRS.Events.Orleans.Grains.Implementation;
 using Squidex.Infrastructure.Log;
 using Xunit;
@@ -23,9 +25,9 @@ namespace Squidex.Infrastructure.CQRS.Events.Grains
         {
         }
 
-        public sealed class MyEventConsumerActor : EventConsumerGrain
+        public sealed class MyEventConsumerGrain : EventConsumerGrain
         {
-            public MyEventConsumerActor(
+            public MyEventConsumerGrain(
                 EventDataFormatter formatter,
                 EventConsumerFactory eventConsumerFactory,
                 IEventStore eventStore,
@@ -37,9 +39,14 @@ namespace Squidex.Infrastructure.CQRS.Events.Grains
             {
             }
 
-            protected override IEventSubscription CreateSubscription(IEventStore eventStore, string streamFilter, string position)
+            protected override IEventConsumerGrain GetSelf()
             {
-                return eventStore.CreateSubscription(this, streamFilter, position);
+                return this;
+            }
+
+            protected override IEventSubscription CreateSubscription(IEventSubscriber subscriber, string streamFilter, string position)
+            {
+                return EventStore.CreateSubscription(subscriber, streamFilter, position);
             }
         }
 
@@ -47,13 +54,12 @@ namespace Squidex.Infrastructure.CQRS.Events.Grains
         private readonly IEventStore eventStore = A.Fake<IEventStore>();
         private readonly IEventSubscription eventSubscription = A.Fake<IEventSubscription>();
         private readonly ISemanticLog log = A.Fake<ISemanticLog>();
-        private readonly IEventSubscriber sutSubscriber;
         private readonly IStorage<EventConsumerGrainState> storage = A.Fake<IStorage<EventConsumerGrainState>>();
         private readonly EventDataFormatter formatter = A.Fake<EventDataFormatter>();
         private readonly EventData eventData = new EventData();
         private readonly Envelope<IEvent> envelope = new Envelope<IEvent>(new MyEvent());
         private readonly EventConsumerFactory factory;
-        private readonly MyEventConsumerActor sut;
+        private readonly MyEventConsumerGrain sut;
         private readonly string consumerName;
         private EventConsumerGrainState state = new EventConsumerGrainState();
 
@@ -72,7 +78,7 @@ namespace Squidex.Infrastructure.CQRS.Events.Grains
             A.CallTo(() => storage.State).ReturnsLazily(() => state);
             A.CallToSet(() => storage.State).Invokes(new Action<EventConsumerGrainState>(s => state = s));
 
-            sut = new MyEventConsumerActor(
+            sut = new MyEventConsumerGrain(
                 formatter,
                 factory,
                 eventStore,
@@ -80,8 +86,6 @@ namespace Squidex.Infrastructure.CQRS.Events.Grains
                 A.Fake<IGrainIdentity>(),
                 A.Fake<IGrainRuntime>(),
                 storage);
-
-            sutSubscriber = sut;
         }
 
         [Fact]
@@ -388,17 +392,17 @@ namespace Squidex.Infrastructure.CQRS.Events.Grains
 
         private Task OnErrorAsync(IEventSubscription subscriber, Exception ex)
         {
-            return sutSubscriber.OnErrorAsync(subscriber, ex);
+            return sut.OnErrorAsync(subscriber.AsImmutable(), ex.AsImmutable());
         }
 
         private Task OnEventAsync(IEventSubscription subscriber, StoredEvent ev)
         {
-            return sutSubscriber.OnEventAsync(subscriber, ev);
+            return sut.OnEventAsync(subscriber.AsImmutable(), ev.AsImmutable());
         }
 
         private Task OnClosedAsync(IEventSubscription subscriber)
         {
-            return sutSubscriber.OnClosedAsync(subscriber);
+            return sut.OnClosedAsync(subscriber.AsImmutable());
         }
     }
 }

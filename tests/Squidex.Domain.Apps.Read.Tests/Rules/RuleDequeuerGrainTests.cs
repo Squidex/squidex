@@ -7,14 +7,15 @@
 // ==========================================================================
 
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
 using NodaTime;
+using Orleans.Concurrency;
 using Orleans.Core;
 using Orleans.Runtime;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
+using Squidex.Domain.Apps.Read.Rules.Orleans.Grains;
 using Squidex.Domain.Apps.Read.Rules.Orleans.Grains.Implementation;
 using Squidex.Domain.Apps.Read.Rules.Repositories;
 using Squidex.Infrastructure.Log;
@@ -31,6 +32,7 @@ namespace Squidex.Domain.Apps.Read.Rules
         private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
         private readonly IRuleEventRepository ruleEventRepository = A.Fake<IRuleEventRepository>();
         private readonly RuleService ruleService = A.Fake<RuleService>();
+        private readonly MyRuleDequeuerGrain sut;
         private readonly Instant now = SystemClock.Instance.GetCurrentInstant();
 
         public sealed class MyRuleDequeuerGrain : RuleDequeuerGrain
@@ -41,11 +43,24 @@ namespace Squidex.Domain.Apps.Read.Rules
                 : base(ruleService, ruleEventRepository, log, clock, identity, runtime)
             {
             }
+
+            protected override IRuleDequeuerGrain GetSelf()
+            {
+                return this;
+            }
         }
 
         public RuleDequeuerGrainTests()
         {
             A.CallTo(() => clock.GetCurrentInstant()).Returns(now);
+
+            sut = new MyRuleDequeuerGrain(
+                ruleService,
+                ruleEventRepository,
+                log,
+                clock,
+                A.Fake<IGrainIdentity>(),
+                A.Fake<IGrainRuntime>());
         }
 
         [Theory]
@@ -65,20 +80,8 @@ namespace Squidex.Domain.Apps.Read.Rules
             var requestElapsed = TimeSpan.FromMinutes(1);
             var requestDump = "Dump";
 
-            SetupSender(@event, requestDump, result, requestElapsed);
-            SetupPendingEvents(@event);
-
-            var sut = new MyRuleDequeuerGrain(
-                ruleService,
-                ruleEventRepository,
-                log,
-                clock,
-                A.Fake<IGrainIdentity>(),
-                A.Fake<IGrainRuntime>());
-
-            await sut.OnActivateAsync();
-            await sut.QueryAsync();
-            await sut.OnDeactivateAsync();
+            A.CallTo(() => ruleService.InvokeAsync(@event.Job.ActionName, @event.Job.ActionData))
+                .Returns((requestDump, result, requestElapsed));
 
             Instant? nextCall = null;
 
@@ -87,33 +90,11 @@ namespace Squidex.Domain.Apps.Read.Rules
                 nextCall = now.Plus(Duration.FromMinutes(minutes));
             }
 
-            VerifyRepositories(@event, requestDump, result, jobResult, requestElapsed, nextCall);
-        }
+            await sut.OnActivateAsync();
+            await sut.HandleAsync(@event.AsImmutable());
+            await sut.OnDeactivateAsync();
 
-        private void SetupSender(IRuleEventEntity @event, string requestDump, RuleResult requestResult, TimeSpan requestTime)
-        {
-            A.CallTo(() => ruleService.InvokeAsync(@event.Job.ActionName, @event.Job.ActionData))
-                .Returns((requestDump, requestResult, requestTime));
-        }
-
-        private void SetupPendingEvents(IRuleEventEntity @event)
-        {
-            A.CallTo(() => ruleEventRepository.QueryPendingAsync(
-                now,
-                A<Func<IRuleEventEntity, Task>>.Ignored,
-                A<CancellationToken>.Ignored))
-                .Invokes(async (Instant n, Func<IRuleEventEntity, Task> callback, CancellationToken ct) =>
-                {
-                    await callback(@event);
-                });
-        }
-
-        private void VerifyRepositories(IRuleEventEntity @event, string dump, RuleResult result, RuleJobResult jobResult, TimeSpan elapsed, Instant? nextCall)
-        {
-            A.CallTo(() => ruleEventRepository.MarkSendingAsync(@event.Id))
-                .MustHaveHappened();
-
-            A.CallTo(() => ruleEventRepository.MarkSentAsync(@event.Id, dump, result, jobResult, elapsed, nextCall))
+            A.CallTo(() => ruleEventRepository.MarkSentAsync(@event.Id, requestDump, result, jobResult, requestElapsed, nextCall))
                 .MustHaveHappened();
         }
 
