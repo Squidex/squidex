@@ -6,6 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using System.Linq;
 using System.Net;
 using Microsoft.Extensions.Configuration;
@@ -34,7 +35,11 @@ namespace Squidex.Config.Orleans
 
                 var ipConfig = config.GetRequiredValue("orleans:hostNameOrIPAddress");
 
-                if (ipConfig.Equals("FirstOfHost"))
+                if (ipConfig.Equals("Host", StringComparison.OrdinalIgnoreCase))
+                {
+                    ipConfig = Dns.GetHostName();
+                }
+                else if (ipConfig.Equals("FirstIPAddressOfHost"))
                 {
                     var ips = Dns.GetHostAddressesAsync(Dns.GetHostName()).Result;
 
