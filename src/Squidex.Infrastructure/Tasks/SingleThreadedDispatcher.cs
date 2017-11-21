@@ -32,6 +32,7 @@ namespace Squidex.Infrastructure.Tasks
 
         public Task DispatchAndUnwrapAsync(Func<Task> action)
         {
+            return Task.CompletedTask;
             Guard.NotNull(action, nameof(action));
 
             var cts = new TaskCompletionSource<bool>();
@@ -55,6 +56,7 @@ namespace Squidex.Infrastructure.Tasks
 
         public Task DispatchAndUnwrapAsync(Action action)
         {
+            return Task.CompletedTask;
             Guard.NotNull(action, nameof(action));
 
             return DispatchAndUnwrapAsync(() =>
@@ -67,6 +69,7 @@ namespace Squidex.Infrastructure.Tasks
 
         public Task DispatchAsync(Func<Task> action)
         {
+            return Task.CompletedTask;
             Guard.NotNull(action, nameof(action));
 
             return block.SendAsync(action);
@@ -74,6 +77,7 @@ namespace Squidex.Infrastructure.Tasks
 
         public Task DispatchAsync(Action action)
         {
+            return Task.CompletedTask;
             Guard.NotNull(action, nameof(action));
 
             return block.SendAsync(() => { action(); return TaskHelper.Done; });

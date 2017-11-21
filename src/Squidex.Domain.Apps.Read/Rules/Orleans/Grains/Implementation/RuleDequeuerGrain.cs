@@ -91,13 +91,6 @@ namespace Squidex.Domain.Apps.Read.Rules.Orleans.Grains.Implementation
             return QueryAsync();
         }
 
-        public override Task OnDeactivateAsync()
-        {
-            blockBlock.Complete();
-
-            return requestBlock.Completion;
-        }
-
         public Task ActivateAsync()
         {
             return TaskHelper.Done;

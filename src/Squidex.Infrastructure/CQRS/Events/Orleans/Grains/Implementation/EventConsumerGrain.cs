@@ -69,11 +69,6 @@ namespace Squidex.Infrastructure.CQRS.Events.Orleans.Grains.Implementation
             return TaskHelper.Done;
         }
 
-        public override Task OnDeactivateAsync()
-        {
-            return dispatcher.StopAndWaitAsync();
-        }
-
         public Task ActivateAsync()
         {
             return dispatcher.DispatchAndUnwrapAsync(() =>
