@@ -20,7 +20,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Squidex.Config;
 using Squidex.Domain.Users;
-using Squidex.Domain.Users.DataProtection.Orleans;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
 
@@ -45,25 +44,20 @@ namespace Squidex.Areas.IdentityServer.Config
                     X509KeyStorageFlags.Exportable);
             }
 
-            services.AddIdentity<IUser, IRole>()
-                .AddDefaultTokenProviders();
-
-            services.AddDataProtection().SetApplicationName("Squidex");
-            services.AddSingleton<OrleansXmlRepository>();
-
             services.AddSingleton<IConfigureOptions<KeyManagementOptions>>(s =>
             {
                 return new ConfigureOptions<KeyManagementOptions>(options =>
                 {
-                    options.XmlRepository = s.GetRequiredService<OrleansXmlRepository>();
+                    options.XmlRepository = s.GetRequiredService<IXmlRepository>();
                 });
             });
 
+            services.AddDataProtection().SetApplicationName("Squidex");
             services.AddSingleton(GetApiResources());
             services.AddSingleton(GetIdentityResources());
 
-            services.AddSingleton<IXmlRepository,
-                OrleansXmlRepository>();
+            services.AddIdentity<IUser, IRole>()
+                .AddDefaultTokenProviders();
             services.AddSingleton<IUserClaimsPrincipalFactory<IUser>,
                 UserClaimsPrincipalFactoryWithEmail>();
             services.AddSingleton<IClientStore,

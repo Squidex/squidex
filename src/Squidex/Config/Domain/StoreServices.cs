@@ -7,6 +7,7 @@
 // ==========================================================================
 
 using IdentityServer4.Stores;
+using Microsoft.AspNetCore.DataProtection.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -47,6 +48,10 @@ namespace Squidex.Config.Domain
                     var mongoClient = Singletons<IMongoClient>.GetOrAdd(mongoConfiguration, s => new MongoClient(s));
                     var mongoDatabase = mongoClient.GetDatabase(mongoDatabaseName);
                     var mongoContentDatabase = mongoClient.GetDatabase(mongoContentDatabaseName);
+
+                    services.AddSingletonAs(c => new MongoXmlRepository(mongoDatabase))
+                        .As<IXmlRepository>()
+                        .As<IExternalSystem>();
 
                     services.AddSingletonAs(c => new MongoUserStore(mongoDatabase))
                         .As<IUserStore<IUser>>()

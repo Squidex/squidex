@@ -30,8 +30,8 @@ namespace Squidex.Config.Orleans
 
             if (clusterConfiguration != null)
             {
-                // clusterConfiguration.Globals.RegisterBootstrapProvider<EventConsumerBootstrap>("EventConsumers");
-                // clusterConfiguration.Globals.RegisterBootstrapProvider<RuleDequeuerBootstrap>("RuleDequeuer");
+                clusterConfiguration.Globals.RegisterBootstrapProvider<EventConsumerBootstrap>("EventConsumers");
+                clusterConfiguration.Globals.RegisterBootstrapProvider<RuleDequeuerBootstrap>("RuleDequeuer");
 
                 var ipConfig = config.GetRequiredValue("orleans:hostNameOrIPAddress");
 

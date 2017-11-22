@@ -12,7 +12,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Orleans;
 using Orleans.Runtime.Configuration;
 using Squidex.Domain.Apps.Read.State.Orleans.Grains.Implementations;
-using Squidex.Domain.Users.DataProtection.Orleans.Grains.Implementations;
 using Squidex.Infrastructure.CQRS.Events.Orleans.Grains.Implementation;
 
 namespace Squidex.Config.Orleans
@@ -36,7 +35,6 @@ namespace Squidex.Config.Orleans
                     .UseDashboard()
                     .AddApplicationPartsFromReferences(typeof(AppStateGrain).Assembly)
                     .AddApplicationPartsFromReferences(typeof(EventConsumerGrain).Assembly)
-                    .AddApplicationPartsFromReferences(typeof(XmlRepositoryGrain).Assembly)
                     .UseStaticGatewayListProvider(options =>
                     {
                         options.Gateways.Add(new Uri("gwy.tcp://127.0.0.1:40000/0"));
