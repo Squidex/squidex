@@ -16,7 +16,7 @@ using Squidex.Infrastructure.Reflection;
 
 #pragma warning disable CS0612 // Type or member is obsolete
 
-namespace Squidex.Domain.Apps.Read.State.Orleans.Grains.Implementations
+namespace Squidex.Domain.Apps.Read.State.Orleans.Grains
 {
     public sealed partial class AppStateGrainState
     {

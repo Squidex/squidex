@@ -14,16 +14,17 @@ using Xunit;
 
 namespace Squidex.Infrastructure.CQRS.Events
 {
-    public class EventSubscriptionTests
+    public class PollingSubscriptionTests
     {
         private readonly IEventStore eventStore = A.Fake<IEventStore>();
+        private readonly IEventNotifier eventNotifier = new DefaultEventNotifier(new InMemoryPubSub());
         private readonly IEventSubscriber eventSubscriber = A.Fake<IEventSubscriber>();
         private readonly string position = Guid.NewGuid().ToString();
 
         [Fact]
         public async Task Should_subscribe_on_start()
         {
-            var sut = new EventStoreSubscription(eventStore, eventSubscriber, "^my-stream", position);
+            var sut = new PollingSubscription(eventStore, eventNotifier, eventSubscriber, "^my-stream", position);
 
             await WaitAndStopAsync(sut);
 
@@ -39,7 +40,7 @@ namespace Squidex.Infrastructure.CQRS.Events
             A.CallTo(() => eventStore.GetEventsAsync(A<Func<StoredEvent, Task>>.Ignored, A<CancellationToken>.Ignored, "^my-stream", position))
                 .Throws(ex);
 
-            var sut = new EventStoreSubscription(eventStore, eventSubscriber, "^my-stream", position);
+            var sut = new PollingSubscription(eventStore, eventNotifier, eventSubscriber, "^my-stream", position);
 
             await WaitAndStopAsync(sut);
 
@@ -55,7 +56,7 @@ namespace Squidex.Infrastructure.CQRS.Events
             A.CallTo(() => eventStore.GetEventsAsync(A<Func<StoredEvent, Task>>.Ignored, A<CancellationToken>.Ignored, "^my-stream", position))
                 .Throws(ex);
 
-            var sut = new EventStoreSubscription(eventStore, eventSubscriber, "^my-stream", position);
+            var sut = new PollingSubscription(eventStore, eventNotifier, eventSubscriber, "^my-stream", position);
 
             await WaitAndStopAsync(sut);
 
@@ -71,12 +72,38 @@ namespace Squidex.Infrastructure.CQRS.Events
             A.CallTo(() => eventStore.GetEventsAsync(A<Func<StoredEvent, Task>>.Ignored, A<CancellationToken>.Ignored, "^my-stream", position))
                 .Throws(ex);
 
-            var sut = new EventStoreSubscription(eventStore, eventSubscriber, "^my-stream", position);
+            var sut = new PollingSubscription(eventStore, eventNotifier, eventSubscriber, "^my-stream", position);
 
             await WaitAndStopAsync(sut);
 
             A.CallTo(() => eventSubscriber.OnErrorAsync(sut, ex))
                 .MustNotHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_not_subscribe_on_notify_when_stream_matches()
+        {
+            var sut = new PollingSubscription(eventStore, eventNotifier, eventSubscriber, "^my-stream", position);
+
+            eventNotifier.NotifyEventsStored("other-stream-123");
+
+            await WaitAndStopAsync(sut);
+
+            A.CallTo(() => eventStore.GetEventsAsync(A<Func<StoredEvent, Task>>.Ignored, A<CancellationToken>.Ignored, "^my-stream", position))
+                .MustHaveHappened(Repeated.Exactly.Once);
+        }
+
+        [Fact]
+        public async Task Should_subscribe_on_notify_when_stream_matches()
+        {
+            var sut = new PollingSubscription(eventStore, eventNotifier, eventSubscriber, "^my-stream", position);
+
+            eventNotifier.NotifyEventsStored("my-stream-123");
+
+            await WaitAndStopAsync(sut);
+
+            A.CallTo(() => eventStore.GetEventsAsync(A<Func<StoredEvent, Task>>.Ignored, A<CancellationToken>.Ignored, "^my-stream", position))
+                .MustHaveHappened(Repeated.Exactly.Twice);
         }
 
         private static async Task WaitAndStopAsync(IEventSubscription sut)

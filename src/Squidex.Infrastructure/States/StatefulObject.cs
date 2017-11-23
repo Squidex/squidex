@@ -46,7 +46,7 @@ namespace Squidex.Infrastructure.States
             return stateHolder.ReadAsync();
         }
 
-        public async Task ReadStateAsync()
+        public virtual async Task ReadStateAsync()
         {
             if (stateHolder != null)
             {
@@ -54,12 +54,16 @@ namespace Squidex.Infrastructure.States
             }
         }
 
-        public async Task WriteStateAsync()
+        public virtual async Task WriteStateAsync()
         {
             if (stateHolder != null)
             {
                 await stateHolder.WriteAsync();
             }
+        }
+
+        protected override void DisposeObject(bool disposing)
+        {
         }
     }
 }

@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  RuleDequeuerGrain.cs
+//  RuleDequeuer.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -7,41 +7,31 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Threading.Tasks.Dataflow;
 using NodaTime;
-using Orleans;
-using Orleans.Concurrency;
-using Orleans.Core;
-using Orleans.Runtime;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Read.Rules.Repositories;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
-using Squidex.Infrastructure.Tasks;
+using Squidex.Infrastructure.Timers;
 
-namespace Squidex.Domain.Apps.Read.Rules.Orleans.Grains.Implementation
+namespace Squidex.Domain.Apps.Read.Rules
 {
-    [Reentrant]
-    public class RuleDequeuerGrain : Grain, IRuleDequeuerGrain, IRemindable
+    public sealed class RuleDequeuer : DisposableObjectBase, IExternalSystem
     {
+        private readonly ActionBlock<IRuleEventEntity> requestBlock;
         private readonly IRuleEventRepository ruleEventRepository;
         private readonly RuleService ruleService;
+        private readonly CompletionTimer timer;
+        private readonly ConcurrentDictionary<Guid, bool> executing = new ConcurrentDictionary<Guid, bool>();
         private readonly IClock clock;
         private readonly ISemanticLog log;
-        private readonly HashSet<Guid> executing = new HashSet<Guid>();
-        private TaskFactory scheduler;
 
-        public RuleDequeuerGrain(RuleService ruleService, IRuleEventRepository ruleEventRepository, ISemanticLog log, IClock clock)
-            : this(ruleService, ruleEventRepository, log, clock, null, null)
-        {
-        }
-
-        protected RuleDequeuerGrain(RuleService ruleService, IRuleEventRepository ruleEventRepository, ISemanticLog log, IClock clock,
-            IGrainIdentity identity,
-            IGrainRuntime runtime)
-            : base(identity, runtime)
+        public RuleDequeuer(RuleService ruleService, IRuleEventRepository ruleEventRepository, ISemanticLog log, IClock clock)
         {
             Guard.NotNull(ruleEventRepository, nameof(ruleEventRepository));
             Guard.NotNull(ruleService, nameof(ruleService));
@@ -54,42 +44,41 @@ namespace Squidex.Domain.Apps.Read.Rules.Orleans.Grains.Implementation
             this.clock = clock;
 
             this.log = log;
+
+            requestBlock =
+                new ActionBlock<IRuleEventEntity>(HandleAsync,
+                    new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = 32, BoundedCapacity = 32 });
+
+            timer = new CompletionTimer(5000, QueryAsync);
         }
 
-        public override Task OnActivateAsync()
+        protected override void DisposeObject(bool disposing)
         {
-            scheduler = new TaskFactory(TaskScheduler.Current ?? TaskScheduler.Default);
+            if (disposing)
+            {
+                timer.StopAsync().Wait();
 
-            DelayDeactivation(TimeSpan.FromDays(1));
-
-            RegisterOrUpdateReminder("Default", TimeSpan.Zero, TimeSpan.FromMinutes(10));
-            RegisterTimer(x => QueryAsync(), null, TimeSpan.Zero, TimeSpan.FromSeconds(2));
-
-            return base.OnActivateAsync();
+                requestBlock.Complete();
+                requestBlock.Completion.Wait();
+            }
         }
 
-        public Task ReceiveReminder(string reminderName, TickStatus status)
+        public void Connect()
         {
-            return TaskHelper.Done;
         }
 
-        public Task ActivateAsync()
+        public void Next()
         {
-            return TaskHelper.Done;
+            timer.SkipCurrentDelay();
         }
 
-        public async Task QueryAsync()
+        private async Task QueryAsync(CancellationToken cancellationToken)
         {
             try
             {
-                var self = GetSelf();
+                var now = clock.GetCurrentInstant();
 
-                await ruleEventRepository.QueryPendingAsync(clock.GetCurrentInstant(), x =>
-                {
-                    scheduler.StartNew(() => self.HandleAsync(x.AsImmutable()).Forget()).Forget();
-
-                    return TaskHelper.Done;
-                });
+                await ruleEventRepository.QueryPendingAsync(now, requestBlock.SendAsync, cancellationToken);
             }
             catch (Exception ex)
             {
@@ -99,23 +88,23 @@ namespace Squidex.Domain.Apps.Read.Rules.Orleans.Grains.Implementation
             }
         }
 
-        public async Task HandleAsync(Immutable<IRuleEventEntity> @event)
+        public async Task HandleAsync(IRuleEventEntity @event)
         {
-            if (!executing.Add(@event.Value.Id))
+            if (!executing.TryAdd(@event.Id, false))
             {
                 return;
             }
 
             try
             {
-                var job = @event.Value.Job;
+                var job = @event.Job;
 
                 var response = await ruleService.InvokeAsync(job.ActionName, job.ActionData);
 
                 var jobInvoke = ComputeJobInvoke(response.Result, @event, job);
                 var jobResult = ComputeJobResult(response.Result, jobInvoke);
 
-                await ruleEventRepository.MarkSentAsync(@event.Value.Id, response.Dump, response.Result, jobResult, response.Elapsed, jobInvoke);
+                await ruleEventRepository.MarkSentAsync(@event.Id, response.Dump, response.Result, jobResult, response.Elapsed, jobInvoke);
             }
             catch (Exception ex)
             {
@@ -125,7 +114,7 @@ namespace Squidex.Domain.Apps.Read.Rules.Orleans.Grains.Implementation
             }
             finally
             {
-                executing.Remove(@event.Value.Id);
+                executing.TryRemove(@event.Id, out var value);
             }
         }
 
@@ -145,11 +134,11 @@ namespace Squidex.Domain.Apps.Read.Rules.Orleans.Grains.Implementation
             }
         }
 
-        private static Instant? ComputeJobInvoke(RuleResult result, Immutable<IRuleEventEntity> @event, RuleJob job)
+        private static Instant? ComputeJobInvoke(RuleResult result, IRuleEventEntity @event, RuleJob job)
         {
             if (result != RuleResult.Success)
             {
-                switch (@event.Value.NumCalls)
+                switch (@event.NumCalls)
                 {
                     case 0:
                         return job.Created.Plus(Duration.FromMinutes(5));
@@ -163,11 +152,6 @@ namespace Squidex.Domain.Apps.Read.Rules.Orleans.Grains.Implementation
             }
 
             return null;
-        }
-
-        protected virtual IRuleDequeuerGrain GetSelf()
-        {
-            return this.AsReference<IRuleDequeuerGrain>();
         }
     }
 }

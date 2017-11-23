@@ -8,14 +8,12 @@
 
 using System;
 using Newtonsoft.Json;
-using Orleans.Concurrency;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Read.Rules;
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Read.State.Orleans.Grains.Implementations
+namespace Squidex.Domain.Apps.Read.State.Orleans.Grains
 {
-    [Immutable]
     public sealed class JsonRuleEntity :
         JsonEntity<JsonRuleEntity>,
         IRuleEntity,

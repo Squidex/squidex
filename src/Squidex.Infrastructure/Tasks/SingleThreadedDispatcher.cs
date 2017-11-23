@@ -29,6 +29,52 @@ namespace Squidex.Infrastructure.Tasks
             block = new ActionBlock<Func<Task>>(Handle, options);
         }
 
+        public Task DispatchAndUnwrapAsync(Func<Task> action)
+        {
+            Guard.NotNull(action, nameof(action));
+
+            var tcs = new TaskCompletionSource<bool>();
+
+            block.SendAsync(async () =>
+            {
+                try
+                {
+                    await action();
+
+                    tcs.SetResult(true);
+                }
+                catch (Exception ex)
+                {
+                    tcs.SetException(ex);
+                }
+            });
+
+            return tcs.Task;
+        }
+
+        public Task<T> DispatchAndUnwrapAsync<T>(Func<Task<T>> action)
+        {
+            Guard.NotNull(action, nameof(action));
+
+            var tcs = new TaskCompletionSource<T>();
+
+            block.SendAsync(async () =>
+            {
+                try
+                {
+                    var result = await action();
+
+                    tcs.SetResult(result);
+                }
+                catch (Exception ex)
+                {
+                    tcs.SetException(ex);
+                }
+            });
+
+            return tcs.Task;
+        }
+
         public Task DispatchAsync(Func<Task> action)
         {
             Guard.NotNull(action, nameof(action));

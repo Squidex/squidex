@@ -25,7 +25,7 @@ namespace Squidex.Infrastructure.Caching
             this.inner = inner;
             this.invalidator = invalidator;
 
-            subscription = invalidator.Subscribe<InvalidationMessage>(m =>
+            subscription = invalidator.Subscribe<InvalidateMessage>(m =>
             {
                 inner.Remove(m.CacheKey);
             });
@@ -60,7 +60,7 @@ namespace Squidex.Infrastructure.Caching
         {
             if (key is string stringKey)
             {
-                invalidator.Publish(new InvalidationMessage { CacheKey = stringKey }, true);
+                invalidator.Publish(new InvalidateMessage { CacheKey = stringKey }, true);
             }
         }
     }

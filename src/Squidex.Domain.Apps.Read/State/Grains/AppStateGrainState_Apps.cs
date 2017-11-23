@@ -15,7 +15,7 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Reflection;
 
-namespace Squidex.Domain.Apps.Read.State.Orleans.Grains.Implementations
+namespace Squidex.Domain.Apps.Read.State.Orleans.Grains
 {
     public sealed partial class AppStateGrainState
     {

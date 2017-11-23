@@ -1,15 +1,19 @@
 ﻿// ==========================================================================
-//  InvalidationMessage.cs
+//  AppUserGrainState.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.Caching
+using System.Collections.Generic;
+using Newtonsoft.Json;
+
+namespace Squidex.Domain.Apps.Read.State.Orleans.Grains
 {
-    public sealed class InvalidationMessage
+    public sealed class AppUserGrainState
     {
-        public string CacheKey { get; set; }
+        [JsonProperty]
+        public HashSet<string> AppNames { get; set; } = new HashSet<string>();
     }
 }

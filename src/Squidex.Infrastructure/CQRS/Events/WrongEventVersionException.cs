@@ -11,6 +11,7 @@ using System.Runtime.Serialization;
 
 namespace Squidex.Infrastructure.CQRS.Events
 {
+    [Serializable]
     public class WrongEventVersionException : Exception
     {
         private readonly long currentVersion;

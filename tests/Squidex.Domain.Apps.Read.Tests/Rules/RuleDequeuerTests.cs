@@ -10,13 +10,8 @@ using System;
 using System.Threading.Tasks;
 using FakeItEasy;
 using NodaTime;
-using Orleans.Concurrency;
-using Orleans.Core;
-using Orleans.Runtime;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
-using Squidex.Domain.Apps.Read.Rules.Orleans.Grains;
-using Squidex.Domain.Apps.Read.Rules.Orleans.Grains.Implementation;
 using Squidex.Domain.Apps.Read.Rules.Repositories;
 using Squidex.Infrastructure.Log;
 using Xunit;
@@ -25,42 +20,25 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Read.Rules
 {
-    public class RuleDequeuerGrainTests
+    public class RuleDequeuerTests
     {
         private readonly IClock clock = A.Fake<IClock>();
         private readonly ISemanticLog log = A.Fake<ISemanticLog>();
         private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
         private readonly IRuleEventRepository ruleEventRepository = A.Fake<IRuleEventRepository>();
         private readonly RuleService ruleService = A.Fake<RuleService>();
-        private readonly MyRuleDequeuerGrain sut;
+        private readonly RuleDequeuer sut;
         private readonly Instant now = SystemClock.Instance.GetCurrentInstant();
 
-        public sealed class MyRuleDequeuerGrain : RuleDequeuerGrain
-        {
-            public MyRuleDequeuerGrain(RuleService ruleService, IRuleEventRepository ruleEventRepository, ISemanticLog log, IClock clock,
-                IGrainIdentity identity,
-                IGrainRuntime runtime)
-                : base(ruleService, ruleEventRepository, log, clock, identity, runtime)
-            {
-            }
-
-            protected override IRuleDequeuerGrain GetSelf()
-            {
-                return this;
-            }
-        }
-
-        public RuleDequeuerGrainTests()
+        public RuleDequeuerTests()
         {
             A.CallTo(() => clock.GetCurrentInstant()).Returns(now);
 
-            sut = new MyRuleDequeuerGrain(
+            sut = new RuleDequeuer(
                 ruleService,
                 ruleEventRepository,
                 log,
-                clock,
-                A.Fake<IGrainIdentity>(),
-                A.Fake<IGrainRuntime>());
+                clock);
         }
 
         [Theory]
@@ -90,9 +68,9 @@ namespace Squidex.Domain.Apps.Read.Rules
                 nextCall = now.Plus(Duration.FromMinutes(minutes));
             }
 
-            await sut.OnActivateAsync();
-            await sut.HandleAsync(@event.AsImmutable());
-            await sut.OnDeactivateAsync();
+            await sut.HandleAsync(@event);
+
+            sut.Dispose();
 
             A.CallTo(() => ruleEventRepository.MarkSentAsync(@event.Id, requestDump, result, jobResult, requestElapsed, nextCall))
                 .MustHaveHappened();

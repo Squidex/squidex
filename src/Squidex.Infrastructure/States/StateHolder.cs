@@ -30,6 +30,11 @@ namespace Squidex.Infrastructure.States
         public async Task ReadAsync()
         {
             (State, etag) = await store.ReadAsync<T>(key);
+
+            if (Equals(State, default(T)))
+            {
+                State = Activator.CreateInstance<T>();
+            }
         }
 
         public async Task WriteAsync()

@@ -7,13 +7,11 @@
 // ==========================================================================
 
 using Newtonsoft.Json;
-using Orleans.Concurrency;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Read.Apps;
 
-namespace Squidex.Domain.Apps.Read.State.Orleans.Grains.Implementations
+namespace Squidex.Domain.Apps.Read.State.Orleans.Grains
 {
-    [Immutable]
     public sealed class JsonAppEntity : JsonEntity<JsonAppEntity>, IAppEntity
     {
         [JsonProperty]

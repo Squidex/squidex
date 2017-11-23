@@ -22,7 +22,7 @@ namespace Squidex.Infrastructure.States
         private readonly IMemoryCache statesCache;
         private readonly IServiceProvider services;
         private readonly List<IDisposable> states = new List<IDisposable>();
-        private readonly SingleThreadedDispatcher cleanupDispatcher = new SingleThreadedDispatcher();
+        private readonly SingleThreadedDispatcher dispatcher = new SingleThreadedDispatcher();
         private IDisposable pubSubscription;
 
         public StateFactory(
@@ -50,58 +50,74 @@ namespace Squidex.Infrastructure.States
             });
         }
 
-        public async Task<T> GetAsync<T, TState>(string key) where T : StatefulObject<TState>
+        public Task<T> GetAsync<T, TState>(string key) where T : StatefulObject<TState>
         {
             Guard.NotNull(key, nameof(key));
 
-            if (statesCache.TryGetValue<T>(key, out var state))
+            var tcs = new TaskCompletionSource<T>();
+
+            dispatcher.DispatchAsync(async () =>
             {
-                return state;
-            }
-
-            state = (T)services.GetService(typeof(T));
-
-            var stateHolder = new StateHolder<TState>(key, () =>
-            {
-                pubSub.Publish(new InvalidateMessage { Key = key }, false);
-            }, store);
-
-            await state.ActivateAsync(stateHolder);
-
-            var stateEntry = statesCache.CreateEntry(key);
-
-            stateEntry.Value = state;
-            stateEntry.AbsoluteExpirationRelativeToNow = CacheDuration;
-
-            stateEntry.PostEvictionCallbacks.Add(new PostEvictionCallbackRegistration
-            {
-                EvictionCallback = (k, v, r, s) =>
+                try
                 {
-                    cleanupDispatcher.DispatchAsync(() =>
+                    if (statesCache.TryGetValue<T>(key, out var state))
                     {
-                        state.Dispose();
-                        states.Remove(state);
-                    }).Forget();
+                        tcs.SetResult(state);
+                    }
+                    else
+                    {
+                        state = (T)services.GetService(typeof(T));
+
+                        var stateHolder = new StateHolder<TState>(key, () =>
+                        {
+                            pubSub.Publish(new InvalidateMessage { Key = key }, false);
+                        }, store);
+
+                        await state.ActivateAsync(stateHolder);
+
+                        var stateEntry = statesCache.CreateEntry(key);
+
+                        stateEntry.Value = state;
+                        stateEntry.AbsoluteExpirationRelativeToNow = CacheDuration;
+
+                        stateEntry.PostEvictionCallbacks.Add(new PostEvictionCallbackRegistration
+                        {
+                            EvictionCallback = (k, v, r, s) =>
+                            {
+                                dispatcher.DispatchAsync(() =>
+                                {
+                                    state.Dispose();
+                                    states.Remove(state);
+                                }).Forget();
+                            }
+                        });
+
+                        states.Add(state);
+
+                        tcs.SetResult(state);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    tcs.SetException(ex);
                 }
             });
 
-            states.Add(state);
-
-            return state;
+            return tcs.Task;
         }
 
         protected override void DisposeObject(bool disposing)
         {
             if (disposing)
             {
-                cleanupDispatcher.DispatchAsync(() =>
+                dispatcher.DispatchAsync(() =>
                 {
                     foreach (var state in states)
                     {
                         state.Dispose();
                     }
                 });
-                cleanupDispatcher.StopAndWaitAsync().Wait();
+                dispatcher.StopAndWaitAsync().Wait();
             }
         }
     }

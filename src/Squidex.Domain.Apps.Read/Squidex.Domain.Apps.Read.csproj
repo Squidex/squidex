@@ -15,9 +15,6 @@
   <ItemGroup>
     <PackageReference Include="GraphQL" Version="0.17.3" />
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="2.0.0" />
-    <PackageReference Include="Microsoft.Orleans.Client" Version="2.0.0-beta1" />
-    <PackageReference Include="Microsoft.Orleans.Core" Version="2.0.0-beta1" />
-    <PackageReference Include="Microsoft.Orleans.OrleansCodeGenerator.Build" Version="2.0.0-beta1-fix" />
     <PackageReference Include="NodaTime" Version="2.2.3" />
     <PackageReference Include="RefactoringEssentials" Version="5.4.0" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.0.2" />

@@ -164,7 +164,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [Route("apps/{app}/assets/")]
         [ProducesResponseType(typeof(AssetCreatedDto), 201)]
         [ProducesResponseType(typeof(ErrorDto), 400)]
-        public async Task<IActionResult> PostAsset(string app, List<IFormFile> file)
+        public async Task<IActionResult> PostAsset(string app, [SwaggerIgnore] List<IFormFile> file)
         {
             var assetFile = await CheckAssetFileAsync(file);
 
@@ -188,13 +188,16 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// 404 => Asset or app not found.
         /// 400 => Asset exceeds the maximum size.
         /// </returns>
+        /// <remarks>
+        /// Use multipart request to upload an asset.
+        /// </remarks>
         [MustBeAppEditor]
         [HttpPut]
         [Route("apps/{app}/assets/{id}/content/")]
         [ProducesResponseType(typeof(AssetReplacedDto), 201)]
         [ProducesResponseType(typeof(ErrorDto), 400)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PutAssetContent(string app, Guid id, List<IFormFile> file)
+        public async Task<IActionResult> PutAssetContent(string app, Guid id, [SwaggerIgnore] List<IFormFile> file)
         {
             var assetFile = await CheckAssetFileAsync(file);
 

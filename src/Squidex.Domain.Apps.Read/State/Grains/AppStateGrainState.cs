@@ -17,7 +17,7 @@ using Squidex.Domain.Apps.Read.Schemas;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Dispatching;
 
-namespace Squidex.Domain.Apps.Read.State.Orleans.Grains.Implementations
+namespace Squidex.Domain.Apps.Read.State.Orleans.Grains
 {
     public sealed partial class AppStateGrainState
     {
@@ -44,17 +44,17 @@ namespace Squidex.Domain.Apps.Read.State.Orleans.Grains.Implementations
 
         public ISchemaEntity FindSchema(Func<JsonSchemaEntity, bool> filter)
         {
-            return Schemas.Values?.FirstOrDefault(filter);
-        }
-
-        public List<IRuleEntity> FindRules()
-        {
-            return Rules.Values?.OfType<IRuleEntity>().ToList() ?? new List<IRuleEntity>();
+            return Schemas?.Values.FirstOrDefault(filter);
         }
 
         public List<ISchemaEntity> FindSchemas(Func<JsonSchemaEntity, bool> filter)
         {
-            return Schemas.Values?.Where(filter).OfType<ISchemaEntity>().ToList() ?? new List<ISchemaEntity>();
+            return Schemas?.Values.Where(filter).OfType<ISchemaEntity>().ToList() ?? new List<ISchemaEntity>();
+        }
+
+        public List<IRuleEntity> FindRules()
+        {
+            return Rules?.Values.OfType<IRuleEntity>().ToList() ?? new List<IRuleEntity>();
         }
 
         public void Reset()

@@ -78,16 +78,16 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
             dispatcher.DispatchAsync(() => HandleSetupAsync(eventConsumer)).Forget();
         }
 
-        private async Task HandleSetupAsync(IEventConsumer consumer)
+        private Task HandleSetupAsync(IEventConsumer consumer)
         {
             eventConsumer = consumer;
-
-            await ReadStateAsync();
 
             if (!State.IsStopped)
             {
                 Subscribe(State.Position);
             }
+
+            return TaskHelper.Done;
         }
 
         private Task HandleEventAsync(IEventSubscription subscription, StoredEvent storedEvent)

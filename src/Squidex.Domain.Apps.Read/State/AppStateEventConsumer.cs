@@ -7,20 +7,19 @@
 // ==========================================================================
 
 using System.Threading.Tasks;
-using Orleans;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Domain.Apps.Read.State.Orleans.Grains;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
-using Squidex.Infrastructure.Json.Orleans;
+using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Read.State.Orleans
 {
     public sealed class AppStateEventConsumer : IEventConsumer
     {
-        private readonly IGrainFactory factory;
+        private readonly IStateFactory factory;
 
         public string Name
         {
@@ -32,7 +31,7 @@ namespace Squidex.Domain.Apps.Read.State.Orleans
             get { return @"(^app-)|(^schema-)|(^rule\-)"; }
         }
 
-        public AppStateEventConsumer(IGrainFactory factory)
+        public AppStateEventConsumer(IStateFactory factory)
         {
             Guard.NotNull(factory, nameof(factory));
 
@@ -48,21 +47,21 @@ namespace Squidex.Domain.Apps.Read.State.Orleans
         {
             if (@event.Payload is AppEvent appEvent)
             {
-                var appGrain = factory.GetGrain<IAppStateGrain>(appEvent.AppId.Name);
+                var appGrain = await factory.GetAsync<AppStateGrain, AppStateGrainState>(appEvent.AppId.Name);
 
-                await appGrain.HandleAsync(@event.AsJ());
+                await appGrain.HandleAsync(@event);
             }
 
             if (@event.Payload is AppContributorAssigned contributorAssigned)
             {
-                var userGrain = factory.GetGrain<IAppUserGrain>(contributorAssigned.ContributorId);
+                var userGrain = await factory.GetAsync<AppUserGrain, AppUserGrainState>(contributorAssigned.ContributorId);
 
                 await userGrain.AddAppAsync(contributorAssigned.AppId.Name);
             }
 
             if (@event.Payload is AppContributorRemoved contributorRemoved)
             {
-                var userGrain = factory.GetGrain<IAppUserGrain>(contributorRemoved.ContributorId);
+                var userGrain = await factory.GetAsync<AppUserGrain, AppUserGrainState>(contributorRemoved.ContributorId);
 
                 await userGrain.RemoveAppAsync(contributorRemoved.AppId.Name);
             }
