@@ -21,7 +21,7 @@ namespace Squidex.Areas.Api.Config.Swagger
 {
     public sealed class XmlResponseTypesProcessor : IOperationProcessor
     {
-        private static readonly Regex ResponseRegex = new Regex("(?<Code>[0-9]{3}) => (?<Description>.*)", RegexOptions.Compiled);
+        private static readonly Regex ResponseRegex = new Regex("(?<Code>[0-9]{3}) =&gt; (?<Description>.*)", RegexOptions.Compiled);
 
         public async Task<bool> ProcessAsync(OperationProcessorContext context)
         {

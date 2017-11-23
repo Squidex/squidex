@@ -63,7 +63,7 @@ namespace Squidex.Pipeline.Swagger
                     {
                         ["x-logo"] = new { url = urlOptions.BuildUrl("images/logo-white.png", false), backgroundColor = "#3f83df" }
                     },
-                    Title = $"Suidex API for {appName} App"
+                    Title = $"Squidex API for {appName} App", Version = "1.0"
                 },
                 BasePath = "/api"
             };

@@ -25,11 +25,13 @@ using Squidex.Domain.Apps.Read.History;
 using Squidex.Domain.Apps.Read.Rules;
 using Squidex.Domain.Apps.Read.Schemas;
 using Squidex.Domain.Apps.Read.State.Orleans;
+using Squidex.Domain.Apps.Read.State.Orleans.Grains;
 using Squidex.Domain.Users;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.CQRS.Events;
-using Squidex.Infrastructure.CQRS.Events.Orleans;
+using Squidex.Infrastructure.CQRS.Events.Actors;
+using Squidex.Infrastructure.States;
 using Squidex.Pipeline;
 
 namespace Squidex.Config.Domain
@@ -38,6 +40,18 @@ namespace Squidex.Config.Domain
     {
         public static void AddMyReadServices(this IServiceCollection services, IConfiguration config)
         {
+            var consumeEvents = config.GetOptionalValue("eventStore:consume", false);
+
+            if (consumeEvents)
+            {
+                services.AddTransient<EventConsumerActor>();
+
+                services.AddSingletonAs<EventConsumerActorManager>()
+                    .As<IExternalSystem>();
+                services.AddSingletonAs<RuleDequeuer>()
+                    .As<IExternalSystem>();
+            }
+
             var exposeSourceUrl = config.GetOptionalValue("assetStore:exposeSourceUrl", true);
 
             services.AddSingletonAs(c => new GraphQLUrlGenerator(
@@ -72,10 +86,10 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<NoopAppPlanBillingManager>()
                 .As<IAppPlanBillingManager>();
 
-            services.AddSingletonAs<OrleansEventNotifier>()
+            services.AddSingletonAs<DefaultEventNotifier>()
                 .As<IEventNotifier>();
 
-            services.AddSingletonAs<OrleansAppProvider>()
+            services.AddSingletonAs<AppProvider>()
                 .As<IAppProvider>();
 
             services.AddSingletonAs<AppStateEventConsumer>()
@@ -83,6 +97,9 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<RuleEnqueuer>()
                 .As<IEventConsumer>();
+
+            services.AddSingletonAs<StateFactory>()
+                .As<IStateFactory>();
 
             services.AddSingletonAs<ContentChangedTriggerHandler>()
                 .As<IRuleTriggerHandler>();
@@ -100,8 +117,12 @@ namespace Squidex.Config.Domain
                 return new EventConsumerFactory(n => allEventConsumers.FirstOrDefault(x => x.Name == n));
             });
 
-            services.AddSingletonAs<RuleService>();
             services.AddSingletonAs<EdmModelBuilder>();
+
+            services.AddTransient<AppStateGrain>();
+            services.AddTransient<AppUserGrain>();
+
+            services.AddSingleton<RuleService>();
         }
     }
 }

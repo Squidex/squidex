@@ -14,15 +14,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Squidex.Areas.Api;
 using Squidex.Areas.Frontend;
 using Squidex.Areas.IdentityServer;
-using Squidex.Areas.OrleansDashboard;
 using Squidex.Areas.Portal;
 using Squidex.Config.Domain;
-using Squidex.Config.Orleans;
 using Squidex.Config.Web;
 
 namespace Squidex
 {
-    public class WebStartup : IStartup
+    public sealed class WebStartup : IStartup
     {
         private readonly IConfiguration configuration;
 
@@ -33,7 +31,6 @@ namespace Squidex
 
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
-            services.AddAppClient();
             services.AddAppServices(configuration);
 
             return services.BuildServiceProvider();
@@ -49,7 +46,6 @@ namespace Squidex
             app.UseMyTracking();
 
             app.ConfigureApi();
-            app.ConfigureOrleansDashboard();
             app.ConfigurePortal();
             app.ConfigureIdentityServer();
 

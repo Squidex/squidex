@@ -32,6 +32,7 @@ namespace Squidex
             services.AddMyIdentityServer();
             services.AddMyInfrastructureServices(config);
             services.AddMyMvc();
+            services.AddMyPubSubServices(config);
             services.AddMyReadServices(config);
             services.AddMySerializers();
             services.AddMyStoreServices(config);

@@ -6,14 +6,15 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
-using Orleans;
 using Squidex.Areas.Api.Controllers.EventConsumers.Models;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Commands;
-using Squidex.Infrastructure.CQRS.Events.Orleans.Grains;
+using Squidex.Infrastructure.CQRS.Events.Actors.Messages;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
 
@@ -25,12 +26,12 @@ namespace Squidex.Areas.Api.Controllers.EventConsumers
     [SwaggerIgnore]
     public sealed class EventConsumersController : ApiController
     {
-        private readonly IEventConsumerRegistryGrain eventConsumerRegistryGrain;
+        private readonly IPubSub pubSub;
 
-        public EventConsumersController(ICommandBus commandBus, IClusterClient orleans)
+        public EventConsumersController(ICommandBus commandBus, IPubSub pubSub)
             : base(commandBus)
         {
-            eventConsumerRegistryGrain = orleans.GetGrain<IEventConsumerRegistryGrain>("Default");
+            this.pubSub = pubSub;
         }
 
         [HttpGet]
@@ -38,9 +39,9 @@ namespace Squidex.Areas.Api.Controllers.EventConsumers
         [ApiCosts(0)]
         public async Task<IActionResult> GetEventConsumers()
         {
-            var entities = await eventConsumerRegistryGrain.GetConsumersAsync();
+            var entities = await pubSub.RequestAsync<GetStatesRequest, GetStatesResponse>(new GetStatesRequest(), TimeSpan.FromSeconds(2), true);
 
-            var models = entities.Value.Select(x => SimpleMapper.Map(x, new EventConsumerDto())).ToList();
+            var models = entities.States.Select(x => SimpleMapper.Map(x, new EventConsumerDto())).ToList();
 
             return Ok(models);
         }
@@ -48,9 +49,9 @@ namespace Squidex.Areas.Api.Controllers.EventConsumers
         [HttpPut]
         [Route("event-consumers/{name}/start/")]
         [ApiCosts(0)]
-        public async Task<IActionResult> Start(string name)
+        public IActionResult Start(string name)
         {
-            await eventConsumerRegistryGrain.StartAsync(name);
+            pubSub.Publish(new StartConsumerMessage { ConsumerName = name }, true);
 
             return NoContent();
         }
@@ -58,9 +59,9 @@ namespace Squidex.Areas.Api.Controllers.EventConsumers
         [HttpPut]
         [Route("event-consumers/{name}/stop/")]
         [ApiCosts(0)]
-        public async Task<IActionResult> Stop(string name)
+        public IActionResult Stop(string name)
         {
-            await eventConsumerRegistryGrain.StopAsync(name);
+            pubSub.Publish(new StopConsumerMessage { ConsumerName = name }, true);
 
             return NoContent();
         }
@@ -68,9 +69,9 @@ namespace Squidex.Areas.Api.Controllers.EventConsumers
         [HttpPut]
         [Route("event-consumers/{name}/reset/")]
         [ApiCosts(0)]
-        public async Task<IActionResult> Reset(string name)
+        public IActionResult Reset(string name)
         {
-            await eventConsumerRegistryGrain.ResetAsync(name);
+            pubSub.Publish(new ResetConsumerMessage { ConsumerName = name }, true);
 
             return NoContent();
         }

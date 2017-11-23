@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
+using Newtonsoft.Json;
 using Squidex.Domain.Apps.Read;
 using Squidex.Domain.Apps.Read.Assets;
 using Squidex.Domain.Apps.Read.Assets.Repositories;
@@ -28,6 +29,7 @@ using Squidex.Domain.Users.MongoDb;
 using Squidex.Domain.Users.MongoDb.Infrastructure;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.UsageTracking;
 using Squidex.Shared.Users;
 
@@ -51,6 +53,10 @@ namespace Squidex.Config.Domain
 
                     services.AddSingletonAs(c => new MongoXmlRepository(mongoDatabase))
                         .As<IXmlRepository>()
+                        .As<IExternalSystem>();
+
+                    services.AddSingletonAs(c => new MongoStateStore(mongoDatabase, c.GetRequiredService<JsonSerializer>()))
+                        .As<IStateStore>()
                         .As<IExternalSystem>();
 
                     services.AddSingletonAs(c => new MongoUserStore(mongoDatabase))
