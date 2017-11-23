@@ -1,18 +1,15 @@
 ﻿// ==========================================================================
-//  JExtensions.cs
+//  InvalidationMessage.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.Json.Orleans
+namespace Squidex.Infrastructure.Caching
 {
-    public static class JExtensions
+    public sealed class InvalidationMessage
     {
-        public static J<T> AsJ<T>(this T value, bool immutable = true)
-        {
-            return new J<T>(value, immutable);
-        }
+        public string CacheKey { get; set; }
     }
 }

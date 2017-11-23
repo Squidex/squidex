@@ -1,20 +1,14 @@
 ﻿// ==========================================================================
-//  IEventSubscriber.cs
+//  GetStatesRequest.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using System;
-using System.Threading.Tasks;
-
-namespace Squidex.Infrastructure.CQRS.Events
+namespace Squidex.Infrastructure.CQRS.Events.Actors.Messages
 {
-    public interface IEventSubscriber
+    public sealed class GetStatesRequest
     {
-        Task OnEventAsync(IEventSubscription subscription, StoredEvent storedEvent);
-
-        Task OnErrorAsync(IEventSubscription subscription, Exception exception);
     }
 }

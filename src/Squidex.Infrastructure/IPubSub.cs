@@ -12,8 +12,8 @@ namespace Squidex.Infrastructure
 {
     public interface IPubSub
     {
-        void Publish(string channelName, string token, bool notifySelf);
+        void Publish<T>(T value, bool notifySelf);
 
-        IDisposable Subscribe(string channelName, Action<string> handler);
+        IDisposable Subscribe<T>(Action<T> handler);
     }
 }

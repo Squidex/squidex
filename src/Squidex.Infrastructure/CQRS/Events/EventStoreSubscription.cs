@@ -51,10 +51,6 @@ namespace Squidex.Infrastructure.CQRS.Events
                         await eventSubscriber.OnErrorAsync(this, ex);
                     }
                 }
-                finally
-                {
-                    await eventSubscriber.OnClosedAsync(this);
-                }
             });
         }
 

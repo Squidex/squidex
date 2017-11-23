@@ -1,20 +1,21 @@
 ﻿// ==========================================================================
-//  IEventSubscriber.cs
+//  IStateHolder.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using System;
 using System.Threading.Tasks;
 
-namespace Squidex.Infrastructure.CQRS.Events
+namespace Squidex.Infrastructure.States
 {
-    public interface IEventSubscriber
+    public interface IStateHolder<T>
     {
-        Task OnEventAsync(IEventSubscription subscription, StoredEvent storedEvent);
+        T State { get; set; }
 
-        Task OnErrorAsync(IEventSubscription subscription, Exception exception);
+        Task ReadAsync();
+
+        Task WriteAsync();
     }
 }

@@ -1,17 +1,17 @@
 ﻿// ==========================================================================
-//  IJsonValue.cs
+//  IStateFactory.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.Json.Orleans
-{
-    public interface IJsonValue
-    {
-        object Value { get; }
+using System.Threading.Tasks;
 
-        bool IsImmutable { get; }
+namespace Squidex.Infrastructure.States
+{
+    public interface IStateFactory
+    {
+        Task<T> GetAsync<T, TState>(string key) where T : StatefulObject<TState>;
     }
 }

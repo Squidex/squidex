@@ -112,26 +112,6 @@ namespace Squidex.Infrastructure.CQRS.Events
                 .MustNotHaveHappened();
         }
 
-        [Fact]
-        public async Task Should_forward_closed_from_inner_subscription()
-        {
-            await OnClosedAsync(eventSubscription);
-            await sut.StopAsync();
-
-            A.CallTo(() => eventSubscriber.OnClosedAsync(sut))
-                .MustHaveHappened();
-        }
-
-        [Fact]
-        public async Task Should_not_forward_closed_when_message_is_from_another_subscription()
-        {
-            await OnClosedAsync(A.Fake<IEventSubscription>());
-            await sut.StopAsync();
-
-            A.CallTo(() => eventSubscriber.OnClosedAsync(sut))
-                .MustNotHaveHappened();
-        }
-
         private Task OnErrorAsync(IEventSubscription subscriber, Exception ex)
         {
             return sutSubscriber.OnErrorAsync(subscriber, ex);
@@ -140,11 +120,6 @@ namespace Squidex.Infrastructure.CQRS.Events
         private Task OnEventAsync(IEventSubscription subscriber, StoredEvent ev)
         {
             return sutSubscriber.OnEventAsync(subscriber, ev);
-        }
-
-        private Task OnClosedAsync(IEventSubscription subscriber)
-        {
-            return sutSubscriber.OnClosedAsync(subscriber);
         }
     }
 }

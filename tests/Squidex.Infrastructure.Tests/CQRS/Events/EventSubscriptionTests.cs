@@ -48,22 +48,6 @@ namespace Squidex.Infrastructure.CQRS.Events
         }
 
         [Fact]
-        public async Task Should_propagate_closed_to_subscriber()
-        {
-            var ex = new InvalidOperationException();
-
-            A.CallTo(() => eventStore.GetEventsAsync(A<Func<StoredEvent, Task>>.Ignored, A<CancellationToken>.Ignored, "^my-stream", position))
-                .Throws(ex);
-
-            var sut = new EventStoreSubscription(eventStore, eventSubscriber, "^my-stream", position);
-
-            await WaitAndStopAsync(sut);
-
-            A.CallTo(() => eventSubscriber.OnClosedAsync(sut))
-                .MustHaveHappened();
-        }
-
-        [Fact]
         public async Task Should_propagate_operation_cancelled_exception_to_subscriber()
         {
             var ex = new OperationCanceledException();
