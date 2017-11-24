@@ -1,6 +1,6 @@
 <sqx-title message="{app} | {schema}" parameter1="app" [value1]="ctx.appName" parameter2="schema" [value2]="schema?.name"></sqx-title>
 
-<sqx-panel desiredWidth="48rem">
+<sqx-panel desiredWidth="56rem">
     <div class="panel-header">
         <div class="panel-title-row">
             <div class="float-right">
@@ -44,7 +44,7 @@
             </div>
 
             <h3 class="panel-title">
-                {{schema | sqxDisplayName:'properties.label':'name'}} <i class="schema-edit icon-pencil" (click)="editSchemaDialog.show()"></i>
+                <i class="schema-edit icon-pencil" (click)="editSchemaDialog.show()"></i> {{schema | sqxDisplayName:'properties.label':'name'}} 
             </h3>
         </div>
 
