@@ -75,22 +75,18 @@ namespace Squidex.Infrastructure.States
 
                         await state.ActivateAsync(stateHolder);
 
-                        var stateEntry = statesCache.CreateEntry(key);
-
-                        stateEntry.Value = state;
-                        stateEntry.AbsoluteExpirationRelativeToNow = CacheDuration;
-
-                        stateEntry.PostEvictionCallbacks.Add(new PostEvictionCallbackRegistration
-                        {
-                            EvictionCallback = (k, v, r, s) =>
+                        statesCache.CreateEntry(key)
+                            .SetValue(state)
+                            .SetAbsoluteExpiration(CacheDuration)
+                            .RegisterPostEvictionCallback((k, v, r, s) =>
                             {
                                 dispatcher.DispatchAsync(() =>
                                 {
                                     state.Dispose();
                                     states.Remove(state);
                                 }).Forget();
-                            }
-                        });
+                            })
+                            .Dispose();
 
                         states.Add(state);
 
