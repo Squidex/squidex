@@ -29,14 +29,21 @@ namespace Squidex.Domain.Apps.Read.Contents
                 "deleted content item.");
 
             AddEventMessage<ContentStatusChanged>(
-                "change status of content item to {[Status]}.");
+                "changed status of content item to {[Status]}.");
         }
 
         protected override Task<HistoryEventToStore> CreateEventCoreAsync(Envelope<IEvent> @event)
         {
             var channel = $"contents.{@event.Headers.AggregateId()}";
 
-            return Task.FromResult(ForEvent(@event.Payload, channel));
+            var result = ForEvent(@event.Payload, channel);
+
+            if (@event.Payload is ContentStatusChanged contentStatusChanged)
+            {
+                result = result.AddParameter("Status", contentStatusChanged.Status);
+            }
+
+            return Task.FromResult(result);
         }
     }
 }
