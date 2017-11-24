@@ -2,7 +2,8 @@
         [formControl]="addInput"
         autocomplete="off" 
         autocorrect="off"
-        autocapitalize="off">
+        autocapitalize="off"
+        placeholder="Press enter to add new item">
 
     <div class="items">
         <span class="item" *ngFor="let item of items; let i = index" [class.disabled]="addInput.disabled">
