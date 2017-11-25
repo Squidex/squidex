@@ -7,7 +7,11 @@
 // ==========================================================================
 
 using System;
+using System.IO;
+using System.Linq;
 using FluentAssertions;
+using MongoDB.Bson.IO;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Xunit;
 
@@ -19,13 +23,29 @@ namespace Squidex.Infrastructure.MongoDb
     {
         public class TestObject
         {
-            public TimeSpan TimeSpan { get; set; }
+            public bool Bool { get; set; }
+
+            public byte Byte { get; set; }
+
+            public byte[] Bytes { get; set; }
+
+            public string String { get; set; }
+
+            public string[] Strings { get; set; }
+
+            public float Float32 { get; set; }
+
+            public double Float64 { get; set; }
+
+            public Uri Uri { get; set; }
 
             public Guid Guid { get; set; }
 
-            public DateTimeOffset DateTimeOffset { get; set; }
+            public TimeSpan TimeSpan { get; set; }
 
             public DateTime DateTime { get; set; }
+
+            public DateTimeOffset DateTimeOffset { get; set; }
 
             public Int64 Int64 { get; set; }
 
@@ -39,25 +59,13 @@ namespace Squidex.Infrastructure.MongoDb
 
             public UInt16 UInt16 { get; set; }
 
-            public double Float64 { get; set; }
+            public TestObject Nested { get; set; }
 
-            public float Float32 { get; set; }
+            public TestObject[] NestedArray { get; set; }
 
-            public bool Bool { get; set; }
-
-            public byte Byte { get; set; }
-
-            public byte[] Bytes { get; set; }
-
-            public string String { get; set; }
-
-            public string[] Strings { get; set; }
-
-            public Uri Uri { get; set; }
-
-            public static TestObject CreateWithValues()
+            public static TestObject CreateWithValues(bool nested = true)
             {
-                return new TestObject
+                var result = new TestObject
                 {
                     Bool = true,
                     Byte = 0x2,
@@ -78,16 +86,48 @@ namespace Squidex.Infrastructure.MongoDb
                     UInt16 = 116,
                     Uri = new Uri("http://squidex.io")
                 };
+
+                if (nested)
+                {
+                    result.Nested = CreateWithValues(false);
+                    result.NestedArray = Enumerable.Repeat(0, 4).Select(x => CreateWithValues(false)).ToArray();
+                }
+
+                return result;
             }
         }
+
+        private readonly TestObject source = TestObject.CreateWithValues();
+        private readonly JsonSerializer serializer = JsonSerializer.CreateDefault();
 
         [Fact]
         public void Should_serialize_and_deserialize_to_bson_with_json()
         {
-            var source = TestObject.CreateWithValues();
             var target = JObject.FromObject(source).ToBson().ToJson().ToObject<TestObject>();
 
             target.ShouldBeEquivalentTo(source);
+        }
+
+        [Fact]
+        public void Should_serialize_with_reader_and_writer()
+        {
+            var stream = new MemoryStream();
+
+            using (var writer = new BsonJsonWriter(new BsonBinaryWriter(stream)))
+            {
+                serializer.Serialize(writer, source);
+
+                writer.Flush();
+            }
+
+            stream.Position = 0;
+
+            using (var reader = new BsonJsonReader(new BsonBinaryReader(stream)))
+            {
+                var target = serializer.Deserialize<TestObject>(reader);
+
+                target.ShouldBeEquivalentTo(source);
+            }
         }
     }
 }

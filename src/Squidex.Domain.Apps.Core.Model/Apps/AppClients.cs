@@ -7,6 +7,7 @@
 // ==========================================================================
 
 using System.Collections.Immutable;
+using System.Diagnostics.Contracts;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Apps
@@ -25,6 +26,7 @@ namespace Squidex.Domain.Apps.Core.Apps
         {
         }
 
+        [Pure]
         public AppClients Add(string id, AppClient client)
         {
             Guard.NotNullOrEmpty(id, nameof(id));
@@ -33,6 +35,7 @@ namespace Squidex.Domain.Apps.Core.Apps
             return new AppClients(Inner.Add(id, client));
         }
 
+        [Pure]
         public AppClients Add(string id, string secret)
         {
             Guard.NotNullOrEmpty(id, nameof(id));
@@ -40,6 +43,7 @@ namespace Squidex.Domain.Apps.Core.Apps
             return new AppClients(Inner.Add(id, new AppClient(id, secret, AppClientPermission.Editor)));
         }
 
+        [Pure]
         public AppClients Revoke(string id)
         {
             Guard.NotNullOrEmpty(id, nameof(id));
@@ -47,6 +51,7 @@ namespace Squidex.Domain.Apps.Core.Apps
             return new AppClients(Inner.Remove(id));
         }
 
+        [Pure]
         public AppClients Rename(string id, string newName)
         {
             Guard.NotNullOrEmpty(id, nameof(id));
@@ -59,6 +64,7 @@ namespace Squidex.Domain.Apps.Core.Apps
             return new AppClients(Inner.SetItem(id, client.Rename(newName)));
         }
 
+        [Pure]
         public AppClients Update(string id, AppClientPermission permission)
         {
             Guard.NotNullOrEmpty(id, nameof(id));

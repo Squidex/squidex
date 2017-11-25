@@ -62,12 +62,13 @@ namespace Squidex.Infrastructure.States
 
             try
             {
-                await collection.InsertOneAsync(
-                    /*Builders<MongoState<T>>.Filter.And(
-                        Builders<MongoState<T>>.Filter.Eq(nameof(MongoState<T>.Id), key),
-                        Builders<MongoState<T>>.Filter.Eq(nameof(MongoState<T>.Etag), oldEtag)
-                    ),*/
-                    new MongoState<T> { Id = key, Etag = newEtag, Doc = value });
+                await collection.UpdateOneAsync(
+                    Builders<MongoState<T>>.Filter.And(
+                        Builders<MongoState<T>>.Filter.Eq(x => x.Id, key),
+                        Builders<MongoState<T>>.Filter.Eq(x => x.Etag, oldEtag)
+                    ),
+                    Builders<MongoState<T>>.Update.Set(x => x.Doc, value),
+                    Upsert);
             }
             catch (MongoWriteException ex)
             {

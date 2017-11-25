@@ -57,5 +57,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         }
 
         public abstract T Accept<T>(IFieldPropertiesVisitor<T> visitor);
+
+        public abstract Field CreateField(long id, string name, Partitioning partitioning);
     }
 }

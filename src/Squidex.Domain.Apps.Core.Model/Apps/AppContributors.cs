@@ -7,6 +7,7 @@
 // ==========================================================================
 
 using System.Collections.Immutable;
+using System.Diagnostics.Contracts;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Apps
@@ -25,6 +26,7 @@ namespace Squidex.Domain.Apps.Core.Apps
         {
         }
 
+        [Pure]
         public AppContributors Assign(string contributorId, AppContributorPermission permission)
         {
             Guard.NotNullOrEmpty(contributorId, nameof(contributorId));
@@ -33,6 +35,7 @@ namespace Squidex.Domain.Apps.Core.Apps
             return new AppContributors(Inner.SetItem(contributorId, permission));
         }
 
+        [Pure]
         public AppContributors Remove(string contributorId)
         {
             Guard.NotNullOrEmpty(contributorId, nameof(contributorId));

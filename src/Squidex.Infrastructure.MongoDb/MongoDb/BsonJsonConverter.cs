@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  JsonBsonConverter.cs
+//  BsonJsonConverter.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -12,7 +12,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Squidex.Infrastructure.MongoDb
 {
-    public static class JsonBsonConverter
+    public static class BsonJsonConverter
     {
         public static BsonDocument ToBson(this JObject source)
         {

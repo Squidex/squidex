@@ -14,19 +14,19 @@ using Squidex.Infrastructure.CQRS.Events;
 
 namespace Benchmarks.Tests
 {
-    public sealed class AppendToEventStoreWithManyWriters : IBenchmark
+    public sealed class AppendToEventStoreWithManyWriters : Benchmark
     {
         private IServiceProvider services;
         private IEventStore eventStore;
 
-        public void RunInitialize()
+        public override void RunInitialize()
         {
             services = Services.Create();
 
             eventStore = services.GetRequiredService<IEventStore>();
         }
 
-        public long Run()
+        public override long Run()
         {
             const long numCommits = 200;
             const long numStreams = 100;
@@ -44,7 +44,7 @@ namespace Benchmarks.Tests
             return numCommits * numStreams;
         }
 
-        public void RunCleanup()
+        public override void RunCleanup()
         {
             services.Cleanup();
         }

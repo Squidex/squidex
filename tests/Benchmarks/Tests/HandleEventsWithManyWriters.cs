@@ -16,7 +16,7 @@ using Squidex.Infrastructure.States;
 
 namespace Benchmarks.Tests
 {
-    public sealed class HandleEventsWithManyWriters : IBenchmark
+    public sealed class HandleEventsWithManyWriters : Benchmark
     {
         private const int NumCommits = 200;
         private const int NumStreams = 10;
@@ -26,7 +26,7 @@ namespace Benchmarks.Tests
         private EventDataFormatter eventDataFormatter;
         private MyEventConsumer eventConsumer;
 
-        public void RunInitialize()
+        public override void RunInitialize()
         {
             services = Services.Create();
 
@@ -41,7 +41,7 @@ namespace Benchmarks.Tests
             eventConsumerActor.Activate(eventConsumer);
         }
 
-        public long Run()
+        public override long Run()
         {
             Parallel.For(0, NumStreams, streamId =>
             {
@@ -62,7 +62,7 @@ namespace Benchmarks.Tests
             return NumStreams * NumCommits;
         }
 
-        public void RunCleanup()
+        public override void RunCleanup()
         {
             services.Cleanup();
         }

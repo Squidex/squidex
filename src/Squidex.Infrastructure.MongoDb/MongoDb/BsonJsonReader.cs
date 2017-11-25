@@ -27,7 +27,9 @@ namespace Squidex.Infrastructure.MongoDb
 
         public override bool Read()
         {
-            if (bsonReader.State == BsonReaderState.Type)
+            if (bsonReader.State == BsonReaderState.Initial ||
+                bsonReader.State == BsonReaderState.ScopeDocument ||
+                bsonReader.State == BsonReaderState.Type)
             {
                 bsonReader.ReadBsonType();
             }
@@ -60,9 +62,11 @@ namespace Squidex.Infrastructure.MongoDb
                         break;
                     case BsonType.Undefined:
                         SetToken(NewtonsoftJsonToken.Undefined);
+                        bsonReader.ReadUndefined();
                         break;
                     case BsonType.Null:
                         SetToken(NewtonsoftJsonToken.Null);
+                        bsonReader.ReadNull();
                         break;
                     case BsonType.String:
                         SetToken(NewtonsoftJsonToken.String, bsonReader.ReadString());
@@ -91,6 +95,11 @@ namespace Squidex.Infrastructure.MongoDb
                     default:
                         throw new NotSupportedException();
                 }
+            }
+
+            if (bsonReader.State == BsonReaderState.Initial)
+            {
+                return true;
             }
 
             return !bsonReader.IsAtEndOfFile();

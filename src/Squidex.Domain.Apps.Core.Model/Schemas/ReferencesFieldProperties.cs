@@ -64,5 +64,10 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
             return visitor.Visit(this);
         }
+
+        public override Field CreateField(long id, string name, Partitioning partitioning)
+        {
+            return new ReferencesField(id, name, partitioning, this);
+        }
     }
 }

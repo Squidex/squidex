@@ -10,6 +10,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using Squidex.Infrastructure;
 
@@ -88,6 +89,7 @@ namespace Squidex.Domain.Apps.Core.Apps
             return Build(languages?.Select(x => new LanguageConfig(x)).ToList());
         }
 
+        [Pure]
         public LanguagesConfig MakeMaster(Language language)
         {
             Guard.NotNull(language, nameof(language));
@@ -95,6 +97,7 @@ namespace Squidex.Domain.Apps.Core.Apps
             return new LanguagesConfig(languages, languages[language]);
         }
 
+        [Pure]
         public LanguagesConfig Set(LanguageConfig config)
         {
             Guard.NotNull(config, nameof(config));
@@ -102,6 +105,7 @@ namespace Squidex.Domain.Apps.Core.Apps
             return new LanguagesConfig(languages.SetItem(config.Language, config), Master?.Language == config.Language ? config : Master);
         }
 
+        [Pure]
         public LanguagesConfig Remove(Language language)
         {
             Guard.NotNull(language, nameof(language));

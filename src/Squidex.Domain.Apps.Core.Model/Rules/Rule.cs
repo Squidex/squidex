@@ -7,6 +7,7 @@
 // ==========================================================================
 
 using System;
+using System.Diagnostics.Contracts;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Rules
@@ -41,6 +42,7 @@ namespace Squidex.Domain.Apps.Core.Rules
             this.action = action;
         }
 
+        [Pure]
         public Rule Enable()
         {
             return Clone(clone =>
@@ -49,6 +51,7 @@ namespace Squidex.Domain.Apps.Core.Rules
             });
         }
 
+        [Pure]
         public Rule Disable()
         {
             return Clone(clone =>
@@ -57,6 +60,7 @@ namespace Squidex.Domain.Apps.Core.Rules
             });
         }
 
+        [Pure]
         public Rule Update(RuleTrigger newTrigger)
         {
             Guard.NotNull(newTrigger, nameof(newTrigger));
@@ -72,6 +76,7 @@ namespace Squidex.Domain.Apps.Core.Rules
             });
         }
 
+        [Pure]
         public Rule Update(RuleAction newAction)
         {
             Guard.NotNull(newAction, nameof(newAction));

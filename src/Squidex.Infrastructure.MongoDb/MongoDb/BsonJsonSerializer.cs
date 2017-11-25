@@ -14,11 +14,11 @@ using Newtonsoft.Json.Linq;
 
 namespace Squidex.Infrastructure.MongoDb
 {
-    public class JsonBsonSerializer<T> : ClassSerializerBase<T> where T : class
+    public class BsonJsonSerializer<T> : ClassSerializerBase<T> where T : class
     {
         private readonly JsonSerializer serializer;
 
-        public JsonBsonSerializer(JsonSerializer serializer)
+        public BsonJsonSerializer(JsonSerializer serializer)
         {
             Guard.NotNull(serializer, nameof(serializer));
 

@@ -15,7 +15,7 @@ using Squidex.Infrastructure.States;
 
 namespace Benchmarks.Tests
 {
-    public sealed class HandleEvents : IBenchmark
+    public sealed class HandleEvents : Benchmark
     {
         private const int NumEvents = 5000;
         private IServiceProvider services;
@@ -24,7 +24,7 @@ namespace Benchmarks.Tests
         private EventDataFormatter eventDataFormatter;
         private MyEventConsumer eventConsumer;
 
-        public void RunInitialize()
+        public override void RunInitialize()
         {
             services = Services.Create();
 
@@ -39,7 +39,7 @@ namespace Benchmarks.Tests
             eventConsumerActor.Activate(eventConsumer);
         }
 
-        public long Run()
+        public override long Run()
         {
             var streamName = Guid.NewGuid().ToString();
 
@@ -55,7 +55,7 @@ namespace Benchmarks.Tests
             return NumEvents;
         }
 
-        public void RunCleanup()
+        public override void RunCleanup()
         {
             services.Cleanup();
         }

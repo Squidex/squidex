@@ -16,7 +16,7 @@ namespace Benchmarks
 {
     public static class Program
     {
-        private static readonly List<(string Name, IBenchmark Benchmark)> Benchmarks = new IBenchmark[]
+        private static readonly List<(string Name, Benchmark Benchmark)> Benchmarks = new Benchmark[]
         {
             new AppendToEventStore(),
             new AppendToEventStoreWithManyWriters(),
@@ -51,6 +51,8 @@ namespace Benchmarks
 
                     Console.WriteLine($"{selected.Name}: Initialized");
 
+                    selected.Benchmark.Initialize();
+
                     for (var run = 0; run < numRuns; run++)
                     {
                         try
@@ -81,6 +83,10 @@ namespace Benchmarks
                 catch (Exception e)
                 {
                     Console.WriteLine($"Benchmark failed with '{e.Message}'");
+                }
+                finally
+                {
+                    selected.Benchmark.Cleanup();
                 }
             }
 

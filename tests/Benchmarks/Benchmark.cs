@@ -8,12 +8,24 @@
 
 namespace Benchmarks
 {
-    public interface IBenchmark
+    public abstract class Benchmark
     {
-        void RunInitialize();
+        public virtual void Initialize()
+        {
+        }
 
-        long Run();
+        public virtual void RunInitialize()
+        {
+        }
 
-        void RunCleanup();
+        public virtual void RunCleanup()
+        {
+        }
+
+        public virtual void Cleanup()
+        {
+        }
+
+        public abstract long Run();
     }
 }

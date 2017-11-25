@@ -22,12 +22,12 @@ using Squidex.Infrastructure.States;
 
 namespace Benchmarks.Tests
 {
-    public class ReadSchemaState : IBenchmark
+    public class ReadSchemaState : Benchmark
     {
         private IServiceProvider services;
         private MyAppState grain;
 
-        public void RunInitialize()
+        public override void Initialize()
         {
             services = Services.Create();
 
@@ -84,7 +84,7 @@ namespace Benchmarks.Tests
             grain.WriteStateAsync().Wait();
         }
 
-        public long Run()
+        public override long Run()
         {
             for (var i = 0; i < 10; i++)
             {
@@ -94,7 +94,7 @@ namespace Benchmarks.Tests
             return 10;
         }
 
-        public void RunCleanup()
+        public override void Cleanup()
         {
             services.Cleanup();
         }
