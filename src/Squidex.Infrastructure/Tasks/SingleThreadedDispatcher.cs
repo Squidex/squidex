@@ -22,7 +22,7 @@ namespace Squidex.Infrastructure.Tasks
             var options = new ExecutionDataflowBlockOptions
             {
                 BoundedCapacity = capacity,
-                MaxMessagesPerTask = -1,
+                MaxMessagesPerTask = 1,
                 MaxDegreeOfParallelism = 1
             };
 

@@ -22,7 +22,7 @@ namespace Squidex.Infrastructure.States
         private readonly IMemoryCache statesCache;
         private readonly IServiceProvider services;
         private readonly List<IDisposable> states = new List<IDisposable>();
-        private readonly SingleThreadedDispatcher dispatcher = new SingleThreadedDispatcher();
+        private readonly TaskFactory taskFactory = new TaskFactory(new LimitedConcurrencyLevelTaskScheduler(1));
         private IDisposable pubSubscription;
 
         public StateFactory(
@@ -54,66 +54,54 @@ namespace Squidex.Infrastructure.States
         {
             Guard.NotNull(key, nameof(key));
 
-            var tcs = new TaskCompletionSource<T>();
-
-            dispatcher.DispatchAsync(async () =>
+            return taskFactory.StartNew(async () =>
             {
-                try
+                if (statesCache.TryGetValue<T>(key, out var state))
                 {
-                    if (statesCache.TryGetValue<T>(key, out var state))
-                    {
-                        tcs.SetResult(state);
-                    }
-                    else
-                    {
-                        state = (T)services.GetService(typeof(T));
+                    return state;
+                }
+                else
+                {
+                    state = (T)services.GetService(typeof(T));
 
-                        var stateHolder = new StateHolder<TState>(key, () =>
+                    var stateHolder = new StateHolder<TState>(key, () =>
+                    {
+                        pubSub.Publish(new InvalidateMessage { Key = key }, false);
+                    }, store);
+
+                    await state.ActivateAsync(stateHolder);
+
+                    statesCache.CreateEntry(key)
+                        .SetValue(state)
+                        .SetAbsoluteExpiration(CacheDuration)
+                        .RegisterPostEvictionCallback((k, v, r, s) =>
                         {
-                            pubSub.Publish(new InvalidateMessage { Key = key }, false);
-                        }, store);
-
-                        await state.ActivateAsync(stateHolder);
-
-                        statesCache.CreateEntry(key)
-                            .SetValue(state)
-                            .SetAbsoluteExpiration(CacheDuration)
-                            .RegisterPostEvictionCallback((k, v, r, s) =>
+                            taskFactory.StartNew(async () =>
                             {
-                                dispatcher.DispatchAsync(() =>
-                                {
-                                    state.Dispose();
-                                    states.Remove(state);
-                                }).Forget();
-                            })
-                            .Dispose();
+                                state.Dispose();
+                                states.Remove(state);
+                            }).Forget();
+                        })
+                        .Dispose();
 
-                        states.Add(state);
+                    states.Add(state);
 
-                        tcs.SetResult(state);
-                    }
+                    return state;
                 }
-                catch (Exception ex)
-                {
-                    tcs.SetException(ex);
-                }
-            });
-
-            return tcs.Task;
+            }).Unwrap();
         }
 
         protected override void DisposeObject(bool disposing)
         {
             if (disposing)
             {
-                dispatcher.DispatchAsync(() =>
+                taskFactory.StartNew(() =>
                 {
                     foreach (var state in states)
                     {
                         state.Dispose();
                     }
-                });
-                dispatcher.StopAndWaitAsync().Wait();
+                }).Wait();
             }
         }
     }

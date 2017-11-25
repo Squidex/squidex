@@ -19,7 +19,7 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
         private readonly EventDataFormatter formatter;
         private readonly IEventStore eventStore;
         private readonly ISemanticLog log;
-        private readonly SingleThreadedDispatcher dispatcher = new SingleThreadedDispatcher(1);
+        private readonly TaskFactory taskFactory = new TaskFactory(new LimitedConcurrencyLevelTaskScheduler(1));
         private IEventSubscription currentSubscription;
         private IEventConsumer eventConsumer;
 

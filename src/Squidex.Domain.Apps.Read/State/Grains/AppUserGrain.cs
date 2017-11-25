@@ -16,33 +16,33 @@ namespace Squidex.Domain.Apps.Read.State.Orleans.Grains
 {
     public sealed class AppUserGrain : StatefulObject<AppUserGrainState>
     {
-        private readonly SingleThreadedDispatcher dispatcher = new SingleThreadedDispatcher();
+        private readonly TaskFactory taskFactory = new TaskFactory(new LimitedConcurrencyLevelTaskScheduler(1));
 
         public Task AddAppAsync(string appName)
         {
-            return dispatcher.DispatchAndUnwrapAsync(() =>
+            return taskFactory.StartNew(() =>
             {
                 State.AppNames.Add(appName);
 
                 return WriteStateAsync();
-            });
+            }).Unwrap();
         }
 
         public Task RemoveAppAsync(string appName)
         {
-            return dispatcher.DispatchAndUnwrapAsync(() =>
+            return taskFactory.StartNew(() =>
             {
                 State.AppNames.Remove(appName);
 
                 return WriteStateAsync();
-            });
+            }).Unwrap();
         }
 
         public Task<List<string>> GetAppNamesAsync()
         {
-            return dispatcher.DispatchAndUnwrapAsync(() =>
+            return taskFactory.StartNew(() =>
             {
-                return Task.FromResult(State.AppNames.ToList());
+                return State.AppNames.ToList();
             });
         }
     }

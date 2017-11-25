@@ -24,7 +24,7 @@ namespace Squidex.Domain.Apps.Read.State.Orleans.Grains
     public class AppStateGrain : StatefulObject<AppStateGrainState>
     {
         private readonly FieldRegistry fieldRegistry;
-        private readonly SingleThreadedDispatcher dispatcher = new SingleThreadedDispatcher();
+        private readonly TaskFactory taskFactory = new TaskFactory(new LimitedConcurrencyLevelTaskScheduler(1));
         private Exception exception;
 
         public AppStateGrain(FieldRegistry fieldRegistry)
@@ -52,67 +52,67 @@ namespace Squidex.Domain.Apps.Read.State.Orleans.Grains
 
         public virtual Task<(IAppEntity, ISchemaEntity)> GetAppWithSchemaAsync(Guid id)
         {
-            return dispatcher.DispatchAndUnwrapAsync(() =>
+            return taskFactory.StartNew(() =>
             {
                 var schema = State.FindSchema(x => x.Id == id && !x.IsDeleted);
 
-                return Task.FromResult((State.GetApp(), schema));
+                return (State.GetApp(), schema);
             });
         }
 
         public virtual Task<IAppEntity> GetAppAsync()
         {
-            return dispatcher.DispatchAndUnwrapAsync(() =>
+            return taskFactory.StartNew(() =>
             {
-            var value = State.GetApp();
+                var value = State.GetApp();
 
-            return Task.FromResult(value);
+                return value;
             });
         }
 
         public virtual Task<List<IRuleEntity>> GetRulesAsync()
         {
-            return dispatcher.DispatchAndUnwrapAsync(() =>
+            return taskFactory.StartNew(() =>
             {
                 var value = State.FindRules();
 
-                return Task.FromResult(value);
+                return value;
             });
         }
 
         public virtual Task<List<ISchemaEntity>> GetSchemasAsync()
         {
-            return dispatcher.DispatchAndUnwrapAsync(() =>
+            return taskFactory.StartNew(() =>
             {
                 var value = State.FindSchemas(x => !x.IsDeleted);
 
-                return Task.FromResult(value);
+                return value;
             });
         }
 
         public virtual Task<ISchemaEntity> GetSchemaAsync(Guid id, bool provideDeleted = false)
         {
-            return dispatcher.DispatchAndUnwrapAsync(() =>
+            return taskFactory.StartNew(() =>
             {
                 var value = State.FindSchema(x => x.Id == id && (!x.IsDeleted || provideDeleted));
 
-                return Task.FromResult(value);
+                return value;
             });
         }
 
         public virtual Task<ISchemaEntity> GetSchemaAsync(string name, bool provideDeleted = false)
         {
-            return dispatcher.DispatchAndUnwrapAsync(() =>
+            return taskFactory.StartNew(() =>
             {
                 var value = State.FindSchema(x => string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase) && (!x.IsDeleted || provideDeleted));
 
-                return Task.FromResult(value);
+                return value;
             });
         }
 
         public virtual Task HandleAsync(Envelope<IEvent> message)
         {
-            return dispatcher.DispatchAndUnwrapAsync(() =>
+            return taskFactory.StartNew(() =>
             {
                 if (exception != null)
                 {
@@ -129,7 +129,7 @@ namespace Squidex.Domain.Apps.Read.State.Orleans.Grains
                 State.Apply(message);
 
                 return WriteStateAsync();
-            });
+            }).Unwrap();
         }
     }
 }
