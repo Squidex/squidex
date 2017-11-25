@@ -105,6 +105,12 @@ namespace Squidex.Domain.Apps.Core.Schemas
             fieldsOrdered = ImmutableArray.Create(fields);
         }
 
+        protected override void OnCloned()
+        {
+            fieldsById = null;
+            fieldsByName = null;
+        }
+
         [Pure]
         public Schema Update(SchemaProperties newProperties)
         {
@@ -192,7 +198,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         [Pure]
         public Schema DeleteField(long fieldId)
         {
-            if (!fieldsById.TryGetValue(fieldId, out var field))
+            if (!FieldsById.TryGetValue(fieldId, out var field))
             {
                 return this;
             }
