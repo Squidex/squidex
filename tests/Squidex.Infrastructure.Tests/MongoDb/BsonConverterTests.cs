@@ -15,52 +15,70 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Xunit;
 
-#pragma warning disable SA1121 // Use built-in type alias
-
 namespace Squidex.Infrastructure.MongoDb
 {
     public class BsonConverterTests
     {
         public class TestObject
         {
+            [JsonProperty]
             public bool Bool { get; set; }
 
+            [JsonProperty]
             public byte Byte { get; set; }
 
+            [JsonProperty]
             public byte[] Bytes { get; set; }
 
+            [JsonProperty]
+            public int Int32 { get; set; }
+
+            [JsonProperty]
+            public long Int64 { get; set; }
+
+            [JsonProperty]
+            public short Int16 { get; set; }
+
+            [JsonProperty]
+            public uint UInt32 { get; set; }
+
+            [JsonProperty]
+            public ulong UInt64 { get; set; }
+
+            [JsonProperty]
+            public ushort UInt16 { get; set; }
+
+            [JsonProperty]
             public string String { get; set; }
 
-            public string[] Strings { get; set; }
-
+            [JsonProperty]
             public float Float32 { get; set; }
 
+            [JsonProperty]
             public double Float64 { get; set; }
 
+            [JsonProperty]
+            public string[] Strings { get; set; }
+
+            [JsonProperty]
             public Uri Uri { get; set; }
 
+            [JsonProperty]
             public Guid Guid { get; set; }
 
+            [JsonProperty]
             public TimeSpan TimeSpan { get; set; }
 
+            [JsonProperty]
             public DateTime DateTime { get; set; }
 
+            [JsonProperty]
             public DateTimeOffset DateTimeOffset { get; set; }
 
-            public Int64 Int64 { get; set; }
-
-            public Int32 Int32 { get; set; }
-
-            public Int16 Int16 { get; set; }
-
-            public UInt64 UInt64 { get; set; }
-
-            public UInt32 UInt32 { get; set; }
-
-            public UInt16 UInt16 { get; set; }
-
+            [JsonProperty]
             public TestObject Nested { get; set; }
 
+            [JsonProperty]
             public TestObject[] NestedArray { get; set; }
 
             public static TestObject CreateWithValues(bool nested = true)
