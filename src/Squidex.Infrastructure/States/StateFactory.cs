@@ -76,7 +76,7 @@ namespace Squidex.Infrastructure.States
                         .SetAbsoluteExpiration(CacheDuration)
                         .RegisterPostEvictionCallback((k, v, r, s) =>
                         {
-                            taskFactory.StartNew(async () =>
+                            taskFactory.StartNew(() =>
                             {
                                 state.Dispose();
                                 states.Remove(state);
