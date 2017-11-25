@@ -75,7 +75,10 @@ namespace Squidex.Infrastructure.Tasks
                         TryExecuteTask(item);
                     }
                 }
-                finally { currentThreadIsProcessingItems = false; }
+                finally
+                {
+                    currentThreadIsProcessingItems = false;
+                }
             }, null);
         }
 
