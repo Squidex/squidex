@@ -15,12 +15,11 @@ using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Scripting;
+using Squidex.Domain.Apps.Read;
 using Squidex.Domain.Apps.Read.Apps;
-using Squidex.Domain.Apps.Read.Apps.Services;
 using Squidex.Domain.Apps.Read.Assets.Repositories;
 using Squidex.Domain.Apps.Read.Contents.Repositories;
 using Squidex.Domain.Apps.Read.Schemas;
-using Squidex.Domain.Apps.Read.Schemas.Services;
 using Squidex.Domain.Apps.Write.Contents.Commands;
 using Squidex.Domain.Apps.Write.TestHelpers;
 using Squidex.Infrastructure;
@@ -33,7 +32,6 @@ namespace Squidex.Domain.Apps.Write.Contents
     {
         private readonly ContentCommandMiddleware sut;
         private readonly ContentDomainObject content;
-        private readonly ISchemaProvider schemas = A.Fake<ISchemaProvider>();
         private readonly ISchemaEntity schema = A.Fake<ISchemaEntity>();
         private readonly IScriptEngine scriptEngine = A.Fake<IScriptEngine>();
         private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
@@ -61,21 +59,20 @@ namespace Squidex.Domain.Apps.Write.Contents
 
         public ContentCommandMiddlewareTests()
         {
-            var schemaDef = new Schema("my-schema");
-
-            schemaDef.AddField(new NumberField(1, "my-field1", Partitioning.Invariant,
-                new NumberFieldProperties { IsRequired = true }));
-            schemaDef.AddField(new NumberField(2, "my-field2", Partitioning.Invariant,
-                new NumberFieldProperties { IsRequired = false }));
+            var schemaDef =
+                new Schema("my-schema")
+                    .AddField(new NumberField(1, "my-field1", Partitioning.Invariant,
+                        new NumberFieldProperties { IsRequired = true }))
+                    .AddField(new NumberField(2, "my-field2", Partitioning.Invariant,
+                        new NumberFieldProperties { IsRequired = false }));
 
             content = new ContentDomainObject(contentId, -1);
 
-            sut = new ContentCommandMiddleware(Handler, appProvider, A.Dummy<IAssetRepository>(), schemas, scriptEngine, A.Dummy<IContentRepository>());
+            sut = new ContentCommandMiddleware(Handler, appProvider, A.Dummy<IAssetRepository>(), scriptEngine, A.Dummy<IContentRepository>());
 
             A.CallTo(() => app.LanguagesConfig).Returns(languagesConfig);
-            A.CallTo(() => app.PartitionResolver).Returns(languagesConfig.ToResolver());
 
-            A.CallTo(() => appProvider.FindAppByIdAsync(AppId)).Returns(app);
+            A.CallTo(() => appProvider.GetAppAsync(AppName)).Returns(app);
 
             A.CallTo(() => schema.SchemaDef).Returns(schemaDef);
             A.CallTo(() => schema.ScriptCreate).Returns("<create-script>");
@@ -83,7 +80,7 @@ namespace Squidex.Domain.Apps.Write.Contents
             A.CallTo(() => schema.ScriptUpdate).Returns("<update-script>");
             A.CallTo(() => schema.ScriptDelete).Returns("<delete-script>");
 
-            A.CallTo(() => schemas.FindSchemaByIdAsync(SchemaId, false)).Returns(schema);
+            A.CallTo(() => appProvider.GetAppWithSchemaAsync(AppName, SchemaId)).Returns((app, schema));
         }
 
         [Fact]

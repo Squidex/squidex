@@ -7,6 +7,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Newtonsoft.Json.Linq;
@@ -73,7 +74,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_add_errors_if_number_is_not_allowed()
         {
-            var sut = new NumberField(1, "my-number", Partitioning.Invariant, new NumberFieldProperties { AllowedValues = new[] { 10d } });
+            var sut = new NumberField(1, "my-number", Partitioning.Invariant, new NumberFieldProperties { AllowedValues = ImmutableList.Create(10d) });
 
             await sut.ValidateAsync(CreateValue(20), errors);
 

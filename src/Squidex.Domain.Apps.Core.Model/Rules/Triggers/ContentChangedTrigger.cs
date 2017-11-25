@@ -6,7 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System.Collections.Generic;
+using System.Collections.Immutable;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Rules.Triggers
@@ -14,7 +14,21 @@ namespace Squidex.Domain.Apps.Core.Rules.Triggers
     [TypeName(nameof(ContentChangedTrigger))]
     public sealed class ContentChangedTrigger : RuleTrigger
     {
-        public List<ContentChangedTriggerSchema> Schemas { get; set; }
+        private ImmutableList<ContentChangedTriggerSchema> schemas;
+
+        public ImmutableList<ContentChangedTriggerSchema> Schemas
+        {
+            get
+            {
+                return schemas;
+            }
+            set
+            {
+                ThrowIfFrozen();
+
+                schemas = value;
+            }
+        }
 
         public override T Accept<T>(IRuleTriggerVisitor<T> visitor)
         {

@@ -7,49 +7,58 @@
 // ==========================================================================
 
 using System;
-using System.Linq;
 using System.Reactive.Subjects;
+using Newtonsoft.Json;
 using Squidex.Infrastructure.Log;
 using StackExchange.Redis;
 
+#pragma warning disable SA1401 // Fields must be private
+
 namespace Squidex.Infrastructure
 {
-    internal sealed class RedisSubscription
+    internal sealed class RedisSubscription<T>
     {
-        private static readonly Guid InstanceId = Guid.NewGuid();
-        private readonly Subject<string> subject = new Subject<string>();
+        private readonly Guid selfId = Guid.NewGuid();
+        private readonly Subject<T> subject = new Subject<T>();
         private readonly ISubscriber subscriber;
-        private readonly string channelName;
         private readonly ISemanticLog log;
+        private readonly string channelName;
+
+        private sealed class Envelope
+        {
+            public T Payload;
+
+            public Guid Sender;
+        }
 
         public RedisSubscription(ISubscriber subscriber, string channelName, ISemanticLog log)
         {
             this.log = log;
 
             this.subscriber = subscriber;
-            this.subscriber.Subscribe(channelName, (channel, value) => HandleInvalidation(value));
+            this.subscriber.Subscribe(channelName, (channel, value) => HandleMessage(value));
 
             this.channelName = channelName;
         }
 
-        public void Publish(string token, bool notifySelf)
+        public void Publish(object value, bool notifySelf)
         {
             try
             {
-                var message = string.Join("#", (notifySelf ? Guid.Empty : InstanceId).ToString(), token);
+                var envelope = JsonConvert.SerializeObject(new Envelope { Sender = selfId, Payload = (T)value });
 
-                subscriber.Publish(channelName, message);
+                subscriber.Publish(channelName, envelope);
             }
             catch (Exception ex)
             {
                 log.LogError(ex, w => w
                     .WriteProperty("action", "PublishRedisMessage")
                     .WriteProperty("state", "Failed")
-                    .WriteProperty("token", token));
+                    .WriteProperty("channel", channelName));
             }
         }
 
-        private void HandleInvalidation(string value)
+        private void HandleMessage(string value)
         {
             try
             {
@@ -58,28 +67,15 @@ namespace Squidex.Infrastructure
                     return;
                 }
 
-                var parts = value.Split('#');
+                var envelope = JsonConvert.DeserializeObject<Envelope>(value);
 
-                if (parts.Length < 1)
+                if (envelope.Sender != selfId)
                 {
-                    return;
-                }
-
-                if (!Guid.TryParse(parts[0], out var sender))
-                {
-                    return;
-                }
-
-                if (sender != InstanceId)
-                {
-                    var token = string.Join("#", parts.Skip(1));
-
-                    subject.OnNext(token);
+                    subject.OnNext(envelope.Payload);
 
                     log.LogDebug(w => w
                         .WriteProperty("action", "ReceiveRedisMessage")
                         .WriteProperty("channel", channelName)
-                        .WriteProperty("token", token)
                         .WriteProperty("state", "Received"));
                 }
             }
@@ -92,7 +88,7 @@ namespace Squidex.Infrastructure
             }
         }
 
-        public IDisposable Subscribe(Action<string> handler)
+        public IDisposable Subscribe(Action<T> handler)
         {
             return subject.Subscribe(handler);
         }

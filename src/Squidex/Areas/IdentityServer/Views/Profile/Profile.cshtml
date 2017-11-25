@@ -1,0 +1,237 @@
+﻿@model Squidex.Areas.IdentityServer.Controllers.Profile.ProfileVM
+
+@{
+    ViewBag.Theme = "white";
+    ViewBag.Title = "Profile";
+}
+
+<div class="profile profile-lg">
+    <img class="profile-logo" src="~/images/logo-small.png" />
+    
+    <h1>Edit Profile</h1>
+
+    <h2>Personal Information</h2>
+
+    @if (!string.IsNullOrWhiteSpace(Model.SuccessMessage))
+    {
+        <div class="form-alert form-alert-success" id="success">
+            @Model.SuccessMessage
+        </div>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+    {
+        <div class="form-alert form-alert-error">
+            @Model.ErrorMessage
+        </div>
+    }
+    
+    <div class="row profile-section">
+        <div class="col profile-picture-col">
+            <img class="profile-picture" src="@Url.Content($"~/../api/users/{Model.Id}/picture/")" />
+        </div>
+        <div class="col">
+            <form id="pictureForm" class="profile-picture-form" asp-controller="Profile" asp-action="UploadPicture" method="post" enctype="multipart/form-data">
+                <span class="btn btn-secondary" id="pictureButton">
+                    <span>Upload Picture</span>
+
+                    <input class="profile-picture-input" name="file" type="file" id="pictureInput" />
+                </span>
+            </form>
+        </div>
+    </div>
+
+    <form class="profile-form profile-section" asp-controller="Profile" asp-action="UpdateProfile" method="post">
+        <div class="form-group">
+            <label for="email">Email</label>
+                    
+            @if (ViewContext.ViewData.ModelState["Email"]?.ValidationState == Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid)
+            {
+                <div class="errors-container">
+                    <span asp-validation-for="Email" class="errors"></span>
+                </div>
+            }
+
+            <input type="email" ap class="form-control" asp-for="Email" name="email" id="email" />
+        </div>
+
+        <div class="form-group">
+            <label for="displayName">Display Name</label>
+
+            @if (ViewContext.ViewData.ModelState["DisplayName"]?.ValidationState == Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid)
+            {
+                <div class="errors-container">
+                    <span asp-validation-for="DisplayName" class="errors"></span>
+                </div>
+            }
+
+            <input type="text" class="form-control" asp-for="DisplayName" name="displayName" id="displayName"/>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Save</button>
+    </form>
+    
+    @if (Model.ExternalProviders.Any())
+    {
+        <div class="profile-section">
+            <h2>Logins</h2>
+
+            <table class="table table-fixed table-lesspadding">
+                <colgroup>
+                    <col style="width: 100px;"/>
+                    <col style="width: 100%;"/>
+                    <col style="width: 100px;"/>
+                </colgroup>
+                @foreach (var login in Model.ExternalLogins)
+                {
+                    <tr>
+                        <td>
+                            <span>@login.LoginProvider</span>
+                        </td>
+                        <td>
+                            <span class="truncate">@login.ProviderDisplayName</span>
+                        </td>
+                        <td class="text-right">
+                            @if (Model.ExternalLogins.Count > 1 || Model.HasPassword)
+                            {
+                                <form asp-controller="Profile" asp-action="RemoveLogin" method="post">
+                                    <input type="hidden" value="@login.LoginProvider" name="LoginProvider"/>
+                                    <input type="hidden" value="@login.ProviderKey" name="ProviderKey"/>
+
+                                    <button type="submit" class="btn btn-link btn-danger btn-sm">
+                                        Remove
+                                    </button>
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
+            </table>
+
+            <form asp-controller="Profile" asp-action="AddLogin" method="post">
+                @foreach (var provider in Model.ExternalProviders.Where(x => !Model.ExternalLogins.Any(y => x.AuthenticationScheme == y.LoginProvider)))
+                {
+                    var schema = provider.AuthenticationScheme.ToLowerInvariant();
+
+                    <button class="btn external-button-small btn btn-@schema" type="submit" name="provider" value="@provider.AuthenticationScheme">
+                        <i class="icon-@schema external-icon"></i>
+                    </button>
+                }
+            </form>
+        </div>
+    }
+    
+    @if (Model.HasPasswordAuth)
+    {
+        <div class="profile-section">
+            <h2>Password</h2>
+
+            @if (Model.HasPassword)
+            {
+                <form class="profile-form" asp-controller="Profile" asp-action="ChangePassword" method="post">
+                    <div class="form-group">
+                        <label for="oldPassword">Old Password</label>
+
+                        @if (ViewContext.ViewData.ModelState["OldPassword"]?.ValidationState == Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid)
+                        {
+                            <div class="errors-container">
+                                <span class="errors">@Html.ValidationMessage("OldPassword")</span>
+                            </div>
+                        }
+
+                        <input type="password" class="form-control" name="oldPassword" id="oldPassword" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+
+                        @if (ViewContext.ViewData.ModelState["Password"]?.ValidationState == Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid)
+                        {
+                            <div class="errors-container">
+                                <span class="errors">@Html.ValidationMessage("Password")</span>
+                            </div>
+                        }
+
+                        <input type="password" class="form-control" name="password" id="password" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="passwordConfirm">Confirm</label>
+
+                        @if (ViewContext.ViewData.ModelState["PasswordConfirm"]?.ValidationState == Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid)
+                        {
+                            <div class="errors-container">
+                                <span class="errors">@Html.ValidationMessage("PasswordConfirm")</span>
+                            </div>
+                        }
+
+                        <input type="password" class="form-control" name="passwordConfirm" id="passwordConfirm" />
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary">Change Password</button>
+                    </div>
+                </form>
+            }
+            else
+            {
+                <form class="profile-form" asp-controller="Profile" asp-action="SetPassword" method="post">
+                    <div class="form-group">
+                        <label for="password">Password</label>
+
+                        @if (ViewContext.ViewData.ModelState["Password"]?.ValidationState == Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid)
+                        {
+                            <div class="errors-container">
+                                <span class="errors">@Html.ValidationMessage("Password")</span>
+                            </div>
+                        }
+
+                        <input type="password" class="form-control" name="password" id="password" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="passwordConfirm">Confirm</label>
+
+                        @if (ViewContext.ViewData.ModelState["PasswordConfirm"]?.ValidationState == Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid)
+                        {
+                            <div class="errors-container">
+                                <span class="errors">@Html.ValidationMessage("PasswordConfirm")</span>
+                            </div>
+                        }
+
+                        <input type="password" class="form-control" name="passwordConfirm" id="passwordConfirm" />
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary">Set Password</button>
+                    </div>
+                </form>
+            }
+        </div>
+    }
+</div>
+
+<script>
+    var pictureButton = document.getElementById('pictureButton');
+    var pictureInput = document.getElementById('pictureInput');
+    var pictureForm = document.getElementById('pictureForm');
+
+    pictureButton.addEventListener('click',
+        function() {
+            pictureInput.click();
+        });
+
+    pictureInput.addEventListener('change',
+        function() {
+            pictureForm.submit();
+        });
+
+    var successMessage = document.getElementById('success');
+
+    if (successMessage) {
+        setTimeout(function() {
+                successMessage.remove();
+            },
+            5000);
+    }
+</script>

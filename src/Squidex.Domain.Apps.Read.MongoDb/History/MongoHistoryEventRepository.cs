@@ -83,9 +83,13 @@ namespace Squidex.Domain.Apps.Read.MongoDb.History
 
                 if (message != null)
                 {
-                    await Collection.CreateAsync((SquidexEvent)@event.Payload, @event.Headers, entity =>
+                    var appEvent = (AppEvent)@event.Payload;
+
+                    await Collection.CreateAsync(appEvent, @event.Headers, entity =>
                     {
                         entity.Id = Guid.NewGuid();
+
+                        entity.AppId = appEvent.AppId.Id;
 
                         entity.Version = @event.Headers.EventStreamNumber();
 

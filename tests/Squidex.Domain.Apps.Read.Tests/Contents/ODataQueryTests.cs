@@ -7,6 +7,7 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Immutable;
 using FakeItEasy;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
@@ -29,7 +30,7 @@ namespace Squidex.Domain.Apps.Read.Contents
 {
     public class ODataQueryTests
     {
-        private readonly Schema schemaDef = new Schema("user");
+        private readonly Schema schemaDef;
         private readonly IBsonSerializerRegistry registry = BsonSerializer.SerializerRegistry;
         private readonly IBsonSerializer<MongoContentEntity> serializer = BsonSerializer.SerializerRegistry.GetSerializer<MongoContentEntity>();
         private readonly IEdmModel edmModel;
@@ -42,30 +43,25 @@ namespace Squidex.Domain.Apps.Read.Contents
 
         public ODataQueryTests()
         {
-            schemaDef.Update(new SchemaProperties { Hints = "The User" });
-
-            schemaDef.AddField(new StringField(1, "firstName", Partitioning.Language,
-                new StringFieldProperties { Label = "FirstName", IsRequired = true, AllowedValues = new[] { "1", "2" } }));
-            schemaDef.AddField(new StringField(2, "lastName", Partitioning.Language,
-                new StringFieldProperties { Hints = "Last Name", Editor = StringFieldEditor.Input }));
-
-            schemaDef.AddField(new BooleanField(3, "isAdmin", Partitioning.Invariant,
-                new BooleanFieldProperties()));
-
-            schemaDef.AddField(new NumberField(4, "age", Partitioning.Invariant,
-                new NumberFieldProperties { MinValue = 1, MaxValue = 10 }));
-
-            schemaDef.AddField(new DateTimeField(5, "birthday", Partitioning.Invariant,
-                new DateTimeFieldProperties()));
-
-            schemaDef.AddField(new AssetsField(6, "pictures", Partitioning.Invariant,
-                new AssetsFieldProperties()));
-
-            schemaDef.AddField(new ReferencesField(7, "friends", Partitioning.Invariant,
-                new ReferencesFieldProperties()));
-
-            schemaDef.AddField(new StringField(8, "dashed-field", Partitioning.Invariant,
-                new StringFieldProperties()));
+            schemaDef =
+                new Schema("user")
+                    .AddField(new StringField(1, "firstName", Partitioning.Language,
+                        new StringFieldProperties { Label = "FirstName", IsRequired = true, AllowedValues = ImmutableList.Create("1", "2") }))
+                    .AddField(new StringField(2, "lastName", Partitioning.Language,
+                        new StringFieldProperties { Hints = "Last Name", Editor = StringFieldEditor.Input }))
+                    .AddField(new BooleanField(3, "isAdmin", Partitioning.Invariant,
+                        new BooleanFieldProperties()))
+                    .AddField(new NumberField(4, "age", Partitioning.Invariant,
+                        new NumberFieldProperties { MinValue = 1, MaxValue = 10 }))
+                    .AddField(new DateTimeField(5, "birthday", Partitioning.Invariant,
+                        new DateTimeFieldProperties()))
+                    .AddField(new AssetsField(6, "pictures", Partitioning.Invariant,
+                        new AssetsFieldProperties()))
+                    .AddField(new ReferencesField(7, "friends", Partitioning.Invariant,
+                        new ReferencesFieldProperties()))
+                    .AddField(new StringField(8, "dashed-field", Partitioning.Invariant,
+                        new StringFieldProperties()))
+                    .Update(new SchemaProperties { Hints = "The User" });
 
             var builder = new EdmModelBuilder(new MemoryCache(Options.Create(new MemoryCacheOptions())));
 
@@ -77,7 +73,7 @@ namespace Squidex.Domain.Apps.Read.Contents
             var app = A.Dummy<IAppEntity>();
             A.CallTo(() => app.Id).Returns(Guid.NewGuid());
             A.CallTo(() => app.Version).Returns(3);
-            A.CallTo(() => app.PartitionResolver).Returns(languagesConfig.ToResolver());
+            A.CallTo(() => app.LanguagesConfig).Returns(languagesConfig);
 
             edmModel = builder.BuildEdmModel(schema, app);
         }

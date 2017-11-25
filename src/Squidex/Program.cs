@@ -12,7 +12,7 @@ using Squidex.Infrastructure.Log.Adapter;
 
 namespace Squidex
 {
-    public class Program
+    public static class Program
     {
         public static void Main(string[] args)
         {

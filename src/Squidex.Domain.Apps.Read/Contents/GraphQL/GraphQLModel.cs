@@ -44,7 +44,7 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
 
             CanGenerateAssetSourceUrl = urlGenerator.CanGenerateAssetSourceUrl;
 
-            partitionResolver = app.PartitionResolver;
+            partitionResolver = app.PartitionResolver();
 
             assetType = new AssetGraphType(this);
             assetListType = new ListGraphType(new NonNullGraphType(assetType));

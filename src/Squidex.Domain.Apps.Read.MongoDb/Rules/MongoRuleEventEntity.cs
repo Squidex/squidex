@@ -40,10 +40,6 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Rules
 
         [BsonRequired]
         [BsonElement]
-        public bool IsSending { get; set; }
-
-        [BsonRequired]
-        [BsonElement]
         public RuleResult Result { get; set; }
 
         [BsonRequired]

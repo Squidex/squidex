@@ -26,7 +26,7 @@ if ($all -Or $infrastructure) {
 	-register:user `
 	-target:"C:\Program Files\dotnet\dotnet.exe" `
 	-targetargs:"test $folderWorking\Squidex.Infrastructure.Tests\Squidex.Infrastructure.Tests.csproj" `
-	-filter:"+[Squidex.Infrastructure*]*" `
+	-filter:"+[Squidex.Infrastructure*]* -[Squidex.Infrastructure*]*CodeGen*" `
 	-skipautoprops `
 	-output:"$folderWorking\$folderReports\Infrastructure.xml" `
 	-oldStyle
@@ -76,6 +76,6 @@ if ($all -Or $users) {
 	-oldStyle
 }
 
-&"$folderHome\.nuget\packages\ReportGenerator\3.0.1\tools\ReportGenerator.exe" `
+&"$folderHome\.nuget\packages\ReportGenerator\3.0.2\tools\ReportGenerator.exe" `
 -reports:"$folderWorking\$folderReports\*.xml" `
 -targetdir:"$folderWorking\$folderReports\Output"

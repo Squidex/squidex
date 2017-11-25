@@ -10,7 +10,7 @@ using Squidex.Domain.Apps.Core.Schemas;
 
 namespace Squidex.Domain.Apps.Read.Schemas
 {
-    public interface ISchemaEntity : IAppRefEntity, IEntityWithCreatedBy, IEntityWithLastModifiedBy, IEntityWithVersion
+    public interface ISchemaEntity : IEntityWithAppRef, IEntityWithCreatedBy, IEntityWithLastModifiedBy, IEntityWithVersion
     {
         string Name { get; }
 

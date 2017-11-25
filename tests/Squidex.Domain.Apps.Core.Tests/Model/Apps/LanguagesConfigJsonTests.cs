@@ -26,7 +26,8 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
             var sut = LanguagesConfig.Build(
                 new LanguageConfig(Language.EN),
                 new LanguageConfig(Language.DE, true, Language.EN),
-                new LanguageConfig(Language.IT, false, Language.DE));
+                new LanguageConfig(Language.IT, false, Language.DE))
+                .MakeMaster(Language.IT);
 
             sut.MakeMaster(Language.IT);
 

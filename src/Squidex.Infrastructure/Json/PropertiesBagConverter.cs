@@ -13,9 +13,9 @@ using NodaTime.Extensions;
 
 namespace Squidex.Infrastructure.Json
 {
-    public sealed class PropertiesBagConverter : JsonClassConverter<PropertiesBag>
+    public sealed class PropertiesBagConverter<T> : JsonClassConverter<T> where T : PropertiesBag, new()
     {
-        protected override void WriteValue(JsonWriter writer, PropertiesBag value, JsonSerializer serializer)
+        protected override void WriteValue(JsonWriter writer, T value, JsonSerializer serializer)
         {
             writer.WriteStartObject();
 
@@ -36,14 +36,14 @@ namespace Squidex.Infrastructure.Json
             writer.WriteEndObject();
         }
 
-        protected override PropertiesBag ReadValue(JsonReader reader, JsonSerializer serializer)
+        protected override T ReadValue(JsonReader reader, Type objectType, JsonSerializer serializer)
         {
             if (reader.TokenType != JsonToken.StartObject)
             {
                 throw new JsonException($"Expected Object, but got {reader.TokenType}.");
             }
 
-            var properties = new PropertiesBag();
+            var properties = new T();
 
             while (reader.Read())
             {
@@ -73,7 +73,7 @@ namespace Squidex.Infrastructure.Json
 
         public override bool CanConvert(Type objectType)
         {
-            return typeof(PropertiesBag).IsAssignableFrom(objectType);
+            return objectType == typeof(T);
         }
     }
 }

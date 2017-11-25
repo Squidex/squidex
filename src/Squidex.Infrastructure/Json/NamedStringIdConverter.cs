@@ -19,7 +19,7 @@ namespace Squidex.Infrastructure.Json
             writer.WriteValue($"{value.Id},{value.Name}");
         }
 
-        protected override NamedId<string> ReadValue(JsonReader reader, JsonSerializer serializer)
+        protected override NamedId<string> ReadValue(JsonReader reader, Type objectType, JsonSerializer serializer)
         {
             if (reader.TokenType != JsonToken.String)
             {

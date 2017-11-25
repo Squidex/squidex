@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.HandleRules.Triggers;
@@ -67,8 +68,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules.Triggers
         {
             var trigger = new ContentChangedTrigger
             {
-                Schemas = new List<ContentChangedTriggerSchema>
-                {
+                Schemas = ImmutableList.Create(
                     new ContentChangedTriggerSchema
                     {
                         SendCreate = sendCreate == 1,
@@ -76,8 +76,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules.Triggers
                         SendDelete = sendDelete == 1,
                         SendPublish = sendPublish == 1,
                         SchemaId = SchemaMatch.Id
-                    }
-                }
+                    })
             };
 
             var result = sut.Triggers(new Envelope<AppEvent>(@event), trigger);

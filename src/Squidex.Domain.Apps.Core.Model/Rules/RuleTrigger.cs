@@ -6,9 +6,11 @@
 //  All rights reserved.
 // ==========================================================================
 
+using Squidex.Infrastructure;
+
 namespace Squidex.Domain.Apps.Core.Rules
 {
-    public abstract class RuleTrigger
+    public abstract class RuleTrigger : Freezable
     {
         public abstract T Accept<T>(IRuleTriggerVisitor<T> visitor);
     }

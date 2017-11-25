@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Read.Rules
 {
     public class RuleEnqueuerTests
     {
-        private readonly IRuleRepository ruleRepository = A.Fake<IRuleRepository>();
+        private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
         private readonly IRuleEventRepository ruleEventRepository = A.Fake<IRuleEventRepository>();
         private readonly RuleService ruleService = A.Fake<RuleService>();
         private readonly Instant now = SystemClock.Instance.GetCurrentInstant();
@@ -36,7 +36,7 @@ namespace Squidex.Domain.Apps.Read.Rules
         {
             sut = new RuleEnqueuer(
                 ruleEventRepository,
-                ruleRepository,
+                appProvider,
                 ruleService);
         }
 
@@ -74,11 +74,11 @@ namespace Squidex.Domain.Apps.Read.Rules
             var ruleEntity2 = A.Fake<IRuleEntity>();
             var ruleEntity3 = A.Fake<IRuleEntity>();
 
-            A.CallTo(() => ruleEntity1.Rule).Returns(rule1);
-            A.CallTo(() => ruleEntity2.Rule).Returns(rule2);
-            A.CallTo(() => ruleEntity3.Rule).Returns(rule3);
+            A.CallTo(() => ruleEntity1.RuleDef).Returns(rule1);
+            A.CallTo(() => ruleEntity2.RuleDef).Returns(rule2);
+            A.CallTo(() => ruleEntity3.RuleDef).Returns(rule3);
 
-            A.CallTo(() => ruleRepository.QueryCachedByAppAsync(appId.Id))
+            A.CallTo(() => appProvider.GetRulesAsync(appId.Name))
                 .Returns(new List<IRuleEntity> { ruleEntity1, ruleEntity2, ruleEntity3 });
 
             A.CallTo(() => ruleService.CreateJob(rule1, @event))

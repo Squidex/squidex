@@ -7,78 +7,81 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Actions;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
+using Squidex.Domain.Apps.Read;
 using Squidex.Domain.Apps.Read.Schemas;
-using Squidex.Domain.Apps.Read.Schemas.Services;
 using Squidex.Domain.Apps.Write.Rules.Commands;
 using Squidex.Infrastructure;
 using Xunit;
+
+#pragma warning disable SA1310 // Field names must not contain underscore
 
 namespace Squidex.Domain.Apps.Write.Rules.Guards
 {
     public class GuardRuleTests
     {
         private readonly Uri validUrl = new Uri("https://squidex.io");
-        private readonly Rule rule = new Rule(new ContentChangedTrigger(), new WebhookAction());
-        private readonly ISchemaProvider schemas = A.Fake<ISchemaProvider>();
+        private readonly Rule rule_0 = new Rule(new ContentChangedTrigger(), new WebhookAction());
+        private readonly NamedId<Guid> appId = new NamedId<Guid>(Guid.NewGuid(), "my-app");
+        private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
 
         public GuardRuleTests()
         {
-            A.CallTo(() => schemas.FindSchemaByIdAsync(A<Guid>.Ignored, false))
+            A.CallTo(() => appProvider.GetSchemaAsync(appId.Name, A<Guid>.Ignored, false))
                 .Returns(A.Fake<ISchemaEntity>());
         }
 
         [Fact]
         public async Task CanCreate_should_throw_exception_if_trigger_null()
         {
-            var command = new CreateRule
+            var command = CreateCommand(new CreateRule
             {
                 Trigger = null,
                 Action = new WebhookAction
                 {
                     Url = validUrl
                 }
-            };
+            });
 
-            await Assert.ThrowsAsync<ValidationException>(() => GuardRule.CanCreate(command, schemas));
+            await Assert.ThrowsAsync<ValidationException>(() => GuardRule.CanCreate(command, appProvider));
         }
 
         [Fact]
         public async Task CanCreate_should_throw_exception_if_action_null()
         {
-            var command = new CreateRule
+            var command = CreateCommand(new CreateRule
             {
                 Trigger = new ContentChangedTrigger
                 {
-                    Schemas = new List<ContentChangedTriggerSchema>()
+                    Schemas = ImmutableList<ContentChangedTriggerSchema>.Empty
                 },
                 Action = null
-            };
+            });
 
-            await Assert.ThrowsAsync<ValidationException>(() => GuardRule.CanCreate(command, schemas));
+            await Assert.ThrowsAsync<ValidationException>(() => GuardRule.CanCreate(command, appProvider));
         }
 
         [Fact]
         public async Task CanCreate_should_not_throw_exception_if_trigger_and_action_valid()
         {
-            var command = new CreateRule
+            var command = CreateCommand(new CreateRule
             {
                 Trigger = new ContentChangedTrigger
                 {
-                    Schemas = new List<ContentChangedTriggerSchema>()
+                    Schemas = ImmutableList<ContentChangedTriggerSchema>.Empty
                 },
                 Action = new WebhookAction
                 {
                     Url = validUrl
                 }
-            };
+            });
 
-            await GuardRule.CanCreate(command, schemas);
+            await GuardRule.CanCreate(command, appProvider);
         }
 
         [Fact]
@@ -86,25 +89,25 @@ namespace Squidex.Domain.Apps.Write.Rules.Guards
         {
             var command = new UpdateRule();
 
-            await Assert.ThrowsAsync<ValidationException>(() => GuardRule.CanUpdate(command, schemas));
+            await Assert.ThrowsAsync<ValidationException>(() => GuardRule.CanUpdate(command, appProvider));
         }
 
         [Fact]
         public async Task CanUpdate_should_not_throw_exception_if_trigger_and_action_valid()
         {
-            var command = new UpdateRule
+            var command = CreateCommand(new UpdateRule
             {
                 Trigger = new ContentChangedTrigger
                 {
-                    Schemas = new List<ContentChangedTriggerSchema>()
+                    Schemas = ImmutableList<ContentChangedTriggerSchema>.Empty
                 },
                 Action = new WebhookAction
                 {
                     Url = validUrl
                 }
-            };
+            });
 
-            await GuardRule.CanUpdate(command, schemas);
+            await GuardRule.CanUpdate(command, appProvider);
         }
 
         [Fact]
@@ -112,9 +115,9 @@ namespace Squidex.Domain.Apps.Write.Rules.Guards
         {
             var command = new EnableRule();
 
-            rule.Enable();
+            var rule_1 = rule_0.Enable();
 
-            Assert.Throws<ValidationException>(() => GuardRule.CanEnable(command, rule));
+            Assert.Throws<ValidationException>(() => GuardRule.CanEnable(command, rule_1));
         }
 
         [Fact]
@@ -122,9 +125,9 @@ namespace Squidex.Domain.Apps.Write.Rules.Guards
         {
             var command = new EnableRule();
 
-            rule.Disable();
+            var rule_1 = rule_0.Disable();
 
-            GuardRule.CanEnable(command, rule);
+            GuardRule.CanEnable(command, rule_1);
         }
 
         [Fact]
@@ -132,9 +135,9 @@ namespace Squidex.Domain.Apps.Write.Rules.Guards
         {
             var command = new DisableRule();
 
-            rule.Disable();
+            var rule_1 = rule_0.Disable();
 
-            Assert.Throws<ValidationException>(() => GuardRule.CanDisable(command, rule));
+            Assert.Throws<ValidationException>(() => GuardRule.CanDisable(command, rule_1));
         }
 
         [Fact]
@@ -142,9 +145,9 @@ namespace Squidex.Domain.Apps.Write.Rules.Guards
         {
             var command = new DisableRule();
 
-            rule.Enable();
+            var rule_1 = rule_0.Enable();
 
-            GuardRule.CanDisable(command, rule);
+            GuardRule.CanDisable(command, rule_1);
         }
 
         [Fact]
@@ -153,6 +156,13 @@ namespace Squidex.Domain.Apps.Write.Rules.Guards
             var command = new DeleteRule();
 
             GuardRule.CanDelete(command);
+        }
+
+        private T CreateCommand<T>(T command) where T : AppCommand
+        {
+            command.AppId = appId;
+
+            return command;
         }
     }
 }

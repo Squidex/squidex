@@ -18,6 +18,7 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Schemas.Json;
 using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.MongoDb;
 
@@ -29,7 +30,12 @@ namespace Squidex.Config.Domain
         private static readonly JsonSerializerSettings SerializerSettings = new JsonSerializerSettings();
         private static readonly FieldRegistry FieldRegistry = new FieldRegistry(TypeNameRegistry);
 
-        private static JsonSerializerSettings ConfigureJson(JsonSerializerSettings settings, TypeNameHandling typeNameHandling)
+        public static JsonSerializerSettings DefaultJsonSettings
+        {
+            get { return SerializerSettings; }
+        }
+
+        private static void ConfigureJson(JsonSerializerSettings settings, TypeNameHandling typeNameHandling)
         {
             settings.SerializationBinder = new TypeNameSerializationBinder(TypeNameRegistry);
 
@@ -43,7 +49,8 @@ namespace Squidex.Config.Domain
                 new NamedGuidIdConverter(),
                 new NamedLongIdConverter(),
                 new NamedStringIdConverter(),
-                new PropertiesBagConverter(),
+                new PropertiesBagConverter<EnvelopeHeaders>(),
+                new PropertiesBagConverter<PropertiesBag>(),
                 new RefTokenConverter(),
                 new RuleConverter(),
                 new SchemaConverter(FieldRegistry),
@@ -57,8 +64,6 @@ namespace Squidex.Config.Domain
             settings.TypeNameHandling = typeNameHandling;
 
             settings.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
-
-            return settings;
         }
 
         static SerializationServices()
@@ -74,10 +79,10 @@ namespace Squidex.Config.Domain
 
         public static IServiceCollection AddMySerializers(this IServiceCollection services)
         {
-            services.AddSingleton(t => TypeNameRegistry);
-            services.AddSingleton(t => FieldRegistry);
-            services.AddSingleton(t => SerializerSettings);
-            services.AddSingleton(t => JsonSerializer.Create(SerializerSettings));
+            services.AddSingletonAs(t => TypeNameRegistry);
+            services.AddSingletonAs(t => FieldRegistry);
+            services.AddSingletonAs(t => SerializerSettings);
+            services.AddSingletonAs(t => JsonSerializer.Create(SerializerSettings));
 
             return services;
         }

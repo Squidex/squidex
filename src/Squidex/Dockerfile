@@ -1,4 +1,4 @@
-FROM microsoft/aspnetcore:2.0.0-jessie
+FROM microsoft/aspnetcore:2.0.3-jessie
 
 WORKDIR /app
 
@@ -6,4 +6,7 @@ WORKDIR /app
 COPY . .
 
 EXPOSE 80
+EXPOSE 33333
+EXPOSE 40000
+
 ENTRYPOINT ["dotnet", "Squidex.dll"]

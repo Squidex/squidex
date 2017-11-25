@@ -9,7 +9,6 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Squidex.Infrastructure.Actors;
 using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.CQRS.Events
@@ -17,7 +16,7 @@ namespace Squidex.Infrastructure.CQRS.Events
     public sealed class RetrySubscription : IEventSubscription, IEventSubscriber
     {
         private readonly SingleThreadedDispatcher dispatcher = new SingleThreadedDispatcher(10);
-        private readonly CancellationTokenSource disposeCts = new CancellationTokenSource();
+        private readonly CancellationTokenSource timerCts = new CancellationTokenSource();
         private readonly RetryWindow retryWindow = new RetryWindow(TimeSpan.FromMinutes(5), 5);
         private readonly IEventStore eventStore;
         private readonly IEventSubscriber eventSubscriber;
@@ -44,12 +43,16 @@ namespace Squidex.Infrastructure.CQRS.Events
 
         private void Subscribe()
         {
-            currentSubscription = eventStore.CreateSubscription(this, streamFilter, position);
+            if (currentSubscription == null)
+            {
+                currentSubscription = eventStore.CreateSubscription(this, streamFilter, position);
+            }
         }
 
         private void Unsubscribe()
         {
             currentSubscription?.StopAsync().Forget();
+            currentSubscription = null;
         }
 
         private async Task HandleEventAsync(IEventSubscription subscription, StoredEvent storedEvent)
@@ -66,12 +69,11 @@ namespace Squidex.Infrastructure.CQRS.Events
         {
             if (subscription == currentSubscription)
             {
-                subscription.StopAsync().Forget();
-                subscription = null;
+                Unsubscribe();
 
                 if (retryWindow.CanRetryAfterFailure())
                 {
-                    Task.Delay(ReconnectWaitMs, disposeCts.Token).ContinueWith(t =>
+                    Task.Delay(ReconnectWaitMs, timerCts.Token).ContinueWith(t =>
                     {
                         dispatcher.DispatchAsync(() => Subscribe());
                     }).Forget();
@@ -98,7 +100,7 @@ namespace Squidex.Infrastructure.CQRS.Events
             await dispatcher.DispatchAsync(() => Unsubscribe());
             await dispatcher.StopAndWaitAsync();
 
-            disposeCts.Cancel();
+            timerCts.Cancel();
         }
     }
 }

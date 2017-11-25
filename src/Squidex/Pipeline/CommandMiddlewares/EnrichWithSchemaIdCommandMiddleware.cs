@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  EnrichWithSchemaIdHandler.cs
+//  EnrichWithSchemaIdCommandMiddleware.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -9,8 +9,8 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Squidex.Domain.Apps.Read;
 using Squidex.Domain.Apps.Read.Schemas;
-using Squidex.Domain.Apps.Read.Schemas.Services;
 using Squidex.Domain.Apps.Write;
 using Squidex.Domain.Apps.Write.Schemas;
 using Squidex.Infrastructure;
@@ -20,12 +20,12 @@ namespace Squidex.Pipeline.CommandMiddlewares
 {
     public sealed class EnrichWithSchemaIdCommandMiddleware : ICommandMiddleware
     {
-        private readonly ISchemaProvider schemas;
+        private readonly IAppProvider appProvider;
         private readonly IActionContextAccessor actionContextAccessor;
 
-        public EnrichWithSchemaIdCommandMiddleware(ISchemaProvider schemas, IActionContextAccessor actionContextAccessor)
+        public EnrichWithSchemaIdCommandMiddleware(IAppProvider appProvider, IActionContextAccessor actionContextAccessor)
         {
-            this.schemas = schemas;
+            this.appProvider = appProvider;
 
             this.actionContextAccessor = actionContextAccessor;
         }
@@ -44,11 +44,11 @@ namespace Squidex.Pipeline.CommandMiddlewares
 
                     if (Guid.TryParse(schemaName, out var id))
                     {
-                        schema = await schemas.FindSchemaByIdAsync(id);
+                        schema = await appProvider.GetSchemaAsync(schemaCommand.AppId.Name, id);
                     }
                     else
                     {
-                        schema = await schemas.FindSchemaByNameAsync(schemaCommand.AppId.Id, schemaName);
+                        schema = await appProvider.GetSchemaAsync(schemaCommand.AppId.Name, schemaName);
                     }
 
                     if (schema == null)

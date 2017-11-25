@@ -15,12 +15,14 @@ using Squidex.Domain.Apps.Core.Rules.Actions;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Xunit;
 
+#pragma warning disable SA1310 // Field names must not contain underscore
+
 namespace Squidex.Domain.Apps.Core.Model.Rules
 {
     public class RuleTests
     {
         private readonly JsonSerializer serializer = TestData.DefaultSerializer();
-        private readonly Rule sut = new Rule(new ContentChangedTrigger(), new WebhookAction());
+        private readonly Rule rule_0 = new Rule(new ContentChangedTrigger(), new WebhookAction());
 
         public sealed class OtherTrigger : RuleTrigger
         {
@@ -54,18 +56,22 @@ namespace Squidex.Domain.Apps.Core.Model.Rules
         [Fact]
         public void Should_set_enabled_to_true_when_enabling()
         {
-            sut.Enable();
+            var rule_1 = rule_0.Disable();
+            var rule_2 = rule_1.Enable();
+            var rule_3 = rule_2.Enable();
 
-            Assert.True(sut.IsEnabled);
+            Assert.False(rule_1.IsEnabled);
+            Assert.True(rule_3.IsEnabled);
         }
 
         [Fact]
         public void Should_set_enabled_to_false_when_disabling()
         {
-            sut.Enable();
-            sut.Disable();
+            var rule_1 = rule_0.Disable();
+            var rule_2 = rule_1.Disable();
 
-            Assert.False(sut.IsEnabled);
+            Assert.True(rule_0.IsEnabled);
+            Assert.False(rule_2.IsEnabled);
         }
 
         [Fact]
@@ -73,15 +79,16 @@ namespace Squidex.Domain.Apps.Core.Model.Rules
         {
             var newTrigger = new ContentChangedTrigger();
 
-            sut.Update(newTrigger);
+            var rule_1 = rule_0.Update(newTrigger);
 
-            Assert.Same(newTrigger, sut.Trigger);
+            Assert.NotSame(newTrigger, rule_0.Trigger);
+            Assert.Same(newTrigger, rule_1.Trigger);
         }
 
         [Fact]
         public void Should_throw_exception_when_new_trigger_has_other_type()
         {
-            Assert.Throws<ArgumentException>(() => sut.Update(new OtherTrigger()));
+            Assert.Throws<ArgumentException>(() => rule_0.Update(new OtherTrigger()));
         }
 
         [Fact]
@@ -89,25 +96,38 @@ namespace Squidex.Domain.Apps.Core.Model.Rules
         {
             var newAction = new WebhookAction();
 
-            sut.Update(newAction);
+            var rule_1 = rule_0.Update(newAction);
 
-            Assert.Same(newAction, sut.Action);
+            Assert.NotSame(newAction, rule_0.Action);
+            Assert.Same(newAction, rule_1.Action);
         }
 
         [Fact]
         public void Should_throw_exception_when_new_action_has_other_type()
         {
-            Assert.Throws<ArgumentException>(() => sut.Update(new OtherAction()));
+            Assert.Throws<ArgumentException>(() => rule_0.Update(new OtherAction()));
         }
 
         [Fact]
         public void Should_serialize_and_deserialize()
         {
-            sut.Disable();
+            var rule_1 = rule_0.Disable();
 
-            var appClients = JToken.FromObject(sut, serializer).ToObject<Rule>(serializer);
+            var appClients = JToken.FromObject(rule_1, serializer).ToObject<Rule>(serializer);
 
-            appClients.ShouldBeEquivalentTo(sut);
+            appClients.ShouldBeEquivalentTo(rule_0);
+        }
+
+        [Fact]
+        public void Should_freeze_webhook_action()
+        {
+            TestData.TestFreeze(new WebhookAction());
+        }
+
+        [Fact]
+        public void Should_freeze_contentchanged_trigger()
+        {
+            TestData.TestFreeze(new ContentChangedTrigger());
         }
     }
 }

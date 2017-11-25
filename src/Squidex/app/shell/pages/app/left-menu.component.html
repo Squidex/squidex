@@ -20,7 +20,7 @@
                 <i class="nav-icon icon-rules"></i> <div class="nav-text">Rules</div>
             </a>
         </li>
-        <li class="nav-item" *ngIf="ctx.app.permission === 'Owner'">
+        <li class="nav-item" *ngIf="ctx.app.permission !== 'Editor'">
             <a class="nav-link" routerLink="settings" routerLinkActive="active">
                 <i class="nav-icon icon-settings"></i> <div class="nav-text">Settings</div>
             </a>

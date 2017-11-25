@@ -39,21 +39,21 @@ namespace Squidex.Config
             }
         }
 
-        public static InterfaceRegistrator<T> AddSingleton<T>(this IServiceCollection services, Func<IServiceProvider, T> factory) where T : class
+        public static InterfaceRegistrator<T> AddSingletonAs<T>(this IServiceCollection services, Func<IServiceProvider, T> factory) where T : class
         {
             services.AddSingleton(typeof(T), factory);
 
             return new InterfaceRegistrator<T>(services);
         }
 
-        public static InterfaceRegistrator<T> AddSingleton<T>(this IServiceCollection services, T instance) where T : class
+        public static InterfaceRegistrator<T> AddSingletonAs<T>(this IServiceCollection services, T instance) where T : class
         {
             services.AddSingleton(typeof(T), instance);
 
             return new InterfaceRegistrator<T>(services);
         }
 
-        public static InterfaceRegistrator<T> AddSingleton<T>(this IServiceCollection services) where T : class
+        public static InterfaceRegistrator<T> AddSingletonAs<T>(this IServiceCollection services) where T : class
         {
             services.AddSingleton<T, T>();
 
@@ -62,7 +62,7 @@ namespace Squidex.Config
 
         public static T GetOptionalValue<T>(this IConfiguration config, string path, T defaultValue = default(T))
         {
-            var value = config.GetValue<T>(path, defaultValue);
+            var value = config.GetValue(path, defaultValue);
 
             return value;
         }

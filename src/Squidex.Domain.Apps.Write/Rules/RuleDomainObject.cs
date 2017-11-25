@@ -41,17 +41,17 @@ namespace Squidex.Domain.Apps.Write.Rules
 
         protected void On(RuleUpdated @event)
         {
-            rule.Apply(@event);
+            rule = rule.Apply(@event);
         }
 
         protected void On(RuleEnabled @event)
         {
-            rule.Apply(@event);
+            rule = rule.Apply(@event);
         }
 
         protected void On(RuleDisabled @event)
         {
-            rule.Apply(@event);
+            rule = rule.Apply(@event);
         }
 
         protected void On(RuleDeleted @event)

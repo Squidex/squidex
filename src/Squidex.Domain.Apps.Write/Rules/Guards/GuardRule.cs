@@ -8,7 +8,7 @@
 
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Rules;
-using Squidex.Domain.Apps.Read.Schemas.Services;
+using Squidex.Domain.Apps.Read;
 using Squidex.Domain.Apps.Write.Rules.Commands;
 using Squidex.Infrastructure;
 
@@ -16,7 +16,7 @@ namespace Squidex.Domain.Apps.Write.Rules.Guards
 {
     public static class GuardRule
     {
-        public static Task CanCreate(CreateRule command, ISchemaProvider schemas)
+        public static Task CanCreate(CreateRule command, IAppProvider appProvider)
         {
             Guard.NotNull(command, nameof(command));
 
@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Write.Rules.Guards
                 }
                 else
                 {
-                    var errors = await RuleTriggerValidator.ValidateAsync(command.Trigger, schemas);
+                    var errors = await RuleTriggerValidator.ValidateAsync(command.AppId.Name, command.Trigger, appProvider);
 
                     errors.Foreach(error);
                 }
@@ -46,7 +46,7 @@ namespace Squidex.Domain.Apps.Write.Rules.Guards
             });
         }
 
-        public static Task CanUpdate(UpdateRule command, ISchemaProvider schemas)
+        public static Task CanUpdate(UpdateRule command, IAppProvider appProvider)
         {
             Guard.NotNull(command, nameof(command));
 
@@ -59,7 +59,7 @@ namespace Squidex.Domain.Apps.Write.Rules.Guards
 
                 if (command.Trigger != null)
                 {
-                    var errors = await RuleTriggerValidator.ValidateAsync(command.Trigger, schemas);
+                    var errors = await RuleTriggerValidator.ValidateAsync(command.AppId.Name, command.Trigger, appProvider);
 
                     errors.Foreach(error);
                 }

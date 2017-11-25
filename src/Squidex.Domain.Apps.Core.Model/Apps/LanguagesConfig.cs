@@ -10,83 +10,108 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using Squidex.Infrastructure;
-
-#pragma warning disable IDE0016 // Use 'throw' expression
 
 namespace Squidex.Domain.Apps.Core.Apps
 {
     public sealed class LanguagesConfig : IFieldPartitioning
     {
-        private State state;
+        public static readonly LanguagesConfig Empty = new LanguagesConfig(ImmutableDictionary<Language, LanguageConfig>.Empty, null, false);
+        public static readonly LanguagesConfig English = LanguagesConfig.Build(Language.EN);
+
+        private readonly ImmutableDictionary<Language, LanguageConfig> languages;
+        private readonly LanguageConfig master;
 
         public LanguageConfig Master
         {
-            get { return state.Master; }
+            get { return master; }
         }
 
         IFieldPartitionItem IFieldPartitioning.Master
         {
-            get { return state.Master; }
+            get { return master; }
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return state.Languages.Values.GetEnumerator();
+            return languages.Values.GetEnumerator();
         }
 
         IEnumerator<IFieldPartitionItem> IEnumerable<IFieldPartitionItem>.GetEnumerator()
         {
-            return state.Languages.Values.GetEnumerator();
+            return languages.Values.GetEnumerator();
         }
 
         public int Count
         {
-            get { return state.Languages.Count; }
+            get { return languages.Count; }
         }
 
-        private LanguagesConfig(ICollection<LanguageConfig> configs)
+        private LanguagesConfig(ImmutableDictionary<Language, LanguageConfig> languages, LanguageConfig master, bool checkMaster = true)
+        {
+            if (checkMaster)
+            {
+                this.master = master ?? throw new InvalidOperationException("Config has no master language.");
+            }
+
+            foreach (var languageConfig in languages.Values)
+            {
+                foreach (var fallback in languageConfig.LanguageFallbacks)
+                {
+                    if (!languages.ContainsKey(fallback))
+                    {
+                        var message = $"Config for language '{languageConfig.Language.Iso2Code}' contains unsupported fallback language '{fallback.Iso2Code}'";
+
+                        throw new InvalidOperationException(message);
+                    }
+                }
+            }
+
+            this.languages = languages;
+        }
+
+        public static LanguagesConfig Build(ICollection<LanguageConfig> configs)
         {
             Guard.NotNull(configs, nameof(configs));
 
-            state = new State(configs.ToImmutableDictionary(x => x.Language), configs.FirstOrDefault());
+            return new LanguagesConfig(configs.ToImmutableDictionary(x => x.Language), configs.FirstOrDefault());
         }
 
         public static LanguagesConfig Build(params LanguageConfig[] configs)
         {
-            Guard.NotNull(configs, nameof(configs));
-
-            return new LanguagesConfig(configs);
+            return Build(configs?.ToList());
         }
 
         public static LanguagesConfig Build(params Language[] languages)
         {
-            Guard.NotNull(languages, nameof(languages));
-
-            return new LanguagesConfig(languages.Select(x => new LanguageConfig(x, false)).ToList());
+            return Build(languages?.Select(x => new LanguageConfig(x)).ToList());
         }
 
-        public void MakeMaster(Language language)
+        [Pure]
+        public LanguagesConfig MakeMaster(Language language)
         {
             Guard.NotNull(language, nameof(language));
 
-            state = new State(state.Languages, state.Languages[language]);
+            return new LanguagesConfig(languages, languages[language]);
         }
 
-        public void Set(LanguageConfig config)
+        [Pure]
+        public LanguagesConfig Set(LanguageConfig config)
         {
             Guard.NotNull(config, nameof(config));
 
-            state = new State(state.Languages.SetItem(config.Language, config), state.Master?.Language == config.Language ? config : state.Master);
+            return new LanguagesConfig(languages.SetItem(config.Language, config), Master?.Language == config.Language ? config : Master);
         }
 
-        public void Remove(Language language)
+        [Pure]
+        public LanguagesConfig Remove(Language language)
         {
             Guard.NotNull(language, nameof(language));
 
             var newLanguages =
-                state.Languages.Values.Where(x => x.Language != language)
+                languages.Values.Where(x => x.Language != language)
                     .Select(config =>
                     {
                         return new LanguageConfig(
@@ -97,26 +122,26 @@ namespace Squidex.Domain.Apps.Core.Apps
                     .ToImmutableDictionary(x => x.Language);
 
             var newMaster =
-                state.Master.Language != language ?
-                state.Master :
+                Master.Language != language ?
+                Master :
                 newLanguages.Values.FirstOrDefault();
 
-            state = new State(newLanguages, newMaster);
+            return new LanguagesConfig(newLanguages, newMaster);
         }
 
         public bool Contains(Language language)
         {
-            return language != null && state.Languages.ContainsKey(language);
+            return language != null && languages.ContainsKey(language);
         }
 
         public bool TryGetConfig(Language language, out LanguageConfig config)
         {
-            return state.Languages.TryGetValue(language, out config);
+            return languages.TryGetValue(language, out config);
         }
 
         public bool TryGetItem(string key, out IFieldPartitionItem item)
         {
-            if (Language.IsValidLanguage(key) && state.Languages.TryGetValue(key, out var value))
+            if (Language.IsValidLanguage(key) && languages.TryGetValue(key, out var value))
             {
                 item = value;
 
@@ -127,38 +152,6 @@ namespace Squidex.Domain.Apps.Core.Apps
                 item = null;
 
                 return false;
-            }
-        }
-
-        private sealed class State
-        {
-            public ImmutableDictionary<Language, LanguageConfig> Languages { get; }
-
-            public LanguageConfig Master { get; }
-
-            public State(ImmutableDictionary<Language, LanguageConfig> languages, LanguageConfig master)
-            {
-                foreach (var languageConfig in languages.Values)
-                {
-                    foreach (var fallback in languageConfig.LanguageFallbacks)
-                    {
-                        if (!languages.ContainsKey(fallback))
-                        {
-                            var message = $"Config for language '{languageConfig.Language.Iso2Code}' contains unsupported fallback language '{fallback.Iso2Code}'";
-
-                            throw new InvalidOperationException(message);
-                        }
-                    }
-                }
-
-                Languages = languages;
-
-                if (master == null)
-                {
-                    throw new InvalidOperationException("Config has no master language.");
-                }
-
-                this.Master = master;
             }
         }
 

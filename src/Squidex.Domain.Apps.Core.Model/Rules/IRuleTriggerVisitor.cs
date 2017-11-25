@@ -10,7 +10,7 @@ using Squidex.Domain.Apps.Core.Rules.Triggers;
 
 namespace Squidex.Domain.Apps.Core.Rules
 {
-    public interface IRuleTriggerVisitor<T>
+    public interface IRuleTriggerVisitor<out T>
     {
         T Visit(ContentChangedTrigger trigger);
     }

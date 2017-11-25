@@ -17,27 +17,29 @@ namespace Squidex.Domain.Apps.Events.Rules.Utils
             return new Rule(@event.Trigger, @event.Action);
         }
 
-        public static void Apply(this Rule rule, RuleUpdated @event)
+        public static Rule Apply(this Rule rule, RuleUpdated @event)
         {
             if (@event.Trigger != null)
             {
-                rule.Update(@event.Trigger);
+                return rule.Update(@event.Trigger);
             }
 
             if (@event.Action != null)
             {
-                rule.Update(@event.Action);
+                return rule.Update(@event.Action);
             }
+
+            return rule;
         }
 
-        public static void Apply(this Rule rule, RuleEnabled @event)
+        public static Rule Apply(this Rule rule, RuleEnabled @event)
         {
-            rule.Enable();
+            return rule.Enable();
         }
 
-        public static void Apply(this Rule rule, RuleDisabled @event)
+        public static Rule Apply(this Rule rule, RuleDisabled @event)
         {
-            rule.Disable();
+            return rule.Disable();
         }
     }
 }

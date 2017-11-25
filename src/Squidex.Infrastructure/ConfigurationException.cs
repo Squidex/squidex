@@ -7,10 +7,12 @@
 // ==========================================================================
 
 using System;
+using System.Runtime.Serialization;
 
 namespace Squidex.Infrastructure
 {
-    public sealed class ConfigurationException : Exception
+    [Serializable]
+    public class ConfigurationException : Exception
     {
         public ConfigurationException()
         {
@@ -23,6 +25,11 @@ namespace Squidex.Infrastructure
 
         public ConfigurationException(string message, Exception inner)
             : base(message, inner)
+        {
+        }
+
+        protected ConfigurationException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
         {
         }
     }

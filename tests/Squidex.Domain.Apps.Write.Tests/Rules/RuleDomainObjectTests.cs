@@ -7,7 +7,7 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
+using System.Collections.Immutable;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Actions;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
@@ -83,7 +83,7 @@ namespace Squidex.Domain.Apps.Write.Rules
         {
             var newTrigger = new ContentChangedTrigger
             {
-                Schemas = new List<ContentChangedTriggerSchema>()
+                Schemas = ImmutableList<ContentChangedTriggerSchema>.Empty
             };
 
             var newAction = new WebhookAction

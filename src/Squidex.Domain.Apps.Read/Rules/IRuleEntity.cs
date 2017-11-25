@@ -10,8 +10,8 @@ using Squidex.Domain.Apps.Core.Rules;
 
 namespace Squidex.Domain.Apps.Read.Rules
 {
-    public interface IRuleEntity : IAppRefEntity, IEntityWithCreatedBy, IEntityWithLastModifiedBy, IEntityWithVersion
+    public interface IRuleEntity : IEntityWithAppRef, IEntityWithCreatedBy, IEntityWithLastModifiedBy, IEntityWithVersion
     {
-        Rule Rule { get; }
+        Rule RuleDef { get; }
     }
 }

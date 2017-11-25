@@ -6,6 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using Newtonsoft.Json;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
@@ -28,7 +29,7 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
             serializer.Serialize(writer, new JsonSchemaModel(value));
         }
 
-        protected override Schema ReadValue(JsonReader reader, JsonSerializer serializer)
+        protected override Schema ReadValue(JsonReader reader, Type objectType, JsonSerializer serializer)
         {
             return serializer.Deserialize<JsonSchemaModel>(reader).ToSchema(fieldRegistry);
         }

@@ -8,96 +8,87 @@
 
 using System;
 using FluentAssertions;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Apps;
 using Xunit;
+
+#pragma warning disable SA1310 // Field names must not contain underscore
 
 namespace Squidex.Domain.Apps.Core.Model.Apps
 {
     public class AppClientsTests
     {
-        private readonly JsonSerializer serializer = TestData.DefaultSerializer();
-        private readonly AppClients sut = new AppClients();
-
-        public AppClientsTests()
-        {
-            sut.Add("1", "my-secret");
-        }
+        private readonly AppClients clients_0 = AppClients.Empty.Add("1", "my-secret");
 
         [Fact]
         public void Should_assign_client()
         {
-            sut.Add("2", "my-secret");
+            var clients_1 = clients_0.Add("2", "my-secret");
 
-            sut["2"].ShouldBeEquivalentTo(new AppClient("2", "my-secret", AppClientPermission.Editor));
+            clients_1["2"].ShouldBeEquivalentTo(new AppClient("2", "my-secret", AppClientPermission.Editor));
         }
 
         [Fact]
-        public void Should_assign_client_with_permission()
+        public void Should_assign_clients_with_permission()
         {
-            sut.Add("2", new AppClient("my-name", "my-secret", AppClientPermission.Reader));
+            var clients_1 = clients_0.Add("2", new AppClient("my-name", "my-secret", AppClientPermission.Reader));
 
-            sut["2"].ShouldBeEquivalentTo(new AppClient("my-name", "my-secret", AppClientPermission.Reader));
+            clients_1["2"].ShouldBeEquivalentTo(new AppClient("my-name", "my-secret", AppClientPermission.Reader));
         }
 
         [Fact]
-        public void Should_throw_exception_if_assigning_client_with_same_id()
+        public void Should_throw_exception_if_assigning_clients_with_same_id()
         {
-            sut.Add("2", "my-secret");
+            var clients_1 = clients_0.Add("2", "my-secret");
 
-            Assert.Throws<ArgumentException>(() => sut.Add("2", "my-secret"));
+            Assert.Throws<ArgumentException>(() => clients_1.Add("2", "my-secret"));
         }
 
         [Fact]
         public void Should_rename_client()
         {
-            sut["1"].Rename("my-name");
+            var clients_1 = clients_0.Rename("1", "new-name");
 
-            sut["1"].ShouldBeEquivalentTo(new AppClient("my-name", "my-secret", AppClientPermission.Editor));
+            clients_1["1"].ShouldBeEquivalentTo(new AppClient("new-name", "my-secret", AppClientPermission.Editor));
+        }
+
+        [Fact]
+        public void Should_return_same_clients_if_client_to_rename_not_found()
+        {
+            var clients_1 = clients_0.Rename("2", "new-name");
+
+            Assert.Same(clients_0, clients_1);
         }
 
         [Fact]
         public void Should_update_client()
         {
-            sut["1"].Update(AppClientPermission.Reader);
+            var client_1 = clients_0.Update("1", AppClientPermission.Reader);
 
-            sut["1"].ShouldBeEquivalentTo(new AppClient("1", "my-secret", AppClientPermission.Reader));
+            client_1["1"].ShouldBeEquivalentTo(new AppClient("1", "my-secret", AppClientPermission.Reader));
+        }
+
+        [Fact]
+        public void Should_return_same_clients_if_client_to_update_not_found()
+        {
+            var clients_1 = clients_0.Update("2", AppClientPermission.Reader);
+
+            Assert.Same(clients_0, clients_1);
         }
 
         [Fact]
         public void Should_revoke_client()
         {
-            sut.Revoke("1");
+            var clients_1 = clients_0.Revoke("1");
 
-            Assert.Empty(sut);
+            Assert.Empty(clients_1);
         }
 
         [Fact]
         public void Should_do_nothing_if_client_to_revoke_not_found()
         {
-            sut.Revoke("2");
+            var clients_1 = clients_0.Revoke("2");
 
-            Assert.Single(sut);
-        }
-
-        [Fact]
-        public void Should_serialize_and_deserialize()
-        {
-            sut.Add("2", "my-secret");
-            sut.Add("3", "my-secret");
-            sut.Add("4", "my-secret");
-
-            sut["3"].Update(AppClientPermission.Editor);
-
-            sut["3"].Rename("My Client 3");
-            sut["2"].Rename("My Client 2");
-
-            sut.Revoke("4");
-
-            var appClients = JToken.FromObject(sut, serializer).ToObject<AppClients>(serializer);
-
-            appClients.ShouldBeEquivalentTo(sut);
+            Assert.NotSame(clients_0, clients_1);
         }
     }
 }

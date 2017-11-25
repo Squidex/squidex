@@ -6,7 +6,9 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using Newtonsoft.Json;
 using Squidex.Infrastructure.Json;
 
@@ -26,18 +28,11 @@ namespace Squidex.Domain.Apps.Core.Apps.Json
             serializer.Serialize(writer, json);
         }
 
-        protected override AppClients ReadValue(JsonReader reader, JsonSerializer serializer)
+        protected override AppClients ReadValue(JsonReader reader, Type objectType, JsonSerializer serializer)
         {
             var json = serializer.Deserialize<Dictionary<string, JsonAppClient>>(reader);
 
-            var clients = new AppClients();
-
-            foreach (var client in json)
-            {
-                clients.Add(client.Key, client.Value.ToClient());
-            }
-
-            return clients;
+            return new AppClients(json.ToImmutableDictionary(x => x.Key, x => x.Value.ToClient()));
         }
     }
 }

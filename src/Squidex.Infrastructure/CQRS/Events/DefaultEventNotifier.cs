@@ -16,6 +16,11 @@ namespace Squidex.Infrastructure.CQRS.Events
 
         private readonly IPubSub pubsub;
 
+        public sealed class EventNotification
+        {
+            public string StreamName { get; set; }
+        }
+
         public DefaultEventNotifier(IPubSub pubsub)
         {
             Guard.NotNull(pubsub, nameof(pubsub));
@@ -25,12 +30,12 @@ namespace Squidex.Infrastructure.CQRS.Events
 
         public void NotifyEventsStored(string streamName)
         {
-            pubsub.Publish(ChannelName, streamName, true);
+            pubsub.Publish(new EventNotification { StreamName = streamName }, true);
         }
 
         public IDisposable Subscribe(Action<string> handler)
         {
-            return pubsub.Subscribe(ChannelName, x => handler?.Invoke(x));
+            return pubsub.Subscribe<EventNotification>(x => handler?.Invoke(x.StreamName));
         }
     }
 }

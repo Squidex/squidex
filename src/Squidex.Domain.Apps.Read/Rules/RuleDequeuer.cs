@@ -7,11 +7,13 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using NodaTime;
 using Squidex.Domain.Apps.Core.HandleRules;
+using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Read.Rules.Repositories;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
@@ -22,10 +24,10 @@ namespace Squidex.Domain.Apps.Read.Rules
     public sealed class RuleDequeuer : DisposableObjectBase, IExternalSystem
     {
         private readonly ActionBlock<IRuleEventEntity> requestBlock;
-        private readonly TransformBlock<IRuleEventEntity, IRuleEventEntity> blockBlock;
         private readonly IRuleEventRepository ruleEventRepository;
         private readonly RuleService ruleService;
         private readonly CompletionTimer timer;
+        private readonly ConcurrentDictionary<Guid, bool> executing = new ConcurrentDictionary<Guid, bool>();
         private readonly IClock clock;
         private readonly ISemanticLog log;
 
@@ -44,14 +46,8 @@ namespace Squidex.Domain.Apps.Read.Rules
             this.log = log;
 
             requestBlock =
-                new ActionBlock<IRuleEventEntity>(MakeRequestAsync,
+                new ActionBlock<IRuleEventEntity>(HandleAsync,
                     new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = 32, BoundedCapacity = 32 });
-
-            blockBlock =
-                new TransformBlock<IRuleEventEntity, IRuleEventEntity>(x => BlockAsync(x),
-                    new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = 1, BoundedCapacity = 1 });
-
-            blockBlock.LinkTo(requestBlock, new DataflowLinkOptions { PropagateCompletion = true });
 
             timer = new CompletionTimer(5000, QueryAsync);
         }
@@ -62,7 +58,7 @@ namespace Squidex.Domain.Apps.Read.Rules
             {
                 timer.StopAsync().Wait();
 
-                blockBlock.Complete();
+                requestBlock.Complete();
                 requestBlock.Completion.Wait();
             }
         }
@@ -82,7 +78,7 @@ namespace Squidex.Domain.Apps.Read.Rules
             {
                 var now = clock.GetCurrentInstant();
 
-                await ruleEventRepository.QueryPendingAsync(now, blockBlock.SendAsync, cancellationToken);
+                await ruleEventRepository.QueryPendingAsync(now, requestBlock.SendAsync, cancellationToken);
             }
             catch (Exception ex)
             {
@@ -92,78 +88,70 @@ namespace Squidex.Domain.Apps.Read.Rules
             }
         }
 
-        private async Task<IRuleEventEntity> BlockAsync(IRuleEventEntity @event)
+        public async Task HandleAsync(IRuleEventEntity @event)
         {
-            try
+            if (!executing.TryAdd(@event.Id, false))
             {
-                await ruleEventRepository.MarkSendingAsync(@event.Id);
-
-                return @event;
+                return;
             }
-            catch (Exception ex)
-            {
-                log.LogError(ex, w => w
-                    .WriteProperty("action", "BlockWebhookEvent")
-                    .WriteProperty("status", "Failed"));
 
-                throw;
-            }
-        }
-
-        private async Task MakeRequestAsync(IRuleEventEntity @event)
-        {
             try
             {
                 var job = @event.Job;
 
                 var response = await ruleService.InvokeAsync(job.ActionName, job.ActionData);
 
-                Instant? nextCall = null;
+                var jobInvoke = ComputeJobInvoke(response.Result, @event, job);
+                var jobResult = ComputeJobResult(response.Result, jobInvoke);
 
-                if (response.Result != RuleResult.Success)
-                {
-                    switch (@event.NumCalls)
-                    {
-                        case 0:
-                            nextCall = job.Created.Plus(Duration.FromMinutes(5));
-                            break;
-                        case 1:
-                            nextCall = job.Created.Plus(Duration.FromHours(1));
-                            break;
-                        case 2:
-                            nextCall = job.Created.Plus(Duration.FromHours(6));
-                            break;
-                        case 3:
-                            nextCall = job.Created.Plus(Duration.FromHours(12));
-                            break;
-                    }
-                }
-
-                RuleJobResult jobResult;
-
-                if (response.Result != RuleResult.Success && !nextCall.HasValue)
-                {
-                    jobResult = RuleJobResult.Failed;
-                }
-                else if (response.Result != RuleResult.Success && nextCall.HasValue)
-                {
-                    jobResult = RuleJobResult.Retry;
-                }
-                else
-                {
-                    jobResult = RuleJobResult.Success;
-                }
-
-                await ruleEventRepository.MarkSentAsync(@event.Id, response.Dump, response.Result, jobResult, response.Elapsed, nextCall);
+                await ruleEventRepository.MarkSentAsync(@event.Id, response.Dump, response.Result, jobResult, response.Elapsed, jobInvoke);
             }
             catch (Exception ex)
             {
                 log.LogError(ex, w => w
                     .WriteProperty("action", "SendWebhookEvent")
                     .WriteProperty("status", "Failed"));
-
-                throw;
             }
+            finally
+            {
+                executing.TryRemove(@event.Id, out var value);
+            }
+        }
+
+        private static RuleJobResult ComputeJobResult(RuleResult result, Instant? nextCall)
+        {
+            if (result != RuleResult.Success && !nextCall.HasValue)
+            {
+                return RuleJobResult.Failed;
+            }
+            else if (result != RuleResult.Success && nextCall.HasValue)
+            {
+                return RuleJobResult.Retry;
+            }
+            else
+            {
+                return RuleJobResult.Success;
+            }
+        }
+
+        private static Instant? ComputeJobInvoke(RuleResult result, IRuleEventEntity @event, RuleJob job)
+        {
+            if (result != RuleResult.Success)
+            {
+                switch (@event.NumCalls)
+                {
+                    case 0:
+                        return job.Created.Plus(Duration.FromMinutes(5));
+                    case 1:
+                        return job.Created.Plus(Duration.FromHours(1));
+                    case 2:
+                        return job.Created.Plus(Duration.FromHours(6));
+                    case 3:
+                        return job.Created.Plus(Duration.FromHours(12));
+                }
+            }
+
+            return null;
         }
     }
 }

@@ -24,7 +24,7 @@ namespace Squidex.Config.Domain
                 {
                     var path = config.GetRequiredValue("assetStore:folder:path");
 
-                    services.AddSingleton(c => new FolderAssetStore(path, c.GetRequiredService<ISemanticLog>()))
+                    services.AddSingletonAs(c => new FolderAssetStore(path, c.GetRequiredService<ISemanticLog>()))
                         .As<IAssetStore>()
                         .As<IExternalSystem>();
                 },
@@ -32,7 +32,7 @@ namespace Squidex.Config.Domain
                 {
                     var bucketName = config.GetRequiredValue("assetStore:googleCloud:bucket");
 
-                    services.AddSingleton(c => new GoogleCloudAssetStore(bucketName))
+                    services.AddSingletonAs(c => new GoogleCloudAssetStore(bucketName))
                         .As<IAssetStore>()
                         .As<IExternalSystem>();
                 },
@@ -41,7 +41,7 @@ namespace Squidex.Config.Domain
                     var connectionString = config.GetRequiredValue("assetStore:azureBlob:connectionString");
                     var containerName = config.GetRequiredValue("assetStore:azureBlob:containerName");
 
-                    services.AddSingleton(c => new AzureBlobAssetStore(connectionString, containerName))
+                    services.AddSingletonAs(c => new AzureBlobAssetStore(connectionString, containerName))
                         .As<IAssetStore>()
                         .As<IExternalSystem>();
                 }

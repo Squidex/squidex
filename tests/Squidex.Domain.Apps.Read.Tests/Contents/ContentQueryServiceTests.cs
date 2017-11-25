@@ -18,7 +18,6 @@ using Squidex.Domain.Apps.Read.Apps;
 using Squidex.Domain.Apps.Read.Contents.Edm;
 using Squidex.Domain.Apps.Read.Contents.Repositories;
 using Squidex.Domain.Apps.Read.Schemas;
-using Squidex.Domain.Apps.Read.Schemas.Services;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
 using Xunit;
@@ -29,13 +28,14 @@ namespace Squidex.Domain.Apps.Read.Contents
     {
         private readonly IContentRepository contentRepository = A.Fake<IContentRepository>();
         private readonly IScriptEngine scriptEngine = A.Fake<IScriptEngine>();
-        private readonly ISchemaProvider schemas = A.Fake<ISchemaProvider>();
         private readonly ISchemaEntity schema = A.Fake<ISchemaEntity>();
         private readonly IContentEntity content = A.Fake<IContentEntity>();
         private readonly IAppEntity app = A.Fake<IAppEntity>();
+        private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
         private readonly Guid appId = Guid.NewGuid();
         private readonly Guid schemaId = Guid.NewGuid();
         private readonly Guid contentId = Guid.NewGuid();
+        private readonly string appName = "my-app";
         private readonly NamedContentData data = new NamedContentData();
         private readonly NamedContentData transformedData = new NamedContentData();
         private readonly ClaimsPrincipal user;
@@ -48,18 +48,19 @@ namespace Squidex.Domain.Apps.Read.Contents
             user = new ClaimsPrincipal(identity);
 
             A.CallTo(() => app.Id).Returns(appId);
+            A.CallTo(() => app.Name).Returns(appName);
 
             A.CallTo(() => content.Id).Returns(contentId);
             A.CallTo(() => content.Data).Returns(data);
             A.CallTo(() => content.Status).Returns(Status.Published);
 
-            sut = new ContentQueryService(contentRepository, schemas, scriptEngine, modelBuilder);
+            sut = new ContentQueryService(contentRepository, appProvider, scriptEngine, modelBuilder);
         }
 
         [Fact]
         public async Task Should_return_schema_from_id_if_string_is_guid()
         {
-            A.CallTo(() => schemas.FindSchemaByIdAsync(schemaId, false))
+            A.CallTo(() => appProvider.GetSchemaAsync(appName, schemaId, false))
                 .Returns(schema);
 
             var result = await sut.FindSchemaAsync(app, schemaId.ToString());
@@ -70,7 +71,7 @@ namespace Squidex.Domain.Apps.Read.Contents
         [Fact]
         public async Task Should_return_schema_from_name_if_string_not_guid()
         {
-            A.CallTo(() => schemas.FindSchemaByNameAsync(appId, "my-schema"))
+            A.CallTo(() => appProvider.GetSchemaAsync(appName, "my-schema", false))
                 .Returns(schema);
 
             var result = await sut.FindSchemaAsync(app, "my-schema");
@@ -81,7 +82,7 @@ namespace Squidex.Domain.Apps.Read.Contents
         [Fact]
         public async Task Should_throw_if_schema_not_found()
         {
-            A.CallTo(() => schemas.FindSchemaByNameAsync(appId, "my-schema"))
+            A.CallTo(() => appProvider.GetSchemaAsync(appName, "my-schema", false))
                 .Returns((ISchemaEntity)null);
 
             await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.FindSchemaAsync(app, "my-schema"));
@@ -90,7 +91,7 @@ namespace Squidex.Domain.Apps.Read.Contents
         [Fact]
         public async Task Should_return_content_from_repository_and_transform()
         {
-            A.CallTo(() => schemas.FindSchemaByIdAsync(schemaId, false))
+            A.CallTo(() => appProvider.GetSchemaAsync(appName, schemaId, false))
                 .Returns(schema);
             A.CallTo(() => contentRepository.FindContentAsync(app, schema, contentId))
                 .Returns(content);
@@ -111,7 +112,7 @@ namespace Squidex.Domain.Apps.Read.Contents
         [Fact]
         public async Task Should_throw_if_content_to_find_does_not_exist()
         {
-            A.CallTo(() => schemas.FindSchemaByIdAsync(schemaId, false))
+            A.CallTo(() => appProvider.GetSchemaAsync(appName, schemaId, false))
                 .Returns(schema);
             A.CallTo(() => contentRepository.FindContentAsync(app, schema, contentId))
                 .Returns((IContentEntity)null);
@@ -189,7 +190,7 @@ namespace Squidex.Domain.Apps.Read.Contents
 
         private void SetupFakeWithIdQuery(Status[] status, HashSet<Guid> ids)
         {
-            A.CallTo(() => schemas.FindSchemaByIdAsync(schemaId, false))
+            A.CallTo(() => appProvider.GetSchemaAsync(appName, schemaId, false))
                 .Returns(schema);
             A.CallTo(() => contentRepository.QueryAsync(app, schema, A<Status[]>.That.IsSameSequenceAs(status), ids))
                 .Returns(new List<IContentEntity> { content });
@@ -199,7 +200,7 @@ namespace Squidex.Domain.Apps.Read.Contents
 
         private void SetupFakeWithOdataQuery(Status[] status)
         {
-            A.CallTo(() => schemas.FindSchemaByIdAsync(schemaId, false))
+            A.CallTo(() => appProvider.GetSchemaAsync(appName, schemaId, false))
                 .Returns(schema);
             A.CallTo(() => contentRepository.QueryAsync(app, schema, A<Status[]>.That.IsSameSequenceAs(status), A<ODataUriParser>.Ignored))
                 .Returns(new List<IContentEntity> { content });

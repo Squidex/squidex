@@ -6,65 +6,51 @@
 //  All rights reserved.
 // ==========================================================================
 
-using FluentAssertions;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Apps;
 using Xunit;
+
+#pragma warning disable SA1310 // Field names must not contain underscore
 
 namespace Squidex.Domain.Apps.Core.Model.Apps
 {
     public class AppContributorsTests
     {
-        private readonly JsonSerializer serializer = TestData.DefaultSerializer();
-        private readonly AppContributors sut = new AppContributors();
+        private readonly AppContributors contributors_0 = AppContributors.Empty;
 
         [Fact]
         public void Should_assign_new_contributor()
         {
-            sut.Assign("1", AppContributorPermission.Developer);
-            sut.Assign("2", AppContributorPermission.Editor);
+            var contributors_1 = contributors_0.Assign("1", AppContributorPermission.Developer);
+            var contributors_2 = contributors_1.Assign("2", AppContributorPermission.Editor);
 
-            Assert.Equal(AppContributorPermission.Developer, sut["1"]);
-            Assert.Equal(AppContributorPermission.Editor, sut["2"]);
+            Assert.Equal(AppContributorPermission.Developer, contributors_2["1"]);
+            Assert.Equal(AppContributorPermission.Editor, contributors_2["2"]);
         }
 
         [Fact]
         public void Should_replace_contributor_if_already_exists()
         {
-            sut.Assign("1", AppContributorPermission.Developer);
-            sut.Assign("1", AppContributorPermission.Owner);
+            var contributors_1 = contributors_0.Assign("1", AppContributorPermission.Developer);
+            var contributors_2 = contributors_1.Assign("1", AppContributorPermission.Owner);
 
-            Assert.Equal(AppContributorPermission.Owner, sut["1"]);
+            Assert.Equal(AppContributorPermission.Owner, contributors_2["1"]);
         }
 
         [Fact]
         public void Should_remove_contributor()
         {
-            sut.Assign("1", AppContributorPermission.Developer);
-            sut.Remove("1");
+            var contributors_1 = contributors_0.Assign("1", AppContributorPermission.Developer);
+            var contributors_2 = contributors_1.Remove("1");
 
-            Assert.Empty(sut);
+            Assert.Empty(contributors_2);
         }
 
         [Fact]
         public void Should_do_nothing_if_contributor_to_remove_not_found()
         {
-            sut.Remove("2");
+            var contributors_1 = contributors_0.Remove("2");
 
-            Assert.Empty(sut);
-        }
-
-        [Fact]
-        public void Should_serialize_and_deserialize()
-        {
-            sut.Assign("1", AppContributorPermission.Developer);
-            sut.Assign("2", AppContributorPermission.Editor);
-            sut.Assign("3", AppContributorPermission.Owner);
-
-            var serialized = JToken.FromObject(sut, serializer).ToObject<AppContributors>(serializer);
-
-            serialized.ShouldBeEquivalentTo(sut);
+            Assert.Empty(contributors_1);
         }
     }
 }

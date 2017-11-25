@@ -9,10 +9,9 @@
 using System;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Scripting;
-using Squidex.Domain.Apps.Read.Apps.Services;
+using Squidex.Domain.Apps.Read;
 using Squidex.Domain.Apps.Read.Assets.Repositories;
 using Squidex.Domain.Apps.Read.Contents.Repositories;
-using Squidex.Domain.Apps.Read.Schemas.Services;
 using Squidex.Domain.Apps.Write.Contents.Commands;
 using Squidex.Domain.Apps.Write.Contents.Guards;
 using Squidex.Infrastructure;
@@ -27,26 +26,22 @@ namespace Squidex.Domain.Apps.Write.Contents
         private readonly IAppProvider appProvider;
         private readonly IAssetRepository assetRepository;
         private readonly IContentRepository contentRepository;
-        private readonly ISchemaProvider schemas;
         private readonly IScriptEngine scriptEngine;
 
         public ContentCommandMiddleware(
             IAggregateHandler handler,
             IAppProvider appProvider,
             IAssetRepository assetRepository,
-            ISchemaProvider schemas,
             IScriptEngine scriptEngine,
             IContentRepository contentRepository)
         {
             Guard.NotNull(handler, nameof(handler));
-            Guard.NotNull(schemas, nameof(schemas));
             Guard.NotNull(appProvider, nameof(appProvider));
             Guard.NotNull(scriptEngine, nameof(scriptEngine));
             Guard.NotNull(assetRepository, nameof(assetRepository));
             Guard.NotNull(contentRepository, nameof(contentRepository));
 
             this.handler = handler;
-            this.schemas = schemas;
             this.appProvider = appProvider;
             this.scriptEngine = scriptEngine;
             this.assetRepository = assetRepository;
@@ -154,9 +149,8 @@ namespace Squidex.Domain.Apps.Write.Contents
                     content,
                     command,
                     appProvider,
-                    schemas,
-                    scriptEngine,
                     assetRepository,
+                    scriptEngine,
                     message);
 
             return operationContext;

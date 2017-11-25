@@ -8,8 +8,8 @@
 
 namespace Squidex.Infrastructure.CQRS.Events.Actors.Messages
 {
-    [TypeName(nameof(StopConsumerMessage))]
     public sealed class StopConsumerMessage
     {
+        public string ConsumerName { get; set; }
     }
 }

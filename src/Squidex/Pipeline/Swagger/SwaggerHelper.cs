@@ -17,7 +17,6 @@ using NJsonSchema;
 using NJsonSchema.Generation;
 using NSwag;
 using Squidex.Config;
-using Squidex.Controllers.Api;
 using Squidex.Shared.Identity;
 
 namespace Squidex.Pipeline.Swagger
@@ -64,7 +63,7 @@ namespace Squidex.Pipeline.Swagger
                     {
                         ["x-logo"] = new { url = urlOptions.BuildUrl("images/logo-white.png", false), backgroundColor = "#3f83df" }
                     },
-                    Title = $"Suidex API for {appName} App"
+                    Title = $"Squidex API for {appName} App", Version = "1.0"
                 },
                 BasePath = "/api"
             };
@@ -81,7 +80,7 @@ namespace Squidex.Pipeline.Swagger
 
         public static SwaggerSecurityScheme CreateOAuthSchema(MyUrlsOptions urlOptions)
         {
-            var tokenUrl = urlOptions.BuildUrl($"{Constants.IdentityPrefix}/connect/token");
+            var tokenUrl = urlOptions.BuildUrl($"{Constants.IdentityServerPrefix}/connect/token");
 
             var securityDocs = LoadDocs("security");
             var securityText = securityDocs.Replace("<TOKEN_URL>", tokenUrl);

@@ -21,7 +21,7 @@ namespace Squidex.Domain.Apps.Core.Apps.Json
             serializer.Serialize(writer, json);
         }
 
-        protected override LanguagesConfig ReadValue(JsonReader reader, JsonSerializer serializer)
+        protected override LanguagesConfig ReadValue(JsonReader reader, Type objectType, JsonSerializer serializer)
         {
             var json = serializer.Deserialize<JsonLanguagesConfig>(reader);
 

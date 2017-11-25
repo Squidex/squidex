@@ -6,6 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using System.Linq;
 using System.Security.Claims;
 using Newtonsoft.Json;
@@ -48,7 +49,7 @@ namespace Squidex.Infrastructure.Json
             serializer.Serialize(writer, jsonIdentities);
         }
 
-        protected override ClaimsPrincipal ReadValue(JsonReader reader, JsonSerializer serializer)
+        protected override ClaimsPrincipal ReadValue(JsonReader reader, Type objectType, JsonSerializer serializer)
         {
             var jsonIdentities = serializer.Deserialize<JsonIdentity[]>(reader);
 

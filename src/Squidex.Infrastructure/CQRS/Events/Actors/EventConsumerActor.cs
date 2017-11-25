@@ -8,47 +8,34 @@
 
 using System;
 using System.Threading.Tasks;
-using Squidex.Infrastructure.Actors;
-using Squidex.Infrastructure.CQRS.Events.Actors.Messages;
 using Squidex.Infrastructure.Log;
+using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.CQRS.Events.Actors
 {
-    public class EventConsumerActor : DisposableObjectBase, IEventSubscriber, IActor
+    public class EventConsumerActor : StatefulObject<EventConsumerState>, IEventSubscriber
     {
         private readonly EventDataFormatter formatter;
         private readonly IEventStore eventStore;
-        private readonly IEventConsumerInfoRepository eventConsumerInfoRepository;
         private readonly ISemanticLog log;
         private readonly SingleThreadedDispatcher dispatcher = new SingleThreadedDispatcher(1);
         private IEventSubscription currentSubscription;
         private IEventConsumer eventConsumer;
-        private bool statusIsRunning = true;
-        private string statusPosition;
-        private string statusError;
-
-        private static Func<IEventStore, IEventSubscriber, string, string, IEventSubscription> DefaultFactory
-        {
-            get { return (e, s, t, p) => new RetrySubscription(e, s, t, p); }
-        }
 
         public EventConsumerActor(
             EventDataFormatter formatter,
             IEventStore eventStore,
-            IEventConsumerInfoRepository eventConsumerInfoRepository,
             ISemanticLog log)
         {
             Guard.NotNull(log, nameof(log));
             Guard.NotNull(formatter, nameof(formatter));
             Guard.NotNull(eventStore, nameof(eventStore));
-            Guard.NotNull(eventConsumerInfoRepository, nameof(eventConsumerInfoRepository));
 
             this.log = log;
 
             this.formatter = formatter;
             this.eventStore = eventStore;
-            this.eventConsumerInfoRepository = eventConsumerInfoRepository;
         }
 
         protected override void DisposeObject(bool disposing)
@@ -64,30 +51,43 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
             return new RetrySubscription(eventStore, this, streamFilter, position);
         }
 
-        public Task SubscribeAsync(IEventConsumer eventConsumer)
+        public virtual EventConsumerInfo GetState()
+        {
+            return State.ToInfo(this.eventConsumer.Name);
+        }
+
+        public virtual void Stop()
+        {
+            dispatcher.DispatchAsync(() => HandleStopAsync()).Forget();
+        }
+
+        public virtual void Start()
+        {
+            dispatcher.DispatchAsync(() => HandleStartAsync()).Forget();
+        }
+
+        public virtual void Reset()
+        {
+            dispatcher.DispatchAsync(() => HandleResetAsync()).Forget();
+        }
+
+        public virtual void Activate(IEventConsumer eventConsumer)
         {
             Guard.NotNull(eventConsumer, nameof(eventConsumer));
 
-            return dispatcher.DispatchAsync(() => HandleSetupAsync(eventConsumer));
+            dispatcher.DispatchAsync(() => HandleSetupAsync(eventConsumer)).Forget();
         }
 
-        private async Task HandleSetupAsync(IEventConsumer consumer)
+        private Task HandleSetupAsync(IEventConsumer consumer)
         {
             eventConsumer = consumer;
 
-            var status = await eventConsumerInfoRepository.FindAsync(eventConsumer.Name);
-
-            if (status != null)
+            if (!State.IsStopped)
             {
-                statusError = status.Error;
-                statusPosition = status.Position;
-                statusIsRunning = !status.IsStopped;
+                Subscribe(State.Position);
             }
 
-            if (statusIsRunning)
-            {
-                Subscribe(statusPosition);
-            }
+            return TaskHelper.Done;
         }
 
         private Task HandleEventAsync(IEventSubscription subscription, StoredEvent storedEvent)
@@ -106,8 +106,7 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
                     await DispatchConsumerAsync(@event);
                 }
 
-                statusError = null;
-                statusPosition = storedEvent.EventPosition;
+                State = State.Handled(storedEvent.EventPosition);
             });
         }
 
@@ -122,30 +121,28 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
             {
                 Unsubscribe();
 
-                statusError = exception.ToString();
-                statusIsRunning = false;
+                State = State.Failed(exception);
             });
         }
 
         private Task HandleStartAsync()
         {
-            if (statusIsRunning)
+            if (!State.IsStopped)
             {
                 return TaskHelper.Done;
             }
 
             return DoAndUpdateStateAsync(() =>
             {
-                Subscribe(statusPosition);
+                Subscribe(State.Position);
 
-                statusError = null;
-                statusIsRunning = true;
+                State = State.Started();
             });
         }
 
         private Task HandleStopAsync()
         {
-            if (!statusIsRunning)
+            if (State.IsStopped)
             {
                 return TaskHelper.Done;
             }
@@ -154,12 +151,11 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
             {
                 Unsubscribe();
 
-                statusError = null;
-                statusIsRunning = false;
+                State = State.Stopped();
             });
         }
 
-        private Task HandleResetInternalAsync()
+        private Task HandleResetAsync()
         {
             return DoAndUpdateStateAsync(async () =>
             {
@@ -169,9 +165,7 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
 
                 Subscribe(null);
 
-                statusError = null;
-                statusPosition = null;
-                statusIsRunning = true;
+                State = State.Reset();
             });
         }
 
@@ -185,24 +179,6 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
             return dispatcher.DispatchAsync(() => HandleErrorAsync(subscription, exception));
         }
 
-        void IActor.Tell(object message)
-        {
-            switch (message)
-            {
-                case StopConsumerMessage stop:
-                    dispatcher.DispatchAsync(() => HandleStopAsync()).Forget();
-                    break;
-
-                case StartConsumerMessage stop:
-                    dispatcher.DispatchAsync(() => HandleStartAsync()).Forget();
-                    break;
-
-                case ResetConsumerMessage stop:
-                    dispatcher.DispatchAsync(() => HandleResetInternalAsync()).Forget();
-                    break;
-            }
-        }
-
         private Task DoAndUpdateStateAsync(Action action)
         {
             return DoAndUpdateStateAsync(() => { action(); return TaskHelper.Done; });
@@ -213,7 +189,6 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
             try
             {
                 await action();
-                await eventConsumerInfoRepository.SetAsync(eventConsumer.Name, statusPosition, !statusIsRunning, statusError);
             }
             catch (Exception ex)
             {
@@ -231,11 +206,10 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
                     .WriteProperty("state", "Failed")
                     .WriteProperty("eventConsumer", eventConsumer.Name));
 
-                statusError = ex.ToString();
-                statusIsRunning = false;
-
-                await eventConsumerInfoRepository.SetAsync(eventConsumer.Name, statusPosition, !statusIsRunning, statusError);
+                State = State.Failed(ex);
             }
+
+            await WriteStateAsync();
         }
 
         private async Task ClearAsync()

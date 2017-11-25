@@ -9,9 +9,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 
 namespace Squidex.Infrastructure
 {
+    [Serializable]
     public class ValidationException : Exception
     {
         private static readonly List<ValidationError> FallbackErrors = new List<ValidationError>();
@@ -44,6 +46,11 @@ namespace Squidex.Infrastructure
             : base(message, inner)
         {
             this.errors = errors ?? FallbackErrors;
+        }
+
+        protected ValidationException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        {
         }
 
         public override string ToString()

@@ -68,7 +68,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
 
         protected Task On(ContentCreated @event, EnvelopeHeaders headers)
         {
-            return ForSchemaAsync(@event.AppId.Id, @event.SchemaId.Id, (collection, schema) =>
+            return ForSchemaAsync(@event.AppId, @event.SchemaId.Id, (collection, schema) =>
             {
                 return collection.CreateAsync(@event, headers, content =>
                 {
@@ -87,7 +87,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
 
         protected Task On(ContentUpdated @event, EnvelopeHeaders headers)
         {
-            return ForSchemaAsync(@event.AppId.Id, @event.SchemaId.Id, (collection, schema) =>
+            return ForSchemaAsync(@event.AppId, @event.SchemaId.Id, (collection, schema) =>
             {
                 var idData = @event.Data?.ToIdModel(schema.SchemaDef, true);
 

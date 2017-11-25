@@ -54,7 +54,7 @@ namespace Squidex.Domain.Apps.Core.Apps.Json
 
             if (Master != null)
             {
-                result.MakeMaster(Master);
+                result = result.MakeMaster(Master);
             }
 
             return result;

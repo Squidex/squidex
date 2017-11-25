@@ -7,9 +7,11 @@
 // ==========================================================================
 
 using System;
+using System.Runtime.Serialization;
 
 namespace Squidex.Infrastructure
 {
+    [Serializable]
     public class DomainForbiddenException : DomainException
     {
         public DomainForbiddenException(string message)
@@ -19,6 +21,11 @@ namespace Squidex.Infrastructure
 
         public DomainForbiddenException(string message, Exception inner)
             : base(message, inner)
+        {
+        }
+
+        protected DomainForbiddenException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
         {
         }
     }

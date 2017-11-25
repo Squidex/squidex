@@ -9,41 +9,24 @@
 using System;
 using System.Threading.Tasks;
 using Benchmarks.Utils;
-using MongoDB.Driver;
-using Squidex.Infrastructure;
+using Microsoft.Extensions.DependencyInjection;
 using Squidex.Infrastructure.CQRS.Events;
 
 namespace Benchmarks.Tests
 {
-    public sealed class AppendToEventStoreWithManyWriters : IBenchmark
+    public sealed class AppendToEventStoreWithManyWriters : Benchmark
     {
-        private IMongoClient mongoClient;
-        private IMongoDatabase mongoDatabase;
+        private IServiceProvider services;
         private IEventStore eventStore;
 
-        public string Id
+        public override void RunInitialize()
         {
-            get { return "appendToEventStoreParallel"; }
+            services = Services.Create();
+
+            eventStore = services.GetRequiredService<IEventStore>();
         }
 
-        public string Name
-        {
-            get { return "Append events parallel"; }
-        }
-
-        public void Initialize()
-        {
-            mongoClient = new MongoClient("mongodb://localhost");
-        }
-
-        public void RunInitialize()
-        {
-            mongoDatabase = mongoClient.GetDatabase(Guid.NewGuid().ToString());
-
-            eventStore = new MongoEventStore(mongoDatabase, new DefaultEventNotifier(new InMemoryPubSub()));
-        }
-
-        public long Run()
+        public override long Run()
         {
             const long numCommits = 200;
             const long numStreams = 100;
@@ -61,13 +44,9 @@ namespace Benchmarks.Tests
             return numCommits * numStreams;
         }
 
-        public void RunCleanup()
+        public override void RunCleanup()
         {
-            mongoClient.DropDatabase(mongoDatabase.DatabaseNamespace.DatabaseName);
-        }
-
-        public void Cleanup()
-        {
+            services.Cleanup();
         }
     }
 }

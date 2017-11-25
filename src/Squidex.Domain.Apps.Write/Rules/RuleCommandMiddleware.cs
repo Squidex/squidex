@@ -8,7 +8,7 @@
 
 using System;
 using System.Threading.Tasks;
-using Squidex.Domain.Apps.Read.Schemas.Services;
+using Squidex.Domain.Apps.Read;
 using Squidex.Domain.Apps.Write.Rules.Commands;
 using Squidex.Domain.Apps.Write.Rules.Guards;
 using Squidex.Infrastructure;
@@ -20,22 +20,23 @@ namespace Squidex.Domain.Apps.Write.Rules
     public class RuleCommandMiddleware : ICommandMiddleware
     {
         private readonly IAggregateHandler handler;
-        private readonly ISchemaProvider schemas;
+        private readonly IAppProvider appProvider;
 
-        public RuleCommandMiddleware(IAggregateHandler handler, ISchemaProvider schemas)
+        public RuleCommandMiddleware(IAggregateHandler handler, IAppProvider appProvider)
         {
             Guard.NotNull(handler, nameof(handler));
-            Guard.NotNull(schemas, nameof(schemas));
+            Guard.NotNull(appProvider, nameof(appProvider));
 
             this.handler = handler;
-            this.schemas = schemas;
+
+            this.appProvider = appProvider;
         }
 
         protected Task On(CreateRule command, CommandContext context)
         {
             return handler.CreateAsync<RuleDomainObject>(context, async w =>
             {
-                await GuardRule.CanCreate(command, schemas);
+                await GuardRule.CanCreate(command, appProvider);
 
                 w.Create(command);
             });
@@ -45,7 +46,7 @@ namespace Squidex.Domain.Apps.Write.Rules
         {
             return handler.UpdateAsync<RuleDomainObject>(context, async c =>
             {
-                await GuardRule.CanUpdate(command, schemas);
+                await GuardRule.CanUpdate(command, appProvider);
 
                 c.Update(command);
             });

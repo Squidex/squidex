@@ -7,11 +7,13 @@
 // ==========================================================================
 
 using System;
+using System.IO;
+using System.Linq;
 using FluentAssertions;
+using MongoDB.Bson.IO;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Xunit;
-
-#pragma warning disable SA1121 // Use built-in type alias
 
 namespace Squidex.Infrastructure.MongoDb
 {
@@ -19,45 +21,69 @@ namespace Squidex.Infrastructure.MongoDb
     {
         public class TestObject
         {
-            public TimeSpan TimeSpan { get; set; }
-
-            public Guid Guid { get; set; }
-
-            public DateTimeOffset DateTimeOffset { get; set; }
-
-            public DateTime DateTime { get; set; }
-
-            public Int64 Int64 { get; set; }
-
-            public Int32 Int32 { get; set; }
-
-            public Int16 Int16 { get; set; }
-
-            public UInt64 UInt64 { get; set; }
-
-            public UInt32 UInt32 { get; set; }
-
-            public UInt16 UInt16 { get; set; }
-
-            public double Float64 { get; set; }
-
-            public float Float32 { get; set; }
-
+            [JsonProperty]
             public bool Bool { get; set; }
 
+            [JsonProperty]
             public byte Byte { get; set; }
 
+            [JsonProperty]
             public byte[] Bytes { get; set; }
 
+            [JsonProperty]
+            public int Int32 { get; set; }
+
+            [JsonProperty]
+            public long Int64 { get; set; }
+
+            [JsonProperty]
+            public short Int16 { get; set; }
+
+            [JsonProperty]
+            public uint UInt32 { get; set; }
+
+            [JsonProperty]
+            public ulong UInt64 { get; set; }
+
+            [JsonProperty]
+            public ushort UInt16 { get; set; }
+
+            [JsonProperty]
             public string String { get; set; }
 
+            [JsonProperty]
+            public float Float32 { get; set; }
+
+            [JsonProperty]
+            public double Float64 { get; set; }
+
+            [JsonProperty]
             public string[] Strings { get; set; }
 
+            [JsonProperty]
             public Uri Uri { get; set; }
 
-            public static TestObject CreateWithValues()
+            [JsonProperty]
+            public Guid Guid { get; set; }
+
+            [JsonProperty]
+            public TimeSpan TimeSpan { get; set; }
+
+            [JsonProperty]
+            public DateTime DateTime { get; set; }
+
+            [JsonProperty]
+            public DateTimeOffset DateTimeOffset { get; set; }
+
+            [JsonProperty]
+            public TestObject Nested { get; set; }
+
+            [JsonProperty]
+            public TestObject[] NestedArray { get; set; }
+
+            public static TestObject CreateWithValues(bool nested = true)
             {
-                return new TestObject
+                var result = new TestObject
                 {
                     Bool = true,
                     Byte = 0x2,
@@ -78,16 +104,48 @@ namespace Squidex.Infrastructure.MongoDb
                     UInt16 = 116,
                     Uri = new Uri("http://squidex.io")
                 };
+
+                if (nested)
+                {
+                    result.Nested = CreateWithValues(false);
+                    result.NestedArray = Enumerable.Repeat(0, 4).Select(x => CreateWithValues(false)).ToArray();
+                }
+
+                return result;
             }
         }
+
+        private readonly TestObject source = TestObject.CreateWithValues();
+        private readonly JsonSerializer serializer = JsonSerializer.CreateDefault();
 
         [Fact]
         public void Should_serialize_and_deserialize_to_bson_with_json()
         {
-            var source = TestObject.CreateWithValues();
             var target = JObject.FromObject(source).ToBson().ToJson().ToObject<TestObject>();
 
             target.ShouldBeEquivalentTo(source);
+        }
+
+        [Fact]
+        public void Should_serialize_with_reader_and_writer()
+        {
+            var stream = new MemoryStream();
+
+            using (var writer = new BsonJsonWriter(new BsonBinaryWriter(stream)))
+            {
+                serializer.Serialize(writer, source);
+
+                writer.Flush();
+            }
+
+            stream.Position = 0;
+
+            using (var reader = new BsonJsonReader(new BsonBinaryReader(stream)))
+            {
+                var target = serializer.Deserialize<TestObject>(reader);
+
+                target.ShouldBeEquivalentTo(source);
+            }
         }
     }
 }

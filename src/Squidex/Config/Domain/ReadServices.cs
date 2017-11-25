@@ -11,8 +11,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core.HandleRules;
-using Squidex.Domain.Apps.Core.HandleRules.ActionHandlers;
+using Squidex.Domain.Apps.Core.HandleRules.Actions;
 using Squidex.Domain.Apps.Core.HandleRules.Triggers;
+using Squidex.Domain.Apps.Read;
 using Squidex.Domain.Apps.Read.Apps;
 using Squidex.Domain.Apps.Read.Apps.Services;
 using Squidex.Domain.Apps.Read.Apps.Services.Implementations;
@@ -23,12 +24,14 @@ using Squidex.Domain.Apps.Read.Contents.GraphQL;
 using Squidex.Domain.Apps.Read.History;
 using Squidex.Domain.Apps.Read.Rules;
 using Squidex.Domain.Apps.Read.Schemas;
-using Squidex.Domain.Apps.Read.Schemas.Services;
-using Squidex.Domain.Apps.Read.Schemas.Services.Implementations;
+using Squidex.Domain.Apps.Read.State.Orleans;
+using Squidex.Domain.Apps.Read.State.Orleans.Grains;
 using Squidex.Domain.Users;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure.CQRS.Events.Actors;
+using Squidex.Infrastructure.States;
 using Squidex.Pipeline;
 
 namespace Squidex.Config.Domain
@@ -37,74 +40,89 @@ namespace Squidex.Config.Domain
     {
         public static void AddMyReadServices(this IServiceCollection services, IConfiguration config)
         {
+            var consumeEvents = config.GetOptionalValue("eventStore:consume", false);
+
+            if (consumeEvents)
+            {
+                services.AddTransient<EventConsumerActor>();
+
+                services.AddSingletonAs<EventConsumerActorManager>()
+                    .As<IExternalSystem>();
+                services.AddSingletonAs<RuleDequeuer>()
+                    .As<IExternalSystem>();
+            }
+
             var exposeSourceUrl = config.GetOptionalValue("assetStore:exposeSourceUrl", true);
 
-            services.AddSingleton(c => new GraphQLUrlGenerator(
+            services.AddSingletonAs(c => new GraphQLUrlGenerator(
                     c.GetRequiredService<IOptions<MyUrlsOptions>>(),
                     c.GetRequiredService<IAssetStore>(),
                     exposeSourceUrl))
                 .As<IGraphQLUrlGenerator>();
 
-            services.AddSingleton(c => c.GetService<IOptions<MyUsageOptions>>()?.Value?.Plans.OrEmpty());
+            services.AddSingletonAs(c => c.GetService<IOptions<MyUsageOptions>>()?.Value?.Plans.OrEmpty());
 
-            services.AddSingleton<CachingGraphQLService>()
+            services.AddSingletonAs<CachingGraphQLService>()
                 .As<IGraphQLService>();
 
-            services.AddSingleton<ContentQueryService>()
+            services.AddSingletonAs<ContentQueryService>()
                 .As<IContentQueryService>();
 
-            services.AddSingleton<CachingAppProvider>()
-                .As<IAppProvider>();
-
-            services.AddSingleton<ConfigAppPlansProvider>()
+            services.AddSingletonAs<ConfigAppPlansProvider>()
                 .As<IAppPlansProvider>();
 
-            services.AddSingleton<CachingSchemaProvider>()
-                .As<ISchemaProvider>();
-
-            services.AddSingleton<AssetUserPictureStore>()
+            services.AddSingletonAs<AssetUserPictureStore>()
                 .As<IUserPictureStore>();
 
-            services.AddSingleton<AppHistoryEventsCreator>()
+            services.AddSingletonAs<AppHistoryEventsCreator>()
                 .As<IHistoryEventsCreator>();
 
-            services.AddSingleton<ContentHistoryEventsCreator>()
+            services.AddSingletonAs<ContentHistoryEventsCreator>()
                 .As<IHistoryEventsCreator>();
 
-            services.AddSingleton<SchemaHistoryEventsCreator>()
+            services.AddSingletonAs<SchemaHistoryEventsCreator>()
                 .As<IHistoryEventsCreator>();
 
-            services.AddSingleton<NoopAppPlanBillingManager>()
+            services.AddSingletonAs<NoopAppPlanBillingManager>()
                 .As<IAppPlanBillingManager>();
 
-            services.AddSingleton<RuleDequeuer>()
-                .As<IExternalSystem>();
+            services.AddSingletonAs<DefaultEventNotifier>()
+                .As<IEventNotifier>();
 
-            services.AddSingleton<RuleEnqueuer>()
+            services.AddSingletonAs<AppProvider>()
+                .As<IAppProvider>();
+
+            services.AddSingletonAs<AppStateEventConsumer>()
                 .As<IEventConsumer>();
 
-            services.AddSingleton<ContentChangedTriggerHandler>()
+            services.AddSingletonAs<RuleEnqueuer>()
+                .As<IEventConsumer>();
+
+            services.AddSingletonAs<StateFactory>()
+                .As<IStateFactory>();
+
+            services.AddSingletonAs<ContentChangedTriggerHandler>()
                 .As<IRuleTriggerHandler>();
 
-            services.AddSingleton<WebhookActionHandler>()
+            services.AddSingletonAs<WebhookActionHandler>()
                 .As<IRuleActionHandler>();
 
-            services.AddSingleton<IEventConsumer>(c =>
+            services.AddSingletonAs<IEventConsumer>(c =>
                 new CompoundEventConsumer(c.GetServices<IAssetEventConsumer>().ToArray()));
 
-            services.AddSingleton<IEventConsumer>(c =>
-                new CompoundEventConsumer(
-                    c.GetServices<IAppEventConsumer>().OfType<IEventConsumer>()
-                        .Concat(c.GetRequiredService<CachingAppProvider>()).ToArray()));
+            services.AddSingletonAs(c =>
+            {
+                var allEventConsumers = c.GetServices<IEventConsumer>();
 
-            services.AddSingleton<IEventConsumer>(c =>
-                new CompoundEventConsumer(
-                    c.GetServices<ISchemaEventConsumer>().OfType<IEventConsumer>()
-                        .Concat(c.GetRequiredService<CachingGraphQLService>())
-                        .Concat(c.GetRequiredService<CachingSchemaProvider>()).ToArray()));
+                return new EventConsumerFactory(n => allEventConsumers.FirstOrDefault(x => x.Name == n));
+            });
+
+            services.AddSingletonAs<EdmModelBuilder>();
+
+            services.AddTransient<AppStateGrain>();
+            services.AddTransient<AppUserGrain>();
 
             services.AddSingleton<RuleService>();
-            services.AddSingleton<EdmModelBuilder>();
         }
     }
 }

@@ -22,7 +22,7 @@ namespace Squidex.Config.Domain
             {
                 ["InMemory"] = () =>
                 {
-                    services.AddSingleton<InMemoryPubSub>()
+                    services.AddSingletonAs<InMemoryPubSub>()
                         .As<IPubSub>();
                 },
                 ["Redis"] = () =>
@@ -31,7 +31,7 @@ namespace Squidex.Config.Domain
 
                     var redis = Singletons<IConnectionMultiplexer>.GetOrAddLazy(configuration, s => ConnectionMultiplexer.Connect(s));
 
-                    services.AddSingleton(c => new RedisPubSub(redis, c.GetRequiredService<ISemanticLog>()))
+                    services.AddSingletonAs(c => new RedisPubSub(redis, c.GetRequiredService<ISemanticLog>()))
                         .As<IPubSub>()
                         .As<IExternalSystem>();
                 }

@@ -6,31 +6,33 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
-using Squidex.Domain.Apps.Read.Schemas.Services;
+using Squidex.Domain.Apps.Read;
+using Squidex.Domain.Apps.Read.Schemas;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Write.Rules.Guards
 {
     public sealed class RuleTriggerValidator : IRuleTriggerVisitor<Task<IEnumerable<ValidationError>>>
     {
-        public ISchemaProvider Schemas { get; }
+        public Func<Guid, Task<ISchemaEntity>> SchemaProvider { get; }
 
-        public RuleTriggerValidator(ISchemaProvider schemas)
+        public RuleTriggerValidator(Func<Guid, Task<ISchemaEntity>> schemaProvider)
         {
-            Schemas = schemas;
+            SchemaProvider = schemaProvider;
         }
 
-        public static Task<IEnumerable<ValidationError>> ValidateAsync(RuleTrigger action, ISchemaProvider schemas)
+        public static Task<IEnumerable<ValidationError>> ValidateAsync(string appName, RuleTrigger action, IAppProvider appProvider)
         {
             Guard.NotNull(action, nameof(action));
-            Guard.NotNull(schemas, nameof(schemas));
+            Guard.NotNull(appProvider, nameof(appProvider));
 
-            var visitor = new RuleTriggerValidator(schemas);
+            var visitor = new RuleTriggerValidator(x => appProvider.GetSchemaAsync(appName, x));
 
             return action.Accept(visitor);
         }
@@ -41,7 +43,7 @@ namespace Squidex.Domain.Apps.Write.Rules.Guards
             {
                 var schemaErrors = await Task.WhenAll(
                     trigger.Schemas.Select(async s =>
-                        await Schemas.FindSchemaByIdAsync(s.SchemaId) == null
+                        await SchemaProvider(s.SchemaId) == null
                             ? new ValidationError($"Schema {s.SchemaId} does not exist.", nameof(trigger.Schemas))
                             : null));
 

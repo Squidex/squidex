@@ -7,26 +7,26 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Concurrent;
+using System.Reactive.Linq;
 using System.Reactive.Subjects;
 
 namespace Squidex.Infrastructure
 {
     public sealed class InMemoryPubSub : IPubSub
     {
-        private readonly ConcurrentDictionary<string, Subject<string>> subjects = new ConcurrentDictionary<string, Subject<string>>();
+        private readonly Subject<object> subject = new Subject<object>();
 
-        public void Publish(string channelName, string token, bool notifySelf)
+        public void Publish<T>(T value, bool notifySelf)
         {
             if (notifySelf)
             {
-                subjects.GetOrAdd(channelName, k => new Subject<string>()).OnNext(token);
+                subject.OnNext(value);
             }
         }
 
-        public IDisposable Subscribe(string channelName, Action<string> handler)
+        public IDisposable Subscribe<T>(Action<T> handler)
         {
-            return subjects.GetOrAdd(channelName, k => new Subject<string>()).Subscribe(handler);
+            return subject.Where(x => x is T).OfType<T>().Subscribe(handler);
         }
     }
 }

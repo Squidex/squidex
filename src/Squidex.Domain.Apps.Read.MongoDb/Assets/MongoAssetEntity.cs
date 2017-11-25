@@ -14,7 +14,12 @@ using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Domain.Apps.Read.MongoDb.Assets
 {
-    public sealed class MongoAssetEntity : MongoEntity, IAssetEntity
+    public sealed class MongoAssetEntity :
+        MongoEntity,
+        IAssetEntity,
+        IUpdateableEntityWithVersion,
+        IUpdateableEntityWithCreatedBy,
+        IUpdateableEntityWithLastModifiedBy
     {
         [BsonRequired]
         [BsonElement]

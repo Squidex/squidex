@@ -11,7 +11,7 @@
     "dev": "cpx node_modules/oidc-client/dist/oidc-client.min.js wwwroot/scripts/ & cpx node_modules/redoc/dist/redoc.min.js wwwroot/scripts/ && webpack-dev-server --config app-config/webpack.run.dev.js --inline --port 3000",
     "build": "webpack --config app-config/webpack.run.prod.js --display-error-details --bail",
     "build:nobail": "webpack --config app-config/webpack.run.prod.js --display-error-details",
-    "build:copy": "cpx node_modules/oidc-client/dist/oidc-client.min.js wwwroot/scripts/ & cpx node_modules/redoc/dist/redoc.min.js wwwroot/scripts/",
+    "build:copy": "cpx node_modules/oidc-client/dist/oidc-client.min.js wwwroot/scripts/",
     "build:clean": "rimraf wwwroot/build"
   },
   "dependencies": {
@@ -38,7 +38,6 @@
     "progressbar.js": "1.0.1",
     "react": "16.0.0",
     "react-dom": "16.0.0",
-    "redoc": "1.19.1",
     "rxjs": "5.5.2",
     "zone.js": "0.8.18"
   },

@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  RuleDequeuerTests.cs
+//  RuleDequeuerGrainTests.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -7,7 +7,6 @@
 // ==========================================================================
 
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
 using NodaTime;
@@ -25,14 +24,21 @@ namespace Squidex.Domain.Apps.Read.Rules
     {
         private readonly IClock clock = A.Fake<IClock>();
         private readonly ISemanticLog log = A.Fake<ISemanticLog>();
-        private readonly IRuleRepository ruleRepository = A.Fake<IRuleRepository>();
+        private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
         private readonly IRuleEventRepository ruleEventRepository = A.Fake<IRuleEventRepository>();
         private readonly RuleService ruleService = A.Fake<RuleService>();
+        private readonly RuleDequeuer sut;
         private readonly Instant now = SystemClock.Instance.GetCurrentInstant();
 
         public RuleDequeuerTests()
         {
             A.CallTo(() => clock.GetCurrentInstant()).Returns(now);
+
+            sut = new RuleDequeuer(
+                ruleService,
+                ruleEventRepository,
+                log,
+                clock);
         }
 
         [Theory]
@@ -42,7 +48,7 @@ namespace Squidex.Domain.Apps.Read.Rules
         [InlineData(2, 360, RuleResult.Failed,  RuleJobResult.Retry)]
         [InlineData(3, 720, RuleResult.Failed,  RuleJobResult.Retry)]
         [InlineData(4, 0,   RuleResult.Failed,  RuleJobResult.Failed)]
-        public void Should_set_next_attempt_based_on_num_calls(int calls, int minutes, RuleResult result, RuleJobResult jobResult)
+        public async Task Should_set_next_attempt_based_on_num_calls(int calls, int minutes, RuleResult result, RuleJobResult jobResult)
         {
             var actionData = new RuleJobData();
             var actionName = "MyAction";
@@ -52,17 +58,8 @@ namespace Squidex.Domain.Apps.Read.Rules
             var requestElapsed = TimeSpan.FromMinutes(1);
             var requestDump = "Dump";
 
-            SetupSender(@event, requestDump, result, requestElapsed);
-            SetupPendingEvents(@event);
-
-            var sut = new RuleDequeuer(
-                ruleService,
-                ruleEventRepository,
-                log,
-                clock);
-
-            sut.Next();
-            sut.Dispose();
+            A.CallTo(() => ruleService.InvokeAsync(@event.Job.ActionName, @event.Job.ActionData))
+                .Returns((requestDump, result, requestElapsed));
 
             Instant? nextCall = null;
 
@@ -71,33 +68,11 @@ namespace Squidex.Domain.Apps.Read.Rules
                 nextCall = now.Plus(Duration.FromMinutes(minutes));
             }
 
-            VerifyRepositories(@event, requestDump, result, jobResult, requestElapsed, nextCall);
-        }
+            await sut.HandleAsync(@event);
 
-        private void SetupSender(IRuleEventEntity @event, string requestDump, RuleResult requestResult, TimeSpan requestTime)
-        {
-            A.CallTo(() => ruleService.InvokeAsync(@event.Job.ActionName, @event.Job.ActionData))
-                .Returns((requestDump, requestResult, requestTime));
-        }
+            sut.Dispose();
 
-        private void SetupPendingEvents(IRuleEventEntity @event)
-        {
-            A.CallTo(() => ruleEventRepository.QueryPendingAsync(
-                now,
-                A<Func<IRuleEventEntity, Task>>.Ignored,
-                A<CancellationToken>.Ignored))
-                .Invokes(async (Instant n, Func<IRuleEventEntity, Task> callback, CancellationToken ct) =>
-                {
-                    await callback(@event);
-                });
-        }
-
-        private void VerifyRepositories(IRuleEventEntity @event, string dump, RuleResult result, RuleJobResult jobResult, TimeSpan elapsed, Instant? nextCall)
-        {
-            A.CallTo(() => ruleEventRepository.MarkSendingAsync(@event.Id))
-                .MustHaveHappened();
-
-            A.CallTo(() => ruleEventRepository.MarkSentAsync(@event.Id, dump, result, jobResult, elapsed, nextCall))
+            A.CallTo(() => ruleEventRepository.MarkSentAsync(@event.Id, requestDump, result, jobResult, requestElapsed, nextCall))
                 .MustHaveHappened();
         }
 

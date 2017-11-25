@@ -1,0 +1,107 @@
+﻿@model Squidex.Areas.IdentityServer.Controllers.Account.LoginVM
+
+@{
+    var type = Model.IsLogin ? "Login" : "Signup";
+
+    ViewBag.Theme = "white";
+    ViewBag.Title = type;
+}
+
+<div class="profile">
+    <img class="profile-logo" src="~/images/logo-small.png" />
+    
+    <div class="container">
+        <div class="row text-center">
+            <div class="btn-group profile-headline">
+                @if (Model.IsLogin)
+                {
+                    <a class="btn btn-toggle btn-primary" asp-controller="Account" asp-action="Login" asp-route-returnurl="@Model.ReturnUrl">Login</a>
+                }
+                else
+                {
+                    <a class="btn btn-toggle" asp-controller="Account" asp-action="Login" asp-route-returnurl="@Model.ReturnUrl">Login</a>
+                }
+                @if (!Model.IsLogin)
+                {
+                    <a class="btn btn-toggle btn-primary" asp-controller="Account" asp-action="Signup" asp-route-returnurl="@Model.ReturnUrl">Signup</a>
+                }
+                else
+                {
+                    <a class="btn btn-toggle" asp-controller="Account" asp-action="Signup" asp-route-returnurl="@Model.ReturnUrl">Signup</a>
+                }
+            </div>
+        </div>
+    </div>
+
+    <form asp-controller="Account" asp-action="External" asp-route-returnurl="@Model.ReturnUrl" method="post">
+        @foreach (var provider in Model.ExternalProviders)
+        {
+            var schema = provider.AuthenticationScheme.ToLowerInvariant();
+
+            <div class="form-group">
+                <button class="btn external-button btn-block btn btn-@schema" type="submit" name="provider" value="@provider.AuthenticationScheme">
+                    <i class="icon-@schema external-icon"></i> @type with <strong>@provider.AuthenticationScheme</strong>
+                </button>
+            </div>
+        }
+    </form>
+
+    @if (Model.HasPasswordAndExternal)
+    {
+        <div class="profile-separator">
+            <div class="profile-separator-text">OR</div>
+        </div>
+    }
+
+    @if (@Model.HasPasswordAuth)
+    {
+        @if (Model.IsLogin)
+         {
+            @if (Model.IsFailed)
+            {
+                <div class="form-alert form-alert-error">Email or password not correct.</div>
+            }
+
+            <form asp-controller="Account" asp-action="Login" asp-route-returnurl="@Model.ReturnUrl" method="post">
+                <div class="form-group">
+                    <input type="email" class="form-control" name="email" id="email" placeholder="Enter Email" />
+                </div>
+
+                <div class="form-group">
+                    <input type="password" class="form-control" name="password" id="password" placeholder="Enter Password" />
+                </div>
+
+                <button type="submit" class="btn btn-block btn-primary">@type</button>
+            </form>
+         }
+         else
+         {
+             <div class="profile-password-signup text-center">Ask your administrator to create an account.</div>
+         }
+    }
+
+    @if (Model.IsLogin)
+    {
+        <p class="profile-footer">
+            No account yet? <a asp-controller="Account" asp-action="Signup" asp-route-returnurl="@Model.ReturnUrl">Click here to signup</a>
+        </p>
+    }
+    else
+    {
+        <p class="profile-footer">
+            Already registered? <a asp-controller="Account" asp-action="Login" asp-route-returnurl="@Model.ReturnUrl">Click here to login</a>
+        </p>
+    }
+</div>
+
+@if (!Model.HasPasswordAuth && Model.ExternalProviders.Count == 1)
+{
+    <script>
+        var redirectButtons = document.getElementsByClassName("redirect-button");
+
+        if (redirectButtons.length === 1) {
+            debugger;
+            redirectButtons[0].click();
+        }
+    </script>
+}

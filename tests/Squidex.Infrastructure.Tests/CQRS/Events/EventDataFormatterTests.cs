@@ -38,7 +38,7 @@ namespace Squidex.Infrastructure.CQRS.Events
 
         public EventDataFormatterTests()
         {
-            serializerSettings.Converters.Add(new PropertiesBagConverter());
+            serializerSettings.Converters.Add(new PropertiesBagConverter<EnvelopeHeaders>());
 
             typeNameRegistry.Map(typeof(MyEvent), "Event");
             typeNameRegistry.Map(typeof(MyOldEvent), "OldEvent");

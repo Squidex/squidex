@@ -6,6 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System.Collections.Immutable;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Schemas
@@ -13,23 +14,120 @@ namespace Squidex.Domain.Apps.Core.Schemas
     [TypeName(nameof(StringField))]
     public sealed class StringFieldProperties : FieldProperties
     {
-        public int? MinLength { get; set; }
+        private int? minLength;
+        private int? maxLength;
+        private string pattern;
+        private string patternMessage;
+        private string defaultValue;
+        private ImmutableList<string> allowedValues;
+        private StringFieldEditor editor;
 
-        public int? MaxLength { get; set; }
+        public int? MinLength
+        {
+            get
+            {
+                return minLength;
+            }
+            set
+            {
+                ThrowIfFrozen();
 
-        public string DefaultValue { get; set; }
+                minLength = value;
+            }
+        }
 
-        public string Pattern { get; set; }
+        public int? MaxLength
+        {
+            get
+            {
+                return maxLength;
+            }
+            set
+            {
+                ThrowIfFrozen();
 
-        public string PatternMessage { get; set; }
+                maxLength = value;
+            }
+        }
 
-        public string[] AllowedValues { get; set; }
+        public string DefaultValue
+        {
+            get
+            {
+                return defaultValue;
+            }
+            set
+            {
+                ThrowIfFrozen();
 
-        public StringFieldEditor Editor { get; set; }
+                defaultValue = value;
+            }
+        }
+
+        public string Pattern
+        {
+            get
+            {
+                return pattern;
+            }
+            set
+            {
+                ThrowIfFrozen();
+
+                pattern = value;
+            }
+        }
+
+        public string PatternMessage
+        {
+            get
+            {
+                return patternMessage;
+            }
+            set
+            {
+                ThrowIfFrozen();
+
+                patternMessage = value;
+            }
+        }
+
+        public ImmutableList<string> AllowedValues
+        {
+            get
+            {
+                return allowedValues;
+            }
+            set
+            {
+                ThrowIfFrozen();
+
+                allowedValues = value;
+            }
+        }
+
+        public StringFieldEditor Editor
+        {
+            get
+            {
+                return editor;
+            }
+            set
+            {
+                ThrowIfFrozen();
+
+                editor = value;
+            }
+        }
 
         public override T Accept<T>(IFieldPropertiesVisitor<T> visitor)
         {
             return visitor.Visit(this);
+        }
+
+        public override Field CreateField(long id, string name, Partitioning partitioning)
+        {
+            return new StringField(id, name, partitioning, this);
         }
     }
 }

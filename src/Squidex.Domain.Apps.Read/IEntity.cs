@@ -13,10 +13,10 @@ namespace Squidex.Domain.Apps.Read
 {
     public interface IEntity
     {
-        Guid Id { get; }
+        Guid Id { get; set; }
 
-        Instant Created { get; }
+        Instant Created { get; set; }
 
-        Instant LastModified { get; }
+        Instant LastModified { get; set; }
     }
 }

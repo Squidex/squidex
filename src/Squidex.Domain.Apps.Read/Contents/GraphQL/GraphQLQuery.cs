@@ -6,6 +6,8 @@
 //  All rights reserved.
 // ==========================================================================
 
+using Newtonsoft.Json.Linq;
+
 namespace Squidex.Domain.Apps.Read.Contents.GraphQL
 {
     public class GraphQLQuery
@@ -16,6 +18,6 @@ namespace Squidex.Domain.Apps.Read.Contents.GraphQL
 
         public string Query { get; set; }
 
-        public string Variables { get; set; }
+        public JObject Variables { get; set; }
     }
 }

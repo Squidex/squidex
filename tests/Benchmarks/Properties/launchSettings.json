@@ -1,8 +1,7 @@
 {
   "profiles": {
     "Benchmarks": {
-      "commandName": "Project",
-      "commandLineArgs": "handleEvents"
+      "commandName": "Project"
     }
   }
 }

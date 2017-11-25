@@ -12,6 +12,6 @@ namespace Squidex.Domain.Apps.Read
 {
     public interface IEntityWithCreatedBy
     {
-        RefToken CreatedBy { get; set; }
+        RefToken CreatedBy { get; }
     }
 }

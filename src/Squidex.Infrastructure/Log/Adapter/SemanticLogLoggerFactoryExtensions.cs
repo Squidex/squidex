@@ -20,11 +20,11 @@ namespace Squidex.Infrastructure.Log.Adapter
             return builder;
         }
 
-        public static LoggerFactory AddSemanticLog(this LoggerFactory builder, ISemanticLog log)
+        public static ILoggerFactory AddSemanticLog(this ILoggerFactory factory, ISemanticLog log)
         {
-            builder.AddProvider(new SemanticLogLoggerProvider(log));
+            factory.AddProvider(new SemanticLogLoggerProvider(log));
 
-            return builder;
+            return factory;
         }
     }
 }

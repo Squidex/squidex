@@ -11,7 +11,7 @@ using Squidex.Domain.Apps.Core.Contents;
 
 namespace Squidex.Domain.Apps.Read.Contents
 {
-    public interface IContentEntity : IAppRefEntity, IEntityWithCreatedBy, IEntityWithLastModifiedBy, IEntityWithVersion
+    public interface IContentEntity : IEntityWithAppRef, IEntityWithCreatedBy, IEntityWithLastModifiedBy, IEntityWithVersion
     {
         Status Status { get; }
 

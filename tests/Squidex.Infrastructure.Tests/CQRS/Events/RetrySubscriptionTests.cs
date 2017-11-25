@@ -26,20 +26,22 @@ namespace Squidex.Infrastructure.CQRS.Events
         {
             A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(eventSubscription);
 
-            sut = new RetrySubscription(eventStore, eventSubscriber, streamFilter, null) { ReconnectWaitMs = 0 };
+            sut = new RetrySubscription(eventStore, eventSubscriber, streamFilter, null) { ReconnectWaitMs = 100 };
 
             sutSubscriber = sut;
         }
 
         [Fact]
-        public void Should_subscribe_after_constructor()
+        public async Task Should_subscribe_after_constructor()
         {
+            await sut.StopAsync();
+
             A.CallTo(() => eventStore.CreateSubscription(sut, streamFilter, null))
                 .MustHaveHappened();
         }
 
         [Fact]
-        public async Task Should_reopen_subscription_when_exception_is_retrieved()
+        public async Task Should_reopen_subscription_once_when_exception_is_retrieved()
         {
             await OnErrorAsync(eventSubscription, new InvalidOperationException());
 
@@ -63,26 +65,14 @@ namespace Squidex.Infrastructure.CQRS.Events
             var ex = new InvalidOperationException();
 
             await OnErrorAsync(eventSubscription, ex);
-            await OnErrorAsync(eventSubscription, ex);
-            await OnErrorAsync(eventSubscription, ex);
-            await OnErrorAsync(eventSubscription, ex);
-            await OnErrorAsync(eventSubscription, ex);
-            await OnErrorAsync(eventSubscription, ex);
+            await OnErrorAsync(null, ex);
+            await OnErrorAsync(null, ex);
+            await OnErrorAsync(null, ex);
+            await OnErrorAsync(null, ex);
+            await OnErrorAsync(null, ex);
             await sut.StopAsync();
 
             A.CallTo(() => eventSubscriber.OnErrorAsync(sut, ex))
-                .MustHaveHappened();
-        }
-
-        [Fact]
-        public async Task Should_forward_event_from_inner_subscription()
-        {
-            var ev = new StoredEvent("1", 2, new EventData());
-
-            await OnEventAsync(eventSubscription, ev);
-            await sut.StopAsync();
-
-            A.CallTo(() => eventSubscriber.OnEventAsync(sut, ev))
                 .MustHaveHappened();
         }
 
@@ -96,6 +86,18 @@ namespace Squidex.Infrastructure.CQRS.Events
 
             A.CallTo(() => eventSubscriber.OnErrorAsync(A<IEventSubscription>.Ignored, A<Exception>.Ignored))
                 .MustNotHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_forward_event_from_inner_subscription()
+        {
+            var ev = new StoredEvent("1", 2, new EventData());
+
+            await OnEventAsync(eventSubscription, ev);
+            await sut.StopAsync();
+
+            A.CallTo(() => eventSubscriber.OnEventAsync(sut, ev))
+                .MustHaveHappened();
         }
 
         [Fact]

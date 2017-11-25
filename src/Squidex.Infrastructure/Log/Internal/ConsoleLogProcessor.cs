@@ -8,12 +8,13 @@
 
 using System;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 namespace Squidex.Infrastructure.Log.Internal
 {
-    public class ConsoleLogProcessor : DisposableObjectBase
+    public sealed class ConsoleLogProcessor : DisposableObjectBase
     {
         private const int MaxQueuedMessages = 1024;
         private readonly IConsole console;
@@ -24,7 +25,7 @@ namespace Squidex.Infrastructure.Log.Internal
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                console = new WindowsLogConsole(false);
+                console = new WindowsLogConsole(true);
             }
             else
             {
@@ -36,15 +37,20 @@ namespace Squidex.Infrastructure.Log.Internal
 
         public void EnqueueMessage(LogMessageEntry message)
         {
-            messageQueue.Add(message);
-        }
-
-        private void ProcessLogQueue()
-        {
-            foreach (var entry in messageQueue.GetConsumingEnumerable())
+            if (!messageQueue.IsAddingCompleted)
             {
-                console.WriteLine(entry.IsError, entry.Message);
+                try
+                {
+                    messageQueue.Add(message);
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Failed to enqueue log message: {ex}.");
+                }
             }
+
+            WriteMessage(message);
         }
 
         private static void ProcessLogQueue(object state)
@@ -54,12 +60,24 @@ namespace Squidex.Infrastructure.Log.Internal
             processor.ProcessLogQueue();
         }
 
+        private void ProcessLogQueue()
+        {
+            foreach (var entry in messageQueue.GetConsumingEnumerable())
+            {
+                WriteMessage(entry);
+            }
+        }
+
+        private void WriteMessage(LogMessageEntry entry)
+        {
+            console.WriteLine(entry.Color, entry.Message);
+        }
+
         protected override void DisposeObject(bool disposing)
         {
             if (disposing)
             {
                 messageQueue.CompleteAdding();
-                messageQueue.Dispose();
 
                 try
                 {
@@ -67,10 +85,7 @@ namespace Squidex.Infrastructure.Log.Internal
                 }
                 catch (Exception ex)
                 {
-                    if (!ex.Is<OperationCanceledException>())
-                    {
-                        throw;
-                    }
+                    Debug.WriteLine($"Failed to shutdown log queue grateful: {ex}.");
                 }
             }
         }

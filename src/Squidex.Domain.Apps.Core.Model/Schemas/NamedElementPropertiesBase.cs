@@ -6,12 +6,41 @@
 //  All rights reserved.
 // ==========================================================================
 
+using Squidex.Infrastructure;
+
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    public abstract class NamedElementPropertiesBase
+    public abstract class NamedElementPropertiesBase : Freezable
     {
-        public string Label { get; set; }
+        private string label;
+        private string hints;
 
-        public string Hints { get; set; }
+        public string Label
+        {
+            get
+            {
+                return label;
+            }
+            set
+            {
+                ThrowIfFrozen();
+
+                label = value;
+            }
+        }
+
+        public string Hints
+        {
+            get
+            {
+                return hints;
+            }
+            set
+            {
+                ThrowIfFrozen();
+
+                hints = value;
+            }
+        }
     }
 }

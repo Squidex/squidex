@@ -20,7 +20,7 @@ namespace Squidex.Infrastructure.Json
                 return null;
             }
 
-            return ReadValue(reader, serializer);
+            return ReadValue(reader, objectType, serializer);
         }
 
         public sealed override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
@@ -41,6 +41,6 @@ namespace Squidex.Infrastructure.Json
 
         protected abstract void WriteValue(JsonWriter writer, T value, JsonSerializer serializer);
 
-        protected abstract T ReadValue(JsonReader reader, JsonSerializer serializer);
+        protected abstract T ReadValue(JsonReader reader, Type objectType, JsonSerializer serializer);
     }
 }

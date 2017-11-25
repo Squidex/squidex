@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Read.Rules
     public sealed class RuleEnqueuer : IEventConsumer
     {
         private readonly IRuleEventRepository ruleEventRepository;
-        private readonly IRuleRepository ruleRepository;
+        private readonly IAppProvider appProvider;
         private readonly RuleService ruleService;
 
         public string Name
@@ -33,17 +33,18 @@ namespace Squidex.Domain.Apps.Read.Rules
         }
 
         public RuleEnqueuer(
-            IRuleEventRepository ruleEventRepository,
-            IRuleRepository ruleRepository,
+            IRuleEventRepository ruleEventRepository, IAppProvider appProvider,
             RuleService ruleService)
         {
             Guard.NotNull(ruleEventRepository, nameof(ruleEventRepository));
-            Guard.NotNull(ruleRepository, nameof(ruleRepository));
             Guard.NotNull(ruleService, nameof(ruleService));
 
+            Guard.NotNull(appProvider, nameof(appProvider));
+
             this.ruleEventRepository = ruleEventRepository;
-            this.ruleRepository = ruleRepository;
             this.ruleService = ruleService;
+
+            this.appProvider = appProvider;
         }
 
         public Task ClearAsync()
@@ -55,11 +56,11 @@ namespace Squidex.Domain.Apps.Read.Rules
         {
             if (@event.Payload is AppEvent appEvent)
             {
-                var rules = await ruleRepository.QueryCachedByAppAsync(appEvent.AppId.Id);
+                var rules = await appProvider.GetRulesAsync(appEvent.AppId.Name);
 
                 foreach (var ruleEntity in rules)
                 {
-                    var job = ruleService.CreateJob(ruleEntity.Rule, @event);
+                    var job = ruleService.CreateJob(ruleEntity.RuleDef, @event);
 
                     if (job != null)
                     {

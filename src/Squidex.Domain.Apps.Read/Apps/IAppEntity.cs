@@ -6,13 +6,14 @@
 //  All rights reserved.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Apps;
 
 namespace Squidex.Domain.Apps.Read.Apps
 {
     public interface IAppEntity : IEntity, IEntityWithVersion
     {
+        string Etag { get; }
+
         string Name { get; }
 
         string PlanId { get; }
@@ -24,7 +25,5 @@ namespace Squidex.Domain.Apps.Read.Apps
         AppContributors Contributors { get; }
 
         LanguagesConfig LanguagesConfig { get; }
-
-        PartitionResolver PartitionResolver { get; }
     }
 }

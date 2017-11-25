@@ -7,9 +7,11 @@
 // ==========================================================================
 
 using System;
+using System.Runtime.Serialization;
 
 namespace Squidex.Infrastructure
 {
+    [Serializable]
     public class DomainObjectException : Exception
     {
         private readonly string id;
@@ -31,6 +33,11 @@ namespace Squidex.Infrastructure
             this.id = id;
 
             typeName = type?.Name;
+        }
+
+        protected DomainObjectException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        {
         }
     }
 }

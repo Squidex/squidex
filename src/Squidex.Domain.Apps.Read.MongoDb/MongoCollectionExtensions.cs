@@ -18,25 +18,14 @@ namespace Squidex.Domain.Apps.Read.MongoDb
 {
     public static class MongoCollectionExtensions
     {
-        public static Task CreateAsync<T>(this IMongoCollection<T> collection, SquidexEvent @event, EnvelopeHeaders headers, Action<T> updater) where T : class, IMongoEntity, new()
+        public static Task CreateAsync<T>(this IMongoCollection<T> collection, SquidexEvent @event, EnvelopeHeaders headers, Action<T> updater) where T : class, IEntity, new()
         {
-            var entity = EntityMapper.Create<T>(@event, headers);
-
-            updater(entity);
+            var entity = EntityMapper.Create(@event, headers, updater);
 
             return collection.InsertOneIfNotExistsAsync(entity);
         }
 
-        public static async Task CreateAsync<T>(this IMongoCollection<T> collection, SquidexEvent @event, EnvelopeHeaders headers, Func<T, Task> updater) where T : class, IMongoEntity, new()
-        {
-            var entity = EntityMapper.Create<T>(@event, headers);
-
-            await updater(entity);
-
-            await collection.InsertOneIfNotExistsAsync(entity);
-        }
-
-        public static async Task UpdateAsync<T>(this IMongoCollection<T> collection, SquidexEvent @event, EnvelopeHeaders headers, Action<T> updater) where T : class, IMongoEntity, new()
+        public static async Task UpdateAsync<T>(this IMongoCollection<T> collection, SquidexEvent @event, EnvelopeHeaders headers, Action<T> updater) where T : class, IEntity, new()
         {
             var entity =
                 await collection.Find(t => t.Id == headers.AggregateId())
@@ -50,7 +39,7 @@ namespace Squidex.Domain.Apps.Read.MongoDb
             await collection.UpdateAsync(@event, headers, entity, updater);
         }
 
-        public static async Task<bool> TryUpdateAsync<T>(this IMongoCollection<T> collection, SquidexEvent @event, EnvelopeHeaders headers, Action<T> updater) where T : class, IMongoEntity, new()
+        public static async Task<bool> TryUpdateAsync<T>(this IMongoCollection<T> collection, SquidexEvent @event, EnvelopeHeaders headers, Action<T> updater) where T : class, IEntity, new()
         {
             var entity =
                 await collection.Find(t => t.Id == headers.AggregateId())
@@ -76,11 +65,9 @@ namespace Squidex.Domain.Apps.Read.MongoDb
             return false;
         }
 
-        private static async Task UpdateAsync<T>(this IMongoCollection<T> collection, SquidexEvent @event, EnvelopeHeaders headers, T entity, Action<T> updater) where T : class, IMongoEntity, new()
+        private static async Task UpdateAsync<T>(this IMongoCollection<T> collection, SquidexEvent @event, EnvelopeHeaders headers, T entity, Action<T> updater) where T : class, IEntity, new()
         {
-            EntityMapper.Update(@event, headers, entity);
-
-            updater(entity);
+            entity.Update(@event, headers, updater);
 
             await collection.ReplaceOneAsync(t => t.Id == entity.Id, entity);
         }

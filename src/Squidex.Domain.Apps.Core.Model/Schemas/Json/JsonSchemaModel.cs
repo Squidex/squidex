@@ -14,6 +14,8 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
 {
     public sealed class JsonSchemaModel
     {
+        private static readonly Field[] Empty = new Field[0];
+
         [JsonProperty]
         public string Name { get; set; }
 
@@ -54,46 +56,40 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
 
         public Schema ToSchema(FieldRegistry fieldRegistry)
         {
-            var schema = new Schema(Name);
+            Field[] fields = Empty;
 
             if (Fields != null)
             {
-                foreach (var fieldModel in Fields)
+                fields = new Field[Fields.Count];
+
+                for (var i = 0; i < fields.Length; i++)
                 {
+                    var fieldModel = Fields[i];
+
                     var parititonKey = new Partitioning(fieldModel.Partitioning);
 
                     var field = fieldRegistry.CreateField(fieldModel.Id, fieldModel.Name, parititonKey, fieldModel.Properties);
 
                     if (fieldModel.IsDisabled)
                     {
-                        field.Disable();
+                        field = field.Disable();
                     }
 
                     if (fieldModel.IsLocked)
                     {
-                        field.Lock();
+                        field = field.Lock();
                     }
 
                     if (fieldModel.IsHidden)
                     {
-                        field.Hide();
+                        field = field.Hide();
                     }
 
-                    schema.AddField(field);
+                    fields[i] = field;
                 }
             }
 
-            if (IsPublished)
-            {
-                schema.Publish();
-            }
-
-            if (Properties != null)
-            {
-                schema.Update(Properties);
-            }
-
-            return schema;
+            return new Schema(Name, fields, Properties, IsPublished);
         }
     }
 }

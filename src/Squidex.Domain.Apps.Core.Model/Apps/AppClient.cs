@@ -6,6 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System.Diagnostics.Contracts;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Apps
@@ -13,8 +14,8 @@ namespace Squidex.Domain.Apps.Core.Apps
     public sealed class AppClient
     {
         private readonly string secret;
-        private string name;
-        private AppClientPermission permission;
+        private readonly string name;
+        private readonly AppClientPermission permission;
 
         public string Name
         {
@@ -42,18 +43,20 @@ namespace Squidex.Domain.Apps.Core.Apps
             this.permission = permission;
         }
 
-        public void Update(AppClientPermission newPermission)
+        [Pure]
+        public AppClient Update(AppClientPermission newPermission)
         {
             Guard.Enum(newPermission, nameof(newPermission));
 
-            permission = newPermission;
+            return new AppClient(name, secret, newPermission);
         }
 
-        public void Rename(string newName)
+        [Pure]
+        public AppClient Rename(string newName)
         {
             Guard.NotNullOrEmpty(newName, nameof(newName));
 
-            name = newName;
+            return new AppClient(newName, secret, permission);
         }
     }
 }

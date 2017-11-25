@@ -14,9 +14,36 @@ namespace Squidex.Domain.Apps.Core.Rules.Actions
     [TypeName(nameof(WebhookAction))]
     public sealed class WebhookAction : RuleAction
     {
-        public Uri Url { get; set; }
+        private Uri url;
+        private string sharedSecret;
 
-        public string SharedSecret { get; set; }
+        public Uri Url
+        {
+            get
+            {
+                return url;
+            }
+            set
+            {
+                ThrowIfFrozen();
+
+                url = value;
+            }
+        }
+
+        public string SharedSecret
+        {
+            get
+            {
+                return sharedSecret;
+            }
+            set
+            {
+                ThrowIfFrozen();
+
+                sharedSecret = value;
+            }
+        }
 
         public override T Accept<T>(IRuleActionVisitor<T> visitor)
         {

@@ -13,7 +13,7 @@ using NodaTime;
 
 namespace Squidex.Infrastructure.MongoDb
 {
-    public abstract class MongoEntity : IMongoEntity
+    public abstract class MongoEntity
     {
         [BsonId]
         [BsonElement]

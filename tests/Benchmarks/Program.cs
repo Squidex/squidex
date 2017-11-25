@@ -16,29 +16,28 @@ namespace Benchmarks
 {
     public static class Program
     {
-        private static readonly List<IBenchmark> Benchmarks = new List<IBenchmark>
+        private static readonly List<(string Name, Benchmark Benchmark)> Benchmarks = new Benchmark[]
         {
             new AppendToEventStore(),
             new AppendToEventStoreWithManyWriters(),
             new HandleEvents(),
-            new HandleEventsWithManyWriters()
-        };
+            new HandleEventsWithManyWriters(),
+            new ReadSchemaState()
+        }.Select(x => (x.GetType().Name, x)).ToList();
 
         public static void Main(string[] args)
         {
-            var id = args.Length > 0 ? args[0] : string.Empty;
+            var name = "ReadSchemaState";
 
-            var benchmark = Benchmarks.Find(x => x.Id == id);
+            var selected = Benchmarks.Find(x => x.Name == name);
 
-            if (benchmark == null)
+            if (selected.Benchmark == null)
             {
-                Console.WriteLine($"'{id}' is not a valid benchmark, please try: ");
-
-                var longestId = Benchmarks.Max(x => x.Id.Length);
+                Console.WriteLine($"'{name}' is not a valid benchmark, please try: ");
 
                 foreach (var b in Benchmarks)
                 {
-                    Console.WriteLine($" * {b.Id.PadRight(longestId)}: {b.Name}");
+                    Console.WriteLine($" * {b.Name}");
                 }
             }
             else
@@ -50,36 +49,36 @@ namespace Benchmarks
                     var elapsed = 0d;
                     var count = 0L;
 
-                    Console.WriteLine($"{benchmark.Name}: Initialized");
+                    Console.WriteLine($"{selected.Name}: Initialized");
 
-                    benchmark.Initialize();
+                    selected.Benchmark.Initialize();
 
                     for (var run = 0; run < numRuns; run++)
                     {
                         try
                         {
-                            benchmark.RunInitialize();
+                            selected.Benchmark.RunInitialize();
 
                             var watch = Stopwatch.StartNew();
 
-                            count += benchmark.Run();
+                            count += selected.Benchmark.Run();
 
                             watch.Stop();
 
                             elapsed += watch.ElapsedMilliseconds;
 
-                            Console.WriteLine($"{benchmark.Name}: Run {run + 1} finished");
+                            Console.WriteLine($"{selected.Name}: Run {run + 1} finished");
                         }
                         finally
                         {
-                            benchmark.RunCleanup();
+                            selected.Benchmark.RunCleanup();
                         }
                     }
 
                     var averageElapsed = TimeSpan.FromMilliseconds(elapsed / numRuns);
                     var averageSeconds = Math.Round(count / (numRuns * averageElapsed.TotalSeconds), 2);
 
-                    Console.WriteLine($"{benchmark.Name}: Completed after {averageElapsed}, {averageSeconds} items/s");
+                    Console.WriteLine($"{selected.Name}: Completed after {averageElapsed}, {averageSeconds} items/s");
                 }
                 catch (Exception e)
                 {
@@ -87,9 +86,11 @@ namespace Benchmarks
                 }
                 finally
                 {
-                    benchmark.Cleanup();
+                    selected.Benchmark.Cleanup();
                 }
             }
+
+            Console.ReadLine();
         }
     }
 }
