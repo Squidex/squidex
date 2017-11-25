@@ -23,6 +23,11 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
             {
                 return default(T);
             }
+
+            public override Field CreateField(long id, string name, Partitioning partitioning)
+            {
+                return null;
+            }
         }
 
         [Fact]
