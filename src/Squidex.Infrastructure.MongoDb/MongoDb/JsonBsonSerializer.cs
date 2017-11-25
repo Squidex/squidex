@@ -27,12 +27,16 @@ namespace Squidex.Infrastructure.MongoDb
 
         protected override T DeserializeValue(BsonDeserializationContext context, BsonDeserializationArgs args)
         {
-            return BsonSerializer.Deserialize<BsonDocument>(context.Reader).ToJson().ToObject<T>(serializer);
+            var jsonReader = new BsonJsonReader(context.Reader);
+
+            return serializer.Deserialize<T>(jsonReader);
         }
 
         protected override void SerializeValue(BsonSerializationContext context, BsonSerializationArgs args, T value)
         {
-            BsonSerializer.Serialize(context.Writer, JObject.FromObject(value, serializer).ToBson());
+            var jsonWriter = new BsonJsonWriter(context.Writer);
+
+            serializer.Serialize(jsonWriter, value);
         }
     }
 }

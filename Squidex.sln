@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27004.2006
+VisualStudioVersion = 15.0.27004.2009
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex", "src\Squidex\Squidex.csproj", "{61F6BBCE-A080-4400-B194-70E2F5D2096E}"
 EndProject
@@ -62,6 +62,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex.Domain.Apps.Core.Model", "src\Squidex.Domain.Apps.Core.Model\Squidex.Domain.Apps.Core.Model.csproj", "{F0A83301-50A5-40EA-A1A2-07C7858F5A3F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex.Domain.Apps.Core.Operations", "src\Squidex.Domain.Apps.Core.Operations\Squidex.Domain.Apps.Core.Operations.csproj", "{6B3F75B6-5888-468E-BA4F-4FC725DAEF31}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benchmarks", "tests\Benchmarks\Benchmarks.csproj", "{9B4A55F4-D9A4-4FC3-8D85-02A9EF93FBAB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -301,6 +303,18 @@ Global
 		{6B3F75B6-5888-468E-BA4F-4FC725DAEF31}.Release|x64.Build.0 = Release|Any CPU
 		{6B3F75B6-5888-468E-BA4F-4FC725DAEF31}.Release|x86.ActiveCfg = Release|Any CPU
 		{6B3F75B6-5888-468E-BA4F-4FC725DAEF31}.Release|x86.Build.0 = Release|Any CPU
+		{9B4A55F4-D9A4-4FC3-8D85-02A9EF93FBAB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B4A55F4-D9A4-4FC3-8D85-02A9EF93FBAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B4A55F4-D9A4-4FC3-8D85-02A9EF93FBAB}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{9B4A55F4-D9A4-4FC3-8D85-02A9EF93FBAB}.Debug|x64.Build.0 = Debug|Any CPU
+		{9B4A55F4-D9A4-4FC3-8D85-02A9EF93FBAB}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{9B4A55F4-D9A4-4FC3-8D85-02A9EF93FBAB}.Debug|x86.Build.0 = Debug|Any CPU
+		{9B4A55F4-D9A4-4FC3-8D85-02A9EF93FBAB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B4A55F4-D9A4-4FC3-8D85-02A9EF93FBAB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9B4A55F4-D9A4-4FC3-8D85-02A9EF93FBAB}.Release|x64.ActiveCfg = Release|Any CPU
+		{9B4A55F4-D9A4-4FC3-8D85-02A9EF93FBAB}.Release|x64.Build.0 = Release|Any CPU
+		{9B4A55F4-D9A4-4FC3-8D85-02A9EF93FBAB}.Release|x86.ActiveCfg = Release|Any CPU
+		{9B4A55F4-D9A4-4FC3-8D85-02A9EF93FBAB}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

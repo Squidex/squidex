@@ -18,9 +18,9 @@ namespace Squidex.Domain.Apps.Core.Schemas
     public sealed class Schema : Cloneable<Schema>
     {
         private readonly string name;
-        private ImmutableList<Field> fieldsOrdered = ImmutableList<Field>.Empty;
-        private ImmutableDictionary<long, Field> fieldsById = ImmutableDictionary<long, Field>.Empty;
-        private ImmutableDictionary<string, Field> fieldsByName = ImmutableDictionary<string, Field>.Empty;
+        private ImmutableArray<Field> fieldsOrdered = ImmutableArray<Field>.Empty;
+        private ImmutableDictionary<long, Field> fieldsById;
+        private ImmutableDictionary<string, Field> fieldsByName;
         private SchemaProperties properties;
         private bool isPublished;
 
@@ -41,12 +41,42 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public IReadOnlyDictionary<long, Field> FieldsById
         {
-            get { return fieldsById; }
+            get
+            {
+                if (fieldsById == null)
+                {
+                    if (fieldsOrdered.Length == 0)
+                    {
+                        fieldsById = ImmutableDictionary<long, Field>.Empty;
+                    }
+                    else
+                    {
+                        fieldsById = fieldsOrdered.ToImmutableDictionary(x => x.Id);
+                    }
+                }
+
+                return fieldsById;
+            }
         }
 
         public IReadOnlyDictionary<string, Field> FieldsByName
         {
-            get { return fieldsByName; }
+            get
+            {
+                if (fieldsByName == null)
+                {
+                    if (fieldsOrdered.Length == 0)
+                    {
+                        fieldsByName = ImmutableDictionary<string, Field>.Empty;
+                    }
+                    else
+                    {
+                        fieldsByName = fieldsOrdered.ToImmutableDictionary(x => x.Name);
+                    }
+                }
+
+                return fieldsByName;
+            }
         }
 
         public SchemaProperties Properties
@@ -62,34 +92,17 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
             this.properties = properties ?? new SchemaProperties();
             this.properties.Freeze();
-
-            OnCloned();
         }
 
-        public Schema(string name, IEnumerable<Field> fields, SchemaProperties properties, bool isPublished)
+        public Schema(string name, Field[] fields, SchemaProperties properties, bool isPublished)
             : this(name, properties)
         {
             Guard.NotNullOrEmpty(name, nameof(name));
+            Guard.NotNull(fields, nameof(fields));
 
             this.isPublished = isPublished;
 
-            fieldsOrdered = ImmutableList<Field>.Empty.AddRange(fields);
-
-            OnCloned();
-        }
-
-        protected override void OnCloned()
-        {
-            if (fieldsOrdered.Count > 0)
-            {
-                fieldsById = fieldsOrdered.ToImmutableDictionary(x => x.Id);
-                fieldsByName = fieldsOrdered.ToImmutableDictionary(x => x.Name);
-            }
-            else
-            {
-                fieldsById = ImmutableDictionary<long, Field>.Empty;
-                fieldsByName = ImmutableDictionary<string, Field>.Empty;
-            }
+            fieldsOrdered = ImmutableArray.Create(fields);
         }
 
         [Pure]
@@ -195,14 +208,14 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
             Guard.NotNull(ids, nameof(ids));
 
-            if (ids.Count != fieldsOrdered.Count || ids.Any(x => !fieldsById.ContainsKey(x)))
+            if (ids.Count != fieldsOrdered.Length || ids.Any(x => !FieldsById.ContainsKey(x)))
             {
                 throw new ArgumentException("Ids must cover all fields.", nameof(ids));
             }
 
             return Clone(clone =>
             {
-                clone.fieldsOrdered = fieldsOrdered.OrderBy(f => ids.IndexOf(f.Id)).ToImmutableList();
+                clone.fieldsOrdered = fieldsOrdered.OrderBy(f => ids.IndexOf(f.Id)).ToImmutableArray();
             });
         }
 
@@ -211,7 +224,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
             Guard.NotNull(field, nameof(field));
 
-            if (fieldsByName.ContainsKey(field.Name) || fieldsById.ContainsKey(field.Id))
+            if (FieldsByName.ContainsKey(field.Name) || FieldsById.ContainsKey(field.Id))
             {
                 throw new ArgumentException($"A field with name '{field.Name}' and id {field.Id} already exists.", nameof(field));
             }
@@ -227,7 +240,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
             Guard.NotNull(updater, nameof(updater));
 
-            if (!fieldsById.TryGetValue(fieldId, out var field))
+            if (!FieldsById.TryGetValue(fieldId, out var field))
             {
                 return this;
             }

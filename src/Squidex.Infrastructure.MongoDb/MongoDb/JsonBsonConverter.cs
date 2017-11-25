@@ -20,9 +20,7 @@ namespace Squidex.Infrastructure.MongoDb
 
             foreach (var property in source)
             {
-                var key = ReplaceFirstCharacter(property.Key, '$', '§');
-
-                result.Add(key, property.Value.ToBson());
+                result.Add(property.Key.EscapeJson(), property.Value.ToBson());
             }
 
             return result;
@@ -34,9 +32,7 @@ namespace Squidex.Infrastructure.MongoDb
 
             foreach (var property in source)
             {
-                var key = ReplaceFirstCharacter(property.Name, '§', '$');
-
-                result.Add(key, property.Value.ToJson());
+                result.Add(property.Name.UnescapeBson(), property.Value.ToJson());
             }
 
             return result;
@@ -132,21 +128,6 @@ namespace Squidex.Infrastructure.MongoDb
             }
 
             throw new NotSupportedException($"Cannot convert {source.GetType()} to Json.");
-        }
-
-        private static string ReplaceFirstCharacter(string value, char toReplace, char replacement)
-        {
-            if (value.Length == 0 || value[0] != toReplace)
-            {
-                return value;
-            }
-
-            if (value.Length == 1)
-            {
-                return toReplace.ToString();
-            }
-
-            return replacement + value.Substring(1);
         }
     }
 }

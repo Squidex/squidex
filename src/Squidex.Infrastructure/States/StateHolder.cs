@@ -20,11 +20,11 @@ namespace Squidex.Infrastructure.States
 
         public T State { get; set; }
 
-        internal StateHolder(string key, Action written, IStateStore store)
+        public StateHolder(string key, Action written, IStateStore store)
         {
             this.key = key;
-            this.written = written;
             this.store = store;
+            this.written = written;
         }
 
         public async Task ReadAsync()

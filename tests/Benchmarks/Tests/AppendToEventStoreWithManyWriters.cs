@@ -1,0 +1,52 @@
+﻿// ==========================================================================
+//  AppendToEventStoreWithManyWriters.cs
+//  Squidex Headless CMS
+// ==========================================================================
+//  Copyright (c) Squidex Group
+//  All rights reserved.
+// ==========================================================================
+
+using System;
+using System.Threading.Tasks;
+using Benchmarks.Utils;
+using Microsoft.Extensions.DependencyInjection;
+using Squidex.Infrastructure.CQRS.Events;
+
+namespace Benchmarks.Tests
+{
+    public sealed class AppendToEventStoreWithManyWriters : IBenchmark
+    {
+        private IServiceProvider services;
+        private IEventStore eventStore;
+
+        public void RunInitialize()
+        {
+            services = Services.Create();
+
+            eventStore = services.GetRequiredService<IEventStore>();
+        }
+
+        public long Run()
+        {
+            const long numCommits = 200;
+            const long numStreams = 100;
+
+            Parallel.For(0, numStreams, streamId =>
+            {
+                var streamName = streamId.ToString();
+
+                for (var commitId = 0; commitId < numCommits; commitId++)
+                {
+                    eventStore.AppendEventsAsync(Guid.NewGuid(), streamName, new[] { Helper.CreateEventData() }).Wait();
+                }
+            });
+
+            return numCommits * numStreams;
+        }
+
+        public void RunCleanup()
+        {
+            services.Cleanup();
+        }
+    }
+}

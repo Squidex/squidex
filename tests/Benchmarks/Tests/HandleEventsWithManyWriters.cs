@@ -1,0 +1,70 @@
+﻿// ==========================================================================
+//  HandleEventsWithManyWriters.cs
+//  Squidex Headless CMS
+// ==========================================================================
+//  Copyright (c) Squidex Group
+//  All rights reserved.
+// ==========================================================================
+
+using System;
+using System.Threading.Tasks;
+using Benchmarks.Tests.TestData;
+using Microsoft.Extensions.DependencyInjection;
+using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure.CQRS.Events.Actors;
+using Squidex.Infrastructure.States;
+
+namespace Benchmarks.Tests
+{
+    public sealed class HandleEventsWithManyWriters : IBenchmark
+    {
+        private const int NumCommits = 200;
+        private const int NumStreams = 10;
+        private IServiceProvider services;
+        private IEventStore eventStore;
+        private EventConsumerActor eventConsumerActor;
+        private EventDataFormatter eventDataFormatter;
+        private MyEventConsumer eventConsumer;
+
+        public void RunInitialize()
+        {
+            services = Services.Create();
+
+            eventConsumer = new MyEventConsumer(NumStreams * NumCommits);
+
+            eventStore = services.GetRequiredService<IEventStore>();
+
+            eventDataFormatter = services.GetRequiredService<EventDataFormatter>();
+            eventConsumerActor = services.GetRequiredService<EventConsumerActor>();
+
+            eventConsumerActor.ActivateAsync(services.GetRequiredService<StateHolder<EventConsumerState>>()).Wait();
+            eventConsumerActor.Activate(eventConsumer);
+        }
+
+        public long Run()
+        {
+            Parallel.For(0, NumStreams, streamId =>
+            {
+                var eventOffset = -1;
+                var streamName = streamId.ToString();
+
+                for (var commitId = 0; commitId < NumCommits; commitId++)
+                {
+                    var eventData = eventDataFormatter.ToEventData(new Envelope<IEvent>(new MyEvent()), Guid.NewGuid());
+
+                    eventStore.AppendEventsAsync(Guid.NewGuid(), streamName, eventOffset - 1, new[] { eventData }).Wait();
+                    eventOffset++;
+                }
+            });
+
+            eventConsumer.WaitAndVerify();
+
+            return NumStreams * NumCommits;
+        }
+
+        public void RunCleanup()
+        {
+            services.Cleanup();
+        }
+    }
+}

@@ -8,23 +8,14 @@
 
 using System;
 using System.Threading.Tasks;
-using MongoDB.Bson;
 using MongoDB.Driver;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Infrastructure.States
 {
     public sealed class MongoStateStore : IStateStore, IExternalSystem
     {
-        private const string FieldId = "_id";
-        private const string FieldDoc = "_doc";
-        private const string FieldEtag = "_etag";
         private static readonly UpdateOptions Upsert = new UpdateOptions { IsUpsert = true };
-        private static readonly FilterDefinitionBuilder<BsonDocument> Filter = Builders<BsonDocument>.Filter;
-        private static readonly UpdateDefinitionBuilder<BsonDocument> Update = Builders<BsonDocument>.Update;
-        private static readonly ProjectionDefinitionBuilder<BsonDocument> Projection = Builders<BsonDocument>.Projection;
         private readonly IMongoDatabase database;
         private readonly JsonSerializer serializer;
 
@@ -54,14 +45,12 @@ namespace Squidex.Infrastructure.States
             var collection = GetCollection<T>();
 
             var existing =
-                await collection.Find(Filter.Eq(FieldId, key))
+                await collection.Find(x => x.Id == key)
                     .FirstOrDefaultAsync();
 
             if (existing != null)
             {
-                var value = existing[FieldDoc].AsBsonDocument.ToJson().ToObject<T>(serializer);
-
-                return (value, existing[FieldEtag].AsString);
+                return (existing.Doc, existing.Etag);
             }
 
             return (default(T), null);
@@ -71,31 +60,26 @@ namespace Squidex.Infrastructure.States
         {
             var collection = GetCollection<T>();
 
-            var newData = JToken.FromObject(value, serializer).ToBson();
-
             try
             {
-                await collection.UpdateOneAsync(
-                    Filter.And(
-                        Filter.Eq(FieldId, key),
-                        Filter.Eq(FieldEtag, oldEtag)
-                    ),
-                    Update
-                        .Set(FieldEtag, newEtag)
-                        .Set(FieldDoc, newData),
-                    Upsert);
+                await collection.InsertOneAsync(
+                    /*Builders<MongoState<T>>.Filter.And(
+                        Builders<MongoState<T>>.Filter.Eq(nameof(MongoState<T>.Id), key),
+                        Builders<MongoState<T>>.Filter.Eq(nameof(MongoState<T>.Etag), oldEtag)
+                    ),*/
+                    new MongoState<T> { Id = key, Etag = newEtag, Doc = value });
             }
             catch (MongoWriteException ex)
             {
                 if (ex.WriteError.Category == ServerErrorCategory.DuplicateKey)
                 {
                     var existingEtag =
-                        await collection.Find(Filter.Eq(FieldId, key))
-                            .Project<BsonDocument>(Projection.Exclude(FieldDoc)).FirstOrDefaultAsync();
+                        await collection.Find(x => x.Id == key)
+                            .Project<MongoState<T>>(Builders<MongoState<T>>.Projection.Exclude(x => x.Id)).FirstOrDefaultAsync();
 
-                    if (existingEtag != null && existingEtag.Contains(FieldEtag))
+                    if (existingEtag != null)
                     {
-                        throw new InconsistentStateException(existingEtag[FieldEtag].AsString, oldEtag, ex);
+                        throw new InconsistentStateException(existingEtag.Etag, oldEtag, ex);
                     }
                 }
                 else
@@ -105,9 +89,9 @@ namespace Squidex.Infrastructure.States
             }
         }
 
-        private IMongoCollection<BsonDocument> GetCollection<T>()
+        private IMongoCollection<MongoState<T>> GetCollection<T>()
         {
-            return database.GetCollection<BsonDocument>($"States_{typeof(T).Name}");
+            return database.GetCollection<MongoState<T>>($"States_{typeof(T).Name}");
         }
     }
 }
