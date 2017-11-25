@@ -67,7 +67,9 @@ namespace Squidex.Infrastructure.States
                         Builders<MongoState<T>>.Filter.Eq(x => x.Id, key),
                         Builders<MongoState<T>>.Filter.Eq(x => x.Etag, oldEtag)
                     ),
-                    Builders<MongoState<T>>.Update.Set(x => x.Doc, value),
+                    Builders<MongoState<T>>.Update
+                        .Set(x => x.Doc, value)
+                        .Set(x => x.Etag, newEtag),
                     Upsert);
             }
             catch (MongoWriteException ex)

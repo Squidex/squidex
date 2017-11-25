@@ -101,8 +101,10 @@ namespace Squidex.Areas.Api.Controllers.Assets
                         }
                     }
                 }
-
-                await assetStorage.DownloadAsync(assetId, asset.FileVersion, null, bodyStream);
+                else
+                {
+                    await assetStorage.DownloadAsync(assetId, asset.FileVersion, null, bodyStream);
+                }
             });
         }
 
