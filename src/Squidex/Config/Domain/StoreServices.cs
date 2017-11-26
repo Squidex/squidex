@@ -91,13 +91,13 @@ namespace Squidex.Config.Domain
                         .As<IEventConsumer>()
                         .As<IExternalSystem>();
 
-                    services.AddSingletonAs(c => new MongoAssetStatsRepository(mongoDatabase))
-                        .As<IAssetStatsRepository>()
+                    services.AddSingletonAs(c => new MongoAssetRepository(mongoDatabase))
+                        .As<IAssetRepository>()
                         .As<IAssetEventConsumer>()
                         .As<IExternalSystem>();
 
-                    services.AddSingletonAs(c => new MongoAssetRepository(mongoDatabase))
-                        .As<IAssetRepository>()
+                    services.AddSingletonAs(c => new MongoAssetStatsRepository(mongoDatabase))
+                        .As<IAssetStatsRepository>()
                         .As<IAssetEventConsumer>()
                         .As<IExternalSystem>();
                 }
