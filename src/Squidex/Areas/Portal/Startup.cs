@@ -16,11 +16,11 @@ namespace Squidex.Areas.Portal
     {
         public static void ConfigurePortal(this IApplicationBuilder app)
         {
-            app.Map(Constants.PortalPrefix, orleansApp =>
+            app.Map(Constants.PortalPrefix, portalApp =>
             {
-                orleansApp.UseAuthentication();
-                orleansApp.UseMiddleware<PortalDashboardAuthenticationMiddleware>();
-                orleansApp.UseMiddleware<PortalRedirectMiddleware>();
+                portalApp.UseAuthentication();
+                portalApp.UseMiddleware<PortalDashboardAuthenticationMiddleware>();
+                portalApp.UseMiddleware<PortalRedirectMiddleware>();
             });
         }
     }

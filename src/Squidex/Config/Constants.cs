@@ -20,8 +20,6 @@ namespace Squidex.Config
 
         public static readonly string PortalPrefix = "/portal";
 
-        public static readonly string OrleansPrefix = "/orleans";
-
         public static readonly string RoleScope = "role";
 
         public static readonly string ProfileScope = "squidex-profile";

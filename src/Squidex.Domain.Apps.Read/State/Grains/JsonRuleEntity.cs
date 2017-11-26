@@ -12,7 +12,7 @@ using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Read.Rules;
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Read.State.Orleans.Grains
+namespace Squidex.Domain.Apps.Read.State.Grains
 {
     public sealed class JsonRuleEntity :
         JsonEntity<JsonRuleEntity>,

@@ -16,7 +16,7 @@ using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Actions;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Domain.Apps.Read.State.Orleans.Grains;
+using Squidex.Domain.Apps.Read.State.Grains;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.States;
 

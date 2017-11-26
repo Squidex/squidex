@@ -12,7 +12,7 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Read.Schemas;
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Read.State.Orleans.Grains
+namespace Squidex.Domain.Apps.Read.State.Grains
 {
     public sealed class JsonSchemaEntity :
         JsonEntity<JsonSchemaEntity>,

@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.Tasks;
 
-namespace Squidex.Domain.Apps.Read.State.Orleans.Grains
+namespace Squidex.Domain.Apps.Read.State.Grains
 {
     public sealed class AppUserGrain : StatefulObject<AppUserGrainState>
     {

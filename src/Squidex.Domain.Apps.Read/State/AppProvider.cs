@@ -13,11 +13,11 @@ using System.Threading.Tasks;
 using Squidex.Domain.Apps.Read.Apps;
 using Squidex.Domain.Apps.Read.Rules;
 using Squidex.Domain.Apps.Read.Schemas;
-using Squidex.Domain.Apps.Read.State.Orleans.Grains;
+using Squidex.Domain.Apps.Read.State.Grains;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.States;
 
-namespace Squidex.Domain.Apps.Read.State.Orleans
+namespace Squidex.Domain.Apps.Read.State
 {
     public sealed class AppProvider : IAppProvider
     {

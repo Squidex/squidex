@@ -39,7 +39,7 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
 
             foreach (var consumer in consumers)
             {
-                var actor = factory.GetAsync<EventConsumerActor, EventConsumerState>(consumer.Name).Result;
+                var actor = factory.GetDetachedAsync<EventConsumerActor, EventConsumerState>(consumer.Name).Result;
 
                 actors[consumer.Name] = actor;
                 actor.Activate(consumer);

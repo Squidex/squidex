@@ -33,8 +33,8 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
             A.CallTo(() => consumer1.Name).Returns(consumerName1);
             A.CallTo(() => consumer2.Name).Returns(consumerName2);
 
-            A.CallTo(() => factory.GetAsync<EventConsumerActor, EventConsumerState>(consumerName1)).Returns(actor1);
-            A.CallTo(() => factory.GetAsync<EventConsumerActor, EventConsumerState>(consumerName2)).Returns(actor2);
+            A.CallTo(() => factory.GetDetachedAsync<EventConsumerActor, EventConsumerState>(consumerName1)).Returns(actor1);
+            A.CallTo(() => factory.GetDetachedAsync<EventConsumerActor, EventConsumerState>(consumerName2)).Returns(actor2);
 
             sut = new EventConsumerActorManager(new IEventConsumer[] { consumer1, consumer2 }, pubSub, factory);
         }

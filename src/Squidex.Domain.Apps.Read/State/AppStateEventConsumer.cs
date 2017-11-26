@@ -9,13 +9,13 @@
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Apps;
-using Squidex.Domain.Apps.Read.State.Orleans.Grains;
+using Squidex.Domain.Apps.Read.State.Grains;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.Tasks;
 
-namespace Squidex.Domain.Apps.Read.State.Orleans
+namespace Squidex.Domain.Apps.Read.State
 {
     public sealed class AppStateEventConsumer : IEventConsumer
     {

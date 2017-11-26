@@ -17,7 +17,7 @@ using Squidex.Domain.Apps.Read.Schemas;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Dispatching;
 
-namespace Squidex.Domain.Apps.Read.State.Orleans.Grains
+namespace Squidex.Domain.Apps.Read.State.Grains
 {
     public sealed partial class AppStateGrainState
     {

@@ -11,7 +11,7 @@ using Newtonsoft.Json;
 using NodaTime;
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Read.State.Orleans.Grains
+namespace Squidex.Domain.Apps.Read.State.Grains
 {
     public abstract class JsonEntity<T> : Cloneable<T>, IUpdateableEntityWithVersion where T : Cloneable
     {

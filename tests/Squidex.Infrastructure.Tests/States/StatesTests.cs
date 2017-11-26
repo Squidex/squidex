@@ -126,6 +126,16 @@ namespace Squidex.Infrastructure.States
         }
 
         [Fact]
+        public async Task Should_not_dispose_detached_when_message_sent()
+        {
+            var actual = await sut.GetDetachedAsync<MyStatefulObject, int>(key);
+
+            await InvalidateCacheAsync();
+
+            Assert.False(actual.IsDisposed);
+        }
+
+        [Fact]
         public async Task Should_dispose_states_if_exired()
         {
             var actual = await sut.GetAsync<MyStatefulObject, int>(key);
@@ -136,6 +146,16 @@ namespace Squidex.Infrastructure.States
         }
 
         [Fact]
+        public async Task Should_not_dispose_detached_states_if_exired()
+        {
+            var actual = await sut.GetDetachedAsync<MyStatefulObject, int>(key);
+
+            await RemoveFromCacheAsync();
+
+            Assert.False(actual.IsDisposed);
+        }
+
+        [Fact]
         public async Task Should_dispose_states_if_disposed()
         {
             var actual = await sut.GetAsync<MyStatefulObject, int>(key);
@@ -143,6 +163,16 @@ namespace Squidex.Infrastructure.States
             sut.Dispose();
 
             Assert.True(actual.IsDisposed);
+        }
+
+        [Fact]
+        public async Task Should_not_dispose_detached_states_if_disposed()
+        {
+            var actual = await sut.GetDetachedAsync<MyStatefulObject, int>(key);
+
+            sut.Dispose();
+
+            Assert.False(actual.IsDisposed);
         }
 
         private async Task RemoveFromCacheAsync()

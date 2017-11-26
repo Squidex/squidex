@@ -1,12 +1,12 @@
 ﻿// ==========================================================================
-//  ReadSchemaState.cs
+//  MyAppState.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Read.State.Orleans.Grains;
+using Squidex.Domain.Apps.Read.State.Grains;
 using Squidex.Infrastructure.States;
 
 namespace Benchmarks.Tests.TestData

@@ -131,8 +131,7 @@ namespace Squidex.Areas.IdentityServer.Config
                 ClientSecrets = new List<Secret> { new Secret(Constants.InternalClientSecret) },
                 RedirectUris = new List<string>
                 {
-                    urlsOptions.BuildUrl($"{Constants.PortalPrefix}/signin-oidc", false),
-                    urlsOptions.BuildUrl($"{Constants.OrleansPrefix}/signin-oidc", false)
+                    urlsOptions.BuildUrl($"{Constants.PortalPrefix}/signin-oidc", false)
                 },
                 AccessTokenLifetime = (int)TimeSpan.FromDays(30).TotalSeconds,
                 AllowedGrantTypes = GrantTypes.ImplicitAndClientCredentials,

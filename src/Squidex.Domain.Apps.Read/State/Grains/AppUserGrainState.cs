@@ -9,7 +9,7 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace Squidex.Domain.Apps.Read.State.Orleans.Grains
+namespace Squidex.Domain.Apps.Read.State.Grains
 {
     public sealed class AppUserGrainState
     {

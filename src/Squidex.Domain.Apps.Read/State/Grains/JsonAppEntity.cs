@@ -10,7 +10,7 @@ using Newtonsoft.Json;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Read.Apps;
 
-namespace Squidex.Domain.Apps.Read.State.Orleans.Grains
+namespace Squidex.Domain.Apps.Read.State.Grains
 {
     public sealed class JsonAppEntity : JsonEntity<JsonAppEntity>, IAppEntity
     {

@@ -50,6 +50,18 @@ namespace Squidex.Infrastructure.States
             });
         }
 
+        public async Task<T> GetDetachedAsync<T, TState>(string key) where T : StatefulObject<TState>
+        {
+            Guard.NotNull(key, nameof(key));
+
+            var stateHolder = new StateHolder<TState>(key, () => { }, store);
+            var state = (T)services.GetService(typeof(T));
+
+            await state.ActivateAsync(stateHolder);
+
+            return state;
+        }
+
         public Task<T> GetAsync<T, TState>(string key) where T : StatefulObject<TState>
         {
             Guard.NotNull(key, nameof(key));
