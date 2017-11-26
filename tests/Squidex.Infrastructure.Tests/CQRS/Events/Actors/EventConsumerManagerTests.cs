@@ -10,33 +10,33 @@ using System;
 using System.Threading.Tasks;
 using FakeItEasy;
 using FluentAssertions;
-using Squidex.Infrastructure.CQRS.Events.Actors.Messages;
+using Squidex.Infrastructure.CQRS.Events.Grains.Messages;
 using Squidex.Infrastructure.States;
 using Xunit;
 
-namespace Squidex.Infrastructure.CQRS.Events.Actors
+namespace Squidex.Infrastructure.CQRS.Events.Grains
 {
     public class EventConsumerManagerTests
     {
-        private readonly EventConsumerActor actor1 = A.Fake<EventConsumerActor>();
-        private readonly EventConsumerActor actor2 = A.Fake<EventConsumerActor>();
+        private readonly EventConsumerGrain actor1 = A.Fake<EventConsumerGrain>();
+        private readonly EventConsumerGrain actor2 = A.Fake<EventConsumerGrain>();
         private readonly IStateFactory factory = A.Fake<IStateFactory>();
         private readonly IEventConsumer consumer1 = A.Fake<IEventConsumer>();
         private readonly IEventConsumer consumer2 = A.Fake<IEventConsumer>();
         private readonly IPubSub pubSub = new InMemoryPubSub();
         private readonly string consumerName1 = "Consumer1";
         private readonly string consumerName2 = "Consumer2";
-        private readonly EventConsumerActorManager sut;
+        private readonly EventConsumerGrainManager sut;
 
         public EventConsumerManagerTests()
         {
             A.CallTo(() => consumer1.Name).Returns(consumerName1);
             A.CallTo(() => consumer2.Name).Returns(consumerName2);
 
-            A.CallTo(() => factory.GetDetachedAsync<EventConsumerActor, EventConsumerState>(consumerName1)).Returns(actor1);
-            A.CallTo(() => factory.GetDetachedAsync<EventConsumerActor, EventConsumerState>(consumerName2)).Returns(actor2);
+            A.CallTo(() => factory.GetDetachedAsync<EventConsumerGrain, EventConsumerState>(consumerName1)).Returns(actor1);
+            A.CallTo(() => factory.GetDetachedAsync<EventConsumerGrain, EventConsumerState>(consumerName2)).Returns(actor2);
 
-            sut = new EventConsumerActorManager(new IEventConsumer[] { consumer1, consumer2 }, pubSub, factory);
+            sut = new EventConsumerGrainManager(new IEventConsumer[] { consumer1, consumer2 }, pubSub, factory);
         }
 
         [Fact]

@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  EventConsumerActorTests.cs
+//  EventConsumerGrainTests.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -14,17 +14,17 @@ using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.States;
 using Xunit;
 
-namespace Squidex.Infrastructure.CQRS.Events.Actors
+namespace Squidex.Infrastructure.CQRS.Events.Grains
 {
-    public class EventConsumerActorTests
+    public class EventConsumerGrainTests
     {
         public sealed class MyEvent : IEvent
         {
         }
 
-        public sealed class MyEventConsumerActor : EventConsumerActor
+        public sealed class MyEventConsumerGrain : EventConsumerGrain
         {
-            public MyEventConsumerActor(EventDataFormatter formatter, IEventStore eventStore, ISemanticLog log)
+            public MyEventConsumerGrain(EventDataFormatter formatter, IEventStore eventStore, ISemanticLog log)
                 : base(formatter, eventStore, log)
             {
             }
@@ -44,12 +44,12 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
         private readonly EventDataFormatter formatter = A.Fake<EventDataFormatter>();
         private readonly EventData eventData = new EventData();
         private readonly Envelope<IEvent> envelope = new Envelope<IEvent>(new MyEvent());
-        private readonly EventConsumerActor sut;
+        private readonly EventConsumerGrain sut;
         private readonly string consumerName;
         private readonly string initialPosition = Guid.NewGuid().ToString();
         private EventConsumerState state = new EventConsumerState();
 
-        public EventConsumerActorTests()
+        public EventConsumerGrainTests()
         {
             state.Position = initialPosition;
 
@@ -69,7 +69,7 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
 
             A.CallTo(() => formatter.Parse(eventData, true)).Returns(envelope);
 
-            sut = new MyEventConsumerActor(formatter, eventStore, log);
+            sut = new MyEventConsumerGrain(formatter, eventStore, log);
             sutSubscriber = sut;
 
             sut.ActivateAsync(stateHolder).Wait();

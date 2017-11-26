@@ -1,15 +1,15 @@
 ﻿// ==========================================================================
-//  GetStatesResponse.cs
+//  StartConsumerMessage.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.CQRS.Events.Actors.Messages
+namespace Squidex.Infrastructure.CQRS.Events.Grains.Messages
 {
-    public sealed class GetStatesResponse
+    public sealed class StartConsumerMessage
     {
-        public EventConsumerInfo[] States { get; set; }
+        public string ConsumerName { get; set; }
     }
 }

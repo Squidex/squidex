@@ -10,7 +10,7 @@ using System;
 using Benchmarks.Tests.TestData;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Infrastructure.CQRS.Events;
-using Squidex.Infrastructure.CQRS.Events.Actors;
+using Squidex.Infrastructure.CQRS.Events.Grains;
 using Squidex.Infrastructure.States;
 
 namespace Benchmarks.Tests
@@ -20,7 +20,7 @@ namespace Benchmarks.Tests
         private const int NumEvents = 5000;
         private IServiceProvider services;
         private IEventStore eventStore;
-        private EventConsumerActor eventConsumerActor;
+        private EventConsumerGrain eventConsumerGrain;
         private EventDataFormatter eventDataFormatter;
         private MyEventConsumer eventConsumer;
 
@@ -33,10 +33,10 @@ namespace Benchmarks.Tests
             eventStore = services.GetRequiredService<IEventStore>();
 
             eventDataFormatter = services.GetRequiredService<EventDataFormatter>();
-            eventConsumerActor = services.GetRequiredService<EventConsumerActor>();
+            eventConsumerGrain = services.GetRequiredService<EventConsumerGrain>();
 
-            eventConsumerActor.ActivateAsync(services.GetRequiredService<StateHolder<EventConsumerState>>()).Wait();
-            eventConsumerActor.Activate(eventConsumer);
+            eventConsumerGrain.ActivateAsync(services.GetRequiredService<StateHolder<EventConsumerState>>()).Wait();
+            eventConsumerGrain.Activate(eventConsumer);
         }
 
         public override long Run()

@@ -10,19 +10,19 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Squidex.Infrastructure.CQRS.Events.Actors.Messages;
+using Squidex.Infrastructure.CQRS.Events.Grains.Messages;
 using Squidex.Infrastructure.States;
 
-namespace Squidex.Infrastructure.CQRS.Events.Actors
+namespace Squidex.Infrastructure.CQRS.Events.Grains
 {
-    public sealed class EventConsumerActorManager : DisposableObjectBase, IExternalSystem
+    public sealed class EventConsumerGrainManager : DisposableObjectBase, IExternalSystem
     {
         private readonly IStateFactory factory;
         private readonly IPubSub pubSub;
         private readonly List<IEventConsumer> consumers;
         private readonly List<IDisposable> subscriptions = new List<IDisposable>();
 
-        public EventConsumerActorManager(IEnumerable<IEventConsumer> consumers, IPubSub pubSub, IStateFactory factory)
+        public EventConsumerGrainManager(IEnumerable<IEventConsumer> consumers, IPubSub pubSub, IStateFactory factory)
         {
             Guard.NotNull(pubSub, nameof(pubSub));
             Guard.NotNull(factory, nameof(factory));
@@ -35,11 +35,11 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
 
         public void Connect()
         {
-            var actors = new Dictionary<string, EventConsumerActor>();
+            var actors = new Dictionary<string, EventConsumerGrain>();
 
             foreach (var consumer in consumers)
             {
-                var actor = factory.GetDetachedAsync<EventConsumerActor, EventConsumerState>(consumer.Name).Result;
+                var actor = factory.GetDetachedAsync<EventConsumerGrain, EventConsumerState>(consumer.Name).Result;
 
                 actors[consumer.Name] = actor;
                 actor.Activate(consumer);

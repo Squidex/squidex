@@ -6,7 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.CQRS.Events.Actors.Messages
+namespace Squidex.Infrastructure.CQRS.Events.Grains.Messages
 {
     public sealed class StopConsumerMessage
     {

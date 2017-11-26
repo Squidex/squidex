@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  EventConsumerActorTests.cs
+//  RetrySubscriptionTests.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group

@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  EventConsumerActor.cs
+//  EventConsumerGrain.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -12,9 +12,9 @@ using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.Tasks;
 
-namespace Squidex.Infrastructure.CQRS.Events.Actors
+namespace Squidex.Infrastructure.CQRS.Events.Grains
 {
-    public class EventConsumerActor : StatefulObject<EventConsumerState>, IEventSubscriber
+    public class EventConsumerGrain : StatefulObject<EventConsumerState>, IEventSubscriber
     {
         private readonly EventDataFormatter formatter;
         private readonly IEventStore eventStore;
@@ -23,7 +23,7 @@ namespace Squidex.Infrastructure.CQRS.Events.Actors
         private IEventSubscription currentSubscription;
         private IEventConsumer eventConsumer;
 
-        public EventConsumerActor(
+        public EventConsumerGrain(
             EventDataFormatter formatter,
             IEventStore eventStore,
             ISemanticLog log)

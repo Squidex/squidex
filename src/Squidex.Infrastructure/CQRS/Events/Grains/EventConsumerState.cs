@@ -9,7 +9,7 @@
 using System;
 using Squidex.Infrastructure.Reflection;
 
-namespace Squidex.Infrastructure.CQRS.Events.Actors
+namespace Squidex.Infrastructure.CQRS.Events.Grains
 {
     public sealed class EventConsumerState
     {
