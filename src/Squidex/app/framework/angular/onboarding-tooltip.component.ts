@@ -63,13 +63,22 @@ export class OnboardingTooltipComponent implements OnDestroy, OnInit {
         if (this.for && this.id && Types.isFunction(this.for.addEventListener)) {
             this.showTimer = setTimeout(() => {
                 if (this.onboardingService.shouldShow(this.id)) {
-                    this.tooltipModal.show();
+                    const forRect = this.for.getBoundingClientRect();
 
-                    this.closeTimer = setTimeout(() => {
-                        this.hideThis();
-                    }, 10000);
+                    const x = forRect.left + 0.5 * forRect.width;
+                    const y = forRect.top  + 0.5 * forRect.height;
 
-                    this.onboardingService.disable(this.id);
+                    const fromPoint = document.elementFromPoint(x, y);
+
+                    if (this.isSameOrParent(fromPoint)) {
+                        this.tooltipModal.show();
+
+                        this.closeTimer = setTimeout(() => {
+                            this.hideThis();
+                        }, 10000);
+
+                        this.onboardingService.disable(this.id);
+                    }
                 }
             }, this.after);
 
@@ -79,6 +88,16 @@ export class OnboardingTooltipComponent implements OnDestroy, OnInit {
 
                     this.hideThis();
                 });
+        }
+    }
+
+    private isSameOrParent(underCursor: Element): boolean {
+        if (!underCursor) {
+            return false;
+        } if (this.for === underCursor) {
+            return true;
+        } else {
+            return this.isSameOrParent(underCursor.parentElement);
         }
     }
 
