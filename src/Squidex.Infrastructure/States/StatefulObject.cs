@@ -43,7 +43,7 @@ namespace Squidex.Infrastructure.States
 
             this.stateHolder = stateHolder;
 
-            return stateHolder.ReadAsync();
+            return ReadStateAsync();
         }
 
         public virtual async Task ReadStateAsync()

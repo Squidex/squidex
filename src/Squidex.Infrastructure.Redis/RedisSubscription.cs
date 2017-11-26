@@ -45,7 +45,9 @@ namespace Squidex.Infrastructure
         {
             try
             {
-                var envelope = JsonConvert.SerializeObject(new Envelope { Sender = selfId, Payload = (T)value });
+                var senderId = notifySelf ? Guid.Empty : selfId;
+
+                var envelope = JsonConvert.SerializeObject(new Envelope { Sender = senderId, Payload = (T)value });
 
                 subscriber.Publish(channelName, envelope);
             }
