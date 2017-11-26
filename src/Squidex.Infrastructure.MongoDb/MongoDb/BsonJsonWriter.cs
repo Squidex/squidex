@@ -23,6 +23,11 @@ namespace Squidex.Infrastructure.MongoDb
             this.bsonWriter = bsonWriter;
         }
 
+        public override void WritePropertyName(string name)
+        {
+            bsonWriter.WriteName(name.EscapeJson());
+        }
+
         public override void WritePropertyName(string name, bool escape)
         {
             bsonWriter.WriteName(name.EscapeJson());

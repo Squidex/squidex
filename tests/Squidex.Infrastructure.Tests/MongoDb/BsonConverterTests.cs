@@ -127,6 +127,44 @@ namespace Squidex.Infrastructure.MongoDb
         }
 
         [Fact]
+        public void Should_write_problematic_object()
+        {
+            var buggy = new
+            {
+                a = new
+                {
+                    iv = 1
+                },
+                b = new
+                {
+                    iv = JObject.FromObject(new
+                    {
+                        lat = 1.0,
+                        lon = 3.0
+                    })
+                }
+            };
+
+            var stream = new MemoryStream();
+
+            using (var writer = new BsonJsonWriter(new BsonBinaryWriter(stream)))
+            {
+                serializer.Serialize(writer, buggy);
+
+                writer.Flush();
+            }
+
+            stream.Position = 0;
+
+            using (var reader = new BsonJsonReader(new BsonBinaryReader(stream)))
+            {
+                var target = serializer.Deserialize(reader, buggy.GetType());
+
+                target.ShouldBeEquivalentTo(buggy);
+            }
+        }
+
+        [Fact]
         public void Should_serialize_with_reader_and_writer()
         {
             var stream = new MemoryStream();
