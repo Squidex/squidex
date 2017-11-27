@@ -113,7 +113,7 @@ namespace Squidex.Domain.Apps.Read.State.Grains
 
         public virtual Task HandleAsync(Envelope<IEvent> message)
         {
-            return taskFactory.StartNew(() =>
+            return taskFactory.StartNew(async () =>
             {
                 if (exception != null)
                 {
@@ -131,11 +131,22 @@ namespace Squidex.Domain.Apps.Read.State.Grains
                 {
                     if (State.App == null || State.App.Id == appEvent.AppId.Id)
                     {
-                        State.Apply(message);
+                        try
+                        {
+                            State.Apply(message);
+
+                            await WriteStateAsync();
+                        }
+                        catch (InconsistentStateException)
+                        {
+                            await ReadStateAsync();
+
+                            State.Apply(message);
+
+                            await WriteStateAsync();
+                        }
                     }
                 }
-
-                return WriteStateAsync();
             }).Unwrap();
         }
     }

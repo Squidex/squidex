@@ -60,6 +60,10 @@ namespace Squidex.Config.Domain
                     exposeSourceUrl))
                 .As<IGraphQLUrlGenerator>();
 
+            services.AddSingletonAs<StateFactory>()
+                .As<IExternalSystem>()
+                .As<IStateFactory>();
+
             services.AddSingletonAs(c => c.GetService<IOptions<MyUsageOptions>>()?.Value?.Plans.OrEmpty());
 
             services.AddSingletonAs<CachingGraphQLService>()
@@ -86,26 +90,23 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<NoopAppPlanBillingManager>()
                 .As<IAppPlanBillingManager>();
 
-            services.AddSingletonAs<DefaultEventNotifier>()
-                .As<IEventNotifier>();
-
             services.AddSingletonAs<AppProvider>()
                 .As<IAppProvider>();
-
-            services.AddSingletonAs<AppStateEventConsumer>()
-                .As<IEventConsumer>();
-
-            services.AddSingletonAs<RuleEnqueuer>()
-                .As<IEventConsumer>();
-
-            services.AddSingletonAs<StateFactory>()
-                .As<IStateFactory>();
 
             services.AddSingletonAs<ContentChangedTriggerHandler>()
                 .As<IRuleTriggerHandler>();
 
             services.AddSingletonAs<WebhookActionHandler>()
                 .As<IRuleActionHandler>();
+
+            services.AddSingletonAs<DefaultEventNotifier>()
+                .As<IEventNotifier>();
+
+            services.AddSingletonAs<AppStateEventConsumer>()
+                .As<IEventConsumer>();
+
+            services.AddSingletonAs<RuleEnqueuer>()
+                .As<IEventConsumer>();
 
             services.AddSingletonAs<IEventConsumer>(c =>
                 new CompoundEventConsumer(c.GetServices<IAssetEventConsumer>().ToArray()));
