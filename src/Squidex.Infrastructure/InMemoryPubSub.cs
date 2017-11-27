@@ -15,10 +15,20 @@ namespace Squidex.Infrastructure
     public sealed class InMemoryPubSub : IPubSub
     {
         private readonly Subject<object> subject = new Subject<object>();
+        private readonly bool publishAlways;
+
+        public InMemoryPubSub()
+        {
+        }
+
+        public InMemoryPubSub(bool publishAlways)
+        {
+            this.publishAlways = publishAlways;
+        }
 
         public void Publish<T>(T value, bool notifySelf)
         {
-            if (notifySelf)
+            if (notifySelf || publishAlways)
             {
                 subject.OnNext(value);
             }

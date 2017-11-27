@@ -39,11 +39,18 @@ namespace Squidex.Infrastructure.States
 
         public async Task WriteAsync()
         {
-            var newEtag = Guid.NewGuid().ToString();
+            try
+            {
+                var newEtag = Guid.NewGuid().ToString();
 
-            await store.WriteAsync(key, State, etag, newEtag);
+                await store.WriteAsync(key, State, etag, newEtag);
 
-            etag = newEtag;
+                etag = newEtag;
+            }
+            finally
+            {
+                written();
+            }
         }
     }
 }

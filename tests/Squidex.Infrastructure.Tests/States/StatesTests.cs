@@ -28,7 +28,7 @@ namespace Squidex.Infrastructure.States
         private readonly string key = Guid.NewGuid().ToString();
         private readonly MyStatefulObject state = new MyStatefulObject();
         private readonly IMemoryCache cache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
-        private readonly IPubSub pubSub = new InMemoryPubSub();
+        private readonly IPubSub pubSub = new InMemoryPubSub(true);
         private readonly IServiceProvider services = A.Fake<IServiceProvider>();
         private readonly IStateStore store = A.Fake<IStateStore>();
         private readonly StateFactory sut;
@@ -97,6 +97,13 @@ namespace Squidex.Infrastructure.States
         {
             var etag = Guid.NewGuid().ToString();
 
+            InvalidateMessage message = null;
+
+            pubSub.Subscribe<InvalidateMessage>(m =>
+            {
+                message = m;
+            });
+
             A.CallTo(() => store.ReadAsync<int>(key))
                 .Returns((123, etag));
 
@@ -113,6 +120,9 @@ namespace Squidex.Infrastructure.States
 
             A.CallTo(() => store.WriteAsync(key, 456, etag, A<string>.That.Matches(x => x != null)))
                 .MustHaveHappened();
+
+            Assert.NotNull(message);
+            Assert.Equal(key, message.Key);
         }
 
         [Fact]

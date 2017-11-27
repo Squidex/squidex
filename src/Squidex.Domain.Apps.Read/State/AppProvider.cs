@@ -77,13 +77,11 @@ namespace Squidex.Domain.Apps.Read.State
             var appUser = await factory.GetAsync<AppUserGrain, AppUserGrainState>(userId);
             var appNames = await appUser.GetAppNamesAsync();
 
-            var tasks =
-                appNames
-                    .Select(x => GetAppAsync(x));
+            var tasks = appNames.Select(x => GetAppAsync(x));
 
             var apps = await Task.WhenAll(tasks);
 
-            return apps.Where(a => a != null).ToList();
+            return apps.Where(a => a != null && a.Contributors.ContainsKey(userId)).ToList();
         }
     }
 }

@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Domain.Apps.Read.Apps;
 using Squidex.Domain.Apps.Read.Rules;
@@ -126,7 +127,13 @@ namespace Squidex.Domain.Apps.Read.State.Grains
                     }
                 }
 
-                State.Apply(message);
+                if (message.Payload is AppEvent appEvent)
+                {
+                    if (State.App == null || State.App.Id == appEvent.AppId.Id)
+                    {
+                        State.Apply(message);
+                    }
+                }
 
                 return WriteStateAsync();
             }).Unwrap();
