@@ -56,7 +56,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [HttpGet]
         [Route("apps/")]
         [ProducesResponseType(typeof(AppDto[]), 200)]
-        [ApiCosts(1)]
+        [ApiCosts(0)]
         public async Task<IActionResult> GetApps()
         {
             var subject = HttpContext.User.OpenIdSubject();

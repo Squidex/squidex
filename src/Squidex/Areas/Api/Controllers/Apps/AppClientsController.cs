@@ -48,7 +48,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [HttpGet]
         [Route("apps/{app}/clients/")]
         [ProducesResponseType(typeof(ClientDto[]), 200)]
-        [ApiCosts(1)]
+        [ApiCosts(0)]
         public IActionResult GetClients(string app)
         {
             var response = App.Clients.Select(x => SimpleMapper.Map(x.Value, new ClientDto { Id = x.Key })).ToList();

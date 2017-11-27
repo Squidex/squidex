@@ -16,8 +16,9 @@ namespace Squidex.Config.Web
     {
         public static void AddMyMvc(this IServiceCollection services)
         {
-            services.AddSingletonAs<AppApiFilter>();
             services.AddSingletonAs<FileCallbackResultExecutor>();
+            services.AddSingletonAs<AppApiFilter>();
+            services.AddSingletonAs<ApiCostsFilter>();
 
             services.AddMvc().AddMySerializers();
             services.AddCors();

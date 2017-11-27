@@ -22,15 +22,15 @@ namespace Squidex.Areas.IdentityServer.Config
 {
     public class LazyClientStore : IClientStore
     {
-        private readonly IAppProvider appState;
+        private readonly IAppProvider appProvider;
         private readonly Dictionary<string, Client> staticClients = new Dictionary<string, Client>(StringComparer.OrdinalIgnoreCase);
 
-        public LazyClientStore(IOptions<MyUrlsOptions> urlsOptions, IAppProvider appState)
+        public LazyClientStore(IOptions<MyUrlsOptions> urlsOptions, IAppProvider appProvider)
         {
             Guard.NotNull(urlsOptions, nameof(urlsOptions));
-            Guard.NotNull(appState, nameof(appState));
+            Guard.NotNull(appProvider, nameof(appProvider));
 
-            this.appState = appState;
+            this.appProvider = appProvider;
 
             CreateStaticClients(urlsOptions);
         }
@@ -51,7 +51,7 @@ namespace Squidex.Areas.IdentityServer.Config
                 return null;
             }
 
-            var app = await appState.GetAppAsync(token[0]);
+            var app = await appProvider.GetAppAsync(token[0]);
 
             var appClient = app?.Clients.GetOrDefault(token[1]);
 

@@ -53,7 +53,7 @@ namespace Squidex.Areas.Api.Controllers.Plans
         [HttpGet]
         [Route("apps/{app}/plans/")]
         [ProducesResponseType(typeof(AppPlansDto), 200)]
-        [ApiCosts(0.5)]
+        [ApiCosts(0)]
         public IActionResult GetPlans(string app)
         {
             var planId = appPlansProvider.GetPlanForApp(App).Id;
@@ -87,7 +87,7 @@ namespace Squidex.Areas.Api.Controllers.Plans
         [Route("apps/{app}/plan/")]
         [ProducesResponseType(typeof(PlanChangedDto), 200)]
         [ProducesResponseType(typeof(ErrorDto), 400)]
-        [ApiCosts(0.5)]
+        [ApiCosts(0)]
         public async Task<IActionResult> ChangePlanAsync(string app, [FromBody] ChangePlanDto request)
         {
             var redirectUri = (string)null;

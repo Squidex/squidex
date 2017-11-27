@@ -6,27 +6,31 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Squidex.Domain.Apps.Read.Apps.Services;
-using Squidex.Infrastructure.UsageTracking;
+using Squidex.Domain.Apps.Read;
+using Squidex.Domain.Apps.Read.Apps;
 
 namespace Squidex.Pipeline
 {
     public sealed class AppApiFilter : IAsyncActionFilter
     {
-        private readonly Domain.Apps.Read.IAppProvider appState;
-        private readonly IAppPlansProvider appPlanProvider;
-        private readonly IUsageTracker usageTracker;
+        private readonly IAppProvider appProvider;
 
-        public AppApiFilter(Domain.Apps.Read.IAppProvider appState, IAppPlansProvider appPlanProvider, IUsageTracker usageTracker)
+        private sealed class AppFeature : IAppFeature
         {
-            this.appState = appState;
-            this.appPlanProvider = appPlanProvider;
+            public IAppEntity App { get; }
 
-            this.usageTracker = usageTracker;
+            public AppFeature(IAppEntity app)
+            {
+                App = app;
+            }
+        }
+
+        public AppApiFilter(IAppProvider appProvider)
+        {
+            this.appProvider = appProvider;
         }
 
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
@@ -35,21 +39,11 @@ namespace Squidex.Pipeline
 
             if (!string.IsNullOrWhiteSpace(appName))
             {
-                var app = await appState.GetAppAsync(appName);
+                var app = await appProvider.GetAppAsync(appName);
 
                 if (app == null)
                 {
                     context.Result = new NotFoundResult();
-                    return;
-                }
-
-                var plan = appPlanProvider.GetPlanForApp(app);
-
-                var usage = await usageTracker.GetMonthlyCalls(app.Id.ToString(), DateTime.Today);
-
-                if (plan.MaxApiCalls >= 0 && (usage * 1.1) > plan.MaxApiCalls)
-                {
-                    context.Result = new StatusCodeResult(429);
                     return;
                 }
 

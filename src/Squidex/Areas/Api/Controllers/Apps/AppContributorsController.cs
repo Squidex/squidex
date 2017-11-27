@@ -49,7 +49,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [HttpGet]
         [Route("apps/{app}/contributors/")]
         [ProducesResponseType(typeof(ContributorsDto), 200)]
-        [ApiCosts(1)]
+        [ApiCosts(0)]
         public IActionResult GetContributors(string app)
         {
             var contributors = App.Contributors.Select(x => new ContributorDto { ContributorId = x.Key, Permission = x.Value }).ToArray();
