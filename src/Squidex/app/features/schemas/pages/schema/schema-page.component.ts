@@ -31,6 +31,7 @@ import {
 } from 'shared';
 
 import {
+    SchemaCloning,
     SchemaCreated,
     SchemaDeleted,
     SchemaUpdated
@@ -247,6 +248,10 @@ export class SchemaPageComponent implements OnDestroy, OnInit {
 
     public cancelAddField() {
         this.resetFieldForm();
+    }
+
+    public cloneSchema() {
+        this.ctx.bus.emit(new SchemaCloning(this.schemaExport));
     }
 
     public onSchemaSaved(properties: SchemaPropertiesDto, version: Version) {

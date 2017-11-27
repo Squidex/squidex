@@ -7,6 +7,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Read.Schemas;
 using Squidex.Domain.Apps.Write.Schemas.Commands;
 using Squidex.Infrastructure.Reflection;
@@ -61,11 +62,15 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Converters
 
             if (dto.Properties != null)
             {
+                command.Properties = new SchemaProperties();
+
                 SimpleMapper.Map(dto.Properties, command.Properties);
             }
 
             if (dto.Fields != null)
             {
+                command.Fields = new List<CreateSchemaField>();
+
                 foreach (var fieldDto in dto.Fields)
                 {
                     var fieldProperties = fieldDto?.Properties.ToProperties();

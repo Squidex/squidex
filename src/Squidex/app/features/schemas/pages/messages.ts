@@ -27,3 +27,10 @@ export class SchemaDeleted {
     ) {
     }
 }
+
+export class SchemaCloning {
+    constructor(
+        public readonly importing: any
+    ) {
+    }
+}

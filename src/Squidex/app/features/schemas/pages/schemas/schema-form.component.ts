@@ -5,7 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 
 import {
@@ -31,12 +31,15 @@ const FALLBACK_NAME = 'my-schema';
         fadeAnimation
     ]
 })
-export class SchemaFormComponent {
+export class SchemaFormComponent implements OnInit {
     @Output()
     public created = new EventEmitter<SchemaDetailsDto>();
 
     @Output()
     public cancelled = new EventEmitter();
+
+    @Input()
+    public import: any;
 
     public showImport = false;
 
@@ -63,6 +66,12 @@ export class SchemaFormComponent {
         private readonly schemas: SchemasService,
         private readonly formBuilder: FormBuilder
     ) {
+    }
+
+    public ngOnInit() {
+        this.createForm.controls['import'].setValue(this.import || {});
+
+        this.showImport = !!this.import;
     }
 
     public toggleImport() {

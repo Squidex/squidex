@@ -19,6 +19,7 @@ import {
 } from 'shared';
 
 import {
+    SchemaCloning,
     SchemaCreated,
     SchemaDeleted,
     SchemaUpdated
@@ -38,6 +39,7 @@ import {
 export class SchemasPageComponent implements OnDestroy, OnInit {
     private schemaUpdatedSubscription: Subscription;
     private schemaDeletedSubscription: Subscription;
+    private schemaCloningSubscription: Subscription;
 
     public addSchemaDialog = new ModalView();
 
@@ -45,6 +47,8 @@ export class SchemasPageComponent implements OnDestroy, OnInit {
     public schemaQuery: string;
     public schemasFilter = new FormControl();
     public schemasFiltered = ImmutableArray.empty<SchemaDto>();
+
+    public import: any;
 
     constructor(public readonly ctx: AppContext,
         private readonly schemasService: SchemasService
@@ -54,6 +58,7 @@ export class SchemasPageComponent implements OnDestroy, OnInit {
     public ngOnDestroy() {
         this.schemaUpdatedSubscription.unsubscribe();
         this.schemaDeletedSubscription.unsubscribe();
+        this.schemaCloningSubscription.unsubscribe();
     }
 
     public ngOnInit() {
@@ -71,6 +76,12 @@ export class SchemasPageComponent implements OnDestroy, OnInit {
                 }
             });
 
+        this.schemaCloningSubscription =
+            this.ctx.bus.of(SchemaCloning)
+                .subscribe(m => {
+                    this.createSchema(m.importing);
+                });
+
         this.schemaUpdatedSubscription =
             this.ctx.bus.of(SchemaUpdated)
                 .subscribe(m => {
@@ -84,6 +95,12 @@ export class SchemasPageComponent implements OnDestroy, OnInit {
                 });
 
         this.load();
+    }
+
+    public createSchema(importing: any) {
+        this.import = importing;
+
+        this.addSchemaDialog.show();
     }
 
     private load() {
