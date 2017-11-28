@@ -19,7 +19,8 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Assets
         IAssetEntity,
         IUpdateableEntityWithVersion,
         IUpdateableEntityWithCreatedBy,
-        IUpdateableEntityWithLastModifiedBy
+        IUpdateableEntityWithLastModifiedBy,
+        IUpdateableEntityWithAppRef
     {
         [BsonRequired]
         [BsonElement]

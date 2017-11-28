@@ -23,7 +23,8 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Contents
         IContentEntity,
         IUpdateableEntityWithVersion,
         IUpdateableEntityWithCreatedBy,
-        IUpdateableEntityWithLastModifiedBy
+        IUpdateableEntityWithLastModifiedBy,
+        IUpdateableEntityWithAppRef
     {
         private NamedContentData data;
 

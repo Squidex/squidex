@@ -17,7 +17,8 @@ namespace Squidex.Domain.Apps.Read.MongoDb.History
     public sealed class MongoHistoryEventEntity : MongoEntity,
         IEntityWithAppRef,
         IUpdateableEntityWithVersion,
-        IUpdateableEntityWithCreatedBy
+        IUpdateableEntityWithCreatedBy,
+        IUpdateableEntityWithAppRef
     {
         [BsonRequired]
         [BsonElement]
