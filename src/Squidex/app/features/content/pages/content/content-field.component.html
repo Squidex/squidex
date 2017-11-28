@@ -38,7 +38,7 @@
                             <div *ngSwitchCase="'Radio'">
                                 <div class="form-check form-check-inline" *ngFor="let value of field.properties.allowedValues">
                                     <label class="form-check-label">
-                                        <input class="form-check-input" type="radio" value="{{value}}" [formControlName]="partition"> {{value}}
+                                        <input class="form-check-input" type="radio" [value]="value" [formControlName]="partition"> {{value}}
                                     </label>
                                 </div>
                             </div>
