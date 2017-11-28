@@ -10,40 +10,28 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Infrastructure.States;
-using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Read.State.Grains
 {
     public sealed class AppUserGrain : StatefulObject<AppUserGrainState>
     {
-        private readonly TaskFactory taskFactory = new TaskFactory(new LimitedConcurrencyLevelTaskScheduler(1));
-
         public Task AddAppAsync(string appName)
         {
-            return taskFactory.StartNew(() =>
-            {
-                State.AppNames.Add(appName);
+            State = State.AddApp(appName);
 
-                return WriteStateAsync();
-            }).Unwrap();
+            return WriteStateAsync();
         }
 
         public Task RemoveAppAsync(string appName)
         {
-            return taskFactory.StartNew(() =>
-            {
-                State.AppNames.Remove(appName);
+            State = State.RemoveApp(appName);
 
-                return WriteStateAsync();
-            }).Unwrap();
+            return WriteStateAsync();
         }
 
         public Task<List<string>> GetAppNamesAsync()
         {
-            return taskFactory.StartNew(() =>
-            {
-                return State.AppNames.ToList();
-            });
+            return Task.FromResult(State.AppNames.ToList());
         }
     }
 }

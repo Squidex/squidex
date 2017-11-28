@@ -11,6 +11,7 @@ using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Schemas;
 using Squidex.Domain.Apps.Events.Schemas.Old;
 using Squidex.Domain.Apps.Events.Schemas.Utils;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Reflection;
 
@@ -22,12 +23,14 @@ namespace Squidex.Domain.Apps.Read.State.Grains
     {
         public void On(SchemaCreated @event, EnvelopeHeaders headers)
         {
-            Schemas[@event.SchemaId.Id] = EntityMapper.Create<JsonSchemaEntity>(@event, headers, s =>
+            var id = @event.SchemaId.Id;
+
+            Schemas = Schemas.SetItem(id, EntityMapper.Create<JsonSchemaEntity>(@event, headers, s =>
             {
                 s.SchemaDef = SchemaEventDispatcher.Create(@event, registry);
 
                 SimpleMapper.Map(@event, s);
-            });
+            }));
         }
 
         public void On(SchemaPublished @event, EnvelopeHeaders headers)
@@ -68,11 +71,6 @@ namespace Squidex.Domain.Apps.Read.State.Grains
             {
                 s.SchemaDef = s.SchemaDef.Apply(@event);
             });
-        }
-
-        public void On(SchemaDeleted @event)
-        {
-            Schemas.Remove(@event.SchemaId.Id);
         }
 
         public void On(FieldAdded @event, EnvelopeHeaders headers)
@@ -149,11 +147,16 @@ namespace Squidex.Domain.Apps.Read.State.Grains
             UpdateSchema(@event, headers);
         }
 
+        public void On(SchemaDeleted @event, EnvelopeHeaders headers)
+        {
+            Schemas = Schemas.Remove(@event.SchemaId.Id);
+        }
+
         private void UpdateSchema(SchemaEvent @event, EnvelopeHeaders headers, Action<JsonSchemaEntity> updater = null)
         {
             var id = @event.SchemaId.Id;
 
-            Schemas[id] = Schemas[id].Clone().Update(@event, headers, updater);
+            Schemas = Schemas.SetItem(id, x => x.Clone().Update(@event, headers, updater));
         }
     }
 }

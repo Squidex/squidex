@@ -8,12 +8,28 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 
 namespace Squidex.Infrastructure
 {
     public static class CollectionExtensions
     {
+        public static ImmutableDictionary<TKey, TValue> SetItem<TKey, TValue>(this ImmutableDictionary<TKey, TValue> dictionary, TKey key, Func<TValue, TValue> updater)
+        {
+            if (dictionary.TryGetValue(key, out var value))
+            {
+                var newValue = updater(value);
+
+                if (!Equals(newValue, value))
+                {
+                    return dictionary.SetItem(key, newValue);
+                }
+            }
+
+            return dictionary;
+        }
+
         public static bool TryGetValue<TKey, TValue, TBase>(this IReadOnlyDictionary<TKey, TValue> values, TKey key, out TBase item) where TValue : TBase
         {
             if (values.TryGetValue(key, out var value))

@@ -21,8 +21,6 @@ namespace Squidex.Domain.Apps.Read.State.Grains
     {
         public void On(AppCreated @event, EnvelopeHeaders headers)
         {
-            Reset();
-
             App = EntityMapper.Create<JsonAppEntity>(@event, headers, a =>
             {
                 SimpleMapper.Map(@event, a);

@@ -9,6 +9,7 @@
 using System;
 using Squidex.Domain.Apps.Events.Rules;
 using Squidex.Domain.Apps.Events.Rules.Utils;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
 
 namespace Squidex.Domain.Apps.Read.State.Grains
@@ -17,10 +18,12 @@ namespace Squidex.Domain.Apps.Read.State.Grains
     {
         public void On(RuleCreated @event, EnvelopeHeaders headers)
         {
-            Rules[@event.RuleId] = EntityMapper.Create<JsonRuleEntity>(@event, headers, r =>
+            var id = @event.RuleId;
+
+            Rules.SetItem(id, EntityMapper.Create<JsonRuleEntity>(@event, headers, r =>
             {
                 r.RuleDef = RuleEventDispatcher.Create(@event);
-            });
+            }));
         }
 
         public void On(RuleUpdated @event, EnvelopeHeaders headers)
@@ -56,7 +59,7 @@ namespace Squidex.Domain.Apps.Read.State.Grains
         {
             var id = @event.RuleId;
 
-            Rules[id] = Rules[id].Clone().Update(@event, headers, updater);
+            Rules = Rules.SetItem(id, x => x.Clone().Update(@event, headers, updater));
         }
     }
 }

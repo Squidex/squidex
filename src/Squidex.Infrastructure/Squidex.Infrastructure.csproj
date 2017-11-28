@@ -15,6 +15,7 @@
     <PackageReference Include="RefactoringEssentials" Version="5.4.0" />
     <PackageReference Include="SixLabors.ImageSharp" Version="1.0.0-beta0001" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.0.2" />
+    <PackageReference Include="System.Collections.Immutable" Version="1.4.0" />
     <PackageReference Include="System.Linq" Version="4.3.0" />
     <PackageReference Include="System.Reactive" Version="3.1.1" />
     <PackageReference Include="System.Reflection.TypeExtensions" Version="4.4.0" />

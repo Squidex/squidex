@@ -8,18 +8,20 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using Newtonsoft.Json;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Read.Apps;
 using Squidex.Domain.Apps.Read.Rules;
 using Squidex.Domain.Apps.Read.Schemas;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.Dispatching;
 
 namespace Squidex.Domain.Apps.Read.State.Grains
 {
-    public sealed partial class AppStateGrainState
+    public sealed partial class AppStateGrainState : Cloneable<AppStateGrainState>
     {
         private FieldRegistry registry;
 
@@ -27,10 +29,10 @@ namespace Squidex.Domain.Apps.Read.State.Grains
         public JsonAppEntity App { get; set; }
 
         [JsonProperty]
-        public Dictionary<Guid, JsonRuleEntity> Rules { get; set; }
+        public ImmutableDictionary<Guid, JsonRuleEntity> Rules { get; set; } = ImmutableDictionary<Guid, JsonRuleEntity>.Empty;
 
         [JsonProperty]
-        public Dictionary<Guid, JsonSchemaEntity> Schemas { get; set; }
+        public ImmutableDictionary<Guid, JsonSchemaEntity> Schemas { get; set; } = ImmutableDictionary<Guid, JsonSchemaEntity>.Empty;
 
         public void SetRegistry(FieldRegistry registry)
         {
@@ -57,21 +59,17 @@ namespace Squidex.Domain.Apps.Read.State.Grains
             return Rules?.Values.OfType<IRuleEntity>().ToList() ?? new List<IRuleEntity>();
         }
 
-        public void Reset()
+        public AppStateGrainState Apply(Envelope<IEvent> envelope)
         {
-            Rules = new Dictionary<Guid, JsonRuleEntity>();
-
-            Schemas = new Dictionary<Guid, JsonSchemaEntity>();
-        }
-
-        public void Apply(Envelope<IEvent> envelope)
-        {
-            this.DispatchAction(envelope.Payload, envelope.Headers);
-
-            if (App != null)
+            return Clone(c =>
             {
-                App.Etag = Guid.NewGuid().ToString();
-            }
+                c.DispatchAction(envelope.Payload, envelope.Headers);
+
+                if (c.App != null)
+                {
+                    c.App.Etag = Guid.NewGuid().ToString();
+                }
+            });
         }
     }
 }

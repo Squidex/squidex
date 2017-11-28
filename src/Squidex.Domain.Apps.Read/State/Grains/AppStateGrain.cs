@@ -18,14 +18,12 @@ using Squidex.Domain.Apps.Read.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
 using Squidex.Infrastructure.States;
-using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Read.State.Grains
 {
     public class AppStateGrain : StatefulObject<AppStateGrainState>
     {
         private readonly FieldRegistry fieldRegistry;
-        private readonly TaskFactory taskFactory = new TaskFactory(new LimitedConcurrencyLevelTaskScheduler(1));
         private Exception exception;
 
         public AppStateGrain(FieldRegistry fieldRegistry)
@@ -53,101 +51,77 @@ namespace Squidex.Domain.Apps.Read.State.Grains
 
         public virtual Task<(IAppEntity, ISchemaEntity)> GetAppWithSchemaAsync(Guid id)
         {
-            return taskFactory.StartNew(() =>
-            {
-                var schema = State.FindSchema(x => x.Id == id && !x.IsDeleted);
+            var schema = State.FindSchema(x => x.Id == id && !x.IsDeleted);
 
-                return (State.GetApp(), schema);
-            });
+            return Task.FromResult((State.GetApp(), schema));
         }
 
         public virtual Task<IAppEntity> GetAppAsync()
         {
-            return taskFactory.StartNew(() =>
-            {
-                var value = State.GetApp();
+            var result = State.GetApp();
 
-                return value;
-            });
+            return Task.FromResult(result);
         }
 
         public virtual Task<List<IRuleEntity>> GetRulesAsync()
         {
-            return taskFactory.StartNew(() =>
-            {
-                var value = State.FindRules();
+            var result = State.FindRules();
 
-                return value;
-            });
+            return Task.FromResult(result);
         }
 
         public virtual Task<List<ISchemaEntity>> GetSchemasAsync()
         {
-            return taskFactory.StartNew(() =>
-            {
-                var value = State.FindSchemas(x => !x.IsDeleted);
+            var result = State.FindSchemas(x => !x.IsDeleted);
 
-                return value;
-            });
+            return Task.FromResult(result);
         }
 
         public virtual Task<ISchemaEntity> GetSchemaAsync(Guid id, bool provideDeleted = false)
         {
-            return taskFactory.StartNew(() =>
-            {
-                var value = State.FindSchema(x => x.Id == id && (!x.IsDeleted || provideDeleted));
+            var result = State.FindSchema(x => x.Id == id && (!x.IsDeleted || provideDeleted));
 
-                return value;
-            });
+            return Task.FromResult(result);
         }
 
         public virtual Task<ISchemaEntity> GetSchemaAsync(string name, bool provideDeleted = false)
         {
-            return taskFactory.StartNew(() =>
-            {
-                var value = State.FindSchema(x => string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase) && (!x.IsDeleted || provideDeleted));
+            var result = State.FindSchema(x => string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase) && (!x.IsDeleted || provideDeleted));
 
-                return value;
-            });
+            return Task.FromResult(result);
         }
 
-        public virtual Task HandleAsync(Envelope<IEvent> message)
+        public async virtual Task HandleAsync(Envelope<IEvent> message)
         {
-            return taskFactory.StartNew(async () =>
+            if (exception != null)
             {
-                if (exception != null)
+                if (message.Payload is AppCreated)
                 {
-                    if (message.Payload is AppCreated)
-                    {
-                        exception = null;
-                    }
-                    else
-                    {
-                        throw exception;
-                    }
+                    exception = null;
                 }
-
-                if (message.Payload is AppEvent appEvent)
+                else
                 {
-                    if (State.App == null || State.App.Id == appEvent.AppId.Id)
-                    {
-                        try
-                        {
-                            State.Apply(message);
-
-                            await WriteStateAsync();
-                        }
-                        catch (InconsistentStateException)
-                        {
-                            await ReadStateAsync();
-
-                            State.Apply(message);
-
-                            await WriteStateAsync();
-                        }
-                    }
+                    throw exception;
                 }
-            }).Unwrap();
+            }
+
+            if (message.Payload is AppEvent appEvent && (State.App == null || State.App.Id == appEvent.AppId.Id))
+            {
+                try
+                {
+                    State = State.Apply(message);
+
+                    await WriteStateAsync();
+                }
+                catch (InconsistentStateException)
+                {
+                    await ReadStateAsync();
+
+                    State = State.Apply(message);
+
+                    await WriteStateAsync();
+                }
+            }
         }
     }
 }
