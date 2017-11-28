@@ -426,7 +426,7 @@ export class NumberFieldPropertiesDto extends FieldPropertiesDto {
         }
 
         if (this.allowedValues && this.allowedValues.length > 0) {
-            validators.push(ValidatorsEx.validValues(this.allowedValues.map(String)));
+            validators.push(ValidatorsEx.validValues(this.allowedValues));
         }
 
         return validators;
