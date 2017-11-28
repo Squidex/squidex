@@ -137,6 +137,11 @@ namespace Squidex.Domain.Apps.Read.State.Grains
             });
         }
 
+        public void On(SchemaDeleted @event, EnvelopeHeaders headers)
+        {
+            Schemas.Remove(@event.SchemaId.Id);
+        }
+
         public void On(WebhookAdded @event, EnvelopeHeaders headers)
         {
             UpdateSchema(@event, headers);
