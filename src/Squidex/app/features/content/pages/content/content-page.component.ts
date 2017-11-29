@@ -256,11 +256,25 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
                     fieldForm.controls['iv'].setValue(fieldValue['iv'] === undefined ? null : fieldValue['iv']);
                 }
             }
-
             if (this.content.status === 'Archived') {
                 this.contentForm.disable();
+            }
+        } else {
+            for (const field of this.schema.fields) {
+                if (field.properties.hasOwnProperty('defaultValue')) {
+                    const defaultValue = (field.properties as any).defaultValue;
+                    if (defaultValue) {
+                        const fieldForm = <FormGroup>this.contentForm.get(field.name);
+                        if (field.partitioning === 'language') {
+                            for (let language of this.languages) {
+                                fieldForm.controls[language.iso2Code].setValue(defaultValue);
+                            }
+                        } else {
+                            fieldForm.controls['iv'].setValue(defaultValue);
+                        }
+                    }
+                }
             }
         }
     }
 }
-

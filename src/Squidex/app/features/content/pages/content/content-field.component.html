@@ -31,7 +31,7 @@
                             </div>
                             <div *ngSwitchCase="'Dropdown'">
                                 <select class="form-control" [formControlName]="partition">
-                                    <option></option>
+                                    <option [ngValue]="null"></option>
                                     <option *ngFor="let value of field.properties.allowedValues" [ngValue]="value">{{value}}</option>
                                 </select>
                             </div>
@@ -60,6 +60,7 @@
                             </div>
                             <div *ngSwitchCase="'Dropdown'">
                                 <select class="form-control" [formControlName]="partition">
+                                    <option [ngValue]="null"></option>
                                     <option *ngFor="let value of field.properties.allowedValues" [ngValue]="value">{{value}}</option>
                                 </select>
                             </div>
