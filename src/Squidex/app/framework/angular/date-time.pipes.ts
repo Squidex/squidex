@@ -16,7 +16,17 @@ import { Duration } from './../utils/duration';
 })
 export class ShortDatePipe implements PipeTransform {
     public transform(value: DateTime): any {
-        return value.toStringFormat('DD.MMM');
+        return value.toStringFormat('DD. MMM');
+    }
+}
+
+@Pipe({
+    name: 'sqxDate',
+    pure: true
+})
+export class DatePipe implements PipeTransform {
+    public transform(value: DateTime): any {
+        return value.toStringFormat('DD. MMM YYYY');
     }
 }
 

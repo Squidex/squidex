@@ -43,6 +43,7 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
     private contentUnpublishedSubscription: Subscription;
     private contentDeletedSubscription: Subscription;
     private contentVersionSelectedSubscription: Subscription;
+    private contentOld: ContentDto;
 
     public schema: SchemaDetailsDto;
 
@@ -68,7 +69,6 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
     }
 
     public ngOnInit() {
-
         this.contentVersionSelectedSubscription =
             this.ctx.bus.of(ContentVersionSelected)
                 .subscribe(message => {
@@ -119,6 +119,14 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
         } else {
             return this.ctx.confirmUnsavedChanges();
         }
+    }
+
+    public showLatest() {
+        this.content = this.contentOld;
+        this.contentOld = null;
+
+        this.emitContentUpdated(this.content);
+        this.populateContentForm();
     }
 
     public saveAndPublish() {
@@ -176,6 +184,12 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
         if (!this.isNewMode && this.content) {
            this.contentsService.getVersionData(this.ctx.appName, this.schema.name, this.content.id, new Version(version.toString()))
                 .subscribe(dto => {
+                    if (this.content.version.value !== version.toString()) {
+                        this.contentOld = this.content;
+                    } else {
+                        this.contentOld = null;
+                    }
+
                     this.content = this.content.setData(dto);
 
                     this.ctx.notifyInfo('Content version loaded successfully.');

@@ -40,7 +40,7 @@ export class UsersProviderService {
 
         return result
             .map(dto => {
-                if (this.authService.user && dto.id === this.authService.user.id) {
+                if (me && this.authService.user && dto.id === this.authService.user.id) {
                     dto = new UserDto(dto.id, dto.email, me, dto.pictureUrl, dto.isLocked);
                 }
                 return dto;

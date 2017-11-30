@@ -77,6 +77,14 @@ a {
             color: inherit;
         }
     }
+
+    &.force {
+        &:hover {
+            text-decoration: underline !important;
+            cursor: pointer;
+            color: inherit;
+        }
+    }
 }
 
 //

@@ -8,6 +8,7 @@
 import { DateTime, Duration } from './../';
 
 import {
+    DatePipe,
     DayOfWeekPipe,
     DayPipe,
     DurationPipe,
@@ -76,12 +77,23 @@ describe('DayOfWeekPipe', () => {
     });
 });
 
+describe('DatePipe', () => {
+    it('should format to two digit day number and short month name and year', () => {
+        const pipe = new DatePipe();
+
+        const actual = pipe.transform(dateTime);
+        const expected = '03. Oct 2013';
+
+        expect(actual).toBe(expected);
+    });
+});
+
 describe('ShortDatePipe', () => {
     it('should format to two digit day number and short month name', () => {
         const pipe = new ShortDatePipe();
 
         const actual = pipe.transform(dateTime);
-        const expected = '03.Oct';
+        const expected = '03. Oct';
 
         expect(actual).toBe(expected);
     });
