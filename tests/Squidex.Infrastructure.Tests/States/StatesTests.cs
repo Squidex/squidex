@@ -44,16 +44,6 @@ namespace Squidex.Infrastructure.States
         }
 
         [Fact]
-        public async Task Should_provide_object_from_cache()
-        {
-            cache.Set(key, state);
-
-            var actual = await sut.GetAsync<MyStatefulObject, int>(key);
-
-            Assert.Same(state, actual);
-        }
-
-        [Fact]
         public async Task Should_read_from_store()
         {
             A.CallTo(() => store.ReadAsync<int>(key))
@@ -62,7 +52,7 @@ namespace Squidex.Infrastructure.States
             var actual = await sut.GetAsync<MyStatefulObject, int>(key);
 
             Assert.Same(state, actual);
-            Assert.Same(state, cache.Get<MyStatefulObject>(key));
+            Assert.NotNull(cache.Get<object>(key));
 
             Assert.Equal(123, state.State);
         }
@@ -73,7 +63,7 @@ namespace Squidex.Infrastructure.States
             var actual = await sut.GetAsync<MyStatefulObject, int>(key);
 
             Assert.Same(state, actual);
-            Assert.Same(state, cache.Get<MyStatefulObject>(key));
+            Assert.NotNull(cache.Get<object>(key));
         }
 
         [Fact]
@@ -82,12 +72,11 @@ namespace Squidex.Infrastructure.States
             var actual1 = await sut.GetAsync<MyStatefulObject, int>(key);
 
             Assert.Same(state, actual1);
-            Assert.Same(state, cache.Get<MyStatefulObject>(key));
+            Assert.NotNull(cache.Get<object>(key));
 
             var actual2 = await sut.GetAsync<MyStatefulObject, int>(key);
 
             Assert.Same(state, actual2);
-            Assert.Same(state, cache.Get<MyStatefulObject>(key));
 
             A.CallTo(() => services.GetService(typeof(MyStatefulObject)))
                 .MustHaveHappened(Repeated.Exactly.Once);
@@ -111,8 +100,6 @@ namespace Squidex.Infrastructure.States
             var actual = await sut.GetAsync<MyStatefulObject, int>(key);
 
             Assert.Same(state, actual);
-            Assert.Same(state, cache.Get<MyStatefulObject>(key));
-
             Assert.Equal(123, state.State);
 
             state.SetState(456);
@@ -127,7 +114,7 @@ namespace Squidex.Infrastructure.States
         }
 
         [Fact]
-        public async Task Should_remove_from_cache_when_message_sent()
+        public async Task Should_remove_from_cache_when_invalidation_message_received()
         {
             var actual = await sut.GetAsync<MyStatefulObject, int>(key);
 
