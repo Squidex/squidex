@@ -43,11 +43,11 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
     private contentUnpublishedSubscription: Subscription;
     private contentDeletedSubscription: Subscription;
     private contentVersionSelectedSubscription: Subscription;
-    private contentOld: ContentDto;
 
     public schema: SchemaDetailsDto;
 
     public content: ContentDto;
+    public contentOld: ContentDto;
     public contentFormSubmitted = false;
     public contentForm: FormGroup;
 
