@@ -16,7 +16,7 @@ namespace Squidex.Infrastructure.States
 {
     public sealed class StateFactory : DisposableObjectBase, IExternalSystem, IStateFactory
     {
-        private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(1);
+        private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(10);
         private readonly IPubSub pubSub;
         private readonly IStateStore store;
         private readonly IMemoryCache statesCache;
