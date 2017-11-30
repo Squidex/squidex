@@ -262,7 +262,7 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
         } else {
             for (const field of this.schema.fields) {
                 if (field.properties.hasOwnProperty('defaultValue')) {
-                    const defaultValue = (field.properties as any).defaultValue;
+                    const defaultValue = field.defaultValue();
                     if (defaultValue) {
                         const fieldForm = <FormGroup>this.contentForm.get(field.name);
                         if (field.partitioning === 'language') {
