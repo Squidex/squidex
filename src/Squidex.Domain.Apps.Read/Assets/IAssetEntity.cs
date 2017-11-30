@@ -6,22 +6,20 @@
 //  All rights reserved.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.ValidateContent;
+
 namespace Squidex.Domain.Apps.Read.Assets
 {
-    public interface IAssetEntity : IEntityWithAppRef, IEntityWithCreatedBy, IEntityWithLastModifiedBy, IEntityWithVersion
+    public interface IAssetEntity :
+        IEntity,
+        IEntityWithAppRef,
+        IEntityWithCreatedBy,
+        IEntityWithLastModifiedBy,
+        IEntityWithVersion,
+        IAssetInfo
     {
         string MimeType { get; }
 
-        string FileName { get; }
-
-        long FileSize { get; }
-
         long FileVersion { get; }
-
-        bool IsImage { get; }
-
-        int? PixelWidth { get; }
-
-        int? PixelHeight { get; }
     }
 }

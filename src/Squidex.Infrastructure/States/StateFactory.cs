@@ -88,24 +88,24 @@ namespace Squidex.Infrastructure.States
 
             lock (lockObject)
             {
-                if (statesCache.TryGetValue<T>(key, out var state))
+                if (statesCache.TryGetValue<ObjectHolder<T, TState>>(key, out var stateObj))
                 {
-                    return Task.FromResult(state);
+                    return stateObj.ActivateAsync();
                 }
 
-                state = (T)services.GetService(typeof(T));
+                var state = (T)services.GetService(typeof(T));
 
                 var stateHolder = new StateHolder<TState>(key, () =>
                 {
                     pubSub.Publish(new InvalidateMessage { Key = key }, false);
                 }, store);
 
+                stateObj = new ObjectHolder<T, TState>(state, stateHolder);
+
                 statesCache.CreateEntry(key)
-                    .SetValue(state)
+                    .SetValue(stateObj)
                     .SetAbsoluteExpiration(CacheDuration)
                     .Dispose();
-
-                var stateObj = new ObjectHolder<T, TState>(state, stateHolder);
 
                 return stateObj.ActivateAsync();
             }

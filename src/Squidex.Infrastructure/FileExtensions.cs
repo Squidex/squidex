@@ -36,6 +36,11 @@ namespace Squidex.Infrastructure
             }
         }
 
+        public static string ToReadableSize(this int value)
+        {
+            return ToReadableSize((long)value);
+        }
+
         public static string ToReadableSize(this long value)
         {
             if (value < 0)

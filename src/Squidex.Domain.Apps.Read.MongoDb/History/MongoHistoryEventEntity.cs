@@ -15,6 +15,7 @@ using Squidex.Infrastructure.MongoDb;
 namespace Squidex.Domain.Apps.Read.MongoDb.History
 {
     public sealed class MongoHistoryEventEntity : MongoEntity,
+        IEntity,
         IEntityWithAppRef,
         IUpdateableEntityWithVersion,
         IUpdateableEntityWithCreatedBy,

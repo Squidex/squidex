@@ -579,7 +579,17 @@ export class AssetsFieldPropertiesDto extends FieldPropertiesDto {
         isRequired: boolean,
         isListField: boolean,
         public readonly minItems?: number,
-        public readonly maxItems?: number
+        public readonly maxItems?: number,
+        public readonly minSize?: number,
+        public readonly maxSize?: number,
+        public readonly allowedExtensions?: string[],
+        public readonly mustBeImage?: boolean,
+        public readonly minWidth?: number,
+        public readonly maxWidth?: number,
+        public readonly minHeight?: number,
+        public readonly maxHeight?: number,
+        public readonly aspectWidth?: number,
+        public readonly aspectHeight?: number
     ) {
         super('Assets', label, hints, placeholder, isRequired, isListField);
     }

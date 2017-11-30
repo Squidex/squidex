@@ -1,8 +1,6 @@
 <form [formGroup]="createForm" (ngSubmit)="createSchema()">
     <div *ngIf="createFormError">
-        <div class="form-alert form-alert-error">
-            {{createFormError}}
-        </div>
+        <div class="form-alert form-alert-error" [innerHTML]="createFormError"></div>
     </div>
 
 	<div class="form-group">

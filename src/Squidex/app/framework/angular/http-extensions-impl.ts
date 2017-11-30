@@ -19,29 +19,29 @@ export class Versioned<T> {
 }
 
 function formatMessage(message: string, details?: string[]) {
-    const parts: string[] = [];
+    const format = (row: string) => {
+        const last = row[row.length - 1];
 
-    const addPart = (p: string) => {
-        p = p.trim();
-
-        const c = p[p.length - 1];
-
-        if (c !== '.') {
-            p += '.';
+        if (last !== '.') {
+            return row + '.';
+        } else {
+            return row;
         }
-
-        parts.push(p);
     };
 
-    addPart(message);
+    let result = format(message);
 
     if (details) {
+        result = result + '<ul>';
+
         for (let d of details) {
-            addPart(d);
+            result += `<li>${format(d)}</li>`;
         }
+
+        result = result + '</ul>';
     }
 
-    return parts.join(' ');
+    return result;
 }
 
 export class ErrorDto {

@@ -16,7 +16,7 @@ const DEFAULT_ERRORS: { [key: string]: string } = {
     patternmessage: '{message}',
     minvalue: '{field} must be larger than {minValue}.',
     maxvalue: '{field} must be smaller than {maxValue}.',
-    minlength: '{field} must have a length of more than {requiredLength}.',
+    minmax: '{field} must have a length of more than {requiredLength}.',
     maxlength: '{field} must have a length of less than {requiredLength}.',
     match: '{message}',
     validdatetime: '{field} is not a valid date time',

@@ -34,6 +34,34 @@ namespace Squidex.Domain.Apps.Write.Schemas.Guards
                     nameof(properties.MinItems),
                     nameof(properties.MaxItems));
             }
+
+            if (properties.MaxHeight.HasValue && properties.MinHeight.HasValue && properties.MinHeight.Value >= properties.MaxHeight.Value)
+            {
+                yield return new ValidationError("Max height must be greater than min height.",
+                    nameof(properties.MaxHeight),
+                    nameof(properties.MinHeight));
+            }
+
+            if (properties.MaxWidth.HasValue && properties.MinWidth.HasValue && properties.MinWidth.Value >= properties.MaxWidth.Value)
+            {
+                yield return new ValidationError("Max width must be greater than min width.",
+                    nameof(properties.MaxWidth),
+                    nameof(properties.MinWidth));
+            }
+
+            if (properties.MaxSize.HasValue && properties.MinSize.HasValue && properties.MinSize.Value >= properties.MaxSize.Value)
+            {
+                yield return new ValidationError("Max size must be greater than min size.",
+                    nameof(properties.MaxSize),
+                    nameof(properties.MinSize));
+            }
+
+            if (properties.AspectWidth.HasValue != properties.AspectHeight.HasValue)
+            {
+                yield return new ValidationError("Aspect width and height must be defined.",
+                    nameof(properties.AspectWidth),
+                    nameof(properties.AspectHeight));
+            }
         }
 
         public IEnumerable<ValidationError> Visit(BooleanFieldProperties properties)

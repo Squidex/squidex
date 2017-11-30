@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  IHistoryEventEntity.cs
+//  IAssetInfo.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -7,18 +7,21 @@
 // ==========================================================================
 
 using System;
-using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Read.History
+namespace Squidex.Domain.Apps.Core.ValidateContent
 {
-    public interface IHistoryEventEntity : IEntity
+    public interface IAssetInfo
     {
-        Guid EventId { get; }
+        Guid AssetId { get; }
 
-        RefToken Actor { get; }
+        long FileSize { get; }
 
-        string Message { get; }
+        bool IsImage { get; }
 
-        long Version { get; }
+        int? PixelWidth { get; }
+
+        int? PixelHeight { get; }
+
+        string FileName { get; }
     }
 }

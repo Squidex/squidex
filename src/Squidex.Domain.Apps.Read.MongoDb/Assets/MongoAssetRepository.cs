@@ -39,15 +39,6 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Assets
                     .Descending(x => x.LastModified));
         }
 
-        public async Task<IReadOnlyList<Guid>> QueryNotFoundAsync(Guid appId, IList<Guid> assetIds)
-        {
-            var assetEntities =
-                await Collection.Find(x => assetIds.Contains(x.Id) && x.AppId == appId).Project<BsonDocument>(Project.Include(x => x.Id))
-                    .ToListAsync();
-
-            return assetIds.Except(assetEntities.Select(x => Guid.Parse(x["_id"].AsString))).ToList();
-        }
-
         public async Task<IReadOnlyList<IAssetEntity>> QueryAsync(Guid appId, HashSet<string> mimeTypes = null, HashSet<Guid> ids = null, string query = null, int take = 10, int skip = 0)
         {
             var filter = CreateFilter(appId, mimeTypes, ids, query);

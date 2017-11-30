@@ -53,7 +53,7 @@ namespace Squidex.Domain.Apps.Read.Contents
 
             if (asset == null)
             {
-                asset = await assetRepository.FindAssetAsync(id).ConfigureAwait(false);
+                asset = await assetRepository.FindAssetAsync(id);
 
                 if (asset != null)
                 {
@@ -70,7 +70,7 @@ namespace Squidex.Domain.Apps.Read.Contents
 
             if (content == null)
             {
-                content = (await contentQuery.FindContentAsync(app, schemaId.ToString(), user, id).ConfigureAwait(false)).Content;
+                content = (await contentQuery.FindContentAsync(app, schemaId.ToString(), user, id)).Content;
 
                 if (content != null)
                 {
@@ -95,14 +95,14 @@ namespace Squidex.Domain.Apps.Read.Contents
 
         public async Task<IReadOnlyList<IContentEntity>> QueryContentsAsync(string schemaIdOrName, string query)
         {
-            var contents = (await contentQuery.QueryWithCountAsync(app, schemaIdOrName, user, false, query).ConfigureAwait(false)).Items;
+            var contents = await contentQuery.QueryWithCountAsync(app, schemaIdOrName, user, false, query);
 
-            foreach (var content in contents)
+            foreach (var content in contents.Items)
             {
                 cachedContents[content.Id] = content;
             }
 
-            return contents;
+            return contents.Items;
         }
 
         public async Task<IReadOnlyList<IAssetEntity>> GetReferencedAssetsAsync(ICollection<Guid> ids)
@@ -113,7 +113,7 @@ namespace Squidex.Domain.Apps.Read.Contents
 
             if (notLoadedAssets.Count > 0)
             {
-                var assets = await assetRepository.QueryAsync(app.Id, null, notLoadedAssets, null, int.MaxValue).ConfigureAwait(false);
+                var assets = await assetRepository.QueryAsync(app.Id, null, notLoadedAssets, null, int.MaxValue);
 
                 foreach (var asset in assets)
                 {
@@ -132,9 +132,9 @@ namespace Squidex.Domain.Apps.Read.Contents
 
             if (notLoadedContents.Count > 0)
             {
-                var contents = (await contentQuery.QueryWithCountAsync(app, schemaId.ToString(), user, false, notLoadedContents).ConfigureAwait(false)).Items;
+                var contents = await contentQuery.QueryWithCountAsync(app, schemaId.ToString(), user, false, notLoadedContents);
 
-                foreach (var content in contents)
+                foreach (var content in contents.Items)
                 {
                     cachedContents[content.Id] = content;
                 }

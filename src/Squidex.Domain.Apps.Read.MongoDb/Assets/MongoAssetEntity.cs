@@ -8,6 +8,7 @@
 
 using System;
 using MongoDB.Bson.Serialization.Attributes;
+using Squidex.Domain.Apps.Core.ValidateContent;
 using Squidex.Domain.Apps.Read.Assets;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
@@ -65,5 +66,10 @@ namespace Squidex.Domain.Apps.Read.MongoDb.Assets
         [BsonRequired]
         [BsonElement]
         public RefToken LastModifiedBy { get; set; }
+
+        Guid IAssetInfo.AssetId
+        {
+            get { return Id; }
+        }
     }
 }

@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public void Should_instantiate_field()
         {
-            var sut = new JsonField(1, "my-json", Partitioning.Invariant);
+            var sut = Field(new JsonFieldProperties());
 
             Assert.Equal("my-json", sut.Name);
         }
@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_not_add_error_if_json_is_valid()
         {
-            var sut = new JsonField(1, "my-json", Partitioning.Invariant);
+            var sut = Field(new JsonFieldProperties());
 
             await sut.ValidateAsync(CreateValue(new JValue(1)), errors);
 
@@ -40,7 +40,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_add_errors_if_json_is_required()
         {
-            var sut = new JsonField(1, "my-json", Partitioning.Invariant, new JsonFieldProperties { IsRequired = true });
+            var sut = Field(new JsonFieldProperties { IsRequired = true });
 
             await sut.ValidateAsync(CreateValue(JValue.CreateNull()), errors);
 
@@ -51,6 +51,11 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         private static JValue CreateValue(JValue v)
         {
             return v;
+        }
+
+        private static JsonField Field(JsonFieldProperties properties)
+        {
+            return new JsonField(1, "my-json", Partitioning.Invariant, properties);
         }
     }
 }
