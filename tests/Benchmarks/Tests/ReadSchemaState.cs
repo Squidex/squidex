@@ -7,7 +7,7 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
+using System.Collections.Immutable;
 using Benchmarks.Tests.TestData;
 using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
@@ -41,7 +41,7 @@ namespace Benchmarks.Tests
                 }
             };
 
-            state.Schemas = new Dictionary<Guid, JsonSchemaEntity>();
+            state.Schemas = ImmutableDictionary<Guid, JsonSchemaEntity>.Empty;
 
             for (var i = 1; i <= 100; i++)
             {
@@ -60,10 +60,10 @@ namespace Benchmarks.Tests
                     schema.SchemaDef = schema.SchemaDef.AddField(new StringField(j, j.ToString(), Partitioning.Invariant));
                 }
 
-                state.Schemas.Add(schema.Id, schema);
+                state.Schemas = state.Schemas.Add(schema.Id, schema);
             }
 
-            state.Rules = new Dictionary<Guid, JsonRuleEntity>();
+            state.Rules = ImmutableDictionary<Guid, JsonRuleEntity>.Empty;
 
             for (var i = 0; i < 100; i++)
             {
@@ -77,7 +77,7 @@ namespace Benchmarks.Tests
                     RuleDef = new Rule(new ContentChangedTrigger(), new WebhookAction())
                 };
 
-                state.Rules.Add(rule.Id, rule);
+                state.Rules = state.Rules.Add(rule.Id, rule);
             }
 
             grain.SetState(state);

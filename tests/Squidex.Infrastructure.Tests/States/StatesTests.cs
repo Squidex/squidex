@@ -7,6 +7,7 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.Extensions.Caching.Memory;
@@ -132,57 +133,31 @@ namespace Squidex.Infrastructure.States
 
             await InvalidateCacheAsync();
 
-            Assert.True(actual.IsDisposed);
+            Assert.False(cache.TryGetValue(key, out var t));
         }
 
         [Fact]
-        public async Task Should_not_dispose_detached_when_message_sent()
+        public async Task Should_return_same_instance_for_parallel_requests()
         {
-            var actual = await sut.GetDetachedAsync<MyStatefulObject, int>(key);
+            A.CallTo(() => store.ReadAsync<int>(key))
+                .ReturnsLazily(() => Task.Delay(1).ContinueWith(x => (1, "1")));
 
-            await InvalidateCacheAsync();
+            var tasks = new List<Task<MyStatefulObject>>();
 
-            Assert.False(actual.IsDisposed);
-        }
+            for (var i = 0; i < 1000; i++)
+            {
+                tasks.Add(Task.Run(() => sut.GetAsync<MyStatefulObject, int>(key)));
+            }
 
-        [Fact]
-        public async Task Should_dispose_states_if_exired()
-        {
-            var actual = await sut.GetAsync<MyStatefulObject, int>(key);
+            var retrievedStates = await Task.WhenAll(tasks);
 
-            await RemoveFromCacheAsync();
+            foreach (var retrievedState in retrievedStates)
+            {
+                Assert.Same(retrievedStates[0], retrievedState);
+            }
 
-            Assert.True(actual.IsDisposed);
-        }
-
-        [Fact]
-        public async Task Should_not_dispose_detached_states_if_exired()
-        {
-            var actual = await sut.GetDetachedAsync<MyStatefulObject, int>(key);
-
-            await RemoveFromCacheAsync();
-
-            Assert.False(actual.IsDisposed);
-        }
-
-        [Fact]
-        public async Task Should_dispose_states_if_disposed()
-        {
-            var actual = await sut.GetAsync<MyStatefulObject, int>(key);
-
-            sut.Dispose();
-
-            Assert.True(actual.IsDisposed);
-        }
-
-        [Fact]
-        public async Task Should_not_dispose_detached_states_if_disposed()
-        {
-            var actual = await sut.GetDetachedAsync<MyStatefulObject, int>(key);
-
-            sut.Dispose();
-
-            Assert.False(actual.IsDisposed);
+            A.CallTo(() => store.ReadAsync<int>(key))
+                .MustHaveHappened(Repeated.Exactly.Once);
         }
 
         private async Task RemoveFromCacheAsync()

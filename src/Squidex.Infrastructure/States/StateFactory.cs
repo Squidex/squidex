@@ -7,10 +7,10 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
-using Squidex.Infrastructure.Tasks;
+
+#pragma warning disable RECS0096 // Type parameter is never used
 
 namespace Squidex.Infrastructure.States
 {
@@ -21,9 +21,26 @@ namespace Squidex.Infrastructure.States
         private readonly IStateStore store;
         private readonly IMemoryCache statesCache;
         private readonly IServiceProvider services;
-        private readonly List<IDisposable> states = new List<IDisposable>();
-        private readonly TaskFactory taskFactory = new TaskFactory(new LimitedConcurrencyLevelTaskScheduler(1));
+        private readonly object lockObject = new object();
         private IDisposable pubSubscription;
+
+        public sealed class ObjectHolder<T, TState> where T : StatefulObject<TState>
+        {
+            private readonly Task activationTask;
+            private readonly T obj;
+
+            public ObjectHolder(T obj, IStateHolder<TState> stateHolder)
+            {
+                this.obj = obj;
+
+                activationTask = obj.ActivateAsync(stateHolder);
+            }
+
+            public Task<T> ActivateAsync()
+            {
+                return activationTask.ContinueWith(x => obj);
+            }
+        }
 
         public StateFactory(
             IPubSub pubSub,
@@ -46,7 +63,10 @@ namespace Squidex.Infrastructure.States
         {
             pubSubscription = pubSub.Subscribe<InvalidateMessage>(m =>
             {
-                statesCache.Remove(m.Key);
+                lock (lockObject)
+                {
+                    statesCache.Remove(m.Key);
+                }
             });
         }
 
@@ -66,54 +86,36 @@ namespace Squidex.Infrastructure.States
         {
             Guard.NotNull(key, nameof(key));
 
-            return taskFactory.StartNew(async () =>
+            lock (lockObject)
             {
                 if (statesCache.TryGetValue<T>(key, out var state))
                 {
-                    return state;
+                    return Task.FromResult(state);
                 }
-                else
+
+                state = (T)services.GetService(typeof(T));
+
+                var stateHolder = new StateHolder<TState>(key, () =>
                 {
-                    state = (T)services.GetService(typeof(T));
+                    pubSub.Publish(new InvalidateMessage { Key = key }, false);
+                }, store);
 
-                    var stateHolder = new StateHolder<TState>(key, () =>
-                    {
-                        pubSub.Publish(new InvalidateMessage { Key = key }, false);
-                    }, store);
+                statesCache.CreateEntry(key)
+                    .SetValue(state)
+                    .SetAbsoluteExpiration(CacheDuration)
+                    .Dispose();
 
-                    await state.ActivateAsync(stateHolder);
+                var stateObj = new ObjectHolder<T, TState>(state, stateHolder);
 
-                    statesCache.CreateEntry(key)
-                        .SetValue(state)
-                        .SetAbsoluteExpiration(CacheDuration)
-                        .RegisterPostEvictionCallback((k, v, r, s) =>
-                        {
-                            taskFactory.StartNew(() =>
-                            {
-                                state.Dispose();
-                                states.Remove(state);
-                            }).Forget();
-                        })
-                        .Dispose();
-
-                    states.Add(state);
-
-                    return state;
-                }
-            }).Unwrap();
+                return stateObj.ActivateAsync();
+            }
         }
 
         protected override void DisposeObject(bool disposing)
         {
             if (disposing)
             {
-                taskFactory.StartNew(() =>
-                {
-                    foreach (var state in states)
-                    {
-                        state.Dispose();
-                    }
-                }).Wait();
+                pubSubscription.Dispose();
             }
         }
     }

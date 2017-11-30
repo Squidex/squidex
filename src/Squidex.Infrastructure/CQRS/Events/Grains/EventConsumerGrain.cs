@@ -7,6 +7,7 @@
 // ==========================================================================
 
 using System;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.States;
@@ -38,12 +39,9 @@ namespace Squidex.Infrastructure.CQRS.Events.Grains
             this.eventStore = eventStore;
         }
 
-        protected override void DisposeObject(bool disposing)
+        public void Dispose()
         {
-            if (disposing)
-            {
-                dispatcher.StopAndWaitAsync().Wait();
-            }
+            dispatcher.StopAndWaitAsync().Wait();
         }
 
         protected virtual IEventSubscription CreateSubscription(IEventStore eventStore, string streamFilter, string position)
@@ -179,12 +177,12 @@ namespace Squidex.Infrastructure.CQRS.Events.Grains
             return dispatcher.DispatchAsync(() => HandleErrorAsync(subscription, exception));
         }
 
-        private Task DoAndUpdateStateAsync(Action action)
+        private Task DoAndUpdateStateAsync(Action action, [CallerMemberName] string caller = null)
         {
-            return DoAndUpdateStateAsync(() => { action(); return TaskHelper.Done; });
+            return DoAndUpdateStateAsync(() => { action(); return TaskHelper.Done; }, caller);
         }
 
-        private async Task DoAndUpdateStateAsync(Func<Task> action)
+        private async Task DoAndUpdateStateAsync(Func<Task> action, [CallerMemberName] string caller = null)
         {
             try
             {
@@ -202,7 +200,7 @@ namespace Squidex.Infrastructure.CQRS.Events.Grains
                 }
 
                 log.LogFatal(ex, w => w
-                    .WriteProperty("action", "HandleEvent")
+                    .WriteProperty("action", caller)
                     .WriteProperty("state", "Failed")
                     .WriteProperty("eventConsumer", eventConsumer.Name));
 

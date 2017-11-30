@@ -117,9 +117,6 @@ namespace Squidex.Infrastructure.CQRS.Events.Grains
         public void Should_not_dispose_actors()
         {
             sut.Dispose();
-
-            Assert.False(actor1.IsDisposed);
-            Assert.False(actor2.IsDisposed);
         }
     }
 }

@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Squidex.Infrastructure.States
 {
-    public abstract class StatefulObject<T> : DisposableObjectBase
+    public abstract class StatefulObject<T>
     {
         private IStateHolder<T> stateHolder;
 
@@ -60,10 +60,6 @@ namespace Squidex.Infrastructure.States
             {
                 await stateHolder.WriteAsync();
             }
-        }
-
-        protected override void DisposeObject(bool disposing)
-        {
         }
     }
 }
