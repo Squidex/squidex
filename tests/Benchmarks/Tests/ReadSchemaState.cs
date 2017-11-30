@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using Benchmarks.Tests.TestData;
 using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
@@ -41,7 +42,7 @@ namespace Benchmarks.Tests
                 }
             };
 
-            state.Schemas = new Dictionary<Guid, JsonSchemaEntity>();
+            state.Schemas = ImmutableDictionary<Guid, JsonSchemaEntity>.Empty;
 
             for (var i = 1; i <= 100; i++)
             {
@@ -63,7 +64,7 @@ namespace Benchmarks.Tests
                 state.Schemas.Add(schema.Id, schema);
             }
 
-            state.Rules = new Dictionary<Guid, JsonRuleEntity>();
+            state.Rules = ImmutableDictionary<Guid, JsonRuleEntity>.Empty;
 
             for (var i = 0; i < 100; i++)
             {

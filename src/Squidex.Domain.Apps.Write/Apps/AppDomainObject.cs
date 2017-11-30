@@ -7,6 +7,8 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
+using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Apps;
@@ -25,8 +27,10 @@ namespace Squidex.Domain.Apps.Write.Apps
         private AppContributors contributors = AppContributors.Empty;
         private AppClients clients = AppClients.Empty;
         private LanguagesConfig languagesConfig = LanguagesConfig.English;
+        private AppPatterns patterns = AppPatterns.Empty;
         private AppPlan plan;
         private string name;
+        private IOptions<List<AppPattern>> defaultPatterns;
 
         public string Name
         {
@@ -53,9 +57,16 @@ namespace Squidex.Domain.Apps.Write.Apps
             get { return languagesConfig; }
         }
 
-        public AppDomainObject(Guid id, int version)
+        public AppPatterns Patterns
+        {
+            get { return patterns; }
+        }
+
+        public AppDomainObject(IOptions<List<AppPattern>> defaultPatterns, Guid id, int version)
             : base(id, version)
         {
+            Guard.NotNull(defaultPatterns.Value, nameof(defaultPatterns));
+            this.defaultPatterns = defaultPatterns;
         }
 
         protected void On(AppCreated @event)
@@ -113,6 +124,21 @@ namespace Squidex.Domain.Apps.Write.Apps
             plan = string.IsNullOrWhiteSpace(@event.PlanId) ? null : new AppPlan(@event.Actor, @event.PlanId);
         }
 
+        protected void On(AppPatternAdded @event)
+        {
+            patterns = patterns.Apply(@event);
+        }
+
+        protected void On(AppPatternDeleted @event)
+        {
+            patterns = patterns.Apply(@event);
+        }
+
+        protected void On(AppPatternUpdated @event)
+        {
+            patterns = patterns.Apply(@event);
+        }
+
         protected override void DispatchEvent(Envelope<IEvent> @event)
         {
             this.DispatchAction(@event.Payload);
@@ -128,6 +154,7 @@ namespace Squidex.Domain.Apps.Write.Apps
 
             RaiseEvent(SimpleMapper.Map(command, CreateInitialOwner(appId, command)));
             RaiseEvent(SimpleMapper.Map(command, CreateInitialLanguage(appId)));
+            CreateInitialPatterns(command, appId);
 
             return this;
         }
@@ -221,6 +248,33 @@ namespace Squidex.Domain.Apps.Write.Apps
             return this;
         }
 
+        public AppDomainObject AddPattern(AddPattern command)
+        {
+            ThrowIfNotCreated();
+
+            RaiseEvent(SimpleMapper.Map(command, new AppPatternAdded()));
+
+            return this;
+        }
+
+        public AppDomainObject DeletePattern(DeletePattern command)
+        {
+            ThrowIfNotCreated();
+
+            RaiseEvent(SimpleMapper.Map(command, new AppPatternDeleted()));
+
+            return this;
+        }
+
+        public AppDomainObject UpdatePattern(UpdatePattern command)
+        {
+            ThrowIfNotCreated();
+
+            RaiseEvent(SimpleMapper.Map(command, new AppPatternUpdated()));
+
+            return this;
+        }
+
         private void RaiseEvent(AppEvent @event)
         {
             if (@event.AppId == null)
@@ -239,6 +293,20 @@ namespace Squidex.Domain.Apps.Write.Apps
         private static AppContributorAssigned CreateInitialOwner(NamedId<Guid> id, SquidexCommand command)
         {
             return new AppContributorAssigned { AppId = id, ContributorId = command.Actor.Identifier, Permission = AppContributorPermission.Owner };
+        }
+
+        private void CreateInitialPatterns(SquidexCommand command, NamedId<Guid> id)
+        {
+            foreach (var option in defaultPatterns.Value)
+            {
+                RaiseEvent(SimpleMapper.Map(command, new AppPatternAdded
+                {
+                    Name = option.Name,
+                    Pattern = option.Pattern,
+                    DefaultMessage = option.DefaultMessage,
+                    AppId = id
+                }));
+            }
         }
 
         private void ThrowIfNotCreated()

@@ -13,6 +13,7 @@ using Microsoft.Extensions.Options;
 using NSwag.Annotations;
 using Squidex.Areas.Api.Controllers.UI.Models;
 using Squidex.Config;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Infrastructure.CQRS.Commands;
 using Squidex.Pipeline;
 
@@ -25,12 +26,12 @@ namespace Squidex.Areas.Api.Controllers.UI
     [SwaggerTag(nameof(UI))]
     public sealed class UIController : ApiController
     {
-        private readonly MyUIOptions uiOptions;
+        private readonly List<AppPattern> patterns;
 
-        public UIController(ICommandBus commandBus, IOptions<MyUIOptions> uiOptions)
+        public UIController(ICommandBus commandBus, IOptions<List<AppPattern>> patterns)
             : base(commandBus)
         {
-            this.uiOptions = uiOptions.Value;
+            this.patterns = patterns.Value;
         }
 
         /// <summary>
@@ -45,11 +46,11 @@ namespace Squidex.Areas.Api.Controllers.UI
             var dto = new UISettingsDto
             {
                 RegexSuggestions =
-                    uiOptions.RegexSuggestions?
+                    patterns?
                         .Where(x =>
-                            !string.IsNullOrWhiteSpace(x.Key) &&
-                            !string.IsNullOrWhiteSpace(x.Value))
-                        .Select(x => new UIRegexSuggestionDto { Name = x.Key, Pattern = x.Value }).ToList()
+                            !string.IsNullOrWhiteSpace(x.Name) &&
+                            !string.IsNullOrWhiteSpace(x.Pattern))
+                        .Select(x => new UIRegexSuggestionDto { Name = x.Name, Pattern = x.Pattern, DefaultMessage = x.DefaultMessage }).ToList()
                     ?? new List<UIRegexSuggestionDto>()
             };
 

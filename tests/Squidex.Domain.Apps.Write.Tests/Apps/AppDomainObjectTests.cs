@@ -9,6 +9,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using FakeItEasy;
+using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Domain.Apps.Write.Apps.Commands;
@@ -26,10 +28,11 @@ namespace Squidex.Domain.Apps.Write.Apps
         private readonly string clientId = "client";
         private readonly string clientNewName = "My Client";
         private readonly string planId = "premium";
+        private readonly IOptions<List<AppPattern>> defaultPatterns = A.Fake<IOptions<List<AppPattern>>>();
 
         public AppDomainObjectTests()
         {
-            sut = new AppDomainObject(AppId, 0);
+            sut = new AppDomainObject(defaultPatterns, AppId, 0);
         }
 
         [Fact]
@@ -46,6 +49,11 @@ namespace Squidex.Domain.Apps.Write.Apps
         [Fact]
         public void Create_should_specify_name_and_owner()
         {
+            A.CallTo(() => defaultPatterns.Value)
+                .Returns(new List<AppPattern>
+                    { new AppPattern { Name = "Pattern", Pattern = "[0-9]", DefaultMessage = "Default Message" } }
+                );
+
             sut.Create(CreateCommand(new CreateApp { Name = AppName, Actor = User, AppId = AppId }));
 
             Assert.Equal(AppName, sut.Name);
@@ -54,7 +62,8 @@ namespace Squidex.Domain.Apps.Write.Apps
                 .ShouldHaveSameEvents(
                     CreateEvent(new AppCreated { Name = AppName }),
                     CreateEvent(new AppContributorAssigned { ContributorId = User.Identifier, Permission = AppContributorPermission.Owner }),
-                    CreateEvent(new AppLanguageAdded { Language = Language.EN })
+                    CreateEvent(new AppLanguageAdded { Language = Language.EN }),
+                    CreateEvent(new AppPatternAdded { Name = "Pattern", Pattern = "[0-9]", DefaultMessage = "Default Message" })
                 );
         }
 
@@ -264,6 +273,121 @@ namespace Squidex.Domain.Apps.Write.Apps
                 );
         }
 
+        [Fact]
+        public void AddPattern_should_throw_exception_if_app_not_created()
+        {
+            Assert.Throws<DomainException>(() =>
+            {
+                sut.AddPattern(CreateCommand(new AddPattern
+                {
+                    Name = "Pattern",
+                    Pattern = "[0-9]",
+                    DefaultMessage = "Message"
+                }));
+            });
+        }
+
+        [Fact]
+        public void AddPattern_should_create_events()
+        {
+            CreateApp();
+
+            sut.AddPattern(CreateCommand(new AddPattern
+            {
+                Name = "New Pattern",
+                Pattern = "[0-9]",
+                DefaultMessage = "Message"
+            }));
+
+            sut.GetUncomittedEvents()
+                .ShouldHaveSameEvents(
+                    CreateEvent(new AppPatternAdded
+                    {
+                        Name = "New Pattern",
+                        Pattern = "[0-9]",
+                        DefaultMessage = "Message"
+                    })
+                );
+
+            Assert.Single(sut.Patterns);
+        }
+
+        [Fact]
+        public void DeletePattern_should_throw_exception_if_app_not_created()
+        {
+            Assert.Throws<DomainException>(() =>
+            {
+                sut.DeletePattern(CreateCommand(new DeletePattern
+                {
+                    Name = "Pattern"
+                }));
+            });
+        }
+
+        [Fact]
+        public void DeletePattern_should_create_events()
+        {
+            CreateApp();
+            CreatePattern();
+
+            sut.DeletePattern(CreateCommand(new DeletePattern
+            {
+                Name = "Pattern"
+            }));
+
+            sut.GetUncomittedEvents()
+                .ShouldHaveSameEvents(
+                    CreateEvent(new AppPatternDeleted
+                    {
+                        Name = "Pattern",
+                    })
+                );
+
+            Assert.Empty(sut.Patterns);
+        }
+
+        [Fact]
+        public void UpdatePattern_should_throw_exception_if_app_not_created()
+        {
+            Assert.Throws<DomainException>(() =>
+            {
+                sut.UpdatePattern(CreateCommand(new UpdatePattern
+                {
+                    Name = "Pattern",
+                    OriginalName = "Original",
+                    Pattern = "[0-9]"
+                }));
+            });
+        }
+
+        [Fact]
+        public void UpdatePattern_should_create_events()
+        {
+            CreateApp();
+            CreatePattern();
+
+            sut.UpdatePattern(CreateCommand(new UpdatePattern
+            {
+                Name = "Pattern Update",
+                OriginalName = "Pattern",
+                Pattern = "[0-9]",
+                DefaultMessage = "Message"
+            }));
+
+            sut.GetUncomittedEvents()
+                .ShouldHaveSameEvents(
+                    CreateEvent(new AppPatternUpdated
+                    {
+                        Name = "Pattern Update",
+                        OriginalName = "Pattern",
+                        Pattern = "[0-9]",
+                        DefaultMessage = "Message"
+                    })
+                );
+
+            Assert.Single(sut.Patterns);
+        }
+
         private void CreateApp()
         {
             sut.Create(CreateCommand(new CreateApp { Name = AppName }));
@@ -282,6 +406,17 @@ namespace Squidex.Domain.Apps.Write.Apps
         {
             sut.AddLanguage(CreateCommand(new AddLanguage { Language = language }));
 
+            ((IAggregate)sut).ClearUncommittedEvents();
+        }
+
+        private void CreatePattern()
+        {
+            sut.AddPattern(CreateCommand(new AddPattern
+            {
+                Name = "Pattern",
+                Pattern = "[0-9]",
+                DefaultMessage = "Message"
+            }));
             ((IAggregate)sut).ClearUncommittedEvents();
         }
     }
