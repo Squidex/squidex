@@ -317,6 +317,10 @@ export class FieldDto {
     public createValidators(isOptional: boolean): ValidatorFn[] {
         return this.properties.createValidators(isOptional);
     }
+
+    public defaultValue(): any {
+        return this.properties.getDefaultValue();
+    }
 }
 
 export abstract class FieldPropertiesDto {
@@ -333,6 +337,10 @@ export abstract class FieldPropertiesDto {
     public abstract formatValue(value: any): string;
 
     public abstract createValidators(isOptional: boolean): ValidatorFn[];
+
+    public getDefaultValue(): any {
+        return null;
+    }
 }
 
 export class StringFieldPropertiesDto extends FieldPropertiesDto {
@@ -387,6 +395,10 @@ export class StringFieldPropertiesDto extends FieldPropertiesDto {
 
         return validators;
     }
+
+    public getDefaultValue(): any {
+        return this.defaultValue;
+    }
 }
 
 export class NumberFieldPropertiesDto extends FieldPropertiesDto {
@@ -426,10 +438,18 @@ export class NumberFieldPropertiesDto extends FieldPropertiesDto {
         }
 
         if (this.allowedValues && this.allowedValues.length > 0) {
-            validators.push(ValidatorsEx.validValues(this.allowedValues));
+            if (this.isRequired && !isOptional) {
+                validators.push(ValidatorsEx.validValues(this.allowedValues));
+            } else {
+                validators.push(ValidatorsEx.validValues(this.allowedValues.concat([null])));
+            }
         }
 
         return validators;
+    }
+
+    public getDefaultValue(): any {
+        return this.defaultValue;
     }
 }
 
@@ -473,6 +493,17 @@ export class DateTimeFieldPropertiesDto extends FieldPropertiesDto {
 
         return validators;
     }
+
+    public getDefaultValue(): any {
+        if (this.calculatedDefaultValue != null) {
+            let now = DateTime.now();
+            if (this.calculatedDefaultValue === 'Today') {
+                now = now.date;
+            }
+            return now.toUTCStringFormat('ddd, DD MMM YYYY hh:mm:ss Z');
+        }
+        return this.defaultValue;
+    }
 }
 
 export class BooleanFieldPropertiesDto extends FieldPropertiesDto {
@@ -501,6 +532,10 @@ export class BooleanFieldPropertiesDto extends FieldPropertiesDto {
         }
 
         return validators;
+    }
+
+    public getDefaultValue(): any {
+        return this.defaultValue;
     }
 }
 
