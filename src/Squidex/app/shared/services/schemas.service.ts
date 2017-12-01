@@ -802,272 +802,272 @@ export class SchemasService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas`);
 
         return HTTP.getVersioned<any>(this.http, url)
-            .map(response => {
-                const body = response.payload.body;
+                .map(response => {
+                    const body = response.payload.body;
 
-                const items: any[] = body;
+                    const items: any[] = body;
 
-                return items.map(item => {
-                    const properties = new SchemaPropertiesDto(item.properties.label, item.properties.hints);
+                    return items.map(item => {
+                        const properties = new SchemaPropertiesDto(item.properties.label, item.properties.hints);
 
-                    return new SchemaDto(
-                        item.id,
-                        item.name, properties,
-                        item.isPublished,
-                        item.createdBy,
-                        item.lastModifiedBy,
-                        DateTime.parseISO_UTC(item.created),
-                        DateTime.parseISO_UTC(item.lastModified),
-                        new Version(item.version.toString()));
-                });
-            })
-            .pretifyError('Failed to load schemas. Please reload.');
+                        return new SchemaDto(
+                            item.id,
+                            item.name, properties,
+                            item.isPublished,
+                            item.createdBy,
+                            item.lastModifiedBy,
+                            DateTime.parseISO_UTC(item.created),
+                            DateTime.parseISO_UTC(item.lastModified),
+                            new Version(item.version.toString()));
+                    });
+                })
+                .pretifyError('Failed to load schemas. Please reload.');
     }
 
     public getSchema(appName: string, id: string): Observable<SchemaDetailsDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${id}`);
 
         return HTTP.getVersioned<any>(this.http, url)
-            .map(response => {
-                const body = response.payload.body;
+                .map(response => {
+                    const body = response.payload.body;
 
-                const fields = body.fields.map((item: any) => {
-                    const propertiesDto =
-                        createProperties(
-                            item.properties.fieldType,
-                            item.properties);
+                    const fields = body.fields.map((item: any) => {
+                        const propertiesDto =
+                            createProperties(
+                                item.properties.fieldType,
+                                item.properties);
 
-                    return new FieldDto(
-                        item.fieldId,
-                        item.name,
-                        item.isLocked,
-                        item.isHidden,
-                        item.isDisabled,
-                        item.partitioning,
-                        propertiesDto);
-                });
+                        return new FieldDto(
+                            item.fieldId,
+                            item.name,
+                            item.isLocked,
+                            item.isHidden,
+                            item.isDisabled,
+                            item.partitioning,
+                            propertiesDto);
+                    });
 
-                const properties = new SchemaPropertiesDto(body.properties.label, body.properties.hints);
+                    const properties = new SchemaPropertiesDto(body.properties.label, body.properties.hints);
 
-                return new SchemaDetailsDto(
-                    body.id,
-                    body.name, properties,
-                    body.isPublished,
-                    body.createdBy,
-                    body.lastModifiedBy,
-                    DateTime.parseISO_UTC(body.created),
-                    DateTime.parseISO_UTC(body.lastModified),
-                    response.version,
-                    fields,
-                    body.scriptQuery,
-                    body.scriptCreate,
-                    body.scriptUpdate,
-                    body.scriptDelete,
-                    body.scriptChange);
-            })
-            .catch(error => {
-                if (error instanceof HttpErrorResponse && error.status === 404) {
-                    const cached = this.localCache.get(`schema.${appName}.${id}`);
+                    return new SchemaDetailsDto(
+                        body.id,
+                        body.name, properties,
+                        body.isPublished,
+                        body.createdBy,
+                        body.lastModifiedBy,
+                        DateTime.parseISO_UTC(body.created),
+                        DateTime.parseISO_UTC(body.lastModified),
+                        response.version,
+                        fields,
+                        body.scriptQuery,
+                        body.scriptCreate,
+                        body.scriptUpdate,
+                        body.scriptDelete,
+                        body.scriptChange);
+                })
+                .catch(error => {
+                    if (error instanceof HttpErrorResponse && error.status === 404) {
+                        const cached = this.localCache.get(`schema.${appName}.${id}`);
 
-                    if (cached) {
-                        return Observable.of(cached);
+                        if (cached) {
+                            return Observable.of(cached);
+                        }
                     }
-                }
 
-                return Observable.throw(error);
-            })
-            .pretifyError('Failed to load schema. Please reload.');
+                    return Observable.throw(error);
+                })
+                .pretifyError('Failed to load schema. Please reload.');
     }
 
     public postSchema(appName: string, dto: CreateSchemaDto, user: string, now: DateTime): Observable<SchemaDetailsDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas`);
 
         return HTTP.postVersioned<any>(this.http, url, dto)
-            .map(response => {
-                const body = response.payload.body;
+                .map(response => {
+                    const body = response.payload.body;
 
-                now = now || DateTime.now();
+                    now = now || DateTime.now();
 
-                return new SchemaDetailsDto(
-                    body.id,
-                    dto.name,
-                    dto.properties || new SchemaPropertiesDto(),
-                    false,
-                    user,
-                    user,
-                    now,
-                    now,
-                    response.version,
-                    dto.fields || [],
-                    body.scriptQuery,
-                    body.scriptCreate,
-                    body.scriptUpdate,
-                    body.scriptDelete,
-                    body.scriptChange);
-            })
-            .do(schema => {
-                this.analytics.trackEvent('Schema', 'Created', appName);
+                    return new SchemaDetailsDto(
+                        body.id,
+                        dto.name,
+                        dto.properties || new SchemaPropertiesDto(),
+                        false,
+                        user,
+                        user,
+                        now,
+                        now,
+                        response.version,
+                        dto.fields || [],
+                        body.scriptQuery,
+                        body.scriptCreate,
+                        body.scriptUpdate,
+                        body.scriptDelete,
+                        body.scriptChange);
+                })
+                .do(schema => {
+                    this.analytics.trackEvent('Schema', 'Created', appName);
 
-                this.localCache.set(`schema.${appName}.${schema.id}`, schema, 5000);
-                this.localCache.set(`schema.${appName}.${schema.name}`, schema, 5000);
-            })
-            .pretifyError('Failed to create schema. Please reload.');
+                    this.localCache.set(`schema.${appName}.${schema.id}`, schema, 5000);
+                    this.localCache.set(`schema.${appName}.${schema.name}`, schema, 5000);
+                })
+                .pretifyError('Failed to create schema. Please reload.');
     }
 
     public postField(appName: string, schemaName: string, dto: AddFieldDto, version: Version): Observable<Versioned<FieldDto>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/fields`);
 
         return HTTP.postVersioned<any>(this.http, url, dto, version)
-            .map(response => {
-                const body = response.payload.body;
+                .map(response => {
+                    const body = response.payload.body;
 
-                const field = new FieldDto(
-                    body.id,
-                    dto.name,
-                    false,
-                    false,
-                    false,
-                    dto.partitioning,
-                    dto.properties);
+                    const field = new FieldDto(
+                        body.id,
+                        dto.name,
+                        false,
+                        false,
+                        false,
+                        dto.partitioning,
+                        dto.properties);
 
-                return new Versioned(response.version, field);
-            })
-            .do(() => {
-                this.analytics.trackEvent('Schema', 'FieldCreated', appName);
-            })
-            .pretifyError('Failed to add field. Please reload.');
+                    return new Versioned(response.version, field);
+                })
+                .do(() => {
+                    this.analytics.trackEvent('Schema', 'FieldCreated', appName);
+                })
+                .pretifyError('Failed to add field. Please reload.');
     }
 
     public deleteSchema(appName: string, schemaName: string, version: Version): Observable<Versioned<any>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}`);
 
         return HTTP.deleteVersioned(this.http, url, version)
-            .do(() => {
-                this.localCache.remove(`schema.${appName}.${schemaName}`);
-            })
-            .do(() => {
-                this.analytics.trackEvent('Schema', 'Deleted', appName);
-            })
-            .pretifyError('Failed to delete schema. Please reload.');
+                .do(() => {
+                    this.localCache.remove(`schema.${appName}.${schemaName}`);
+                })
+                .do(() => {
+                    this.analytics.trackEvent('Schema', 'Deleted', appName);
+                })
+                .pretifyError('Failed to delete schema. Please reload.');
     }
 
     public putSchemaScripts(appName: string, schemaName: string, dto: UpdateSchemaScriptsDto, version: Version): Observable<Versioned<any>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/scripts`);
 
         return HTTP.putVersioned(this.http, url, dto, version)
-            .do(() => {
-                this.analytics.trackEvent('Schema', 'ScriptsConfigured', appName);
-            })
-            .pretifyError('Failed to update schema scripts. Please reload.');
+                .do(() => {
+                    this.analytics.trackEvent('Schema', 'ScriptsConfigured', appName);
+                })
+                .pretifyError('Failed to update schema scripts. Please reload.');
     }
 
     public putSchema(appName: string, schemaName: string, dto: UpdateSchemaDto, version: Version): Observable<Versioned<any>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}`);
 
         return HTTP.putVersioned(this.http, url, dto, version)
-            .do(() => {
-                this.analytics.trackEvent('Schema', 'Updated', appName);
-            })
-            .pretifyError('Failed to update schema. Please reload.');
+                .do(() => {
+                    this.analytics.trackEvent('Schema', 'Updated', appName);
+                })
+                .pretifyError('Failed to update schema. Please reload.');
     }
 
     public putFieldOrdering(appName: string, schemaName: string, dto: number[], version: Version): Observable<Versioned<any>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/fields/ordering`);
 
         return HTTP.putVersioned(this.http, url, { fieldIds: dto }, version)
-            .do(() => {
-                this.analytics.trackEvent('Schema', 'FieldsReordered', appName);
-            })
-            .pretifyError('Failed to reorder fields. Please reload.');
+                .do(() => {
+                    this.analytics.trackEvent('Schema', 'FieldsReordered', appName);
+                })
+                .pretifyError('Failed to reorder fields. Please reload.');
     }
 
     public publishSchema(appName: string, schemaName: string, version: Version): Observable<Versioned<any>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/publish`);
 
         return HTTP.putVersioned(this.http, url, {}, version)
-            .do(() => {
-                this.analytics.trackEvent('Schema', 'Published', appName);
-            })
-            .pretifyError('Failed to publish schema. Please reload.');
+                .do(() => {
+                    this.analytics.trackEvent('Schema', 'Published', appName);
+                })
+                .pretifyError('Failed to publish schema. Please reload.');
     }
 
     public unpublishSchema(appName: string, schemaName: string, version: Version): Observable<Versioned<any>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/unpublish`);
 
         return HTTP.putVersioned(this.http, url, {}, version)
-            .do(() => {
-                this.analytics.trackEvent('Schema', 'Unpublished', appName);
-            })
-            .pretifyError('Failed to unpublish schema. Please reload.');
+                .do(() => {
+                    this.analytics.trackEvent('Schema', 'Unpublished', appName);
+                })
+                .pretifyError('Failed to unpublish schema. Please reload.');
     }
 
     public putField(appName: string, schemaName: string, fieldId: number, dto: UpdateFieldDto, version: Version): Observable<Versioned<any>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/fields/${fieldId}`);
 
         return HTTP.putVersioned(this.http, url, dto, version)
-            .do(() => {
-                this.analytics.trackEvent('Schema', 'FieldUpdated', appName);
-            })
-            .pretifyError('Failed to update field. Please reload.');
+                .do(() => {
+                    this.analytics.trackEvent('Schema', 'FieldUpdated', appName);
+                })
+                .pretifyError('Failed to update field. Please reload.');
     }
 
     public enableField(appName: string, schemaName: string, fieldId: number, version: Version): Observable<Versioned<any>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/fields/${fieldId}/enable`);
 
         return HTTP.putVersioned(this.http, url, {}, version)
-            .do(() => {
-                this.analytics.trackEvent('Schema', 'FieldEnabled', appName);
-            })
-            .pretifyError('Failed to enable field. Please reload.');
+                .do(() => {
+                    this.analytics.trackEvent('Schema', 'FieldEnabled', appName);
+                })
+                .pretifyError('Failed to enable field. Please reload.');
     }
 
     public disableField(appName: string, schemaName: string, fieldId: number, version: Version): Observable<Versioned<any>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/fields/${fieldId}/disable`);
 
         return HTTP.putVersioned(this.http, url, {}, version)
-            .do(() => {
-                this.analytics.trackEvent('Schema', 'FieldDisabled', appName);
-            })
-            .pretifyError('Failed to disable field. Please reload.');
+                .do(() => {
+                    this.analytics.trackEvent('Schema', 'FieldDisabled', appName);
+                })
+                .pretifyError('Failed to disable field. Please reload.');
     }
 
     public lockField(appName: string, schemaName: string, fieldId: number, version: Version): Observable<Versioned<any>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/fields/${fieldId}/lock`);
 
         return HTTP.putVersioned(this.http, url, {}, version)
-            .do(() => {
-                this.analytics.trackEvent('Schema', 'FieldLocked', appName);
-            })
-            .pretifyError('Failed to lock field. Please reload.');
+                .do(() => {
+                    this.analytics.trackEvent('Schema', 'FieldLocked', appName);
+                })
+                .pretifyError('Failed to lock field. Please reload.');
     }
 
     public showField(appName: string, schemaName: string, fieldId: number, version: Version): Observable<Versioned<any>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/fields/${fieldId}/show`);
 
         return HTTP.putVersioned(this.http, url, {}, version)
-            .do(() => {
-                this.analytics.trackEvent('Schema', 'FieldShown', appName);
-            })
-            .pretifyError('Failed to show field. Please reload.');
+                .do(() => {
+                    this.analytics.trackEvent('Schema', 'FieldShown', appName);
+                })
+                .pretifyError('Failed to show field. Please reload.');
     }
 
     public hideField(appName: string, schemaName: string, fieldId: number, version: Version): Observable<Versioned<any>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/fields/${fieldId}/hide`);
 
         return HTTP.putVersioned(this.http, url, {}, version)
-            .do(() => {
-                this.analytics.trackEvent('Schema', 'FieldHidden', appName);
-            })
-            .pretifyError('Failed to hide field. Please reload.');
+                .do(() => {
+                    this.analytics.trackEvent('Schema', 'FieldHidden', appName);
+                })
+                .pretifyError('Failed to hide field. Please reload.');
     }
 
     public deleteField(appName: string, schemaName: string, fieldId: number, version: Version): Observable<Versioned<any>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/fields/${fieldId}`);
 
         return HTTP.deleteVersioned(this.http, url, version)
-            .do(() => {
-                this.analytics.trackEvent('Schema', 'FieldDeleted', appName);
-            })
-            .pretifyError('Failed to delete field. Please reload.');
+                .do(() => {
+                    this.analytics.trackEvent('Schema', 'FieldDeleted', appName);
+                })
+                .pretifyError('Failed to delete field. Please reload.');
     }
 }
