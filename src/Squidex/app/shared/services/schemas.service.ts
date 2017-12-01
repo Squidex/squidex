@@ -338,7 +338,9 @@ export abstract class FieldPropertiesDto {
 
     public abstract createValidators(isOptional: boolean): ValidatorFn[];
 
-    public abstract getDefaultValue(): any;
+    public getDefaultValue(): any {
+        return null;
+    }
 }
 
 export class StringFieldPropertiesDto extends FieldPropertiesDto {
@@ -563,10 +565,6 @@ export class GeolocationFieldPropertiesDto extends FieldPropertiesDto {
 
         return validators;
     }
-
-    public getDefaultValue(): any {
-        return null;
-    }
 }
 
 export class ReferencesFieldPropertiesDto extends FieldPropertiesDto {
@@ -609,10 +607,6 @@ export class ReferencesFieldPropertiesDto extends FieldPropertiesDto {
 
         return validators;
     }
-
-    public getDefaultValue(): any {
-        return null;
-    }
 }
 
 export class AssetsFieldPropertiesDto extends FieldPropertiesDto {
@@ -653,10 +647,6 @@ export class AssetsFieldPropertiesDto extends FieldPropertiesDto {
         }
 
         return validators;
-    }
-
-    public getDefaultValue(): any {
-        return null;
     }
 }
 
@@ -699,10 +689,6 @@ export class TagsFieldPropertiesDto extends FieldPropertiesDto {
 
         return validators;
     }
-
-    public getDefaultValue(): any {
-        return null;
-    }
 }
 
 export class JsonFieldPropertiesDto extends FieldPropertiesDto {
@@ -729,10 +715,6 @@ export class JsonFieldPropertiesDto extends FieldPropertiesDto {
         }
 
         return validators;
-    }
-
-    public getDefaultValue(): any {
-        return null;
     }
 }
 
