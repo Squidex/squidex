@@ -261,17 +261,15 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
             }
         } else {
             for (const field of this.schema.fields) {
-                if (field.properties.hasOwnProperty('defaultValue')) {
-                    const defaultValue = field.defaultValue();
-                    if (defaultValue) {
-                        const fieldForm = <FormGroup>this.contentForm.get(field.name);
-                        if (field.partitioning === 'language') {
-                            for (let language of this.languages) {
-                                fieldForm.controls[language.iso2Code].setValue(defaultValue);
-                            }
-                        } else {
-                            fieldForm.controls['iv'].setValue(defaultValue);
+                const defaultValue = field.defaultValue();
+                if (defaultValue) {
+                    const fieldForm = <FormGroup>this.contentForm.get(field.name);
+                    if (field.partitioning === 'language') {
+                        for (let language of this.languages) {
+                            fieldForm.controls[language.iso2Code].setValue(defaultValue);
                         }
+                    } else {
+                        fieldForm.controls['iv'].setValue(defaultValue);
                     }
                 }
             }
