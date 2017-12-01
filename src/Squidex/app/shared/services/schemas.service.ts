@@ -494,15 +494,16 @@ export class DateTimeFieldPropertiesDto extends FieldPropertiesDto {
         return validators;
     }
 
-    public getDefaultValue(): any {
-        if (this.calculatedDefaultValue != null) {
-            let now = DateTime.now();
-            if (this.calculatedDefaultValue === 'Today') {
-                now = now.date;
-            }
-            return now.toUTCStringFormat('ddd, DD MMM YYYY hh:mm:ss Z');
+    public getDefaultValue(now?: DateTime): any {
+        now = now || DateTime.now();
+
+        if (this.calculatedDefaultValue === 'Now') {
+            return now.toUTCStringFormat('YYYY-MM-DDTHH:mm:ss') + 'Z';
+        } else if (this.calculatedDefaultValue === 'Today') {
+            return now.toUTCStringFormat('YYYY-MM-DD');
+        } else {
+            return this.defaultValue;
         }
-        return this.defaultValue;
     }
 }
 

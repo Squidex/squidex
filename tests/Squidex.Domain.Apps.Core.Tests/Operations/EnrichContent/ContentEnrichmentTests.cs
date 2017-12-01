@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EnrichContent
 {
     public class ContentEnrichmentTests
     {
-        private static readonly Instant Now = SystemClock.Instance.GetCurrentInstant();
+        private static readonly Instant Now = Instant.FromDateTimeUtc(new DateTime(2017, 10, 12, 16, 30, 10, DateTimeKind.Utc));
         private readonly LanguagesConfig languagesConfig = LanguagesConfig.Build(Language.DE, Language.EN);
         private readonly Schema schema;
 
@@ -119,7 +119,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EnrichContent
                 new DateTimeField(1, "1", Partitioning.Invariant,
                     new DateTimeFieldProperties { CalculatedDefaultValue = DateTimeCalculatedDefaultValue.Today });
 
-            Assert.Equal(Now.ToString().Substring(10), DefaultValueFactory.CreateDefaultValue(field, Now));
+            Assert.Equal("2017-10-12", DefaultValueFactory.CreateDefaultValue(field, Now));
         }
 
         [Fact]
@@ -129,7 +129,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EnrichContent
                 new DateTimeField(1, "1", Partitioning.Invariant,
                     new DateTimeFieldProperties { CalculatedDefaultValue = DateTimeCalculatedDefaultValue.Now });
 
-            Assert.Equal(Now.ToString(), DefaultValueFactory.CreateDefaultValue(field, Now));
+            Assert.Equal("2017-10-12T16:30:10Z", DefaultValueFactory.CreateDefaultValue(field, Now));
         }
 
         [Fact]
