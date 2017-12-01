@@ -12,15 +12,18 @@ import {
     AddFieldDto,
     AnalyticsService,
     ApiUrlConfig,
+    AssetsFieldPropertiesDto,
     CreateSchemaDto,
     createProperties,
     DateTime,
+    DateTimeFieldPropertiesDto,
     FieldDto,
     LocalCacheService,
     SchemaDetailsDto,
     SchemaDto,
     SchemaPropertiesDto,
     SchemasService,
+    StringFieldPropertiesDto,
     UpdateFieldDto,
     UpdateSchemaDto,
     UpdateSchemaScriptsDto,
@@ -682,4 +685,34 @@ describe('SchemasService', () => {
 
         req.flush({});
     }));
+});
+
+describe('FieldPropertiesDto', () => {
+    it('should return default value for StringFieldProperties', () => {
+        const dto = new StringFieldPropertiesDto(null, null, null, false, false, 'Input', 'Default Value');
+        expect(dto.getDefaultValue()).toEqual('Default Value');
+    });
+
+    it('should return default for DateFieldProperties', () => {
+        const now = DateTime.now();
+        const dto = new DateTimeFieldPropertiesDto(null, null, null, false, false, 'Input', now.toISOString());
+        expect(dto.getDefaultValue()).toEqual(now.toISOString());
+    });
+
+    it('should return calculated date when Today for DateFieldProperties', () => {
+        const now = DateTime.now().date;
+        const dto = new DateTimeFieldPropertiesDto(null, null, null, false, false, 'Input', null, null, null, 'Today');
+        expect(dto.getDefaultValue()).toEqual(now.toUTCStringFormat('ddd, DD MMM YYYY hh:mm:ss Z'));
+    });
+
+    it('should return calculated date when Now for DateFieldProperties', () => {
+        const now = DateTime.now();
+        const dto = new DateTimeFieldPropertiesDto(null, null, null, false, false, 'Input', null, null, null, 'Now');
+        expect(dto.getDefaultValue()).toEqual(now.toUTCStringFormat('ddd, DD MMM YYYY hh:mm:ss Z'));
+    });
+
+    it('should return null for default properties', () => {
+        const dto = new AssetsFieldPropertiesDto(null, null, null, false, false);
+        expect(dto.getDefaultValue()).toEqual(null);
+    });
 });

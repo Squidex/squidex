@@ -496,11 +496,11 @@ export class DateTimeFieldPropertiesDto extends FieldPropertiesDto {
 
     public getDefaultValue(): any {
         if (this.calculatedDefaultValue != null) {
-            let now = new Date();
+            let now = DateTime.now();
             if (this.calculatedDefaultValue === 'Today') {
-                now = new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+                now = now.date;
             }
-            return now.toUTCString();
+            return now.toUTCStringFormat('ddd, DD MMM YYYY hh:mm:ss Z');
         }
         return this.defaultValue;
     }
