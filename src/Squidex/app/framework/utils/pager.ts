@@ -59,10 +59,22 @@ export class Pager {
     }
 
     public incrementCount(): Pager {
-        return new Pager(this.numberOfItems + 1, this.page, this.pageSize);
+        const result = new Pager(this.numberOfItems + 1, this.page, this.pageSize);
+
+        if (result.canGoNext) {
+            result.itemLast = this.itemLast + 1;
+        }
+
+        return result;
     }
 
     public decrementCount(): Pager {
-        return new Pager(this.numberOfItems - 1, this.page, this.pageSize);
+        const result = new Pager(this.numberOfItems - 1, this.page, this.pageSize);
+
+        if (result.canGoNext) {
+            result.itemLast = this.itemLast - 1;
+        }
+
+        return result;
     }
 }
