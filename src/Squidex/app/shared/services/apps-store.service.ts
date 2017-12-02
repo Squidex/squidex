@@ -62,7 +62,7 @@ export class AppsStoreService {
     public createApp(dto: CreateAppDto, now?: DateTime): Observable<AppDto> {
         return this.appsService.postApp(dto)
             .do(app => {
-                this.apps$.first().subscribe(apps => {
+                this.apps$.take(1).subscribe(apps => {
                     this.apps$.next(apps.concat([app]));
                 });
             });

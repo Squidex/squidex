@@ -58,7 +58,7 @@ export class AppContext implements OnDestroy {
         public readonly bus: MessageBus
     ) {
         this.appSubscription =
-            this.appsStore.selectedApp.first().subscribe(app => {
+            this.appsStore.selectedApp.take(1).subscribe(app => {
                 this.appField = app;
             });
     }

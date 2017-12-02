@@ -20,7 +20,7 @@ export class MustBeAuthenticatedGuard implements CanActivate {
     }
 
     public canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> {
-        return this.authService.userChanges.first()
+        return this.authService.userChanges.take(1)
             .do(user => {
                 if (!user) {
                     this.router.navigate(['']);

@@ -68,9 +68,9 @@
     <PackageReference Include="Microsoft.Orleans.Core" Version="2.0.0-beta1" />
     <PackageReference Include="Microsoft.Orleans.OrleansRuntime" Version="2.0.0-beta1" />
     <PackageReference Include="MongoDB.Driver" Version="2.4.4" />
-    <PackageReference Include="NJsonSchema" Version="9.10.9" />
+    <PackageReference Include="NJsonSchema" Version="9.10.10" />
     <PackageReference Include="NodaTime.Serialization.JsonNet" Version="2.0.0" />
-    <PackageReference Include="NSwag.AspNetCore" Version="11.12.9" />
+    <PackageReference Include="NSwag.AspNetCore" Version="11.12.10" />
     <PackageReference Include="OpenCover" Version="4.6.519" />
     <PackageReference Include="RefactoringEssentials" Version="5.4.0" />
     <PackageReference Include="ReportGenerator" Version="3.0.2" />
