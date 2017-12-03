@@ -13,7 +13,7 @@ using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Domain.Apps.Write.Contents.Commands;
 using Squidex.Domain.Apps.Write.TestHelpers;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.CQRS;
+using Squidex.Infrastructure.Commands;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Write.Contents

@@ -13,9 +13,9 @@ using Squidex.Domain.Apps.Events.Schemas;
 using Squidex.Domain.Apps.Events.Schemas.Utils;
 using Squidex.Domain.Apps.Write.Schemas.Commands;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.CQRS;
-using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Dispatching;
+using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Write.Schemas

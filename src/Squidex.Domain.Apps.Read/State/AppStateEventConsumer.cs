@@ -47,21 +47,21 @@ namespace Squidex.Domain.Apps.Read.State
         {
             if (@event.Payload is AppEvent appEvent)
             {
-                var appGrain = await factory.GetAsync<AppStateGrain, AppStateGrainState>(appEvent.AppId.Name);
+                var appGrain = await factory.GetSynchronizedAsync<AppStateGrain>(appEvent.AppId.Name);
 
                 await appGrain.HandleAsync(@event);
             }
 
             if (@event.Payload is AppContributorAssigned contributorAssigned)
             {
-                var userGrain = await factory.GetAsync<AppUserGrain, AppUserGrainState>(contributorAssigned.ContributorId);
+                var userGrain = await factory.GetSynchronizedAsync<AppUserGrain>(contributorAssigned.ContributorId);
 
                 await userGrain.AddAppAsync(contributorAssigned.AppId.Name);
             }
 
             if (@event.Payload is AppContributorRemoved contributorRemoved)
             {
-                var userGrain = await factory.GetAsync<AppUserGrain, AppUserGrainState>(contributorRemoved.ContributorId);
+                var userGrain = await factory.GetSynchronizedAsync<AppUserGrain>(contributorRemoved.ContributorId);
 
                 await userGrain.RemoveAppAsync(contributorRemoved.AppId.Name);
             }

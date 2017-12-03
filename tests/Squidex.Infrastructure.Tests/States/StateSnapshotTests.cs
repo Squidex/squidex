@@ -191,7 +191,7 @@ namespace Squidex.Infrastructure.States
                 .Returns((123, version));
 
             A.CallTo(() => snapshotStore.WriteAsync(key, 123, version, 2))
-                .Throws(new InconsistentStateException(1, 1));
+                .Throws(new InconsistentStateException(1, 1, new InvalidOperationException()));
 
             var actualObject = await sut.GetSynchronizedAsync<MyStatefulObject>(key);
 

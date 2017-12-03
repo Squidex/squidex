@@ -10,8 +10,8 @@ using System;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Events.Assets;
-using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Dispatching;
+using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Read.MongoDb.Assets
 {

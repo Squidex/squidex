@@ -10,7 +10,6 @@ using System;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.CQRS;
 using Squidex.Infrastructure.Commands;
 
 #pragma warning disable IDE0019 // Use pattern matching

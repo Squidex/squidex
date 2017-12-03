@@ -10,8 +10,8 @@ using System.Threading.Tasks;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Domain.Apps.Read.History;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Dispatching;
+using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Read.Apps
 {

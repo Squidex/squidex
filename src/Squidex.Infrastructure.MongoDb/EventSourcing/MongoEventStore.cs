@@ -61,7 +61,7 @@ namespace Squidex.Infrastructure.EventSourcing
             return new PollingSubscription(this, notifier, subscriber, streamFilter, position);
         }
 
-        public async Task<IReadOnlyList<StoredEvent>> GetEventsAsync(string streamName, long streamPosition = -1)
+        public async Task<IReadOnlyList<StoredEvent>> GetEventsAsync(string streamName, long streamPosition = 0)
         {
             var commits = await Collection.Find(x => x.EventStreamOffset >= streamPosition).Sort(Sort.Ascending(TimestampField)).ToListAsync();
 

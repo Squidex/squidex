@@ -22,8 +22,8 @@ namespace Benchmarks.Tests
         private const int NumStreams = 10;
         private IServiceProvider services;
         private IEventStore eventStore;
+        private IEventDataFormatter eventDataFormatter;
         private EventConsumerGrain eventConsumerGrain;
-        private EventDataFormatter eventDataFormatter;
         private MyEventConsumer eventConsumer;
 
         public override void RunInitialize()
@@ -33,11 +33,11 @@ namespace Benchmarks.Tests
             eventConsumer = new MyEventConsumer(NumStreams * NumCommits);
 
             eventStore = services.GetRequiredService<IEventStore>();
+            eventDataFormatter = services.GetRequiredService<IEventDataFormatter>();
 
-            eventDataFormatter = services.GetRequiredService<EventDataFormatter>();
             eventConsumerGrain = services.GetRequiredService<EventConsumerGrain>();
 
-            eventConsumerGrain.ActivateAsync(services.GetRequiredService<StateHolder<EventConsumerState>>()).Wait();
+            eventConsumerGrain.ActivateAsync("Test", services.GetRequiredService<IStore>()).Wait();
             eventConsumerGrain.Activate(eventConsumer);
         }
 

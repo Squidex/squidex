@@ -32,49 +32,49 @@ namespace Squidex.Domain.Apps.Read.State
 
         public async Task<IAppEntity> GetAppAsync(string appName)
         {
-            var app = await factory.GetAsync<AppStateGrain, AppStateGrainState>(appName);
+            var app = await factory.GetSynchronizedAsync<AppStateGrain>(appName);
 
             return await app.GetAppAsync();
         }
 
         public async Task<(IAppEntity, ISchemaEntity)> GetAppWithSchemaAsync(string appName, Guid id)
         {
-            var app = await factory.GetAsync<AppStateGrain, AppStateGrainState>(appName);
+            var app = await factory.GetSynchronizedAsync<AppStateGrain>(appName);
 
             return await app.GetAppWithSchemaAsync(id);
         }
 
         public async Task<List<IRuleEntity>> GetRulesAsync(string appName)
         {
-            var app = await factory.GetAsync<AppStateGrain, AppStateGrainState>(appName);
+            var app = await factory.GetSynchronizedAsync<AppStateGrain>(appName);
 
             return await app.GetRulesAsync();
         }
 
         public async Task<ISchemaEntity> GetSchemaAsync(string appName, Guid id, bool provideDeleted = false)
         {
-            var app = await factory.GetAsync<AppStateGrain, AppStateGrainState>(appName);
+            var app = await factory.GetSynchronizedAsync<AppStateGrain>(appName);
 
             return await app.GetSchemaAsync(id, provideDeleted);
         }
 
         public async Task<ISchemaEntity> GetSchemaAsync(string appName, string name, bool provideDeleted = false)
         {
-            var app = await factory.GetAsync<AppStateGrain, AppStateGrainState>(appName);
+            var app = await factory.GetSynchronizedAsync<AppStateGrain>(appName);
 
             return await app.GetSchemaAsync(name, provideDeleted);
         }
 
         public async Task<List<ISchemaEntity>> GetSchemasAsync(string appName)
         {
-            var app = await factory.GetAsync<AppStateGrain, AppStateGrainState>(appName);
+            var app = await factory.GetSynchronizedAsync<AppStateGrain>(appName);
 
             return await app.GetSchemasAsync();
         }
 
         public async Task<List<IAppEntity>> GetUserApps(string userId)
         {
-            var appUser = await factory.GetAsync<AppUserGrain, AppUserGrainState>(userId);
+            var appUser = await factory.GetSynchronizedAsync<AppUserGrain>(userId);
             var appNames = await appUser.GetAppNamesAsync();
 
             var tasks = appNames.Select(x => GetAppAsync(x));

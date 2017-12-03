@@ -13,6 +13,7 @@ using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Write.Contents
 {
@@ -20,9 +21,9 @@ namespace Squidex.Domain.Apps.Write.Contents
     {
         private readonly IStreamNameResolver nameResolver;
         private readonly IEventStore eventStore;
-        private readonly EventDataFormatter formatter;
+        private readonly IEventDataFormatter formatter;
 
-        public ContentVersionLoader(IEventStore eventStore, IStreamNameResolver nameResolver, EventDataFormatter formatter)
+        public ContentVersionLoader(IEventStore eventStore, IStreamNameResolver nameResolver, IEventDataFormatter formatter)
         {
             Guard.NotNull(formatter, nameof(formatter));
             Guard.NotNull(eventStore, nameof(eventStore));

@@ -17,7 +17,6 @@ namespace Squidex.Domain.Apps.Read.State.Grains
     public sealed class AppUserGrain : IStatefulObject
     {
         private IPersistence<AppUserGrainState> persistence;
-        private Task readTask;
         private AppUserGrainState state;
 
         public Task ActivateAsync(string key, IStore store)
@@ -38,14 +37,14 @@ namespace Squidex.Domain.Apps.Read.State.Grains
         {
             state = state.AddApp(appName);
 
-            return persistence.WriteSnapShotAsync(state);
+            return persistence.WriteSnapshotAsync(state);
         }
 
         public Task RemoveAppAsync(string appName)
         {
             state = state.RemoveApp(appName);
 
-            return persistence.WriteSnapShotAsync(state);
+            return persistence.WriteSnapshotAsync(state);
         }
 
         public Task<List<string>> GetAppNamesAsync()

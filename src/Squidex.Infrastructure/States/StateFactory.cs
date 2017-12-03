@@ -26,7 +26,7 @@ namespace Squidex.Infrastructure.States
         private readonly IEventStore eventStore;
         private readonly IEventDataFormatter eventDataFormatter;
         private readonly object lockObject = new object();
-        private IDisposable pubSubscription;
+        private IDisposable pubSubSubscription;
 
         public sealed class ObjectHolder<T> where T : IStatefulObject
         {
@@ -76,7 +76,7 @@ namespace Squidex.Infrastructure.States
 
         public void Connect()
         {
-            pubSubscription = pubSub.Subscribe<InvalidateMessage>(m =>
+            pubSubSubscription = pubSub.Subscribe<InvalidateMessage>(m =>
             {
                 lock (lockObject)
                 {
@@ -128,9 +128,9 @@ namespace Squidex.Infrastructure.States
 
         protected override void DisposeObject(bool disposing)
         {
-            if (disposing)
+            if (disposing && pubSubSubscription != null)
             {
-                pubSubscription.Dispose();
+                pubSubSubscription.Dispose();
             }
         }
     }

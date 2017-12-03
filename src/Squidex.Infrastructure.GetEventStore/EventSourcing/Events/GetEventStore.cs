@@ -12,6 +12,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using EventStore.ClientAPI;
+using EventStore.ClientAPI.Exceptions;
 
 namespace Squidex.Infrastructure.EventSourcing
 {
@@ -59,7 +60,7 @@ namespace Squidex.Infrastructure.EventSourcing
             throw new NotSupportedException();
         }
 
-        public async Task<IReadOnlyList<StoredEvent>> GetEventsAsync(string streamName, long streamPosition = -1)
+        public async Task<IReadOnlyList<StoredEvent>> GetEventsAsync(string streamName, long streamPosition = 0)
         {
             var result = new List<StoredEvent>();
 

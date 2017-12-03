@@ -31,7 +31,7 @@ namespace Benchmarks.Tests
         {
             services = Services.Create();
 
-            grain = services.GetRequiredService<IStateFactory>().GetAsync<MyAppState, AppStateGrainState>("DEFAULT").Result;
+            grain = services.GetRequiredService<IStateFactory>().GetSynchronizedAsync<MyAppState>("DEFAULT").Result;
 
             var state = new AppStateGrainState
             {

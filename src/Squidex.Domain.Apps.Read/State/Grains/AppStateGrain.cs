@@ -25,7 +25,6 @@ namespace Squidex.Domain.Apps.Read.State.Grains
     {
         private readonly FieldRegistry fieldRegistry;
         private IPersistence<AppStateGrainState> persistence;
-        private Task readTask;
         private Exception exception;
         private AppStateGrainState state;
 
@@ -36,15 +35,10 @@ namespace Squidex.Domain.Apps.Read.State.Grains
             this.fieldRegistry = fieldRegistry;
         }
 
-        public Task ActivateAsync(string key, IStore store)
+        public async Task ActivateAsync(string key, IStore store)
         {
             persistence = store.WithSnapshots<AppStateGrain, AppStateGrainState>(key, s => state = s);
 
-            return readTask ?? (readTask = ReadInitialAsync());
-        }
-
-        private async Task ReadInitialAsync()
-        {
             try
             {
                 await persistence.ReadAsync();
@@ -121,15 +115,15 @@ namespace Squidex.Domain.Apps.Read.State.Grains
                 {
                     state = state.Apply(message);
 
-                    await persistence.WriteSnapShotAsync(state);
+                    await persistence.WriteSnapshotAsync(state);
                 }
                 catch (InconsistentStateException)
                 {
-                    await persistence.ReadAsync(true);
+                    await persistence.ReadAsync();
 
                     state = state.Apply(message);
 
-                    await persistence.WriteSnapShotAsync(state);
+                    await persistence.WriteSnapshotAsync(state);
                 }
             }
         }
