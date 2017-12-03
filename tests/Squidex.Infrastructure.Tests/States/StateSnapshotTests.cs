@@ -17,7 +17,7 @@ using Xunit;
 
 namespace Squidex.Infrastructure.States
 {
-    public class StateSnapshotTests
+    public class StateSnapshotTests : IDisposable
     {
         private class MyStatefulObject : IStatefulObject
         {
@@ -67,6 +67,11 @@ namespace Squidex.Infrastructure.States
 
             sut = new StateFactory(pubSub, cache, eventStore, eventDataFormatter, services, snapshotStore, streamNameResolver);
             sut.Connect();
+        }
+
+        public void Dispose()
+        {
+            sut.Dispose();
         }
 
         [Fact]
@@ -141,10 +146,24 @@ namespace Squidex.Infrastructure.States
 
             var actualObject2 = await sut.GetSynchronizedAsync<MyStatefulObject>(key);
 
-            Assert.Same(statefulObject, actualObject2);
-
             A.CallTo(() => services.GetService(typeof(MyStatefulObject)))
                 .MustHaveHappened(Repeated.Exactly.Once);
+        }
+
+        [Fact]
+        public async Task Should_not_serve_next_request_from_cache_when_detached()
+        {
+            statefulObject.ExpectedVersion = null;
+
+            var actualObject1 = await sut.GetDetachedAsync<MyStatefulObject>(key);
+
+            Assert.Same(statefulObject, actualObject1);
+            Assert.Null(cache.Get<object>(key));
+
+            var actualObject2 = await sut.GetDetachedAsync<MyStatefulObject>(key);
+
+            A.CallTo(() => services.GetService(typeof(MyStatefulObject)))
+                .MustHaveHappened(Repeated.Exactly.Twice);
         }
 
         [Fact]

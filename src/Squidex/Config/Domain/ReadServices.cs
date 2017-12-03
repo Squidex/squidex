@@ -29,6 +29,7 @@ using Squidex.Domain.Apps.Read.State.Grains;
 using Squidex.Domain.Users;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
+using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.EventSourcing.Grains;
 using Squidex.Infrastructure.States;
@@ -120,6 +121,7 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<EdmModelBuilder>();
 
+            services.AddTransient(typeof(DomainObjectWrapper<>));
             services.AddTransient<AppStateGrain>();
             services.AddTransient<AppUserGrain>();
 

@@ -209,8 +209,6 @@ namespace Squidex.Infrastructure.States
 
             var actualObject2 = await sut.GetSynchronizedAsync<MyStatefulObject>(key);
 
-            Assert.Same(statefulObject, actualObject2);
-
             A.CallTo(() => services.GetService(typeof(MyStatefulObject)))
                 .MustHaveHappened(Repeated.Exactly.Once);
         }

@@ -63,7 +63,12 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public async Task<IReadOnlyList<StoredEvent>> GetEventsAsync(string streamName, long streamPosition = 0)
         {
-            var commits = await Collection.Find(x => x.EventStreamOffset >= streamPosition).Sort(Sort.Ascending(TimestampField)).ToListAsync();
+            var commits =
+                await Collection.Find(
+                    Filter.And(
+                        Filter.Eq(EventStreamField, streamName),
+                        Filter.Gte(EventStreamOffsetField, streamPosition - 1)))
+                    .Sort(Sort.Ascending(TimestampField)).ToListAsync();
 
             var result = new List<StoredEvent>();
 

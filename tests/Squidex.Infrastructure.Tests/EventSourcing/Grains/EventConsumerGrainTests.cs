@@ -297,6 +297,8 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
             A.CallTo(() => eventSubscription.StopAsync())
                 .MustHaveHappened(Repeated.Exactly.Once);
+
+            sut.GetState().ShouldBeEquivalentTo(new EventConsumerInfo { Name = consumerName, IsStopped = true, Position = initialPosition, Error = ex.ToString() });
         }
 
         [Fact]
