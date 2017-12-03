@@ -24,7 +24,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         private IEventSubscription currentSubscription;
         private IEventConsumer eventConsumer;
         private IPersistence<EventConsumerState> persistence;
-        private EventConsumerState state;
+        private EventConsumerState state = new EventConsumerState();
 
         public EventConsumerGrain(
             IEventStore eventStore,

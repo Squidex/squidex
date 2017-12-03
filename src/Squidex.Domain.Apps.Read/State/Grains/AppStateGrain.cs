@@ -46,7 +46,10 @@ namespace Squidex.Domain.Apps.Read.State.Grains
             catch (Exception ex)
             {
                 exception = ex;
+            }
 
+            if (state == null)
+            {
                 state = new AppStateGrainState();
             }
 

@@ -59,7 +59,7 @@ namespace Squidex.Infrastructure.States
                 positionSnapshot = position;
                 positionEvent = position;
 
-                if (applyState != null)
+                if (applyState != null && position >= 0)
                 {
                     await applyState(state);
                 }
