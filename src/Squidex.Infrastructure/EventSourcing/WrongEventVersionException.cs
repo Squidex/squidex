@@ -9,7 +9,7 @@
 using System;
 using System.Runtime.Serialization;
 
-namespace Squidex.Infrastructure.CQRS.Events
+namespace Squidex.Infrastructure.EventSourcing
 {
     [Serializable]
     public class WrongEventVersionException : Exception

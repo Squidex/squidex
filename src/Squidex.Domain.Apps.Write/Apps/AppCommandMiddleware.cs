@@ -13,7 +13,7 @@ using Squidex.Domain.Apps.Read.Apps.Services;
 using Squidex.Domain.Apps.Write.Apps.Commands;
 using Squidex.Domain.Apps.Write.Apps.Guards;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.CQRS.Commands;
+using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Dispatching;
 using Squidex.Shared.Users;
 

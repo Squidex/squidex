@@ -8,7 +8,7 @@
 
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
-using Squidex.Infrastructure.CQRS.Commands;
+using Squidex.Infrastructure.Commands;
 using Squidex.Pipeline;
 
 namespace Squidex.Areas.Api.Controllers.Docs

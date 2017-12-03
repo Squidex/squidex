@@ -28,7 +28,7 @@ using Squidex.Domain.Users;
 using Squidex.Domain.Users.MongoDb;
 using Squidex.Domain.Users.MongoDb.Infrastructure;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.UsageTracking;
 using Squidex.Shared.Users;

@@ -10,7 +10,7 @@ using System;
 using System.Threading.Tasks;
 using NodaTime;
 
-namespace Squidex.Infrastructure.CQRS.Commands
+namespace Squidex.Infrastructure.Commands
 {
     public sealed class EnrichWithTimestampCommandMiddleware : ICommandMiddleware
     {

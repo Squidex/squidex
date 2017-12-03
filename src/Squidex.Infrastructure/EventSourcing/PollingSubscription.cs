@@ -11,7 +11,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Squidex.Infrastructure.Timers;
 
-namespace Squidex.Infrastructure.CQRS.Events
+namespace Squidex.Infrastructure.EventSourcing
 {
     public sealed class PollingSubscription : IEventSubscription
     {

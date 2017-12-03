@@ -8,7 +8,7 @@
 
 using System;
 
-namespace Squidex.Infrastructure.CQRS.Commands
+namespace Squidex.Infrastructure.Commands
 {
     public sealed class CommandContext
     {

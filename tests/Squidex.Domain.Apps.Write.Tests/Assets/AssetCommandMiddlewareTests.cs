@@ -13,7 +13,7 @@ using FakeItEasy;
 using Squidex.Domain.Apps.Write.Assets.Commands;
 using Squidex.Domain.Apps.Write.TestHelpers;
 using Squidex.Infrastructure.Assets;
-using Squidex.Infrastructure.CQRS.Commands;
+using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Tasks;
 using Xunit;
 

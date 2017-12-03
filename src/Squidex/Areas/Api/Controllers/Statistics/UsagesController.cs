@@ -14,7 +14,7 @@ using NSwag.Annotations;
 using Squidex.Areas.Api.Controllers.Statistics.Models;
 using Squidex.Domain.Apps.Read.Apps.Services;
 using Squidex.Domain.Apps.Read.Assets.Repositories;
-using Squidex.Infrastructure.CQRS.Commands;
+using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.UsageTracking;
 using Squidex.Pipeline;
 

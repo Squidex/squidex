@@ -13,32 +13,32 @@ using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.Tasks;
 
-namespace Squidex.Infrastructure.CQRS.Events.Grains
+namespace Squidex.Infrastructure.EventSourcing.Grains
 {
     public class EventConsumerGrain : DisposableObjectBase, IStatefulObject, IEventSubscriber
     {
-        private readonly EventDataFormatter formatter;
+        private readonly IEventDataFormatter eventDataFormatter;
         private readonly IEventStore eventStore;
         private readonly ISemanticLog log;
         private readonly SingleThreadedDispatcher dispatcher = new SingleThreadedDispatcher(1);
         private IEventSubscription currentSubscription;
         private IEventConsumer eventConsumer;
-        private IPersistence<EventConsumerState> persistance;
+        private IPersistence<EventConsumerState> persistence;
         private EventConsumerState state;
 
         public EventConsumerGrain(
-            EventDataFormatter formatter,
             IEventStore eventStore,
+            IEventDataFormatter eventDataFormatter,
             ISemanticLog log)
         {
             Guard.NotNull(log, nameof(log));
-            Guard.NotNull(formatter, nameof(formatter));
             Guard.NotNull(eventStore, nameof(eventStore));
+            Guard.NotNull(eventDataFormatter, nameof(eventDataFormatter));
 
             this.log = log;
 
-            this.formatter = formatter;
             this.eventStore = eventStore;
+            this.eventDataFormatter = eventDataFormatter;
         }
 
         protected override void DisposeObject(bool disposing)
@@ -51,9 +51,9 @@ namespace Squidex.Infrastructure.CQRS.Events.Grains
 
         public Task ActivateAsync(string key, IStore store)
         {
-            persistance = store.WithSnapshots<EventConsumerGrain, EventConsumerState>(key, s => state = s);
+            persistence = store.WithSnapshots<EventConsumerGrain, EventConsumerState>(key, s => state = s);
 
-            return persistance.ReadAsync();
+            return persistence.ReadAsync();
         }
 
         protected virtual IEventSubscription CreateSubscription(IEventStore eventStore, string streamFilter, string position)
@@ -219,7 +219,7 @@ namespace Squidex.Infrastructure.CQRS.Events.Grains
                 state = state.Failed(ex);
             }
 
-            await persistance.WriteSnapShotAsync(state);
+            await persistence.WriteSnapshotAsync(state);
         }
 
         private async Task ClearAsync()
@@ -289,7 +289,7 @@ namespace Squidex.Infrastructure.CQRS.Events.Grains
         {
             try
             {
-                var @event = formatter.Parse(message.Data);
+                var @event = eventDataFormatter.Parse(message.Data);
 
                 @event.SetEventPosition(message.EventPosition);
                 @event.SetEventStreamNumber(message.EventStreamNumber);

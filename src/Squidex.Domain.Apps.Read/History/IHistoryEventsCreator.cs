@@ -8,7 +8,7 @@
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Read.History
 {

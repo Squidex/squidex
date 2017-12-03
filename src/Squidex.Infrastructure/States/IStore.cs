@@ -8,7 +8,7 @@
 
 using System;
 using System.Threading.Tasks;
-using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Infrastructure.States
 {

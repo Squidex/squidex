@@ -8,24 +8,22 @@
 
 using System;
 using System.Threading.Tasks;
-using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure.States;
 
-namespace Squidex.Infrastructure.CQRS.Commands
+namespace Squidex.Infrastructure.Commands
 {
     public sealed class AggregateHandler : IAggregateHandler
     {
-        private readonly IDomainObjectRepository domainObjectRepository;
-        private readonly IDomainObjectFactory domainObjectFactory;
+        private readonly IStateFactory stateFactory;
+        private readonly IServiceProvider serviceProvider;
 
-        public AggregateHandler(
-            IDomainObjectFactory domainObjectFactory,
-            IDomainObjectRepository domainObjectRepository)
+        public AggregateHandler(IStateFactory stateFactory, IServiceProvider serviceProvider)
         {
-            Guard.NotNull(domainObjectFactory, nameof(domainObjectFactory));
-            Guard.NotNull(domainObjectRepository, nameof(domainObjectRepository));
+            Guard.NotNull(stateFactory, nameof(stateFactory));
+            Guard.NotNull(serviceProvider, nameof(serviceProvider));
 
-            this.domainObjectFactory = domainObjectFactory;
-            this.domainObjectRepository = domainObjectRepository;
+            this.stateFactory = stateFactory;
+            this.serviceProvider = serviceProvider;
         }
 
         public Task<T> CreateAsync<T>(CommandContext context, Func<T, Task> creator) where T : class, IAggregate
@@ -47,39 +45,28 @@ namespace Squidex.Infrastructure.CQRS.Commands
             Guard.NotNull(context, nameof(context));
 
             var aggregateCommand = GetCommand(context);
-            var aggregateObject = domainObjectFactory.CreateNew<T>(aggregateCommand.AggregateId);
+            var aggregateFactory = (DomainObjectFactoryFunction<T>)serviceProvider.GetService(typeof(DomainObjectFactoryFunction<T>));
 
-            if (isUpdate)
-            {
-                await domainObjectRepository.LoadAsync(aggregateObject, aggregateCommand.ExpectedVersion);
-            }
+            var wrapper = await stateFactory.GetDetachedAsync<DomainObjectWrapper<T>>(aggregateCommand.AggregateId.ToString());
 
-            await handler(aggregateObject);
+            var domainObject = aggregateFactory(aggregateCommand.AggregateId);
 
-            var events = aggregateObject.GetUncomittedEvents();
-
-            foreach (var @event in events)
-            {
-                @event.SetAggregateId(aggregateObject.Id);
-            }
-
-            await domainObjectRepository.SaveAsync(aggregateObject, events, Guid.NewGuid());
-
-            aggregateObject.ClearUncommittedEvents();
+            await wrapper.LoadAsync(domainObject, isUpdate ? aggregateCommand.ExpectedVersion : -1);
+            await wrapper.UpdateAsync(handler);
 
             if (!context.IsCompleted)
             {
                 if (isUpdate)
                 {
-                    context.Complete(new EntitySavedResult(aggregateObject.Version));
+                    context.Complete(new EntitySavedResult(domainObject.Version));
                 }
                 else
                 {
-                    context.Complete(EntityCreatedResult.Create(aggregateObject.Id, aggregateObject.Version));
+                    context.Complete(EntityCreatedResult.Create(domainObject.Id, domainObject.Version));
                 }
             }
 
-            return aggregateObject;
+            return domainObject;
         }
 
         private static IAggregateCommand GetCommand(CommandContext context)

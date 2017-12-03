@@ -40,7 +40,7 @@ namespace Squidex.Infrastructure.States
             }
         }
 
-        public async Task<(T Value, string Etag)> ReadAsync<T>(string key)
+        public async Task<(T Value, long Version)> ReadAsync<T>(string key)
         {
             var collection = GetCollection<T>();
 
@@ -50,13 +50,13 @@ namespace Squidex.Infrastructure.States
 
             if (existing != null)
             {
-                return (existing.Doc, existing.Etag);
+                return (existing.Doc, existing.Version);
             }
 
-            return (default(T), null);
+            return (default(T), -1);
         }
 
-        public async Task WriteAsync<T>(string key, T value, string oldEtag, string newEtag)
+        public async Task WriteAsync<T>(string key, T value, long oldVersion, long newVersion)
         {
             var collection = GetCollection<T>();
 
@@ -65,24 +65,24 @@ namespace Squidex.Infrastructure.States
                 await collection.UpdateOneAsync(
                     Builders<MongoState<T>>.Filter.And(
                         Builders<MongoState<T>>.Filter.Eq(x => x.Id, key),
-                        Builders<MongoState<T>>.Filter.Eq(x => x.Etag, oldEtag)
+                        Builders<MongoState<T>>.Filter.Eq(x => x.Version, oldVersion)
                     ),
                     Builders<MongoState<T>>.Update
                         .Set(x => x.Doc, value)
-                        .Set(x => x.Etag, newEtag),
+                        .Set(x => x.Version, newVersion),
                     Upsert);
             }
             catch (MongoWriteException ex)
             {
                 if (ex.WriteError.Category == ServerErrorCategory.DuplicateKey)
                 {
-                    var existingEtag =
+                    var existingVersion =
                         await collection.Find(x => x.Id == key)
                             .Project<MongoState<T>>(Builders<MongoState<T>>.Projection.Exclude(x => x.Id)).FirstOrDefaultAsync();
 
-                    if (existingEtag != null)
+                    if (existingVersion != null)
                     {
-                        throw new InconsistentStateException(existingEtag.Etag, oldEtag, ex);
+                        throw new InconsistentStateException(existingVersion.Version, oldVersion, ex);
                     }
                 }
                 else

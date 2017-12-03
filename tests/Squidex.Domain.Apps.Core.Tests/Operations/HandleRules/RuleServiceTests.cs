@@ -17,7 +17,7 @@ using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure.EventSourcing;
 using Xunit;
 
 #pragma warning disable xUnit2009 // Do not use boolean check to check for string equality

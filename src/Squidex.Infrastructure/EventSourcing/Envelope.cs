@@ -9,7 +9,7 @@
 using System;
 using NodaTime;
 
-namespace Squidex.Infrastructure.CQRS.Events
+namespace Squidex.Infrastructure.EventSourcing
 {
     public static class Envelope
     {

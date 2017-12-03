@@ -10,10 +10,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Squidex.Infrastructure.CQRS.Events.Grains.Messages;
+using Squidex.Infrastructure.EventSourcing.Grains.Messages;
 using Squidex.Infrastructure.States;
 
-namespace Squidex.Infrastructure.CQRS.Events.Grains
+namespace Squidex.Infrastructure.EventSourcing.Grains
 {
     public sealed class EventConsumerGrainManager : DisposableObjectBase, IExternalSystem
     {

@@ -23,7 +23,7 @@ using Squidex.Domain.Apps.Read.Schemas;
 using Squidex.Domain.Apps.Write.Contents.Commands;
 using Squidex.Domain.Apps.Write.TestHelpers;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.CQRS.Commands;
+using Squidex.Infrastructure.Commands;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Write.Contents

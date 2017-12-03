@@ -18,7 +18,7 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Read;
 using Squidex.Domain.Apps.Read.Schemas;
 using Squidex.Domain.Apps.Write.Schemas.Commands;
-using Squidex.Infrastructure.CQRS.Commands;
+using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
 

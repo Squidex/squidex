@@ -7,7 +7,7 @@
 // ==========================================================================
 
 using System.Threading.Tasks;
-using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Infrastructure.States
 {
@@ -15,8 +15,8 @@ namespace Squidex.Infrastructure.States
     {
         Task WriteEventsAsync(params Envelope<IEvent>[] @events);
 
-        Task WriteSnapShotAsync(TState state);
+        Task WriteSnapshotAsync(TState state);
 
-        Task ReadAsync(bool force = false);
+        Task ReadAsync(long? expectedVersion = null);
     }
 }

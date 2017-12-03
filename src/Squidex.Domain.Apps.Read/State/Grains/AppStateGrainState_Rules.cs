@@ -10,7 +10,7 @@ using System;
 using Squidex.Domain.Apps.Events.Rules;
 using Squidex.Domain.Apps.Events.Rules.Utils;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Read.State.Grains
 {

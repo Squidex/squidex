@@ -7,7 +7,7 @@
 // ==========================================================================
 
 using System;
-using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.States

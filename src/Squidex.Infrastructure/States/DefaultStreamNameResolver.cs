@@ -8,7 +8,7 @@
 
 using System;
 
-namespace Squidex.Infrastructure.CQRS.Events
+namespace Squidex.Infrastructure.States
 {
     public sealed class DefaultStreamNameResolver : IStreamNameResolver
     {

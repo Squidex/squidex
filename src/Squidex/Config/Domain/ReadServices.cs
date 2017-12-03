@@ -29,8 +29,8 @@ using Squidex.Domain.Apps.Read.State.Grains;
 using Squidex.Domain.Users;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
-using Squidex.Infrastructure.CQRS.Events;
-using Squidex.Infrastructure.CQRS.Events.Grains;
+using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.EventSourcing.Grains;
 using Squidex.Infrastructure.States;
 using Squidex.Pipeline;
 

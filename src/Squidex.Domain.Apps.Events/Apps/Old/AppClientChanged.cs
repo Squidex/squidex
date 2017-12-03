@@ -7,7 +7,7 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.Apps;
-using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Events.Apps.Old

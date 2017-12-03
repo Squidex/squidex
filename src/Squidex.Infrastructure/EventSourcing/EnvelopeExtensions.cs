@@ -10,7 +10,7 @@ using System;
 using System.Globalization;
 using NodaTime;
 
-namespace Squidex.Infrastructure.CQRS.Events
+namespace Squidex.Infrastructure.EventSourcing
 {
     public static class EnvelopeExtensions
     {

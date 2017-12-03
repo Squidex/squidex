@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Write.Contents
 {

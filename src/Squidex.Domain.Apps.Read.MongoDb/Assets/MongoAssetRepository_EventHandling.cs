@@ -9,7 +9,7 @@
 using System.Threading.Tasks;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Events.Assets;
-using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.Reflection;
 

@@ -10,8 +10,8 @@ using System;
 using System.Threading.Tasks;
 using Benchmarks.Tests.TestData;
 using Microsoft.Extensions.DependencyInjection;
-using Squidex.Infrastructure.CQRS.Events;
-using Squidex.Infrastructure.CQRS.Events.Grains;
+using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.EventSourcing.Grains;
 using Squidex.Infrastructure.States;
 
 namespace Benchmarks.Tests

@@ -6,7 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.CQRS.Events.Grains.Messages
+namespace Squidex.Infrastructure.EventSourcing.Grains.Messages
 {
     public sealed class GetStatesRequest
     {

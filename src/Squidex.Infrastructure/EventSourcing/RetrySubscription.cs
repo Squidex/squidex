@@ -11,7 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Infrastructure.Tasks;
 
-namespace Squidex.Infrastructure.CQRS.Events
+namespace Squidex.Infrastructure.EventSourcing
 {
     public sealed class RetrySubscription : IEventSubscription, IEventSubscriber
     {

@@ -8,9 +8,9 @@
 
 using System;
 using System.Collections.Generic;
-using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Infrastructure.CQRS
+namespace Squidex.Infrastructure.Commands
 {
     public abstract class DomainObjectBase : IAggregate, IEquatable<IAggregate>
     {

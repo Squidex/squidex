@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Squidex.Domain.Apps.Read.Apps;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.CQRS.Commands;
+using Squidex.Infrastructure.Commands;
 using Squidex.Pipeline;
 
 namespace Squidex.Areas.Api.Controllers

@@ -13,7 +13,7 @@ using Newtonsoft.Json;
 using RabbitMQ.Client;
 using Squidex.Infrastructure.Tasks;
 
-namespace Squidex.Infrastructure.CQRS.Events
+namespace Squidex.Infrastructure.EventSourcing
 {
     public sealed class RabbitMqEventConsumer : DisposableObjectBase, IExternalSystem, IEventConsumer
     {

@@ -17,7 +17,7 @@ using Squidex.Areas.Api.Controllers.Apps.Models;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Write.Apps.Commands;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.CQRS.Commands;
+using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
 

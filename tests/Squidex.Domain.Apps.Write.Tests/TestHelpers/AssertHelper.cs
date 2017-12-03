@@ -9,7 +9,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
-using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Write.TestHelpers
 {

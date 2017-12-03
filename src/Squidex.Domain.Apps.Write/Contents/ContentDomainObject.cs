@@ -12,7 +12,7 @@ using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Domain.Apps.Write.Contents.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS;
-using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.Reflection;
 

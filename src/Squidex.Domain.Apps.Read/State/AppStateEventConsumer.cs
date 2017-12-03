@@ -11,7 +11,7 @@ using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Domain.Apps.Read.State.Grains;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.Tasks;
 

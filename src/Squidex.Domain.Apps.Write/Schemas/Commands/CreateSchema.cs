@@ -8,7 +8,7 @@
 
 using System;
 using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Infrastructure.CQRS.Commands;
+using Squidex.Infrastructure.Commands;
 using SchemaFields = System.Collections.Generic.List<Squidex.Domain.Apps.Write.Schemas.Commands.CreateSchemaField>;
 
 namespace Squidex.Domain.Apps.Write.Schemas.Commands

@@ -6,7 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.CQRS.Commands
+namespace Squidex.Infrastructure.Commands
 {
     public sealed class EntityCreatedResult<T> : EntitySavedResult
     {

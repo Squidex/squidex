@@ -11,7 +11,7 @@ using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Domain.Apps.Write.Assets.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS;
-using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.Reflection;
 

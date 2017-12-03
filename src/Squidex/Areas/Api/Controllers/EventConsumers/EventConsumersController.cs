@@ -13,8 +13,8 @@ using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using Squidex.Areas.Api.Controllers.EventConsumers.Models;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.CQRS.Commands;
-using Squidex.Infrastructure.CQRS.Events.Grains.Messages;
+using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.EventSourcing.Grains.Messages;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
 

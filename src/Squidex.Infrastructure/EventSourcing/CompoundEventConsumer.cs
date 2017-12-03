@@ -9,7 +9,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Squidex.Infrastructure.CQRS.Events
+namespace Squidex.Infrastructure.EventSourcing
 {
     public sealed class CompoundEventConsumer : IEventConsumer
     {

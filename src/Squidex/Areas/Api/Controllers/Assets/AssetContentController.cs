@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using Squidex.Domain.Apps.Read.Assets.Repositories;
 using Squidex.Infrastructure.Assets;
-using Squidex.Infrastructure.CQRS.Commands;
+using Squidex.Infrastructure.Commands;
 using Squidex.Pipeline;
 
 #pragma warning disable 1573

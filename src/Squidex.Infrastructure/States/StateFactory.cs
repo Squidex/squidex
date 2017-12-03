@@ -9,7 +9,7 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
-using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure.EventSourcing;
 
 #pragma warning disable RECS0096 // Type parameter is never used
 
@@ -24,7 +24,7 @@ namespace Squidex.Infrastructure.States
         private readonly ISnapshotStore snapshotStore;
         private readonly IStreamNameResolver streamNameResolver;
         private readonly IEventStore eventStore;
-        private readonly EventDataFormatter eventDataFormatter;
+        private readonly IEventDataFormatter eventDataFormatter;
         private readonly object lockObject = new object();
         private IDisposable pubSubscription;
 
@@ -40,20 +40,22 @@ namespace Squidex.Infrastructure.States
                 activationTask = obj.ActivateAsync(key, store);
             }
 
-            public Task<T> ActivateAsync()
+            public async Task<T> ActivateAsync()
             {
-                return activationTask.ContinueWith(x => obj);
+                await activationTask;
+
+                return obj;
             }
         }
 
         public StateFactory(
             IPubSub pubSub,
             IMemoryCache statesCache,
+            IEventStore eventStore,
+            IEventDataFormatter eventDataFormatter,
             IServiceProvider services,
             ISnapshotStore snapshotStore,
-            IStreamNameResolver streamNameResolver,
-            IEventStore eventStore,
-            EventDataFormatter eventDataFormatter)
+            IStreamNameResolver streamNameResolver)
         {
             Guard.NotNull(services, nameof(services));
             Guard.NotNull(eventStore, nameof(eventStore));
@@ -87,7 +89,7 @@ namespace Squidex.Infrastructure.States
         {
             Guard.NotNull(key, nameof(key));
 
-            var stateStore = new Store(snapshotStore, streamNameResolver, eventStore, eventDataFormatter, () => { });
+            var stateStore = new Store(() => { }, eventStore, eventDataFormatter, snapshotStore, streamNameResolver);
             var state = (T)services.GetService(typeof(T));
 
             await state.ActivateAsync(key, stateStore);
@@ -108,10 +110,10 @@ namespace Squidex.Infrastructure.States
 
                 var state = (T)services.GetService(typeof(T));
 
-                var stateStore = new Store(snapshotStore, streamNameResolver, eventStore, eventDataFormatter, () =>
+                var stateStore = new Store(() =>
                 {
                     pubSub.Publish(new InvalidateMessage { Key = key }, false);
-                });
+                }, eventStore, eventDataFormatter, snapshotStore, streamNameResolver);
 
                 stateObj = new ObjectHolder<T>(state, key, stateStore);
 

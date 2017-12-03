@@ -11,17 +11,17 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Squidex.Infrastructure.CQRS.Events
+namespace Squidex.Infrastructure.EventSourcing
 {
     public interface IEventStore
     {
-        Task<IReadOnlyList<StoredEvent>> GetEventsAsync(string streamName, int startPosition = -1);
+        Task<IReadOnlyList<StoredEvent>> GetEventsAsync(string streamName, long streamPosition = -1);
 
         Task GetEventsAsync(Func<StoredEvent, Task> callback, CancellationToken cancellationToken, string streamFilter = null, string position = null);
 
         Task AppendEventsAsync(Guid commitId, string streamName, ICollection<EventData> events);
 
-        Task AppendEventsAsync(Guid commitId, string streamName, int expectedVersion, ICollection<EventData> events);
+        Task AppendEventsAsync(Guid commitId, string streamName, long expectedVersion, ICollection<EventData> events);
 
         IEventSubscription CreateSubscription(IEventSubscriber subscriber, string streamFilter, string position = null);
     }

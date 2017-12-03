@@ -10,7 +10,7 @@ using System;
 using System.Threading.Tasks;
 using Squidex.Infrastructure.Log;
 
-namespace Squidex.Infrastructure.CQRS.Commands
+namespace Squidex.Infrastructure.Commands
 {
     public sealed class LogCommandMiddleware : ICommandMiddleware
     {

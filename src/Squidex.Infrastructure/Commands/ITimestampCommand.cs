@@ -8,7 +8,7 @@
 
 using NodaTime;
 
-namespace Squidex.Infrastructure.CQRS.Commands
+namespace Squidex.Infrastructure.Commands
 {
     public interface ITimestampCommand : ICommand
     {

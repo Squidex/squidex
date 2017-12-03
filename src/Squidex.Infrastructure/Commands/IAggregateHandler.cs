@@ -9,7 +9,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace Squidex.Infrastructure.CQRS.Commands
+namespace Squidex.Infrastructure.Commands
 {
     public interface IAggregateHandler
     {

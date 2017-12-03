@@ -9,7 +9,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace Squidex.Infrastructure.CQRS.Events
+namespace Squidex.Infrastructure.EventSourcing
 {
     public interface IEventSubscriber
     {

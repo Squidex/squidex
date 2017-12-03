@@ -13,7 +13,7 @@ using Microsoft.Extensions.Options;
 using NSwag.Annotations;
 using Squidex.Areas.Api.Controllers.UI.Models;
 using Squidex.Config;
-using Squidex.Infrastructure.CQRS.Commands;
+using Squidex.Infrastructure.Commands;
 using Squidex.Pipeline;
 
 namespace Squidex.Areas.Api.Controllers.UI

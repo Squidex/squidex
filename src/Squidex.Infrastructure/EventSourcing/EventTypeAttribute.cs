@@ -8,7 +8,7 @@
 
 using System;
 
-namespace Squidex.Infrastructure.CQRS.Events
+namespace Squidex.Infrastructure.EventSourcing
 {
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
     public sealed class EventTypeAttribute : TypeNameAttribute

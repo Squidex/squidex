@@ -12,7 +12,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Infrastructure.Tasks;
 
-namespace Squidex.Infrastructure.CQRS.Commands
+namespace Squidex.Infrastructure.Commands
 {
     public sealed class InMemoryCommandBus : ICommandBus
     {

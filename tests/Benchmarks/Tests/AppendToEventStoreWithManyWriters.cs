@@ -10,7 +10,7 @@ using System;
 using System.Threading.Tasks;
 using Benchmarks.Utils;
 using Microsoft.Extensions.DependencyInjection;
-using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure.EventSourcing;
 
 namespace Benchmarks.Tests
 {

@@ -8,7 +8,7 @@
 
 using System;
 using Squidex.Domain.Apps.Events;
-using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Read
 {
