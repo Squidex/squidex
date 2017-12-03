@@ -6,10 +6,12 @@
 //  All rights reserved.
 // ==========================================================================
 
+using Squidex.Infrastructure.CQRS;
+using Squidex.Infrastructure.CQRS.Events;
 using System;
 using Xunit;
 
-namespace Squidex.Infrastructure.CQRS.Events
+namespace Squidex.Infrastructure.States
 {
     public class DefaultStreamNameResolverTests
     {
