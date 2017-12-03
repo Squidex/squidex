@@ -15,7 +15,7 @@ namespace Squidex.Infrastructure.CQRS.Events
 {
     public interface IEventStore
     {
-        Task<IReadOnlyList<StoredEvent>> GetEventsAsync(string streamName);
+        Task<IReadOnlyList<StoredEvent>> GetEventsAsync(string streamName, int startPosition = -1);
 
         Task GetEventsAsync(Func<StoredEvent, Task> callback, CancellationToken cancellationToken, string streamFilter = null, string position = null);
 

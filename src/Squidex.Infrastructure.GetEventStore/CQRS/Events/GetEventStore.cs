@@ -59,7 +59,7 @@ namespace Squidex.Infrastructure.CQRS.Events
             throw new NotSupportedException();
         }
 
-        public async Task<IReadOnlyList<StoredEvent>> GetEventsAsync(string streamName)
+        public async Task<IReadOnlyList<StoredEvent>> GetEventsAsync(string streamName, int position = -1)
         {
             var result = new List<StoredEvent>();
 

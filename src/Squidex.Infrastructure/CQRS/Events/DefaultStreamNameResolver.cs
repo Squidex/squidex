@@ -14,7 +14,7 @@ namespace Squidex.Infrastructure.CQRS.Events
     {
         private const string Suffix = "DomainObject";
 
-        public string GetStreamName(Type aggregateType, Guid id)
+        public string GetStreamName(Type aggregateType, string id)
         {
             var typeName = char.ToLower(aggregateType.Name[0]) + aggregateType.Name.Substring(1);
 

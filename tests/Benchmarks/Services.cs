@@ -61,7 +61,7 @@ namespace Benchmarks
                 MongoEventStore>();
 
             services.AddSingleton<IStateStore,
-                MongoStateStore>();
+                MongoSnapshotStore>();
 
             services.AddSingleton<IStateFactory,
                 StateFactory>();

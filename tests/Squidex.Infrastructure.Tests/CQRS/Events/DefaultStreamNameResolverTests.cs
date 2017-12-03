@@ -44,7 +44,7 @@ namespace Squidex.Infrastructure.CQRS.Events
         {
             var user = new MyUser(Guid.NewGuid(), 1);
 
-            var name = sut.GetStreamName(typeof(MyUser), user.Id);
+            var name = sut.GetStreamName(typeof(MyUser), user.Id.ToString());
 
             Assert.Equal($"myUser-{user.Id}", name);
         }
@@ -54,7 +54,7 @@ namespace Squidex.Infrastructure.CQRS.Events
         {
             var user = new MyUserDomainObject(Guid.NewGuid(), 1);
 
-            var name = sut.GetStreamName(typeof(MyUserDomainObject), user.Id);
+            var name = sut.GetStreamName(typeof(MyUserDomainObject), user.Id.ToString());
 
             Assert.Equal($"myUser-{user.Id}", name);
         }

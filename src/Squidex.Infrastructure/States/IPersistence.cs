@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  IStateStore.cs
+//  IPersistent.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -7,13 +7,16 @@
 // ==========================================================================
 
 using System.Threading.Tasks;
+using Squidex.Infrastructure.CQRS.Events;
 
 namespace Squidex.Infrastructure.States
 {
-    public interface IStateStore
+    public interface IPersistence<TState>
     {
-        Task WriteAsync<T>(string key, T value, string oldEtag, string newEtag);
+        Task WriteEventsAsync(params Envelope<IEvent>[] @events);
 
-        Task<(T Value, string Etag)> ReadAsync<T>(string key);
+        Task WriteSnapShotAsync(TState state);
+
+        Task ReadAsync(bool force = false);
     }
 }

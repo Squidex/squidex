@@ -31,7 +31,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
         {
             domainObject = new MyDomainObject(aggregateId, 123);
 
-            A.CallTo(() => nameResolver.GetStreamName(A<Type>.Ignored, aggregateId))
+            A.CallTo(() => nameResolver.GetStreamName(A<Type>.Ignored, aggregateId.ToString()))
                 .Returns(streamName);
 
             A.CallTo(() => factory.CreateNew<MyDomainObject>(aggregateId))
@@ -72,7 +72,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
         [Fact]
         public async Task Should_throw_exception_when_event_store_returns_no_events()
         {
-            A.CallTo(() => eventStore.GetEventsAsync(streamName))
+            A.CallTo(() => eventStore.GetEventsAsync(streamName, -1))
                 .Returns(new List<StoredEvent>());
 
             await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.LoadAsync(domainObject, -1));
@@ -93,7 +93,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
                 new StoredEvent("1", 1, eventData2)
             };
 
-            A.CallTo(() => eventStore.GetEventsAsync(streamName))
+            A.CallTo(() => eventStore.GetEventsAsync(streamName, -1))
                 .Returns(events);
 
             A.CallTo(() => formatter.Parse(eventData1, true))
@@ -121,7 +121,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
                 new StoredEvent("1", 1, eventData2)
             };
 
-            A.CallTo(() => eventStore.GetEventsAsync(streamName))
+            A.CallTo(() => eventStore.GetEventsAsync(streamName, -1))
                 .Returns(events);
 
             A.CallTo(() => formatter.Parse(eventData1, true))

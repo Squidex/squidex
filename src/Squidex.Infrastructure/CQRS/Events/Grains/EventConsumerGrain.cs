@@ -15,7 +15,7 @@ using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.CQRS.Events.Grains
 {
-    public class EventConsumerGrain : StatefulObject<EventConsumerState>, IEventSubscriber
+    public class EventConsumerGrain : DisposableObjectBase, IStatefulObject, IEventSubscriber
     {
         private readonly EventDataFormatter formatter;
         private readonly IEventStore eventStore;
@@ -23,6 +23,8 @@ namespace Squidex.Infrastructure.CQRS.Events.Grains
         private readonly SingleThreadedDispatcher dispatcher = new SingleThreadedDispatcher(1);
         private IEventSubscription currentSubscription;
         private IEventConsumer eventConsumer;
+        private IPersistence<EventConsumerState> persistance;
+        private EventConsumerState state;
 
         public EventConsumerGrain(
             EventDataFormatter formatter,
@@ -39,9 +41,19 @@ namespace Squidex.Infrastructure.CQRS.Events.Grains
             this.eventStore = eventStore;
         }
 
-        public void Dispose()
+        protected override void DisposeObject(bool disposing)
         {
-            dispatcher.StopAndWaitAsync().Wait();
+            if (disposing)
+            {
+                dispatcher.StopAndWaitAsync().Wait();
+            }
+        }
+
+        public Task ActivateAsync(string key, IStore store)
+        {
+            persistance = store.WithSnapshots<EventConsumerGrain, EventConsumerState>(key, s => state = s);
+
+            return persistance.ReadAsync();
         }
 
         protected virtual IEventSubscription CreateSubscription(IEventStore eventStore, string streamFilter, string position)
@@ -51,7 +63,7 @@ namespace Squidex.Infrastructure.CQRS.Events.Grains
 
         public virtual EventConsumerInfo GetState()
         {
-            return State.ToInfo(this.eventConsumer.Name);
+            return state.ToInfo(this.eventConsumer.Name);
         }
 
         public virtual void Stop()
@@ -80,9 +92,9 @@ namespace Squidex.Infrastructure.CQRS.Events.Grains
         {
             eventConsumer = consumer;
 
-            if (!State.IsStopped)
+            if (!state.IsStopped)
             {
-                Subscribe(State.Position);
+                Subscribe(state.Position);
             }
 
             return TaskHelper.Done;
@@ -104,7 +116,7 @@ namespace Squidex.Infrastructure.CQRS.Events.Grains
                     await DispatchConsumerAsync(@event);
                 }
 
-                State = State.Handled(storedEvent.EventPosition);
+                state = state.Handled(storedEvent.EventPosition);
             });
         }
 
@@ -119,28 +131,28 @@ namespace Squidex.Infrastructure.CQRS.Events.Grains
             {
                 Unsubscribe();
 
-                State = State.Failed(exception);
+                state = state.Failed(exception);
             });
         }
 
         private Task HandleStartAsync()
         {
-            if (!State.IsStopped)
+            if (!state.IsStopped)
             {
                 return TaskHelper.Done;
             }
 
             return DoAndUpdateStateAsync(() =>
             {
-                Subscribe(State.Position);
+                Subscribe(state.Position);
 
-                State = State.Started();
+                state = state.Started();
             });
         }
 
         private Task HandleStopAsync()
         {
-            if (State.IsStopped)
+            if (state.IsStopped)
             {
                 return TaskHelper.Done;
             }
@@ -149,7 +161,7 @@ namespace Squidex.Infrastructure.CQRS.Events.Grains
             {
                 Unsubscribe();
 
-                State = State.Stopped();
+                state = state.Stopped();
             });
         }
 
@@ -163,7 +175,7 @@ namespace Squidex.Infrastructure.CQRS.Events.Grains
 
                 Subscribe(null);
 
-                State = State.Reset();
+                state = state.Reset();
             });
         }
 
@@ -204,10 +216,10 @@ namespace Squidex.Infrastructure.CQRS.Events.Grains
                     .WriteProperty("state", "Failed")
                     .WriteProperty("eventConsumer", eventConsumer.Name));
 
-                State = State.Failed(ex);
+                state = state.Failed(ex);
             }
 
-            await WriteStateAsync();
+            await persistance.WriteSnapShotAsync(state);
         }
 
         private async Task ClearAsync()

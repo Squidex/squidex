@@ -33,8 +33,8 @@ namespace Squidex.Infrastructure.CQRS.Events.Grains
             A.CallTo(() => consumer1.Name).Returns(consumerName1);
             A.CallTo(() => consumer2.Name).Returns(consumerName2);
 
-            A.CallTo(() => factory.GetDetachedAsync<EventConsumerGrain, EventConsumerState>(consumerName1)).Returns(actor1);
-            A.CallTo(() => factory.GetDetachedAsync<EventConsumerGrain, EventConsumerState>(consumerName2)).Returns(actor2);
+            A.CallTo(() => factory.GetDetachedAsync<EventConsumerGrain>(consumerName1)).Returns(actor1);
+            A.CallTo(() => factory.GetDetachedAsync<EventConsumerGrain>(consumerName2)).Returns(actor2);
 
             sut = new EventConsumerGrainManager(new IEventConsumer[] { consumer1, consumer2 }, pubSub, factory);
         }

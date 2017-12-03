@@ -55,8 +55,8 @@ namespace Squidex.Config.Domain
                         .As<IXmlRepository>()
                         .As<IExternalSystem>();
 
-                    services.AddSingletonAs(c => new MongoStateStore(mongoDatabase, c.GetRequiredService<JsonSerializer>()))
-                        .As<IStateStore>()
+                    services.AddSingletonAs(c => new MongoSnapshotStore(mongoDatabase, c.GetRequiredService<JsonSerializer>()))
+                        .As<ISnapshotStore>()
                         .As<IExternalSystem>();
 
                     services.AddSingletonAs(c => new MongoUserStore(mongoDatabase))

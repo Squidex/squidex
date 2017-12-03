@@ -35,7 +35,7 @@ namespace Squidex.Domain.Apps.Write.Contents
 
         public async Task<NamedContentData> LoadAsync(Guid appId, Guid id, long version)
         {
-            var streamName = nameResolver.GetStreamName(typeof(ContentDomainObject), id);
+            var streamName = nameResolver.GetStreamName(typeof(ContentDomainObject), id.ToString());
 
             var events = await eventStore.GetEventsAsync(streamName);
 

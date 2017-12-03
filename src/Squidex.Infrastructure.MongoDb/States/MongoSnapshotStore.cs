@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  MongoStateStore.cs
+//  MongoSnapshotStore.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -13,13 +13,13 @@ using Newtonsoft.Json;
 
 namespace Squidex.Infrastructure.States
 {
-    public sealed class MongoStateStore : IStateStore, IExternalSystem
+    public sealed class MongoSnapshotStore : ISnapshotStore, IExternalSystem
     {
         private static readonly UpdateOptions Upsert = new UpdateOptions { IsUpsert = true };
         private readonly IMongoDatabase database;
         private readonly JsonSerializer serializer;
 
-        public MongoStateStore(IMongoDatabase database, JsonSerializer serializer)
+        public MongoSnapshotStore(IMongoDatabase database, JsonSerializer serializer)
         {
             Guard.NotNull(database, nameof(database));
             Guard.NotNull(serializer, nameof(serializer));

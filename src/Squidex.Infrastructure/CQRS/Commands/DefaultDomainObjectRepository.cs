@@ -33,7 +33,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
 
         public async Task LoadAsync(IAggregate domainObject, long? expectedVersion = null)
         {
-            var streamName = nameResolver.GetStreamName(domainObject.GetType(), domainObject.Id);
+            var streamName = nameResolver.GetStreamName(domainObject.GetType(), domainObject.Id.ToString());
 
             var events = await eventStore.GetEventsAsync(streamName);
 
@@ -62,7 +62,7 @@ namespace Squidex.Infrastructure.CQRS.Commands
         {
             Guard.NotNull(domainObject, nameof(domainObject));
 
-            var streamName = nameResolver.GetStreamName(domainObject.GetType(), domainObject.Id);
+            var streamName = nameResolver.GetStreamName(domainObject.GetType(), domainObject.Id.ToString());
 
             var versionCurrent = domainObject.Version;
             var versionExpected = versionCurrent - events.Count;

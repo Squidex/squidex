@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  IStateHolder.cs
+//  IStatefulObject.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -10,12 +10,8 @@ using System.Threading.Tasks;
 
 namespace Squidex.Infrastructure.States
 {
-    public interface IStateHolder<T>
+    public interface IStatefulObject
     {
-        T State { get; set; }
-
-        Task ReadAsync();
-
-        Task WriteAsync();
+        Task ActivateAsync(string key, IStore store);
     }
 }

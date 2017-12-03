@@ -1,17 +1,19 @@
 ﻿// ==========================================================================
-//  IStreamNameResolver.cs
+//  ISnapshotStore.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using System;
+using System.Threading.Tasks;
 
-namespace Squidex.Infrastructure.CQRS.Events
+namespace Squidex.Infrastructure.States
 {
-    public interface IStreamNameResolver
+    public interface ISnapshotStore
     {
-        string GetStreamName(Type aggregateType, string id);
+        Task WriteAsync<T>(string key, T value, string oldEtag, string newEtag);
+
+        Task<(T Value, string Etag)> ReadAsync<T>(string key);
     }
 }

@@ -63,19 +63,34 @@ namespace Squidex.Infrastructure.CQRS.Events
             return new PollingSubscription(this, notifier, subscriber, streamFilter, position);
         }
 
-        public async Task<IReadOnlyList<StoredEvent>> GetEventsAsync(string streamName)
+        public async Task<IReadOnlyList<StoredEvent>> GetEventsAsync(string streamName, int position = -1)
         {
-            var result = await Observable.Create<StoredEvent>((observer, ct) =>
+            var commits = await Collection.Find(x => x.EventStreamOffset > position).Sort(Sort.Ascending(TimestampField)).ToListAsync();
+
+            var result = new List<StoredEvent>();
+
+            foreach (var commit in commits)
             {
-                return GetEventsAsync(storedEvent =>
+                var eventStreamOffset = (int)commit.EventStreamOffset;
+
+                var commitTimestamp = commit.Timestamp;
+                var commitOffset = 0;
+
+                foreach (var e in commit.Events)
                 {
-                    observer.OnNext(storedEvent);
+                    eventStreamOffset++;
 
-                    return TaskHelper.Done;
-                }, ct, streamName);
-            }).ToList();
+                    if (eventStreamOffset > position)
+                    {
+                        var eventData = e.ToEventData();
+                        var eventToken = new StreamPosition(commitTimestamp, commitOffset, commit.Events.Length);
 
-            return result.ToList();
+                        result.Add(new StoredEvent(eventToken, eventStreamOffset, eventData));
+                    }
+                }
+            }
+
+            return result;
         }
 
         public async Task GetEventsAsync(Func<StoredEvent, Task> callback, CancellationToken cancellationToken, string streamFilter = null, string position = null)
