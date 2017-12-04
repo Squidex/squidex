@@ -1,8 +1,10 @@
 ﻿// ==========================================================================
 //  GuardAppPatternsTests.cs
-//  CivicPlus implementation of Squidex Headless CMS
+//  Squidex Headless CMS
 // ==========================================================================
-
+//  Copyright (c) Squidex Group
+//  All rights reserved.
+// ==========================================================================
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Write.Apps.Commands;
 using Squidex.Infrastructure;

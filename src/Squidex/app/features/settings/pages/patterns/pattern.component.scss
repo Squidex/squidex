@@ -1,0 +1,49 @@
+@import '_vars';
+@import '_mixins';
+
+$field-header: #e7ebef;
+
+.table-items-row-details {
+    cursor: default;
+}
+
+.col {
+    &-tags,
+    &-options {
+        white-space: nowrap;
+    }
+
+    &-options {
+        max-width: 140px;
+    }
+}
+
+.field {
+    &-icon {
+        margin-right: 1rem;
+        color: $color-border-dark;
+        font-size: 1.2rem;
+        font-weight: normal;
+        vertical-align: middle;
+    }
+
+    &-name {
+        @include truncate;
+    }
+
+    &-hidden {
+        color: $color-text-decent;
+    }
+
+    &-partitioning {
+        color: $color-text-decent;
+        font-weight: normal;
+        font-size: .85rem;
+    }
+
+    .tag {
+        @include opacity(.9);
+        min-width: 4rem;
+        max-width: 6rem;
+    }
+}

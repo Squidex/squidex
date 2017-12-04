@@ -25,5 +25,7 @@ namespace Squidex.Domain.Apps.Read.Apps
         AppContributors Contributors { get; }
 
         LanguagesConfig LanguagesConfig { get; }
+
+        AppPatterns Patterns { get; }
     }
 }

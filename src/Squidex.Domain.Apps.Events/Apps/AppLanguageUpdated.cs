@@ -8,10 +8,11 @@
 
 using System.Collections.Generic;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Events.Apps
 {
-    [TypeName("AppLanguageUpdated")]
+    [EventType(nameof(AppLanguageUpdated))]
     public sealed class AppLanguageUpdated : AppEvent
     {
         public Language Language { get; set; }

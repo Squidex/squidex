@@ -1,0 +1,90 @@
+<div class="table-items-row table-items-row-expandable field">
+    <div class="table-items-row-summary">
+        <div class="row">
+            <div class="col col-10">
+                <span class="field-name">
+                    <span>{{(isNew ? "Add Pattern" : pattern.name)}}</span>
+                </span>
+            </div>
+            <div class="col col-options">
+                <div class="float-right">
+                    <button type="button" class="btn btn-secondary table-items-edit-button" [class.active]="isEditing" (click)="toggleEditing()" *ngIf="!isNew">
+                        <i class="icon-settings"></i>
+                    </button>
+                    <button type="button" class="btn btn-success subheader-button" [class.active]="isEditing" (click)="toggleEditing()" *ngIf="isNew">
+                        <i class="icon-plus"></i>
+                    </button>
+                    
+                    <button type="button" class="btn btn-link btn-danger"
+                            (sqxConfirmClick)="removing.emit(pattern)"
+                            confirmTitle="Remove pattern" 
+                            confirmText="Do you really want to remove this pattern?"
+                            *ngIf="!isNew">
+                        <i class="icon-bin2"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-items-row-details" *ngIf="isEditing">
+        <form [formGroup]="editForm" (ngSubmit)="save()">
+            <div class="table-items-row-details-tabs clearfix">
+                <ul class="nav nav-tabs2">
+                    <li class="nav-item">
+                        <a class="nav-link active">Common</a>
+                    </li>
+                </ul>
+
+                <div class="float-right">
+                    <button type="reset" class="btn btn-secondary" (click)="cancel()">Cancel</button>
+                    <button type="submit" class="btn btn-primary ml-1" *ngIf="!isNew" (sqxConfirmClick)="save()" confirmTitle="Update Pattern" confirmText="All fields using this pattern will be updated to reflect the changes. If you do not wish to update these fields, please create a new pattern instead.">Save</button>
+                    <button type="submit" class="btn btn-success" *ngIf="isNew">Create</button>
+                </div>
+            </div>
+
+            <div class="table-items-row-details-tab">
+                <div class="form-group row">
+                    <label for="pattern-name" class="col col-2 col-form-label">Name</label>
+
+                    <div class="col col-8">
+                        <sqx-control-errors for="name" [submitted]="editFormSubmitted"></sqx-control-errors>
+                        <input type="text" class="form-control" id="pattern-name" maxlength="100" formControlName="name" />
+
+                        <small class="form-text text-muted">
+                            The name of the field validator.
+                        </small>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label for="pattern-label" class="col col-2 col-form-label">Pattern</label>
+
+                    <div class="col col-8">
+                        <sqx-control-errors for="pattern" [submitted]="editFormSubmitted"></sqx-control-errors>
+
+                        <textarea type="text" class="form-control" id="pattern-pattern" maxlength="1000" formControlName="pattern"></textarea>
+
+                        <small class="form-text text-muted">
+                            Define the regex pattern for the field validator.
+                        </small>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label for="pattern-label" class="col col-2 col-form-label">Message</label>
+
+                    <div class="col col-8">
+                        <sqx-control-errors for="defaultMessage" [submitted]="editFormSubmitted"></sqx-control-errors>
+
+                        <input type="text" class="form-control" id="pattern-defaultMessage" maxlength="1000" formControlName="defaultMessage" />
+
+                        <small class="form-text text-muted">
+                            Define the message that appears when a field validation fails.
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
