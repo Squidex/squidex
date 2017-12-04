@@ -12,7 +12,7 @@ using Squidex.Domain.Apps.Read;
 using Squidex.Domain.Apps.Write.Rules.Commands;
 using Squidex.Domain.Apps.Write.Rules.Guards;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.CQRS.Commands;
+using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Dispatching;
 
 namespace Squidex.Domain.Apps.Write.Rules

@@ -10,7 +10,7 @@ using System;
 
 namespace Squidex.Domain.Apps.Read
 {
-    public interface IEntityWithAppRef : IEntity
+    public interface IEntityWithAppRef
     {
         Guid AppId { get; }
     }

@@ -21,7 +21,7 @@ using Squidex.Domain.Apps.Core.Rules.Json;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Schemas.Json;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.MongoDb;
@@ -37,7 +37,6 @@ namespace Benchmarks
 
             services.AddSingleton(CreateTypeNameRegistry());
 
-            services.AddSingleton<EventDataFormatter>();
             services.AddSingleton<FieldRegistry>();
 
             services.AddTransient<MyAppState>();
@@ -60,11 +59,17 @@ namespace Benchmarks
             services.AddSingleton<IEventStore,
                 MongoEventStore>();
 
-            services.AddSingleton<IStateStore,
-                MongoStateStore>();
+            services.AddSingleton<IEventDataFormatter,
+                JsonEventDataFormatter>();
+
+            services.AddSingleton<ISnapshotStore,
+                MongoSnapshotStore>();
 
             services.AddSingleton<IStateFactory,
                 StateFactory>();
+
+            services.AddSingleton<IStreamNameResolver,
+                DefaultStreamNameResolver>();
 
             services.AddSingleton<JsonSerializer>(c =>
                 JsonSerializer.Create(c.GetRequiredService<JsonSerializerSettings>()));

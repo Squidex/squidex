@@ -16,9 +16,10 @@ using NodaTime;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Assets.ImageSharp;
-using Squidex.Infrastructure.CQRS.Commands;
-using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Log;
+using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.UsageTracking;
 using Squidex.Pipeline;
 
@@ -76,12 +77,6 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<ActionContextAccessor>()
                 .As<IActionContextAccessor>();
 
-            services.AddSingletonAs<DefaultDomainObjectRepository>()
-                .As<IDomainObjectRepository>();
-
-            services.AddSingletonAs<DefaultDomainObjectFactory>()
-                .As<IDomainObjectFactory>();
-
             services.AddSingletonAs<AggregateHandler>()
                 .As<IAggregateHandler>();
 
@@ -94,7 +89,8 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<ImageSharpAssetThumbnailGenerator>()
                 .As<IAssetThumbnailGenerator>();
 
-            services.AddSingletonAs<EventDataFormatter>();
+            services.AddSingletonAs<JsonEventDataFormatter>()
+                .As<IEventDataFormatter>();
         }
     }
 }

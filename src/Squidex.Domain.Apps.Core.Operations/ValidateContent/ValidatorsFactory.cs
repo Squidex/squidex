@@ -38,7 +38,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
                 yield return new CollectionValidator<Guid>(properties.IsRequired, properties.MinItems, properties.MaxItems);
             }
 
-            yield return new AssetsValidator();
+            yield return new AssetsValidator(properties);
         }
 
         public IEnumerable<IValidator> Visit(BooleanFieldProperties properties)

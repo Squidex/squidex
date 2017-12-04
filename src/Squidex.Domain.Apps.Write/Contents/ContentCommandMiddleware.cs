@@ -15,7 +15,7 @@ using Squidex.Domain.Apps.Read.Contents.Repositories;
 using Squidex.Domain.Apps.Write.Contents.Commands;
 using Squidex.Domain.Apps.Write.Contents.Guards;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.CQRS.Commands;
+using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Dispatching;
 
 namespace Squidex.Domain.Apps.Write.Contents

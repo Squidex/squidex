@@ -120,11 +120,11 @@
 
         a {
             color: $color-dark-foreground;
-        }
 
-        a,
-        a:hover {
-            text-decoration: underline;
+            &,
+            &:hover {
+                text-decoration: underline;
+            }
         }
 
         &-success {

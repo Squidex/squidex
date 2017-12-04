@@ -8,7 +8,7 @@
 
 using System;
 using System.Reflection;
-using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure.EventSourcing;
 using Xunit;
 
 namespace Squidex.Infrastructure

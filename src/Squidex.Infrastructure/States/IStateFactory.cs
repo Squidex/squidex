@@ -12,8 +12,8 @@ namespace Squidex.Infrastructure.States
 {
     public interface IStateFactory
     {
-        Task<T> GetAsync<T, TState>(string key) where T : StatefulObject<TState>;
+        Task<T> GetSynchronizedAsync<T>(string key) where T : IStatefulObject;
 
-        Task<T> GetDetachedAsync<T, TState>(string key) where T : StatefulObject<TState>;
+        Task<T> GetDetachedAsync<T>(string key) where T : IStatefulObject;
     }
 }

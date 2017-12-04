@@ -11,7 +11,7 @@ using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Read.Rules.Repositories;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Read.Rules

@@ -15,10 +15,10 @@ namespace Squidex.Domain.Apps.Read.History
     {
         Guid EventId { get; }
 
+        RefToken Actor { get; }
+
         string Message { get; }
 
         long Version { get; }
-
-        RefToken Actor { get; }
     }
 }

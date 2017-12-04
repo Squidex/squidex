@@ -26,11 +26,6 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Converters
             return properties.Accept(Instance);
         }
 
-        public FieldPropertiesDto Visit(AssetsFieldProperties properties)
-        {
-            return SimpleMapper.Map(properties, new AssetsFieldPropertiesDto());
-        }
-
         public FieldPropertiesDto Visit(BooleanFieldProperties properties)
         {
             return SimpleMapper.Map(properties, new BooleanFieldPropertiesDto());
@@ -61,14 +56,20 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Converters
             return SimpleMapper.Map(properties, new TagsFieldPropertiesDto());
         }
 
+        public FieldPropertiesDto Visit(AssetsFieldProperties properties)
+        {
+            var result = SimpleMapper.Map(properties, new AssetsFieldPropertiesDto());
+
+            result.AllowedExtensions = properties.AllowedExtensions?.ToArray();
+
+            return result;
+        }
+
         public FieldPropertiesDto Visit(NumberFieldProperties properties)
         {
             var result = SimpleMapper.Map(properties, new NumberFieldPropertiesDto());
 
-            if (properties.AllowedValues != null)
-            {
-                result.AllowedValues = properties.AllowedValues.ToArray();
-            }
+            result.AllowedValues = properties.AllowedValues?.ToArray();
 
             return result;
         }
@@ -77,10 +78,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Converters
         {
             var result = SimpleMapper.Map(properties, new StringFieldPropertiesDto());
 
-            if (properties.AllowedValues != null)
-            {
-                result.AllowedValues = properties.AllowedValues.ToArray();
-            }
+            result.AllowedValues = properties.AllowedValues?.ToArray();
 
             return result;
         }

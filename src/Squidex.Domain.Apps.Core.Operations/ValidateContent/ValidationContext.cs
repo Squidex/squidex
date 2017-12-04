@@ -16,20 +16,20 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
     public sealed class ValidationContext
     {
         private readonly Func<IEnumerable<Guid>, Guid, Task<IReadOnlyList<Guid>>> checkContent;
-        private readonly Func<IEnumerable<Guid>, Task<IReadOnlyList<Guid>>> checkAsset;
+        private readonly Func<IEnumerable<Guid>, Task<IReadOnlyList<IAssetInfo>>> checkAsset;
 
         public bool IsOptional { get; }
 
         public ValidationContext(
             Func<IEnumerable<Guid>, Guid, Task<IReadOnlyList<Guid>>> checkContent,
-            Func<IEnumerable<Guid>, Task<IReadOnlyList<Guid>>> checkAsset)
+            Func<IEnumerable<Guid>, Task<IReadOnlyList<IAssetInfo>>> checkAsset)
             : this(checkContent, checkAsset, false)
         {
         }
 
         private ValidationContext(
             Func<IEnumerable<Guid>, Guid, Task<IReadOnlyList<Guid>>> checkContent,
-            Func<IEnumerable<Guid>, Task<IReadOnlyList<Guid>>> checkAsset,
+            Func<IEnumerable<Guid>, Task<IReadOnlyList<IAssetInfo>>> checkAsset,
             bool isOptional)
         {
             Guard.NotNull(checkAsset, nameof(checkAsset));
@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             return checkContent(contentIds, schemaId);
         }
 
-        public Task<IReadOnlyList<Guid>> GetInvalidAssetIdsAsync(IEnumerable<Guid> assetId)
+        public Task<IReadOnlyList<IAssetInfo>> GetAssetInfosAsync(IEnumerable<Guid> assetId)
         {
             return checkAsset(assetId);
         }

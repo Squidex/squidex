@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public void Should_instantiate_field()
         {
-            var sut = new StringField(1, "my-string", Partitioning.Invariant);
+            var sut = Field(new StringFieldProperties());
 
             Assert.Equal("my-string", sut.Name);
         }
@@ -31,7 +31,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_not_add_error_if_string_is_valid()
         {
-            var sut = new StringField(1, "my-string", Partitioning.Invariant, new StringFieldProperties { Label = "<FIELD>" });
+            var sut = Field(new StringFieldProperties { Label = "<FIELD>" });
 
             await sut.ValidateAsync(CreateValue(null), errors);
 
@@ -41,7 +41,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_add_errors_if_string_is_required()
         {
-            var sut = new StringField(1, "my-string", Partitioning.Invariant, new StringFieldProperties { IsRequired = true });
+            var sut = Field(new StringFieldProperties { IsRequired = true });
 
             await sut.ValidateAsync(CreateValue(null), errors);
 
@@ -52,7 +52,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_add_errors_if_string_is_shorter_than_min_length()
         {
-            var sut = new StringField(1, "my-string", Partitioning.Invariant, new StringFieldProperties { MinLength = 10 });
+            var sut = Field(new StringFieldProperties { MinLength = 10 });
 
             await sut.ValidateAsync(CreateValue("123"), errors);
 
@@ -63,7 +63,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_add_errors_if_string_is_longer_than_max_length()
         {
-            var sut = new StringField(1, "my-string", Partitioning.Invariant, new StringFieldProperties { MaxLength = 5 });
+            var sut = Field(new StringFieldProperties { MaxLength = 5 });
 
             await sut.ValidateAsync(CreateValue("12345678"), errors);
 
@@ -74,7 +74,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_add_errors_if_string_not_allowed()
         {
-            var sut = new StringField(1, "my-string", Partitioning.Invariant, new StringFieldProperties { AllowedValues = ImmutableList.Create("Foo") });
+            var sut = Field(new StringFieldProperties { AllowedValues = ImmutableList.Create("Foo") });
 
             await sut.ValidateAsync(CreateValue("Bar"), errors);
 
@@ -85,7 +85,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_add_errors_if_number_is_not_valid_pattern()
         {
-            var sut = new StringField(1, "my-string", Partitioning.Invariant, new StringFieldProperties { Pattern = "[0-9]{3}" });
+            var sut = Field(new StringFieldProperties { Pattern = "[0-9]{3}" });
 
             await sut.ValidateAsync(CreateValue("abc"), errors);
 
@@ -96,7 +96,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_add_errors_if_number_is_not_valid_pattern_with_message()
         {
-            var sut = new StringField(1, "my-string", Partitioning.Invariant, new StringFieldProperties { Pattern = "[0-9]{3}", PatternMessage = "Custom Error Message." });
+            var sut = Field(new StringFieldProperties { Pattern = "[0-9]{3}", PatternMessage = "Custom Error Message." });
 
             await sut.ValidateAsync(CreateValue("abc"), errors);
 
@@ -107,6 +107,11 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         private static JValue CreateValue(object v)
         {
             return new JValue(v);
+        }
+
+        private static StringField Field(StringFieldProperties properties)
+        {
+            return new StringField(1, "my-string", Partitioning.Invariant, properties);
         }
     }
 }

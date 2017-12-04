@@ -7,7 +7,7 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Collections.Immutable;
 using Benchmarks.Tests.TestData;
 using Microsoft.Extensions.DependencyInjection;
@@ -32,7 +32,7 @@ namespace Benchmarks.Tests
         {
             services = Services.Create();
 
-            grain = services.GetRequiredService<IStateFactory>().GetAsync<MyAppState, AppStateGrainState>("DEFAULT").Result;
+            grain = services.GetRequiredService<IStateFactory>().GetSynchronizedAsync<MyAppState>("DEFAULT").Result;
 
             var state = new AppStateGrainState
             {
@@ -61,7 +61,7 @@ namespace Benchmarks.Tests
                     schema.SchemaDef = schema.SchemaDef.AddField(new StringField(j, j.ToString(), Partitioning.Invariant));
                 }
 
-                state.Schemas.Add(schema.Id, schema);
+                state.Schemas = state.Schemas.Add(schema.Id, schema);
             }
 
             state.Rules = ImmutableDictionary<Guid, JsonRuleEntity>.Empty;
@@ -78,7 +78,7 @@ namespace Benchmarks.Tests
                     RuleDef = new Rule(new ContentChangedTrigger(), new WebhookAction())
                 };
 
-                state.Rules.Add(rule.Id, rule);
+                state.Rules = state.Rules.Add(rule.Id, rule);
             }
 
             grain.SetState(state);

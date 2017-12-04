@@ -1,11 +1,12 @@
 ﻿// ==========================================================================
-//  ValidatorsFactory.cs
+//  DefaultValueFactory.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
+using System.Globalization;
 using Newtonsoft.Json.Linq;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -78,7 +79,7 @@ namespace Squidex.Domain.Apps.Core.EnrichContent
 
             if (properties.CalculatedDefaultValue == DateTimeCalculatedDefaultValue.Today)
             {
-                return now.ToString().Substring(10);
+                return now.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
             }
 
             return properties.DefaultValue?.ToString();

@@ -41,6 +41,13 @@
 
         <div class="panel-main">
             <div class="panel-content panel-content-scroll">
+                <div class="panel-alert panel-alert-danger" *ngIf="contentOld">
+                    <div class="float-right">
+                        <a class="force" (click)="showLatest()">View latest</a>
+                    </div>
+                    Viewing <strong>{{content.lastModifiedBy | sqxUserNameRef:null}}'s</strong> changes of {{content.lastModified | sqxShortDate}}.
+                </div>
+
                 <div *ngFor="let field of schema.fields">
                     <sqx-content-field [field]="field" [fieldForm]="contentForm.controls[field.name]" [languages]="languages" [contentFormSubmitted]="contentFormSubmitted"></sqx-content-field>
                 </div>

@@ -21,7 +21,7 @@ namespace Squidex.Infrastructure.States
 
         [BsonRequired]
         [BsonElement]
-        public string Etag { get; set; }
+        public long Version { get; set; }
 
         [BsonRequired]
         [BsonElement]

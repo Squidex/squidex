@@ -17,7 +17,7 @@ using Squidex.Domain.Apps.Write.Contents;
 using Squidex.Domain.Apps.Write.Rules;
 using Squidex.Domain.Apps.Write.Schemas;
 using Squidex.Domain.Users;
-using Squidex.Infrastructure.CQRS.Commands;
+using Squidex.Infrastructure.Commands;
 using Squidex.Pipeline.CommandMiddlewares;
 
 namespace Squidex.Config.Domain

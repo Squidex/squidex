@@ -84,11 +84,11 @@ namespace Squidex.Domain.Apps.Write.Contents
                     new ValidationContext(
                         (contentIds, schemaId) =>
                         {
-                            return contentRepository.QueryNotFoundAsync(appId, schemaId, contentIds.ToList());
+                            return QueryContentsAsync(appId, schemaId, contentIds);
                         },
                         assetIds =>
                         {
-                            return assetRepository.QueryNotFoundAsync(appId, assetIds.ToList());
+                            return QueryAssetsAsync(appId, assetIds);
                         });
 
                 if (partial)
@@ -105,6 +105,16 @@ namespace Squidex.Domain.Apps.Write.Contents
                     throw new ValidationException(message(), errors.ToArray());
                 }
             }
+        }
+
+        private async Task<IReadOnlyList<IAssetInfo>> QueryAssetsAsync(Guid appId, IEnumerable<Guid> assetIds)
+        {
+            return await assetRepository.QueryAsync(appId, null, new HashSet<Guid>(assetIds), null, int.MaxValue, 0);
+        }
+
+        private async Task<IReadOnlyList<Guid>> QueryContentsAsync(Guid appId, Guid schemaId, IEnumerable<Guid> contentIds)
+        {
+            return await contentRepository.QueryNotFoundAsync(appId, schemaId, contentIds.ToList());
         }
 
         public Task ExecuteScriptAndTransformAsync(Func<ISchemaEntity, string> script, object operation)

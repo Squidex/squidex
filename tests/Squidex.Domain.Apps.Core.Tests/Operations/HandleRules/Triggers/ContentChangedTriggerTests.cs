@@ -18,7 +18,7 @@ using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Domain.Apps.Events.Rules;
 using Squidex.Domain.Apps.Events.Schemas;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure.EventSourcing;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.HandleRules.Triggers

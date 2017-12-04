@@ -317,6 +317,10 @@ export class FieldDto {
     public createValidators(isOptional: boolean): ValidatorFn[] {
         return this.properties.createValidators(isOptional);
     }
+
+    public defaultValue(): any {
+        return this.properties.getDefaultValue();
+    }
 }
 
 export abstract class FieldPropertiesDto {
@@ -333,6 +337,10 @@ export abstract class FieldPropertiesDto {
     public abstract formatValue(value: any): string;
 
     public abstract createValidators(isOptional: boolean): ValidatorFn[];
+
+    public getDefaultValue(): any {
+        return null;
+    }
 }
 
 export class StringFieldPropertiesDto extends FieldPropertiesDto {
@@ -387,6 +395,10 @@ export class StringFieldPropertiesDto extends FieldPropertiesDto {
 
         return validators;
     }
+
+    public getDefaultValue(): any {
+        return this.defaultValue;
+    }
 }
 
 export class NumberFieldPropertiesDto extends FieldPropertiesDto {
@@ -426,10 +438,18 @@ export class NumberFieldPropertiesDto extends FieldPropertiesDto {
         }
 
         if (this.allowedValues && this.allowedValues.length > 0) {
-            validators.push(ValidatorsEx.validValues(this.allowedValues));
+            if (this.isRequired && !isOptional) {
+                validators.push(ValidatorsEx.validValues(this.allowedValues));
+            } else {
+                validators.push(ValidatorsEx.validValues(this.allowedValues.concat([null])));
+            }
         }
 
         return validators;
+    }
+
+    public getDefaultValue(): any {
+        return this.defaultValue;
     }
 }
 
@@ -473,6 +493,18 @@ export class DateTimeFieldPropertiesDto extends FieldPropertiesDto {
 
         return validators;
     }
+
+    public getDefaultValue(now?: DateTime): any {
+        now = now || DateTime.now();
+
+        if (this.calculatedDefaultValue === 'Now') {
+            return now.toUTCStringFormat('YYYY-MM-DDTHH:mm:ss') + 'Z';
+        } else if (this.calculatedDefaultValue === 'Today') {
+            return now.toUTCStringFormat('YYYY-MM-DD');
+        } else {
+            return this.defaultValue;
+        }
+    }
 }
 
 export class BooleanFieldPropertiesDto extends FieldPropertiesDto {
@@ -501,6 +533,10 @@ export class BooleanFieldPropertiesDto extends FieldPropertiesDto {
         }
 
         return validators;
+    }
+
+    public getDefaultValue(): any {
+        return this.defaultValue;
     }
 }
 
@@ -579,7 +615,17 @@ export class AssetsFieldPropertiesDto extends FieldPropertiesDto {
         isRequired: boolean,
         isListField: boolean,
         public readonly minItems?: number,
-        public readonly maxItems?: number
+        public readonly maxItems?: number,
+        public readonly minSize?: number,
+        public readonly maxSize?: number,
+        public readonly allowedExtensions?: string[],
+        public readonly mustBeImage?: boolean,
+        public readonly minWidth?: number,
+        public readonly maxWidth?: number,
+        public readonly minHeight?: number,
+        public readonly maxHeight?: number,
+        public readonly aspectWidth?: number,
+        public readonly aspectHeight?: number
     ) {
         super('Assets', label, hints, placeholder, isRequired, isListField);
     }

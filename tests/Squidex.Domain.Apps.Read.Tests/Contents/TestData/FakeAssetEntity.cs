@@ -19,6 +19,8 @@ namespace Squidex.Domain.Apps.Read.Contents.TestData
 
         public Guid AppId { get; set; }
 
+        public Guid AssetId { get; set; }
+
         public Instant Created { get; set; }
 
         public Instant LastModified { get; set; }

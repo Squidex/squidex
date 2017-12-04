@@ -13,7 +13,8 @@ using FakeItEasy;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.States;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Write.Contents
@@ -21,8 +22,8 @@ namespace Squidex.Domain.Apps.Write.Contents
     public class ContentVersionLoaderTests
     {
         private readonly IEventStore eventStore = A.Fake<IEventStore>();
+        private readonly IEventDataFormatter formatter = A.Fake<IEventDataFormatter>();
         private readonly IStreamNameResolver nameResolver = A.Fake<IStreamNameResolver>();
-        private readonly EventDataFormatter formatter = A.Fake<EventDataFormatter>();
         private readonly Guid id = Guid.NewGuid();
         private readonly Guid appId = Guid.NewGuid();
         private readonly string streamName = Guid.NewGuid().ToString();
@@ -30,7 +31,7 @@ namespace Squidex.Domain.Apps.Write.Contents
 
         public ContentVersionLoaderTests()
         {
-            A.CallTo(() => nameResolver.GetStreamName(typeof(ContentDomainObject), id))
+            A.CallTo(() => nameResolver.GetStreamName(typeof(ContentDomainObject), id.ToString()))
                 .Returns(streamName);
 
             sut = new ContentVersionLoader(eventStore, nameResolver, formatter);
@@ -39,7 +40,7 @@ namespace Squidex.Domain.Apps.Write.Contents
         [Fact]
         public async Task Should_throw_exception_when_event_store_returns_no_events()
         {
-            A.CallTo(() => eventStore.GetEventsAsync(streamName))
+            A.CallTo(() => eventStore.GetEventsAsync(streamName, 0))
                 .Returns(new List<StoredEvent>());
 
             await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.LoadAsync(appId, id, -1));
@@ -48,7 +49,7 @@ namespace Squidex.Domain.Apps.Write.Contents
         [Fact]
         public async Task Should_throw_exception_when_version_not_found()
         {
-            A.CallTo(() => eventStore.GetEventsAsync(streamName))
+            A.CallTo(() => eventStore.GetEventsAsync(streamName, 0))
                 .Returns(new List<StoredEvent>());
 
             await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.LoadAsync(appId, id, 3));
@@ -66,7 +67,7 @@ namespace Squidex.Domain.Apps.Write.Contents
                 new StoredEvent("0", 0, eventData1)
             };
 
-            A.CallTo(() => eventStore.GetEventsAsync(streamName))
+            A.CallTo(() => eventStore.GetEventsAsync(streamName, 0))
                 .Returns(events);
 
             A.CallTo(() => formatter.Parse(eventData1, true))
@@ -90,7 +91,7 @@ namespace Squidex.Domain.Apps.Write.Contents
                 new StoredEvent("1", 1, eventData2)
             };
 
-            A.CallTo(() => eventStore.GetEventsAsync(streamName))
+            A.CallTo(() => eventStore.GetEventsAsync(streamName, 0))
                 .Returns(events);
 
             A.CallTo(() => formatter.Parse(eventData1, true))
@@ -121,7 +122,7 @@ namespace Squidex.Domain.Apps.Write.Contents
                 new StoredEvent("2", 2, eventData3)
             };
 
-            A.CallTo(() => eventStore.GetEventsAsync(streamName))
+            A.CallTo(() => eventStore.GetEventsAsync(streamName, 0))
                 .Returns(events);
 
             A.CallTo(() => formatter.Parse(eventData1, true))
