@@ -20,11 +20,11 @@ namespace Squidex.Domain.Apps.Entities.Apps
 {
     public class AppDomainObjectTests : HandlerTestBase<AppDomainObject>
     {
-        private readonly AppDomainObject sut;
         private readonly string contributorId = Guid.NewGuid().ToString();
         private readonly string clientId = "client";
         private readonly string clientNewName = "My Client";
         private readonly string planId = "premium";
+        private readonly AppDomainObject sut;
 
         public AppDomainObjectTests()
         {
@@ -73,6 +73,8 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             sut.ChangePlan(CreateCommand(new ChangePlan { PlanId = planId }));
 
+            Assert.Equal(planId, sut.State.Plan.PlanId);
+
             sut.GetUncomittedEvents()
                 .ShouldHaveSameEvents(
                     CreateEvent(new AppPlanChanged { PlanId = planId })
@@ -94,6 +96,8 @@ namespace Squidex.Domain.Apps.Entities.Apps
             CreateApp();
 
             sut.AssignContributor(CreateCommand(new AssignContributor { ContributorId = contributorId, Permission = AppContributorPermission.Editor }));
+
+            Assert.Equal(AppContributorPermission.Editor, sut.State.Contributors[contributorId]);
 
             sut.GetUncomittedEvents()
                 .ShouldHaveSameEvents(
@@ -117,6 +121,8 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             sut.AssignContributor(CreateCommand(new AssignContributor { ContributorId = contributorId, Permission = AppContributorPermission.Editor }));
             sut.RemoveContributor(CreateCommand(new RemoveContributor { ContributorId = contributorId }));
+
+            Assert.False(sut.State.Contributors.ContainsKey(contributorId));
 
             sut.GetUncomittedEvents().Skip(1)
                 .ShouldHaveSameEvents(
@@ -142,6 +148,8 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             sut.AttachClient(CreateCommand(command));
 
+            Assert.True(sut.State.Clients.ContainsKey(clientId));
+
             sut.GetUncomittedEvents()
                 .ShouldHaveSameEvents(
                     CreateEvent(new AppClientAttached { Id = clientId, Secret = command.Secret })
@@ -164,6 +172,8 @@ namespace Squidex.Domain.Apps.Entities.Apps
             CreateClient();
 
             sut.RevokeClient(CreateCommand(new RevokeClient { Id = clientId }));
+
+            Assert.False(sut.State.Clients.ContainsKey(clientId));
 
             sut.GetUncomittedEvents()
                 .ShouldHaveSameEvents(
@@ -188,6 +198,8 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             sut.UpdateClient(CreateCommand(new UpdateClient { Id = clientId, Name = clientNewName, Permission = AppClientPermission.Developer }));
 
+            Assert.Equal(clientNewName, sut.State.Clients[clientId].Name);
+
             sut.GetUncomittedEvents()
                 .ShouldHaveSameEvents(
                     CreateEvent(new AppClientRenamed { Id = clientId, Name = clientNewName }),
@@ -211,6 +223,8 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             sut.AddLanguage(CreateCommand(new AddLanguage { Language = Language.DE }));
 
+            Assert.True(sut.State.LanguagesConfig.Contains(Language.DE));
+
             sut.GetUncomittedEvents()
                 .ShouldHaveSameEvents(
                     CreateEvent(new AppLanguageAdded { Language = Language.DE })
@@ -233,6 +247,8 @@ namespace Squidex.Domain.Apps.Entities.Apps
             CreateLanguage(Language.DE);
 
             sut.RemoveLanguage(CreateCommand(new RemoveLanguage { Language = Language.DE }));
+
+            Assert.False(sut.State.LanguagesConfig.Contains(Language.DE));
 
             sut.GetUncomittedEvents()
                 .ShouldHaveSameEvents(

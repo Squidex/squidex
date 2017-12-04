@@ -26,9 +26,9 @@ namespace Squidex.Domain.Apps.Entities.Rules
         private readonly ISemanticLog log = A.Fake<ISemanticLog>();
         private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
         private readonly IRuleEventRepository ruleEventRepository = A.Fake<IRuleEventRepository>();
+        private readonly Instant now = SystemClock.Instance.GetCurrentInstant();
         private readonly RuleService ruleService = A.Fake<RuleService>();
         private readonly RuleDequeuer sut;
-        private readonly Instant now = SystemClock.Instance.GetCurrentInstant();
 
         public RuleDequeuerTests()
         {

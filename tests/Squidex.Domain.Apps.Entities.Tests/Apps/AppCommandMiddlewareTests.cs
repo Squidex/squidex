@@ -26,11 +26,11 @@ namespace Squidex.Domain.Apps.Entities.Apps
         private readonly IAppPlansProvider appPlansProvider = A.Fake<IAppPlansProvider>();
         private readonly IAppPlanBillingManager appPlansBillingManager = A.Fake<IAppPlanBillingManager>();
         private readonly IUserResolver userResolver = A.Fake<IUserResolver>();
-        private readonly AppCommandMiddleware sut;
         private readonly AppDomainObject app;
         private readonly Language language = Language.DE;
         private readonly string contributorId = Guid.NewGuid().ToString();
         private readonly string clientName = "client";
+        private readonly AppCommandMiddleware sut;
 
         public AppCommandMiddlewareTests()
         {
