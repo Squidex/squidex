@@ -13,6 +13,8 @@ namespace Squidex.Domain.Apps.Events
 {
     public abstract class SquidexEvent : IEvent
     {
+        public string Username { get; set; }
+
         public RefToken Actor { get; set; }
     }
 }

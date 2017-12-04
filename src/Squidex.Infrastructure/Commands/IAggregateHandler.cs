@@ -13,8 +13,8 @@ namespace Squidex.Infrastructure.Commands
 {
     public interface IAggregateHandler
     {
-        Task<T> CreateAsync<T>(CommandContext context, Func<T, Task> creator) where T : class, IAggregate;
+        Task<T> CreateAsync<T>(CommandContext context, Func<T, Task> creator) where T : class, IDomainObject;
 
-        Task<T> UpdateAsync<T>(CommandContext context, Func<T, Task> updater) where T : class, IAggregate;
+        Task<T> UpdateAsync<T>(CommandContext context, Func<T, Task> updater) where T : class, IDomainObject;
     }
 }

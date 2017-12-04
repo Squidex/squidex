@@ -65,7 +65,7 @@ namespace Squidex.Domain.Apps.Read
 
         private static void SetCreatedBy(SquidexEvent @event, IEntity entity)
         {
-            if (entity is IUpdateableEntityWithCreatedBy withCreatedBy)
+            if (entity is IUpdateableEntityWithCreatedBy withCreatedBy && withCreatedBy)
             {
                 withCreatedBy.CreatedBy = @event.Actor;
             }

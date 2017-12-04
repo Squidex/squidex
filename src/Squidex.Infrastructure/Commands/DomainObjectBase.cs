@@ -8,41 +8,35 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Log;
+using Squidex.Infrastructure.States;
 
 namespace Squidex.Infrastructure.Commands
 {
-    public abstract class DomainObjectBase : IAggregate, IEquatable<IAggregate>
+    public abstract class DomainObjectBase<TBase, TState> : IDomainObject
     {
         private readonly List<Envelope<IEvent>> uncomittedEvents = new List<Envelope<IEvent>>();
-        private readonly Guid id;
-        private int version;
+        private int version = -1;
+        private TState state;
+        private IPersistence<TState> persistence;
+
+        public TState State
+        {
+            get { return state; }
+        }
 
         public int Version
         {
             get { return version; }
         }
 
-        public Guid Id
+        public Task ActivateAsync(string key, IStore store)
         {
-            get { return id; }
-        }
+            persistence = store.WithSnapshots<TBase, TState>(key, s => state = s);
 
-        protected DomainObjectBase(Guid id, int version)
-        {
-            Guard.NotEmpty(id, nameof(id));
-            Guard.GreaterEquals(version, -1, nameof(version));
-
-            this.id = id;
-
-            this.version = version;
-        }
-
-        protected abstract void DispatchEvent(Envelope<IEvent> @event);
-
-        private void ApplyEventCore(Envelope<IEvent> @event)
-        {
-            DispatchEvent(@event); version++;
+            return persistence.ReadAsync();
         }
 
         protected void RaiseEvent(IEvent @event)
@@ -55,38 +49,31 @@ namespace Squidex.Infrastructure.Commands
             Guard.NotNull(@event, nameof(@event));
 
             uncomittedEvents.Add(@event.To<IEvent>());
-
-            ApplyEventCore(@event.To<IEvent>());
         }
 
-        void IAggregate.ApplyEvent(Envelope<IEvent> @event)
+        public void UpdateState(ICommand command, Action<TState> updater)
         {
-            ApplyEventCore(@event);
+            state = CloneState(command, updater);
         }
 
-        void IAggregate.ClearUncommittedEvents()
-        {
-            uncomittedEvents.Clear();
-        }
+        protected abstract TState CloneState(ICommand command, Action<TState> updater);
 
-        public ICollection<Envelope<IEvent>> GetUncomittedEvents()
+        public async Task WriteAsync(ISemanticLog log)
         {
-            return uncomittedEvents;
-        }
+            await persistence.WriteSnapshotAsync(state);
 
-        public override int GetHashCode()
-        {
-            return id.GetHashCode();
-        }
-
-        public override bool Equals(object obj)
-        {
-            return Equals(obj as IAggregate);
-        }
-
-        public bool Equals(IAggregate other)
-        {
-            return other != null && other.Id.Equals(id);
+            try
+            {
+                await persistence.WriteEventsAsync(uncomittedEvents.ToArray());
+            }
+            catch (Exception ex)
+            {
+                log.LogFatal(ex, w => w.WriteProperty("action", "writeEvents"));
+            }
+            finally
+            {
+                uncomittedEvents.Clear();
+            }
         }
     }
 }

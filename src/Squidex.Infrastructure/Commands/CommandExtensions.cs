@@ -14,7 +14,7 @@ namespace Squidex.Infrastructure.Commands
 {
     public static class CommandExtensions
     {
-        public static Task CreateAsync<T>(this IAggregateHandler handler, CommandContext context, Action<T> creator) where T : class, IAggregate
+        public static Task CreateAsync<T>(this IAggregateHandler handler, CommandContext context, Action<T> creator) where T : class, IDomainObject
         {
             return handler.CreateAsync<T>(context, x =>
             {
@@ -24,7 +24,7 @@ namespace Squidex.Infrastructure.Commands
             });
         }
 
-        public static Task UpdateAsync<T>(this IAggregateHandler handler, CommandContext context, Action<T> updater) where T : class, IAggregate
+        public static Task UpdateAsync<T>(this IAggregateHandler handler, CommandContext context, Action<T> updater) where T : class, IDomainObject
         {
             return handler.UpdateAsync<T>(context, x =>
             {
