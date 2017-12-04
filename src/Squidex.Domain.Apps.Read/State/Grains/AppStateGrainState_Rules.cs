@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Read.State.Grains
         {
             var id = @event.RuleId;
 
-            Rules.SetItem(id, EntityMapper.Create<JsonRuleEntity>(@event, headers, r =>
+            Rules = Rules.SetItem(id, EntityMapper.Create<JsonRuleEntity>(@event, headers, r =>
             {
                 r.RuleDef = RuleEventDispatcher.Create(@event);
             }));
@@ -52,7 +52,7 @@ namespace Squidex.Domain.Apps.Read.State.Grains
 
         public void On(RuleDeleted @event, EnvelopeHeaders headers)
         {
-            Rules.Remove(@event.RuleId);
+            Rules = Rules.Remove(@event.RuleId);
         }
 
         private void UpdateRule(RuleEvent @event, EnvelopeHeaders headers, Action<JsonRuleEntity> updater = null)
