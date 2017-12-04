@@ -46,7 +46,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// </remarks>
         [HttpGet]
         [Route("apps/{app}/patterns/")]
-        [ProducesResponseType(typeof(UIRegexSuggestionDto[]), 200)]
+        [ProducesResponseType(typeof(AppPatternDto[]), 200)]
         [ApiCosts(1)]
         public IActionResult GetPatterns(string app)
         {
@@ -54,10 +54,10 @@ namespace Squidex.Areas.Api.Controllers.Apps
                         .Where(x =>
                             !string.IsNullOrWhiteSpace(x.Name) &&
                             !string.IsNullOrWhiteSpace(x.Pattern))
-                        .Select(x => new UIRegexSuggestionDto { Name = x.Name, Pattern = x.Pattern, DefaultMessage = x.DefaultMessage })
+                        .Select(x => new AppPatternDto { Name = x.Name, Pattern = x.Pattern, DefaultMessage = x.DefaultMessage })
                         .OrderBy(x => x.Name)
                         .ToList()
-                    ?? new List<UIRegexSuggestionDto>());
+                    ?? new List<AppPatternDto>());
         }
 
         /// <summary>
@@ -71,15 +71,15 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// </returns>
         [HttpPost]
         [Route("apps/{app}/patterns/")]
-        [ProducesResponseType(typeof(UIRegexSuggestionDto), 201)]
+        [ProducesResponseType(typeof(AppPatternDto), 201)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PostPattern(string app, [FromBody] UIRegexSuggestionDto request)
+        public async Task<IActionResult> PostPattern(string app, [FromBody] AppPatternDto request)
         {
             var command = SimpleMapper.Map(request, new AddPattern());
 
             await CommandBus.PublishAsync(command);
 
-            var response = SimpleMapper.Map(command, new UIRegexSuggestionDto());
+            var response = SimpleMapper.Map(command, new AppPatternDto());
 
             return CreatedAtAction(nameof(GetPatterns), new { app }, response);
         }
@@ -96,9 +96,9 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// </returns>
         [HttpPut]
         [Route("apps/{app}/patterns/{name}")]
-        [ProducesResponseType(typeof(UIRegexSuggestionDto), 201)]
+        [ProducesResponseType(typeof(AppPatternDto), 201)]
         [ApiCosts(1)]
-        public async Task<IActionResult> UpdatePattern(string app, string name, [FromBody] UIRegexSuggestionDto request)
+        public async Task<IActionResult> UpdatePattern(string app, string name, [FromBody] AppPatternDto request)
         {
             var command = SimpleMapper.Map(request, new UpdatePattern { OriginalName = name });
 

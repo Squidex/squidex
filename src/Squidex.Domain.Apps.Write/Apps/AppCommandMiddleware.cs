@@ -191,51 +191,7 @@ namespace Squidex.Domain.Apps.Write.Apps
 
                 a.UpdatePattern(command);
             });
-
-            // await UpdateSchemaValidators(command);
         }
-
-        // private async Task UpdateSchemaValidators(UpdatePattern command)
-        // {
-        //    foreach (var kvp in command.Schemas)
-        //    {
-        //        var schema = command.Schemas[kvp.Key];
-        //        var fieldsToUpdate = schema.Fields
-        //            .Where(x => x.RawProperties is StringFieldProperties &&
-        //                    ((StringFieldProperties)x.RawProperties).Pattern == command.OriginalPattern)
-        //            .ToList();
-
-        //        foreach (var field in fieldsToUpdate)
-        //        {
-        //            var patternMessage = command.DefaultMessage;
-        //            // Check if the user has updated the default message or not
-        //            if ((field.RawProperties as StringFieldProperties)?.PatternMessage !=
-        //                command.OriginalDefaultMessage)
-        //            {
-        //                patternMessage = (field.RawProperties as StringFieldProperties)?.PatternMessage;
-        //            }
-
-        //            var updatedProperties = SimpleMapper.Map(field.RawProperties as StringFieldProperties, new StringFieldProperties());
-        //            updatedProperties.Pattern = command.Pattern;
-        //            updatedProperties.PatternMessage = patternMessage;
-
-        //            var updateField = new UpdateField
-        //            {
-        //                Actor = command.Actor,
-        //                AppId = command.AppId,
-        //                FieldId = field.Id,
-        //                Properties = updatedProperties,
-        //                SchemaId = new NamedId<Guid>(kvp.Key, schema.Name)
-        //            };
-        //            var context = new CommandContext(updateField);
-
-        //            await defaultSchemaHandler.UpdateAsync<SchemaDomainObject>(context, a =>
-        //            {
-        //                a.UpdateField(updateField);
-        //            });
-        //        }
-        //    }
-        // }
 
         public async Task HandleAsync(CommandContext context, Func<Task> next)
         {
