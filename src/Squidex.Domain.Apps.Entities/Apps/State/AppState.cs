@@ -8,11 +8,14 @@
 
 using Newtonsoft.Json;
 using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Apps.State
 {
     public sealed class AppState : DomainObjectState<AppState>, IAppEntity
     {
+        private static readonly LanguagesConfig English = LanguagesConfig.Build(Language.EN);
+
         [JsonProperty]
         public string Name { get; set; }
 
@@ -26,6 +29,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.State
         public AppContributors Contributors { get; set; } = AppContributors.Empty;
 
         [JsonProperty]
-        public LanguagesConfig LanguagesConfig { get; set; }
+        public LanguagesConfig LanguagesConfig { get; set; } = English;
     }
 }

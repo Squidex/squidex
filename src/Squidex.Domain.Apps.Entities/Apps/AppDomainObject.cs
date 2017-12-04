@@ -28,7 +28,9 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             var appId = new NamedId<Guid>(command.AppId, command.Name);
 
-            UpdateState(command, s => s.Name = command.Name);
+            UpdateState(command, s => { s.Id = appId.Id; s.Name = command.Name; });
+
+            UpdateContributors(command, c => c.Assign(command.Actor.Identifier, AppContributorPermission.Owner));
 
             RaiseEvent(SimpleMapper.Map(command, CreateInitalEvent(appId)));
             RaiseEvent(SimpleMapper.Map(command, CreateInitialOwner(appId, command)));
@@ -158,7 +160,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             ThrowIfNotCreated();
 
-            UpdateState(command, s => s.Plan = new AppPlan(command.Actor, command.PlanId));
+            UpdateState(command, s => s.Plan = command.PlanId != null ? new AppPlan(command.Actor, command.PlanId) : null);
 
             RaiseEvent(SimpleMapper.Map(command, new AppPlanChanged()));
 

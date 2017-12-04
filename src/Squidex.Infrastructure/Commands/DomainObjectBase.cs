@@ -15,11 +15,11 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Infrastructure.Commands
 {
-    public abstract class DomainObjectBase<TBase, TState> : IDomainObject
+    public abstract class DomainObjectBase<TBase, TState> : IDomainObject where TState : new()
     {
         private readonly List<Envelope<IEvent>> uncomittedEvents = new List<Envelope<IEvent>>();
         private int version = -1;
-        private TState state;
+        private TState state = new TState();
         private IPersistence<TState> persistence;
 
         public TState State
@@ -30,6 +30,16 @@ namespace Squidex.Infrastructure.Commands
         public int Version
         {
             get { return version; }
+        }
+
+        public IReadOnlyList<Envelope<IEvent>> GetUncomittedEvents()
+        {
+            return uncomittedEvents;
+        }
+
+        public void ClearUncommittedEvents()
+        {
+            uncomittedEvents.Clear();
         }
 
         public Task ActivateAsync(string key, IStore store)

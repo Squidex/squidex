@@ -67,6 +67,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benchmarks", "tests\Benchma
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex.Domain.Apps.Entities", "src\Squidex.Domain.Apps.Entities\Squidex.Domain.Apps.Entities.csproj", "{79FEF326-CA5E-4698-B2BA-C16A4580B4D5}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex.Domain.Apps.Entities.Tests", "tests\Squidex.Domain.Apps.Entities.Tests\Squidex.Domain.Apps.Entities.Tests.csproj", "{AA003372-CD8D-4DBC-962C-F61E0C93CF05}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -329,6 +331,18 @@ Global
 		{79FEF326-CA5E-4698-B2BA-C16A4580B4D5}.Release|x64.Build.0 = Release|Any CPU
 		{79FEF326-CA5E-4698-B2BA-C16A4580B4D5}.Release|x86.ActiveCfg = Release|Any CPU
 		{79FEF326-CA5E-4698-B2BA-C16A4580B4D5}.Release|x86.Build.0 = Release|Any CPU
+		{AA003372-CD8D-4DBC-962C-F61E0C93CF05}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AA003372-CD8D-4DBC-962C-F61E0C93CF05}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AA003372-CD8D-4DBC-962C-F61E0C93CF05}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{AA003372-CD8D-4DBC-962C-F61E0C93CF05}.Debug|x64.Build.0 = Debug|Any CPU
+		{AA003372-CD8D-4DBC-962C-F61E0C93CF05}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{AA003372-CD8D-4DBC-962C-F61E0C93CF05}.Debug|x86.Build.0 = Debug|Any CPU
+		{AA003372-CD8D-4DBC-962C-F61E0C93CF05}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AA003372-CD8D-4DBC-962C-F61E0C93CF05}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AA003372-CD8D-4DBC-962C-F61E0C93CF05}.Release|x64.ActiveCfg = Release|Any CPU
+		{AA003372-CD8D-4DBC-962C-F61E0C93CF05}.Release|x64.Build.0 = Release|Any CPU
+		{AA003372-CD8D-4DBC-962C-F61E0C93CF05}.Release|x86.ActiveCfg = Release|Any CPU
+		{AA003372-CD8D-4DBC-962C-F61E0C93CF05}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -359,6 +373,7 @@ Global
 		{F0A83301-50A5-40EA-A1A2-07C7858F5A3F} = {C9809D59-6665-471E-AD87-5AC624C65892}
 		{6B3F75B6-5888-468E-BA4F-4FC725DAEF31} = {C9809D59-6665-471E-AD87-5AC624C65892}
 		{79FEF326-CA5E-4698-B2BA-C16A4580B4D5} = {C9809D59-6665-471E-AD87-5AC624C65892}
+		{AA003372-CD8D-4DBC-962C-F61E0C93CF05} = {C9809D59-6665-471E-AD87-5AC624C65892}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {02F2E872-3141-44F5-BD6A-33CD84E9FE08}

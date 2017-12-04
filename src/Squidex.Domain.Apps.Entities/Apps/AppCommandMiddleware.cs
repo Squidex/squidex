@@ -62,7 +62,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             return handler.UpdateAsync<AppDomainObject>(context, async a =>
             {
-                await GuardAppContributors.CanAssign(a.State.Contributors, command, userResolver, appPlansProvider.GetPlan(a.State.Plan.PlanId));
+                await GuardAppContributors.CanAssign(a.State.Contributors, command, userResolver, appPlansProvider.GetPlan(a.State.Plan?.PlanId));
 
                 a.AssignContributor(command);
             });
