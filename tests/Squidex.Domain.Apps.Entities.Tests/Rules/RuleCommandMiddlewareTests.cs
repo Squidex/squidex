@@ -23,18 +23,16 @@ namespace Squidex.Domain.Apps.Entities.Rules
     public class RuleCommandMiddlewareTests : HandlerTestBase<RuleDomainObject>
     {
         private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
-        private readonly RuleCommandMiddleware sut;
-        private readonly RuleDomainObject rule;
+        private readonly RuleDomainObject rule = new RuleDomainObject();
         private readonly RuleTrigger ruleTrigger = new ContentChangedTrigger();
         private readonly RuleAction ruleAction = new WebhookAction { Url = new Uri("https://squidex.io") };
         private readonly Guid ruleId = Guid.NewGuid();
+        private readonly RuleCommandMiddleware sut;
 
         public RuleCommandMiddlewareTests()
         {
             A.CallTo(() => appProvider.GetSchemaAsync(A<string>.Ignored, A<Guid>.Ignored, false))
                 .Returns(A.Fake<ISchemaEntity>());
-
-            rule = new RuleDomainObject();
 
             sut = new RuleCommandMiddleware(Handler, appProvider);
         }

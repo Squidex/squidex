@@ -8,6 +8,7 @@
 
 using System;
 using NodaTime;
+using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Domain.Apps.Entities
 {
@@ -17,28 +18,24 @@ namespace Squidex.Domain.Apps.Entities
         {
             var timestamp = SystemClock.Instance.GetCurrentInstant();
 
+            SetId(entity, command);
             SetAppId(entity, command);
-            SetVersion(entity);
             SetCreated(entity, timestamp);
             SetCreatedBy(entity, command);
             SetLastModified(entity, timestamp);
             SetLastModifiedBy(entity, command);
+            SetVersion(entity);
 
             updater?.Invoke(entity);
 
             return entity;
         }
 
-        private static void SetLastModified(IEntity entity, Instant timestamp)
+        private static void SetId(IEntity entity, SquidexCommand command)
         {
-            entity.LastModified = timestamp;
-        }
-
-        private static void SetCreated(IEntity entity, Instant timestamp)
-        {
-            if (entity.Created == default(Instant))
+            if (entity is IUpdateableEntity updateable && command is IAggregateCommand aggregateCommand)
             {
-                entity.Created = timestamp;
+                updateable.Id = aggregateCommand.AggregateId;
             }
         }
 
@@ -50,11 +47,27 @@ namespace Squidex.Domain.Apps.Entities
             }
         }
 
+        private static void SetCreated(IEntity entity, Instant timestamp)
+        {
+            if (entity is IUpdateableEntity updateable && updateable.Created == default(Instant))
+            {
+                updateable.Created = timestamp;
+            }
+        }
+
         private static void SetCreatedBy(IEntity entity, SquidexCommand command)
         {
             if (entity is IUpdateableEntityWithCreatedBy withCreatedBy && withCreatedBy.CreatedBy == null)
             {
                 withCreatedBy.CreatedBy = command.Actor;
+            }
+        }
+
+        private static void SetLastModified(IEntity entity, Instant timestamp)
+        {
+            if (entity is IUpdateableEntity updateable)
+            {
+                updateable.LastModified = timestamp;
             }
         }
 

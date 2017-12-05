@@ -24,12 +24,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         private readonly string clientId = "client";
         private readonly string clientNewName = "My Client";
         private readonly string planId = "premium";
-        private readonly AppDomainObject sut;
-
-        public AppDomainObjectTests()
-        {
-            sut = new AppDomainObject();
-        }
+        private readonly AppDomainObject sut = new AppDomainObject();
 
         [Fact]
         public void Create_should_throw_exception_if_created()

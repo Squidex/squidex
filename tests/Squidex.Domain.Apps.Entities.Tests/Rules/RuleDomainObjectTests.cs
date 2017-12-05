@@ -21,16 +21,10 @@ namespace Squidex.Domain.Apps.Entities.Rules
 {
     public class RuleDomainObjectTests : HandlerTestBase<RuleDomainObject>
     {
+        private readonly Guid ruleId = Guid.NewGuid();
         private readonly RuleTrigger ruleTrigger = new ContentChangedTrigger();
         private readonly RuleAction ruleAction = new WebhookAction { Url = new Uri("https://squidex.io") };
-        private readonly RuleDomainObject sut;
-
-        public Guid RuleId { get; } = Guid.NewGuid();
-
-        public RuleDomainObjectTests()
-        {
-            sut = new RuleDomainObject();
-        }
+        private readonly RuleDomainObject sut = new RuleDomainObject();
 
         [Fact]
         public void Create_should_throw_exception_if_created()
@@ -234,14 +228,14 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
         protected T CreateRuleEvent<T>(T @event) where T : RuleEvent
         {
-            @event.RuleId = RuleId;
+            @event.RuleId = ruleId;
 
             return CreateEvent(@event);
         }
 
         protected T CreateRuleCommand<T>(T command) where T : RuleAggregateCommand
         {
-            command.RuleId = RuleId;
+            command.RuleId = ruleId;
 
             return CreateCommand(command);
         }

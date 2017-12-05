@@ -200,7 +200,7 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             var document =
                 await Collection.Find(Filter.Eq(EventStreamField, streamName))
-                    .Project<BsonDocument>(Project
+                    .Project<BsonDocument>(Projection
                         .Include(EventStreamOffsetField)
                         .Include(EventsCountField))
                     .Sort(Sort.Descending(EventStreamOffsetField)).Limit(1)

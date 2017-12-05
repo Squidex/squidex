@@ -26,14 +26,19 @@ namespace Squidex.Domain.Apps.Entities.Assets
             {
                 FileName = command.File.FileName,
                 FileSize = command.File.FileSize,
-                FileVersion = State.FileVersion + 1,
+                FileVersion = 0,
                 MimeType = command.File.MimeType,
                 PixelWidth = command.ImageInfo?.PixelWidth,
                 PixelHeight = command.ImageInfo?.PixelHeight,
                 IsImage = command.ImageInfo != null
             });
 
-            UpdateState(command, s => SimpleMapper.Map(@event, s));
+            UpdateState(command, s =>
+            {
+                s.TotalSize = @event.FileSize;
+
+                SimpleMapper.Map(@event, s);
+            });
 
             RaiseEvent(@event);
 
@@ -54,7 +59,12 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 IsImage = command.ImageInfo != null
             });
 
-            UpdateState(command, s => SimpleMapper.Map(@event, s));
+            UpdateState(command, s =>
+            {
+                s.TotalSize += @event.FileSize;
+
+                SimpleMapper.Map(@event, s);
+            });
 
             RaiseEvent(@event);
 

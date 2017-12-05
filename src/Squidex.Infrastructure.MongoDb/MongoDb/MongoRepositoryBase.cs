@@ -13,18 +13,21 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Infrastructure.Tasks;
 
+#pragma warning disable RECS0108 // Warns about static fields in generic types
+
 namespace Squidex.Infrastructure.MongoDb
 {
     public abstract class MongoRepositoryBase<TEntity> : IExternalSystem
     {
         private const string CollectionFormat = "{0}Set";
 
+        protected static readonly UpdateOptions Upsert = new UpdateOptions { IsUpsert = true };
         protected static readonly SortDefinitionBuilder<TEntity> Sort = Builders<TEntity>.Sort;
         protected static readonly UpdateDefinitionBuilder<TEntity> Update = Builders<TEntity>.Update;
         protected static readonly FieldDefinitionBuilder<TEntity> Fields = FieldDefinitionBuilder<TEntity>.Instance;
         protected static readonly FilterDefinitionBuilder<TEntity> Filter = Builders<TEntity>.Filter;
         protected static readonly IndexKeysDefinitionBuilder<TEntity> Index = Builders<TEntity>.IndexKeys;
-        protected static readonly ProjectionDefinitionBuilder<TEntity> Project = Builders<TEntity>.Projection;
+        protected static readonly ProjectionDefinitionBuilder<TEntity> Projection = Builders<TEntity>.Projection;
 
         private readonly IMongoDatabase mongoDatabase;
         private Lazy<IMongoCollection<TEntity>> mongoCollection;

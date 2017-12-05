@@ -13,10 +13,10 @@ using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Infrastructure.States
 {
-    public sealed class Persistence<TOwner, TState> : IPersistence<TState>
+    internal sealed class Persistence<TOwner, TState> : IPersistence<TState>
     {
         private readonly string ownerKey;
-        private readonly ISnapshotStore snapshotStore;
+        private readonly ISnapshotStore<TState> snapshotStore;
         private readonly IStreamNameResolver streamNameResolver;
         private readonly IEventStore eventStore;
         private readonly IEventDataFormatter eventDataFormatter;
@@ -30,13 +30,11 @@ namespace Squidex.Infrastructure.States
             Action invalidate,
             IEventStore eventStore,
             IEventDataFormatter eventDataFormatter,
-            ISnapshotStore snapshotStore,
+            ISnapshotStore<TState> snapshotStore,
             IStreamNameResolver streamNameResolver,
             Func<TState, Task> applyState,
             Func<Envelope<IEvent>, Task> applyEvent)
         {
-            Guard.NotNull(ownerKey, nameof(ownerKey));
-
             this.ownerKey = ownerKey;
             this.applyState = applyState;
             this.applyEvent = applyEvent;
@@ -54,7 +52,7 @@ namespace Squidex.Infrastructure.States
 
             if (snapshotStore != null)
             {
-                var (state, position) = await snapshotStore.ReadAsync<TState>(ownerKey);
+                var (state, position) = await snapshotStore.ReadAsync(ownerKey);
 
                 positionSnapshot = position;
                 positionEvent = position;
@@ -104,13 +102,10 @@ namespace Squidex.Infrastructure.States
 
         public async Task WriteSnapshotAsync(TState state)
         {
-            if (snapshotStore == null)
-            {
-                throw new InvalidOperationException("Snapshots are not supported.");
-            }
-
             var newPosition =
-                eventStore != null ? positionEvent : positionSnapshot + 1;
+                eventStore != null ?
+                positionEvent :
+                positionSnapshot + 1;
 
             if (newPosition != positionSnapshot)
             {
@@ -126,17 +121,12 @@ namespace Squidex.Infrastructure.States
                 positionSnapshot = newPosition;
             }
 
-            invalidate();
+            invalidate?.Invoke();
         }
 
         public async Task WriteEventsAsync(params Envelope<IEvent>[] @events)
         {
             Guard.NotNull(events, nameof(@events));
-
-            if (eventStore == null)
-            {
-                throw new InvalidOperationException("Events are not supported.");
-            }
 
             if (@events.Length > 0)
             {
@@ -157,7 +147,7 @@ namespace Squidex.Infrastructure.States
                 positionEvent += events.Length;
             }
 
-            invalidate();
+            invalidate?.Invoke();
         }
 
         private EventData[] GetEventData(Envelope<IEvent>[] events, Guid commitId)

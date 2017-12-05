@@ -14,6 +14,7 @@ using Squidex.Infrastructure;
 namespace Squidex.Domain.Apps.Entities
 {
     public abstract class DomainObjectState<T> : Cloneable<T>,
+        IUpdateableEntity,
         IUpdateableEntityWithCreatedBy,
         IUpdateableEntityWithLastModifiedBy,
         IUpdateableEntityWithVersion

@@ -21,7 +21,6 @@ namespace Squidex.Infrastructure.States
         private readonly IPubSub pubSub;
         private readonly IMemoryCache statesCache;
         private readonly IServiceProvider services;
-        private readonly ISnapshotStore snapshotStore;
         private readonly IStreamNameResolver streamNameResolver;
         private readonly IEventStore eventStore;
         private readonly IEventDataFormatter eventDataFormatter;
@@ -54,22 +53,19 @@ namespace Squidex.Infrastructure.States
             IEventStore eventStore,
             IEventDataFormatter eventDataFormatter,
             IServiceProvider services,
-            ISnapshotStore snapshotStore,
             IStreamNameResolver streamNameResolver)
         {
             Guard.NotNull(services, nameof(services));
             Guard.NotNull(eventStore, nameof(eventStore));
             Guard.NotNull(eventDataFormatter, nameof(eventDataFormatter));
             Guard.NotNull(pubSub, nameof(pubSub));
-            Guard.NotNull(snapshotStore, nameof(snapshotStore));
             Guard.NotNull(statesCache, nameof(statesCache));
             Guard.NotNull(streamNameResolver, nameof(streamNameResolver));
 
-            this.services = services;
             this.eventStore = eventStore;
             this.eventDataFormatter = eventDataFormatter;
             this.pubSub = pubSub;
-            this.snapshotStore = snapshotStore;
+            this.services = services;
             this.statesCache = statesCache;
             this.streamNameResolver = streamNameResolver;
         }
@@ -89,7 +85,7 @@ namespace Squidex.Infrastructure.States
         {
             Guard.NotNull(key, nameof(key));
 
-            var stateStore = new Store(() => { }, eventStore, eventDataFormatter, snapshotStore, streamNameResolver);
+            var stateStore = new Store(eventStore, eventDataFormatter, services, streamNameResolver);
             var state = (T)services.GetService(typeof(T));
 
             await state.ActivateAsync(key, stateStore);
@@ -110,10 +106,10 @@ namespace Squidex.Infrastructure.States
 
                 var state = (T)services.GetService(typeof(T));
 
-                var stateStore = new Store(() =>
+                var stateStore = new Store(eventStore, eventDataFormatter, services, streamNameResolver, () =>
                 {
                     pubSub.Publish(new InvalidateMessage { Key = key }, false);
-                }, eventStore, eventDataFormatter, snapshotStore, streamNameResolver);
+                });
 
                 stateObj = new ObjectHolder<T>(state, key, stateStore);
 

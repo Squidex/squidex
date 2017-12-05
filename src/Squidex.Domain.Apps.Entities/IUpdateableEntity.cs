@@ -1,19 +1,22 @@
 ﻿// ==========================================================================
-//  ISnapshotStore.cs
+//  IUpdateableEntity.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using System.Threading.Tasks;
+using System;
+using NodaTime;
 
-namespace Squidex.Infrastructure.States
+namespace Squidex.Domain.Apps.Entities
 {
-    public interface ISnapshotStore<T>
+    public interface IUpdateableEntity
     {
-        Task WriteAsync(string key, T value, long oldVersion, long newVersion);
+        Guid Id { get; set; }
 
-        Task<(T Value, long Version)> ReadAsync(string key);
+        Instant Created { get; set; }
+
+        Instant LastModified { get; set; }
     }
 }
