@@ -273,6 +273,8 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             sut.UpdateLanguage(CreateCommand(new UpdateLanguage { Language = Language.DE, Fallback = new List<Language> { Language.EN } }));
 
+            Assert.True(sut.State.LanguagesConfig.Contains(Language.DE));
+
             sut.GetUncomittedEvents()
                 .ShouldHaveSameEvents(
                     CreateEvent(new AppLanguageUpdated { Language = Language.DE, Fallback = new List<Language> { Language.EN } })
