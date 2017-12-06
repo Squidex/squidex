@@ -8,13 +8,13 @@
 
 using System;
 using System.Collections.Generic;
-using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Domain.Apps.Entities.Schemas.State;
 using Squidex.Domain.Apps.Events.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Entities.Schemas
@@ -57,22 +57,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         {
             VerifyCreatedAndNotDeleted();
 
-            var partitioning =
-                string.Equals(command.Partitioning, Partitioning.Language.Key, StringComparison.OrdinalIgnoreCase) ?
-                    Partitioning.Language :
-                    Partitioning.Invariant;
-
-            var fieldId = State.TotalFields;
-
-            var field = registry.CreateField(fieldId, command.Name, partitioning, command.Properties);
-
-            UpdateState(command, state =>
-            {
-                state.SchemaDef = state.SchemaDef.AddField(field);
-                state.TotalFields = fieldId + 1;
-            });
-
-            RaiseEvent(SimpleMapper.Map(command, new FieldAdded { FieldId = new NamedId<long>(fieldId + 1, command.Name) }));
+            RaiseEvent(SimpleMapper.Map(command, new FieldAdded { FieldId = new NamedId<long>(State.TotalFields + 1, command.Name) }));
 
             return this;
         }
@@ -80,8 +65,6 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         public SchemaDomainObject UpdateField(UpdateField command)
         {
             VerifyCreatedAndNotDeleted();
-
-            UpdateSchema(command, s => s.UpdateField(command.FieldId, command.Properties));
 
             RaiseEvent(command, SimpleMapper.Map(command, new FieldUpdated()));
 
@@ -92,8 +75,6 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         {
             VerifyCreatedAndNotDeleted();
 
-            UpdateSchema(command, s => s.LockField(command.FieldId));
-
             RaiseEvent(command, new FieldLocked());
 
             return this;
@@ -102,8 +83,6 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         public SchemaDomainObject HideField(HideField command)
         {
             VerifyCreatedAndNotDeleted();
-
-            UpdateSchema(command, s => s.HideField(command.FieldId));
 
             RaiseEvent(command, new FieldHidden());
 
@@ -114,8 +93,6 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         {
             VerifyCreatedAndNotDeleted();
 
-            UpdateSchema(command, s => s.ShowField(command.FieldId));
-
             RaiseEvent(command, new FieldShown());
 
             return this;
@@ -124,8 +101,6 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         public SchemaDomainObject DisableField(DisableField command)
         {
             VerifyCreatedAndNotDeleted();
-
-            UpdateSchema(command, s => s.DisableField(command.FieldId));
 
             RaiseEvent(command, new FieldDisabled());
 
@@ -136,8 +111,6 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         {
             VerifyCreatedAndNotDeleted();
 
-            UpdateSchema(command, s => s.EnableField(command.FieldId));
-
             RaiseEvent(command, new FieldEnabled());
 
             return this;
@@ -146,8 +119,6 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         public SchemaDomainObject DeleteField(DeleteField command)
         {
             VerifyCreatedAndNotDeleted();
-
-            UpdateSchema(command, s => s.DeleteField(command.FieldId));
 
             RaiseEvent(command, new FieldDeleted());
 
@@ -158,8 +129,6 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         {
             VerifyCreatedAndNotDeleted();
 
-            UpdateSchema(command, s => s.ReorderFields(command.FieldIds));
-
             RaiseEvent(SimpleMapper.Map(command, new SchemaFieldsReordered()));
 
             return this;
@@ -168,8 +137,6 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         public SchemaDomainObject Publish(PublishSchema command)
         {
             VerifyCreatedAndNotDeleted();
-
-            UpdateSchema(command, s => s.Publish());
 
             RaiseEvent(SimpleMapper.Map(command, new SchemaPublished()));
 
@@ -180,8 +147,6 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         {
             VerifyCreatedAndNotDeleted();
 
-            UpdateSchema(command, s => s.Unpublish());
-
             RaiseEvent(SimpleMapper.Map(command, new SchemaUnpublished()));
 
             return this;
@@ -190,8 +155,6 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         public SchemaDomainObject ConfigureScripts(ConfigureScripts command)
         {
             VerifyCreatedAndNotDeleted();
-
-            UpdateState(command, s => SimpleMapper.Map(command, s));
 
             RaiseEvent(SimpleMapper.Map(command, new ScriptsConfigured()));
 
@@ -202,8 +165,6 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         {
             VerifyCreatedAndNotDeleted();
 
-            UpdateState(command, s => s.IsDeleted = true);
-
             RaiseEvent(SimpleMapper.Map(command, new SchemaDeleted()));
 
             return this;
@@ -212,8 +173,6 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         public SchemaDomainObject Update(UpdateSchema command)
         {
             VerifyCreatedAndNotDeleted();
-
-            UpdateState(command, s => SimpleMapper.Map(command, s));
 
             RaiseEvent(SimpleMapper.Map(command, new SchemaUpdated()));
 
@@ -248,14 +207,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             }
         }
 
-        private void UpdateSchema(ICommand command, Func<Schema, Schema> updater)
+        protected override void OnRaised(Envelope<IEvent> @event)
         {
-            UpdateState(command, s => s.SchemaDef = updater(s.SchemaDef));
-        }
-
-        protected override SchemaState CloneState(ICommand command, Action<SchemaState> updater)
-        {
-            return State.Clone().Update((SquidexCommand)command, updater);
+            UpdateState(State.Apply(@event));
         }
     }
 }

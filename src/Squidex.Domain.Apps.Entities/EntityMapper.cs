@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  EntityMapper.cs
+//  EntityMapper2.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -8,82 +8,81 @@
 
 using System;
 using NodaTime;
-using Squidex.Infrastructure.Commands;
+using Squidex.Domain.Apps.Events;
+using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Entities
 {
     public static class EntityMapper
     {
-        public static T Update<T>(this T entity, SquidexCommand command, Action<T> updater = null) where T : IEntity
+        public static T Update<T>(this T entity, SquidexEvent @event, EnvelopeHeaders headers, Action<T> updater = null) where T : IEntity
         {
-            var timestamp = SystemClock.Instance.GetCurrentInstant();
-
-            SetId(entity, command);
-            SetAppId(entity, command);
-            SetCreated(entity, timestamp);
-            SetCreatedBy(entity, command);
-            SetLastModified(entity, timestamp);
-            SetLastModifiedBy(entity, command);
-            SetVersion(entity);
+            SetId(entity, headers);
+            SetAppId(entity, @event);
+            SetCreated(entity, headers);
+            SetCreatedBy(entity, @event);
+            SetLastModified(entity, headers);
+            SetLastModifiedBy(entity, @event);
+            SetVersion(entity, headers);
 
             updater?.Invoke(entity);
 
             return entity;
         }
 
-        private static void SetId(IEntity entity, SquidexCommand command)
-        {
-            if (entity is IUpdateableEntity updateable && command is IAggregateCommand aggregateCommand)
-            {
-                updateable.Id = aggregateCommand.AggregateId;
-            }
-        }
-
-        private static void SetVersion(IEntity entity)
-        {
-            if (entity is IUpdateableEntityWithVersion withVersion)
-            {
-                withVersion.Version++;
-            }
-        }
-
-        private static void SetCreated(IEntity entity, Instant timestamp)
-        {
-            if (entity is IUpdateableEntity updateable && updateable.Created == default(Instant))
-            {
-                updateable.Created = timestamp;
-            }
-        }
-
-        private static void SetCreatedBy(IEntity entity, SquidexCommand command)
-        {
-            if (entity is IUpdateableEntityWithCreatedBy withCreatedBy && withCreatedBy.CreatedBy == null)
-            {
-                withCreatedBy.CreatedBy = command.Actor;
-            }
-        }
-
-        private static void SetLastModified(IEntity entity, Instant timestamp)
+        private static void SetId(IEntity entity, EnvelopeHeaders headers)
         {
             if (entity is IUpdateableEntity updateable)
             {
-                updateable.LastModified = timestamp;
+                updateable.Id = headers.AggregateId();
             }
         }
 
-        private static void SetLastModifiedBy(IEntity entity, SquidexCommand command)
+        private static void SetVersion(IEntity entity, EnvelopeHeaders headers)
+        {
+            if (entity is IUpdateableEntityWithVersion withVersion)
+            {
+                withVersion.Version = headers.EventStreamNumber();
+            }
+        }
+
+        private static void SetCreated(IEntity entity, EnvelopeHeaders headers)
+        {
+            if (entity is IUpdateableEntity updateable && updateable.Created == default(Instant))
+            {
+                updateable.Created = headers.Timestamp();
+            }
+        }
+
+        private static void SetCreatedBy(IEntity entity, SquidexEvent @event)
+        {
+            if (entity is IUpdateableEntityWithCreatedBy withCreatedBy && withCreatedBy.CreatedBy == null)
+            {
+                withCreatedBy.CreatedBy = @event.Actor;
+            }
+        }
+
+        private static void SetLastModified(IEntity entity, EnvelopeHeaders headers)
+        {
+            if (entity is IUpdateableEntity updateable)
+            {
+                updateable.LastModified = headers.Timestamp();
+            }
+        }
+
+        private static void SetLastModifiedBy(IEntity entity, SquidexEvent @event)
         {
             if (entity is IUpdateableEntityWithLastModifiedBy withModifiedBy)
             {
-                withModifiedBy.LastModifiedBy = command.Actor;
+                withModifiedBy.LastModifiedBy = @event.Actor;
             }
         }
 
-        private static void SetAppId(IEntity entity, SquidexCommand command)
+        private static void SetAppId(IEntity entity, SquidexEvent @event)
         {
-            if (entity is IUpdateableEntityWithAppRef appEntity && command is AppCommand appCommand)
+            if (entity is IUpdateableEntityWithAppRef appEntity && @event is AppEvent appEvent)
             {
-                appEntity.AppId = appCommand.AppId.Id;
+                appEntity.AppId = appEvent.AppId.Id;
             }
         }
     }

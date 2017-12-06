@@ -49,24 +49,28 @@ namespace Squidex.Infrastructure.Commands
             return persistence.ReadAsync();
         }
 
-        protected void RaiseEvent(IEvent @event)
+        public void RaiseEvent(IEvent @event)
         {
             RaiseEvent(Envelope.Create(@event));
         }
 
-        protected void RaiseEvent<TEvent>(Envelope<TEvent> @event) where TEvent : class, IEvent
+        public void RaiseEvent<TEvent>(Envelope<TEvent> @event) where TEvent : class, IEvent
         {
             Guard.NotNull(@event, nameof(@event));
+
+            OnRaised(@event.To<IEvent>());
 
             uncomittedEvents.Add(@event.To<IEvent>());
         }
 
-        public void UpdateState(ICommand command, Action<TState> updater)
+        public void UpdateState(TState newState)
         {
-            state = CloneState(command, updater);
+            state = newState;
         }
 
-        protected abstract TState CloneState(ICommand command, Action<TState> updater);
+        protected virtual void OnRaised(Envelope<IEvent> @event)
+        {
+        }
 
         public async Task WriteAsync(ISemanticLog log)
         {

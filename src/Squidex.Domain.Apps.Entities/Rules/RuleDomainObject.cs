@@ -6,13 +6,12 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System;
-using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.Rules.State;
 using Squidex.Domain.Apps.Events.Rules;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Entities.Rules
@@ -23,16 +22,12 @@ namespace Squidex.Domain.Apps.Entities.Rules
         {
             VerifyNotCreated();
 
-            UpdateRule(command, r => new Rule(command.Trigger, command.Action));
-
             RaiseEvent(SimpleMapper.Map(command, new RuleCreated()));
         }
 
         public void Update(UpdateRule command)
         {
             VerifyCreatedAndNotDeleted();
-
-            UpdateRule(command, r => r.Update(command.Trigger).Update(command.Action));
 
             RaiseEvent(SimpleMapper.Map(command, new RuleUpdated()));
         }
@@ -41,8 +36,6 @@ namespace Squidex.Domain.Apps.Entities.Rules
         {
             VerifyCreatedAndNotDeleted();
 
-            UpdateRule(command, r => r.Enable());
-
             RaiseEvent(SimpleMapper.Map(command, new RuleEnabled()));
         }
 
@@ -50,16 +43,12 @@ namespace Squidex.Domain.Apps.Entities.Rules
         {
             VerifyCreatedAndNotDeleted();
 
-            UpdateRule(command, r => r.Disable());
-
             RaiseEvent(SimpleMapper.Map(command, new RuleDisabled()));
         }
 
         public void Delete(DeleteRule command)
         {
             VerifyCreatedAndNotDeleted();
-
-            UpdateState(command, s => s.IsDeleted = true);
 
             RaiseEvent(SimpleMapper.Map(command, new RuleDeleted()));
         }
@@ -80,14 +69,9 @@ namespace Squidex.Domain.Apps.Entities.Rules
             }
         }
 
-        private void UpdateRule(ICommand command, Func<Rule, Rule> updater)
+        protected override void OnRaised(Envelope<IEvent> @event)
         {
-            UpdateState(command, s => s.RuleDef = updater(s.RuleDef));
-        }
-
-        protected override RuleState CloneState(ICommand command, Action<RuleState> updater)
-        {
-            return State.Clone().Update((SquidexCommand)command, updater);
+            UpdateState(State.Apply(@event));
         }
     }
 }

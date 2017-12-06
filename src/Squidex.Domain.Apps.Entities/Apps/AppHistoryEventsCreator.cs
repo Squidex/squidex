@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 "changed master language to {[Language]}");
         }
 
-        protected Task<HistoryEventToStore> On(AppContributorRemoved @event, EnvelopeHeaders headers)
+        protected Task<HistoryEventToStore> On(AppContributorRemoved @event)
         {
             const string channel = "settings.contributors";
 
@@ -60,7 +60,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                     .AddParameter("Contributor", @event.ContributorId));
         }
 
-        protected Task<HistoryEventToStore> On(AppContributorAssigned @event, EnvelopeHeaders headers)
+        protected Task<HistoryEventToStore> On(AppContributorAssigned @event)
         {
             const string channel = "settings.contributors";
 
@@ -69,7 +69,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                     .AddParameter("Contributor", @event.ContributorId).AddParameter("Permission", @event.Permission));
         }
 
-        protected Task<HistoryEventToStore> On(AppClientAttached @event, EnvelopeHeaders headers)
+        protected Task<HistoryEventToStore> On(AppClientAttached @event)
         {
             const string channel = "settings.clients";
 
@@ -78,7 +78,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                     .AddParameter("Id", @event.Id));
         }
 
-        protected Task<HistoryEventToStore> On(AppClientRevoked @event, EnvelopeHeaders headers)
+        protected Task<HistoryEventToStore> On(AppClientRevoked @event)
         {
             const string channel = "settings.clients";
 
@@ -87,7 +87,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                     .AddParameter("Id", @event.Id));
         }
 
-        protected Task<HistoryEventToStore> On(AppClientRenamed @event, EnvelopeHeaders headers)
+        protected Task<HistoryEventToStore> On(AppClientRenamed @event)
         {
             const string channel = "settings.clients";
 
@@ -96,7 +96,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                     .AddParameter("Id", @event.Id).AddParameter("Name", ClientName(@event)));
         }
 
-        protected Task<HistoryEventToStore> On(AppLanguageAdded @event, EnvelopeHeaders headers)
+        protected Task<HistoryEventToStore> On(AppLanguageAdded @event)
         {
             const string channel = "settings.languages";
 
@@ -105,7 +105,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                     .AddParameter("Language", @event.Language));
         }
 
-        protected Task<HistoryEventToStore> On(AppLanguageRemoved @event, EnvelopeHeaders headers)
+        protected Task<HistoryEventToStore> On(AppLanguageRemoved @event)
         {
             const string channel = "settings.languages";
 
@@ -114,7 +114,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                     .AddParameter("Language", @event.Language));
         }
 
-        protected Task<HistoryEventToStore> On(AppLanguageUpdated @event, EnvelopeHeaders headers)
+        protected Task<HistoryEventToStore> On(AppLanguageUpdated @event)
         {
             const string channel = "settings.languages";
 
@@ -123,7 +123,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                     .AddParameter("Language", @event.Language));
         }
 
-        protected Task<HistoryEventToStore> On(AppMasterLanguageSet @event, EnvelopeHeaders headers)
+        protected Task<HistoryEventToStore> On(AppMasterLanguageSet @event)
         {
             const string channel = "settings.languages";
 

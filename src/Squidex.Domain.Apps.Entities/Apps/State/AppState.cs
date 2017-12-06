@@ -8,11 +8,16 @@
 
 using Newtonsoft.Json;
 using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Domain.Apps.Events;
+using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Dispatching;
+using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Entities.Apps.State
 {
-    public sealed class AppState : DomainObjectState<AppState>, IAppEntity
+    public class AppState : DomainObjectState<AppState>, IAppEntity
     {
         private static readonly LanguagesConfig English = LanguagesConfig.Build(Language.EN);
 
@@ -30,5 +35,72 @@ namespace Squidex.Domain.Apps.Entities.Apps.State
 
         [JsonProperty]
         public LanguagesConfig LanguagesConfig { get; set; } = English;
+
+        protected void On(AppCreated @event)
+        {
+            SimpleMapper.Map(@event, this);
+        }
+
+        protected void On(AppPlanChanged @event)
+        {
+            Plan = @event.PlanId == null ? null : new AppPlan(@event.Actor, @event.PlanId);
+        }
+
+        protected void On(AppContributorAssigned @event)
+        {
+            Contributors = Contributors.Assign(@event.ContributorId, @event.Permission);
+        }
+
+        protected void On(AppContributorRemoved @event)
+        {
+            Contributors = Contributors.Remove(@event.ContributorId);
+        }
+
+        protected void On(AppClientAttached @event)
+        {
+            Clients = Clients.Add(@event.Id, @event.Secret);
+        }
+
+        protected void On(AppClientUpdated @event)
+        {
+            Clients = Clients.Update(@event.Id, @event.Permission);
+        }
+
+        protected void On(AppClientRenamed @event)
+        {
+            Clients = Clients.Rename(@event.Id, @event.Name);
+        }
+
+        protected void On(AppClientRevoked @event)
+        {
+            Clients = Clients.Revoke(@event.Id);
+        }
+
+        protected void On(AppLanguageAdded @event)
+        {
+            LanguagesConfig = LanguagesConfig.Set(new LanguageConfig(@event.Language));
+        }
+
+        protected void On(AppLanguageRemoved @event)
+        {
+            LanguagesConfig = LanguagesConfig.Remove(@event.Language);
+        }
+
+        protected void On(AppLanguageUpdated @event)
+        {
+            LanguagesConfig = LanguagesConfig.Set(new LanguageConfig(@event.Language, @event.IsOptional, @event.Fallback));
+
+            if (@event.IsMaster)
+            {
+                LanguagesConfig = LanguagesConfig.MakeMaster(@event.Language);
+            }
+        }
+
+        public AppState Apply(Envelope<IEvent> @event)
+        {
+            var payload = (SquidexEvent)@event.Payload;
+
+            return Clone().Update(payload, @event.Headers, r => r.DispatchAction(payload));
+        }
     }
 }

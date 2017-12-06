@@ -33,6 +33,16 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
                 IsUpdated = false;
             }
 
+            public Task<V> CreateSyncedAsync<V>(CommandContext context, Func<V, Task> creator) where V : class, IDomainObject
+            {
+                return CreateAsync(context, creator);
+            }
+
+            public Task<V> UpdateSyncedAsync<V>(CommandContext context, Func<V, Task> creator) where V : class, IDomainObject
+            {
+                return UpdateAsync(context, creator);
+            }
+
             public async Task<V> CreateAsync<V>(CommandContext context, Func<V, Task> creator) where V : class, IDomainObject
             {
                 IsCreated = true;

@@ -7,7 +7,6 @@
 // ==========================================================================
 
 using System;
-using System.Linq;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.State;
@@ -28,10 +27,6 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             var appId = new NamedId<Guid>(command.AppId, command.Name);
 
-            UpdateState(command, s => { s.Id = appId.Id; s.Name = command.Name; });
-
-            UpdateContributors(command, c => c.Assign(command.Actor.Identifier, AppContributorPermission.Owner));
-
             RaiseEvent(SimpleMapper.Map(command, CreateInitalEvent(appId)));
             RaiseEvent(SimpleMapper.Map(command, CreateInitialOwner(appId, command)));
             RaiseEvent(SimpleMapper.Map(command, CreateInitialLanguage(appId)));
@@ -42,27 +37,6 @@ namespace Squidex.Domain.Apps.Entities.Apps
         public AppDomainObject UpdateLanguage(UpdateLanguage command)
         {
             ThrowIfNotCreated();
-
-            UpdateLanguages(command, l =>
-            {
-                var fallback = command.Fallback;
-
-                if (fallback != null && fallback.Count > 0)
-                {
-                    var existingLangauges = l.OfType<LanguageConfig>().Select(x => x.Language);
-
-                    fallback = fallback.Intersect(existingLangauges).ToList();
-                }
-
-                l = l.Set(new LanguageConfig(command.Language, command.IsOptional, fallback));
-
-                if (command.IsMaster)
-                {
-                    l = l.MakeMaster(command.Language);
-                }
-
-                return l;
-            });
 
             RaiseEvent(SimpleMapper.Map(command, new AppLanguageUpdated()));
 
@@ -75,15 +49,11 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             if (!string.IsNullOrWhiteSpace(command.Name))
             {
-                UpdateClients(command, c => c.Rename(command.Id, command.Name));
-
                 RaiseEvent(SimpleMapper.Map(command, new AppClientRenamed()));
             }
 
             if (command.Permission.HasValue)
             {
-                UpdateClients(command, c => c.Update(command.Id, command.Permission.Value));
-
                 RaiseEvent(SimpleMapper.Map(command, new AppClientUpdated { Permission = command.Permission.Value }));
             }
 
@@ -94,8 +64,6 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             ThrowIfNotCreated();
 
-            UpdateContributors(command, c => c.Assign(command.ContributorId, command.Permission));
-
             RaiseEvent(SimpleMapper.Map(command, new AppContributorAssigned()));
 
             return this;
@@ -104,8 +72,6 @@ namespace Squidex.Domain.Apps.Entities.Apps
         public AppDomainObject RemoveContributor(RemoveContributor command)
         {
             ThrowIfNotCreated();
-
-            UpdateContributors(command, c => c.Remove(command.ContributorId));
 
             RaiseEvent(SimpleMapper.Map(command, new AppContributorRemoved()));
 
@@ -116,8 +82,6 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             ThrowIfNotCreated();
 
-            UpdateClients(command, c => c.Add(command.Id, command.Secret));
-
             RaiseEvent(SimpleMapper.Map(command, new AppClientAttached()));
 
             return this;
@@ -126,8 +90,6 @@ namespace Squidex.Domain.Apps.Entities.Apps
         public AppDomainObject RevokeClient(RevokeClient command)
         {
             ThrowIfNotCreated();
-
-            UpdateClients(command, c => c.Revoke(command.Id));
 
             RaiseEvent(SimpleMapper.Map(command, new AppClientRevoked()));
 
@@ -138,8 +100,6 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             ThrowIfNotCreated();
 
-            UpdateLanguages(command, l => l.Set(new LanguageConfig(command.Language)));
-
             RaiseEvent(SimpleMapper.Map(command, new AppLanguageAdded()));
 
             return this;
@@ -149,8 +109,6 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             ThrowIfNotCreated();
 
-            UpdateLanguages(command, l => l.Remove(command.Language));
-
             RaiseEvent(SimpleMapper.Map(command, new AppLanguageRemoved()));
 
             return this;
@@ -159,8 +117,6 @@ namespace Squidex.Domain.Apps.Entities.Apps
         public AppDomainObject ChangePlan(ChangePlan command)
         {
             ThrowIfNotCreated();
-
-            UpdateState(command, s => s.Plan = command.PlanId != null ? new AppPlan(command.Actor, command.PlanId) : null);
 
             RaiseEvent(SimpleMapper.Map(command, new AppPlanChanged()));
 
@@ -208,24 +164,9 @@ namespace Squidex.Domain.Apps.Entities.Apps
             }
         }
 
-        private void UpdateClients(ICommand command, Func<AppClients, AppClients> updater)
+        protected override void OnRaised(Envelope<IEvent> @event)
         {
-            UpdateState(command, s => s.Clients = updater(s.Clients));
-        }
-
-        private void UpdateContributors(ICommand command, Func<AppContributors, AppContributors> updater)
-        {
-            UpdateState(command, s => s.Contributors = updater(s.Contributors));
-        }
-
-        private void UpdateLanguages(ICommand command, Func<LanguagesConfig, LanguagesConfig> updater)
-        {
-            UpdateState(command, s => s.LanguagesConfig = updater(s.LanguagesConfig));
-        }
-
-        protected override AppState CloneState(ICommand command, Action<AppState> updater)
-        {
-            return State.Clone().Update((SquidexCommand)command, updater);
+            UpdateState(State.Apply(@event));
         }
     }
 }

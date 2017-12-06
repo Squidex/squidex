@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  JsonSchemaEntity.cs
+//  SchemaState.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -8,11 +8,17 @@
 
 using System;
 using Newtonsoft.Json;
+using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Events;
+using Squidex.Domain.Apps.Events.Schemas;
+using Squidex.Infrastructure.Dispatching;
+using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.State
 {
-    public sealed class SchemaState : DomainObjectState<SchemaState>,
+    public class SchemaState : DomainObjectState<SchemaState>,
         ISchemaEntity,
         IUpdateableEntityWithAppRef,
         IUpdateableEntityWithCreatedBy,
@@ -25,7 +31,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.State
         public Guid AppId { get; set; }
 
         [JsonProperty]
-        public int TotalFields { get; set; }
+        public int TotalFields { get; set; } = 1;
 
         [JsonProperty]
         public bool IsDeleted { get; set; }
@@ -52,6 +58,137 @@ namespace Squidex.Domain.Apps.Entities.Schemas.State
         public bool IsPublished
         {
             get { return SchemaDef.IsPublished; }
+        }
+
+        protected void On(SchemaCreated @event, FieldRegistry registry)
+        {
+            var schema = new Schema(@event.Name);
+
+            if (@event.Properties != null)
+            {
+                schema = schema.Update(@event.Properties);
+            }
+
+            if (@event.Fields != null)
+            {
+                foreach (var eventField in @event.Fields)
+                {
+                    var partitioning =
+                        string.Equals(eventField.Partitioning, Partitioning.Language.Key, StringComparison.OrdinalIgnoreCase) ?
+                            Partitioning.Language :
+                            Partitioning.Invariant;
+
+                    var field = registry.CreateField(TotalFields, eventField.Name, partitioning, eventField.Properties);
+
+                    if (eventField.IsHidden)
+                    {
+                        field = field.Hide();
+                    }
+
+                    if (eventField.IsDisabled)
+                    {
+                        field = field.Disable();
+                    }
+
+                    if (eventField.IsLocked)
+                    {
+                        field = field.Lock();
+                    }
+
+                    schema = schema.AddField(field);
+
+                    TotalFields++;
+                }
+            }
+
+            SchemaDef = schema;
+        }
+
+        protected void On(FieldAdded @event, FieldRegistry registry)
+        {
+            var partitioning =
+                string.Equals(@event.Partitioning, Partitioning.Language.Key, StringComparison.OrdinalIgnoreCase) ?
+                    Partitioning.Language :
+                    Partitioning.Invariant;
+
+            var field = registry.CreateField(@event.FieldId.Id, @event.Name, partitioning, @event.Properties);
+
+            SchemaDef = SchemaDef.DeleteField(@event.FieldId.Id);
+            SchemaDef = SchemaDef.AddField(field);
+
+            TotalFields++;
+        }
+
+        protected void On(SchemaPublished @event, FieldRegistry registry)
+        {
+            SchemaDef = SchemaDef.Publish();
+        }
+
+        protected void On(SchemaUnpublished @event, FieldRegistry registry)
+        {
+            SchemaDef = SchemaDef.Unpublish();
+        }
+
+        protected void On(SchemaUpdated @event, FieldRegistry registry)
+        {
+            SchemaDef = SchemaDef.Update(@event.Properties);
+        }
+
+        protected void On(SchemaFieldsReordered @event, FieldRegistry registry)
+        {
+            SchemaDef = SchemaDef.ReorderFields(@event.FieldIds);
+        }
+
+        protected void On(FieldUpdated @event, FieldRegistry registry)
+        {
+            SchemaDef = SchemaDef.UpdateField(@event.FieldId.Id, @event.Properties);
+        }
+
+        protected void On(FieldLocked @event, FieldRegistry registry)
+        {
+            SchemaDef = SchemaDef.LockField(@event.FieldId.Id);
+        }
+
+        protected void On(FieldDisabled @event, FieldRegistry registry)
+        {
+            SchemaDef = SchemaDef.DisableField(@event.FieldId.Id);
+        }
+
+        protected void On(FieldEnabled @event, FieldRegistry registry)
+        {
+            SchemaDef = SchemaDef.EnableField(@event.FieldId.Id);
+        }
+
+        protected void On(FieldHidden @event, FieldRegistry registry)
+        {
+            SchemaDef = SchemaDef.HideField(@event.FieldId.Id);
+        }
+
+        protected void On(FieldShown @event, FieldRegistry registry)
+        {
+            SchemaDef = SchemaDef.ShowField(@event.FieldId.Id);
+        }
+
+        protected void On(FieldDeleted @event, FieldRegistry registry)
+        {
+            SchemaDef = SchemaDef.DeleteField(@event.FieldId.Id);
+        }
+
+        protected void On(SchemaDeleted @event, FieldRegistry registry)
+        {
+            IsDeleted = true;
+        }
+
+        protected void On(ScriptsConfigured @event, FieldRegistry registry)
+        {
+            SimpleMapper.Map(@event, this);
+        }
+
+        public SchemaState Apply(Envelope<IEvent> @event)
+        {
+            var payload = (SquidexEvent)@event.Payload;
+
+            return Clone().Update(payload, @event.Headers, r => r.DispatchAction(payload));
         }
     }
 }

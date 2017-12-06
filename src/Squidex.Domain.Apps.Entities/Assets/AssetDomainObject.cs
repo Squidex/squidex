@@ -6,12 +6,12 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.Assets.State;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Entities.Assets
@@ -33,13 +33,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 IsImage = command.ImageInfo != null
             });
 
-            UpdateState(command, s =>
-            {
-                s.TotalSize = @event.FileSize;
-
-                SimpleMapper.Map(@event, s);
-            });
-
             RaiseEvent(@event);
 
             return this;
@@ -59,13 +52,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 IsImage = command.ImageInfo != null
             });
 
-            UpdateState(command, s =>
-            {
-                s.TotalSize += @event.FileSize;
-
-                SimpleMapper.Map(@event, s);
-            });
-
             RaiseEvent(@event);
 
             return this;
@@ -75,8 +61,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             VerifyCreatedAndNotDeleted();
 
-            UpdateState(command, s => s.IsDeleted = true);
-
             RaiseEvent(SimpleMapper.Map(command, new AssetDeleted { DeletedSize = State.TotalSize }));
 
             return this;
@@ -85,8 +69,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
         public AssetDomainObject Rename(RenameAsset command)
         {
             VerifyCreatedAndNotDeleted();
-
-            UpdateState(command, s => s.FileName = command.FileName);
 
             RaiseEvent(SimpleMapper.Map(command, new AssetRenamed()));
 
@@ -109,9 +91,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
             }
         }
 
-        protected override AssetState CloneState(ICommand command, Action<AssetState> updater)
+        protected override void OnRaised(Envelope<IEvent> @event)
         {
-            return State.Clone().Update((SquidexCommand)command, updater);
+            UpdateState(State.Apply(@event));
         }
     }
 }
