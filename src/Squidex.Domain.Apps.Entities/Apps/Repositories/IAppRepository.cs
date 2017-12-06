@@ -1,19 +1,18 @@
 ﻿// ==========================================================================
-//  IStateFactory.cs
+//  IAppRepository.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Squidex.Infrastructure.States
+namespace Squidex.Domain.Apps.Entities.Apps.Repositories
 {
-    public interface IStateFactory
+    public interface IAppRepository
     {
-        Task<T> GetSingleAsync<T>(string key) where T : IStatefulObject;
-
-        Task<T> CreateAsync<T>(string key) where T : IStatefulObject;
+        Task<IReadOnlyList<string>> QueryUserAppNamesAsync(string userId);
     }
 }

@@ -81,7 +81,7 @@ namespace Squidex.Infrastructure.States
             });
         }
 
-        public async Task<T> GetDetachedAsync<T>(string key) where T : IStatefulObject
+        public async Task<T> CreateAsync<T>(string key) where T : IStatefulObject
         {
             Guard.NotNull(key, nameof(key));
 
@@ -93,7 +93,7 @@ namespace Squidex.Infrastructure.States
             return state;
         }
 
-        public Task<T> GetSynchronizedAsync<T>(string key) where T : IStatefulObject
+        public Task<T> GetSingleAsync<T>(string key) where T : IStatefulObject
         {
             Guard.NotNull(key, nameof(key));
 

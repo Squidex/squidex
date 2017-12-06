@@ -10,11 +10,13 @@ using System;
 using System.Threading.Tasks;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.States;
+using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.Commands
 {
     public sealed class AggregateHandler : IAggregateHandler
     {
+        private readonly AsyncLockPool lockPool = new AsyncLockPool(10000);
         private readonly IStateFactory stateFactory;
         private readonly ISemanticLog log;
         private readonly IServiceProvider serviceProvider;
@@ -45,13 +47,27 @@ namespace Squidex.Infrastructure.Commands
             return InvokeAsync(context, updater, true);
         }
 
+        public Task<T> CreateSyncedAsync<T>(CommandContext context, Func<T, Task> creator) where T : class, IDomainObject
+        {
+            Guard.NotNull(creator, nameof(creator));
+
+            return InvokeSyncedAsync(context, creator, false);
+        }
+
+        public Task<T> UpdateSyncedAsync<T>(CommandContext context, Func<T, Task> updater) where T : class, IDomainObject
+        {
+            Guard.NotNull(updater, nameof(updater));
+
+            return InvokeSyncedAsync(context, updater, true);
+        }
+
         private async Task<T> InvokeAsync<T>(CommandContext context, Func<T, Task> handler, bool isUpdate) where T : class, IDomainObject
         {
             Guard.NotNull(context, nameof(context));
 
             var domainObjectCommand = GetCommand(context);
             var domainObjectId = domainObjectCommand.AggregateId;
-            var domainObject = await stateFactory.GetDetachedAsync<T>(domainObjectId.ToString());
+            var domainObject = await stateFactory.CreateAsync<T>(domainObjectId.ToString());
 
             await domainObject.WriteAsync(log);
 
@@ -68,6 +84,35 @@ namespace Squidex.Infrastructure.Commands
             }
 
             return domainObject;
+        }
+
+        private async Task<T> InvokeSyncedAsync<T>(CommandContext context, Func<T, Task> handler, bool isUpdate) where T : class, IDomainObject
+        {
+            Guard.NotNull(context, nameof(context));
+
+            var domainObjectCommand = GetCommand(context);
+            var domainObjectId = domainObjectCommand.AggregateId;
+
+            using (await lockPool.LockAsync(Tuple.Create(typeof(T), domainObjectId)))
+            {
+                var domainObject = await stateFactory.GetSingleAsync<T>(domainObjectId.ToString());
+
+                await domainObject.WriteAsync(log);
+
+                if (!context.IsCompleted)
+                {
+                    if (isUpdate)
+                    {
+                        context.Complete(new EntitySavedResult(domainObject.Version));
+                    }
+                    else
+                    {
+                        context.Complete(EntityCreatedResult.Create(domainObjectId, domainObject.Version));
+                    }
+                }
+
+                return domainObject;
+            }
         }
 
         private static IAggregateCommand GetCommand(CommandContext context)

@@ -1,36 +1,36 @@
 ﻿// ==========================================================================
-//  MongoSnapshotStore.cs
+//  MongoRuleRepository.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using MongoDB.Driver;
-using Newtonsoft.Json;
+using Squidex.Domain.Apps.Entities.Rules.Repositories;
+using Squidex.Domain.Apps.Entities.Rules.State;
 using Squidex.Infrastructure.MongoDb;
+using Squidex.Infrastructure.States;
 
-namespace Squidex.Infrastructure.States
+namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
 {
-    public class MongoSnapshotStore<T> : MongoRepositoryBase<MongoState<T>>, ISnapshotStore<T>, IExternalSystem
+    public sealed class MongoRuleRepository : MongoRepositoryBase<MongoRuleEntity>, IRuleRepository, ISnapshotStore<RuleState>
     {
-        private readonly JsonSerializer serializer;
-
-        public MongoSnapshotStore(IMongoDatabase database, JsonSerializer serializer)
+        public MongoRuleRepository(IMongoDatabase database)
             : base(database)
         {
-            Guard.NotNull(serializer, nameof(serializer));
-
-            this.serializer = serializer;
         }
 
-        protected override string CollectionName()
+        protected override Task SetupCollectionAsync(IMongoCollection<MongoRuleEntity> collection)
         {
-            return $"States_{typeof(T).Name}";
+            return collection.Indexes.CreateOneAsync(Index.Ascending(x => x.State.AppId));
         }
 
-        public async Task<(T Value, long Version)> ReadAsync(string key)
+        public async Task<(RuleState Value, long Version)> ReadAsync(string key)
         {
             var existing =
                 await Collection.Find(x => x.Id == key)
@@ -38,19 +38,27 @@ namespace Squidex.Infrastructure.States
 
             if (existing != null)
             {
-                return (existing.Doc, existing.Version);
+                return (existing.State, existing.Version);
             }
 
-            return (default(T), -1);
+            return (null, -1);
         }
 
-        public async Task WriteAsync(string key, T value, long oldVersion, long newVersion)
+        public async Task<IReadOnlyList<string>> QueryRuleIdsAsync(Guid appId)
+        {
+            var ruleEntities =
+                await Collection.Find(x => x.State.AppId == appId).Project<MongoRuleEntity>(Projection.Include(x => x.Id)).ToListAsync();
+
+            return ruleEntities.Select(x => x.Id).ToList();
+        }
+
+        public async Task WriteAsync(string key, RuleState value, long oldVersion, long newVersion)
         {
             try
             {
                 await Collection.UpdateOneAsync(x => x.Id == key && x.Version == oldVersion,
                     Update
-                        .Set(x => x.Doc, value)
+                        .Set(x => x.State, value)
                         .Set(x => x.Version, newVersion),
                     Upsert);
             }
@@ -60,7 +68,7 @@ namespace Squidex.Infrastructure.States
                 {
                     var existingVersion =
                         await Collection.Find(x => x.Id == key)
-                            .Project<MongoState<T>>(Projection.Exclude(x => x.Id)).FirstOrDefaultAsync();
+                            .Project<MongoRuleEntity>(Projection.Exclude(x => x.Id)).FirstOrDefaultAsync();
 
                     if (existingVersion != null)
                     {

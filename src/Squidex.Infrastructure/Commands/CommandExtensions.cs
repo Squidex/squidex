@@ -34,6 +34,26 @@ namespace Squidex.Infrastructure.Commands
             });
         }
 
+        public static Task CreateSyncedAsync<T>(this IAggregateHandler handler, CommandContext context, Action<T> creator) where T : class, IDomainObject
+        {
+            return handler.CreateSyncedAsync<T>(context, x =>
+            {
+                creator(x);
+
+                return TaskHelper.Done;
+            });
+        }
+
+        public static Task UpdateSyncedAsync<T>(this IAggregateHandler handler, CommandContext context, Action<T> updater) where T : class, IDomainObject
+        {
+            return handler.UpdateSyncedAsync<T>(context, x =>
+            {
+                updater(x);
+
+                return TaskHelper.Done;
+            });
+        }
+
         public static Task HandleAsync(this ICommandMiddleware commandMiddleware, CommandContext context)
         {
             return commandMiddleware.HandleAsync(context, () => TaskHelper.Done);
