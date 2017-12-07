@@ -18,11 +18,13 @@ import {
 } from 'framework';
 
 export class AppPatternsSuggestionDto {
+    public id: string;
     public name: string;
     public pattern: string;
     public defaultMessage: string;
 
-    constructor(name: string, pattern: string, message: string) {
+    constructor(id: string, name: string, pattern: string, message: string) {
+        this.id = id;
         this.name = name;
         this.pattern = pattern;
         this.defaultMessage = message;
@@ -54,22 +56,23 @@ export class AppPatternsService {
             .map(response => {
                 const body = response.payload.body;
                 return new AppPatternsSuggestionDto(
-                    body.name || body.id,
+                    body.id,
+                    body.name,
                     body.pattern,
                     body.defaultMessage);
             })
             .pretifyError('Failed to add pattern. Please reload.');
     }
 
-    public updatePattern(appName: string, name: string, dto: AppPatternsSuggestionDto, version: Version): Observable<any> {
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/patterns/${name}`);
+    public updatePattern(appName: string, id: string, dto: AppPatternsSuggestionDto, version: Version): Observable<any> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/patterns/${id}`);
 
         return HTTP.putVersioned(this.http, url, dto, version)
             .pretifyError('Failed to update pattern. Please reload.');
     }
 
-    public deletePattern(appName: string, name: string, version: Version): Observable<AppPatternsSuggestionDto> {
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/patterns/${name}`);
+    public deletePattern(appName: string, id: string, version: Version): Observable<AppPatternsSuggestionDto> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/patterns/${id}`);
 
         return HTTP.deleteVersioned(this.http, url, version)
             .pretifyError('Failed to remove pattern. Please reload.');

@@ -45,8 +45,8 @@ namespace Squidex
                 config.GetSection("urls"));
             services.Configure<MyIdentityOptions>(
                 config.GetSection("identity"));
-            services.Configure<List<AppPattern>>(
-                config.GetSection("ui:regexSuggestions"));
+            services.Configure<MyUIOptions>(
+                config.GetSection("ui"));
             services.Configure<MyUsageOptions>(
                 config.GetSection("usage"));
         }

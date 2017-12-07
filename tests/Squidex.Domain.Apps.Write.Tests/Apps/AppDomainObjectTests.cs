@@ -28,11 +28,11 @@ namespace Squidex.Domain.Apps.Write.Apps
         private readonly string clientId = "client";
         private readonly string clientNewName = "My Client";
         private readonly string planId = "premium";
-        private readonly IOptions<List<AppPattern>> defaultPatterns = A.Fake<IOptions<List<AppPattern>>>();
+        private readonly Guid defaultId = Guid.NewGuid();
 
         public AppDomainObjectTests()
         {
-            sut = new AppDomainObject(defaultPatterns, AppId, 0);
+            sut = new AppDomainObject(AppId, 0);
         }
 
         [Fact]
@@ -49,11 +49,6 @@ namespace Squidex.Domain.Apps.Write.Apps
         [Fact]
         public void Create_should_specify_name_and_owner()
         {
-            A.CallTo(() => defaultPatterns.Value)
-                .Returns(new List<AppPattern>
-                    { new AppPattern { Name = "Pattern", Pattern = "[0-9]", DefaultMessage = "Default Message" } }
-                );
-
             sut.Create(CreateCommand(new CreateApp { Name = AppName, Actor = User, AppId = AppId }));
 
             Assert.Equal(AppName, sut.Name);
@@ -62,8 +57,7 @@ namespace Squidex.Domain.Apps.Write.Apps
                 .ShouldHaveSameEvents(
                     CreateEvent(new AppCreated { Name = AppName }),
                     CreateEvent(new AppContributorAssigned { ContributorId = User.Identifier, Permission = AppContributorPermission.Owner }),
-                    CreateEvent(new AppLanguageAdded { Language = Language.EN }),
-                    CreateEvent(new AppPatternAdded { Name = "Pattern", Pattern = "[0-9]", DefaultMessage = "Default Message" })
+                    CreateEvent(new AppLanguageAdded { Language = Language.EN })
                 );
         }
 
@@ -319,7 +313,7 @@ namespace Squidex.Domain.Apps.Write.Apps
             {
                 sut.DeletePattern(CreateCommand(new DeletePattern
                 {
-                    Name = "Pattern"
+                    Id = Guid.NewGuid()
                 }));
             });
         }
@@ -332,14 +326,14 @@ namespace Squidex.Domain.Apps.Write.Apps
 
             sut.DeletePattern(CreateCommand(new DeletePattern
             {
-                Name = "Pattern"
+                Id = defaultId
             }));
 
             sut.GetUncomittedEvents()
                 .ShouldHaveSameEvents(
                     CreateEvent(new AppPatternDeleted
                     {
-                        Name = "Pattern",
+                        Id = defaultId
                     })
                 );
 
@@ -353,8 +347,8 @@ namespace Squidex.Domain.Apps.Write.Apps
             {
                 sut.UpdatePattern(CreateCommand(new UpdatePattern
                 {
+                    Id = Guid.NewGuid(),
                     Name = "Pattern",
-                    OriginalName = "Original",
                     Pattern = "[0-9]"
                 }));
             });
@@ -368,8 +362,8 @@ namespace Squidex.Domain.Apps.Write.Apps
 
             sut.UpdatePattern(CreateCommand(new UpdatePattern
             {
+                Id = defaultId,
                 Name = "Pattern Update",
-                OriginalName = "Pattern",
                 Pattern = "[0-9]",
                 DefaultMessage = "Message"
             }));
@@ -378,8 +372,8 @@ namespace Squidex.Domain.Apps.Write.Apps
                 .ShouldHaveSameEvents(
                     CreateEvent(new AppPatternUpdated
                     {
+                        Id = defaultId,
                         Name = "Pattern Update",
-                        OriginalName = "Pattern",
                         Pattern = "[0-9]",
                         DefaultMessage = "Message"
                     })
@@ -413,6 +407,7 @@ namespace Squidex.Domain.Apps.Write.Apps
         {
             sut.AddPattern(CreateCommand(new AddPattern
             {
+                Id = defaultId,
                 Name = "Pattern",
                 Pattern = "[0-9]",
                 DefaultMessage = "Message"

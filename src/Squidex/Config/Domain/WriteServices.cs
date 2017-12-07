@@ -6,9 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Write.Apps;
@@ -65,13 +63,7 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<RuleCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
-            services.AddSingletonAs<DomainObjectFactoryFunction<AppDomainObject>>(c =>
-            {
-                var patterns = c.GetRequiredService<IOptions<List<Squidex.Domain.Apps.Core.Apps.AppPattern>>>();
-
-                return id => new AppDomainObject(patterns, id, -1);
-            });
-
+            services.AddSingletonAs<DomainObjectFactoryFunction<AppDomainObject>>(c => (id => new AppDomainObject(id, -1)));
             services.AddSingletonAs<DomainObjectFactoryFunction<RuleDomainObject>>(c => (id => new RuleDomainObject(id, -1)));
             services.AddSingletonAs<DomainObjectFactoryFunction<AssetDomainObject>>(c => (id => new AssetDomainObject(id, -1)));
             services.AddSingletonAs<DomainObjectFactoryFunction<ContentDomainObject>>(c => (id => new ContentDomainObject(id, -1)));

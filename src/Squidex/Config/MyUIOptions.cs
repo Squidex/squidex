@@ -7,11 +7,12 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using Squidex.Areas.Api.Controllers.Apps.Models;
 
 namespace Squidex.Config
 {
     public sealed class MyUIOptions
     {
-        public Dictionary<string, string> RegexSuggestions { get; set; }
+        public List<AppPatternDto> RegexSuggestions { get; set; }
     }
 }

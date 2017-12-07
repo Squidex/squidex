@@ -79,7 +79,7 @@ describe('AppPatternsService', () => {
             (patternService: AppPatternsService, httpMock: HttpTestingController) => {
 
                 let returnValue: AppPatternsSuggestionDto | null = null;
-                const pattern1: AppPatternsSuggestionDto = new AppPatternsSuggestionDto('pattern1', '[0-9]', 'message');
+                const pattern1: AppPatternsSuggestionDto = new AppPatternsSuggestionDto('id', 'pattern1', '[0-9]', 'message');
 
                 patternService.postPattern('my-app', pattern1, new Version()).subscribe(result => {
                     returnValue = result;
@@ -101,7 +101,7 @@ describe('AppPatternsService', () => {
             (patternService: AppPatternsService, httpMock: HttpTestingController) => {
 
                 let returnValue: AppPatternsSuggestionDto | null = null;
-                const pattern1: AppPatternsSuggestionDto = new AppPatternsSuggestionDto('pattern update', '[0-9]', 'message');
+                const pattern1: AppPatternsSuggestionDto = new AppPatternsSuggestionDto('id', 'pattern update', '[0-9]', 'message');
 
                 patternService.updatePattern('my-app', 'pattern1', pattern1, new Version()).subscribe(result => {
                     returnValue = result.payload.body;

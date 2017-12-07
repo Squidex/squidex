@@ -55,7 +55,7 @@ export class PatternsPageComponent implements OnInit {
     }
 
     public removePattern(pattern: AppPatternsSuggestionDto) {
-        this.patternService.deletePattern(this.ctx.appName, pattern.name, this.version)
+        this.patternService.deletePattern(this.ctx.appName, pattern.id, this.version)
             .subscribe(() => {
                 this.updatePatterns(this.appPatterns.remove(pattern));
             }, error => {
@@ -67,6 +67,7 @@ export class PatternsPageComponent implements OnInit {
         this.appPatterns =
             patterns.map(p => {
             return new AppPatternsSuggestionDto(
+                    p.id,
                     p.name,
                     p.pattern,
                     p.defaultMessage

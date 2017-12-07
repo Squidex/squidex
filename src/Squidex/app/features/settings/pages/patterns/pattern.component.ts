@@ -52,6 +52,7 @@ export class PatternComponent implements OnInit {
 
     public editForm =
     this.formBuilder.group({
+        id: [''],
         name: [
             '',
             [
@@ -98,6 +99,7 @@ export class PatternComponent implements OnInit {
 
         if (this.editForm.valid) {
             let requestDto: AppPatternsSuggestionDto = new AppPatternsSuggestionDto(
+                this.editForm.controls['id'].value,
                 this.editForm.controls['name'].value,
                 this.editForm.controls['pattern'].value,
                 this.editForm.controls['defaultMessage'].value);

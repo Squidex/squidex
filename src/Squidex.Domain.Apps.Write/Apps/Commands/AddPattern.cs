@@ -5,6 +5,7 @@
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
+using System;
 using System.Collections.Generic;
 using Squidex.Infrastructure;
 
@@ -12,6 +13,8 @@ namespace Squidex.Domain.Apps.Write.Apps.Commands
 {
     public sealed class AddPattern : AppAggregateCommand, IValidatable
     {
+        public Guid Id { get; set; }
+
         public string Name { get; set; }
 
         public string Pattern { get; set; }

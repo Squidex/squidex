@@ -5,12 +5,15 @@
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using NSwag.Annotations;
-using Squidex.Areas.Api.Controllers.UI.Models;
+using Squidex.Areas.Api.Controllers.Apps.Models;
+using Squidex.Config;
 using Squidex.Domain.Apps.Write.Apps.Commands;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Reflection;
@@ -22,15 +25,18 @@ namespace Squidex.Areas.Api.Controllers.Apps
     /// Manages and configures app patterns.
     /// </summary>
     [ApiAuthorize]
-    [MustBeAppOwner]
+    [MustBeAppDeveloper]
     [ApiExceptionFilter]
     [AppApi]
     [SwaggerTag(nameof(Apps))]
     public sealed class AppPatternsController : ApiController
     {
-        public AppPatternsController(ICommandBus commandBus)
+        private readonly List<AppPatternDto> defaultPatterns;
+
+        public AppPatternsController(ICommandBus commandBus, IOptions<MyUIOptions> uiOptions)
             : base(commandBus)
         {
+            this.defaultPatterns = uiOptions.Value.RegexSuggestions;
         }
 
         /// <summary>
@@ -48,16 +54,37 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [Route("apps/{app}/patterns/")]
         [ProducesResponseType(typeof(AppPatternDto[]), 200)]
         [ApiCosts(1)]
-        public IActionResult GetPatterns(string app)
+        public async Task<IActionResult> GetPatterns(string app)
         {
-            return Ok(App.Patterns.Values?
-                        .Where(x =>
-                            !string.IsNullOrWhiteSpace(x.Name) &&
-                            !string.IsNullOrWhiteSpace(x.Pattern))
-                        .Select(x => new AppPatternDto { Name = x.Name, Pattern = x.Pattern, DefaultMessage = x.DefaultMessage })
-                        .OrderBy(x => x.Name)
-                        .ToList()
-                    ?? new List<AppPatternDto>());
+            List<AppPatternDto> patterns;
+            if (App.Patterns.Values.Count() == 0)
+            {
+                await CreateIntialPatterns();
+                patterns = defaultPatterns;
+            }
+            else
+            {
+                patterns = App.Patterns.Values?.Select(x =>
+                    new AppPatternDto
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        Pattern = x.Pattern,
+                        DefaultMessage = x.DefaultMessage
+                    }).ToList();
+            }
+
+            var orderedPatterns = patterns.OrderBy(x => x.Name);
+            return Ok(orderedPatterns);
+        }
+
+        private async Task CreateIntialPatterns()
+        {
+            foreach (var pattern in defaultPatterns)
+            {
+                var command = SimpleMapper.Map(pattern, new AddPattern());
+                await CommandBus.PublishAsync(command);
+            }
         }
 
         /// <summary>
@@ -79,16 +106,14 @@ namespace Squidex.Areas.Api.Controllers.Apps
 
             await CommandBus.PublishAsync(command);
 
-            var response = SimpleMapper.Map(command, new AppPatternDto());
-
-            return CreatedAtAction(nameof(GetPatterns), new { app }, response);
+            return CreatedAtAction(nameof(GetPatterns), new { app }, request);
         }
 
         /// <summary>
         /// Update an existing app patterm.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="name">The name of the pattern to be updated.</param>
+        /// <param name="id">The id of the pattern to be updated.</param>
         /// <param name="request">Pattern to be updated for the app.</param>
         /// <returns>
         /// 204 => Pattern updated.
@@ -98,9 +123,9 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [Route("apps/{app}/patterns/{name}")]
         [ProducesResponseType(typeof(AppPatternDto), 201)]
         [ApiCosts(1)]
-        public async Task<IActionResult> UpdatePattern(string app, string name, [FromBody] AppPatternDto request)
+        public async Task<IActionResult> UpdatePattern(string app, Guid id, [FromBody] AppPatternDto request)
         {
-            var command = SimpleMapper.Map(request, new UpdatePattern { OriginalName = name });
+            var command = SimpleMapper.Map(request, new UpdatePattern { Id = id });
 
             await CommandBus.PublishAsync(command);
             return NoContent();
@@ -110,7 +135,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// Revoke an app client
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="name">The name of the pattern to be deleted.</param>
+        /// <param name="id">The id of the pattern to be deleted.</param>
         /// <returns>
         /// 204 => Pattern removed.
         /// 404 => App not found or pattern not found.
@@ -119,11 +144,11 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// Schemas using this pattern will still function using the same Regular Expression
         /// </remarks>
         [HttpDelete]
-        [Route("apps/{app}/patterns/{name}/")]
+        [Route("apps/{app}/patterns/{id}/")]
         [ApiCosts(1)]
-        public async Task<IActionResult> DeletePattern(string app, string name)
+        public async Task<IActionResult> DeletePattern(string app, Guid id)
         {
-            await CommandBus.PublishAsync(new DeletePattern { Name = name });
+            await CommandBus.PublishAsync(new DeletePattern { Id = id });
 
             return NoContent();
         }

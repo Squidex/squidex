@@ -6,6 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Events.Apps
@@ -13,7 +14,7 @@ namespace Squidex.Domain.Apps.Events.Apps
     [EventType(nameof(AppPatternUpdated))]
     public sealed class AppPatternUpdated : AppEvent
     {
-        public string OriginalName { get; set; }
+        public Guid Id { get; set; }
 
         public string Name { get; set; }
 

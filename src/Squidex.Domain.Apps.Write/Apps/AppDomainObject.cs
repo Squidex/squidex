@@ -7,8 +7,6 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
-using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Apps;
@@ -30,7 +28,6 @@ namespace Squidex.Domain.Apps.Write.Apps
         private AppPatterns patterns = AppPatterns.Empty;
         private AppPlan plan;
         private string name;
-        private IOptions<List<AppPattern>> defaultPatterns;
 
         public string Name
         {
@@ -62,11 +59,9 @@ namespace Squidex.Domain.Apps.Write.Apps
             get { return patterns; }
         }
 
-        public AppDomainObject(IOptions<List<AppPattern>> defaultPatterns, Guid id, int version)
+        public AppDomainObject(Guid id, int version)
             : base(id, version)
         {
-            Guard.NotNull(defaultPatterns.Value, nameof(defaultPatterns));
-            this.defaultPatterns = defaultPatterns;
         }
 
         protected void On(AppCreated @event)
@@ -154,7 +149,6 @@ namespace Squidex.Domain.Apps.Write.Apps
 
             RaiseEvent(SimpleMapper.Map(command, CreateInitialOwner(appId, command)));
             RaiseEvent(SimpleMapper.Map(command, CreateInitialLanguage(appId)));
-            CreateInitialPatterns(command, appId);
 
             return this;
         }
@@ -293,20 +287,6 @@ namespace Squidex.Domain.Apps.Write.Apps
         private static AppContributorAssigned CreateInitialOwner(NamedId<Guid> id, SquidexCommand command)
         {
             return new AppContributorAssigned { AppId = id, ContributorId = command.Actor.Identifier, Permission = AppContributorPermission.Owner };
-        }
-
-        private void CreateInitialPatterns(SquidexCommand command, NamedId<Guid> id)
-        {
-            foreach (var option in defaultPatterns.Value)
-            {
-                RaiseEvent(SimpleMapper.Map(command, new AppPatternAdded
-                {
-                    Name = option.Name,
-                    Pattern = option.Pattern,
-                    DefaultMessage = option.DefaultMessage,
-                    AppId = id
-                }));
-            }
         }
 
         private void ThrowIfNotCreated()

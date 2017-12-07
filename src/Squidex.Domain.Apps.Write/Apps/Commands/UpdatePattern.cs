@@ -14,11 +14,7 @@ namespace Squidex.Domain.Apps.Write.Apps.Commands
 {
     public sealed class UpdatePattern : AppAggregateCommand, IValidatable
     {
-        public string OriginalName { get; set; }
-
-        public string OriginalPattern { get; set; }
-
-        public string OriginalDefaultMessage { get; set; }
+        public Guid Id { get; set; }
 
         public string Name { get; set; }
 
@@ -26,13 +22,11 @@ namespace Squidex.Domain.Apps.Write.Apps.Commands
 
         public string DefaultMessage { get; set; }
 
-        public Dictionary<Guid, Schema> Schemas { get; set; }
-
         public void Validate(IList<ValidationError> errors)
         {
-            if (string.IsNullOrWhiteSpace(OriginalName))
+            if (Id == Guid.Empty)
             {
-                errors.Add(new ValidationError("OriginalName is not defined", nameof(OriginalName)));
+                errors.Add(new ValidationError("Id is empty", nameof(Id)));
             }
 
             if (string.IsNullOrWhiteSpace(Name))

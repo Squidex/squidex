@@ -5,12 +5,18 @@
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
+using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace Squidex.Areas.Api.Controllers.UI.Models
+namespace Squidex.Areas.Api.Controllers.Apps.Models
 {
     public sealed class AppPatternDto
     {
+        /// <summary>
+        /// Identifier for Pattern
+        /// </summary>
+        public Guid Id { get; set; }
+
         /// <summary>
         /// The name of the suggestion.
         /// </summary>
@@ -27,5 +33,10 @@ namespace Squidex.Areas.Api.Controllers.UI.Models
         /// The regex message.
         /// </summary>
         public string DefaultMessage { get; set; }
+
+        public AppPatternDto()
+        {
+            Id = Guid.NewGuid();
+        }
     }
 }

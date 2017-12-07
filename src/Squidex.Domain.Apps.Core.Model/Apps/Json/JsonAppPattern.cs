@@ -5,6 +5,7 @@
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
+using System;
 using Newtonsoft.Json;
 using Squidex.Infrastructure.Reflection;
 
@@ -12,6 +13,9 @@ namespace Squidex.Domain.Apps.Core.Apps.Json
 {
     public class JsonAppPattern
     {
+        [JsonProperty]
+        public Guid Id { get; set; }
+
         [JsonProperty]
         public string Name { get; set; }
 
@@ -32,12 +36,7 @@ namespace Squidex.Domain.Apps.Core.Apps.Json
 
         public AppPattern ToPattern()
         {
-            return new AppPattern
-            {
-                Name = this.Name,
-                Pattern = this.Pattern,
-                DefaultMessage = this.DefaultMessage
-            };
+            return new AppPattern(Id, Name, Pattern, DefaultMessage);
         }
     }
 }

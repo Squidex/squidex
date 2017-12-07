@@ -76,17 +76,17 @@ namespace Squidex.Domain.Apps.Events.Apps.Utils
 
         public static AppPatterns Apply(this AppPatterns patterns, AppPatternAdded @event)
         {
-            return patterns.Add(@event.Name, @event.Pattern, @event.DefaultMessage);
+            return patterns.Add(@event.Id, @event.Name, @event.Pattern, @event.DefaultMessage);
         }
 
         public static AppPatterns Apply(this AppPatterns patterns, AppPatternDeleted @event)
         {
-            return patterns.Remove(@event.Name);
+            return patterns.Remove(@event.Id);
         }
 
         public static AppPatterns Apply(this AppPatterns patterns, AppPatternUpdated @event)
         {
-            return patterns.Update(@event.OriginalName, @event.Name, @event.Pattern, @event.DefaultMessage);
+            return patterns.Update(@event.Id, @event.Name, @event.Pattern, @event.DefaultMessage);
         }
     }
 }

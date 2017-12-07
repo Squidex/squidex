@@ -21,6 +21,11 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
 
             Validate.It(() => "Cannot add pattern.", error =>
             {
+                if (command.Id == Guid.Empty)
+                {
+                    error(new ValidationError("Id can not be empty Guid.", "Id"));
+                }
+
                 if (string.IsNullOrWhiteSpace(command.Name))
                 {
                     error(new ValidationError("Pattern name can not be empty.", "Name"));
@@ -31,7 +36,7 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
                     error(new ValidationError("Pattern can not be empty.", "Name"));
                 }
 
-                if (patterns.ContainsKey(command.Name.ToLower()))
+                if (patterns.Values.Any(x => x.Name.Equals(command.Name.ToLower(), StringComparison.OrdinalIgnoreCase)))
                 {
                     error(new ValidationError("Pattern name is already assigned.", "Name"));
                 }
@@ -49,9 +54,9 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
 
             Validate.It(() => "Cannot remove pattern.", error =>
             {
-                if (!patterns.ContainsKey(command.Name.ToLower()))
+                if (!patterns.ContainsKey(command.Id))
                 {
-                    error(new ValidationError("Pattern not found.", nameof(command.Name)));
+                    error(new ValidationError("Pattern not found.", nameof(command.Id)));
                 }
             });
         }
@@ -72,20 +77,18 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
                     error(new ValidationError("Pattern can not be empty.", "Name"));
                 }
 
-                if (!patterns.ContainsKey(command.OriginalName.ToLower()))
+                if (!patterns.ContainsKey(command.Id))
                 {
-                    error(new ValidationError("Pattern not found.", nameof(command.OriginalName)));
+                    error(new ValidationError("Pattern not found.", nameof(command.Id)));
                 }
 
-                if (patterns.Where(x => !x.Key.Equals(command.OriginalName, StringComparison.OrdinalIgnoreCase))
-                    .ToDictionary(x => x.Key, y => y.Value).ContainsKey(command.Name.ToLower()))
+                if (patterns.Any(x => x.Key != command.Id
+                    && x.Value.Name.Equals(command.Name, StringComparison.OrdinalIgnoreCase)))
                 {
                     error(new ValidationError("Pattern name is already assigned.", "Name"));
                 }
 
-                if (patterns.Where(x => !x.Key.Equals(command.OriginalName, StringComparison.OrdinalIgnoreCase))
-                    .ToDictionary(x => x.Key, y => y.Value).Values
-                    .Any(x => x.Pattern == command.Pattern))
+                if (patterns.Any(x => x.Key != command.Id && x.Value.Pattern == command.Pattern))
                 {
                     error(new ValidationError("Pattern already exists.", "Pattern"));
                 }

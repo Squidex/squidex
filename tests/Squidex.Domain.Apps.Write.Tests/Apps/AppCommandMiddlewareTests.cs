@@ -40,7 +40,7 @@ namespace Squidex.Domain.Apps.Write.Apps
 
         public AppCommandMiddlewareTests()
         {
-            app = new AppDomainObject(defaultPatterns, AppId, -1);
+            app = new AppDomainObject(AppId, -1);
 
             A.CallTo(() => appProvider.GetAppAsync(AppName))
                 .Returns((IAppEntity)null);
@@ -238,7 +238,7 @@ namespace Squidex.Domain.Apps.Write.Apps
         {
             CreateApp();
 
-            var context = CreateContextForCommand(new AddPattern { Name = "Numbers", Pattern = "[0-9]", DefaultMessage = "Display Error" });
+            var context = CreateContextForCommand(new AddPattern { Id = Guid.NewGuid(), Name = "Numbers", Pattern = "[0-9]", DefaultMessage = "Display Error" });
 
             await TestUpdate(app, async _ =>
             {
@@ -275,9 +275,10 @@ namespace Squidex.Domain.Apps.Write.Apps
         [Fact]
         public async Task DeletePattern_should_update_domain_object()
         {
-            CreateApp().AddPattern(CreateCommand(new AddPattern { Name = "Pattern", Pattern = "[0-9]" }));
+            var @event = new AddPattern { Name = "Pattern", Pattern = "[0-9]" };
+            CreateApp().AddPattern(CreateCommand(@event));
 
-            var context = CreateContextForCommand(new DeletePattern { Name = "Pattern" });
+            var context = CreateContextForCommand(new DeletePattern { Id = @event.Id });
 
             await TestUpdate(app, async _ =>
             {
@@ -288,9 +289,10 @@ namespace Squidex.Domain.Apps.Write.Apps
         [Fact]
         public async Task DeletePattern_should_throw_error_if_name_empty()
         {
-            CreateApp().AddPattern(CreateCommand(new AddPattern { Name = "Pattern", Pattern = "[0-9]" }));
+            var @event = new AddPattern { Id = Guid.NewGuid(), Name = "Pattern", Pattern = "[0-9]" };
+            CreateApp().AddPattern(CreateCommand(@event));
 
-            var context = CreateContextForCommand(new DeletePattern { Name = string.Empty });
+            var context = CreateContextForCommand(new DeletePattern { Id = Guid.Empty });
 
             await TestUpdate(app, async _ =>
             {
@@ -301,9 +303,10 @@ namespace Squidex.Domain.Apps.Write.Apps
         [Fact]
         public async Task UpdatePattern_should_update_domain_object_with_no_schemas_using_pattern()
         {
-            CreateApp().AddPattern(CreateCommand(new AddPattern { Name = "Pattern", Pattern = "[0-9]" }));
+            var @event = new AddPattern { Name = "Pattern", Pattern = "[0-9]" };
+            CreateApp().AddPattern(CreateCommand(@event));
 
-            var context = CreateContextForCommand(new UpdatePattern { Name = "Numbers", Pattern = "[0-9]", OriginalName = "Pattern", DefaultMessage = "Display Error", Schemas = new Dictionary<Guid, Core.Schemas.Schema>() });
+            var context = CreateContextForCommand(new UpdatePattern { Id = @event.Id, Name = "Numbers", Pattern = "[0-9]", DefaultMessage = "Display Error" });
 
             await TestUpdate(app, async _ =>
             {
@@ -314,9 +317,10 @@ namespace Squidex.Domain.Apps.Write.Apps
         [Fact]
         public async Task UpdatePattern_should_throw_error_if_name_empty()
         {
-            CreateApp().AddPattern(CreateCommand(new AddPattern { Name = "Pattern", Pattern = "[0-9]" }));
+            var @event = new AddPattern { Name = "Pattern", Pattern = "[0-9]" };
+            CreateApp().AddPattern(CreateCommand(@event));
 
-            var context = CreateContextForCommand(new UpdatePattern { Name = string.Empty, Pattern = "[0-9]", OriginalName = "Pattern", DefaultMessage = "Display Error", Schemas = new Dictionary<Guid, Core.Schemas.Schema>() });
+            var context = CreateContextForCommand(new UpdatePattern { Id = @event.Id, Name = string.Empty, Pattern = "[0-9]", DefaultMessage = "Display Error" });
 
             await TestUpdate(app, async _ =>
             {
@@ -327,26 +331,14 @@ namespace Squidex.Domain.Apps.Write.Apps
         [Fact]
         public async Task UpdatePattern_should_throw_error_if_pattern_empty()
         {
-            CreateApp().AddPattern(CreateCommand(new AddPattern { Name = "Pattern", Pattern = "[0-9]" }));
+            var @event = new AddPattern { Name = "Pattern", Pattern = "[0-9]" };
+            CreateApp().AddPattern(CreateCommand(@event));
 
-            var context = CreateContextForCommand(new UpdatePattern { Name = "Name", Pattern = string.Empty, OriginalName = "Pattern", DefaultMessage = "Display Error", Schemas = new Dictionary<Guid, Core.Schemas.Schema>() });
+            var context = CreateContextForCommand(new UpdatePattern { Id = @event.Id, Name = "Name", Pattern = string.Empty, DefaultMessage = "Display Error" });
 
             await TestUpdate(app, async _ =>
             {
                 await Assert.ThrowsAsync<ValidationException>(() => sut.HandleAsync(context));
-            }, false);
-        }
-
-        [Fact]
-        public async Task UpdatePattern_should_throw_error_if_original_empty()
-        {
-            CreateApp().AddPattern(CreateCommand(new AddPattern { Name = "Pattern", Pattern = "[0-9]" }));
-
-            var context = CreateContextForCommand(new UpdatePattern { Name = "Name", Pattern = "Pattern", OriginalName = string.Empty, DefaultMessage = "Display Error", Schemas = new Dictionary<Guid, Core.Schemas.Schema>() });
-
-            await TestUpdate(app, async _ =>
-            {
-                await Assert.ThrowsAsync<KeyNotFoundException>(() => sut.HandleAsync(context));
             }, false);
         }
 

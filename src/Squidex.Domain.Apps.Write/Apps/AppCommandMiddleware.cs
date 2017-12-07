@@ -185,10 +185,7 @@ namespace Squidex.Domain.Apps.Write.Apps
         {
             await handler.UpdateAsync<AppDomainObject>(context, a =>
             {
-                command.OriginalPattern = a.Patterns[command.OriginalName.ToLowerInvariant()]?.Pattern;
-                command.OriginalDefaultMessage = a.Patterns[command.OriginalName.ToLowerInvariant()]?.DefaultMessage;
                 GuardAppPattern.CanApply(a.Patterns, command);
-
                 a.UpdatePattern(command);
             });
         }
