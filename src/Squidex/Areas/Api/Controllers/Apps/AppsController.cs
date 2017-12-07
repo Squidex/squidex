@@ -17,6 +17,7 @@ using Squidex.Domain.Apps.Read;
 using Squidex.Domain.Apps.Read.Apps.Services;
 using Squidex.Domain.Apps.Write.Apps.Commands;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.Geocoding;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Security;
 using Squidex.Pipeline;
@@ -33,14 +34,17 @@ namespace Squidex.Areas.Api.Controllers.Apps
     {
         private readonly IAppProvider appProvider;
         private readonly IAppPlansProvider appPlansProvider;
+        private readonly IGeocoder geocoder;
 
         public AppsController(ICommandBus commandBus,
             IAppProvider appProvider,
-            IAppPlansProvider appPlansProvider)
+            IAppPlansProvider appPlansProvider,
+            IGeocoder geocoder)
             : base(commandBus)
         {
             this.appProvider = appProvider;
             this.appPlansProvider = appPlansProvider;
+            this.geocoder = geocoder;
         }
 
         /// <summary>
@@ -65,7 +69,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
 
             var response = apps.Select(a =>
             {
-                var dto = SimpleMapper.Map(a, new AppDto());
+                var dto = SimpleMapper.Map(a, new AppDto() { GeocoderKey = geocoder.Key ?? string.Empty });
 
                 dto.Permission = a.Contributors[subject];
 
@@ -104,7 +108,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
             var context = await CommandBus.PublishAsync(command);
 
             var result = context.Result<EntityCreatedResult<Guid>>();
-            var response = new AppCreatedDto { Id = result.IdOrValue.ToString(), Version = result.Version };
+            var response = new AppCreatedDto { Id = result.IdOrValue.ToString(), Version = result.Version, GeocoderKey = geocoder.Key ?? string.Empty };
 
             response.Permission = AppContributorPermission.Owner;
 

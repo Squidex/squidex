@@ -11,14 +11,15 @@ using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Geocoding;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent
 {
     public static class ContentValidationExtensions
     {
-        public static async Task ValidateAsync(this NamedContentData data, ValidationContext context, Schema schema, PartitionResolver partitionResolver, IList<ValidationError> errors)
+        public static async Task ValidateAsync(this NamedContentData data, ValidationContext context, Schema schema, PartitionResolver partitionResolver, IList<ValidationError> errors, IGeocoder geocoder)
         {
-            var validator = new ContentValidator(schema, partitionResolver, context);
+            var validator = new ContentValidator(schema, partitionResolver, context, geocoder);
 
             await validator.ValidateAsync(data);
 
@@ -28,9 +29,9 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             }
         }
 
-        public static async Task ValidatePartialAsync(this NamedContentData data, ValidationContext context, Schema schema, PartitionResolver partitionResolver, IList<ValidationError> errors)
+        public static async Task ValidatePartialAsync(this NamedContentData data, ValidationContext context, Schema schema, PartitionResolver partitionResolver, IList<ValidationError> errors, IGeocoder geocoder)
         {
-            var validator = new ContentValidator(schema, partitionResolver, context);
+            var validator = new ContentValidator(schema, partitionResolver, context, geocoder);
 
             await validator.ValidatePartialAsync(data);
 

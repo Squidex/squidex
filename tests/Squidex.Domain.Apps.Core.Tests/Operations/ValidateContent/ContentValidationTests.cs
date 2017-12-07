@@ -8,12 +8,14 @@
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using FakeItEasy;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.ValidateContent;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Geocoding;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
@@ -22,6 +24,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
     {
         private readonly LanguagesConfig languagesConfig = LanguagesConfig.Build(Language.DE, Language.EN);
         private readonly List<ValidationError> errors = new List<ValidationError>();
+        private readonly IGeocoder geocoder = A.Fake<IGeocoder>();
         private readonly ValidationContext context = ValidationTestExtensions.ValidContext;
         private Schema schema = new Schema("my-schema");
 
@@ -33,7 +36,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                     .AddField("unknown",
                         new ContentFieldData());
 
-            await data.ValidateAsync(context, schema, languagesConfig.ToResolver(), errors);
+            await data.ValidateAsync(context, schema, languagesConfig.ToResolver(), errors, geocoder);
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
@@ -54,7 +57,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                         new ContentFieldData()
                             .AddValue(1000));
 
-            await data.ValidateAsync(context, schema, languagesConfig.ToResolver(), errors);
+            await data.ValidateAsync(context, schema, languagesConfig.ToResolver(), errors, geocoder);
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
@@ -75,7 +78,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                             .AddValue("es", 1)
                             .AddValue("it", 1));
 
-            await data.ValidateAsync(context, schema, languagesConfig.ToResolver(), errors);
+            await data.ValidateAsync(context, schema, languagesConfig.ToResolver(), errors, geocoder);
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
@@ -94,7 +97,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             var data =
                 new NamedContentData();
 
-            await data.ValidateAsync(context, schema, languagesConfig.ToResolver(), errors);
+            await data.ValidateAsync(context, schema, languagesConfig.ToResolver(), errors, geocoder);
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
@@ -113,7 +116,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             var data =
                 new NamedContentData();
 
-            await data.ValidateAsync(context, schema, languagesConfig.ToResolver(), errors);
+            await data.ValidateAsync(context, schema, languagesConfig.ToResolver(), errors, geocoder);
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
@@ -134,7 +137,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                             .AddValue("de", 1)
                             .AddValue("xx", 1));
 
-            await data.ValidateAsync(context, schema, languagesConfig.ToResolver(), errors);
+            await data.ValidateAsync(context, schema, languagesConfig.ToResolver(), errors, geocoder);
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
@@ -160,7 +163,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                         new ContentFieldData()
                             .AddValue("es", "value"));
 
-            await data.ValidateAsync(context, schema, optionalConfig.ToResolver(), errors);
+            await data.ValidateAsync(context, schema, optionalConfig.ToResolver(), errors, geocoder);
 
             Assert.Empty(errors);
         }
@@ -177,7 +180,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                             .AddValue("es", 1)
                             .AddValue("it", 1));
 
-            await data.ValidateAsync(context, schema, languagesConfig.ToResolver(), errors);
+            await data.ValidateAsync(context, schema, languagesConfig.ToResolver(), errors, geocoder);
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
@@ -195,7 +198,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                     .AddField("unknown",
                         new ContentFieldData());
 
-            await data.ValidatePartialAsync(context, schema, languagesConfig.ToResolver(), errors);
+            await data.ValidatePartialAsync(context, schema, languagesConfig.ToResolver(), errors, geocoder);
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
@@ -216,7 +219,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                         new ContentFieldData()
                             .AddValue(1000));
 
-            await data.ValidatePartialAsync(context, schema, languagesConfig.ToResolver(), errors);
+            await data.ValidatePartialAsync(context, schema, languagesConfig.ToResolver(), errors, geocoder);
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
@@ -237,7 +240,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                             .AddValue("es", 1)
                             .AddValue("it", 1));
 
-            await data.ValidatePartialAsync(context, schema, languagesConfig.ToResolver(), errors);
+            await data.ValidatePartialAsync(context, schema, languagesConfig.ToResolver(), errors, geocoder);
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
@@ -256,7 +259,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             var data =
                 new NamedContentData();
 
-            await data.ValidatePartialAsync(context, schema, languagesConfig.ToResolver(), errors);
+            await data.ValidatePartialAsync(context, schema, languagesConfig.ToResolver(), errors, geocoder);
 
             Assert.Empty(errors);
         }
@@ -270,7 +273,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             var data =
                 new NamedContentData();
 
-            await data.ValidatePartialAsync(context, schema, languagesConfig.ToResolver(), errors);
+            await data.ValidatePartialAsync(context, schema, languagesConfig.ToResolver(), errors, geocoder);
 
             Assert.Empty(errors);
         }
@@ -287,7 +290,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                             .AddValue("de", 1)
                             .AddValue("xx", 1));
 
-            await data.ValidatePartialAsync(context, schema, languagesConfig.ToResolver(), errors);
+            await data.ValidatePartialAsync(context, schema, languagesConfig.ToResolver(), errors, geocoder);
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
@@ -308,7 +311,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                             .AddValue("es", 1)
                             .AddValue("it", 1));
 
-            await data.ValidatePartialAsync(context, schema, languagesConfig.ToResolver(), errors);
+            await data.ValidatePartialAsync(context, schema, languagesConfig.ToResolver(), errors, geocoder);
 
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>

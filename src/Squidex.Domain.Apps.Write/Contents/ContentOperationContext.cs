@@ -20,6 +20,7 @@ using Squidex.Domain.Apps.Read.Contents.Repositories;
 using Squidex.Domain.Apps.Read.Schemas;
 using Squidex.Domain.Apps.Write.Contents.Commands;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Geocoding;
 using Squidex.Infrastructure.Tasks;
 
 #pragma warning disable IDE0017 // Simplify object initialization
@@ -36,6 +37,7 @@ namespace Squidex.Domain.Apps.Write.Contents
         private ISchemaEntity schemaEntity;
         private IAppEntity appEntity;
         private Func<string> message;
+        private IGeocoder geocoder;
 
         public static async Task<ContentOperationContext> CreateAsync(
             IContentRepository contentRepository,
@@ -44,20 +46,23 @@ namespace Squidex.Domain.Apps.Write.Contents
             IAppProvider appProvider,
             IAssetRepository assetRepository,
             IScriptEngine scriptEngine,
-            Func<string> message)
+            Func<string> message,
+            IGeocoder geocoder)
         {
             var (appEntity, schemaEntity) = await appProvider.GetAppWithSchemaAsync(command.AppId.Name, command.SchemaId.Id);
 
-            var context = new ContentOperationContext();
-
-            context.appEntity = appEntity;
-            context.assetRepository = assetRepository;
-            context.contentRepository = contentRepository;
-            context.content = content;
-            context.command = command;
-            context.message = message;
-            context.schemaEntity = schemaEntity;
-            context.scriptEngine = scriptEngine;
+            var context = new ContentOperationContext
+            {
+                appEntity = appEntity,
+                assetRepository = assetRepository,
+                contentRepository = contentRepository,
+                content = content,
+                command = command,
+                message = message,
+                schemaEntity = schemaEntity,
+                scriptEngine = scriptEngine,
+                geocoder = geocoder
+            };
 
             return context;
         }
@@ -93,11 +98,11 @@ namespace Squidex.Domain.Apps.Write.Contents
 
                 if (partial)
                 {
-                    await dataCommand.Data.ValidatePartialAsync(ctx, schemaEntity.SchemaDef, appEntity.PartitionResolver(), errors);
+                    await dataCommand.Data.ValidatePartialAsync(ctx, schemaEntity.SchemaDef, appEntity.PartitionResolver(), errors, geocoder);
                 }
                 else
                 {
-                    await dataCommand.Data.ValidateAsync(ctx, schemaEntity.SchemaDef, appEntity.PartitionResolver(), errors);
+                    await dataCommand.Data.ValidateAsync(ctx, schemaEntity.SchemaDef, appEntity.PartitionResolver(), errors, geocoder);
                 }
 
                 if (errors.Count > 0)

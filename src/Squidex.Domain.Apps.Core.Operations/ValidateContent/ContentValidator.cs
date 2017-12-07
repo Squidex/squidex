@@ -13,6 +13,7 @@ using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Geocoding;
 
 #pragma warning disable 168
 
@@ -22,6 +23,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
     {
         private readonly Schema schema;
         private readonly PartitionResolver partitionResolver;
+        private readonly IGeocoder geocoder;
         private readonly ValidationContext context;
         private readonly ConcurrentBag<ValidationError> errors = new ConcurrentBag<ValidationError>();
 
@@ -30,10 +32,11 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             get { return errors; }
         }
 
-        public ContentValidator(Schema schema, PartitionResolver partitionResolver, ValidationContext context)
+        public ContentValidator(Schema schema, PartitionResolver partitionResolver, ValidationContext context, IGeocoder geocoder)
         {
             Guard.NotNull(schema, nameof(schema));
             Guard.NotNull(partitionResolver, nameof(partitionResolver));
+            Guard.NotNull(geocoder, nameof(geocoder));
 
             this.schema = schema;
             this.context = context;
@@ -74,7 +77,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             {
                 if (partition.TryGetItem(partitionValues.Key, out var item))
                 {
-                    tasks.Add(field.ValidateAsync(partitionValues.Value, context.Optional(item.IsOptional), m => errors.AddError(m, field, item)));
+                    tasks.Add(field.ValidateAsync(partitionValues.Value, context.Optional(item.IsOptional), m => errors.AddError(m, field, item), geocoder));
                 }
                 else
                 {
@@ -133,7 +136,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             {
                 var value = fieldData.GetOrCreate(item.Key, k => JValue.CreateNull());
 
-                tasks.Add(field.ValidateAsync(value, context.Optional(item.IsOptional), m => errors.AddError(m, field, item)));
+                tasks.Add(field.ValidateAsync(value, context.Optional(item.IsOptional), m => errors.AddError(m, field, item), geocoder));
             }
 
             return Task.WhenAll(tasks);

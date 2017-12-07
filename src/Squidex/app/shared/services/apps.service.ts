@@ -26,7 +26,8 @@ export class AppDto {
         public readonly created: DateTime,
         public readonly lastModified: DateTime,
         public readonly planName: string,
-        public readonly planUpgrade: string
+        public readonly planUpgrade: string,
+        public readonly geocoderKey: string
     ) {
     }
 }
@@ -64,7 +65,8 @@ export class AppsService {
                             DateTime.parseISO(item.created),
                             DateTime.parseISO(item.lastModified),
                             item.planName,
-                            item.planUpgrade);
+                            item.planUpgrade,
+                            item.geocoderKey);
                     });
                 })
                 .pretifyError('Failed to load apps. Please reload.');
@@ -79,7 +81,7 @@ export class AppsService {
 
                     now = now || DateTime.now();
 
-                    return new AppDto(body.id, dto.name, body.permission, now, now, body.planName, body.planUpgrade);
+                    return new AppDto(body.id, dto.name, body.permission, now, now, body.planName, body.planUpgrade, body.geocoderKey);
                 })
                 .do(() => {
                     this.analytics.trackEvent('App', 'Created', dto.name);

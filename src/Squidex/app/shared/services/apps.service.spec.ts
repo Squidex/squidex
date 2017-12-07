@@ -59,7 +59,8 @@ describe('AppsService', () => {
                 created: '2016-01-01',
                 lastModified: '2016-02-02',
                 planName: 'Free',
-                planUpgrade: 'Basic'
+                planUpgrade: 'Basic',
+                geocoderKey: ''
             },
             {
                 id: '456',
@@ -68,13 +69,14 @@ describe('AppsService', () => {
                 created: '2017-01-01',
                 lastModified: '2017-02-02',
                 planName: 'Basic',
-                planUpgrade: 'Enterprise'
+                planUpgrade: 'Enterprise',
+                geocoderKey: ''
             }
         ]);
 
         expect(apps).toEqual([
-            new AppDto('123', 'name1', 'Owner', DateTime.parseISO('2016-01-01'), DateTime.parseISO('2016-02-02'), 'Free', 'Basic'),
-            new AppDto('456', 'name2', 'Owner', DateTime.parseISO('2017-01-01'), DateTime.parseISO('2017-02-02'), 'Basic', 'Enterprise')
+            new AppDto('123', 'name1', 'Owner', DateTime.parseISO('2016-01-01'), DateTime.parseISO('2016-02-02'), 'Free', 'Basic', ''),
+            new AppDto('456', 'name2', 'Owner', DateTime.parseISO('2017-01-01'), DateTime.parseISO('2017-02-02'), 'Basic', 'Enterprise', '')
         ]);
     }));
 
@@ -98,9 +100,10 @@ describe('AppsService', () => {
             id: '123',
             permission: 'Reader',
             planName: 'Basic',
-            planUpgrade: 'Enterprise'
+            planUpgrade: 'Enterprise',
+            geocoderKey: ''
         });
 
-        expect(app).toEqual(new AppDto('123', dto.name, 'Reader', now, now, 'Basic', 'Enterprise'));
+        expect(app).toEqual(new AppDto('123', dto.name, 'Reader', now, now, 'Basic', 'Enterprise', ''));
     }));
 });

@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Geocoding;
 using Squidex.Infrastructure.Json;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent
@@ -38,20 +39,26 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             errors.Add(new ValidationError(message.Replace("<FIELD>", displayName), fieldName));
         }
 
-        public static async Task ValidateAsync(this Field field, JToken value, ValidationContext context, Action<string> addError)
+        public static async Task ValidateAsync(this Field field, JToken value, ValidationContext context, Action<string> addError, IGeocoder geocoder)
         {
             try
             {
-                var typedValue = value.IsNull() ? null : JsonValueConverter.ConvertValue(field, value);
+                var typedValue = value.IsNull() ? null : JsonValueConverter.ConvertValue(field, value, geocoder);
 
                 foreach (var validator in ValidatorsFactory.CreateValidators(field))
                 {
                     await validator.ValidateAsync(typedValue, context, addError);
                 }
             }
-            catch
+            catch (InvalidCastException ex)
             {
-                addError("<FIELD> is not a valid value.");
+                var error = ex.Message;
+                addError($"<FIELD> is not a valid value. {error}".Trim());
+            }
+            catch (Exception ex)
+            {
+                var error = (ex as AggregateException)?.InnerException?.Message;
+                addError($"<FIELD> is not a valid value. {error ?? string.Empty}".Trim());
             }
         }
     }

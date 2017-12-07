@@ -18,6 +18,7 @@ using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Assets.ImageSharp;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Geocoding;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.UsageTracking;
@@ -45,6 +46,25 @@ namespace Squidex.Config.Domain
                 services.AddSingletonAs(new FileChannel(loggingFile))
                     .As<ILogChannel>()
                     .As<IExternalSystem>();
+            }
+
+            var geocoder = config.GetRequiredValue("geolocation:type");
+
+            if (string.Equals(geocoder, "GoogleMaps", StringComparison.OrdinalIgnoreCase))
+            {
+                var geocoderKey = config.GetRequiredValue("geolocation:key");
+
+                services.AddSingletonAs(c => new GoogleMapsGeocoder(geocoderKey))
+                    .As<IGeocoder>();
+            }
+            else if (string.Equals(geocoder, "OSM", StringComparison.OrdinalIgnoreCase))
+            {
+                services.AddSingletonAs<OSMGeocoder>()
+                    .As<IGeocoder>();
+            }
+            else
+            {
+                throw new ConfigurationException($"Unsupported value '{geocoder}' for 'geocoder:type', supported: GoogleMaps, OSM.");
             }
 
             services.AddSingletonAs(c => new ApplicationInfoLogAppender(typeof(Program).Assembly, Guid.NewGuid()))

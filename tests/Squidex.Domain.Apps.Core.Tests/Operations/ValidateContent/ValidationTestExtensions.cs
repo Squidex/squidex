@@ -14,6 +14,7 @@ using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.ValidateContent;
 using Squidex.Domain.Apps.Core.ValidateContent.Validators;
+using Squidex.Infrastructure.Geocoding;
 
 namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 {
@@ -34,14 +35,14 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             return validator.ValidateAsync(value, (context ?? ValidContext).Optional(true), errors.Add);
         }
 
-        public static Task ValidateAsync(this Field field, JToken value, IList<string> errors, ValidationContext context = null)
+        public static Task ValidateAsync(this Field field, JToken value, IList<string> errors, ValidationContext context = null, IGeocoder geocoder = null)
         {
-            return field.ValidateAsync(value, context ?? ValidContext, errors.Add);
+            return field.ValidateAsync(value, context ?? ValidContext, errors.Add, geocoder);
         }
 
-        public static Task ValidateOptionalAsync(this Field field, JToken value, IList<string> errors, ValidationContext context = null)
+        public static Task ValidateOptionalAsync(this Field field, JToken value, IList<string> errors, ValidationContext context = null, IGeocoder geocoder = null)
         {
-            return field.ValidateAsync(value, (context ?? ValidContext).Optional(true), errors.Add);
+            return field.ValidateAsync(value, (context ?? ValidContext).Optional(true), errors.Add, geocoder);
         }
 
         public static ValidationContext Assets(params IAssetInfo[] assets)

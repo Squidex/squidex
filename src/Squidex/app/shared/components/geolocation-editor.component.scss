@@ -1,0 +1,68 @@
+@import '_mixins';
+@import '_vars';
+
+.editor {
+    height: 30rem;
+}
+
+.form-group {
+    margin-top: .5rem;
+    margin-bottom: .5rem;
+
+
+    &.city-group {
+        display: inline-block;
+        width: 70%;
+
+        &.hasClear{
+            width: 55%;
+        }
+    }
+
+    &.state-group {
+        display: inline-block;
+        width: 10%;
+    }
+
+    &.zip-group {
+        display: inline-block;
+        width: 18.5%;
+    }
+
+    &.clear-group {
+        display: inline-block;
+        &.hidden{
+            display: none;
+        }
+    }
+}
+
+.latitude-group {
+    margin-right: .25rem;
+}
+
+#pac-input {
+    background-color: #fff;
+    font-size: 15px;
+    font-weight: 300;
+    margin-left: 12px;
+    padding: 0 11px 0 13px;
+    text-overflow: ellipsis;
+    width: 400px;
+    height: 40px;
+
+    &:focus {
+        border-color: #4d90fe;
+    }
+}
+
+#type-selector {
+    color: #fff;
+    background-color: #4d90fe;
+    padding: 5px 11px 0px 11px;
+}
+
+#type-selector label {
+    font-size: 13px;
+    font-weight: 300;
+}

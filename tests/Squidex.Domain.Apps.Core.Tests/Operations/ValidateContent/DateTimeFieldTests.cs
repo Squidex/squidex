@@ -91,7 +91,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             await sut.ValidateAsync(CreateValue(123), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> is not a valid value." });
+                new[] { "<FIELD> is not a valid value. Invalid json type, expected string." });
         }
 
         private static Instant FutureDays(int days)

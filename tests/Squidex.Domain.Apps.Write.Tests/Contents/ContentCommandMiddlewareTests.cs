@@ -10,6 +10,7 @@ using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using FakeItEasy;
+using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
@@ -24,6 +25,7 @@ using Squidex.Domain.Apps.Write.Contents.Commands;
 using Squidex.Domain.Apps.Write.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.Geocoding;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Write.Contents
@@ -36,6 +38,7 @@ namespace Squidex.Domain.Apps.Write.Contents
         private readonly IScriptEngine scriptEngine = A.Fake<IScriptEngine>();
         private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
         private readonly IAppEntity app = A.Fake<IAppEntity>();
+        private readonly IGeocoder geocoder = A.Fake<IGeocoder>();
         private readonly ClaimsPrincipal user = new ClaimsPrincipal();
         private readonly LanguagesConfig languagesConfig = LanguagesConfig.Build(Language.DE);
         private readonly Guid contentId = Guid.NewGuid();
@@ -57,6 +60,14 @@ namespace Squidex.Domain.Apps.Write.Contents
                 .AddField("my-field1", new ContentFieldData()
                     .AddValue(1));
 
+        private readonly NamedContentData invalidOSMLatLongData = new NamedContentData()
+            .AddField("my-geolocation-field1", new ContentFieldData()
+                .AddValue(JObject.FromObject(new { latitude = 0, longitude = (double?)null })));
+
+        private readonly NamedContentData invalidGoogleMapsLatLongData = new NamedContentData()
+            .AddField("my-geolocation-field1", new ContentFieldData()
+                .AddValue(JObject.FromObject(new { latitude = 0, longitude = (double?)null, address1 = "baddata" })));
+
         public ContentCommandMiddlewareTests()
         {
             var schemaDef =
@@ -68,7 +79,7 @@ namespace Squidex.Domain.Apps.Write.Contents
 
             content = new ContentDomainObject(contentId, -1);
 
-            sut = new ContentCommandMiddleware(Handler, appProvider, A.Dummy<IAssetRepository>(), scriptEngine, A.Dummy<IContentRepository>());
+            sut = new ContentCommandMiddleware(Handler, appProvider, A.Dummy<IAssetRepository>(), scriptEngine, A.Dummy<IContentRepository>(), geocoder);
 
             A.CallTo(() => app.LanguagesConfig).Returns(languagesConfig);
 
@@ -237,6 +248,49 @@ namespace Squidex.Domain.Apps.Write.Contents
             });
 
             A.CallTo(() => scriptEngine.Execute(A<ScriptContext>.Ignored, "<delete-script>")).MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Create_geolocation_should_throw_exception_if_OSM_data_is_invalid()
+        {
+            A.CallTo(() => scriptEngine.ExecuteAndTransform(A<ScriptContext>.Ignored, A<string>.Ignored))
+                .Returns(invalidOSMLatLongData);
+            SetupGeolocationTest();
+
+            var context = CreateContextForCommand(new CreateContent { ContentId = contentId, Data = invalidOSMLatLongData, User = user });
+
+            await TestCreate(content, async _ =>
+            {
+                await Assert.ThrowsAsync<ValidationException>(() => sut.HandleAsync(context));
+            }, false);
+        }
+
+        [Fact]
+        public async Task Create_geolocation_should_throw_exception_if_Google_Maps_data_does_not_return_lat_long()
+        {
+            A.CallTo(() => scriptEngine.ExecuteAndTransform(A<ScriptContext>.Ignored, A<string>.Ignored))
+                .Returns(invalidGoogleMapsLatLongData);
+            SetupGeolocationTest("key");
+
+            var context = CreateContextForCommand(new CreateContent { ContentId = contentId, Data = invalidOSMLatLongData, User = user });
+
+            await TestCreate(content, async _ =>
+            {
+                await Assert.ThrowsAsync<ValidationException>(() => sut.HandleAsync(context));
+            }, false);
+        }
+
+        private void SetupGeolocationTest(string googleApiKey = "")
+        {
+            var geolocationSchemaDef =
+                new Schema("my-geolocation-schema")
+                    .AddField(new GeolocationField(1, "my-geolocation-field1", Partitioning.Invariant,
+                        new GeolocationFieldProperties { IsRequired = true }));
+
+            A.CallTo(() => schema.SchemaDef).Returns(geolocationSchemaDef);
+            A.CallTo(() => geocoder.Key).Returns(googleApiKey);
+            A.CallTo(() => geocoder.GeocodeAddress("baddata")).Throws<InvalidCastException>();
+            A.CallTo(() => geocoder.GeocodeAddress(string.Empty)).Throws<InvalidCastException>();
         }
 
         private void CreateContent()

@@ -17,6 +17,7 @@ using Squidex.Domain.Apps.Write.Contents.Guards;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Dispatching;
+using Squidex.Infrastructure.Geocoding;
 
 namespace Squidex.Domain.Apps.Write.Contents
 {
@@ -27,25 +28,29 @@ namespace Squidex.Domain.Apps.Write.Contents
         private readonly IAssetRepository assetRepository;
         private readonly IContentRepository contentRepository;
         private readonly IScriptEngine scriptEngine;
+        private readonly IGeocoder geocoder;
 
         public ContentCommandMiddleware(
             IAggregateHandler handler,
             IAppProvider appProvider,
             IAssetRepository assetRepository,
             IScriptEngine scriptEngine,
-            IContentRepository contentRepository)
+            IContentRepository contentRepository,
+            IGeocoder geocoder)
         {
             Guard.NotNull(handler, nameof(handler));
             Guard.NotNull(appProvider, nameof(appProvider));
             Guard.NotNull(scriptEngine, nameof(scriptEngine));
             Guard.NotNull(assetRepository, nameof(assetRepository));
             Guard.NotNull(contentRepository, nameof(contentRepository));
+            Guard.NotNull(geocoder, nameof(geocoder));
 
             this.handler = handler;
             this.appProvider = appProvider;
             this.scriptEngine = scriptEngine;
             this.assetRepository = assetRepository;
             this.contentRepository = contentRepository;
+            this.geocoder = geocoder;
         }
 
         protected async Task On(CreateContent command, CommandContext context)
@@ -151,7 +156,8 @@ namespace Squidex.Domain.Apps.Write.Contents
                     appProvider,
                     assetRepository,
                     scriptEngine,
-                    message);
+                    message,
+                    geocoder);
 
             return operationContext;
         }

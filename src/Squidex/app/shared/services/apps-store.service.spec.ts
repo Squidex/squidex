@@ -20,10 +20,10 @@ describe('AppsStoreService', () => {
     const now = DateTime.now();
 
     const oldApps = [
-        new AppDto('id', 'old-name', 'Owner', now, now, 'Free', 'Plan'),
-        new AppDto('id', 'old-name', 'Owner', now, now, 'Free', 'Plan')
+        new AppDto('id', 'old-name', 'Owner', now, now, 'Free', 'Plan', ''),
+        new AppDto('id', 'old-name', 'Owner', now, now, 'Free', 'Plan', '')
     ];
-    const newApp = new AppDto('id', 'new-name', 'Owner', now, now, 'Free', 'Plan');
+    const newApp = new AppDto('id', 'new-name', 'Owner', now, now, 'Free', 'Plan', '');
 
     let appsService: IMock<AppsService>;
 

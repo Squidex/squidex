@@ -59,5 +59,10 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// Gets the next plan name.
         /// </summary>
         public string PlanUpgrade { get; set; }
+
+        /// <summary>
+        /// The geocoding api key for the application
+        /// </summary>
+        public string GeocoderKey { get; set; }
     }
 }
