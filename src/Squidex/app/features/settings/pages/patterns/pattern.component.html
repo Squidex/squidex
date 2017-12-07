@@ -38,7 +38,7 @@
 
                 <div class="float-right">
                     <button type="reset" class="btn btn-secondary" (click)="cancel()">Cancel</button>
-                    <button type="submit" class="btn btn-primary ml-1" *ngIf="!isNew" (sqxConfirmClick)="save()" confirmTitle="Update Pattern" confirmText="All fields using this pattern will be updated to reflect the changes. If you do not wish to update these fields, please create a new pattern instead.">Save</button>
+                    <button type="submit" class="btn btn-primary ml-1" *ngIf="!isNew">Save</button>
                     <button type="submit" class="btn btn-success" *ngIf="isNew">Create</button>
                 </div>
             </div>
