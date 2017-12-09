@@ -48,7 +48,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         protected Task On(CreateApp command, CommandContext context)
         {
-            return handler.CreateAsync<AppDomainObject>(context, async a =>
+            return handler.CreateSyncedAsync<AppDomainObject>(context, async a =>
             {
                 await GuardApp.CanCreate(command, appProvider);
 
@@ -60,7 +60,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         protected Task On(AssignContributor command, CommandContext context)
         {
-            return handler.UpdateAsync<AppDomainObject>(context, async a =>
+            return handler.handler.UpdateSyncedAsync<AppDomainObject>(context, async a =>
             {
                 await GuardAppContributors.CanAssign(a.State.Contributors, command, userResolver, appPlansProvider.GetPlan(a.State.Plan?.PlanId));
 
@@ -70,7 +70,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         protected Task On(RemoveContributor command, CommandContext context)
         {
-            return handler.UpdateAsync<AppDomainObject>(context, a =>
+            return handler.handler.UpdateSyncedAsync<AppDomainObject>(context, a =>
             {
                 GuardAppContributors.CanRemove(a.State.Contributors, command);
 
@@ -80,7 +80,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         protected Task On(AttachClient command, CommandContext context)
         {
-            return handler.UpdateAsync<AppDomainObject>(context, a =>
+            return handler.handler.UpdateSyncedAsync<AppDomainObject>(context, a =>
             {
                 GuardAppClients.CanAttach(a.State.Clients, command);
 
@@ -90,7 +90,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         protected Task On(UpdateClient command, CommandContext context)
         {
-            return handler.UpdateAsync<AppDomainObject>(context, a =>
+            return handler.handler.UpdateSyncedAsync<AppDomainObject>(context, a =>
             {
                 GuardAppClients.CanUpdate(a.State.Clients, command);
 
@@ -100,7 +100,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         protected Task On(RevokeClient command, CommandContext context)
         {
-            return handler.UpdateAsync<AppDomainObject>(context, a =>
+            return handler.handler.UpdateSyncedAsync<AppDomainObject>(context, a =>
             {
                 GuardAppClients.CanRevoke(a.State.Clients, command);
 
@@ -110,7 +110,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         protected Task On(AddLanguage command, CommandContext context)
         {
-            return handler.UpdateAsync<AppDomainObject>(context, a =>
+            return handler.handler.UpdateSyncedAsync<AppDomainObject>(context, a =>
             {
                 GuardAppLanguages.CanAdd(a.State.LanguagesConfig, command);
 
@@ -120,7 +120,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         protected Task On(RemoveLanguage command, CommandContext context)
         {
-            return handler.UpdateAsync<AppDomainObject>(context, a =>
+            return handler.handler.UpdateSyncedAsync<AppDomainObject>(context, a =>
             {
                 GuardAppLanguages.CanRemove(a.State.LanguagesConfig, command);
 
@@ -130,7 +130,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         protected Task On(UpdateLanguage command, CommandContext context)
         {
-            return handler.UpdateAsync<AppDomainObject>(context, a =>
+            return handler.handler.UpdateSyncedAsync<AppDomainObject>(context, a =>
             {
                 GuardAppLanguages.CanUpdate(a.State.LanguagesConfig, command);
 
@@ -140,7 +140,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         protected Task On(ChangePlan command, CommandContext context)
         {
-            return handler.UpdateAsync<AppDomainObject>(context, async a =>
+            return handler.handler.UpdateSyncedAsync<AppDomainObject>(context, async a =>
             {
                 GuardApp.CanChangePlan(command, a.State.Plan, appPlansProvider);
 

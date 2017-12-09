@@ -42,7 +42,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             command.ImageInfo = await assetThumbnailGenerator.GetImageInfoAsync(command.File.OpenRead());
             try
             {
-                var asset = await handler.CreateAsync<AssetDomainObject>(context, async a =>
+                var asset = await handler.CreateSyncedAsync<AssetDomainObject>(context, async a =>
                 {
                     GuardAsset.CanCreate(command);
 
@@ -67,7 +67,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             try
             {
-                var asset = await handler.UpdateAsync<AssetDomainObject>(context, async a =>
+                var asset = await handler.handler.UpdateSyncedAsync<AssetDomainObject>(context, async a =>
                 {
                     GuardAsset.CanUpdate(command);
 
@@ -88,7 +88,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         protected Task On(RenameAsset command, CommandContext context)
         {
-            return handler.UpdateAsync<AssetDomainObject>(context, a =>
+            return handler.handler.UpdateSyncedAsync<AssetDomainObject>(context, a =>
             {
                 GuardAsset.CanRename(command, a.State.FileName);
 
@@ -98,7 +98,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         protected Task On(DeleteAsset command, CommandContext context)
         {
-            return handler.UpdateAsync<AssetDomainObject>(context, a =>
+            return handler.handler.UpdateSyncedAsync<AssetDomainObject>(context, a =>
             {
                 GuardAsset.CanDelete(command);
 

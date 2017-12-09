@@ -33,7 +33,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
         protected Task On(CreateRule command, CommandContext context)
         {
-            return handler.CreateAsync<RuleDomainObject>(context, async w =>
+            return handler.CreateSyncedAsync<RuleDomainObject>(context, async w =>
             {
                 await GuardRule.CanCreate(command, appProvider);
 
@@ -43,7 +43,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
         protected Task On(UpdateRule command, CommandContext context)
         {
-            return handler.UpdateAsync<RuleDomainObject>(context, async c =>
+            return handler.handler.UpdateSyncedAsync<RuleDomainObject>(context, async c =>
             {
                 await GuardRule.CanUpdate(command, appProvider);
 
@@ -53,7 +53,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
         protected Task On(EnableRule command, CommandContext context)
         {
-            return handler.UpdateAsync<RuleDomainObject>(context, r =>
+            return handler.handler.UpdateSyncedAsync<RuleDomainObject>(context, r =>
             {
                 GuardRule.CanEnable(command, r.State.RuleDef);
 
@@ -63,7 +63,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
         protected Task On(DisableRule command, CommandContext context)
         {
-            return handler.UpdateAsync<RuleDomainObject>(context, r =>
+            return handler.handler.UpdateSyncedAsync<RuleDomainObject>(context, r =>
             {
                 GuardRule.CanDisable(command, r.State.RuleDef);
 
@@ -73,7 +73,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
         protected Task On(DeleteRule command, CommandContext context)
         {
-            return handler.UpdateAsync<RuleDomainObject>(context, c =>
+            return handler.handler.UpdateSyncedAsync<RuleDomainObject>(context, c =>
             {
                 GuardRule.CanDelete(command);
 
