@@ -24,8 +24,6 @@ namespace Squidex.Domain.Apps.Entities
 {
     public sealed class AppProvider : IAppProvider
     {
-        private readonly ConcurrentDictionary<string, Guid> appIds = new ConcurrentDictionary<string, Guid>();
-        private readonly ConcurrentDictionary<Tuple<Guid, string>, Guid> schemaIds = new ConcurrentDictionary<Tuple<Guid, string>, Guid>();
         private readonly IAppRepository appRepository;
         private readonly IRuleRepository ruleRepository;
         private readonly ISchemaRepository schemaRepository;
@@ -52,33 +50,23 @@ namespace Squidex.Domain.Apps.Entities
         {
             var app = await stateFactory.GetSingleAsync<AppDomainObject>(appId.ToString());
 
-            if (app.Version < 0)
+            if (IsNotFound(app))
             {
-                throw new DomainObjectNotFoundException(appId.ToString(), typeof(SchemaDomainObject));
+                return (null, null);
             }
 
             var schema = await stateFactory.GetSingleAsync<SchemaDomainObject>(id.ToString());
 
-            if (schema.Version < 0 || schema.State.IsDeleted)
-            {
-                throw new DomainObjectNotFoundException(id.ToString(), typeof(SchemaDomainObject));
-            }
-
-            return (app.State, schema.State);
+            return IsNotFound(false, schema) ? (null, null) : (app.State, schema.State);
         }
 
         public async Task<IAppEntity> GetAppAsync(string appName)
         {
             var appId = await GetAppIdAsync(appName);
 
-            var app = await stateFactory.GetSingleAsync<AppDomainObject>(appName);
+            var app = await stateFactory.GetSingleAsync<AppDomainObject>(appId.ToString());
 
-            if (app.Version < 0)
-            {
-                throw new DomainObjectNotFoundException(appName, typeof(SchemaDomainObject));
-            }
-
-            return app.State;
+            return IsNotFound(app) ? null : app.State;
         }
 
         public async Task<ISchemaEntity> GetSchemaAsync(Guid appId, string name, bool provideDeleted = false)
@@ -87,24 +75,14 @@ namespace Squidex.Domain.Apps.Entities
 
             var schema = await stateFactory.GetSingleAsync<SchemaDomainObject>(schemaId.ToString());
 
-            if (schema.Version < 0 || (schema.State.IsDeleted && !provideDeleted))
-            {
-                throw new DomainObjectNotFoundException(schemaId.ToString(), typeof(SchemaDomainObject));
-            }
-
-            return schema.State;
+            return IsNotFound(provideDeleted, schema) ? null : schema.State;
         }
 
         public async Task<ISchemaEntity> GetSchemaAsync(Guid appId, Guid id, bool provideDeleted = false)
         {
             var schema = await stateFactory.GetSingleAsync<SchemaDomainObject>(id.ToString());
 
-            if (schema.Version < 0 || (schema.State.IsDeleted && !provideDeleted))
-            {
-                throw new DomainObjectNotFoundException(id.ToString(), typeof(SchemaDomainObject));
-            }
-
-            return schema.State;
+            return IsNotFound(provideDeleted, schema) ? null : schema.State;
         }
 
         public async Task<List<ISchemaEntity>> GetSchemasAsync(Guid appId)
@@ -140,32 +118,24 @@ namespace Squidex.Domain.Apps.Entities
             return apps.Select(a => (IAppEntity)a.State).ToList();
         }
 
-        private async Task<Guid> GetAppIdAsync(string name)
+        private Task<Guid> GetAppIdAsync(string name)
         {
-            var key = name;
-
-            if (!appIds.TryGetValue(key, out var id))
-            {
-                id = await appRepository.FindAppIdByNameAsync(name);
-
-                appIds[key] = id;
-            }
-
-            return id;
+            return appRepository.FindAppIdByNameAsync(name);
         }
 
-        private async Task<Guid> GetSchemaIdAsync(Guid appId, string name)
+        private Task<Guid> GetSchemaIdAsync(Guid appId, string name)
         {
-            var key = Tuple.Create(appId, name);
+            return schemaRepository.FindSchemaIdAsync(appId, name);
+        }
 
-            if (!schemaIds.TryGetValue(key, out var id))
-            {
-                id = await schemaRepository.FindSchemaIdAsync(appId, name);
+        private static bool IsNotFound(AppDomainObject app)
+        {
+            return app.Version < 0;
+        }
 
-                schemaIds[key] = id;
-            }
-
-            return id;
+        private static bool IsNotFound(bool provideDeleted, SchemaDomainObject schema)
+        {
+            return schema.Version < 0 || (schema.State.IsDeleted && !provideDeleted);
         }
     }
 }

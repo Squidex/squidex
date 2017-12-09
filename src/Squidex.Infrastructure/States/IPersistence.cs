@@ -6,6 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Squidex.Infrastructure.EventSourcing;
 
@@ -15,9 +16,9 @@ namespace Squidex.Infrastructure.States
     {
         long Version { get; }
 
-        Task WriteEventsAsync(params Envelope<IEvent>[] @events);
+        Task WriteEventsAsync(IEnumerable<Envelope<IEvent>> @events);
 
-        Task WriteSnapshotAsync(TState state);
+        Task WriteSnapshotAsync(TState state, long newVersion = -1);
 
         Task ReadAsync(long? expectedVersion = null);
     }

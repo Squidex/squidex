@@ -7,6 +7,7 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Infrastructure.EventSourcing;
@@ -55,7 +56,7 @@ namespace Squidex.Infrastructure.States
             positionSnapshot = -1;
             positionEvent = -1;
 
-            if (snapshotStore != null)
+            if (applyState != null)
             {
                 var (state, position) = await snapshotStore.ReadAsync(ownerKey);
 
@@ -68,7 +69,7 @@ namespace Squidex.Infrastructure.States
                 }
             }
 
-            if (eventStore != null && streamNameResolver != null)
+            if (applyEvent != null && streamNameResolver != null)
             {
                 var events = await eventStore.GetEventsAsync(GetStreamName(), positionEvent + 1);
 
@@ -105,51 +106,56 @@ namespace Squidex.Infrastructure.States
             }
         }
 
-        public async Task WriteSnapshotAsync(TState state)
+        public async Task WriteSnapshotAsync(TState state, long newVersion = -1)
         {
-            var newPosition =
-                eventStore != null ?
-                positionEvent :
-                positionSnapshot + 1;
+            if (newVersion < 0)
+            {
+                newVersion =
+                    applyEvent != null ?
+                    positionEvent :
+                    positionSnapshot + 1;
+            }
 
-            if (newPosition != positionSnapshot)
+            if (newVersion != positionSnapshot)
             {
                 try
                 {
-                    await snapshotStore.WriteAsync(ownerKey, state, positionSnapshot, newPosition);
+                    await snapshotStore.WriteAsync(ownerKey, state, positionSnapshot, newVersion);
                 }
                 catch (InconsistentStateException ex)
                 {
                     throw new DomainObjectVersionException(ownerKey, typeof(TOwner), ex.CurrentVersion, ex.ExpectedVersion);
                 }
 
-                positionSnapshot = newPosition;
+                positionSnapshot = newVersion;
             }
 
             invalidate?.Invoke();
         }
 
-        public async Task WriteEventsAsync(params Envelope<IEvent>[] @events)
+        public async Task WriteEventsAsync(IEnumerable<Envelope<IEvent>> events)
         {
             Guard.NotNull(events, nameof(@events));
 
-            if (@events.Length > 0)
+            var eventArray = events.ToArray();
+
+            if (eventArray.Length > 0)
             {
                 var commitId = Guid.NewGuid();
 
                 var eventStream = GetStreamName();
-                var eventData = GetEventData(events, commitId);
+                var eventData = GetEventData(eventArray, commitId);
 
                 try
                 {
-                    await eventStore.AppendEventsAsync(commitId, GetStreamName(), positionEvent, eventData);
+                    await eventStore.AppendEventsAsync(commitId, GetStreamName(), Version, eventData);
                 }
                 catch (WrongEventVersionException ex)
                 {
                     throw new DomainObjectVersionException(ownerKey, typeof(TOwner), ex.CurrentVersion, ex.ExpectedVersion);
                 }
 
-                positionEvent += events.Length;
+                positionEvent += eventArray.Length;
             }
 
             invalidate?.Invoke();

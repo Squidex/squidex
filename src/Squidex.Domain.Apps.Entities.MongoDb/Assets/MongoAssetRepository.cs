@@ -116,6 +116,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
         {
             try
             {
+                value.Version = newVersion;
+
                 await Collection.UpdateOneAsync(x => x.Id == key && x.Version == oldVersion,
                     Update
                         .Set(x => x.State, value)
@@ -132,7 +134,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 
                     if (existingVersion != null)
                     {
-                        throw new InconsistentStateException(existingVersion.Version, oldVersion, ex);
+                        throw new InconsistentStateException(existingVersion["Version"].AsInt64, oldVersion, ex);
                     }
                 }
                 else

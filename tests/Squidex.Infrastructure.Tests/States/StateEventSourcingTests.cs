@@ -52,13 +52,13 @@ namespace Squidex.Infrastructure.States
 
         private class MyStatefulObjectWithSnapshot : IStatefulObject
         {
-            private IPersistence<int> persistence;
+            private IPersistence<object> persistence;
 
             public long? ExpectedVersion { get; set; }
 
             public Task ActivateAsync(string key, IStore store)
             {
-                persistence = store.WithSnapshotsAndEventSourcing<MyStatefulObject, int>(key, s => TaskHelper.Done, s => TaskHelper.Done);
+                persistence = store.WithSnapshotsAndEventSourcing<MyStatefulObject, object>(key, s => TaskHelper.Done, s => TaskHelper.Done);
 
                 return persistence.ReadAsync(ExpectedVersion);
             }
@@ -72,7 +72,7 @@ namespace Squidex.Infrastructure.States
         private readonly IMemoryCache cache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
         private readonly IPubSub pubSub = new InMemoryPubSub(true);
         private readonly IServiceProvider services = A.Fake<IServiceProvider>();
-        private readonly ISnapshotStore<int> snapshotStore = A.Fake<ISnapshotStore<int>>();
+        private readonly ISnapshotStore<object> snapshotStore = A.Fake<ISnapshotStore<object>>();
         private readonly IStreamNameResolver streamNameResolver = A.Fake<IStreamNameResolver>();
         private readonly StateFactory sut;
 
@@ -82,7 +82,7 @@ namespace Squidex.Infrastructure.States
                 .Returns(statefulObject);
             A.CallTo(() => services.GetService(typeof(MyStatefulObjectWithSnapshot)))
                 .Returns(statefulObjectWithSnapShot);
-            A.CallTo(() => services.GetService(typeof(ISnapshotStore<int>)))
+            A.CallTo(() => services.GetService(typeof(ISnapshotStore<object>)))
                 .Returns(snapshotStore);
 
             A.CallTo(() => streamNameResolver.GetStreamName(typeof(MyStatefulObject), key))
@@ -278,7 +278,7 @@ namespace Squidex.Infrastructure.States
             statefulObject.ExpectedVersion = null;
 
             A.CallTo(() => snapshotStore.ReadAsync(key))
-                .ReturnsLazily(() => Task.Delay(1).ContinueWith(x => (1, 1L)));
+                .ReturnsLazily(() => Task.Delay(1).ContinueWith(x => ((object)1, 1L)));
 
             var tasks = new List<Task<MyStatefulObject>>();
 

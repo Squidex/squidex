@@ -69,6 +69,8 @@ namespace Squidex.Infrastructure.Commands
             var domainObjectId = domainObjectCommand.AggregateId;
             var domainObject = await stateFactory.CreateAsync<T>(domainObjectId.ToString());
 
+            await handler(domainObject);
+
             await domainObject.WriteAsync(log);
 
             if (!context.IsCompleted)

@@ -25,18 +25,24 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Apps
         {
         }
 
-        protected override Task SetupCollectionAsync(IMongoCollection<MongoAppEntity> collection)
+        protected override string CollectionName()
         {
-            return collection.Indexes.CreateOneAsync(Index.Ascending(x => x.UserIds));
+            return "Snapshots_Apps";
+        }
+
+        protected override async Task SetupCollectionAsync(IMongoCollection<MongoAppEntity> collection)
+        {
+            await collection.Indexes.CreateOneAsync(Index.Ascending(x => x.UserIds));
+            await collection.Indexes.CreateOneAsync(Index.Ascending(x => x.Name));
         }
 
         public async Task<Guid> FindAppIdByNameAsync(string name)
         {
             var appEntity =
-                await Collection.Find(x => x.State.Name == name).Only(x => x.Id)
+                await Collection.Find(x => x.Name == name).Only(x => x.Id)
                     .FirstOrDefaultAsync();
 
-            return appEntity != null ? Guid.Parse(appEntity.Id) : Guid.Empty;
+            return appEntity != null ? Guid.Parse(appEntity["_id"].AsString) : Guid.Empty;
         }
 
         public async Task<IReadOnlyList<Guid>> QueryUserAppIdsAsync(string userId)
@@ -45,7 +51,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Apps
                 await Collection.Find(x => x.UserIds.Contains(userId)).Only(x => x.Id)
                     .ToListAsync();
 
-            return appEntities.Select(x => Guid.Parse(x.Id)).ToList();
+            return appEntities.Select(x => Guid.Parse(x["_id"].AsString)).ToList();
         }
 
         public async Task<IReadOnlyList<string>> QueryUserAppNamesAsync(string userId)
@@ -75,9 +81,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Apps
         {
             try
             {
+                value.Version = newVersion;
+
                 await Collection.UpdateOneAsync(x => x.Id == key && x.Version == oldVersion,
                     Update
                         .Set(x => x.UserIds, value.Contributors.Keys.ToArray())
+                        .Set(x => x.Name, value.Name)
                         .Set(x => x.State, value)
                         .Set(x => x.Version, newVersion),
                     Upsert);

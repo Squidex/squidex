@@ -32,8 +32,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Schemas
 
         protected override async Task SetupCollectionAsync(IMongoCollection<MongoSchemaEntity> collection)
         {
-            await collection.Indexes.CreateOneAsync(Index.Ascending(x => x.State.AppId));
-            await collection.Indexes.CreateOneAsync(Index.Ascending(x => x.State.Name));
+            await collection.Indexes.CreateOneAsync(Index.Ascending(x => x.AppId));
+            await collection.Indexes.CreateOneAsync(Index.Ascending(x => x.Name));
         }
 
         public async Task<(SchemaState Value, long Version)> ReadAsync(string key)
@@ -53,10 +53,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Schemas
         public async Task<Guid> FindSchemaIdAsync(Guid appId, string name)
         {
             var schemaEntity =
-                await Collection.Find(x => x.State.Name == name).Only(x => x.Id)
+                await Collection.Find(x => x.Name == name).Only(x => x.Id)
                     .FirstOrDefaultAsync();
 
-            return schemaEntity != null ? Guid.Parse(schemaEntity.Id) : Guid.Empty;
+            return schemaEntity != null ? Guid.Parse(schemaEntity["_id"].AsString) : Guid.Empty;
         }
 
         public async Task<IReadOnlyList<Guid>> QuerySchemaIdsAsync(Guid appId)
@@ -65,16 +65,20 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Schemas
                 await Collection.Find(x => x.State.AppId == appId).Only(x => x.Id)
                     .ToListAsync();
 
-            return schemaEntities.Select(x => Guid.Parse(x.Id)).ToList();
+            return schemaEntities.Select(x => Guid.Parse(x["_id"].AsString)).ToList();
         }
 
         public async Task WriteAsync(string key, SchemaState value, long oldVersion, long newVersion)
         {
             try
             {
+                value.Version = newVersion;
+
                 await Collection.UpdateOneAsync(x => x.Id == key && x.Version == oldVersion,
                     Update
                         .Set(x => x.State, value)
+                        .Set(x => x.AppId, value.AppId)
+                        .Set(x => x.Name, value.Name)
                         .Set(x => x.Version, newVersion),
                     Upsert);
             }
@@ -88,7 +92,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Schemas
 
                     if (existingVersion != null)
                     {
-                        throw new InconsistentStateException(existingVersion.Version, oldVersion, ex);
+                        throw new InconsistentStateException(existingVersion["Version"].AsInt64, oldVersion, ex);
                     }
                 }
                 else

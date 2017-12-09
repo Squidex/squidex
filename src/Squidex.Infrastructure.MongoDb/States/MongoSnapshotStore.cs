@@ -64,7 +64,7 @@ namespace Squidex.Infrastructure.States
 
                     if (existingVersion != null)
                     {
-                        throw new InconsistentStateException(existingVersion.Version, oldVersion, ex);
+                        throw new InconsistentStateException(existingVersion["Version"].AsInt64, oldVersion, ex);
                     }
                 }
                 else

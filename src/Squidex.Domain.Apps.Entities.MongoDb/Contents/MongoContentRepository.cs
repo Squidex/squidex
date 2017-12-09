@@ -45,7 +45,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         protected override string CollectionName()
         {
-            return "Snapshots_Assets";
+            return "Snapshots_Contents";
         }
 
         protected override async Task SetupCollectionAsync(IMongoCollection<MongoContentEntity> collection)
@@ -89,6 +89,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
             try
             {
+                value.Version = newVersion;
+
                 await Collection.InsertOneAsync(document);
             }
             catch (MongoWriteException ex)
@@ -101,7 +103,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
                     if (existingVersion != null)
                     {
-                        throw new InconsistentStateException(existingVersion.Version, oldVersion, ex);
+                        throw new InconsistentStateException(existingVersion["Version"].AsInt64, oldVersion, ex);
                     }
                 }
                 else
@@ -206,7 +208,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                 await Collection.Find(x => contentIds.Contains(x.Id) && x.AppId == appId).Only(x => x.Id)
                     .ToListAsync();
 
-            return contentIds.Except(contentEntities.Select(x => x.Id)).ToList();
+            return contentIds.Except(contentEntities.Select(x => Guid.Parse(x["_id"].AsString))).ToList();
         }
 
         public async Task<IContentEntity> FindContentAsync(IAppEntity app, ISchemaEntity schema, Guid id, long version)

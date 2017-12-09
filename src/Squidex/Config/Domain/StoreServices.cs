@@ -31,6 +31,7 @@ using Squidex.Domain.Apps.Entities.MongoDb.Schemas;
 using Squidex.Domain.Apps.Entities.Rules.Repositories;
 using Squidex.Domain.Apps.Entities.Rules.State;
 using Squidex.Domain.Apps.Entities.Schemas.Repositories;
+using Squidex.Domain.Apps.Entities.Schemas.State;
 using Squidex.Domain.Users;
 using Squidex.Domain.Users.MongoDb;
 using Squidex.Domain.Users.MongoDb.Infrastructure;
@@ -100,19 +101,20 @@ namespace Squidex.Config.Domain
                         .As<ISnapshotStore<AssetState>>()
                         .As<IExternalSystem>();
 
-                    services.AddSingletonAs(c => new MongoContentRepository(mongoContentDatabase, c.GetService<IAppProvider>()))
-                        .As<IContentRepository>()
-                        .As<ISnapshotStore<ContentState>>()
-                        .As<IEventConsumer>();
-
                     services.AddSingletonAs(c => new MongoRuleRepository(mongoContentDatabase))
                         .As<IRuleRepository>()
                         .As<ISnapshotStore<RuleState>>()
-                        .As<IEventConsumer>();
+                        .As<IExternalSystem>();
 
                     services.AddSingletonAs(c => new MongoSchemaRepository(mongoDatabase))
                         .As<ISchemaRepository>()
-                        .As<ISnapshotStore<AppState>>()
+                        .As<ISnapshotStore<SchemaState>>()
+                        .As<IExternalSystem>();
+
+                    services.AddSingletonAs(c => new MongoContentRepository(mongoContentDatabase, c.GetService<IAppProvider>()))
+                        .As<IContentRepository>()
+                        .As<ISnapshotStore<ContentState>>()
+                        .As<IEventConsumer>()
                         .As<IExternalSystem>();
 
                     services.AddSingletonAs(c => new MongoHistoryEventRepository(mongoDatabase, c.GetServices<IHistoryEventsCreator>()))

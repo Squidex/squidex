@@ -9,6 +9,7 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using Squidex.Domain.Apps.Entities.Apps.State;
+using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Apps
 {
@@ -21,14 +22,19 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Apps
 
         [BsonElement]
         [BsonRequired]
-        public AppState State { get; set; }
-
-        [BsonElement]
-        [BsonRequired]
         public int Version { get; set; }
 
         [BsonElement]
         [BsonRequired]
+        public string Name { get; set; }
+
+        [BsonElement]
+        [BsonRequired]
         public string[] UserIds { get; set; }
+
+        [BsonJson]
+        [BsonElement]
+        [BsonRequired]
+        public AppState State { get; set; }
     }
 }

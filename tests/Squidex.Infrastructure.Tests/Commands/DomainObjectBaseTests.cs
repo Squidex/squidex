@@ -7,40 +7,47 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using FakeItEasy;
 using Squidex.Infrastructure.Commands.TestHelpers;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Log;
+using Squidex.Infrastructure.States;
 using Xunit;
 
 namespace Squidex.Infrastructure.Commands
 {
     public class DomainObjectBaseTests
     {
-        [Fact]
-        public void Should_instantiate()
+        private readonly IStore store = A.Fake<IStore>();
+        private readonly IPersistence<object> persistence = A.Fake<IPersistence<object>>();
+        private readonly Guid id = Guid.NewGuid();
+        private readonly MyDomainObject sut = new MyDomainObject();
+
+        public DomainObjectBaseTests()
         {
-            var domainObjectId = Guid.NewGuid();
-            var domainObjectVersion = 123;
-
-            var sut = new MyDomainObject();
-
-            Assert.Equal(domainObjectId, sut.Id);
-            Assert.Equal(domainObjectVersion, sut.Version);
+            A.CallTo(() => store.WithSnapshots<MyDomainObject, object>(id.ToString(), A<Func<object, Task>>.Ignored))
+                .Returns(persistence);
         }
 
         [Fact]
-        public void Should_add_event_to_uncommitted_events_and_increase_version_when_raised()
+        public void Should_instantiate()
+        {
+            Assert.Equal(-1, sut.Version);
+        }
+
+        [Fact]
+        public void Should_add_event_to_uncommitted_events_and_not_increase_version_when_raised()
         {
             var event1 = new MyEvent();
             var event2 = new MyEvent();
 
-            var sut = new MyDomainObject();
+            sut.RaiseEvent(event1);
+            sut.RaiseEvent(event2);
 
-            sut.RaiseNewEvent(event1);
-            sut.RaiseNewEvent(event2);
-
-            Assert.Equal(12, sut.Version);
-
+            Assert.Equal(-1, sut.Version);
             Assert.Equal(new IEvent[] { event1, event2 }, sut.GetUncomittedEvents().Select(x => x.Payload).ToArray());
 
             sut.ClearUncommittedEvents();
@@ -49,18 +56,66 @@ namespace Squidex.Infrastructure.Commands
         }
 
         [Fact]
-        public void Should_not_add_event_to_uncommitted_events_and_increase_version_when_raised()
+        public async Task Should_write_state_and_events_when_saved()
         {
+            A.CallTo(() => persistence.Version)
+                .Returns(100);
+
+            await sut.ActivateAsync(id.ToString(), store);
+
+            Assert.Equal(100, sut.Version);
+
             var event1 = new MyEvent();
             var event2 = new MyEvent();
 
-            var sut = new MyDomainObject();
+            sut.RaiseEvent(event1);
+            sut.RaiseEvent(event2);
 
-            sut.RaiseEvent(new Envelope<IEvent>(event1));
-            sut.RaiseEvent(new Envelope<IEvent>(event2));
+            var newState = "STATE";
 
-            Assert.Equal(12, sut.Version);
-            Assert.Equal(0, sut.GetUncomittedEvents().Count);
+            sut.UpdateState(newState);
+
+            await sut.WriteAsync(A.Fake<ISemanticLog>());
+
+            A.CallTo(() => persistence.WriteSnapshotAsync(newState, 102))
+                .MustHaveHappened();
+            A.CallTo(() => persistence.WriteEventsAsync(A<IEnumerable<Envelope<IEvent>>>.That.Matches(x => x.Count() == 2)))
+                .MustHaveHappened();
+
+            Assert.Empty(sut.GetUncomittedEvents());
+        }
+
+        [Fact]
+        public async Task Should_ignore_exception_when_saving()
+        {
+            A.CallTo(() => persistence.Version)
+                .Returns(100);
+
+            A.CallTo(() => persistence.WriteEventsAsync(A<IEnumerable<Envelope<IEvent>>>.Ignored))
+                .Throws(new InvalidOperationException());
+
+            await sut.ActivateAsync(id.ToString(), store);
+
+            Assert.Equal(100, sut.Version);
+
+            var event1 = new MyEvent();
+            var event2 = new MyEvent();
+
+            sut.RaiseEvent(event1);
+            sut.RaiseEvent(event2);
+
+            var newState = "STATE";
+
+            sut.UpdateState(newState);
+
+            await sut.WriteAsync(A.Fake<ISemanticLog>());
+
+            A.CallTo(() => persistence.WriteSnapshotAsync(newState, 102))
+                .MustHaveHappened();
+            A.CallTo(() => persistence.WriteEventsAsync(A<IEnumerable<Envelope<IEvent>>>.That.Matches(x => x.Count() == 2)))
+                .MustHaveHappened();
+
+            Assert.Empty(sut.GetUncomittedEvents());
         }
     }
 }

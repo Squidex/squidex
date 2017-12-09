@@ -9,6 +9,7 @@
 using System;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace Squidex.Infrastructure.MongoDb
@@ -34,25 +35,25 @@ namespace Squidex.Infrastructure.MongoDb
             return true;
         }
 
-        public static IFindFluent<TDocument, TDocument> Only<TDocument>(this IFindFluent<TDocument, TDocument> find,
+        public static IFindFluent<TDocument, BsonDocument> Only<TDocument>(this IFindFluent<TDocument, TDocument> find,
             Expression<Func<TDocument, object>> include)
         {
-            return find.Project<TDocument>(Builders<TDocument>.Projection.Include(include));
+            return find.Project<BsonDocument>(Builders<TDocument>.Projection.Include(include));
         }
 
-        public static IFindFluent<TDocument, TDocument> Only<TDocument>(this IFindFluent<TDocument, TDocument> find,
+        public static IFindFluent<TDocument, BsonDocument> Only<TDocument>(this IFindFluent<TDocument, TDocument> find,
             Expression<Func<TDocument, object>> include1,
             Expression<Func<TDocument, object>> include2)
         {
-            return find.Project<TDocument>(Builders<TDocument>.Projection.Include(include1).Include(include2));
+            return find.Project<BsonDocument>(Builders<TDocument>.Projection.Include(include1).Include(include2));
         }
 
-        public static IFindFluent<TDocument, TDocument> Only<TDocument>(this IFindFluent<TDocument, TDocument> find,
+        public static IFindFluent<TDocument, BsonDocument> Only<TDocument>(this IFindFluent<TDocument, TDocument> find,
             Expression<Func<TDocument, object>> include1,
             Expression<Func<TDocument, object>> include2,
             Expression<Func<TDocument, object>> include3)
         {
-            return find.Project<TDocument>(Builders<TDocument>.Projection.Include(include1).Include(include2).Include(include3));
+            return find.Project<BsonDocument>(Builders<TDocument>.Projection.Include(include1).Include(include2).Include(include3));
         }
     }
 }

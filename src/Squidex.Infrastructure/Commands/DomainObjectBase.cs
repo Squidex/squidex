@@ -18,12 +18,13 @@ namespace Squidex.Infrastructure.Commands
     public abstract class DomainObjectBase<TBase, TState> : IDomainObject where TState : new()
     {
         private readonly List<Envelope<IEvent>> uncomittedEvents = new List<Envelope<IEvent>>();
+        private Guid id;
         private TState state = new TState();
         private IPersistence<TState> persistence;
 
         public long Version
         {
-            get { return persistence.Version; }
+            get { return persistence?.Version ?? -1; }
         }
 
         public TState State
@@ -43,6 +44,8 @@ namespace Squidex.Infrastructure.Commands
 
         public Task ActivateAsync(string key, IStore store)
         {
+            id = Guid.Parse(key);
+
             persistence = store.WithSnapshots<TBase, TState>(key, s => state = s);
 
             return persistence.ReadAsync();
@@ -56,6 +59,8 @@ namespace Squidex.Infrastructure.Commands
         public void RaiseEvent<TEvent>(Envelope<TEvent> @event) where TEvent : class, IEvent
         {
             Guard.NotNull(@event, nameof(@event));
+
+            @event.SetAggregateId(id);
 
             OnRaised(@event.To<IEvent>());
 
@@ -73,19 +78,24 @@ namespace Squidex.Infrastructure.Commands
 
         public async Task WriteAsync(ISemanticLog log)
         {
-            await persistence.WriteSnapshotAsync(state);
+            var newVersion = Version + uncomittedEvents.Count;
 
-            try
+            if (newVersion != Version)
             {
-                await persistence.WriteEventsAsync(uncomittedEvents.ToArray());
-            }
-            catch (Exception ex)
-            {
-                log.LogFatal(ex, w => w.WriteProperty("action", "writeEvents"));
-            }
-            finally
-            {
-                uncomittedEvents.Clear();
+                await persistence.WriteSnapshotAsync(state, newVersion);
+
+                try
+                {
+                    await persistence.WriteEventsAsync(uncomittedEvents.ToArray());
+                }
+                catch (Exception ex)
+                {
+                    log.LogFatal(ex, w => w.WriteProperty("action", "writeEvents"));
+                }
+                finally
+                {
+                    uncomittedEvents.Clear();
+                }
             }
         }
     }
