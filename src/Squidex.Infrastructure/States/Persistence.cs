@@ -26,6 +26,11 @@ namespace Squidex.Infrastructure.States
         private long positionSnapshot = -1;
         private long positionEvent = -1;
 
+        public long Version
+        {
+            get { return Math.Max(positionEvent, positionSnapshot); }
+        }
+
         public Persistence(string ownerKey,
             Action invalidate,
             IEventStore eventStore,
@@ -85,17 +90,17 @@ namespace Squidex.Infrastructure.States
                 }
             }
 
-            var maxVersion = Math.Max(positionEvent, positionSnapshot);
+            var newVersion = Version;
 
-            if (expectedVersion.HasValue && expectedVersion.Value != maxVersion)
+            if (expectedVersion.HasValue && expectedVersion.Value != newVersion)
             {
-                if (maxVersion == -1)
+                if (newVersion == -1)
                 {
                     throw new DomainObjectNotFoundException(ownerKey, typeof(TOwner));
                 }
                 else
                 {
-                    throw new DomainObjectVersionException(ownerKey, typeof(TOwner), maxVersion, expectedVersion.Value);
+                    throw new DomainObjectVersionException(ownerKey, typeof(TOwner), newVersion, expectedVersion.Value);
                 }
             }
         }

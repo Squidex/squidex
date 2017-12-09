@@ -9,8 +9,8 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Squidex.Domain.Apps.Read;
-using Squidex.Domain.Apps.Read.Apps;
+using Squidex.Domain.Apps.Entities;
+using Squidex.Domain.Apps.Entities.Apps;
 
 namespace Squidex.Pipeline
 {

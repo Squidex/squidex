@@ -59,8 +59,8 @@ namespace Squidex.Infrastructure.States
                 if (ex.WriteError.Category == ServerErrorCategory.DuplicateKey)
                 {
                     var existingVersion =
-                        await Collection.Find(x => x.Id == key)
-                            .Project<MongoState<T>>(Projection.Exclude(x => x.Id)).FirstOrDefaultAsync();
+                        await Collection.Find(x => x.Id == key).Only(x => x.Id, x => x.Version)
+                            .FirstOrDefaultAsync();
 
                     if (existingVersion != null)
                     {

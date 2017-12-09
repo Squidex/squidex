@@ -18,18 +18,17 @@ namespace Squidex.Infrastructure.Commands
     public abstract class DomainObjectBase<TBase, TState> : IDomainObject where TState : new()
     {
         private readonly List<Envelope<IEvent>> uncomittedEvents = new List<Envelope<IEvent>>();
-        private int version = -1;
         private TState state = new TState();
         private IPersistence<TState> persistence;
+
+        public long Version
+        {
+            get { return persistence.Version; }
+        }
 
         public TState State
         {
             get { return state; }
-        }
-
-        public int Version
-        {
-            get { return version; }
         }
 
         public IReadOnlyList<Envelope<IEvent>> GetUncomittedEvents()

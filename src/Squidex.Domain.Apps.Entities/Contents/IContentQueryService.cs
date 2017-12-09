@@ -21,7 +21,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         Task<(ISchemaEntity Schema, long Total, IReadOnlyList<IContentEntity> Items)> QueryWithCountAsync(IAppEntity app, string schemaIdOrName, ClaimsPrincipal user, bool archived, string query);
 
-        Task<(ISchemaEntity Schema, IContentEntity Content)> FindContentAsync(IAppEntity app, string schemaIdOrName, ClaimsPrincipal user, Guid id);
+        Task<(ISchemaEntity Schema, IContentEntity Content)> FindContentAsync(IAppEntity app, string schemaIdOrName, ClaimsPrincipal user, Guid id, long version = -1);
 
         Task<ISchemaEntity> FindSchemaAsync(IAppEntity app, string schemaIdOrName);
     }

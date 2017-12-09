@@ -6,6 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -29,6 +30,33 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Apps
             return collection.Indexes.CreateOneAsync(Index.Ascending(x => x.UserIds));
         }
 
+        public async Task<Guid> FindAppIdByNameAsync(string name)
+        {
+            var appEntity =
+                await Collection.Find(x => x.State.Name == name).Only(x => x.Id)
+                    .FirstOrDefaultAsync();
+
+            return appEntity != null ? Guid.Parse(appEntity.Id) : Guid.Empty;
+        }
+
+        public async Task<IReadOnlyList<Guid>> QueryUserAppIdsAsync(string userId)
+        {
+            var appEntities =
+                await Collection.Find(x => x.UserIds.Contains(userId)).Only(x => x.Id)
+                    .ToListAsync();
+
+            return appEntities.Select(x => Guid.Parse(x.Id)).ToList();
+        }
+
+        public async Task<IReadOnlyList<string>> QueryUserAppNamesAsync(string userId)
+        {
+            var appEntities =
+                await Collection.Find(x => x.UserIds.Contains(userId)).Project<MongoAppEntity>(Projection.Include(x => x.Id))
+                    .ToListAsync();
+
+            return appEntities.Select(x => x.Id).ToList();
+        }
+
         public async Task<(AppState Value, long Version)> ReadAsync(string key)
         {
             var existing =
@@ -41,14 +69,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Apps
             }
 
             return (null, -1);
-        }
-
-        public async Task<IReadOnlyList<string>> QueryUserAppNamesAsync(string userId)
-        {
-            var appEntities =
-                await Collection.Find(x => x.UserIds.Contains(userId)).Project<MongoAppEntity>(Projection.Include(x => x.Id)).ToListAsync();
-
-            return appEntities.Select(x => x.Id).ToList();
         }
 
         public async Task WriteAsync(string key, AppState value, long oldVersion, long newVersion)

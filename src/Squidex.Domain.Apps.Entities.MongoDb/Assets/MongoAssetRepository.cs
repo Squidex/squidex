@@ -27,6 +27,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
         {
         }
 
+        protected override string CollectionName()
+        {
+            return "Snapshots_Assets";
+        }
+
         protected override Task SetupCollectionAsync(IMongoCollection<MongoAssetEntity> collection)
         {
             return collection.Indexes.CreateOneAsync(
@@ -122,8 +127,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                 if (ex.WriteError.Category == ServerErrorCategory.DuplicateKey)
                 {
                     var existingVersion =
-                        await Collection.Find(x => x.Id == key)
-                            .Project<MongoAssetEntity>(Projection.Exclude(x => x.Id)).FirstOrDefaultAsync();
+                        await Collection.Find(x => x.Id == key).Only(x => x.Id, x => x.Version)
+                            .FirstOrDefaultAsync();
 
                     if (existingVersion != null)
                     {

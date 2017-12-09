@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                     error(new ValidationError("Name must be a valid slug.", nameof(command.Name)));
                 }
 
-                if (await appProvider.GetSchemaAsync(command.AppId.Name, command.Name) != null)
+                if (await appProvider.GetSchemaAsync(command.AppId.Id, command.Name) != null)
                 {
                     error(new ValidationError($"A schema with name '{command.Name}' already exists", nameof(command.Name)));
                 }

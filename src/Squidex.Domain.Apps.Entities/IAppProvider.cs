@@ -17,17 +17,17 @@ namespace Squidex.Domain.Apps.Entities
 {
     public interface IAppProvider
     {
-        Task<(IAppEntity, ISchemaEntity)> GetAppWithSchemaAsync(string appName, Guid id);
+        Task<(IAppEntity, ISchemaEntity)> GetAppWithSchemaAsync(Guid appId, Guid id);
 
         Task<IAppEntity> GetAppAsync(string appName);
 
-        Task<ISchemaEntity> GetSchemaAsync(string appName, Guid id, bool provideDeleted = false);
+        Task<ISchemaEntity> GetSchemaAsync(Guid appId, Guid id, bool provideDeleted = false);
 
-        Task<ISchemaEntity> GetSchemaAsync(string appName, string name, bool provideDeleted = false);
+        Task<ISchemaEntity> GetSchemaAsync(Guid appId, string name, bool provideDeleted = false);
 
-        Task<List<ISchemaEntity>> GetSchemasAsync(string appName);
+        Task<List<ISchemaEntity>> GetSchemasAsync(Guid appId);
 
-        Task<List<IRuleEntity>> GetRulesAsync(string appName);
+        Task<List<IRuleEntity>> GetRulesAsync(Guid appId);
 
         Task<List<IAppEntity>> GetUserApps(string userId);
     }

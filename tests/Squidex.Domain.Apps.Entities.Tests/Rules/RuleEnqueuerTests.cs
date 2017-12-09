@@ -78,7 +78,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
             A.CallTo(() => ruleEntity2.RuleDef).Returns(rule2);
             A.CallTo(() => ruleEntity3.RuleDef).Returns(rule3);
 
-            A.CallTo(() => appProvider.GetRulesAsync(appId.Name))
+            A.CallTo(() => appProvider.GetRulesAsync(appId.Id))
                 .Returns(new List<IRuleEntity> { ruleEntity1, ruleEntity2, ruleEntity3 });
 
             A.CallTo(() => ruleService.CreateJob(rule1, @event))

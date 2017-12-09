@@ -25,9 +25,15 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
         {
         }
 
-        protected override Task SetupCollectionAsync(IMongoCollection<MongoRuleEntity> collection)
+        protected override string CollectionName()
         {
-            return collection.Indexes.CreateOneAsync(Index.Ascending(x => x.State.AppId));
+            return "States_Rules";
+        }
+
+        protected override async Task SetupCollectionAsync(IMongoCollection<MongoRuleEntity> collection)
+        {
+            await collection.Indexes.CreateOneAsync(Index.Ascending(x => x.State.AppId));
+            await collection.Indexes.CreateOneAsync(Index.Ascending(x => x.State.IsDeleted));
         }
 
         public async Task<(RuleState Value, long Version)> ReadAsync(string key)
@@ -44,12 +50,13 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
             return (null, -1);
         }
 
-        public async Task<IReadOnlyList<string>> QueryRuleIdsAsync(Guid appId)
+        public async Task<IReadOnlyList<Guid>> QueryRuleIdsAsync(Guid appId)
         {
             var ruleEntities =
-                await Collection.Find(x => x.State.AppId == appId).Project<MongoRuleEntity>(Projection.Include(x => x.Id)).ToListAsync();
+                await Collection.Find(x => x.State.AppId == appId && !x.State.IsDeleted).Only(x => x.Id)
+                    .ToListAsync();
 
-            return ruleEntities.Select(x => x.Id).ToList();
+            return ruleEntities.Select(x => Guid.Parse(x.Id)).ToList();
         }
 
         public async Task WriteAsync(string key, RuleState value, long oldVersion, long newVersion)
@@ -67,8 +74,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
                 if (ex.WriteError.Category == ServerErrorCategory.DuplicateKey)
                 {
                     var existingVersion =
-                        await Collection.Find(x => x.Id == key)
-                            .Project<MongoRuleEntity>(Projection.Exclude(x => x.Id)).FirstOrDefaultAsync();
+                        await Collection.Find(x => x.Id == key).Only(x => x.Id, x => x.Version)
+                            .FirstOrDefaultAsync();
 
                     if (existingVersion != null)
                     {

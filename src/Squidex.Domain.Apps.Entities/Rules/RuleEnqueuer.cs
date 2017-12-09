@@ -56,7 +56,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
         {
             if (@event.Payload is AppEvent appEvent)
             {
-                var rules = await appProvider.GetRulesAsync(appEvent.AppId.Name);
+                var rules = await appProvider.GetRulesAsync(appEvent.AppId.Id);
 
                 foreach (var ruleEntity in rules)
                 {

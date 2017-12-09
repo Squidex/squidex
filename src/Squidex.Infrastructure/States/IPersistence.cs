@@ -13,6 +13,8 @@ namespace Squidex.Infrastructure.States
 {
     public interface IPersistence<TState>
     {
+        long Version { get; }
+
         Task WriteEventsAsync(params Envelope<IEvent>[] @events);
 
         Task WriteSnapshotAsync(TState state);

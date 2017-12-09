@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using Squidex.Areas.Api.Controllers.Contents.Generator;
-using Squidex.Domain.Apps.Read;
+using Squidex.Domain.Apps.Entities;
 using Squidex.Infrastructure.Commands;
 using Squidex.Pipeline;
 
@@ -47,7 +47,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(0)]
         public async Task<IActionResult> GetSwagger(string app)
         {
-            var schemas = await appProvider.GetSchemasAsync(AppName);
+            var schemas = await appProvider.GetSchemasAsync(AppId);
 
             var swaggerDocument = await schemasSwaggerGenerator.Generate(App, schemas);
 

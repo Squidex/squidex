@@ -14,8 +14,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Repositories
 {
     public interface ISchemaRepository
     {
-        Task<string> FindSchemaNameAsync(Guid schemaId);
+        Task<Guid> FindSchemaIdAsync(Guid appId, string name);
 
-        Task<IReadOnlyList<string>> QuerySchemaNamesAsync(Guid appId);
+        Task<IReadOnlyList<Guid>> QuerySchemaIdsAsync(Guid appId);
     }
 }

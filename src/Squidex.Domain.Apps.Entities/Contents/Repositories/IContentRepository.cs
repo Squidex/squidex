@@ -29,5 +29,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Repositories
         Task<long> CountAsync(IAppEntity app, ISchemaEntity schema, Status[] status, ODataUriParser odataQuery);
 
         Task<IContentEntity> FindContentAsync(IAppEntity app, ISchemaEntity schema, Guid id);
+
+        Task<IContentEntity> FindContentAsync(IAppEntity app, ISchemaEntity schema, Guid id, long version);
     }
 }

@@ -6,7 +6,6 @@
 //  All rights reserved.
 // ==========================================================================
 
-/*
 using System;
 using System.Collections.Immutable;
 using FakeItEasy;
@@ -391,4 +390,3 @@ namespace Squidex.Domain.Apps.Entities.Contents
         }
     }
 }
-*/

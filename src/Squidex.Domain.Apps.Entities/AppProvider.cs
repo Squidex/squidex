@@ -7,11 +7,16 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Entities.Apps.Repositories;
 using Squidex.Domain.Apps.Entities.Rules;
+using Squidex.Domain.Apps.Entities.Rules.Repositories;
 using Squidex.Domain.Apps.Entities.Schemas;
+using Squidex.Domain.Apps.Entities.Schemas.Repositories;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.States;
 
@@ -19,48 +24,148 @@ namespace Squidex.Domain.Apps.Entities
 {
     public sealed class AppProvider : IAppProvider
     {
-        private readonly IStateFactory factory;
+        private readonly ConcurrentDictionary<string, Guid> appIds = new ConcurrentDictionary<string, Guid>();
+        private readonly ConcurrentDictionary<Tuple<Guid, string>, Guid> schemaIds = new ConcurrentDictionary<Tuple<Guid, string>, Guid>();
+        private readonly IAppRepository appRepository;
+        private readonly IRuleRepository ruleRepository;
+        private readonly ISchemaRepository schemaRepository;
+        private readonly IStateFactory stateFactory;
 
-        public AppProvider(IStateFactory factory)
+        public AppProvider(
+            IAppRepository appRepository,
+            ISchemaRepository schemaRepository,
+            IStateFactory stateFactory,
+            IRuleRepository ruleRepository)
         {
-            Guard.NotNull(factory, nameof(factory));
+            Guard.NotNull(appRepository, nameof(appRepository));
+            Guard.NotNull(schemaRepository, nameof(schemaRepository));
+            Guard.NotNull(stateFactory, nameof(stateFactory));
+            Guard.NotNull(ruleRepository, nameof(ruleRepository));
 
-            this.factory = factory;
+            this.appRepository = appRepository;
+            this.schemaRepository = schemaRepository;
+            this.stateFactory = stateFactory;
+            this.ruleRepository = ruleRepository;
         }
 
-        public Task<IAppEntity> GetAppAsync(string appName)
+        public async Task<(IAppEntity, ISchemaEntity)> GetAppWithSchemaAsync(Guid appId, Guid id)
         {
-            return null;
+            var app = await stateFactory.GetSingleAsync<AppDomainObject>(appId.ToString());
+
+            if (app.Version < 0)
+            {
+                throw new DomainObjectNotFoundException(appId.ToString(), typeof(SchemaDomainObject));
+            }
+
+            var schema = await stateFactory.GetSingleAsync<SchemaDomainObject>(id.ToString());
+
+            if (schema.Version < 0 || schema.State.IsDeleted)
+            {
+                throw new DomainObjectNotFoundException(id.ToString(), typeof(SchemaDomainObject));
+            }
+
+            return (app.State, schema.State);
         }
 
-        public Task<(IAppEntity, ISchemaEntity)> GetAppWithSchemaAsync(string appName, Guid id)
+        public async Task<IAppEntity> GetAppAsync(string appName)
         {
-            return null;
+            var appId = await GetAppIdAsync(appName);
+
+            var app = await stateFactory.GetSingleAsync<AppDomainObject>(appName);
+
+            if (app.Version < 0)
+            {
+                throw new DomainObjectNotFoundException(appName, typeof(SchemaDomainObject));
+            }
+
+            return app.State;
         }
 
-        public Task<List<IRuleEntity>> GetRulesAsync(string appName)
+        public async Task<ISchemaEntity> GetSchemaAsync(Guid appId, string name, bool provideDeleted = false)
         {
-            return null;
+            var schemaId = await GetSchemaIdAsync(appId, name);
+
+            var schema = await stateFactory.GetSingleAsync<SchemaDomainObject>(schemaId.ToString());
+
+            if (schema.Version < 0 || (schema.State.IsDeleted && !provideDeleted))
+            {
+                throw new DomainObjectNotFoundException(schemaId.ToString(), typeof(SchemaDomainObject));
+            }
+
+            return schema.State;
         }
 
-        public Task<ISchemaEntity> GetSchemaAsync(string appName, Guid id, bool provideDeleted = false)
+        public async Task<ISchemaEntity> GetSchemaAsync(Guid appId, Guid id, bool provideDeleted = false)
         {
-            return null;
+            var schema = await stateFactory.GetSingleAsync<SchemaDomainObject>(id.ToString());
+
+            if (schema.Version < 0 || (schema.State.IsDeleted && !provideDeleted))
+            {
+                throw new DomainObjectNotFoundException(id.ToString(), typeof(SchemaDomainObject));
+            }
+
+            return schema.State;
         }
 
-        public Task<ISchemaEntity> GetSchemaAsync(string appName, string name, bool provideDeleted = false)
+        public async Task<List<ISchemaEntity>> GetSchemasAsync(Guid appId)
         {
-            return null;
+            var ids = await schemaRepository.QuerySchemaIdsAsync(appId);
+
+            var schemas =
+                await Task.WhenAll(
+                    ids.Select(id => stateFactory.GetSingleAsync<SchemaDomainObject>(id.ToString())));
+
+            return schemas.Select(a => (ISchemaEntity)a.State).ToList();
         }
 
-        public Task<List<ISchemaEntity>> GetSchemasAsync(string appName)
+        public async Task<List<IRuleEntity>> GetRulesAsync(Guid appId)
         {
-            return null;
+            var ids = await ruleRepository.QueryRuleIdsAsync(appId);
+
+            var rules =
+                await Task.WhenAll(
+                    ids.Select(id => stateFactory.GetSingleAsync<RuleDomainObject>(id.ToString())));
+
+            return rules.Select(a => (IRuleEntity)a.State).ToList();
         }
 
-        public Task<List<IAppEntity>> GetUserApps(string userId)
+        public async Task<List<IAppEntity>> GetUserApps(string userId)
         {
-            return null;
+            var ids = await appRepository.QueryUserAppIdsAsync(userId);
+
+            var apps =
+                await Task.WhenAll(
+                    ids.Select(id => stateFactory.GetSingleAsync<AppDomainObject>(id.ToString())));
+
+            return apps.Select(a => (IAppEntity)a.State).ToList();
+        }
+
+        private async Task<Guid> GetAppIdAsync(string name)
+        {
+            var key = name;
+
+            if (!appIds.TryGetValue(key, out var id))
+            {
+                id = await appRepository.FindAppIdByNameAsync(name);
+
+                appIds[key] = id;
+            }
+
+            return id;
+        }
+
+        private async Task<Guid> GetSchemaIdAsync(Guid appId, string name)
+        {
+            var key = Tuple.Create(appId, name);
+
+            if (!schemaIds.TryGetValue(key, out var id))
+            {
+                id = await schemaRepository.FindSchemaIdAsync(appId, name);
+
+                schemaIds[key] = id;
+            }
+
+            return id;
         }
     }
 }

@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Infrastructure.Commands.TestHelpers;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.Tasks;
 using Xunit;
@@ -19,42 +20,29 @@ namespace Squidex.Infrastructure.Commands
 {
     public class AggregateHandlerTests
     {
+        private readonly ISemanticLog log = A.Fake<ISemanticLog>();
         private readonly IServiceProvider serviceProvider = A.Fake<IServiceProvider>();
         private readonly IStore store = A.Fake<IStore>();
         private readonly IStateFactory stateFactory = A.Fake<IStateFactory>();
         private readonly IPersistence<object> persistence = A.Fake<IPersistence<object>>();
         private readonly Envelope<IEvent> event1 = new Envelope<IEvent>(new MyEvent());
         private readonly Envelope<IEvent> event2 = new Envelope<IEvent>(new MyEvent());
-        private readonly DomainObjectFactoryFunction<MyDomainObject> factory;
         private readonly CommandContext context;
-        private readonly AggregateHandler sut;
-        private readonly DomainObjectWrapper<MyDomainObject> domainObjectWrapper = new DomainObjectWrapper<MyDomainObject>();
         private readonly Guid domainObjectId = Guid.NewGuid();
-        private readonly MyDomainObject domainObject;
+        private readonly MyDomainObject domainObject = new MyDomainObject();
+        private readonly AggregateHandler sut;
 
         public AggregateHandlerTests()
         {
-            factory = new DomainObjectFactoryFunction<MyDomainObject>(id => domainObject);
-
-            domainObject =
-                new MyDomainObject(domainObjectId, 1)
-                    .RaiseNewEvent(event1)
-                    .RaiseNewEvent(event2);
-
-            context = new CommandContext(new MyCommand { AggregateId = domainObject.Id });
+            context = new CommandContext(new MyCommand { AggregateId = domainObjectId });
 
             A.CallTo(() => store.WithEventSourcing<MyDomainObject>(domainObjectId.ToString(), A<Func<Envelope<IEvent>, Task>>.Ignored))
                 .Returns(persistence);
 
-            A.CallTo(() => serviceProvider.GetService(factory.GetType()))
-                .Returns(factory);
+            A.CallTo(() => stateFactory.CreateAsync<MyDomainObject>(domainObjectId.ToString()))
+                .Returns(Task.FromResult(domainObject));
 
-            A.CallTo(() => stateFactory.GetDetachedAsync<DomainObjectWrapper<MyDomainObject>>(domainObject.Id.ToString()))
-                .Returns(Task.FromResult(domainObjectWrapper));
-
-            sut = new AggregateHandler(stateFactory, serviceProvider);
-
-            domainObjectWrapper.ActivateAsync(domainObjectId.ToString(), store).Wait();
+            sut = new AggregateHandler(stateFactory, serviceProvider, log);
         }
 
         [Fact]

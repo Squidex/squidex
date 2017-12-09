@@ -27,7 +27,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
                 }
                 else
                 {
-                    var errors = await RuleTriggerValidator.ValidateAsync(command.AppId.Name, command.Trigger, appProvider);
+                    var errors = await RuleTriggerValidator.ValidateAsync(command.AppId.Id, command.Trigger, appProvider);
 
                     errors.Foreach(error);
                 }
@@ -58,7 +58,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
 
                 if (command.Trigger != null)
                 {
-                    var errors = await RuleTriggerValidator.ValidateAsync(command.AppId.Name, command.Trigger, appProvider);
+                    var errors = await RuleTriggerValidator.ValidateAsync(command.AppId.Id, command.Trigger, appProvider);
 
                     errors.Foreach(error);
                 }

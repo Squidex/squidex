@@ -11,13 +11,8 @@ using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Infrastructure.Commands.TestHelpers
 {
-    internal sealed class MyDomainObject : DomainObjectBase
+    internal sealed class MyDomainObject : DomainObjectBase<MyDomainObject, object>
     {
-        public MyDomainObject(Guid id, int version)
-            : base(id, version)
-        {
-        }
-
         public MyDomainObject RaiseNewEvent(IEvent @event)
         {
             RaiseEvent(@event);
@@ -30,10 +25,6 @@ namespace Squidex.Infrastructure.Commands.TestHelpers
             RaiseEvent(@event);
 
             return this;
-        }
-
-        protected override void DispatchEvent(Envelope<IEvent> @event)
-        {
         }
     }
 }

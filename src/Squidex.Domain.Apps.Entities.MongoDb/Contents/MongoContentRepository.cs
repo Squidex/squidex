@@ -11,74 +11,129 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.OData.UriParser;
-using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.ConvertContent;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
+using Squidex.Domain.Apps.Entities.Contents.State;
 using Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.MongoDb;
+using Squidex.Infrastructure.Reflection;
+using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 {
-    public class MongoContentRepository : IContentRepository
+    public partial class MongoContentRepository : MongoRepositoryBase<MongoContentEntity>,
+        IEventConsumer,
+        IContentRepository,
+        ISnapshotStore<ContentState>
     {
-        private const string Prefix = "Projections_Content_";
-        private readonly IMongoDatabase database;
         private readonly IAppProvider appProvider;
 
-        protected static FilterDefinitionBuilder<MongoContentEntity> Filter
-        {
-            get
-            {
-                return Builders<MongoContentEntity>.Filter;
-            }
-        }
-
-        protected static UpdateDefinitionBuilder<MongoContentEntity> Update
-        {
-            get
-            {
-                return Builders<MongoContentEntity>.Update;
-            }
-        }
-
-        protected static ProjectionDefinitionBuilder<MongoContentEntity> Projection
-        {
-            get
-            {
-                return Builders<MongoContentEntity>.Projection;
-            }
-        }
-
-        protected static IndexKeysDefinitionBuilder<MongoContentEntity> Index
-        {
-            get
-            {
-                return Builders<MongoContentEntity>.IndexKeys;
-            }
-        }
-
         public MongoContentRepository(IMongoDatabase database, IAppProvider appProvider)
+            : base(database)
         {
-            Guard.NotNull(database, nameof(database));
             Guard.NotNull(appProvider, nameof(appProvider));
 
-            this.database = database;
             this.appProvider = appProvider;
+        }
+
+        protected override string CollectionName()
+        {
+            return "Snapshots_Assets";
+        }
+
+        protected override async Task SetupCollectionAsync(IMongoCollection<MongoContentEntity> collection)
+        {
+            await collection.Indexes.CreateOneAsync(
+                Index
+                    .Ascending(x => x.Id)
+                    .Descending(x => x.Version));
+
+            await collection.Indexes.CreateOneAsync(
+                Index
+                    .Ascending(x => x.SchemaId)
+                    .Descending(x => x.IsLatest)
+                    .Descending(x => x.LastModified));
+
+            await collection.Indexes.CreateOneAsync(Index.Ascending(x => x.ReferencedIds));
+            await collection.Indexes.CreateOneAsync(Index.Ascending(x => x.Status));
+            await collection.Indexes.CreateOneAsync(Index.Text(x => x.DataText));
+        }
+
+        public async Task WriteAsync(string key, ContentState value, long oldVersion, long newVersion)
+        {
+            var documentId = $"{key}_{oldVersion}";
+
+            var schema = await appProvider.GetSchemaAsync(value.AppId, value.SchemaId);
+
+            if (schema == null)
+            {
+                throw new InvalidOperationException($"Cannot find schema {value.SchemaId}");
+            }
+
+            var idData = value.Data?.ToIdModel(schema.SchemaDef, true);
+
+            var document = SimpleMapper.Map(value, new MongoContentEntity
+            {
+                DocumentId = documentId,
+                DataText = idData?.ToFullText(),
+                DataByIds = idData,
+                ReferencedIds = idData?.ToReferencedIds(schema.SchemaDef),
+            });
+
+            try
+            {
+                await Collection.InsertOneAsync(document);
+            }
+            catch (MongoWriteException ex)
+            {
+                if (ex.WriteError.Category == ServerErrorCategory.DuplicateKey)
+                {
+                    var existingVersion =
+                        await Collection.Find(x => x.Id == value.Id && x.IsLatest).Only(x => x.Id, x => x.Version)
+                            .FirstOrDefaultAsync();
+
+                    if (existingVersion != null)
+                    {
+                        throw new InconsistentStateException(existingVersion.Version, oldVersion, ex);
+                    }
+                }
+                else
+                {
+                    throw;
+                }
+            }
+        }
+
+        public async Task<(ContentState Value, long Version)> ReadAsync(string key)
+        {
+            var id = Guid.Parse(key);
+
+            var existing =
+                await Collection.Find(x => x.Id == id && x.IsLatest)
+                    .FirstOrDefaultAsync();
+
+            if (existing != null)
+            {
+                return (SimpleMapper.Map(existing, new ContentState()), existing.Version);
+            }
+
+            return (null, -1);
         }
 
         public async Task<IReadOnlyList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, Status[] status, ODataUriParser odataQuery)
         {
-            var collection = GetCollection(app.Id);
-
             IFindFluent<MongoContentEntity, MongoContentEntity> cursor;
             try
             {
                 cursor =
-                    collection
+                    Collection
                         .Find(odataQuery, schema.Id, schema.SchemaDef, status)
                         .Take(odataQuery)
                         .Skip(odataQuery)
@@ -103,14 +158,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             return contentEntities;
         }
 
-        public Task<long> CountAsync(IAppEntity app, ISchemaEntity schema, Status[] status, ODataUriParser odataQuery)
+        public async Task<long> CountAsync(IAppEntity app, ISchemaEntity schema, Status[] status, ODataUriParser odataQuery)
         {
-            var collection = GetCollection(app.Id);
-
             IFindFluent<MongoContentEntity, MongoContentEntity> cursor;
             try
             {
-                cursor = collection.Find(odataQuery, schema.Id, schema.SchemaDef, status);
+                cursor = Collection.Find(odataQuery, schema.Id, schema.SchemaDef, status);
             }
             catch (NotSupportedException)
             {
@@ -121,15 +174,13 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                 throw new ValidationException("This odata operation is not supported.");
             }
 
-            return cursor.CountAsync();
+            return await cursor.CountAsync();
         }
 
         public async Task<long> CountAsync(IAppEntity app, ISchemaEntity schema, Status[] status, HashSet<Guid> ids)
         {
-            var collection = GetCollection(app.Id);
-
             var contentsCount =
-                await collection.Find(x => ids.Contains(x.Id))
+                await Collection.Find(x => ids.Contains(x.Id) && x.IsLatest)
                     .CountAsync();
 
             return contentsCount;
@@ -137,10 +188,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         public async Task<IReadOnlyList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, Status[] status, HashSet<Guid> ids)
         {
-            var collection = GetCollection(app.Id);
-
             var contentEntities =
-                await collection.Find(x => ids.Contains(x.Id))
+                await Collection.Find(x => ids.Contains(x.Id) && x.IsLatest)
                     .ToListAsync();
 
             foreach (var entity in contentEntities)
@@ -153,21 +202,17 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         public async Task<IReadOnlyList<Guid>> QueryNotFoundAsync(Guid appId, Guid schemaId, IList<Guid> contentIds)
         {
-            var collection = GetCollection(appId);
-
             var contentEntities =
-                await collection.Find(x => contentIds.Contains(x.Id) && x.AppId == appId).Project<BsonDocument>(Projection.Include(x => x.Id))
+                await Collection.Find(x => contentIds.Contains(x.Id) && x.AppId == appId).Only(x => x.Id)
                     .ToListAsync();
 
-            return contentIds.Except(contentEntities.Select(x => Guid.Parse(x["_id"].AsString))).ToList();
+            return contentIds.Except(contentEntities.Select(x => x.Id)).ToList();
         }
 
-        public async Task<IContentEntity> FindContentAsync(IAppEntity app, ISchemaEntity schema, Guid id)
+        public async Task<IContentEntity> FindContentAsync(IAppEntity app, ISchemaEntity schema, Guid id, long version)
         {
-            var collection = GetCollection(app.Id);
-
             var contentEntity =
-                await collection.Find(x => x.Id == id)
+                await Collection.Find(x => x.Id == id && x.Version == version)
                     .FirstOrDefaultAsync();
 
             contentEntity?.ParseData(schema.SchemaDef);
@@ -175,32 +220,15 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             return contentEntity;
         }
 
-        private async Task ForSchemaAsync(NamedId<Guid> appId, Guid schemaId, Func<IMongoCollection<MongoContentEntity>, ISchemaEntity, Task> action)
+        public async Task<IContentEntity> FindContentAsync(IAppEntity app, ISchemaEntity schema, Guid id)
         {
-            var collection = GetCollection(appId.Id);
+            var contentEntity =
+                await Collection.Find(x => x.Id == id && x.IsLatest)
+                    .FirstOrDefaultAsync();
 
-            var schema = await appProvider.GetSchemaAsync(appId.Name, schemaId, true);
+            contentEntity?.ParseData(schema.SchemaDef);
 
-            if (schema == null)
-            {
-                return;
-            }
-
-            await action(collection, schema);
-        }
-
-        private Task ForAppIdAsync(Guid appId, Func<IMongoCollection<MongoContentEntity>, Task> action)
-        {
-            var collection = GetCollection(appId);
-
-            return action(collection);
-        }
-
-        private IMongoCollection<MongoContentEntity> GetCollection(Guid appId)
-        {
-            var name = $"{Prefix}{appId}";
-
-            return database.GetCollection<MongoContentEntity>(name);
+            return contentEntity;
         }
     }
 }

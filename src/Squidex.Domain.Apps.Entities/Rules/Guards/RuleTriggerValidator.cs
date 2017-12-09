@@ -26,12 +26,12 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
             SchemaProvider = schemaProvider;
         }
 
-        public static Task<IEnumerable<ValidationError>> ValidateAsync(string appName, RuleTrigger action, IAppProvider appProvider)
+        public static Task<IEnumerable<ValidationError>> ValidateAsync(Guid appId, RuleTrigger action, IAppProvider appProvider)
         {
             Guard.NotNull(action, nameof(action));
             Guard.NotNull(appProvider, nameof(appProvider));
 
-            var visitor = new RuleTriggerValidator(x => appProvider.GetSchemaAsync(appName, x));
+            var visitor = new RuleTriggerValidator(x => appProvider.GetSchemaAsync(appId, x));
 
             return action.Accept(visitor);
         }

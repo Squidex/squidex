@@ -14,6 +14,6 @@ namespace Squidex.Domain.Apps.Entities.Rules.Repositories
 {
     public interface IRuleRepository
     {
-        Task<IReadOnlyList<string>> QueryRuleIdsAsync(Guid appId);
+        Task<IReadOnlyList<Guid>> QueryRuleIdsAsync(Guid appId);
     }
 }

@@ -72,7 +72,7 @@ namespace Squidex.Infrastructure.States
         private readonly IMemoryCache cache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
         private readonly IPubSub pubSub = new InMemoryPubSub(true);
         private readonly IServiceProvider services = A.Fake<IServiceProvider>();
-        private readonly ISnapshotStore snapshotStore = A.Fake<ISnapshotStore>();
+        private readonly ISnapshotStore<int> snapshotStore = A.Fake<ISnapshotStore<int>>();
         private readonly IStreamNameResolver streamNameResolver = A.Fake<IStreamNameResolver>();
         private readonly StateFactory sut;
 
@@ -82,13 +82,15 @@ namespace Squidex.Infrastructure.States
                 .Returns(statefulObject);
             A.CallTo(() => services.GetService(typeof(MyStatefulObjectWithSnapshot)))
                 .Returns(statefulObjectWithSnapShot);
+            A.CallTo(() => services.GetService(typeof(ISnapshotStore<int>)))
+                .Returns(snapshotStore);
 
             A.CallTo(() => streamNameResolver.GetStreamName(typeof(MyStatefulObject), key))
                 .Returns(key);
             A.CallTo(() => streamNameResolver.GetStreamName(typeof(MyStatefulObjectWithSnapshot), key))
                 .Returns(key);
 
-            sut = new StateFactory(pubSub, cache, eventStore, eventDataFormatter, services, snapshotStore, streamNameResolver);
+            sut = new StateFactory(pubSub, cache, eventStore, eventDataFormatter, services, streamNameResolver);
             sut.Connect();
         }
 
@@ -102,7 +104,7 @@ namespace Squidex.Infrastructure.States
 
             SetupEventStore(event1, event2);
 
-            var actualObject = await sut.GetSynchronizedAsync<MyStatefulObject>(key);
+            var actualObject = await sut.GetSingleAsync<MyStatefulObject>(key);
 
             Assert.Same(statefulObject, actualObject);
             Assert.NotNull(cache.Get<object>(key));
@@ -115,12 +117,12 @@ namespace Squidex.Infrastructure.States
         {
             statefulObjectWithSnapShot.ExpectedVersion = null;
 
-            A.CallTo(() => snapshotStore.ReadAsync<int>(key))
+            A.CallTo(() => snapshotStore.ReadAsync(key))
                 .Returns((2, 2L));
 
             SetupEventStore(3, 2);
 
-            await sut.GetSynchronizedAsync<MyStatefulObjectWithSnapshot>(key);
+            await sut.GetSingleAsync<MyStatefulObjectWithSnapshot>(key);
 
             A.CallTo(() => eventStore.GetEventsAsync(key, 3))
                 .MustHaveHappened();
@@ -131,12 +133,12 @@ namespace Squidex.Infrastructure.States
         {
             statefulObjectWithSnapShot.ExpectedVersion = null;
 
-            A.CallTo(() => snapshotStore.ReadAsync<int>(key))
+            A.CallTo(() => snapshotStore.ReadAsync(key))
                 .Returns((2, 2L));
 
             SetupEventStore(3, 0, 3);
 
-            await Assert.ThrowsAsync<InvalidOperationException>(() => sut.GetSynchronizedAsync<MyStatefulObjectWithSnapshot>(key));
+            await Assert.ThrowsAsync<InvalidOperationException>(() => sut.GetSingleAsync<MyStatefulObjectWithSnapshot>(key));
         }
 
         [Fact]
@@ -144,12 +146,12 @@ namespace Squidex.Infrastructure.States
         {
             statefulObjectWithSnapShot.ExpectedVersion = null;
 
-            A.CallTo(() => snapshotStore.ReadAsync<int>(key))
+            A.CallTo(() => snapshotStore.ReadAsync(key))
                 .Returns((2, 2L));
 
             SetupEventStore(3, 4, 3);
 
-            await Assert.ThrowsAsync<InvalidOperationException>(() => sut.GetSynchronizedAsync<MyStatefulObjectWithSnapshot>(key));
+            await Assert.ThrowsAsync<InvalidOperationException>(() => sut.GetSingleAsync<MyStatefulObjectWithSnapshot>(key));
         }
 
         [Fact]
@@ -159,7 +161,7 @@ namespace Squidex.Infrastructure.States
 
             SetupEventStore(0);
 
-            await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.GetSynchronizedAsync<MyStatefulObject>(key));
+            await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.GetSingleAsync<MyStatefulObject>(key));
         }
 
         [Fact]
@@ -169,7 +171,7 @@ namespace Squidex.Infrastructure.States
 
             SetupEventStore(3);
 
-            await Assert.ThrowsAsync<DomainObjectVersionException>(() => sut.GetSynchronizedAsync<MyStatefulObject>(key));
+            await Assert.ThrowsAsync<DomainObjectVersionException>(() => sut.GetSingleAsync<MyStatefulObject>(key));
         }
 
         [Fact]
@@ -179,7 +181,7 @@ namespace Squidex.Infrastructure.States
 
             SetupEventStore(0);
 
-            await sut.GetSynchronizedAsync<MyStatefulObject>(key);
+            await sut.GetSingleAsync<MyStatefulObject>(key);
         }
 
         [Fact]
@@ -189,7 +191,7 @@ namespace Squidex.Infrastructure.States
 
             SetupEventStore(0);
 
-            var actualObject = await sut.GetSynchronizedAsync<MyStatefulObject>(key);
+            var actualObject = await sut.GetSingleAsync<MyStatefulObject>(key);
 
             Assert.Same(statefulObject, actualObject);
             Assert.NotNull(cache.Get<object>(key));
@@ -202,12 +204,12 @@ namespace Squidex.Infrastructure.States
 
             SetupEventStore(0);
 
-            var actualObject1 = await sut.GetSynchronizedAsync<MyStatefulObject>(key);
+            var actualObject1 = await sut.GetSingleAsync<MyStatefulObject>(key);
 
             Assert.Same(statefulObject, actualObject1);
             Assert.NotNull(cache.Get<object>(key));
 
-            var actualObject2 = await sut.GetSynchronizedAsync<MyStatefulObject>(key);
+            var actualObject2 = await sut.GetSingleAsync<MyStatefulObject>(key);
 
             A.CallTo(() => services.GetService(typeof(MyStatefulObject)))
                 .MustHaveHappened(Repeated.Exactly.Once);
@@ -227,7 +229,7 @@ namespace Squidex.Infrastructure.States
 
             SetupEventStore(3);
 
-            var actualObject = await sut.GetSynchronizedAsync<MyStatefulObject>(key);
+            var actualObject = await sut.GetSingleAsync<MyStatefulObject>(key);
 
             Assert.Same(statefulObject, actualObject);
 
@@ -250,7 +252,7 @@ namespace Squidex.Infrastructure.States
 
             SetupEventStore(3);
 
-            var actualObject = await sut.GetSynchronizedAsync<MyStatefulObject>(key);
+            var actualObject = await sut.GetSingleAsync<MyStatefulObject>(key);
 
             A.CallTo(() => eventStore.AppendEventsAsync(A<Guid>.Ignored, key, 2, A<ICollection<EventData>>.That.Matches(x => x.Count == 2)))
                 .Throws(new WrongEventVersionException(1, 1));
@@ -263,7 +265,7 @@ namespace Squidex.Infrastructure.States
         {
             statefulObject.ExpectedVersion = null;
 
-            var actualObject = await sut.GetSynchronizedAsync<MyStatefulObject>(key);
+            var actualObject = await sut.GetSingleAsync<MyStatefulObject>(key);
 
             await InvalidateCacheAsync();
 
@@ -275,14 +277,14 @@ namespace Squidex.Infrastructure.States
         {
             statefulObject.ExpectedVersion = null;
 
-            A.CallTo(() => snapshotStore.ReadAsync<int>(key))
+            A.CallTo(() => snapshotStore.ReadAsync(key))
                 .ReturnsLazily(() => Task.Delay(1).ContinueWith(x => (1, 1L)));
 
             var tasks = new List<Task<MyStatefulObject>>();
 
             for (var i = 0; i < 1000; i++)
             {
-                tasks.Add(Task.Run(() => sut.GetSynchronizedAsync<MyStatefulObject>(key)));
+                tasks.Add(Task.Run(() => sut.GetSingleAsync<MyStatefulObject>(key)));
             }
 
             var retrievedStates = await Task.WhenAll(tasks);

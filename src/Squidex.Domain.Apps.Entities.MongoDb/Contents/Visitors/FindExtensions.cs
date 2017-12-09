@@ -69,6 +69,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors
             var filters = new List<FilterDefinition<MongoContentEntity>>
             {
                 Filter.Eq(x => x.SchemaId, schemaId),
+                Filter.Eq(x => x.IsLatest, true),
                 Filter.In(x => x.Status, status)
             };
 

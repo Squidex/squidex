@@ -1,16 +1,14 @@
 ﻿// ==========================================================================
-//  IAssetEventConsumer.cs
+//  UpdateContent.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using Squidex.Infrastructure.EventSourcing;
-
-namespace Squidex.Domain.Apps.Entities.Assets
+namespace Squidex.Domain.Apps.Entities.Contents.Commands
 {
-    public interface IAssetEventConsumer : IEventConsumer
+    public sealed class UpdateContent : ContentDataCommand
     {
     }
 }

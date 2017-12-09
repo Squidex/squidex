@@ -22,7 +22,7 @@ namespace Squidex.Infrastructure.Commands
             var domainObjectId = Guid.NewGuid();
             var domainObjectVersion = 123;
 
-            var sut = new MyDomainObject(domainObjectId, domainObjectVersion);
+            var sut = new MyDomainObject();
 
             Assert.Equal(domainObjectId, sut.Id);
             Assert.Equal(domainObjectVersion, sut.Version);
@@ -34,18 +34,16 @@ namespace Squidex.Infrastructure.Commands
             var event1 = new MyEvent();
             var event2 = new MyEvent();
 
-            var sut = new MyDomainObject(Guid.NewGuid(), 10);
-
-            IAggregate aggregate = sut;
+            var sut = new MyDomainObject();
 
             sut.RaiseNewEvent(event1);
             sut.RaiseNewEvent(event2);
 
             Assert.Equal(12, sut.Version);
 
-            Assert.Equal(new IEvent[] { event1, event2 }, aggregate.GetUncomittedEvents().Select(x => x.Payload).ToArray());
+            Assert.Equal(new IEvent[] { event1, event2 }, sut.GetUncomittedEvents().Select(x => x.Payload).ToArray());
 
-            aggregate.ClearUncommittedEvents();
+            sut.ClearUncommittedEvents();
 
             Assert.Equal(0, sut.GetUncomittedEvents().Count);
         }
@@ -56,58 +54,13 @@ namespace Squidex.Infrastructure.Commands
             var event1 = new MyEvent();
             var event2 = new MyEvent();
 
-            var sut = new MyDomainObject(Guid.NewGuid(), 10);
+            var sut = new MyDomainObject();
 
-            IAggregate aggregate = sut;
-
-            aggregate.ApplyEvent(new Envelope<IEvent>(event1));
-            aggregate.ApplyEvent(new Envelope<IEvent>(event2));
+            sut.RaiseEvent(new Envelope<IEvent>(event1));
+            sut.RaiseEvent(new Envelope<IEvent>(event2));
 
             Assert.Equal(12, sut.Version);
             Assert.Equal(0, sut.GetUncomittedEvents().Count);
-        }
-
-        [Fact]
-        public void Should_make_correct_equal_comparisons()
-        {
-            var id1 = Guid.NewGuid();
-            var id2 = Guid.NewGuid();
-
-            var user1a = new MyDomainObject(id1, 1);
-            var user1b = new MyDomainObject(id1, 2);
-            var user2a = new MyDomainObject(id2, 2);
-
-            Assert.True(user1a.Equals(user1b));
-            Assert.False(user1a.Equals(user2a));
-        }
-
-        [Fact]
-        public void Should_make_correct_object_equal_comparisons()
-        {
-            var id1 = Guid.NewGuid();
-            var id2 = Guid.NewGuid();
-
-            var user1a = new MyDomainObject(id1, 1);
-
-            object user1b = new MyDomainObject(id1, 2);
-            object user2a = new MyDomainObject(id2, 2);
-
-            Assert.True(user1a.Equals(user1b));
-            Assert.False(user1a.Equals(user2a));
-        }
-
-        [Fact]
-        public void Should_provide_correct_hash_codes()
-        {
-            var id1 = Guid.NewGuid();
-            var id2 = Guid.NewGuid();
-
-            var user1a = new MyDomainObject(id1, 1);
-            var user1b = new MyDomainObject(id1, 2);
-            var user2a = new MyDomainObject(id2, 2);
-
-            Assert.Equal(user1a.GetHashCode(), user1b.GetHashCode());
-            Assert.NotEqual(user1a.GetHashCode(), user2a.GetHashCode());
         }
     }
 }

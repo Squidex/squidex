@@ -67,7 +67,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             if (modelContext == null)
             {
-                var allSchemas = await appProvider.GetSchemasAsync(app.Name);
+                var allSchemas = await appProvider.GetSchemasAsync(app.Id);
 
                 modelContext = new GraphQLModel(app, allSchemas.Where(x => x.IsPublished), urlGenerator);
 

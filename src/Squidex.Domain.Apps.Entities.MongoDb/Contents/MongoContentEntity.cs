@@ -25,13 +25,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         [BsonId]
         [BsonElement]
-        [BsonRepresentation(BsonType.String)]
-        public Guid Id { get; set; }
+        public string DocumentId { get; set; }
 
         [BsonRequired]
-        [BsonElement("st")]
-        [BsonRepresentation(BsonType.String)]
-        public Status Status { get; set; }
+        [BsonElement]
+        public Guid Id { get; set; }
 
         [BsonRequired]
         [BsonElement("ct")]
@@ -74,9 +72,18 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         public List<Guid> ReferencedIdsDeleted { get; set; } = new List<Guid>();
 
         [BsonRequired]
+        [BsonElement("lt")]
+        public bool IsLatest { get; set; }
+
+        [BsonRequired]
+        [BsonElement("st")]
+        [BsonRepresentation(BsonType.String)]
+        public Status Status { get; set; }
+
+        [BsonRequired]
         [BsonElement("do")]
         [BsonJson]
-        public IdContentData IdData { get; set; }
+        public IdContentData DataByIds { get; set; }
 
         NamedContentData IContentEntity.Data
         {
@@ -85,7 +92,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         public void ParseData(Schema schema)
         {
-            data = IdData.ToData(schema, ReferencedIdsDeleted);
+            data = DataByIds.ToData(schema, ReferencedIdsDeleted);
         }
     }
 }

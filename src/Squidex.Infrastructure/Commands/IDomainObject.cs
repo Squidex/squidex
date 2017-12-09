@@ -14,7 +14,7 @@ namespace Squidex.Infrastructure.Commands
 {
     public interface IDomainObject : IStatefulObject
     {
-        int Version { get; }
+        long Version { get; }
 
         Task WriteAsync(ISemanticLog log);
     }
