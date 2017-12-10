@@ -8,9 +8,11 @@
 
 using System;
 using System.Threading.Tasks;
+using FakeItEasy;
 using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.States;
 
 #pragma warning disable IDE0019 // Use pattern matching
 
@@ -74,6 +76,8 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
 
         protected Guid SchemaId { get; } = Guid.NewGuid();
 
+        protected abstract Guid Id { get; }
+
         protected string AppName { get; } = "my-app";
 
         protected string SchemaName { get; } = "my-schema";
@@ -102,6 +106,7 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
         {
             handler.Init(domainObject);
 
+            await domainObject.ActivateAsync(Id.ToString(), A.Fake<IStore>());
             await action(domainObject);
 
             if (!handler.IsCreated && shouldCreate)
@@ -114,6 +119,7 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
         {
             handler.Init(domainObject);
 
+            await domainObject.ActivateAsync(Id.ToString(), A.Fake<IStore>());
             await action(domainObject);
 
             if (!handler.IsUpdated && shouldUpdate)

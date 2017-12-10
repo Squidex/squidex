@@ -31,7 +31,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.State
         public Guid AppId { get; set; }
 
         [JsonProperty]
-        public int TotalFields { get; set; } = 1;
+        public int TotalFields { get; set; } = 0;
 
         [JsonProperty]
         public bool IsDeleted { get; set; }
@@ -62,6 +62,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.State
 
         protected void On(SchemaCreated @event, FieldRegistry registry)
         {
+            Name = @event.Name;
+
             var schema = new Schema(@event.Name);
 
             if (@event.Properties != null)
@@ -73,6 +75,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.State
             {
                 foreach (var eventField in @event.Fields)
                 {
+                    TotalFields++;
+
                     var partitioning =
                         string.Equals(eventField.Partitioning, Partitioning.Language.Key, StringComparison.OrdinalIgnoreCase) ?
                             Partitioning.Language :
@@ -96,8 +100,6 @@ namespace Squidex.Domain.Apps.Entities.Schemas.State
                     }
 
                     schema = schema.AddField(field);
-
-                    TotalFields++;
                 }
             }
 
@@ -184,11 +186,11 @@ namespace Squidex.Domain.Apps.Entities.Schemas.State
             SimpleMapper.Map(@event, this);
         }
 
-        public SchemaState Apply(Envelope<IEvent> @event)
+        public SchemaState Apply(Envelope<IEvent> @event, FieldRegistry registry)
         {
             var payload = (SquidexEvent)@event.Payload;
 
-            return Clone().Update(payload, @event.Headers, r => r.DispatchAction(payload));
+            return Clone().Update(payload, @event.Headers, r => r.DispatchAction(payload, registry));
         }
     }
 }

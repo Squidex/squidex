@@ -39,6 +39,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
         private readonly ContentDomainObject content = new ContentDomainObject();
         private readonly ContentCommandMiddleware sut;
 
+        protected override Guid Id
+        {
+            get { return contentId; }
+        }
+
         private readonly NamedContentData invalidData =
             new NamedContentData()
                 .AddField("my-field1", new ContentFieldData()
@@ -238,7 +243,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         private void CreateContent()
         {
-            content.Create(new CreateContent { Data = data });
+            content.Create(CreateCommand(new CreateContent { Data = data }));
         }
     }
 }

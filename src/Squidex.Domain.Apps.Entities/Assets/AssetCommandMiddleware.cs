@@ -50,10 +50,10 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                     await assetStore.UploadTemporaryAsync(context.ContextId.ToString(), command.File.OpenRead());
 
-                    context.Complete(EntityCreatedResult.Create(a.State.Id, a.Version));
+                    context.Complete(EntityCreatedResult.Create(command.AssetId, a.Version));
                 });
 
-                await assetStore.CopyTemporaryAsync(context.ContextId.ToString(), asset.State.Id.ToString(), asset.State.FileVersion, null);
+                await assetStore.CopyTemporaryAsync(context.ContextId.ToString(), command.AssetId.ToString(), asset.State.FileVersion, null);
             }
             finally
             {
@@ -78,7 +78,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                     context.Complete(new AssetSavedResult(a.Version, a.State.FileVersion));
                 });
 
-                await assetStore.CopyTemporaryAsync(context.ContextId.ToString(), asset.State.Id.ToString(), asset.State.FileVersion, null);
+                await assetStore.CopyTemporaryAsync(context.ContextId.ToString(), command.AssetId.ToString(), asset.State.FileVersion, null);
             }
             finally
             {

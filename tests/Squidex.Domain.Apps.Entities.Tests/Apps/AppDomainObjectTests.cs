@@ -26,6 +26,11 @@ namespace Squidex.Domain.Apps.Entities.Apps
         private readonly string planId = "premium";
         private readonly AppDomainObject sut = new AppDomainObject();
 
+        protected override Guid Id
+        {
+            get { return AppId; }
+        }
+
         [Fact]
         public void Create_should_throw_exception_if_created()
         {

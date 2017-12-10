@@ -32,6 +32,11 @@ namespace Squidex.Domain.Apps.Entities.Apps
         private readonly string clientName = "client";
         private readonly AppCommandMiddleware sut;
 
+        protected override Guid Id
+        {
+            get { return AppId; }
+        }
+
         public AppCommandMiddlewareTests()
         {
             A.CallTo(() => appProvider.GetAppAsync(AppName))

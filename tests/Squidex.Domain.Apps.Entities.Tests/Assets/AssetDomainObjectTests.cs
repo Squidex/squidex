@@ -24,6 +24,11 @@ namespace Squidex.Domain.Apps.Entities.Assets
         private readonly AssetFile file = new AssetFile("my-image.png", "image/png", 1024, () => new MemoryStream());
         private readonly AssetDomainObject sut = new AssetDomainObject();
 
+        protected override Guid Id
+        {
+            get { return assetId; }
+        }
+
         [Fact]
         public void Create_should_throw_exception_if_created()
         {

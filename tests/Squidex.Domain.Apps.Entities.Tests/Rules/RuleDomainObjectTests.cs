@@ -26,10 +26,15 @@ namespace Squidex.Domain.Apps.Entities.Rules
         private readonly RuleAction ruleAction = new WebhookAction { Url = new Uri("https://squidex.io") };
         private readonly RuleDomainObject sut = new RuleDomainObject();
 
+        protected override Guid Id
+        {
+            get { return ruleId; }
+        }
+
         [Fact]
         public void Create_should_throw_exception_if_created()
         {
-            sut.Create(new CreateRule { Trigger = ruleTrigger, Action = ruleAction });
+            sut.Create(CreateRuleCommand(new CreateRule { Trigger = ruleTrigger, Action = ruleAction }));
 
             Assert.Throws<DomainException>(() =>
             {
@@ -43,6 +48,8 @@ namespace Squidex.Domain.Apps.Entities.Rules
             var command = new CreateRule { Trigger = ruleTrigger, Action = ruleAction };
 
             sut.Create(CreateRuleCommand(command));
+
+            Assert.Equal(AppId, sut.State.AppId);
 
             Assert.Same(ruleTrigger, sut.State.RuleDef.Trigger);
             Assert.Same(ruleAction, sut.State.RuleDef.Action);

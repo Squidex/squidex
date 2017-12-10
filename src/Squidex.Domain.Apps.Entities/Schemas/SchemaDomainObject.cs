@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         {
             VerifyNotCreated();
 
-            var @event = SimpleMapper.Map(command, new SchemaCreated { SchemaId = new NamedId<Guid>(State.Id, command.Name) });
+            var @event = SimpleMapper.Map(command, new SchemaCreated { SchemaId = new NamedId<Guid>(command.SchemaId, command.Name) });
 
             if (command.Fields != null)
             {
@@ -209,7 +209,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
         protected override void OnRaised(Envelope<IEvent> @event)
         {
-            UpdateState(State.Apply(@event));
+            UpdateState(State.Apply(@event, registry));
         }
     }
 }

@@ -32,10 +32,15 @@ namespace Squidex.Domain.Apps.Entities.Contents
         private readonly Guid contentId = Guid.NewGuid();
         private readonly ContentDomainObject sut = new ContentDomainObject();
 
+        protected override Guid Id
+        {
+            get { return contentId; }
+        }
+
         [Fact]
         public void Create_should_throw_exception_if_created()
         {
-            sut.Create(new CreateContent { Data = data });
+            sut.Create(CreateCommand(new CreateContent { Data = data }));
 
             Assert.Throws<DomainException>(() =>
             {

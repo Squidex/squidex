@@ -16,7 +16,7 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Dispatching;
 
-namespace Squidex.Domain.Apps.Entities.State.SchemaDefs
+namespace Squidex.Domain.Apps.Entities.Schemas
 {
     public class SchemaCommandMiddleware : ICommandMiddleware
     {
@@ -41,7 +41,7 @@ namespace Squidex.Domain.Apps.Entities.State.SchemaDefs
 
                 s.Create(command);
 
-                context.Complete(EntityCreatedResult.Create(s.State.Id, s.Version));
+                context.Complete(EntityCreatedResult.Create(command.SchemaId, s.Version));
             });
         }
 

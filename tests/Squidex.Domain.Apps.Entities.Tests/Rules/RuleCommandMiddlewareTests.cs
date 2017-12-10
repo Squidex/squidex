@@ -29,6 +29,11 @@ namespace Squidex.Domain.Apps.Entities.Rules
         private readonly Guid ruleId = Guid.NewGuid();
         private readonly RuleCommandMiddleware sut;
 
+        protected override Guid Id
+        {
+            get { return ruleId; }
+        }
+
         public RuleCommandMiddlewareTests()
         {
             A.CallTo(() => appProvider.GetSchemaAsync(A<Guid>.Ignored, A<Guid>.Ignored, false))
@@ -103,12 +108,12 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
         private void DisableRule()
         {
-            rule.Disable(new DisableRule());
+            rule.Disable(CreateCommand(new DisableRule()));
         }
 
         private void CreateRule()
         {
-            rule.Create(new CreateRule { Trigger = ruleTrigger, Action = ruleAction });
+            rule.Create(CreateCommand(new CreateRule { Trigger = ruleTrigger, Action = ruleAction }));
         }
     }
 }

@@ -50,6 +50,11 @@ namespace Squidex.Domain.Apps.Entities.Rules.State
             RuleDef = RuleDef.Disable();
         }
 
+        protected void On(RuleDeleted @event)
+        {
+            IsDeleted = true;
+        }
+
         public RuleState Apply(Envelope<IEvent> @event)
         {
             var payload = (SquidexEvent)@event.Payload;

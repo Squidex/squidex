@@ -391,7 +391,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                   }}
                 }}";
 
-            A.CallTo(() => contentQuery.FindContentAsync(app, schema.Id.ToString(), user, contentId, -1))
+            A.CallTo(() => contentQuery.FindContentAsync(app, schema.Id.ToString(), user, contentId, EtagVersion.Any))
                 .Returns((schema, content));
 
             var result = await sut.QueryAsync(app, user, new GraphQLQuery { Query = query });

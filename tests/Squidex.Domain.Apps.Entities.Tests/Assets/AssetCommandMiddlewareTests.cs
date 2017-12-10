@@ -30,6 +30,11 @@ namespace Squidex.Domain.Apps.Entities.Assets
         private readonly AssetFile file;
         private readonly AssetCommandMiddleware sut;
 
+        protected override Guid Id
+        {
+            get { return assetId; }
+        }
+
         public AssetCommandMiddlewareTests()
         {
             file = new AssetFile("my-image.png", "image/png", 1024, () => stream);
@@ -124,14 +129,18 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         private void AssertAssetImageChecked()
         {
-            A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(stream)).MustHaveHappened();
+            A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(stream))
+                .MustHaveHappened();
         }
 
         private void AssertAssetHasBeenUploaded(long version, Guid commitId)
         {
-            A.CallTo(() => assetStore.UploadTemporaryAsync(commitId.ToString(), stream)).MustHaveHappened();
-            A.CallTo(() => assetStore.CopyTemporaryAsync(commitId.ToString(), assetId.ToString(), version, null)).MustHaveHappened();
-            A.CallTo(() => assetStore.DeleteTemporaryAsync(commitId.ToString())).MustHaveHappened();
+            A.CallTo(() => assetStore.UploadTemporaryAsync(commitId.ToString(), stream))
+                .MustHaveHappened();
+            A.CallTo(() => assetStore.CopyTemporaryAsync(commitId.ToString(), assetId.ToString(), version, null))
+                .MustHaveHappened();
+            A.CallTo(() => assetStore.DeleteTemporaryAsync(commitId.ToString()))
+                .MustHaveHappened();
         }
     }
 }

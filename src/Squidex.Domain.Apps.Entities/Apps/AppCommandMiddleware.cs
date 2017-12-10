@@ -54,7 +54,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
                 a.Create(command);
 
-                context.Complete(EntityCreatedResult.Create(a.State.Id, a.Version));
+                context.Complete(EntityCreatedResult.Create(command.AppId, a.Version));
             });
         }
 
@@ -150,7 +150,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 }
                 else
                 {
-                    var result = await appPlansBillingManager.ChangePlanAsync(command.Actor.Identifier, a.State.Id, a.State.Name, command.PlanId);
+                    var result = await appPlansBillingManager.ChangePlanAsync(command.Actor.Identifier, command.AppId.Id, a.State.Name, command.PlanId);
 
                     if (result is PlanChangedResult)
                     {
