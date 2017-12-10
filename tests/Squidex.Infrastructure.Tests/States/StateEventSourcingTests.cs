@@ -22,10 +22,10 @@ namespace Squidex.Infrastructure.States
 {
     public class StateEventSourcingTests
     {
-        private class MyStatefulObject : IStatefulObject
+        private class MyStatefulObject : IStatefulObject<string>
         {
             private readonly List<IEvent> appliedEvents = new List<IEvent>();
-            private IPersistence<object> persistence;
+            private IPersistence persistence;
 
             public long ExpectedVersion { get; set; }
 
@@ -34,9 +34,9 @@ namespace Squidex.Infrastructure.States
                 get { return appliedEvents; }
             }
 
-            public Task ActivateAsync(string key, IStore store)
+            public Task ActivateAsync(string key, IStore<string> store)
             {
-                persistence = store.WithEventSourcing<MyStatefulObject>(key, e => appliedEvents.Add(e.Payload));
+                persistence = store.WithEventSourcing(key, e => appliedEvents.Add(e.Payload));
 
                 return persistence.ReadAsync(ExpectedVersion);
             }
@@ -47,15 +47,15 @@ namespace Squidex.Infrastructure.States
             }
         }
 
-        private class MyStatefulObjectWithSnapshot : IStatefulObject
+        private class MyStatefulObjectWithSnapshot : IStatefulObject<string>
         {
             private IPersistence<object> persistence;
 
             public long ExpectedVersion { get; set; }
 
-            public Task ActivateAsync(string key, IStore store)
+            public Task ActivateAsync(string key, IStore<string> store)
             {
-                persistence = store.WithSnapshotsAndEventSourcing<MyStatefulObject, object>(key, s => TaskHelper.Done, s => TaskHelper.Done);
+                persistence = store.WithSnapshotsAndEventSourcing<object>(key, s => TaskHelper.Done, s => TaskHelper.Done);
 
                 return persistence.ReadAsync(ExpectedVersion);
             }
@@ -69,7 +69,7 @@ namespace Squidex.Infrastructure.States
         private readonly IMemoryCache cache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
         private readonly IPubSub pubSub = new InMemoryPubSub(true);
         private readonly IServiceProvider services = A.Fake<IServiceProvider>();
-        private readonly ISnapshotStore<object> snapshotStore = A.Fake<ISnapshotStore<object>>();
+        private readonly ISnapshotStore<object, string> snapshotStore = A.Fake<ISnapshotStore<object, string>>();
         private readonly IStreamNameResolver streamNameResolver = A.Fake<IStreamNameResolver>();
         private readonly StateFactory sut;
 
@@ -79,7 +79,7 @@ namespace Squidex.Infrastructure.States
                 .Returns(statefulObject);
             A.CallTo(() => services.GetService(typeof(MyStatefulObjectWithSnapshot)))
                 .Returns(statefulObjectWithSnapShot);
-            A.CallTo(() => services.GetService(typeof(ISnapshotStore<object>)))
+            A.CallTo(() => services.GetService(typeof(ISnapshotStore<object, string>)))
                 .Returns(snapshotStore);
 
             A.CallTo(() => streamNameResolver.GetStreamName(typeof(MyStatefulObject), key))

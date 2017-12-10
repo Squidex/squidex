@@ -106,7 +106,7 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
         {
             handler.Init(domainObject);
 
-            await domainObject.ActivateAsync(Id.ToString(), A.Fake<IStore>());
+            await domainObject.ActivateAsync(Id, A.Fake<IStore<Guid>>());
             await action(domainObject);
 
             if (!handler.IsCreated && shouldCreate)
@@ -119,7 +119,7 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
         {
             handler.Init(domainObject);
 
-            await domainObject.ActivateAsync(Id.ToString(), A.Fake<IStore>());
+            await domainObject.ActivateAsync(Id, A.Fake<IStore<Guid>>());
             await action(domainObject);
 
             if (!handler.IsUpdated && shouldUpdate)

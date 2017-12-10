@@ -21,7 +21,7 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 {
-    public sealed class MongoAssetRepository : MongoRepositoryBase<MongoAssetEntity>, IAssetRepository, ISnapshotStore<AssetState>
+    public sealed class MongoAssetRepository : MongoRepositoryBase<MongoAssetEntity>, IAssetRepository, ISnapshotStore<AssetState, Guid>
     {
         public MongoAssetRepository(IMongoDatabase database)
             : base(database)
@@ -43,7 +43,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                     .Descending(x => x.State.LastModified));
         }
 
-        public async Task<(AssetState Value, long Version)> ReadAsync(string key)
+        public async Task<(AssetState Value, long Version)> ReadAsync(Guid key)
         {
             var existing =
                 await Collection.Find(x => x.Id == key)
@@ -81,7 +81,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 
         public async Task<IAssetEntity> FindAssetAsync(Guid id)
         {
-            var (state, etag) = await ReadAsync(id.ToString());
+            var (state, etag) = await ReadAsync(id);
 
             return state;
         }
@@ -95,7 +95,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 
             if (ids != null && ids.Count > 0)
             {
-                filters.Add(Filter.In(x => x.Id, ids.Select(x => x.ToString())));
+                filters.Add(Filter.In(x => x.Id, ids));
             }
 
             if (mimeTypes != null && mimeTypes.Count > 0)
@@ -113,7 +113,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             return filter;
         }
 
-        public async Task WriteAsync(string key, AssetState value, long oldVersion, long newVersion)
+        public async Task WriteAsync(Guid key, AssetState value, long oldVersion, long newVersion)
         {
             try
             {

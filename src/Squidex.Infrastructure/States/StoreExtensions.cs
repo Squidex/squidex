@@ -14,39 +14,19 @@ namespace Squidex.Infrastructure.States
 {
     public static class StoreExtensions
     {
-        public static IPersistence<object> WithEventSourcing<TOwner>(this IStore store, string key, Action<Envelope<IEvent>> applyEvent)
+        public static IPersistence WithEventSourcing<TKey>(this IStore<TKey> store, TKey key, Action<Envelope<IEvent>> applyEvent)
         {
-            return store.WithEventSourcing<TOwner>(key, x =>
-            {
-                applyEvent(x);
-
-                return TaskHelper.Done;
-            });
+            return store.WithEventSourcing(key, applyEvent.ToAsync());
         }
 
-        public static IPersistence<TState> WithSnapshots<TOwner, TState>(this IStore store, string key, Action<TState> applySnapshot)
+        public static IPersistence<TState> WithSnapshots<TState, TKey>(this IStore<TKey> store, TKey key, Action<TState> applySnapshot)
         {
-            return store.WithSnapshots<TOwner, TState>(key, x =>
-            {
-                applySnapshot(x);
-
-                return TaskHelper.Done;
-            });
+            return store.WithSnapshots(key, applySnapshot.ToAsync());
         }
 
-        public static IPersistence<TState> WithSnapshotsAndEventSourcing<TOwner, TState>(this IStore store, string key, Action<TState> applySnapshot, Action<Envelope<IEvent>> applyEvent)
+        public static IPersistence<TState> WithSnapshotsAndEventSourcing<TState, TKey>(this IStore<TKey> store, TKey key, Action<TState> applySnapshot, Action<Envelope<IEvent>> applyEvent)
         {
-            return store.WithSnapshotsAndEventSourcing<TOwner, TState>(key, x =>
-            {
-                applySnapshot(x);
-
-                return TaskHelper.Done;
-            }, x =>
-            {
-                applyEvent(x);
-
-                return TaskHelper.Done;
-            });
+            return store.WithSnapshotsAndEventSourcing(key, applySnapshot.ToAsync(), applyEvent.ToAsync());
         }
     }
 }

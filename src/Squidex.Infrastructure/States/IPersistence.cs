@@ -12,6 +12,10 @@ using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Infrastructure.States
 {
+    public interface IPersistence : IPersistence<object>
+    {
+    }
+
     public interface IPersistence<TState>
     {
         long Version { get; }

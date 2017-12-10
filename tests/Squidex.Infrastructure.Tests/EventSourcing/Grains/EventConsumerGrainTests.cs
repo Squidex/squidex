@@ -38,7 +38,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         private readonly IEventSubscription eventSubscription = A.Fake<IEventSubscription>();
         private readonly IPersistence<EventConsumerState> persistence = A.Fake<IPersistence<EventConsumerState>>();
         private readonly ISemanticLog log = A.Fake<ISemanticLog>();
-        private readonly IStore store = A.Fake<IStore>();
+        private readonly IStore<string> store = A.Fake<IStore<string>>();
         private readonly IEventDataFormatter formatter = A.Fake<IEventDataFormatter>();
         private readonly EventData eventData = new EventData();
         private readonly Envelope<IEvent> envelope = new Envelope<IEvent>(new MyEvent());
@@ -54,7 +54,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
             consumerName = eventConsumer.GetType().Name;
 
-            A.CallTo(() => store.WithSnapshots<EventConsumerGrain, EventConsumerState>(consumerName, A<Func<EventConsumerState, Task>>.Ignored))
+            A.CallTo(() => store.WithSnapshots(consumerName, A<Func<EventConsumerState, Task>>.Ignored))
                 .Invokes(new Action<string, Func<EventConsumerState, Task>>((key, a) => apply = a))
                 .Returns(persistence);
 

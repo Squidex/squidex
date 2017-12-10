@@ -17,7 +17,7 @@ using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Entities.Contents
 {
-    public class ContentDomainObject : DomainObjectBase<ContentDomainObject, ContentState>
+    public class ContentDomainObject : DomainObjectBase<ContentState>
     {
         public ContentDomainObject Create(CreateContent command)
         {

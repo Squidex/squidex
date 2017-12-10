@@ -10,7 +10,7 @@ using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Infrastructure.TestHelpers
 {
-    internal sealed class MyDomainObject : DomainObjectBase<MyDomainObject, MyDomainState>
+    internal sealed class MyDomainObject : DomainObjectBase<MyDomainState>
     {
     }
 }

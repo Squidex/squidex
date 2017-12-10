@@ -19,7 +19,7 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Schemas
 {
-    public sealed class MongoSchemaRepository : MongoRepositoryBase<MongoSchemaEntity>, ISchemaRepository, ISnapshotStore<SchemaState>
+    public sealed class MongoSchemaRepository : MongoRepositoryBase<MongoSchemaEntity>, ISchemaRepository, ISnapshotStore<SchemaState, Guid>
     {
         public MongoSchemaRepository(IMongoDatabase database)
             : base(database)
@@ -37,7 +37,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Schemas
             await collection.Indexes.CreateOneAsync(Index.Ascending(x => x.Name));
         }
 
-        public async Task<(SchemaState Value, long Version)> ReadAsync(string key)
+        public async Task<(SchemaState Value, long Version)> ReadAsync(Guid key)
         {
             var existing =
                 await Collection.Find(x => x.Id == key)
@@ -69,7 +69,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Schemas
             return schemaEntities.Select(x => Guid.Parse(x["_id"].AsString)).ToList();
         }
 
-        public async Task WriteAsync(string key, SchemaState value, long oldVersion, long newVersion)
+        public async Task WriteAsync(Guid key, SchemaState value, long oldVersion, long newVersion)
         {
             try
             {

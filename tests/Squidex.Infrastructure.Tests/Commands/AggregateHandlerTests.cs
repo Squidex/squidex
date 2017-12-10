@@ -23,7 +23,7 @@ namespace Squidex.Infrastructure.Commands
     {
         private readonly ISemanticLog log = A.Fake<ISemanticLog>();
         private readonly IServiceProvider serviceProvider = A.Fake<IServiceProvider>();
-        private readonly IStore store = A.Fake<IStore>();
+        private readonly IStore<Guid> store = A.Fake<IStore<Guid>>();
         private readonly IStateFactory stateFactory = A.Fake<IStateFactory>();
         private readonly IPersistence<MyDomainState> persistence = A.Fake<IPersistence<MyDomainState>>();
         private readonly Envelope<IEvent> event1 = new Envelope<IEvent>(new MyEvent());
@@ -40,18 +40,18 @@ namespace Squidex.Infrastructure.Commands
             command = new MyCommand { AggregateId = domainObjectId, ExpectedVersion = EtagVersion.Any };
             context = new CommandContext(command);
 
-            A.CallTo(() => store.WithSnapshots<MyDomainObject, MyDomainState>(domainObjectId.ToString(), A<Func<MyDomainState, Task>>.Ignored))
+            A.CallTo(() => store.WithSnapshots(domainObjectId, A<Func<MyDomainState, Task>>.Ignored))
                 .Returns(persistence);
 
-            A.CallTo(() => stateFactory.CreateAsync<MyDomainObject>(domainObjectId.ToString()))
+            A.CallTo(() => stateFactory.CreateAsync<MyDomainObject>(domainObjectId))
                 .Returns(Task.FromResult(domainObject));
 
-            A.CallTo(() => stateFactory.GetSingleAsync<MyDomainObject>(domainObjectId.ToString()))
+            A.CallTo(() => stateFactory.GetSingleAsync<MyDomainObject>(domainObjectId))
                 .Returns(Task.FromResult(domainObject));
 
             sut = new AggregateHandler(stateFactory, serviceProvider, log);
 
-            domainObject.ActivateAsync(domainObjectId.ToString(), store).Wait();
+            domainObject.ActivateAsync(domainObjectId, store).Wait();
         }
 
         [Fact]

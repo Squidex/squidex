@@ -27,12 +27,12 @@ namespace Squidex.Infrastructure.States
         private readonly object lockObject = new object();
         private IDisposable pubSubSubscription;
 
-        public sealed class ObjectHolder<T> where T : IStatefulObject
+        public sealed class ObjectHolder<T, TKey> where T : IStatefulObject<TKey>
         {
             private readonly Task activationTask;
             private readonly T obj;
 
-            public ObjectHolder(T obj, string key, IStore store)
+            public ObjectHolder(T obj, TKey key, IStore<TKey> store)
             {
                 this.obj = obj;
 
@@ -81,11 +81,21 @@ namespace Squidex.Infrastructure.States
             });
         }
 
-        public async Task<T> CreateAsync<T>(string key) where T : IStatefulObject
+        public Task<T> CreateAsync<T>(string key) where T : IStatefulObject<string>
+        {
+            return CreateAsync<T, string>(key);
+        }
+
+        public Task<T> CreateAsync<T>(Guid key) where T : IStatefulObject<Guid>
+        {
+            return CreateAsync<T, Guid>(key);
+        }
+
+        public async Task<T> CreateAsync<T, TKey>(TKey key) where T : IStatefulObject<TKey>
         {
             Guard.NotNull(key, nameof(key));
 
-            var stateStore = new Store(eventStore, eventDataFormatter, services, streamNameResolver);
+            var stateStore = new Store<T, TKey>(eventStore, eventDataFormatter, services, streamNameResolver);
             var state = (T)services.GetService(typeof(T));
 
             await state.ActivateAsync(key, stateStore);
@@ -93,25 +103,35 @@ namespace Squidex.Infrastructure.States
             return state;
         }
 
-        public Task<T> GetSingleAsync<T>(string key) where T : IStatefulObject
+        public Task<T> GetSingleAsync<T>(string key) where T : IStatefulObject<string>
+        {
+            return GetSingleAsync<T, string>(key);
+        }
+
+        public Task<T> GetSingleAsync<T>(Guid key) where T : IStatefulObject<Guid>
+        {
+            return GetSingleAsync<T, Guid>(key);
+        }
+
+        public Task<T> GetSingleAsync<T, TKey>(TKey key) where T : IStatefulObject<TKey>
         {
             Guard.NotNull(key, nameof(key));
 
             lock (lockObject)
             {
-                if (statesCache.TryGetValue<ObjectHolder<T>>(key, out var stateObj))
+                if (statesCache.TryGetValue<ObjectHolder<T, TKey>>(key, out var stateObj))
                 {
                     return stateObj.ActivateAsync();
                 }
 
                 var state = (T)services.GetService(typeof(T));
 
-                var stateStore = new Store(eventStore, eventDataFormatter, services, streamNameResolver, () =>
+                var stateStore = new Store<T, TKey>(eventStore, eventDataFormatter, services, streamNameResolver, () =>
                 {
-                    pubSub.Publish(new InvalidateMessage { Key = key }, false);
+                    pubSub.Publish(new InvalidateMessage { Key = key.ToString() }, false);
                 });
 
-                stateObj = new ObjectHolder<T>(state, key, stateStore);
+                stateObj = new ObjectHolder<T, TKey>(state, key, stateStore);
 
                 statesCache.CreateEntry(key)
                     .SetValue(stateObj)

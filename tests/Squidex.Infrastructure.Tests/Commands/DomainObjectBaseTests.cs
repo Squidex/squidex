@@ -21,14 +21,14 @@ namespace Squidex.Infrastructure.Commands
 {
     public class DomainObjectBaseTests
     {
-        private readonly IStore store = A.Fake<IStore>();
+        private readonly IStore<Guid> store = A.Fake<IStore<Guid>>();
         private readonly IPersistence<MyDomainState> persistence = A.Fake<IPersistence<MyDomainState>>();
         private readonly Guid id = Guid.NewGuid();
         private readonly MyDomainObject sut = new MyDomainObject();
 
         public DomainObjectBaseTests()
         {
-            A.CallTo(() => store.WithSnapshots<MyDomainObject, MyDomainState>(id.ToString(), A<Func<MyDomainState, Task>>.Ignored))
+            A.CallTo(() => store.WithSnapshots<MyDomainState>(id, A<Func<MyDomainState, Task>>.Ignored))
                 .Returns(persistence);
         }
 
@@ -58,7 +58,7 @@ namespace Squidex.Infrastructure.Commands
         [Fact]
         public async Task Should_write_state_and_events_when_saved()
         {
-            await sut.ActivateAsync(id.ToString(), store);
+            await sut.ActivateAsync(id, store);
 
             var event1 = new MyEvent();
             var event2 = new MyEvent();
@@ -84,7 +84,7 @@ namespace Squidex.Infrastructure.Commands
             A.CallTo(() => persistence.WriteEventsAsync(A<IEnumerable<Envelope<IEvent>>>.Ignored))
                 .Throws(new InvalidOperationException());
 
-            await sut.ActivateAsync(id.ToString(), store);
+            await sut.ActivateAsync(id, store);
 
             var event1 = new MyEvent();
             var event2 = new MyEvent();

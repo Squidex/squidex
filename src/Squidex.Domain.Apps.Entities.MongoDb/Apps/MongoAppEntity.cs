@@ -6,6 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using Squidex.Domain.Apps.Entities.Apps.State;
@@ -18,7 +19,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Apps
         [BsonId]
         [BsonElement]
         [BsonRepresentation(BsonType.String)]
-        public string Id { get; set; }
+        public Guid Id { get; set; }
 
         [BsonElement]
         [BsonRequired]

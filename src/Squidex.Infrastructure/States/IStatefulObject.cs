@@ -10,8 +10,8 @@ using System.Threading.Tasks;
 
 namespace Squidex.Infrastructure.States
 {
-    public interface IStatefulObject
+    public interface IStatefulObject<TKey>
     {
-        Task ActivateAsync(string key, IStore store);
+        Task ActivateAsync(TKey key, IStore<TKey> store);
     }
 }

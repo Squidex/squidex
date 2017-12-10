@@ -19,7 +19,7 @@ using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Entities.Schemas
 {
-    public class SchemaDomainObject : DomainObjectBase<SchemaDomainObject, SchemaState>
+    public class SchemaDomainObject : DomainObjectBase<SchemaState>
     {
         private readonly FieldRegistry registry;
 

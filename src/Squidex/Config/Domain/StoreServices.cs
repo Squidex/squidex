@@ -6,6 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using IdentityServer4.Stores;
 using Microsoft.AspNetCore.DataProtection.Repositories;
 using Microsoft.AspNetCore.Identity;
@@ -64,8 +65,8 @@ namespace Squidex.Config.Domain
                         .As<IXmlRepository>()
                         .As<IExternalSystem>();
 
-                    services.AddSingletonAs(c => new MongoSnapshotStore<EventConsumerState>(mongoDatabase, c.GetRequiredService<JsonSerializer>()))
-                        .As<ISnapshotStore<EventConsumerState>>()
+                    services.AddSingletonAs(c => new MongoSnapshotStore<EventConsumerState, string>(mongoDatabase, c.GetRequiredService<JsonSerializer>()))
+                        .As<ISnapshotStore<EventConsumerState, string>>()
                         .As<IExternalSystem>();
 
                     services.AddSingletonAs(c => new MongoUserStore(mongoDatabase))
@@ -93,27 +94,27 @@ namespace Squidex.Config.Domain
 
                     services.AddSingletonAs(c => new MongoAppRepository(mongoDatabase))
                         .As<IAppRepository>()
-                        .As<ISnapshotStore<AppState>>()
+                        .As<ISnapshotStore<AppState, Guid>>()
                         .As<IExternalSystem>();
 
                     services.AddSingletonAs(c => new MongoAssetRepository(mongoDatabase))
                         .As<IAssetRepository>()
-                        .As<ISnapshotStore<AssetState>>()
+                        .As<ISnapshotStore<AssetState, Guid>>()
                         .As<IExternalSystem>();
 
                     services.AddSingletonAs(c => new MongoRuleRepository(mongoContentDatabase))
                         .As<IRuleRepository>()
-                        .As<ISnapshotStore<RuleState>>()
+                        .As<ISnapshotStore<RuleState, Guid>>()
                         .As<IExternalSystem>();
 
                     services.AddSingletonAs(c => new MongoSchemaRepository(mongoDatabase))
                         .As<ISchemaRepository>()
-                        .As<ISnapshotStore<SchemaState>>()
+                        .As<ISnapshotStore<SchemaState, Guid>>()
                         .As<IExternalSystem>();
 
                     services.AddSingletonAs(c => new MongoContentRepository(mongoContentDatabase, c.GetService<IAppProvider>()))
                         .As<IContentRepository>()
-                        .As<ISnapshotStore<ContentState>>()
+                        .As<ISnapshotStore<ContentState, Guid>>()
                         .As<IEventConsumer>()
                         .As<IExternalSystem>();
 

@@ -12,12 +12,12 @@ using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Infrastructure.States
 {
-    public interface IStore
+    public interface IStore<TKey>
     {
-        IPersistence<object> WithEventSourcing<TOwner>(string key, Func<Envelope<IEvent>, Task> applyEvent);
+        IPersistence WithEventSourcing(TKey key, Func<Envelope<IEvent>, Task> applyEvent);
 
-        IPersistence<TState> WithSnapshots<TOwner, TState>(string key, Func<TState, Task> applySnapshot);
+        IPersistence<T> WithSnapshots<T>(TKey key, Func<T, Task> applySnapshot);
 
-        IPersistence<TState> WithSnapshotsAndEventSourcing<TOwner, TState>(string key, Func<TState, Task> applySnapshot, Func<Envelope<IEvent>, Task> applyEvent);
+        IPersistence<T> WithSnapshotsAndEventSourcing<T>(TKey key, Func<T, Task> applySnapshot, Func<Envelope<IEvent>, Task> applyEvent);
     }
 }

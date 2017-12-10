@@ -15,26 +15,26 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Infrastructure.Commands
 {
-    public abstract class DomainObjectBase<TBase, TState> : IDomainObject where TState : IDomainState, new()
+    public abstract class DomainObjectBase<T> : IDomainObject where T : IDomainState, new()
     {
         private readonly List<Envelope<IEvent>> uncomittedEvents = new List<Envelope<IEvent>>();
         private Guid id;
-        private TState state;
-        private IPersistence<TState> persistence;
+        private T state;
+        private IPersistence<T> persistence;
 
         public long Version
         {
             get { return state.Version; }
         }
 
-        public TState State
+        public T State
         {
             get { return state; }
         }
 
         protected DomainObjectBase()
         {
-            state = new TState();
+            state = new T();
             state.Version = EtagVersion.Empty;
         }
 
@@ -48,11 +48,11 @@ namespace Squidex.Infrastructure.Commands
             uncomittedEvents.Clear();
         }
 
-        public Task ActivateAsync(string key, IStore store)
+        public Task ActivateAsync(Guid key, IStore<Guid> store)
         {
-            id = Guid.Parse(key);
+            id = key;
 
-            persistence = store.WithSnapshots<TBase, TState>(key, s => state = s);
+            persistence = store.WithSnapshots<T, Guid>(key, s => state = s);
 
             return persistence.ReadAsync();
         }
@@ -73,7 +73,7 @@ namespace Squidex.Infrastructure.Commands
             uncomittedEvents.Add(@event.To<IEvent>());
         }
 
-        public void UpdateState(TState newState)
+        public void UpdateState(T newState)
         {
             state = newState;
         }

@@ -15,7 +15,7 @@ using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.EventSourcing.Grains
 {
-    public class EventConsumerGrain : DisposableObjectBase, IStatefulObject, IEventSubscriber
+    public class EventConsumerGrain : DisposableObjectBase, IStatefulObject<string>, IEventSubscriber
     {
         private readonly IEventDataFormatter eventDataFormatter;
         private readonly IEventStore eventStore;
@@ -49,9 +49,9 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             }
         }
 
-        public Task ActivateAsync(string key, IStore store)
+        public Task ActivateAsync(string key, IStore<string> store)
         {
-            persistence = store.WithSnapshots<EventConsumerGrain, EventConsumerState>(key, s => state = s);
+            persistence = store.WithSnapshots<EventConsumerState, string>(key, s => state = s);
 
             return persistence.ReadAsync();
         }

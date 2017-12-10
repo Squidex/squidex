@@ -67,7 +67,7 @@ namespace Squidex.Infrastructure.Commands
 
             var domainCommand = GetCommand(context);
             var domainObjectId = domainCommand.AggregateId;
-            var domainObject = await stateFactory.CreateAsync<T>(domainObjectId.ToString());
+            var domainObject = await stateFactory.CreateAsync<T>(domainObjectId);
 
             if (domainCommand.ExpectedVersion != EtagVersion.Any && domainCommand.ExpectedVersion != domainObject.Version)
             {
@@ -102,7 +102,7 @@ namespace Squidex.Infrastructure.Commands
 
             using (await lockPool.LockAsync(Tuple.Create(typeof(T), domainObjectId)))
             {
-                var domainObject = await stateFactory.GetSingleAsync<T>(domainObjectId.ToString());
+                var domainObject = await stateFactory.GetSingleAsync<T>(domainObjectId);
 
                 if (domainCommand.ExpectedVersion != EtagVersion.Any && domainCommand.ExpectedVersion != domainObject.Version)
                 {

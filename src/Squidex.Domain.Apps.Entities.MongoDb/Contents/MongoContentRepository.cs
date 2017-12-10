@@ -31,7 +31,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
     public partial class MongoContentRepository : MongoRepositoryBase<MongoContentEntity>,
         IEventConsumer,
         IContentRepository,
-        ISnapshotStore<ContentState>
+        ISnapshotStore<ContentState, Guid>
     {
         private readonly IAppProvider appProvider;
 
@@ -71,9 +71,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             await collection.Indexes.CreateOneAsync(Index.Text(x => x.DataText));
         }
 
-        public async Task WriteAsync(string key, ContentState value, long oldVersion, long newVersion)
+        public async Task WriteAsync(Guid key, ContentState value, long oldVersion, long newVersion)
         {
-            var documentId = $"{key}_{oldVersion}";
+            var documentId = $"{key}_{newVersion}";
 
             var schema = await appProvider.GetSchemaAsync(value.AppId, value.SchemaId);
 
@@ -119,12 +119,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
         }
 
-        public async Task<(ContentState Value, long Version)> ReadAsync(string key)
+        public async Task<(ContentState Value, long Version)> ReadAsync(Guid key)
         {
-            var id = Guid.Parse(key);
-
             var contentEntity =
-                await Collection.Find(x => x.Id == id && x.IsLatest)
+                await Collection.Find(x => x.Id == key && x.IsLatest)
                     .FirstOrDefaultAsync();
 
             if (contentEntity != null)

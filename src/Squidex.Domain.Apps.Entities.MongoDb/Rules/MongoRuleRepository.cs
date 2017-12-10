@@ -19,7 +19,7 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
 {
-    public sealed class MongoRuleRepository : MongoRepositoryBase<MongoRuleEntity>, IRuleRepository, ISnapshotStore<RuleState>
+    public sealed class MongoRuleRepository : MongoRepositoryBase<MongoRuleEntity>, IRuleRepository, ISnapshotStore<RuleState, Guid>
     {
         public MongoRuleRepository(IMongoDatabase database)
             : base(database)
@@ -37,7 +37,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
             await collection.Indexes.CreateOneAsync(Index.Ascending(x => x.IsDeleted));
         }
 
-        public async Task<(RuleState Value, long Version)> ReadAsync(string key)
+        public async Task<(RuleState Value, long Version)> ReadAsync(Guid key)
         {
             var existing =
                 await Collection.Find(x => x.Id == key)
@@ -60,7 +60,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
             return ruleEntities.Select(x => Guid.Parse(x["_id"].AsString)).ToList();
         }
 
-        public async Task WriteAsync(string key, RuleState value, long oldVersion, long newVersion)
+        public async Task WriteAsync(Guid key, RuleState value, long oldVersion, long newVersion)
         {
             try
             {

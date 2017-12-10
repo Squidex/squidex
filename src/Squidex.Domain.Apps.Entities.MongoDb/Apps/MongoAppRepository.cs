@@ -19,7 +19,7 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Apps
 {
-    public sealed class MongoAppRepository : MongoRepositoryBase<MongoAppEntity>, IAppRepository, ISnapshotStore<AppState>
+    public sealed class MongoAppRepository : MongoRepositoryBase<MongoAppEntity>, IAppRepository, ISnapshotStore<AppState, Guid>
     {
         public MongoAppRepository(IMongoDatabase database)
             : base(database)
@@ -55,16 +55,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Apps
             return appEntities.Select(x => Guid.Parse(x["_id"].AsString)).ToList();
         }
 
-        public async Task<IReadOnlyList<string>> QueryUserAppNamesAsync(string userId)
-        {
-            var appEntities =
-                await Collection.Find(x => x.UserIds.Contains(userId)).Project<MongoAppEntity>(Projection.Include(x => x.Id))
-                    .ToListAsync();
-
-            return appEntities.Select(x => x.Id).ToList();
-        }
-
-        public async Task<(AppState Value, long Version)> ReadAsync(string key)
+        public async Task<(AppState Value, long Version)> ReadAsync(Guid key)
         {
             var existing =
                 await Collection.Find(x => x.Id == key)
@@ -78,7 +69,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Apps
             return (null, EtagVersion.NotFound);
         }
 
-        public async Task WriteAsync(string key, AppState value, long oldVersion, long newVersion)
+        public async Task WriteAsync(Guid key, AppState value, long oldVersion, long newVersion)
         {
             try
             {

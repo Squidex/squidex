@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Schemas
         [BsonId]
         [BsonElement]
         [BsonRepresentation(BsonType.String)]
-        public string Id { get; set; }
+        public Guid Id { get; set; }
 
         [BsonElement]
         [BsonRequired]

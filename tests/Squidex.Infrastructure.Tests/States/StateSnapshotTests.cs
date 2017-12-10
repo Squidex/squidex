@@ -21,7 +21,7 @@ namespace Squidex.Infrastructure.States
 {
     public class StateSnapshotTests : IDisposable
     {
-        private class MyStatefulObject : IStatefulObject
+        private class MyStatefulObject : IStatefulObject<string>
         {
             private IPersistence<int> persistence;
             private int state;
@@ -38,9 +38,9 @@ namespace Squidex.Infrastructure.States
                 get { return state; }
             }
 
-            public Task ActivateAsync(string key, IStore store)
+            public Task ActivateAsync(string key, IStore<string> store)
             {
-                persistence = store.WithSnapshots<MyStatefulObject, int>(key, s => state = s);
+                persistence = store.WithSnapshots<int, string>(key, s => state = s);
 
                 return persistence.ReadAsync(ExpectedVersion);
             }
@@ -63,7 +63,7 @@ namespace Squidex.Infrastructure.States
         private readonly IMemoryCache cache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
         private readonly IPubSub pubSub = new InMemoryPubSub(true);
         private readonly IServiceProvider services = A.Fake<IServiceProvider>();
-        private readonly ISnapshotStore<int> snapshotStore = A.Fake<ISnapshotStore<int>>();
+        private readonly ISnapshotStore<int, string> snapshotStore = A.Fake<ISnapshotStore<int, string>>();
         private readonly IStreamNameResolver streamNameResolver = A.Fake<IStreamNameResolver>();
         private readonly StateFactory sut;
 
@@ -71,7 +71,7 @@ namespace Squidex.Infrastructure.States
         {
             A.CallTo(() => services.GetService(typeof(MyStatefulObject)))
                 .Returns(statefulObject);
-            A.CallTo(() => services.GetService(typeof(ISnapshotStore<int>)))
+            A.CallTo(() => services.GetService(typeof(ISnapshotStore<int, string>)))
                 .Returns(snapshotStore);
 
             sut = new StateFactory(pubSub, cache, eventStore, eventDataFormatter, services, streamNameResolver);
@@ -91,7 +91,7 @@ namespace Squidex.Infrastructure.States
             A.CallTo(() => snapshotStore.ReadAsync(key))
                 .Returns((123, 1));
 
-            var actualObject = await sut.GetSingleAsync<MyStatefulObject>(key);
+            var actualObject = await sut.GetSingleAsync<MyStatefulObject, string>(key);
 
             Assert.Same(statefulObject, actualObject);
             Assert.NotNull(cache.Get<object>(key));
@@ -107,7 +107,7 @@ namespace Squidex.Infrastructure.States
             A.CallTo(() => snapshotStore.ReadAsync(key))
                 .Returns((123, EtagVersion.NotFound));
 
-            var actualObject = await sut.GetSingleAsync<MyStatefulObject>(key);
+            var actualObject = await sut.GetSingleAsync<MyStatefulObject, string>(key);
 
             Assert.Equal(-1, statefulObject.Version);
             Assert.Equal( 0, statefulObject.State);
@@ -121,7 +121,7 @@ namespace Squidex.Infrastructure.States
             A.CallTo(() => snapshotStore.ReadAsync(key))
                 .Returns((0, EtagVersion.Empty));
 
-            await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.GetSingleAsync<MyStatefulObject>(key));
+            await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.GetSingleAsync<MyStatefulObject, string>(key));
         }
 
         [Fact]
@@ -132,7 +132,7 @@ namespace Squidex.Infrastructure.States
             A.CallTo(() => snapshotStore.ReadAsync(key))
                 .Returns((2, 2));
 
-            await Assert.ThrowsAsync<DomainObjectVersionException>(() => sut.GetSingleAsync<MyStatefulObject>(key));
+            await Assert.ThrowsAsync<DomainObjectVersionException>(() => sut.GetSingleAsync<MyStatefulObject, string>(key));
         }
 
         [Fact]
@@ -143,7 +143,7 @@ namespace Squidex.Infrastructure.States
             A.CallTo(() => snapshotStore.ReadAsync(key))
                 .Returns((0, EtagVersion.Empty));
 
-            await sut.GetSingleAsync<MyStatefulObject>(key);
+            await sut.GetSingleAsync<MyStatefulObject, string>(key);
         }
 
         [Fact]
@@ -151,7 +151,7 @@ namespace Squidex.Infrastructure.States
         {
             statefulObject.ExpectedVersion = EtagVersion.Any;
 
-            var actualObject = await sut.GetSingleAsync<MyStatefulObject>(key);
+            var actualObject = await sut.GetSingleAsync<MyStatefulObject, string>(key);
 
             Assert.Same(statefulObject, actualObject);
             Assert.NotNull(cache.Get<object>(key));
@@ -162,12 +162,12 @@ namespace Squidex.Infrastructure.States
         {
             statefulObject.ExpectedVersion = EtagVersion.Any;
 
-            var actualObject1 = await sut.GetSingleAsync<MyStatefulObject>(key);
+            var actualObject1 = await sut.GetSingleAsync<MyStatefulObject, string>(key);
 
             Assert.Same(statefulObject, actualObject1);
             Assert.NotNull(cache.Get<object>(key));
 
-            var actualObject2 = await sut.GetSingleAsync<MyStatefulObject>(key);
+            var actualObject2 = await sut.GetSingleAsync<MyStatefulObject, string>(key);
 
             A.CallTo(() => services.GetService(typeof(MyStatefulObject)))
                 .MustHaveHappened(Repeated.Exactly.Once);
@@ -178,12 +178,12 @@ namespace Squidex.Infrastructure.States
         {
             statefulObject.ExpectedVersion = EtagVersion.Any;
 
-            var actualObject1 = await sut.CreateAsync<MyStatefulObject>(key);
+            var actualObject1 = await sut.CreateAsync<MyStatefulObject, string>(key);
 
             Assert.Same(statefulObject, actualObject1);
             Assert.Null(cache.Get<object>(key));
 
-            var actualObject2 = await sut.CreateAsync<MyStatefulObject>(key);
+            var actualObject2 = await sut.CreateAsync<MyStatefulObject, string>(key);
 
             A.CallTo(() => services.GetService(typeof(MyStatefulObject)))
                 .MustHaveHappened(Repeated.Exactly.Twice);
@@ -204,7 +204,7 @@ namespace Squidex.Infrastructure.States
             A.CallTo(() => snapshotStore.ReadAsync(key))
                 .Returns((123, 13));
 
-            var actualObject = await sut.GetSingleAsync<MyStatefulObject>(key);
+            var actualObject = await sut.GetSingleAsync<MyStatefulObject, string>(key);
 
             Assert.Same(statefulObject, actualObject);
             Assert.Equal(123, statefulObject.State);
@@ -231,7 +231,7 @@ namespace Squidex.Infrastructure.States
             A.CallTo(() => snapshotStore.WriteAsync(key, 123, 13, 14))
                 .Throws(new InconsistentStateException(1, 1, new InvalidOperationException()));
 
-            var actualObject = await sut.GetSingleAsync<MyStatefulObject>(key);
+            var actualObject = await sut.GetSingleAsync<MyStatefulObject, string>(key);
 
             await Assert.ThrowsAsync<DomainObjectVersionException>(() => statefulObject.WriteStateAsync());
         }
@@ -241,7 +241,7 @@ namespace Squidex.Infrastructure.States
         {
             statefulObject.ExpectedVersion = EtagVersion.Any;
 
-            var actualObject = await sut.GetSingleAsync<MyStatefulObject>(key);
+            var actualObject = await sut.GetSingleAsync<MyStatefulObject, string>(key);
 
             await InvalidateCacheAsync();
 
@@ -260,7 +260,7 @@ namespace Squidex.Infrastructure.States
 
             for (var i = 0; i < 1000; i++)
             {
-                tasks.Add(Task.Run(() => sut.GetSingleAsync<MyStatefulObject>(key)));
+                tasks.Add(Task.Run(() => sut.GetSingleAsync<MyStatefulObject, string>(key)));
             }
 
             var retrievedStates = await Task.WhenAll(tasks);

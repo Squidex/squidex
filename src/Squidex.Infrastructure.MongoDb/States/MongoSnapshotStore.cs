@@ -13,7 +13,7 @@ using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Infrastructure.States
 {
-    public class MongoSnapshotStore<T> : MongoRepositoryBase<MongoState<T>>, ISnapshotStore<T>, IExternalSystem
+    public class MongoSnapshotStore<T, TKey> : MongoRepositoryBase<MongoState<T, TKey>>, ISnapshotStore<T, TKey>, IExternalSystem
     {
         private readonly JsonSerializer serializer;
 
@@ -30,10 +30,10 @@ namespace Squidex.Infrastructure.States
             return $"States_{typeof(T).Name}";
         }
 
-        public async Task<(T Value, long Version)> ReadAsync(string key)
+        public async Task<(T Value, long Version)> ReadAsync(TKey key)
         {
             var existing =
-                await Collection.Find(x => x.Id == key)
+                await Collection.Find(x => Equals(x.Id, key))
                     .FirstOrDefaultAsync();
 
             if (existing != null)
@@ -44,11 +44,11 @@ namespace Squidex.Infrastructure.States
             return (default(T), EtagVersion.NotFound);
         }
 
-        public async Task WriteAsync(string key, T value, long oldVersion, long newVersion)
+        public async Task WriteAsync(TKey key, T value, long oldVersion, long newVersion)
         {
             try
             {
-                await Collection.UpdateOneAsync(x => x.Id == key && x.Version == oldVersion,
+                await Collection.UpdateOneAsync(x => Equals(x.Id, key) && x.Version == oldVersion,
                     Update
                         .Set(x => x.Doc, value)
                         .Set(x => x.Version, newVersion),
@@ -59,7 +59,7 @@ namespace Squidex.Infrastructure.States
                 if (ex.WriteError.Category == ServerErrorCategory.DuplicateKey)
                 {
                     var existingVersion =
-                        await Collection.Find(x => x.Id == key).Only(x => x.Id, x => x.Version)
+                        await Collection.Find(x => Equals(x.Id, key)).Only(x => x.Id, x => x.Version)
                             .FirstOrDefaultAsync();
 
                     if (existingVersion != null)
