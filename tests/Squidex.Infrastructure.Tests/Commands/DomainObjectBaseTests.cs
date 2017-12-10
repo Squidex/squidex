@@ -22,20 +22,20 @@ namespace Squidex.Infrastructure.Commands
     public class DomainObjectBaseTests
     {
         private readonly IStore store = A.Fake<IStore>();
-        private readonly IPersistence<object> persistence = A.Fake<IPersistence<object>>();
+        private readonly IPersistence<MyDomainState> persistence = A.Fake<IPersistence<MyDomainState>>();
         private readonly Guid id = Guid.NewGuid();
         private readonly MyDomainObject sut = new MyDomainObject();
 
         public DomainObjectBaseTests()
         {
-            A.CallTo(() => store.WithSnapshots<MyDomainObject, object>(id.ToString(), A<Func<object, Task>>.Ignored))
+            A.CallTo(() => store.WithSnapshots<MyDomainObject, MyDomainState>(id.ToString(), A<Func<MyDomainState, Task>>.Ignored))
                 .Returns(persistence);
         }
 
         [Fact]
         public void Should_instantiate()
         {
-            Assert.Equal(EtagVersion.NotFound, sut.Version);
+            Assert.Equal(EtagVersion.Empty, sut.Version);
         }
 
         [Fact]
@@ -47,7 +47,7 @@ namespace Squidex.Infrastructure.Commands
             sut.RaiseEvent(event1);
             sut.RaiseEvent(event2);
 
-            Assert.Equal(EtagVersion.NotFound, sut.Version);
+            Assert.Equal(EtagVersion.Empty, sut.Version);
             Assert.Equal(new IEvent[] { event1, event2 }, sut.GetUncomittedEvents().Select(x => x.Payload).ToArray());
 
             sut.ClearUncommittedEvents();
@@ -58,21 +58,14 @@ namespace Squidex.Infrastructure.Commands
         [Fact]
         public async Task Should_write_state_and_events_when_saved()
         {
-            A.CallTo(() => persistence.Version)
-                .Returns(100);
-
             await sut.ActivateAsync(id.ToString(), store);
-
-            Assert.Equal(100, sut.Version);
 
             var event1 = new MyEvent();
             var event2 = new MyEvent();
+            var newState = new MyDomainState();
 
             sut.RaiseEvent(event1);
             sut.RaiseEvent(event2);
-
-            var newState = new MyDomainState();
-
             sut.UpdateState(newState);
 
             await sut.WriteAsync(A.Fake<ISemanticLog>());
@@ -88,24 +81,17 @@ namespace Squidex.Infrastructure.Commands
         [Fact]
         public async Task Should_ignore_exception_when_saving()
         {
-            A.CallTo(() => persistence.Version)
-                .Returns(100);
-
             A.CallTo(() => persistence.WriteEventsAsync(A<IEnumerable<Envelope<IEvent>>>.Ignored))
                 .Throws(new InvalidOperationException());
 
             await sut.ActivateAsync(id.ToString(), store);
 
-            Assert.Equal(100, sut.Version);
-
             var event1 = new MyEvent();
             var event2 = new MyEvent();
+            var newState = new MyDomainState();
 
             sut.RaiseEvent(event1);
             sut.RaiseEvent(event2);
-
-            var newState = new MyDomainState();
-
             sut.UpdateState(newState);
 
             await sut.WriteAsync(A.Fake<ISemanticLog>());

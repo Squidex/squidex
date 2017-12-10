@@ -214,7 +214,7 @@ namespace Squidex.Infrastructure
         {
             bag.Set("Key", long.MaxValue);
 
-            Assert.Throws<InvalidCastException>(() => bag["Key"].ToInt64(c));
+            Assert.Throws<InvalidCastException>(() => bag["Key"].ToInt32(c));
         }
 
         [Fact]

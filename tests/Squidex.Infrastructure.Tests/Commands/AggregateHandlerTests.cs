@@ -25,7 +25,7 @@ namespace Squidex.Infrastructure.Commands
         private readonly IServiceProvider serviceProvider = A.Fake<IServiceProvider>();
         private readonly IStore store = A.Fake<IStore>();
         private readonly IStateFactory stateFactory = A.Fake<IStateFactory>();
-        private readonly IPersistence<object> persistence = A.Fake<IPersistence<object>>();
+        private readonly IPersistence<MyDomainState> persistence = A.Fake<IPersistence<MyDomainState>>();
         private readonly Envelope<IEvent> event1 = new Envelope<IEvent>(new MyEvent());
         private readonly Envelope<IEvent> event2 = new Envelope<IEvent>(new MyEvent());
         private readonly CommandContext context;
@@ -37,10 +37,10 @@ namespace Squidex.Infrastructure.Commands
 
         public AggregateHandlerTests()
         {
-            command = new MyCommand { AggregateId = domainObjectId };
+            command = new MyCommand { AggregateId = domainObjectId, ExpectedVersion = EtagVersion.Any };
             context = new CommandContext(command);
 
-            A.CallTo(() => store.WithSnapshots<MyDomainObject, object>(domainObjectId.ToString(), A<Func<object, Task>>.Ignored))
+            A.CallTo(() => store.WithSnapshots<MyDomainObject, MyDomainState>(domainObjectId.ToString(), A<Func<MyDomainState, Task>>.Ignored))
                 .Returns(persistence);
 
             A.CallTo(() => stateFactory.CreateAsync<MyDomainObject>(domainObjectId.ToString()))
@@ -111,12 +111,14 @@ namespace Squidex.Infrastructure.Commands
             await sut.CreateSyncedAsync<MyDomainObject>(context, async x =>
             {
                 x.RaiseEvent(new MyEvent());
+                x.RaiseEvent(new MyEvent());
 
                 await Task.Yield();
 
                 passedDomainObject = x;
             });
 
+            Assert.Equal(1, domainObject.State.Version);
             Assert.Equal(domainObject, passedDomainObject);
             Assert.NotNull(context.Result<EntityCreatedResult<Guid>>());
 
@@ -132,10 +134,12 @@ namespace Squidex.Infrastructure.Commands
             await sut.CreateAsync<MyDomainObject>(context, x =>
             {
                 x.RaiseEvent(new MyEvent());
+                x.RaiseEvent(new MyEvent());
 
                 passedDomainObject = x;
             });
 
+            Assert.Equal(1, domainObject.State.Version);
             Assert.Equal(domainObject, passedDomainObject);
             Assert.NotNull(context.Result<EntityCreatedResult<Guid>>());
 
@@ -151,10 +155,12 @@ namespace Squidex.Infrastructure.Commands
             await sut.CreateSyncedAsync<MyDomainObject>(context, x =>
             {
                 x.RaiseEvent(new MyEvent());
+                x.RaiseEvent(new MyEvent());
 
                 passedDomainObject = x;
             });
 
+            Assert.Equal(1, domainObject.State.Version);
             Assert.Equal(domainObject, passedDomainObject);
             Assert.NotNull(context.Result<EntityCreatedResult<Guid>>());
 
@@ -198,12 +204,14 @@ namespace Squidex.Infrastructure.Commands
             await sut.UpdateAsync<MyDomainObject>(context, async x =>
             {
                 x.RaiseEvent(new MyEvent());
+                x.RaiseEvent(new MyEvent());
 
                 await Task.Yield();
 
                 passedDomainObject = x;
             });
 
+            Assert.Equal(1, domainObject.State.Version);
             Assert.Equal(domainObject, passedDomainObject);
             Assert.NotNull(context.Result<EntitySavedResult>());
 
@@ -219,12 +227,14 @@ namespace Squidex.Infrastructure.Commands
             await sut.UpdateSyncedAsync<MyDomainObject>(context, async x =>
             {
                 x.RaiseEvent(new MyEvent());
+                x.RaiseEvent(new MyEvent());
 
                 await Task.Yield();
 
                 passedDomainObject = x;
             });
 
+            Assert.Equal(1, domainObject.State.Version);
             Assert.Equal(domainObject, passedDomainObject);
             Assert.NotNull(context.Result<EntitySavedResult>());
 
@@ -240,10 +250,12 @@ namespace Squidex.Infrastructure.Commands
             await sut.UpdateAsync<MyDomainObject>(context, x =>
             {
                 x.RaiseEvent(new MyEvent());
+                x.RaiseEvent(new MyEvent());
 
                 passedDomainObject = x;
             });
 
+            Assert.Equal(1, domainObject.State.Version);
             Assert.Equal(domainObject, passedDomainObject);
             Assert.NotNull(context.Result<EntitySavedResult>());
 
@@ -259,10 +271,12 @@ namespace Squidex.Infrastructure.Commands
             await sut.UpdateSyncedAsync<MyDomainObject>(context, x =>
             {
                 x.RaiseEvent(new MyEvent());
+                x.RaiseEvent(new MyEvent());
 
                 passedDomainObject = x;
             });
 
+            Assert.Equal(1, domainObject.State.Version);
             Assert.Equal(domainObject, passedDomainObject);
             Assert.NotNull(context.Result<EntitySavedResult>());
 

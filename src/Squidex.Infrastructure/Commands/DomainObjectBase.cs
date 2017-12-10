@@ -84,17 +84,17 @@ namespace Squidex.Infrastructure.Commands
 
         public async Task WriteAsync(ISemanticLog log)
         {
-            var events = uncomittedEvents;
+            var events = uncomittedEvents.ToArray();
 
-            if (events.Count > 0)
+            if (events.Length > 0)
             {
-                state.Version += events.Count;
+                state.Version += events.Length;
 
                 await persistence.WriteSnapshotAsync(state);
 
                 try
                 {
-                    await persistence.WriteEventsAsync(uncomittedEvents.ToArray());
+                    await persistence.WriteEventsAsync(events);
                 }
                 catch (Exception ex)
                 {
