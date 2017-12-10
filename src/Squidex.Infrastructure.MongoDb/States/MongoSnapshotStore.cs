@@ -41,7 +41,7 @@ namespace Squidex.Infrastructure.States
                 return (existing.Doc, existing.Version);
             }
 
-            return (default(T), -1);
+            return (default(T), EtagVersion.NotFound);
         }
 
         public async Task WriteAsync(string key, T value, long oldVersion, long newVersion)

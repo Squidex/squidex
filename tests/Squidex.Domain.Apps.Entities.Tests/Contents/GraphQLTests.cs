@@ -483,7 +483,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var refContents = new List<IContentEntity> { contentRef };
 
-            A.CallTo(() => contentQuery.FindContentAsync(app, schema.Id.ToString(), user, contentId, -1))
+            A.CallTo(() => contentQuery.FindContentAsync(app, schema.Id.ToString(), user, contentId, EtagVersion.Any))
                 .Returns((schema, content));
 
             A.CallTo(() => contentQuery.QueryWithCountAsync(app, schema.Id.ToString(), user, false, A<HashSet<Guid>>.That.Matches(x => x.Contains(contentRefId))))
@@ -543,7 +543,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var refAssets = new List<IAssetEntity> { assetRef };
 
-            A.CallTo(() => contentQuery.FindContentAsync(app, schema.Id.ToString(), user, contentId, -1))
+            A.CallTo(() => contentQuery.FindContentAsync(app, schema.Id.ToString(), user, contentId, EtagVersion.Any))
                 .Returns((schema, content));
 
             A.CallTo(() => assetRepository.QueryAsync(app.Id, null, A<HashSet<Guid>>.That.Matches(x => x.Contains(assetRefId)), null, int.MaxValue, 0))
@@ -602,7 +602,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                   }}
                 }}";
 
-            A.CallTo(() => contentQuery.FindContentAsync(app, schema.Id.ToString(), user, contentId, -1))
+            A.CallTo(() => contentQuery.FindContentAsync(app, schema.Id.ToString(), user, contentId, EtagVersion.Any))
                 .Returns((schema, content));
 
             var result = await sut.QueryAsync(app, user, new GraphQLQuery { Query = query });

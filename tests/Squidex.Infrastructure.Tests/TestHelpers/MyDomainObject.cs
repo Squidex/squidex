@@ -6,11 +6,11 @@
 //  All rights reserved.
 // ==========================================================================
 
-using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Commands;
 
-namespace Squidex.Infrastructure.Commands.TestHelpers
+namespace Squidex.Infrastructure.TestHelpers
 {
-    internal sealed class MyDomainObject : DomainObjectBase<MyDomainObject, object>
+    internal sealed class MyDomainObject : DomainObjectBase<MyDomainObject, MyDomainState>
     {
     }
 }

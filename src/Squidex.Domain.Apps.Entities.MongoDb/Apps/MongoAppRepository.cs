@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Entities.Apps.Repositories;
 using Squidex.Domain.Apps.Entities.Apps.State;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.States;
 
@@ -74,15 +75,13 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Apps
                 return (existing.State, existing.Version);
             }
 
-            return (null, -1);
+            return (null, EtagVersion.NotFound);
         }
 
         public async Task WriteAsync(string key, AppState value, long oldVersion, long newVersion)
         {
             try
             {
-                value.Version = newVersion;
-
                 await Collection.UpdateOneAsync(x => x.Id == key && x.Version == oldVersion,
                     Update
                         .Set(x => x.UserIds, value.Contributors.Keys.ToArray())

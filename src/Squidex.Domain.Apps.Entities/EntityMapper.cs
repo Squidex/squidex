@@ -23,6 +23,7 @@ namespace Squidex.Domain.Apps.Entities
             SetCreatedBy(entity, @event);
             SetLastModified(entity, headers);
             SetLastModifiedBy(entity, @event);
+            SetVersion(entity, headers);
 
             updater?.Invoke(entity);
 
@@ -31,9 +32,17 @@ namespace Squidex.Domain.Apps.Entities
 
         private static void SetId(IEntity entity, EnvelopeHeaders headers)
         {
-            if (entity is IUpdateableEntity updateable)
+            if (entity is IUpdateableEntity updateable && updateable.Id == Guid.Empty)
             {
                 updateable.Id = headers.AggregateId();
+            }
+        }
+
+        private static void SetVersion(IEntity entity, EnvelopeHeaders headers)
+        {
+            if (entity is IUpdateableEntityWithVersion updateable)
+            {
+                updateable.Version = headers.EventStreamNumber();
             }
         }
 

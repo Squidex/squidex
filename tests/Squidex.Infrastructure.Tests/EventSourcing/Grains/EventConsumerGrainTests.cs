@@ -12,16 +12,13 @@ using FakeItEasy;
 using FluentAssertions;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.States;
+using Squidex.Infrastructure.TestHelpers;
 using Xunit;
 
 namespace Squidex.Infrastructure.EventSourcing.Grains
 {
     public class EventConsumerGrainTests
     {
-        public sealed class MyEvent : IEvent
-        {
-        }
-
         public sealed class MyEventConsumerGrain : EventConsumerGrain
         {
             public MyEventConsumerGrain(IEventStore eventStore, IEventDataFormatter eventDataFormatter, ISemanticLog log)
@@ -67,7 +64,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             A.CallTo(() => eventConsumer.Name)
                 .Returns(consumerName);
 
-            A.CallTo(() => persistence.ReadAsync(ExpectedVersion.Any))
+            A.CallTo(() => persistence.ReadAsync(EtagVersion.Any))
                 .Invokes(new Action<long>(s => apply(state)));
 
             A.CallTo(() => persistence.WriteSnapshotAsync(A<EventConsumerState>.Ignored))

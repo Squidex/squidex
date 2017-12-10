@@ -47,7 +47,7 @@ namespace Squidex.Domain.Apps.Entities.State.SchemaDefs
 
         protected Task On(AddField command, CommandContext context)
         {
-            return handler.handler.UpdateSyncedAsync<SchemaDomainObject>(context, s =>
+            return handler.UpdateSyncedAsync<SchemaDomainObject>(context, s =>
             {
                 GuardSchemaField.CanAdd(s.State.SchemaDef, command);
 
@@ -59,7 +59,7 @@ namespace Squidex.Domain.Apps.Entities.State.SchemaDefs
 
         protected Task On(DeleteField command, CommandContext context)
         {
-            return handler.handler.UpdateSyncedAsync<SchemaDomainObject>(context, s =>
+            return handler.UpdateSyncedAsync<SchemaDomainObject>(context, s =>
             {
                 GuardSchemaField.CanDelete(s.State.SchemaDef, command);
 
@@ -69,7 +69,7 @@ namespace Squidex.Domain.Apps.Entities.State.SchemaDefs
 
         protected Task On(LockField command, CommandContext context)
         {
-            return handler.handler.UpdateSyncedAsync<SchemaDomainObject>(context, s =>
+            return handler.UpdateSyncedAsync<SchemaDomainObject>(context, s =>
             {
                 GuardSchemaField.CanLock(s.State.SchemaDef, command);
 
@@ -79,7 +79,7 @@ namespace Squidex.Domain.Apps.Entities.State.SchemaDefs
 
         protected Task On(HideField command, CommandContext context)
         {
-            return handler.handler.UpdateSyncedAsync<SchemaDomainObject>(context, s =>
+            return handler.UpdateSyncedAsync<SchemaDomainObject>(context, s =>
             {
                 GuardSchemaField.CanHide(s.State.SchemaDef, command);
 
@@ -89,7 +89,7 @@ namespace Squidex.Domain.Apps.Entities.State.SchemaDefs
 
         protected Task On(ShowField command, CommandContext context)
         {
-            return handler.handler.UpdateSyncedAsync<SchemaDomainObject>(context, s =>
+            return handler.UpdateSyncedAsync<SchemaDomainObject>(context, s =>
             {
                 GuardSchemaField.CanShow(s.State.SchemaDef, command);
 
@@ -99,7 +99,7 @@ namespace Squidex.Domain.Apps.Entities.State.SchemaDefs
 
         protected Task On(DisableField command, CommandContext context)
         {
-            return handler.handler.UpdateSyncedAsync<SchemaDomainObject>(context, s =>
+            return handler.UpdateSyncedAsync<SchemaDomainObject>(context, s =>
             {
                 GuardSchemaField.CanDisable(s.State.SchemaDef, command);
 
@@ -109,7 +109,7 @@ namespace Squidex.Domain.Apps.Entities.State.SchemaDefs
 
         protected Task On(EnableField command, CommandContext context)
         {
-            return handler.handler.UpdateSyncedAsync<SchemaDomainObject>(context, s =>
+            return handler.UpdateSyncedAsync<SchemaDomainObject>(context, s =>
             {
                 GuardSchemaField.CanEnable(s.State.SchemaDef, command);
 
@@ -119,7 +119,7 @@ namespace Squidex.Domain.Apps.Entities.State.SchemaDefs
 
         protected Task On(UpdateField command, CommandContext context)
         {
-            return handler.handler.UpdateSyncedAsync<SchemaDomainObject>(context, s =>
+            return handler.UpdateSyncedAsync<SchemaDomainObject>(context, s =>
             {
                 GuardSchemaField.CanUpdate(s.State.SchemaDef, command);
 
@@ -129,7 +129,7 @@ namespace Squidex.Domain.Apps.Entities.State.SchemaDefs
 
         protected Task On(ReorderFields command, CommandContext context)
         {
-            return handler.handler.UpdateSyncedAsync<SchemaDomainObject>(context, s =>
+            return handler.UpdateSyncedAsync<SchemaDomainObject>(context, s =>
             {
                 GuardSchema.CanReorder(s.State.SchemaDef, command);
 
@@ -139,7 +139,7 @@ namespace Squidex.Domain.Apps.Entities.State.SchemaDefs
 
         protected Task On(UpdateSchema command, CommandContext context)
         {
-            return handler.handler.UpdateSyncedAsync<SchemaDomainObject>(context, s =>
+            return handler.UpdateSyncedAsync<SchemaDomainObject>(context, s =>
             {
                 GuardSchema.CanUpdate(s.State.SchemaDef, command);
 
@@ -149,7 +149,7 @@ namespace Squidex.Domain.Apps.Entities.State.SchemaDefs
 
         protected Task On(PublishSchema command, CommandContext context)
         {
-            return handler.handler.UpdateSyncedAsync<SchemaDomainObject>(context, s =>
+            return handler.UpdateSyncedAsync<SchemaDomainObject>(context, s =>
             {
                 GuardSchema.CanPublish(s.State.SchemaDef, command);
 
@@ -159,7 +159,7 @@ namespace Squidex.Domain.Apps.Entities.State.SchemaDefs
 
         protected Task On(UnpublishSchema command, CommandContext context)
         {
-            return handler.handler.UpdateSyncedAsync<SchemaDomainObject>(context, s =>
+            return handler.UpdateSyncedAsync<SchemaDomainObject>(context, s =>
             {
                 GuardSchema.CanUnpublish(s.State.SchemaDef, command);
 
@@ -169,7 +169,7 @@ namespace Squidex.Domain.Apps.Entities.State.SchemaDefs
 
         protected Task On(ConfigureScripts command, CommandContext context)
         {
-            return handler.handler.UpdateSyncedAsync<SchemaDomainObject>(context, s =>
+            return handler.UpdateSyncedAsync<SchemaDomainObject>(context, s =>
             {
                 GuardSchema.CanConfigureScripts(s.State.SchemaDef, command);
 
@@ -179,7 +179,7 @@ namespace Squidex.Domain.Apps.Entities.State.SchemaDefs
 
         protected Task On(DeleteSchema command, CommandContext context)
         {
-            return handler.handler.UpdateSyncedAsync<SchemaDomainObject>(context, s =>
+            return handler.UpdateSyncedAsync<SchemaDomainObject>(context, s =>
             {
                 GuardSchema.CanDelete(s.State.SchemaDef, command);
 

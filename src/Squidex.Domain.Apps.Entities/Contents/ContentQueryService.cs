@@ -61,7 +61,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             var schema = await FindSchemaAsync(app, schemaIdOrName);
 
             var content =
-                version > 0 ?
+                version > EtagVersion.Empty ?
                 await contentRepository.FindContentAsync(app, schema, id, version) :
                 await contentRepository.FindContentAsync(app, schema, id);
 

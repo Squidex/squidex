@@ -67,7 +67,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             try
             {
-                var asset = await handler.handler.UpdateSyncedAsync<AssetDomainObject>(context, async a =>
+                var asset = await handler.UpdateSyncedAsync<AssetDomainObject>(context, async a =>
                 {
                     GuardAsset.CanUpdate(command);
 
@@ -88,7 +88,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         protected Task On(RenameAsset command, CommandContext context)
         {
-            return handler.handler.UpdateSyncedAsync<AssetDomainObject>(context, a =>
+            return handler.UpdateSyncedAsync<AssetDomainObject>(context, a =>
             {
                 GuardAsset.CanRename(command, a.State.FileName);
 
@@ -98,7 +98,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         protected Task On(DeleteAsset command, CommandContext context)
         {
-            return handler.handler.UpdateSyncedAsync<AssetDomainObject>(context, a =>
+            return handler.UpdateSyncedAsync<AssetDomainObject>(context, a =>
             {
                 GuardAsset.CanDelete(command);
 

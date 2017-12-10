@@ -20,6 +20,6 @@ namespace Squidex.Infrastructure.States
 
         Task WriteSnapshotAsync(TState state);
 
-        Task ReadAsync(long expectedVersion = ExpectedVersion.Any);
+        Task ReadAsync(long expectedVersion = EtagVersion.Any);
     }
 }

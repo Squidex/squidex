@@ -1,16 +1,15 @@
 ﻿// ==========================================================================
-//  AggregateHandlerTests.cs
+//  IDomainState.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using Squidex.Infrastructure.EventSourcing;
-
-namespace Squidex.Infrastructure.Commands.TestHelpers
+namespace Squidex.Infrastructure.Commands
 {
-    internal sealed class MyEvent : IEvent
+    public interface IDomainState
     {
+        long Version { get; set; }
     }
 }

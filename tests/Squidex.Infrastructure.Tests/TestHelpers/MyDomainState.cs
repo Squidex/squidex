@@ -1,15 +1,17 @@
 ﻿// ==========================================================================
-//  ICommand.cs
+//  MyDomainState.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.Commands
+using Squidex.Infrastructure.Commands;
+
+namespace Squidex.Infrastructure.TestHelpers
 {
-    public interface ICommand
+    public class MyDomainState : IDomainState
     {
-        long ExpectedVersion { get; set; }
+        public long Version { get; set; }
     }
 }

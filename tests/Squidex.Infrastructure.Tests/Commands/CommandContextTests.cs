@@ -7,7 +7,7 @@
 // ==========================================================================
 
 using System;
-using Squidex.Infrastructure.Commands.TestHelpers;
+using Squidex.Infrastructure.TestHelpers;
 using Xunit;
 
 namespace Squidex.Infrastructure.Commands

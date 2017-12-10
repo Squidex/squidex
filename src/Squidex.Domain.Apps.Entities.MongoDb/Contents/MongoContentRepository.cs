@@ -89,8 +89,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
             try
             {
-                value.Version = newVersion;
-
                 await Collection.InsertOneAsync(document);
             }
             catch (MongoWriteException ex)
@@ -126,7 +124,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                 return (SimpleMapper.Map(existing, new ContentState()), existing.Version);
             }
 
-            return (null, -1);
+            return (null, EtagVersion.NotFound);
         }
 
         public async Task<IReadOnlyList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, Status[] status, ODataUriParser odataQuery)

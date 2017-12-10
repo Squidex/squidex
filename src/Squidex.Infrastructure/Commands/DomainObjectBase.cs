@@ -15,21 +15,27 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Infrastructure.Commands
 {
-    public abstract class DomainObjectBase<TBase, TState> : IDomainObject where TState : new()
+    public abstract class DomainObjectBase<TBase, TState> : IDomainObject where TState : IDomainState, new()
     {
         private readonly List<Envelope<IEvent>> uncomittedEvents = new List<Envelope<IEvent>>();
         private Guid id;
-        private TState state = new TState();
+        private TState state;
         private IPersistence<TState> persistence;
 
         public long Version
         {
-            get { return persistence?.Version ?? -1; }
+            get { return state.Version; }
         }
 
         public TState State
         {
             get { return state; }
+        }
+
+        protected DomainObjectBase()
+        {
+            state = new TState();
+            state.Version = EtagVersion.Empty;
         }
 
         public IReadOnlyList<Envelope<IEvent>> GetUncomittedEvents()
@@ -78,19 +84,26 @@ namespace Squidex.Infrastructure.Commands
 
         public async Task WriteAsync(ISemanticLog log)
         {
-            await persistence.WriteSnapshotAsync(state);
+            var events = uncomittedEvents;
 
-            try
+            if (events.Count > 0)
             {
-                await persistence.WriteEventsAsync(uncomittedEvents.ToArray());
-            }
-            catch (Exception ex)
-            {
-                log.LogFatal(ex, w => w.WriteProperty("action", "writeEvents"));
-            }
-            finally
-            {
-                uncomittedEvents.Clear();
+                state.Version += events.Count;
+
+                await persistence.WriteSnapshotAsync(state);
+
+                try
+                {
+                    await persistence.WriteEventsAsync(uncomittedEvents.ToArray());
+                }
+                catch (Exception ex)
+                {
+                    log.LogFatal(ex, w => w.WriteProperty("action", "writeEvents"));
+                }
+                finally
+                {
+                    uncomittedEvents.Clear();
+                }
             }
         }
     }

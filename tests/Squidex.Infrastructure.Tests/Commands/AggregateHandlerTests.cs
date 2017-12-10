@@ -10,11 +10,11 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FakeItEasy;
-using Squidex.Infrastructure.Commands.TestHelpers;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.Tasks;
+using Squidex.Infrastructure.TestHelpers;
 using Xunit;
 
 namespace Squidex.Infrastructure.Commands
@@ -29,17 +29,16 @@ namespace Squidex.Infrastructure.Commands
         private readonly Envelope<IEvent> event1 = new Envelope<IEvent>(new MyEvent());
         private readonly Envelope<IEvent> event2 = new Envelope<IEvent>(new MyEvent());
         private readonly CommandContext context;
+        private readonly CommandContext invalidContext = new CommandContext(A.Dummy<ICommand>());
         private readonly Guid domainObjectId = Guid.NewGuid();
+        private readonly MyCommand command;
         private readonly MyDomainObject domainObject = new MyDomainObject();
         private readonly AggregateHandler sut;
 
-        public sealed class MyEvent : IEvent
-        {
-        }
-
         public AggregateHandlerTests()
         {
-            context = new CommandContext(new MyCommand { AggregateId = domainObjectId });
+            command = new MyCommand { AggregateId = domainObjectId };
+            context = new CommandContext(command);
 
             A.CallTo(() => store.WithSnapshots<MyDomainObject, object>(domainObjectId.ToString(), A<Func<object, Task>>.Ignored))
                 .Returns(persistence);
@@ -58,13 +57,29 @@ namespace Squidex.Infrastructure.Commands
         [Fact]
         public Task Create_with_task_should_throw_exception_if_not_aggregate_command()
         {
-            return Assert.ThrowsAnyAsync<ArgumentException>(() => sut.CreateAsync<MyDomainObject>(new CommandContext(A.Dummy<ICommand>()), x => TaskHelper.False));
+            return Assert.ThrowsAnyAsync<ArgumentException>(() => sut.CreateAsync<MyDomainObject>(invalidContext, x => TaskHelper.False));
         }
 
         [Fact]
         public Task Create_synced_with_task_should_throw_exception_if_not_aggregate_command()
         {
-            return Assert.ThrowsAnyAsync<ArgumentException>(() => sut.CreateSyncedAsync<MyDomainObject>(new CommandContext(A.Dummy<ICommand>()), x => TaskHelper.False));
+            return Assert.ThrowsAnyAsync<ArgumentException>(() => sut.CreateSyncedAsync<MyDomainObject>(invalidContext, x => TaskHelper.False));
+        }
+
+        [Fact]
+        public Task Create_with_task_should_should_throw_exception_if_version_is_wrong()
+        {
+            command.ExpectedVersion = 2;
+
+            return Assert.ThrowsAnyAsync<DomainObjectVersionException>(() => sut.CreateAsync<MyDomainObject>(context, x => TaskHelper.False));
+        }
+
+        [Fact]
+        public Task Create_synced_with_task_should_should_throw_exception_if_version_is_wrong()
+        {
+            command.ExpectedVersion = 2;
+
+            return Assert.ThrowsAnyAsync<DomainObjectVersionException>(() => sut.CreateSyncedAsync<MyDomainObject>(context, x => TaskHelper.False));
         }
 
         [Fact]
@@ -150,13 +165,29 @@ namespace Squidex.Infrastructure.Commands
         [Fact]
         public Task Update_with_task_should_throw_exception_if_not_aggregate_command()
         {
-            return Assert.ThrowsAnyAsync<ArgumentException>(() => sut.UpdateAsync<MyDomainObject>(new CommandContext(A.Dummy<ICommand>()), x => TaskHelper.False));
+            return Assert.ThrowsAnyAsync<ArgumentException>(() => sut.UpdateAsync<MyDomainObject>(invalidContext, x => TaskHelper.False));
         }
 
         [Fact]
         public Task Update_synced_with_task_should_throw_exception_if_not_aggregate_command()
         {
-            return Assert.ThrowsAnyAsync<ArgumentException>(() => sut.UpdateSyncedAsync<MyDomainObject>(new CommandContext(A.Dummy<ICommand>()), x => TaskHelper.False));
+            return Assert.ThrowsAnyAsync<ArgumentException>(() => sut.UpdateSyncedAsync<MyDomainObject>(invalidContext, x => TaskHelper.False));
+        }
+
+        [Fact]
+        public Task Update_with_task_should_should_throw_exception_if_version_is_wrong()
+        {
+            command.ExpectedVersion = 2;
+
+            return Assert.ThrowsAnyAsync<DomainObjectVersionException>(() => sut.UpdateAsync<MyDomainObject>(context, x => TaskHelper.False));
+        }
+
+        [Fact]
+        public Task Update_synced_with_task_should_should_throw_exception_if_version_is_wrong()
+        {
+            command.ExpectedVersion = 2;
+
+            return Assert.ThrowsAnyAsync<DomainObjectVersionException>(() => sut.UpdateSyncedAsync<MyDomainObject>(context, x => TaskHelper.False));
         }
 
         [Fact]

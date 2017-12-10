@@ -1,15 +1,17 @@
 ﻿// ==========================================================================
-//  ICommand.cs
+//  AggregateHandlerTests.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.Commands
+using Squidex.Infrastructure.EventSourcing;
+
+namespace Squidex.Infrastructure.TestHelpers
 {
-    public interface ICommand
+    internal sealed class MyEvent : IEvent
     {
-        long ExpectedVersion { get; set; }
+        public string MyProperty { get; set; }
     }
 }

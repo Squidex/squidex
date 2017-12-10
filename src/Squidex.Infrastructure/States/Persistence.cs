@@ -12,6 +12,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Infrastructure.EventSourcing;
 
+#pragma warning disable RECS0012 // 'if' statement can be re-written as 'switch' statement
+
 namespace Squidex.Infrastructure.States
 {
     internal sealed class Persistence<TOwner, TState> : IPersistence<TState>
@@ -25,8 +27,8 @@ namespace Squidex.Infrastructure.States
         private readonly Action invalidate;
         private readonly Func<TState, Task> applyState;
         private readonly Func<Envelope<IEvent>, Task> applyEvent;
-        private long versionSnapshot = -1;
-        private long versionEvents = -1;
+        private long versionSnapshot = EtagVersion.Empty;
+        private long versionEvents = EtagVersion.Empty;
         private long version;
 
         public long Version
@@ -55,19 +57,19 @@ namespace Squidex.Infrastructure.States
             this.streamNameResolver = streamNameResolver;
         }
 
-        public async Task ReadAsync(long expectedVersion = ExpectedVersion.Any)
+        public async Task ReadAsync(long expectedVersion = EtagVersion.Any)
         {
-            versionSnapshot = -1;
-            versionEvents = -1;
+            versionSnapshot = EtagVersion.Empty;
+            versionEvents = EtagVersion.Empty;
 
             await ReadSnapshotAsync();
             await ReadEventsAsync();
 
             UpdateVersion();
 
-            if (expectedVersion != ExpectedVersion.Any && expectedVersion != version)
+            if (expectedVersion != EtagVersion.Any && expectedVersion != version)
             {
-                if (version == ExpectedVersion.Empty)
+                if (version == EtagVersion.Empty)
                 {
                     throw new DomainObjectNotFoundException(ownerKey, typeof(TOwner));
                 }
@@ -83,6 +85,11 @@ namespace Squidex.Infrastructure.States
             if (UseSnapshots())
             {
                 var (state, position) = await snapshotStore.ReadAsync(ownerKey);
+
+                if (position < EtagVersion.Empty)
+                {
+                    position = EtagVersion.Empty;
+                }
 
                 versionSnapshot = position;
                 versionEvents = position;
@@ -150,7 +157,7 @@ namespace Squidex.Infrastructure.States
 
             if (eventArray.Length > 0)
             {
-                var expectedVersion = UseEventSourcing() ? version : ExpectedVersion.Any;
+                var expectedVersion = UseEventSourcing() ? version : EtagVersion.Any;
 
                 var commitId = Guid.NewGuid();
 
@@ -159,7 +166,7 @@ namespace Squidex.Infrastructure.States
 
                 try
                 {
-                    await eventStore.AppendEventsAsync(commitId, GetStreamName(), Version, eventData);
+                    await eventStore.AppendEventsAsync(commitId, GetStreamName(), expectedVersion, eventData);
                 }
                 catch (WrongEventVersionException ex)
                 {

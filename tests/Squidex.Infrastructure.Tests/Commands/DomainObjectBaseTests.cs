@@ -11,10 +11,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FakeItEasy;
-using Squidex.Infrastructure.Commands.TestHelpers;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.States;
+using Squidex.Infrastructure.TestHelpers;
 using Xunit;
 
 namespace Squidex.Infrastructure.Commands
@@ -35,7 +35,7 @@ namespace Squidex.Infrastructure.Commands
         [Fact]
         public void Should_instantiate()
         {
-            Assert.Equal(-1, sut.Version);
+            Assert.Equal(EtagVersion.NotFound, sut.Version);
         }
 
         [Fact]
@@ -47,7 +47,7 @@ namespace Squidex.Infrastructure.Commands
             sut.RaiseEvent(event1);
             sut.RaiseEvent(event2);
 
-            Assert.Equal(-1, sut.Version);
+            Assert.Equal(EtagVersion.NotFound, sut.Version);
             Assert.Equal(new IEvent[] { event1, event2 }, sut.GetUncomittedEvents().Select(x => x.Payload).ToArray());
 
             sut.ClearUncommittedEvents();
@@ -71,7 +71,7 @@ namespace Squidex.Infrastructure.Commands
             sut.RaiseEvent(event1);
             sut.RaiseEvent(event2);
 
-            var newState = "STATE";
+            var newState = new MyDomainState();
 
             sut.UpdateState(newState);
 
@@ -104,7 +104,7 @@ namespace Squidex.Infrastructure.Commands
             sut.RaiseEvent(event1);
             sut.RaiseEvent(event2);
 
-            var newState = "STATE";
+            var newState = new MyDomainState();
 
             sut.UpdateState(newState);
 

@@ -10,10 +10,12 @@ using System;
 using Newtonsoft.Json;
 using NodaTime;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Domain.Apps.Entities
 {
     public abstract class DomainObjectState<T> : Cloneable<T>,
+        IDomainState,
         IEntity,
         IEntityWithCreatedBy,
         IEntityWithLastModifiedBy,

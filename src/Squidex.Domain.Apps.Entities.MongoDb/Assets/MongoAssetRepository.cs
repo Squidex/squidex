@@ -15,6 +15,7 @@ using MongoDB.Driver;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Domain.Apps.Entities.Assets.State;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.States;
 
@@ -53,7 +54,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                 return (existing.State, existing.Version);
             }
 
-            return (null, -1);
+            return (null, EtagVersion.NotFound);
         }
 
         public async Task<IReadOnlyList<IAssetEntity>> QueryAsync(Guid appId, HashSet<string> mimeTypes = null, HashSet<Guid> ids = null, string query = null, int take = 10, int skip = 0)
@@ -116,8 +117,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
         {
             try
             {
-                value.Version = newVersion;
-
                 await Collection.UpdateOneAsync(x => x.Id == key && x.Version == oldVersion,
                     Update
                         .Set(x => x.State, value)

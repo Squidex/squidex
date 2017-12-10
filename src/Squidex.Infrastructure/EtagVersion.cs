@@ -1,15 +1,19 @@
 ﻿// ==========================================================================
-//  ICommand.cs
+//  EtagVersion.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.Commands
+namespace Squidex.Infrastructure
 {
-    public interface ICommand
+    public static class EtagVersion
     {
-        long ExpectedVersion { get; set; }
+        public const long Any = -2;
+
+        public const long Empty = -1;
+
+        public const long NotFound = long.MinValue;
     }
 }

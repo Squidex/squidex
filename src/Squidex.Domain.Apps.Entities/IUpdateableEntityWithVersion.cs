@@ -1,17 +1,15 @@
 ﻿// ==========================================================================
-//  ExpectedVersion.cs
+//  IUpdateableEntityWithVersion.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.EventSourcing
+namespace Squidex.Domain.Apps.Entities
 {
-    public static class ExpectedVersion
+    public interface IUpdateableEntityWithVersion
     {
-        public const int Any = -2;
-
-        public const int Empty = -1;
+        long Version { get; set; }
     }
 }

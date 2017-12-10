@@ -129,12 +129,12 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public Task AppendEventsAsync(Guid commitId, string streamName, ICollection<EventData> events)
         {
-            return AppendEventsInternalAsync(commitId, streamName, ExpectedVersion.Any, events);
+            return AppendEventsInternalAsync(commitId, streamName, EtagVersion.Any, events);
         }
 
         public Task AppendEventsAsync(Guid commitId, string streamName, long expectedVersion, ICollection<EventData> events)
         {
-            Guard.GreaterEquals(expectedVersion, -1, nameof(expectedVersion));
+            Guard.GreaterEquals(expectedVersion, EtagVersion.Any, nameof(expectedVersion));
 
             return AppendEventsInternalAsync(commitId, streamName, expectedVersion, events);
         }
@@ -151,7 +151,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
             var currentVersion = await GetEventStreamOffset(streamName);
 
-            if (expectedVersion != ExpectedVersion.Any && expectedVersion != currentVersion)
+            if (expectedVersion != EtagVersion.Any && expectedVersion != currentVersion)
             {
                 throw new WrongEventVersionException(currentVersion, expectedVersion);
             }
@@ -174,7 +174,7 @@ namespace Squidex.Infrastructure.EventSourcing
                     {
                         currentVersion = await GetEventStreamOffset(streamName);
 
-                        if (expectedVersion != ExpectedVersion.Any)
+                        if (expectedVersion != EtagVersion.Any)
                         {
                             throw new WrongEventVersionException(currentVersion, expectedVersion);
                         }
@@ -210,7 +210,7 @@ namespace Squidex.Infrastructure.EventSourcing
                 return document[nameof(MongoEventCommit.EventStreamOffset)].ToInt64() + document[nameof(MongoEventCommit.EventsCount)].ToInt64();
             }
 
-            return -1;
+            return EtagVersion.Empty;
         }
 
         private static FilterDefinition<MongoEventCommit> CreateFilter(string streamFilter, StreamPosition streamPosition)

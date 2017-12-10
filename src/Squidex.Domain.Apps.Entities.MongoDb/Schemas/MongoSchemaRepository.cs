@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Entities.Schemas.Repositories;
 using Squidex.Domain.Apps.Entities.Schemas.State;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.States;
 
@@ -47,7 +48,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Schemas
                 return (existing.State, existing.Version);
             }
 
-            return (null, -1);
+            return (null, EtagVersion.NotFound);
         }
 
         public async Task<Guid> FindSchemaIdAsync(Guid appId, string name)
@@ -62,7 +63,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Schemas
         public async Task<IReadOnlyList<Guid>> QuerySchemaIdsAsync(Guid appId)
         {
             var schemaEntities =
-                await Collection.Find(x => x.State.AppId == appId).Only(x => x.Id)
+                await Collection.Find(x => x.AppId == appId).Only(x => x.Id)
                     .ToListAsync();
 
             return schemaEntities.Select(x => Guid.Parse(x["_id"].AsString)).ToList();
@@ -72,8 +73,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Schemas
         {
             try
             {
-                value.Version = newVersion;
-
                 await Collection.UpdateOneAsync(x => x.Id == key && x.Version == oldVersion,
                     Update
                         .Set(x => x.State, value)

@@ -15,6 +15,6 @@ namespace Squidex.Domain.Apps.Entities
     {
         public RefToken Actor { get; set; }
 
-        public long? ExpectedVersion { get; set; }
+        public long ExpectedVersion { get; set; }
     }
 }
