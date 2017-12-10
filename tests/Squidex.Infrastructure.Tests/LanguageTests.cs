@@ -97,6 +97,18 @@ namespace Squidex.Infrastructure
         }
 
         [Theory]
+        [InlineData("en-US", "en")]
+        [InlineData("en-GB", "en")]
+        [InlineData("EN-US", "en")]
+        [InlineData("EN-GB", "en")]
+        public void Should_parse_lanuages_from_culture(string input, string languageCode)
+        {
+            var language = Language.ParseOrNull(input);
+
+            Assert.Equal(language, Language.GetLanguage(languageCode));
+        }
+
+        [Theory]
         [InlineData("")]
         [InlineData(" ")]
         [InlineData("xx")]

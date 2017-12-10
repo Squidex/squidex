@@ -37,13 +37,24 @@ namespace Squidex.Infrastructure.Reflection
         {
             public int Value2 { get; set; }
 
+            public int ValueReadOnly { get; }
+
             public Cloneable Cloneable { get; set; }
+
+            public MyClass1()
+            {
+            }
+
+            public MyClass1(int readValue)
+            {
+                ValueReadOnly = readValue;
+            }
         }
 
         [Fact]
         public void Should_copy_class()
         {
-            var value = new MyClass1
+            var value = new MyClass1(100)
             {
                 Value1 = 1,
                 Value2 = 2,
@@ -54,6 +65,7 @@ namespace Squidex.Infrastructure.Reflection
 
             Assert.Equal(value.Value1, copy.Value1);
             Assert.Equal(value.Value2, copy.Value2);
+            Assert.Equal(0, copy.ValueReadOnly);
 
             Assert.Equal(value.Cloneable.Value, copy.Cloneable.Value);
             Assert.NotSame(value.Cloneable, copy.Cloneable);

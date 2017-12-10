@@ -43,9 +43,9 @@ namespace Squidex.Infrastructure.States
                 state = value;
             }
 
-            public Task WriteStateAsync()
+            public Task WriteStateAsync(long newVersion = -1)
             {
-                return persistence.WriteSnapshotAsync(state);
+                return persistence.WriteSnapshotAsync(state, newVersion);
             }
         }
 
@@ -173,8 +173,6 @@ namespace Squidex.Infrastructure.States
         {
             statefulObject.ExpectedVersion = null;
 
-            var version = 1;
-
             InvalidateMessage message = null;
 
             pubSub.Subscribe<InvalidateMessage>(m =>
@@ -183,7 +181,7 @@ namespace Squidex.Infrastructure.States
             });
 
             A.CallTo(() => snapshotStore.ReadAsync(key))
-                .Returns((123, version));
+                .Returns((123, 13));
 
             var actualObject = await sut.GetSingleAsync<MyStatefulObject>(key);
 
@@ -194,7 +192,7 @@ namespace Squidex.Infrastructure.States
 
             await statefulObject.WriteStateAsync();
 
-            A.CallTo(() => snapshotStore.WriteAsync(key, 456, version, 2))
+            A.CallTo(() => snapshotStore.WriteAsync(key, 456, 13, 14))
                 .MustHaveHappened();
 
             Assert.NotNull(message);
@@ -202,16 +200,35 @@ namespace Squidex.Infrastructure.States
         }
 
         [Fact]
+        public async Task Should_write_to_store_with_explicit_version()
+        {
+            statefulObject.ExpectedVersion = null;
+
+            A.CallTo(() => snapshotStore.ReadAsync(key))
+                .Returns((123, 1));
+
+            var actualObject = await sut.GetSingleAsync<MyStatefulObject>(key);
+
+            Assert.Same(statefulObject, actualObject);
+            Assert.Equal(123, statefulObject.State);
+
+            statefulObject.SetState(456);
+
+            await statefulObject.WriteStateAsync(100);
+
+            A.CallTo(() => snapshotStore.WriteAsync(key, 456, 1, 100))
+                .MustHaveHappened();
+        }
+
+        [Fact]
         public async Task Should_wrap_exception_when_writing_to_store_with_previous_version()
         {
             statefulObject.ExpectedVersion = null;
 
-            var version = 1;
-
             A.CallTo(() => snapshotStore.ReadAsync(key))
-                .Returns((123, version));
+                .Returns((123, 13));
 
-            A.CallTo(() => snapshotStore.WriteAsync(key, 123, version, 2))
+            A.CallTo(() => snapshotStore.WriteAsync(key, 123, 13, 14))
                 .Throws(new InconsistentStateException(1, 1, new InvalidOperationException()));
 
             var actualObject = await sut.GetSingleAsync<MyStatefulObject>(key);

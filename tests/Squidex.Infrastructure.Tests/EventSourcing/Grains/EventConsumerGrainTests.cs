@@ -230,6 +230,27 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         }
 
         [Fact]
+        public async Task Should_stop_if_consumer_failed()
+        {
+            sut.ActivateAsync(consumerName, store).Wait();
+            sut.Activate(eventConsumer);
+
+            var ex = new InvalidOperationException();
+
+            await OnErrorAsync(eventSubscription, ex);
+
+            sut.Dispose();
+
+            state.ShouldBeEquivalentTo(new EventConsumerState { IsStopped = true, Position = initialPosition, Error = ex.ToString() });
+
+            A.CallTo(() => persistence.WriteSnapshotAsync(A<EventConsumerState>.Ignored, -1))
+                .MustHaveHappened(Repeated.Exactly.Once);
+
+            A.CallTo(() => eventSubscription.StopAsync())
+                .MustHaveHappened(Repeated.Exactly.Once);
+        }
+
+        [Fact]
         public async Task Should_not_make_error_handling_when_exception_is_from_another_subscription()
         {
             sut.ActivateAsync(consumerName, store).Wait();

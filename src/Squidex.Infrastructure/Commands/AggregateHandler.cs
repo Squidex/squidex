@@ -99,6 +99,8 @@ namespace Squidex.Infrastructure.Commands
             {
                 var domainObject = await stateFactory.GetSingleAsync<T>(domainObjectId.ToString());
 
+                await handler(domainObject);
+
                 await domainObject.WriteAsync(log);
 
                 if (!context.IsCompleted)
