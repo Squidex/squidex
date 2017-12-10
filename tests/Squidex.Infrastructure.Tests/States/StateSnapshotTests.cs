@@ -28,6 +28,11 @@ namespace Squidex.Infrastructure.States
 
             public long ExpectedVersion { get; set; }
 
+            public long Version
+            {
+                get { return persistence.Version; }
+            }
+
             public int State
             {
                 get { return state; }
@@ -92,6 +97,20 @@ namespace Squidex.Infrastructure.States
             Assert.NotNull(cache.Get<object>(key));
 
             Assert.Equal(123, statefulObject.State);
+        }
+
+        [Fact]
+        public async Task Should_set_to_empty_when_store_returns_not_found()
+        {
+            statefulObject.ExpectedVersion = EtagVersion.Any;
+
+            A.CallTo(() => snapshotStore.ReadAsync(key))
+                .Returns((123, EtagVersion.NotFound));
+
+            var actualObject = await sut.GetSingleAsync<MyStatefulObject>(key);
+
+            Assert.Equal(-1, statefulObject.Version);
+            Assert.Equal( 0, statefulObject.State);
         }
 
         [Fact]
