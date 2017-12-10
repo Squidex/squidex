@@ -85,7 +85,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         [BsonJson]
         public IdContentData DataByIds { get; set; }
 
-        NamedContentData IContentEntity.Data
+        [BsonIgnore]
+        public NamedContentData Data
         {
             get { return data; }
         }

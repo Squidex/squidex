@@ -53,6 +53,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             await collection.Indexes.CreateOneAsync(
                 Index
                     .Ascending(x => x.Id)
+                    .Ascending(x => x.Version));
+
+            await collection.Indexes.CreateOneAsync(
+                Index
+                    .Ascending(x => x.Id)
                     .Descending(x => x.Version));
 
             await collection.Indexes.CreateOneAsync(
@@ -84,12 +89,15 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                 DocumentId = documentId,
                 DataText = idData?.ToFullText(),
                 DataByIds = idData,
+                IsLatest = true,
                 ReferencedIds = idData?.ToReferencedIds(schema.SchemaDef),
             });
 
             try
             {
                 await Collection.InsertOneAsync(document);
+
+                await Collection.UpdateManyAsync(x => x.Id == value.Id && x.Version < value.Version, Update.Set(x => x.IsLatest, false));
             }
             catch (MongoWriteException ex)
             {
@@ -115,13 +123,22 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
             var id = Guid.Parse(key);
 
-            var existing =
+            var contentEntity =
                 await Collection.Find(x => x.Id == id && x.IsLatest)
                     .FirstOrDefaultAsync();
 
-            if (existing != null)
+            if (contentEntity != null)
             {
-                return (SimpleMapper.Map(existing, new ContentState()), existing.Version);
+                var schema = await appProvider.GetSchemaAsync(contentEntity.AppId, contentEntity.SchemaId);
+
+                if (schema == null)
+                {
+                    throw new InvalidOperationException($"Cannot find schema {contentEntity.SchemaId}");
+                }
+
+                contentEntity?.ParseData(schema.SchemaDef);
+
+                return (SimpleMapper.Map(contentEntity, new ContentState()), contentEntity.Version);
             }
 
             return (null, EtagVersion.NotFound);
@@ -212,7 +229,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         public async Task<IContentEntity> FindContentAsync(IAppEntity app, ISchemaEntity schema, Guid id, long version)
         {
             var contentEntity =
-                await Collection.Find(x => x.Id == id && x.Version == version)
+                await Collection.Find(x => x.Id == id && x.Version >= version).SortBy(x => x.Version)
                     .FirstOrDefaultAsync();
 
             contentEntity?.ParseData(schema.SchemaDef);

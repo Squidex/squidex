@@ -16,7 +16,9 @@ using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Entities.Contents.State
 {
-    public class ContentState : DomainObjectState<ContentState>, IContentEntity
+    public class ContentState : DomainObjectState<ContentState>,
+        IContentEntity,
+        IUpdateableEntityWithAppRef
     {
         [JsonProperty]
         public NamedContentData Data { get; set; }

@@ -13,7 +13,6 @@ using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Domain.Apps.Entities.Schemas;
-using Squidex.Domain.Apps.Entities.State.SchemaDefs;
 using Squidex.Domain.Users;
 using Squidex.Infrastructure.Commands;
 using Squidex.Pipeline.CommandMiddlewares;

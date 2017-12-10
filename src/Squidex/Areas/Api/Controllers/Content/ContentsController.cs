@@ -151,7 +151,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
 
             Response.Headers["ETag"] = new StringValues(version.ToString());
 
-            return Ok(response);
+            return Ok(response.Data);
         }
 
         [MustBeAppEditor]

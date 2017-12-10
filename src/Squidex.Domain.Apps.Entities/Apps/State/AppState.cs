@@ -17,7 +17,8 @@ using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Entities.Apps.State
 {
-    public class AppState : DomainObjectState<AppState>, IAppEntity
+    public class AppState : DomainObjectState<AppState>,
+        IAppEntity
     {
         private static readonly LanguagesConfig English = LanguagesConfig.Build(Language.EN);
 
