@@ -77,7 +77,7 @@ namespace Squidex.Infrastructure.Commands
 
             await sut.WriteAsync(A.Fake<ISemanticLog>());
 
-            A.CallTo(() => persistence.WriteSnapshotAsync(newState, 102))
+            A.CallTo(() => persistence.WriteSnapshotAsync(newState))
                 .MustHaveHappened();
             A.CallTo(() => persistence.WriteEventsAsync(A<IEnumerable<Envelope<IEvent>>>.That.Matches(x => x.Count() == 2)))
                 .MustHaveHappened();
@@ -110,7 +110,7 @@ namespace Squidex.Infrastructure.Commands
 
             await sut.WriteAsync(A.Fake<ISemanticLog>());
 
-            A.CallTo(() => persistence.WriteSnapshotAsync(newState, 102))
+            A.CallTo(() => persistence.WriteSnapshotAsync(newState))
                 .MustHaveHappened();
             A.CallTo(() => persistence.WriteEventsAsync(A<IEnumerable<Envelope<IEvent>>>.That.Matches(x => x.Count() == 2)))
                 .MustHaveHappened();

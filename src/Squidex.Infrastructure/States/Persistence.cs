@@ -21,15 +21,17 @@ namespace Squidex.Infrastructure.States
         private readonly IStreamNameResolver streamNameResolver;
         private readonly IEventStore eventStore;
         private readonly IEventDataFormatter eventDataFormatter;
+        private readonly PersistenceMode persistenceMode;
         private readonly Action invalidate;
         private readonly Func<TState, Task> applyState;
         private readonly Func<Envelope<IEvent>, Task> applyEvent;
-        private long positionSnapshot = -1;
-        private long positionEvent = -1;
+        private long versionSnapshot = -1;
+        private long versionEvents = -1;
+        private long version;
 
         public long Version
         {
-            get { return Math.Max(positionEvent, positionSnapshot); }
+            get { return version; }
         }
 
         public Persistence(string ownerKey,
@@ -38,6 +40,7 @@ namespace Squidex.Infrastructure.States
             IEventDataFormatter eventDataFormatter,
             ISnapshotStore<TState> snapshotStore,
             IStreamNameResolver streamNameResolver,
+            PersistenceMode persistenceMode,
             Func<TState, Task> applyState,
             Func<Envelope<IEvent>, Task> applyEvent)
         {
@@ -47,37 +50,61 @@ namespace Squidex.Infrastructure.States
             this.invalidate = invalidate;
             this.eventStore = eventStore;
             this.eventDataFormatter = eventDataFormatter;
+            this.persistenceMode = persistenceMode;
             this.snapshotStore = snapshotStore;
             this.streamNameResolver = streamNameResolver;
         }
 
-        public async Task ReadAsync(long? expectedVersion)
+        public async Task ReadAsync(long expectedVersion = ExpectedVersion.Any)
         {
-            positionSnapshot = -1;
-            positionEvent = -1;
+            versionSnapshot = -1;
+            versionEvents = -1;
 
-            if (applyState != null)
+            await ReadSnapshotAsync();
+            await ReadEventsAsync();
+
+            UpdateVersion();
+
+            if (expectedVersion != ExpectedVersion.Any && expectedVersion != version)
+            {
+                if (version == ExpectedVersion.Empty)
+                {
+                    throw new DomainObjectNotFoundException(ownerKey, typeof(TOwner));
+                }
+                else
+                {
+                    throw new DomainObjectVersionException(ownerKey, typeof(TOwner), version, expectedVersion);
+                }
+            }
+        }
+
+        private async Task ReadSnapshotAsync()
+        {
+            if (UseSnapshots())
             {
                 var (state, position) = await snapshotStore.ReadAsync(ownerKey);
 
-                positionSnapshot = position;
-                positionEvent = position;
+                versionSnapshot = position;
+                versionEvents = position;
 
                 if (applyState != null && position >= 0)
                 {
                     await applyState(state);
                 }
             }
+        }
 
-            if (applyEvent != null && streamNameResolver != null)
+        private async Task ReadEventsAsync()
+        {
+            if (UseEventSourcing())
             {
-                var events = await eventStore.GetEventsAsync(GetStreamName(), positionEvent + 1);
+                var events = await eventStore.GetEventsAsync(GetStreamName(), versionEvents + 1);
 
                 foreach (var @event in events)
                 {
-                    positionEvent++;
+                    versionEvents++;
 
-                    if (@event.EventStreamNumber != positionEvent)
+                    if (@event.EventStreamNumber != versionEvents)
                     {
                         throw new InvalidOperationException("Events must follow the snapshot version in consecutive order with no gaps.");
                     }
@@ -90,45 +117,27 @@ namespace Squidex.Infrastructure.States
                     }
                 }
             }
-
-            var newVersion = Version;
-
-            if (expectedVersion.HasValue && expectedVersion.Value != newVersion)
-            {
-                if (newVersion == -1)
-                {
-                    throw new DomainObjectNotFoundException(ownerKey, typeof(TOwner));
-                }
-                else
-                {
-                    throw new DomainObjectVersionException(ownerKey, typeof(TOwner), newVersion, expectedVersion.Value);
-                }
-            }
         }
 
-        public async Task WriteSnapshotAsync(TState state, long newVersion = -1)
+        public async Task WriteSnapshotAsync(TState state)
         {
-            if (newVersion < 0)
-            {
-                newVersion =
-                    applyEvent != null ?
-                    positionEvent :
-                    positionSnapshot + 1;
-            }
+            var newVersion = UseEventSourcing() ? versionEvents : versionSnapshot + 1;
 
-            if (newVersion != positionSnapshot)
+            if (newVersion != versionSnapshot)
             {
                 try
                 {
-                    await snapshotStore.WriteAsync(ownerKey, state, positionSnapshot, newVersion);
+                    await snapshotStore.WriteAsync(ownerKey, state, versionSnapshot, newVersion);
                 }
                 catch (InconsistentStateException ex)
                 {
                     throw new DomainObjectVersionException(ownerKey, typeof(TOwner), ex.CurrentVersion, ex.ExpectedVersion);
                 }
 
-                positionSnapshot = newVersion;
+                versionSnapshot = newVersion;
             }
+
+            UpdateVersion();
 
             invalidate?.Invoke();
         }
@@ -141,6 +150,8 @@ namespace Squidex.Infrastructure.States
 
             if (eventArray.Length > 0)
             {
+                var expectedVersion = UseEventSourcing() ? version : ExpectedVersion.Any;
+
                 var commitId = Guid.NewGuid();
 
                 var eventStream = GetStreamName();
@@ -155,8 +166,10 @@ namespace Squidex.Infrastructure.States
                     throw new DomainObjectVersionException(ownerKey, typeof(TOwner), ex.CurrentVersion, ex.ExpectedVersion);
                 }
 
-                positionEvent += eventArray.Length;
+                versionEvents += eventArray.Length;
             }
+
+            UpdateVersion();
 
             invalidate?.Invoke();
         }
@@ -171,6 +184,16 @@ namespace Squidex.Infrastructure.States
             return streamNameResolver.GetStreamName(typeof(TOwner), ownerKey);
         }
 
+        private bool UseSnapshots()
+        {
+            return persistenceMode == PersistenceMode.Snapshots || persistenceMode == PersistenceMode.SnapshotsAndEventSourcing;
+        }
+
+        private bool UseEventSourcing()
+        {
+            return persistenceMode == PersistenceMode.EventSourcing || persistenceMode == PersistenceMode.SnapshotsAndEventSourcing;
+        }
+
         private Envelope<IEvent> ParseKnownEvent(StoredEvent storedEvent)
         {
             try
@@ -180,6 +203,22 @@ namespace Squidex.Infrastructure.States
             catch (TypeNameNotFoundException)
             {
                 return null;
+            }
+        }
+
+        private void UpdateVersion()
+        {
+            if (persistenceMode == PersistenceMode.Snapshots)
+            {
+                version = versionSnapshot;
+            }
+            else if (persistenceMode == PersistenceMode.EventSourcing)
+            {
+                version = versionEvents;
+            }
+            else if (persistenceMode == PersistenceMode.SnapshotsAndEventSourcing)
+            {
+                version = Math.Max(versionEvents, versionSnapshot);
             }
         }
     }

@@ -19,7 +19,6 @@ namespace Squidex.Infrastructure.EventSourcing
 {
     public class MongoEventStore : MongoRepositoryBase<MongoEventCommit>, IEventStore
     {
-        private const long AnyVersion = long.MinValue;
         private const int MaxAttempts = 20;
         private static readonly BsonTimestamp EmptyTimestamp = new BsonTimestamp(0);
         private static readonly FieldDefinition<MongoEventCommit, BsonTimestamp> TimestampField = Fields.Build(x => x.Timestamp);
@@ -130,7 +129,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public Task AppendEventsAsync(Guid commitId, string streamName, ICollection<EventData> events)
         {
-            return AppendEventsInternalAsync(commitId, streamName, AnyVersion, events);
+            return AppendEventsInternalAsync(commitId, streamName, ExpectedVersion.Any, events);
         }
 
         public Task AppendEventsAsync(Guid commitId, string streamName, long expectedVersion, ICollection<EventData> events)
@@ -152,7 +151,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
             var currentVersion = await GetEventStreamOffset(streamName);
 
-            if (expectedVersion != AnyVersion && expectedVersion != currentVersion)
+            if (expectedVersion != ExpectedVersion.Any && expectedVersion != currentVersion)
             {
                 throw new WrongEventVersionException(currentVersion, expectedVersion);
             }
@@ -175,7 +174,7 @@ namespace Squidex.Infrastructure.EventSourcing
                     {
                         currentVersion = await GetEventStreamOffset(streamName);
 
-                        if (expectedVersion != AnyVersion)
+                        if (expectedVersion != ExpectedVersion.Any)
                         {
                             throw new WrongEventVersionException(currentVersion, expectedVersion);
                         }

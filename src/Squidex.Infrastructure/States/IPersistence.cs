@@ -18,8 +18,8 @@ namespace Squidex.Infrastructure.States
 
         Task WriteEventsAsync(IEnumerable<Envelope<IEvent>> @events);
 
-        Task WriteSnapshotAsync(TState state, long newVersion = -1);
+        Task WriteSnapshotAsync(TState state);
 
-        Task ReadAsync(long? expectedVersion = null);
+        Task ReadAsync(long expectedVersion = ExpectedVersion.Any);
     }
 }

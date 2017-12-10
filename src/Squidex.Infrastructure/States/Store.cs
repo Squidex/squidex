@@ -36,26 +36,26 @@ namespace Squidex.Infrastructure.States
 
         public IPersistence<object> WithEventSourcing<TOwner>(string key, Func<Envelope<IEvent>, Task> applyEvent)
         {
-            return CreatePersistence<TOwner, object>(key, null, applyEvent);
+            return CreatePersistence<TOwner, object>(key, PersistenceMode.EventSourcing, null, applyEvent);
         }
 
         public IPersistence<TState> WithSnapshots<TOwner, TState>(string key, Func<TState, Task> applySnapshot)
         {
-            return CreatePersistence<TOwner, TState>(key, applySnapshot, null);
+            return CreatePersistence<TOwner, TState>(key, PersistenceMode.Snapshots, applySnapshot, null);
         }
 
         public IPersistence<TState> WithSnapshotsAndEventSourcing<TOwner, TState>(string key, Func<TState, Task> applySnapshot, Func<Envelope<IEvent>, Task> applyEvent)
         {
-            return CreatePersistence<TOwner, TState>(key, applySnapshot, applyEvent);
+            return CreatePersistence<TOwner, TState>(key, PersistenceMode.SnapshotsAndEventSourcing, applySnapshot, applyEvent);
         }
 
-        private IPersistence<TState> CreatePersistence<TOwner, TState>(string key, Func<TState, Task> applySnapshot, Func<Envelope<IEvent>, Task> applyEvent)
+        private IPersistence<TState> CreatePersistence<TOwner, TState>(string key, PersistenceMode mode, Func<TState, Task> applySnapshot, Func<Envelope<IEvent>, Task> applyEvent)
         {
             Guard.NotNullOrEmpty(key, nameof(key));
 
             var snapshotStore = (ISnapshotStore<TState>)services.GetService(typeof(ISnapshotStore<TState>));
 
-            return new Persistence<TOwner, TState>(key, invalidate, eventStore, eventDataFormatter, snapshotStore, streamNameResolver, applySnapshot, applyEvent);
+            return new Persistence<TOwner, TState>(key, invalidate, eventStore, eventDataFormatter, snapshotStore, streamNameResolver, mode, applySnapshot, applyEvent);
         }
     }
 }

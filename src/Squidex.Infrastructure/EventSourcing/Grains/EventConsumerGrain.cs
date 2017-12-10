@@ -68,17 +68,17 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
         public virtual void Stop()
         {
-            dispatcher.DispatchAsync(() => HandleStopAsync()).Forget();
+            dispatcher.DispatchAsync(HandleStopAsync).Forget();
         }
 
         public virtual void Start()
         {
-            dispatcher.DispatchAsync(() => HandleStartAsync()).Forget();
+            dispatcher.DispatchAsync(HandleStartAsync).Forget();
         }
 
         public virtual void Reset()
         {
-            dispatcher.DispatchAsync(() => HandleResetAsync()).Forget();
+            dispatcher.DispatchAsync(HandleResetAsync).Forget();
         }
 
         public virtual void Activate(IEventConsumer eventConsumer)

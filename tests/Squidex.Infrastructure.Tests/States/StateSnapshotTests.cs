@@ -15,6 +15,8 @@ using Microsoft.Extensions.Options;
 using Squidex.Infrastructure.EventSourcing;
 using Xunit;
 
+#pragma warning disable RECS0002 // Convert anonymous method to method group
+
 namespace Squidex.Infrastructure.States
 {
     public class StateSnapshotTests : IDisposable
@@ -24,7 +26,7 @@ namespace Squidex.Infrastructure.States
             private IPersistence<int> persistence;
             private int state;
 
-            public long? ExpectedVersion { get; set; }
+            public long ExpectedVersion { get; set; }
 
             public int State
             {
@@ -43,9 +45,9 @@ namespace Squidex.Infrastructure.States
                 state = value;
             }
 
-            public Task WriteStateAsync(long newVersion = -1)
+            public Task WriteStateAsync()
             {
-                return persistence.WriteSnapshotAsync(state, newVersion);
+                return persistence.WriteSnapshotAsync(state);
             }
         }
 
@@ -117,7 +119,7 @@ namespace Squidex.Infrastructure.States
         [Fact]
         public async Task Should_not_throw_exception_if_noting_expected()
         {
-            statefulObject.ExpectedVersion = null;
+            statefulObject.ExpectedVersion = ExpectedVersion.Any;
 
             A.CallTo(() => snapshotStore.ReadAsync(key))
                 .Returns((0, -1));
@@ -128,7 +130,7 @@ namespace Squidex.Infrastructure.States
         [Fact]
         public async Task Should_provide_state_from_services_and_add_to_cache()
         {
-            statefulObject.ExpectedVersion = null;
+            statefulObject.ExpectedVersion = ExpectedVersion.Any;
 
             var actualObject = await sut.GetSingleAsync<MyStatefulObject>(key);
 
@@ -139,7 +141,7 @@ namespace Squidex.Infrastructure.States
         [Fact]
         public async Task Should_serve_next_request_from_cache()
         {
-            statefulObject.ExpectedVersion = null;
+            statefulObject.ExpectedVersion = ExpectedVersion.Any;
 
             var actualObject1 = await sut.GetSingleAsync<MyStatefulObject>(key);
 
@@ -155,7 +157,7 @@ namespace Squidex.Infrastructure.States
         [Fact]
         public async Task Should_not_serve_next_request_from_cache_when_detached()
         {
-            statefulObject.ExpectedVersion = null;
+            statefulObject.ExpectedVersion = ExpectedVersion.Any;
 
             var actualObject1 = await sut.CreateAsync<MyStatefulObject>(key);
 
@@ -171,7 +173,7 @@ namespace Squidex.Infrastructure.States
         [Fact]
         public async Task Should_write_to_store_with_previous_version()
         {
-            statefulObject.ExpectedVersion = null;
+            statefulObject.ExpectedVersion = ExpectedVersion.Any;
 
             InvalidateMessage message = null;
 
@@ -200,30 +202,9 @@ namespace Squidex.Infrastructure.States
         }
 
         [Fact]
-        public async Task Should_write_to_store_with_explicit_version()
-        {
-            statefulObject.ExpectedVersion = null;
-
-            A.CallTo(() => snapshotStore.ReadAsync(key))
-                .Returns((123, 1));
-
-            var actualObject = await sut.GetSingleAsync<MyStatefulObject>(key);
-
-            Assert.Same(statefulObject, actualObject);
-            Assert.Equal(123, statefulObject.State);
-
-            statefulObject.SetState(456);
-
-            await statefulObject.WriteStateAsync(100);
-
-            A.CallTo(() => snapshotStore.WriteAsync(key, 456, 1, 100))
-                .MustHaveHappened();
-        }
-
-        [Fact]
         public async Task Should_wrap_exception_when_writing_to_store_with_previous_version()
         {
-            statefulObject.ExpectedVersion = null;
+            statefulObject.ExpectedVersion = ExpectedVersion.Any;
 
             A.CallTo(() => snapshotStore.ReadAsync(key))
                 .Returns((123, 13));
@@ -239,7 +220,7 @@ namespace Squidex.Infrastructure.States
         [Fact]
         public async Task Should_remove_from_cache_when_invalidation_message_received()
         {
-            statefulObject.ExpectedVersion = null;
+            statefulObject.ExpectedVersion = ExpectedVersion.Any;
 
             var actualObject = await sut.GetSingleAsync<MyStatefulObject>(key);
 
@@ -251,7 +232,7 @@ namespace Squidex.Infrastructure.States
         [Fact]
         public async Task Should_return_same_instance_for_parallel_requests()
         {
-            statefulObject.ExpectedVersion = null;
+            statefulObject.ExpectedVersion = ExpectedVersion.Any;
 
             A.CallTo(() => snapshotStore.ReadAsync(key))
                 .ReturnsLazily(() => Task.Delay(1).ContinueWith(x => (1, 1L)));

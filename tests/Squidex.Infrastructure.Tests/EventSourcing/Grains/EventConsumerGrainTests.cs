@@ -67,11 +67,11 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             A.CallTo(() => eventConsumer.Name)
                 .Returns(consumerName);
 
-            A.CallTo(() => persistence.ReadAsync(null))
-                .Invokes(new Action<long?>(s => apply(state)));
+            A.CallTo(() => persistence.ReadAsync(ExpectedVersion.Any))
+                .Invokes(new Action<long>(s => apply(state)));
 
-            A.CallTo(() => persistence.WriteSnapshotAsync(A<EventConsumerState>.Ignored, -1))
-                .Invokes(new Action<EventConsumerState, long>((s, v) => state = s));
+            A.CallTo(() => persistence.WriteSnapshotAsync(A<EventConsumerState>.Ignored))
+                .Invokes(new Action<EventConsumerState>(s => state = s));
 
             A.CallTo(() => formatter.Parse(eventData, true)).Returns(envelope);
 
@@ -132,7 +132,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
             state.ShouldBeEquivalentTo(new EventConsumerState { IsStopped = true, Position = initialPosition, Error = null });
 
-            A.CallTo(() => persistence.WriteSnapshotAsync(A<EventConsumerState>.Ignored, -1))
+            A.CallTo(() => persistence.WriteSnapshotAsync(A<EventConsumerState>.Ignored))
                 .MustHaveHappened(Repeated.Exactly.Once);
 
             A.CallTo(() => eventSubscription.StopAsync())
@@ -150,7 +150,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
             state.ShouldBeEquivalentTo(new EventConsumerState { IsStopped = false, Position = null, Error = null });
 
-            A.CallTo(() => persistence.WriteSnapshotAsync(A<EventConsumerState>.Ignored, -1))
+            A.CallTo(() => persistence.WriteSnapshotAsync(A<EventConsumerState>.Ignored))
                 .MustHaveHappened(Repeated.Exactly.Twice);
 
             A.CallTo(() => eventConsumer.ClearAsync())
@@ -180,7 +180,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
             state.ShouldBeEquivalentTo(new EventConsumerState { IsStopped = false, Position = @event.EventPosition, Error = null });
 
-            A.CallTo(() => persistence.WriteSnapshotAsync(A<EventConsumerState>.Ignored, -1))
+            A.CallTo(() => persistence.WriteSnapshotAsync(A<EventConsumerState>.Ignored))
                 .MustHaveHappened(Repeated.Exactly.Once);
 
             A.CallTo(() => eventConsumer.On(envelope))
@@ -204,7 +204,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
             state.ShouldBeEquivalentTo(new EventConsumerState { IsStopped = false, Position = @event.EventPosition, Error = null });
 
-            A.CallTo(() => persistence.WriteSnapshotAsync(A<EventConsumerState>.Ignored, -1))
+            A.CallTo(() => persistence.WriteSnapshotAsync(A<EventConsumerState>.Ignored))
                 .MustHaveHappened(Repeated.Exactly.Once);
 
             A.CallTo(() => eventConsumer.On(envelope))
@@ -243,7 +243,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
             state.ShouldBeEquivalentTo(new EventConsumerState { IsStopped = true, Position = initialPosition, Error = ex.ToString() });
 
-            A.CallTo(() => persistence.WriteSnapshotAsync(A<EventConsumerState>.Ignored, -1))
+            A.CallTo(() => persistence.WriteSnapshotAsync(A<EventConsumerState>.Ignored))
                 .MustHaveHappened(Repeated.Exactly.Once);
 
             A.CallTo(() => eventSubscription.StopAsync())
@@ -264,7 +264,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
             state.ShouldBeEquivalentTo(new EventConsumerState { IsStopped = false, Position = initialPosition, Error = null });
 
-            A.CallTo(() => persistence.WriteSnapshotAsync(A<EventConsumerState>.Ignored, -1))
+            A.CallTo(() => persistence.WriteSnapshotAsync(A<EventConsumerState>.Ignored))
                 .MustNotHaveHappened();
         }
 
@@ -284,7 +284,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
             state.ShouldBeEquivalentTo(new EventConsumerState { IsStopped = true, Position = initialPosition, Error = ex.ToString() });
 
-            A.CallTo(() => persistence.WriteSnapshotAsync(A<EventConsumerState>.Ignored, -1))
+            A.CallTo(() => persistence.WriteSnapshotAsync(A<EventConsumerState>.Ignored))
                 .MustHaveHappened(Repeated.Exactly.Once);
 
             A.CallTo(() => eventSubscription.StopAsync())
@@ -313,7 +313,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             A.CallTo(() => eventConsumer.On(envelope))
                 .MustHaveHappened();
 
-            A.CallTo(() => persistence.WriteSnapshotAsync(A<EventConsumerState>.Ignored, -1))
+            A.CallTo(() => persistence.WriteSnapshotAsync(A<EventConsumerState>.Ignored))
                 .MustHaveHappened(Repeated.Exactly.Once);
 
             A.CallTo(() => eventSubscription.StopAsync())
@@ -344,7 +344,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             A.CallTo(() => eventConsumer.On(envelope))
                 .MustNotHaveHappened();
 
-            A.CallTo(() => persistence.WriteSnapshotAsync(A<EventConsumerState>.Ignored, -1))
+            A.CallTo(() => persistence.WriteSnapshotAsync(A<EventConsumerState>.Ignored))
                 .MustHaveHappened(Repeated.Exactly.Once);
 
             A.CallTo(() => eventSubscription.StopAsync())
@@ -375,7 +375,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             A.CallTo(() => eventConsumer.On(envelope))
                 .MustHaveHappened();
 
-            A.CallTo(() => persistence.WriteSnapshotAsync(A<EventConsumerState>.Ignored, -1))
+            A.CallTo(() => persistence.WriteSnapshotAsync(A<EventConsumerState>.Ignored))
                 .MustHaveHappened(Repeated.Exactly.Twice);
 
             A.CallTo(() => eventSubscription.StopAsync())

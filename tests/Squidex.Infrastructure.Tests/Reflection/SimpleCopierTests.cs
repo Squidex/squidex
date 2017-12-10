@@ -65,6 +65,7 @@ namespace Squidex.Infrastructure.Reflection
 
             Assert.Equal(value.Value1, copy.Value1);
             Assert.Equal(value.Value2, copy.Value2);
+
             Assert.Equal(0, copy.ValueReadOnly);
 
             Assert.Equal(value.Cloneable.Value, copy.Cloneable.Value);

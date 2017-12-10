@@ -30,7 +30,7 @@ namespace Squidex.Infrastructure.States
             private readonly List<IEvent> appliedEvents = new List<IEvent>();
             private IPersistence<object> persistence;
 
-            public long? ExpectedVersion { get; set; }
+            public long ExpectedVersion { get; set; }
 
             public List<IEvent> AppliedEvents
             {
@@ -54,7 +54,7 @@ namespace Squidex.Infrastructure.States
         {
             private IPersistence<object> persistence;
 
-            public long? ExpectedVersion { get; set; }
+            public long ExpectedVersion { get; set; }
 
             public Task ActivateAsync(string key, IStore store)
             {
@@ -115,7 +115,7 @@ namespace Squidex.Infrastructure.States
         [Fact]
         public async Task Should_read_events_from_snapshot()
         {
-            statefulObjectWithSnapShot.ExpectedVersion = null;
+            statefulObjectWithSnapShot.ExpectedVersion = ExpectedVersion.Any;
 
             A.CallTo(() => snapshotStore.ReadAsync(key))
                 .Returns((2, 2L));
@@ -131,7 +131,7 @@ namespace Squidex.Infrastructure.States
         [Fact]
         public async Task Should_throw_exception_if_events_are_older_than_snapshot()
         {
-            statefulObjectWithSnapShot.ExpectedVersion = null;
+            statefulObjectWithSnapShot.ExpectedVersion = ExpectedVersion.Any;
 
             A.CallTo(() => snapshotStore.ReadAsync(key))
                 .Returns((2, 2L));
@@ -144,7 +144,7 @@ namespace Squidex.Infrastructure.States
         [Fact]
         public async Task Should_throw_exception_if_events_have_gaps_to_snapshot()
         {
-            statefulObjectWithSnapShot.ExpectedVersion = null;
+            statefulObjectWithSnapShot.ExpectedVersion = ExpectedVersion.Any;
 
             A.CallTo(() => snapshotStore.ReadAsync(key))
                 .Returns((2, 2L));
@@ -177,7 +177,7 @@ namespace Squidex.Infrastructure.States
         [Fact]
         public async Task Should_not_throw_exception_if_noting_expected()
         {
-            statefulObject.ExpectedVersion = null;
+            statefulObject.ExpectedVersion = ExpectedVersion.Any;
 
             SetupEventStore(0);
 
@@ -187,7 +187,7 @@ namespace Squidex.Infrastructure.States
         [Fact]
         public async Task Should_provide_state_from_services_and_add_to_cache()
         {
-            statefulObject.ExpectedVersion = null;
+            statefulObject.ExpectedVersion = ExpectedVersion.Any;
 
             SetupEventStore(0);
 
@@ -200,7 +200,7 @@ namespace Squidex.Infrastructure.States
         [Fact]
         public async Task Should_serve_next_request_from_cache()
         {
-            statefulObject.ExpectedVersion = null;
+            statefulObject.ExpectedVersion = ExpectedVersion.Any;
 
             SetupEventStore(0);
 
@@ -218,7 +218,7 @@ namespace Squidex.Infrastructure.States
         [Fact]
         public async Task Should_write_to_store_with_previous_position()
         {
-            statefulObject.ExpectedVersion = null;
+            statefulObject.ExpectedVersion = ExpectedVersion.Any;
 
             InvalidateMessage message = null;
 
@@ -248,7 +248,7 @@ namespace Squidex.Infrastructure.States
         [Fact]
         public async Task Should_wrap_exception_when_writing_to_store_with_previous_position()
         {
-            statefulObject.ExpectedVersion = null;
+            statefulObject.ExpectedVersion = ExpectedVersion.Any;
 
             SetupEventStore(3);
 
@@ -263,7 +263,7 @@ namespace Squidex.Infrastructure.States
         [Fact]
         public async Task Should_remove_from_cache_when_invalidation_message_received()
         {
-            statefulObject.ExpectedVersion = null;
+            statefulObject.ExpectedVersion = ExpectedVersion.Any;
 
             var actualObject = await sut.GetSingleAsync<MyStatefulObject>(key);
 
@@ -275,7 +275,7 @@ namespace Squidex.Infrastructure.States
         [Fact]
         public async Task Should_return_same_instance_for_parallel_requests()
         {
-            statefulObject.ExpectedVersion = null;
+            statefulObject.ExpectedVersion = ExpectedVersion.Any;
 
             A.CallTo(() => snapshotStore.ReadAsync(key))
                 .ReturnsLazily(() => Task.Delay(1).ContinueWith(x => ((object)1, 1L)));

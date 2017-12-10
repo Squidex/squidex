@@ -20,8 +20,7 @@ namespace Squidex.Domain.Apps.Entities
         IEntityWithVersion,
         IUpdateableEntity,
         IUpdateableEntityWithCreatedBy,
-        IUpdateableEntityWithLastModifiedBy,
-        IUpdateableEntityWithVersion
+        IUpdateableEntityWithLastModifiedBy
         where T : Cloneable
     {
         [JsonProperty]

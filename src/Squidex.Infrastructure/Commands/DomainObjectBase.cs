@@ -78,24 +78,19 @@ namespace Squidex.Infrastructure.Commands
 
         public async Task WriteAsync(ISemanticLog log)
         {
-            var newVersion = Version + uncomittedEvents.Count;
+            await persistence.WriteSnapshotAsync(state);
 
-            if (newVersion != Version)
+            try
             {
-                await persistence.WriteSnapshotAsync(state, newVersion);
-
-                try
-                {
-                    await persistence.WriteEventsAsync(uncomittedEvents.ToArray());
-                }
-                catch (Exception ex)
-                {
-                    log.LogFatal(ex, w => w.WriteProperty("action", "writeEvents"));
-                }
-                finally
-                {
-                    uncomittedEvents.Clear();
-                }
+                await persistence.WriteEventsAsync(uncomittedEvents.ToArray());
+            }
+            catch (Exception ex)
+            {
+                log.LogFatal(ex, w => w.WriteProperty("action", "writeEvents"));
+            }
+            finally
+            {
+                uncomittedEvents.Clear();
             }
         }
     }
