@@ -16,7 +16,7 @@ using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public class AssetDomainObject : DomainObjectBase<AssetState>
+    public sealed class AssetDomainObject : DomainObjectBase<AssetState>
     {
         public AssetDomainObject Create(CreateAsset command)
         {

@@ -16,7 +16,7 @@ using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Entities.Rules
 {
-    public class RuleDomainObject : DomainObjectBase<RuleState>
+    public sealed class RuleDomainObject : DomainObjectBase<RuleState>
     {
         public void Create(CreateRule command)
         {

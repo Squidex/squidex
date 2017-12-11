@@ -19,7 +19,7 @@ using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Entities.Schemas
 {
-    public class SchemaDomainObject : DomainObjectBase<SchemaState>
+    public sealed class SchemaDomainObject : DomainObjectBase<SchemaState>
     {
         private readonly FieldRegistry registry;
 
@@ -179,7 +179,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             return this;
         }
 
-        protected void RaiseEvent(FieldCommand fieldCommand, FieldEvent @event)
+        private void RaiseEvent(FieldCommand fieldCommand, FieldEvent @event)
         {
             SimpleMapper.Map(fieldCommand, @event);
 

@@ -19,7 +19,7 @@ using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Entities.Apps
 {
-    public class AppDomainObject : DomainObjectBase<AppState>
+    public sealed class AppDomainObject : DomainObjectBase<AppState>
     {
         public AppDomainObject Create(CreateApp command)
         {
