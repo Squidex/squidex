@@ -23,7 +23,6 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
-using Squidex.Domain.Apps.Entities.Contents.GraphQL;
 using Squidex.Domain.Apps.Entities.Contents.TestData;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
@@ -31,7 +30,7 @@ using Xunit;
 
 #pragma warning disable SA1311 // Static readonly fields must begin with upper-case letter
 
-namespace Squidex.Domain.Apps.Entities.Contents
+namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 {
     public class GraphQLTests
     {
