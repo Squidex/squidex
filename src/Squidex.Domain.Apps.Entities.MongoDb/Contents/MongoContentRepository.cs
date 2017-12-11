@@ -75,7 +75,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
             var documentId = $"{key}_{newVersion}";
 
-            var schema = await appProvider.GetSchemaAsync(value.AppId, value.SchemaId);
+            var schema = await appProvider.GetSchemaAsync(value.AppId, value.SchemaId, true);
 
             if (schema == null)
             {
@@ -126,7 +126,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
             if (contentEntity != null)
             {
-                var schema = await appProvider.GetSchemaAsync(contentEntity.AppId, contentEntity.SchemaId);
+                var schema = await appProvider.GetSchemaAsync(contentEntity.AppId, contentEntity.SchemaId, true);
 
                 if (schema == null)
                 {

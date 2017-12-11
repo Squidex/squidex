@@ -7,8 +7,8 @@
 // ==========================================================================
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
-using System.Timers;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Assets;
@@ -31,8 +31,8 @@ namespace Migrate_01
         private readonly IEventStore eventStore;
         private readonly IEventDataFormatter eventDataFormatter;
         private readonly IStateFactory stateFactory;
-        private readonly Timer timer = new Timer { AutoReset = false, Interval = 5000 };
-        private readonly TaskCompletionSource<object> tcs = new TaskCompletionSource<object>();
+        private readonly Timer timer;
+        private readonly TaskCompletionSource<object> subscriptionTcs = new TaskCompletionSource<object>();
 
         public int FromVersion { get; } = 0;
 
@@ -49,68 +49,75 @@ namespace Migrate_01
             this.eventStore = eventStore;
             this.stateFactory = stateFactory;
 
-            timer.Elapsed += (sender, e) =>
-            {
-                tcs.TrySetResult(true);
-            };
+            timer = new Timer(d => subscriptionTcs.TrySetResult(true));
         }
 
         public async Task UpdateAsync()
         {
             var subscription = eventStore.CreateSubscription(this, ".*");
 
-            await tcs.Task;
+            await subscriptionTcs.Task;
             await subscription.StopAsync();
         }
 
         public async Task OnEventAsync(IEventSubscription subscription, StoredEvent storedEvent)
         {
-            var @event = ParseKnownEvent(storedEvent);
-
-            if (@event != null)
+            try
             {
-                var version = storedEvent.EventStreamNumber;
+                timer.Change(Timeout.Infinite, Timeout.Infinite);
 
-                if (@event.Payload is AssetEvent assetEvent)
+                var @event = ParseKnownEvent(storedEvent);
+
+                if (@event != null)
                 {
-                    var asset = await stateFactory.CreateAsync<AssetDomainObject>(assetEvent.AssetId);
+                    var version = storedEvent.EventStreamNumber;
 
-                    asset.UpdateState(asset.State.Apply(@event));
+                    if (@event.Payload is AssetEvent assetEvent)
+                    {
+                        var asset = await stateFactory.CreateAsync<AssetDomainObject>(assetEvent.AssetId);
 
-                    await asset.WriteStateAsync(version);
+                        asset.UpdateState(asset.State.Apply(@event));
+
+                        await asset.WriteStateAsync(version);
+                    }
+                    else if (@event.Payload is ContentEvent contentEvent)
+                    {
+                        var content = await stateFactory.CreateAsync<ContentDomainObject>(contentEvent.ContentId);
+
+                        content.UpdateState(content.State.Apply(@event));
+
+                        await content.WriteStateAsync(version);
+                    }
+                    else if (@event.Payload is SchemaEvent schemaEvent)
+                    {
+                        var schema = await stateFactory.GetSingleAsync<SchemaDomainObject>(schemaEvent.SchemaId.Id);
+
+                        schema.UpdateState(schema.State.Apply(@event, fieldRegistry));
+
+                        await schema.WriteStateAsync(version);
+                    }
+                    else if (@event.Payload is AppEvent appEvent)
+                    {
+                        var app = await stateFactory.GetSingleAsync<AppDomainObject>(appEvent.AppId.Id);
+
+                        app.UpdateState(app.State.Apply(@event));
+
+                        await app.WriteStateAsync(version);
+                    }
                 }
-                else if (@event.Payload is ContentEvent contentEvent)
-                {
-                    var content = await stateFactory.CreateAsync<ContentDomainObject>(contentEvent.ContentId);
 
-                    content.UpdateState(content.State.Apply(@event));
-
-                    await content.WriteStateAsync(version);
-                }
-                else if (@event.Payload is SchemaEvent schemaEvent)
-                {
-                    var schema = await stateFactory.GetSingleAsync<SchemaDomainObject>(schemaEvent.SchemaId.Id);
-
-                    schema.UpdateState(schema.State.Apply(@event, fieldRegistry));
-
-                    await schema.WriteStateAsync(version);
-                }
-                else if (@event.Payload is AppEvent appEvent)
-                {
-                    var app = await stateFactory.GetSingleAsync<AppDomainObject>(appEvent.AppId.Id);
-
-                    app.UpdateState(app.State.Apply(@event));
-
-                    await app.WriteStateAsync(version);
-                }
+                timer.Change(5000, 0);
             }
-
-            timer.Stop();
-            timer.Start();
+            catch (Exception ex)
+            {
+                subscriptionTcs.SetException(ex);
+            }
         }
 
         public Task OnErrorAsync(IEventSubscription subscription, Exception exception)
         {
+            subscriptionTcs.TrySetException(exception);
+
             return TaskHelper.Done;
         }
 
