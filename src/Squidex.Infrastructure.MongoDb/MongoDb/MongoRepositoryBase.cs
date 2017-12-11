@@ -106,7 +106,7 @@ namespace Squidex.Infrastructure.MongoDb
             }
         }
 
-        public void Connect()
+        public virtual void Connect()
         {
             try
             {

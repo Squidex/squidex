@@ -10,7 +10,7 @@ using System;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
-namespace Migrate_01
+namespace Migrate_00
 {
     public class Program
     {

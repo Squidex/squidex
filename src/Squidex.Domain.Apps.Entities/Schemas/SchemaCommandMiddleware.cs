@@ -9,7 +9,6 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Domain.Apps.Entities.Schemas.Guards;
 using Squidex.Infrastructure;

@@ -1,0 +1,29 @@
+﻿// ==========================================================================
+//  MongoMigrationEntity.cs
+//  Squidex Headless CMS
+// ==========================================================================
+//  Copyright (c) Squidex Group
+//  All rights reserved.
+// ==========================================================================
+
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
+
+namespace Squidex.Infrastructure.Migrations
+{
+    public sealed class MongoMigrationEntity
+    {
+        [BsonId]
+        [BsonElement]
+        [BsonRepresentation(BsonType.String)]
+        public string Id { get; set; }
+
+        [BsonElement]
+        [BsonRequired]
+        public bool IsLocked { get; set; }
+
+        [BsonElement]
+        [BsonRequired]
+        public int Version { get; set; }
+    }
+}

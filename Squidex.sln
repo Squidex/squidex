@@ -36,7 +36,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex.Infrastructure.Goog
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "migrations", "migrations", "{94207AA6-4923-4183-A558-E0F8196B8CA3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Migrate_01", "tools\Migrate_01\Migrate_01.csproj", "{B51126A8-0D75-4A79-867D-10724EC6AC84}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Migrate_00", "tools\Migrate_00\Migrate_00.csproj", "{B51126A8-0D75-4A79-867D-10724EC6AC84}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex.Shared", "src\Squidex.Shared\Squidex.Shared.csproj", "{5E75AB7D-6F01-4313-AFF1-7F7128FFD71F}"
 EndProject

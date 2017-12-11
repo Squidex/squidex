@@ -39,6 +39,7 @@ using Squidex.Domain.Users.MongoDb.Infrastructure;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.EventSourcing.Grains;
+using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.UsageTracking;
 using Squidex.Shared.Users;
@@ -63,6 +64,10 @@ namespace Squidex.Config.Domain
 
                     services.AddSingletonAs(c => new MongoXmlRepository(mongoDatabase))
                         .As<IXmlRepository>()
+                        .As<IExternalSystem>();
+
+                    services.AddSingletonAs(c => new MongoMigrationStatus(mongoDatabase))
+                        .As<IMigrationStatus>()
                         .As<IExternalSystem>();
 
                     services.AddSingletonAs(c => new MongoSnapshotStore<EventConsumerState, string>(mongoDatabase, c.GetRequiredService<JsonSerializer>()))

@@ -40,6 +40,7 @@ namespace Squidex
         {
             app.ApplicationServices.LogConfiguration();
             app.ApplicationServices.TestExternalSystems();
+            app.ApplicationServices.Migrate();
 
             app.UseMyCors();
             app.UseMyForwardingRules();
