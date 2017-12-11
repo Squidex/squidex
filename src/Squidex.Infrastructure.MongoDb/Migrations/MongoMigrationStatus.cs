@@ -21,9 +21,9 @@ namespace Squidex.Infrastructure.Migrations
         {
         }
 
-        public override void Connect()
+        protected override string CollectionName()
         {
-            base.Connect();
+            return "Migration";
         }
 
         public async Task<int> GetVersionAsync()

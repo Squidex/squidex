@@ -107,7 +107,7 @@ namespace Squidex.Config.Domain
                         .As<ISnapshotStore<AssetState, Guid>>()
                         .As<IExternalSystem>();
 
-                    services.AddSingletonAs(c => new MongoRuleRepository(mongoContentDatabase))
+                    services.AddSingletonAs(c => new MongoRuleRepository(mongoDatabase))
                         .As<IRuleRepository>()
                         .As<ISnapshotStore<RuleState, Guid>>()
                         .As<IExternalSystem>();

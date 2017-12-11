@@ -19,6 +19,7 @@ using Squidex.Infrastructure.Assets.ImageSharp;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Log;
+using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.UsageTracking;
 using Squidex.Pipeline;
@@ -91,6 +92,9 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<JsonEventDataFormatter>()
                 .As<IEventDataFormatter>();
+
+            services.AddSingletonAs<Migrator>()
+                .AsSelf();
         }
     }
 }

@@ -213,7 +213,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
                 log.LogFatal(ex, w => w
                     .WriteProperty("action", caller)
-                    .WriteProperty("state", "Failed")
+                    .WriteProperty("status", "Failed")
                     .WriteProperty("eventConsumer", eventConsumer.Name));
 
                 state = state.Failed(ex);
@@ -229,13 +229,13 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             log.LogInformation(w => w
                 .WriteProperty("action", "EventConsumerReset")
                 .WriteProperty("actionId", actionId)
-                .WriteProperty("state", "Started")
+                .WriteProperty("status", "Started")
                 .WriteProperty("eventConsumer", eventConsumer.Name));
 
             using (log.MeasureTrace(w => w
                 .WriteProperty("action", "EventConsumerReset")
                 .WriteProperty("actionId", actionId)
-                .WriteProperty("state", "Completed")
+                .WriteProperty("status", "Completed")
                 .WriteProperty("eventConsumer", eventConsumer.Name)))
             {
                 await eventConsumer.ClearAsync();
@@ -250,7 +250,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             log.LogInformation(w => w
                 .WriteProperty("action", "HandleEvent")
                 .WriteProperty("actionId", eventId)
-                .WriteProperty("state", "Started")
+                .WriteProperty("status", "Started")
                 .WriteProperty("eventId", eventId)
                 .WriteProperty("eventType", eventType)
                 .WriteProperty("eventConsumer", eventConsumer.Name));
@@ -258,7 +258,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             using (log.MeasureTrace(w => w
                 .WriteProperty("action", "HandleEvent")
                 .WriteProperty("actionId", eventId)
-                .WriteProperty("state", "Completed")
+                .WriteProperty("status", "Completed")
                 .WriteProperty("eventId", eventId)
                 .WriteProperty("eventType", eventType)
                 .WriteProperty("eventConsumer", eventConsumer.Name)))

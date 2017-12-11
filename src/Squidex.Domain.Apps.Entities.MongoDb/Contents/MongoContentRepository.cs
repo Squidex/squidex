@@ -45,7 +45,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         protected override string CollectionName()
         {
-            return "Snapshots_Contents";
+            return "States_Contents";
         }
 
         protected override async Task SetupCollectionAsync(IMongoCollection<MongoContentEntity> collection)
@@ -96,7 +96,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             try
             {
                 await Collection.InsertOneAsync(document);
-
                 await Collection.UpdateManyAsync(x => x.Id == value.Id && x.Version < value.Version, Update.Set(x => x.IsLatest, false));
             }
             catch (MongoWriteException ex)

@@ -7,6 +7,7 @@
 // ==========================================================================
 
 using Microsoft.Extensions.DependencyInjection;
+using Migrate_01;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Assets;
@@ -15,6 +16,7 @@ using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Users;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.Migrations;
 using Squidex.Pipeline.CommandMiddlewares;
 
 namespace Squidex.Config.Domain
@@ -59,11 +61,23 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<RuleCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
-            services.AddTransient<AppDomainObject>();
-            services.AddTransient<AssetDomainObject>();
-            services.AddTransient<ContentDomainObject>();
-            services.AddTransient<RuleDomainObject>();
-            services.AddTransient<SchemaDomainObject>();
+            services.AddTransientAs<Migration01>()
+                .As<IMigration>();
+
+            services.AddTransientAs<AppDomainObject>()
+                .AsSelf();
+
+            services.AddTransientAs<AssetDomainObject>()
+                .AsSelf();
+
+            services.AddTransientAs<ContentDomainObject>()
+                .AsSelf();
+
+            services.AddTransientAs<RuleDomainObject>()
+                .AsSelf();
+
+            services.AddTransientAs<SchemaDomainObject>()
+                .AsSelf();
         }
     }
 }

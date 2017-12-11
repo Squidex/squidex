@@ -55,9 +55,17 @@ namespace Squidex.Infrastructure.Migrations
 
                     foreach (var migrator in migrationPath)
                     {
+                        var name = migrator.GetType().ToString();
+
+                        log.LogInformation(w => w
+                            .WriteProperty("action", "Migration")
+                            .WriteProperty("status", "Started")
+                            .WriteProperty("migrator", name));
+
                         using (log.MeasureInformation(w => w
                             .WriteProperty("action", "Migration")
-                            .WriteProperty("migrator", migrator.GetType().ToString())))
+                            .WriteProperty("status", "Completed")
+                            .WriteProperty("migrator", name)))
                         {
                             await migrator.UpdateAsync();
 

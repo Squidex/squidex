@@ -82,6 +82,13 @@ namespace Squidex.Infrastructure.Commands
         {
         }
 
+        public Task WriteStateAsync(long version)
+        {
+            state.Version = version;
+
+            return persistence.WriteSnapshotAsync(state);
+        }
+
         public async Task WriteAsync(ISemanticLog log)
         {
             var events = uncomittedEvents.ToArray();

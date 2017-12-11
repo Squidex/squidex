@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Schemas
 
         protected override string CollectionName()
         {
-            return "Snapshots_Schemas";
+            return "States_Schemas";
         }
 
         protected override async Task SetupCollectionAsync(IMongoCollection<MongoSchemaEntity> collection)

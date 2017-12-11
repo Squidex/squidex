@@ -109,8 +109,11 @@ namespace Squidex.Config.Domain
                 return new EventConsumerFactory(n => allEventConsumers.FirstOrDefault(x => x.Name == n));
             });
 
-            services.AddSingletonAs<EdmModelBuilder>();
-            services.AddSingleton<RuleService>();
+            services.AddSingletonAs<EdmModelBuilder>()
+                .AsSelf();
+
+            services.AddSingletonAs<RuleService>()
+                .AsSelf();
         }
     }
 }

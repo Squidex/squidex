@@ -7,6 +7,7 @@
 // ==========================================================================
 
 using Microsoft.Extensions.DependencyInjection;
+using Migrate_01;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using NodaTime;
@@ -26,7 +27,12 @@ namespace Squidex.Config.Domain
 {
     public static class SerializationServices
     {
-        private static readonly TypeNameRegistry TypeNameRegistry = new TypeNameRegistry();
+        private static readonly TypeNameRegistry TypeNameRegistry =
+            new TypeNameRegistry()
+                .MapUnmapped(typeof(Migration01).Assembly)
+                .MapUnmapped(typeof(SquidexCoreModel).Assembly)
+                .MapUnmapped(typeof(SquidexEvents).Assembly)
+                .MapUnmapped(typeof(SquidexInfrastructure).Assembly);
         private static readonly JsonSerializerSettings SerializerSettings = new JsonSerializerSettings();
         private static readonly FieldRegistry FieldRegistry = new FieldRegistry(TypeNameRegistry);
 
@@ -68,10 +74,6 @@ namespace Squidex.Config.Domain
 
         static SerializationServices()
         {
-            TypeNameRegistry.MapUnmapped(typeof(SquidexCoreModel).Assembly);
-            TypeNameRegistry.MapUnmapped(typeof(SquidexEvents).Assembly);
-            TypeNameRegistry.MapUnmapped(typeof(SquidexInfrastructure).Assembly);
-
             ConfigureJson(SerializerSettings, TypeNameHandling.Auto);
 
             BsonJsonConvention.Register(JsonSerializer.Create(SerializerSettings));

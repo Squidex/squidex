@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Apps
 
         protected override string CollectionName()
         {
-            return "Snapshots_Apps";
+            return "States_Apps";
         }
 
         protected override async Task SetupCollectionAsync(IMongoCollection<MongoAppEntity> collection)
