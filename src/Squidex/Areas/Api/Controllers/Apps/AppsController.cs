@@ -69,7 +69,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
 
             var response = apps.Select(a =>
             {
-                var dto = SimpleMapper.Map(a, new AppDto() { GeocoderKey = geocoder.Key ?? string.Empty });
+                var dto = SimpleMapper.Map(a, new AppDto());
 
                 dto.Permission = a.Contributors[subject];
 
@@ -108,7 +108,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
             var context = await CommandBus.PublishAsync(command);
 
             var result = context.Result<EntityCreatedResult<Guid>>();
-            var response = new AppCreatedDto { Id = result.IdOrValue.ToString(), Version = result.Version, GeocoderKey = geocoder.Key ?? string.Empty };
+            var response = new AppCreatedDto { Id = result.IdOrValue.ToString(), Version = result.Version };
 
             response.Permission = AppContributorPermission.Owner;
 

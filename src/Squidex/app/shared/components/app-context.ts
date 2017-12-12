@@ -18,13 +18,16 @@ import {
     DialogService,
     ErrorDto,
     Notification,
-    Profile
+    Profile,
+    UISettingsDto
 } from './../declarations-base';
 
 @Injectable()
 export class AppContext implements OnDestroy {
     private readonly appSubscription: Subscription;
+    private readonly uiSettingsSubscription: Subscription;
     private appField: AppDto;
+    private uiSettingsField: UISettingsDto;
 
     public get app(): AppDto {
         return this.appField;
@@ -36,6 +39,10 @@ export class AppContext implements OnDestroy {
 
     public get appName(): string {
         return this.appField ? this.appField.name : '';
+    }
+
+    public get uiSettings() {
+        return this.uiSettingsField;
     }
 
     public get userToken(): string {
@@ -60,6 +67,11 @@ export class AppContext implements OnDestroy {
         this.appSubscription =
             this.appsStore.selectedApp.take(1).subscribe(app => {
                 this.appField = app;
+            });
+
+        this.uiSettingsSubscription =
+            this.appsStore.uiSettings.subscribe(settings => {
+                this.uiSettingsField = settings;
             });
     }
 

@@ -15,6 +15,7 @@ import { ApiUrlConfig } from 'framework';
 
 export interface UISettingsDto {
     regexSuggestions: UIRegexSuggestionDto[];
+    geocoderKey: string;
 }
 
 export interface UIRegexSuggestionDto {
@@ -39,7 +40,7 @@ export class UIService {
 
             return this.http.get<UISettingsDto>(url)
                 .catch(error => {
-                    return Observable.of({ regexSuggestions: [] });
+                    return Observable.of({ regexSuggestions: [], geocoderKey: '' });
                 })
                 .do(settings => {
                     this.settings = settings;

@@ -14,6 +14,7 @@ using NSwag.Annotations;
 using Squidex.Areas.Api.Controllers.UI.Models;
 using Squidex.Config;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.Geocoding;
 using Squidex.Pipeline;
 
 namespace Squidex.Areas.Api.Controllers.UI
@@ -26,11 +27,13 @@ namespace Squidex.Areas.Api.Controllers.UI
     public sealed class UIController : ApiController
     {
         private readonly MyUIOptions uiOptions;
+        private readonly IGeocoder geocoder;
 
-        public UIController(ICommandBus commandBus, IOptions<MyUIOptions> uiOptions)
+        public UIController(ICommandBus commandBus, IOptions<MyUIOptions> uiOptions, IGeocoder geocoder)
             : base(commandBus)
         {
             this.uiOptions = uiOptions.Value;
+            this.geocoder = geocoder;
         }
 
         /// <summary>
@@ -50,7 +53,8 @@ namespace Squidex.Areas.Api.Controllers.UI
                             !string.IsNullOrWhiteSpace(x.Key) &&
                             !string.IsNullOrWhiteSpace(x.Value))
                         .Select(x => new UIRegexSuggestionDto { Name = x.Key, Pattern = x.Value }).ToList()
-                    ?? new List<UIRegexSuggestionDto>()
+                    ?? new List<UIRegexSuggestionDto>(),
+                GeocoderKey = geocoder.Key ?? string.Empty
             };
 
             return Ok(dto);

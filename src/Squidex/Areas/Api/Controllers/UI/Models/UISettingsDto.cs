@@ -18,5 +18,11 @@ namespace Squidex.Areas.Api.Controllers.UI.Models
         /// </summary>
         [Required]
         public List<UIRegexSuggestionDto> RegexSuggestions { get; set; }
+
+        /// <summary>
+        /// The geocoder key.
+        /// </summary>
+        [Required]
+        public string GeocoderKey { get; set; }
     }
 }

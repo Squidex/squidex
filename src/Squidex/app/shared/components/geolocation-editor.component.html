@@ -4,38 +4,16 @@
         <input id="pac-input" class="form-control controls" type="text" placeholder="Search Google Maps" #searchBox />
     </form>
     <div>
-        <form [formGroup]="geolocationForm" (change)="updateValueByInput()" [class.form-inline]="!useGoogleMaps">
-            <sqx-control-errors for="state"></sqx-control-errors>
-            <sqx-control-errors for="zip"></sqx-control-errors>
-            <div class="form-group latitude-group" [hidden]="useGoogleMaps">
+        <form class="form-inline" [formGroup]="geolocationForm" (change)="updateValueByInput()" (submit)="updateValueByInput()">
+            <div class="form-group latitude-group">
                 <sqx-control-errors for="latitude" style="z-index: 10000;"></sqx-control-errors>
                 <label for="latitude">Lat. </label>
-                <input type="number" class="form-control" formControlName="latitude" step="any"/>
+                <input type="number" class="form-control" formControlName="latitude" step="any" />
             </div>
-            <div class="form-group longitude-group" [hidden]="useGoogleMaps">
+            <div class="form-group longitude-group">
                 <sqx-control-errors for="longitude" style="z-index: 10000;"></sqx-control-errors>
                 <label for="longitude">Long. </label>
-                <input type="number" class="form-control" formControlName="longitude" step="any"/>
-            </div>
-            <div class="form-group address1-group" [hidden]="!useGoogleMaps">
-                <label for="latitude">Address 1 </label>
-                <input type="text" class="form-control" formControlName="address1"/>
-            </div>
-            <div class="form-group address2-group" [hidden]="!useGoogleMaps">
-                <label for="longitude">Address 2 </label>
-                <input type="text" class="form-control" formControlName="address2"/>
-            </div>
-            <div class="form-group city-group" [hidden]="!useGoogleMaps" [class.hasClear]="hasValue">
-                <label for="latitude">City </label>
-                <input type="text" class="form-control" formControlName="city"/>
-            </div>
-            <div class="form-group state-group" [hidden]="!useGoogleMaps">
-                <label for="longitude">State </label>
-                <input type="text" class="form-control" formControlName="state" sqxUpperCaseInput/>
-            </div>
-            <div class="form-group zip-group" [hidden]="!useGoogleMaps">
-                <label for="longitude">ZIP Code </label>
-                <input type="text" class="form-control" formControlName="zip"/>
+                <input type="number" class="form-control" formControlName="longitude" step="any" />
             </div>
             <div class="form-group clear-group" [class.hidden]="!hasValue">
                 <button type="reset" class="btn btn-link clear" [disabled]="isDisabled" (click)="reset()">Clear</button>

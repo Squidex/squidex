@@ -66,7 +66,7 @@ namespace Squidex.Domain.Apps.Write.Contents
 
         private readonly NamedContentData invalidGoogleMapsLatLongData = new NamedContentData()
             .AddField("my-geolocation-field1", new ContentFieldData()
-                .AddValue(JObject.FromObject(new { latitude = 0, longitude = (double?)null, address1 = "baddata" })));
+                .AddValue(JObject.FromObject(new { latitude = 0, longitude = (double?)null, address = "baddata" })));
 
         public ContentCommandMiddlewareTests()
         {

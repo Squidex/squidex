@@ -25,11 +25,6 @@ export const SQX_GEOLOCATION_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
 interface Geolocation {
     latitude: number;
     longitude: number;
-    address1: string;
-    address2: string;
-    city: string;
-    state: string;
-    zip: string;
 }
 
 @Component({
@@ -53,19 +48,6 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
 
     public geolocationForm =
     this.formBuilder.group({
-        address1: ['', []],
-        address2: ['', []],
-        city: ['', []],
-        state: [
-            '', [
-                ValidatorsEx.pattern('[A-Z]{2}', 'This field must be a valid state abbreviation.')
-            ]
-        ],
-        zip: [
-            '', [
-                ValidatorsEx.pattern('[0-9]{5}(\-[0-9]{4})?', 'This field must be a valid ZIP Code.')
-            ]
-        ],
         latitude: [
             '',
             [
@@ -93,7 +75,7 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
         private readonly formBuilder: FormBuilder,
         private readonly ctx: AppContext
     ) {
-        this.useGoogleMaps = this.ctx.app.geocoderKey !== '';
+        this.useGoogleMaps = this.ctx.uiSettings.geocoderKey !== '';
     }
 
     public writeValue(value: Geolocation) {
@@ -109,7 +91,7 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
     }
 
     public setDisabledState(isDisabled: boolean): void {
-        if (this.ctx.app.geocoderKey === '') {
+        if (!this.useGoogleMaps) {
             this.setDisabledStateOSM(isDisabled);
         } else {
             this.setDisabledStateGoogle(isDisabled);
@@ -234,12 +216,7 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
 
                             this.value = {
                                 latitude: latlng.lat,
-                                longitude: latlng.lng,
-                                address1: '',
-                                address2: '',
-                                city: '',
-                                state: '',
-                                zip: ''
+                                longitude: latlng.lng
                             };
 
                             this.updateMarker(false, true);
@@ -259,7 +236,7 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
     }
 
     private ngAfterViewInitGoogle() {
-        this.resourceLoader.loadScript(`https://maps.googleapis.com/maps/api/js?key=${this.ctx.app.geocoderKey}&libraries=places`).then(
+        this.resourceLoader.loadScript(`https://maps.googleapis.com/maps/api/js?key=${this.ctx.uiSettings.geocoderKey}&libraries=places`).then(
             () => {
                 this.map = new google.maps.Map(this.editor.nativeElement,
                     {
@@ -277,12 +254,7 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
                         if (!this.isDisabled) {
                             this.value = {
                                 latitude: event.latLng.lat(),
-                                longitude: event.latLng.lng(),
-                                address1: this.value == null ? '' : this.value.address1,
-                                address2: this.value == null ? '' : this.value.address2,
-                                city: this.value == null ? '' : this.value.city,
-                                state: this.value == null ? '' : this.value.state,
-                                zip: this.value == null ? '' : this.value.zip
+                                longitude: event.latLng.lng()
                             };
 
                             this.updateMarker(false, true);
@@ -305,7 +277,10 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
                         }
 
                         if (!this.isDisabled) {
-                            this.value = this.parseAddress(place);
+                            let latitude = place.geometry.location.lat();
+                            let longitude = place.geometry.location.lng();
+
+                            this.value = { latitude: latitude, longitude: longitude };
 
                             this.updateMarker(false, true);
                         }
@@ -330,40 +305,8 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
         this.updateMarker(true, true);
     }
 
-    private parseAddress(value: any): Geolocation {
-        let latitude = value.geometry.location.lat();
-        let longitude = value.geometry.location.lng();
-        let address1 = this.getAddressValue(value.address_components.find((a: any) => a.types.indexOf('street_number') > -1))
-            + ' ' + this.getAddressValue(value.address_components.find((a: any) => a.types.indexOf('route') > -1));
-        let address2 = this.getAddressValue(value.address_components.find((a: any) => a.types.indexOf('subpremise') > -1));
-        let city = this.getAddressValue(value.address_components.find((a: any) => a.types.indexOf('locality') > -1));
-        let state = this.getAddressValue(value.address_components.find((a: any) => a.types.indexOf('administrative_area_level_1') > -1)).toUpperCase();
-
-        let zipCode = this.getAddressValue(value.address_components.find((a: any) => a.types.indexOf('postal_code') > -1));
-        let zipCodeSuffix = this.getAddressValue(value.address_components.find((a: any) => a.types.indexOf('postal_code_suffix') > -1));
-        let zip = zipCodeSuffix === '' ? zipCode : zipCode + '-' + zipCodeSuffix;
-
-        return { latitude: latitude, longitude: longitude, address1: address1, address2: address2, city: city, state: state, zip: zip };
-    }
-
-    private getAddressValue(value: any) {
-        return value == null ? '' : value.short_name;
-    }
-
-    private fillMissingParameters() {
-        return {
-            latitude: this.value.latitude,
-            longitude: this.value.longitude,
-            address1: this.value.address1 ? this.value.address1 : '',
-            address2: this.value.address2 ? this.value.address2 : '',
-            city: this.value.city ? this.value.city : '',
-            state: this.value.state ? this.value.state : '',
-            zip: this.value.zip ? this.value.zip : ''
-        };
-    }
-
     private updateMarker(zoom: boolean, fireEvent: boolean) {
-        if (this.ctx.app.geocoderKey === '') {
+        if (!this.useGoogleMaps) {
             this.updateMarkerOSM(zoom, fireEvent);
         } else {
             this.updateMarkerGoogle(zoom, fireEvent);
@@ -380,12 +323,7 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
 
                     this.value = {
                         latitude: latlng.lat,
-                        longitude: latlng.lng,
-                        address1: '',
-                        address2: '',
-                        city: '',
-                        state: '',
-                        zip: '' };
+                        longitude: latlng.lng};
                 });
 
                 this.marker.on('dragend', () => {
@@ -407,7 +345,7 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
 
             this.marker.setLatLng(latLng);
 
-            this.geolocationForm.setValue(this.fillMissingParameters(), { emitEvent: false, onlySelf: false });
+            this.geolocationForm.setValue(this.value, { emitEvent: false, onlySelf: false });
         } else {
             if (this.marker) {
                 this.marker.removeFrom(this.map);
@@ -438,12 +376,7 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
                     if (!this.isDisabled) {
                         this.value = {
                             latitude: event.latLng.lat(),
-                            longitude: event.latLng.lng(),
-                            address1: this.value == null ? '' : this.value.address1,
-                            address2: this.value == null ? '' : this.value.address2,
-                            city: this.value == null ? '' : this.value.city,
-                            state: this.value == null ? '' : this.value.state,
-                            zip: this.value == null ? '' : this.value.zip
+                            longitude: event.latLng.lng()
                         };
                     }
                 });
@@ -451,12 +384,7 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
                     if (!this.isDisabled) {
                         this.value = {
                             latitude: event.latLng.lat(),
-                            longitude: event.latLng.lng(),
-                            address1: this.value == null ? '' : this.value.address1,
-                            address2: this.value == null ? '' : this.value.address2,
-                            city: this.value == null ? '' : this.value.city,
-                            state: this.value == null ? '' : this.value.state,
-                            zip: this.value == null ? '' : this.value.zip
+                            longitude: event.latLng.lng()
                         };
 
                         this.updateMarker(false, true);
@@ -475,7 +403,7 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
             this.marker.setPosition(latLng);
             this.map.setZoom(16);
 
-            this.geolocationForm.setValue(this.fillMissingParameters(), { emitEvent: false, onlySelf: false });
+            this.geolocationForm.setValue(this.value, { emitEvent: false, onlySelf: false });
         } else {
             if (this.marker) {
                 this.marker.setMap(null);

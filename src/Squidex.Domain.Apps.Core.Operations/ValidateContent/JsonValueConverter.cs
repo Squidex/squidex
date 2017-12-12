@@ -69,7 +69,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             List<string> addressString = new List<string>();
             var validProperties = new string[]
             {
-                "latitude", "longitude", "address1", "address2", "city", "state", "zip"
+                "latitude", "longitude", "address"
             };
 
             foreach (var property in geolocation.Properties())
@@ -78,19 +78,16 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
                 {
                     throw new InvalidCastException("Geolocation must have proper properties.");
                 }
-
-                addressString.Add(geolocation[property.Name.ToLower()]?.ToString());
             }
 
             var lat = geolocation["latitude"];
             var lon = geolocation["longitude"];
-            var state = geolocation["state"]?.ToString();
-            var zip = geolocation["zip"]?.ToString();
+            var address = geolocation["address"]?.ToString();
 
             if (lat == null || lon == null ||
                 ((JValue)lat).Value == null || ((JValue)lon).Value == null)
             {
-                var response = geocoder.GeocodeAddress(string.Join(string.Empty, addressString));
+                var response = geocoder.GeocodeAddress(address);
                 lat = response.TryGetPropertyValue("Latitude", (JToken)null);
                 lon = response.TryGetPropertyValue("Longitude", (JToken)null);
 
@@ -106,16 +103,6 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             if (!((double)lon).IsBetween(-180, 180))
             {
                 throw new InvalidCastException("Longitude must be between -180 and 180.");
-            }
-
-            if (!string.IsNullOrWhiteSpace(state) && !Regex.IsMatch(state, "[A-Z]{2}"))
-            {
-                throw new InvalidCastException("State must be two capital letters.");
-            }
-
-            if (!string.IsNullOrWhiteSpace(zip) && !Regex.IsMatch(zip, "[0-9]{5}(\\-[0-9]{4})?"))
-            {
-                throw new InvalidCastException("ZIP Code must match postal code with optional suffix pattern.");
             }
 
             return geolocation;

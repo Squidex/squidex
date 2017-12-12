@@ -9,26 +9,6 @@
     margin-top: .5rem;
     margin-bottom: .5rem;
 
-
-    &.city-group {
-        display: inline-block;
-        width: 70%;
-
-        &.hasClear{
-            width: 55%;
-        }
-    }
-
-    &.state-group {
-        display: inline-block;
-        width: 10%;
-    }
-
-    &.zip-group {
-        display: inline-block;
-        width: 18.5%;
-    }
-
     &.clear-group {
         display: inline-block;
         &.hidden{

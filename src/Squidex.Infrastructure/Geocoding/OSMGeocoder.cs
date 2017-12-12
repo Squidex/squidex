@@ -1,6 +1,9 @@
 ﻿// ==========================================================================
 //  OSMGeocoder.cs
-//  CivicPlus implementation of Squidex Headless CMS
+//  Squidex Headless CMS
+// ==========================================================================
+//  Copyright (c) Squidex Group
+//  All rights reserved.
 // ==========================================================================
 
 using System;

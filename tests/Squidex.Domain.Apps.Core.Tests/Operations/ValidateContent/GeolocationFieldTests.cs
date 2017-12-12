@@ -98,38 +98,6 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         }
 
         [Fact]
-        public async Task Should_add_errors_if_geolocation_has_invalid_zip()
-        {
-            var sut = new GeolocationField(1, "my-geolocation", Partitioning.Invariant, new GeolocationFieldProperties { IsRequired = true });
-
-            var geolocation = new JObject(
-                new JProperty("latitude", 0),
-                new JProperty("longitude", 0),
-                new JProperty("zip", "1234"));
-
-            await sut.ValidateAsync(CreateValue(geolocation), errors);
-
-            errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> is not a valid value. ZIP Code must match postal code with optional suffix pattern." });
-        }
-
-        [Fact]
-        public async Task Should_add_errors_if_geolocation_has_invalid_state()
-        {
-            var sut = new GeolocationField(1, "my-geolocation", Partitioning.Invariant, new GeolocationFieldProperties { IsRequired = true });
-
-            var geolocation = new JObject(
-                new JProperty("latitude", 0),
-                new JProperty("longitude", 0),
-                new JProperty("state", "1"));
-
-            await sut.ValidateAsync(CreateValue(geolocation), errors);
-
-            errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> is not a valid value. State must be two capital letters." });
-        }
-
-        [Fact]
         public async Task Should_add_errors_if_geolocation_is_required()
         {
             var sut = Field(new GeolocationFieldProperties { IsRequired = true });

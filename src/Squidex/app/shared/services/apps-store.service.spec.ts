@@ -13,30 +13,39 @@ import {
     AppsService,
     AppsStoreService,
     CreateAppDto,
-    DateTime
+    DateTime,
+    UIService,
+    UISettingsDto
 } from './../';
 
 describe('AppsStoreService', () => {
     const now = DateTime.now();
 
     const oldApps = [
-        new AppDto('id', 'old-name', 'Owner', now, now, 'Free', 'Plan', ''),
-        new AppDto('id', 'old-name', 'Owner', now, now, 'Free', 'Plan', '')
+        new AppDto('id', 'old-name', 'Owner', now, now, 'Free', 'Plan'),
+        new AppDto('id', 'old-name', 'Owner', now, now, 'Free', 'Plan')
     ];
-    const newApp = new AppDto('id', 'new-name', 'Owner', now, now, 'Free', 'Plan', '');
+    const newApp = new AppDto('id', 'new-name', 'Owner', now, now, 'Free', 'Plan');
+
+    const settings: UISettingsDto = { regexSuggestions: [], geocoderKey: '' };
 
     let appsService: IMock<AppsService>;
+    let uiService: IMock<UIService>;
 
     beforeEach(() => {
         appsService = Mock.ofType(AppsService);
-    });
+        uiService = Mock.ofType(UIService);
 
-    it('should load automatically', () => {
         appsService.setup(x => x.getApps())
             .returns(() => Observable.of(oldApps))
             .verifiable(Times.once());
+        uiService.setup(x => x.getSettings())
+            .returns(() => Observable.of(settings))
+            .verifiable(Times.once());
+    });
 
-        const store = new AppsStoreService(appsService.object);
+    it('should load automatically', () => {
+        const store = new AppsStoreService(appsService.object, uiService.object);
 
         let result1: AppDto[] | null = null;
         let result2: AppDto[] | null = null;
@@ -56,15 +65,11 @@ describe('AppsStoreService', () => {
     });
 
     it('should add app to cache when created', () => {
-        appsService.setup(x => x.getApps())
-            .returns(() => Observable.of(oldApps))
-            .verifiable(Times.once());
-
         appsService.setup(x => x.postApp(It.isAny()))
             .returns(() => Observable.of(newApp))
             .verifiable(Times.once());
 
-        const store = new AppsStoreService(appsService.object);
+        const store = new AppsStoreService(appsService.object, uiService.object);
 
         let result1: AppDto[] | null = null;
         let result2: AppDto[] | null = null;
@@ -86,11 +91,7 @@ describe('AppsStoreService', () => {
     });
 
     it('should select app', (done) => {
-        appsService.setup(x => x.getApps())
-            .returns(() => Observable.of(oldApps))
-            .verifiable(Times.once());
-
-        const store = new AppsStoreService(appsService.object);
+        const store = new AppsStoreService(appsService.object, uiService.object);
 
         store.selectApp('old-name').subscribe(isSelected => {
             expect(isSelected).toBeTruthy();
@@ -104,4 +105,19 @@ describe('AppsStoreService', () => {
             done();
         });
     });
+
+
+    it('should load uisettings',
+        () => {
+            const store = new AppsStoreService(appsService.object, uiService.object);
+
+            store.uiSettings.subscribe(result => {
+                    expect(result).toEqual(settings);
+
+                    uiService.verifyAll();
+                },
+                err => {
+                    expect(err).toBeNull();
+                });
+        });
 });

@@ -1,6 +1,9 @@
 ﻿// ==========================================================================
 //  IGeocoder.cs
-//  CivicPlus implementation of Squidex Headless CMS
+//  Squidex Headless CMS
+// ==========================================================================
+//  Copyright (c) Squidex Group
+//  All rights reserved.
 // ==========================================================================
 
 namespace Squidex.Infrastructure.Geocoding

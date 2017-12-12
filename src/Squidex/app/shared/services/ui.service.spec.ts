@@ -41,7 +41,7 @@ describe('UIService', () => {
             settings1 = result;
         });
 
-        const response: UISettingsDto = { regexSuggestions: [] };
+        const response: UISettingsDto = { regexSuggestions: [], geocoderKey: '' };
 
         const req = httpMock.expectOne('http://service/p/api/ui/settings');
 

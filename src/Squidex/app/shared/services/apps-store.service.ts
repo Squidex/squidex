@@ -16,10 +16,13 @@ import {
     CreateAppDto
 } from './apps.service';
 
+import { UIService, UISettingsDto } from './ui.service';
+
 @Injectable()
 export class AppsStoreService {
     private readonly apps$ = new ReplaySubject<AppDto[]>(1);
     private readonly app$ = new BehaviorSubject<AppDto | null>(null);
+    private readonly uiSettings$ = new BehaviorSubject<UISettingsDto | null>(null);
 
     public get apps(): Observable<AppDto[]> {
         return this.apps$;
@@ -29,8 +32,13 @@ export class AppsStoreService {
         return this.app$;
     }
 
+    public get uiSettings(): Observable<UISettingsDto | null> {
+        return this.uiSettings$;
+    }
+
     constructor(
-        private readonly appsService: AppsService
+        private readonly appsService: AppsService,
+        private readonly uiService: UIService
     ) {
         if (!appsService) {
             return;
@@ -42,6 +50,14 @@ export class AppsStoreService {
             }, error => {
                 this.apps$.next([]);
             });
+
+        this.uiService.getSettings()
+            .subscribe(settings => {
+                    this.uiSettings$.next(settings);
+                },
+                error => {
+                    this.uiSettings$.next(null);
+                });
     }
 
     public selectApp(name: string | null): Observable<boolean> {
