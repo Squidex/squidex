@@ -5,7 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { HttpClient, HttpErrorResponse, HttpEventType, HttpHeaders, HttpRequest, HttpResponse } from '@angular/common/http';
+import { HttpClient, HttpEventType, HttpHeaders, HttpRequest, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
@@ -13,7 +13,6 @@ import {
     AnalyticsService,
     ApiUrlConfig,
     DateTime,
-    LocalCacheService,
     HTTP,
     Version,
     Versioned
@@ -106,8 +105,7 @@ export class AssetsService {
     constructor(
         private readonly http: HttpClient,
         private readonly apiUrl: ApiUrlConfig,
-        private readonly analytics: AnalyticsService,
-        private readonly localCache: LocalCacheService
+        private readonly analytics: AnalyticsService
     ) {
     }
 
@@ -202,8 +200,6 @@ export class AssetsService {
                             assetUrl,
                             new Version(event.headers.get('etag')));
 
-                        this.localCache.set(`asset.${dto.id}`, dto, 5000);
-
                         return dto;
                     }
                 })
@@ -238,17 +234,6 @@ export class AssetsService {
                         body.pixelHeight,
                         assetUrl,
                         response.version);
-                })
-                .catch(error => {
-                    if (error instanceof HttpErrorResponse && error.status === 404) {
-                        const cached = this.localCache.get(`asset.${id}`);
-
-                        if (cached) {
-                            return Observable.of(cached);
-                        }
-                    }
-
-                    return Observable.throw(error);
                 })
                 .pretifyError('Failed to load assets. Please reload.');
     }
@@ -298,8 +283,6 @@ export class AssetsService {
         return HTTP.deleteVersioned(this.http, url, version)
                 .do(() => {
                     this.analytics.trackEvent('Analytics', 'Deleted', appName);
-
-                    this.localCache.remove(`asset.${id}`);
                 })
                 .pretifyError('Failed to delete asset. Please reload.');
     }

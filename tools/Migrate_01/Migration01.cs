@@ -56,8 +56,14 @@ namespace Migrate_01
         {
             var subscription = eventStore.CreateSubscription(this, ".*");
 
-            await subscriptionTcs.Task;
-            await subscription.StopAsync();
+            try
+            {
+                await subscriptionTcs.Task;
+            }
+            finally
+            {
+                await subscription.StopAsync();
+            }
         }
 
         public async Task OnEventAsync(IEventSubscription subscription, StoredEvent storedEvent)

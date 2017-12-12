@@ -5,7 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights reserved
  */
 
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
@@ -15,7 +15,6 @@ import {
     AnalyticsService,
     ApiUrlConfig,
     DateTime,
-    LocalCacheService,
     HTTP,
     Version,
     Versioned
@@ -96,8 +95,7 @@ export class ContentsService {
     constructor(
         private readonly http: HttpClient,
         private readonly apiUrl: ApiUrlConfig,
-        private readonly analytics: AnalyticsService,
-        private readonly localCache: LocalCacheService
+        private readonly analytics: AnalyticsService
     ) {
     }
 
@@ -172,17 +170,6 @@ export class ContentsService {
                         body.data,
                         response.version);
                 })
-                .catch(error => {
-                    if (error instanceof HttpErrorResponse && error.status === 404) {
-                        const cached = this.localCache.get(`content.${id}`);
-
-                        if (cached) {
-                            return Observable.of(cached);
-                        }
-                    }
-
-                    return Observable.throw(error);
-                })
                 .pretifyError('Failed to load content. Please reload.');
     }
 
@@ -215,8 +202,6 @@ export class ContentsService {
                 })
                 .do(content => {
                     this.analytics.trackEvent('Content', 'Created', appName);
-
-                    this.localCache.set(`content.${content.id}`, content, 5000);
                 })
                 .pretifyError('Failed to create content. Please reload.');
     }
@@ -232,8 +217,6 @@ export class ContentsService {
                 })
                 .do(() => {
                     this.analytics.trackEvent('Content', 'Updated', appName);
-
-                    this.localCache.set(`content.${id}`, dto, 5000);
                 })
                 .pretifyError('Failed to update content. Please reload.');
     }
@@ -244,8 +227,6 @@ export class ContentsService {
         return HTTP.deleteVersioned(this.http, url, version)
                 .do(() => {
                     this.analytics.trackEvent('Content', 'Deleted', appName);
-
-                    this.localCache.remove(`content.${id}`);
                 })
                 .pretifyError('Failed to delete content. Please reload.');
     }
