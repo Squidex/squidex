@@ -27,7 +27,7 @@ namespace Squidex.Infrastructure.States
             private readonly List<IEvent> appliedEvents = new List<IEvent>();
             private IPersistence persistence;
 
-            public long ExpectedVersion { get; set; }
+            public long ExpectedVersion { get; set; } = EtagVersion.Any;
 
             public List<IEvent> AppliedEvents
             {
@@ -51,7 +51,7 @@ namespace Squidex.Infrastructure.States
         {
             private IPersistence<object> persistence;
 
-            public long ExpectedVersion { get; set; }
+            public long ExpectedVersion { get; set; } = EtagVersion.Any;
 
             public Task ActivateAsync(string key, IStore<string> store)
             {
@@ -110,10 +110,8 @@ namespace Squidex.Infrastructure.States
         }
 
         [Fact]
-        public async Task Should_read_events_from_snapshot()
+        public async Task Should_read_status_from_snapshot()
         {
-            statefulObjectWithSnapShot.ExpectedVersion = EtagVersion.Any;
-
             A.CallTo(() => snapshotStore.ReadAsync(key))
                 .Returns((2, 2L));
 
@@ -128,8 +126,6 @@ namespace Squidex.Infrastructure.States
         [Fact]
         public async Task Should_throw_exception_if_events_are_older_than_snapshot()
         {
-            statefulObjectWithSnapShot.ExpectedVersion = EtagVersion.Any;
-
             A.CallTo(() => snapshotStore.ReadAsync(key))
                 .Returns((2, 2L));
 
@@ -141,8 +137,6 @@ namespace Squidex.Infrastructure.States
         [Fact]
         public async Task Should_throw_exception_if_events_have_gaps_to_snapshot()
         {
-            statefulObjectWithSnapShot.ExpectedVersion = EtagVersion.Any;
-
             A.CallTo(() => snapshotStore.ReadAsync(key))
                 .Returns((2, 2L));
 
@@ -172,6 +166,19 @@ namespace Squidex.Infrastructure.States
         }
 
         [Fact]
+        public async Task Should_throw_exception_if_other_version_found_from_snapshot()
+        {
+            statefulObjectWithSnapShot.ExpectedVersion = 1;
+
+            A.CallTo(() => snapshotStore.ReadAsync(key))
+                .Returns((2, 2L));
+
+            SetupEventStore(0);
+
+            await Assert.ThrowsAsync<DomainObjectVersionException>(() => sut.GetSingleAsync<MyStatefulObjectWithSnapshot>(key));
+        }
+
+        [Fact]
         public async Task Should_not_throw_exception_if_noting_expected()
         {
             statefulObject.ExpectedVersion = EtagVersion.Any;
@@ -197,8 +204,6 @@ namespace Squidex.Infrastructure.States
         [Fact]
         public async Task Should_serve_next_request_from_cache()
         {
-            statefulObject.ExpectedVersion = EtagVersion.Any;
-
             SetupEventStore(0);
 
             var actualObject1 = await sut.GetSingleAsync<MyStatefulObject>(key);
@@ -215,8 +220,6 @@ namespace Squidex.Infrastructure.States
         [Fact]
         public async Task Should_write_to_store_with_previous_position()
         {
-            statefulObject.ExpectedVersion = EtagVersion.Any;
-
             InvalidateMessage message = null;
 
             pubSub.Subscribe<InvalidateMessage>(m =>
@@ -245,8 +248,6 @@ namespace Squidex.Infrastructure.States
         [Fact]
         public async Task Should_wrap_exception_when_writing_to_store_with_previous_position()
         {
-            statefulObject.ExpectedVersion = EtagVersion.Any;
-
             SetupEventStore(3);
 
             var actualObject = await sut.GetSingleAsync<MyStatefulObject>(key);
@@ -260,8 +261,6 @@ namespace Squidex.Infrastructure.States
         [Fact]
         public async Task Should_remove_from_cache_when_invalidation_message_received()
         {
-            statefulObject.ExpectedVersion = EtagVersion.Any;
-
             var actualObject = await sut.GetSingleAsync<MyStatefulObject>(key);
 
             await InvalidateCacheAsync();
@@ -270,10 +269,21 @@ namespace Squidex.Infrastructure.States
         }
 
         [Fact]
+        public async Task Should_remove_from_cache_when_write_failed()
+        {
+            A.CallTo(() => eventStore.AppendEventsAsync(A<Guid>.Ignored, A<string>.Ignored, A<long>.Ignored, A<ICollection<EventData>>.Ignored))
+                .Throws(new InvalidOperationException());
+
+            var actualObject = await sut.GetSingleAsync<MyStatefulObject>(key);
+
+            await Assert.ThrowsAsync<InvalidOperationException>(() => statefulObject.WriteEventsAsync(new MyEvent()));
+
+            Assert.False(cache.TryGetValue(key, out var t));
+        }
+
+        [Fact]
         public async Task Should_return_same_instance_for_parallel_requests()
         {
-            statefulObject.ExpectedVersion = EtagVersion.Any;
-
             A.CallTo(() => snapshotStore.ReadAsync(key))
                 .ReturnsLazily(() => Task.Delay(1).ContinueWith(x => ((object)1, 1L)));
 

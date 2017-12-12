@@ -18,12 +18,13 @@ namespace Squidex.Infrastructure.States
     {
         public Persistence(TKey ownerKey,
             Action invalidate,
+            Action failed,
             IEventStore eventStore,
             IEventDataFormatter eventDataFormatter,
             ISnapshotStore<object, TKey> snapshotStore,
             IStreamNameResolver streamNameResolver,
             Func<Envelope<IEvent>, Task> applyEvent)
-            : base(ownerKey, invalidate, eventStore, eventDataFormatter, snapshotStore, streamNameResolver, PersistenceMode.EventSourcing, null, applyEvent)
+            : base(ownerKey, invalidate, failed, eventStore, eventDataFormatter, snapshotStore, streamNameResolver, PersistenceMode.EventSourcing, null, applyEvent)
         {
         }
     }

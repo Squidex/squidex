@@ -15,6 +15,7 @@ namespace Squidex.Infrastructure.States
     internal sealed class Store<TOwner, TKey> : IStore<TKey>
     {
         private readonly Action invalidate;
+        private readonly Action failed;
         private readonly IServiceProvider services;
         private readonly IStreamNameResolver streamNameResolver;
         private readonly IEventStore eventStore;
@@ -25,10 +26,12 @@ namespace Squidex.Infrastructure.States
             IEventDataFormatter eventDataFormatter,
             IServiceProvider services,
             IStreamNameResolver streamNameResolver,
-            Action invalidate = null)
+            Action invalidate = null,
+            Action failed = null)
         {
             this.eventStore = eventStore;
             this.eventDataFormatter = eventDataFormatter;
+            this.failed = failed;
             this.invalidate = invalidate;
             this.services = services;
             this.streamNameResolver = streamNameResolver;
@@ -50,7 +53,7 @@ namespace Squidex.Infrastructure.States
 
             var snapshotStore = (ISnapshotStore<object, TKey>)services.GetService(typeof(ISnapshotStore<object, TKey>));
 
-            return new Persistence<TOwner, TKey>(key, invalidate, eventStore, eventDataFormatter, snapshotStore, streamNameResolver, applyEvent);
+            return new Persistence<TOwner, TKey>(key, invalidate, failed, eventStore, eventDataFormatter, snapshotStore, streamNameResolver, applyEvent);
         }
 
         private IPersistence<TState> CreatePersistence<TState>(TKey key, PersistenceMode mode, Func<TState, Task> applySnapshot, Func<Envelope<IEvent>, Task> applyEvent)
@@ -59,7 +62,7 @@ namespace Squidex.Infrastructure.States
 
             var snapshotStore = (ISnapshotStore<TState, TKey>)services.GetService(typeof(ISnapshotStore<TState, TKey>));
 
-            return new Persistence<TOwner, TState, TKey>(key, invalidate, eventStore, eventDataFormatter, snapshotStore, streamNameResolver, mode, applySnapshot, applyEvent);
+            return new Persistence<TOwner, TState, TKey>(key, invalidate, failed, eventStore, eventDataFormatter, snapshotStore, streamNameResolver, mode, applySnapshot, applyEvent);
         }
     }
 }

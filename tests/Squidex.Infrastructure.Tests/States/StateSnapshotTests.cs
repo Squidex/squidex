@@ -26,7 +26,7 @@ namespace Squidex.Infrastructure.States
             private IPersistence<int> persistence;
             private int state;
 
-            public long ExpectedVersion { get; set; }
+            public long ExpectedVersion { get; set; } = EtagVersion.Any;
 
             public long Version
             {
@@ -102,8 +102,6 @@ namespace Squidex.Infrastructure.States
         [Fact]
         public async Task Should_set_to_empty_when_store_returns_not_found()
         {
-            statefulObject.ExpectedVersion = EtagVersion.Any;
-
             A.CallTo(() => snapshotStore.ReadAsync(key))
                 .Returns((123, EtagVersion.NotFound));
 
@@ -138,8 +136,6 @@ namespace Squidex.Infrastructure.States
         [Fact]
         public async Task Should_not_throw_exception_if_noting_expected()
         {
-            statefulObject.ExpectedVersion = EtagVersion.Any;
-
             A.CallTo(() => snapshotStore.ReadAsync(key))
                 .Returns((0, EtagVersion.Empty));
 
@@ -149,8 +145,6 @@ namespace Squidex.Infrastructure.States
         [Fact]
         public async Task Should_provide_state_from_services_and_add_to_cache()
         {
-            statefulObject.ExpectedVersion = EtagVersion.Any;
-
             var actualObject = await sut.GetSingleAsync<MyStatefulObject, string>(key);
 
             Assert.Same(statefulObject, actualObject);
@@ -160,8 +154,6 @@ namespace Squidex.Infrastructure.States
         [Fact]
         public async Task Should_serve_next_request_from_cache()
         {
-            statefulObject.ExpectedVersion = EtagVersion.Any;
-
             var actualObject1 = await sut.GetSingleAsync<MyStatefulObject, string>(key);
 
             Assert.Same(statefulObject, actualObject1);
@@ -176,8 +168,6 @@ namespace Squidex.Infrastructure.States
         [Fact]
         public async Task Should_not_serve_next_request_from_cache_when_detached()
         {
-            statefulObject.ExpectedVersion = EtagVersion.Any;
-
             var actualObject1 = await sut.CreateAsync<MyStatefulObject, string>(key);
 
             Assert.Same(statefulObject, actualObject1);
@@ -192,8 +182,6 @@ namespace Squidex.Infrastructure.States
         [Fact]
         public async Task Should_write_to_store_with_previous_version()
         {
-            statefulObject.ExpectedVersion = EtagVersion.Any;
-
             InvalidateMessage message = null;
 
             pubSub.Subscribe<InvalidateMessage>(m =>
@@ -223,8 +211,6 @@ namespace Squidex.Infrastructure.States
         [Fact]
         public async Task Should_wrap_exception_when_writing_to_store_with_previous_version()
         {
-            statefulObject.ExpectedVersion = EtagVersion.Any;
-
             A.CallTo(() => snapshotStore.ReadAsync(key))
                 .Returns((123, 13));
 
@@ -239,8 +225,6 @@ namespace Squidex.Infrastructure.States
         [Fact]
         public async Task Should_remove_from_cache_when_invalidation_message_received()
         {
-            statefulObject.ExpectedVersion = EtagVersion.Any;
-
             var actualObject = await sut.GetSingleAsync<MyStatefulObject, string>(key);
 
             await InvalidateCacheAsync();
@@ -249,10 +233,21 @@ namespace Squidex.Infrastructure.States
         }
 
         [Fact]
+        public async Task Should_remove_from_cache_when_write_failed()
+        {
+            A.CallTo(() => snapshotStore.WriteAsync(A<string>.Ignored, A<int>.Ignored, A<long>.Ignored, A<long>.Ignored))
+                .Throws(new InvalidOperationException());
+
+            var actualObject = await sut.GetSingleAsync<MyStatefulObject>(key);
+
+            await Assert.ThrowsAsync<InvalidOperationException>(() => statefulObject.WriteStateAsync());
+
+            Assert.False(cache.TryGetValue(key, out var t));
+        }
+
+        [Fact]
         public async Task Should_return_same_instance_for_parallel_requests()
         {
-            statefulObject.ExpectedVersion = EtagVersion.Any;
-
             A.CallTo(() => snapshotStore.ReadAsync(key))
                 .ReturnsLazily(() => Task.Delay(1).ContinueWith(x => (1, 1L)));
 

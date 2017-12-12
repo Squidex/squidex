@@ -126,10 +126,14 @@ namespace Squidex.Infrastructure.States
 
                 var state = (T)services.GetService(typeof(T));
 
-                var stateStore = new Store<T, TKey>(eventStore, eventDataFormatter, services, streamNameResolver, () =>
-                {
-                    pubSub.Publish(new InvalidateMessage { Key = key.ToString() }, false);
-                });
+                var stateStore = new Store<T, TKey>(eventStore, eventDataFormatter, services, streamNameResolver,
+                    () =>
+                    {
+                        pubSub.Publish(new InvalidateMessage { Key = key.ToString() }, false);
+                    }, () =>
+                    {
+                        statesCache.Remove(key);
+                    });
 
                 stateObj = new ObjectHolder<T, TKey>(state, key, stateStore);
 
