@@ -63,6 +63,11 @@ namespace Squidex.Domain.Apps.Entities
         {
             var appId = await GetAppIdAsync(appName);
 
+            if (appId == Guid.Empty)
+            {
+                return null;
+            }
+
             var app = await stateFactory.GetSingleAsync<AppDomainObject>(appId);
 
             return IsNotFound(app) ? null : app.State;
@@ -71,6 +76,11 @@ namespace Squidex.Domain.Apps.Entities
         public async Task<ISchemaEntity> GetSchemaAsync(Guid appId, string name, bool provideDeleted = false)
         {
             var schemaId = await GetSchemaIdAsync(appId, name);
+
+            if (schemaId == Guid.Empty)
+            {
+                return null;
+            }
 
             var schema = await stateFactory.GetSingleAsync<SchemaDomainObject>(schemaId);
 
