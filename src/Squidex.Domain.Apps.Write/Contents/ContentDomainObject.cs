@@ -115,7 +115,7 @@ namespace Squidex.Domain.Apps.Write.Contents
         {
             VerifyCreatedAndNotDeleted();
 
-            var newData = Data.MergeInto(command.Data);
+            var newData = command.Data.MergeInto(Data);
 
             if (!newData.Equals(Data))
             {
