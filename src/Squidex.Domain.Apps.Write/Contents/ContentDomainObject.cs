@@ -119,7 +119,11 @@ namespace Squidex.Domain.Apps.Write.Contents
 
             if (!newData.Equals(Data))
             {
-                RaiseEvent(SimpleMapper.Map(command, new ContentUpdated { Data = newData }));
+                var @event = SimpleMapper.Map(command, new ContentUpdated());
+
+                @event.Data = newData;
+
+                RaiseEvent(@event);
             }
 
             return this;

@@ -31,20 +31,25 @@ namespace Squidex.Domain.Apps.Core.Contents
         {
         }
 
-        protected static TResult Merge<TResult>(TResult source, TResult target) where TResult : ContentData<T>
+        protected static TResult Merge<TResult>(TResult target, TResult source1, TResult source2) where TResult : ContentData<T>
         {
-            if (ReferenceEquals(target, source))
+            if (ReferenceEquals(source1, source2))
             {
-                return source;
+                return source1;
             }
 
-            foreach (var otherValue in source)
-            {
-                var fieldValue = target.GetOrAdd(otherValue.Key, x => new ContentFieldData());
+            var sources = new[] { source1, source2 };
 
-                foreach (var value in otherValue.Value)
+            foreach (var source in sources)
+            {
+                foreach (var otherValue in source)
                 {
-                    fieldValue[value.Key] = value.Value;
+                    var fieldValue = target.GetOrAdd(otherValue.Key, x => new ContentFieldData());
+
+                    foreach (var value in otherValue.Value)
+                    {
+                        fieldValue[value.Key] = value.Value;
+                    }
                 }
             }
 

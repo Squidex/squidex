@@ -32,10 +32,14 @@ namespace Squidex.Domain.Apps.Write.Contents
                     new ContentFieldData()
                         .AddValue("iv", 2));
 
+        private readonly NamedContentData patched;
+
         public Guid ContentId { get; } = Guid.NewGuid();
 
         public ContentDomainObjectTests()
         {
+            patched = otherData.MergeInto(data);
+
             sut = new ContentDomainObject(ContentId, 0);
         }
 
@@ -143,12 +147,13 @@ namespace Squidex.Domain.Apps.Write.Contents
         public void Patch_should_create_events()
         {
             CreateContent();
+            UpdateContent();
 
             sut.Patch(CreateContentCommand(new PatchContent { Data = otherData }));
 
             sut.GetUncomittedEvents()
                 .ShouldHaveSameEvents(
-                    CreateContentEvent(new ContentUpdated { Data = otherData })
+                    CreateContentEvent(new ContentUpdated { Data = patched })
                 );
         }
 
