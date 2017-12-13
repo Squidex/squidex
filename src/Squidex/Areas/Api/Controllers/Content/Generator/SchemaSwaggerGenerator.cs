@@ -174,7 +174,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 operation.Summary = $"Patchs a {schemaName} content.";
                 operation.Security = EditorSecurity;
 
-                operation.AddBodyParameter("data", contentSchema, SchemaBodyDescription);
+                operation.AddBodyParameter("data", dataSchema, SchemaBodyDescription);
 
                 operation.AddResponse("201", $"{schemaName} item patched.", dataSchema);
             });

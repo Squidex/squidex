@@ -67,7 +67,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             VerifyCreatedAndNotDeleted();
 
-            var newData = State.Data.MergeInto(command.Data);
+            var newData = command.Data.MergeInto(State.Data);
 
             if (!newData.Equals(State.Data))
             {
