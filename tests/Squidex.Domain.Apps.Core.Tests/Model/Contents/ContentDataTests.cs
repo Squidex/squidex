@@ -113,6 +113,8 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
             var actual = lhs.MergeInto(rhs);
 
             Assert.Equal(expected, actual);
+            Assert.NotSame(expected, rhs);
+            Assert.NotSame(expected, lhs);
         }
 
         [Fact]
@@ -152,6 +154,8 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
             var actual = lhs.MergeInto(rhs);
 
             Assert.Equal(expected, actual);
+            Assert.NotSame(expected, rhs);
+            Assert.NotSame(expected, lhs);
         }
 
         [Fact]

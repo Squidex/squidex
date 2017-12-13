@@ -26,7 +26,7 @@ namespace Squidex.Domain.Apps.Core.Contents
 
         public IdContentData MergeInto(IdContentData target)
         {
-            return Merge(this, target);
+            return Merge(new IdContentData(), this, target);
         }
 
         public IdContentData ToCleaned()

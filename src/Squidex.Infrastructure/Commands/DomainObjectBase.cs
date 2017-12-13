@@ -97,6 +97,11 @@ namespace Squidex.Infrastructure.Commands
             {
                 state.Version += events.Length;
 
+                foreach (var @event in events)
+                {
+                    @event.SetSnapshotVersion(state.Version);
+                }
+
                 await persistence.WriteSnapshotAsync(state);
 
                 try

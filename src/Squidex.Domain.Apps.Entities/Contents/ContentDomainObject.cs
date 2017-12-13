@@ -71,7 +71,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             if (!newData.Equals(State.Data))
             {
-                RaiseEvent(SimpleMapper.Map(command, new ContentUpdated { Data = newData }));
+                var @event = SimpleMapper.Map(command, new ContentUpdated());
+
+                @event.Data = newData;
+
+                RaiseEvent(@event);
             }
 
             return this;

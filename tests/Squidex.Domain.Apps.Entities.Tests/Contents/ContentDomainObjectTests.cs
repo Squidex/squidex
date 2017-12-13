@@ -29,12 +29,18 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 .AddField("field2",
                     new ContentFieldData()
                         .AddValue("iv", 2));
+        private readonly NamedContentData patched;
         private readonly Guid contentId = Guid.NewGuid();
         private readonly ContentDomainObject sut = new ContentDomainObject();
 
         protected override Guid Id
         {
             get { return contentId; }
+        }
+
+        public ContentDomainObjectTests()
+        {
+            patched = otherData.MergeInto(data);
         }
 
         [Fact]
@@ -141,12 +147,13 @@ namespace Squidex.Domain.Apps.Entities.Contents
         public void Patch_should_create_events()
         {
             CreateContent();
+            UpdateContent();
 
             sut.Patch(CreateContentCommand(new PatchContent { Data = otherData }));
 
             sut.GetUncomittedEvents()
                 .ShouldHaveSameEvents(
-                    CreateContentEvent(new ContentUpdated { Data = otherData })
+                    CreateContentEvent(new ContentUpdated { Data = patched })
                 );
         }
 
