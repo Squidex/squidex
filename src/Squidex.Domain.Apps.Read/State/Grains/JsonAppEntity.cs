@@ -34,5 +34,8 @@ namespace Squidex.Domain.Apps.Read.State.Grains
 
         [JsonProperty]
         public LanguagesConfig LanguagesConfig { get; set; }
+
+        [JsonProperty]
+        public AppPatterns Patterns { get; set; } = AppPatterns.Empty;
     }
 }

@@ -1,26 +1,25 @@
 ﻿// ==========================================================================
-//  AppLanguageUpdated.cs
+//  AppPatternAdded.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using System.Collections.Generic;
-using Squidex.Infrastructure;
+using System;
 using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Events.Apps
 {
-    [EventType(nameof(AppLanguageUpdated))]
-    public sealed class AppLanguageUpdated : AppEvent
+    [EventType(nameof(AppPatternAdded))]
+    public sealed class AppPatternAdded : AppEvent
     {
-        public Language Language { get; set; }
+        public Guid Id { get; set; }
 
-        public bool IsOptional { get; set; }
+        public string Name { get; set; }
 
-        public bool IsMaster { get; set; }
+        public string Pattern { get; set; }
 
-        public List<Language> Fallback { get; set; }
+        public string DefaultMessage { get; set; }
     }
 }

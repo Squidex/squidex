@@ -25,6 +25,7 @@ namespace Squidex.Domain.Apps.Write.Apps
         private AppContributors contributors = AppContributors.Empty;
         private AppClients clients = AppClients.Empty;
         private LanguagesConfig languagesConfig = LanguagesConfig.English;
+        private AppPatterns patterns = AppPatterns.Empty;
         private AppPlan plan;
         private string name;
 
@@ -51,6 +52,11 @@ namespace Squidex.Domain.Apps.Write.Apps
         public LanguagesConfig LanguagesConfig
         {
             get { return languagesConfig; }
+        }
+
+        public AppPatterns Patterns
+        {
+            get { return patterns; }
         }
 
         public AppDomainObject(Guid id, int version)
@@ -111,6 +117,21 @@ namespace Squidex.Domain.Apps.Write.Apps
         protected void On(AppPlanChanged @event)
         {
             plan = string.IsNullOrWhiteSpace(@event.PlanId) ? null : new AppPlan(@event.Actor, @event.PlanId);
+        }
+
+        protected void On(AppPatternAdded @event)
+        {
+            patterns = patterns.Apply(@event);
+        }
+
+        protected void On(AppPatternDeleted @event)
+        {
+            patterns = patterns.Apply(@event);
+        }
+
+        protected void On(AppPatternUpdated @event)
+        {
+            patterns = patterns.Apply(@event);
         }
 
         protected override void DispatchEvent(Envelope<IEvent> @event)
@@ -217,6 +238,33 @@ namespace Squidex.Domain.Apps.Write.Apps
             ThrowIfNotCreated();
 
             RaiseEvent(SimpleMapper.Map(command, new AppPlanChanged()));
+
+            return this;
+        }
+
+        public AppDomainObject AddPattern(AddPattern command)
+        {
+            ThrowIfNotCreated();
+
+            RaiseEvent(SimpleMapper.Map(command, new AppPatternAdded()));
+
+            return this;
+        }
+
+        public AppDomainObject DeletePattern(DeletePattern command)
+        {
+            ThrowIfNotCreated();
+
+            RaiseEvent(SimpleMapper.Map(command, new AppPatternDeleted()));
+
+            return this;
+        }
+
+        public AppDomainObject UpdatePattern(UpdatePattern command)
+        {
+            ThrowIfNotCreated();
+
+            RaiseEvent(SimpleMapper.Map(command, new AppPatternUpdated()));
 
             return this;
         }

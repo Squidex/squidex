@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Immutable;
+using System.Collections.Immutable;
 using Benchmarks.Tests.TestData;
 using Microsoft.Extensions.DependencyInjection;
 using NodaTime;

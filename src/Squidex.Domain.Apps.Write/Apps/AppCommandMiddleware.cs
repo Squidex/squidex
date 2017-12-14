@@ -163,6 +163,33 @@ namespace Squidex.Domain.Apps.Write.Apps
             });
         }
 
+        protected Task On(AddPattern command, CommandContext context)
+        {
+            return handler.UpdateAsync<AppDomainObject>(context, a =>
+            {
+                GuardAppPattern.CanApply(a.Patterns, command);
+                a.AddPattern(command);
+            });
+        }
+
+        protected Task On(DeletePattern command, CommandContext context)
+        {
+            return handler.UpdateAsync<AppDomainObject>(context, a =>
+            {
+                GuardAppPattern.CanApply(a.Patterns, command);
+                a.DeletePattern(command);
+            });
+        }
+
+        protected async Task On(UpdatePattern command, CommandContext context)
+        {
+            await handler.UpdateAsync<AppDomainObject>(context, a =>
+            {
+                GuardAppPattern.CanApply(a.Patterns, command);
+                a.UpdatePattern(command);
+            });
+        }
+
         public async Task HandleAsync(CommandContext context, Func<Task> next)
         {
             if (!await this.DispatchActionAsync(context.Command, context))

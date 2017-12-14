@@ -42,6 +42,7 @@ namespace Squidex.Config.Domain
             settings.ContractResolver = new ConverterContractResolver(
                 new AppClientsConverter(),
                 new AppContributorsConverter(),
+                new AppPatternsConverter(),
                 new ClaimsPrincipalConverter(),
                 new InstantConverter(),
                 new LanguageConverter(),

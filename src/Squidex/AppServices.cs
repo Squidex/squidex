@@ -6,6 +6,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System.Collections.Generic;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Areas.Api.Config.Swagger;
@@ -14,6 +15,7 @@ using Squidex.Config;
 using Squidex.Config.Authentication;
 using Squidex.Config.Domain;
 using Squidex.Config.Web;
+using Squidex.Domain.Apps.Core.Apps;
 
 namespace Squidex
 {

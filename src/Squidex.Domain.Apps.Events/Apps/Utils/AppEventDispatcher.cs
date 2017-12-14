@@ -73,5 +73,20 @@ namespace Squidex.Domain.Apps.Events.Apps.Utils
 
             return languagesConfig;
         }
+
+        public static AppPatterns Apply(this AppPatterns patterns, AppPatternAdded @event)
+        {
+            return patterns.Add(@event.Id, @event.Name, @event.Pattern, @event.DefaultMessage);
+        }
+
+        public static AppPatterns Apply(this AppPatterns patterns, AppPatternDeleted @event)
+        {
+            return patterns.Remove(@event.Id);
+        }
+
+        public static AppPatterns Apply(this AppPatterns patterns, AppPatternUpdated @event)
+        {
+            return patterns.Update(@event.Id, @event.Name, @event.Pattern, @event.DefaultMessage);
+        }
     }
 }

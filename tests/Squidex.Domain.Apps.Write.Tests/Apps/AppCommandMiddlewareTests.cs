@@ -7,8 +7,11 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using FakeItEasy;
+using Microsoft.Extensions.Options;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Read;
 using Squidex.Domain.Apps.Read.Apps;
 using Squidex.Domain.Apps.Read.Apps.Services;
@@ -28,6 +31,7 @@ namespace Squidex.Domain.Apps.Write.Apps
         private readonly IAppPlansProvider appPlansProvider = A.Fake<IAppPlansProvider>();
         private readonly IAppPlanBillingManager appPlansBillingManager = A.Fake<IAppPlanBillingManager>();
         private readonly IUserResolver userResolver = A.Fake<IUserResolver>();
+        private readonly IOptions<List<AppPattern>> defaultPatterns = A.Fake<IOptions<List<AppPattern>>>();
         private readonly AppCommandMiddleware sut;
         private readonly AppDomainObject app;
         private readonly Language language = Language.DE;
@@ -227,6 +231,115 @@ namespace Squidex.Domain.Apps.Write.Apps
             {
                 await sut.HandleAsync(context);
             });
+        }
+
+        [Fact]
+        public async Task AddPattern_should_update_domain_object()
+        {
+            CreateApp();
+
+            var context = CreateContextForCommand(new AddPattern { Id = Guid.NewGuid(), Name = "Numbers", Pattern = "[0-9]", DefaultMessage = "Display Error" });
+
+            await TestUpdate(app, async _ =>
+            {
+                await sut.HandleAsync(context);
+            });
+        }
+
+        [Fact]
+        public async Task AddPattern_should_throw_error_if_name_empty()
+        {
+            CreateApp();
+
+            var context = CreateContextForCommand(new AddPattern { Name = string.Empty, Pattern = "[0-9]", DefaultMessage = "Display Error" });
+
+            await TestUpdate(app, async _ =>
+            {
+                await Assert.ThrowsAsync<ValidationException>(() => sut.HandleAsync(context));
+            }, false);
+        }
+
+        [Fact]
+        public async Task AddPattern_should_throw_error_if_pattern_empty()
+        {
+            CreateApp();
+
+            var context = CreateContextForCommand(new AddPattern { Name = "Name", Pattern = string.Empty, DefaultMessage = "Display Error" });
+
+            await TestUpdate(app, async _ =>
+            {
+                await Assert.ThrowsAsync<ValidationException>(() => sut.HandleAsync(context));
+            }, false);
+        }
+
+        [Fact]
+        public async Task DeletePattern_should_update_domain_object()
+        {
+            var @event = new AddPattern { Name = "Pattern", Pattern = "[0-9]" };
+            CreateApp().AddPattern(CreateCommand(@event));
+
+            var context = CreateContextForCommand(new DeletePattern { Id = @event.Id });
+
+            await TestUpdate(app, async _ =>
+            {
+                await sut.HandleAsync(context);
+            });
+        }
+
+        [Fact]
+        public async Task DeletePattern_should_throw_error_if_name_empty()
+        {
+            var @event = new AddPattern { Id = Guid.NewGuid(), Name = "Pattern", Pattern = "[0-9]" };
+            CreateApp().AddPattern(CreateCommand(@event));
+
+            var context = CreateContextForCommand(new DeletePattern { Id = Guid.Empty });
+
+            await TestUpdate(app, async _ =>
+            {
+                await Assert.ThrowsAsync<ValidationException>(() => sut.HandleAsync(context));
+            }, false);
+        }
+
+        [Fact]
+        public async Task UpdatePattern_should_update_domain_object_with_no_schemas_using_pattern()
+        {
+            var @event = new AddPattern { Name = "Pattern", Pattern = "[0-9]" };
+            CreateApp().AddPattern(CreateCommand(@event));
+
+            var context = CreateContextForCommand(new UpdatePattern { Id = @event.Id, Name = "Numbers", Pattern = "[0-9]", DefaultMessage = "Display Error" });
+
+            await TestUpdate(app, async _ =>
+            {
+                await sut.HandleAsync(context);
+            });
+        }
+
+        [Fact]
+        public async Task UpdatePattern_should_throw_error_if_name_empty()
+        {
+            var @event = new AddPattern { Name = "Pattern", Pattern = "[0-9]" };
+            CreateApp().AddPattern(CreateCommand(@event));
+
+            var context = CreateContextForCommand(new UpdatePattern { Id = @event.Id, Name = string.Empty, Pattern = "[0-9]", DefaultMessage = "Display Error" });
+
+            await TestUpdate(app, async _ =>
+            {
+                await Assert.ThrowsAsync<ValidationException>(() => sut.HandleAsync(context));
+            }, false);
+        }
+
+        [Fact]
+        public async Task UpdatePattern_should_throw_error_if_pattern_empty()
+        {
+            var @event = new AddPattern { Name = "Pattern", Pattern = "[0-9]" };
+            CreateApp().AddPattern(CreateCommand(@event));
+
+            var context = CreateContextForCommand(new UpdatePattern { Id = @event.Id, Name = "Name", Pattern = string.Empty, DefaultMessage = "Display Error" });
+
+            await TestUpdate(app, async _ =>
+            {
+                await Assert.ThrowsAsync<ValidationException>(() => sut.HandleAsync(context));
+            }, false);
         }
 
         private AppDomainObject CreateApp()

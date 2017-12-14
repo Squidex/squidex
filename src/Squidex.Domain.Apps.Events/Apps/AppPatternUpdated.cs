@@ -1,27 +1,25 @@
 ﻿// ==========================================================================
-//  UIRegexSuggestionDto.cs
+//  AppPatternUpdated.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using System.ComponentModel.DataAnnotations;
+using System;
+using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Areas.Api.Controllers.UI.Models
+namespace Squidex.Domain.Apps.Events.Apps
 {
-    public sealed class UIRegexSuggestionDto
+    [EventType(nameof(AppPatternUpdated))]
+    public sealed class AppPatternUpdated : AppEvent
     {
-        /// <summary>
-        /// The name of the suggestion.
-        /// </summary>
-        [Required]
+        public Guid Id { get; set; }
+
         public string Name { get; set; }
 
-        /// <summary>
-        /// The regex pattern.
-        /// </summary>
-        [Required]
         public string Pattern { get; set; }
+
+        public string DefaultMessage { get; set; }
     }
 }

@@ -9,6 +9,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using FakeItEasy;
+using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Domain.Apps.Write.Apps.Commands;
@@ -26,6 +28,7 @@ namespace Squidex.Domain.Apps.Write.Apps
         private readonly string clientId = "client";
         private readonly string clientNewName = "My Client";
         private readonly string planId = "premium";
+        private readonly Guid defaultId = Guid.NewGuid();
 
         public AppDomainObjectTests()
         {
@@ -264,6 +267,121 @@ namespace Squidex.Domain.Apps.Write.Apps
                 );
         }
 
+        [Fact]
+        public void AddPattern_should_throw_exception_if_app_not_created()
+        {
+            Assert.Throws<DomainException>(() =>
+            {
+                sut.AddPattern(CreateCommand(new AddPattern
+                {
+                    Name = "Pattern",
+                    Pattern = "[0-9]",
+                    DefaultMessage = "Message"
+                }));
+            });
+        }
+
+        [Fact]
+        public void AddPattern_should_create_events()
+        {
+            CreateApp();
+
+            sut.AddPattern(CreateCommand(new AddPattern
+            {
+                Name = "New Pattern",
+                Pattern = "[0-9]",
+                DefaultMessage = "Message"
+            }));
+
+            sut.GetUncomittedEvents()
+                .ShouldHaveSameEvents(
+                    CreateEvent(new AppPatternAdded
+                    {
+                        Name = "New Pattern",
+                        Pattern = "[0-9]",
+                        DefaultMessage = "Message"
+                    })
+                );
+
+            Assert.Single(sut.Patterns);
+        }
+
+        [Fact]
+        public void DeletePattern_should_throw_exception_if_app_not_created()
+        {
+            Assert.Throws<DomainException>(() =>
+            {
+                sut.DeletePattern(CreateCommand(new DeletePattern
+                {
+                    Id = Guid.NewGuid()
+                }));
+            });
+        }
+
+        [Fact]
+        public void DeletePattern_should_create_events()
+        {
+            CreateApp();
+            CreatePattern();
+
+            sut.DeletePattern(CreateCommand(new DeletePattern
+            {
+                Id = defaultId
+            }));
+
+            sut.GetUncomittedEvents()
+                .ShouldHaveSameEvents(
+                    CreateEvent(new AppPatternDeleted
+                    {
+                        Id = defaultId
+                    })
+                );
+
+            Assert.Empty(sut.Patterns);
+        }
+
+        [Fact]
+        public void UpdatePattern_should_throw_exception_if_app_not_created()
+        {
+            Assert.Throws<DomainException>(() =>
+            {
+                sut.UpdatePattern(CreateCommand(new UpdatePattern
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "Pattern",
+                    Pattern = "[0-9]"
+                }));
+            });
+        }
+
+        [Fact]
+        public void UpdatePattern_should_create_events()
+        {
+            CreateApp();
+            CreatePattern();
+
+            sut.UpdatePattern(CreateCommand(new UpdatePattern
+            {
+                Id = defaultId,
+                Name = "Pattern Update",
+                Pattern = "[0-9]",
+                DefaultMessage = "Message"
+            }));
+
+            sut.GetUncomittedEvents()
+                .ShouldHaveSameEvents(
+                    CreateEvent(new AppPatternUpdated
+                    {
+                        Id = defaultId,
+                        Name = "Pattern Update",
+                        Pattern = "[0-9]",
+                        DefaultMessage = "Message"
+                    })
+                );
+
+            Assert.Single(sut.Patterns);
+        }
+
         private void CreateApp()
         {
             sut.Create(CreateCommand(new CreateApp { Name = AppName }));
@@ -282,6 +400,18 @@ namespace Squidex.Domain.Apps.Write.Apps
         {
             sut.AddLanguage(CreateCommand(new AddLanguage { Language = language }));
 
+            ((IAggregate)sut).ClearUncommittedEvents();
+        }
+
+        private void CreatePattern()
+        {
+            sut.AddPattern(CreateCommand(new AddPattern
+            {
+                Id = defaultId,
+                Name = "Pattern",
+                Pattern = "[0-9]",
+                DefaultMessage = "Message"
+            }));
             ((IAggregate)sut).ClearUncommittedEvents();
         }
     }

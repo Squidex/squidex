@@ -101,6 +101,30 @@ namespace Squidex.Domain.Apps.Read.State.Grains
             });
         }
 
+        public void On(AppPatternAdded @event, EnvelopeHeaders headers)
+        {
+            UpdateApp(@event, headers, a =>
+            {
+                a.Patterns = a.Patterns.Apply(@event);
+            });
+        }
+
+        public void On(AppPatternUpdated @event, EnvelopeHeaders headers)
+        {
+            UpdateApp(@event, headers, a =>
+            {
+                a.Patterns = a.Patterns.Apply(@event);
+            });
+        }
+
+        public void On(AppPatternDeleted @event, EnvelopeHeaders headers)
+        {
+            UpdateApp(@event, headers, a =>
+            {
+                a.Patterns = a.Patterns.Apply(@event);
+            });
+        }
+
         public void On(AppPlanChanged @event, EnvelopeHeaders headers)
         {
             UpdateApp(@event, headers, a =>
