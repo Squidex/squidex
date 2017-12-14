@@ -24,9 +24,14 @@ namespace Squidex.Domain.Apps.Core.Contents
         {
         }
 
+        public static NamedContentData Merge(params NamedContentData[] contents)
+        {
+            return MergeTo(new NamedContentData(), contents);
+        }
+
         public NamedContentData MergeInto(NamedContentData target)
         {
-            return Merge(new NamedContentData(), this, target);
+            return Merge(target, this);
         }
 
         public NamedContentData ToCleaned()
