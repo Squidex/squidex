@@ -18,8 +18,6 @@ namespace Squidex.Domain.Users.MongoDb
 {
     public sealed class MongoXmlRepository : MongoRepositoryBase<MongoXmlDocument>, IXmlRepository
     {
-        private static readonly UpdateOptions Upsert = new UpdateOptions { IsUpsert = true };
-
         public MongoXmlRepository(IMongoDatabase database)
             : base(database)
         {

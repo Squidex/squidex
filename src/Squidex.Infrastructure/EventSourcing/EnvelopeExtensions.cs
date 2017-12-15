@@ -26,9 +26,21 @@ namespace Squidex.Infrastructure.EventSourcing
             return envelope;
         }
 
+        public static long SnapshotVersion(this EnvelopeHeaders headers)
+        {
+            return headers[CommonHeaders.SnapshotVersion].ToInt64(CultureInfo.InvariantCulture);
+        }
+
+        public static Envelope<T> SetSnapshotVersion<T>(this Envelope<T> envelope, long value) where T : class
+        {
+            envelope.Headers.Set(CommonHeaders.SnapshotVersion, value);
+
+            return envelope;
+        }
+
         public static long EventStreamNumber(this EnvelopeHeaders headers)
         {
-            return headers[CommonHeaders.EventStreamNumber].ToInt32(CultureInfo.InvariantCulture);
+            return headers[CommonHeaders.EventStreamNumber].ToInt64(CultureInfo.InvariantCulture);
         }
 
         public static Envelope<T> SetEventStreamNumber<T>(this Envelope<T> envelope, long value) where T : class

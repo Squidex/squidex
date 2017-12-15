@@ -6,46 +6,34 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 using Newtonsoft.Json;
+using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Infrastructure.States
 {
-    public sealed class MongoSnapshotStore : ISnapshotStore, IExternalSystem
+    public class MongoSnapshotStore<T, TKey> : MongoRepositoryBase<MongoState<T, TKey>>, ISnapshotStore<T, TKey>, IExternalSystem
     {
-        private static readonly UpdateOptions Upsert = new UpdateOptions { IsUpsert = true };
-        private readonly IMongoDatabase database;
         private readonly JsonSerializer serializer;
 
         public MongoSnapshotStore(IMongoDatabase database, JsonSerializer serializer)
+            : base(database)
         {
-            Guard.NotNull(database, nameof(database));
             Guard.NotNull(serializer, nameof(serializer));
 
-            this.database = database;
             this.serializer = serializer;
         }
 
-        public void Connect()
+        protected override string CollectionName()
         {
-            try
-            {
-                database.ListCollections();
-            }
-            catch (Exception ex)
-            {
-                throw new ConfigurationException($"MongoDb connection failed to connect to database {database.DatabaseNamespace.DatabaseName}", ex);
-            }
+            return $"States_{typeof(T).Name}";
         }
 
-        public async Task<(T Value, long Version)> ReadAsync<T>(string key)
+        public async Task<(T Value, long Version)> ReadAsync(TKey key)
         {
-            var collection = GetCollection<T>();
-
             var existing =
-                await collection.Find(x => x.Id == key)
+                await Collection.Find(x => Equals(x.Id, key))
                     .FirstOrDefaultAsync();
 
             if (existing != null)
@@ -53,21 +41,15 @@ namespace Squidex.Infrastructure.States
                 return (existing.Doc, existing.Version);
             }
 
-            return (default(T), -1);
+            return (default(T), EtagVersion.NotFound);
         }
 
-        public async Task WriteAsync<T>(string key, T value, long oldVersion, long newVersion)
+        public async Task WriteAsync(TKey key, T value, long oldVersion, long newVersion)
         {
-            var collection = GetCollection<T>();
-
             try
             {
-                await collection.UpdateOneAsync(
-                    Builders<MongoState<T>>.Filter.And(
-                        Builders<MongoState<T>>.Filter.Eq(x => x.Id, key),
-                        Builders<MongoState<T>>.Filter.Eq(x => x.Version, oldVersion)
-                    ),
-                    Builders<MongoState<T>>.Update
+                await Collection.UpdateOneAsync(x => Equals(x.Id, key) && x.Version == oldVersion,
+                    Update
                         .Set(x => x.Doc, value)
                         .Set(x => x.Version, newVersion),
                     Upsert);
@@ -77,12 +59,12 @@ namespace Squidex.Infrastructure.States
                 if (ex.WriteError.Category == ServerErrorCategory.DuplicateKey)
                 {
                     var existingVersion =
-                        await collection.Find(x => x.Id == key)
-                            .Project<MongoState<T>>(Builders<MongoState<T>>.Projection.Exclude(x => x.Id)).FirstOrDefaultAsync();
+                        await Collection.Find(x => Equals(x.Id, key)).Only(x => x.Id, x => x.Version)
+                            .FirstOrDefaultAsync();
 
                     if (existingVersion != null)
                     {
-                        throw new InconsistentStateException(existingVersion.Version, oldVersion, ex);
+                        throw new InconsistentStateException(existingVersion["Version"].AsInt64, oldVersion, ex);
                     }
                 }
                 else
@@ -90,11 +72,6 @@ namespace Squidex.Infrastructure.States
                     throw;
                 }
             }
-        }
-
-        private IMongoCollection<MongoState<T>> GetCollection<T>()
-        {
-            return database.GetCollection<MongoState<T>>($"States_{typeof(T).Name}");
         }
     }
 }

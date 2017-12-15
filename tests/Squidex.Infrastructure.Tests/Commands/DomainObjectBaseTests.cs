@@ -7,107 +7,101 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
-using Squidex.Infrastructure.Commands.TestHelpers;
+using System.Threading.Tasks;
+using FakeItEasy;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Log;
+using Squidex.Infrastructure.States;
+using Squidex.Infrastructure.TestHelpers;
 using Xunit;
 
 namespace Squidex.Infrastructure.Commands
 {
     public class DomainObjectBaseTests
     {
+        private readonly IStore<Guid> store = A.Fake<IStore<Guid>>();
+        private readonly IPersistence<MyDomainState> persistence = A.Fake<IPersistence<MyDomainState>>();
+        private readonly Guid id = Guid.NewGuid();
+        private readonly MyDomainObject sut = new MyDomainObject();
+
+        public DomainObjectBaseTests()
+        {
+            A.CallTo(() => store.WithSnapshots<MyDomainState>(id, A<Func<MyDomainState, Task>>.Ignored))
+                .Returns(persistence);
+        }
+
         [Fact]
         public void Should_instantiate()
         {
-            var domainObjectId = Guid.NewGuid();
-            var domainObjectVersion = 123;
-
-            var sut = new MyDomainObject(domainObjectId, domainObjectVersion);
-
-            Assert.Equal(domainObjectId, sut.Id);
-            Assert.Equal(domainObjectVersion, sut.Version);
+            Assert.Equal(EtagVersion.Empty, sut.Version);
         }
 
         [Fact]
-        public void Should_add_event_to_uncommitted_events_and_increase_version_when_raised()
+        public void Should_add_event_to_uncommitted_events_and_not_increase_version_when_raised()
         {
             var event1 = new MyEvent();
             var event2 = new MyEvent();
 
-            var sut = new MyDomainObject(Guid.NewGuid(), 10);
+            sut.RaiseEvent(event1);
+            sut.RaiseEvent(event2);
 
-            IAggregate aggregate = sut;
+            Assert.Equal(EtagVersion.Empty, sut.Version);
+            Assert.Equal(new IEvent[] { event1, event2 }, sut.GetUncomittedEvents().Select(x => x.Payload).ToArray());
 
-            sut.RaiseNewEvent(event1);
-            sut.RaiseNewEvent(event2);
-
-            Assert.Equal(12, sut.Version);
-
-            Assert.Equal(new IEvent[] { event1, event2 }, aggregate.GetUncomittedEvents().Select(x => x.Payload).ToArray());
-
-            aggregate.ClearUncommittedEvents();
+            sut.ClearUncommittedEvents();
 
             Assert.Equal(0, sut.GetUncomittedEvents().Count);
         }
 
         [Fact]
-        public void Should_not_add_event_to_uncommitted_events_and_increase_version_when_raised()
+        public async Task Should_write_state_and_events_when_saved()
         {
+            await sut.ActivateAsync(id, store);
+
             var event1 = new MyEvent();
             var event2 = new MyEvent();
+            var newState = new MyDomainState();
 
-            var sut = new MyDomainObject(Guid.NewGuid(), 10);
+            sut.RaiseEvent(event1);
+            sut.RaiseEvent(event2);
+            sut.UpdateState(newState);
 
-            IAggregate aggregate = sut;
+            await sut.WriteAsync(A.Fake<ISemanticLog>());
 
-            aggregate.ApplyEvent(new Envelope<IEvent>(event1));
-            aggregate.ApplyEvent(new Envelope<IEvent>(event2));
+            A.CallTo(() => persistence.WriteSnapshotAsync(newState))
+                .MustHaveHappened();
+            A.CallTo(() => persistence.WriteEventsAsync(A<IEnumerable<Envelope<IEvent>>>.That.Matches(x => x.Count() == 2)))
+                .MustHaveHappened();
 
-            Assert.Equal(12, sut.Version);
-            Assert.Equal(0, sut.GetUncomittedEvents().Count);
+            Assert.Empty(sut.GetUncomittedEvents());
         }
 
         [Fact]
-        public void Should_make_correct_equal_comparisons()
+        public async Task Should_ignore_exception_when_saving()
         {
-            var id1 = Guid.NewGuid();
-            var id2 = Guid.NewGuid();
+            A.CallTo(() => persistence.WriteEventsAsync(A<IEnumerable<Envelope<IEvent>>>.Ignored))
+                .Throws(new InvalidOperationException());
 
-            var user1a = new MyDomainObject(id1, 1);
-            var user1b = new MyDomainObject(id1, 2);
-            var user2a = new MyDomainObject(id2, 2);
+            await sut.ActivateAsync(id, store);
 
-            Assert.True(user1a.Equals(user1b));
-            Assert.False(user1a.Equals(user2a));
-        }
+            var event1 = new MyEvent();
+            var event2 = new MyEvent();
+            var newState = new MyDomainState();
 
-        [Fact]
-        public void Should_make_correct_object_equal_comparisons()
-        {
-            var id1 = Guid.NewGuid();
-            var id2 = Guid.NewGuid();
+            sut.RaiseEvent(event1);
+            sut.RaiseEvent(event2);
+            sut.UpdateState(newState);
 
-            var user1a = new MyDomainObject(id1, 1);
+            await sut.WriteAsync(A.Fake<ISemanticLog>());
 
-            object user1b = new MyDomainObject(id1, 2);
-            object user2a = new MyDomainObject(id2, 2);
+            A.CallTo(() => persistence.WriteSnapshotAsync(newState))
+                .MustHaveHappened();
+            A.CallTo(() => persistence.WriteEventsAsync(A<IEnumerable<Envelope<IEvent>>>.That.Matches(x => x.Count() == 2)))
+                .MustHaveHappened();
 
-            Assert.True(user1a.Equals(user1b));
-            Assert.False(user1a.Equals(user2a));
-        }
-
-        [Fact]
-        public void Should_provide_correct_hash_codes()
-        {
-            var id1 = Guid.NewGuid();
-            var id2 = Guid.NewGuid();
-
-            var user1a = new MyDomainObject(id1, 1);
-            var user1b = new MyDomainObject(id1, 2);
-            var user2a = new MyDomainObject(id2, 2);
-
-            Assert.Equal(user1a.GetHashCode(), user1b.GetHashCode());
-            Assert.NotEqual(user1a.GetHashCode(), user2a.GetHashCode());
+            Assert.Empty(sut.GetUncomittedEvents());
         }
     }
 }

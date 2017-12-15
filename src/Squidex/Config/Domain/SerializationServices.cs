@@ -7,6 +7,7 @@
 // ==========================================================================
 
 using Microsoft.Extensions.DependencyInjection;
+using Migrate_01;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using NodaTime;
@@ -26,16 +27,16 @@ namespace Squidex.Config.Domain
 {
     public static class SerializationServices
     {
-        private static readonly TypeNameRegistry TypeNameRegistry = new TypeNameRegistry();
-        private static readonly JsonSerializerSettings SerializerSettings = new JsonSerializerSettings();
+        private static readonly TypeNameRegistry TypeNameRegistry =
+            new TypeNameRegistry()
+                .MapUnmapped(typeof(Migration01).Assembly)
+                .MapUnmapped(typeof(SquidexCoreModel).Assembly)
+                .MapUnmapped(typeof(SquidexEvents).Assembly)
+                .MapUnmapped(typeof(SquidexInfrastructure).Assembly);
+
         private static readonly FieldRegistry FieldRegistry = new FieldRegistry(TypeNameRegistry);
 
-        public static JsonSerializerSettings DefaultJsonSettings
-        {
-            get { return SerializerSettings; }
-        }
-
-        private static void ConfigureJson(JsonSerializerSettings settings, TypeNameHandling typeNameHandling)
+        private static JsonSerializerSettings ConfigureJson(JsonSerializerSettings settings, TypeNameHandling typeNameHandling)
         {
             settings.SerializationBinder = new TypeNameSerializationBinder(TypeNameRegistry);
 
@@ -64,25 +65,21 @@ namespace Squidex.Config.Domain
             settings.TypeNameHandling = typeNameHandling;
 
             settings.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
-        }
 
-        static SerializationServices()
-        {
-            TypeNameRegistry.MapUnmapped(typeof(SquidexCoreModel).Assembly);
-            TypeNameRegistry.MapUnmapped(typeof(SquidexEvents).Assembly);
-            TypeNameRegistry.MapUnmapped(typeof(SquidexInfrastructure).Assembly);
-
-            ConfigureJson(SerializerSettings, TypeNameHandling.Auto);
-
-            BsonJsonConvention.Register(JsonSerializer.Create(SerializerSettings));
+            return settings;
         }
 
         public static IServiceCollection AddMySerializers(this IServiceCollection services)
         {
-            services.AddSingletonAs(t => TypeNameRegistry);
+            var serializerSettings = ConfigureJson(new JsonSerializerSettings(), TypeNameHandling.Auto);
+            var serializerInstance = JsonSerializer.Create(serializerSettings);
+
             services.AddSingletonAs(t => FieldRegistry);
-            services.AddSingletonAs(t => SerializerSettings);
-            services.AddSingletonAs(t => JsonSerializer.Create(SerializerSettings));
+            services.AddSingletonAs(t => serializerSettings);
+            services.AddSingletonAs(t => serializerInstance);
+            services.AddSingletonAs(t => TypeNameRegistry);
+
+            BsonJsonConvention.Register(serializerInstance);
 
             return services;
         }

@@ -7,15 +7,16 @@
 // ==========================================================================
 
 using Microsoft.Extensions.DependencyInjection;
-using Squidex.Domain.Apps.Core.Schemas;
+using Migrate_01;
 using Squidex.Domain.Apps.Core.Scripting;
-using Squidex.Domain.Apps.Write.Apps;
-using Squidex.Domain.Apps.Write.Assets;
-using Squidex.Domain.Apps.Write.Contents;
-using Squidex.Domain.Apps.Write.Rules;
-using Squidex.Domain.Apps.Write.Schemas;
+using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Entities.Assets;
+using Squidex.Domain.Apps.Entities.Contents;
+using Squidex.Domain.Apps.Entities.Rules;
+using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Users;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.Migrations;
 using Squidex.Pipeline.CommandMiddlewares;
 
 namespace Squidex.Config.Domain
@@ -29,9 +30,6 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<JintScriptEngine>()
                 .As<IScriptEngine>();
-
-            services.AddSingletonAs<ContentVersionLoader>()
-                .As<IContentVersionLoader>();
 
             services.AddSingletonAs<ETagCommandMiddleware>()
                 .As<ICommandMiddleware>();
@@ -63,17 +61,23 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<RuleCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
-            services.AddSingletonAs<DomainObjectFactoryFunction<AppDomainObject>>(c => (id => new AppDomainObject(id, -1)));
-            services.AddSingletonAs<DomainObjectFactoryFunction<RuleDomainObject>>(c => (id => new RuleDomainObject(id, -1)));
-            services.AddSingletonAs<DomainObjectFactoryFunction<AssetDomainObject>>(c => (id => new AssetDomainObject(id, -1)));
-            services.AddSingletonAs<DomainObjectFactoryFunction<ContentDomainObject>>(c => (id => new ContentDomainObject(id, -1)));
+            services.AddTransientAs<Migration01>()
+                .As<IMigration>();
 
-            services.AddSingletonAs<DomainObjectFactoryFunction<SchemaDomainObject>>(c =>
-                {
-                    var fieldRegistry = c.GetRequiredService<FieldRegistry>();
+            services.AddTransientAs<AppDomainObject>()
+                .AsSelf();
 
-                    return id => new SchemaDomainObject(id, -1, fieldRegistry);
-                });
+            services.AddTransientAs<AssetDomainObject>()
+                .AsSelf();
+
+            services.AddTransientAs<ContentDomainObject>()
+                .AsSelf();
+
+            services.AddTransientAs<RuleDomainObject>()
+                .AsSelf();
+
+            services.AddTransientAs<SchemaDomainObject>()
+                .AsSelf();
         }
     }
 }

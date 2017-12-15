@@ -208,7 +208,7 @@ namespace Squidex.Infrastructure
         }
 
         [Fact]
-        public async Task Should_invoke_correct_event_asynchronously()
+        public async Task Should_invoke_correct_event_with_taskhronously()
         {
             var consumer = new MyAsyncConsumer();
 
@@ -222,7 +222,7 @@ namespace Squidex.Infrastructure
         }
 
         [Fact]
-        public async Task Should_invoke_correct_event_with_context_asynchronously()
+        public async Task Should_invoke_correct_event_with_context_with_taskhronously()
         {
             var consumer = new MyAsyncConsumer();
 
@@ -264,7 +264,7 @@ namespace Squidex.Infrastructure
         }
 
         [Fact]
-        public async Task Should_invoke_correct_event_and_return_synchronously()
+        public async Task Should_invoke_correct_event_and_returnhronously()
         {
             var consumer = new MyAsyncFuncConsumer();
 
@@ -278,7 +278,7 @@ namespace Squidex.Infrastructure
         }
 
         [Fact]
-        public async Task Should_invoke_correct_event_with_context_and_return_synchronously()
+        public async Task Should_invoke_correct_event_with_context_and_returnhronously()
         {
             var consumer = new MyAsyncFuncConsumer();
 

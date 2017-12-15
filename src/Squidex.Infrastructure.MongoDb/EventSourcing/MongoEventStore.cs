@@ -19,7 +19,6 @@ namespace Squidex.Infrastructure.EventSourcing
 {
     public class MongoEventStore : MongoRepositoryBase<MongoEventCommit>, IEventStore
     {
-        private const long AnyVersion = long.MinValue;
         private const int MaxAttempts = 20;
         private static readonly BsonTimestamp EmptyTimestamp = new BsonTimestamp(0);
         private static readonly FieldDefinition<MongoEventCommit, BsonTimestamp> TimestampField = Fields.Build(x => x.Timestamp);
@@ -130,12 +129,12 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public Task AppendEventsAsync(Guid commitId, string streamName, ICollection<EventData> events)
         {
-            return AppendEventsInternalAsync(commitId, streamName, AnyVersion, events);
+            return AppendEventsInternalAsync(commitId, streamName, EtagVersion.Any, events);
         }
 
         public Task AppendEventsAsync(Guid commitId, string streamName, long expectedVersion, ICollection<EventData> events)
         {
-            Guard.GreaterEquals(expectedVersion, -1, nameof(expectedVersion));
+            Guard.GreaterEquals(expectedVersion, EtagVersion.Any, nameof(expectedVersion));
 
             return AppendEventsInternalAsync(commitId, streamName, expectedVersion, events);
         }
@@ -152,7 +151,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
             var currentVersion = await GetEventStreamOffset(streamName);
 
-            if (expectedVersion != AnyVersion && expectedVersion != currentVersion)
+            if (expectedVersion != EtagVersion.Any && expectedVersion != currentVersion)
             {
                 throw new WrongEventVersionException(currentVersion, expectedVersion);
             }
@@ -175,7 +174,7 @@ namespace Squidex.Infrastructure.EventSourcing
                     {
                         currentVersion = await GetEventStreamOffset(streamName);
 
-                        if (expectedVersion != AnyVersion)
+                        if (expectedVersion != EtagVersion.Any)
                         {
                             throw new WrongEventVersionException(currentVersion, expectedVersion);
                         }
@@ -200,7 +199,7 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             var document =
                 await Collection.Find(Filter.Eq(EventStreamField, streamName))
-                    .Project<BsonDocument>(Project
+                    .Project<BsonDocument>(Projection
                         .Include(EventStreamOffsetField)
                         .Include(EventsCountField))
                     .Sort(Sort.Descending(EventStreamOffsetField)).Limit(1)
@@ -211,7 +210,7 @@ namespace Squidex.Infrastructure.EventSourcing
                 return document[nameof(MongoEventCommit.EventStreamOffset)].ToInt64() + document[nameof(MongoEventCommit.EventsCount)].ToInt64();
             }
 
-            return -1;
+            return EtagVersion.Empty;
         }
 
         private static FilterDefinition<MongoEventCommit> CreateFilter(string streamFilter, StreamPosition streamPosition)

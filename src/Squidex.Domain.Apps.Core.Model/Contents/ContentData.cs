@@ -31,14 +31,14 @@ namespace Squidex.Domain.Apps.Core.Contents
         {
         }
 
-        protected static TResult Merge<TResult>(TResult target, TResult source1, TResult source2) where TResult : ContentData<T>
+        protected static TResult MergeTo<TResult>(TResult target, params TResult[] sources) where TResult : ContentData<T>
         {
-            if (ReferenceEquals(source1, source2))
-            {
-                return source1;
-            }
+            Guard.NotEmpty(sources, nameof(sources));
 
-            var sources = new[] { source1, source2 };
+            if (sources.Length == 1 || sources.Skip(1).All(x => ReferenceEquals(x, sources[0])))
+            {
+                return sources[0];
+            }
 
             foreach (var source in sources)
             {

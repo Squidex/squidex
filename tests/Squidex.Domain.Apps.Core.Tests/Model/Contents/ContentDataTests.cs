@@ -86,12 +86,14 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
                             .AddValue("iv", 1))
                     .AddField("field2",
                         new ContentFieldData()
-                            .AddValue("de", 2));
+                            .AddValue("de", 2)
+                            .AddValue("it", 2));
 
             var rhs =
                 new NamedContentData()
                     .AddField("field2",
                         new ContentFieldData()
+                            .AddValue("it", 3)
                             .AddValue("en", 3))
                     .AddField("field3",
                         new ContentFieldData()
@@ -104,6 +106,7 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
                             .AddValue("iv", 1))
                     .AddField("field2",
                         new ContentFieldData()
+                            .AddValue("it", 2)
                             .AddValue("de", 2)
                             .AddValue("en", 3))
                     .AddField("field3",
@@ -127,12 +130,14 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
                             .AddValue("iv", 1))
                     .AddField(2,
                         new ContentFieldData()
-                            .AddValue("de", 2));
+                            .AddValue("de", 2)
+                            .AddValue("it", 2));
 
             var rhs =
                 new IdContentData()
                     .AddField(2,
                         new ContentFieldData()
+                            .AddValue("it", 3)
                             .AddValue("en", 3))
                     .AddField(3,
                         new ContentFieldData()
@@ -145,6 +150,7 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
                             .AddValue("iv", 1))
                     .AddField(2,
                         new ContentFieldData()
+                            .AddValue("it", 2)
                             .AddValue("de", 2)
                             .AddValue("en", 3))
                     .AddField(3,

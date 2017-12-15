@@ -11,7 +11,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Squidex.Domain.Apps.Read.Apps.Services;
+using Squidex.Domain.Apps.Entities.Apps.Services;
 using Squidex.Infrastructure.UsageTracking;
 
 namespace Squidex.Pipeline

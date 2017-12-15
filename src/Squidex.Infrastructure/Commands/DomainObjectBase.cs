@@ -8,85 +8,115 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Log;
+using Squidex.Infrastructure.States;
 
 namespace Squidex.Infrastructure.Commands
 {
-    public abstract class DomainObjectBase : IAggregate, IEquatable<IAggregate>
+    public abstract class DomainObjectBase<T> : IDomainObject where T : IDomainState, new()
     {
         private readonly List<Envelope<IEvent>> uncomittedEvents = new List<Envelope<IEvent>>();
-        private readonly Guid id;
-        private int version;
+        private Guid id;
+        private T state;
+        private IPersistence<T> persistence;
 
-        public int Version
+        public long Version
         {
-            get { return version; }
+            get { return state.Version; }
         }
 
-        public Guid Id
+        public T State
         {
-            get { return id; }
+            get { return state; }
         }
 
-        protected DomainObjectBase(Guid id, int version)
+        protected DomainObjectBase()
         {
-            Guard.NotEmpty(id, nameof(id));
-            Guard.GreaterEquals(version, -1, nameof(version));
-
-            this.id = id;
-
-            this.version = version;
+            state = new T();
+            state.Version = EtagVersion.Empty;
         }
 
-        protected abstract void DispatchEvent(Envelope<IEvent> @event);
-
-        private void ApplyEventCore(Envelope<IEvent> @event)
-        {
-            DispatchEvent(@event); version++;
-        }
-
-        protected void RaiseEvent(IEvent @event)
-        {
-            RaiseEvent(Envelope.Create(@event));
-        }
-
-        protected void RaiseEvent<TEvent>(Envelope<TEvent> @event) where TEvent : class, IEvent
-        {
-            Guard.NotNull(@event, nameof(@event));
-
-            uncomittedEvents.Add(@event.To<IEvent>());
-
-            ApplyEventCore(@event.To<IEvent>());
-        }
-
-        void IAggregate.ApplyEvent(Envelope<IEvent> @event)
-        {
-            ApplyEventCore(@event);
-        }
-
-        void IAggregate.ClearUncommittedEvents()
-        {
-            uncomittedEvents.Clear();
-        }
-
-        public ICollection<Envelope<IEvent>> GetUncomittedEvents()
+        public IReadOnlyList<Envelope<IEvent>> GetUncomittedEvents()
         {
             return uncomittedEvents;
         }
 
-        public override int GetHashCode()
+        public void ClearUncommittedEvents()
         {
-            return id.GetHashCode();
+            uncomittedEvents.Clear();
         }
 
-        public override bool Equals(object obj)
+        public Task ActivateAsync(Guid key, IStore<Guid> store)
         {
-            return Equals(obj as IAggregate);
+            id = key;
+
+            persistence = store.WithSnapshots<T, Guid>(key, s => state = s);
+
+            return persistence.ReadAsync();
         }
 
-        public bool Equals(IAggregate other)
+        public void RaiseEvent(IEvent @event)
         {
-            return other != null && other.Id.Equals(id);
+            RaiseEvent(Envelope.Create(@event));
+        }
+
+        public void RaiseEvent<TEvent>(Envelope<TEvent> @event) where TEvent : class, IEvent
+        {
+            Guard.NotNull(@event, nameof(@event));
+
+            @event.SetAggregateId(id);
+
+            OnRaised(@event.To<IEvent>());
+
+            uncomittedEvents.Add(@event.To<IEvent>());
+        }
+
+        public void UpdateState(T newState)
+        {
+            state = newState;
+        }
+
+        protected virtual void OnRaised(Envelope<IEvent> @event)
+        {
+        }
+
+        public Task WriteStateAsync(long version)
+        {
+            state.Version = version;
+
+            return persistence.WriteSnapshotAsync(state);
+        }
+
+        public async Task WriteAsync(ISemanticLog log)
+        {
+            var events = uncomittedEvents.ToArray();
+
+            if (events.Length > 0)
+            {
+                state.Version += events.Length;
+
+                foreach (var @event in events)
+                {
+                    @event.SetSnapshotVersion(state.Version);
+                }
+
+                await persistence.WriteSnapshotAsync(state);
+
+                try
+                {
+                    await persistence.WriteEventsAsync(events);
+                }
+                catch (Exception ex)
+                {
+                    log.LogFatal(ex, w => w.WriteProperty("action", "writeEvents"));
+                }
+                finally
+                {
+                    uncomittedEvents.Clear();
+                }
+            }
         }
     }
 }

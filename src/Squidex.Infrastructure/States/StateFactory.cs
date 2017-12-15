@@ -21,19 +21,18 @@ namespace Squidex.Infrastructure.States
         private readonly IPubSub pubSub;
         private readonly IMemoryCache statesCache;
         private readonly IServiceProvider services;
-        private readonly ISnapshotStore snapshotStore;
         private readonly IStreamNameResolver streamNameResolver;
         private readonly IEventStore eventStore;
         private readonly IEventDataFormatter eventDataFormatter;
         private readonly object lockObject = new object();
         private IDisposable pubSubSubscription;
 
-        public sealed class ObjectHolder<T> where T : IStatefulObject
+        public sealed class ObjectHolder<T, TKey> where T : IStatefulObject<TKey>
         {
             private readonly Task activationTask;
             private readonly T obj;
 
-            public ObjectHolder(T obj, string key, IStore store)
+            public ObjectHolder(T obj, TKey key, IStore<TKey> store)
             {
                 this.obj = obj;
 
@@ -54,22 +53,19 @@ namespace Squidex.Infrastructure.States
             IEventStore eventStore,
             IEventDataFormatter eventDataFormatter,
             IServiceProvider services,
-            ISnapshotStore snapshotStore,
             IStreamNameResolver streamNameResolver)
         {
             Guard.NotNull(services, nameof(services));
             Guard.NotNull(eventStore, nameof(eventStore));
             Guard.NotNull(eventDataFormatter, nameof(eventDataFormatter));
             Guard.NotNull(pubSub, nameof(pubSub));
-            Guard.NotNull(snapshotStore, nameof(snapshotStore));
             Guard.NotNull(statesCache, nameof(statesCache));
             Guard.NotNull(streamNameResolver, nameof(streamNameResolver));
 
-            this.services = services;
             this.eventStore = eventStore;
             this.eventDataFormatter = eventDataFormatter;
             this.pubSub = pubSub;
-            this.snapshotStore = snapshotStore;
+            this.services = services;
             this.statesCache = statesCache;
             this.streamNameResolver = streamNameResolver;
         }
@@ -85,11 +81,21 @@ namespace Squidex.Infrastructure.States
             });
         }
 
-        public async Task<T> GetDetachedAsync<T>(string key) where T : IStatefulObject
+        public Task<T> CreateAsync<T>(string key) where T : IStatefulObject<string>
+        {
+            return CreateAsync<T, string>(key);
+        }
+
+        public Task<T> CreateAsync<T>(Guid key) where T : IStatefulObject<Guid>
+        {
+            return CreateAsync<T, Guid>(key);
+        }
+
+        public async Task<T> CreateAsync<T, TKey>(TKey key) where T : IStatefulObject<TKey>
         {
             Guard.NotNull(key, nameof(key));
 
-            var stateStore = new Store(() => { }, eventStore, eventDataFormatter, snapshotStore, streamNameResolver);
+            var stateStore = new Store<T, TKey>(eventStore, eventDataFormatter, services, streamNameResolver);
             var state = (T)services.GetService(typeof(T));
 
             await state.ActivateAsync(key, stateStore);
@@ -97,25 +103,39 @@ namespace Squidex.Infrastructure.States
             return state;
         }
 
-        public Task<T> GetSynchronizedAsync<T>(string key) where T : IStatefulObject
+        public Task<T> GetSingleAsync<T>(string key) where T : IStatefulObject<string>
+        {
+            return GetSingleAsync<T, string>(key);
+        }
+
+        public Task<T> GetSingleAsync<T>(Guid key) where T : IStatefulObject<Guid>
+        {
+            return GetSingleAsync<T, Guid>(key);
+        }
+
+        public Task<T> GetSingleAsync<T, TKey>(TKey key) where T : IStatefulObject<TKey>
         {
             Guard.NotNull(key, nameof(key));
 
             lock (lockObject)
             {
-                if (statesCache.TryGetValue<ObjectHolder<T>>(key, out var stateObj))
+                if (statesCache.TryGetValue<ObjectHolder<T, TKey>>(key, out var stateObj))
                 {
                     return stateObj.ActivateAsync();
                 }
 
                 var state = (T)services.GetService(typeof(T));
 
-                var stateStore = new Store(() =>
-                {
-                    pubSub.Publish(new InvalidateMessage { Key = key }, false);
-                }, eventStore, eventDataFormatter, snapshotStore, streamNameResolver);
+                var stateStore = new Store<T, TKey>(eventStore, eventDataFormatter, services, streamNameResolver,
+                    () =>
+                    {
+                        pubSub.Publish(new InvalidateMessage { Key = key.ToString() }, false);
+                    }, () =>
+                    {
+                        statesCache.Remove(key);
+                    });
 
-                stateObj = new ObjectHolder<T>(state, key, stateStore);
+                stateObj = new ObjectHolder<T, TKey>(state, key, stateStore);
 
                 statesCache.CreateEntry(key)
                     .SetValue(stateObj)

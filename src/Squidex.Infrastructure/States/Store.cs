@@ -12,41 +12,57 @@ using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Infrastructure.States
 {
-    public sealed class Store : IStore
+    internal sealed class Store<TOwner, TKey> : IStore<TKey>
     {
         private readonly Action invalidate;
-        private readonly ISnapshotStore snapshotStore;
+        private readonly Action failed;
+        private readonly IServiceProvider services;
         private readonly IStreamNameResolver streamNameResolver;
         private readonly IEventStore eventStore;
         private readonly IEventDataFormatter eventDataFormatter;
 
         public Store(
-            Action invalidate,
             IEventStore eventStore,
             IEventDataFormatter eventDataFormatter,
-            ISnapshotStore snapshotStore,
-            IStreamNameResolver streamNameResolver)
+            IServiceProvider services,
+            IStreamNameResolver streamNameResolver,
+            Action invalidate = null,
+            Action failed = null)
         {
             this.eventStore = eventStore;
             this.eventDataFormatter = eventDataFormatter;
+            this.failed = failed;
             this.invalidate = invalidate;
-            this.snapshotStore = snapshotStore;
+            this.services = services;
             this.streamNameResolver = streamNameResolver;
         }
 
-        public IPersistence<object> WithEventSourcing<TOwner>(string key, Func<Envelope<IEvent>, Task> applyEvent)
+        public IPersistence<TState> WithSnapshots<TState>(TKey key, Func<TState, Task> applySnapshot)
         {
-            return new Persistence<TOwner, object>(key, invalidate, eventStore, eventDataFormatter, null, streamNameResolver, null, applyEvent);
+            return CreatePersistence(key, PersistenceMode.Snapshots, applySnapshot, null);
         }
 
-        public IPersistence<TState> WithSnapshots<TOwner, TState>(string key, Func<TState, Task> applySnapshot)
+        public IPersistence<TState> WithSnapshotsAndEventSourcing<TState>(TKey key, Func<TState, Task> applySnapshot, Func<Envelope<IEvent>, Task> applyEvent)
         {
-            return new Persistence<TOwner, TState>(key, invalidate, null, null, snapshotStore, null, applySnapshot, null);
+            return CreatePersistence(key, PersistenceMode.SnapshotsAndEventSourcing, applySnapshot, applyEvent);
         }
 
-        public IPersistence<TState> WithSnapshotsAndEventSourcing<TOwner, TState>(string key, Func<TState, Task> applySnapshot, Func<Envelope<IEvent>, Task> applyEvent)
+        public IPersistence WithEventSourcing(TKey key, Func<Envelope<IEvent>, Task> applyEvent)
         {
-            return new Persistence<TOwner, TState>(key, invalidate, eventStore, eventDataFormatter, snapshotStore, streamNameResolver, applySnapshot, applyEvent);
+            Guard.NotDefault(key, nameof(key));
+
+            var snapshotStore = (ISnapshotStore<object, TKey>)services.GetService(typeof(ISnapshotStore<object, TKey>));
+
+            return new Persistence<TOwner, TKey>(key, invalidate, failed, eventStore, eventDataFormatter, snapshotStore, streamNameResolver, applyEvent);
+        }
+
+        private IPersistence<TState> CreatePersistence<TState>(TKey key, PersistenceMode mode, Func<TState, Task> applySnapshot, Func<Envelope<IEvent>, Task> applyEvent)
+        {
+            Guard.NotDefault(key, nameof(key));
+
+            var snapshotStore = (ISnapshotStore<TState, TKey>)services.GetService(typeof(ISnapshotStore<TState, TKey>));
+
+            return new Persistence<TOwner, TState, TKey>(key, invalidate, failed, eventStore, eventDataFormatter, snapshotStore, streamNameResolver, mode, applySnapshot, applyEvent);
         }
     }
 }

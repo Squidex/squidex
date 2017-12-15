@@ -11,17 +11,13 @@ using System.Linq;
 using Newtonsoft.Json;
 using NodaTime;
 using Squidex.Infrastructure.Json;
+using Squidex.Infrastructure.TestHelpers;
 using Xunit;
 
 namespace Squidex.Infrastructure.EventSourcing
 {
     public class EventDataFormatterTests
     {
-        public sealed class MyEvent : IEvent
-        {
-            public string MyProperty { get; set; }
-        }
-
         public sealed class MyOldEvent : IEvent, IMigratedEvent
         {
             public string MyProperty { get; set; }

@@ -9,6 +9,7 @@
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Infrastructure.Tasks;
+using Squidex.Infrastructure.TestHelpers;
 using Xunit;
 
 namespace Squidex.Infrastructure.EventSourcing
@@ -17,10 +18,6 @@ namespace Squidex.Infrastructure.EventSourcing
     {
         private readonly IEventConsumer consumer1 = A.Fake<IEventConsumer>();
         private readonly IEventConsumer consumer2 = A.Fake<IEventConsumer>();
-
-        private sealed class MyEvent : IEvent
-        {
-        }
 
         [Fact]
         public void Should_return_given_name()

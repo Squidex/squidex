@@ -10,6 +10,6 @@ namespace Squidex.Infrastructure.Commands
 {
     public interface ICommand
     {
-        long? ExpectedVersion { get; set; }
+        long ExpectedVersion { get; set; }
     }
 }

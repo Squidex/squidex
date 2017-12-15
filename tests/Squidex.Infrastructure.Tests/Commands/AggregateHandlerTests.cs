@@ -7,69 +7,90 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using FakeItEasy;
-using Squidex.Infrastructure.Commands.TestHelpers;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.Tasks;
+using Squidex.Infrastructure.TestHelpers;
 using Xunit;
 
 namespace Squidex.Infrastructure.Commands
 {
     public class AggregateHandlerTests
     {
+        private readonly ISemanticLog log = A.Fake<ISemanticLog>();
         private readonly IServiceProvider serviceProvider = A.Fake<IServiceProvider>();
-        private readonly IStore store = A.Fake<IStore>();
+        private readonly IStore<Guid> store = A.Fake<IStore<Guid>>();
         private readonly IStateFactory stateFactory = A.Fake<IStateFactory>();
-        private readonly IPersistence<object> persistence = A.Fake<IPersistence<object>>();
+        private readonly IPersistence<MyDomainState> persistence = A.Fake<IPersistence<MyDomainState>>();
         private readonly Envelope<IEvent> event1 = new Envelope<IEvent>(new MyEvent());
         private readonly Envelope<IEvent> event2 = new Envelope<IEvent>(new MyEvent());
-        private readonly DomainObjectFactoryFunction<MyDomainObject> factory;
         private readonly CommandContext context;
-        private readonly AggregateHandler sut;
-        private readonly DomainObjectWrapper<MyDomainObject> domainObjectWrapper = new DomainObjectWrapper<MyDomainObject>();
+        private readonly CommandContext invalidContext = new CommandContext(A.Dummy<ICommand>());
         private readonly Guid domainObjectId = Guid.NewGuid();
-        private readonly MyDomainObject domainObject;
+        private readonly MyCommand command;
+        private readonly MyDomainObject domainObject = new MyDomainObject();
+        private readonly AggregateHandler sut;
 
         public AggregateHandlerTests()
         {
-            factory = new DomainObjectFactoryFunction<MyDomainObject>(id => domainObject);
+            command = new MyCommand { AggregateId = domainObjectId, ExpectedVersion = EtagVersion.Any };
+            context = new CommandContext(command);
 
-            domainObject =
-                new MyDomainObject(domainObjectId, 1)
-                    .RaiseNewEvent(event1)
-                    .RaiseNewEvent(event2);
-
-            context = new CommandContext(new MyCommand { AggregateId = domainObject.Id });
-
-            A.CallTo(() => store.WithEventSourcing<MyDomainObject>(domainObjectId.ToString(), A<Func<Envelope<IEvent>, Task>>.Ignored))
+            A.CallTo(() => store.WithSnapshots(domainObjectId, A<Func<MyDomainState, Task>>.Ignored))
                 .Returns(persistence);
 
-            A.CallTo(() => serviceProvider.GetService(factory.GetType()))
-                .Returns(factory);
+            A.CallTo(() => stateFactory.CreateAsync<MyDomainObject>(domainObjectId))
+                .Returns(Task.FromResult(domainObject));
 
-            A.CallTo(() => stateFactory.GetDetachedAsync<DomainObjectWrapper<MyDomainObject>>(domainObject.Id.ToString()))
-                .Returns(Task.FromResult(domainObjectWrapper));
+            A.CallTo(() => stateFactory.GetSingleAsync<MyDomainObject>(domainObjectId))
+                .Returns(Task.FromResult(domainObject));
 
-            sut = new AggregateHandler(stateFactory, serviceProvider);
+            sut = new AggregateHandler(stateFactory, serviceProvider, log);
 
-            domainObjectWrapper.ActivateAsync(domainObjectId.ToString(), store).Wait();
+            domainObject.ActivateAsync(domainObjectId, store).Wait();
         }
 
         [Fact]
-        public Task Create_async_should_throw_exception_if_not_aggregate_command()
+        public Task Create_with_task_should_throw_exception_if_not_aggregate_command()
         {
-            return Assert.ThrowsAnyAsync<ArgumentException>(() => sut.CreateAsync<MyDomainObject>(new CommandContext(A.Dummy<ICommand>()), x => TaskHelper.False));
+            return Assert.ThrowsAnyAsync<ArgumentException>(() => sut.CreateAsync<MyDomainObject>(invalidContext, x => TaskHelper.False));
         }
 
         [Fact]
-        public async Task Create_async_should_create_domain_object_and_save()
+        public Task Create_synced_with_task_should_throw_exception_if_not_aggregate_command()
+        {
+            return Assert.ThrowsAnyAsync<ArgumentException>(() => sut.CreateSyncedAsync<MyDomainObject>(invalidContext, x => TaskHelper.False));
+        }
+
+        [Fact]
+        public Task Create_with_task_should_should_throw_exception_if_version_is_wrong()
+        {
+            command.ExpectedVersion = 2;
+
+            return Assert.ThrowsAnyAsync<DomainObjectVersionException>(() => sut.CreateAsync<MyDomainObject>(context, x => TaskHelper.False));
+        }
+
+        [Fact]
+        public Task Create_synced_with_task_should_should_throw_exception_if_version_is_wrong()
+        {
+            command.ExpectedVersion = 2;
+
+            return Assert.ThrowsAnyAsync<DomainObjectVersionException>(() => sut.CreateSyncedAsync<MyDomainObject>(context, x => TaskHelper.False));
+        }
+
+        [Fact]
+        public async Task Create_with_task_should_create_domain_object_and_save()
         {
             MyDomainObject passedDomainObject = null;
 
             await sut.CreateAsync<MyDomainObject>(context, async x =>
             {
+                x.RaiseEvent(new MyEvent());
+
                 await Task.Yield();
 
                 passedDomainObject = x;
@@ -78,78 +99,188 @@ namespace Squidex.Infrastructure.Commands
             Assert.Equal(domainObject, passedDomainObject);
             Assert.NotNull(context.Result<EntityCreatedResult<Guid>>());
 
-            A.CallTo(() => persistence.ReadAsync(-1))
-                .MustHaveHappened();
-
-            A.CallTo(() => persistence.WriteEventsAsync(A<Envelope<IEvent>[]>.Ignored))
+            A.CallTo(() => persistence.WriteEventsAsync(A<IEnumerable<Envelope<IEvent>>>.Ignored))
                 .MustHaveHappened();
         }
 
         [Fact]
-        public async Task Create_sync_should_create_domain_object_and_save()
+        public async Task Create_synced_with_task_should_create_domain_object_and_save()
+        {
+            MyDomainObject passedDomainObject = null;
+
+            await sut.CreateSyncedAsync<MyDomainObject>(context, async x =>
+            {
+                x.RaiseEvent(new MyEvent());
+                x.RaiseEvent(new MyEvent());
+
+                await Task.Yield();
+
+                passedDomainObject = x;
+            });
+
+            Assert.Equal(1, domainObject.State.Version);
+            Assert.Equal(domainObject, passedDomainObject);
+            Assert.NotNull(context.Result<EntityCreatedResult<Guid>>());
+
+            A.CallTo(() => persistence.WriteEventsAsync(A<IEnumerable<Envelope<IEvent>>>.Ignored))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Create_should_create_domain_object_and_save()
         {
             MyDomainObject passedDomainObject = null;
 
             await sut.CreateAsync<MyDomainObject>(context, x =>
             {
+                x.RaiseEvent(new MyEvent());
+                x.RaiseEvent(new MyEvent());
+
                 passedDomainObject = x;
             });
 
+            Assert.Equal(1, domainObject.State.Version);
             Assert.Equal(domainObject, passedDomainObject);
             Assert.NotNull(context.Result<EntityCreatedResult<Guid>>());
 
-            A.CallTo(() => persistence.ReadAsync(-1))
-                .MustHaveHappened();
-
-            A.CallTo(() => persistence.WriteEventsAsync(A<Envelope<IEvent>[]>.Ignored))
+            A.CallTo(() => persistence.WriteEventsAsync(A<IEnumerable<Envelope<IEvent>>>.Ignored))
                 .MustHaveHappened();
         }
 
         [Fact]
-        public Task Update_async_should_throw_exception_if_not_aggregate_command()
+        public async Task Create_synced_should_create_domain_object_and_save()
         {
-            return Assert.ThrowsAnyAsync<ArgumentException>(() => sut.UpdateAsync<MyDomainObject>(new CommandContext(A.Dummy<ICommand>()), x => TaskHelper.False));
+            MyDomainObject passedDomainObject = null;
+
+            await sut.CreateSyncedAsync<MyDomainObject>(context, x =>
+            {
+                x.RaiseEvent(new MyEvent());
+                x.RaiseEvent(new MyEvent());
+
+                passedDomainObject = x;
+            });
+
+            Assert.Equal(1, domainObject.State.Version);
+            Assert.Equal(domainObject, passedDomainObject);
+            Assert.NotNull(context.Result<EntityCreatedResult<Guid>>());
+
+            A.CallTo(() => persistence.WriteEventsAsync(A<IEnumerable<Envelope<IEvent>>>.Ignored))
+                .MustHaveHappened();
         }
 
         [Fact]
-        public async Task Update_async_should_create_domain_object_and_save()
+        public Task Update_with_task_should_throw_exception_if_not_aggregate_command()
+        {
+            return Assert.ThrowsAnyAsync<ArgumentException>(() => sut.UpdateAsync<MyDomainObject>(invalidContext, x => TaskHelper.False));
+        }
+
+        [Fact]
+        public Task Update_synced_with_task_should_throw_exception_if_not_aggregate_command()
+        {
+            return Assert.ThrowsAnyAsync<ArgumentException>(() => sut.UpdateSyncedAsync<MyDomainObject>(invalidContext, x => TaskHelper.False));
+        }
+
+        [Fact]
+        public Task Update_with_task_should_should_throw_exception_if_version_is_wrong()
+        {
+            command.ExpectedVersion = 2;
+
+            return Assert.ThrowsAnyAsync<DomainObjectVersionException>(() => sut.UpdateAsync<MyDomainObject>(context, x => TaskHelper.False));
+        }
+
+        [Fact]
+        public Task Update_synced_with_task_should_should_throw_exception_if_version_is_wrong()
+        {
+            command.ExpectedVersion = 2;
+
+            return Assert.ThrowsAnyAsync<DomainObjectVersionException>(() => sut.UpdateSyncedAsync<MyDomainObject>(context, x => TaskHelper.False));
+        }
+
+        [Fact]
+        public async Task Update_with_task_should_create_domain_object_and_save()
         {
             MyDomainObject passedDomainObject = null;
 
             await sut.UpdateAsync<MyDomainObject>(context, async x =>
             {
+                x.RaiseEvent(new MyEvent());
+                x.RaiseEvent(new MyEvent());
+
                 await Task.Yield();
 
                 passedDomainObject = x;
             });
 
+            Assert.Equal(1, domainObject.State.Version);
             Assert.Equal(domainObject, passedDomainObject);
             Assert.NotNull(context.Result<EntitySavedResult>());
 
-            A.CallTo(() => persistence.ReadAsync(null))
-                .MustHaveHappened();
-
-            A.CallTo(() => persistence.WriteEventsAsync(A<Envelope<IEvent>[]>.Ignored))
+            A.CallTo(() => persistence.WriteEventsAsync(A<IEnumerable<Envelope<IEvent>>>.Ignored))
                 .MustHaveHappened();
         }
 
         [Fact]
-        public async Task Update_sync_should_create_domain_object_and_save()
+        public async Task Update_synced_with_task_should_create_domain_object_and_save()
+        {
+            MyDomainObject passedDomainObject = null;
+
+            await sut.UpdateSyncedAsync<MyDomainObject>(context, async x =>
+            {
+                x.RaiseEvent(new MyEvent());
+                x.RaiseEvent(new MyEvent());
+
+                await Task.Yield();
+
+                passedDomainObject = x;
+            });
+
+            Assert.Equal(1, domainObject.State.Version);
+            Assert.Equal(domainObject, passedDomainObject);
+            Assert.NotNull(context.Result<EntitySavedResult>());
+
+            A.CallTo(() => persistence.WriteEventsAsync(A<IEnumerable<Envelope<IEvent>>>.Ignored))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Update_should_create_domain_object_and_save()
         {
             MyDomainObject passedDomainObject = null;
 
             await sut.UpdateAsync<MyDomainObject>(context, x =>
             {
+                x.RaiseEvent(new MyEvent());
+                x.RaiseEvent(new MyEvent());
+
                 passedDomainObject = x;
             });
 
+            Assert.Equal(1, domainObject.State.Version);
             Assert.Equal(domainObject, passedDomainObject);
             Assert.NotNull(context.Result<EntitySavedResult>());
 
-            A.CallTo(() => persistence.ReadAsync(null))
+            A.CallTo(() => persistence.WriteEventsAsync(A<IEnumerable<Envelope<IEvent>>>.Ignored))
                 .MustHaveHappened();
+        }
 
-            A.CallTo(() => persistence.WriteEventsAsync(A<Envelope<IEvent>[]>.Ignored))
+        [Fact]
+        public async Task Update_synced_should_create_domain_object_and_save()
+        {
+            MyDomainObject passedDomainObject = null;
+
+            await sut.UpdateSyncedAsync<MyDomainObject>(context, x =>
+            {
+                x.RaiseEvent(new MyEvent());
+                x.RaiseEvent(new MyEvent());
+
+                passedDomainObject = x;
+            });
+
+            Assert.Equal(1, domainObject.State.Version);
+            Assert.Equal(domainObject, passedDomainObject);
+            Assert.NotNull(context.Result<EntitySavedResult>());
+
+            A.CallTo(() => persistence.WriteEventsAsync(A<IEnumerable<Envelope<IEvent>>>.Ignored))
                 .MustHaveHappened();
         }
     }

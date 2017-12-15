@@ -56,7 +56,6 @@ export * from './services/analytics.service';
 export * from './services/clipboard.service';
 export * from './services/dialog.service';
 export * from './services/local-store.service';
-export * from './services/local-cache.service';
 export * from './services/message-bus.service';
 export * from './services/onboarding.service';
 export * from './services/resource-loader.service';

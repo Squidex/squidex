@@ -8,8 +8,8 @@
 
 using System.Collections.Generic;
 using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Domain.Apps.Read.Schemas;
-using Squidex.Domain.Apps.Write.Schemas.Commands;
+using Squidex.Domain.Apps.Entities.Schemas;
+using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Areas.Api.Controllers.Schemas.Models.Converters

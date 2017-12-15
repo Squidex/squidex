@@ -9,7 +9,7 @@
 using System.Threading.Tasks;
 using FakeItEasy;
 using NodaTime;
-using Squidex.Infrastructure.Commands.TestHelpers;
+using Squidex.Infrastructure.TestHelpers;
 using Xunit;
 
 namespace Squidex.Infrastructure.Commands

@@ -16,10 +16,9 @@ using NSwag.Annotations;
 using Squidex.Areas.Api.Controllers.Contents.Models;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.ConvertContent;
-using Squidex.Domain.Apps.Read.Contents;
-using Squidex.Domain.Apps.Read.Contents.GraphQL;
-using Squidex.Domain.Apps.Write.Contents;
-using Squidex.Domain.Apps.Write.Contents.Commands;
+using Squidex.Domain.Apps.Entities.Contents;
+using Squidex.Domain.Apps.Entities.Contents.Commands;
+using Squidex.Domain.Apps.Entities.Contents.GraphQL;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
@@ -33,17 +32,14 @@ namespace Squidex.Areas.Api.Controllers.Contents
     public sealed class ContentsController : ApiController
     {
         private readonly IContentQueryService contentQuery;
-        private readonly IContentVersionLoader contentVersionLoader;
         private readonly IGraphQLService graphQl;
 
         public ContentsController(ICommandBus commandBus,
             IContentQueryService contentQuery,
-            IContentVersionLoader contentVersionLoader,
             IGraphQLService graphQl)
             : base(commandBus)
         {
             this.contentQuery = contentQuery;
-            this.contentVersionLoader = contentVersionLoader;
 
             this.graphQl = graphQl;
         }
@@ -142,13 +138,20 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(1)]
         public async Task<IActionResult> GetContentVersion(string name, Guid id, int version)
         {
-            var contentData = await contentVersionLoader.LoadAsync(App.Id, id, version);
+            var content = await contentQuery.FindContentAsync(App, name, User, id, version);
 
-            var response = contentData;
+            var response = SimpleMapper.Map(content.Content, new ContentDto());
+
+            if (content.Content.Data != null)
+            {
+                var isFrontendClient = User.IsFrontendClient();
+
+                response.Data = content.Content.Data.ToApiModel(content.Schema.SchemaDef, App.LanguagesConfig, !isFrontendClient);
+            }
 
             Response.Headers["ETag"] = new StringValues(version.ToString());
 
-            return Ok(response);
+            return Ok(response.Data);
         }
 
         [MustBeAppEditor]

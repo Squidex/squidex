@@ -12,7 +12,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using EventStore.ClientAPI;
-using EventStore.ClientAPI.Exceptions;
 
 namespace Squidex.Infrastructure.EventSourcing
 {
@@ -90,7 +89,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public Task AppendEventsAsync(Guid commitId, string streamName, ICollection<EventData> events)
         {
-            return AppendEventsInternalAsync(streamName, ExpectedVersion.Any, events);
+            return AppendEventsInternalAsync(streamName, EtagVersion.Any, events);
         }
 
         public Task AppendEventsAsync(Guid commitId, string streamName, long expectedVersion, ICollection<EventData> events)

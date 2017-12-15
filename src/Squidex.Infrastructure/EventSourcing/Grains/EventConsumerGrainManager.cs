@@ -39,7 +39,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
             foreach (var consumer in consumers)
             {
-                var actor = factory.GetDetachedAsync<EventConsumerGrain>(consumer.Name).Result;
+                var actor = factory.CreateAsync<EventConsumerGrain>(consumer.Name).Result;
 
                 actors[consumer.Name] = actor;
                 actor.Activate(consumer);

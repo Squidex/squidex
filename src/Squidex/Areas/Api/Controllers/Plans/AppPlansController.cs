@@ -12,8 +12,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 using NSwag.Annotations;
 using Squidex.Areas.Api.Controllers.Plans.Models;
-using Squidex.Domain.Apps.Read.Apps.Services;
-using Squidex.Domain.Apps.Write.Apps.Commands;
+using Squidex.Domain.Apps.Entities.Apps.Commands;
+using Squidex.Domain.Apps.Entities.Apps.Services;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
@@ -62,7 +62,7 @@ namespace Squidex.Areas.Api.Controllers.Plans
             {
                 CurrentPlanId = planId,
                 Plans = appPlansProvider.GetAvailablePlans().Select(x => SimpleMapper.Map(x, new PlanDto())).ToList(),
-                PlanOwner = App.PlanOwner,
+                PlanOwner = App.Plan?.Owner.Identifier,
                 HasPortal = appPlansBillingManager.HasPortal
             };
 

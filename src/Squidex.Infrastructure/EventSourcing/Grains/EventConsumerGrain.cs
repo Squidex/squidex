@@ -15,7 +15,7 @@ using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.EventSourcing.Grains
 {
-    public class EventConsumerGrain : DisposableObjectBase, IStatefulObject, IEventSubscriber
+    public class EventConsumerGrain : DisposableObjectBase, IStatefulObject<string>, IEventSubscriber
     {
         private readonly IEventDataFormatter eventDataFormatter;
         private readonly IEventStore eventStore;
@@ -49,9 +49,9 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             }
         }
 
-        public Task ActivateAsync(string key, IStore store)
+        public Task ActivateAsync(string key, IStore<string> store)
         {
-            persistence = store.WithSnapshots<EventConsumerGrain, EventConsumerState>(key, s => state = s);
+            persistence = store.WithSnapshots<EventConsumerState, string>(key, s => state = s);
 
             return persistence.ReadAsync();
         }
@@ -68,17 +68,17 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
         public virtual void Stop()
         {
-            dispatcher.DispatchAsync(() => HandleStopAsync()).Forget();
+            dispatcher.DispatchAsync(HandleStopAsync).Forget();
         }
 
         public virtual void Start()
         {
-            dispatcher.DispatchAsync(() => HandleStartAsync()).Forget();
+            dispatcher.DispatchAsync(HandleStartAsync).Forget();
         }
 
         public virtual void Reset()
         {
-            dispatcher.DispatchAsync(() => HandleResetAsync()).Forget();
+            dispatcher.DispatchAsync(HandleResetAsync).Forget();
         }
 
         public virtual void Activate(IEventConsumer eventConsumer)
@@ -213,7 +213,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
                 log.LogFatal(ex, w => w
                     .WriteProperty("action", caller)
-                    .WriteProperty("state", "Failed")
+                    .WriteProperty("status", "Failed")
                     .WriteProperty("eventConsumer", eventConsumer.Name));
 
                 state = state.Failed(ex);
@@ -229,13 +229,13 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             log.LogInformation(w => w
                 .WriteProperty("action", "EventConsumerReset")
                 .WriteProperty("actionId", actionId)
-                .WriteProperty("state", "Started")
+                .WriteProperty("status", "Started")
                 .WriteProperty("eventConsumer", eventConsumer.Name));
 
             using (log.MeasureTrace(w => w
                 .WriteProperty("action", "EventConsumerReset")
                 .WriteProperty("actionId", actionId)
-                .WriteProperty("state", "Completed")
+                .WriteProperty("status", "Completed")
                 .WriteProperty("eventConsumer", eventConsumer.Name)))
             {
                 await eventConsumer.ClearAsync();
@@ -250,7 +250,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             log.LogInformation(w => w
                 .WriteProperty("action", "HandleEvent")
                 .WriteProperty("actionId", eventId)
-                .WriteProperty("state", "Started")
+                .WriteProperty("status", "Started")
                 .WriteProperty("eventId", eventId)
                 .WriteProperty("eventType", eventType)
                 .WriteProperty("eventConsumer", eventConsumer.Name));
@@ -258,7 +258,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             using (log.MeasureTrace(w => w
                 .WriteProperty("action", "HandleEvent")
                 .WriteProperty("actionId", eventId)
-                .WriteProperty("state", "Completed")
+                .WriteProperty("status", "Completed")
                 .WriteProperty("eventId", eventId)
                 .WriteProperty("eventType", eventType)
                 .WriteProperty("eventConsumer", eventConsumer.Name)))

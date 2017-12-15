@@ -30,13 +30,13 @@ namespace Squidex.Infrastructure.Commands
                 log.LogInformation(w => w
                     .WriteProperty("action", "HandleCommand.")
                     .WriteProperty("actionId", context.ContextId.ToString())
-                    .WriteProperty("state", "Started")
+                    .WriteProperty("status", "Started")
                     .WriteProperty("commandType", context.Command.GetType().Name));
 
                 using (log.MeasureInformation(w => w
                     .WriteProperty("action", "HandleCommand.")
                     .WriteProperty("actionId", context.ContextId.ToString())
-                    .WriteProperty("state", "Completed")
+                    .WriteProperty("status", "Completed")
                     .WriteProperty("commandType", context.Command.GetType().Name)))
                 {
                     await next();
@@ -45,7 +45,7 @@ namespace Squidex.Infrastructure.Commands
                 log.LogInformation(w => w
                     .WriteProperty("action", "HandleCommand.")
                     .WriteProperty("actionId", context.ContextId.ToString())
-                    .WriteProperty("state", "Succeeded")
+                    .WriteProperty("status", "Succeeded")
                     .WriteProperty("commandType", context.Command.GetType().Name));
             }
             catch (Exception ex)
@@ -53,7 +53,7 @@ namespace Squidex.Infrastructure.Commands
                 log.LogError(ex, w => w
                     .WriteProperty("action", "HandleCommand.")
                     .WriteProperty("actionId", context.ContextId.ToString())
-                    .WriteProperty("state", "Failed")
+                    .WriteProperty("status", "Failed")
                     .WriteProperty("commandType", context.Command.GetType().Name));
 
                 throw;
@@ -64,7 +64,7 @@ namespace Squidex.Infrastructure.Commands
                 log.LogFatal(w => w
                     .WriteProperty("action", "HandleCommand.")
                     .WriteProperty("actionId", context.ContextId.ToString())
-                    .WriteProperty("state", "Unhandled")
+                    .WriteProperty("status", "Unhandled")
                     .WriteProperty("commandType", context.Command.GetType().Name));
             }
         }

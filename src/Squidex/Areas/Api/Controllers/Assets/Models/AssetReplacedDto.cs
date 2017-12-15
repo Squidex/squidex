@@ -7,8 +7,8 @@
 // ==========================================================================
 
 using System.ComponentModel.DataAnnotations;
-using Squidex.Domain.Apps.Write.Assets;
-using Squidex.Domain.Apps.Write.Assets.Commands;
+using Squidex.Domain.Apps.Entities.Assets;
+using Squidex.Domain.Apps.Entities.Assets.Commands;
 
 namespace Squidex.Areas.Api.Controllers.Assets.Models
 {

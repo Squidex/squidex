@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Migrations;
 
 namespace Squidex.Config.Domain
 {
@@ -23,6 +24,13 @@ namespace Squidex.Config.Domain
             {
                 system.Connect();
             }
+        }
+
+        public static void Migrate(this IServiceProvider services)
+        {
+            var migrator = services.GetRequiredService<Migrator>();
+
+            migrator.MigrateAsync().Wait();
         }
     }
 }

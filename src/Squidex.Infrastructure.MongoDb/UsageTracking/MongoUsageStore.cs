@@ -17,8 +17,6 @@ namespace Squidex.Infrastructure.UsageTracking
 {
     public sealed class MongoUsageStore : MongoRepositoryBase<MongoUsage>, IUsageStore
     {
-        private static readonly UpdateOptions Upsert = new UpdateOptions { IsUpsert = true };
-
         public MongoUsageStore(IMongoDatabase database)
             : base(database)
         {
