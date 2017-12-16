@@ -39,7 +39,7 @@ namespace Squidex.Infrastructure.Commands
         }
 
         [Fact]
-        public void Should_add_event_to_uncommitted_events_and_not_increase_version_when_raised()
+        public void Should_add_event_to_uncommitted_events_and_increase_version_when_raised()
         {
             var event1 = new MyEvent();
             var event2 = new MyEvent();
@@ -47,7 +47,7 @@ namespace Squidex.Infrastructure.Commands
             sut.RaiseEvent(event1);
             sut.RaiseEvent(event2);
 
-            Assert.Equal(EtagVersion.Empty, sut.Version);
+            Assert.Equal(1, sut.Version);
             Assert.Equal(new IEvent[] { event1, event2 }, sut.GetUncomittedEvents().Select(x => x.Payload).ToArray());
 
             sut.ClearUncommittedEvents();
