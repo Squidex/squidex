@@ -7,9 +7,11 @@
 // ==========================================================================
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Infrastructure.Log;
+using Squidex.Infrastructure.Tasks;
 using Xunit;
 
 namespace Squidex.Infrastructure.Migrations
@@ -17,6 +19,48 @@ namespace Squidex.Infrastructure.Migrations
     public sealed class MigratorTests
     {
         private readonly IMigrationStatus status = A.Fake<IMigrationStatus>();
+        private readonly ISemanticLog log = A.Fake<ISemanticLog>();
+
+        public sealed class InMemoryStatus : IMigrationStatus
+        {
+            private readonly object lockObject = new object();
+            private int version;
+            private bool isLocked;
+
+            public Task<int> GetVersionAsync()
+            {
+                return Task.FromResult(version);
+            }
+
+            public Task<bool> TryLockAsync()
+            {
+                var lockAcquired = false;
+
+                lock (lockObject)
+                {
+                    if (!isLocked)
+                    {
+                        isLocked = true;
+
+                        lockAcquired = true;
+                    }
+                }
+
+                return Task.FromResult(lockAcquired);
+            }
+
+            public Task UnlockAsync(int newVersion)
+            {
+                lock (lockObject)
+                {
+                    isLocked = false;
+
+                    version = newVersion;
+                }
+
+                return TaskHelper.Done;
+            }
+        }
 
         public MigratorTests()
         {
@@ -31,7 +75,7 @@ namespace Squidex.Infrastructure.Migrations
             var migrator_1_2 = BuildMigration(1, 2);
             var migrator_2_3 = BuildMigration(2, 3);
 
-            var migrator = new Migrator(status, new[] { migrator_0_1, migrator_1_2, migrator_2_3 }, A.Fake<ISemanticLog>());
+            var migrator = new Migrator(status, new[] { migrator_0_1, migrator_1_2, migrator_2_3 }, log);
 
             await migrator.MigrateAsync();
 
@@ -49,7 +93,7 @@ namespace Squidex.Infrastructure.Migrations
             var migrator_1_2 = BuildMigration(1, 2);
             var migrator_2_3 = BuildMigration(2, 3);
 
-            var migrator = new Migrator(status, new[] { migrator_0_1, migrator_1_2, migrator_2_3 }, A.Fake<ISemanticLog>());
+            var migrator = new Migrator(status, new[] { migrator_0_1, migrator_1_2, migrator_2_3 }, log);
 
             A.CallTo(() => migrator_1_2.UpdateAsync()).Throws(new ArgumentException());
 
@@ -70,7 +114,7 @@ namespace Squidex.Infrastructure.Migrations
             var migrator_1_2 = BuildMigration(1, 2);
             var migrator_2_3 = BuildMigration(2, 3);
 
-            var migrator = new Migrator(status, new[] { migrator_0_1, migrator_0_2, migrator_1_2, migrator_2_3 }, A.Fake<ISemanticLog>());
+            var migrator = new Migrator(status, new[] { migrator_0_1, migrator_0_2, migrator_1_2, migrator_2_3 }, log);
 
             await migrator.MigrateAsync();
 
@@ -88,7 +132,7 @@ namespace Squidex.Infrastructure.Migrations
             var migrator_0_1 = BuildMigration(0, 1);
             var migrator_2_3 = BuildMigration(2, 3);
 
-            var migrator = new Migrator(status, new[] { migrator_0_1, migrator_2_3 }, A.Fake<ISemanticLog>());
+            var migrator = new Migrator(status, new[] { migrator_0_1, migrator_2_3 }, log);
 
             await Assert.ThrowsAsync<InvalidOperationException>(migrator.MigrateAsync);
 
@@ -96,6 +140,20 @@ namespace Squidex.Infrastructure.Migrations
             A.CallTo(() => migrator_2_3.UpdateAsync()).MustNotHaveHappened();
 
             A.CallTo(() => status.UnlockAsync(0)).MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_prevent_multiple_updates()
+        {
+            var migrator_0_1 = BuildMigration(0, 1);
+            var migrator_1_2 = BuildMigration(1, 2);
+
+            var migrator = new Migrator(new InMemoryStatus(), new[] { migrator_0_1, migrator_1_2 }, log) { LockWaitMs = 2 };
+
+            await Task.WhenAll(Enumerable.Repeat(0, 10).Select(x => Task.Run(migrator.MigrateAsync)));
+
+            A.CallTo(() => migrator_0_1.UpdateAsync()).MustHaveHappened(Repeated.Exactly.Once);
+            A.CallTo(() => migrator_1_2.UpdateAsync()).MustHaveHappened(Repeated.Exactly.Once);
         }
 
         private IMigration BuildMigration(int fromVersion, int toVersion)

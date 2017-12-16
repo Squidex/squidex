@@ -20,6 +20,8 @@ namespace Squidex.Infrastructure.Migrations
         private readonly IEnumerable<IMigration> migrations;
         private readonly ISemanticLog log;
 
+        public int LockWaitMs { get; set; } = 5000;
+
         public Migrator(IMigrationStatus migrationStatus, IEnumerable<IMigration> migrations, ISemanticLog log)
         {
             Guard.NotNull(migrationStatus, nameof(migrationStatus));
@@ -34,22 +36,24 @@ namespace Squidex.Infrastructure.Migrations
 
         public async Task MigrateAsync()
         {
-            var version = await migrationStatus.GetVersionAsync();
+            var version = 0;
 
-            var lastMigrator = migrations.FirstOrDefault();
-
-            if (lastMigrator != null && lastMigrator.ToVersion != version)
+            try
             {
                 while (!await migrationStatus.TryLockAsync())
                 {
                     log.LogInformation(w => w
                         .WriteProperty("action", "Migrate")
-                        .WriteProperty("mesage", "Waiting 5sec to acquire lock."));
+                        .WriteProperty("mesage", $"Waiting {LockWaitMs}ms to acquire lock."));
 
-                    await Task.Delay(5000);
+                    await Task.Delay(LockWaitMs);
                 }
 
-                try
+                var lastMigrator = migrations.FirstOrDefault();
+
+                version = await migrationStatus.GetVersionAsync();
+
+                if (lastMigrator != null && lastMigrator.ToVersion != version)
                 {
                     var migrationPath = FindMigratorPath(version, lastMigrator.ToVersion).ToList();
 
@@ -73,10 +77,10 @@ namespace Squidex.Infrastructure.Migrations
                         }
                     }
                 }
-                finally
-                {
-                    await migrationStatus.UnlockAsync(version);
-                }
+            }
+            finally
+            {
+                await migrationStatus.UnlockAsync(version);
             }
         }
 

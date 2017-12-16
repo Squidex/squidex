@@ -15,6 +15,7 @@ namespace Squidex.Infrastructure.Migrations
     public sealed class MongoMigrationStatus : MongoRepositoryBase<MongoMigrationEntity>, IMigrationStatus
     {
         private const string DefaultId = "Default";
+        private static readonly FindOneAndUpdateOptions<MongoMigrationEntity> UpsertFind = new FindOneAndUpdateOptions<MongoMigrationEntity> { IsUpsert = true };
 
         public MongoMigrationStatus(IMongoDatabase database)
             : base(database)
@@ -30,27 +31,15 @@ namespace Squidex.Infrastructure.Migrations
         {
             var entity = await Collection.Find(x => x.Id == DefaultId).FirstOrDefaultAsync();
 
-            if (entity == null)
-            {
-                try
-                {
-                    await Collection.InsertOneAsync(new MongoMigrationEntity { Id = DefaultId });
-                }
-                catch (MongoWriteException ex)
-                {
-                    if (ex.WriteError.Category != ServerErrorCategory.DuplicateKey)
-                    {
-                        throw;
-                    }
-                }
-            }
-
             return entity?.Version ?? 0;
         }
 
         public async Task<bool> TryLockAsync()
         {
-            var entity = await Collection.FindOneAndUpdateAsync(x => x.Id == DefaultId, Update.Set(x => x.IsLocked, true));
+            var entity =
+                await Collection.FindOneAndUpdateAsync<MongoMigrationEntity>(x => x.Id == DefaultId,
+                    Update.Set(x => x.IsLocked, true),
+                    UpsertFind);
 
             return entity?.IsLocked == false;
         }
