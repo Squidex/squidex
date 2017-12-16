@@ -108,7 +108,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
                     if (existingVersion != null)
                     {
-                        throw new InconsistentStateException(existingVersion["Version"].AsInt64, oldVersion, ex);
+                        throw new InconsistentStateException(existingVersion["vs"].AsInt64, oldVersion, ex);
                     }
                 }
                 else
