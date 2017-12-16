@@ -29,13 +29,13 @@ describe('AppsStoreService', () => {
 
     beforeEach(() => {
         appsService = Mock.ofType(AppsService);
-    });
 
-    it('should load automatically', () => {
         appsService.setup(x => x.getApps())
             .returns(() => Observable.of(oldApps))
             .verifiable(Times.once());
+    });
 
+    it('should load automatically', () => {
         const store = new AppsStoreService(appsService.object);
 
         let result1: AppDto[] | null = null;
@@ -56,10 +56,6 @@ describe('AppsStoreService', () => {
     });
 
     it('should add app to cache when created', () => {
-        appsService.setup(x => x.getApps())
-            .returns(() => Observable.of(oldApps))
-            .verifiable(Times.once());
-
         appsService.setup(x => x.postApp(It.isAny()))
             .returns(() => Observable.of(newApp))
             .verifiable(Times.once());
@@ -86,10 +82,6 @@ describe('AppsStoreService', () => {
     });
 
     it('should select app', (done) => {
-        appsService.setup(x => x.getApps())
-            .returns(() => Observable.of(oldApps))
-            .verifiable(Times.once());
-
         const store = new AppsStoreService(appsService.object);
 
         store.selectApp('old-name').subscribe(isSelected => {

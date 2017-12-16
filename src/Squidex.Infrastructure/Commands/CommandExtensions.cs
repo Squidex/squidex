@@ -14,24 +14,24 @@ namespace Squidex.Infrastructure.Commands
 {
     public static class CommandExtensions
     {
-        public static Task CreateAsync<T>(this IAggregateHandler handler, CommandContext context, Action<T> creator) where T : class, IDomainObject
+        public static Task<T> CreateAsync<T>(this IAggregateHandler handler, CommandContext context, Action<T> creator) where T : class, IDomainObject
         {
-            return handler.CreateAsync<T>(context, creator.ToAsync());
+            return handler.CreateAsync(context, creator.ToAsync());
         }
 
-        public static Task UpdateAsync<T>(this IAggregateHandler handler, CommandContext context, Action<T> updater) where T : class, IDomainObject
+        public static Task<T> UpdateAsync<T>(this IAggregateHandler handler, CommandContext context, Action<T> updater) where T : class, IDomainObject
         {
-            return handler.UpdateAsync<T>(context, updater.ToAsync());
+            return handler.UpdateAsync(context, updater.ToAsync());
         }
 
-        public static Task CreateSyncedAsync<T>(this IAggregateHandler handler, CommandContext context, Action<T> creator) where T : class, IDomainObject
+        public static Task<T> CreateSyncedAsync<T>(this IAggregateHandler handler, CommandContext context, Action<T> creator) where T : class, IDomainObject
         {
-            return handler.CreateSyncedAsync<T>(context, creator.ToAsync());
+            return handler.CreateSyncedAsync(context, creator.ToAsync());
         }
 
-        public static Task UpdateSyncedAsync<T>(this IAggregateHandler handler, CommandContext context, Action<T> updater) where T : class, IDomainObject
+        public static Task<T> UpdateSyncedAsync<T>(this IAggregateHandler handler, CommandContext context, Action<T> updater) where T : class, IDomainObject
         {
-            return handler.UpdateSyncedAsync<T>(context, updater.ToAsync());
+            return handler.UpdateSyncedAsync(context, updater.ToAsync());
         }
 
         public static Task HandleAsync(this ICommandMiddleware commandMiddleware, CommandContext context)

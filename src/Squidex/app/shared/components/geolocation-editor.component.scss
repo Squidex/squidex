@@ -1,0 +1,20 @@
+@import '_mixins';
+@import '_vars';
+
+.editor {
+    height: 30rem;
+}
+
+.editor-container {
+    position: relative;
+}
+
+.search-control {
+    @include absolute(.5rem, auto, auto, .5rem);
+    @include box-shadow;
+    width: 40%;
+}
+
+.form-inline {
+    margin-top: .5rem;
+}

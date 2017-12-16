@@ -54,7 +54,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Schemas
         public async Task<Guid> FindSchemaIdAsync(Guid appId, string name)
         {
             var schemaEntity =
-                await Collection.Find(x => x.Name == name).Only(x => x.Id)
+                await Collection.Find(x => x.AppId == appId && x.Name == name).Only(x => x.Id)
                     .FirstOrDefaultAsync();
 
             return schemaEntity != null ? Guid.Parse(schemaEntity["_id"].AsString) : Guid.Empty;

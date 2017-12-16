@@ -31,17 +31,19 @@ namespace Squidex.Infrastructure.Migrations
         {
             var entity = await Collection.Find(x => x.Id == DefaultId).FirstOrDefaultAsync();
 
-            return entity?.Version ?? 0;
+            return entity.Version;
         }
 
-        public async Task<bool> TryLockAsync()
+        public async Task<bool> TryLockAsync(int currentVersion)
         {
             var entity =
                 await Collection.FindOneAndUpdateAsync<MongoMigrationEntity>(x => x.Id == DefaultId,
-                    Update.Set(x => x.IsLocked, true),
+                    Update
+                        .Set(x => x.IsLocked, true)
+                        .Set(x => x.Version, currentVersion),
                     UpsertFind);
 
-            return entity?.IsLocked == false;
+            return entity == null || entity.IsLocked == false;
         }
 
         public Task UnlockAsync(int newVersion)

@@ -40,7 +40,9 @@ namespace Squidex.Infrastructure.Migrations
 
             try
             {
-                while (!await migrationStatus.TryLockAsync())
+                var lastMigrator = migrations.FirstOrDefault();
+
+                while (!await migrationStatus.TryLockAsync(lastMigrator.ToVersion))
                 {
                     log.LogInformation(w => w
                         .WriteProperty("action", "Migrate")
@@ -48,8 +50,6 @@ namespace Squidex.Infrastructure.Migrations
 
                     await Task.Delay(LockWaitMs);
                 }
-
-                var lastMigrator = migrations.FirstOrDefault();
 
                 version = await migrationStatus.GetVersionAsync();
 

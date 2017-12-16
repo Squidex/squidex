@@ -70,6 +70,8 @@ namespace Squidex.Infrastructure.Commands
 
             OnRaised(@event.To<IEvent>());
 
+            state.Version++;
+
             uncomittedEvents.Add(@event.To<IEvent>());
         }
 
@@ -95,8 +97,6 @@ namespace Squidex.Infrastructure.Commands
 
             if (events.Length > 0)
             {
-                state.Version += events.Length;
-
                 foreach (var @event in events)
                 {
                     @event.SetSnapshotVersion(state.Version);

@@ -50,7 +50,9 @@ namespace Squidex.Areas.Api.Controllers.UI
                             !string.IsNullOrWhiteSpace(x.Key) &&
                             !string.IsNullOrWhiteSpace(x.Value))
                         .Select(x => new UIRegexSuggestionDto { Name = x.Key, Pattern = x.Value }).ToList()
-                    ?? new List<UIRegexSuggestionDto>()
+                    ?? new List<UIRegexSuggestionDto>(),
+                MapType = uiOptions.Map?.Type ?? "OSM",
+                MapKey = uiOptions.Map?.GoogleMaps?.Key
             };
 
             return Ok(dto);

@@ -32,7 +32,7 @@ namespace Squidex.Infrastructure.Migrations
                 return Task.FromResult(version);
             }
 
-            public Task<bool> TryLockAsync()
+            public Task<bool> TryLockAsync(int currentVersion)
             {
                 var lockAcquired = false;
 
@@ -65,7 +65,7 @@ namespace Squidex.Infrastructure.Migrations
         public MigratorTests()
         {
             A.CallTo(() => status.GetVersionAsync()).Returns(0);
-            A.CallTo(() => status.TryLockAsync()).Returns(true);
+            A.CallTo(() => status.TryLockAsync(A<int>.Ignored)).Returns(true);
         }
 
         [Fact]

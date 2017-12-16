@@ -18,5 +18,17 @@ namespace Squidex.Areas.Api.Controllers.UI.Models
         /// </summary>
         [Required]
         public List<UIRegexSuggestionDto> RegexSuggestions { get; set; }
+
+        /// <summary>
+        /// The type of the map control.
+        /// </summary>
+        [Required]
+        public string MapType { get; set; }
+
+        /// <summary>
+        /// The key for the map control.
+        /// </summary>
+        [Required]
+        public string MapKey { get; set; }
     }
 }
