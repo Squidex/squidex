@@ -1,27 +1,28 @@
 ﻿// ==========================================================================
-//  UIRegexSuggestionDto.cs
+//  AddPattern.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
-using System.ComponentModel.DataAnnotations;
+using System;
 
-namespace Squidex.Areas.Api.Controllers.UI.Models
+namespace Squidex.Domain.Apps.Entities.Apps.Commands
 {
-    public sealed class UIRegexSuggestionDto
+    public sealed class AddPattern : AppAggregateCommand
     {
-        /// <summary>
-        /// The name of the suggestion.
-        /// </summary>
-        [Required]
+        public Guid PatternId { get; set; }
+
         public string Name { get; set; }
 
-        /// <summary>
-        /// The regex pattern.
-        /// </summary>
-        [Required]
         public string Pattern { get; set; }
+
+        public string Message { get; set; }
+
+        public AddPattern()
+        {
+            PatternId = Guid.NewGuid();
+        }
     }
 }

@@ -172,7 +172,7 @@ describe('AppLanguagesService', () => {
 
         const dto = new UpdateAppLanguageDto(true, true, []);
 
-        appLanguagesService.updateLanguage('my-app', 'de', dto, version).subscribe();
+        appLanguagesService.putLanguage('my-app', 'de', dto, version).subscribe();
 
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/languages/de');
 

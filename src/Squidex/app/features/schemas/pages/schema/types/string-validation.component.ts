@@ -10,10 +10,9 @@ import { FormControl, FormGroup } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 
 import {
+    AppPatternDto,
     ModalView,
-    StringFieldPropertiesDto,
-    UIRegexSuggestionDto,
-    UIService
+    StringFieldPropertiesDto
 } from 'shared';
 
 @Component({
@@ -23,7 +22,6 @@ import {
 })
 export class StringValidationComponent implements OnDestroy, OnInit {
     private patternSubscription: Subscription;
-    private uiSettingsSubscription: Subscription;
 
     @Input()
     public editForm: FormGroup;
@@ -31,22 +29,18 @@ export class StringValidationComponent implements OnDestroy, OnInit {
     @Input()
     public properties: StringFieldPropertiesDto;
 
-    public showDefaultValue: Observable<boolean>;
-    public showPatternMessage: Observable<boolean>;
-    public showPatternSuggestions: Observable<boolean>;
+    @Input()
+    public regexSuggestions: AppPatternDto[] = [];
 
-    public regexSuggestions: UIRegexSuggestionDto[] = [];
+    public showDefaultValue: Observable<boolean>;
+    public showPatternMessage: boolean;
+    public showPatternSuggestions: Observable<boolean>;
+    public patternName: string;
 
     public regexSuggestionsModal = new ModalView(false, false);
 
-    constructor(
-        private readonly uiService: UIService
-    ) {
-    }
-
     public ngOnDestroy() {
         this.patternSubscription.unsubscribe();
-        this.uiSettingsSubscription.unsubscribe();
     }
 
     public ngOnInit() {
@@ -71,20 +65,12 @@ export class StringValidationComponent implements OnDestroy, OnInit {
                 .map(x => !x);
 
         this.showPatternMessage =
-            this.editForm.controls['pattern'].valueChanges
-                .startWith('')
-                .map(x => x && x.trim().length > 0);
+            this.editForm.controls['pattern'].value && this.editForm.controls['pattern'].value.trim().length > 0;
 
         this.showPatternSuggestions =
             this.editForm.controls['pattern'].valueChanges
                 .startWith('')
                 .map(x => !x || x.trim().length === 0);
-
-        this.uiSettingsSubscription =
-            this.uiService.getSettings()
-                .subscribe(settings => {
-                    this.regexSuggestions = settings.regexSuggestions;
-                });
 
         this.patternSubscription =
             this.editForm.controls['pattern'].valueChanges
@@ -92,10 +78,28 @@ export class StringValidationComponent implements OnDestroy, OnInit {
                     if (!value || value.length === 0) {
                         this.editForm.controls['patternMessage'].setValue(undefined);
                     }
+                    this.setPatternName();
                 });
+
+        this.setPatternName();
     }
 
-    public setPattern(pattern: string) {
-        this.editForm.controls['pattern'].setValue(pattern);
+    public setPattern(pattern: AppPatternDto) {
+        this.patternName = pattern.name;
+        this.editForm.controls['pattern'].setValue(pattern.pattern);
+        this.editForm.controls['patternMessage'].setValue(pattern.message);
+        this.showPatternMessage = true;
+    }
+
+    private setPatternName() {
+        const matchingPattern = this.regexSuggestions.find(x => x.pattern === this.editForm.controls['pattern'].value);
+
+        if (matchingPattern) {
+            this.patternName = matchingPattern.name;
+        } else if (this.editForm.controls['pattern'].value && this.editForm.controls['pattern'].value.trim() !== '') {
+            this.patternName = 'Advanced';
+        } else {
+            this.patternName = undefined;
+        }
     }
 }

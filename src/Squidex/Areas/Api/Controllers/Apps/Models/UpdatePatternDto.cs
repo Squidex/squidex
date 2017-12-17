@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  UISettingsDto.cs
+//  AddPatternDto.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -8,20 +8,25 @@
 
 using System.ComponentModel.DataAnnotations;
 
-namespace Squidex.Areas.Api.Controllers.UI.Models
+namespace Squidex.Areas.Api.Controllers.Apps.Models
 {
-    public sealed class UISettingsDto
+    public class UpdatePatternDto
     {
         /// <summary>
-        /// The type of the map control.
+        /// The name of the suggestion.
         /// </summary>
         [Required]
-        public string MapType { get; set; }
+        public string Name { get; set; }
 
         /// <summary>
-        /// The key for the map control.
+        /// The regex pattern.
         /// </summary>
         [Required]
-        public string MapKey { get; set; }
+        public string Pattern { get; set; }
+
+        /// <summary>
+        /// The regex message.
+        /// </summary>
+        public string Message { get; set; }
     }
 }

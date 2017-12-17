@@ -40,7 +40,7 @@ namespace Squidex.Infrastructure.Migrations
                 await Collection.FindOneAndUpdateAsync<MongoMigrationEntity>(x => x.Id == DefaultId,
                     Update
                         .Set(x => x.IsLocked, true)
-                        .Set(x => x.Version, 0),
+                        .SetOnInsert(x => x.Version, 0),
                     UpsertFind);
 
             return entity == null || entity.IsLocked == false;

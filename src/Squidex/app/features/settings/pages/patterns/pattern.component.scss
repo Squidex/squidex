@@ -1,0 +1,13 @@
+@import '_vars';
+@import '_mixins';
+
+.col-options {
+    min-width: 7.5rem;
+    max-width: 7.5rem;
+}
+
+.col-name,
+.col-message {
+    min-width: 10rem;
+    max-width: 10rem;
+}

@@ -29,7 +29,7 @@ namespace Squidex.Config.Domain
     {
         private static readonly TypeNameRegistry TypeNameRegistry =
             new TypeNameRegistry()
-                .MapUnmapped(typeof(Migration01).Assembly)
+                .MapUnmapped(typeof(Migration01_FromCqrs).Assembly)
                 .MapUnmapped(typeof(SquidexCoreModel).Assembly)
                 .MapUnmapped(typeof(SquidexEvents).Assembly)
                 .MapUnmapped(typeof(SquidexInfrastructure).Assembly);
@@ -43,6 +43,7 @@ namespace Squidex.Config.Domain
             settings.ContractResolver = new ConverterContractResolver(
                 new AppClientsConverter(),
                 new AppContributorsConverter(),
+                new AppPatternsConverter(),
                 new ClaimsPrincipalConverter(),
                 new InstantConverter(),
                 new LanguageConverter(),

@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Entities.Apps.Repositories;
 using Squidex.Domain.Apps.Entities.Apps.State;
@@ -44,6 +45,15 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Apps
                     .FirstOrDefaultAsync();
 
             return appEntity != null ? Guid.Parse(appEntity["_id"].AsString) : Guid.Empty;
+        }
+
+        public async Task<IReadOnlyList<Guid>> QueryAppIdsAsync()
+        {
+            var appEntities =
+                await Collection.Find(new BsonDocument()).Only(x => x.Id)
+                    .ToListAsync();
+
+            return appEntities.Select(x => Guid.Parse(x["_id"].AsString)).ToList();
         }
 
         public async Task<IReadOnlyList<Guid>> QueryUserAppIdsAsync(string userId)
