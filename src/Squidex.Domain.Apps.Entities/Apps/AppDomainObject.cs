@@ -181,7 +181,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         private static AppPatternAdded CreateInitialPattern(NamedId<Guid> appId, RefToken actor, Guid id, AppPattern p)
         {
-            return new AppPatternAdded { AppId = appId, Actor = actor, Id = id, Name = p.Name, Pattern = p.Pattern, Message = p.Message };
+            return new AppPatternAdded { AppId = appId, Actor = actor, PatternId = id, Name = p.Name, Pattern = p.Pattern, Message = p.Message };
         }
 
         private static AppLanguageAdded CreateInitialLanguage(NamedId<Guid> appId, RefToken actor)

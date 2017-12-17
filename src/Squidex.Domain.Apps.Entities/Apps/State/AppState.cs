@@ -82,17 +82,17 @@ namespace Squidex.Domain.Apps.Entities.Apps.State
 
         protected void On(AppPatternAdded @event)
         {
-            Patterns = Patterns.Add(@event.Id, @event.Name, @event.Pattern, @event.Message);
+            Patterns = Patterns.Add(@event.PatternId, @event.Name, @event.Pattern, @event.Message);
         }
 
         protected void On(AppPatternDeleted @event)
         {
-            Patterns = Patterns.Remove(@event.Id);
+            Patterns = Patterns.Remove(@event.PatternId);
         }
 
         protected void On(AppPatternUpdated @event)
         {
-            Patterns = Patterns.Update(@event.Id, @event.Name, @event.Pattern, @event.Message);
+            Patterns = Patterns.Update(@event.PatternId, @event.Name, @event.Pattern, @event.Message);
         }
 
         protected void On(AppLanguageAdded @event)

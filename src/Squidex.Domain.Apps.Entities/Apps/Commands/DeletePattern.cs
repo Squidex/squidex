@@ -12,6 +12,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.Commands
 {
     public sealed class DeletePattern : AppAggregateCommand
     {
-        public Guid Id { get; set; }
+        public Guid PatternId { get; set; }
     }
 }

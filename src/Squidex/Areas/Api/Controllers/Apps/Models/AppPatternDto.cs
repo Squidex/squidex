@@ -16,7 +16,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// <summary>
         /// Identifier for Pattern
         /// </summary>
-        public Guid Id { get; set; }
+        public Guid PatternId { get; set; }
 
         /// <summary>
         /// The name of the suggestion.

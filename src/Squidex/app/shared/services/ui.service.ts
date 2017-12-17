@@ -14,13 +14,8 @@ import 'framework/angular/http-extensions';
 import { ApiUrlConfig } from 'framework';
 
 export interface UISettingsDto {
-    regexSuggestions: UIRegexSuggestionDto[];
     mapType: string;
     mapKey: string;
-}
-
-export interface UIRegexSuggestionDto {
-    name: string; pattern: string;
 }
 
 @Injectable()

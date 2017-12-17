@@ -12,7 +12,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Commands
 {
     public sealed class AddPattern : AppAggregateCommand
     {
-        public Guid Id { get; set; }
+        public Guid PatternId { get; set; }
 
         public string Name { get; set; }
 
@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Commands
 
         public AddPattern()
         {
-            Id = Guid.NewGuid();
+            PatternId = Guid.NewGuid();
         }
     }
 }

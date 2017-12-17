@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
         [Fact]
         public void CanAdd_should_throw_exception_if_name_empty()
         {
-            var command = new AddPattern { Id = patternId, Name = string.Empty, Pattern = ".*" };
+            var command = new AddPattern { PatternId = patternId, Name = string.Empty, Pattern = ".*" };
 
             Assert.Throws<ValidationException>(() => GuardAppPattern.CanAdd(patterns_0, command));
         }
@@ -41,7 +41,7 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
         [Fact]
         public void CanAdd_should_throw_exception_if_pattern_empty()
         {
-            var command = new AddPattern { Id = patternId, Name = "any", Pattern = string.Empty };
+            var command = new AddPattern { PatternId = patternId, Name = "any", Pattern = string.Empty };
 
             Assert.Throws<ValidationException>(() => GuardAppPattern.CanAdd(patterns_0, command));
         }
@@ -49,7 +49,7 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
         [Fact]
         public void CanAdd_should_throw_exception_if_pattern_not_valid()
         {
-            var command = new AddPattern { Id = patternId, Name = "any", Pattern = "[0-9{1}" };
+            var command = new AddPattern { PatternId = patternId, Name = "any", Pattern = "[0-9{1}" };
 
             Assert.Throws<ValidationException>(() => GuardAppPattern.CanAdd(patterns_0, command));
         }
@@ -59,7 +59,7 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
         {
             var patterns_1 = patterns_0.Add(Guid.NewGuid(), "any", "[a-z]", "Message");
 
-            var command = new AddPattern { Id = patternId, Name = "any", Pattern = ".*" };
+            var command = new AddPattern { PatternId = patternId, Name = "any", Pattern = ".*" };
 
             Assert.Throws<ValidationException>(() => GuardAppPattern.CanAdd(patterns_1, command));
         }
@@ -67,7 +67,7 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
         [Fact]
         public void CanAdd_should_not_throw_exception_if_success()
         {
-            var command = new AddPattern { Id = patternId, Name = "any", Pattern = ".*" };
+            var command = new AddPattern { PatternId = patternId, Name = "any", Pattern = ".*" };
 
             GuardAppPattern.CanAdd(patterns_0, command);
         }
@@ -75,7 +75,7 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
         [Fact]
         public void CanDelete_should_throw_exception_if_pattern_not_found()
         {
-            var command = new DeletePattern { Id = patternId };
+            var command = new DeletePattern { PatternId = patternId };
 
             Assert.Throws<DomainObjectNotFoundException>(() => GuardAppPattern.CanDelete(patterns_0, command));
         }
@@ -85,7 +85,7 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
         {
             var patterns_1 = patterns_0.Add(patternId, "any", ".*", "Message");
 
-            var command = new DeletePattern { Id = patternId };
+            var command = new DeletePattern { PatternId = patternId };
 
             GuardAppPattern.CanDelete(patterns_1, command);
         }
@@ -95,7 +95,7 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
         {
             var patterns_1 = patterns_0.Add(patternId, "any", ".*", "Message");
 
-            var command = new UpdatePattern { Id = patternId, Name = string.Empty, Pattern = ".*" };
+            var command = new UpdatePattern { PatternId = patternId, Name = string.Empty, Pattern = ".*" };
 
             Assert.Throws<ValidationException>(() => GuardAppPattern.CanUpdate(patterns_1, command));
         }
@@ -105,7 +105,7 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
         {
             var patterns_1 = patterns_0.Add(patternId, "any", ".*", "Message");
 
-            var command = new UpdatePattern { Id = patternId, Name = "any", Pattern = string.Empty };
+            var command = new UpdatePattern { PatternId = patternId, Name = "any", Pattern = string.Empty };
 
             Assert.Throws<ValidationException>(() => GuardAppPattern.CanUpdate(patterns_1, command));
         }
@@ -115,7 +115,7 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
         {
             var patterns_1 = patterns_0.Add(patternId, "any", ".*", "Message");
 
-            var command = new UpdatePattern { Id = patternId, Name = "any", Pattern = "[0-9{1}" };
+            var command = new UpdatePattern { PatternId = patternId, Name = "any", Pattern = "[0-9{1}" };
 
             Assert.Throws<ValidationException>(() => GuardAppPattern.CanUpdate(patterns_1, command));
         }
@@ -129,7 +129,7 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
             var patterns_1 = patterns_0.Add(id1, "Pattern1", "[0-5]", "Message");
             var patterns_2 = patterns_1.Add(id2, "Pattern2", "[0-4]", "Message");
 
-            var command = new UpdatePattern { Id = id2, Name = "Pattern1", Pattern = "[0-4]" };
+            var command = new UpdatePattern { PatternId = id2, Name = "Pattern1", Pattern = "[0-4]" };
 
             Assert.Throws<ValidationException>(() => GuardAppPattern.CanUpdate(patterns_2, command));
         }
@@ -143,7 +143,7 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
             var patterns_1 = patterns_0.Add(id1, "Pattern1", "[0-5]", "Message");
             var patterns_2 = patterns_1.Add(id2, "Pattern2", "[0-4]", "Message");
 
-            var command = new UpdatePattern { Id = id2, Name = "Pattern2", Pattern = "[0-5]" };
+            var command = new UpdatePattern { PatternId = id2, Name = "Pattern2", Pattern = "[0-5]" };
 
             Assert.Throws<ValidationException>(() => GuardAppPattern.CanUpdate(patterns_2, command));
         }
@@ -151,7 +151,7 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
         [Fact]
         public void CanUpdate_should_throw_exception_if_pattern_does_not_exists()
         {
-            var command = new UpdatePattern { Id = patternId, Name = "Pattern1", Pattern = ".*" };
+            var command = new UpdatePattern { PatternId = patternId, Name = "Pattern1", Pattern = ".*" };
 
             Assert.Throws<DomainObjectNotFoundException>(() => GuardAppPattern.CanUpdate(patterns_0, command));
         }
@@ -161,7 +161,7 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
         {
             var patterns_1 = patterns_0.Add(patternId, "any", ".*", "Message");
 
-            var command = new UpdatePattern { Id = patternId, Name = "Pattern1", Pattern = ".*" };
+            var command = new UpdatePattern { PatternId = patternId, Name = "Pattern1", Pattern = ".*" };
 
             GuardAppPattern.CanUpdate(patterns_1, command);
         }

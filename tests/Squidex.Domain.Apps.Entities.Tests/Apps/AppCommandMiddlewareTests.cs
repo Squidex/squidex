@@ -250,9 +250,9 @@ namespace Squidex.Domain.Apps.Entities.Apps
         public async Task UpdatePattern_should_update_domain()
         {
             CreateApp()
-                .AddPattern(CreateCommand(new AddPattern { Id = patternId, Name = "Any", Pattern = "." }));
+                .AddPattern(CreateCommand(new AddPattern { PatternId = patternId, Name = "Any", Pattern = "." }));
 
-            var context = CreateContextForCommand(new UpdatePattern { Id = patternId, Name = "Number", Pattern = "[0-9]" });
+            var context = CreateContextForCommand(new UpdatePattern { PatternId = patternId, Name = "Number", Pattern = "[0-9]" });
 
             await TestUpdate(app, async _ =>
             {
@@ -264,9 +264,9 @@ namespace Squidex.Domain.Apps.Entities.Apps
         public async Task DeletePattern_should_update_domain_object()
         {
             CreateApp()
-                .AddPattern(CreateCommand(new AddPattern { Id = patternId, Name = "Any", Pattern = "." }));
+                .AddPattern(CreateCommand(new AddPattern { PatternId = patternId, Name = "Any", Pattern = "." }));
 
-            var context = CreateContextForCommand(new DeletePattern { Id = patternId });
+            var context = CreateContextForCommand(new DeletePattern { PatternId = patternId });
 
             await TestUpdate(app, async _ =>
             {

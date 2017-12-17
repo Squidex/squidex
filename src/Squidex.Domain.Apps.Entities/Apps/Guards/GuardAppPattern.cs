@@ -51,9 +51,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            if (!patterns.ContainsKey(command.Id))
+            if (!patterns.ContainsKey(command.PatternId))
             {
-                throw new DomainObjectNotFoundException(command.Id.ToString(), typeof(AppPattern));
+                throw new DomainObjectNotFoundException(command.PatternId.ToString(), typeof(AppPattern));
             }
         }
 
@@ -61,9 +61,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            if (!patterns.ContainsKey(command.Id))
+            if (!patterns.ContainsKey(command.PatternId))
             {
-                throw new DomainObjectNotFoundException(command.Id.ToString(), typeof(AppPattern));
+                throw new DomainObjectNotFoundException(command.PatternId.ToString(), typeof(AppPattern));
             }
 
             Validate.It(() => "Cannot update pattern.", error =>
@@ -73,7 +73,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                     error(new ValidationError("Pattern name can not be empty.", nameof(command.Name)));
                 }
 
-                if (patterns.Any(x => x.Key != command.Id && x.Value.Name.Equals(command.Name, StringComparison.OrdinalIgnoreCase)))
+                if (patterns.Any(x => x.Key != command.PatternId && x.Value.Name.Equals(command.Name, StringComparison.OrdinalIgnoreCase)))
                 {
                     error(new ValidationError("Pattern name is already assigned.", nameof(command.Name)));
                 }
@@ -87,7 +87,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                     error(new ValidationError("Pattern is not a valid regular expression.", nameof(command.Pattern)));
                 }
 
-                if (patterns.Any(x => x.Key != command.Id && x.Value.Pattern == command.Pattern))
+                if (patterns.Any(x => x.Key != command.PatternId && x.Value.Pattern == command.Pattern))
                 {
                     error(new ValidationError("Pattern already exists.", nameof(command.Pattern)));
                 }

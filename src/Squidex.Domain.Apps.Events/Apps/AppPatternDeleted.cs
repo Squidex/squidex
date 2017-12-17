@@ -14,7 +14,7 @@ namespace Squidex.Domain.Apps.Events.Apps
     [EventType(nameof(AppPatternDeleted))]
     public sealed class AppPatternDeleted : AppEvent
     {
-        public Guid Id { get; set; }
+        public Guid PatternId { get; set; }
 
         public string Name { get; set; }
     }

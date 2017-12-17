@@ -52,7 +52,8 @@ namespace Squidex.Areas.Api.Controllers.Apps
         public IActionResult GetPatterns(string app)
         {
             var response =
-                App.Patterns.Select(x => SimpleMapper.Map(x.Value, new AppPatternDto { Id = x.Key })).OrderBy(x => x.Name).ToList();
+                App.Patterns.Select(x => SimpleMapper.Map(x.Value, new AppPatternDto { PatternId = x.Key }))
+                    .OrderBy(x => x.Name).ToList();
 
             return Ok(response);
         }
@@ -76,6 +77,8 @@ namespace Squidex.Areas.Api.Controllers.Apps
 
             await CommandBus.PublishAsync(command);
 
+            var response = SimpleMapper.Map(request, new AppPatternDto { PatternId = command.PatternId });
+
             return CreatedAtAction(nameof(GetPatterns), new { app }, request);
         }
 
@@ -95,7 +98,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [ApiCosts(1)]
         public async Task<IActionResult> UpdatePattern(string app, Guid id, [FromBody] UpdatePatternDto request)
         {
-            var command = SimpleMapper.Map(request, new UpdatePattern { Id = id });
+            var command = SimpleMapper.Map(request, new UpdatePattern { PatternId = id });
 
             await CommandBus.PublishAsync(command);
 
@@ -119,7 +122,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [ApiCosts(1)]
         public async Task<IActionResult> DeletePattern(string app, Guid id)
         {
-            await CommandBus.PublishAsync(new DeletePattern { Id = id });
+            await CommandBus.PublishAsync(new DeletePattern { PatternId = id });
 
             return NoContent();
         }
