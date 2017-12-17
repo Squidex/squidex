@@ -138,6 +138,36 @@ namespace Squidex.Domain.Apps.Entities.Apps
             });
         }
 
+        protected Task On(AddPattern command, CommandContext context)
+        {
+            return handler.UpdateAsync<AppDomainObject>(context, a =>
+            {
+                GuardAppPattern.CanAdd(a.State.Patterns, command);
+
+                a.AddPattern(command);
+            });
+        }
+
+        protected Task On(DeletePattern command, CommandContext context)
+        {
+            return handler.UpdateAsync<AppDomainObject>(context, a =>
+            {
+                GuardAppPattern.CanDelete(a.State.Patterns, command);
+
+                a.DeletePattern(command);
+            });
+        }
+
+        protected async Task On(UpdatePattern command, CommandContext context)
+        {
+            await handler.UpdateAsync<AppDomainObject>(context, a =>
+            {
+                GuardAppPattern.CanUpdate(a.State.Patterns, command);
+
+                a.UpdatePattern(command);
+            });
+        }
+
         protected Task On(ChangePlan command, CommandContext context)
         {
             return handler.UpdateSyncedAsync<AppDomainObject>(context, async a =>

@@ -123,6 +123,33 @@ namespace Squidex.Domain.Apps.Entities.Apps
             return this;
         }
 
+        public AppDomainObject AddPattern(AddPattern command)
+        {
+            ThrowIfNotCreated();
+
+            RaiseEvent(SimpleMapper.Map(command, new AppPatternAdded()));
+
+            return this;
+        }
+
+        public AppDomainObject DeletePattern(DeletePattern command)
+        {
+            ThrowIfNotCreated();
+
+            RaiseEvent(SimpleMapper.Map(command, new AppPatternDeleted()));
+
+            return this;
+        }
+
+        public AppDomainObject UpdatePattern(UpdatePattern command)
+        {
+            ThrowIfNotCreated();
+
+            RaiseEvent(SimpleMapper.Map(command, new AppPatternUpdated()));
+
+            return this;
+        }
+
         private void RaiseEvent(AppEvent @event)
         {
             if (@event.AppId == null)

@@ -32,6 +32,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.State
         public AppClients Clients { get; set; } = AppClients.Empty;
 
         [JsonProperty]
+        public AppPatterns Patterns { get; set; } = AppPatterns.Empty;
+
+        [JsonProperty]
         public AppContributors Contributors { get; set; } = AppContributors.Empty;
 
         [JsonProperty]
@@ -75,6 +78,21 @@ namespace Squidex.Domain.Apps.Entities.Apps.State
         protected void On(AppClientRevoked @event)
         {
             Clients = Clients.Revoke(@event.Id);
+        }
+
+        protected void On(AppPatternAdded @event)
+        {
+            Patterns = Patterns.Add(@event.Id, @event.Name, @event.Pattern, @event.DefaultMessage);
+        }
+
+        protected void On(AppPatternDeleted @event)
+        {
+            Patterns = Patterns.Remove(@event.Id);
+        }
+
+        protected void On(AppPatternUpdated @event)
+        {
+            Patterns = Patterns.Update(@event.Id, @event.Name, @event.Pattern, @event.DefaultMessage);
         }
 
         protected void On(AppLanguageAdded @event)

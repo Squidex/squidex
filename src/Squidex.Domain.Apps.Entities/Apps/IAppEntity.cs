@@ -18,6 +18,8 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         AppClients Clients { get; }
 
+        AppPatterns Patterns { get; }
+
         AppContributors Contributors { get; }
 
         LanguagesConfig LanguagesConfig { get; }

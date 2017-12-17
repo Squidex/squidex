@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  CreateApp.cs
+//  UpdatePattern.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -7,24 +7,17 @@
 // ==========================================================================
 
 using System;
-using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Commands
 {
-    public sealed class CreateApp : SquidexCommand, IAggregateCommand
+    public sealed class UpdatePattern : AppAggregateCommand
     {
-        public Guid AppId { get; set; }
+        public Guid Id { get; set; }
 
         public string Name { get; set; }
 
-        Guid IAggregateCommand.AggregateId
-        {
-            get { return AppId; }
-        }
+        public string Pattern { get; set; }
 
-        public CreateApp()
-        {
-            AppId = Guid.NewGuid();
-        }
+        public string DefaultMessage { get; set; }
     }
 }

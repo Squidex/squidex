@@ -24,6 +24,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         private readonly string clientId = "client";
         private readonly string clientNewName = "My Client";
         private readonly string planId = "premium";
+        private readonly Guid patternId = Guid.NewGuid();
         private readonly AppDomainObject sut = new AppDomainObject();
 
         protected override Guid Id
@@ -279,6 +280,83 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 .ShouldHaveSameEvents(
                     CreateEvent(new AppLanguageUpdated { Language = Language.DE, Fallback = new List<Language> { Language.EN } })
                 );
+        }
+
+        [Fact]
+        public void AddPattern_should_throw_exception_if_app_not_created()
+        {
+            Assert.Throws<DomainException>(() => sut.AddPattern(CreateCommand(new AddPattern { Id = patternId, Name = "Any", Pattern = ".*" })));
+        }
+
+        [Fact]
+        public void AddPattern_should_create_events()
+        {
+            CreateApp();
+
+            sut.AddPattern(CreateCommand(new AddPattern { Id = patternId, Name = "Any", Pattern = ".*", DefaultMessage = "Msg" }));
+
+            Assert.Single(sut.State.Patterns);
+
+            sut.GetUncomittedEvents()
+                .ShouldHaveSameEvents(
+                    CreateEvent(new AppPatternAdded { Id = patternId, Name = "Any", Pattern = ".*", DefaultMessage = "Msg" })
+                );
+        }
+
+        [Fact]
+        public void DeletePattern_should_throw_exception_if_app_not_created()
+        {
+            Assert.Throws<DomainException>(() =>
+            {
+                sut.DeletePattern(CreateCommand(new DeletePattern
+                {
+                    Id = Guid.NewGuid()
+                }));
+            });
+        }
+
+        [Fact]
+        public void DeletePattern_should_create_events()
+        {
+            CreateApp();
+            CreatePattern();
+
+            sut.DeletePattern(CreateCommand(new DeletePattern { Id = patternId }));
+
+            Assert.Empty(sut.State.Patterns);
+
+            sut.GetUncomittedEvents()
+                .ShouldHaveSameEvents(
+                    CreateEvent(new AppPatternDeleted { Id = patternId })
+                );
+        }
+
+        [Fact]
+        public void UpdatePattern_should_throw_exception_if_app_not_created()
+        {
+            Assert.Throws<DomainException>(() => sut.UpdatePattern(CreateCommand(new UpdatePattern { Id = patternId, Name = "Any", Pattern = ".*" })));
+        }
+
+        [Fact]
+        public void UpdatePattern_should_create_events()
+        {
+            CreateApp();
+            CreatePattern();
+
+            sut.UpdatePattern(CreateCommand(new UpdatePattern { Id = patternId, Name = "Any", Pattern = ".*", DefaultMessage = "Msg" }));
+
+            Assert.Single(sut.State.Patterns);
+
+            sut.GetUncomittedEvents()
+                .ShouldHaveSameEvents(
+                    CreateEvent(new AppPatternUpdated { Id = patternId, Name = "Any", Pattern = ".*", DefaultMessage = "Msg" })
+                );
+        }
+
+        private void CreatePattern()
+        {
+            sut.AddPattern(CreateCommand(new AddPattern { Id = patternId, Name = "Name", Pattern = ".*" }));
+            sut.ClearUncommittedEvents();
         }
 
         private void CreateApp()

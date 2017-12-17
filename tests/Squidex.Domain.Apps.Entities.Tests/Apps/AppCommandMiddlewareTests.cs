@@ -26,10 +26,11 @@ namespace Squidex.Domain.Apps.Entities.Apps
         private readonly IAppPlansProvider appPlansProvider = A.Fake<IAppPlansProvider>();
         private readonly IAppPlanBillingManager appPlansBillingManager = A.Fake<IAppPlanBillingManager>();
         private readonly IUserResolver userResolver = A.Fake<IUserResolver>();
-        private readonly AppDomainObject app = new AppDomainObject();
         private readonly Language language = Language.DE;
         private readonly string contributorId = Guid.NewGuid().ToString();
         private readonly string clientName = "client";
+        private readonly Guid patternId = Guid.NewGuid();
+        private readonly AppDomainObject app = new AppDomainObject();
         private readonly AppCommandMiddleware sut;
 
         protected override Guid Id
@@ -225,6 +226,47 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 .AddLanguage(CreateCommand(new AddLanguage { Language = language }));
 
             var context = CreateContextForCommand(new UpdateLanguage { Language = language });
+
+            await TestUpdate(app, async _ =>
+            {
+                await sut.HandleAsync(context);
+            });
+        }
+
+        [Fact]
+        public async Task AddPattern_should_update_domain_object()
+        {
+            CreateApp();
+
+            var context = CreateContextForCommand(new AddPattern { Name = "Any", Pattern = ".*" });
+
+            await TestUpdate(app, async _ =>
+            {
+                await sut.HandleAsync(context);
+            });
+        }
+
+        [Fact]
+        public async Task UpdatePattern_should_update_domain()
+        {
+            CreateApp()
+                .AddPattern(CreateCommand(new AddPattern { Id = patternId, Name = "Any", Pattern = "." }));
+
+            var context = CreateContextForCommand(new UpdatePattern { Id = patternId, Name = "Number", Pattern = "[0-9]" });
+
+            await TestUpdate(app, async _ =>
+            {
+                await sut.HandleAsync(context);
+            });
+        }
+
+        [Fact]
+        public async Task DeletePattern_should_update_domain_object()
+        {
+            CreateApp()
+                .AddPattern(CreateCommand(new AddPattern { Id = patternId, Name = "Any", Pattern = "." }));
+
+            var context = CreateContextForCommand(new DeletePattern { Id = patternId });
 
             await TestUpdate(app, async _ =>
             {

@@ -7,7 +7,6 @@
 // ==========================================================================
 
 using System;
-using System.Linq;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core.Apps;
 using Xunit;
@@ -25,8 +24,6 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         public AppPatternsTests()
         {
             defaultPatterns = AppPatterns.Empty.Add(firstId, "Default", "Default Pattern", "Message");
-
-            id = Guid.NewGuid();
         }
 
         [Fact]
