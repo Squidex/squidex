@@ -38,6 +38,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             return collection.Indexes.CreateOneAsync(
                 Index
                     .Ascending(x => x.State.AppId)
+                    .Ascending(x => x.State.IsDeleted)
                     .Ascending(x => x.State.FileName)
                     .Ascending(x => x.State.MimeType)
                     .Descending(x => x.State.LastModified));
@@ -90,7 +91,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
         {
             var filters = new List<FilterDefinition<MongoAssetEntity>>
             {
-                Filter.Eq(x => x.State.AppId, appId)
+                Filter.Eq(x => x.State.AppId, appId),
+                Filter.Eq(x => x.State.IsDeleted, false)
             };
 
             if (ids != null && ids.Count > 0)
