@@ -23,7 +23,7 @@ using Squidex.Infrastructure.States;
 
 namespace Migrate_01
 {
-    public sealed class Migration01 : IMigration
+    public sealed class Migration01_FromCqrs : IMigration
     {
         private readonly FieldRegistry fieldRegistry;
         private readonly IEventStore eventStore;
@@ -34,7 +34,7 @@ namespace Migrate_01
 
         public int ToVersion { get; } = 1;
 
-        public Migration01(
+        public Migration01_FromCqrs(
             FieldRegistry fieldRegistry,
             IEventDataFormatter eventDataFormatter,
             IEventStore eventStore,

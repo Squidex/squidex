@@ -64,7 +64,10 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<RuleCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
-            services.AddTransientAs<Migration01>()
+            services.AddTransientAs<Migration01_FromCqrs>()
+                .As<IMigration>();
+
+            services.AddTransientAs<Migration02_AddPatterns>()
                 .As<IMigration>();
 
             services.AddTransientAs<AppDomainObject>()

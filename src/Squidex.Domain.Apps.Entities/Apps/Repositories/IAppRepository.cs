@@ -16,6 +16,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Repositories
     {
         Task<Guid> FindAppIdByNameAsync(string name);
 
+        Task<IReadOnlyList<Guid>> QueryAppIdsAsync();
+
         Task<IReadOnlyList<Guid>> QueryUserAppIdsAsync(string userId);
     }
 }
