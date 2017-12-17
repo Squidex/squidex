@@ -34,13 +34,13 @@ namespace Squidex.Infrastructure.Migrations
             return entity.Version;
         }
 
-        public async Task<bool> TryLockAsync(int currentVersion)
+        public async Task<bool> TryLockAsync()
         {
             var entity =
                 await Collection.FindOneAndUpdateAsync<MongoMigrationEntity>(x => x.Id == DefaultId,
                     Update
                         .Set(x => x.IsLocked, true)
-                        .Set(x => x.Version, currentVersion),
+                        .Set(x => x.Version, 0),
                     UpsertFind);
 
             return entity == null || entity.IsLocked == false;

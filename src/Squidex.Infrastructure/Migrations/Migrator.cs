@@ -42,7 +42,7 @@ namespace Squidex.Infrastructure.Migrations
             {
                 var lastMigrator = migrations.FirstOrDefault();
 
-                while (!await migrationStatus.TryLockAsync(lastMigrator.ToVersion))
+                while (!await migrationStatus.TryLockAsync())
                 {
                     log.LogInformation(w => w
                         .WriteProperty("action", "Migrate")
