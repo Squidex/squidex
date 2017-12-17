@@ -6,19 +6,12 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Squidex.Areas.Api.Controllers.UI.Models
 {
     public sealed class UISettingsDto
     {
-        /// <summary>
-        /// The regex suggestions.
-        /// </summary>
-        [Required]
-        public List<UIRegexSuggestionDto> RegexSuggestions { get; set; }
-
         /// <summary>
         /// The type of the map control.
         /// </summary>

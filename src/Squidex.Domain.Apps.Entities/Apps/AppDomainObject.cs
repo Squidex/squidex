@@ -21,15 +21,29 @@ namespace Squidex.Domain.Apps.Entities.Apps
 {
     public sealed class AppDomainObject : DomainObjectBase<AppState>
     {
+        private readonly InitialPatterns initialPatterns;
+
+        public AppDomainObject(InitialPatterns initialPatterns)
+        {
+            Guard.NotNull(initialPatterns, nameof(initialPatterns));
+
+            this.initialPatterns = initialPatterns;
+        }
+
         public AppDomainObject Create(CreateApp command)
         {
             ThrowIfCreated();
 
             var appId = new NamedId<Guid>(command.AppId, command.Name);
 
-            RaiseEvent(SimpleMapper.Map(command, CreateInitalEvent(appId)));
-            RaiseEvent(SimpleMapper.Map(command, CreateInitialOwner(appId, command)));
-            RaiseEvent(SimpleMapper.Map(command, CreateInitialLanguage(appId)));
+            RaiseEvent(CreateInitalEvent(appId, command.Actor, command.Name));
+            RaiseEvent(CreateInitialOwner(appId, command.Actor));
+            RaiseEvent(CreateInitialLanguage(appId, command.Actor));
+
+            foreach (var pattern in initialPatterns)
+            {
+                RaiseEvent(CreateInitialPattern(appId, command.Actor, pattern.Key, pattern.Value));
+            }
 
             return this;
         }
@@ -160,19 +174,24 @@ namespace Squidex.Domain.Apps.Entities.Apps
             RaiseEvent(Envelope.Create(@event));
         }
 
-        private static AppCreated CreateInitalEvent(NamedId<Guid> appId)
+        private static AppCreated CreateInitalEvent(NamedId<Guid> appId, RefToken actor, string name)
         {
-            return new AppCreated { AppId = appId };
+            return new AppCreated { AppId = appId, Actor = actor, Name = name };
         }
 
-        private static AppLanguageAdded CreateInitialLanguage(NamedId<Guid> id)
+        private static AppPatternAdded CreateInitialPattern(NamedId<Guid> appId, RefToken actor, Guid id, AppPattern p)
         {
-            return new AppLanguageAdded { AppId = id, Language = Language.EN };
+            return new AppPatternAdded { AppId = appId, Actor = actor, Id = id, Name = p.Name, Pattern = p.Pattern, Message = p.Message };
         }
 
-        private static AppContributorAssigned CreateInitialOwner(NamedId<Guid> id, SquidexCommand command)
+        private static AppLanguageAdded CreateInitialLanguage(NamedId<Guid> appId, RefToken actor)
         {
-            return new AppContributorAssigned { AppId = id, ContributorId = command.Actor.Identifier, Permission = AppContributorPermission.Owner };
+            return new AppLanguageAdded { AppId = appId, Actor = actor, Language = Language.EN };
+        }
+
+        private static AppContributorAssigned CreateInitialOwner(NamedId<Guid> appId, RefToken actor)
+        {
+            return new AppContributorAssigned { AppId = appId, Actor = actor, ContributorId = actor.Identifier, Permission = AppContributorPermission.Owner };
         }
 
         private void ThrowIfNotCreated()

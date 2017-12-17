@@ -6,8 +6,11 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Migrate_01;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Assets;
@@ -78,6 +81,24 @@ namespace Squidex.Config.Domain
 
             services.AddTransientAs<SchemaDomainObject>()
                 .AsSelf();
+
+            services.AddSingleton<InitialPatterns>(c =>
+            {
+                var config = c.GetRequiredService<IOptions<MyUIOptions>>();
+
+                var result = new InitialPatterns();
+
+                foreach (var pattern in config.Value.RegexSuggestions)
+                {
+                    if (!string.IsNullOrWhiteSpace(pattern.Key) &&
+                        !string.IsNullOrWhiteSpace(pattern.Value))
+                    {
+                        result[Guid.NewGuid()] = new AppPattern(pattern.Key, pattern.Value);
+                    }
+                }
+
+                return result;
+            });
         }
     }
 }

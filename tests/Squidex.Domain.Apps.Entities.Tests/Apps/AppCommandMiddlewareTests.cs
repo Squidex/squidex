@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         private readonly string contributorId = Guid.NewGuid().ToString();
         private readonly string clientName = "client";
         private readonly Guid patternId = Guid.NewGuid();
-        private readonly AppDomainObject app = new AppDomainObject();
+        private readonly AppDomainObject app = new AppDomainObject(new InitialPatterns());
         private readonly AppCommandMiddleware sut;
 
         protected override Guid Id

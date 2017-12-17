@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         private readonly string clientNewName = "My Client";
         private readonly string planId = "premium";
         private readonly Guid patternId = Guid.NewGuid();
-        private readonly AppDomainObject sut = new AppDomainObject();
+        private readonly AppDomainObject sut = new AppDomainObject(new InitialPatterns());
 
         protected override Guid Id
         {
@@ -46,15 +46,28 @@ namespace Squidex.Domain.Apps.Entities.Apps
         [Fact]
         public void Create_should_specify_name_and_owner()
         {
-            sut.Create(CreateCommand(new CreateApp { Name = AppName, Actor = User, AppId = AppId }));
+            var id1 = Guid.NewGuid();
+            var id2 = Guid.NewGuid();
 
-            Assert.Equal(AppName, sut.State.Name);
+            var initialPatterns = new InitialPatterns
+            {
+                { id1, new AppPattern("Number", "[0-9]") },
+                { id2, new AppPattern("Numbers", "[0-9]*") }
+            };
 
-            sut.GetUncomittedEvents()
+            var app = new AppDomainObject(initialPatterns);
+
+            app.Create(CreateCommand(new CreateApp { Name = AppName, Actor = User, AppId = AppId }));
+
+            Assert.Equal(AppName, app.State.Name);
+
+            app.GetUncomittedEvents()
                 .ShouldHaveSameEvents(
                     CreateEvent(new AppCreated { Name = AppName }),
                     CreateEvent(new AppContributorAssigned { ContributorId = User.Identifier, Permission = AppContributorPermission.Owner }),
-                    CreateEvent(new AppLanguageAdded { Language = Language.EN })
+                    CreateEvent(new AppLanguageAdded { Language = Language.EN }),
+                    CreateEvent(new AppPatternAdded { Id = id1, Name = "Number", Pattern = "[0-9]" }),
+                    CreateEvent(new AppPatternAdded { Id = id2, Name = "Numbers", Pattern = "[0-9]*" })
                 );
         }
 

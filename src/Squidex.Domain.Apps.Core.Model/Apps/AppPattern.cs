@@ -32,7 +32,7 @@ namespace Squidex.Domain.Apps.Core.Apps
             get { return message; }
         }
 
-        public AppPattern(string name, string pattern, string message)
+        public AppPattern(string name, string pattern, string message = null)
         {
             Guard.NotNullOrEmpty(name, nameof(name));
             Guard.NotNullOrEmpty(pattern, nameof(pattern));

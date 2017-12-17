@@ -48,7 +48,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [HttpGet]
         [Route("apps/{app}/patterns/")]
         [ProducesResponseType(typeof(AppPatternDto[]), 200)]
-        [ApiCosts(1)]
+        [ApiCosts(0)]
         public IActionResult GetPatterns(string app)
         {
             var response =
