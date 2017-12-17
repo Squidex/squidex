@@ -89,7 +89,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                 DocumentId = documentId,
                 DataText = idData?.ToFullText(),
                 DataByIds = idData,
-                IsLatest = true,
+                IsLatest = !value.IsDeleted,
                 ReferencedIds = idData?.ToReferencedIds(schema.SchemaDef),
             });
 

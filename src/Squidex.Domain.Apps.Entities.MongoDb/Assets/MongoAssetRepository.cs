@@ -65,7 +65,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                 await Collection.Find(filter).Skip(skip).Limit(take).SortByDescending(x => x.State.LastModified)
                     .ToListAsync();
 
-            return assetEntities.OfType<IAssetEntity>().ToList();
+            return assetEntities.Select(x => x.State).ToList();
         }
 
         public async Task<long> CountAsync(Guid appId, HashSet<string> mimeTypes = null, HashSet<Guid> ids = null, string query = null)
