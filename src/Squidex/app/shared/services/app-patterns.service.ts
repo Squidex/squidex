@@ -96,26 +96,28 @@ export class AppPatternsService {
             .pretifyError('Failed to add pattern. Please reload.');
     }
 
-    public postPattern(appName: string, pattern: UpdatePatternDto, version: Version): Observable<Versioned<AppPatternDto>> {
+    public postPattern(appName: string, dto: UpdatePatternDto, version: Version): Observable<Versioned<AppPatternDto>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/patterns`);
 
-        return HTTP.postVersioned<any>(this.http, url, pattern, version)
+        return HTTP.postVersioned<any>(this.http, url, dto, version)
             .map(response => {
                 const body = response.payload.body;
 
-                return new AppPatternDto(
+                const pattern = new AppPatternDto(
                     body.patternId,
                     body.name,
                     body.pattern,
                     body.message);
+
+                return new Versioned(response.version, pattern);
             })
             .pretifyError('Failed to add pattern. Please reload.');
     }
 
-    public putPattern(appName: string, id: string, pattern: UpdatePatternDto, version: Version): Observable<Versioned<any>> {
+    public putPattern(appName: string, id: string, dto: UpdatePatternDto, version: Version): Observable<Versioned<any>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/patterns/${id}`);
 
-        return HTTP.putVersioned(this.http, url, pattern, version)
+        return HTTP.putVersioned(this.http, url, dto, version)
             .pretifyError('Failed to update pattern. Please reload.');
     }
 

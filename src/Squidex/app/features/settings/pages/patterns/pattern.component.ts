@@ -89,6 +89,10 @@ export class PatternComponent implements OnInit {
                 this.editForm.controls['message'].value);
 
             this.updating.emit(requestDto);
+
+            if (!this.pattern) {
+                this.cancel();
+            }
         }
     }
 }

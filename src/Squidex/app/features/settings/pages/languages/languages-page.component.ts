@@ -82,7 +82,7 @@ export class LanguagesPageComponent implements OnInit {
     }
 
     public updateLanguage(language: AppLanguageDto) {
-        this.appLanguagesService.updateLanguage(this.ctx.appName, language.iso2Code, language, this.appLanguages.version)
+        this.appLanguagesService.putLanguage(this.ctx.appName, language.iso2Code, language, this.appLanguages.version)
             .subscribe(dto => {
                 this.updateLanguages(this.appLanguages.updateLanguage(language, dto.version));
             }, error => {
