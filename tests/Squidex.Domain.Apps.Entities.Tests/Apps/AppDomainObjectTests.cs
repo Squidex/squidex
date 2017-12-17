@@ -293,13 +293,13 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             CreateApp();
 
-            sut.AddPattern(CreateCommand(new AddPattern { Id = patternId, Name = "Any", Pattern = ".*", DefaultMessage = "Msg" }));
+            sut.AddPattern(CreateCommand(new AddPattern { Id = patternId, Name = "Any", Pattern = ".*", Message = "Msg" }));
 
             Assert.Single(sut.State.Patterns);
 
             sut.GetUncomittedEvents()
                 .ShouldHaveSameEvents(
-                    CreateEvent(new AppPatternAdded { Id = patternId, Name = "Any", Pattern = ".*", DefaultMessage = "Msg" })
+                    CreateEvent(new AppPatternAdded { Id = patternId, Name = "Any", Pattern = ".*", Message = "Msg" })
                 );
         }
 
@@ -343,13 +343,13 @@ namespace Squidex.Domain.Apps.Entities.Apps
             CreateApp();
             CreatePattern();
 
-            sut.UpdatePattern(CreateCommand(new UpdatePattern { Id = patternId, Name = "Any", Pattern = ".*", DefaultMessage = "Msg" }));
+            sut.UpdatePattern(CreateCommand(new UpdatePattern { Id = patternId, Name = "Any", Pattern = ".*", Message = "Msg" }));
 
             Assert.Single(sut.State.Patterns);
 
             sut.GetUncomittedEvents()
                 .ShouldHaveSameEvents(
-                    CreateEvent(new AppPatternUpdated { Id = patternId, Name = "Any", Pattern = ".*", DefaultMessage = "Msg" })
+                    CreateEvent(new AppPatternUpdated { Id = patternId, Name = "Any", Pattern = ".*", Message = "Msg" })
                 );
         }
 

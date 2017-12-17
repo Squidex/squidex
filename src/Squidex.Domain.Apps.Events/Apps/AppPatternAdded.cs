@@ -20,6 +20,6 @@ namespace Squidex.Domain.Apps.Events.Apps
 
         public string Pattern { get; set; }
 
-        public string DefaultMessage { get; set; }
+        public string Message { get; set; }
     }
 }

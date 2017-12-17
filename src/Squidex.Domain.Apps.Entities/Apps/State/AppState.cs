@@ -82,7 +82,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.State
 
         protected void On(AppPatternAdded @event)
         {
-            Patterns = Patterns.Add(@event.Id, @event.Name, @event.Pattern, @event.DefaultMessage);
+            Patterns = Patterns.Add(@event.Id, @event.Name, @event.Pattern, @event.Message);
         }
 
         protected void On(AppPatternDeleted @event)
@@ -92,7 +92,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.State
 
         protected void On(AppPatternUpdated @event)
         {
-            Patterns = Patterns.Update(@event.Id, @event.Name, @event.Pattern, @event.DefaultMessage);
+            Patterns = Patterns.Update(@event.Id, @event.Name, @event.Pattern, @event.Message);
         }
 
         protected void On(AppLanguageAdded @event)

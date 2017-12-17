@@ -6,23 +6,16 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System;
 using System.Diagnostics.Contracts;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Apps
 {
-    public class AppPattern
+    public sealed class AppPattern
     {
-        private readonly Guid id;
         private readonly string name;
         private readonly string pattern;
-        private readonly string defaultMessage;
-
-        public Guid Id
-        {
-            get { return id; }
-        }
+        private readonly string message;
 
         public string Name
         {
@@ -34,29 +27,25 @@ namespace Squidex.Domain.Apps.Core.Apps
             get { return pattern; }
         }
 
-        public string DefaultMessage
+        public string Message
         {
-            get { return defaultMessage; }
+            get { return message; }
         }
 
-        public AppPattern(Guid id, string name, string pattern, string defaultMessage)
+        public AppPattern(string name, string pattern, string message)
         {
             Guard.NotNullOrEmpty(name, nameof(name));
             Guard.NotNullOrEmpty(pattern, nameof(pattern));
 
-            this.id = id;
             this.name = name;
             this.pattern = pattern;
-            this.defaultMessage = defaultMessage;
+            this.message = message;
         }
 
         [Pure]
         public AppPattern Update(string name, string pattern, string defaultMessage)
         {
-            Guard.NotNullOrEmpty(name, nameof(name));
-            Guard.NotNullOrEmpty(pattern, nameof(pattern));
-
-            return new AppPattern(this.id, name, pattern, defaultMessage);
+            return new AppPattern(name, pattern, defaultMessage);
         }
     }
 }

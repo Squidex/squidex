@@ -27,9 +27,9 @@ namespace Squidex.Domain.Apps.Core.Apps
         }
 
         [Pure]
-        public AppPatterns Add(Guid id, string name, string pattern, string defaultMessage)
+        public AppPatterns Add(Guid id, string name, string pattern, string message)
         {
-            var newPattern = new AppPattern(id, name, pattern, defaultMessage);
+            var newPattern = new AppPattern(name, pattern, message);
 
             return new AppPatterns(Inner.Add(id, newPattern));
         }
@@ -41,7 +41,7 @@ namespace Squidex.Domain.Apps.Core.Apps
         }
 
         [Pure]
-        public AppPatterns Update(Guid id, string name, string pattern, string defaultMessage)
+        public AppPatterns Update(Guid id, string name, string pattern, string message)
         {
             Guard.NotNullOrEmpty(name, nameof(name));
             Guard.NotNullOrEmpty(pattern, nameof(pattern));
@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Core.Apps
                 return this;
             }
 
-            return new AppPatterns(Inner.SetItem(id, appPattern.Update(name, pattern, defaultMessage)));
+            return new AppPatterns(Inner.SetItem(id, appPattern.Update(name, pattern, message)));
         }
     }
 }

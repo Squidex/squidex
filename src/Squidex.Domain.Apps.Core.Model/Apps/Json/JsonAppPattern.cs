@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Core.Apps.Json
         public string Pattern { get; set; }
 
         [JsonProperty]
-        public string DefaultMessage { get; set; }
+        public string Message { get; set; }
 
         public JsonAppPattern()
         {
@@ -36,7 +36,7 @@ namespace Squidex.Domain.Apps.Core.Apps.Json
 
         public AppPattern ToPattern()
         {
-            return new AppPattern(Id, Name, Pattern, DefaultMessage);
+            return new AppPattern(Name, Pattern, Message);
         }
     }
 }
