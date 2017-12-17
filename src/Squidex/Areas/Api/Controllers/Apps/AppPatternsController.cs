@@ -93,7 +93,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// 404 => App not found or pattern not found.
         /// </returns>
         [HttpPut]
-        [Route("apps/{app}/patterns/{name}")]
+        [Route("apps/{app}/patterns/{id}/")]
         [ProducesResponseType(typeof(AppPatternDto), 201)]
         [ApiCosts(1)]
         public async Task<IActionResult> UpdatePattern(string app, Guid id, [FromBody] UpdatePatternDto request)

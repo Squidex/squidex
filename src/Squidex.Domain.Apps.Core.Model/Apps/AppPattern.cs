@@ -43,9 +43,9 @@ namespace Squidex.Domain.Apps.Core.Apps
         }
 
         [Pure]
-        public AppPattern Update(string name, string pattern, string defaultMessage)
+        public AppPattern Update(string name, string pattern, string message)
         {
-            return new AppPattern(name, pattern, defaultMessage);
+            return new AppPattern(name, pattern, message);
         }
     }
 }

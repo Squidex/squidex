@@ -34,7 +34,7 @@ describe('ApppatternsDto', () => {
 
     it('should update patterns when removing pattern', () => {
         const patterns_1 = new AppPatternsDto([pattern1, pattern2], version);
-        const patterns_2 = patterns_1.removePattern(pattern1, newVersion);
+        const patterns_2 = patterns_1.deletePattern(pattern1, newVersion);
 
         expect(patterns_2.patterns).toEqual([pattern2]);
         expect(patterns_2.version).toEqual(newVersion);
@@ -61,6 +61,8 @@ describe('AppPatternDto', () => {
 });
 
 describe('AppPatternsService', () => {
+    const version = new Version('1');
+
     beforeEach(() => {
         TestBed.configureTestingModule({
             imports: [
@@ -123,14 +125,14 @@ describe('AppPatternsService', () => {
 
         let pattern: AppPatternDto | null = null;
 
-        patternService.postPattern('my-app', dto, new Version()).subscribe(result => {
-            pattern = result;
+        patternService.postPattern('my-app', dto, version).subscribe(result => {
+            pattern = result.payload;
         });
 
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/patterns');
 
         expect(req.request.method).toEqual('POST');
-        expect(req.request.headers.get('E-Tag')).toBeNull();
+        expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
         req.flush({
             patternId: '1',
@@ -147,12 +149,12 @@ describe('AppPatternsService', () => {
 
         const dto = new UpdatePatternDto('Number', '[0-9]', 'Message1');
 
-        patternService.updatePattern('my-app', '1', dto, new Version()).subscribe();
+        patternService.putPattern('my-app', '1', dto, version).subscribe();
 
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/patterns/1');
 
         expect(req.request.method).toEqual('PUT');
-        expect(req.request.headers.get('E-Tag')).toBeNull();
+        expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
         req.flush({});
     }));
@@ -160,12 +162,12 @@ describe('AppPatternsService', () => {
     it('should make delete request to remove pattern',
         inject([AppPatternsService, HttpTestingController], (patternService: AppPatternsService, httpMock: HttpTestingController) => {
 
-        patternService.deletePattern('my-app', '1', new Version('1')).subscribe();
+        patternService.deletePattern('my-app', '1', version).subscribe();
 
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/patterns/1');
 
         expect(req.request.method).toEqual('DELETE');
-        expect(req.request.headers.get('If-Match')).toEqual(new Version('1').value);
+        expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
         req.flush({});
     }));

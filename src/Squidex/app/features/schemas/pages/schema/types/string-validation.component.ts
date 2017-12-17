@@ -80,6 +80,8 @@ export class StringValidationComponent implements OnDestroy, OnInit {
                     }
                     this.setPatternName();
                 });
+
+        this.setPatternName();
     }
 
     public setPattern(pattern: AppPatternDto) {

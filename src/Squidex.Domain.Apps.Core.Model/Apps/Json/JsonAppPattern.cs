@@ -14,9 +14,6 @@ namespace Squidex.Domain.Apps.Core.Apps.Json
     public class JsonAppPattern
     {
         [JsonProperty]
-        public Guid Id { get; set; }
-
-        [JsonProperty]
         public string Name { get; set; }
 
         [JsonProperty]

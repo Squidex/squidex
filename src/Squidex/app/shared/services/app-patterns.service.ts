@@ -14,7 +14,8 @@ import 'framework/angular/http-extensions';
 import {
     ApiUrlConfig,
     HTTP,
-    Version
+    Version,
+    Versioned
 } from 'framework';
 
 export class AppPatternsDto {
@@ -32,7 +33,7 @@ export class AppPatternsDto {
         return new AppPatternsDto(this.patterns.map(p => p.patternId === pattern.patternId ? pattern : p), version);
     }
 
-    public removePattern(pattern: AppPatternDto, version: Version) {
+    public deletePattern(pattern: AppPatternDto, version: Version) {
         return new AppPatternsDto(this.patterns.filter(c => c.patternId !== pattern.patternId), version);
     }
 }
@@ -95,7 +96,7 @@ export class AppPatternsService {
             .pretifyError('Failed to add pattern. Please reload.');
     }
 
-    public postPattern(appName: string, pattern: UpdatePatternDto, version: Version): Observable<AppPatternDto> {
+    public postPattern(appName: string, pattern: UpdatePatternDto, version: Version): Observable<Versioned<AppPatternDto>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/patterns`);
 
         return HTTP.postVersioned<any>(this.http, url, pattern, version)
@@ -111,14 +112,14 @@ export class AppPatternsService {
             .pretifyError('Failed to add pattern. Please reload.');
     }
 
-    public updatePattern(appName: string, id: string, pattern: UpdatePatternDto, version: Version): Observable<any> {
+    public putPattern(appName: string, id: string, pattern: UpdatePatternDto, version: Version): Observable<Versioned<any>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/patterns/${id}`);
 
         return HTTP.putVersioned(this.http, url, pattern, version)
             .pretifyError('Failed to update pattern. Please reload.');
     }
 
-    public deletePattern(appName: string, id: string, version: Version): Observable<AppPatternDto> {
+    public deletePattern(appName: string, id: string, version: Version): Observable<Versioned<any>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/patterns/${id}`);
 
         return HTTP.deleteVersioned(this.http, url, version)
