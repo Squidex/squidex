@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
     {
         [BsonRequired]
         [BsonElement]
-        public Guid AssetId { get; set; }
+        public Guid AppId { get; set; }
 
         [BsonRequired]
         [BsonElement]

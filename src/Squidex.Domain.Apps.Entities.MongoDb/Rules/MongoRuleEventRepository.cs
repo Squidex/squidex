@@ -36,7 +36,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
         protected override async Task SetupCollectionAsync(IMongoCollection<MongoRuleEventEntity> collection)
         {
             await collection.Indexes.CreateOneAsync(Index.Ascending(x => x.NextAttempt));
-            await collection.Indexes.CreateOneAsync(Index.Ascending(x => x.AssetId).Descending(x => x.Created));
+            await collection.Indexes.CreateOneAsync(Index.Ascending(x => x.AppId).Descending(x => x.Created));
             await collection.Indexes.CreateOneAsync(Index.Ascending(x => x.Expires), new CreateIndexOptions { ExpireAfter = TimeSpan.Zero });
         }
 
@@ -48,7 +48,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
         public async Task<IReadOnlyList<IRuleEventEntity>> QueryByAppAsync(Guid appId, int skip = 0, int take = 20)
         {
             var ruleEventEntities =
-                await Collection.Find(x => x.AssetId == appId).Skip(skip).Limit(take).SortByDescending(x => x.Created)
+                await Collection.Find(x => x.AppId == appId).Skip(skip).Limit(take).SortByDescending(x => x.Created)
                     .ToListAsync();
 
             return ruleEventEntities;
@@ -65,7 +65,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
 
         public async Task<int> CountByAppAsync(Guid appId)
         {
-            return (int)await Collection.CountAsync(x => x.AssetId == appId);
+            return (int)await Collection.CountAsync(x => x.AppId == appId);
         }
 
         public Task EnqueueAsync(Guid id, Instant nextAttempt)
@@ -75,7 +75,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
 
         public Task EnqueueAsync(RuleJob job, Instant nextAttempt)
         {
-            var entity = SimpleMapper.Map(job, new MongoRuleEventEntity { Job = job, Created = nextAttempt, NextAttempt = nextAttempt });
+            var entity = SimpleMapper.Map(job, new MongoRuleEventEntity { Id = job.JobId, Job = job, Created = nextAttempt, NextAttempt = nextAttempt });
 
             return Collection.InsertOneIfNotExistsAsync(entity);
         }

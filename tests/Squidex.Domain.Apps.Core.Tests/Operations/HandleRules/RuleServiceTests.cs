@@ -114,7 +114,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         }
 
         [Fact]
-        public void Should_create_job_if_triggeres()
+        public void Should_not_create_job_if_too_old()
         {
             var e = new ContentCreated { SchemaId = new NamedId<Guid>(Guid.NewGuid(), "my-schema"), AppId = new NamedId<Guid>(Guid.NewGuid(), "my-event") };
 
@@ -122,6 +122,39 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
             var ruleConfig = new Rule(new ContentChangedTrigger(), new WebhookAction());
             var ruleEnvelope = Envelope.Create(e);
+
+            ruleEnvelope.SetTimestamp(now.Minus(Duration.FromDays(3)));
+
+            var actionData = new RuleJobData();
+            var actionDescription = "MyDescription";
+
+            var eventName = "MySchemaCreatedEvent";
+
+            A.CallTo(() => clock.GetCurrentInstant())
+                .Returns(now);
+
+            A.CallTo(() => ruleTriggerHandler.Triggers(A<Envelope<AppEvent>>.Ignored, ruleConfig.Trigger))
+                .Returns(true);
+
+            A.CallTo(() => ruleActionHandler.CreateJob(A<Envelope<AppEvent>>.Ignored, eventName, ruleConfig.Action))
+                .Returns((actionDescription, actionData));
+
+            var job = sut.CreateJob(ruleConfig, ruleEnvelope);
+
+            Assert.Null(job);
+        }
+
+        [Fact]
+        public void Should_create_job_if_triggered()
+        {
+            var e = new ContentCreated { SchemaId = new NamedId<Guid>(Guid.NewGuid(), "my-schema"), AppId = new NamedId<Guid>(Guid.NewGuid(), "my-event") };
+
+            var now = SystemClock.Instance.GetCurrentInstant();
+
+            var ruleConfig = new Rule(new ContentChangedTrigger(), new WebhookAction());
+            var ruleEnvelope = Envelope.Create(e);
+
+            ruleEnvelope.SetTimestamp(now);
 
             var actionName = "WebhookAction";
             var actionData = new RuleJobData();
@@ -151,7 +184,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
             Assert.Equal(e.AppId.Id, job.AppId);
 
-            Assert.NotEqual(Guid.Empty, job.RuleId);
+            Assert.NotEqual(Guid.Empty, job.JobId);
         }
 
         [Fact]

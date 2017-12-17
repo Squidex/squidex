@@ -7,6 +7,7 @@
 // ==========================================================================
 
 using System.Threading.Tasks;
+using NodaTime;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Entities.Rules.Repositories;
 using Squidex.Domain.Apps.Events;
@@ -32,19 +33,17 @@ namespace Squidex.Domain.Apps.Entities.Rules
             get { return ".*"; }
         }
 
-        public RuleEnqueuer(
-            IRuleEventRepository ruleEventRepository, IAppProvider appProvider,
+        public RuleEnqueuer(IAppProvider appProvider, IRuleEventRepository ruleEventRepository,
             RuleService ruleService)
         {
+            Guard.NotNull(appProvider, nameof(appProvider));
             Guard.NotNull(ruleEventRepository, nameof(ruleEventRepository));
             Guard.NotNull(ruleService, nameof(ruleService));
 
-            Guard.NotNull(appProvider, nameof(appProvider));
+            this.appProvider = appProvider;
 
             this.ruleEventRepository = ruleEventRepository;
             this.ruleService = ruleService;
-
-            this.appProvider = appProvider;
         }
 
         public Task ClearAsync()

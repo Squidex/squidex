@@ -29,13 +29,13 @@ h3 {
             position: relative;
             background: $color-border;
             border: 0;
-            margin: -1.25rem;
+            margin: -.7rem -1.25rem;
             margin-bottom: 1rem;
         }
 
         &::before {
             @include caret-top($color-border);
-            @include absolute(-1.1rem, 2.3rem, auto, auto);
+            @include absolute(-1.1rem, 2.5rem, auto, auto);
         }
 
         h3 {

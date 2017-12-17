@@ -82,7 +82,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
             var job = new RuleJob
             {
-                RuleId = Guid.NewGuid(),
+                JobId = Guid.NewGuid(),
                 ActionData = actionData,
                 ActionName = actionName,
                 Created = now

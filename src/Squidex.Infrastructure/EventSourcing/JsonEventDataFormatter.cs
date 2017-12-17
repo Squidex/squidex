@@ -39,6 +39,8 @@ namespace Squidex.Infrastructure.EventSourcing
 
             var envelope = new Envelope<IEvent>(eventPayload, headers);
 
+            envelope.SetEventId(eventData.EventId);
+
             return envelope;
         }
 

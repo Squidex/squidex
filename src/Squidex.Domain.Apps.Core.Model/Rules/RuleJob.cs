@@ -13,7 +13,7 @@ namespace Squidex.Domain.Apps.Core.Rules
 {
     public sealed class RuleJob
     {
-        public Guid RuleId { get; set; }
+        public Guid JobId { get; set; }
 
         public Guid AppId { get; set; }
 
