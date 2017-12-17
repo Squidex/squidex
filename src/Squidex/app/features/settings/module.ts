@@ -22,6 +22,8 @@ import {
     ContributorsPageComponent,
     LanguageComponent,
     LanguagesPageComponent,
+    PatternComponent,
+    PatternsPageComponent,
     PlansPageComponent,
     SettingsAreaComponent
 } from './declarations';
@@ -97,6 +99,26 @@ const routes: Routes = [
                         }
                     }
                 ]
+            },
+            {
+                path: 'patterns',
+                component: PatternsPageComponent,
+                children: [
+                    {
+                        path: 'history',
+                        component: HistoryComponent,
+                        data: {
+                            channel: 'settings.patterns'
+                        }
+                    },
+                    {
+                        path: 'help',
+                        component: HelpComponent,
+                        data: {
+                            helpPage: '05-integrated/patterns'
+                        }
+                    }
+                ]
             }
         ]
     }
@@ -115,6 +137,8 @@ const routes: Routes = [
         ContributorsPageComponent,
         LanguageComponent,
         LanguagesPageComponent,
+        PatternComponent,
+        PatternsPageComponent,
         PlansPageComponent,
         SettingsAreaComponent
     ]

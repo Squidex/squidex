@@ -1,0 +1,41 @@
+﻿<sqx-title message="{app} | Patterns | Settings" parameter1="app" [value1]="ctx.appName"></sqx-title>
+
+<sqx-panel desiredWidth="60rem">
+    <div class="panel-header">
+        <div class="panel-title-row">
+            <h3 class="panel-title">Patterns</h3>
+        </div>
+
+        <a class="panel-close" sqxParentLink>
+            <i class="icon-close"></i>
+        </a>
+    </div>
+
+    <div class="panel-main">
+        <div class="panel-content panel-content-scroll">
+            <div *ngIf="appPatterns">
+                <div *ngFor="let pattern of appPatterns.patterns">
+                    <sqx-pattern [pattern]="pattern"
+                        (removing)="removePattern(pattern)"
+                        (updating)="updatePattern(pattern, $event)">
+                    </sqx-pattern>
+                </div>
+                <sqx-pattern [isNew]="true"
+                    (updating)="addPattern($event)">
+                </sqx-pattern>
+            </div>
+        </div>
+
+        
+        <div class="panel-sidebar">
+            <a class="panel-link" routerLink="history" routerLinkActive="active">
+                <i class="icon-time"></i>
+            </a>
+            <a class="panel-link" routerLink="help" routerLinkActive="active">
+                <i class="icon-help"></i>
+            </a>
+        </div>
+    </div>
+</sqx-panel>
+
+<router-outlet></router-outlet>

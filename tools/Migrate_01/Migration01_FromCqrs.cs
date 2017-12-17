@@ -6,7 +6,6 @@
 //  All rights reserved.
 // ==========================================================================
 
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -21,24 +20,21 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.States;
-using Squidex.Infrastructure.Tasks;
 
 namespace Migrate_01
 {
-    public sealed class Migration01 : IMigration, IEventSubscriber
+    public sealed class Migration01_FromCqrs : IMigration
     {
         private readonly FieldRegistry fieldRegistry;
         private readonly IEventStore eventStore;
         private readonly IEventDataFormatter eventDataFormatter;
         private readonly IStateFactory stateFactory;
-        private readonly Timer timer;
-        private readonly TaskCompletionSource<object> subscriptionTcs = new TaskCompletionSource<object>();
 
         public int FromVersion { get; } = 0;
 
         public int ToVersion { get; } = 1;
 
-        public Migration01(
+        public Migration01_FromCqrs(
             FieldRegistry fieldRegistry,
             IEventDataFormatter eventDataFormatter,
             IEventStore eventStore,
@@ -48,30 +44,12 @@ namespace Migrate_01
             this.eventDataFormatter = eventDataFormatter;
             this.eventStore = eventStore;
             this.stateFactory = stateFactory;
-
-            timer = new Timer(d => subscriptionTcs.TrySetResult(true));
         }
 
         public async Task UpdateAsync()
         {
-            var subscription = eventStore.CreateSubscription(this, ".*");
-
-            try
+            await eventStore.GetEventsAsync(async storedEvent =>
             {
-                await subscriptionTcs.Task;
-            }
-            finally
-            {
-                await subscription.StopAsync();
-            }
-        }
-
-        public async Task OnEventAsync(IEventSubscription subscription, StoredEvent storedEvent)
-        {
-            try
-            {
-                timer.Change(Timeout.Infinite, Timeout.Infinite);
-
                 var @event = ParseKnownEvent(storedEvent);
 
                 if (@event != null)
@@ -111,20 +89,7 @@ namespace Migrate_01
                         await app.WriteStateAsync(version);
                     }
                 }
-
-                timer.Change(5000, 0);
-            }
-            catch (Exception ex)
-            {
-                subscriptionTcs.SetException(ex);
-            }
-        }
-
-        public Task OnErrorAsync(IEventSubscription subscription, Exception exception)
-        {
-            subscriptionTcs.TrySetException(exception);
-
-            return TaskHelper.Done;
+            }, CancellationToken.None);
         }
 
         private Envelope<IEvent> ParseKnownEvent(StoredEvent storedEvent)

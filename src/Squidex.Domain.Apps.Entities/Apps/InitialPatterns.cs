@@ -1,27 +1,26 @@
 ﻿// ==========================================================================
-//  IAppEntity.cs
+//  InitialPatterns.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
 
+using System;
+using System.Collections.Generic;
 using Squidex.Domain.Apps.Core.Apps;
 
 namespace Squidex.Domain.Apps.Entities.Apps
 {
-    public interface IAppEntity : IEntity, IEntityWithVersion
+    public sealed class InitialPatterns : Dictionary<Guid, AppPattern>
     {
-        string Name { get; }
+        public InitialPatterns()
+        {
+        }
 
-        AppPlan Plan { get; }
-
-        AppClients Clients { get; }
-
-        AppPatterns Patterns { get; }
-
-        AppContributors Contributors { get; }
-
-        LanguagesConfig LanguagesConfig { get; }
+        public InitialPatterns(Dictionary<Guid, AppPattern> patterns)
+            : base(patterns)
+        {
+        }
     }
 }
