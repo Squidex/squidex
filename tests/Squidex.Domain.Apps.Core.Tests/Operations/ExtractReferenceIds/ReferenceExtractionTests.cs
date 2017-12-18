@@ -204,7 +204,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
 
             var result = sut.CleanReferences(CreateValue(id1, id2), new HashSet<Guid>(new[] { id2 }));
 
-            Assert.Equal(CreateValue(id1, schemaId), result);
+            Assert.Equal(CreateValue(id1), result);
         }
 
         [Fact]

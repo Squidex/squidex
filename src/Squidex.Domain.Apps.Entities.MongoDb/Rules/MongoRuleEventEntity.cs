@@ -7,6 +7,7 @@
 // ==========================================================================
 
 using System;
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using NodaTime;
 using Squidex.Domain.Apps.Core.HandleRules;
@@ -20,7 +21,23 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
     {
         [BsonRequired]
         [BsonElement]
+        [BsonRepresentation(BsonType.String)]
         public Guid AppId { get; set; }
+
+        [BsonRequired]
+        [BsonElement]
+        [BsonRepresentation(BsonType.String)]
+        public RuleResult Result { get; set; }
+
+        [BsonRequired]
+        [BsonElement]
+        [BsonRepresentation(BsonType.String)]
+        public RuleJobResult JobResult { get; set; }
+
+        [BsonRequired]
+        [BsonElement]
+        [BsonJson]
+        public RuleJob Job { get; set; }
 
         [BsonRequired]
         [BsonElement]
@@ -37,18 +54,5 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
         [BsonRequired]
         [BsonElement]
         public Instant? NextAttempt { get; set; }
-
-        [BsonRequired]
-        [BsonElement]
-        public RuleResult Result { get; set; }
-
-        [BsonRequired]
-        [BsonElement]
-        public RuleJobResult JobResult { get; set; }
-
-        [BsonRequired]
-        [BsonElement]
-        [BsonJson]
-        public RuleJob Job { get; set; }
     }
 }

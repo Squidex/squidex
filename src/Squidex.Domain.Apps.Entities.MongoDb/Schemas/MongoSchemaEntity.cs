@@ -23,19 +23,20 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Schemas
 
         [BsonElement]
         [BsonRequired]
+        [BsonRepresentation(BsonType.String)]
+        public Guid AppId { get; set; }
+
+        [BsonElement]
+        [BsonRequired]
+        [BsonJson]
+        public SchemaState State { get; set; }
+
+        [BsonElement]
+        [BsonRequired]
         public string Name { get; set; }
 
         [BsonElement]
         [BsonRequired]
         public int Version { get; set; }
-
-        [BsonElement]
-        [BsonRequired]
-        public Guid AppId { get; set; }
-
-        [BsonJson]
-        [BsonElement]
-        [BsonRequired]
-        public SchemaState State { get; set; }
     }
 }

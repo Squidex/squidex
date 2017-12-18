@@ -22,12 +22,13 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 
         [BsonRequired]
         [BsonElement]
-        [BsonDateTimeOptions(DateOnly = true)]
-        public DateTime Date { get; set; }
+        [BsonRepresentation(BsonType.String)]
+        public Guid AssetId { get; set; }
 
         [BsonRequired]
         [BsonElement]
-        public Guid AssetId { get; set; }
+        [BsonDateTimeOptions(DateOnly = true)]
+        public DateTime Date { get; set; }
 
         [BsonRequired]
         [BsonElement]

@@ -21,11 +21,11 @@ namespace Squidex.Infrastructure.States
 
         [BsonRequired]
         [BsonElement]
-        public long Version { get; set; }
+        [BsonJson]
+        public T Doc { get; set; }
 
         [BsonRequired]
         [BsonElement]
-        [BsonJson]
-        public T Doc { get; set; }
+        public long Version { get; set; }
     }
 }

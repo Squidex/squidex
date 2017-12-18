@@ -24,12 +24,44 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         private NamedContentData data;
 
         [BsonId]
+        [BsonRequired]
         [BsonElement]
         public string DocumentId { get; set; }
 
         [BsonRequired]
-        [BsonElement]
+        [BsonElement("id")]
+        [BsonRepresentation(BsonType.String)]
         public Guid Id { get; set; }
+
+        [BsonRequired]
+        [BsonElement("ai")]
+        [BsonRepresentation(BsonType.String)]
+        public Guid AppId { get; set; }
+
+        [BsonRequired]
+        [BsonElement("si")]
+        [BsonRepresentation(BsonType.String)]
+        public Guid SchemaId { get; set; }
+
+        [BsonRequired]
+        [BsonElement("rf")]
+        [BsonRepresentation(BsonType.String)]
+        public List<Guid> ReferencedIds { get; set; }
+
+        [BsonRequired]
+        [BsonElement("rd")]
+        [BsonRepresentation(BsonType.String)]
+        public List<Guid> ReferencedIdsDeleted { get; set; } = new List<Guid>();
+
+        [BsonRequired]
+        [BsonElement("st")]
+        [BsonRepresentation(BsonType.String)]
+        public Status Status { get; set; }
+
+        [BsonRequired]
+        [BsonElement("do")]
+        [BsonJson]
+        public IdContentData DataByIds { get; set; }
 
         [BsonRequired]
         [BsonElement("ct")]
@@ -48,14 +80,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         public long Version { get; set; }
 
         [BsonRequired]
-        [BsonElement("ai")]
-        public Guid AppId { get; set; }
-
-        [BsonRequired]
-        [BsonElement("si")]
-        public Guid SchemaId { get; set; }
-
-        [BsonRequired]
         [BsonElement("cb")]
         public RefToken CreatedBy { get; set; }
 
@@ -64,26 +88,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         public RefToken LastModifiedBy { get; set; }
 
         [BsonRequired]
-        [BsonElement("rf")]
-        public List<Guid> ReferencedIds { get; set; }
-
-        [BsonRequired]
-        [BsonElement("rd")]
-        public List<Guid> ReferencedIdsDeleted { get; set; } = new List<Guid>();
-
-        [BsonRequired]
         [BsonElement("lt")]
         public bool IsLatest { get; set; }
-
-        [BsonRequired]
-        [BsonElement("st")]
-        [BsonRepresentation(BsonType.String)]
-        public Status Status { get; set; }
-
-        [BsonRequired]
-        [BsonElement("do")]
-        [BsonJson]
-        public IdContentData DataByIds { get; set; }
 
         [BsonIgnore]
         public NamedContentData Data

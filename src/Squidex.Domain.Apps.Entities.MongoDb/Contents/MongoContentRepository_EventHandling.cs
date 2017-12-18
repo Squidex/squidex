@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         public Task On(Envelope<IEvent> @event)
         {
-            return this.DispatchActionAsync(@event.Payload, @event.Headers);
+            return this.DispatchActionAsync(@event.Payload);
         }
 
         protected Task On(AssetDeleted @event)

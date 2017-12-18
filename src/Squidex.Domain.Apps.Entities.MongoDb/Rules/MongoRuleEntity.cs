@@ -23,19 +23,20 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
 
         [BsonElement]
         [BsonRequired]
-        public int Version { get; set; }
-
-        [BsonElement]
-        [BsonRequired]
+        [BsonRepresentation(BsonType.String)]
         public Guid AppId { get; set; }
 
         [BsonElement]
         [BsonRequired]
-        public bool IsDeleted { get; set; }
-
         [BsonJson]
+        public RuleState State { get; set; }
+
         [BsonElement]
         [BsonRequired]
-        public RuleState State { get; set; }
+        public int Version { get; set; }
+
+        [BsonElement]
+        [BsonRequired]
+        public bool IsDeleted { get; set; }
     }
 }

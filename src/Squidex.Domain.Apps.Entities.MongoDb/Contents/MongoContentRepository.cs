@@ -225,7 +225,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                 await Collection.Find(x => contentIds.Contains(x.Id) && x.AppId == appId).Only(x => x.Id)
                     .ToListAsync();
 
-            return contentIds.Except(contentEntities.Select(x => x["Id"].AsGuid)).ToList();
+            return contentIds.Except(contentEntities.Select(x => Guid.Parse(x["id"].AsString))).ToList();
         }
 
         public async Task<IContentEntity> FindContentAsync(IAppEntity app, ISchemaEntity schema, Guid id, long version)

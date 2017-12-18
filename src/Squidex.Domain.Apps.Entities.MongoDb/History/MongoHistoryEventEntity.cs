@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
@@ -22,8 +23,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.History
         IUpdateableEntityWithCreatedBy,
         IUpdateableEntityWithAppRef
     {
-        [BsonRequired]
         [BsonElement]
+        [BsonRequired]
+        [BsonRepresentation(BsonType.String)]
         public Guid AppId { get; set; }
 
         [BsonRequired]

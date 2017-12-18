@@ -23,6 +23,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Apps
 
         [BsonElement]
         [BsonRequired]
+        [BsonJson]
+        public AppState State { get; set; }
+
+        [BsonElement]
+        [BsonRequired]
         public int Version { get; set; }
 
         [BsonElement]
@@ -32,10 +37,5 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Apps
         [BsonElement]
         [BsonRequired]
         public string[] UserIds { get; set; }
-
-        [BsonJson]
-        [BsonElement]
-        [BsonRequired]
-        public AppState State { get; set; }
     }
 }
