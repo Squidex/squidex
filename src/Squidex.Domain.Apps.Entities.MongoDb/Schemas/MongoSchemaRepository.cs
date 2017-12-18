@@ -51,13 +51,13 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Schemas
             return (null, EtagVersion.NotFound);
         }
 
-        public async Task<Guid> FindSchemaIdAsync(Guid appId, string name)
+        public async Task<IReadOnlyList<Guid>> QuerySchemaIdsAsync(Guid appId, string name)
         {
-            var schemaEntity =
-                await Collection.Find(x => x.AppId == appId && x.Name == name).Only(x => x.Id)
-                    .FirstOrDefaultAsync();
+            var schemaEntities =
+                await Collection.Find(x => x.AppId == appId && x.Name == name).Only(x => x.Id).SortByDescending(x => x.Version)
+                    .ToListAsync();
 
-            return schemaEntity != null ? Guid.Parse(schemaEntity["_id"].AsString) : Guid.Empty;
+            return schemaEntities.Select(x => Guid.Parse(x["_id"].AsString)).ToList();
         }
 
         public async Task<IReadOnlyList<Guid>> QuerySchemaIdsAsync(Guid appId)

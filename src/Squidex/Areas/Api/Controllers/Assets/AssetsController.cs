@@ -102,15 +102,12 @@ namespace Squidex.Areas.Api.Controllers.Assets
                 }
             }
 
-            var taskForItems = assetRepository.QueryAsync(App.Id, mimeTypeList, idsList, query, take, skip);
-            var taskForCount = assetRepository.CountAsync(App.Id, mimeTypeList, idsList, query);
-
-            await Task.WhenAll(taskForItems, taskForCount);
+            var assets = await assetRepository.QueryAsync(App.Id, mimeTypeList, idsList, query, take, skip);
 
             var response = new AssetsDto
             {
-                Total = taskForCount.Result,
-                Items = taskForItems.Result.Select(x => SimpleMapper.Map(x, new AssetDto { FileType = x.FileName.FileType() })).ToArray()
+                Total = assets.Total,
+                Items = assets.Select(x => SimpleMapper.Map(x, new AssetDto { FileType = x.FileName.FileType() })).ToArray()
             };
 
             return Ok(response);

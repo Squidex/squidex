@@ -44,50 +44,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                     .Descending(x => x.State.LastModified));
         }
 
-        public async Task<(AssetState Value, long Version)> ReadAsync(Guid key)
-        {
-            var existing =
-                await Collection.Find(x => x.Id == key)
-                    .FirstOrDefaultAsync();
-
-            if (existing != null)
-            {
-                return (existing.State, existing.Version);
-            }
-
-            return (null, EtagVersion.NotFound);
-        }
-
-        public async Task<IReadOnlyList<IAssetEntity>> QueryAsync(Guid appId, HashSet<string> mimeTypes = null, HashSet<Guid> ids = null, string query = null, int take = 10, int skip = 0)
-        {
-            var filter = CreateFilter(appId, mimeTypes, ids, query);
-
-            var assetEntities =
-                await Collection.Find(filter).Skip(skip).Limit(take).SortByDescending(x => x.State.LastModified)
-                    .ToListAsync();
-
-            return assetEntities.Select(x => x.State).ToList();
-        }
-
-        public async Task<long> CountAsync(Guid appId, HashSet<string> mimeTypes = null, HashSet<Guid> ids = null, string query = null)
-        {
-            var filter = CreateFilter(appId, mimeTypes, ids, query);
-
-            var assetsCount =
-                await Collection.Find(filter)
-                    .CountAsync();
-
-            return assetsCount;
-        }
-
-        public async Task<IAssetEntity> FindAssetAsync(Guid id)
-        {
-            var (state, etag) = await ReadAsync(id);
-
-            return state;
-        }
-
-        private static FilterDefinition<MongoAssetEntity> CreateFilter(Guid appId, ICollection<string> mimeTypes, ICollection<Guid> ids, string query)
+        public async Task<IResultList<IAssetEntity>> QueryAsync(Guid appId, HashSet<string> mimeTypes = null, HashSet<Guid> ids = null, string query = null, int take = 10, int skip = 0)
         {
             var filters = new List<FilterDefinition<MongoAssetEntity>>
             {
@@ -112,7 +69,39 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 
             var filter = Filter.And(filters);
 
-            return filter;
+            var find = Collection.Find(filter);
+
+            var assetEntities =
+                Collection.Find(filter).Skip(skip).Limit(take).SortByDescending(x => x.State.LastModified)
+                    .ToListAsync();
+            var assetCount =
+                Collection.Find(filter)
+                    .CountAsync();
+
+            await Task.WhenAll(assetEntities, assetCount);
+
+            return ResultList.Create<IAssetEntity>(assetEntities.Result.Select(x => x.State), assetCount.Result);
+        }
+
+        public async Task<IAssetEntity> FindAssetAsync(Guid id)
+        {
+            var (state, etag) = await ReadAsync(id);
+
+            return state;
+        }
+
+        public async Task<(AssetState Value, long Version)> ReadAsync(Guid key)
+        {
+            var existing =
+                await Collection.Find(x => x.Id == key)
+                    .FirstOrDefaultAsync();
+
+            if (existing != null)
+            {
+                return (existing.State, existing.Version);
+            }
+
+            return (null, EtagVersion.NotFound);
         }
 
         public async Task WriteAsync(Guid key, AssetState value, long oldVersion, long newVersion)

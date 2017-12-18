@@ -137,7 +137,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             var assets = new List<IAssetEntity> { asset };
 
             A.CallTo(() => assetRepository.QueryAsync(app.Id, null, null, "my-query", 30, 5))
-                .Returns(assets);
+                .Returns(ResultList.Create(assets, 0));
 
             var result = await sut.QueryAsync(app, user, new GraphQLQuery { Query = query });
 
@@ -546,7 +546,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 .Returns((schema, content));
 
             A.CallTo(() => assetRepository.QueryAsync(app.Id, null, A<HashSet<Guid>>.That.Matches(x => x.Contains(assetRefId)), null, int.MaxValue, 0))
-                .Returns(refAssets);
+                .Returns(ResultList.Create(refAssets, 0));
 
             var result = await sut.QueryAsync(app, user, new GraphQLQuery { Query = query });
 
