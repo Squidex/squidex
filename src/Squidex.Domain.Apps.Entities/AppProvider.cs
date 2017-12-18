@@ -49,14 +49,14 @@ namespace Squidex.Domain.Apps.Entities
         {
             var app = await stateFactory.GetSingleAsync<AppDomainObject>(appId);
 
-            if (IsNotFound(app))
+            if (IsFound(app))
             {
                 return (null, null);
             }
 
             var schema = await stateFactory.GetSingleAsync<SchemaDomainObject>(id);
 
-            return IsNotFound(false, schema) ? (null, null) : (app.State, schema.State);
+            return IsFound(schema, false) ? (null, null) : (app.State, schema.State);
         }
 
         public async Task<IAppEntity> GetAppAsync(string appName)
@@ -70,36 +70,36 @@ namespace Squidex.Domain.Apps.Entities
 
             var app = await stateFactory.GetSingleAsync<AppDomainObject>(appId);
 
-            return IsNotFound(app) ? null : app.State;
+            return IsFound(app) ? app.State : null;
         }
 
         public async Task<ISchemaEntity> GetSchemaAsync(Guid appId, Guid id, bool provideDeleted = false)
         {
             var schema = await stateFactory.GetSingleAsync<SchemaDomainObject>(id);
 
-            return IsNotFound(provideDeleted, schema) ? null : schema.State;
+            return IsFound(schema, provideDeleted) ? schema.State : null;
         }
 
         public async Task<ISchemaEntity> GetSchemaAsync(Guid appId, string name, bool provideDeleted = false)
         {
-            var ids = await schemaRepository.QuerySchemaIdsAsync(appId);
+            var ids = await schemaRepository.QueryAllSchemaIdsAsync(appId, name);
 
             var schemas =
                 await Task.WhenAll(
                     ids.Select(id => stateFactory.GetSingleAsync<SchemaDomainObject>(id)));
 
-            return schemas.OrderByDescending(x => x.State.LastModified).FirstOrDefault(s => IsNotFound(provideDeleted, s))?.State;
+            return schemas.OrderByDescending(x => x.State.LastModified).FirstOrDefault(s => IsFound(s, provideDeleted))?.State;
         }
 
         public async Task<List<ISchemaEntity>> GetSchemasAsync(Guid appId)
         {
-            var ids = await schemaRepository.QuerySchemaIdsAsync(appId);
+            var ids = await schemaRepository.QueryAllSchemaIdsAsync(appId);
 
             var schemas =
                 await Task.WhenAll(
                     ids.Select(id => stateFactory.GetSingleAsync<SchemaDomainObject>(id)));
 
-            return schemas.Where(s => !s.State.IsDeleted).Select(s => (ISchemaEntity)s.State).ToList();
+            return schemas.Where(s => IsFound(s)).Select(s => (ISchemaEntity)s.State).ToList();
         }
 
         public async Task<List<IRuleEntity>> GetRulesAsync(Guid appId)
@@ -129,14 +129,14 @@ namespace Squidex.Domain.Apps.Entities
             return appRepository.FindAppIdByNameAsync(name);
         }
 
-        private static bool IsNotFound(AppDomainObject app)
+        private static bool IsFound(AppDomainObject app)
         {
-            return app.Version < 0;
+            return app.Version >= 0;
         }
 
-        private static bool IsNotFound(bool provideDeleted, SchemaDomainObject schema)
+        private static bool IsFound(SchemaDomainObject schema, bool provideDeleted = false)
         {
-            return schema.Version < 0 || (schema.State.IsDeleted && !provideDeleted);
+            return schema.Version >= 0 && (!schema.State.IsDeleted || provideDeleted);
         }
     }
 }

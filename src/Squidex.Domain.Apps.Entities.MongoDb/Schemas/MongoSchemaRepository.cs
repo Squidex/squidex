@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Schemas
             await collection.Indexes.CreateOneAsync(Index.Ascending(x => x.Name));
         }
 
-        public async Task<IReadOnlyList<Guid>> QuerySchemaIdsAsync(Guid appId, string name)
+        public async Task<IReadOnlyList<Guid>> QueryAllSchemaIdsAsync(Guid appId, string name)
         {
             var schemaEntities =
                 await Collection.Find(x => x.AppId == appId && x.Name == name).Only(x => x.Id).SortByDescending(x => x.Version)
@@ -43,7 +43,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Schemas
             return schemaEntities.Select(x => Guid.Parse(x["_id"].AsString)).ToList();
         }
 
-        public async Task<IReadOnlyList<Guid>> QuerySchemaIdsAsync(Guid appId)
+        public async Task<IReadOnlyList<Guid>> QueryAllSchemaIdsAsync(Guid appId)
         {
             var schemaEntities =
                 await Collection.Find(x => x.AppId == appId).Only(x => x.Id)
