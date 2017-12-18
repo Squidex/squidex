@@ -7,7 +7,6 @@
 // ==========================================================================
 
 using System.Threading.Tasks;
-using NodaTime;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Entities.Rules.Repositories;
 using Squidex.Domain.Apps.Events;

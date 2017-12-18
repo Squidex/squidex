@@ -86,21 +86,21 @@ namespace Squidex.Areas.Api.Controllers.Contents
 
             var isFrontendClient = User.IsFrontendClient();
 
-            var contents =
+            var result =
                 idsList != null ?
-                    await contentQuery.QueryWithCountAsync(App, name, User, archived, idsList) :
-                    await contentQuery.QueryWithCountAsync(App, name, User, archived, Request.QueryString.ToString());
+                    await contentQuery.QueryAsync(App, name, User, archived, idsList) :
+                    await contentQuery.QueryAsync(App, name, User, archived, Request.QueryString.ToString());
 
             var response = new AssetsDto
             {
-                Total = contents.Total,
-                Items = contents.Items.Take(200).Select(item =>
+                Total = result.Contents.Total,
+                Items = result.Contents.Take(200).Select(item =>
                 {
                     var itemModel = SimpleMapper.Map(item, new ContentDto());
 
                     if (item.Data != null)
                     {
-                        itemModel.Data = item.Data.ToApiModel(contents.Schema.SchemaDef, App.LanguagesConfig, !isFrontendClient);
+                        itemModel.Data = item.Data.ToApiModel(result.Schema.SchemaDef, App.LanguagesConfig, !isFrontendClient);
                     }
 
                     return itemModel;

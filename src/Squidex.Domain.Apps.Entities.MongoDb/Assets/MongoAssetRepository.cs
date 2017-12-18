@@ -14,14 +14,12 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
-using Squidex.Domain.Apps.Entities.Assets.State;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
-using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 {
-    public sealed class MongoAssetRepository : MongoRepositoryBase<MongoAssetEntity>, IAssetRepository, ISnapshotStore<AssetState, Guid>
+    public sealed partial class MongoAssetRepository : MongoRepositoryBase<MongoAssetEntity>, IAssetRepository
     {
         public MongoAssetRepository(IMongoDatabase database)
             : base(database)
@@ -71,67 +69,21 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 
             var find = Collection.Find(filter);
 
-            var assetEntities =
-                Collection.Find(filter).Skip(skip).Limit(take).SortByDescending(x => x.State.LastModified)
-                    .ToListAsync();
-            var assetCount =
-                Collection.Find(filter)
-                    .CountAsync();
+            var assetItems = find.Skip(skip).Limit(take).SortByDescending(x => x.State.LastModified).ToListAsync();
+            var assetCount = find.CountAsync();
 
-            await Task.WhenAll(assetEntities, assetCount);
+            await Task.WhenAll(assetItems, assetCount);
 
-            return ResultList.Create<IAssetEntity>(assetEntities.Result.Select(x => x.State), assetCount.Result);
+            return ResultList.Create<IAssetEntity>(assetItems.Result.Select(x => x.State), assetCount.Result);
         }
 
         public async Task<IAssetEntity> FindAssetAsync(Guid id)
         {
-            var (state, etag) = await ReadAsync(id);
-
-            return state;
-        }
-
-        public async Task<(AssetState Value, long Version)> ReadAsync(Guid key)
-        {
-            var existing =
-                await Collection.Find(x => x.Id == key)
+            var assetEntity =
+                await Collection.Find(x => x.Id == id)
                     .FirstOrDefaultAsync();
 
-            if (existing != null)
-            {
-                return (existing.State, existing.Version);
-            }
-
-            return (null, EtagVersion.NotFound);
-        }
-
-        public async Task WriteAsync(Guid key, AssetState value, long oldVersion, long newVersion)
-        {
-            try
-            {
-                await Collection.UpdateOneAsync(x => x.Id == key && x.Version == oldVersion,
-                    Update
-                        .Set(x => x.State, value)
-                        .Set(x => x.Version, newVersion),
-                    Upsert);
-            }
-            catch (MongoWriteException ex)
-            {
-                if (ex.WriteError.Category == ServerErrorCategory.DuplicateKey)
-                {
-                    var existingVersion =
-                        await Collection.Find(x => x.Id == key).Only(x => x.Id, x => x.Version)
-                            .FirstOrDefaultAsync();
-
-                    if (existingVersion != null)
-                    {
-                        throw new InconsistentStateException(existingVersion["Version"].AsInt64, oldVersion, ex);
-                    }
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            return assetEntity?.State;
         }
     }
 }

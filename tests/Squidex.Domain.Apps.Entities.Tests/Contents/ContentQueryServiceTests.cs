@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using FakeItEasy;
@@ -36,8 +37,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
         private readonly Guid schemaId = Guid.NewGuid();
         private readonly Guid contentId = Guid.NewGuid();
         private readonly string appName = "my-app";
-        private readonly NamedContentData data = new NamedContentData();
-        private readonly NamedContentData transformedData = new NamedContentData();
+        private readonly NamedContentData contentData = new NamedContentData();
+        private readonly NamedContentData contentTransformed = new NamedContentData();
         private readonly ClaimsPrincipal user;
         private readonly ClaimsIdentity identity = new ClaimsIdentity();
         private readonly EdmModelBuilder modelBuilder = A.Fake<EdmModelBuilder>();
@@ -51,7 +52,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             A.CallTo(() => app.Name).Returns(appName);
 
             A.CallTo(() => content.Id).Returns(contentId);
-            A.CallTo(() => content.Data).Returns(data);
+            A.CallTo(() => content.Data).Returns(contentData);
             A.CallTo(() => content.Status).Returns(Status.Published);
 
             sut = new ContentQueryService(contentRepository, appProvider, scriptEngine, modelBuilder);
@@ -99,13 +100,14 @@ namespace Squidex.Domain.Apps.Entities.Contents
             A.CallTo(() => schema.ScriptQuery)
                 .Returns("<script-query>");
 
-            A.CallTo(() => scriptEngine.Transform(A<ScriptContext>.That.Matches(x => x.User == user && x.ContentId == contentId && ReferenceEquals(x.Data, data)), "<query-script>"))
-                .Returns(transformedData);
+            A.CallTo(() => scriptEngine.Transform(A<ScriptContext>.That.Matches(x => x.User == user && x.ContentId == contentId && ReferenceEquals(x.Data, contentData)), "<query-script>"))
+                .Returns(contentTransformed);
 
             var result = await sut.FindContentAsync(app, schemaId.ToString(), user, contentId);
 
             Assert.Equal(schema, result.Schema);
-            Assert.Equal(data, result.Content.Data);
+
+            Assert.Equal(contentTransformed, result.Content.Data);
             Assert.Equal(content.Id, result.Content.Id);
         }
 
@@ -157,12 +159,14 @@ namespace Squidex.Domain.Apps.Entities.Contents
             SetupFakeWithOdataQuery(status);
             SetupFakeWithScripting();
 
-            var result = await sut.QueryWithCountAsync(app, schemaId.ToString(), user, archive, string.Empty);
+            var result = await sut.QueryAsync(app, schemaId.ToString(), user, archive, string.Empty);
 
-            Assert.Equal(123, result.Total);
             Assert.Equal(schema, result.Schema);
-            Assert.Equal(data, result.Items[0].Data);
-            Assert.Equal(content.Id, result.Items[0].Id);
+
+            Assert.Equal(contentData, result.Contents[0].Data);
+            Assert.Equal(content.Id, result.Contents[0].Id);
+
+            Assert.Equal(123, result.Contents.Total);
         }
 
         private async Task TestManyIdRequest(bool isFrontend, bool archive, HashSet<Guid> ids, params Status[] status)
@@ -172,12 +176,14 @@ namespace Squidex.Domain.Apps.Entities.Contents
             SetupFakeWithIdQuery(status, ids);
             SetupFakeWithScripting();
 
-            var result = await sut.QueryWithCountAsync(app, schemaId.ToString(), user, archive, ids);
+            var result = await sut.QueryAsync(app, schemaId.ToString(), user, archive, ids);
 
-            Assert.Equal(123, result.Total);
             Assert.Equal(schema, result.Schema);
-            Assert.Equal(data, result.Items[0].Data);
-            Assert.Equal(content.Id, result.Items[0].Id);
+
+            Assert.Equal(contentData, result.Contents[0].Data);
+            Assert.Equal(content.Id, result.Contents[0].Id);
+
+            Assert.Equal(123, result.Contents.Total);
         }
 
         private void SetupClaims(bool isFrontend)
@@ -192,20 +198,18 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             A.CallTo(() => appProvider.GetSchemaAsync(appId, schemaId, false))
                 .Returns(schema);
+
             A.CallTo(() => contentRepository.QueryAsync(app, schema, A<Status[]>.That.IsSameSequenceAs(status), ids))
-                .Returns(new List<IContentEntity> { content });
-            A.CallTo(() => contentRepository.CountAsync(app, schema, A<Status[]>.That.IsSameSequenceAs(status), ids))
-                .Returns(123);
+                .Returns(ResultList.Create(Enumerable.Repeat(content, 1), 123));
         }
 
         private void SetupFakeWithOdataQuery(Status[] status)
         {
             A.CallTo(() => appProvider.GetSchemaAsync(appId, schemaId, false))
                 .Returns(schema);
+
             A.CallTo(() => contentRepository.QueryAsync(app, schema, A<Status[]>.That.IsSameSequenceAs(status), A<ODataUriParser>.Ignored))
-                .Returns(new List<IContentEntity> { content });
-            A.CallTo(() => contentRepository.CountAsync(app, schema, A<Status[]>.That.IsSameSequenceAs(status), A<ODataUriParser>.Ignored))
-                .Returns(123);
+                .Returns(ResultList.Create(Enumerable.Repeat(content, 1), 123));
         }
 
         private void SetupFakeWithScripting()
@@ -213,8 +217,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
             A.CallTo(() => schema.ScriptQuery)
                 .Returns("<script-query>");
 
-            A.CallTo(() => scriptEngine.Transform(A<ScriptContext>.That.Matches(x => x.User == user && x.ContentId == contentId && ReferenceEquals(x.Data, data)), "<query-script>"))
-                .Returns(transformedData);
+            A.CallTo(() => scriptEngine.Transform(A<ScriptContext>.That.Matches(x => x.User == user && x.ContentId == contentId && ReferenceEquals(x.Data, contentData)), "<query-script>"))
+                .Returns(contentTransformed);
         }
     }
 }

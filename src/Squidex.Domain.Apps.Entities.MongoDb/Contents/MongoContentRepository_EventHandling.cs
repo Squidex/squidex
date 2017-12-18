@@ -15,7 +15,7 @@ using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 {
-    public partial class MongoContentRepository
+    public partial class MongoContentRepository : IEventConsumer
     {
         public string Name
         {

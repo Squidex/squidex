@@ -70,12 +70,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 throw new DomainObjectNotFoundException(id.ToString(), typeof(ISchemaEntity));
             }
 
-            content = TransformContent(user, schema, new List<IContentEntity> { content })[0];
+            content = TransformContent(user, schema, Enumerable.Repeat(content, 1)).FirstOrDefault();
 
             return (schema, content);
         }
 
-        public async Task<(ISchemaEntity Schema, long Total, IReadOnlyList<IContentEntity> Items)> QueryWithCountAsync(IAppEntity app, string schemaIdOrName, ClaimsPrincipal user, bool archived, string query)
+        public async Task<(ISchemaEntity Schema, IResultList<IContentEntity> Contents)> QueryAsync(IAppEntity app, string schemaIdOrName, ClaimsPrincipal user, bool archived, string query)
         {
             Guard.NotNull(app, nameof(app));
             Guard.NotNull(user, nameof(user));
@@ -84,20 +84,14 @@ namespace Squidex.Domain.Apps.Entities.Contents
             var schema = await FindSchemaAsync(app, schemaIdOrName);
 
             var parsedQuery = ParseQuery(app, query, schema);
+            var parsedStatus = ParseStatus(user, archived);
 
-            var status = ParseStatus(user, archived);
+            var contents = await contentRepository.QueryAsync(app, schema, parsedStatus.ToArray(), parsedQuery);
 
-            var taskForItems = contentRepository.QueryAsync(app, schema, status.ToArray(), parsedQuery);
-            var taskForCount = contentRepository.CountAsync(app, schema, status.ToArray(), parsedQuery);
-
-            await Task.WhenAll(taskForItems, taskForCount);
-
-            var list = TransformContent(user, schema, taskForItems.Result.ToList());
-
-            return (schema, taskForCount.Result, list);
+            return TransformContents(user, schema, contents);
         }
 
-        public async Task<(ISchemaEntity Schema, long Total, IReadOnlyList<IContentEntity> Items)> QueryWithCountAsync(IAppEntity app, string schemaIdOrName, ClaimsPrincipal user, bool archived, HashSet<Guid> ids)
+        public async Task<(ISchemaEntity Schema, IResultList<IContentEntity> Contents)> QueryAsync(IAppEntity app, string schemaIdOrName, ClaimsPrincipal user, bool archived, HashSet<Guid> ids)
         {
             Guard.NotNull(ids, nameof(ids));
             Guard.NotNull(app, nameof(app));
@@ -106,34 +100,41 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var schema = await FindSchemaAsync(app, schemaIdOrName);
 
-            var status = ParseStatus(user, archived);
+            var parsedStatus = ParseStatus(user, archived);
 
-            var taskForItems = contentRepository.QueryAsync(app, schema, status.ToArray(), ids);
-            var taskForCount = contentRepository.CountAsync(app, schema, status.ToArray(), ids);
+            var contents = await contentRepository.QueryAsync(app, schema, parsedStatus.ToArray(), ids);
 
-            await Task.WhenAll(taskForItems, taskForCount);
-
-            var list = TransformContent(user, schema, taskForItems.Result.ToList());
-
-            return (schema, taskForCount.Result, list);
+            return TransformContents(user, schema, contents);
         }
 
-        private List<IContentEntity> TransformContent(ClaimsPrincipal user, ISchemaEntity schema, List<IContentEntity> contents)
+        private (ISchemaEntity Schema, IResultList<IContentEntity> Contents) TransformContents(ClaimsPrincipal user, ISchemaEntity schema, IResultList<IContentEntity> contents)
+        {
+            var transformed = TransformContent(user, schema, contents);
+
+            return (schema, ResultList.Create(transformed, contents.Total));
+        }
+
+        private IEnumerable<IContentEntity> TransformContent(ClaimsPrincipal user, ISchemaEntity schema, IEnumerable<IContentEntity> contents)
         {
             var scriptText = schema.ScriptQuery;
 
             if (!string.IsNullOrWhiteSpace(scriptText))
             {
-                for (var i = 0; i < contents.Count; i++)
+                foreach (var content in contents)
                 {
-                    var content = contents[i];
                     var contentData = scriptEngine.Transform(new ScriptContext { User = user, Data = content.Data, ContentId = content.Id }, scriptText);
+                    var contentResult = SimpleMapper.Map(content, new Content());
 
-                    contents[i] = SimpleMapper.Map(content, new Content { Data = contentData });
+                    contentResult.Data = contentData;
+
+                    yield return contentResult;
                 }
             }
 
-            return contents;
+            foreach (var content in contents)
+            {
+                yield return content;
+            }
         }
 
         private ODataUriParser ParseQuery(IAppEntity app, string query, ISchemaEntity schema)
