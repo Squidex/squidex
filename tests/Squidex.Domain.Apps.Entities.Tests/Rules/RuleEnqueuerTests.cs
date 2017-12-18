@@ -35,8 +35,8 @@ namespace Squidex.Domain.Apps.Entities.Rules
         public RuleEnqueuerTests()
         {
             sut = new RuleEnqueuer(
-                ruleEventRepository,
                 appProvider,
+                ruleEventRepository,
                 ruleService);
         }
 

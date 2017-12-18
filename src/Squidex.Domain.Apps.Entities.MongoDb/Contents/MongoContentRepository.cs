@@ -126,7 +126,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         public async Task<(ContentState Value, long Version)> ReadAsync(Guid key)
         {
             var contentEntity =
-                await Collection.Find(x => x.Id == key && x.IsLatest)
+                await Collection.Find(x => x.Id == key).SortByDescending(x => x.Version)
                     .FirstOrDefaultAsync();
 
             if (contentEntity != null)
