@@ -33,7 +33,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                     .AddField(new StringField(1, "field1", Partitioning.Invariant))
                     .AddField(new StringField(2, "field2", Partitioning.Invariant));
 
-            A.CallTo(() => appProvider.GetSchemaAsync(A<Guid>.Ignored, "new-schema", false))
+            A.CallTo(() => appProvider.GetSchemaAsync(A<Guid>.Ignored, "new-schema"))
                 .Returns(Task.FromResult<ISchemaEntity>(null));
         }
 
@@ -48,7 +48,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         [Fact]
         public Task CanCreate_should_throw_exception_if_name_already_in_use()
         {
-            A.CallTo(() => appProvider.GetSchemaAsync(A<Guid>.Ignored, "new-schema", false))
+            A.CallTo(() => appProvider.GetSchemaAsync(A<Guid>.Ignored, "new-schema"))
                 .Returns(Task.FromResult(A.Fake<ISchemaEntity>()));
 
             var command = new CreateSchema { AppId = appId, Name = "new-schema" };

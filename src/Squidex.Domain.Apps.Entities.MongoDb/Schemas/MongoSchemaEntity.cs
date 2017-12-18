@@ -38,5 +38,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Schemas
         [BsonElement]
         [BsonRequired]
         public int Version { get; set; }
+
+        [BsonElement]
+        [BsonRequired]
+        public bool IsDeleted { get; set; }
     }
 }

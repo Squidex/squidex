@@ -41,7 +41,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Schemas
                         .Set(x => x.State, value)
                         .Set(x => x.AppId, value.AppId)
                         .Set(x => x.Name, value.Name)
-                        .Set(x => x.Version, newVersion),
+                        .Set(x => x.Version, newVersion)
+                        .Set(x => x.IsDeleted, value.IsDeleted),
                     Upsert);
             }
             catch (MongoWriteException ex)

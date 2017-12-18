@@ -36,7 +36,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
         public RuleCommandMiddlewareTests()
         {
-            A.CallTo(() => appProvider.GetSchemaAsync(A<Guid>.Ignored, A<Guid>.Ignored, false))
+            A.CallTo(() => appProvider.GetSchemaAsync(A<Guid>.Ignored, A<Guid>.Ignored))
                 .Returns(A.Fake<ISchemaEntity>());
 
             sut = new RuleCommandMiddleware(Handler, appProvider);

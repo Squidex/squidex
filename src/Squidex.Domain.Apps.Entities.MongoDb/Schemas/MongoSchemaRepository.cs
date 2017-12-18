@@ -30,23 +30,23 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Schemas
 
         protected override async Task SetupCollectionAsync(IMongoCollection<MongoSchemaEntity> collection)
         {
-            await collection.Indexes.CreateOneAsync(Index.Ascending(x => x.AppId));
-            await collection.Indexes.CreateOneAsync(Index.Ascending(x => x.Name));
+            await collection.Indexes.CreateOneAsync(Index.Ascending(x => x.AppId).Ascending(x => x.IsDeleted));
+            await collection.Indexes.CreateOneAsync(Index.Ascending(x => x.AppId).Ascending(x => x.Name).Ascending(x => x.IsDeleted));
         }
 
-        public async Task<IReadOnlyList<Guid>> QueryAllSchemaIdsAsync(Guid appId, string name)
+        public async Task<Guid> FindSchemaIdAsync(Guid appId, string name)
         {
-            var schemaEntities =
-                await Collection.Find(x => x.AppId == appId && x.Name == name).Only(x => x.Id).SortByDescending(x => x.Version)
-                    .ToListAsync();
+            var schemaEntity =
+                await Collection.Find(x => x.AppId == appId && x.Name == name && !x.IsDeleted).Only(x => x.Id).SortByDescending(x => x.Version)
+                    .FirstOrDefaultAsync();
 
-            return schemaEntities.Select(x => Guid.Parse(x["_id"].AsString)).ToList();
+            return schemaEntity != null ? Guid.Parse(schemaEntity["_id"].AsString) : Guid.Empty;
         }
 
-        public async Task<IReadOnlyList<Guid>> QueryAllSchemaIdsAsync(Guid appId)
+        public async Task<IReadOnlyList<Guid>> QuerySchemaIdsAsync(Guid appId)
         {
             var schemaEntities =
-                await Collection.Find(x => x.AppId == appId).Only(x => x.Id)
+                await Collection.Find(x => x.AppId == appId && !x.IsDeleted).Only(x => x.Id)
                     .ToListAsync();
 
             return schemaEntities.Select(x => Guid.Parse(x["_id"].AsString)).ToList();

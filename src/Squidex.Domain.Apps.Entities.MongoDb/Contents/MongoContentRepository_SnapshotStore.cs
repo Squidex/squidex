@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Core.ConvertContent;
 using Squidex.Domain.Apps.Entities.Contents.State;
+using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.Reflection;
@@ -28,12 +29,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
             if (contentEntity != null)
             {
-                var schema = await appProvider.GetSchemaAsync(contentEntity.AppId, contentEntity.SchemaId, true);
-
-                if (schema == null)
-                {
-                    throw new InvalidOperationException($"Cannot find schema {contentEntity.SchemaId}");
-                }
+                var schema = await GetSchemaAsync(contentEntity.AppId, contentEntity.SchemaId);
 
                 contentEntity?.ParseData(schema.SchemaDef);
 
@@ -52,12 +48,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                 return;
             }
 
-            var schema = await appProvider.GetSchemaAsync(value.AppId, value.SchemaId, true);
-
-            if (schema == null)
-            {
-                throw new InvalidOperationException($"Cannot find schema {value.SchemaId}");
-            }
+            var schema = await GetSchemaAsync(value.AppId, value.SchemaId);
 
             var idData = value.Data?.ToIdModel(schema.SchemaDef, true);
 
@@ -93,6 +84,18 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                     throw;
                 }
             }
+        }
+
+        private async Task<ISchemaEntity> GetSchemaAsync(Guid appId, Guid schemaId)
+        {
+            var schema = await appProvider.GetSchemaAsync(appId, schemaId);
+
+            if (schema == null)
+            {
+                throw new DomainObjectNotFoundException(schemaId.ToString(), typeof(ISchemaEntity));
+            }
+
+            return schema;
         }
     }
 }

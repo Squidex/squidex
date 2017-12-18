@@ -21,9 +21,9 @@ namespace Squidex.Domain.Apps.Entities
 
         Task<IAppEntity> GetAppAsync(string appName);
 
-        Task<ISchemaEntity> GetSchemaAsync(Guid appId, Guid id, bool provideDeleted = false);
+        Task<ISchemaEntity> GetSchemaAsync(Guid appId, Guid id);
 
-        Task<ISchemaEntity> GetSchemaAsync(Guid appId, string name, bool provideDeleted = false);
+        Task<ISchemaEntity> GetSchemaAsync(Guid appId, string name);
 
         Task<List<ISchemaEntity>> GetSchemasAsync(Guid appId);
 

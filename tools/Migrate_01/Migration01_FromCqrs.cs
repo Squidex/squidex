@@ -56,21 +56,28 @@ namespace Migrate_01
                 {
                     var version = storedEvent.EventStreamNumber;
 
-                    if (@event.Payload is AssetEvent assetEvent)
+                    if (@event.Payload is ContentEvent contentEvent)
+                    {
+                        try
+                        {
+                            var content = await stateFactory.CreateAsync<ContentDomainObject>(contentEvent.ContentId);
+
+                            content.UpdateState(content.State.Apply(@event));
+
+                            await content.WriteStateAsync(version);
+                        }
+                        catch (DomainObjectNotFoundException)
+                        {
+                            // Schema has been deleted.
+                        }
+                    }
+                    else if (@event.Payload is AssetEvent assetEvent)
                     {
                         var asset = await stateFactory.CreateAsync<AssetDomainObject>(assetEvent.AssetId);
 
                         asset.UpdateState(asset.State.Apply(@event));
 
                         await asset.WriteStateAsync(version);
-                    }
-                    else if (@event.Payload is ContentEvent contentEvent)
-                    {
-                        var content = await stateFactory.CreateAsync<ContentDomainObject>(contentEvent.ContentId);
-
-                        content.UpdateState(content.State.Apply(@event));
-
-                        await content.WriteStateAsync(version);
                     }
                     else if (@event.Payload is SchemaEvent schemaEvent)
                     {

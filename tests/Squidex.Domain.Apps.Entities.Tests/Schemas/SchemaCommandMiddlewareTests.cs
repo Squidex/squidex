@@ -38,7 +38,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             sut = new SchemaCommandMiddleware(Handler, appProvider);
 
-            A.CallTo(() => appProvider.GetSchemaAsync(AppId, SchemaName, false))
+            A.CallTo(() => appProvider.GetSchemaAsync(AppId, SchemaName))
                 .Returns((ISchemaEntity)null);
         }
 
@@ -54,7 +54,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             Assert.Equal(SchemaId, context.Result<EntityCreatedResult<Guid>>().IdOrValue);
 
-            A.CallTo(() => appProvider.GetSchemaAsync(AppId, SchemaName, false)).MustHaveHappened();
+            A.CallTo(() => appProvider.GetSchemaAsync(AppId, SchemaName)).MustHaveHappened();
         }
 
         [Fact]
