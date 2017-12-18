@@ -102,7 +102,7 @@ namespace Squidex.Domain.Apps.Entities
                 await Task.WhenAll(
                     ids.Select(id => stateFactory.GetSingleAsync<SchemaDomainObject>(id)));
 
-            return schemas.Select(a => (ISchemaEntity)a.State).ToList();
+            return schemas.Where(s => !s.State.IsDeleted).Select(s => (ISchemaEntity)s.State).ToList();
         }
 
         public async Task<List<IRuleEntity>> GetRulesAsync(Guid appId)
@@ -113,7 +113,7 @@ namespace Squidex.Domain.Apps.Entities
                 await Task.WhenAll(
                     ids.Select(id => stateFactory.GetSingleAsync<RuleDomainObject>(id)));
 
-            return rules.Select(a => (IRuleEntity)a.State).ToList();
+            return rules.Select(r => (IRuleEntity)r.State).ToList();
         }
 
         public async Task<List<IAppEntity>> GetUserApps(string userId)
