@@ -49,8 +49,8 @@
 
   <ItemGroup>
     <PackageReference Include="EventStore.ClientAPI.NetCore" Version="4.0.2-rc" />
-    <PackageReference Include="IdentityServer4" Version="2.0.5" />
-    <PackageReference Include="IdentityServer4.AccessTokenValidation" Version="2.1.0" />
+    <PackageReference Include="IdentityServer4" Version="2.0.6" />
+    <PackageReference Include="IdentityServer4.AccessTokenValidation" Version="2.2.0" />
     <PackageReference Include="IdentityServer4.AspNetIdentity" Version="2.0.0" />
     <PackageReference Include="Microsoft.AspNetCore" Version="2.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Cookies" Version="2.0.1" />
@@ -67,10 +67,10 @@
     <PackageReference Include="Microsoft.OData.Core" Version="7.3.1" />
     <PackageReference Include="Microsoft.Orleans.Core" Version="2.0.0-beta1" />
     <PackageReference Include="Microsoft.Orleans.OrleansRuntime" Version="2.0.0-beta1" />
-    <PackageReference Include="MongoDB.Driver" Version="2.4.4" />
-    <PackageReference Include="NJsonSchema" Version="9.10.13" />
+    <PackageReference Include="MongoDB.Driver" Version="2.5.0" />
+    <PackageReference Include="NJsonSchema" Version="9.10.15" />
     <PackageReference Include="NodaTime.Serialization.JsonNet" Version="2.0.0" />
-    <PackageReference Include="NSwag.AspNetCore" Version="11.12.12" />
+    <PackageReference Include="NSwag.AspNetCore" Version="11.12.14" />
     <PackageReference Include="OpenCover" Version="4.6.519" />
     <PackageReference Include="RefactoringEssentials" Version="5.4.0" />
     <PackageReference Include="ReportGenerator" Version="3.1.0" />
