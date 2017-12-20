@@ -31,7 +31,7 @@ Current Version 1.0-beta3. Roadmap: https://trello.com/b/KakM4F3S/squidex-roadma
 
 * [pushrbx](https://pushrbx.net/): Azure Store Support.
 * [cpmstars](https://www.cpmstars.com): Asset support for rich editor.
-* [civicplus](https://www.civicplus.com/) ([Avd6977](https://github.com/Avd6977)): Google Maps support
+* [civicplus](https://www.civicplus.com/) ([Avd6977](https://github.com/Avd6977), [dsbegnoce](https://github.com/dsbegnoche)): Google Maps support, custom regex patterns and a lot of small improvements.
 
 ## Contributing
 
