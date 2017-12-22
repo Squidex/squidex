@@ -117,7 +117,7 @@ namespace Squidex.Infrastructure.Commands
                 passedDomainObject = x;
             });
 
-            Assert.Equal(1, domainObject.Snapshot.Version);
+            Assert.Equal(2, domainObject.Snapshot.Version);
             Assert.Equal(domainObject, passedDomainObject);
             Assert.NotNull(context.Result<EntityCreatedResult<Guid>>());
 
@@ -138,7 +138,7 @@ namespace Squidex.Infrastructure.Commands
                 passedDomainObject = x;
             });
 
-            Assert.Equal(1, domainObject.Snapshot.Version);
+            Assert.Equal(2, domainObject.Snapshot.Version);
             Assert.Equal(domainObject, passedDomainObject);
             Assert.NotNull(context.Result<EntityCreatedResult<Guid>>());
 
@@ -159,7 +159,7 @@ namespace Squidex.Infrastructure.Commands
                 passedDomainObject = x;
             });
 
-            Assert.Equal(1, domainObject.Snapshot.Version);
+            Assert.Equal(2, domainObject.Snapshot.Version);
             Assert.Equal(domainObject, passedDomainObject);
             Assert.NotNull(context.Result<EntityCreatedResult<Guid>>());
 
@@ -210,7 +210,7 @@ namespace Squidex.Infrastructure.Commands
                 passedDomainObject = x;
             });
 
-            Assert.Equal(1, domainObject.Snapshot.Version);
+            Assert.Equal(2, domainObject.Snapshot.Version);
             Assert.Equal(domainObject, passedDomainObject);
             Assert.NotNull(context.Result<EntitySavedResult>());
 
@@ -233,7 +233,7 @@ namespace Squidex.Infrastructure.Commands
                 passedDomainObject = x;
             });
 
-            Assert.Equal(1, domainObject.Snapshot.Version);
+            Assert.Equal(2, domainObject.Snapshot.Version);
             Assert.Equal(domainObject, passedDomainObject);
             Assert.NotNull(context.Result<EntitySavedResult>());
 
@@ -254,7 +254,7 @@ namespace Squidex.Infrastructure.Commands
                 passedDomainObject = x;
             });
 
-            Assert.Equal(1, domainObject.Snapshot.Version);
+            Assert.Equal(2, domainObject.Snapshot.Version);
             Assert.Equal(domainObject, passedDomainObject);
             Assert.NotNull(context.Result<EntitySavedResult>());
 
@@ -275,7 +275,7 @@ namespace Squidex.Infrastructure.Commands
                 passedDomainObject = x;
             });
 
-            Assert.Equal(1, domainObject.Snapshot.Version);
+            Assert.Equal(2, domainObject.Snapshot.Version);
             Assert.Equal(domainObject, passedDomainObject);
             Assert.NotNull(context.Result<EntitySavedResult>());
 
