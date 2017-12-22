@@ -45,7 +45,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             sut.Create(CreateAssetCommand(new CreateAsset { File = file, ImageInfo = image }));
 
-            Assert.Equal(0, sut.State.FileVersion);
+            Assert.Equal(0, sut.Snapshot.FileVersion);
 
             sut.GetUncomittedEvents()
                 .ShouldHaveSameEvents(
@@ -90,7 +90,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             sut.Update(CreateAssetCommand(new UpdateAsset { File = file, ImageInfo = image }));
 
-            Assert.Equal(1, sut.State.FileVersion);
+            Assert.Equal(1, sut.Snapshot.FileVersion);
 
             sut.GetUncomittedEvents()
                 .ShouldHaveSameEvents(
@@ -134,7 +134,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             sut.Rename(CreateAssetCommand(new RenameAsset { FileName = "my-new-image.png" }));
 
-            Assert.Equal("my-new-image.png", sut.State.FileName);
+            Assert.Equal("my-new-image.png", sut.Snapshot.FileName);
 
             sut.GetUncomittedEvents()
                 .ShouldHaveSameEvents(
@@ -171,7 +171,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             sut.Delete(CreateAssetCommand(new DeleteAsset()));
 
-            Assert.True(sut.State.IsDeleted);
+            Assert.True(sut.Snapshot.IsDeleted);
 
             sut.GetUncomittedEvents()
                 .ShouldHaveSameEvents(

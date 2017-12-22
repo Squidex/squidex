@@ -83,7 +83,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                 content.Update(command);
 
-                context.Complete(new ContentDataChangedResult(content.State.Data, content.Version));
+                context.Complete(new ContentDataChangedResult(content.Snapshot.Data, content.Version));
             });
         }
 
@@ -100,7 +100,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                 content.Patch(command);
 
-                context.Complete(new ContentDataChangedResult(content.State.Data, content.Version));
+                context.Complete(new ContentDataChangedResult(content.Snapshot.Data, content.Version));
             });
         }
 
@@ -108,7 +108,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             return handler.UpdateAsync<ContentDomainObject>(context, async content =>
             {
-                GuardContent.CanChangeContentStatus(content.State.Status, command);
+                GuardContent.CanChangeContentStatus(content.Snapshot.Status, command);
 
                 var operationContext = await CreateContext(command, content, () => "Failed to patch content.");
 

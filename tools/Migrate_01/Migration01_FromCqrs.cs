@@ -6,16 +6,21 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Entities.Apps.State;
 using Squidex.Domain.Apps.Entities.Assets;
-using Squidex.Domain.Apps.Entities.Contents;
+using Squidex.Domain.Apps.Entities.Contents.State;
+using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Domain.Apps.Events.Contents;
+using Squidex.Domain.Apps.Events.Rules;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Migrations;
@@ -28,6 +33,7 @@ namespace Migrate_01
         private readonly FieldRegistry fieldRegistry;
         private readonly IEventStore eventStore;
         private readonly IEventDataFormatter eventDataFormatter;
+        private readonly ISnapshotStore<ContentState, Guid> snapshotStore;
         private readonly IStateFactory stateFactory;
 
         public int FromVersion { get; } = 0;
@@ -38,65 +44,114 @@ namespace Migrate_01
             FieldRegistry fieldRegistry,
             IEventDataFormatter eventDataFormatter,
             IEventStore eventStore,
+            ISnapshotStore<ContentState, Guid> snapshotStore,
             IStateFactory stateFactory)
         {
             this.fieldRegistry = fieldRegistry;
             this.eventDataFormatter = eventDataFormatter;
             this.eventStore = eventStore;
+            this.snapshotStore = snapshotStore;
             this.stateFactory = stateFactory;
         }
 
         public async Task UpdateAsync()
         {
-            await eventStore.GetEventsAsync(async storedEvent =>
+            // await MigrateConfigAsync();
+            await MigrateContentAsync();
+            // await MigrateAssetsAsync();
+        }
+
+        private Task MigrateAssetsAsync()
+        {
+            const string filter = "^asset\\-";
+
+            var handledIds = new HashSet<Guid>();
+
+            return eventStore.GetEventsAsync(async storedEvent =>
             {
                 var @event = ParseKnownEvent(storedEvent);
 
                 if (@event != null)
                 {
-                    var version = storedEvent.EventStreamNumber;
-
-                    if (@event.Payload is ContentEvent contentEvent)
-                    {
-                        try
-                        {
-                            var content = await stateFactory.CreateAsync<ContentDomainObject>(contentEvent.ContentId);
-
-                            content.UpdateState(content.State.Apply(@event));
-
-                            await content.WriteStateAsync(version);
-                        }
-                        catch (DomainObjectNotFoundException)
-                        {
-                            // Schema has been deleted.
-                        }
-                    }
-                    else if (@event.Payload is AssetEvent assetEvent)
+                    if (@event.Payload is AssetEvent assetEvent && handledIds.Add(assetEvent.AssetId))
                     {
                         var asset = await stateFactory.CreateAsync<AssetDomainObject>(assetEvent.AssetId);
 
-                        asset.UpdateState(asset.State.Apply(@event));
+                        asset.ApplySnapshot(asset.Snapshot.Apply(@event));
 
-                        await asset.WriteStateAsync(version);
+                        await asset.WriteSnapshotAsync();
                     }
-                    else if (@event.Payload is SchemaEvent schemaEvent)
+                }
+            }, CancellationToken.None, filter);
+        }
+
+        private Task MigrateConfigAsync()
+        {
+            const string filter = "^((app\\-)|(schema\\-)|(rule\\-))";
+
+            var handledIds = new HashSet<Guid>();
+
+            return eventStore.GetEventsAsync(async storedEvent =>
+            {
+                var @event = ParseKnownEvent(storedEvent);
+
+                if (@event != null)
+                {
+                    if (@event.Payload is SchemaEvent schemaEvent && handledIds.Add(schemaEvent.SchemaId.Id))
                     {
                         var schema = await stateFactory.GetSingleAsync<SchemaDomainObject>(schemaEvent.SchemaId.Id);
 
-                        schema.UpdateState(schema.State.Apply(@event, fieldRegistry));
-
-                        await schema.WriteStateAsync(version);
+                        await schema.WriteSnapshotAsync();
                     }
-                    else if (@event.Payload is AppEvent appEvent)
+                    else if (@event.Payload is RuleEvent ruleEvent && handledIds.Add(ruleEvent.RuleId))
+                    {
+                        var rule = await stateFactory.GetSingleAsync<RuleDomainObject>(ruleEvent.RuleId);
+
+                        await rule.WriteSnapshotAsync();
+                    }
+                    else if (@event.Payload is AppEvent appEvent && handledIds.Add(appEvent.AppId.Id))
                     {
                         var app = await stateFactory.GetSingleAsync<AppDomainObject>(appEvent.AppId.Id);
 
-                        app.UpdateState(app.State.Apply(@event));
-
-                        await app.WriteStateAsync(version);
+                        await app.WriteSnapshotAsync();
                     }
                 }
-            }, CancellationToken.None);
+            }, CancellationToken.None, filter);
+        }
+
+        private Task MigrateContentAsync()
+        {
+            const string filter = "^((content\\-))";
+
+            var handledIds = new HashSet<Guid>();
+
+            return eventStore.GetEventsAsync(async storedEvent =>
+            {
+                var @event = ParseKnownEvent(storedEvent);
+
+                if (@event.Payload is ContentEvent contentEvent)
+                {
+                    try
+                    {
+                        var (content, version) = await snapshotStore.ReadAsync(contentEvent.ContentId);
+
+                        if (content == null)
+                        {
+                            version = EtagVersion.Empty;
+
+                            content = new ContentState();
+                        }
+
+                        content = content.Apply(@event);
+
+                        await snapshotStore.WriteAsync(contentEvent.ContentId, content, version, version + 1);
+                    }
+                    catch (DomainObjectNotFoundException)
+                    {
+                        // Schema has been deleted.
+                    }
+                }
+            }, CancellationToken.None, filter);
         }
 
         private Envelope<IEvent> ParseKnownEvent(StoredEvent storedEvent)

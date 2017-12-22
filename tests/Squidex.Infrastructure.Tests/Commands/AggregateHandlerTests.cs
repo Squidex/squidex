@@ -21,7 +21,6 @@ namespace Squidex.Infrastructure.Commands
 {
     public class AggregateHandlerTests
     {
-        private readonly ISemanticLog log = A.Fake<ISemanticLog>();
         private readonly IServiceProvider serviceProvider = A.Fake<IServiceProvider>();
         private readonly IStore<Guid> store = A.Fake<IStore<Guid>>();
         private readonly IStateFactory stateFactory = A.Fake<IStateFactory>();
@@ -40,7 +39,7 @@ namespace Squidex.Infrastructure.Commands
             command = new MyCommand { AggregateId = domainObjectId, ExpectedVersion = EtagVersion.Any };
             context = new CommandContext(command);
 
-            A.CallTo(() => store.WithSnapshots(domainObjectId, A<Func<MyDomainState, Task>>.Ignored))
+            A.CallTo(() => store.WithSnapshotsAndEventSourcing(domainObjectId, A<Func<MyDomainState, Task>>.Ignored, A<Func<Envelope<IEvent>, Task>>.Ignored))
                 .Returns(persistence);
 
             A.CallTo(() => stateFactory.CreateAsync<MyDomainObject>(domainObjectId))
@@ -49,7 +48,7 @@ namespace Squidex.Infrastructure.Commands
             A.CallTo(() => stateFactory.GetSingleAsync<MyDomainObject>(domainObjectId))
                 .Returns(Task.FromResult(domainObject));
 
-            sut = new AggregateHandler(stateFactory, serviceProvider, log);
+            sut = new AggregateHandler(stateFactory, serviceProvider);
 
             domainObject.ActivateAsync(domainObjectId, store).Wait();
         }
@@ -118,7 +117,7 @@ namespace Squidex.Infrastructure.Commands
                 passedDomainObject = x;
             });
 
-            Assert.Equal(1, domainObject.State.Version);
+            Assert.Equal(1, domainObject.Snapshot.Version);
             Assert.Equal(domainObject, passedDomainObject);
             Assert.NotNull(context.Result<EntityCreatedResult<Guid>>());
 
@@ -139,7 +138,7 @@ namespace Squidex.Infrastructure.Commands
                 passedDomainObject = x;
             });
 
-            Assert.Equal(1, domainObject.State.Version);
+            Assert.Equal(1, domainObject.Snapshot.Version);
             Assert.Equal(domainObject, passedDomainObject);
             Assert.NotNull(context.Result<EntityCreatedResult<Guid>>());
 
@@ -160,7 +159,7 @@ namespace Squidex.Infrastructure.Commands
                 passedDomainObject = x;
             });
 
-            Assert.Equal(1, domainObject.State.Version);
+            Assert.Equal(1, domainObject.Snapshot.Version);
             Assert.Equal(domainObject, passedDomainObject);
             Assert.NotNull(context.Result<EntityCreatedResult<Guid>>());
 
@@ -211,7 +210,7 @@ namespace Squidex.Infrastructure.Commands
                 passedDomainObject = x;
             });
 
-            Assert.Equal(1, domainObject.State.Version);
+            Assert.Equal(1, domainObject.Snapshot.Version);
             Assert.Equal(domainObject, passedDomainObject);
             Assert.NotNull(context.Result<EntitySavedResult>());
 
@@ -234,7 +233,7 @@ namespace Squidex.Infrastructure.Commands
                 passedDomainObject = x;
             });
 
-            Assert.Equal(1, domainObject.State.Version);
+            Assert.Equal(1, domainObject.Snapshot.Version);
             Assert.Equal(domainObject, passedDomainObject);
             Assert.NotNull(context.Result<EntitySavedResult>());
 
@@ -255,7 +254,7 @@ namespace Squidex.Infrastructure.Commands
                 passedDomainObject = x;
             });
 
-            Assert.Equal(1, domainObject.State.Version);
+            Assert.Equal(1, domainObject.Snapshot.Version);
             Assert.Equal(domainObject, passedDomainObject);
             Assert.NotNull(context.Result<EntitySavedResult>());
 
@@ -276,7 +275,7 @@ namespace Squidex.Infrastructure.Commands
                 passedDomainObject = x;
             });
 
-            Assert.Equal(1, domainObject.State.Version);
+            Assert.Equal(1, domainObject.Snapshot.Version);
             Assert.Equal(domainObject, passedDomainObject);
             Assert.NotNull(context.Result<EntitySavedResult>());
 

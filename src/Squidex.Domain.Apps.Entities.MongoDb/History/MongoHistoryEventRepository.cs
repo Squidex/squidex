@@ -90,14 +90,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.History
 
                         entity.AppId = appEvent.AppId.Id;
 
-                        if (@event.Headers.Contains(CommonHeaders.SnapshotVersion))
-                        {
-                            entity.Version = @event.Headers.SnapshotVersion();
-                        }
-                        else
-                        {
-                            entity.Version = @event.Headers.EventStreamNumber();
-                        }
+                        entity.Version = @event.Headers.EventStreamNumber();
 
                         entity.Channel = message.Channel;
                         entity.Message = message.Message;

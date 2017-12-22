@@ -16,17 +16,17 @@ using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Infrastructure.States
 {
-    internal class Persistence<TOwner, TState, TKey> : IPersistence<TState>
+    internal class Persistence<TOwner, TSnapshot, TKey> : IPersistence<TSnapshot>
     {
         private readonly TKey ownerKey;
-        private readonly ISnapshotStore<TState, TKey> snapshotStore;
+        private readonly ISnapshotStore<TSnapshot, TKey> snapshotStore;
         private readonly IStreamNameResolver streamNameResolver;
         private readonly IEventStore eventStore;
         private readonly IEventDataFormatter eventDataFormatter;
         private readonly PersistenceMode persistenceMode;
         private readonly Action invalidate;
         private readonly Action failed;
-        private readonly Func<TState, Task> applyState;
+        private readonly Func<TSnapshot, Task> applyState;
         private readonly Func<Envelope<IEvent>, Task> applyEvent;
         private long versionSnapshot = EtagVersion.Empty;
         private long versionEvents = EtagVersion.Empty;
@@ -42,10 +42,10 @@ namespace Squidex.Infrastructure.States
             Action failed,
             IEventStore eventStore,
             IEventDataFormatter eventDataFormatter,
-            ISnapshotStore<TState, TKey> snapshotStore,
+            ISnapshotStore<TSnapshot, TKey> snapshotStore,
             IStreamNameResolver streamNameResolver,
             PersistenceMode persistenceMode,
-            Func<TState, Task> applyState,
+            Func<TSnapshot, Task> applyState,
             Func<Envelope<IEvent>, Task> applyEvent)
         {
             this.ownerKey = ownerKey;
@@ -129,7 +129,7 @@ namespace Squidex.Infrastructure.States
             }
         }
 
-        public async Task WriteSnapshotAsync(TState state)
+        public async Task WriteSnapshotAsync(TSnapshot state)
         {
             try
             {

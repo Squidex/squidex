@@ -33,21 +33,21 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
         protected Task On(CreateRule command, CommandContext context)
         {
-            return handler.CreateSyncedAsync<RuleDomainObject>(context, async w =>
+            return handler.CreateSyncedAsync<RuleDomainObject>(context, async r =>
             {
                 await GuardRule.CanCreate(command, appProvider);
 
-                w.Create(command);
+                r.Create(command);
             });
         }
 
         protected Task On(UpdateRule command, CommandContext context)
         {
-            return handler.UpdateSyncedAsync<RuleDomainObject>(context, async c =>
+            return handler.UpdateSyncedAsync<RuleDomainObject>(context, async r =>
             {
                 await GuardRule.CanUpdate(command, appProvider);
 
-                c.Update(command);
+                r.Update(command);
             });
         }
 
@@ -55,7 +55,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
         {
             return handler.UpdateSyncedAsync<RuleDomainObject>(context, r =>
             {
-                GuardRule.CanEnable(command, r.State.RuleDef);
+                GuardRule.CanEnable(command, r.Snapshot.RuleDef);
 
                 r.Enable(command);
             });
@@ -65,7 +65,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
         {
             return handler.UpdateSyncedAsync<RuleDomainObject>(context, r =>
             {
-                GuardRule.CanDisable(command, r.State.RuleDef);
+                GuardRule.CanDisable(command, r.Snapshot.RuleDef);
 
                 r.Disable(command);
             });
@@ -73,11 +73,11 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
         protected Task On(DeleteRule command, CommandContext context)
         {
-            return handler.UpdateSyncedAsync<RuleDomainObject>(context, c =>
+            return handler.UpdateSyncedAsync<RuleDomainObject>(context, r =>
             {
                 GuardRule.CanDelete(command);
 
-                c.Delete(command);
+                r.Delete(command);
             });
         }
 

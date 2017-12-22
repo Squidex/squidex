@@ -57,7 +57,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         {
             VerifyCreatedAndNotDeleted();
 
-            RaiseEvent(SimpleMapper.Map(command, new FieldAdded { FieldId = new NamedId<long>(State.TotalFields + 1, command.Name) }));
+            RaiseEvent(SimpleMapper.Map(command, new FieldAdded { FieldId = new NamedId<long>(Snapshot.TotalFields + 1, command.Name) }));
 
             return this;
         }
@@ -183,7 +183,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         {
             SimpleMapper.Map(fieldCommand, @event);
 
-            if (State.SchemaDef.FieldsById.TryGetValue(fieldCommand.FieldId, out var field))
+            if (Snapshot.SchemaDef.FieldsById.TryGetValue(fieldCommand.FieldId, out var field))
             {
                 @event.FieldId = new NamedId<long>(field.Id, field.Name);
             }
@@ -193,7 +193,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
         private void VerifyNotCreated()
         {
-            if (State.SchemaDef != null)
+            if (Snapshot.SchemaDef != null)
             {
                 throw new DomainException("Schema has already been created.");
             }
@@ -201,15 +201,15 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
         private void VerifyCreatedAndNotDeleted()
         {
-            if (State.IsDeleted || State.SchemaDef == null)
+            if (Snapshot.IsDeleted || Snapshot.SchemaDef == null)
             {
                 throw new DomainException("Schema has already been deleted or not created yet.");
             }
         }
 
-        protected override void OnRaised(Envelope<IEvent> @event)
+        public override void ApplyEvent(Envelope<IEvent> @event)
         {
-            UpdateState(State.Apply(@event, registry));
+            ApplySnapshot(Snapshot.Apply(@event, registry));
         }
     }
 }

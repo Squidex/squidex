@@ -53,7 +53,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                     context.Complete(EntityCreatedResult.Create(command.AssetId, a.Version));
                 });
 
-                await assetStore.CopyTemporaryAsync(context.ContextId.ToString(), command.AssetId.ToString(), asset.State.FileVersion, null);
+                await assetStore.CopyTemporaryAsync(context.ContextId.ToString(), command.AssetId.ToString(), asset.Snapshot.FileVersion, null);
             }
             finally
             {
@@ -75,10 +75,10 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                     await assetStore.UploadTemporaryAsync(context.ContextId.ToString(), command.File.OpenRead());
 
-                    context.Complete(new AssetSavedResult(a.Version, a.State.FileVersion));
+                    context.Complete(new AssetSavedResult(a.Version, a.Snapshot.FileVersion));
                 });
 
-                await assetStore.CopyTemporaryAsync(context.ContextId.ToString(), command.AssetId.ToString(), asset.State.FileVersion, null);
+                await assetStore.CopyTemporaryAsync(context.ContextId.ToString(), command.AssetId.ToString(), asset.Snapshot.FileVersion, null);
             }
             finally
             {
@@ -90,7 +90,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             return handler.UpdateSyncedAsync<AssetDomainObject>(context, a =>
             {
-                GuardAsset.CanRename(command, a.State.FileName);
+                GuardAsset.CanRename(command, a.Snapshot.FileName);
 
                 a.Rename(command);
             });

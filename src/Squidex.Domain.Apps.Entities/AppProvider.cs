@@ -57,12 +57,12 @@ namespace Squidex.Domain.Apps.Entities
 
             var schema = await stateFactory.GetSingleAsync<SchemaDomainObject>(id);
 
-            if (!IsFound(schema) || schema.State.IsDeleted)
+            if (!IsFound(schema) || schema.Snapshot.IsDeleted)
             {
                 return (null, null);
             }
 
-            return (app.State, schema.State);
+            return (app.Snapshot, schema.Snapshot);
         }
 
         public async Task<IAppEntity> GetAppAsync(string appName)
@@ -74,7 +74,7 @@ namespace Squidex.Domain.Apps.Entities
                 return null;
             }
 
-            return (await stateFactory.GetSingleAsync<AppDomainObject>(appId)).State;
+            return (await stateFactory.GetSingleAsync<AppDomainObject>(appId)).Snapshot;
         }
 
         public async Task<ISchemaEntity> GetSchemaAsync(Guid appId, string name)
@@ -86,7 +86,7 @@ namespace Squidex.Domain.Apps.Entities
                 return null;
             }
 
-            return (await stateFactory.GetSingleAsync<SchemaDomainObject>(schemaId)).State;
+            return (await stateFactory.GetSingleAsync<SchemaDomainObject>(schemaId)).Snapshot;
         }
 
         public async Task<ISchemaEntity> GetSchemaAsync(Guid appId, Guid id)
@@ -98,7 +98,7 @@ namespace Squidex.Domain.Apps.Entities
                 return null;
             }
 
-            return schema.State;
+            return schema.Snapshot;
         }
 
         public async Task<List<ISchemaEntity>> GetSchemasAsync(Guid appId)
@@ -109,7 +109,7 @@ namespace Squidex.Domain.Apps.Entities
                 await Task.WhenAll(
                     ids.Select(id => stateFactory.GetSingleAsync<SchemaDomainObject>(id)));
 
-            return schemas.Where(IsFound).Select(s => (ISchemaEntity)s.State).ToList();
+            return schemas.Where(IsFound).Select(s => (ISchemaEntity)s.Snapshot).ToList();
         }
 
         public async Task<List<IRuleEntity>> GetRulesAsync(Guid appId)
@@ -120,7 +120,7 @@ namespace Squidex.Domain.Apps.Entities
                 await Task.WhenAll(
                     ids.Select(id => stateFactory.GetSingleAsync<RuleDomainObject>(id)));
 
-            return rules.Where(IsFound).Select(r => (IRuleEntity)r.State).ToList();
+            return rules.Where(IsFound).Select(r => (IRuleEntity)r.Snapshot).ToList();
         }
 
         public async Task<List<IAppEntity>> GetUserApps(string userId)
@@ -131,7 +131,7 @@ namespace Squidex.Domain.Apps.Entities
                 await Task.WhenAll(
                     ids.Select(id => stateFactory.GetSingleAsync<AppDomainObject>(id)));
 
-            return apps.Where(IsFound).Select(a => (IAppEntity)a.State).ToList();
+            return apps.Where(IsFound).Select(a => (IAppEntity)a.Snapshot).ToList();
         }
 
         private Task<Guid> GetAppIdAsync(string name)

@@ -48,11 +48,11 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         {
             return handler.UpdateSyncedAsync<SchemaDomainObject>(context, s =>
             {
-                GuardSchemaField.CanAdd(s.State.SchemaDef, command);
+                GuardSchemaField.CanAdd(s.Snapshot.SchemaDef, command);
 
                 s.Add(command);
 
-                context.Complete(EntityCreatedResult.Create(s.State.SchemaDef.FieldsById.Values.First(x => x.Name == command.Name).Id, s.Version));
+                context.Complete(EntityCreatedResult.Create(s.Snapshot.SchemaDef.FieldsById.Values.First(x => x.Name == command.Name).Id, s.Version));
             });
         }
 
@@ -60,7 +60,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         {
             return handler.UpdateSyncedAsync<SchemaDomainObject>(context, s =>
             {
-                GuardSchemaField.CanDelete(s.State.SchemaDef, command);
+                GuardSchemaField.CanDelete(s.Snapshot.SchemaDef, command);
 
                 s.DeleteField(command);
             });
@@ -70,7 +70,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         {
             return handler.UpdateSyncedAsync<SchemaDomainObject>(context, s =>
             {
-                GuardSchemaField.CanLock(s.State.SchemaDef, command);
+                GuardSchemaField.CanLock(s.Snapshot.SchemaDef, command);
 
                 s.LockField(command);
             });
@@ -80,7 +80,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         {
             return handler.UpdateSyncedAsync<SchemaDomainObject>(context, s =>
             {
-                GuardSchemaField.CanHide(s.State.SchemaDef, command);
+                GuardSchemaField.CanHide(s.Snapshot.SchemaDef, command);
 
                 s.HideField(command);
             });
@@ -90,7 +90,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         {
             return handler.UpdateSyncedAsync<SchemaDomainObject>(context, s =>
             {
-                GuardSchemaField.CanShow(s.State.SchemaDef, command);
+                GuardSchemaField.CanShow(s.Snapshot.SchemaDef, command);
 
                 s.ShowField(command);
             });
@@ -100,7 +100,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         {
             return handler.UpdateSyncedAsync<SchemaDomainObject>(context, s =>
             {
-                GuardSchemaField.CanDisable(s.State.SchemaDef, command);
+                GuardSchemaField.CanDisable(s.Snapshot.SchemaDef, command);
 
                 s.DisableField(command);
             });
@@ -110,7 +110,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         {
             return handler.UpdateSyncedAsync<SchemaDomainObject>(context, s =>
             {
-                GuardSchemaField.CanEnable(s.State.SchemaDef, command);
+                GuardSchemaField.CanEnable(s.Snapshot.SchemaDef, command);
 
                 s.EnableField(command);
             });
@@ -120,7 +120,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         {
             return handler.UpdateSyncedAsync<SchemaDomainObject>(context, s =>
             {
-                GuardSchemaField.CanUpdate(s.State.SchemaDef, command);
+                GuardSchemaField.CanUpdate(s.Snapshot.SchemaDef, command);
 
                 s.UpdateField(command);
             });
@@ -130,7 +130,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         {
             return handler.UpdateSyncedAsync<SchemaDomainObject>(context, s =>
             {
-                GuardSchema.CanReorder(s.State.SchemaDef, command);
+                GuardSchema.CanReorder(s.Snapshot.SchemaDef, command);
 
                 s.Reorder(command);
             });
@@ -140,7 +140,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         {
             return handler.UpdateSyncedAsync<SchemaDomainObject>(context, s =>
             {
-                GuardSchema.CanUpdate(s.State.SchemaDef, command);
+                GuardSchema.CanUpdate(s.Snapshot.SchemaDef, command);
 
                 s.Update(command);
             });
@@ -150,7 +150,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         {
             return handler.UpdateSyncedAsync<SchemaDomainObject>(context, s =>
             {
-                GuardSchema.CanPublish(s.State.SchemaDef, command);
+                GuardSchema.CanPublish(s.Snapshot.SchemaDef, command);
 
                 s.Publish(command);
             });
@@ -160,7 +160,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         {
             return handler.UpdateSyncedAsync<SchemaDomainObject>(context, s =>
             {
-                GuardSchema.CanUnpublish(s.State.SchemaDef, command);
+                GuardSchema.CanUnpublish(s.Snapshot.SchemaDef, command);
 
                 s.Unpublish(command);
             });
@@ -170,7 +170,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         {
             return handler.UpdateSyncedAsync<SchemaDomainObject>(context, s =>
             {
-                GuardSchema.CanConfigureScripts(s.State.SchemaDef, command);
+                GuardSchema.CanConfigureScripts(s.Snapshot.SchemaDef, command);
 
                 s.ConfigureScripts(command);
             });
@@ -180,7 +180,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         {
             return handler.UpdateSyncedAsync<SchemaDomainObject>(context, s =>
             {
-                GuardSchema.CanDelete(s.State.SchemaDef, command);
+                GuardSchema.CanDelete(s.Snapshot.SchemaDef, command);
 
                 s.Delete(command);
             });

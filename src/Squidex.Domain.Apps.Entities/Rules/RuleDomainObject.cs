@@ -55,7 +55,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
         private void VerifyNotCreated()
         {
-            if (State.RuleDef != null)
+            if (Snapshot.RuleDef != null)
             {
                 throw new DomainException("Webhook has already been created.");
             }
@@ -63,15 +63,15 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
         private void VerifyCreatedAndNotDeleted()
         {
-            if (State.IsDeleted || State.RuleDef == null)
+            if (Snapshot.IsDeleted || Snapshot.RuleDef == null)
             {
                 throw new DomainException("Webhook has already been deleted or not created yet.");
             }
         }
 
-        protected override void OnRaised(Envelope<IEvent> @event)
+        public override void ApplyEvent(Envelope<IEvent> @event)
         {
-            UpdateState(State.Apply(@event));
+            ApplySnapshot(Snapshot.Apply(@event));
         }
     }
 }

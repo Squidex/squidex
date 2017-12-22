@@ -62,7 +62,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             return handler.UpdateSyncedAsync<AppDomainObject>(context, async a =>
             {
-                await GuardAppContributors.CanAssign(a.State.Contributors, command, userResolver, appPlansProvider.GetPlan(a.State.Plan?.PlanId));
+                await GuardAppContributors.CanAssign(a.Snapshot.Contributors, command, userResolver, appPlansProvider.GetPlan(a.Snapshot.Plan?.PlanId));
 
                 a.AssignContributor(command);
             });
@@ -72,7 +72,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             return handler.UpdateSyncedAsync<AppDomainObject>(context, a =>
             {
-                GuardAppContributors.CanRemove(a.State.Contributors, command);
+                GuardAppContributors.CanRemove(a.Snapshot.Contributors, command);
 
                 a.RemoveContributor(command);
             });
@@ -82,7 +82,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             return handler.UpdateSyncedAsync<AppDomainObject>(context, a =>
             {
-                GuardAppClients.CanAttach(a.State.Clients, command);
+                GuardAppClients.CanAttach(a.Snapshot.Clients, command);
 
                 a.AttachClient(command);
             });
@@ -92,7 +92,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             return handler.UpdateSyncedAsync<AppDomainObject>(context, a =>
             {
-                GuardAppClients.CanUpdate(a.State.Clients, command);
+                GuardAppClients.CanUpdate(a.Snapshot.Clients, command);
 
                 a.UpdateClient(command);
             });
@@ -102,7 +102,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             return handler.UpdateSyncedAsync<AppDomainObject>(context, a =>
             {
-                GuardAppClients.CanRevoke(a.State.Clients, command);
+                GuardAppClients.CanRevoke(a.Snapshot.Clients, command);
 
                 a.RevokeClient(command);
             });
@@ -112,7 +112,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             return handler.UpdateSyncedAsync<AppDomainObject>(context, a =>
             {
-                GuardAppLanguages.CanAdd(a.State.LanguagesConfig, command);
+                GuardAppLanguages.CanAdd(a.Snapshot.LanguagesConfig, command);
 
                 a.AddLanguage(command);
             });
@@ -122,7 +122,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             return handler.UpdateSyncedAsync<AppDomainObject>(context, a =>
             {
-                GuardAppLanguages.CanRemove(a.State.LanguagesConfig, command);
+                GuardAppLanguages.CanRemove(a.Snapshot.LanguagesConfig, command);
 
                 a.RemoveLanguage(command);
             });
@@ -132,7 +132,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             return handler.UpdateSyncedAsync<AppDomainObject>(context, a =>
             {
-                GuardAppLanguages.CanUpdate(a.State.LanguagesConfig, command);
+                GuardAppLanguages.CanUpdate(a.Snapshot.LanguagesConfig, command);
 
                 a.UpdateLanguage(command);
             });
@@ -142,7 +142,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             return handler.UpdateSyncedAsync<AppDomainObject>(context, a =>
             {
-                GuardAppPattern.CanAdd(a.State.Patterns, command);
+                GuardAppPattern.CanAdd(a.Snapshot.Patterns, command);
 
                 a.AddPattern(command);
             });
@@ -152,7 +152,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             return handler.UpdateSyncedAsync<AppDomainObject>(context, a =>
             {
-                GuardAppPattern.CanDelete(a.State.Patterns, command);
+                GuardAppPattern.CanDelete(a.Snapshot.Patterns, command);
 
                 a.DeletePattern(command);
             });
@@ -162,7 +162,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             await handler.UpdateSyncedAsync<AppDomainObject>(context, a =>
             {
-                GuardAppPattern.CanUpdate(a.State.Patterns, command);
+                GuardAppPattern.CanUpdate(a.Snapshot.Patterns, command);
 
                 a.UpdatePattern(command);
             });
@@ -172,7 +172,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             return handler.UpdateSyncedAsync<AppDomainObject>(context, async a =>
             {
-                GuardApp.CanChangePlan(command, a.State.Plan, appPlansProvider);
+                GuardApp.CanChangePlan(command, a.Snapshot.Plan, appPlansProvider);
 
                 if (command.FromCallback)
                 {
@@ -180,7 +180,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 }
                 else
                 {
-                    var result = await appPlansBillingManager.ChangePlanAsync(command.Actor.Identifier, command.AppId.Id, a.State.Name, command.PlanId);
+                    var result = await appPlansBillingManager.ChangePlanAsync(command.Actor.Identifier, command.AppId.Id, a.Snapshot.Name, command.PlanId);
 
                     if (result is PlanChangedResult)
                     {

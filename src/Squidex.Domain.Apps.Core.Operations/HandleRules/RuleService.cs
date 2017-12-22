@@ -83,8 +83,15 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             var actionName = typeNameRegistry.GetName(actionType);
             var actionData = actionHandler.CreateJob(appEventEnvelope, eventName, rule.Action);
 
-            var eventTime = @event.Headers.Contains(CommonHeaders.Timestamp) ? @event.Headers.Timestamp() : now;
-            var eventGuid = @event.Headers.Contains(CommonHeaders.EventId) ? @event.Headers.EventId() : Guid.NewGuid();
+            var eventTime =
+                @event.Headers.Contains(CommonHeaders.Timestamp) ?
+                @event.Headers.Timestamp() :
+                now;
+
+            var eventGuid =
+                @event.Headers.Contains(CommonHeaders.EventId) ?
+                @event.Headers.EventId() :
+                Guid.NewGuid();
 
             var job = new RuleJob
             {

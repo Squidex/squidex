@@ -44,7 +44,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             var @event = SimpleMapper.Map(command, new AssetUpdated
             {
-                FileVersion = State.FileVersion + 1,
+                FileVersion = Snapshot.FileVersion + 1,
                 FileSize = command.File.FileSize,
                 MimeType = command.File.MimeType,
                 PixelWidth = command.ImageInfo?.PixelWidth,
@@ -61,7 +61,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             VerifyCreatedAndNotDeleted();
 
-            RaiseEvent(SimpleMapper.Map(command, new AssetDeleted { DeletedSize = State.TotalSize }));
+            RaiseEvent(SimpleMapper.Map(command, new AssetDeleted { DeletedSize = Snapshot.TotalSize }));
 
             return this;
         }
@@ -77,7 +77,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         private void VerifyNotCreated()
         {
-            if (!string.IsNullOrWhiteSpace(State.FileName))
+            if (!string.IsNullOrWhiteSpace(Snapshot.FileName))
             {
                 throw new DomainException("Asset has already been created.");
             }
@@ -85,15 +85,15 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         private void VerifyCreatedAndNotDeleted()
         {
-            if (State.IsDeleted || string.IsNullOrWhiteSpace(State.FileName))
+            if (Snapshot.IsDeleted || string.IsNullOrWhiteSpace(Snapshot.FileName))
             {
                 throw new DomainException("Asset has already been deleted or not created yet.");
             }
         }
 
-        protected override void OnRaised(Envelope<IEvent> @event)
+        public override void ApplyEvent(Envelope<IEvent> @event)
         {
-            UpdateState(State.Apply(@event));
+            ApplySnapshot(Snapshot.Apply(@event));
         }
     }
 }

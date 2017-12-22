@@ -61,6 +61,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                 ReferencedIds = idData?.ToReferencedIds(schema.SchemaDef),
             });
 
+            document.Version = newVersion;
+
             try
             {
                 await Collection.InsertOneAsync(document);

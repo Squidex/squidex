@@ -55,7 +55,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             VerifyCreatedAndNotDeleted();
 
-            if (!command.Data.Equals(State.Data))
+            if (!command.Data.Equals(Snapshot.Data))
             {
                 RaiseEvent(SimpleMapper.Map(command, new ContentUpdated()));
             }
@@ -67,9 +67,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             VerifyCreatedAndNotDeleted();
 
-            var newData = command.Data.MergeInto(State.Data);
+            var newData = command.Data.MergeInto(Snapshot.Data);
 
-            if (!newData.Equals(State.Data))
+            if (!newData.Equals(Snapshot.Data))
             {
                 var @event = SimpleMapper.Map(command, new ContentUpdated());
 
@@ -83,7 +83,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         private void VerifyNotCreated()
         {
-            if (State.Data != null)
+            if (Snapshot.Data != null)
             {
                 throw new DomainException("Content has already been created.");
             }
@@ -91,15 +91,15 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         private void VerifyCreatedAndNotDeleted()
         {
-            if (State.IsDeleted || State.Data == null)
+            if (Snapshot.IsDeleted || Snapshot.Data == null)
             {
                 throw new DomainException("Content has already been deleted or not created yet.");
             }
         }
 
-        protected override void OnRaised(Envelope<IEvent> @event)
+        public override void ApplyEvent(Envelope<IEvent> @event)
         {
-            UpdateState(State.Apply(@event));
+            ApplySnapshot(Snapshot.Apply(@event));
         }
     }
 }

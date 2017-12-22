@@ -119,7 +119,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             if (command is ContentDataCommand dataCommand)
             {
-                var ctx = new ScriptContext { ContentId = content.State.Id, OldData = content.State.Data, User = command.User, Operation = operation.ToString(), Data = dataCommand.Data };
+                var ctx = new ScriptContext { ContentId = content.Snapshot.Id, OldData = content.Snapshot.Data, User = command.User, Operation = operation.ToString(), Data = dataCommand.Data };
 
                 dataCommand.Data = scriptEngine.ExecuteAndTransform(ctx, script(schemaEntity));
             }
@@ -129,7 +129,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public Task ExecuteScriptAsync(Func<ISchemaEntity, string> script, object operation)
         {
-            var ctx = new ScriptContext { ContentId = content.State.Id, OldData = content.State.Data, User = command.User, Operation = operation.ToString() };
+            var ctx = new ScriptContext { ContentId = content.Snapshot.Id, OldData = content.Snapshot.Data, User = command.User, Operation = operation.ToString() };
 
             scriptEngine.Execute(ctx, script(schemaEntity));
 

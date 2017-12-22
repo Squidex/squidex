@@ -196,7 +196,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             sut.ChangeStatus(CreateContentCommand(new ChangeContentStatus { Status = Status.Published }));
 
-            Assert.Equal(Status.Published, sut.State.Status);
+            Assert.Equal(Status.Published, sut.Snapshot.Status);
 
             sut.GetUncomittedEvents()
                 .ShouldHaveSameEvents(
@@ -232,7 +232,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             sut.Delete(CreateContentCommand(new DeleteContent()));
 
-            Assert.True(sut.State.IsDeleted);
+            Assert.True(sut.Snapshot.IsDeleted);
 
             sut.GetUncomittedEvents()
                 .ShouldHaveSameEvents(

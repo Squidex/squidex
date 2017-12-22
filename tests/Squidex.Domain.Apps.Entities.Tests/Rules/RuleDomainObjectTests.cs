@@ -49,10 +49,10 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
             sut.Create(CreateRuleCommand(command));
 
-            Assert.Equal(AppId, sut.State.AppId);
+            Assert.Equal(AppId, sut.Snapshot.AppId);
 
-            Assert.Same(ruleTrigger, sut.State.RuleDef.Trigger);
-            Assert.Same(ruleAction, sut.State.RuleDef.Action);
+            Assert.Same(ruleTrigger, sut.Snapshot.RuleDef.Trigger);
+            Assert.Same(ruleAction, sut.Snapshot.RuleDef.Action);
 
             sut.GetUncomittedEvents()
                 .ShouldHaveSameEvents(
@@ -100,8 +100,8 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
             sut.Update(CreateRuleCommand(command));
 
-            Assert.Same(newTrigger, sut.State.RuleDef.Trigger);
-            Assert.Same(newAction, sut.State.RuleDef.Action);
+            Assert.Same(newTrigger, sut.Snapshot.RuleDef.Trigger);
+            Assert.Same(newAction, sut.Snapshot.RuleDef.Action);
 
             sut.GetUncomittedEvents()
                 .ShouldHaveSameEvents(
@@ -139,7 +139,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
             sut.Enable(CreateRuleCommand(command));
 
-            Assert.True(sut.State.RuleDef.IsEnabled);
+            Assert.True(sut.Snapshot.RuleDef.IsEnabled);
 
             sut.GetUncomittedEvents()
                 .ShouldHaveSameEvents(
@@ -177,7 +177,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
             sut.Disable(CreateRuleCommand(command));
 
-            Assert.False(sut.State.RuleDef.IsEnabled);
+            Assert.False(sut.Snapshot.RuleDef.IsEnabled);
 
             sut.GetUncomittedEvents()
                 .ShouldHaveSameEvents(
@@ -213,7 +213,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
             sut.Delete(CreateRuleCommand(new DeleteRule()));
 
-            Assert.True(sut.State.IsDeleted);
+            Assert.True(sut.Snapshot.IsDeleted);
 
             sut.GetUncomittedEvents()
                 .ShouldHaveSameEvents(

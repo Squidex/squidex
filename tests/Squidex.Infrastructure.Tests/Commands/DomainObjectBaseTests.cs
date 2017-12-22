@@ -28,7 +28,7 @@ namespace Squidex.Infrastructure.Commands
 
         public DomainObjectBaseTests()
         {
-            A.CallTo(() => store.WithSnapshots<MyDomainState>(id, A<Func<MyDomainState, Task>>.Ignored))
+            A.CallTo(() => store.WithSnapshotsAndEventSourcing(id, A<Func<MyDomainState, Task>>.Ignored, A<Func<Envelope<IEvent>, Task>>.Ignored))
                 .Returns(persistence);
         }
 
@@ -66,9 +66,9 @@ namespace Squidex.Infrastructure.Commands
 
             sut.RaiseEvent(event1);
             sut.RaiseEvent(event2);
-            sut.UpdateState(newState);
+            sut.ApplySnapshot(newState);
 
-            await sut.WriteAsync(A.Fake<ISemanticLog>());
+            await sut.WriteAsync();
 
             A.CallTo(() => persistence.WriteSnapshotAsync(newState))
                 .MustHaveHappened();
@@ -79,7 +79,7 @@ namespace Squidex.Infrastructure.Commands
         }
 
         [Fact]
-        public async Task Should_ignore_exception_when_saving()
+        public async Task Should_not_ignore_exception_when_saving()
         {
             A.CallTo(() => persistence.WriteEventsAsync(A<IEnumerable<Envelope<IEvent>>>.Ignored))
                 .Throws(new InvalidOperationException());
@@ -92,12 +92,12 @@ namespace Squidex.Infrastructure.Commands
 
             sut.RaiseEvent(event1);
             sut.RaiseEvent(event2);
-            sut.UpdateState(newState);
+            sut.ApplySnapshot(newState);
 
-            await sut.WriteAsync(A.Fake<ISemanticLog>());
+            await Assert.ThrowsAsync<InvalidOperationException>(() => sut.WriteAsync());
 
             A.CallTo(() => persistence.WriteSnapshotAsync(newState))
-                .MustHaveHappened();
+                .MustNotHaveHappened();
             A.CallTo(() => persistence.WriteEventsAsync(A<IEnumerable<Envelope<IEvent>>>.That.Matches(x => x.Count() == 2)))
                 .MustHaveHappened();
 

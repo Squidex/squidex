@@ -27,10 +27,7 @@ namespace Migrate_01
 
         public int ToVersion { get; } = 2;
 
-        public Migration02_AddPatterns(
-            InitialPatterns initialPatterns,
-            IStateFactory stateFactory,
-            IAppRepository appRepository)
+        public Migration02_AddPatterns(InitialPatterns initialPatterns, IAppRepository appRepository, IStateFactory stateFactory)
         {
             this.initialPatterns = initialPatterns;
             this.appRepository = appRepository;
@@ -45,15 +42,15 @@ namespace Migrate_01
             {
                 var app = await stateFactory.CreateAsync<AppDomainObject>(id);
 
-                if (app.State.Patterns.Count == 0)
+                if (app.Snapshot.Patterns.Count == 0)
                 {
                     foreach (var pattern in initialPatterns.Values)
                     {
                         var command =
                             new AddPattern
                             {
-                                Actor = app.State.CreatedBy,
-                                AppId = new NamedId<Guid>(app.State.Id, app.State.Name),
+                                Actor = app.Snapshot.CreatedBy,
+                                AppId = new NamedId<Guid>(app.Snapshot.Id, app.Snapshot.Name),
                                 Name = pattern.Name,
                                 PatternId = Guid.NewGuid(),
                                 Pattern = pattern.Pattern,
@@ -63,7 +60,7 @@ namespace Migrate_01
                         app.AddPattern(command);
                     }
 
-                    await app.WriteStateAsync(app.Version + initialPatterns.Count);
+                    await app.WriteAsync();
                 }
             }
         }

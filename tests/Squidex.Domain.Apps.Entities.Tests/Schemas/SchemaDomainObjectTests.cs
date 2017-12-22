@@ -56,10 +56,10 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             sut.Create(CreateCommand(new CreateSchema { Name = SchemaName, SchemaId = SchemaId, Properties = properties }));
 
-            Assert.Equal(AppId, sut.State.AppId);
+            Assert.Equal(AppId, sut.Snapshot.AppId);
 
-            Assert.Equal(SchemaName, sut.State.Name);
-            Assert.Equal(SchemaName, sut.State.SchemaDef.Name);
+            Assert.Equal(SchemaName, sut.Snapshot.Name);
+            Assert.Equal(SchemaName, sut.Snapshot.SchemaDef.Name);
 
             sut.GetUncomittedEvents()
                 .ShouldHaveSameEvents(
@@ -82,9 +82,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             var @event = (SchemaCreated)sut.GetUncomittedEvents().Single().Payload;
 
-            Assert.Equal(AppId, sut.State.AppId);
-            Assert.Equal(SchemaName, sut.State.Name);
-            Assert.Equal(SchemaName, sut.State.SchemaDef.Name);
+            Assert.Equal(AppId, sut.Snapshot.AppId);
+            Assert.Equal(SchemaName, sut.Snapshot.Name);
+            Assert.Equal(SchemaName, sut.Snapshot.SchemaDef.Name);
 
             Assert.Equal(2, @event.Fields.Count);
         }
@@ -119,7 +119,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             sut.Update(CreateCommand(new UpdateSchema { Properties = properties }));
 
-            Assert.Equal(properties, sut.State.SchemaDef.Properties);
+            Assert.Equal(properties, sut.Snapshot.SchemaDef.Properties);
 
             sut.GetUncomittedEvents()
                 .ShouldHaveSameEvents(
@@ -244,7 +244,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             sut.Publish(CreateCommand(new PublishSchema()));
 
-            Assert.True(sut.State.SchemaDef.IsPublished);
+            Assert.True(sut.Snapshot.SchemaDef.IsPublished);
 
             sut.GetUncomittedEvents()
                 .ShouldHaveSameEvents(
@@ -281,7 +281,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             sut.Unpublish(CreateCommand(new UnpublishSchema()));
 
-            Assert.False(sut.State.SchemaDef.IsPublished);
+            Assert.False(sut.Snapshot.SchemaDef.IsPublished);
 
             sut.GetUncomittedEvents()
                 .ShouldHaveSameEvents(
@@ -317,7 +317,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             sut.Delete(CreateCommand(new DeleteSchema()));
 
-            Assert.True(sut.State.IsDeleted);
+            Assert.True(sut.Snapshot.IsDeleted);
 
             sut.GetUncomittedEvents()
                 .ShouldHaveSameEvents(
@@ -355,7 +355,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             sut.Add(CreateCommand(new AddField { Name = fieldName, Properties = properties }));
 
-            Assert.Equal(properties, sut.State.SchemaDef.FieldsById[1].RawProperties);
+            Assert.Equal(properties, sut.Snapshot.SchemaDef.FieldsById[1].RawProperties);
 
             sut.GetUncomittedEvents()
                 .ShouldHaveSameEvents(
@@ -394,7 +394,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             sut.UpdateField(CreateCommand(new UpdateField { FieldId = 1, Properties = properties }));
 
-            Assert.Equal(properties, sut.State.SchemaDef.FieldsById[1].RawProperties);
+            Assert.Equal(properties, sut.Snapshot.SchemaDef.FieldsById[1].RawProperties);
 
             sut.GetUncomittedEvents()
                 .ShouldHaveSameEvents(
@@ -431,7 +431,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             sut.LockField(CreateCommand(new LockField { FieldId = 1 }));
 
-            Assert.False(sut.State.SchemaDef.FieldsById[1].IsDisabled);
+            Assert.False(sut.Snapshot.SchemaDef.FieldsById[1].IsDisabled);
 
             sut.GetUncomittedEvents()
                 .ShouldHaveSameEvents(
@@ -468,7 +468,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             sut.HideField(CreateCommand(new HideField { FieldId = 1 }));
 
-            Assert.True(sut.State.SchemaDef.FieldsById[1].IsHidden);
+            Assert.True(sut.Snapshot.SchemaDef.FieldsById[1].IsHidden);
 
             sut.GetUncomittedEvents()
                 .ShouldHaveSameEvents(
@@ -506,7 +506,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             sut.HideField(CreateCommand(new HideField { FieldId = 1 }));
             sut.ShowField(CreateCommand(new ShowField { FieldId = 1 }));
 
-            Assert.False(sut.State.SchemaDef.FieldsById[1].IsHidden);
+            Assert.False(sut.Snapshot.SchemaDef.FieldsById[1].IsHidden);
 
             sut.GetUncomittedEvents().Skip(1)
                 .ShouldHaveSameEvents(
@@ -543,7 +543,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             sut.DisableField(CreateCommand(new DisableField { FieldId = 1 }));
 
-            Assert.True(sut.State.SchemaDef.FieldsById[1].IsDisabled);
+            Assert.True(sut.Snapshot.SchemaDef.FieldsById[1].IsDisabled);
 
             sut.GetUncomittedEvents()
                 .ShouldHaveSameEvents(
@@ -581,7 +581,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             sut.DisableField(CreateCommand(new DisableField { FieldId = 1 }));
             sut.EnableField(CreateCommand(new EnableField { FieldId = 1 }));
 
-            Assert.False(sut.State.SchemaDef.FieldsById[1].IsDisabled);
+            Assert.False(sut.Snapshot.SchemaDef.FieldsById[1].IsDisabled);
 
             sut.GetUncomittedEvents().Skip(1)
                 .ShouldHaveSameEvents(
@@ -618,7 +618,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             sut.DeleteField(CreateCommand(new DeleteField { FieldId = 1 }));
 
-            Assert.False(sut.State.SchemaDef.FieldsById.ContainsKey(1));
+            Assert.False(sut.Snapshot.SchemaDef.FieldsById.ContainsKey(1));
 
             sut.GetUncomittedEvents()
                 .ShouldHaveSameEvents(

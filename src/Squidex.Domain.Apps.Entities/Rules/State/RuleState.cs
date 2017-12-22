@@ -37,7 +37,15 @@ namespace Squidex.Domain.Apps.Entities.Rules.State
 
         protected void On(RuleUpdated @event)
         {
-            RuleDef = RuleDef.Update(@event.Trigger).Update(@event.Action);
+            if (@event.Trigger != null)
+            {
+                RuleDef = RuleDef.Update(@event.Trigger);
+            }
+
+            if (@event.Action != null)
+            {
+                RuleDef = RuleDef.Update(@event.Action);
+            }
         }
 
         protected void On(RuleEnabled @event)

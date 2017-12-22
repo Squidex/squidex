@@ -8,7 +8,6 @@
 
 using System;
 using System.Threading.Tasks;
-using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.States;
 
 namespace Squidex.Infrastructure.Commands
@@ -17,6 +16,6 @@ namespace Squidex.Infrastructure.Commands
     {
         long Version { get; }
 
-        Task WriteAsync(ISemanticLog log);
+        Task WriteAsync();
     }
 }

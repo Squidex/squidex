@@ -170,7 +170,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 await sut.HandleAsync(context);
             });
 
-            Assert.Null(app.State.Plan);
+            Assert.Null(app.Snapshot.Plan);
         }
 
         [Fact]

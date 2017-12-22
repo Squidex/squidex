@@ -8,7 +8,6 @@
 
 using System;
 using System.Threading.Tasks;
-using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.Tasks;
 
@@ -18,19 +17,15 @@ namespace Squidex.Infrastructure.Commands
     {
         private readonly AsyncLockPool lockPool = new AsyncLockPool(10000);
         private readonly IStateFactory stateFactory;
-        private readonly ISemanticLog log;
         private readonly IServiceProvider serviceProvider;
 
-        public AggregateHandler(IStateFactory stateFactory, IServiceProvider serviceProvider, ISemanticLog log)
+        public AggregateHandler(IStateFactory stateFactory, IServiceProvider serviceProvider)
         {
             Guard.NotNull(stateFactory, nameof(stateFactory));
             Guard.NotNull(serviceProvider, nameof(serviceProvider));
-            Guard.NotNull(log, nameof(log));
 
             this.stateFactory = stateFactory;
             this.serviceProvider = serviceProvider;
-
-            this.log = log;
         }
 
         public Task<T> CreateAsync<T>(CommandContext context, Func<T, Task> creator) where T : class, IDomainObject
@@ -76,7 +71,7 @@ namespace Squidex.Infrastructure.Commands
 
             await handler(domainObject);
 
-            await domainObject.WriteAsync(log);
+            await domainObject.WriteAsync();
 
             if (!context.IsCompleted)
             {
@@ -111,7 +106,7 @@ namespace Squidex.Infrastructure.Commands
 
                 await handler(domainObject);
 
-                await domainObject.WriteAsync(log);
+                await domainObject.WriteAsync();
 
                 if (!context.IsCompleted)
                 {

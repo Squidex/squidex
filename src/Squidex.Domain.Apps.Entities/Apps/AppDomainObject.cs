@@ -7,6 +7,7 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.State;
@@ -36,13 +37,24 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             var appId = new NamedId<Guid>(command.AppId, command.Name);
 
-            RaiseEvent(CreateInitalEvent(appId, command.Actor, command.Name));
-            RaiseEvent(CreateInitialOwner(appId, command.Actor));
-            RaiseEvent(CreateInitialLanguage(appId, command.Actor));
+            var events = new List<AppEvent>
+            {
+                CreateInitalEvent(command.Name),
+                CreateInitialOwner(command.Actor),
+                CreateInitialLanguage()
+            };
 
             foreach (var pattern in initialPatterns)
             {
-                RaiseEvent(CreateInitialPattern(appId, command.Actor, pattern.Key, pattern.Value));
+                events.Add(CreateInitialPattern(pattern.Key, pattern.Value));
+            }
+
+            foreach (var @event in events)
+            {
+                @event.Actor = command.Actor;
+                @event.AppId = appId;
+
+                RaiseEvent(@event);
             }
 
             return this;
@@ -168,35 +180,35 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             if (@event.AppId == null)
             {
-                @event.AppId = new NamedId<Guid>(State.Id, State.Name);
+                @event.AppId = new NamedId<Guid>(Snapshot.Id, Snapshot.Name);
             }
 
             RaiseEvent(Envelope.Create(@event));
         }
 
-        private static AppCreated CreateInitalEvent(NamedId<Guid> appId, RefToken actor, string name)
+        private static AppCreated CreateInitalEvent(string name)
         {
-            return new AppCreated { AppId = appId, Actor = actor, Name = name };
+            return new AppCreated { Name = name };
         }
 
-        private static AppPatternAdded CreateInitialPattern(NamedId<Guid> appId, RefToken actor, Guid id, AppPattern p)
+        private static AppPatternAdded CreateInitialPattern(Guid id, AppPattern pattern)
         {
-            return new AppPatternAdded { AppId = appId, Actor = actor, PatternId = id, Name = p.Name, Pattern = p.Pattern, Message = p.Message };
+            return new AppPatternAdded { PatternId = id, Name = pattern.Name, Pattern = pattern.Pattern, Message = pattern.Message };
         }
 
-        private static AppLanguageAdded CreateInitialLanguage(NamedId<Guid> appId, RefToken actor)
+        private static AppLanguageAdded CreateInitialLanguage()
         {
-            return new AppLanguageAdded { AppId = appId, Actor = actor, Language = Language.EN };
+            return new AppLanguageAdded { Language = Language.EN };
         }
 
-        private static AppContributorAssigned CreateInitialOwner(NamedId<Guid> appId, RefToken actor)
+        private static AppContributorAssigned CreateInitialOwner(RefToken actor)
         {
-            return new AppContributorAssigned { AppId = appId, Actor = actor, ContributorId = actor.Identifier, Permission = AppContributorPermission.Owner };
+            return new AppContributorAssigned { ContributorId = actor.Identifier, Permission = AppContributorPermission.Owner };
         }
 
         private void ThrowIfNotCreated()
         {
-            if (string.IsNullOrWhiteSpace(State.Name))
+            if (string.IsNullOrWhiteSpace(Snapshot.Name))
             {
                 throw new DomainException("App has not been created.");
             }
@@ -204,15 +216,15 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         private void ThrowIfCreated()
         {
-            if (!string.IsNullOrWhiteSpace(State.Name))
+            if (!string.IsNullOrWhiteSpace(Snapshot.Name))
             {
                 throw new DomainException("App has already been created.");
             }
         }
 
-        protected override void OnRaised(Envelope<IEvent> @event)
+        public override void ApplyEvent(Envelope<IEvent> @event)
         {
-            UpdateState(State.Apply(@event));
+            ApplySnapshot(Snapshot.Apply(@event));
         }
     }
 }

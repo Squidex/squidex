@@ -20,10 +20,6 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public static readonly string EventStreamNumber = "EventStreamNumber";
 
-        public static readonly string SnapshotVersion = "SnapshotVersion";
-
         public static readonly string Timestamp = "Timestamp";
-
-        public static readonly string Actor = "Actor";
     }
 }

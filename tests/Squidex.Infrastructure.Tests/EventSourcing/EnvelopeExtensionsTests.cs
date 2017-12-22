@@ -83,16 +83,5 @@ namespace Squidex.Infrastructure.EventSourcing
             Assert.Equal(eventStreamNumber, sut.Headers.EventStreamNumber());
             Assert.Equal(eventStreamNumber, sut.Headers["EventStreamNumber"].ToInt64(culture));
         }
-
-        [Fact]
-        public void Should_set_and_get_snapshot_version()
-        {
-            const int snapshotVersion = 123;
-
-            sut.SetSnapshotVersion(snapshotVersion);
-
-            Assert.Equal(snapshotVersion, sut.Headers.SnapshotVersion());
-            Assert.Equal(snapshotVersion, sut.Headers["SnapshotVersion"].ToInt64(culture));
-        }
     }
 }
