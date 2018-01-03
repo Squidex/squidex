@@ -84,5 +84,10 @@ namespace Squidex.Infrastructure.EventSourcing
 
             return projectionsManager;
         }
+
+        public static long? ParsePosition(string position)
+        {
+            return long.TryParse(position, out var parsedPosition) ? (long?)parsedPosition : null;
+        }
     }
 }

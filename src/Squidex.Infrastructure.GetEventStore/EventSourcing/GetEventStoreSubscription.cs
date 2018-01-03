@@ -33,7 +33,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
             this.eventStoreConnection = eventStoreConnection;
             this.eventSubscriber = eventSubscriber;
-            this.position = ParsePosition(position);
+            this.position = ProjectionHelper.ParsePosition(position);
 
             var streamName = eventStoreConnection.CreateProjectionAsync(projectionHost, prefix, streamFilter).Result;
 
@@ -68,11 +68,6 @@ namespace Squidex.Infrastructure.EventSourcing
                         eventSubscriber.OnErrorAsync(this, ex);
                     }
                 });
-        }
-
-        private static long? ParsePosition(string position)
-        {
-            return long.TryParse(position, out var parsedPosition) ? (long?)parsedPosition : null;
         }
     }
 }

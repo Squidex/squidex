@@ -54,9 +54,30 @@ namespace Squidex.Infrastructure.EventSourcing
             return new GetEventStoreSubscription(connection, subscriber, projectionHost, prefix, position, streamFilter);
         }
 
-        public Task GetEventsAsync(Func<StoredEvent, Task> callback, CancellationToken cancellationToken, string streamFilter = null, string position = null)
+        public async Task GetEventsAsync(Func<StoredEvent, Task> callback, CancellationToken cancellationToken, string streamFilter = null, string position = null)
         {
-            throw new NotSupportedException();
+            var streamName = await connection.CreateProjectionAsync(projectionHost, prefix, streamFilter);
+
+            var sliceStart = ProjectionHelper.ParsePosition(position) ?? -1;
+
+            StreamEventsSlice currentSlice;
+            do
+            {
+                currentSlice = await connection.ReadStreamEventsForwardAsync(GetStreamName(streamName), sliceStart, ReadPageSize, false);
+
+                if (currentSlice.Status == SliceReadStatus.Success)
+                {
+                    sliceStart = currentSlice.NextEventNumber;
+
+                    foreach (var resolved in currentSlice.Events)
+                    {
+                        var storedEvent = Formatter.Read(resolved);
+
+                        await callback(storedEvent);
+                    }
+                }
+            }
+            while (!currentSlice.IsEndOfStream && !cancellationToken.IsCancellationRequested);
         }
 
         public async Task<IReadOnlyList<StoredEvent>> GetEventsAsync(string streamName, long streamPosition = 0)
