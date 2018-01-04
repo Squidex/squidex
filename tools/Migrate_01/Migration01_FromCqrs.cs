@@ -55,9 +55,9 @@ namespace Migrate_01
 
         public async Task UpdateAsync()
         {
-            // await MigrateConfigAsync();
+            await MigrateConfigAsync();
             await MigrateContentAsync();
-            // await MigrateAssetsAsync();
+            await MigrateAssetsAsync();
         }
 
         private Task MigrateAssetsAsync()
