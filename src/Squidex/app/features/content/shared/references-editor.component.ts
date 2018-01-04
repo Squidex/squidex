@@ -84,7 +84,7 @@ export class ReferencesEditorComponent implements ControlValueAccessor, OnInit {
 
             this.contentsService.getContents(this.ctx.appName, this.schemaId, 10000, 0, undefined, contentIds)
                 .subscribe(dtos => {
-                    this.contentItems = ImmutableArray.of(contentIds.map(id => dtos.items.find(c => c.id === id)).filter(c => !!c));
+                    this.contentItems = ImmutableArray.of(contentIds.map(id => dtos.items.find(c => c.id === id)).filter(r => !!r).map(r => r!));
                 });
         }
     }

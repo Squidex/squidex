@@ -25,7 +25,7 @@ import { fadeAnimation } from './animations';
 export class OnboardingTooltipComponent implements OnDestroy, OnInit {
     private showTimer: any;
     private closeTimer: any;
-    private forMouseDownListener: Function;
+    private forMouseDownListener: Function | null;
 
     public tooltipModal = new ModalView();
 
@@ -91,7 +91,7 @@ export class OnboardingTooltipComponent implements OnDestroy, OnInit {
         }
     }
 
-    private isSameOrParent(underCursor: Element): boolean {
+    private isSameOrParent(underCursor: Element | null): boolean {
         if (!underCursor) {
             return false;
         } if (this.for === underCursor) {

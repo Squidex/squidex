@@ -35,7 +35,7 @@ export class Profile {
     }
 
     public get isExpired(): boolean {
-        return this.user.expired;
+        return this.user.expired || false;
     }
 
     public get authToken(): string {

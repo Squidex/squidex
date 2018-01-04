@@ -47,7 +47,7 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
     public schema: SchemaDetailsDto;
 
     public content: ContentDto;
-    public contentOld: ContentDto;
+    public contentOld: ContentDto | null;
     public contentFormSubmitted = false;
     public contentForm: FormGroup;
 
@@ -122,11 +122,13 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
     }
 
     public showLatest() {
-        this.content = this.contentOld;
-        this.contentOld = null;
+        if (this.contentOld) {
+            this.content = this.contentOld;
+            this.contentOld = null;
 
-        this.emitContentUpdated(this.content);
-        this.populateContentForm();
+            this.emitContentUpdated(this.content);
+            this.populateContentForm();
+        }
     }
 
     public saveAndPublish() {

@@ -7,7 +7,7 @@
 
 export class Version {
     constructor(
-        public readonly value?: string
+        public readonly value: string
     ) {
     }
 }

@@ -12,7 +12,7 @@ import { Pipe, PipeTransform } from '@angular/core';
     pure: true
 })
 export class KeysPipe implements PipeTransform {
-    public transform(value: any, args: any[] = null): any {
+    public transform(value: any): any {
         return Object.keys(value);
     }
 }

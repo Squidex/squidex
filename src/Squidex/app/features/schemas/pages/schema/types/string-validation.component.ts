@@ -99,7 +99,7 @@ export class StringValidationComponent implements OnDestroy, OnInit {
         } else if (this.editForm.controls['pattern'].value && this.editForm.controls['pattern'].value.trim() !== '') {
             this.patternName = 'Advanced';
         } else {
-            this.patternName = undefined;
+            this.patternName = '';
         }
     }
 }

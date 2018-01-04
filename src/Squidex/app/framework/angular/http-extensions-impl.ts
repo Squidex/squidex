@@ -112,7 +112,7 @@ export module HTTP {
 
 export function pretifyError(message: string): Observable<any> {
     return this.catch((response: HttpErrorResponse) => {
-        let result: ErrorDto = null;
+        let result: ErrorDto | null = null;
 
         if (!(response.error instanceof Error)) {
             try {

@@ -385,10 +385,12 @@ export class StringFieldPropertiesDto extends FieldPropertiesDto {
         }
 
         if (this.allowedValues && this.allowedValues.length > 0) {
+            const values: (string | null)[] = this.allowedValues;
+
             if (this.isRequired && !isOptional) {
-                validators.push(ValidatorsEx.validValues(this.allowedValues));
+                validators.push(ValidatorsEx.validValues(values));
             } else {
-                validators.push(ValidatorsEx.validValues(this.allowedValues.concat([null])));
+                validators.push(ValidatorsEx.validValues(values.concat([null])));
             }
         }
 
@@ -437,10 +439,12 @@ export class NumberFieldPropertiesDto extends FieldPropertiesDto {
         }
 
         if (this.allowedValues && this.allowedValues.length > 0) {
+            const values: (number | null)[] = this.allowedValues;
+
             if (this.isRequired && !isOptional) {
-                validators.push(ValidatorsEx.validValues(this.allowedValues));
+                validators.push(ValidatorsEx.validValues(values));
             } else {
-                validators.push(ValidatorsEx.validValues(this.allowedValues.concat([null])));
+                validators.push(ValidatorsEx.validValues(values.concat([null])));
             }
         }
 

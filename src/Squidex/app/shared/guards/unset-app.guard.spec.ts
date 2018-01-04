@@ -25,9 +25,9 @@ describe('UnsetAppGuard', () => {
 
         const guard = new UnsetAppGuard(appStoreService.object);
 
-        let result: boolean = undefined;
+        let result = false;
 
-        guard.canActivate(null, null)
+        guard.canActivate(<any>{}, <any>{})
             .subscribe(value => {
                 result = value;
             });

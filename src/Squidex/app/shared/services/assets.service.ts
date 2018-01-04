@@ -198,7 +198,7 @@ export class AssetsService {
                             response.pixelWidth,
                             response.pixelHeight,
                             assetUrl,
-                            new Version(event.headers.get('etag')));
+                            new Version(event.headers.get('etag')!));
 
                         return dto;
                     }
@@ -268,7 +268,7 @@ export class AssetsService {
                             response.pixelWidth,
                             response.pixelHeight);
 
-                        return new Versioned(new Version(event.headers.get('etag')), replaced);
+                        return new Versioned(new Version(event.headers.get('etag')!), replaced);
                     }
                 })
                 .do(() => {

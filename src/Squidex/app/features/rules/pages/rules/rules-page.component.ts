@@ -42,7 +42,7 @@ export class RulesPageComponent implements OnInit {
     public schemas: SchemaDto[];
 
     public wizardMode = 'Wizard';
-    public wizardRule: RuleDto;
+    public wizardRule: RuleDto | null;
 
     constructor(public readonly ctx: AppContext,
         private readonly schemasService: SchemasService,

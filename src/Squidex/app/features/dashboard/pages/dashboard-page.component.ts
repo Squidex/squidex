@@ -9,6 +9,7 @@ import { Component, OnInit } from '@angular/core';
 
 import {
     AppContext,
+    AppDto,
     DateTime,
     fadeAnimation,
     UsagesService
@@ -35,7 +36,7 @@ export class DashboardPageComponent implements OnInit {
     public chartCallsCount: any;
     public chartCallsPerformance: any;
 
-    public app = this.ctx.appChanges.filter(x => !!x);
+    public app = this.ctx.appChanges.filter(x => !!x).map(x => <AppDto>x);
 
     public chartOptions = {
         responsive: true,

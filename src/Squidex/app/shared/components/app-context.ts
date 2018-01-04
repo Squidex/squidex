@@ -30,7 +30,7 @@ export class AppContext implements OnDestroy {
         return this.appField;
     }
 
-    public get appChanges(): Observable<AppDto> {
+    public get appChanges(): Observable<AppDto | null> {
         return this.appsStore.selectedApp;
     }
 
@@ -59,7 +59,7 @@ export class AppContext implements OnDestroy {
     ) {
         this.appSubscription =
             this.appsStore.selectedApp.take(1).subscribe(app => {
-                this.appField = app;
+                this.appField = app!;
             });
     }
 

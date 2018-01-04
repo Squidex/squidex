@@ -36,7 +36,7 @@ export class AppsMenuComponent implements OnDestroy, OnInit {
     public appsMenu = new ModalView(false, true);
     public apps: AppDto[] = [];
 
-    public selectedApp: AppDto;
+    public selectedApp: AppDto | null;
 
     constructor(
         private readonly appsStore: AppsStoreService

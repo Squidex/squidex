@@ -170,7 +170,7 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
     }
 
     public load(showInfo = false) {
-        this.contentsService.getContents(this.ctx.appName, this.schema.name, this.contentsPager.pageSize, this.contentsPager.skip, this.contentsQuery, null, this.isArchive)
+        this.contentsService.getContents(this.ctx.appName, this.schema.name, this.contentsPager.pageSize, this.contentsPager.skip, this.contentsQuery, undefined, this.isArchive)
             .subscribe(dtos => {
                 this.contentItems = ImmutableArray.of(dtos.items);
                 this.contentsPager = this.contentsPager.setCount(dtos.total);
