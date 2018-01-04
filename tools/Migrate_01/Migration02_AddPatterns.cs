@@ -40,7 +40,7 @@ namespace Migrate_01
 
             foreach (var id in ids)
             {
-                var app = await stateFactory.CreateAsync<AppDomainObject>(id);
+                var app = await stateFactory.GetSingleAsync<AppDomainObject>(id);
 
                 if (app.Snapshot.Patterns.Count == 0)
                 {
