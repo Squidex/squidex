@@ -17,7 +17,7 @@ using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.MongoDb
 {
-    public abstract class MongoRepositoryBase<TEntity> : IExternalSystem
+    public abstract class MongoRepositoryBase<TEntity> : IInitializable
     {
         private const string CollectionFormat = "{0}Set";
 
@@ -106,7 +106,7 @@ namespace Squidex.Infrastructure.MongoDb
             }
         }
 
-        public void Connect()
+        public void Initialize()
         {
             try
             {

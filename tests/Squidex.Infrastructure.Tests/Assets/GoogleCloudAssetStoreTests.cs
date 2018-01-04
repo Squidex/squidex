@@ -25,7 +25,7 @@ namespace Squidex.Infrastructure.Assets
         // [Fact]
         public void Should_calculate_source_url()
         {
-            Sut.Connect();
+            Sut.Initialize();
 
             var id = Guid.NewGuid().ToString();
 

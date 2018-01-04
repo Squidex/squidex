@@ -39,8 +39,9 @@ namespace Squidex
         public void Configure(IApplicationBuilder app)
         {
             app.ApplicationServices.LogConfiguration();
+            app.ApplicationServices.InitializeAll();
             app.ApplicationServices.Migrate();
-            app.ApplicationServices.TestExternalSystems();
+            app.ApplicationServices.RunAll();
 
             app.UseMyCors();
             app.UseMyForwardingRules();

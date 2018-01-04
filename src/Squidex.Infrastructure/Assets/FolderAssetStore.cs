@@ -14,7 +14,7 @@ using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.Assets
 {
-    public sealed class FolderAssetStore : IAssetStore, IExternalSystem
+    public sealed class FolderAssetStore : IAssetStore, IInitializable
     {
         private readonly ISemanticLog log;
         private readonly DirectoryInfo directory;
@@ -29,7 +29,7 @@ namespace Squidex.Infrastructure.Assets
             directory = new DirectoryInfo(path);
         }
 
-        public void Connect()
+        public void Initialize()
         {
             try
             {

@@ -42,7 +42,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         [Fact]
         public void Should_activate_all_actors()
         {
-            sut.Connect();
+            sut.Run();
 
             A.CallTo(() => actor1.Activate(consumer1))
                 .MustHaveHappened();
@@ -54,7 +54,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         [Fact]
         public void Should_start_correct_actor()
         {
-            sut.Connect();
+            sut.Run();
 
             pubSub.Publish(new StartConsumerMessage { ConsumerName = consumerName1 }, true);
 
@@ -68,7 +68,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         [Fact]
         public void Should_stop_correct_actor()
         {
-            sut.Connect();
+            sut.Run();
 
             pubSub.Publish(new StopConsumerMessage { ConsumerName = consumerName1 }, true);
 
@@ -82,7 +82,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         [Fact]
         public void Should_reset_correct_actor()
         {
-            sut.Connect();
+            sut.Run();
 
             pubSub.Publish(new ResetConsumerMessage { ConsumerName = consumerName2 }, true);
 
@@ -96,7 +96,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         [Fact]
         public async Task Should_get_state_from_all_actors()
         {
-            sut.Connect();
+            sut.Run();
 
             A.CallTo(() => actor1.GetState())
                 .Returns(new EventConsumerInfo { Name = consumerName1, Position = "123 " });

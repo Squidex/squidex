@@ -15,7 +15,7 @@ using EventStore.ClientAPI;
 
 namespace Squidex.Infrastructure.EventSourcing
 {
-    public sealed class GetEventStore : IEventStore, IExternalSystem
+    public sealed class GetEventStore : IEventStore, IInitializable
     {
         private const int WritePageSize = 500;
         private const int ReadPageSize = 500;
@@ -37,7 +37,7 @@ namespace Squidex.Infrastructure.EventSourcing
         {
         }
 
-        public void Connect()
+        public void Initialize()
         {
             try
             {

@@ -10,7 +10,7 @@ using Squidex.Infrastructure.Log.Internal;
 
 namespace Squidex.Infrastructure.Log
 {
-    public sealed class FileChannel : DisposableObjectBase, ILogChannel, IExternalSystem
+    public sealed class FileChannel : DisposableObjectBase, ILogChannel, IInitializable
     {
         private readonly FileLogProcessor processor;
 
@@ -34,7 +34,7 @@ namespace Squidex.Infrastructure.Log
             processor.EnqueueMessage(new LogMessageEntry { Message = message });
         }
 
-        public void Connect()
+        public void Initialize()
         {
             processor.Connect();
         }

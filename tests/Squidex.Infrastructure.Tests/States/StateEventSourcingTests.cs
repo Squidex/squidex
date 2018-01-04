@@ -88,7 +88,7 @@ namespace Squidex.Infrastructure.States
                 .Returns(key);
 
             sut = new StateFactory(pubSub, cache, eventStore, eventDataFormatter, services, streamNameResolver);
-            sut.Connect();
+            sut.Initialize();
         }
 
         [Fact]

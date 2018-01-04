@@ -44,9 +44,9 @@ namespace Squidex.Config.Domain
                 services.AddTransient<EventConsumerGrain>();
 
                 services.AddSingletonAs<EventConsumerGrainManager>()
-                    .As<IExternalSystem>();
+                    .As<IRunnable>();
                 services.AddSingletonAs<RuleDequeuer>()
-                    .As<IExternalSystem>();
+                    .As<IRunnable>();
             }
 
             var exposeSourceUrl = config.GetOptionalValue("assetStore:exposeSourceUrl", true);
@@ -58,7 +58,7 @@ namespace Squidex.Config.Domain
                 .As<IGraphQLUrlGenerator>();
 
             services.AddSingletonAs<StateFactory>()
-                .As<IExternalSystem>()
+                .As<IInitializable>()
                 .As<IStateFactory>();
 
             services.AddSingletonAs(c => c.GetService<IOptions<MyUsageOptions>>()?.Value?.Plans.OrEmpty());
