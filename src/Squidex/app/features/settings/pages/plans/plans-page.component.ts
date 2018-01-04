@@ -28,7 +28,7 @@ export class PlansPageComponent implements OnDestroy, OnInit {
     private queryParamsSubscription: Subscription;
     private overridePlanId: string;
 
-    public portalUrl = this.apiUrl.buildUrl('/identity-server/account/portal');
+    public portalUrl = this.apiUrl.buildUrl('/portal/');
 
     public plans: AppPlansDto;
     public planOwned = false;
