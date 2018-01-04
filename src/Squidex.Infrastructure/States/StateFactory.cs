@@ -15,7 +15,7 @@ using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Infrastructure.States
 {
-    public sealed class StateFactory : DisposableObjectBase, IExternalSystem, IStateFactory
+    public sealed class StateFactory : DisposableObjectBase, IInitializable, IStateFactory
     {
         private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(10);
         private readonly IPubSub pubSub;
@@ -70,7 +70,7 @@ namespace Squidex.Infrastructure.States
             this.streamNameResolver = streamNameResolver;
         }
 
-        public void Connect()
+        public void Initialize()
         {
             pubSubSubscription = pubSub.Subscribe<InvalidateMessage>(m =>
             {

@@ -16,13 +16,23 @@ namespace Squidex.Config.Domain
 {
     public static class SystemExtensions
     {
-        public static void TestExternalSystems(this IServiceProvider services)
+        public static void InitializeAll(this IServiceProvider services)
         {
-            var systems = services.GetRequiredService<IEnumerable<IExternalSystem>>();
+            var systems = services.GetRequiredService<IEnumerable<IInitializable>>();
 
             foreach (var system in systems)
             {
-                system.Connect();
+                system.Initialize();
+            }
+        }
+
+        public static void RunAll(this IServiceProvider services)
+        {
+            var systems = services.GetRequiredService<IEnumerable<IRunnable>>();
+
+            foreach (var system in systems)
+            {
+                system.Run();
             }
         }
 

@@ -75,7 +75,7 @@ namespace Squidex.Infrastructure.States
                 .Returns(snapshotStore);
 
             sut = new StateFactory(pubSub, cache, eventStore, eventDataFormatter, services, streamNameResolver);
-            sut.Connect();
+            sut.Initialize();
         }
 
         public void Dispose()

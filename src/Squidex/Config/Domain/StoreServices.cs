@@ -64,74 +64,74 @@ namespace Squidex.Config.Domain
 
                     services.AddSingletonAs(c => new MongoXmlRepository(mongoDatabase))
                         .As<IXmlRepository>()
-                        .As<IExternalSystem>();
+                        .As<IInitializable>();
 
                     services.AddSingletonAs(c => new MongoMigrationStatus(mongoDatabase))
                         .As<IMigrationStatus>()
-                        .As<IExternalSystem>();
+                        .As<IInitializable>();
 
                     services.AddSingletonAs(c => new MongoSnapshotStore<EventConsumerState, string>(mongoDatabase, c.GetRequiredService<JsonSerializer>()))
                         .As<ISnapshotStore<EventConsumerState, string>>()
-                        .As<IExternalSystem>();
+                        .As<IInitializable>();
 
                     services.AddSingletonAs(c => new MongoUserStore(mongoDatabase))
                         .As<IUserStore<IUser>>()
                         .As<IUserFactory>()
                         .As<IUserResolver>()
-                        .As<IExternalSystem>();
+                        .As<IInitializable>();
 
                     services.AddSingletonAs(c => new MongoRoleStore(mongoDatabase))
                         .As<IRoleStore<IRole>>()
                         .As<IRoleFactory>()
-                        .As<IExternalSystem>();
+                        .As<IInitializable>();
 
                     services.AddSingletonAs(c => new MongoPersistedGrantStore(mongoDatabase))
                         .As<IPersistedGrantStore>()
-                        .As<IExternalSystem>();
+                        .As<IInitializable>();
 
                     services.AddSingletonAs(c => new MongoUsageStore(mongoDatabase))
                         .As<IUsageStore>()
-                        .As<IExternalSystem>();
+                        .As<IInitializable>();
 
                     services.AddSingletonAs(c => new MongoRuleEventRepository(mongoDatabase))
                         .As<IRuleEventRepository>()
-                        .As<IExternalSystem>();
+                        .As<IInitializable>();
 
                     services.AddSingletonAs(c => new MongoAppRepository(mongoDatabase))
                         .As<IAppRepository>()
                         .As<ISnapshotStore<AppState, Guid>>()
-                        .As<IExternalSystem>();
+                        .As<IInitializable>();
 
                     services.AddSingletonAs(c => new MongoAssetRepository(mongoDatabase))
                         .As<IAssetRepository>()
                         .As<ISnapshotStore<AssetState, Guid>>()
-                        .As<IExternalSystem>();
+                        .As<IInitializable>();
 
                     services.AddSingletonAs(c => new MongoRuleRepository(mongoDatabase))
                         .As<IRuleRepository>()
                         .As<ISnapshotStore<RuleState, Guid>>()
-                        .As<IExternalSystem>();
+                        .As<IInitializable>();
 
                     services.AddSingletonAs(c => new MongoSchemaRepository(mongoDatabase))
                         .As<ISchemaRepository>()
                         .As<ISnapshotStore<SchemaState, Guid>>()
-                        .As<IExternalSystem>();
+                        .As<IInitializable>();
 
                     services.AddSingletonAs(c => new MongoContentRepository(mongoContentDatabase, c.GetService<IAppProvider>()))
                         .As<IContentRepository>()
                         .As<ISnapshotStore<ContentState, Guid>>()
                         .As<IEventConsumer>()
-                        .As<IExternalSystem>();
+                        .As<IInitializable>();
 
                     services.AddSingletonAs(c => new MongoHistoryEventRepository(mongoDatabase, c.GetServices<IHistoryEventsCreator>()))
                         .As<IHistoryEventRepository>()
                         .As<IEventConsumer>()
-                        .As<IExternalSystem>();
+                        .As<IInitializable>();
 
                     services.AddSingletonAs(c => new MongoAssetStatsRepository(mongoDatabase))
                         .As<IAssetStatsRepository>()
                         .As<IEventConsumer>()
-                        .As<IExternalSystem>();
+                        .As<IInitializable>();
                 }
             });
         }

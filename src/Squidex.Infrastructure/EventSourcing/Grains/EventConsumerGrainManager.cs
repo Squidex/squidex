@@ -15,7 +15,7 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Infrastructure.EventSourcing.Grains
 {
-    public sealed class EventConsumerGrainManager : DisposableObjectBase, IExternalSystem
+    public sealed class EventConsumerGrainManager : DisposableObjectBase, IRunnable
     {
         private readonly IStateFactory factory;
         private readonly IPubSub pubSub;
@@ -33,7 +33,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             this.consumers = consumers.ToList();
         }
 
-        public void Connect()
+        public void Run()
         {
             var actors = new Dictionary<string, EventConsumerGrain>();
 

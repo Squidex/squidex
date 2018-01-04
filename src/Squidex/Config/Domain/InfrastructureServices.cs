@@ -45,7 +45,7 @@ namespace Squidex.Config.Domain
             {
                 services.AddSingletonAs(new FileChannel(loggingFile))
                     .As<ILogChannel>()
-                    .As<IExternalSystem>();
+                    .As<IInitializable>();
             }
 
             services.AddSingletonAs(c => new ApplicationInfoLogAppender(typeof(Program).Assembly, Guid.NewGuid()))

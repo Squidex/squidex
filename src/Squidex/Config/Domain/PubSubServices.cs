@@ -33,7 +33,7 @@ namespace Squidex.Config.Domain
 
                     services.AddSingletonAs(c => new RedisPubSub(redis, c.GetRequiredService<ISemanticLog>()))
                         .As<IPubSub>()
-                        .As<IExternalSystem>();
+                        .As<IInitializable>();
                 }
             });
         }
