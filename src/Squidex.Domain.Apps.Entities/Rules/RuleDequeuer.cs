@@ -21,7 +21,7 @@ using Squidex.Infrastructure.Timers;
 
 namespace Squidex.Domain.Apps.Entities.Rules
 {
-    public class RuleDequeuer : DisposableObjectBase, IExternalSystem
+    public class RuleDequeuer : DisposableObjectBase, IRunnable
     {
         private readonly ActionBlock<IRuleEventEntity> requestBlock;
         private readonly IRuleEventRepository ruleEventRepository;
@@ -63,7 +63,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
             }
         }
 
-        public void Connect()
+        public void Run()
         {
         }
 

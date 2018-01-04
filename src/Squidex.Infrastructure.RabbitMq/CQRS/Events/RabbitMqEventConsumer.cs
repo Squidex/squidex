@@ -15,7 +15,7 @@ using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.EventSourcing
 {
-    public sealed class RabbitMqEventConsumer : DisposableObjectBase, IExternalSystem, IEventConsumer
+    public sealed class RabbitMqEventConsumer : DisposableObjectBase, IInitializable, IEventConsumer
     {
         private readonly JsonSerializerSettings serializerSettings;
         private readonly string eventPublisherName;
@@ -61,7 +61,7 @@ namespace Squidex.Infrastructure.EventSourcing
             }
         }
 
-        public void Connect()
+        public void Initialize()
         {
             try
             {

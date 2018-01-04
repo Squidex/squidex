@@ -13,7 +13,7 @@ using StackExchange.Redis;
 
 namespace Squidex.Infrastructure
 {
-    public sealed class RedisPubSub : IPubSub, IExternalSystem
+    public sealed class RedisPubSub : IPubSub, IInitializable
     {
         private readonly ConcurrentDictionary<string, object> subscriptions = new ConcurrentDictionary<string, object>();
         private readonly Lazy<IConnectionMultiplexer> redisClient;
@@ -31,7 +31,7 @@ namespace Squidex.Infrastructure
             redisSubscriber = new Lazy<ISubscriber>(() => redis.Value.GetSubscriber());
         }
 
-        public void Connect()
+        public void Initialize()
         {
             try
             {

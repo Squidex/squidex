@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  IExternalSystem.cs
+//  IInitializable.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -8,8 +8,8 @@
 
 namespace Squidex.Infrastructure
 {
-    public interface IExternalSystem
+    public interface IInitializable
     {
-        void Connect();
+        void Initialize();
     }
 }
