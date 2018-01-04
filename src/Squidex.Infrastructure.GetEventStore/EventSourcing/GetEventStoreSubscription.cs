@@ -33,7 +33,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
             this.eventStoreConnection = eventStoreConnection;
             this.eventSubscriber = eventSubscriber;
-            this.position = ProjectionHelper.ParsePosition(position);
+            this.position = ProjectionHelper.ParsePositionOrNull(position);
 
             var streamName = eventStoreConnection.CreateProjectionAsync(projectionHost, prefix, streamFilter).Result;
 

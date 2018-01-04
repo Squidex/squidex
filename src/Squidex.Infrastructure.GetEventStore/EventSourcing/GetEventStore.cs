@@ -58,7 +58,7 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             var streamName = await connection.CreateProjectionAsync(projectionHost, prefix, streamFilter);
 
-            var sliceStart = ProjectionHelper.ParsePosition(position) ?? -1;
+            var sliceStart = ProjectionHelper.ParsePosition(position);
 
             StreamEventsSlice currentSlice;
             do
