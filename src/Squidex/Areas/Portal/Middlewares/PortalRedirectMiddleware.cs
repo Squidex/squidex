@@ -6,10 +6,10 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Squidex.Domain.Apps.Entities.Apps.Services;
-using Squidex.Infrastructure.Security;
 
 namespace Squidex.Areas.Portal.Middlewares
 {
@@ -26,9 +26,12 @@ namespace Squidex.Areas.Portal.Middlewares
         {
             if (context.Request.Path == "/")
             {
-                var userId = context.User.FindFirst(OpenIdClaims.Subject).Value;
+                var userIdClaim = context.User.FindFirst(ClaimTypes.NameIdentifier);
 
-                context.Response.RedirectToAbsoluteUrl(await appPlansBillingManager.GetPortalLinkAsync(userId));
+                if (userIdClaim != null)
+                {
+                    context.Response.RedirectToAbsoluteUrl(await appPlansBillingManager.GetPortalLinkAsync(userIdClaim.Value));
+                }
             }
         }
     }

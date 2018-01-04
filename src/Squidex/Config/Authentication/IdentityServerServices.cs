@@ -51,6 +51,7 @@ namespace Squidex.Config.Authentication
                     options.ClientSecret = Constants.InternalClientSecret;
                     options.RequireHttpsMetadata = identityOptions.RequiresHttps;
                     options.SaveTokens = true;
+                    options.Scope.Add(Constants.ProfileScope);
                     options.Scope.Add(Constants.RoleScope);
                     options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                 });

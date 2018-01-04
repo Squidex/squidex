@@ -29,13 +29,17 @@ namespace Squidex.Areas.Portal.Middlewares
 
             if (!authentication.Succeeded)
             {
-                await context.ChallengeAsync(OpenIdConnectDefaults.AuthenticationScheme, new AuthenticationProperties
+                var properties = new AuthenticationProperties
                 {
                     RedirectUri = context.Request.PathBase + context.Request.Path
-                });
+                };
+
+                await context.ChallengeAsync(OpenIdConnectDefaults.AuthenticationScheme, properties);
             }
             else
             {
+                context.User = authentication.Principal;
+
                 await next(context);
             }
         }
