@@ -29,14 +29,12 @@ namespace Squidex.Infrastructure.EventSourcing
             return string.Format(CultureInfo.InvariantCulture, ProjectionName, prefix.Simplify(), filter.Simplify());
         }
 
-        public static async Task<string> CreateProjectionAsync(this IEventStoreConnection connection, string projectionHost, string prefix, string streamFilter = null)
+        public static async Task<string> CreateProjectionAsync(this IEventStoreConnection connection, ProjectionsManager projectionsManager, string prefix, string streamFilter = null)
         {
             var streamName = ParseFilter(prefix, streamFilter);
 
             if (SubscriptionsCreated.TryAdd(streamName, true))
             {
-                var projectsManager = await ConnectToProjections(connection, projectionHost);
-
                 var projectionConfig =
                     $@"fromAll()
                         .when({{
@@ -51,7 +49,7 @@ namespace Squidex.Infrastructure.EventSourcing
                 {
                     var credentials = connection.Settings.DefaultUserCredentials;
 
-                    await projectsManager.CreateContinuousAsync($"${streamName}", projectionConfig, credentials);
+                    await projectionsManager.CreateContinuousAsync($"${streamName}", projectionConfig, credentials);
                 }
                 catch (Exception ex)
                 {
@@ -65,7 +63,7 @@ namespace Squidex.Infrastructure.EventSourcing
             return streamName;
         }
 
-        private static async Task<ProjectionsManager> ConnectToProjections(IEventStoreConnection connection, string projectionHost)
+        public static async Task<ProjectionsManager> GetProjectionsManagerAsync(this IEventStoreConnection connection, string projectionHost)
         {
             var addressParts = projectionHost.Split(':');
 

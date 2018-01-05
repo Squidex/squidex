@@ -9,6 +9,7 @@
 using System.Threading.Tasks;
 using EventStore.ClientAPI;
 using EventStore.ClientAPI.Exceptions;
+using EventStore.ClientAPI.Projections;
 using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.EventSourcing
@@ -23,7 +24,7 @@ namespace Squidex.Infrastructure.EventSourcing
         public GetEventStoreSubscription(
             IEventStoreConnection eventStoreConnection,
             IEventSubscriber eventSubscriber,
-            string projectionHost,
+            ProjectionsManager projectionsManager,
             string prefix,
             string position,
             string streamFilter)
@@ -35,7 +36,7 @@ namespace Squidex.Infrastructure.EventSourcing
             this.eventSubscriber = eventSubscriber;
             this.position = ProjectionHelper.ParsePositionOrNull(position);
 
-            var streamName = eventStoreConnection.CreateProjectionAsync(projectionHost, prefix, streamFilter).Result;
+            var streamName = eventStoreConnection.CreateProjectionAsync(projectionsManager, prefix, streamFilter).Result;
 
             subscription = SubscribeToStream(streamName);
         }

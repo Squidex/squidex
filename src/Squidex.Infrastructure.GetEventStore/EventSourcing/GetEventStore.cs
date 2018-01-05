@@ -12,6 +12,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using EventStore.ClientAPI;
+using EventStore.ClientAPI.Projections;
 
 namespace Squidex.Infrastructure.EventSourcing
 {
@@ -22,6 +23,7 @@ namespace Squidex.Infrastructure.EventSourcing
         private readonly IEventStoreConnection connection;
         private readonly string projectionHost;
         private readonly string prefix;
+        private ProjectionsManager projectionsManager;
 
         public GetEventStore(IEventStoreConnection connection, string prefix, string projectionHost)
         {
@@ -31,10 +33,6 @@ namespace Squidex.Infrastructure.EventSourcing
             this.projectionHost = projectionHost;
 
             this.prefix = prefix?.Trim(' ', '-').WithFallback("squidex");
-        }
-
-        public GetEventStore()
-        {
         }
 
         public void Initialize()
@@ -47,23 +45,34 @@ namespace Squidex.Infrastructure.EventSourcing
             {
                 throw new ConfigurationException("Cannot connect to event store.", ex);
             }
+
+            try
+            {
+                projectionsManager = connection.GetProjectionsManagerAsync(projectionHost).Result;
+
+                projectionsManager.ListAllAsync(connection.Settings.DefaultUserCredentials).Wait();
+            }
+            catch (Exception ex)
+            {
+                throw new ConfigurationException($"Cannot connect to event store projections: {projectionHost}.", ex);
+            }
         }
 
         public IEventSubscription CreateSubscription(IEventSubscriber subscriber, string streamFilter, string position = null)
         {
-            return new GetEventStoreSubscription(connection, subscriber, projectionHost, prefix, position, streamFilter);
+            return new GetEventStoreSubscription(connection, subscriber, projectionsManager, prefix, position, streamFilter);
         }
 
         public async Task GetEventsAsync(Func<StoredEvent, Task> callback, CancellationToken cancellationToken, string streamFilter = null, string position = null)
         {
-            var streamName = await connection.CreateProjectionAsync(projectionHost, prefix, streamFilter);
+            var streamName = await connection.CreateProjectionAsync(projectionsManager, prefix, streamFilter);
 
             var sliceStart = ProjectionHelper.ParsePosition(position);
 
             StreamEventsSlice currentSlice;
             do
             {
-                currentSlice = await connection.ReadStreamEventsForwardAsync(GetStreamName(streamName), sliceStart, ReadPageSize, false);
+                currentSlice = await connection.ReadStreamEventsForwardAsync(streamName, sliceStart, ReadPageSize, false);
 
                 if (currentSlice.Status == SliceReadStatus.Success)
                 {
