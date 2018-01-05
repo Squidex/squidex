@@ -31,6 +31,8 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public static async Task<string> CreateProjectionAsync(this IEventStoreConnection connection, ProjectionsManager projectionsManager, string prefix, string streamFilter = null)
         {
+            streamFilter = streamFilter ?? ".*";
+
             var streamName = ParseFilter(prefix, streamFilter);
 
             if (SubscriptionsCreated.TryAdd(streamName, true))

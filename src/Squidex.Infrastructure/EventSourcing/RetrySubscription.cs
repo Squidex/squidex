@@ -11,6 +11,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Infrastructure.Tasks;
 
+#pragma warning disable RECS0002 // Convert anonymous method to method group
+
 namespace Squidex.Infrastructure.EventSourcing
 {
     public sealed class RetrySubscription : IEventSubscription, IEventSubscriber
@@ -30,6 +32,7 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             Guard.NotNull(eventStore, nameof(eventStore));
             Guard.NotNull(eventSubscriber, nameof(eventSubscriber));
+            Guard.NotNull(streamFilter, nameof(streamFilter));
 
             this.position = position;
 

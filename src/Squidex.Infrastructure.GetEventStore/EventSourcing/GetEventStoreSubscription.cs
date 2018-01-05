@@ -30,7 +30,6 @@ namespace Squidex.Infrastructure.EventSourcing
             string streamFilter)
         {
             Guard.NotNull(eventSubscriber, nameof(eventSubscriber));
-            Guard.NotNullOrEmpty(streamFilter, nameof(streamFilter));
 
             this.eventStoreConnection = eventStoreConnection;
             this.eventSubscriber = eventSubscriber;
