@@ -72,7 +72,7 @@ namespace Squidex.Infrastructure.EventSourcing
             StreamEventsSlice currentSlice;
             do
             {
-                currentSlice = await connection.ReadStreamEventsForwardAsync(streamName, sliceStart, ReadPageSize, false);
+                currentSlice = await connection.ReadStreamEventsForwardAsync(streamName, sliceStart, ReadPageSize, true);
 
                 if (currentSlice.Status == SliceReadStatus.Success)
                 {

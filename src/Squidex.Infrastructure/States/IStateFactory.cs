@@ -24,5 +24,9 @@ namespace Squidex.Infrastructure.States
         Task<T> CreateAsync<T>(Guid key) where T : IStatefulObject<Guid>;
 
         Task<T> CreateAsync<T, TKey>(TKey key) where T : IStatefulObject<TKey>;
+
+        void Remove<T, TKey>(TKey key) where T : IStatefulObject<TKey>;
+
+        void Synchronize<T, TKey>(TKey key) where T : IStatefulObject<TKey>;
     }
 }

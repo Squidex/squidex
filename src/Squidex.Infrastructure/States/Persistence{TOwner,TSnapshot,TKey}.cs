@@ -24,8 +24,6 @@ namespace Squidex.Infrastructure.States
         private readonly IEventStore eventStore;
         private readonly IEventDataFormatter eventDataFormatter;
         private readonly PersistenceMode persistenceMode;
-        private readonly Action invalidate;
-        private readonly Action failed;
         private readonly Func<TSnapshot, Task> applyState;
         private readonly Func<Envelope<IEvent>, Task> applyEvent;
         private long versionSnapshot = EtagVersion.Empty;
@@ -38,8 +36,6 @@ namespace Squidex.Infrastructure.States
         }
 
         public Persistence(TKey ownerKey,
-            Action invalidate,
-            Action failed,
             IEventStore eventStore,
             IEventDataFormatter eventDataFormatter,
             ISnapshotStore<TSnapshot, TKey> snapshotStore,
@@ -53,8 +49,6 @@ namespace Squidex.Infrastructure.States
             this.applyEvent = applyEvent;
             this.eventStore = eventStore;
             this.eventDataFormatter = eventDataFormatter;
-            this.invalidate = invalidate;
-            this.failed = failed;
             this.persistenceMode = persistenceMode;
             this.snapshotStore = snapshotStore;
             this.streamNameResolver = streamNameResolver;
@@ -131,75 +125,53 @@ namespace Squidex.Infrastructure.States
 
         public async Task WriteSnapshotAsync(TSnapshot state)
         {
-            try
+            var newVersion = UseEventSourcing() ? versionEvents : versionSnapshot + 1;
+
+            if (newVersion != versionSnapshot)
             {
-                var newVersion = UseEventSourcing() ? versionEvents : versionSnapshot + 1;
-
-                if (newVersion != versionSnapshot)
+                try
                 {
-                    try
-                    {
-                        await snapshotStore.WriteAsync(ownerKey, state, versionSnapshot, newVersion);
-                    }
-                    catch (InconsistentStateException ex)
-                    {
-                        throw new DomainObjectVersionException(ownerKey.ToString(), typeof(TOwner), ex.CurrentVersion, ex.ExpectedVersion);
-                    }
-
-                    versionSnapshot = newVersion;
+                    await snapshotStore.WriteAsync(ownerKey, state, versionSnapshot, newVersion);
+                }
+                catch (InconsistentStateException ex)
+                {
+                    throw new DomainObjectVersionException(ownerKey.ToString(), typeof(TOwner), ex.CurrentVersion, ex.ExpectedVersion);
                 }
 
-                UpdateVersion();
-
-                invalidate?.Invoke();
+                versionSnapshot = newVersion;
             }
-            catch
-            {
-                failed?.Invoke();
 
-                throw;
-            }
+            UpdateVersion();
         }
 
         public async Task WriteEventsAsync(IEnumerable<Envelope<IEvent>> events)
         {
             Guard.NotNull(events, nameof(@events));
 
-            try
+            var eventArray = events.ToArray();
+
+            if (eventArray.Length > 0)
             {
-                var eventArray = events.ToArray();
+                var expectedVersion = UseEventSourcing() ? version : EtagVersion.Any;
 
-                if (eventArray.Length > 0)
+                var commitId = Guid.NewGuid();
+
+                var eventStream = GetStreamName();
+                var eventData = GetEventData(eventArray, commitId);
+
+                try
                 {
-                    var expectedVersion = UseEventSourcing() ? version : EtagVersion.Any;
-
-                    var commitId = Guid.NewGuid();
-
-                    var eventStream = GetStreamName();
-                    var eventData = GetEventData(eventArray, commitId);
-
-                    try
-                    {
-                        await eventStore.AppendEventsAsync(commitId, GetStreamName(), expectedVersion, eventData);
-                    }
-                    catch (WrongEventVersionException ex)
-                    {
-                        throw new DomainObjectVersionException(ownerKey.ToString(), typeof(TOwner), ex.CurrentVersion, ex.ExpectedVersion);
-                    }
-
-                    versionEvents += eventArray.Length;
+                    await eventStore.AppendEventsAsync(commitId, GetStreamName(), expectedVersion, eventData);
+                }
+                catch (WrongEventVersionException ex)
+                {
+                    throw new DomainObjectVersionException(ownerKey.ToString(), typeof(TOwner), ex.CurrentVersion, ex.ExpectedVersion);
                 }
 
-                UpdateVersion();
-
-                invalidate?.Invoke();
+                versionEvents += eventArray.Length;
             }
-            catch
-            {
-                failed?.Invoke();
 
-                throw;
-            }
+            UpdateVersion();
         }
 
         private EventData[] GetEventData(Envelope<IEvent>[] events, Guid commitId)

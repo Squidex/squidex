@@ -106,7 +106,18 @@ namespace Squidex.Infrastructure.Commands
 
                 await handler(domainObject);
 
-                await domainObject.WriteAsync();
+                try
+                {
+                    await domainObject.WriteAsync();
+
+                    stateFactory.Synchronize<T, Guid>(domainObjectId);
+                }
+                catch
+                {
+                    stateFactory.Remove<T, Guid>(domainObjectId);
+
+                    throw;
+                }
 
                 if (!context.IsCompleted)
                 {

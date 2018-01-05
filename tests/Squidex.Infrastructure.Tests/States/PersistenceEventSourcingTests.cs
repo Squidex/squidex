@@ -1,5 +1,5 @@
 ﻿// ==========================================================================
-//  StateEventSourcingTests.cs
+//  PersistenceEventSourcingTests.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex Group
@@ -20,7 +20,7 @@ using Xunit;
 
 namespace Squidex.Infrastructure.States
 {
-    public class StateEventSourcingTests
+    public class PersistenceEventSourcingTests
     {
         private class MyStatefulObject : IStatefulObject<string>
         {
@@ -73,7 +73,7 @@ namespace Squidex.Infrastructure.States
         private readonly IStreamNameResolver streamNameResolver = A.Fake<IStreamNameResolver>();
         private readonly StateFactory sut;
 
-        public StateEventSourcingTests()
+        public PersistenceEventSourcingTests()
         {
             A.CallTo(() => services.GetService(typeof(MyStatefulObject)))
                 .Returns(statefulObject);
@@ -179,7 +179,7 @@ namespace Squidex.Infrastructure.States
         }
 
         [Fact]
-        public async Task Should_not_throw_exception_if_noting_expected()
+        public async Task Should_not_throw_exception_if_nothing_expected()
         {
             statefulObject.ExpectedVersion = EtagVersion.Any;
 
@@ -189,44 +189,8 @@ namespace Squidex.Infrastructure.States
         }
 
         [Fact]
-        public async Task Should_provide_state_from_services_and_add_to_cache()
-        {
-            statefulObject.ExpectedVersion = EtagVersion.Any;
-
-            SetupEventStore(0);
-
-            var actualObject = await sut.GetSingleAsync<MyStatefulObject>(key);
-
-            Assert.Same(statefulObject, actualObject);
-            Assert.NotNull(cache.Get<object>(key));
-        }
-
-        [Fact]
-        public async Task Should_serve_next_request_from_cache()
-        {
-            SetupEventStore(0);
-
-            var actualObject1 = await sut.GetSingleAsync<MyStatefulObject>(key);
-
-            Assert.Same(statefulObject, actualObject1);
-            Assert.NotNull(cache.Get<object>(key));
-
-            var actualObject2 = await sut.GetSingleAsync<MyStatefulObject>(key);
-
-            A.CallTo(() => services.GetService(typeof(MyStatefulObject)))
-                .MustHaveHappened(Repeated.Exactly.Once);
-        }
-
-        [Fact]
         public async Task Should_write_to_store_with_previous_position()
         {
-            InvalidateMessage message = null;
-
-            pubSub.Subscribe<InvalidateMessage>(m =>
-            {
-                message = m;
-            });
-
             SetupEventStore(3);
 
             var actualObject = await sut.GetSingleAsync<MyStatefulObject>(key);
@@ -240,9 +204,6 @@ namespace Squidex.Infrastructure.States
                 .MustHaveHappened();
             A.CallTo(() => eventStore.AppendEventsAsync(A<Guid>.Ignored, key, 4, A<ICollection<EventData>>.That.Matches(x => x.Count == 2)))
                 .MustHaveHappened();
-
-            Assert.NotNull(message);
-            Assert.Equal(key, message.Key);
         }
 
         [Fact]
@@ -259,17 +220,7 @@ namespace Squidex.Infrastructure.States
         }
 
         [Fact]
-        public async Task Should_remove_from_cache_when_invalidation_message_received()
-        {
-            var actualObject = await sut.GetSingleAsync<MyStatefulObject>(key);
-
-            await InvalidateCacheAsync();
-
-            Assert.False(cache.TryGetValue(key, out var t));
-        }
-
-        [Fact]
-        public async Task Should_remove_from_cache_when_write_failed()
+        public async Task Should_not_remove_from_cache_when_write_failed()
         {
             A.CallTo(() => eventStore.AppendEventsAsync(A<Guid>.Ignored, A<string>.Ignored, A<long>.Ignored, A<ICollection<EventData>>.Ignored))
                 .Throws(new InvalidOperationException());
@@ -278,7 +229,7 @@ namespace Squidex.Infrastructure.States
 
             await Assert.ThrowsAsync<InvalidOperationException>(() => statefulObject.WriteEventsAsync(new MyEvent()));
 
-            Assert.False(cache.TryGetValue(key, out var t));
+            Assert.True(cache.TryGetValue(key, out var t));
         }
 
         [Fact]
@@ -303,20 +254,6 @@ namespace Squidex.Infrastructure.States
 
             A.CallTo(() => eventStore.GetEventsAsync(key, 0))
                 .MustHaveHappened(Repeated.Exactly.Once);
-        }
-
-        private async Task RemoveFromCacheAsync()
-        {
-            cache.Remove(key);
-
-            await Task.Delay(400);
-        }
-
-        private async Task InvalidateCacheAsync()
-        {
-            pubSub.Publish(new InvalidateMessage { Key = key }, true);
-
-            await Task.Delay(400);
         }
 
         private void SetupEventStore(int count, int eventOffset = 0, int readPosition = 0)

@@ -19,7 +19,7 @@ using Xunit;
 
 namespace Squidex.Infrastructure.States
 {
-    public class StateSnapshotTests : IDisposable
+    public class PersistenceSnapshotTests : IDisposable
     {
         private class MyStatefulObject : IStatefulObject<string>
         {
@@ -67,7 +67,7 @@ namespace Squidex.Infrastructure.States
         private readonly IStreamNameResolver streamNameResolver = A.Fake<IStreamNameResolver>();
         private readonly StateFactory sut;
 
-        public StateSnapshotTests()
+        public PersistenceSnapshotTests()
         {
             A.CallTo(() => services.GetService(typeof(MyStatefulObject)))
                 .Returns(statefulObject);
@@ -143,52 +143,8 @@ namespace Squidex.Infrastructure.States
         }
 
         [Fact]
-        public async Task Should_provide_state_from_services_and_add_to_cache()
-        {
-            var actualObject = await sut.GetSingleAsync<MyStatefulObject, string>(key);
-
-            Assert.Same(statefulObject, actualObject);
-            Assert.NotNull(cache.Get<object>(key));
-        }
-
-        [Fact]
-        public async Task Should_serve_next_request_from_cache()
-        {
-            var actualObject1 = await sut.GetSingleAsync<MyStatefulObject, string>(key);
-
-            Assert.Same(statefulObject, actualObject1);
-            Assert.NotNull(cache.Get<object>(key));
-
-            var actualObject2 = await sut.GetSingleAsync<MyStatefulObject, string>(key);
-
-            A.CallTo(() => services.GetService(typeof(MyStatefulObject)))
-                .MustHaveHappened(Repeated.Exactly.Once);
-        }
-
-        [Fact]
-        public async Task Should_not_serve_next_request_from_cache_when_detached()
-        {
-            var actualObject1 = await sut.CreateAsync<MyStatefulObject, string>(key);
-
-            Assert.Same(statefulObject, actualObject1);
-            Assert.Null(cache.Get<object>(key));
-
-            var actualObject2 = await sut.CreateAsync<MyStatefulObject, string>(key);
-
-            A.CallTo(() => services.GetService(typeof(MyStatefulObject)))
-                .MustHaveHappened(Repeated.Exactly.Twice);
-        }
-
-        [Fact]
         public async Task Should_write_to_store_with_previous_version()
         {
-            InvalidateMessage message = null;
-
-            pubSub.Subscribe<InvalidateMessage>(m =>
-            {
-                message = m;
-            });
-
             A.CallTo(() => snapshotStore.ReadAsync(key))
                 .Returns((123, 13));
 
@@ -203,9 +159,6 @@ namespace Squidex.Infrastructure.States
 
             A.CallTo(() => snapshotStore.WriteAsync(key, 456, 13, 14))
                 .MustHaveHappened();
-
-            Assert.NotNull(message);
-            Assert.Equal(key, message.Key);
         }
 
         [Fact]
@@ -223,17 +176,7 @@ namespace Squidex.Infrastructure.States
         }
 
         [Fact]
-        public async Task Should_remove_from_cache_when_invalidation_message_received()
-        {
-            var actualObject = await sut.GetSingleAsync<MyStatefulObject, string>(key);
-
-            await InvalidateCacheAsync();
-
-            Assert.False(cache.TryGetValue(key, out var t));
-        }
-
-        [Fact]
-        public async Task Should_remove_from_cache_when_write_failed()
+        public async Task Should_not_remove_from_cache_when_write_failed()
         {
             A.CallTo(() => snapshotStore.WriteAsync(A<string>.Ignored, A<int>.Ignored, A<long>.Ignored, A<long>.Ignored))
                 .Throws(new InvalidOperationException());
@@ -242,7 +185,7 @@ namespace Squidex.Infrastructure.States
 
             await Assert.ThrowsAsync<InvalidOperationException>(() => statefulObject.WriteStateAsync());
 
-            Assert.False(cache.TryGetValue(key, out var t));
+            Assert.True(cache.TryGetValue(key, out var t));
         }
 
         [Fact]
@@ -267,20 +210,6 @@ namespace Squidex.Infrastructure.States
 
             A.CallTo(() => snapshotStore.ReadAsync(key))
                 .MustHaveHappened(Repeated.Exactly.Once);
-        }
-
-        private async Task RemoveFromCacheAsync()
-        {
-            cache.Remove(key);
-
-            await Task.Delay(400);
-        }
-
-        private async Task InvalidateCacheAsync()
-        {
-            pubSub.Publish(new InvalidateMessage { Key = key }, true);
-
-            await Task.Delay(400);
         }
     }
 }

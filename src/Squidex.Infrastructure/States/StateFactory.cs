@@ -125,15 +125,7 @@ namespace Squidex.Infrastructure.States
                 }
 
                 var state = (T)services.GetService(typeof(T));
-
-                var stateStore = new Store<T, TKey>(eventStore, eventDataFormatter, services, streamNameResolver,
-                    () =>
-                    {
-                        pubSub.Publish(new InvalidateMessage { Key = key.ToString() }, false);
-                    }, () =>
-                    {
-                        statesCache.Remove(key);
-                    });
+                var stateStore = new Store<T, TKey>(eventStore, eventDataFormatter, services, streamNameResolver);
 
                 stateObj = new ObjectHolder<T, TKey>(state, key, stateStore);
 
@@ -144,6 +136,16 @@ namespace Squidex.Infrastructure.States
 
                 return stateObj.ActivateAsync();
             }
+        }
+
+        public void Remove<T, TKey>(TKey key) where T : IStatefulObject<TKey>
+        {
+            statesCache.Remove(key);
+        }
+
+        public void Synchronize<T, TKey>(TKey key) where T : IStatefulObject<TKey>
+        {
+            pubSub.Publish(new InvalidateMessage { Key = key.ToString() }, false);
         }
 
         protected override void DisposeObject(bool disposing)

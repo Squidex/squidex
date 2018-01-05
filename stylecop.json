@@ -1,0 +1,16 @@
+{
+  "$schema": "https://raw.githubusercontent.com/DotNetAnalyzers/StyleCopAnalyzers/master/StyleCop.Analyzers/StyleCop.Analyzers/Settings/stylecop.schema.json",
+  "settings": {
+    "orderingRules": {
+      "usingDirectivesPlacement": "outsideNamespace"
+    },
+    "documentationRules": {
+      "companyName": "Squidex UG (haftungsbeschraenkt)",
+      "copyrightText": "==========================================================================\n Squidex Headless CMS\n==========================================================================\n Copyright (c) {companyName}\n All rights reserved. Licensed under the {licenseName} license.\n==========================================================================",
+      "variables": {
+        "licenseName": "MIT"
+      },
+      "xmlHeader": false
+    }
+  }
+} 
