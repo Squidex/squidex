@@ -1,9 +1,8 @@
 ﻿// ==========================================================================
-//  JsonAppPattern.cs
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex Group
-//  All rights reserved.
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 using Newtonsoft.Json;
 using Squidex.Infrastructure.Reflection;
