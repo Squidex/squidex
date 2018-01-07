@@ -26,6 +26,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
     public partial class MongoContentRepository : MongoRepositoryBase<MongoContentEntity>, IContentRepository
     {
         private readonly IAppProvider appProvider;
+        private readonly IMongoCollection<MongoContentEntity> archiveCollection;
+
+        protected IMongoCollection<MongoContentEntity> ArchiveCollection
+        {
+            get { return archiveCollection; }
+        }
 
         public MongoContentRepository(IMongoDatabase database, IAppProvider appProvider)
             : base(database)
@@ -33,6 +39,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             Guard.NotNull(appProvider, nameof(appProvider));
 
             this.appProvider = appProvider;
+
+            archiveCollection = database.GetCollection<MongoContentEntity>("States_Contents_Archive");
         }
 
         protected override string CollectionName()
@@ -42,25 +50,23 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         protected override async Task SetupCollectionAsync(IMongoCollection<MongoContentEntity> collection)
         {
-            await collection.Indexes.CreateOneAsync(
+            await archiveCollection.Indexes.CreateOneAsync(
                 Index
                     .Ascending(x => x.Id)
                     .Ascending(x => x.Version));
 
             await collection.Indexes.CreateOneAsync(
                 Index
-                    .Ascending(x => x.Id)
-                    .Descending(x => x.Version));
+                    .Ascending(x => x.SchemaId)
+                    .Ascending(x => x.Status)
+                    .Text(x => x.DataText));
 
             await collection.Indexes.CreateOneAsync(
                 Index
-                    .Ascending(x => x.SchemaId)
-                    .Descending(x => x.IsLatest)
-                    .Descending(x => x.LastModified));
+                    .Ascending(x => x.Id)
+                    .Ascending(x => x.Version));
 
             await collection.Indexes.CreateOneAsync(Index.Ascending(x => x.ReferencedIds));
-            await collection.Indexes.CreateOneAsync(Index.Ascending(x => x.Status));
-            await collection.Indexes.CreateOneAsync(Index.Text(x => x.DataText));
         }
 
         public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, Status[] status, ODataUriParser odataQuery)
@@ -94,7 +100,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, Status[] status, HashSet<Guid> ids)
         {
-            var find = Collection.Find(x => ids.Contains(x.Id) && x.IsLatest);
+            var find = Collection.Find(x => ids.Contains(x.Id));
 
             var contentItems = find.ToListAsync();
             var contentCount = find.CountAsync();
@@ -121,7 +127,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         public async Task<IContentEntity> FindContentAsync(IAppEntity app, ISchemaEntity schema, Guid id, long version)
         {
             var contentEntity =
-                await Collection.Find(x => x.Id == id && x.Version >= version).SortBy(x => x.Version)
+                await ArchiveCollection.Find(x => x.Id == id && x.Version >= version).SortBy(x => x.Version)
                     .FirstOrDefaultAsync();
 
             contentEntity?.ParseData(schema.SchemaDef);
@@ -132,7 +138,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         public async Task<IContentEntity> FindContentAsync(IAppEntity app, ISchemaEntity schema, Guid id)
         {
             var contentEntity =
-                await Collection.Find(x => x.Id == id && x.IsLatest)
+                await Collection.Find(x => x.Id == id)
                     .FirstOrDefaultAsync();
 
             contentEntity?.ParseData(schema.SchemaDef);

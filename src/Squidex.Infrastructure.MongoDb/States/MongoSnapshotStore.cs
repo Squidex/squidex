@@ -44,34 +44,9 @@ namespace Squidex.Infrastructure.States
             return (default(T), EtagVersion.NotFound);
         }
 
-        public async Task WriteAsync(TKey key, T value, long oldVersion, long newVersion)
+        public Task WriteAsync(TKey key, T value, long oldVersion, long newVersion)
         {
-            try
-            {
-                await Collection.UpdateOneAsync(x => Equals(x.Id, key) && x.Version == oldVersion,
-                    Update
-                        .Set(x => x.Doc, value)
-                        .Set(x => x.Version, newVersion),
-                    Upsert);
-            }
-            catch (MongoWriteException ex)
-            {
-                if (ex.WriteError.Category == ServerErrorCategory.DuplicateKey)
-                {
-                    var existingVersion =
-                        await Collection.Find(x => Equals(x.Id, key)).Only(x => x.Id, x => x.Version)
-                            .FirstOrDefaultAsync();
-
-                    if (existingVersion != null)
-                    {
-                        throw new InconsistentStateException(existingVersion["Version"].AsInt64, oldVersion, ex);
-                    }
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            return Collection.UpsertVersionedAsync(key, oldVersion, newVersion, u => u.Set(x => x.Doc, value));
         }
     }
 }

@@ -87,10 +87,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         [BsonElement("mb")]
         public RefToken LastModifiedBy { get; set; }
 
-        [BsonRequired]
-        [BsonElement("lt")]
-        public bool IsLatest { get; set; }
-
         [BsonIgnore]
         public NamedContentData Data
         {

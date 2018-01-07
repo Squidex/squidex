@@ -41,8 +41,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         public async Task WriteAsync(Guid key, ContentState value, long oldVersion, long newVersion)
         {
-            var documentId = $"{key}_{newVersion}";
-
             if (value.SchemaId == Guid.Empty)
             {
                 return;
@@ -52,12 +50,13 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
             var idData = value.Data?.ToIdModel(schema.SchemaDef, true);
 
+            var id = key.ToString();
+
             var document = SimpleMapper.Map(value, new MongoContentEntity
             {
-                DocumentId = documentId,
+                DocumentId = key.ToString(),
                 DataText = idData?.ToFullText(),
                 DataByIds = idData,
-                IsLatest = !value.IsDeleted,
                 ReferencedIds = idData?.ToReferencedIds(schema.SchemaDef),
             });
 
@@ -65,15 +64,14 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
             try
             {
-                await Collection.InsertOneAsync(document);
-                await Collection.UpdateManyAsync(x => x.Id == value.Id && x.Version < value.Version, Update.Set(x => x.IsLatest, false));
+                await Collection.ReplaceOneAsync(x => x.DocumentId == id && x.Version == oldVersion, document, Upsert);
             }
             catch (MongoWriteException ex)
             {
                 if (ex.WriteError.Category == ServerErrorCategory.DuplicateKey)
                 {
                     var existingVersion =
-                        await Collection.Find(x => x.Id == value.Id && x.IsLatest).Only(x => x.Id, x => x.Version)
+                        await Collection.Find(x => x.DocumentId == id).Only(x => x.DocumentId, x => x.Version)
                             .FirstOrDefaultAsync();
 
                     if (existingVersion != null)
@@ -86,6 +84,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                     throw;
                 }
             }
+
+            document.DocumentId = $"{key}_{newVersion}";
+
+            await ArchiveCollection.ReplaceOneAsync(x => x.DocumentId == document.DocumentId, document, Upsert);
         }
 
         private async Task<ISchemaEntity> GetSchemaAsync(Guid appId, Guid schemaId)

@@ -10,10 +10,11 @@ using System;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using Squidex.Domain.Apps.Entities.Assets.State;
+using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 {
-    public sealed class MongoAssetEntity
+    public sealed class MongoAssetEntity : IVersionedEntity<Guid>
     {
         [BsonId]
         [BsonElement]
@@ -26,6 +27,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 
         [BsonElement]
         [BsonRequired]
-        public int Version { get; set; }
+        public long Version { get; set; }
     }
 }

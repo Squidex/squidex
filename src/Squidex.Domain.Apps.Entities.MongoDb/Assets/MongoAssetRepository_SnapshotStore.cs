@@ -32,34 +32,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             return (null, EtagVersion.NotFound);
         }
 
-        public async Task WriteAsync(Guid key, AssetState value, long oldVersion, long newVersion)
+        public Task WriteAsync(Guid key, AssetState value, long oldVersion, long newVersion)
         {
-            try
-            {
-                await Collection.UpdateOneAsync(x => x.Id == key && x.Version == oldVersion,
-                    Update
-                        .Set(x => x.State, value)
-                        .Set(x => x.Version, newVersion),
-                    Upsert);
-            }
-            catch (MongoWriteException ex)
-            {
-                if (ex.WriteError.Category == ServerErrorCategory.DuplicateKey)
-                {
-                    var existingVersion =
-                        await Collection.Find(x => x.Id == key).Only(x => x.Id, x => x.Version)
-                            .FirstOrDefaultAsync();
-
-                    if (existingVersion != null)
-                    {
-                        throw new InconsistentStateException(existingVersion["Version"].AsInt64, oldVersion, ex);
-                    }
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            return Collection.UpsertVersionedAsync(key, oldVersion, newVersion, u => u.Set(x => x.State, value));
         }
     }
 }

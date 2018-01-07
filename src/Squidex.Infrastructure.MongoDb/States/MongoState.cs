@@ -12,7 +12,7 @@ using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Infrastructure.States
 {
-    public sealed class MongoState<T, TKey>
+    public sealed class MongoState<T, TKey> : IVersionedEntity<TKey>
     {
         [BsonId]
         [BsonElement]

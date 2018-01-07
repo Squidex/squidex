@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Entities.Apps.State;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Apps
@@ -32,36 +33,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Apps
             return (null, EtagVersion.NotFound);
         }
 
-        public async Task WriteAsync(Guid key, AppState value, long oldVersion, long newVersion)
+        public Task WriteAsync(Guid key, AppState value, long oldVersion, long newVersion)
         {
-            try
-            {
-                await Collection.UpdateOneAsync(x => x.Id == key && x.Version == oldVersion,
-                    Update
-                        .Set(x => x.UserIds, value.Contributors.Keys.ToArray())
-                        .Set(x => x.Name, value.Name)
-                        .Set(x => x.State, value)
-                        .Set(x => x.Version, newVersion),
-                    Upsert);
-            }
-            catch (MongoWriteException ex)
-            {
-                if (ex.WriteError.Category == ServerErrorCategory.DuplicateKey)
-                {
-                    var existingVersion =
-                        await Collection.Find(x => x.Id == key)
-                            .Project<MongoAppEntity>(Projection.Exclude(x => x.Id)).FirstOrDefaultAsync();
-
-                    if (existingVersion != null)
-                    {
-                        throw new InconsistentStateException(existingVersion.Version, oldVersion, ex);
-                    }
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            return Collection.UpsertVersionedAsync(key, oldVersion, newVersion, u => u
+                .Set(x => x.Name, value.Name)
+                .Set(x => x.State, value)
+                .Set(x => x.UserIds, value.Contributors.Keys.ToArray()));
         }
     }
 }

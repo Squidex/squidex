@@ -14,7 +14,7 @@ using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Schemas
 {
-    public sealed class MongoSchemaEntity
+    public sealed class MongoSchemaEntity : IVersionedEntity<Guid>
     {
         [BsonId]
         [BsonElement]
@@ -37,7 +37,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Schemas
 
         [BsonElement]
         [BsonRequired]
-        public int Version { get; set; }
+        public long Version { get; set; }
 
         [BsonElement]
         [BsonRequired]
