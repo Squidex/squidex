@@ -6,29 +6,31 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Infrastructure.Migrations;
 
 namespace Migrate_01
 {
-    public sealed class Migration01_FromCqrs : IMigration
+    public class Migration03_SplitContentCollections : IMigration
     {
         private readonly Rebuilder rebuilder;
 
-        public int FromVersion { get; } = 0;
+        public int FromVersion { get; } = 2;
 
-        public int ToVersion { get; } = 1;
+        public int ToVersion { get; } = 3;
 
-        public Migration01_FromCqrs(Rebuilder rebuilder)
+        public Migration03_SplitContentCollections(Rebuilder rebuilder)
         {
             this.rebuilder = rebuilder;
         }
 
         public async Task UpdateAsync(IEnumerable<IMigration> previousMigrations)
         {
-            await rebuilder.RebuildConfigAsync();
-            await rebuilder.RebuildContentAsync();
-            await rebuilder.RebuildAssetsAsync();
+            if (!previousMigrations.Any(x => x is Migration01_FromCqrs))
+            {
+                await rebuilder.RebuildContentAsync();
+            }
         }
     }
 }

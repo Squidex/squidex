@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
@@ -33,7 +34,7 @@ namespace Migrate_01
             this.stateFactory = stateFactory;
         }
 
-        public async Task UpdateAsync()
+        public async Task UpdateAsync(IEnumerable<IMigration> previousMigrations)
         {
             var ids = await appRepository.QueryAppIdsAsync();
 

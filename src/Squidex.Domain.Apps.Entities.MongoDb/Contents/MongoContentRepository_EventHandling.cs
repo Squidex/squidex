@@ -10,7 +10,6 @@ using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 {
@@ -24,11 +23,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         public string EventsFilter
         {
             get { return "^(content-)|(asset-)"; }
-        }
-
-        public override Task ClearAsync()
-        {
-            return TaskHelper.Done;
         }
 
         public Task On(Envelope<IEvent> @event)

@@ -56,9 +56,11 @@ namespace Squidex.Infrastructure.Migrations
                 {
                     var migrationPath = FindMigratorPath(version, lastMigrator.ToVersion).ToList();
 
-                    foreach (var migrator in migrationPath)
+                    var previousMigrations = new List<IMigration>();
+
+                    foreach (var migration in migrationPath)
                     {
-                        var name = migrator.GetType().ToString();
+                        var name = migration.GetType().ToString();
 
                         log.LogInformation(w => w
                             .WriteProperty("action", "Migration")
@@ -70,10 +72,12 @@ namespace Squidex.Infrastructure.Migrations
                             .WriteProperty("status", "Completed")
                             .WriteProperty("migrator", name)))
                         {
-                            await migrator.UpdateAsync();
+                            await migration.UpdateAsync(previousMigrations.ToList());
 
-                            version = migrator.ToVersion;
+                            version = migration.ToVersion;
                         }
+
+                        previousMigrations.Add(migration);
                     }
                 }
             }

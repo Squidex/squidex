@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FakeItEasy;
@@ -78,9 +79,9 @@ namespace Squidex.Infrastructure.Migrations
 
             await migrator.MigrateAsync();
 
-            A.CallTo(() => migrator_0_1.UpdateAsync()).MustHaveHappened();
-            A.CallTo(() => migrator_1_2.UpdateAsync()).MustHaveHappened();
-            A.CallTo(() => migrator_2_3.UpdateAsync()).MustHaveHappened();
+            A.CallTo(() => migrator_0_1.UpdateAsync(A<IEnumerable<IMigration>>.That.IsEmpty())).MustHaveHappened();
+            A.CallTo(() => migrator_1_2.UpdateAsync(A<IEnumerable<IMigration>>.That.IsSameSequenceAs(migrator_0_1))).MustHaveHappened();
+            A.CallTo(() => migrator_2_3.UpdateAsync(A<IEnumerable<IMigration>>.That.IsSameSequenceAs(migrator_0_1, migrator_1_2))).MustHaveHappened();
 
             A.CallTo(() => status.UnlockAsync(3)).MustHaveHappened();
         }
@@ -94,13 +95,13 @@ namespace Squidex.Infrastructure.Migrations
 
             var migrator = new Migrator(status, new[] { migrator_0_1, migrator_1_2, migrator_2_3 }, log);
 
-            A.CallTo(() => migrator_1_2.UpdateAsync()).Throws(new ArgumentException());
+            A.CallTo(() => migrator_1_2.UpdateAsync(A<IEnumerable<IMigration>>.Ignored)).Throws(new ArgumentException());
 
             await Assert.ThrowsAsync<ArgumentException>(migrator.MigrateAsync);
 
-            A.CallTo(() => migrator_0_1.UpdateAsync()).MustHaveHappened();
-            A.CallTo(() => migrator_1_2.UpdateAsync()).MustHaveHappened();
-            A.CallTo(() => migrator_2_3.UpdateAsync()).MustNotHaveHappened();
+            A.CallTo(() => migrator_0_1.UpdateAsync(A<IEnumerable<IMigration>>.That.IsEmpty())).MustHaveHappened();
+            A.CallTo(() => migrator_1_2.UpdateAsync(A<IEnumerable<IMigration>>.That.IsSameSequenceAs(migrator_0_1))).MustHaveHappened();
+            A.CallTo(() => migrator_2_3.UpdateAsync(A<IEnumerable<IMigration>>.Ignored)).MustNotHaveHappened();
 
             A.CallTo(() => status.UnlockAsync(1)).MustHaveHappened();
         }
@@ -117,10 +118,10 @@ namespace Squidex.Infrastructure.Migrations
 
             await migrator.MigrateAsync();
 
-            A.CallTo(() => migrator_0_2.UpdateAsync()).MustHaveHappened();
-            A.CallTo(() => migrator_0_1.UpdateAsync()).MustNotHaveHappened();
-            A.CallTo(() => migrator_1_2.UpdateAsync()).MustNotHaveHappened();
-            A.CallTo(() => migrator_2_3.UpdateAsync()).MustHaveHappened();
+            A.CallTo(() => migrator_0_2.UpdateAsync(A<IEnumerable<IMigration>>.That.IsEmpty())).MustHaveHappened();
+            A.CallTo(() => migrator_0_1.UpdateAsync(A<IEnumerable<IMigration>>.Ignored)).MustNotHaveHappened();
+            A.CallTo(() => migrator_1_2.UpdateAsync(A<IEnumerable<IMigration>>.Ignored)).MustNotHaveHappened();
+            A.CallTo(() => migrator_2_3.UpdateAsync(A<IEnumerable<IMigration>>.That.IsSameSequenceAs(migrator_0_2))).MustHaveHappened();
 
             A.CallTo(() => status.UnlockAsync(3)).MustHaveHappened();
         }
@@ -135,8 +136,8 @@ namespace Squidex.Infrastructure.Migrations
 
             await Assert.ThrowsAsync<InvalidOperationException>(migrator.MigrateAsync);
 
-            A.CallTo(() => migrator_0_1.UpdateAsync()).MustNotHaveHappened();
-            A.CallTo(() => migrator_2_3.UpdateAsync()).MustNotHaveHappened();
+            A.CallTo(() => migrator_0_1.UpdateAsync(A<IEnumerable<IMigration>>.Ignored)).MustNotHaveHappened();
+            A.CallTo(() => migrator_2_3.UpdateAsync(A<IEnumerable<IMigration>>.Ignored)).MustNotHaveHappened();
 
             A.CallTo(() => status.UnlockAsync(0)).MustHaveHappened();
         }
@@ -151,8 +152,8 @@ namespace Squidex.Infrastructure.Migrations
 
             await Task.WhenAll(Enumerable.Repeat(0, 10).Select(x => Task.Run(migrator.MigrateAsync)));
 
-            A.CallTo(() => migrator_0_1.UpdateAsync()).MustHaveHappened(Repeated.Exactly.Once);
-            A.CallTo(() => migrator_1_2.UpdateAsync()).MustHaveHappened(Repeated.Exactly.Once);
+            A.CallTo(() => migrator_0_1.UpdateAsync(A<IEnumerable<IMigration>>.Ignored)).MustHaveHappened(Repeated.Exactly.Once);
+            A.CallTo(() => migrator_1_2.UpdateAsync(A<IEnumerable<IMigration>>.Ignored)).MustHaveHappened(Repeated.Exactly.Once);
         }
 
         private IMigration BuildMigration(int fromVersion, int toVersion)

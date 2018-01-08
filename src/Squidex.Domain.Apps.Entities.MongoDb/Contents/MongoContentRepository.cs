@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.OData.UriParser;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Apps;
@@ -143,6 +144,13 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             contentEntity?.ParseData(schema.SchemaDef);
 
             return contentEntity;
+        }
+
+        public override async Task ClearAsync()
+        {
+            await ArchiveCollection.DeleteManyAsync(new BsonDocument());
+
+            await base.ClearAsync();
         }
     }
 }

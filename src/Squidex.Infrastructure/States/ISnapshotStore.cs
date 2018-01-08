@@ -14,5 +14,7 @@ namespace Squidex.Infrastructure.States
         Task WriteAsync(TKey key, T value, long oldVersion, long newVersion);
 
         Task<(T Value, long Version)> ReadAsync(TKey key);
+
+        Task ClearAsync();
     }
 }

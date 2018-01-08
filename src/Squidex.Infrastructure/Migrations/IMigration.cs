@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Squidex.Infrastructure.Migrations
@@ -15,6 +16,6 @@ namespace Squidex.Infrastructure.Migrations
 
         int ToVersion { get; }
 
-        Task UpdateAsync();
+        Task UpdateAsync(IEnumerable<IMigration> previousMigrations);
     }
 }
