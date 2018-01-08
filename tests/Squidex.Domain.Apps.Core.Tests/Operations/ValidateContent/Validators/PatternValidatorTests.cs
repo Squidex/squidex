@@ -68,5 +68,16 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
             errors.ShouldBeEquivalentTo(
                 new[] { "Custom Error Message." });
         }
+
+        [Fact]
+        public async Task Should_add_timeout_error_when_regex_is_too_slow()
+        {
+            var sut = new PatternValidator(@"^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$");
+
+            await sut.ValidateAsync("https://archiverbx.blob.core.windows.net/static/C:/Users/USR/Documents/Projects/PROJ/static/images/full/1234567890.jpg", errors);
+
+            errors.ShouldBeEquivalentTo(
+                new[] { "<FIELD> has a regex that is too slow." });
+        }
     }
 }

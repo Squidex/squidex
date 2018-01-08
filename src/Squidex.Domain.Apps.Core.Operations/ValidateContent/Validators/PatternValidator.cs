@@ -14,6 +14,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 {
     public class PatternValidator : IValidator
     {
+        private static readonly TimeSpan Timeout = TimeSpan.FromMilliseconds(20);
         private readonly Regex regex;
         private readonly string errorMessage;
 
@@ -21,22 +22,32 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
         {
             this.errorMessage = errorMessage;
 
-            regex = new Regex("^" + pattern + "$");
+            regex = new Regex("^" + pattern + "$", RegexOptions.None, Timeout);
         }
 
         public Task ValidateAsync(object value, ValidationContext context, Action<string> addError)
         {
             if (value is string stringValue)
             {
-                if (!string.IsNullOrEmpty(stringValue) && !regex.IsMatch(stringValue))
+                if (!string.IsNullOrEmpty(stringValue))
                 {
-                    if (string.IsNullOrWhiteSpace(errorMessage))
+                    try
                     {
-                        addError("<FIELD> is not valid.");
+                        if (!regex.IsMatch(stringValue))
+                        {
+                            if (string.IsNullOrWhiteSpace(errorMessage))
+                            {
+                                addError("<FIELD> is not valid.");
+                            }
+                            else
+                            {
+                                addError(errorMessage);
+                            }
+                        }
                     }
-                    else
+                    catch
                     {
-                        addError(errorMessage);
+                        addError("<FIELD> has a regex that is too slow.");
                     }
                 }
             }
