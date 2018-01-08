@@ -129,10 +129,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     yield return contentResult;
                 }
             }
-
-            foreach (var content in contents)
+            else
             {
-                yield return content;
+                foreach (var content in contents)
+                {
+                    yield return content;
+                }
             }
         }
 
