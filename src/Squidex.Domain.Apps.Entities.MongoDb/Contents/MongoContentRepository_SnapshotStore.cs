@@ -53,6 +53,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
             var document = SimpleMapper.Map(value, new MongoContentEntity
             {
+                IsDeleted = value.IsDeleted,
                 DocumentId = key.ToString(),
                 DataText = idData?.ToFullText(),
                 DataByIds = idData,

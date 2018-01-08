@@ -59,7 +59,13 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                 Index
                     .Ascending(x => x.SchemaId)
                     .Ascending(x => x.Status)
+                    .Ascending(x => x.IsDeleted)
                     .Text(x => x.DataText));
+
+            await collection.Indexes.CreateOneAsync(
+                Index
+                    .Ascending(x => x.Id)
+                    .Ascending(x => x.IsDeleted));
 
             await collection.Indexes.CreateOneAsync(
                 Index
@@ -138,7 +144,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         public async Task<IContentEntity> FindContentAsync(IAppEntity app, ISchemaEntity schema, Guid id)
         {
             var contentEntity =
-                await Collection.Find(x => x.Id == id)
+                await Collection.Find(x => x.Id == id && !x.IsDeleted)
                     .FirstOrDefaultAsync();
 
             contentEntity?.ParseData(schema.SchemaDef);
@@ -148,7 +154,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         public override async Task ClearAsync()
         {
-            await ArchiveCollection.DeleteManyAsync(new BsonDocument());
+            await Database.DropCollectionAsync("States_Contents_Archive");
 
             await base.ClearAsync();
         }

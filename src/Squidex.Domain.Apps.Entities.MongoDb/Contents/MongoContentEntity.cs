@@ -79,6 +79,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         public long Version { get; set; }
 
         [BsonRequired]
+        [BsonElement("dl")]
+        public bool IsDeleted { get; set; }
+
+        [BsonRequired]
         [BsonElement("cb")]
         public RefToken CreatedBy { get; set; }
 

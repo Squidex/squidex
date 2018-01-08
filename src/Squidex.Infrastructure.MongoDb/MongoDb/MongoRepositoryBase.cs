@@ -84,9 +84,11 @@ namespace Squidex.Infrastructure.MongoDb
             return TaskHelper.Done;
         }
 
-        public virtual Task ClearAsync()
+        public virtual async Task ClearAsync()
         {
-            return Collection.DeleteManyAsync(new BsonDocument());
+            await Database.DropCollectionAsync(CollectionName());
+
+            await SetupCollectionAsync(Collection);
         }
 
         public async Task<bool> DropCollectionIfExistsAsync()
