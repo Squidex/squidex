@@ -71,10 +71,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, Status[] status, ODataUriParser odataQuery)
         {
-            IFindFluent<MongoContentEntity, MongoContentEntity> find;
+            FilterDefinition<MongoContentEntity> filter;
             try
             {
-                find = Collection.Find(odataQuery, schema.Id, schema.SchemaDef, status);
+                filter = FindExtensions.BuildQuery(odataQuery, schema.Id, schema.SchemaDef, status);
             }
             catch (NotSupportedException)
             {
@@ -85,8 +85,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                 throw new ValidationException("This odata operation is not supported.");
             }
 
-            var contentItems = find.Take(odataQuery).Skip(odataQuery).Sort(odataQuery, schema.SchemaDef).ToListAsync();
-            var contentCount = find.CountAsync();
+            var contentItems = Collection.Find(filter).Take(odataQuery).Skip(odataQuery).Sort(odataQuery, schema.SchemaDef).ToListAsync();
+            var contentCount = Collection.Find(filter).CountAsync();
 
             await Task.WhenAll(contentItems, contentCount);
 
