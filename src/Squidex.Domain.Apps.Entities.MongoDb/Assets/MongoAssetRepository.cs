@@ -66,10 +66,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 
             var filter = Filter.And(filters);
 
-            var find = Collection.Find(filter);
-
-            var assetItems = find.Skip(skip).Limit(take).SortByDescending(x => x.State.LastModified).ToListAsync();
-            var assetCount = find.CountAsync();
+            var assetItems = Collection.Find(filter).Skip(skip).Limit(take).SortByDescending(x => x.State.LastModified).ToListAsync();
+            var assetCount = Collection.Find(filter).CountAsync();
 
             await Task.WhenAll(assetItems, assetCount);
 
