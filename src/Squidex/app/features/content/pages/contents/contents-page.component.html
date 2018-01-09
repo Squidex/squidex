@@ -94,23 +94,23 @@
             <div class="selection" *ngIf="selectionCount > 0">
                 {{selectionCount}} items selected:
 
-                <button class="btn btn-sm btn-link btn-default" (click)="publishSelected()" *ngIf="canPublish">
+                <button class="btn btn-link btn-default" (click)="publishSelected()" *ngIf="canPublish">
                     Publish
                 </button>
                 
-                <button class="btn btn-sm btn-link btn-default" (click)="unpublishSelected()" *ngIf="canUnpublish">
+                <button class="btn btn-link btn-default" (click)="unpublishSelected()" *ngIf="canUnpublish">
                     Unublish
                 </button>
                 
-                <button class="btn btn-sm btn-link btn-default" (click)="archiveSelected()" *ngIf="!isArchive">
+                <button class="btn btn-link btn-default" (click)="archiveSelected()" *ngIf="!isArchive">
                     Archive
                 </button>
                 
-                <button class="btn btn-sm btn-link btn-default" (click)="restoreSelected()" *ngIf="isArchive">
+                <button class="btn btn-link btn-default" (click)="restoreSelected()" *ngIf="isArchive">
                     Restore
                 </button>
                 
-                <button class="btn btn-sm btn-link btn-danger"
+                <button class="btn btn-link btn-danger"
                     (sqxConfirmClick)="deleteSelected()"
                     confirmTitle="Delete content" 
                     confirmText="Do you really want to delete the selected content items?">
