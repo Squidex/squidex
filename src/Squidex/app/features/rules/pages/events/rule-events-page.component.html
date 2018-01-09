@@ -22,27 +22,22 @@
     <div class="panel-main">
         <div class="panel-content panel-content-scroll">
             <table class="table table-items table-fixed">
-                <colgroup>
-                    <col style="width: 100px" />
-                    <col style="width: 40%" />
-                    <col style="width: 60%" />
-                    <col style="width: 180px" />
-                    <col style="width: 80px" />
-                </colgroup>
-
                 <thead>
                     <tr>
-                        <th>
+                        <th class="cell-label">
                             Status
                         </th>
-                        <th>
+                        <th class="cell-40">
                             Event
                         </th>
-                        <th>
+                        <th class="cell-60">
                             Description
                         </th>
-                        <th>
+                        <th class="cell-time">
                             Created
+                        </th>
+                        <th class="cell-options">
+
                         </th>
                     </tr>
                 </thead>
@@ -50,19 +45,19 @@
                 <tbody>
                     <ng-template ngFor let-event [ngForOf]="eventsItems">
                         <tr [class.expanded]="selectedEventId === event.id">
-                            <td>
+                            <td class="cell-label">
                                 <span class="badge badge-pill badge-{{getBadgeClass(event.jobResult)}}">{{event.jobResult}}</span>
                             </td>
-                            <td>
+                            <td class="cell-40">
                                 <span class="truncate">{{event.eventName}}</span>
                             </td>
-                            <td>
+                            <td class="cell-60">
                                 <span class="truncate">{{event.description}}</span>
                             </td>
-                            <td>
+                            <td class="cell-time">
                                 <small class="item-modified">{{event.created | sqxFromNow}}</small>
                             </td>
-                            <td>
+                            <td class="cell-options">
                                 <button type="button" class="btn btn-secondary table-items-edit-button" [class.active]="selectedEventId === event.id" (click)="selectEvent(event.id)">
                                     <i class="icon-settings"></i>
                                 </button>

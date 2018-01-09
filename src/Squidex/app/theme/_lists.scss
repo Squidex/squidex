@@ -181,8 +181,20 @@
 // Cell styles
 //
 .cell {
+    &-40 {
+        width: 40%;
+    }
+
+    &-60 {
+        width: 60%;
+    }
+
     &-select {
         width: 50px;
+    }
+
+    &-label {
+        width: 100px;
     }
 
     &-separator {
