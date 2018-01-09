@@ -10,13 +10,6 @@
     </div>
 
     <table class="table table-items table-fixed" [class.disabled]="isDisabled" *ngIf="contentItems && contentItems.length > 0">
-        <colgroup>
-            <col *ngFor="let field of contentFields" [style.width]="columnWidth + '%'" />
-            <col style="width: 180px" />
-            <col style="width: 50px" />
-            <col style="width: 70px" />
-        </colgroup>
-
         <tbody dnd-sortable-container [sortableData]="contentItems.mutableValues">
             <ng-template ngFor let-content let-i="index" [ngForOf]="contentItems">
                 <tr [sqxContent]="content" dnd-sortable [sortableIndex]="i" (sqxSorted)="onContentsSorted($event)"

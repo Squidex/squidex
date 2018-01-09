@@ -42,7 +42,7 @@ export class ImageSourceDirective implements OnChanges, OnDestroy, OnInit, After
     }
 
     public ngOnInit() {
-        if (this.parent === null) {
+        if (!this.parent) {
             this.parent = this.element.nativeElement.parentElement;
         }
 

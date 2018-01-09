@@ -1,17 +1,23 @@
-<td *ngFor="let value of values">
+<td class="cell-select" *ngIf="!isReadOnly">
+    <input type="checkbox" class="form-control" 
+        [ngModel]="selected" 
+        (ngModelChange)="selectedChange.emit($event);"
+        (click)="$event.stopPropagation()" />
+</td>
+<td class="cell-auto" *ngFor="let value of values">
     <span class="table-cell">
         {{value}}
     </span>
 </td>
-<td>
+<td class="cell-time">
     <span class="item-published" [class.unpublished]="content.status !== 'Published'"></span>
     
     <small class="item-modified">{{content.lastModified | sqxFromNow}}</small>
 </td>
-<td>
+<td class="cell-user">
     <img class="user-picture" [attr.title]="content.lastModifiedBy | sqxUserNameRef" [attr.src]="content.lastModifiedBy | sqxUserPictureRef" />
 </td>
-<td *ngIf="!isReadOnly">
+<td class="cell-options" *ngIf="!isReadOnly">
     <div class="dropdown dropdown-options" *ngIf="content">
         <button type="button" class="btn btn-link btn-decent" (click)="dropdown.toggle(); $event.stopPropagation()" [class.active]="dropdown.isOpen | async" #optionsButton>
             <i class="icon-dots"></i>
@@ -38,7 +44,7 @@
         </div>
     </div>
 </td>
-<td *ngIf="isReference">
+<td class="cell-options" *ngIf="isReference">
     <button type="button" class="btn btn-link btn-secondary" (click)="deleting.emit(); $event.stopPropagation()">
         <i class="icon-close"></i>
     </button>

@@ -45,6 +45,15 @@ export class ContentItemComponent implements OnInit, OnChanges {
     @Output()
     public deleting = new EventEmitter();
 
+    @Output()
+    public selectedChange = new EventEmitter<boolean>();
+
+    @Input()
+    public selected = false;
+
+    @Input()
+    public columnWidth: number;
+
     @Input()
     public languageCode: string;
 

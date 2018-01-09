@@ -30,61 +30,65 @@
     </div>
 
     <div class="panel-main">
-        <div class="panel-content panel-content-scroll">
-            <table class="table table-items table-fixed">
-                <colgroup>
-                    <col style="width: 70px" />
-                    <col style="width: 50%" />
-                    <col style="width: 50%" />
-                    <col style="width: 120px" />
-                </colgroup>
-
-                <thead>
-                    <tr>
-                        <th>
-                            &nbsp;
-                        </th>
-                        <th>
-                            Name
-                        </th>
-                        <th>
-                            Email
-                        </th>
-                        <th>
-                            Actions
-                        </th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    <ng-template ngFor let-user [ngForOf]="usersItems">
-                        <tr [routerLink]="user.id" routerLinkActive="active">
-                            <td>
-                                <img class="user-picture" [attr.title]="user.name" [attr.src]="user | sqxUserDtoPicture" />
-                            </td>
-                            <td>
-                                <span class="user-name table-cell">{{user.displayName}}</span>
-                            </td>
-                            <td>
-                                <span class="user-email table-cell">{{user.email}}</span>
-                            </td>
-                            <td class="text-right">
-                                <span *ngIf="user.id !== ctx.userId">
-                                    <button class="btn btn-link" (click)="lock(user); $event.stopPropagation();" *ngIf="!user.isLocked" title="Lock User">
-                                        <i class="icon icon-unlocked"></i>
-                                    </button>
-                                    <button class="btn btn-link" (click)="unlock(user); $event.stopPropagation();" *ngIf="user.isLocked" title="Unlock User">
-                                        <i class="icon icon-lock"></i>
-                                    </button>
-                                </span>
-                            </td>
+        <div class="panel-content grid">
+            <div class="grid-header">
+                <table class="table table-items table-fixed">
+                    <thead>
+                        <tr>
+                            <th class="cell-user">
+                                &nbsp;
+                            </th>
+                            <th class="cell-auto">
+                                Name
+                            </th>
+                            <th class="cell-auto">
+                                Email
+                            </th>
+                            <th class="cell-options">
+                                Actions
+                            </th>
                         </tr>
-                        <tr class="spacer"></tr>
-                    </ng-template>
-                </tbody>
-            </table>
+                    </thead>
+                </table>
+            </div>
+            
+            <div class="grid-content">
+                <div sqxIgnoreScrollbar>
+                    <table class="table table-items table-fixed">
+                        <tbody>
+                            <ng-template ngFor let-user [ngForOf]="usersItems">
+                                <tr [routerLink]="user.id" routerLinkActive="active">
+                                    <td class="cell-user">
+                                        <img class="user-picture" [attr.title]="user.name" [attr.src]="user | sqxUserDtoPicture" />
+                                    </td>
+                                    <td class="cell-auto">
+                                        <span class="user-name table-cell">{{user.displayName}}</span>
+                                    </td>
+                                    <td class="cell-auto">
+                                        <span class="user-email table-cell">{{user.email}}</span>
+                                    </td>
+                                    <td class="cell-options">
+                                        <span *ngIf="user.id !== ctx.userId">
+                                            <button class="btn btn-link" (click)="lock(user); $event.stopPropagation();" *ngIf="!user.isLocked" title="Lock User">
+                                                <i class="icon icon-unlocked"></i>
+                                            </button>
+                                            <button class="btn btn-link" (click)="unlock(user); $event.stopPropagation();" *ngIf="user.isLocked" title="Unlock User">
+                                                <i class="icon icon-lock"></i>
+                                            </button>
+                                        </span>
+                                        <button *ngIf="user.id === ctx.userId" class="btn btn-link invisible">
+                                            &nbsp;
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr class="spacer"></tr>
+                            </ng-template>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
-            <div class="clearfix" *ngIf="usersPager.numberOfItems > 0">
+            <div class="grid-footer clearfix" *ngIf="usersPager.numberOfItems > 0">
                 <div class="float-right pagination">
                     <span class="pagination-text">{{usersPager.itemFirst}}-{{usersPager.itemLast}} of {{usersPager.numberOfItems}}</span>
 

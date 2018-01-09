@@ -269,3 +269,42 @@
         }
     }
 }
+
+//
+// Grid with footer and header
+//
+.grid {
+    & {
+        @include flex-box;
+        @include flex-direction(column);
+        overflow: hidden;
+        padding: 0;
+    }
+
+    .grid-content,
+    .grid-header,
+    .grid-footer {
+        padding: 0 $panel-padding;
+    }
+
+    .grid-content {
+        @include flex-grow(1);
+        margin: 0;
+        margin-top: .25rem;
+        overflow-y: scroll;
+    }
+
+    .grid-header {
+        padding-top: .75 * $panel-padding;
+        border: 0;
+        border-bottom: 2px solid $color-border;
+    }
+
+    .grid-footer {
+        border-top: 2px solid $color-border;
+    }
+
+    .pagination {
+        margin-top: .25rem;
+    }
+}

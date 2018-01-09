@@ -50,8 +50,6 @@ export class ReferencesEditorComponent implements ControlValueAccessor, OnInit {
     public contentItems = ImmutableArray.empty<ContentDto>();
     public contentFields: FieldDto[];
 
-    public columnWidth: number;
-
     public isDisabled = false;
     public isInvalidSchema = false;
 
@@ -153,12 +151,6 @@ export class ReferencesEditorComponent implements ControlValueAccessor, OnInit {
 
         if (this.contentFields.length === 0) {
             this.contentFields = [<any>{}];
-        }
-
-        if (this.contentFields.length > 0) {
-            this.columnWidth = 100 / this.contentFields.length;
-        } else {
-            this.columnWidth = 100;
         }
     }
 }

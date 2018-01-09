@@ -18,6 +18,7 @@ export * from './angular/dropdown.component';
 export * from './angular/file-drop.directive';
 export * from './angular/focus-on-init.directive';
 export * from './angular/http-extensions-impl';
+export * from './angular/ignore-scrollbar.directive';
 export * from './angular/image-source.directive';
 export * from './angular/indeterminate-value.directive';
 export * from './angular/jscript-editor.component';

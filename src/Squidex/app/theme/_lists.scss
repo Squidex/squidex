@@ -178,6 +178,46 @@
 }
 
 //
+// Cell styles
+//
+.cell {
+    &-select {
+        width: 50px;
+    }
+
+    &-separator {
+        width: 60px;
+    }
+
+    &-user {
+        width: 55px;
+    }
+
+    &-time {
+        width: 180px;
+    }
+
+    &-options {
+        width: 70px;
+    }
+
+    &-options-lg {
+        width: 150px;
+    }
+
+    &-separator,
+    &-select {
+        text-align: center;
+    }
+
+    &-auto-right,
+    &-options,
+    &-options-lg {
+        text-align: right;
+    }
+}
+
+//
 // Table cell with truncated content.
 //
 .table-cell {
