@@ -36,7 +36,7 @@
                         <th class="cell-time">
                             Created
                         </th>
-                        <th class="cell-options">
+                        <th class="cell-actions">
 
                         </th>
                     </tr>
@@ -57,7 +57,7 @@
                             <td class="cell-time">
                                 <small class="item-modified">{{event.created | sqxFromNow}}</small>
                             </td>
-                            <td class="cell-options">
+                            <td class="cell-actions">
                                 <button type="button" class="btn btn-secondary table-items-edit-button" [class.active]="selectedEventId === event.id" (click)="selectEvent(event.id)">
                                     <i class="icon-settings"></i>
                                 </button>

@@ -35,7 +35,7 @@
                                     <option *ngFor="let permission of usersPermissions" [ngValue]="permission">{{permission}}</option>
                                 </select>
                             </td>
-                            <td class="cell-options">
+                            <td class="cell-actions">
                                 <button type="button" class="btn btn-link btn-danger" [disabled]="userId === contributor.contributorId" (click)="removeContributor(contributor)">
                                     <i class="icon-bin2"></i>
                                 </button>
