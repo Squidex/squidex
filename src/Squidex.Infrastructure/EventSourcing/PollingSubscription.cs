@@ -51,7 +51,7 @@ namespace Squidex.Infrastructure.EventSourcing
                         await eventSubscriber.OnEventAsync(this, storedEvent);
 
                         position = storedEvent.EventPosition;
-                    }, ct, streamFilter, position);
+                    }, streamFilter, position, ct);
                 }
                 catch (Exception ex)
                 {

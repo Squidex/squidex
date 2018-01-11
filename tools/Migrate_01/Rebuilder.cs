@@ -68,7 +68,7 @@ namespace Migrate_01
                         await asset.WriteSnapshotAsync();
                     }
                 }
-            }, CancellationToken.None, filter);
+            }, filter, cancellationToken: CancellationToken.None);
         }
 
         public Task RebuildConfigAsync()
@@ -102,7 +102,7 @@ namespace Migrate_01
                         await app.WriteSnapshotAsync();
                     }
                 }
-            }, CancellationToken.None, filter);
+            }, filter, cancellationToken: CancellationToken.None);
         }
 
         public async Task RebuildContentAsync()
@@ -139,7 +139,7 @@ namespace Migrate_01
                         // Schema has been deleted.
                     }
                 }
-            }, CancellationToken.None, filter);
+            }, filter, cancellationToken: CancellationToken.None);
         }
 
         private Envelope<IEvent> ParseKnownEvent(StoredEvent storedEvent)

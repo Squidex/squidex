@@ -94,7 +94,7 @@ namespace Squidex.Infrastructure.EventSourcing
             return result;
         }
 
-        public async Task GetEventsAsync(Func<StoredEvent, Task> callback, CancellationToken cancellationToken, string streamFilter = null, string position = null)
+        public async Task GetEventsAsync(Func<StoredEvent, Task> callback, string streamFilter = null, string position = null, CancellationToken cancellationToken = default(CancellationToken))
         {
             Guard.NotNull(callback, nameof(callback));
 

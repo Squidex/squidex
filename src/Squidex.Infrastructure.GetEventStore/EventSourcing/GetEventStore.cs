@@ -62,7 +62,7 @@ namespace Squidex.Infrastructure.EventSourcing
             return new GetEventStoreSubscription(connection, subscriber, projectionsManager, prefix, position, streamFilter);
         }
 
-        public async Task GetEventsAsync(Func<StoredEvent, Task> callback, CancellationToken cancellationToken, string streamFilter = null, string position = null)
+        public async Task GetEventsAsync(Func<StoredEvent, Task> callback, string streamFilter = null, string position = null, CancellationToken cancellationToken = default(CancellationToken))
         {
             var streamName = await connection.CreateProjectionAsync(projectionsManager, prefix, streamFilter);
 

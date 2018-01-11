@@ -16,7 +16,7 @@ namespace Squidex.Infrastructure.EventSourcing
     {
         Task<IReadOnlyList<StoredEvent>> GetEventsAsync(string streamName, long streamPosition = 0);
 
-        Task GetEventsAsync(Func<StoredEvent, Task> callback, CancellationToken cancellationToken, string streamFilter = null, string position = null);
+        Task GetEventsAsync(Func<StoredEvent, Task> callback, string streamFilter = null, string position = null, CancellationToken cancellationToken = default(CancellationToken));
 
         Task AppendEventsAsync(Guid commitId, string streamName, ICollection<EventData> events);
 
