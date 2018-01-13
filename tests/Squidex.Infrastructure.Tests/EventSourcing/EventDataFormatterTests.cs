@@ -29,7 +29,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         private readonly JsonSerializerSettings serializerSettings = new JsonSerializerSettings();
         private readonly TypeNameRegistry typeNameRegistry = new TypeNameRegistry();
-        private readonly JsonEventDataFormatter sut;
+        private readonly DefaultEventDataFormatter sut;
 
         public EventDataFormatterTests()
         {
@@ -38,7 +38,7 @@ namespace Squidex.Infrastructure.EventSourcing
             typeNameRegistry.Map(typeof(MyEvent), "Event");
             typeNameRegistry.Map(typeof(MyOldEvent), "OldEvent");
 
-            sut = new JsonEventDataFormatter(typeNameRegistry, serializerSettings);
+            sut = new DefaultEventDataFormatter(typeNameRegistry, JsonSerializer.Create(serializerSettings));
         }
 
         [Fact]

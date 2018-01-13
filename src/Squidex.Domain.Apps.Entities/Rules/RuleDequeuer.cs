@@ -71,13 +71,13 @@ namespace Squidex.Domain.Apps.Entities.Rules
             timer.SkipCurrentDelay();
         }
 
-        private async Task QueryAsync(CancellationToken cancellationToken)
+        private async Task QueryAsync(CancellationToken ct)
         {
             try
             {
                 var now = clock.GetCurrentInstant();
 
-                await ruleEventRepository.QueryPendingAsync(now, requestBlock.SendAsync, cancellationToken);
+                await ruleEventRepository.QueryPendingAsync(now, requestBlock.SendAsync, ct);
             }
             catch (Exception ex)
             {

@@ -7,38 +7,37 @@
 
 using System;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Squidex.Infrastructure.EventSourcing
 {
-    public class JsonEventDataFormatter : IEventDataFormatter
+    public class DefaultEventDataFormatter : IEventDataFormatter
     {
-        private readonly JsonSerializerSettings serializerSettings;
+        private readonly JsonSerializer serializer;
         private readonly TypeNameRegistry typeNameRegistry;
 
-        public JsonEventDataFormatter(TypeNameRegistry typeNameRegistry, JsonSerializerSettings serializerSettings = null)
+        public DefaultEventDataFormatter(TypeNameRegistry typeNameRegistry, JsonSerializer serializer = null)
         {
             Guard.NotNull(typeNameRegistry, nameof(typeNameRegistry));
 
             this.typeNameRegistry = typeNameRegistry;
 
-            this.serializerSettings = serializerSettings ?? new JsonSerializerSettings();
+            this.serializer = serializer ?? JsonSerializer.CreateDefault();
         }
 
         public Envelope<IEvent> Parse(EventData eventData, bool migrate = true)
         {
-            var headers = ReadJson<EnvelopeHeaders>(eventData.Metadata);
-
             var eventType = typeNameRegistry.GetType(eventData.Type);
-            var eventPayload = ReadJson<IEvent>(eventData.Payload, eventType);
 
-            if (migrate && eventPayload is IMigratedEvent migratedEvent)
+            var headers = eventData.Metadata.ToObject<EnvelopeHeaders>();
+            var content = eventData.Metadata.ToObject(eventType, serializer) as IEvent;
+
+            if (migrate && content is IMigratedEvent migratedEvent)
             {
-                eventPayload = migratedEvent.Migrate();
+                content = migratedEvent.Migrate();
             }
 
-            var envelope = new Envelope<IEvent>(eventPayload, headers);
-
-            envelope.SetEventId(eventData.EventId);
+            var envelope = new Envelope<IEvent>(content, headers);
 
             return envelope;
         }
@@ -56,20 +55,10 @@ namespace Squidex.Infrastructure.EventSourcing
 
             envelope.SetCommitId(commitId);
 
-            var headers = WriteJson(envelope.Headers);
-            var content = WriteJson(envelope.Payload);
+            var headers = JToken.FromObject(envelope.Headers, serializer);
+            var content = JToken.FromObject(envelope.Payload, serializer);
 
-            return new EventData { EventId = envelope.Headers.EventId(), Type = eventType, Payload = content, Metadata = headers };
-        }
-
-        private T ReadJson<T>(string data, Type type = null)
-        {
-            return (T)JsonConvert.DeserializeObject(data, type ?? typeof(T), serializerSettings);
-        }
-
-        private string WriteJson(object value)
-        {
-            return JsonConvert.SerializeObject(value, serializerSettings);
+            return new EventData { Type = eventType, Payload = content, Metadata = headers };
         }
     }
 }

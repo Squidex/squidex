@@ -39,9 +39,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
             await collection.Indexes.CreateOneAsync(Index.Ascending(x => x.Expires), new CreateIndexOptions { ExpireAfter = TimeSpan.Zero });
         }
 
-        public Task QueryPendingAsync(Instant now, Func<IRuleEventEntity, Task> callback, CancellationToken cancellationToken = default(CancellationToken))
+        public Task QueryPendingAsync(Instant now, Func<IRuleEventEntity, Task> callback, CancellationToken ct = default(CancellationToken))
         {
-            return Collection.Find(x => x.NextAttempt < now).ForEachAsync(callback, cancellationToken);
+            return Collection.Find(x => x.NextAttempt < now).ForEachAsync(callback, ct);
         }
 
         public async Task<IReadOnlyList<IRuleEventEntity>> QueryByAppAsync(Guid appId, int skip = 0, int take = 20)

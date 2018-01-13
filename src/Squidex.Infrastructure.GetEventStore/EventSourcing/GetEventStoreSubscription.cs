@@ -8,33 +8,32 @@
 using System.Threading.Tasks;
 using EventStore.ClientAPI;
 using EventStore.ClientAPI.Exceptions;
-using EventStore.ClientAPI.Projections;
 using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.EventSourcing
 {
     internal sealed class GetEventStoreSubscription : IEventSubscription
     {
-        private readonly IEventStoreConnection eventStoreConnection;
-        private readonly IEventSubscriber eventSubscriber;
+        private readonly IEventStoreConnection connection;
+        private readonly IEventSubscriber subscriber;
         private readonly EventStoreCatchUpSubscription subscription;
         private readonly long? position;
 
         public GetEventStoreSubscription(
-            IEventStoreConnection eventStoreConnection,
-            IEventSubscriber eventSubscriber,
-            ProjectionsManager projectionsManager,
+            IEventStoreConnection connection,
+            IEventSubscriber subscriber,
+            ProjectionClient projectionClient,
             string prefix,
             string position,
             string streamFilter)
         {
-            Guard.NotNull(eventSubscriber, nameof(eventSubscriber));
+            Guard.NotNull(subscriber, nameof(subscriber));
 
-            this.eventStoreConnection = eventStoreConnection;
-            this.eventSubscriber = eventSubscriber;
-            this.position = ProjectionHelper.ParsePositionOrNull(position);
+            this.connection = connection;
+            this.position = projectionClient.ParsePositionOrNull(position);
+            this.subscriber = subscriber;
 
-            var streamName = eventStoreConnection.CreateProjectionAsync(projectionsManager, prefix, streamFilter).Result;
+            var streamName = projectionClient.CreateProjectionAsync(streamFilter).Result;
 
             subscription = SubscribeToStream(streamName);
         }
@@ -50,12 +49,12 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             var settings = CatchUpSubscriptionSettings.Default;
 
-            return eventStoreConnection.SubscribeToStreamFrom(streamName, position, settings,
+            return connection.SubscribeToStreamFrom(streamName, position, settings,
                 (s, e) =>
                 {
                     var storedEvent = Formatter.Read(e);
 
-                    eventSubscriber.OnEventAsync(this, storedEvent).Wait();
+                    subscriber.OnEventAsync(this, storedEvent).Wait();
                 }, null,
                 (s, reason, ex) =>
                 {
@@ -64,7 +63,7 @@ namespace Squidex.Infrastructure.EventSourcing
                     {
                         ex = ex ?? new ConnectionClosedException($"Subscription closed with reason {reason}.");
 
-                        eventSubscriber.OnErrorAsync(this, ex);
+                        subscriber.OnErrorAsync(this, ex);
                     }
                 });
         }
