@@ -20,8 +20,6 @@ namespace Squidex.Infrastructure.EventSourcing
 {
     public sealed class ProjectionClient
     {
-        private const string StreamByFilter = "by-{0}-{1}";
-        private const string StreamByProperty = "by-{0}-{1}-property";
         private readonly ConcurrentDictionary<string, bool> projections = new ConcurrentDictionary<string, bool>();
         private readonly IEventStoreConnection connection;
         private readonly string prefix;
@@ -38,12 +36,12 @@ namespace Squidex.Infrastructure.EventSourcing
 
         private string CreateFilterStreamName(string filter)
         {
-            return string.Format(CultureInfo.InvariantCulture, StreamByFilter, prefix.Simplify(), filter.Simplify());
+            return $"by-{StreamByFilter}-{prefix.Simplify()}-{filter.Simplify()}";
         }
 
         private string CreatePropertyStreamName(string property)
         {
-            return string.Format(CultureInfo.InvariantCulture, StreamByFilter, prefix.Simplify(), property.Simplify());
+            return $"by-{StreamByFilter}-{prefix.Simplify()}-{property.Simplify()}-property";
         }
 
         public async Task<string> CreateProjectionAsync(string property, object value)
@@ -77,7 +75,7 @@ namespace Squidex.Infrastructure.EventSourcing
                 }
             }
 
-            return streamName + "-" + value;
+            return $"{streamName}-{value}";
         }
 
         public async Task<string> CreateProjectionAsync(string streamFilter = null)
