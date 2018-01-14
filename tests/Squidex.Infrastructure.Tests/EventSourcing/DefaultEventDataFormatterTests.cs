@@ -15,7 +15,7 @@ using Xunit;
 
 namespace Squidex.Infrastructure.EventSourcing
 {
-    public class EventDataFormatterTests
+    public class DefaultEventDataFormatterTests
     {
         public sealed class MyOldEvent : IEvent, IMigratedEvent
         {
@@ -31,7 +31,7 @@ namespace Squidex.Infrastructure.EventSourcing
         private readonly TypeNameRegistry typeNameRegistry = new TypeNameRegistry();
         private readonly DefaultEventDataFormatter sut;
 
-        public EventDataFormatterTests()
+        public DefaultEventDataFormatterTests()
         {
             serializerSettings.Converters.Add(new PropertiesBagConverter<EnvelopeHeaders>());
 

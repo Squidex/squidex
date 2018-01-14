@@ -21,18 +21,12 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public Task AppendAsync(Guid commitId, string streamName, ICollection<EventData> events)
         {
-            return AppendEventsInternalAsync(commitId, streamName, EtagVersion.Any, events);
+            return AppendAsync(commitId, streamName, EtagVersion.Any, events);
         }
 
-        public Task AppendAsync(Guid commitId, string streamName, long expectedVersion, ICollection<EventData> events)
+        public async Task AppendAsync(Guid commitId, string streamName, long expectedVersion, ICollection<EventData> events)
         {
             Guard.GreaterEquals(expectedVersion, EtagVersion.Any, nameof(expectedVersion));
-
-            return AppendEventsInternalAsync(commitId, streamName, expectedVersion, events);
-        }
-
-        private async Task AppendEventsInternalAsync(Guid commitId, string streamName, long expectedVersion, ICollection<EventData> events)
-        {
             Guard.NotNullOrEmpty(streamName, nameof(streamName));
             Guard.NotNull(events, nameof(events));
 

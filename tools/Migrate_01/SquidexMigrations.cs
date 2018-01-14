@@ -1,16 +1,16 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
+using System.Reflection;
 
-namespace Squidex.Infrastructure.Migrations
+namespace Migrate_01
 {
-    public interface IMigration
+    public static class SquidexMigrations
     {
-        Task UpdateAsync();
+        public static readonly Assembly Assembly = typeof(SquidexMigrations).Assembly;
     }
 }

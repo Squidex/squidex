@@ -7,7 +7,6 @@
 
 using System;
 using System.Collections.Concurrent;
-using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -34,73 +33,65 @@ namespace Squidex.Infrastructure.EventSourcing
             this.projectionHost = projectionHost;
         }
 
-        private string CreateFilterStreamName(string filter)
+        private string CreateFilterProjectionName(string filter)
         {
-            return $"by-{StreamByFilter}-{prefix.Simplify()}-{filter.Simplify()}";
+            return $"by-{prefix.Simplify()}-{filter.Simplify()}";
         }
 
-        private string CreatePropertyStreamName(string property)
+        private string CreatePropertyProjectionName(string property)
         {
-            return $"by-{StreamByFilter}-{prefix.Simplify()}-{property.Simplify()}-property";
+            return $"by-{prefix.Simplify()}-{property.Simplify()}-property";
         }
 
         public async Task<string> CreateProjectionAsync(string property, object value)
         {
-            var streamName = CreatePropertyStreamName(property);
+            var name = CreatePropertyProjectionName(property);
 
-            if (projections.TryAdd(streamName, true))
-            {
-                var projectionConfig =
-                    $@"fromAll()
-                        .when({{
-                            $any: function (s, e) {{
-                                if (e.streamId.indexOf('{prefix}') === 0 && e.data.{property}) {{
-                                    linkTo('{streamName}-' + e.data.{property}, e);
-                                }}
+            var query =
+                $@"fromAll()
+                    .when({{
+                        $any: function (s, e) {{
+                            if (e.streamId.indexOf('{prefix}') === 0 && e.data.{property}) {{
+                                linkTo('{name}-' + e.data.{property}, e);
                             }}
-                        }});";
+                        }}
+                    }});";
 
-                try
-                {
-                    var credentials = connection.Settings.DefaultUserCredentials;
+            await CreateProjectionAsync(name, query);
 
-                    await projectionsManager.CreateContinuousAsync($"{streamName}", projectionConfig, credentials);
-                }
-                catch (Exception ex)
-                {
-                    if (!ex.Is<ProjectionCommandConflictException>())
-                    {
-                        throw;
-                    }
-                }
-            }
-
-            return $"{streamName}-{value}";
+            return $"{name}-{value}";
         }
 
         public async Task<string> CreateProjectionAsync(string streamFilter = null)
         {
             streamFilter = streamFilter ?? ".*";
 
-            var streamName = CreateFilterStreamName(streamFilter);
+            var name = CreateFilterProjectionName(streamFilter);
 
-            if (projections.TryAdd(streamName, true))
-            {
-                var projectionConfig =
-                    $@"fromAll()
-                        .when({{
-                            $any: function (s, e) {{
-                                if (e.streamId.indexOf('{prefix}') === 0 && /{streamFilter}/.test(e.streamId.substring({prefix.Length + 1}))) {{
-                                    linkTo('{streamName}', e);
-                                }}
+            var query =
+                $@"fromAll()
+                    .when({{
+                        $any: function (s, e) {{
+                            if (e.streamId.indexOf('{prefix}') === 0 && /{streamFilter}/.test(e.streamId.substring({prefix.Length + 1}))) {{
+                                linkTo('{name}', e);
                             }}
-                        }});";
+                        }}
+                    }});";
 
+            await CreateProjectionAsync(name, query);
+
+            return name;
+        }
+
+        private async Task CreateProjectionAsync(string name, string query)
+        {
+            if (projections.TryAdd(name, true))
+            {
                 try
                 {
                     var credentials = connection.Settings.DefaultUserCredentials;
 
-                    await projectionsManager.CreateContinuousAsync($"{streamName}", projectionConfig, credentials);
+                    await projectionsManager.CreateContinuousAsync(name, query, credentials);
                 }
                 catch (Exception ex)
                 {
@@ -110,8 +101,6 @@ namespace Squidex.Infrastructure.EventSourcing
                     }
                 }
             }
-
-            return streamName;
         }
 
         public async Task ConnectAsync()

@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Infrastructure.Log;
@@ -15,20 +13,20 @@ namespace Squidex.Infrastructure.Migrations
 {
     public sealed class Migrator
     {
-        private readonly IMigrationStatus migrationStatus;
-        private readonly IEnumerable<IMigration> migrations;
         private readonly ISemanticLog log;
+        private readonly IMigrationStatus migrationStatus;
+        private readonly IMigrationPath migrationPath;
 
         public int LockWaitMs { get; set; } = 5000;
 
-        public Migrator(IMigrationStatus migrationStatus, IEnumerable<IMigration> migrations, ISemanticLog log)
+        public Migrator(IMigrationStatus migrationStatus, IMigrationPath migrationPath, ISemanticLog log)
         {
             Guard.NotNull(migrationStatus, nameof(migrationStatus));
-            Guard.NotNull(migrations, nameof(migrations));
+            Guard.NotNull(migrationPath, nameof(migrationPath));
             Guard.NotNull(log, nameof(log));
 
             this.migrationStatus = migrationStatus;
-            this.migrations = migrations.OrderByDescending(x => x.ToVersion).ToList();
+            this.migrationPath = migrationPath;
 
             this.log = log;
         }
@@ -39,8 +37,6 @@ namespace Squidex.Infrastructure.Migrations
 
             try
             {
-                var lastMigrator = migrations.FirstOrDefault();
-
                 while (!await migrationStatus.TryLockAsync())
                 {
                     log.LogInformation(w => w
@@ -52,13 +48,16 @@ namespace Squidex.Infrastructure.Migrations
 
                 version = await migrationStatus.GetVersionAsync();
 
-                if (lastMigrator != null && lastMigrator.ToVersion != version)
+                while (true)
                 {
-                    var migrationPath = FindMigratorPath(version, lastMigrator.ToVersion).ToList();
+                    var migrationStep = migrationPath.GetNext(version);
 
-                    var previousMigrations = new List<IMigration>();
+                    if (migrationStep.Migrations == null || !migrationStep.Migrations.Any())
+                    {
+                        break;
+                    }
 
-                    foreach (var migration in migrationPath)
+                    foreach (var migration in migrationStep.Migrations)
                     {
                         var name = migration.GetType().ToString();
 
@@ -72,43 +71,16 @@ namespace Squidex.Infrastructure.Migrations
                             .WriteProperty("status", "Completed")
                             .WriteProperty("migrator", name)))
                         {
-                            await migration.UpdateAsync(previousMigrations.ToList());
-
-                            version = migration.ToVersion;
+                            await migration.UpdateAsync();
                         }
-
-                        previousMigrations.Add(migration);
                     }
+
+                    version = migrationStep.Version;
                 }
             }
             finally
             {
                 await migrationStatus.UnlockAsync(version);
-            }
-        }
-
-        private IEnumerable<IMigration> FindMigratorPath(int fromVersion, int toVersion)
-        {
-            var addedMigrators = new HashSet<IMigration>();
-
-            while (true)
-            {
-                var bestMigrator = migrations.Where(x => x.FromVersion < x.ToVersion).FirstOrDefault(x => x.FromVersion == fromVersion);
-
-                if (bestMigrator != null && addedMigrators.Add(bestMigrator))
-                {
-                    fromVersion = bestMigrator.ToVersion;
-
-                    yield return bestMigrator;
-                }
-                else if (fromVersion != toVersion)
-                {
-                    throw new InvalidOperationException($"There is no migration path from {fromVersion} to {toVersion}.");
-                }
-                else
-                {
-                    break;
-                }
             }
         }
     }

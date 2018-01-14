@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json.Linq;
 using Squidex.Infrastructure.Reflection;

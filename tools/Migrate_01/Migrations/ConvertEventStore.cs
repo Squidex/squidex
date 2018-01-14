@@ -5,29 +5,24 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Migrations;
 
-namespace Migrate_01
+namespace Migrate_01.Migrations
 {
-    public sealed class Migration00_ConvertEventStore : IMigration
+    public sealed class ConvertEventStore : IMigration
     {
         private readonly IEventStore eventStore;
 
-        public int FromVersion { get; } = 0;
-
-        public int ToVersion { get; } = 1;
-
-        public Migration00_ConvertEventStore(IEventStore eventStore)
+        public ConvertEventStore(IEventStore eventStore)
         {
             this.eventStore = eventStore;
         }
 
-        public async Task UpdateAsync(IEnumerable<IMigration> previousMigrations)
+        public async Task UpdateAsync()
         {
             if (eventStore is MongoEventStore mongoEventStore)
             {

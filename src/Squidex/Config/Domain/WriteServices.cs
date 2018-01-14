@@ -9,6 +9,7 @@ using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Migrate_01;
+using Migrate_01.Migrations;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Entities.Apps;
@@ -63,13 +64,19 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<RuleCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
-            services.AddTransientAs<Migration01_FromCqrs>()
+            services.AddTransientAs<MigrationPath>()
+                .As<IMigrationPath>();
+
+            services.AddTransientAs<AddPatterns>()
                 .As<IMigration>();
 
-            services.AddTransientAs<Migration02_AddPatterns>()
+            services.AddTransientAs<ConvertEventStore>()
                 .As<IMigration>();
 
-            services.AddTransientAs<Migration03_SplitContentCollections>()
+            services.AddTransientAs<RebuildContentCollections>()
+                .As<IMigration>();
+
+            services.AddTransientAs<RebuildSnapshots>()
                 .As<IMigration>();
 
             services.AddTransientAs<Rebuilder>()

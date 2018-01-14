@@ -30,7 +30,7 @@ namespace Squidex.Infrastructure.EventSourcing
             var eventType = typeNameRegistry.GetType(eventData.Type);
 
             var headers = eventData.Metadata.ToObject<EnvelopeHeaders>();
-            var content = eventData.Metadata.ToObject(eventType, serializer) as IEvent;
+            var content = eventData.Payload.ToObject(eventType, serializer) as IEvent;
 
             if (migrate && content is IMigratedEvent migratedEvent)
             {
