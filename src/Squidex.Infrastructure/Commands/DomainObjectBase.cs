@@ -45,13 +45,13 @@ namespace Squidex.Infrastructure.Commands
             RaiseEvent(Envelope.Create(@event));
         }
 
-        public void RaiseEvent<TEvent>(Envelope<TEvent> @event) where TEvent : class, IEvent
+        public virtual void RaiseEvent(Envelope<IEvent> @event)
         {
             Guard.NotNull(@event, nameof(@event));
 
             @event.SetAggregateId(id);
 
-            ApplyEvent(@event.To<IEvent>());
+            ApplyEvent(@event);
 
             snapshot.Version++;
 

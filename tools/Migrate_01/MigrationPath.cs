@@ -13,16 +13,16 @@ using Squidex.Infrastructure.Migrations;
 
 namespace Migrate_01
 {
-    public class MigrationMatrix
+    public sealed class MigrationPath : IMigrationPath
     {
         private readonly IServiceProvider serviceProvider;
 
-        public MigrationMatrix(IServiceProvider serviceProvider)
+        public MigrationPath(IServiceProvider serviceProvider)
         {
             this.serviceProvider = serviceProvider;
         }
 
-        public (int Version, IEnumerable<IMigration> Migrations) MigrationPath(int version)
+        public (int Version, IEnumerable<IMigration> Migrations) GetNext(int version)
         {
             switch (version)
             {

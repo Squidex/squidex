@@ -12,13 +12,12 @@ using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Domain.Apps.Entities.Schemas.State;
 using Squidex.Domain.Apps.Events.Schemas;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Entities.Schemas
 {
-    public sealed class SchemaDomainObject : DomainObjectBase<SchemaState>
+    public sealed class SchemaDomainObject : SquidexDomainObjectBase<SchemaState>
     {
         private readonly FieldRegistry registry;
 

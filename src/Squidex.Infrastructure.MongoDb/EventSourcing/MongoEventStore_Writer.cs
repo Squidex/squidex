@@ -108,7 +108,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
             foreach (var e in events)
             {
-                var mongoEvent = new MongoEvent(e);
+                var mongoEvent = MongoEvent.FromEventData(e);
 
                 commitEvents[i++] = mongoEvent;
             }

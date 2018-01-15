@@ -7,7 +7,6 @@
 
 using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json.Linq;
-using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Infrastructure.EventSourcing
 {
@@ -15,7 +14,7 @@ namespace Squidex.Infrastructure.EventSourcing
     {
         [BsonElement]
         [BsonRequired]
-        public JToken Payload { get; set; }
+        public string Payload { get; set; }
 
         [BsonElement]
         [BsonRequired]
@@ -25,18 +24,14 @@ namespace Squidex.Infrastructure.EventSourcing
         [BsonRequired]
         public string Type { get; set; }
 
-        public MongoEvent()
+        public static MongoEvent FromEventData(EventData data)
         {
-        }
-
-        public MongoEvent(EventData data)
-        {
-            SimpleMapper.Map(data, this);
+            return new MongoEvent { Type = data.Type, Metadata = data.Metadata, Payload = data.ToString() };
         }
 
         public EventData ToEventData()
         {
-            return SimpleMapper.Map(this, new EventData());
+            return new EventData { Type = Type, Metadata = Metadata, Payload = JObject.Parse(Payload) };
         }
     }
 }

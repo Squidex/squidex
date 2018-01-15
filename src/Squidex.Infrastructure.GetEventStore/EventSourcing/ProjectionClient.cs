@@ -51,8 +51,8 @@ namespace Squidex.Infrastructure.EventSourcing
                 $@"fromAll()
                     .when({{
                         $any: function (s, e) {{
-                            if (e.streamId.indexOf('{prefix}') === 0 && e.data.{property}) {{
-                                linkTo('{name}-' + e.data.{property}, e);
+                            if (e.streamId.indexOf('{prefix}') === 0 && e.metadata.{property}) {{
+                                linkTo('{name}-' + e.metadata.{property}, e);
                             }}
                         }}
                     }});";

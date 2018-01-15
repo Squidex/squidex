@@ -10,13 +10,12 @@ using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Contents.State;
 using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Entities.Contents
 {
-    public sealed class ContentDomainObject : DomainObjectBase<ContentState>
+    public sealed class ContentDomainObject : SquidexDomainObjectBase<ContentState>
     {
         public ContentDomainObject Create(CreateContent command)
         {

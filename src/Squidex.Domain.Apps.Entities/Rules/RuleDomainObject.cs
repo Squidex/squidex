@@ -9,13 +9,12 @@ using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.Rules.State;
 using Squidex.Domain.Apps.Events.Rules;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Entities.Rules
 {
-    public sealed class RuleDomainObject : DomainObjectBase<RuleState>
+    public sealed class RuleDomainObject : SquidexDomainObjectBase<RuleState>
     {
         public void Create(CreateRule command)
         {

@@ -25,19 +25,14 @@ namespace Squidex.Infrastructure.Json
                 throw new JsonException($"Expected String, but got {reader.TokenType}.");
             }
 
-            var parts = reader.Value.ToString().Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-
-            if (parts.Length < 2)
+            try
             {
-                throw new JsonException("Named id must have more than 2 parts divided by commata.");
+                return NamedId<Guid>.Parse(reader.Value.ToString(), Guid.TryParse);
             }
-
-            if (!Guid.TryParse(parts[0], out var id))
+            catch (ArgumentException ex)
             {
-                throw new JsonException("Named id must be a valid guid.");
+                throw new JsonException(ex.Message);
             }
-
-            return new NamedId<Guid>(id, string.Join(",", parts.Skip(1)));
         }
     }
 }

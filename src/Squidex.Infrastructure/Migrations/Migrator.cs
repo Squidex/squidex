@@ -17,7 +17,7 @@ namespace Squidex.Infrastructure.Migrations
         private readonly IMigrationStatus migrationStatus;
         private readonly IMigrationPath migrationPath;
 
-        public int LockWaitMs { get; set; } = 5000;
+        public int LockWaitMs { get; set; } = 500;
 
         public Migrator(IMigrationStatus migrationStatus, IMigrationPath migrationPath, ISemanticLog log)
         {

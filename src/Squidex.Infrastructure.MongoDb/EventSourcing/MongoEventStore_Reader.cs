@@ -167,7 +167,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         private static string CreateIndexPath(string property)
         {
-            return $"Events.Payload.{property}";
+            return $"Events.Metadata.{property}";
         }
     }
 }

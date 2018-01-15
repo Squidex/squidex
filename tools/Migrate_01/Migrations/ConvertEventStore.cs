@@ -5,11 +5,16 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using Newtonsoft.Json.Linq;
+using Squidex.Domain.Apps.Events;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Migrations;
+using Squidex.Infrastructure.MongoDb;
 
 namespace Migrate_01.Migrations
 {
@@ -34,10 +39,16 @@ namespace Migrate_01.Migrations
                 {
                     foreach (BsonDocument @event in commit["Events"].AsBsonArray)
                     {
-                        @event.Remove("EventId");
+                        var meta = JObject.Parse(@event["Metadata"].AsString);
+                        var data = JObject.Parse(@event["Payload"].AsString);
 
-                        @event["Payload"] = BsonDocument.Parse(@event["Payload"].AsString);
-                        @event["Metadata"] = BsonDocument.Parse(@event["Metadata"].AsString);
+                        if (data.TryGetValue("appId", out var appId))
+                        {
+                            meta[SquidexHeaders.AppId] = NamedId<Guid>.Parse(appId.ToString(), Guid.TryParse).Id;
+                        }
+
+                        @event.Remove("EventId");
+                        @event["Metadata"] = meta.ToBson();
                     }
 
                     await collection.ReplaceOneAsync(filter.Eq("_id", commit["_id"].AsString), commit);
