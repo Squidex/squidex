@@ -90,7 +90,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             this.schemas = schemas.ToDictionary(x => x.Id);
 
-            graphQLSchema = new GraphQLSchema { Query = new ContentQueryGraphType(this, this.schemas.Values) };
+            graphQLSchema = new GraphQLSchema { Query = new AppQueriesGraphType(this, this.schemas.Values) };
 
             foreach (var schemaType in schemaTypes.Values)
             {

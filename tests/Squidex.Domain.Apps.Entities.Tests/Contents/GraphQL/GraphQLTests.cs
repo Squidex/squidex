@@ -173,6 +173,79 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         }
 
         [Fact]
+        public async Task Should_return_multiple_assets_with_total_when_querying_assets_with_total()
+        {
+            const string query = @"
+                query {
+                  queryAssetsWithTotal(search: ""my-query"", top: 30, skip: 5) {
+                    total
+                    items {
+                      id
+                      version
+                      created
+                      createdBy
+                      lastModified
+                      lastModifiedBy
+                      url
+                      thumbnailUrl
+                      sourceUrl
+                      mimeType
+                      fileName
+                      fileSize
+                      fileVersion
+                      isImage
+                      pixelWidth
+                      pixelHeight
+                    }   
+                  }
+                }";
+
+            var asset = CreateAsset(Guid.NewGuid());
+
+            var assets = new List<IAssetEntity> { asset };
+
+            A.CallTo(() => assetRepository.QueryAsync(app.Id, null, null, "my-query", 30, 5))
+                .Returns(ResultList.Create(assets, 10));
+
+            var result = await sut.QueryAsync(app, user, new GraphQLQuery { Query = query });
+
+            var expected = new
+            {
+                data = new
+                {
+                    queryAssetsWithTotal = new
+                    {
+                        total = 10,
+                        items = new dynamic[]
+                        {
+                            new
+                            {
+                                id = asset.Id,
+                                version = 1,
+                                created = asset.Created.ToDateTimeUtc(),
+                                createdBy = "subject:user1",
+                                lastModified = asset.LastModified.ToDateTimeUtc(),
+                                lastModifiedBy = "subject:user2",
+                                url = $"assets/{asset.Id}",
+                                thumbnailUrl = $"assets/{asset.Id}?width=100",
+                                sourceUrl = $"assets/source/{asset.Id}",
+                                mimeType = "image/png",
+                                fileName = "MyFile.png",
+                                fileSize = 1024,
+                                fileVersion = 123,
+                                isImage = true,
+                                pixelWidth = 800,
+                                pixelHeight = 600
+                            }
+                        }
+                    }
+                }
+            };
+
+            AssertJson(expected, new { data = result.Data });
+        }
+
+        [Fact]
         public async Task Should_return_single_asset_when_finding_asset()
         {
             var assetId = Guid.NewGuid();
@@ -336,6 +409,126 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                                     {
                                         "tag1",
                                         "tag2"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            AssertJson(expected, new { data = result.Data });
+        }
+
+        [Fact]
+        public async Task Should_return_multiple_contents_with_total_when_querying_contents_with_total()
+        {
+            const string query = @"
+                query {
+                  queryMySchemaContentsWithTotal(top: 30, skip: 5) {
+                    total
+                    items {
+                      id
+                      version
+                      created
+                      createdBy
+                      lastModified
+                      lastModifiedBy
+                      url
+                      data {
+                        myString {
+                          de
+                        }
+                        myNumber {
+                          iv
+                        }
+                        myBoolean {
+                          iv
+                        }
+                        myDatetime {
+                          iv
+                        }
+                        myJson {
+                          iv
+                        }
+                        myGeolocation {
+                          iv
+                        }
+                        myTags {
+                          iv
+                        }
+                      }
+                    }
+                  }
+                }";
+
+            var content = CreateContent(Guid.NewGuid(), Guid.Empty, Guid.Empty);
+
+            var contents = new List<IContentEntity> { content };
+
+            A.CallTo(() => contentQuery.QueryAsync(app, schema.Id.ToString(), user, false, "?$top=30&$skip=5"))
+                .Returns((schema, ResultList.Create(contents, 10)));
+
+            var result = await sut.QueryAsync(app, user, new GraphQLQuery { Query = query });
+
+            var expected = new
+            {
+                data = new
+                {
+                    queryMySchemaContentsWithTotal = new
+                    {
+                        total = 10,
+                        items = new dynamic[]
+                        {
+                            new
+                            {
+                                id = content.Id,
+                                version = 1,
+                                created = content.Created.ToDateTimeUtc(),
+                                createdBy = "subject:user1",
+                                lastModified = content.LastModified.ToDateTimeUtc(),
+                                lastModifiedBy = "subject:user2",
+                                url = $"contents/my-schema/{content.Id}",
+                                data = new
+                                {
+                                    myString = new
+                                    {
+                                        de = "value"
+                                    },
+                                    myNumber = new
+                                    {
+                                        iv = 1
+                                    },
+                                    myBoolean = new
+                                    {
+                                        iv = true
+                                    },
+                                    myDatetime = new
+                                    {
+                                        iv = content.LastModified.ToDateTimeUtc()
+                                    },
+                                    myJson = new
+                                    {
+                                        iv = new
+                                        {
+                                            value = 1
+                                        }
+                                    },
+                                    myGeolocation = new
+                                    {
+                                        iv = new
+                                        {
+                                            latitude = 10,
+                                            longitude = 20
+                                        }
+                                    },
+                                    myTags = new
+                                    {
+                                        iv = new[]
+                                        {
+                                            "tag1",
+                                            "tag2"
+                                        }
                                     }
                                 }
                             }

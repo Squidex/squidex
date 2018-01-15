@@ -17,11 +17,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
     public sealed class ContentGraphType : ObjectGraphType<IContentEntity>
     {
         private readonly ISchemaEntity schema;
-        private readonly IGraphQLContext context;
+        private readonly IGraphQLContext ctx;
 
-        public ContentGraphType(ISchemaEntity schema, IGraphQLContext context)
+        public ContentGraphType(ISchemaEntity schema, IGraphQLContext ctx)
         {
-            this.context = context;
+            this.ctx = ctx;
             this.schema = schema;
 
             Name = $"{schema.Name.ToPascalCase()}Dto";
@@ -82,12 +82,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             AddField(new FieldType
             {
                 Name = "url",
-                Resolver = context.ResolveContentUrl(schema),
+                Resolver = ctx.ResolveContentUrl(schema),
                 ResolvedType = new NonNullGraphType(new StringGraphType()),
                 Description = $"The url to the the {schemaName} content."
             });
 
-            var dataType = new ContentDataGraphType(schema.SchemaDef, context);
+            var dataType = new ContentDataGraphType(schema.SchemaDef, ctx);
 
             if (dataType.Fields.Any())
             {

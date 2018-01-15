@@ -16,7 +16,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {
     public sealed class ContentDataGraphType : ObjectGraphType<NamedContentData>
     {
-        public ContentDataGraphType(Schema schema, IGraphQLContext context)
+        public ContentDataGraphType(Schema schema, IGraphQLContext qlContext)
         {
             var schemaName = schema.Properties.Label.WithFallback(schema.Name);
 
@@ -24,7 +24,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
             foreach (var field in schema.Fields.Where(x => !x.IsHidden))
             {
-                var fieldInfo = context.GetGraphType(field);
+                var fieldInfo = qlContext.GetGraphType(field);
 
                 if (fieldInfo.ResolveType != null)
                 {
@@ -35,7 +35,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                         Name = $"{schema.Name.ToPascalCase()}Data{field.Name.ToPascalCase()}Dto"
                     };
 
-                    var partition = context.ResolvePartition(field.Partitioning);
+                    var partition = qlContext.ResolvePartition(field.Partitioning);
 
                     foreach (var partitionItem in partition)
                     {
