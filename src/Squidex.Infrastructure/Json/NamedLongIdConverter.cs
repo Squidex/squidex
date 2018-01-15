@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System;
-using System.Linq;
 using Newtonsoft.Json;
 
 namespace Squidex.Infrastructure.Json

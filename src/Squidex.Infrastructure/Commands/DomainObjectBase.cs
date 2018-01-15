@@ -7,7 +7,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading.Tasks;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.States;
@@ -53,9 +52,7 @@ namespace Squidex.Infrastructure.Commands
 
             ApplyEvent(@event);
 
-            snapshot.Version++;
-
-            uncomittedEvents.Add(@event.To<IEvent>());
+            uncomittedEvents.Add(@event);
         }
 
         public IReadOnlyList<Envelope<IEvent>> GetUncomittedEvents()
@@ -79,11 +76,6 @@ namespace Squidex.Infrastructure.Commands
 
         public Task WriteSnapshotAsync()
         {
-            if (persistence.Version == EtagVersion.NotFound)
-            {
-                Debugger.Break();
-            }
-
             snapshot.Version = persistence.Version;
 
             return persistence.WriteSnapshotAsync(snapshot);

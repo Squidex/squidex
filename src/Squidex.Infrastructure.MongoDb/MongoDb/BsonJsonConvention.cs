@@ -12,7 +12,6 @@ using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Conventions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Infrastructure.MongoDb
 {
