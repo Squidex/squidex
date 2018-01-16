@@ -11,7 +11,7 @@ namespace Squidex.Infrastructure
 {
     public sealed class ValidationError
     {
-        private static readonly string[] FalbackProperties = new string[0];
+        private static readonly string[] FallbackProperties = new string[0];
         private readonly string message;
         private readonly string[] propertyNames;
 
@@ -31,7 +31,7 @@ namespace Squidex.Infrastructure
 
             this.message = message;
 
-            this.propertyNames = propertyNames ?? FalbackProperties;
+            this.propertyNames = propertyNames ?? FallbackProperties;
         }
     }
 }
