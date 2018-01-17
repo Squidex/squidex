@@ -90,14 +90,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             sut = new CachingGraphQLService(cache, appProvider, assetRepository, commandBus, contentQuery, new FakeUrlGenerator());
         }
 
-        protected static IContentEntity CreateContent(Guid id, Guid refId, Guid assetId, NamedContentData data = null)
+        protected static IContentEntity CreateContent(Guid id, Guid refId, Guid assetId, NamedContentData data = null, bool noJson = false)
         {
             var now = DateTime.UtcNow.ToInstant();
 
             data = data ??
                 new NamedContentData()
-                    .AddField("my-json",
-                        new ContentFieldData().AddValue("iv", JToken.FromObject(new { value = 1 })))
                     .AddField("my-string",
                         new ContentFieldData().AddValue("de", "value"))
                     .AddField("my-assets",
@@ -114,6 +112,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                         new ContentFieldData().AddValue("iv", JToken.FromObject(new[] { refId })))
                     .AddField("my-geolocation",
                         new ContentFieldData().AddValue("iv", JToken.FromObject(new { latitude = 10, longitude = 20 })));
+
+            if (!noJson)
+            {
+                data.AddField("my-json",
+                    new ContentFieldData().AddValue("iv", JToken.FromObject(new { value = 1 })));
+            }
 
             var content = new ContentEntity
             {

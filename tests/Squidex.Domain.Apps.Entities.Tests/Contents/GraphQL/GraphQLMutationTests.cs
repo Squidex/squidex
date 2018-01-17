@@ -20,20 +20,110 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 {
     public class GraphQLMutationTests : GraphQLTestBase
     {
+        private readonly Guid contentId = Guid.NewGuid();
+        private readonly IContentEntity content;
         private readonly CommandContext commandContext = new CommandContext(new PatchContent());
 
         public GraphQLMutationTests()
         {
+            content = CreateContent(contentId, Guid.Empty, Guid.Empty, null, true);
+
             A.CallTo(() => commandBus.PublishAsync(A<ICommand>.Ignored))
                 .Returns(commandContext);
         }
 
         [Fact]
+        public async Task Should_return_single_content_when_creating_content()
+        {
+            var query = $@"
+                mutation OP($data: MySchemaInputDto!) {{
+                  createMySchemaContent(data: $data, expectedVersion: 10) {{
+                    version
+                    data {{
+                      myString {{
+                        de
+                      }}
+                      myNumber {{
+                        iv
+                      }}
+                      myBoolean {{
+                        iv
+                      }}
+                      myDatetime {{
+                        iv
+                      }}
+                      myGeolocation {{
+                        iv
+                      }}
+                      myTags {{
+                        iv
+                      }}
+                    }}
+                  }}
+                }}";
+
+            commandContext.Complete(new EntityCreatedResult<NamedContentData>(content.Data, 13));
+
+            var inputContent = GetInputContent(content);
+
+            var variables =
+                new JObject(
+                    new JProperty("data", inputContent));
+
+            var result = await sut.QueryAsync(app, user, new GraphQLQuery { Query = query, Variables = variables });
+
+            var expected = new
+            {
+                data = new
+                {
+                    createMySchemaContent = new
+                    {
+                        version = 13,
+                        data = new
+                        {
+                            myString = new
+                            {
+                                de = "value"
+                            },
+                            myNumber = new
+                            {
+                                iv = 1
+                            },
+                            myBoolean = new
+                            {
+                                iv = true
+                            },
+                            myDatetime = new
+                            {
+                                iv = content.LastModified.ToDateTimeUtc()
+                            },
+                            myGeolocation = new
+                            {
+                                iv = new
+                                {
+                                    latitude = 10,
+                                    longitude = 20
+                                }
+                            },
+                            myTags = new
+                            {
+                                iv = new[]
+                                {
+                                    "tag1",
+                                    "tag2"
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            AssertResult(expected, result);
+        }
+
+        [Fact]
         public async Task Should_return_single_content_when_updating_content()
         {
-            var contentId = Guid.NewGuid();
-            var content = CreateContent(contentId, Guid.Empty, Guid.Empty);
-
             var query = $@"
                 mutation OP($data: MySchemaInputDto!) {{
                   updateMySchemaContent(id: ""{contentId}"", data: $data, expectedVersion: 10) {{
@@ -49,9 +139,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                         iv
                       }}
                       myDatetime {{
-                        iv
-                      }}
-                      myJson {{
                         iv
                       }}
                       myGeolocation {{
@@ -99,13 +186,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                             {
                                 iv = content.LastModified.ToDateTimeUtc()
                             },
-                            myJson = new
-                            {
-                                iv = new
-                                {
-                                    value = 1
-                                }
-                            },
                             myGeolocation = new
                             {
                                 iv = new
@@ -133,9 +213,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         [Fact]
         public async Task Should_return_single_content_when_patching_content()
         {
-            var contentId = Guid.NewGuid();
-            var content = CreateContent(contentId, Guid.Empty, Guid.Empty);
-
             var query = $@"
                 mutation OP($data: MySchemaInputDto!) {{
                   patchMySchemaContent(id: ""{contentId}"", data: $data, expectedVersion: 10) {{
@@ -151,9 +228,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                         iv
                       }}
                       myDatetime {{
-                        iv
-                      }}
-                      myJson {{
                         iv
                       }}
                       myGeolocation {{
@@ -183,7 +257,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     patchMySchemaContent = new
                     {
                         version = 13,
-                        data = new {
+                        data = new
+                        {
                             myString = new
                             {
                                 de = "value"
@@ -199,13 +274,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                             myDatetime = new
                             {
                                 iv = content.LastModified.ToDateTimeUtc()
-                            },
-                            myJson = new
-                            {
-                                iv = new
-                                {
-                                    value = 1
-                                }
                             },
                             myGeolocation = new
                             {
@@ -234,8 +302,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         [Fact]
         public async Task Should_publish_command_for_publish()
         {
-            var contentId = Guid.NewGuid();
-
             var query = $@"
                 mutation {{
                   publishMySchemaContent(id: ""{contentId}"", expectedVersion: 10) {{
@@ -272,8 +338,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         [Fact]
         public async Task Should_publish_command_for_unpublish()
         {
-            var contentId = Guid.NewGuid();
-
             var query = $@"
                 mutation {{
                   unpublishMySchemaContent(id: ""{contentId}"", expectedVersion: 10) {{
@@ -310,8 +374,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         [Fact]
         public async Task Should_publish_command_for_archive()
         {
-            var contentId = Guid.NewGuid();
-
             var query = $@"
                 mutation {{
                   archiveMySchemaContent(id: ""{contentId}"", expectedVersion: 10) {{
@@ -348,8 +410,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         [Fact]
         public async Task Should_publish_command_for_restore()
         {
-            var contentId = Guid.NewGuid();
-
             var query = $@"
                 mutation {{
                   restoreMySchemaContent(id: ""{contentId}"", expectedVersion: 10) {{
@@ -386,8 +446,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         [Fact]
         public async Task Should_publish_command_for_delete()
         {
-            var contentId = Guid.NewGuid();
-
             var query = $@"
                 mutation {{
                   deleteMySchemaContent(id: ""{contentId}"", expectedVersion: 10) {{
@@ -426,10 +484,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             foreach (var kvp in content.Data)
             {
-                if (kvp.Key != "my-json")
-                {
-                    camelContent[kvp.Key.ToCamelCase()] = kvp.Value;
-                }
+                camelContent[kvp.Key.ToCamelCase()] = kvp.Value;
             }
 
             return JObject.FromObject(camelContent);

@@ -89,7 +89,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                     var result = commandContext.Result<EntityCreatedResult<NamedContentData>>();
                     var response = ContentEntity.Create(command, result);
 
-                    return ContentEntity.Create(command, result);
+                    return (IContentEntity)ContentEntity.Create(command, result);
                 }),
                 Description = $"Creates an {schemaName} content."
             });
