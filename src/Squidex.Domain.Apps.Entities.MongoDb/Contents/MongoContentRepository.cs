@@ -64,13 +64,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
             await collection.Indexes.CreateOneAsync(
                 Index
+                    .Ascending(x => x.SchemaId)
                     .Ascending(x => x.Id)
-                    .Ascending(x => x.IsDeleted));
-
-            await collection.Indexes.CreateOneAsync(
-                Index
-                    .Ascending(x => x.Id)
-                    .Ascending(x => x.Version));
+                    .Ascending(x => x.IsDeleted)
+                    .Ascending(x => x.Status));
 
             await collection.Indexes.CreateOneAsync(Index.Ascending(x => x.ReferencedIds));
         }
@@ -106,7 +103,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, Status[] status, HashSet<Guid> ids)
         {
-            var find = Collection.Find(x => ids.Contains(x.Id));
+            var find = Collection.Find(x => x.SchemaId == schema.Id && ids.Contains(x.Id) && !x.IsDeleted && status.Contains(x.Status));
 
             var contentItems = find.ToListAsync();
             var contentCount = find.CountAsync();
@@ -121,13 +118,13 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             return ResultList.Create<IContentEntity>(contentItems.Result, contentCount.Result);
         }
 
-        public async Task<IReadOnlyList<Guid>> QueryNotFoundAsync(Guid appId, Guid schemaId, IList<Guid> contentIds)
+        public async Task<IReadOnlyList<Guid>> QueryNotFoundAsync(Guid appId, Guid schemaId, IList<Guid> ids)
         {
             var contentEntities =
-                await Collection.Find(x => contentIds.Contains(x.Id) && x.AppId == appId).Only(x => x.Id)
+                await Collection.Find(x => x.SchemaId == schemaId && ids.Contains(x.Id) && !x.IsDeleted).Only(x => x.Id)
                     .ToListAsync();
 
-            return contentIds.Except(contentEntities.Select(x => Guid.Parse(x["id"].AsString))).ToList();
+            return ids.Except(contentEntities.Select(x => Guid.Parse(x["id"].AsString))).ToList();
         }
 
         public async Task<IContentEntity> FindContentAsync(IAppEntity app, ISchemaEntity schema, Guid id, long version)
@@ -144,7 +141,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         public async Task<IContentEntity> FindContentAsync(IAppEntity app, ISchemaEntity schema, Guid id)
         {
             var contentEntity =
-                await Collection.Find(x => x.Id == id && !x.IsDeleted)
+                await Collection.Find(x => x.SchemaId == schema.Id && x.Id == id && !x.IsDeleted)
                     .FirstOrDefaultAsync();
 
             contentEntity?.ParseData(schema.SchemaDef);
