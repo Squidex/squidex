@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using GraphQL;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 using Newtonsoft.Json.Linq;
@@ -307,16 +308,31 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
         private static IFieldResolver ResolveAsync<T>(Func<ResolveFieldContext, Func<SquidexCommand, Task<CommandContext>>, Task<T>> action)
         {
-            return new FuncFieldResolver<Task<T>>(c =>
+            return new FuncFieldResolver<Task<T>>(async c =>
             {
                 var e = (GraphQLExecutionContext)c.UserContext;
 
-                return action(c, command =>
+                try
                 {
-                    command.ExpectedVersion = c.GetArgument("expectedVersion", EtagVersion.Any);
+                    return await action(c, command =>
+                    {
+                        command.ExpectedVersion = c.GetArgument("expectedVersion", EtagVersion.Any);
 
-                    return e.CommandBus.PublishAsync(command);
-                });
+                        return e.CommandBus.PublishAsync(command);
+                    });
+                }
+                catch (ValidationException ex)
+                {
+                    c.Errors.Add(new ExecutionError(ex.Message));
+
+                    throw;
+                }
+                catch (DomainException ex)
+                {
+                    c.Errors.Add(new ExecutionError(ex.Message));
+
+                    throw;
+                }
             });
         }
 

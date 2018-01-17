@@ -48,6 +48,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Ben.BlockingDetector" Version="0.0.1" />
     <PackageReference Include="EventStore.ClientAPI.NetCore" Version="4.0.2-rc" />
     <PackageReference Include="IdentityServer4" Version="2.0.6" />
     <PackageReference Include="IdentityServer4.AccessTokenValidation" Version="2.2.0" />
