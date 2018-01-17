@@ -11,7 +11,7 @@ using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {
-    public sealed class CommandVersionGraphType : ComplexGraphType<CommandContext>
+    public sealed class CommandVersionGraphType : ObjectGraphType<CommandContext>
     {
         public CommandVersionGraphType()
         {
@@ -21,14 +21,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             {
                 Name = "version",
                 ResolvedType = new IntGraphType(),
-                Resolver = ResolveEtag(),
+                Resolver = ResolveVersion(),
                 Description = "The new version of the item."
             });
 
             Description = "The result of a mutation";
         }
 
-        private static IFieldResolver ResolveEtag()
+        private static IFieldResolver ResolveVersion()
         {
             return new FuncFieldResolver<CommandContext, int?>(x =>
             {

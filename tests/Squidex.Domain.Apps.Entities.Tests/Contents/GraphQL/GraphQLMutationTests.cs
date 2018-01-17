@@ -132,6 +132,117 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         }
 
         [Fact]
+        public async Task Should_publish_command_for_publish()
+        {
+            var contentId = Guid.NewGuid();
+
+            var query = $@"
+                mutation {{
+                  publishMySchemaContent(id: ""{contentId}"") {{
+                    version
+                  }}
+                }}";
+
+            commandContext.Complete(new EntitySavedResult(13));
+
+            var result = await sut.QueryAsync(app, user, new GraphQLQuery { Query = query });
+
+            var expected = new
+            {
+                data = new
+                {
+                    publishMySchemaContent = new
+                    {
+                        version = 13
+                    }
+                }
+            };
+
+            AssertResult(expected, result);
+
+            A.CallTo(() => commandBus.PublishAsync(
+                A<ChangeContentStatus>.That.Matches(x =>
+                    x.SchemaId.Equals(schema.NamedId()) &&
+                    x.ContentId == contentId &&
+                    x.Status == Status.Published)))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_publish_command_for_unpublish()
+        {
+            var contentId = Guid.NewGuid();
+
+            var query = $@"
+                mutation {{
+                  unpublishMySchemaContent(id: ""{contentId}"") {{
+                    version
+                  }}
+                }}";
+
+            commandContext.Complete(new EntitySavedResult(13));
+
+            var result = await sut.QueryAsync(app, user, new GraphQLQuery { Query = query });
+
+            var expected = new
+            {
+                data = new
+                {
+                    unpublishMySchemaContent = new
+                    {
+                        version = 13
+                    }
+                }
+            };
+
+            AssertResult(expected, result);
+
+            A.CallTo(() => commandBus.PublishAsync(
+                A<ChangeContentStatus>.That.Matches(x =>
+                    x.SchemaId.Equals(schema.NamedId()) &&
+                    x.ContentId == contentId &&
+                    x.Status == Status.Draft)))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_publish_command_for_archive()
+        {
+            var contentId = Guid.NewGuid();
+
+            var query = $@"
+                mutation {{
+                  archiveMySchemaContent(id: ""{contentId}"") {{
+                    version
+                  }}
+                }}";
+
+            commandContext.Complete(new EntitySavedResult(13));
+
+            var result = await sut.QueryAsync(app, user, new GraphQLQuery { Query = query });
+
+            var expected = new
+            {
+                data = new
+                {
+                    archiveMySchemaContent = new
+                    {
+                        version = 13
+                    }
+                }
+            };
+
+            AssertResult(expected, result);
+
+            A.CallTo(() => commandBus.PublishAsync(
+                A<ChangeContentStatus>.That.Matches(x =>
+                    x.SchemaId.Equals(schema.NamedId()) &&
+                    x.ContentId == contentId &&
+                    x.Status == Status.Archived)))
+                .MustHaveHappened();
+        }
+
+        [Fact]
         public async Task Should_publish_command_for_restore()
         {
             var contentId = Guid.NewGuid();
