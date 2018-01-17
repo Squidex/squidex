@@ -54,35 +54,35 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             {
                 {
                     typeof(StringField),
-                    new StringGraphType()
+                    AllTypes.String
                 },
                 {
                     typeof(BooleanField),
-                    new BooleanGraphType()
+                    AllTypes.Boolean
                 },
                 {
                     typeof(NumberField),
-                    new FloatGraphType()
+                    AllTypes.Boolean
                 },
                 {
                     typeof(DateTimeField),
-                    new DateGraphType()
+                    AllTypes.Date
                 },
                 {
                     typeof(GeolocationField),
-                    new GeolocationInputGraphType()
+                    AllTypes.GeolocationInput
                 },
                 {
                     typeof(TagsField),
-                    new ListGraphType(new StringGraphType())
+                    AllTypes.ListOfNonNullString
                 },
                 {
                     typeof(AssetsField),
-                    new ListGraphType(new GuidGraphType())
+                    AllTypes.ListOfNonNullGuid
                 },
                 {
                     typeof(ReferencesField),
-                    new ListGraphType(new GuidGraphType())
+                    AllTypes.ListOfNonNullGuid
                 }
             };
 
@@ -90,31 +90,31 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             {
                 {
                     typeof(StringField),
-                    field => ResolveDefault("String")
+                    field => ResolveDefault(AllTypes.NoopString)
                 },
                 {
                     typeof(BooleanField),
-                    field => ResolveDefault("Boolean")
+                    field => ResolveDefault(AllTypes.NoopBoolean)
                 },
                 {
                     typeof(NumberField),
-                    field => ResolveDefault("Float")
+                    field => ResolveDefault(AllTypes.NoopFloat)
                 },
                 {
                     typeof(DateTimeField),
-                    field => ResolveDefault("Date")
+                    field => ResolveDefault(AllTypes.NoopDate)
                 },
                 {
                     typeof(JsonField),
-                    field => ResolveDefault("Json")
+                    field => ResolveDefault(AllTypes.NoopJson)
                 },
                 {
                     typeof(GeolocationField),
-                    field => ResolveDefault("Geolocation")
+                    field => ResolveDefault(AllTypes.NoopGeolocation)
                 },
                 {
                     typeof(TagsField),
-                    field => ResolveDefault("String")
+                    field => ResolveDefault(AllTypes.NoopTags)
                 },
                 {
                     typeof(AssetsField),
@@ -144,9 +144,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             }
         }
 
-        private static (IGraphType ResolveType, IFieldResolver Resolver) ResolveDefault(string name)
+        private static (IGraphType ResolveType, IFieldResolver Resolver) ResolveDefault(IGraphType type)
         {
-            return (new NoopGraphType(name), new FuncFieldResolver<ContentFieldData, object>(c => c.Source.GetOrDefault(c.FieldName)));
+            return (type, new FuncFieldResolver<ContentFieldData, object>(c => c.Source.GetOrDefault(c.FieldName)));
         }
 
         public IFieldResolver ResolveAssetUrl()

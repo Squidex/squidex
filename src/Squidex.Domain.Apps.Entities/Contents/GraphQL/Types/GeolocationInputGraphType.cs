@@ -18,13 +18,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             AddField(new FieldType
             {
                 Name = "latitude",
-                ResolvedType = new NonNullGraphType(new FloatGraphType())
+                ResolvedType = AllTypes.NonNullFloat
             });
 
             AddField(new FieldType
             {
                 Name = "longitude",
-                ResolvedType = new NonNullGraphType(new FloatGraphType())
+                ResolvedType = AllTypes.NonNullFloat
             });
         }
     }

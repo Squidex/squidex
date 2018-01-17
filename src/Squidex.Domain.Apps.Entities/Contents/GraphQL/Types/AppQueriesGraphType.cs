@@ -143,11 +143,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
         {
             return new QueryArguments
             {
-                new QueryArgument(typeof(NonNullGraphType<GuidGraphType>))
+                new QueryArgument(AllTypes.None)
                 {
                     Name = "id",
                     Description = "The id of the asset (GUID).",
-                    DefaultValue = string.Empty
+                    DefaultValue = string.Empty,
+                    ResolvedType = AllTypes.NonNullGuid
                 }
             };
         }
@@ -156,11 +157,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
         {
             return new QueryArguments
             {
-                new QueryArgument(typeof(NonNullGraphType<GuidGraphType>))
+                new QueryArgument(AllTypes.None)
                 {
                     Name = "id",
                     Description = $"The id of the {schemaName} content (GUID)",
-                    DefaultValue = string.Empty
+                    DefaultValue = string.Empty,
+                    ResolvedType = AllTypes.NonNullGuid
                 }
             };
         }
@@ -169,23 +171,26 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
         {
             return new QueryArguments
             {
-                new QueryArgument(typeof(IntGraphType))
+                new QueryArgument(AllTypes.None)
                 {
                     Name = "take",
                     Description = "Optional number of assets to take (Default: 20).",
-                    DefaultValue = 20
+                    DefaultValue = 20,
+                    ResolvedType = AllTypes.Int
                 },
-                new QueryArgument(typeof(IntGraphType))
+                new QueryArgument(AllTypes.None)
                 {
                     Name = "skip",
                     Description = "Optional number of assets to skip.",
-                    DefaultValue = 0
+                    DefaultValue = 0,
+                    ResolvedType = AllTypes.Int
                 },
-                new QueryArgument(typeof(StringGraphType))
+                new QueryArgument(AllTypes.None)
                 {
                     Name = "search",
                     Description = "Optional query to limit the files by name.",
-                    DefaultValue = string.Empty
+                    DefaultValue = string.Empty,
+                    ResolvedType = AllTypes.String
                 }
             };
         }
@@ -194,35 +199,40 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
         {
             return new QueryArguments
             {
-                new QueryArgument(typeof(IntGraphType))
+                new QueryArgument(AllTypes.None)
                 {
                     Name = "top",
                     Description = "Optional number of contents to take (Default: 20).",
-                    DefaultValue = 20
+                    DefaultValue = 20,
+                    ResolvedType = AllTypes.Int
                 },
-                new QueryArgument(typeof(IntGraphType))
+                new QueryArgument(AllTypes.None)
                 {
                     Name = "skip",
                     Description = "Optional number of contents to skip.",
-                    DefaultValue = 0
+                    DefaultValue = 0,
+                    ResolvedType = AllTypes.Int
                 },
-                new QueryArgument(typeof(StringGraphType))
+                new QueryArgument(AllTypes.None)
                 {
                     Name = "filter",
                     Description = "Optional OData filter.",
-                    DefaultValue = string.Empty
+                    DefaultValue = string.Empty,
+                    ResolvedType = AllTypes.String
                 },
-                new QueryArgument(typeof(StringGraphType))
+                new QueryArgument(AllTypes.None)
                 {
                     Name = "search",
                     Description = "Optional OData full text search.",
-                    DefaultValue = string.Empty
+                    DefaultValue = string.Empty,
+                    ResolvedType = AllTypes.String
                 },
-                new QueryArgument(typeof(StringGraphType))
+                new QueryArgument(AllTypes.None)
                 {
                     Name = "orderby",
                     Description = "Optional OData order definition.",
-                    DefaultValue = string.Empty
+                    DefaultValue = string.Empty,
+                    ResolvedType = AllTypes.String
                 }
             };
         }

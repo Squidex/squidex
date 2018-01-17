@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             {
                 Name = "total",
                 Resolver = Resolver(x => x.Total),
-                ResolvedType = new NonNullGraphType(new IntGraphType()),
+                ResolvedType = AllTypes.NonNullInt,
                 Description = $"The total number of {schemaName} items."
             });
 

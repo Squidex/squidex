@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             AddField(new FieldType
             {
                 Name = "version",
-                ResolvedType = new IntGraphType(),
+                ResolvedType = AllTypes.Int,
                 Resolver = Resolve(x => x.Version),
                 Description = $"The new version of the {schemaName} content."
             });

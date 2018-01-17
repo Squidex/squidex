@@ -56,24 +56,26 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 Name = $"create{schemaType}Content",
                 Arguments = new QueryArguments
                 {
-                    new QueryArgument(typeof(BooleanGraphType))
-                    {
-                        Name = "publish",
-                        Description = "Set to true to autopublish content.",
-                        DefaultValue = false
-                    },
-                    new QueryArgument(typeof(NoopGraphType))
+                    new QueryArgument(AllTypes.None)
                     {
                         Name = "data",
                         Description = $"The data for the {schemaName} content.",
                         DefaultValue = null,
                         ResolvedType = new NonNullGraphType(inputType),
                     },
-                    new QueryArgument(typeof(IntGraphType))
+                    new QueryArgument(AllTypes.None)
+                    {
+                        Name = "publish",
+                        Description = "Set to true to autopublish content.",
+                        DefaultValue = false,
+                        ResolvedType = AllTypes.Boolean
+                    },
+                    new QueryArgument(AllTypes.None)
                     {
                         Name = "expectedVersion",
                         Description = "The expected version",
-                        DefaultValue = EtagVersion.Any
+                        DefaultValue = EtagVersion.Any,
+                        ResolvedType = AllTypes.Int
                     }
                 },
                 ResolvedType = new NonNullGraphType(contentType),
@@ -102,24 +104,26 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 Name = $"update{schemaType}Content",
                 Arguments = new QueryArguments
                 {
-                    new QueryArgument(typeof(NonNullGraphType<GuidGraphType>))
+                    new QueryArgument(AllTypes.None)
                     {
                         Name = "id",
                         Description = $"The id of the {schemaName} content (GUID)",
-                        DefaultValue = string.Empty
+                        DefaultValue = string.Empty,
+                        ResolvedType = AllTypes.NonNullGuid
                     },
-                    new QueryArgument(typeof(NoopGraphType))
+                    new QueryArgument(AllTypes.None)
                     {
                         Name = "data",
                         Description = $"The data for the {schemaName} content.",
                         DefaultValue = null,
                         ResolvedType = new NonNullGraphType(inputType),
                     },
-                    new QueryArgument(typeof(IntGraphType))
+                    new QueryArgument(AllTypes.None)
                     {
                         Name = "expectedVersion",
                         Description = "The expected version",
-                        DefaultValue = EtagVersion.Any
+                        DefaultValue = EtagVersion.Any,
+                        ResolvedType = AllTypes.Int
                     }
                 },
                 ResolvedType = new NonNullGraphType(resultType),
@@ -146,24 +150,26 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 Name = $"patch{schemaType}Content",
                 Arguments = new QueryArguments
                 {
-                    new QueryArgument(typeof(NonNullGraphType<GuidGraphType>))
+                    new QueryArgument(AllTypes.None)
                     {
                         Name = "id",
                         Description = $"The id of the {schemaName} content (GUID)",
-                        DefaultValue = string.Empty
+                        DefaultValue = string.Empty,
+                        ResolvedType = AllTypes.NonNullGuid
                     },
-                    new QueryArgument(typeof(NoopGraphType))
+                    new QueryArgument(AllTypes.None)
                     {
                         Name = "data",
                         Description = $"The data for the {schemaName} content.",
                         DefaultValue = null,
                         ResolvedType = new NonNullGraphType(inputType),
                     },
-                    new QueryArgument(typeof(IntGraphType))
+                    new QueryArgument(AllTypes.None)
                     {
                         Name = "expectedVersion",
                         Description = "The expected version",
-                        DefaultValue = EtagVersion.Any
+                        DefaultValue = EtagVersion.Any,
+                        ResolvedType = AllTypes.Int
                     }
                 },
                 ResolvedType = new NonNullGraphType(resultType),
@@ -189,7 +195,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             {
                 Name = $"publish{schemaType}Content",
                 Arguments = CreateIdArguments(schemaName),
-                ResolvedType = new NonNullGraphType(new CommandVersionGraphType()),
+                ResolvedType = AllTypes.CommandVersion,
                 Resolver = ResolveAsync((c, publish) =>
                 {
                     var contentId = c.GetArgument<Guid>("id");
@@ -208,7 +214,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             {
                 Name = $"unpublish{schemaType}Content",
                 Arguments = CreateIdArguments(schemaName),
-                ResolvedType = new NonNullGraphType(new CommandVersionGraphType()),
+                ResolvedType = AllTypes.CommandVersion,
                 Resolver = ResolveAsync((c, publish) =>
                 {
                     var contentId = c.GetArgument<Guid>("id");
@@ -227,7 +233,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             {
                 Name = $"archive{schemaType}Content",
                 Arguments = CreateIdArguments(schemaName),
-                ResolvedType = new NonNullGraphType(new CommandVersionGraphType()),
+                ResolvedType = AllTypes.CommandVersion,
                 Resolver = ResolveAsync((c, publish) =>
                 {
                     var contentId = c.GetArgument<Guid>("id");
@@ -246,7 +252,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             {
                 Name = $"restore{schemaType}Content",
                 Arguments = CreateIdArguments(schemaName),
-                ResolvedType = new NonNullGraphType(new CommandVersionGraphType()),
+                ResolvedType = AllTypes.CommandVersion,
                 Resolver = ResolveAsync((c, publish) =>
                 {
                     var contentId = c.GetArgument<Guid>("id");
@@ -265,7 +271,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             {
                 Name = $"delete{schemaType}Content",
                 Arguments = CreateIdArguments(schemaName),
-                ResolvedType = new NonNullGraphType(new CommandVersionGraphType()),
+                ResolvedType = AllTypes.CommandVersion,
                 Resolver = ResolveAsync((c, publish) =>
                 {
                     var contentId = c.GetArgument<Guid>("id");
@@ -282,17 +288,19 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
         {
             return new QueryArguments
             {
-                new QueryArgument(typeof(GuidGraphType))
+                new QueryArgument(AllTypes.None)
                 {
                     Name = "id",
                     Description = $"The id of the {schemaName} content (GUID)",
-                    DefaultValue = string.Empty
+                    DefaultValue = string.Empty,
+                    ResolvedType = AllTypes.NonNullGuid
                 },
-                new QueryArgument(typeof(IntGraphType))
+                new QueryArgument(AllTypes.None)
                 {
                     Name = "expectedVersion",
                     Description = "The expected version",
-                    DefaultValue = EtagVersion.Any
+                    DefaultValue = EtagVersion.Any,
+                    ResolvedType = AllTypes.Int
                 }
             };
         }

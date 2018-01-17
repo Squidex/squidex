@@ -22,8 +22,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             AddField(new FieldType
             {
                 Name = "total",
+                ResolvedType = AllTypes.Int,
                 Resolver = Resolve(x => x.Total),
-                ResolvedType = new NonNullGraphType(new IntGraphType()),
                 Description = $"The total count of assets."
             });
 

@@ -25,15 +25,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             AddField(new FieldType
             {
                 Name = "id",
-                ResolvedType = new NonNullGraphType(new StringGraphType()),
-                Resolver = Resolve(x => x.Id.ToString()),
+                ResolvedType = AllTypes.NonNullGuid,
+                Resolver = Resolve(x => x.Id),
                 Description = $"The id of the {schemaName} content."
             });
 
             AddField(new FieldType
             {
                 Name = "version",
-                ResolvedType = new NonNullGraphType(new IntGraphType()),
+                ResolvedType = AllTypes.NonNullInt,
                 Resolver = Resolve(x => x.Version),
                 Description = $"The version of the {schemaName} content."
             });
@@ -41,7 +41,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             AddField(new FieldType
             {
                 Name = "created",
-                ResolvedType = new NonNullGraphType(new DateGraphType()),
+                ResolvedType = AllTypes.NonNullDate,
                 Resolver = Resolve(x => x.Created.ToDateTimeUtc()),
                 Description = $"The date and time when the {schemaName} content has been created."
             });
@@ -49,7 +49,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             AddField(new FieldType
             {
                 Name = "createdBy",
-                ResolvedType = new NonNullGraphType(new StringGraphType()),
+                ResolvedType = AllTypes.NonNullString,
                 Resolver = Resolve(x => x.CreatedBy.ToString()),
                 Description = $"The user that has created the {schemaName} content."
             });
@@ -57,7 +57,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             AddField(new FieldType
             {
                 Name = "lastModified",
-                ResolvedType = new NonNullGraphType(new DateGraphType()),
+                ResolvedType = AllTypes.NonNullDate,
                 Resolver = Resolve(x => x.LastModified.ToDateTimeUtc()),
                 Description = $"The date and time when the {schemaName} content has been modified last."
             });
@@ -65,7 +65,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             AddField(new FieldType
             {
                 Name = "lastModifiedBy",
-                ResolvedType = new NonNullGraphType(new StringGraphType()),
+                ResolvedType = AllTypes.NonNullString,
                 Resolver = Resolve(x => x.LastModifiedBy.ToString()),
                 Description = $"The user that has updated the {schemaName} content last."
             });
@@ -73,7 +73,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             AddField(new FieldType
             {
                 Name = "url",
-                ResolvedType = new NonNullGraphType(new StringGraphType()),
+                ResolvedType = AllTypes.NonNullString,
                 Resolver = model.ResolveContentUrl(schema),
                 Description = $"The url to the the {schemaName} content."
             });

@@ -57,7 +57,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                     {
                         Name = field.Name.ToCamelCase(),
                         Resolver = fieldResolver,
-                        ResolvedType = fieldGraphType
+                        ResolvedType = fieldGraphType,
+                        Description = $"The {fieldName} field."
                     });
                 }
             }
