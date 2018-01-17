@@ -32,11 +32,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 var contentType = model.GetContentType(schema.Id);
                 var contentDataType = model.GetContentDataType(schema.Id);
 
+                var resultType = new ContentDataChangedResultGraphType(schemaType, schemaName, contentDataType);
+
                 var inputType = new ContentDataGraphInputType(model, schema);
 
                 AddContentCreate(schemaId, schemaType, schemaName, inputType, contentDataType, contentType);
-                AddContentUpdate(schemaId, schemaType, schemaName, inputType, contentDataType);
-                AddContentPatch(schemaId, schemaType, schemaName, inputType, contentDataType);
+                AddContentUpdate(schemaId, schemaType, schemaName, inputType, resultType);
+                AddContentPatch(schemaId, schemaType, schemaName, inputType, resultType);
                 AddContentPublish(schemaId, schemaType, schemaName);
                 AddContentUnpublish(schemaId, schemaType, schemaName);
                 AddContentArchive(schemaId, schemaType, schemaName);
@@ -93,7 +95,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             });
         }
 
-        private void AddContentUpdate(NamedId<Guid> schemaId, string schemaType, string schemaName, ContentDataGraphInputType inputType, IComplexGraphType contentDataType)
+        private void AddContentUpdate(NamedId<Guid> schemaId, string schemaType, string schemaName, ContentDataGraphInputType inputType, IComplexGraphType resultType)
         {
             AddField(new FieldType
             {
@@ -120,7 +122,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                         DefaultValue = EtagVersion.Any
                     }
                 },
-                ResolvedType = new NonNullGraphType(contentDataType),
+                ResolvedType = new NonNullGraphType(resultType),
                 Resolver = ResolveAsync(async (c, publish) =>
                 {
                     var contentId = c.GetArgument<Guid>("id");
@@ -131,13 +133,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
                     var result = commandContext.Result<ContentDataChangedResult>();
 
-                    return result.Data;
+                    return result;
                 }),
                 Description = $"Update an {schemaName} content by id."
             });
         }
 
-        private void AddContentPatch(NamedId<Guid> schemaId, string schemaType, string schemaName, ContentDataGraphInputType inputType, IComplexGraphType contentDataType)
+        private void AddContentPatch(NamedId<Guid> schemaId, string schemaType, string schemaName, ContentDataGraphInputType inputType, IComplexGraphType resultType)
         {
             AddField(new FieldType
             {
@@ -164,7 +166,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                         DefaultValue = EtagVersion.Any
                     }
                 },
-                ResolvedType = new NonNullGraphType(contentDataType),
+                ResolvedType = new NonNullGraphType(resultType),
                 Resolver = ResolveAsync(async (c, publish) =>
                 {
                     var contentId = c.GetArgument<Guid>("id");
@@ -175,7 +177,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
                     var result = commandContext.Result<ContentDataChangedResult>();
 
-                    return result.Data;
+                    return result;
                 }),
                 Description = $"Patch a {schemaName} content."
             });
@@ -303,7 +305,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
                 return action(c, command =>
                 {
-                    command.ExpectedVersion = c.GetArgument<int>("expectedVersion");
+                    command.ExpectedVersion = c.GetArgument("expectedVersion", EtagVersion.Any);
 
                     return e.CommandBus.PublishAsync(command);
                 });
