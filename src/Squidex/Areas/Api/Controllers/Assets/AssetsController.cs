@@ -60,9 +60,9 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="ids">The optional asset ids.</param>
-        /// <param name="skip">The number of assets to skip.</param>
-        /// <param name="take">The number of assets to take (Default: 20).</param>
-        /// <param name="query">The query to limit the files by name.</param>
+        /// <param name="skip">Optional number of assets to skip.</param>
+        /// <param name="take">Optional number of assets to take (Default: 20).</param>
+        /// <param name="query">Optional query to limit the files by name.</param>
         /// <param name="mimeTypes">Comma separated list of mime types to get.</param>
         /// <returns>
         /// 200 => Assets returned.
@@ -76,7 +76,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [Route("apps/{app}/assets/")]
         [ProducesResponseType(typeof(AssetsDto), 200)]
         [ApiCosts(1)]
-        public async Task<IActionResult> GetAssets(string app, [FromQuery] string query = null, [FromQuery] string mimeTypes = null, [FromQuery] string ids = null, [FromQuery] int skip = 0, [FromQuery] int take = 10)
+        public async Task<IActionResult> GetAssets(string app, [FromQuery] string query = null, [FromQuery] string mimeTypes = null, [FromQuery] string ids = null, [FromQuery] int skip = 0, [FromQuery] int take = 20)
         {
             var mimeTypeList = new HashSet<string>();
 

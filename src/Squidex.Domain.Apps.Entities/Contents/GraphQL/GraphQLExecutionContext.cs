@@ -13,17 +13,22 @@ using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
+using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 {
-    public sealed class GraphQLQueryContext : QueryContext
+    public sealed class GraphQLExecutionContext : QueryContext
     {
+        public ICommandBus CommandBus { get; }
+
         public IGraphQLUrlGenerator UrlGenerator { get; }
 
-        public GraphQLQueryContext(IAppEntity app, IAssetRepository assetRepository, IContentQueryService contentQuery, ClaimsPrincipal user,
+        public GraphQLExecutionContext(IAppEntity app, IAssetRepository assetRepository, ICommandBus commandBus, IContentQueryService contentQuery, ClaimsPrincipal user,
             IGraphQLUrlGenerator urlGenerator)
             : base(app, assetRepository, contentQuery, user)
         {
+            CommandBus = commandBus;
+
             UrlGenerator = urlGenerator;
         }
 

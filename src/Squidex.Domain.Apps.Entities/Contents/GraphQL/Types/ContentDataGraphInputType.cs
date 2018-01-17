@@ -14,26 +14,31 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {
-    public sealed class ContentDataGraphType : ObjectGraphType<NamedContentData>
+    public sealed class ContentDataGraphInputType : InputObjectGraphType
     {
-        public void Initialize(IGraphModel model, ISchemaEntity schema)
+        public ContentDataGraphInputType(IGraphModel model, ISchemaEntity schema)
         {
             var schemaType = schema.TypeName();
             var schemaName = schema.DisplayName();
 
-            Name = $"{schemaType}DataDto";
+            Name = $"{schemaType}InputDto";
 
             foreach (var field in schema.SchemaDef.Fields.Where(x => !x.IsHidden))
             {
-                var fieldInfo = model.GetGraphType(field);
+                var inputType = model.GetInputGraphType(field);
 
-                if (fieldInfo.ResolveType != null)
+                if (inputType != null)
                 {
+                    if (field.RawProperties.IsRequired)
+                    {
+                        inputType = new NonNullGraphType(inputType);
+                    }
+
                     var fieldName = field.RawProperties.Label.WithFallback(field.Name);
 
-                    var fieldGraphType = new ObjectGraphType
+                    var fieldGraphType = new InputObjectGraphType
                     {
-                        Name = $"{schemaType}Data{field.Name.ToPascalCase()}Dto"
+                        Name = $"{schemaType}Data{field.Name.ToPascalCase()}InputDto"
                     };
 
                     var partition = model.ResolvePartition(field.Partitioning);
@@ -43,13 +48,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                         fieldGraphType.AddField(new FieldType
                         {
                             Name = partitionItem.Key,
-                            Resolver = fieldInfo.Resolver,
-                            ResolvedType = fieldInfo.ResolveType,
+                            ResolvedType = inputType,
+                            Resolver = null,
                             Description = field.RawProperties.Hints
                         });
                     }
 
-                    fieldGraphType.Description = $"The structure of the {fieldName} of a {schemaName} content type.";
+                    fieldGraphType.Description = $"The input structure of the {fieldName} of a {schemaName} content type.";
 
                     var fieldResolver = new FuncFieldResolver<NamedContentData, ContentFieldData>(c => c.Source.GetOrDefault(field.Name));
 

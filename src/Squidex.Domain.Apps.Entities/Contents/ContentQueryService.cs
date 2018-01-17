@@ -12,7 +12,6 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.OData;
 using Microsoft.OData.UriParser;
-using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Entities.Apps;
@@ -122,7 +121,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 foreach (var content in contents)
                 {
                     var contentData = scriptEngine.Transform(new ScriptContext { User = user, Data = content.Data, ContentId = content.Id }, scriptText);
-                    var contentResult = SimpleMapper.Map(content, new Content());
+                    var contentResult = SimpleMapper.Map(content, new ContentEntity());
 
                     contentResult.Data = contentData;
 
@@ -198,24 +197,6 @@ namespace Squidex.Domain.Apps.Entities.Contents
             }
 
             return status;
-        }
-
-        private sealed class Content : IContentEntity
-        {
-            public Guid Id { get; set; }
-            public Guid AppId { get; set; }
-
-            public long Version { get; set; }
-
-            public Instant Created { get; set; }
-            public Instant LastModified { get; set; }
-
-            public RefToken CreatedBy { get; set; }
-            public RefToken LastModifiedBy { get; set; }
-
-            public NamedContentData Data { get; set; }
-
-            public Status Status { get; set; }
         }
     }
 }

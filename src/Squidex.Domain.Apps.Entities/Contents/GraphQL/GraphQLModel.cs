@@ -24,15 +24,17 @@ using GraphQLSchema = GraphQL.Types.Schema;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 {
-    public sealed class GraphQLModel : IGraphQLContext
+    public sealed class GraphQLModel : IGraphModel
     {
         private readonly Dictionary<Type, Func<Field, (IGraphType ResolveType, IFieldResolver Resolver)>> fieldInfos;
-        private readonly Dictionary<Guid, ContentGraphType> schemaTypes = new Dictionary<Guid, ContentGraphType>();
+        private readonly Dictionary<Type, IGraphType> inputFieldInfos;
+        private readonly Dictionary<ISchemaEntity, ContentGraphType> contentTypes = new Dictionary<ISchemaEntity, ContentGraphType>();
+        private readonly Dictionary<ISchemaEntity, ContentDataGraphType> contentDataTypes = new Dictionary<ISchemaEntity, ContentDataGraphType>();
         private readonly Dictionary<Guid, ISchemaEntity> schemas;
         private readonly PartitionResolver partitionResolver;
         private readonly IAppEntity app;
-        private readonly IGraphType assetType;
         private readonly IGraphType assetListType;
+        private readonly IComplexGraphType assetType;
         private readonly GraphQLSchema graphQLSchema;
 
         public bool CanGenerateAssetSourceUrl { get; }
@@ -47,6 +49,42 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             assetType = new AssetGraphType(this);
             assetListType = new ListGraphType(new NonNullGraphType(assetType));
+
+            inputFieldInfos = new Dictionary<Type, IGraphType>
+            {
+                {
+                    typeof(StringField),
+                    new StringGraphType()
+                },
+                {
+                    typeof(BooleanField),
+                    new BooleanGraphType()
+                },
+                {
+                    typeof(NumberField),
+                    new FloatGraphType()
+                },
+                {
+                    typeof(DateTimeField),
+                    new DateGraphType()
+                },
+                {
+                    typeof(GeolocationField),
+                    new GeolocationInputGraphType()
+                },
+                {
+                    typeof(TagsField),
+                    new ListGraphType(new StringGraphType())
+                },
+                {
+                    typeof(AssetsField),
+                    new ListGraphType(new GuidGraphType())
+                },
+                {
+                    typeof(ReferencesField),
+                    new ListGraphType(new GuidGraphType())
+                }
+            };
 
             fieldInfos = new Dictionary<Type, Func<Field, (IGraphType ResolveType, IFieldResolver Resolver)>>
             {
@@ -71,12 +109,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     field => ResolveDefault("Json")
                 },
                 {
-                    typeof(TagsField),
-                    field => ResolveDefault("String")
-                },
-                {
                     typeof(GeolocationField),
                     field => ResolveDefault("Geolocation")
+                },
+                {
+                    typeof(TagsField),
+                    field => ResolveDefault("String")
                 },
                 {
                     typeof(AssetsField),
@@ -90,11 +128,19 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             this.schemas = schemas.ToDictionary(x => x.Id);
 
-            graphQLSchema = new GraphQLSchema { Query = new AppQueriesGraphType(this, this.schemas.Values) };
+            var m = new AppMutationsGraphType(this, this.schemas.Values);
+            var q = new AppQueriesGraphType(this, this.schemas.Values);
 
-            foreach (var schemaType in schemaTypes.Values)
+            graphQLSchema = new GraphQLSchema { Query = q, Mutation = m };
+
+            foreach (var kvp in contentDataTypes)
             {
-                schemaType.Initialize();
+                kvp.Value.Initialize(this, kvp.Key);
+            }
+
+            foreach (var kvp in contentTypes)
+            {
+                kvp.Value.Initialize(this, kvp.Key, contentDataTypes[kvp.Key]);
             }
         }
 
@@ -107,7 +153,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         {
             var resolver = new FuncFieldResolver<IAssetEntity, object>(c =>
             {
-                var context = (GraphQLQueryContext)c.UserContext;
+                var context = (GraphQLExecutionContext)c.UserContext;
 
                 return context.UrlGenerator.GenerateAssetUrl(app, c.Source);
             });
@@ -119,7 +165,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         {
             var resolver = new FuncFieldResolver<IAssetEntity, object>(c =>
             {
-                var context = (GraphQLQueryContext)c.UserContext;
+                var context = (GraphQLExecutionContext)c.UserContext;
 
                 return context.UrlGenerator.GenerateAssetSourceUrl(app, c.Source);
             });
@@ -131,7 +177,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         {
             var resolver = new FuncFieldResolver<IAssetEntity, object>(c =>
             {
-                var context = (GraphQLQueryContext)c.UserContext;
+                var context = (GraphQLExecutionContext)c.UserContext;
 
                 return context.UrlGenerator.GenerateAssetThumbnailUrl(app, c.Source);
             });
@@ -143,7 +189,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         {
             var resolver = new FuncFieldResolver<IContentEntity, object>(c =>
             {
-                var context = (GraphQLQueryContext)c.UserContext;
+                var context = (GraphQLExecutionContext)c.UserContext;
 
                 return context.UrlGenerator.GenerateContentUrl(app, schema, c.Source);
             });
@@ -155,7 +201,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         {
             var resolver = new FuncFieldResolver<ContentFieldData, object>(c =>
             {
-                var context = (GraphQLQueryContext)c.UserContext;
+                var context = (GraphQLExecutionContext)c.UserContext;
                 var contentIds = c.Source.GetOrDefault(c.FieldName);
 
                 return context.GetReferencedAssetsAsync(contentIds);
@@ -167,27 +213,28 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         private ValueTuple<IGraphType, IFieldResolver> ResolveReferences(Field field)
         {
             var schemaId = ((ReferencesField)field).Properties.SchemaId;
-            var schemaType = GetSchemaType(schemaId);
 
-            if (schemaType == null)
+            var contentType = GetContentType(schemaId);
+
+            if (contentType == null)
             {
                 return (null, null);
             }
 
             var resolver = new FuncFieldResolver<ContentFieldData, object>(c =>
             {
-                var context = (GraphQLQueryContext)c.UserContext;
+                var context = (GraphQLExecutionContext)c.UserContext;
                 var contentIds = c.Source.GetOrDefault(c.FieldName);
 
                 return context.GetReferencedContentsAsync(schemaId, contentIds);
             });
 
-            var schemaFieldType = new ListGraphType(new NonNullGraphType(GetSchemaType(schemaId)));
+            var schemaFieldType = new ListGraphType(new NonNullGraphType(contentType));
 
             return (schemaFieldType, resolver);
         }
 
-        public async Task<(object Data, object[] Errors)> ExecuteAsync(GraphQLQueryContext context, GraphQLQuery query)
+        public async Task<(object Data, object[] Errors)> ExecuteAsync(GraphQLExecutionContext context, GraphQLQuery query)
         {
             Guard.NotNull(context, nameof(context));
 
@@ -208,7 +255,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             return partitionResolver(key);
         }
 
-        public IGraphType GetAssetType()
+        public IComplexGraphType GetAssetType()
         {
             return assetType;
         }
@@ -218,11 +265,33 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             return fieldInfos[field.GetType()](field);
         }
 
-        public IGraphType GetSchemaType(Guid schemaId)
+        public IComplexGraphType GetContentDataType(Guid schemaId)
         {
             var schema = schemas.GetOrDefault(schemaId);
 
-            return schema != null ? schemaTypes.GetOrAdd(schemaId, k => new ContentGraphType(schema, this)) : null;
+            if (schema == null)
+            {
+                return null;
+            }
+
+            return schema != null ? contentDataTypes.GetOrAdd(schema, s => new ContentDataGraphType()) : null;
+        }
+
+        public IComplexGraphType GetContentType(Guid schemaId)
+        {
+            var schema = schemas.GetOrDefault(schemaId);
+
+            if (schema == null)
+            {
+                return null;
+            }
+
+            return contentTypes.GetOrAdd(schema, s => new ContentGraphType());
+        }
+
+        public IGraphType GetInputGraphType(Field field)
+        {
+            return inputFieldInfos.GetOrAddDefault(field.GetType());
         }
     }
 }

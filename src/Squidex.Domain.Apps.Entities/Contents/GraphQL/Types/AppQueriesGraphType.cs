@@ -8,29 +8,32 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 using Squidex.Domain.Apps.Entities.Schemas;
-using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {
     public sealed class AppQueriesGraphType : ObjectGraphType
     {
-        public AppQueriesGraphType(IGraphQLContext ctx, IEnumerable<ISchemaEntity> schemas)
+        public AppQueriesGraphType(IGraphModel model, IEnumerable<ISchemaEntity> schemas)
         {
-            var assetType = ctx.GetAssetType();
+            var assetType = model.GetAssetType();
 
             AddAssetFind(assetType);
             AddAssetsQueries(assetType);
 
             foreach (var schema in schemas)
             {
-                var schemaName = schema.SchemaDef.Properties.Label.WithFallback(schema.SchemaDef.Name);
-                var schemaType = ctx.GetSchemaType(schema.Id);
+                var schemaId = schema.Id;
+                var schemaType = schema.TypeName();
+                var schemaName = schema.DisplayName();
 
-                AddContentFind(schema, schemaType, schemaName);
-                AddContentQueries(ctx, schema, schemaType, schemaName);
+                var contentType = model.GetContentType(schema.Id);
+
+                AddContentFind(schemaId, schemaType, schemaName, contentType);
+                AddContentQueries(schemaId, schemaType, schemaName, contentType);
             }
 
             Description = "The app queries.";
@@ -43,102 +46,94 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 Name = "findAsset",
                 Arguments = CreateAssetFindArguments(),
                 ResolvedType = assetType,
-                Resolver = new FuncFieldResolver<object>(c =>
+                Resolver = ResolveAsync((c, e) =>
                 {
-                    var context = (GraphQLQueryContext)c.UserContext;
-                    var contentId = Guid.Parse(c.GetArgument("id", Guid.Empty.ToString()));
+                    var assetId = c.GetArgument<Guid>("id");
 
-                    return context.FindAssetAsync(contentId);
+                    return e.FindAssetAsync(assetId);
                 }),
                 Description = "Find an asset by id."
             });
         }
 
-        private void AddContentFind(ISchemaEntity schema, IGraphType schemaType, string schemaName)
+        private void AddContentFind(Guid schemaId, string schemaType, string schemaName, IGraphType contentType)
         {
             AddField(new FieldType
             {
-                Name = $"find{schema.Name.ToPascalCase()}Content",
+                Name = $"find{schemaType}Content",
                 Arguments = CreateContentFindTypes(schemaName),
-                ResolvedType = schemaType,
-                Resolver = new FuncFieldResolver<object>(c =>
+                ResolvedType = contentType,
+                Resolver = ResolveAsync((c, e) =>
                 {
-                    var context = (GraphQLQueryContext)c.UserContext;
-                    var contentId = Guid.Parse(c.GetArgument("id", Guid.Empty.ToString()));
+                    var contentId = c.GetArgument<Guid>("id");
 
-                    return context.FindContentAsync(schema.Id, contentId);
+                    return e.FindContentAsync(schemaId, contentId);
                 }),
                 Description = $"Find an {schemaName} content by id."
             });
         }
 
-        private void AddAssetsQueries(IGraphType assetType)
+        private void AddAssetsQueries(IComplexGraphType assetType)
         {
             AddField(new FieldType
             {
                 Name = "queryAssets",
                 Arguments = CreateAssetQueryArguments(),
                 ResolvedType = new ListGraphType(new NonNullGraphType(assetType)),
-                Resolver = new FuncFieldResolver<object>(c =>
+                Resolver = ResolveAsync((c, e) =>
                 {
-                    var context = (GraphQLQueryContext)c.UserContext;
-
-                    var argTop = c.GetArgument("top", 20);
+                    var argTake = c.GetArgument("take", 20);
                     var argSkip = c.GetArgument("skip", 0);
                     var argQuery = c.GetArgument("search", string.Empty);
 
-                    return context.QueryAssetsAsync(argQuery, argSkip, argTop);
+                    return e.QueryAssetsAsync(argQuery, argSkip, argTake);
                 }),
-                Description = "Query assets items."
+                Description = "Get assets."
             });
 
             AddField(new FieldType
             {
                 Name = "queryAssetsWithTotal",
                 Arguments = CreateAssetQueryArguments(),
-                ResolvedType = new AssetResultGraphType(assetType),
-                Resolver = new FuncFieldResolver<object>(c =>
+                ResolvedType = new AssetsResultGraphType(assetType),
+                Resolver = ResolveAsync((c, e) =>
                 {
-                    var context = (GraphQLQueryContext)c.UserContext;
-
-                    var argTop = c.GetArgument("top", 20);
+                    var argTake = c.GetArgument("take", 20);
                     var argSkip = c.GetArgument("skip", 0);
                     var argQuery = c.GetArgument("search", string.Empty);
 
-                    return context.QueryAssetsAsync(argQuery, argSkip, argTop);
+                    return e.QueryAssetsAsync(argQuery, argSkip, argTake);
                 }),
-                Description = "Query assets items with total count."
+                Description = "Get assets and total count."
             });
         }
 
-        private void AddContentQueries(IGraphQLContext ctx, ISchemaEntity schema, IGraphType schemaType, string schemaName)
+        private void AddContentQueries(Guid schemaId, string schemaType, string schemaName, IComplexGraphType contentType)
         {
             AddField(new FieldType
             {
-                Name = $"query{schema.Name.ToPascalCase()}Contents",
+                Name = $"query{schemaType}Contents",
                 Arguments = CreateContentQueryArguments(),
-                ResolvedType = new ListGraphType(new NonNullGraphType(schemaType)),
-                Resolver = new FuncFieldResolver<object>(c =>
+                ResolvedType = new ListGraphType(new NonNullGraphType(contentType)),
+                Resolver = ResolveAsync((c, e) =>
                 {
-                    var context = (GraphQLQueryContext)c.UserContext;
                     var contentQuery = BuildODataQuery(c);
 
-                    return context.QueryContentsAsync(schema.Id.ToString(), contentQuery);
+                    return e.QueryContentsAsync(schemaId.ToString(), contentQuery);
                 }),
                 Description = $"Query {schemaName} content items."
             });
 
             AddField(new FieldType
             {
-                Name = $"query{schema.Name.ToPascalCase()}ContentsWithTotal",
+                Name = $"query{schemaType}ContentsWithTotal",
                 Arguments = CreateContentQueryArguments(),
-                ResolvedType = new ContentResultGraphType(ctx, schema, schemaName),
-                Resolver = new FuncFieldResolver<object>(c =>
+                ResolvedType = new ContentsResultGraphType(schemaType, schemaName, contentType),
+                Resolver = ResolveAsync((c, e) =>
                 {
-                    var context = (GraphQLQueryContext)c.UserContext;
                     var contentQuery = BuildODataQuery(c);
 
-                    return context.QueryContentsAsync(schema.Id.ToString(), contentQuery);
+                    return e.QueryContentsAsync(schemaId.ToString(), contentQuery);
                 }),
                 Description = $"Query {schemaName} content items with total count."
             });
@@ -148,10 +143,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
         {
             return new QueryArguments
             {
-                new QueryArgument(typeof(StringGraphType))
+                new QueryArgument(typeof(NonNullGraphType<GuidGraphType>))
                 {
                     Name = "id",
-                    Description = "The id of the asset.",
+                    Description = "The id of the asset (GUID).",
                     DefaultValue = string.Empty
                 }
             };
@@ -161,10 +156,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
         {
             return new QueryArguments
             {
-                new QueryArgument(typeof(StringGraphType))
+                new QueryArgument(typeof(NonNullGraphType<GuidGraphType>))
                 {
                     Name = "id",
-                    Description = $"The id of the {schemaName} content.",
+                    Description = $"The id of the {schemaName} content (GUID)",
                     DefaultValue = string.Empty
                 }
             };
@@ -176,8 +171,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             {
                 new QueryArgument(typeof(IntGraphType))
                 {
-                    Name = "top",
-                    Description = "Optional number of assets to take.",
+                    Name = "take",
+                    Description = "Optional number of assets to take (Default: 20).",
                     DefaultValue = 20
                 },
                 new QueryArgument(typeof(IntGraphType))
@@ -189,7 +184,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 new QueryArgument(typeof(StringGraphType))
                 {
                     Name = "search",
-                    Description = "Optional query.",
+                    Description = "Optional query to limit the files by name.",
                     DefaultValue = string.Empty
                 }
             };
@@ -202,7 +197,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 new QueryArgument(typeof(IntGraphType))
                 {
                     Name = "top",
-                    Description = "Optional number of contents to take.",
+                    Description = "Optional number of contents to take (Default: 20).",
                     DefaultValue = 20
                 },
                 new QueryArgument(typeof(IntGraphType))
@@ -241,6 +236,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                         .Select(x => $"${x.Key}={x.Value}"));
 
             return odataQuery;
+        }
+
+        private static IFieldResolver ResolveAsync<T>(Func<ResolveFieldContext, GraphQLExecutionContext, Task<T>> action)
+        {
+            return new FuncFieldResolver<Task<T>>(c =>
+            {
+                var e = (GraphQLExecutionContext)c.UserContext;
+
+                return action(c, e);
+            });
         }
     }
 }

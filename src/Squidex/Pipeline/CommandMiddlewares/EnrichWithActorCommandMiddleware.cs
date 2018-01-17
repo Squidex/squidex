@@ -27,13 +27,21 @@ namespace Squidex.Pipeline.CommandMiddlewares
 
         public Task HandleAsync(CommandContext context, Func<Task> next)
         {
-            if (context.Command is SquidexCommand squidexCommand && squidexCommand.Actor == null)
+            if (context.Command is SquidexCommand squidexCommand)
             {
-                var actorToken =
-                    FindActorFromSubject() ??
-                    FindActorFromClient();
+                if (squidexCommand.Actor == null)
+                {
+                    var actorToken =
+                        FindActorFromSubject() ??
+                        FindActorFromClient();
 
-                squidexCommand.Actor = actorToken ?? throw new SecurityException("No actor with subject or client id available.");
+                    squidexCommand.Actor = actorToken ?? throw new SecurityException("No actor with subject or client id available.");
+                }
+
+                if (squidexCommand.User == null)
+                {
+                    squidexCommand.User = httpContextAccessor.HttpContext.User;
+                }
             }
 
             return next();

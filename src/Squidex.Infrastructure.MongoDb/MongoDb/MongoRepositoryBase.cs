@@ -8,7 +8,6 @@
 using System;
 using System.Globalization;
 using System.Threading.Tasks;
-using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Infrastructure.Tasks;
 
