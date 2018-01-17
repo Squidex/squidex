@@ -8,24 +8,21 @@
 using System;
 using GraphQL.Resolvers;
 using GraphQL.Types;
-using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {
-    public sealed class ContentResultGraphType : ObjectGraphType<IResultList<IContentEntity>>
+    public sealed class ContentsResultGraphType : ObjectGraphType<IResultList<IContentEntity>>
     {
-        public ContentResultGraphType(IGraphQLContext ctx, ISchemaEntity schema, string schemaName)
+        public ContentsResultGraphType(string schemaType, string schemaName, IComplexGraphType contentType)
         {
-            Name = $"{schema.Name.ToPascalCase()}ResultDto";
-
-            var schemaType = ctx.GetSchemaType(schema.Id);
+            Name = $"{schemaType}ResultDto";
 
             AddField(new FieldType
             {
                 Name = "total",
                 Resolver = Resolver(x => x.Total),
-                ResolvedType = new NonNullGraphType(new IntGraphType()),
+                ResolvedType = AllTypes.NonNullInt,
                 Description = $"The total number of {schemaName} items."
             });
 
@@ -33,9 +30,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             {
                 Name = "items",
                 Resolver = Resolver(x => x),
-                ResolvedType = new ListGraphType(new NonNullGraphType(schemaType)),
+                ResolvedType = new ListGraphType(new NonNullGraphType(contentType)),
                 Description = $"The {schemaName} items."
             });
+
+            Description = $"List of {schemaName} items and total count.";
         }
 
         private static IFieldResolver Resolver(Func<IResultList<IContentEntity>, object> action)

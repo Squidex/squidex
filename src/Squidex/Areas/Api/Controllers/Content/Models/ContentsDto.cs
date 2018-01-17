@@ -7,7 +7,7 @@
 
 namespace Squidex.Areas.Api.Controllers.Contents.Models
 {
-    public sealed class AssetsDto
+    public sealed class ContentsDto
     {
         /// <summary>
         /// The total number of content items.

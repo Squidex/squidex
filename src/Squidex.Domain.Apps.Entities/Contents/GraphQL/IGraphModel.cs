@@ -14,15 +14,17 @@ using Squidex.Domain.Apps.Entities.Schemas;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 {
-    public interface IGraphQLContext
+    public interface IGraphModel
     {
         bool CanGenerateAssetSourceUrl { get; }
 
         IFieldPartitioning ResolvePartition(Partitioning key);
 
-        IGraphType GetAssetType();
+        IComplexGraphType GetAssetType();
 
-        IGraphType GetSchemaType(Guid schemaId);
+        IComplexGraphType GetContentType(Guid schemaId);
+
+        IComplexGraphType GetContentDataType(Guid schemaId);
 
         IFieldResolver ResolveAssetUrl();
 
@@ -31,6 +33,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         IFieldResolver ResolveAssetThumbnailUrl();
 
         IFieldResolver ResolveContentUrl(ISchemaEntity schema);
+
+        IGraphType GetInputGraphType(Field field);
 
         (IGraphType ResolveType, IFieldResolver Resolver) GetGraphType(Field field);
     }
