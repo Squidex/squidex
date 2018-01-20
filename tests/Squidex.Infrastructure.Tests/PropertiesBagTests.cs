@@ -1,9 +1,8 @@
 ﻿// ==========================================================================
-//  PropertiesBagTests.cs
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex Group
-//  All rights reserved.
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using System;
@@ -86,7 +85,7 @@ namespace Squidex.Infrastructure
             Assert.True(bag.Contains("NewKey"));
 
             Assert.Equal(1, bag.Count);
-            Assert.Equal(123, bag["NewKey"].ToInt32(c));
+            Assert.Equal(123, bag["NewKey"].ToInt64(c));
 
             Assert.False(bag.Contains("OldKey"));
         }
@@ -174,7 +173,7 @@ namespace Squidex.Infrastructure
         {
             bag.Set("Key", "abc");
 
-            Assert.Throws<InvalidCastException>(() => bag["Key"].ToInt32(CultureInfo.InvariantCulture));
+            Assert.Throws<InvalidCastException>(() => bag["Key"].ToInt64(CultureInfo.InvariantCulture));
         }
 
         [Fact]
@@ -347,7 +346,7 @@ namespace Squidex.Infrastructure
 
         private void AssertNumber()
         {
-            AssertInt32(123);
+            AssertInt64(123);
             AssertInt64(123);
             AssertSingle(123);
             AssertDouble(123);
@@ -420,10 +419,10 @@ namespace Squidex.Infrastructure
             Assert.Equal(expected, (long?)dynamicBag.Key);
         }
 
-        private void AssertInt32(int expected)
+        private void AssertInt64(int expected)
         {
-            Assert.Equal(expected, bag["Key"].ToInt32(c));
-            Assert.Equal(expected, bag["Key"].ToNullableInt32(c));
+            Assert.Equal(expected, bag["Key"].ToInt64(c));
+            Assert.Equal(expected, bag["Key"].ToNullableInt64(c));
 
             Assert.Equal(expected, (int)dynamicBag.Key);
             Assert.Equal(expected, (int?)dynamicBag.Key);

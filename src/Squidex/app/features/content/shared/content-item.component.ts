@@ -2,7 +2,7 @@
  * Squidex Headless CMS
  *
  * @license
- * Copyright (c) Sebastian Stehle. All rights reserved
+ * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
@@ -44,6 +44,15 @@ export class ContentItemComponent implements OnInit, OnChanges {
 
     @Output()
     public deleting = new EventEmitter();
+
+    @Output()
+    public selectedChange = new EventEmitter<boolean>();
+
+    @Input()
+    public selected = false;
+
+    @Input()
+    public columnWidth: number;
 
     @Input()
     public languageCode: string;

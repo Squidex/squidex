@@ -2,7 +2,7 @@
  * Squidex Headless CMS
  *
  * @license
- * Copyright (c) Sebastian Stehle. All rights reserved
+ * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
 // tslint:disable:prefer-for-of
@@ -70,7 +70,7 @@ export class AssetsEditorComponent implements ControlValueAccessor, OnDestroy, O
 
             this.assetsService.getAssets(this.ctx.appName, 10000, 0, undefined, undefined, value)
                 .subscribe(dtos => {
-                    this.oldAssets = ImmutableArray.of(assetIds.map(id => dtos.items.find(x => x.id === id)));
+                    this.oldAssets = ImmutableArray.of(assetIds.map(id => dtos.items.find(x => x.id === id)).filter(a => !!a).map(a => a!));
                 });
         }
     }

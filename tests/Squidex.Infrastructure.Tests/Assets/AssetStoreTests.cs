@@ -1,9 +1,8 @@
 ﻿// ==========================================================================
-//  AssetStoreTestsBase.cs
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex Group
-//  All rights reserved.
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using System;
@@ -34,7 +33,7 @@ namespace Squidex.Infrastructure.Assets
         [Fact]
         public Task Should_throw_exception_if_asset_to_download_is_not_found()
         {
-            ((IExternalSystem)Sut).Connect();
+            ((IInitializable)Sut).Initialize();
 
             return Assert.ThrowsAsync<AssetNotFoundException>(() => Sut.DownloadAsync(Id(), 1, "suffix", new MemoryStream()));
         }
@@ -42,7 +41,7 @@ namespace Squidex.Infrastructure.Assets
         [Fact]
         public Task Should_throw_exception_if_asset_to_copy_is_not_found()
         {
-            ((IExternalSystem)Sut).Connect();
+            ((IInitializable)Sut).Initialize();
 
             return Assert.ThrowsAsync<AssetNotFoundException>(() => Sut.CopyTemporaryAsync(Id(), Id(), 1, null));
         }
@@ -50,7 +49,7 @@ namespace Squidex.Infrastructure.Assets
         [Fact]
         public async Task Should_read_and_write_file()
         {
-            ((IExternalSystem)Sut).Connect();
+            ((IInitializable)Sut).Initialize();
 
             var assetId = Id();
             var assetData = new MemoryStream(new byte[] { 0x1, 0x2, 0x3, 0x4 });
@@ -67,7 +66,7 @@ namespace Squidex.Infrastructure.Assets
         [Fact]
         public async Task Should_commit_temporary_file()
         {
-            ((IExternalSystem)Sut).Connect();
+            ((IInitializable)Sut).Initialize();
 
             var tempId = Id();
 
@@ -87,7 +86,7 @@ namespace Squidex.Infrastructure.Assets
         [Fact]
         public async Task Should_ignore_when_deleting_twice()
         {
-            ((IExternalSystem)Sut).Connect();
+            ((IInitializable)Sut).Initialize();
 
             var tempId = Id();
 

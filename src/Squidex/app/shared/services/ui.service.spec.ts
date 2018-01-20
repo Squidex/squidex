@@ -2,7 +2,7 @@
  * Squidex Headless CMS
  *
  * @license
- * Copyright (c) Sebastian Stehle. All rights reserved
+ * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
@@ -41,7 +41,7 @@ describe('UIService', () => {
             settings1 = result;
         });
 
-        const response: UISettingsDto = { regexSuggestions: [] };
+        const response: UISettingsDto = { mapType: 'OSM', mapKey: '' };
 
         const req = httpMock.expectOne('http://service/p/api/ui/settings');
 
@@ -75,6 +75,5 @@ describe('UIService', () => {
         req.error(new ErrorEvent('500'));
 
         expect(settings).toBeDefined();
-        expect(settings!.regexSuggestions).toEqual([]);
     }));
 });

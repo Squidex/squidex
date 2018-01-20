@@ -1,14 +1,13 @@
 ﻿// ==========================================================================
-//  RuleConverter.cs
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex Group
-//  All rights reserved.
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using System;
-using Squidex.Domain.Apps.Read.Rules;
-using Squidex.Domain.Apps.Write.Rules.Commands;
+using Squidex.Domain.Apps.Entities.Rules;
+using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Areas.Api.Controllers.Rules.Models.Converters

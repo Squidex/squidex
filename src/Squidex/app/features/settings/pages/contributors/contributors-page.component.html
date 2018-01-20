@@ -18,32 +18,24 @@
             </div>
             
             <table class="table table-items table-fixed">
-                <colgroup>
-                    <col style="width: 70px" />
-                    <col style="width: 50%" />
-                    <col style="width: 50%" />
-                    <col style="width: 160px" />
-                    <col style="width: 80px" />
-                </colgroup>
-
                 <tbody>
                     <ng-template ngFor let-contributor [ngForOf]="appContributors?.contributors">
                         <tr>
-                            <td>
+                            <td class="cell-user">
                                 <img class="user-picture" [attr.title]="contributor.contributorId | sqxUserName" [attr.src]="contributor.contributorId | sqxUserPicture" />
                             </td>
-                            <td>
+                            <td class="cell-auto">
                                 <span class="user-name table-cell">{{contributor.contributorId | sqxUserName}}</span>
                             </td>
-                            <td>
+                            <td class="cell-auto">
                                 <span class="user-email table-cell">{{contributor.contributorId | sqxUserEmail}}</span>
                             </td>
-                            <td>
+                            <td class="cell-time">
                                 <select class="form-control" [ngModel]="contributor.permission" (ngModelChange)="changePermission(contributor, $event)" [disabled]="userId === contributor.contributorId">
                                     <option *ngFor="let permission of usersPermissions" [ngValue]="permission">{{permission}}</option>
                                 </select>
                             </td>
-                            <td>
+                            <td class="cell-actions">
                                 <button type="button" class="btn btn-link btn-danger" [disabled]="userId === contributor.contributorId" (click)="removeContributor(contributor)">
                                     <i class="icon-bin2"></i>
                                 </button>

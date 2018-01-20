@@ -37,7 +37,7 @@
     <Rule Id="SA1311" Action="Error" />
     <Rule Id="SA1400" Action="Error" />
     <Rule Id="SA1401" Action="Error" />
-    <Rul Id="SA1402" Action="None" />
+    <Rule Id="SA1402" Action="None" />
     <Rule Id="SA1407" Action="Error" />
     <Rule Id="SA1408" Action="None" />
     <Rule Id="SA1502" Action="Error" />
@@ -54,7 +54,7 @@
     <Rule Id="SA1612" Action="None" />
     <Rule Id="SA1615" Action="None" />
     <Rule Id="SA1623" Action="None" />
-    <Rule Id="SA1633" Action="None" />
+    <Rule Id="SA1633" Action="Error" />
     <Rule Id="SA1649" Action="Error" />
     <Rule Id="SA1634" Action="None" />
     <Rule Id="SA1635" Action="None" />
@@ -79,5 +79,8 @@
   </Rules>
   <Rules AnalyzerId="Roslyn.Core" RuleNamespace="Roslyn.Core">
     <Rule Id="AD0001" Action="None" />
+  </Rules>
+  <Rules AnalyzerId="Roslyn.Core" RuleNamespace="Microsoft.CodeAnalysis.Diagnostics">
+    <Rule Id="IDE0042" Action="None" />
   </Rules>
 </RuleSet>

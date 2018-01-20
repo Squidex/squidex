@@ -1,18 +1,17 @@
 ﻿// ==========================================================================
-//  ContentDto.cs
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex Group
-//  All rights reserved.
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using System;
 using System.ComponentModel.DataAnnotations;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Domain.Apps.Write.Contents.Commands;
+using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.CQRS.Commands;
+using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Areas.Api.Controllers.Contents.Models
 {

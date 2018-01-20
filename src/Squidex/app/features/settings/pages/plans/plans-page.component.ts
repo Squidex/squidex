@@ -2,7 +2,7 @@
  * Squidex Headless CMS
  *
  * @license
- * Copyright (c) Sebastian Stehle. All rights reserved
+ * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
@@ -28,7 +28,7 @@ export class PlansPageComponent implements OnDestroy, OnInit {
     private queryParamsSubscription: Subscription;
     private overridePlanId: string;
 
-    public portalUrl = this.apiUrl.buildUrl('/identity-server/account/portal');
+    public portalUrl = this.apiUrl.buildUrl('/portal/');
 
     public plans: AppPlansDto;
     public planOwned = false;

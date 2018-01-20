@@ -2,10 +2,11 @@
  * Squidex Headless CMS
  *
  * @license
- * Copyright (c) Sebastian Stehle. All rights reserved
+ * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { FormControl } from '@angular/forms';
 import { Subscription } from 'rxjs';
 
@@ -51,6 +52,7 @@ export class SchemasPageComponent implements OnDestroy, OnInit {
     public import: any;
 
     constructor(public readonly ctx: AppContext,
+        private readonly router: Router,
         private readonly schemasService: SchemasService
     ) {
     }
@@ -117,6 +119,8 @@ export class SchemasPageComponent implements OnDestroy, OnInit {
         this.emitSchemaCreated(schema);
 
         this.addSchemaDialog.hide();
+
+        this.router.navigate([ schema.name ], { relativeTo: this.ctx.route });
     }
 
     private emitSchemaCreated(schema: SchemaDto) {

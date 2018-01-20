@@ -1,9 +1,8 @@
 ﻿// ==========================================================================
-//  UsagesController.cs
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex Group
-//  All rights reserved.
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using System;
@@ -12,9 +11,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using Squidex.Areas.Api.Controllers.Statistics.Models;
-using Squidex.Domain.Apps.Read.Apps.Services;
-using Squidex.Domain.Apps.Read.Assets.Repositories;
-using Squidex.Infrastructure.CQRS.Commands;
+using Squidex.Domain.Apps.Entities.Apps.Services;
+using Squidex.Domain.Apps.Entities.Assets.Repositories;
+using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.UsageTracking;
 using Squidex.Pipeline;
 

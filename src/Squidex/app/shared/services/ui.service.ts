@@ -2,7 +2,7 @@
  * Squidex Headless CMS
  *
  * @license
- * Copyright (c) Sebastian Stehle. All rights reserved
+ * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
 import { HttpClient } from '@angular/common/http';
@@ -14,11 +14,8 @@ import 'framework/angular/http-extensions';
 import { ApiUrlConfig } from 'framework';
 
 export interface UISettingsDto {
-    regexSuggestions: UIRegexSuggestionDto[];
-}
-
-export interface UIRegexSuggestionDto {
-    name: string; pattern: string;
+    mapType: string;
+    mapKey: string;
 }
 
 @Injectable()
@@ -39,7 +36,7 @@ export class UIService {
 
             return this.http.get<UISettingsDto>(url)
                 .catch(error => {
-                    return Observable.of({ regexSuggestions: [] });
+                    return Observable.of({ regexSuggestions: [], mapType: 'OSM', mapKey: '' });
                 })
                 .do(settings => {
                     this.settings = settings;

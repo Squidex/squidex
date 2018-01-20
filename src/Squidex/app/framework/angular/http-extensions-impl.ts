@@ -2,7 +2,7 @@
  * Squidex Headless CMS
  *
  * @license
- * Copyright (c) Sebastian Stehle. All rights reserved
+ * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
 import { HttpClient, HttpErrorResponse, HttpHeaders, HttpResponse } from '@angular/common/http';
@@ -19,29 +19,41 @@ export class Versioned<T> {
 }
 
 function formatMessage(message: string, details?: string[]) {
-    const format = (row: string) => {
+    const appendLast = (row: string, char: string) => {
         const last = row[row.length - 1];
 
-        if (last !== '.') {
-            return row + '.';
+        if (last !== char) {
+            return row + char;
         } else {
             return row;
         }
     };
 
-    let result = format(message);
+    const removeLast = (row: string, char: string) => {
+        const last = row[row.length - 1];
 
-    if (details) {
-        result = result + '<ul>';
+        if (last === char) {
+            return row.substr(0, row.length - 1);
+        } else {
+            return row;
+        }
+    };
 
-        for (let d of details) {
-            result += `<li>${format(d)}</li>`;
+    if (details && details.length > 1) {
+        let result = appendLast(message, '.') + '<ul>';
+
+        for (let detail of details) {
+            result += `<li>${appendLast(detail, '.')}</li>`;
         }
 
         result = result + '</ul>';
-    }
 
-    return result;
+        return result;
+    } else if (details && details.length === 1) {
+        return `${appendLast(removeLast(message, '.'), ':')} ${appendLast(details[0], '.')}`;
+    } else {
+        return appendLast(message, '.');
+    }
 }
 
 export class ErrorDto {
@@ -100,7 +112,7 @@ export module HTTP {
 
 export function pretifyError(message: string): Observable<any> {
     return this.catch((response: HttpErrorResponse) => {
-        let result: ErrorDto = null;
+        let result: ErrorDto | null = null;
 
         if (!(response.error instanceof Error)) {
             try {

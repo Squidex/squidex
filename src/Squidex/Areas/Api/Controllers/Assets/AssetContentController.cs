@@ -1,9 +1,8 @@
 ﻿// ==========================================================================
-//  AssetContentController.cs
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex Group
-//  All rights reserved.
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using System;
@@ -11,9 +10,9 @@ using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
-using Squidex.Domain.Apps.Read.Assets.Repositories;
+using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Infrastructure.Assets;
-using Squidex.Infrastructure.CQRS.Commands;
+using Squidex.Infrastructure.Commands;
 using Squidex.Pipeline;
 
 #pragma warning disable 1573

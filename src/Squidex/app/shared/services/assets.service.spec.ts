@@ -2,7 +2,7 @@
  * Squidex Headless CMS
  *
  * @license
- * Copyright (c) Sebastian Stehle. All rights reserved
+ * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
@@ -16,7 +16,6 @@ import {
     AssetReplacedDto,
     AssetsService,
     DateTime,
-    LocalCacheService,
     UpdateAssetDto,
     Version,
     Versioned
@@ -70,7 +69,6 @@ describe('AssetsService', () => {
             ],
             providers: [
                 AssetsService,
-                LocalCacheService,
                 { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') },
                 { provide: AnalyticsService, useValue: new AnalyticsService() }
             ]
@@ -214,29 +212,6 @@ describe('AssetsService', () => {
                 2048,
                 'http://service/p/api/assets/id1',
                 new Version('2')));
-    }));
-
-    it('should provide entry from cache if not found',
-        inject([LocalCacheService, AssetsService, HttpTestingController], (localCache: LocalCacheService, assetsService: AssetsService, httpMock: HttpTestingController) => {
-
-        const cached = {};
-
-        localCache.set('asset.123', cached, 10000);
-
-        let asset: AssetDto | null = null;
-
-        assetsService.getAsset('my-app', '123').subscribe(result => {
-            asset = result;
-        });
-
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets/123');
-
-        expect(req.request.method).toEqual('GET');
-        expect(req.request.headers.get('If-Match')).toBeNull();
-
-        req.flush({}, { status: 404, statusText: '404' });
-
-        expect(asset).toBe(cached);
     }));
 
     it('should append query to find by name',

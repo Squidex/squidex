@@ -2,13 +2,14 @@
  * Squidex Headless CMS
  *
  * @license
- * Copyright (c) Sebastian Stehle. All rights reserved
+ * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 
 import {
+    AppPatternDto,
     createProperties,
     fadeAnimation,
     FieldDto,
@@ -30,6 +31,9 @@ export class FieldComponent implements OnInit {
 
     @Input()
     public schemas: SchemaDto[];
+
+    @Input()
+    public regexSuggestions: AppPatternDto[] = [];
 
     @Output()
     public locking = new EventEmitter();

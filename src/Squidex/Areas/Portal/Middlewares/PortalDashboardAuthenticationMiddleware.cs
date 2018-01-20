@@ -1,9 +1,8 @@
 ﻿// ==========================================================================
-//  LazyClientStore.cs
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex Group
-//  All rights reserved.
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using System.Threading.Tasks;
@@ -29,13 +28,17 @@ namespace Squidex.Areas.Portal.Middlewares
 
             if (!authentication.Succeeded)
             {
-                await context.ChallengeAsync(OpenIdConnectDefaults.AuthenticationScheme, new AuthenticationProperties
+                var properties = new AuthenticationProperties
                 {
                     RedirectUri = context.Request.PathBase + context.Request.Path
-                });
+                };
+
+                await context.ChallengeAsync(OpenIdConnectDefaults.AuthenticationScheme, properties);
             }
             else
             {
+                context.User = authentication.Principal;
+
                 await next(context);
             }
         }

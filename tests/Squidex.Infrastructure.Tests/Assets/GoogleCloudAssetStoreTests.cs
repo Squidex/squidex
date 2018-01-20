@@ -1,9 +1,8 @@
 ﻿// ==========================================================================
-//  GoogleCloudAssetStoreTests.cs
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex Group
-//  All rights reserved.
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using System;
@@ -25,7 +24,7 @@ namespace Squidex.Infrastructure.Assets
         // [Fact]
         public void Should_calculate_source_url()
         {
-            Sut.Connect();
+            Sut.Initialize();
 
             var id = Guid.NewGuid().ToString();
 

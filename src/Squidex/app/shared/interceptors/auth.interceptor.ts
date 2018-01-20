@@ -2,7 +2,7 @@
  * Squidex Headless CMS
  *
  * @license
- * Copyright (c) Sebastian Stehle. All rights reserved
+ * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
 import { HttpEvent, HttpInterceptor, HttpHandler, HttpRequest, HttpErrorResponse } from '@angular/common/http';
@@ -24,7 +24,7 @@ export class AuthInterceptor implements HttpInterceptor {
 
     public intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
         if (req.url.indexOf(this.baseUrl) === 0 && !req.headers.has('NoAuth')) {
-            return this.authService.userChanges.first().switchMap(user => {
+            return this.authService.userChanges.take(1).switchMap(user => {
                 return this.makeRequest(req, next, user, true);
             });
         } else {

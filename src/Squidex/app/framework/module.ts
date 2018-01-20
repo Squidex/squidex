@@ -2,7 +2,7 @@
  * Squidex Headless CMS
  *
  * @license
- * Copyright (c) Sebastian Stehle. All rights reserved
+ * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
 import { CommonModule } from '@angular/common';
@@ -32,14 +32,13 @@ import {
     FileSizePipe,
     FocusOnInitDirective,
     FromNowPipe,
-    GeolocationEditorComponent,
+    IgnoreScrollbarDirective,
     ImageSourceDirective,
     IndeterminateValueDirective,
     JscriptEditorComponent,
     JsonEditorComponent,
     KeysPipe,
     KNumberPipe,
-    LocalCacheService,
     LocalStoreService,
     LowerCaseInputDirective,
     MarkdownEditorComponent,
@@ -99,7 +98,7 @@ import {
         FileSizePipe,
         FocusOnInitDirective,
         FromNowPipe,
-        GeolocationEditorComponent,
+        IgnoreScrollbarDirective,
         ImageSourceDirective,
         IndeterminateValueDirective,
         JscriptEditorComponent,
@@ -149,7 +148,7 @@ import {
         FileSizePipe,
         FocusOnInitDirective,
         FromNowPipe,
-        GeolocationEditorComponent,
+        IgnoreScrollbarDirective,
         ImageSourceDirective,
         IndeterminateValueDirective,
         JscriptEditorComponent,
@@ -197,7 +196,6 @@ export class SqxFrameworkModule {
                 CanDeactivateGuard,
                 ClipboardService,
                 DialogService,
-                LocalCacheService,
                 LocalStoreService,
                 MessageBus,
                 OnboardingService,

@@ -2,7 +2,7 @@
  * Squidex Headless CMS
  *
  * @license
- * Copyright (c) Sebastian Stehle. All rights reserved
+ * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
 import { Injectable } from '@angular/core';
@@ -35,7 +35,7 @@ export class Profile {
     }
 
     public get isExpired(): boolean {
-        return this.user.expired;
+        return this.user.expired || false;
     }
 
     public get authToken(): string {

@@ -1,18 +1,17 @@
 ﻿// ==========================================================================
-//  GraphQLUrlGenerator.cs
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex Group
-//  All rights reserved.
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using Microsoft.Extensions.Options;
 using Squidex.Config;
-using Squidex.Domain.Apps.Read.Apps;
-using Squidex.Domain.Apps.Read.Assets;
-using Squidex.Domain.Apps.Read.Contents;
-using Squidex.Domain.Apps.Read.Contents.GraphQL;
-using Squidex.Domain.Apps.Read.Schemas;
+using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Entities.Assets;
+using Squidex.Domain.Apps.Entities.Contents;
+using Squidex.Domain.Apps.Entities.Contents.GraphQL;
+using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure.Assets;
 
 namespace Squidex.Pipeline

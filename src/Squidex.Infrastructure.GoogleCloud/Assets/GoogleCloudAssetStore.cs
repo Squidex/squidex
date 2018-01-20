@@ -1,9 +1,8 @@
 ﻿// ==========================================================================
-//  GoogleCloudAssetStore.cs
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex Group
-//  All rights reserved.
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using System;
@@ -16,7 +15,7 @@ using Google.Cloud.Storage.V1;
 
 namespace Squidex.Infrastructure.Assets
 {
-    public sealed class GoogleCloudAssetStore : IAssetStore, IExternalSystem
+    public sealed class GoogleCloudAssetStore : IAssetStore, IInitializable
     {
         private readonly string bucketName;
         private StorageClient storageClient;
@@ -28,7 +27,7 @@ namespace Squidex.Infrastructure.Assets
             this.bucketName = bucketName;
         }
 
-        public void Connect()
+        public void Initialize()
         {
             try
             {

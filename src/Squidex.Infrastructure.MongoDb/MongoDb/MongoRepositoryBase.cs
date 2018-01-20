@@ -1,30 +1,31 @@
 ﻿// ==========================================================================
-//  MongoRepositoryBase.cs
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex Group
-//  All rights reserved.
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using System;
 using System.Globalization;
 using System.Threading.Tasks;
-using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Infrastructure.Tasks;
 
+#pragma warning disable RECS0108 // Warns about static fields in generic types
+
 namespace Squidex.Infrastructure.MongoDb
 {
-    public abstract class MongoRepositoryBase<TEntity> : IExternalSystem
+    public abstract class MongoRepositoryBase<TEntity> : IInitializable
     {
         private const string CollectionFormat = "{0}Set";
 
+        protected static readonly UpdateOptions Upsert = new UpdateOptions { IsUpsert = true };
         protected static readonly SortDefinitionBuilder<TEntity> Sort = Builders<TEntity>.Sort;
         protected static readonly UpdateDefinitionBuilder<TEntity> Update = Builders<TEntity>.Update;
         protected static readonly FieldDefinitionBuilder<TEntity> Fields = FieldDefinitionBuilder<TEntity>.Instance;
         protected static readonly FilterDefinitionBuilder<TEntity> Filter = Builders<TEntity>.Filter;
         protected static readonly IndexKeysDefinitionBuilder<TEntity> Index = Builders<TEntity>.IndexKeys;
-        protected static readonly ProjectionDefinitionBuilder<TEntity> Project = Builders<TEntity>.Projection;
+        protected static readonly ProjectionDefinitionBuilder<TEntity> Projection = Builders<TEntity>.Projection;
 
         private readonly IMongoDatabase mongoDatabase;
         private Lazy<IMongoCollection<TEntity>> mongoCollection;
@@ -82,9 +83,11 @@ namespace Squidex.Infrastructure.MongoDb
             return TaskHelper.Done;
         }
 
-        public virtual Task ClearAsync()
+        public virtual async Task ClearAsync()
         {
-            return Collection.DeleteManyAsync(new BsonDocument());
+            await Database.DropCollectionAsync(CollectionName());
+
+            await SetupCollectionAsync(Collection);
         }
 
         public async Task<bool> DropCollectionIfExistsAsync()
@@ -103,7 +106,7 @@ namespace Squidex.Infrastructure.MongoDb
             }
         }
 
-        public void Connect()
+        public void Initialize()
         {
             try
             {

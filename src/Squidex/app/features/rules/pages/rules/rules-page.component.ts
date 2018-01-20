@@ -2,7 +2,7 @@
  * Squidex Headless CMS
  *
  * @license
- * Copyright (c) Sebastian Stehle. All rights reserved
+ * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
 import { Component, OnInit } from '@angular/core';
@@ -42,7 +42,7 @@ export class RulesPageComponent implements OnInit {
     public schemas: SchemaDto[];
 
     public wizardMode = 'Wizard';
-    public wizardRule: RuleDto;
+    public wizardRule: RuleDto | null;
 
     constructor(public readonly ctx: AppContext,
         private readonly schemasService: SchemasService,

@@ -2,7 +2,7 @@
  * Squidex Headless CMS
  *
  * @license
- * Copyright (c) Sebastian Stehle. All rights reserved
+ * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
 import { Injectable, OnDestroy } from '@angular/core';
@@ -30,7 +30,7 @@ export class AppContext implements OnDestroy {
         return this.appField;
     }
 
-    public get appChanges(): Observable<AppDto> {
+    public get appChanges(): Observable<AppDto | null> {
         return this.appsStore.selectedApp;
     }
 
@@ -58,8 +58,8 @@ export class AppContext implements OnDestroy {
         public readonly bus: MessageBus
     ) {
         this.appSubscription =
-            this.appsStore.selectedApp.first().subscribe(app => {
-                this.appField = app;
+            this.appsStore.selectedApp.take(1).subscribe(app => {
+                this.appField = app!;
             });
     }
 

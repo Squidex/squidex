@@ -1,9 +1,8 @@
 ﻿// ==========================================================================
-//  FolderAssetStore.cs
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex Group
-//  All rights reserved.
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using System.IO;
@@ -14,7 +13,7 @@ using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.Assets
 {
-    public sealed class FolderAssetStore : IAssetStore, IExternalSystem
+    public sealed class FolderAssetStore : IAssetStore, IInitializable
     {
         private readonly ISemanticLog log;
         private readonly DirectoryInfo directory;
@@ -29,7 +28,7 @@ namespace Squidex.Infrastructure.Assets
             directory = new DirectoryInfo(path);
         }
 
-        public void Connect()
+        public void Initialize()
         {
             try
             {

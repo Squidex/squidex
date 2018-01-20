@@ -1,19 +1,16 @@
 ﻿// ==========================================================================
-//  UIController.cs
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex Group
-//  All rights reserved.
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using NSwag.Annotations;
 using Squidex.Areas.Api.Controllers.UI.Models;
 using Squidex.Config;
-using Squidex.Infrastructure.CQRS.Commands;
+using Squidex.Infrastructure.Commands;
 using Squidex.Pipeline;
 
 namespace Squidex.Areas.Api.Controllers.UI
@@ -44,13 +41,8 @@ namespace Squidex.Areas.Api.Controllers.UI
         {
             var dto = new UISettingsDto
             {
-                RegexSuggestions =
-                    uiOptions.RegexSuggestions?
-                        .Where(x =>
-                            !string.IsNullOrWhiteSpace(x.Key) &&
-                            !string.IsNullOrWhiteSpace(x.Value))
-                        .Select(x => new UIRegexSuggestionDto { Name = x.Key, Pattern = x.Value }).ToList()
-                    ?? new List<UIRegexSuggestionDto>()
+                MapType = uiOptions.Map?.Type ?? "OSM",
+                MapKey = uiOptions.Map?.GoogleMaps?.Key
             };
 
             return Ok(dto);

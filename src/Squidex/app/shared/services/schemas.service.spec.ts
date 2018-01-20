@@ -2,7 +2,7 @@
  * Squidex Headless CMS
  *
  * @license
- * Copyright (c) Sebastian Stehle. All rights reserved
+ * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
@@ -16,7 +16,6 @@ import {
     createProperties,
     DateTime,
     FieldDto,
-    LocalCacheService,
     SchemaDetailsDto,
     SchemaDto,
     SchemaPropertiesDto,
@@ -197,7 +196,6 @@ describe('SchemasService', () => {
                 HttpClientTestingModule
             ],
             providers: [
-                LocalCacheService,
                 SchemasService,
                 { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') },
                 { provide: AnalyticsService, useValue: new AnalyticsService() }
@@ -431,29 +429,6 @@ describe('SchemasService', () => {
                 '<script-update>',
                 '<script-delete>',
                 '<script-change>'));
-    }));
-
-    it('should provide entry from cache if not found',
-        inject([LocalCacheService, SchemasService, HttpTestingController], (localCache: LocalCacheService, schemasService: SchemasService, httpMock: HttpTestingController) => {
-
-        const cached = {};
-
-        localCache.set('schema.my-app.my-schema', cached, 10000);
-
-        let schema: SchemaDetailsDto | null = null;
-
-        schemasService.getSchema('my-app', 'my-schema').subscribe(result => {
-            schema = result;
-        });
-
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema');
-
-        expect(req.request.method).toEqual('GET');
-        expect(req.request.headers.get('If-Match')).toBeNull();
-
-        req.flush({}, { status: 404, statusText: '404' });
-
-        expect(schema).toBe(cached);
     }));
 
     it('should make post request to create schema',

@@ -1,9 +1,8 @@
 ﻿// ==========================================================================
-//  IdContentData.cs
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex Group
-//  All rights reserved.
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using System;
@@ -24,9 +23,14 @@ namespace Squidex.Domain.Apps.Core.Contents
         {
         }
 
+        public static IdContentData Merge(params IdContentData[] contents)
+        {
+            return MergeTo(new IdContentData(), contents);
+        }
+
         public IdContentData MergeInto(IdContentData target)
         {
-            return Merge(this, target);
+            return Merge(target, this);
         }
 
         public IdContentData ToCleaned()

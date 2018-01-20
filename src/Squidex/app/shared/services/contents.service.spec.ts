@@ -2,7 +2,7 @@
  * Squidex Headless CMS
  *
  * @license
- * Copyright (c) Sebastian Stehle. All rights reserved
+ * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
@@ -15,7 +15,6 @@ import {
     ContentsDto,
     ContentsService,
     DateTime,
-    LocalCacheService,
     Version
 } from './../';
 
@@ -97,7 +96,6 @@ describe('ContentsService', () => {
             ],
             providers: [
                 ContentsService,
-                LocalCacheService,
                 { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') },
                 { provide: AnalyticsService, useValue: new AnalyticsService() }
             ]
@@ -166,11 +164,7 @@ describe('ContentsService', () => {
     it('should append query to get request as search',
         inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
 
-        let contents: ContentsDto | null = null;
-
-        contentsService.getContents('my-app', 'my-schema', 17, 13, 'my-query').subscribe(result => {
-            contents = result;
-        });
+        contentsService.getContents('my-app', 'my-schema', 17, 13, 'my-query').subscribe();
 
         const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema?$search="my-query"&$top=17&$skip=13');
 
@@ -183,11 +177,7 @@ describe('ContentsService', () => {
     it('should append ids to get request with ids',
         inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
 
-        let contents: ContentsDto | null = null;
-
-        contentsService.getContents('my-app', 'my-schema', 17, 13, undefined, ['id1', 'id2']).subscribe(result => {
-            contents = result;
-        });
+        contentsService.getContents('my-app', 'my-schema', 17, 13, undefined, ['id1', 'id2']).subscribe();
 
         const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema?$top=17&$skip=13&ids=id1,id2');
 
@@ -200,11 +190,7 @@ describe('ContentsService', () => {
     it('should append query to get request as plain query string',
         inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
 
-        let contents: ContentsDto | null = null;
-
-        contentsService.getContents('my-app', 'my-schema', 17, 13, '$filter=my-filter').subscribe(result => {
-            contents = result;
-        });
+        contentsService.getContents('my-app', 'my-schema', 17, 13, '$filter=my-filter').subscribe();
 
         const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema?$filter=my-filter&$top=17&$skip=13');
 
@@ -248,29 +234,6 @@ describe('ContentsService', () => {
                 DateTime.parseISO_UTC('2017-12-12T10:10'),
                 {},
                 new Version('2')));
-    }));
-
-    it('should provide entry from cache if not found',
-        inject([LocalCacheService, ContentsService, HttpTestingController], (localCache: LocalCacheService, contentsService: ContentsService, httpMock: HttpTestingController) => {
-
-        const cached = {};
-
-        localCache.set('content.1', cached, 10000);
-
-        let content: ContentDto | null = null;
-
-        contentsService.getContent('my-app', 'my-schema', '1').subscribe(result => {
-            content = result;
-        });
-
-        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema/1');
-
-        expect(req.request.method).toEqual('GET');
-        expect(req.request.headers.get('If-Match')).toBeNull();
-
-        req.flush({}, { status: 404, statusText: '404' });
-
-        expect(content).toBe(cached);
     }));
 
     it('should make post request to create content',

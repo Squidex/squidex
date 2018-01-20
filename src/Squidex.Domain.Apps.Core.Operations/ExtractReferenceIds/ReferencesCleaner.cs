@@ -1,9 +1,8 @@
 ﻿// ==========================================================================
-//  ReferenceExtractor.cs
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex Group
-//  All rights reserved.
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using System;
@@ -17,6 +16,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 {
     public static class ReferencesCleaner
     {
+        private static readonly List<Guid> EmptyIds = new List<Guid>();
         public static JToken CleanReferences(this Field field, JToken value, ISet<Guid> oldReferences)
         {
             if ((field is AssetsField || field is ReferencesField) && !value.IsNull())
@@ -36,7 +36,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 
         private static JToken Visit(AssetsField field, JToken value, IEnumerable<Guid> oldReferences)
         {
-            var oldIds = field.ExtractReferences(value).ToList();
+            var oldIds = GetIds(value);
             var newIds = oldIds.Except(oldReferences).ToList();
 
             return oldIds.Count != newIds.Count ? JToken.FromObject(newIds) : value;
@@ -49,10 +49,22 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
                 return new JArray();
             }
 
-            var oldIds = field.ExtractReferences(value).ToList();
+            var oldIds = GetIds(value);
             var newIds = oldIds.Except(oldReferences).ToList();
 
             return oldIds.Count != newIds.Count ? JToken.FromObject(newIds) : value;
+        }
+
+        private static List<Guid> GetIds(JToken value)
+        {
+            try
+            {
+                return value?.ToObject<List<Guid>>() ?? EmptyIds;
+            }
+            catch
+            {
+                return EmptyIds;
+            }
         }
     }
 }

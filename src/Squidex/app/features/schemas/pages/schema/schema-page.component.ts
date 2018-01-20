@@ -2,7 +2,7 @@
  * Squidex Headless CMS
  *
  * @license
- * Copyright (c) Sebastian Stehle. All rights reserved
+ * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
@@ -13,6 +13,8 @@ import { Subscription } from 'rxjs';
 import {
     AddFieldDto,
     AppContext,
+    AppPatternDto,
+    AppPatternsService,
     createProperties,
     fadeAnimation,
     FieldDto,
@@ -57,6 +59,8 @@ export class SchemaPageComponent implements OnDestroy, OnInit {
     public schema: SchemaDetailsDto;
     public schemas: ImmutableArray<SchemaDto>;
 
+    public regexSuggestions: AppPatternDto[] = [];
+
     public exportSchemaDialog = new ModalView();
 
     public configureScriptsDialog = new ModalView();
@@ -86,7 +90,8 @@ export class SchemaPageComponent implements OnDestroy, OnInit {
     constructor(public readonly ctx: AppContext,
         private readonly formBuilder: FormBuilder,
         private readonly router: Router,
-        private readonly schemasService: SchemasService
+        private readonly schemasService: SchemasService,
+        private readonly appPatternsService: AppPatternsService
     ) {
     }
 
@@ -114,6 +119,11 @@ export class SchemaPageComponent implements OnDestroy, OnInit {
     }
 
     private load() {
+        this.appPatternsService.getPatterns(this.ctx.appName)
+            .subscribe(dtos => {
+                this.regexSuggestions = dtos.patterns;
+            });
+
         this.schemasService.getSchemas(this.ctx.appName)
             .subscribe(dtos => {
                 this.schemas = ImmutableArray.of(dtos);

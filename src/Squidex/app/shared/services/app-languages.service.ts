@@ -2,7 +2,7 @@
  * Squidex Headless CMS
  *
  * @license
- * Copyright (c) Sebastian Stehle. All rights reserved
+ * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
 import { HttpClient } from '@angular/common/http';
@@ -141,7 +141,7 @@ export class AppLanguagesService {
                 .pretifyError('Failed to add language. Please reload.');
     }
 
-    public updateLanguage(appName: string, languageCode: string, dto: UpdateAppLanguageDto, version: Version): Observable<Versioned<any>> {
+    public putLanguage(appName: string, languageCode: string, dto: UpdateAppLanguageDto, version: Version): Observable<Versioned<any>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/languages/${languageCode}`);
 
         return HTTP.putVersioned(this.http, url, dto, version)

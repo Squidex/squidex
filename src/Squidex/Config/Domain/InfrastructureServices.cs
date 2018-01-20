@@ -1,9 +1,8 @@
 ﻿// ==========================================================================
-//  InfrastructureServices.cs
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex Group
-//  All rights reserved.
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using System;
@@ -16,9 +15,11 @@ using NodaTime;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Assets.ImageSharp;
-using Squidex.Infrastructure.CQRS.Commands;
-using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Log;
+using Squidex.Infrastructure.Migrations;
+using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.UsageTracking;
 using Squidex.Pipeline;
 
@@ -43,7 +44,7 @@ namespace Squidex.Config.Domain
             {
                 services.AddSingletonAs(new FileChannel(loggingFile))
                     .As<ILogChannel>()
-                    .As<IExternalSystem>();
+                    .As<IInitializable>();
             }
 
             services.AddSingletonAs(c => new ApplicationInfoLogAppender(typeof(Program).Assembly, Guid.NewGuid()))
@@ -76,12 +77,6 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<ActionContextAccessor>()
                 .As<IActionContextAccessor>();
 
-            services.AddSingletonAs<DefaultDomainObjectRepository>()
-                .As<IDomainObjectRepository>();
-
-            services.AddSingletonAs<DefaultDomainObjectFactory>()
-                .As<IDomainObjectFactory>();
-
             services.AddSingletonAs<AggregateHandler>()
                 .As<IAggregateHandler>();
 
@@ -94,7 +89,11 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<ImageSharpAssetThumbnailGenerator>()
                 .As<IAssetThumbnailGenerator>();
 
-            services.AddSingletonAs<EventDataFormatter>();
+            services.AddSingletonAs<JsonEventDataFormatter>()
+                .As<IEventDataFormatter>();
+
+            services.AddSingletonAs<Migrator>()
+                .AsSelf();
         }
     }
 }

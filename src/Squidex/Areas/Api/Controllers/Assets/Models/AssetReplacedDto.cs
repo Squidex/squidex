@@ -1,14 +1,13 @@
 ﻿// ==========================================================================
-//  AssetReplacedDto.cs
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex Group
-//  All rights reserved.
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using System.ComponentModel.DataAnnotations;
-using Squidex.Domain.Apps.Write.Assets;
-using Squidex.Domain.Apps.Write.Assets.Commands;
+using Squidex.Domain.Apps.Entities.Assets;
+using Squidex.Domain.Apps.Entities.Assets.Commands;
 
 namespace Squidex.Areas.Api.Controllers.Assets.Models
 {

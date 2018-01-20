@@ -1,9 +1,8 @@
 ﻿// ==========================================================================
-//  RedisSubscription.cs
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex Group
-//  All rights reserved.
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using System;
@@ -55,7 +54,7 @@ namespace Squidex.Infrastructure
             {
                 log.LogError(ex, w => w
                     .WriteProperty("action", "PublishRedisMessage")
-                    .WriteProperty("state", "Failed")
+                    .WriteProperty("status", "Failed")
                     .WriteProperty("channel", channelName));
             }
         }
@@ -78,7 +77,7 @@ namespace Squidex.Infrastructure
                     log.LogDebug(w => w
                         .WriteProperty("action", "ReceiveRedisMessage")
                         .WriteProperty("channel", channelName)
-                        .WriteProperty("state", "Received"));
+                        .WriteProperty("status", "Received"));
                 }
             }
             catch (Exception ex)
@@ -86,7 +85,7 @@ namespace Squidex.Infrastructure
                 log.LogError(ex, w => w
                     .WriteProperty("action", "ReceiveRedisMessage")
                     .WriteProperty("channel", channelName)
-                    .WriteProperty("state", "Failed"));
+                    .WriteProperty("status", "Failed"));
             }
         }
 

@@ -2,7 +2,7 @@
  * Squidex Headless CMS
  *
  * @license
- * Copyright (c) Sebastian Stehle. All rights reserved
+ * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
@@ -47,7 +47,7 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
     public schema: SchemaDetailsDto;
 
     public content: ContentDto;
-    public contentOld: ContentDto;
+    public contentOld: ContentDto | null;
     public contentFormSubmitted = false;
     public contentForm: FormGroup;
 
@@ -122,11 +122,13 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
     }
 
     public showLatest() {
-        this.content = this.contentOld;
-        this.contentOld = null;
+        if (this.contentOld) {
+            this.content = this.contentOld;
+            this.contentOld = null;
 
-        this.emitContentUpdated(this.content);
-        this.populateContentForm();
+            this.emitContentUpdated(this.content);
+            this.populateContentForm();
+        }
     }
 
     public saveAndPublish() {
@@ -270,11 +272,23 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
                     fieldForm.controls['iv'].setValue(fieldValue['iv'] === undefined ? null : fieldValue['iv']);
                 }
             }
-
             if (this.content.status === 'Archived') {
                 this.contentForm.disable();
+            }
+        } else {
+            for (const field of this.schema.fields) {
+                const defaultValue = field.defaultValue();
+                if (defaultValue) {
+                    const fieldForm = <FormGroup>this.contentForm.get(field.name);
+                    if (field.partitioning === 'language') {
+                        for (let language of this.languages) {
+                            fieldForm.controls[language.iso2Code].setValue(defaultValue);
+                        }
+                    } else {
+                        fieldForm.controls['iv'].setValue(defaultValue);
+                    }
+                }
             }
         }
     }
 }
-

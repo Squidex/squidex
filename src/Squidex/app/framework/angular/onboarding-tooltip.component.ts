@@ -2,7 +2,7 @@
  * Squidex Headless CMS
  *
  * @license
- * Copyright (c) Sebastian Stehle. All rights reserved
+ * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
 import { Component, Input, OnDestroy, OnInit, Renderer } from '@angular/core';
@@ -25,7 +25,7 @@ import { fadeAnimation } from './animations';
 export class OnboardingTooltipComponent implements OnDestroy, OnInit {
     private showTimer: any;
     private closeTimer: any;
-    private forMouseDownListener: Function;
+    private forMouseDownListener: Function | null;
 
     public tooltipModal = new ModalView();
 
@@ -91,7 +91,7 @@ export class OnboardingTooltipComponent implements OnDestroy, OnInit {
         }
     }
 
-    private isSameOrParent(underCursor: Element): boolean {
+    private isSameOrParent(underCursor: Element | null): boolean {
         if (!underCursor) {
             return false;
         } if (this.for === underCursor) {

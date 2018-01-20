@@ -9,10 +9,6 @@
     font-size: .8rem;
 }
 
-.form-control {
-    width: 20rem;
-}
-
 .form-inline {
     position: relative;
 }
@@ -27,4 +23,10 @@
     font-size: .9rem;
     font-weight: normal;
     cursor: pointer !important;
+}
+
+.selection {
+    background: $color-table-footer;
+    border-bottom: 2px solid $color-border;
+    padding: .25 * $panel-padding $panel-padding;
 }

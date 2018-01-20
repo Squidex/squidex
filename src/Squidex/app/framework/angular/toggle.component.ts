@@ -2,7 +2,7 @@
  * Squidex Headless CMS
  *
  * @license
- * Copyright (c) Sebastian Stehle. All rights reserved
+ * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
 import { Component, forwardRef } from '@angular/core';
@@ -24,7 +24,7 @@ export class ToggleComponent implements ControlValueAccessor {
     private callChange = (v: any) => { /* NOOP */ };
     private callTouched = () => { /* NOOP */ };
 
-    public isChecked: boolean | null = null;
+    public isChecked: boolean | null | undefined = null;
     public isDisabled = false;
 
     public writeValue(value: boolean | null | undefined) {

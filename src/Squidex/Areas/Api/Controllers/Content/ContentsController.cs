@@ -1,9 +1,8 @@
 ﻿// ==========================================================================
-//  ContentsController.cs
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex Group
-//  All rights reserved.
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using System;
@@ -16,11 +15,10 @@ using NSwag.Annotations;
 using Squidex.Areas.Api.Controllers.Contents.Models;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.ConvertContent;
-using Squidex.Domain.Apps.Read.Contents;
-using Squidex.Domain.Apps.Read.Contents.GraphQL;
-using Squidex.Domain.Apps.Write.Contents;
-using Squidex.Domain.Apps.Write.Contents.Commands;
-using Squidex.Infrastructure.CQRS.Commands;
+using Squidex.Domain.Apps.Entities.Contents;
+using Squidex.Domain.Apps.Entities.Contents.Commands;
+using Squidex.Domain.Apps.Entities.Contents.GraphQL;
+using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
 
@@ -33,17 +31,14 @@ namespace Squidex.Areas.Api.Controllers.Contents
     public sealed class ContentsController : ApiController
     {
         private readonly IContentQueryService contentQuery;
-        private readonly IContentVersionLoader contentVersionLoader;
         private readonly IGraphQLService graphQl;
 
         public ContentsController(ICommandBus commandBus,
             IContentQueryService contentQuery,
-            IContentVersionLoader contentVersionLoader,
             IGraphQLService graphQl)
             : base(commandBus)
         {
             this.contentQuery = contentQuery;
-            this.contentVersionLoader = contentVersionLoader;
 
             this.graphQl = graphQl;
         }
@@ -90,21 +85,21 @@ namespace Squidex.Areas.Api.Controllers.Contents
 
             var isFrontendClient = User.IsFrontendClient();
 
-            var contents =
+            var result =
                 idsList != null ?
-                    await contentQuery.QueryWithCountAsync(App, name, User, archived, idsList) :
-                    await contentQuery.QueryWithCountAsync(App, name, User, archived, Request.QueryString.ToString());
+                    await contentQuery.QueryAsync(App, name, User, archived, idsList) :
+                    await contentQuery.QueryAsync(App, name, User, archived, Request.QueryString.ToString());
 
-            var response = new AssetsDto
+            var response = new ContentsDto
             {
-                Total = contents.Total,
-                Items = contents.Items.Take(200).Select(item =>
+                Total = result.Contents.Total,
+                Items = result.Contents.Take(200).Select(item =>
                 {
                     var itemModel = SimpleMapper.Map(item, new ContentDto());
 
                     if (item.Data != null)
                     {
-                        itemModel.Data = item.Data.ToApiModel(contents.Schema.SchemaDef, App.LanguagesConfig, !isFrontendClient);
+                        itemModel.Data = item.Data.ToApiModel(result.Schema.SchemaDef, App.LanguagesConfig, !isFrontendClient);
                     }
 
                     return itemModel;
@@ -142,13 +137,20 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(1)]
         public async Task<IActionResult> GetContentVersion(string name, Guid id, int version)
         {
-            var contentData = await contentVersionLoader.LoadAsync(App.Id, id, version);
+            var content = await contentQuery.FindContentAsync(App, name, User, id, version);
 
-            var response = contentData;
+            var response = SimpleMapper.Map(content.Content, new ContentDto());
+
+            if (content.Content.Data != null)
+            {
+                var isFrontendClient = User.IsFrontendClient();
+
+                response.Data = content.Content.Data.ToApiModel(content.Schema.SchemaDef, App.LanguagesConfig, !isFrontendClient);
+            }
 
             Response.Headers["ETag"] = new StringValues(version.ToString());
 
-            return Ok(response);
+            return Ok(response.Data);
         }
 
         [MustBeAppEditor]
@@ -159,7 +161,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         {
             await contentQuery.FindSchemaAsync(App, name);
 
-            var command = new CreateContent { ContentId = Guid.NewGuid(), User = User, Data = request.ToCleaned(), Publish = publish };
+            var command = new CreateContent { ContentId = Guid.NewGuid(), Data = request.ToCleaned(), Publish = publish };
 
             var context = await CommandBus.PublishAsync(command);
 
@@ -177,7 +179,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         {
             await contentQuery.FindSchemaAsync(App, name);
 
-            var command = new UpdateContent { ContentId = id, User = User, Data = request.ToCleaned() };
+            var command = new UpdateContent { ContentId = id, Data = request.ToCleaned() };
 
             var context = await CommandBus.PublishAsync(command);
 
@@ -195,7 +197,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         {
             await contentQuery.FindSchemaAsync(App, name);
 
-            var command = new PatchContent { ContentId = id, User = User, Data = request.ToCleaned() };
+            var command = new PatchContent { ContentId = id, Data = request.ToCleaned() };
 
             var context = await CommandBus.PublishAsync(command);
 
@@ -213,7 +215,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         {
             await contentQuery.FindSchemaAsync(App, name);
 
-            var command = new ChangeContentStatus { Status = Status.Published, ContentId = id, User = User };
+            var command = new ChangeContentStatus { Status = Status.Published, ContentId = id };
 
             await CommandBus.PublishAsync(command);
 
@@ -228,7 +230,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         {
             await contentQuery.FindSchemaAsync(App, name);
 
-            var command = new ChangeContentStatus { Status = Status.Draft, ContentId = id, User = User };
+            var command = new ChangeContentStatus { Status = Status.Draft, ContentId = id };
 
             await CommandBus.PublishAsync(command);
 
@@ -243,7 +245,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         {
             await contentQuery.FindSchemaAsync(App, name);
 
-            var command = new ChangeContentStatus { Status = Status.Archived, ContentId = id, User = User };
+            var command = new ChangeContentStatus { Status = Status.Archived, ContentId = id };
 
             await CommandBus.PublishAsync(command);
 
@@ -258,7 +260,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         {
             await contentQuery.FindSchemaAsync(App, name);
 
-            var command = new ChangeContentStatus { Status = Status.Draft, ContentId = id, User = User };
+            var command = new ChangeContentStatus { Status = Status.Draft, ContentId = id };
 
             await CommandBus.PublishAsync(command);
 
@@ -273,7 +275,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         {
             await contentQuery.FindSchemaAsync(App, name);
 
-            var command = new DeleteContent { ContentId = id, User = User };
+            var command = new DeleteContent { ContentId = id };
 
             await CommandBus.PublishAsync(command);
 

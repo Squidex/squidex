@@ -2,7 +2,7 @@
  * Squidex Headless CMS
  *
  * @license
- * Copyright (c) Sebastian Stehle. All rights reserved
+ * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
 export * from './guards/app-must-exist.guard';
@@ -20,6 +20,7 @@ export * from './interceptors/auth.interceptor';
 export * from './services/app-contributors.service';
 export * from './services/app-clients.service';
 export * from './services/app-languages.service';
+export * from './services/app-patterns.service';
 export * from './services/apps-store.service';
 export * from './services/apps.service';
 export * from './services/assets.service';

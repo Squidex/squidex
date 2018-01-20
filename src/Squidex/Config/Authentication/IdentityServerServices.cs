@@ -1,9 +1,8 @@
 ﻿// ==========================================================================
-//  AuthenticationServices.cs
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex Group
-//  All rights reserved.
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using Microsoft.AspNetCore.Authentication;
@@ -51,6 +50,7 @@ namespace Squidex.Config.Authentication
                     options.ClientSecret = Constants.InternalClientSecret;
                     options.RequireHttpsMetadata = identityOptions.RequiresHttps;
                     options.SaveTokens = true;
+                    options.Scope.Add(Constants.ProfileScope);
                     options.Scope.Add(Constants.RoleScope);
                     options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                 });

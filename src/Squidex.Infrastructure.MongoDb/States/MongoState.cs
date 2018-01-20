@@ -1,9 +1,8 @@
 ﻿// ==========================================================================
-//  MongoState.cs
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex Group
-//  All rights reserved.
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using MongoDB.Bson;
@@ -12,20 +11,20 @@ using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Infrastructure.States
 {
-    public sealed class MongoState<T>
+    public sealed class MongoState<T, TKey> : IVersionedEntity<TKey>
     {
         [BsonId]
         [BsonElement]
         [BsonRepresentation(BsonType.String)]
-        public string Id { get; set; }
-
-        [BsonRequired]
-        [BsonElement]
-        public string Etag { get; set; }
+        public TKey Id { get; set; }
 
         [BsonRequired]
         [BsonElement]
         [BsonJson]
         public T Doc { get; set; }
+
+        [BsonRequired]
+        [BsonElement]
+        public long Version { get; set; }
     }
 }

@@ -1,9 +1,8 @@
 ﻿// ==========================================================================
-//  InconsistentStateException.cs
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex Group
-//  All rights reserved.
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using System;
@@ -14,25 +13,25 @@ namespace Squidex.Infrastructure.States
     [Serializable]
     public class InconsistentStateException : Exception
     {
-        private readonly string currentEtag;
-        private readonly string expectedEtag;
+        private readonly long currentVersion;
+        private readonly long expectedVersion;
 
-        public string CurrentEtag
+        public long CurrentVersion
         {
-            get { return currentEtag; }
+            get { return currentVersion; }
         }
 
-        public string ExpectedEtag
+        public long ExpectedVersion
         {
-            get { return expectedEtag; }
+            get { return expectedVersion; }
         }
 
-        public InconsistentStateException(string currentEtag, string expectedEtag, Exception ex)
-            : base(FormatMessage(currentEtag, expectedEtag), ex)
+        public InconsistentStateException(long currentVersion, long expectedVersion, Exception ex)
+            : base(FormatMessage(currentVersion, expectedVersion), ex)
         {
-            this.currentEtag = currentEtag;
+            this.currentVersion = currentVersion;
 
-            this.expectedEtag = expectedEtag;
+            this.expectedVersion = expectedVersion;
         }
 
         protected InconsistentStateException(SerializationInfo info, StreamingContext context)
@@ -40,9 +39,9 @@ namespace Squidex.Infrastructure.States
         {
         }
 
-        private static string FormatMessage(string currentEtag, string expectedEtag)
+        private static string FormatMessage(long currentVersion, long expectedVersion)
         {
-            return $"Requested etag {expectedEtag}, but found {currentEtag}.";
+            return $"Requested version {expectedVersion}, but found {currentVersion}.";
         }
     }
 }

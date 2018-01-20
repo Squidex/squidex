@@ -1,9 +1,8 @@
 ﻿// ==========================================================================
-//  AzureBlobAssetStore.cs
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex Group
-//  All rights reserved.
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using System;
@@ -14,7 +13,7 @@ using Microsoft.WindowsAzure.Storage.Blob;
 
 namespace Squidex.Infrastructure.Assets
 {
-    public class AzureBlobAssetStore : IAssetStore, IExternalSystem
+    public class AzureBlobAssetStore : IAssetStore, IInitializable
     {
         private const string AssetVersion = "AssetVersion";
         private const string AssetId = "AssetId";
@@ -31,7 +30,7 @@ namespace Squidex.Infrastructure.Assets
             this.containerName = containerName;
         }
 
-        public void Connect()
+        public void Initialize()
         {
             try
             {

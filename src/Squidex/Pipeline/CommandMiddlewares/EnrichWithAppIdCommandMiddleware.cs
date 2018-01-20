@@ -1,17 +1,16 @@
 ﻿// ==========================================================================
-//  EnrichWithAppIdHandler.cs
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex Group
-//  All rights reserved.
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Squidex.Domain.Apps.Write;
+using Squidex.Domain.Apps.Entities;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.CQRS.Commands;
+using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Pipeline.CommandMiddlewares
 {

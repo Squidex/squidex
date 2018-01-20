@@ -1,15 +1,14 @@
 ﻿// ==========================================================================
-//  PortalRedirectMiddleware.cs
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex Group
-//  All rights reserved.
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Squidex.Domain.Apps.Read.Apps.Services;
-using Squidex.Infrastructure.Security;
+using Squidex.Domain.Apps.Entities.Apps.Services;
 
 namespace Squidex.Areas.Portal.Middlewares
 {
@@ -26,9 +25,12 @@ namespace Squidex.Areas.Portal.Middlewares
         {
             if (context.Request.Path == "/")
             {
-                var userId = context.User.FindFirst(OpenIdClaims.Subject).Value;
+                var userIdClaim = context.User.FindFirst(ClaimTypes.NameIdentifier);
 
-                context.Response.RedirectToAbsoluteUrl(await appPlansBillingManager.GetPortalLinkAsync(userId));
+                if (userIdClaim != null)
+                {
+                    context.Response.RedirectToAbsoluteUrl(await appPlansBillingManager.GetPortalLinkAsync(userIdClaim.Value));
+                }
             }
         }
     }

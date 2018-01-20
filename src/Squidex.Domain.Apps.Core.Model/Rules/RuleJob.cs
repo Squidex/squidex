@@ -1,9 +1,8 @@
 ﻿// ==========================================================================
-//  RuleJob.cs
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex Group
-//  All rights reserved.
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using System;
@@ -13,7 +12,7 @@ namespace Squidex.Domain.Apps.Core.Rules
 {
     public sealed class RuleJob
     {
-        public Guid RuleId { get; set; }
+        public Guid JobId { get; set; }
 
         public Guid AppId { get; set; }
 

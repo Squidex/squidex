@@ -2,7 +2,7 @@
  * Squidex Headless CMS
  *
  * @license
- * Copyright (c) Sebastian Stehle. All rights reserved
+ * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
 import { Component, Input, OnInit } from '@angular/core';
@@ -41,7 +41,8 @@ export class ContentFieldComponent implements OnInit {
     }
 
     public ngOnInit() {
-        this.masterLanguageCode = this.languages.find(l => l.isMaster).iso2Code;
+        this.masterLanguageCode = this.languages.find(l => l.isMaster)!.iso2Code;
+
         if (this.field.isDisabled) {
             this.fieldForm.disable();
         }

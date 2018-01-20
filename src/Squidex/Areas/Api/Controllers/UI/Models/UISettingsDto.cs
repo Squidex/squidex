@@ -1,12 +1,10 @@
 ﻿// ==========================================================================
-//  UISettingsDto.cs
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex Group
-//  All rights reserved.
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Squidex.Areas.Api.Controllers.UI.Models
@@ -14,9 +12,15 @@ namespace Squidex.Areas.Api.Controllers.UI.Models
     public sealed class UISettingsDto
     {
         /// <summary>
-        /// The regex suggestions.
+        /// The type of the map control.
         /// </summary>
         [Required]
-        public List<UIRegexSuggestionDto> RegexSuggestions { get; set; }
+        public string MapType { get; set; }
+
+        /// <summary>
+        /// The key for the map control.
+        /// </summary>
+        [Required]
+        public string MapKey { get; set; }
     }
 }

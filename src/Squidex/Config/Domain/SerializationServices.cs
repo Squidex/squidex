@@ -1,12 +1,12 @@
 ﻿// ==========================================================================
-//  SerializationServices.cs
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex Group
-//  All rights reserved.
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using Microsoft.Extensions.DependencyInjection;
+using Migrate_01;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using NodaTime;
@@ -18,7 +18,7 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Schemas.Json;
 using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.MongoDb;
 
@@ -26,22 +26,23 @@ namespace Squidex.Config.Domain
 {
     public static class SerializationServices
     {
-        private static readonly TypeNameRegistry TypeNameRegistry = new TypeNameRegistry();
-        private static readonly JsonSerializerSettings SerializerSettings = new JsonSerializerSettings();
+        private static readonly TypeNameRegistry TypeNameRegistry =
+            new TypeNameRegistry()
+                .MapUnmapped(typeof(Migration01_FromCqrs).Assembly)
+                .MapUnmapped(typeof(SquidexCoreModel).Assembly)
+                .MapUnmapped(typeof(SquidexEvents).Assembly)
+                .MapUnmapped(typeof(SquidexInfrastructure).Assembly);
+
         private static readonly FieldRegistry FieldRegistry = new FieldRegistry(TypeNameRegistry);
 
-        public static JsonSerializerSettings DefaultJsonSettings
-        {
-            get { return SerializerSettings; }
-        }
-
-        private static void ConfigureJson(JsonSerializerSettings settings, TypeNameHandling typeNameHandling)
+        private static JsonSerializerSettings ConfigureJson(JsonSerializerSettings settings, TypeNameHandling typeNameHandling)
         {
             settings.SerializationBinder = new TypeNameSerializationBinder(TypeNameRegistry);
 
             settings.ContractResolver = new ConverterContractResolver(
                 new AppClientsConverter(),
                 new AppContributorsConverter(),
+                new AppPatternsConverter(),
                 new ClaimsPrincipalConverter(),
                 new InstantConverter(),
                 new LanguageConverter(),
@@ -64,25 +65,21 @@ namespace Squidex.Config.Domain
             settings.TypeNameHandling = typeNameHandling;
 
             settings.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
-        }
 
-        static SerializationServices()
-        {
-            TypeNameRegistry.MapUnmapped(typeof(SquidexCoreModel).Assembly);
-            TypeNameRegistry.MapUnmapped(typeof(SquidexEvents).Assembly);
-            TypeNameRegistry.MapUnmapped(typeof(SquidexInfrastructure).Assembly);
-
-            ConfigureJson(SerializerSettings, TypeNameHandling.Auto);
-
-            BsonJsonConvention.Register(JsonSerializer.Create(SerializerSettings));
+            return settings;
         }
 
         public static IServiceCollection AddMySerializers(this IServiceCollection services)
         {
-            services.AddSingletonAs(t => TypeNameRegistry);
+            var serializerSettings = ConfigureJson(new JsonSerializerSettings(), TypeNameHandling.Auto);
+            var serializerInstance = JsonSerializer.Create(serializerSettings);
+
             services.AddSingletonAs(t => FieldRegistry);
-            services.AddSingletonAs(t => SerializerSettings);
-            services.AddSingletonAs(t => JsonSerializer.Create(SerializerSettings));
+            services.AddSingletonAs(t => serializerSettings);
+            services.AddSingletonAs(t => serializerInstance);
+            services.AddSingletonAs(t => TypeNameRegistry);
+
+            BsonJsonConvention.Register(serializerInstance);
 
             return services;
         }

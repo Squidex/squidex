@@ -2,7 +2,7 @@
  * Squidex Headless CMS
  *
  * @license
- * Copyright (c) Sebastian Stehle. All rights reserved
+ * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
@@ -17,6 +17,7 @@ import {
     AppContributorsService,
     AppLanguagesService,
     AppMustExistGuard,
+    AppPatternsService,
     AppsStoreService,
     AppsService,
     AssetComponent,
@@ -28,6 +29,7 @@ import {
     ContentsService,
     EventConsumersService,
     FileIconPipe,
+    GeolocationEditorComponent,
     GraphQlService,
     HelpComponent,
     HelpService,
@@ -73,6 +75,7 @@ import {
         AssetPreviewUrlPipe,
         AssetUrlPipe,
         FileIconPipe,
+        GeolocationEditorComponent,
         HelpComponent,
         HistoryComponent,
         LanguageSelectorComponent,
@@ -92,6 +95,7 @@ import {
         AssetPreviewUrlPipe,
         AssetUrlPipe,
         FileIconPipe,
+        GeolocationEditorComponent,
         HelpComponent,
         HistoryComponent,
         LanguageSelectorComponent,
@@ -115,6 +119,7 @@ export class SqxSharedModule {
                 AppContributorsService,
                 AppLanguagesService,
                 AppMustExistGuard,
+                AppPatternsService,
                 AppsService,
                 AppsStoreService,
                 AssetsService,

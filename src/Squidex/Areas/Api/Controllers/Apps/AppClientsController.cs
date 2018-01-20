@@ -1,9 +1,8 @@
 ﻿// ==========================================================================
-//  AppClientsController.cs
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex Group
-//  All rights reserved.
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using System.Linq;
@@ -12,8 +11,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 using NSwag.Annotations;
 using Squidex.Areas.Api.Controllers.Apps.Models;
-using Squidex.Domain.Apps.Write.Apps.Commands;
-using Squidex.Infrastructure.CQRS.Commands;
+using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Domain.Apps.Entities.Apps.Commands;
+using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
 
@@ -81,7 +81,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
 
             await CommandBus.PublishAsync(command);
 
-            var response = SimpleMapper.Map(command, new ClientDto { Name = command.Id });
+            var response = SimpleMapper.Map(command, new ClientDto { Name = command.Id, Permission = AppClientPermission.Editor });
 
             return CreatedAtAction(nameof(GetClients), new { app }, response);
         }

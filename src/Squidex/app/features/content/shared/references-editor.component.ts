@@ -2,7 +2,7 @@
  * Squidex Headless CMS
  *
  * @license
- * Copyright (c) Sebastian Stehle. All rights reserved
+ * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
 // tslint:disable:prefer-for-of
@@ -50,8 +50,6 @@ export class ReferencesEditorComponent implements ControlValueAccessor, OnInit {
     public contentItems = ImmutableArray.empty<ContentDto>();
     public contentFields: FieldDto[];
 
-    public columnWidth: number;
-
     public isDisabled = false;
     public isInvalidSchema = false;
 
@@ -84,7 +82,7 @@ export class ReferencesEditorComponent implements ControlValueAccessor, OnInit {
 
             this.contentsService.getContents(this.ctx.appName, this.schemaId, 10000, 0, undefined, contentIds)
                 .subscribe(dtos => {
-                    this.contentItems = ImmutableArray.of(contentIds.map(id => dtos.items.find(c => c.id === id)).filter(c => !!c));
+                    this.contentItems = ImmutableArray.of(contentIds.map(id => dtos.items.find(c => c.id === id)).filter(r => !!r).map(r => r!));
                 });
         }
     }
@@ -153,12 +151,6 @@ export class ReferencesEditorComponent implements ControlValueAccessor, OnInit {
 
         if (this.contentFields.length === 0) {
             this.contentFields = [<any>{}];
-        }
-
-        if (this.contentFields.length > 0) {
-            this.columnWidth = 100 / this.contentFields.length;
-        } else {
-            this.columnWidth = 100;
         }
     }
 }

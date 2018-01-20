@@ -1,9 +1,8 @@
 ﻿// ==========================================================================
-//  EventStoreServices.cs
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex Group
-//  All rights reserved.
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using EventStore.ClientAPI;
@@ -11,7 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Config.Domain
 {
@@ -33,7 +32,7 @@ namespace Squidex.Config.Domain
 
                             return new MongoEventStore(mongDatabase, c.GetRequiredService<IEventNotifier>());
                         })
-                        .As<IExternalSystem>()
+                        .As<IInitializable>()
                         .As<IEventStore>();
                 },
                 ["GetEventStore"] = () =>
@@ -45,7 +44,7 @@ namespace Squidex.Config.Domain
                     var connection = EventStoreConnection.Create(eventStoreConfiguration);
 
                     services.AddSingletonAs(c => new GetEventStore(connection, eventStorePrefix, eventStoreProjectionHost))
-                        .As<IExternalSystem>()
+                        .As<IInitializable>()
                         .As<IEventStore>();
                 }
             });

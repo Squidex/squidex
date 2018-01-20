@@ -1,9 +1,8 @@
 ﻿// ==========================================================================
-//  RulesController.cs
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex Group
-//  All rights reserved.
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using System;
@@ -14,10 +13,10 @@ using NodaTime;
 using NSwag.Annotations;
 using Squidex.Areas.Api.Controllers.Rules.Models;
 using Squidex.Areas.Api.Controllers.Rules.Models.Converters;
-using Squidex.Domain.Apps.Read;
-using Squidex.Domain.Apps.Read.Rules.Repositories;
-using Squidex.Domain.Apps.Write.Rules.Commands;
-using Squidex.Infrastructure.CQRS.Commands;
+using Squidex.Domain.Apps.Entities;
+using Squidex.Domain.Apps.Entities.Rules.Commands;
+using Squidex.Domain.Apps.Entities.Rules.Repositories;
+using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
 
@@ -59,7 +58,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [ApiCosts(1)]
         public async Task<IActionResult> GetRules(string app)
         {
-            var rules = await appProvider.GetRulesAsync(AppName);
+            var rules = await appProvider.GetRulesAsync(AppId);
 
             var response = rules.Select(r => r.ToModel());
 

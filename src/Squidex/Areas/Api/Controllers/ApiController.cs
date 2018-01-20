@@ -1,17 +1,16 @@
 ﻿// ==========================================================================
-//  ControllerBase.cs
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex Group
-//  All rights reserved.
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using System;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Squidex.Domain.Apps.Read.Apps;
+using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.CQRS.Commands;
+using Squidex.Infrastructure.Commands;
 using Squidex.Pipeline;
 
 namespace Squidex.Areas.Api.Controllers
@@ -39,6 +38,11 @@ namespace Squidex.Areas.Api.Controllers
         protected string AppName
         {
             get { return App.Name; }
+        }
+
+        protected Guid AppId
+        {
+            get { return App.Id; }
         }
 
         protected ApiController(ICommandBus commandBus)

@@ -2,12 +2,12 @@
  * Squidex Headless CMS
  *
  * @license
- * Copyright (c) Sebastian Stehle. All rights reserved
+ * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
 export class Version {
     constructor(
-        public readonly value?: string
+        public readonly value: string
     ) {
     }
 }

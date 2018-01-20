@@ -1,9 +1,8 @@
 // ==========================================================================
-//  SchemaSwaggerGenerator.cs
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex Group
-//  All rights reserved.
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using System;
@@ -15,6 +14,7 @@ using Squidex.Config;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.GenerateJsonSchema;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Pipeline.Swagger;
 using Squidex.Shared.Identity;
@@ -33,7 +33,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
         private readonly JsonSchema4 dataSchema;
         private readonly string schemaPath;
         private readonly string schemaName;
-        private readonly string schemaKey;
+        private readonly string schemaType;
         private readonly string appPath;
 
         static SchemaSwaggerGenerator()
@@ -69,12 +69,12 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
             appPath = path;
 
             schemaPath = schema.Name;
-            schemaName = schema.Properties.Label.WithFallback(schema.Name);
-            schemaKey = schema.Name.ToPascalCase();
+            schemaName = schema.DisplayName();
+            schemaType = schema.TypeName();
 
-            dataSchema = schemaResolver($"{schemaKey}Dto", schema.BuildJsonSchema(partitionResolver, schemaResolver));
+            dataSchema = schemaResolver($"{schemaType}Dto", schema.BuildJsonSchema(partitionResolver, schemaResolver));
 
-            contentSchema = schemaResolver($"{schemaKey}ContentDto", schemaBuilder.CreateContentSchema(schema, dataSchema));
+            contentSchema = schemaResolver($"{schemaType}ContentDto", schemaBuilder.CreateContentSchema(schema, dataSchema));
         }
 
         public void GenerateSchemaOperations()
@@ -109,13 +109,13 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
         {
             return AddOperation(SwaggerOperationMethod.Get, null, $"{appPath}/{schemaPath}", operation =>
             {
-                operation.OperationId = $"Query{schemaKey}Contents";
+                operation.OperationId = $"Query{schemaType}Contents";
                 operation.Summary = $"Queries {schemaName} contents.";
                 operation.Security = ReaderSecurity;
 
                 operation.Description = SchemaQueryDescription;
 
-                operation.AddQueryParameter("$top", JsonObjectType.Number, "Optional number of contents to take.");
+                operation.AddQueryParameter("$top", JsonObjectType.Number, "Optional number of contents to take (Default: 20).");
                 operation.AddQueryParameter("$skip", JsonObjectType.Number, "Optional number of contents to skip.");
                 operation.AddQueryParameter("$filter", JsonObjectType.String, "Optional OData filter.");
                 operation.AddQueryParameter("$search", JsonObjectType.String, "Optional OData full text search.");
@@ -129,7 +129,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
         {
             return AddOperation(SwaggerOperationMethod.Get, schemaName, $"{appPath}/{schemaPath}/{{id}}", operation =>
             {
-                operation.OperationId = $"Get{schemaKey}Content";
+                operation.OperationId = $"Get{schemaType}Content";
                 operation.Summary = $"Get a {schemaName} content.";
                 operation.Security = ReaderSecurity;
 
@@ -141,7 +141,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
         {
             return AddOperation(SwaggerOperationMethod.Post, null, $"{appPath}/{schemaPath}", operation =>
             {
-                operation.OperationId = $"Create{schemaKey}Content";
+                operation.OperationId = $"Create{schemaType}Content";
                 operation.Summary = $"Create a {schemaName} content.";
                 operation.Security = EditorSecurity;
 
@@ -156,7 +156,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
         {
             return AddOperation(SwaggerOperationMethod.Put, schemaName, $"{appPath}/{schemaPath}/{{id}}", operation =>
             {
-                operation.OperationId = $"Update{schemaKey}Content";
+                operation.OperationId = $"Update{schemaType}Content";
                 operation.Summary = $"Update a {schemaName} content.";
                 operation.Security = EditorSecurity;
 
@@ -170,11 +170,11 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
         {
             return AddOperation(SwaggerOperationMethod.Patch, schemaName, $"{appPath}/{schemaPath}/{{id}}", operation =>
             {
-                operation.OperationId = $"Path{schemaKey}Content";
-                operation.Summary = $"Patchs a {schemaName} content.";
+                operation.OperationId = $"Path{schemaType}Content";
+                operation.Summary = $"Patch a {schemaName} content.";
                 operation.Security = EditorSecurity;
 
-                operation.AddBodyParameter("data", contentSchema, SchemaBodyDescription);
+                operation.AddBodyParameter("data", dataSchema, SchemaBodyDescription);
 
                 operation.AddResponse("201", $"{schemaName} item patched.", dataSchema);
             });
@@ -184,7 +184,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
         {
             return AddOperation(SwaggerOperationMethod.Put, schemaName, $"{appPath}/{schemaPath}/{{id}}/publish", operation =>
             {
-                operation.OperationId = $"Publish{schemaKey}Content";
+                operation.OperationId = $"Publish{schemaType}Content";
                 operation.Summary = $"Publish a {schemaName} content.";
                 operation.Security = EditorSecurity;
 
@@ -196,7 +196,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
         {
             return AddOperation(SwaggerOperationMethod.Put, schemaName, $"{appPath}/{schemaPath}/{{id}}/unpublish", operation =>
             {
-                operation.OperationId = $"Unpublish{schemaKey}Content";
+                operation.OperationId = $"Unpublish{schemaType}Content";
                 operation.Summary = $"Unpublish a {schemaName} content.";
                 operation.Security = EditorSecurity;
 
@@ -208,7 +208,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
         {
             return AddOperation(SwaggerOperationMethod.Put, schemaName, $"{appPath}/{schemaPath}/{{id}}/archive", operation =>
             {
-                operation.OperationId = $"Archive{schemaKey}Content";
+                operation.OperationId = $"Archive{schemaType}Content";
                 operation.Summary = $"Archive a {schemaName} content.";
                 operation.Security = EditorSecurity;
 
@@ -220,7 +220,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
         {
             return AddOperation(SwaggerOperationMethod.Put, schemaName, $"{appPath}/{schemaPath}/{{id}}/restore", operation =>
             {
-                operation.OperationId = $"Restore{schemaKey}Content";
+                operation.OperationId = $"Restore{schemaType}Content";
                 operation.Summary = $"Restore a {schemaName} content.";
                 operation.Security = EditorSecurity;
 
@@ -232,7 +232,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
         {
             return AddOperation(SwaggerOperationMethod.Delete, schemaName, $"{appPath}/{schemaPath}/{{id}}/", operation =>
             {
-                operation.OperationId = $"Delete{schemaKey}Content";
+                operation.OperationId = $"Delete{schemaType}Content";
                 operation.Summary = $"Delete a {schemaName} content.";
                 operation.Security = EditorSecurity;
 

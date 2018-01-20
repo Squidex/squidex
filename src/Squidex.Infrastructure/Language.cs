@@ -1,9 +1,8 @@
 ﻿// ==========================================================================
-//  Language.cs
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex Group
-//  All rights reserved.
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using System;
@@ -14,10 +13,10 @@ namespace Squidex.Infrastructure
 {
     public sealed partial class Language
     {
-        private static readonly Regex CultureRegex = new Regex("^([a-z]{2})(\\-[a-z]{2})?$");
+        private static readonly Regex CultureRegex = new Regex("^([a-z]{2})(\\-[a-z]{2})?$", RegexOptions.IgnoreCase);
+        private static readonly Dictionary<string, Language> AllLanguagesField = new Dictionary<string, Language>(StringComparer.OrdinalIgnoreCase);
         private readonly string iso2Code;
         private readonly string englishName;
-        private static readonly Dictionary<string, Language> AllLanguagesField = new Dictionary<string, Language>(StringComparer.OrdinalIgnoreCase);
 
         private static Language AddLanguage(string iso2Code, string englishName)
         {
@@ -106,7 +105,7 @@ namespace Squidex.Infrastructure
                     return null;
                 }
 
-                input = match.Groups[0].Value;
+                input = match.Groups[1].Value;
             }
 
             if (TryGetLanguage(input.ToLowerInvariant(), out var result))

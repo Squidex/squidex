@@ -1,9 +1,8 @@
 ﻿// ==========================================================================
-//  MongoUsageStore.cs
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex Group
-//  All rights reserved.
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using System;
@@ -17,8 +16,6 @@ namespace Squidex.Infrastructure.UsageTracking
 {
     public sealed class MongoUsageStore : MongoRepositoryBase<MongoUsage>, IUsageStore
     {
-        private static readonly UpdateOptions Upsert = new UpdateOptions { IsUpsert = true };
-
         public MongoUsageStore(IMongoDatabase database)
             : base(database)
         {

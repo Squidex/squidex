@@ -1,9 +1,8 @@
 ﻿// ==========================================================================
-//  SchemasController.cs
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex Group
-//  All rights reserved.
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using System;
@@ -15,10 +14,10 @@ using NSwag.Annotations;
 using Squidex.Areas.Api.Controllers.Schemas.Models;
 using Squidex.Areas.Api.Controllers.Schemas.Models.Converters;
 using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Domain.Apps.Read;
-using Squidex.Domain.Apps.Read.Schemas;
-using Squidex.Domain.Apps.Write.Schemas.Commands;
-using Squidex.Infrastructure.CQRS.Commands;
+using Squidex.Domain.Apps.Entities;
+using Squidex.Domain.Apps.Entities.Schemas;
+using Squidex.Domain.Apps.Entities.Schemas.Commands;
+using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
 
@@ -56,7 +55,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         [ApiCosts(0)]
         public async Task<IActionResult> GetSchemas(string app)
         {
-            var schemas = await appProvider.GetSchemasAsync(AppName);
+            var schemas = await appProvider.GetSchemasAsync(AppId);
 
             var response = schemas.Select(s => s.ToModel()).ToList();
 
@@ -83,11 +82,11 @@ namespace Squidex.Areas.Api.Controllers.Schemas
 
             if (Guid.TryParse(name, out var id))
             {
-                entity = await appProvider.GetSchemaAsync(AppName, id);
+                entity = await appProvider.GetSchemaAsync(AppId, id);
             }
             else
             {
-                entity = await appProvider.GetSchemaAsync(AppName, name);
+                entity = await appProvider.GetSchemaAsync(AppId, name);
             }
 
             if (entity == null || entity.IsDeleted)

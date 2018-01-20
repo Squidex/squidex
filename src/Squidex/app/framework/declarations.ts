@@ -2,7 +2,7 @@
  * Squidex Headless CMS
  *
  * @license
- * Copyright (c) Sebastian Stehle. All rights reserved
+ * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
 export * from './angular/animations';
@@ -17,8 +17,8 @@ export * from './angular/dialog-renderer.component';
 export * from './angular/dropdown.component';
 export * from './angular/file-drop.directive';
 export * from './angular/focus-on-init.directive';
-export * from './angular/geolocation-editor.component';
 export * from './angular/http-extensions-impl';
+export * from './angular/ignore-scrollbar.directive';
 export * from './angular/image-source.directive';
 export * from './angular/indeterminate-value.directive';
 export * from './angular/jscript-editor.component';
@@ -56,7 +56,6 @@ export * from './services/analytics.service';
 export * from './services/clipboard.service';
 export * from './services/dialog.service';
 export * from './services/local-store.service';
-export * from './services/local-cache.service';
 export * from './services/message-bus.service';
 export * from './services/onboarding.service';
 export * from './services/resource-loader.service';

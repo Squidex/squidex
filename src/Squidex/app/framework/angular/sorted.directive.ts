@@ -3,7 +3,7 @@
  * Squidex Headless CMS
  *
  * @license
- * Copyright (c) Sebastian Stehle. All rights reserved
+ * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
 import { Directive, EventEmitter, Output } from '@angular/core';
@@ -30,30 +30,32 @@ export class SortedDirective {
     ) {
         const oldDragStartCallback = sortableComponent._onDragStartCallback.bind(sortableComponent);
 
-        sortableComponent._onDragStartCallback = () => {
-            oldDragStartCallback();
+        if (Array.isArray(sortableContainer.sortableData)) {
+            sortableComponent._onDragStartCallback = () => {
+                oldDragStartCallback();
 
-            this.oldArray = [...sortableContainer.sortableData];
-        };
+                this.oldArray = [...<any>sortableContainer.sortableData];
+            };
 
-        const oldDropCallback = sortableComponent._onDropCallback.bind(sortableComponent);
+            const oldDropCallback = sortableComponent._onDropCallback.bind(sortableComponent);
 
-        sortableComponent._onDropCallback = (event: Event) => {
-            oldDropCallback(event);
+            sortableComponent._onDropCallback = (event: Event) => {
+                oldDropCallback(event);
 
-            if (sortableDragDropService.isDragged) {
-                const newArray = sortableContainer.sortableData;
-                const oldArray = this.oldArray;
+                if (sortableDragDropService.isDragged) {
+                    const newArray: any[] = <any>sortableContainer.sortableData;
+                    const oldArray = this.oldArray;
 
-                if (newArray && oldArray && newArray.length === oldArray.length) {
-                    for (let i = 0; i < oldArray.length; i++) {
-                        if (oldArray[i] !== newArray[i]) {
-                            this.sorted.emit(newArray);
-                            break;
+                    if (newArray && oldArray && newArray.length === oldArray.length) {
+                        for (let i = 0; i < oldArray.length; i++) {
+                            if (oldArray[i] !== newArray[i]) {
+                                this.sorted.emit(newArray);
+                                break;
+                            }
                         }
                     }
                 }
-            }
-        };
+            };
+        }
     }
 }

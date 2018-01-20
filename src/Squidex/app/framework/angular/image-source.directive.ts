@@ -2,7 +2,7 @@
  * Squidex Headless CMS
  *
  * @license
- * Copyright (c) Sebastian Stehle. All rights reserved
+ * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
 import { AfterViewInit, Directive, ElementRef, HostListener, Input, OnChanges, OnDestroy, OnInit, Renderer } from '@angular/core';
@@ -42,7 +42,7 @@ export class ImageSourceDirective implements OnChanges, OnDestroy, OnInit, After
     }
 
     public ngOnInit() {
-        if (this.parent === null) {
+        if (!this.parent) {
             this.parent = this.element.nativeElement.parentElement;
         }
 

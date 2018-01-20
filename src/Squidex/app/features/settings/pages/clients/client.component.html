@@ -1,83 +1,80 @@
 <div class="table-items-row">
-    <table class="table table-middle table-sm table-borderless table-fixed client-info">
-        <colgroup>
-            <col style="width: 160px; text-align: right;" />
-            <col style="width: 100%" />
-            <col style="width: 40px" />
-        </colgroup>
+    <div class="row no-gutters">
+        <div class="col">
+            <div class="client-header">
+                <form *ngIf="isRenaming" class="form-inline" [formGroup]="renameForm" (ngSubmit)="renaming.emit(renameForm.controls.name.value)">
+                    <div class="form-group mr-1">
+                        <sqx-control-errors for="name"></sqx-control-errors>
+                        
+                        <input type="text" class="form-control client-name enabled" formControlName="name" maxlength="20" sqxFocusOnInit (keydown)="onKeyDown($event.keyCode)" />
+                    </div>
 
-        <tr>
-            <td colspan="2">
-                <div class="float-right">
-                    <button class="btn btn-secondary" (click)="createToken(client)">Create Token</button>
-                </div>
+                    <button type="submit" class="btn btn-primary" [disabled]="!renameForm.valid || !hasNewName">Save</button>
 
-                <div class="client-header">
-                    <form *ngIf="isRenaming" class="form-inline" [formGroup]="renameForm" (ngSubmit)="renaming.emit(renameForm.controls.name.value)">
-                        <div class="form-group mr-1">
-                            <sqx-control-errors for="name"></sqx-control-errors>
-                            
-                            <input type="text" class="form-control client-name enabled" formControlName="name" maxlength="20" sqxFocusOnInit (keydown)="onKeyDown($event.keyCode)" />
-                        </div>
+                    <button class="btn btn-link btn-decent btn-cancel" (click)="cancelRename()">
+                        <i class="icon-close"></i>
+                    </button>
+                </form>
 
-                        <button type="submit" class="btn btn-primary" [disabled]="!renameForm.valid || !hasNewName">Save</button>
+                <span *ngIf="!isRenaming">
+                    <h3 class="client-name">
+                        <span (dblclick)="startRename()">{{client.name}}</span> 
+                    </h3>
 
-                        <button class="btn btn-link btn-decent btn-cancel" (click)="cancelRename()">
-                            <i class="icon-close"></i>
-                        </button>
-                    </form>
-
-                    <span *ngIf="!isRenaming">
-                        <h3 class="client-name">
-                            <span (dblclick)="startRename()">{{client.name}}</span> 
-                        </h3>
-
-                        <i class="client-edit icon-pencil" (click)="startRename()"></i>
-                    </span>
-                </div>
-                    
-                <div class="client-expires">Access tokens expire after 30 days</div>
-            </td>
-            <td class="client-delete">
-                <button type="button" class="btn btn-link btn-danger"
-                    (sqxConfirmClick)="revoking.emit()"
-                    confirmTitle="Revoke client" 
-                    confirmText="Do you really want to revoke the client?">
-                    <i class="icon-bin2"></i>
-                </button>
-            </td>
-        </tr>
-        <tr>
-            <td>Client Id:</td>
-            <td>
-                <input readonly class="form-control" value="{{ctx.appName}}:{{client.id}}" #inputName />
-            </td>
-            <td>
-                <button type="button" class="btn btn-primary btn-link" [sqxCopy]="inputName">
-                    <i class="icon-copy"></i>
-                </button>
-            </td>
-        </tr>
-        <tr>
-            <td>Client Secret:</td>
-            <td>
-                <input readonly class="form-control" [attr.value]="client.secret" #inputSecret />
-            </td>
-            <td>
-                <button type="button" class="btn btn-primary btn-link" [sqxCopy]="inputSecret">
-                    <i class="icon-copy"></i>
-                </button>
-            </td>
-        </tr>
-        <tr>
-            <td>Permission</td>
-            <td>
-                <select class="form-control" [ngModel]="client.permission" (ngModelChange)="updating.emit($event)">
-                    <option *ngFor="let permission of clientPermissions" [ngValue]="permission">{{permission}}</option>
-                </select>
-            </td>
-        </tr>
-    </table>
+                    <i class="client-edit icon-pencil" (click)="startRename()"></i>
+                </span>
+            </div>
+                
+            <div class="client-expires">Access tokens expire after 30 days</div>
+        </div>
+        <div class="col col-auto">
+            <button class="btn btn-secondary" (click)="createToken(client)">Create Token</button>
+        </div>
+        <div class="col col-auto cell-actions">
+            <button type="button" class="btn btn-link btn-danger"
+                (sqxConfirmClick)="revoking.emit()"
+                confirmTitle="Revoke client" 
+                confirmText="Do you really want to revoke the client?">
+                <i class="icon-bin2"></i>
+            </button>
+        </div>
+    </div>
+    <div class="row no-gutters form-group">
+        <div class="col-4 col-form-label">
+            Client Id:
+        </div>
+        <div class="col">
+            <input readonly class="form-control" value="{{ctx.appName}}:{{client.id}}" #inputName />
+        </div>
+        <div class="col col-auto cell-actions">
+            <button type="button" class="btn btn-primary btn-link" [sqxCopy]="inputName">
+                <i class="icon-copy"></i>
+            </button>
+        </div>
+    </div>
+    <div class="row no-gutters form-group">
+        <div class="col-4 col-form-label">
+            Client Secret:
+        </div>
+        <div class="col">
+            <input readonly class="form-control" [attr.value]="client.secret" #inputSecret />
+        </div>
+        <div class="col col-auto cell-actions">
+            <button type="button" class="btn btn-primary btn-link" [sqxCopy]="inputSecret">
+                <i class="icon-copy"></i>
+            </button>
+        </div>
+    </div>
+    <div class="row no-gutters">
+        <div class="col-4 col-form-label">
+            Permission:
+        </div>
+        <div class="col">
+            <input readonly class="form-control" value="{{ctx.appName}}:{{client.id}}" #inputName />
+        </div>
+        <div class="col col-auto cell-actions">
+        </div>
+    </div>
 </div>
 
 <div class="modal" *sqxModalView="tokenDialog;onRoot:true" @fade>

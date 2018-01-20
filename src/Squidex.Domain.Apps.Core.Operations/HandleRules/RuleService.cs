@@ -1,9 +1,8 @@
 ﻿// ==========================================================================
-//  RuleService.cs
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex Group
-//  All rights reserved.
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using System;
@@ -16,14 +15,13 @@ using NodaTime;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.CQRS.Events;
+using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Core.HandleRules
 {
     public class RuleService
     {
         private const string ContentPrefix = "Content";
-        private static readonly Duration ExpirationTime = Duration.FromDays(2);
         private readonly Dictionary<Type, IRuleActionHandler> ruleActionHandlers;
         private readonly Dictionary<Type, IRuleTriggerHandler> ruleTriggerHandlers;
         private readonly TypeNameRegistry typeNameRegistry;
@@ -84,17 +82,32 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             var actionName = typeNameRegistry.GetName(actionType);
             var actionData = actionHandler.CreateJob(appEventEnvelope, eventName, rule.Action);
 
+            var eventTime =
+                @event.Headers.Contains(CommonHeaders.Timestamp) ?
+                @event.Headers.Timestamp() :
+                now;
+
+            var eventGuid =
+                @event.Headers.Contains(CommonHeaders.EventId) ?
+                @event.Headers.EventId() :
+                Guid.NewGuid();
+
             var job = new RuleJob
             {
-                RuleId = Guid.NewGuid(),
+                JobId = eventGuid,
                 ActionName = actionName,
                 ActionData = actionData.Data,
                 AppId = appEvent.AppId.Id,
                 Created = now,
                 EventName = eventName,
-                Expires = now.Plus(ExpirationTime),
+                Expires = eventTime.Plus(Constants.ExpirationTime),
                 Description = actionData.Description
             };
+
+            if (job.Expires < now)
+            {
+                return null;
+            }
 
             return job;
         }

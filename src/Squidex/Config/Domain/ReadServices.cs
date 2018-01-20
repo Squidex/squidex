@@ -1,9 +1,8 @@
 ﻿// ==========================================================================
-//  ReadServices.cs
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex Group
-//  All rights reserved.
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using System.Linq;
@@ -13,24 +12,21 @@ using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.HandleRules.Actions;
 using Squidex.Domain.Apps.Core.HandleRules.Triggers;
-using Squidex.Domain.Apps.Read;
-using Squidex.Domain.Apps.Read.Apps;
-using Squidex.Domain.Apps.Read.Apps.Services;
-using Squidex.Domain.Apps.Read.Apps.Services.Implementations;
-using Squidex.Domain.Apps.Read.Assets;
-using Squidex.Domain.Apps.Read.Contents;
-using Squidex.Domain.Apps.Read.Contents.Edm;
-using Squidex.Domain.Apps.Read.Contents.GraphQL;
-using Squidex.Domain.Apps.Read.History;
-using Squidex.Domain.Apps.Read.Rules;
-using Squidex.Domain.Apps.Read.Schemas;
-using Squidex.Domain.Apps.Read.State;
-using Squidex.Domain.Apps.Read.State.Grains;
+using Squidex.Domain.Apps.Entities;
+using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Entities.Apps.Services;
+using Squidex.Domain.Apps.Entities.Apps.Services.Implementations;
+using Squidex.Domain.Apps.Entities.Contents;
+using Squidex.Domain.Apps.Entities.Contents.Edm;
+using Squidex.Domain.Apps.Entities.Contents.GraphQL;
+using Squidex.Domain.Apps.Entities.History;
+using Squidex.Domain.Apps.Entities.Rules;
+using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Users;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
-using Squidex.Infrastructure.CQRS.Events;
-using Squidex.Infrastructure.CQRS.Events.Grains;
+using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.EventSourcing.Grains;
 using Squidex.Infrastructure.States;
 using Squidex.Pipeline;
 
@@ -47,9 +43,9 @@ namespace Squidex.Config.Domain
                 services.AddTransient<EventConsumerGrain>();
 
                 services.AddSingletonAs<EventConsumerGrainManager>()
-                    .As<IExternalSystem>();
+                    .As<IRunnable>();
                 services.AddSingletonAs<RuleDequeuer>()
-                    .As<IExternalSystem>();
+                    .As<IRunnable>();
             }
 
             var exposeSourceUrl = config.GetOptionalValue("assetStore:exposeSourceUrl", true);
@@ -61,7 +57,7 @@ namespace Squidex.Config.Domain
                 .As<IGraphQLUrlGenerator>();
 
             services.AddSingletonAs<StateFactory>()
-                .As<IExternalSystem>()
+                .As<IInitializable>()
                 .As<IStateFactory>();
 
             services.AddSingletonAs(c => c.GetService<IOptions<MyUsageOptions>>()?.Value?.Plans.OrEmpty());
@@ -102,14 +98,8 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<DefaultEventNotifier>()
                 .As<IEventNotifier>();
 
-            services.AddSingletonAs<AppStateEventConsumer>()
-                .As<IEventConsumer>();
-
             services.AddSingletonAs<RuleEnqueuer>()
                 .As<IEventConsumer>();
-
-            services.AddSingletonAs<IEventConsumer>(c =>
-                new CompoundEventConsumer(c.GetServices<IAssetEventConsumer>().ToArray()));
 
             services.AddSingletonAs(c =>
             {
@@ -118,12 +108,11 @@ namespace Squidex.Config.Domain
                 return new EventConsumerFactory(n => allEventConsumers.FirstOrDefault(x => x.Name == n));
             });
 
-            services.AddSingletonAs<EdmModelBuilder>();
+            services.AddSingletonAs<EdmModelBuilder>()
+                .AsSelf();
 
-            services.AddTransient<AppStateGrain>();
-            services.AddTransient<AppUserGrain>();
-
-            services.AddSingleton<RuleService>();
+            services.AddSingletonAs<RuleService>()
+                .AsSelf();
         }
     }
 }

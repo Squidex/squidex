@@ -15,9 +15,11 @@
             }
         </style>
     </noscript>
-    
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.3/outdatedbrowser.min.css">
 
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.3/outdatedbrowser.min.css">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/outdated-browser/1.1.3/outdatedbrowser.min.js"></script>
     <script>
         function addLoadEvent(func) {
@@ -25,7 +27,7 @@
             if (typeof window.onload != 'function') {
                 window.onload = func;
             } else {
-                window.onload = function() {
+                window.onload = function () {
                     if (oldonload) {
                         oldonload();
                     }
@@ -33,7 +35,18 @@
                 }
             }
         }
-        addLoadEvent(function() {
+        addLoadEvent(function () {
+            window.cookieconsent.initialise({
+                palette: {
+                    popup: {
+                        background: '#000'
+                    },
+                    button: {
+                        background: '#3389ff'
+                    }
+                }
+            });
+
             outdatedBrowser({ lowerThan: 'borderImage', languagePath: '' });
         });
     </script>

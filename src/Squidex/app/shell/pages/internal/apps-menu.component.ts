@@ -2,7 +2,7 @@
  * Squidex Headless CMS
  *
  * @license
- * Copyright (c) Sebastian Stehle. All rights reserved
+ * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
@@ -36,7 +36,7 @@ export class AppsMenuComponent implements OnDestroy, OnInit {
     public appsMenu = new ModalView(false, true);
     public apps: AppDto[] = [];
 
-    public selectedApp: AppDto;
+    public selectedApp: AppDto | null;
 
     constructor(
         private readonly appsStore: AppsStoreService

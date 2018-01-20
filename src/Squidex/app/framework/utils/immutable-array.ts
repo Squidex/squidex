@@ -2,7 +2,7 @@
  * Squidex Headless CMS
  *
  * @license
- * Copyright (c) Sebastian Stehle. All rights reserved
+ * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
 export interface IdField {
@@ -61,7 +61,7 @@ export class ImmutableArray<T> implements Iterable<T> {
         return new ImmutableArray<T>(this.items.filter(v => predicate(v!)));
     }
 
-    public find(predicate: (item: T, index: number) => boolean): T {
+    public find(predicate: (item: T, index: number) => boolean): T | undefined {
         return this.items.find(predicate);
     }
 

@@ -1,9 +1,8 @@
 ﻿// ==========================================================================
-//  ServiceExtensions.cs
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex Group
-//  All rights reserved.
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using System;
@@ -25,6 +24,11 @@ namespace Squidex.Config
                 this.services = services;
             }
 
+            public InterfaceRegistrator<T> AsSelf()
+            {
+                return this;
+            }
+
             public InterfaceRegistrator<T> As<TInterface>()
             {
                 if (typeof(TInterface) != typeof(T))
@@ -37,6 +41,20 @@ namespace Squidex.Config
 
                 return this;
             }
+        }
+
+        public static InterfaceRegistrator<T> AddTransientAs<T>(this IServiceCollection services, Func<IServiceProvider, T> factory) where T : class
+        {
+            services.AddTransient(typeof(T), factory);
+
+            return new InterfaceRegistrator<T>(services);
+        }
+
+        public static InterfaceRegistrator<T> AddTransientAs<T>(this IServiceCollection services) where T : class
+        {
+            services.AddTransient<T, T>();
+
+            return new InterfaceRegistrator<T>(services);
         }
 
         public static InterfaceRegistrator<T> AddSingletonAs<T>(this IServiceCollection services, Func<IServiceProvider, T> factory) where T : class

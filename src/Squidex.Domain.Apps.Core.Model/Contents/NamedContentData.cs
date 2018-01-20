@@ -1,12 +1,12 @@
 ﻿// ==========================================================================
-//  NamedContentData.cs
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex Group
-//  All rights reserved.
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Contents
@@ -18,9 +18,19 @@ namespace Squidex.Domain.Apps.Core.Contents
         {
         }
 
+        public NamedContentData(NamedContentData copy)
+            : base(copy, EqualityComparer<string>.Default)
+        {
+        }
+
+        public static NamedContentData Merge(params NamedContentData[] contents)
+        {
+            return MergeTo(new NamedContentData(), contents);
+        }
+
         public NamedContentData MergeInto(NamedContentData target)
         {
-            return Merge(this, target);
+            return Merge(target, this);
         }
 
         public NamedContentData ToCleaned()

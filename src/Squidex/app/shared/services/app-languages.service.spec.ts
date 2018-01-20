@@ -2,7 +2,7 @@
  * Squidex Headless CMS
  *
  * @license
- * Copyright (c) Sebastian Stehle. All rights reserved
+ * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
@@ -172,7 +172,7 @@ describe('AppLanguagesService', () => {
 
         const dto = new UpdateAppLanguageDto(true, true, []);
 
-        appLanguagesService.updateLanguage('my-app', 'de', dto, version).subscribe();
+        appLanguagesService.putLanguage('my-app', 'de', dto, version).subscribe();
 
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/languages/de');
 

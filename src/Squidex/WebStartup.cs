@@ -1,12 +1,12 @@
 ﻿// ==========================================================================
-//  WebStartup.cs
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex Group
-//  All rights reserved.
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using System;
+using Ben.Diagnostics;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -39,7 +39,9 @@ namespace Squidex
         public void Configure(IApplicationBuilder app)
         {
             app.ApplicationServices.LogConfiguration();
-            app.ApplicationServices.TestExternalSystems();
+            app.ApplicationServices.InitializeAll();
+            app.ApplicationServices.Migrate();
+            app.ApplicationServices.RunAll();
 
             app.UseMyCors();
             app.UseMyForwardingRules();

@@ -1,9 +1,8 @@
 ﻿// ==========================================================================
-//  ContentData.cs
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex Group
-//  All rights reserved.
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using System;
@@ -31,20 +30,25 @@ namespace Squidex.Domain.Apps.Core.Contents
         {
         }
 
-        protected static TResult Merge<TResult>(TResult source, TResult target) where TResult : ContentData<T>
+        protected static TResult MergeTo<TResult>(TResult target, params TResult[] sources) where TResult : ContentData<T>
         {
-            if (ReferenceEquals(target, source))
+            Guard.NotEmpty(sources, nameof(sources));
+
+            if (sources.Length == 1 || sources.Skip(1).All(x => ReferenceEquals(x, sources[0])))
             {
-                return source;
+                return sources[0];
             }
 
-            foreach (var otherValue in source)
+            foreach (var source in sources)
             {
-                var fieldValue = target.GetOrAdd(otherValue.Key, x => new ContentFieldData());
-
-                foreach (var value in otherValue.Value)
+                foreach (var otherValue in source)
                 {
-                    fieldValue[value.Key] = value.Value;
+                    var fieldValue = target.GetOrAdd(otherValue.Key, x => new ContentFieldData());
+
+                    foreach (var value in otherValue.Value)
+                    {
+                        fieldValue[value.Key] = value.Value;
+                    }
                 }
             }
 

@@ -1,9 +1,8 @@
 ﻿// ==========================================================================
-//  AppPermissionAttribute.cs
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex Group
-//  All rights reserved.
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using System.Collections.Generic;
@@ -12,7 +11,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Squidex.Domain.Apps.Core.Apps;
-using Squidex.Domain.Apps.Read.Apps;
+using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Infrastructure.Security;
 using Squidex.Shared.Identity;
 

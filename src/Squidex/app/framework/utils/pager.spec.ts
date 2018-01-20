@@ -2,7 +2,7 @@
  * Squidex Headless CMS
  *
  * @license
- * Copyright (c) Sebastian Stehle. All rights reserved
+ * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
 import { Pager } from './../';
@@ -117,6 +117,22 @@ describe('Pager', () => {
     });
 
     it('should update count when incrementing it', () => {
+        const pager_1 = new Pager(23, 1, 10);
+        const pager_2 = pager_1.incrementCount().incrementCount();
+
+        expect(Object.assign({}, pager_2)).toEqual({
+            page: 1,
+            pageSize: 10,
+            itemFirst: 11,
+            itemLast: 22,
+            skip: 10,
+            numberOfItems: 25,
+            canGoNext: true,
+            canGoPrev: true
+        });
+    });
+
+    it('should update count for last page when incrementing it', () => {
         const pager_1 = new Pager(23, 2, 10);
         const pager_2 = pager_1.incrementCount();
 
@@ -133,6 +149,22 @@ describe('Pager', () => {
     });
 
     it('should update count when decrementing it', () => {
+        const pager_1 = new Pager(23, 1, 10);
+        const pager_2 = pager_1.decrementCount().decrementCount();
+
+        expect(Object.assign({}, pager_2)).toEqual({
+            page: 1,
+            pageSize: 10,
+            itemFirst: 11,
+            itemLast: 18,
+            skip: 10,
+            numberOfItems: 21,
+            canGoNext: true,
+            canGoPrev: true
+        });
+    });
+
+    it('should update count for last page when decrementing it', () => {
         const pager_1 = new Pager(23, 2, 10);
         const pager_2 = pager_1.decrementCount();
 

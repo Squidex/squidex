@@ -1,20 +1,17 @@
 ﻿// ==========================================================================
-//  EnrichWithSchemaIdCommandMiddleware.cs
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex Group
-//  All rights reserved.
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Squidex.Domain.Apps.Read;
-using Squidex.Domain.Apps.Read.Schemas;
-using Squidex.Domain.Apps.Write;
-using Squidex.Domain.Apps.Write.Schemas;
+using Squidex.Domain.Apps.Entities;
+using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.CQRS.Commands;
+using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Pipeline.CommandMiddlewares
 {
@@ -44,11 +41,11 @@ namespace Squidex.Pipeline.CommandMiddlewares
 
                     if (Guid.TryParse(schemaName, out var id))
                     {
-                        schema = await appProvider.GetSchemaAsync(schemaCommand.AppId.Name, id);
+                        schema = await appProvider.GetSchemaAsync(schemaCommand.AppId.Id, id);
                     }
                     else
                     {
-                        schema = await appProvider.GetSchemaAsync(schemaCommand.AppId.Name, schemaName);
+                        schema = await appProvider.GetSchemaAsync(schemaCommand.AppId.Id, schemaName);
                     }
 
                     if (schema == null)

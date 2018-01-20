@@ -1,9 +1,8 @@
 ﻿// ==========================================================================
-//  HistoryController.cs
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex Group
-//  All rights reserved.
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using System.Linq;
@@ -11,8 +10,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using Squidex.Areas.Api.Controllers.History.Models;
-using Squidex.Domain.Apps.Read.History.Repositories;
-using Squidex.Infrastructure.CQRS.Commands;
+using Squidex.Domain.Apps.Entities.History.Repositories;
+using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
 

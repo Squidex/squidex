@@ -1,9 +1,8 @@
 ﻿// ==========================================================================
-//  AssetsController.cs
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex Group
-//  All rights reserved.
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using System;
@@ -16,13 +15,13 @@ using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using NSwag.Annotations;
 using Squidex.Areas.Api.Controllers.Assets.Models;
-using Squidex.Domain.Apps.Read.Apps.Services;
-using Squidex.Domain.Apps.Read.Assets.Repositories;
-using Squidex.Domain.Apps.Write.Assets;
-using Squidex.Domain.Apps.Write.Assets.Commands;
+using Squidex.Domain.Apps.Entities.Apps.Services;
+using Squidex.Domain.Apps.Entities.Assets;
+using Squidex.Domain.Apps.Entities.Assets.Commands;
+using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
-using Squidex.Infrastructure.CQRS.Commands;
+using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
 
@@ -61,9 +60,9 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="ids">The optional asset ids.</param>
-        /// <param name="skip">The number of assets to skip.</param>
-        /// <param name="take">The number of assets to take (Default: 20).</param>
-        /// <param name="query">The query to limit the files by name.</param>
+        /// <param name="skip">Optional number of assets to skip.</param>
+        /// <param name="take">Optional number of assets to take (Default: 20).</param>
+        /// <param name="query">Optional query to limit the files by name.</param>
         /// <param name="mimeTypes">Comma separated list of mime types to get.</param>
         /// <returns>
         /// 200 => Assets returned.
@@ -77,7 +76,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [Route("apps/{app}/assets/")]
         [ProducesResponseType(typeof(AssetsDto), 200)]
         [ApiCosts(1)]
-        public async Task<IActionResult> GetAssets(string app, [FromQuery] string query = null, [FromQuery] string mimeTypes = null, [FromQuery] string ids = null, [FromQuery] int skip = 0, [FromQuery] int take = 10)
+        public async Task<IActionResult> GetAssets(string app, [FromQuery] string query = null, [FromQuery] string mimeTypes = null, [FromQuery] string ids = null, [FromQuery] int skip = 0, [FromQuery] int take = 20)
         {
             var mimeTypeList = new HashSet<string>();
 
@@ -102,15 +101,12 @@ namespace Squidex.Areas.Api.Controllers.Assets
                 }
             }
 
-            var taskForItems = assetRepository.QueryAsync(App.Id, mimeTypeList, idsList, query, take, skip);
-            var taskForCount = assetRepository.CountAsync(App.Id, mimeTypeList, idsList, query);
-
-            await Task.WhenAll(taskForItems, taskForCount);
+            var assets = await assetRepository.QueryAsync(App.Id, mimeTypeList, idsList, query, take, skip);
 
             var response = new AssetsDto
             {
-                Total = taskForCount.Result,
-                Items = taskForItems.Result.Select(x => SimpleMapper.Map(x, new AssetDto { FileType = x.FileName.FileType() })).ToArray()
+                Total = assets.Total,
+                Items = assets.Select(x => SimpleMapper.Map(x, new AssetDto { FileType = x.FileName.FileType() })).ToArray()
             };
 
             return Ok(response);

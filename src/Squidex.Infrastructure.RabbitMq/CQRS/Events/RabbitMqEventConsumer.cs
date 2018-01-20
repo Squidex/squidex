@@ -1,9 +1,8 @@
 ﻿// ==========================================================================
-//  RabbitMqEventConsumer.cs
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex Group
-//  All rights reserved.
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using System;
@@ -13,9 +12,9 @@ using Newtonsoft.Json;
 using RabbitMQ.Client;
 using Squidex.Infrastructure.Tasks;
 
-namespace Squidex.Infrastructure.CQRS.Events
+namespace Squidex.Infrastructure.EventSourcing
 {
-    public sealed class RabbitMqEventConsumer : DisposableObjectBase, IExternalSystem, IEventConsumer
+    public sealed class RabbitMqEventConsumer : DisposableObjectBase, IInitializable, IEventConsumer
     {
         private readonly JsonSerializerSettings serializerSettings;
         private readonly string eventPublisherName;
@@ -61,7 +60,7 @@ namespace Squidex.Infrastructure.CQRS.Events
             }
         }
 
-        public void Connect()
+        public void Initialize()
         {
             try
             {

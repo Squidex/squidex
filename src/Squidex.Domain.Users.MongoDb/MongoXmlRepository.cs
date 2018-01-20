@@ -1,9 +1,8 @@
 ﻿// ==========================================================================
-//  MongoXmlRepository.cs
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex Group
-//  All rights reserved.
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using System.Collections.Generic;
@@ -18,8 +17,6 @@ namespace Squidex.Domain.Users.MongoDb
 {
     public sealed class MongoXmlRepository : MongoRepositoryBase<MongoXmlDocument>, IXmlRepository
     {
-        private static readonly UpdateOptions Upsert = new UpdateOptions { IsUpsert = true };
-
         public MongoXmlRepository(IMongoDatabase database)
             : base(database)
         {

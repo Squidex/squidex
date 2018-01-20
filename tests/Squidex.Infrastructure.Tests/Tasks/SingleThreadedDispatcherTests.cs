@@ -1,9 +1,8 @@
 ﻿// ==========================================================================
-//  SingleThreadedDispatcherTests.cs
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex Group
-//  All rights reserved.
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using System.Collections.Generic;
@@ -18,7 +17,7 @@ namespace Squidex.Infrastructure.Tasks
         private readonly SingleThreadedDispatcher sut = new SingleThreadedDispatcher();
 
         [Fact]
-        public async Task Should_handle_async_messages_sequentially()
+        public async Task Should_handle_with_task_messages_sequentially()
         {
             var source = Enumerable.Range(1, 100);
             var target = new List<int>();
@@ -39,7 +38,7 @@ namespace Squidex.Infrastructure.Tasks
         }
 
         [Fact]
-        public async Task Should_handle_sync_messages_sequentially()
+        public async Task Should_handle_messages_sequentially()
         {
             var source = Enumerable.Range(1, 100);
             var target = new List<int>();

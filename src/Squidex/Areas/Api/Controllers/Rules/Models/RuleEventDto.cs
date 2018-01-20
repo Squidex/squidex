@@ -1,16 +1,15 @@
 ﻿// ==========================================================================
-//  RuleEventDto.cs
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex Group
-//  All rights reserved.
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using System;
 using System.ComponentModel.DataAnnotations;
 using NodaTime;
 using Squidex.Domain.Apps.Core.HandleRules;
-using Squidex.Domain.Apps.Read.Rules;
+using Squidex.Domain.Apps.Entities.Rules;
 
 namespace Squidex.Areas.Api.Controllers.Rules.Models
 {

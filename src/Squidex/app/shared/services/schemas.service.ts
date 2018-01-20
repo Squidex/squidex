@@ -2,10 +2,10 @@
  * Squidex Headless CMS
  *
  * @license
- * Copyright (c) Sebastian Stehle. All rights reserved
+ * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ValidatorFn, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
@@ -16,7 +16,6 @@ import {
     AnalyticsService,
     ApiUrlConfig,
     DateTime,
-    LocalCacheService,
     HTTP,
     ValidatorsEx,
     Version,
@@ -317,6 +316,10 @@ export class FieldDto {
     public createValidators(isOptional: boolean): ValidatorFn[] {
         return this.properties.createValidators(isOptional);
     }
+
+    public defaultValue(): any {
+        return this.properties.getDefaultValue();
+    }
 }
 
 export abstract class FieldPropertiesDto {
@@ -333,6 +336,10 @@ export abstract class FieldPropertiesDto {
     public abstract formatValue(value: any): string;
 
     public abstract createValidators(isOptional: boolean): ValidatorFn[];
+
+    public getDefaultValue(): any {
+        return null;
+    }
 }
 
 export class StringFieldPropertiesDto extends FieldPropertiesDto {
@@ -378,14 +385,20 @@ export class StringFieldPropertiesDto extends FieldPropertiesDto {
         }
 
         if (this.allowedValues && this.allowedValues.length > 0) {
+            const values: (string | null)[] = this.allowedValues;
+
             if (this.isRequired && !isOptional) {
-                validators.push(ValidatorsEx.validValues(this.allowedValues));
+                validators.push(ValidatorsEx.validValues(values));
             } else {
-                validators.push(ValidatorsEx.validValues(this.allowedValues.concat([null])));
+                validators.push(ValidatorsEx.validValues(values.concat([null])));
             }
         }
 
         return validators;
+    }
+
+    public getDefaultValue(): any {
+        return this.defaultValue;
     }
 }
 
@@ -426,10 +439,20 @@ export class NumberFieldPropertiesDto extends FieldPropertiesDto {
         }
 
         if (this.allowedValues && this.allowedValues.length > 0) {
-            validators.push(ValidatorsEx.validValues(this.allowedValues));
+            const values: (number | null)[] = this.allowedValues;
+
+            if (this.isRequired && !isOptional) {
+                validators.push(ValidatorsEx.validValues(values));
+            } else {
+                validators.push(ValidatorsEx.validValues(values.concat([null])));
+            }
         }
 
         return validators;
+    }
+
+    public getDefaultValue(): any {
+        return this.defaultValue;
     }
 }
 
@@ -473,6 +496,18 @@ export class DateTimeFieldPropertiesDto extends FieldPropertiesDto {
 
         return validators;
     }
+
+    public getDefaultValue(now?: DateTime): any {
+        now = now || DateTime.now();
+
+        if (this.calculatedDefaultValue === 'Now') {
+            return now.toUTCStringFormat('YYYY-MM-DDTHH:mm:ss') + 'Z';
+        } else if (this.calculatedDefaultValue === 'Today') {
+            return now.toUTCStringFormat('YYYY-MM-DD');
+        } else {
+            return this.defaultValue;
+        }
+    }
 }
 
 export class BooleanFieldPropertiesDto extends FieldPropertiesDto {
@@ -501,6 +536,10 @@ export class BooleanFieldPropertiesDto extends FieldPropertiesDto {
         }
 
         return validators;
+    }
+
+    public getDefaultValue(): any {
+        return this.defaultValue;
     }
 }
 
@@ -750,8 +789,7 @@ export class SchemasService {
     constructor(
         private readonly http: HttpClient,
         private readonly apiUrl: ApiUrlConfig,
-        private readonly analytics: AnalyticsService,
-        private readonly localCache: LocalCacheService
+        private readonly analytics: AnalyticsService
     ) {
     }
 
@@ -822,17 +860,6 @@ export class SchemasService {
                         body.scriptDelete,
                         body.scriptChange);
                 })
-                .catch(error => {
-                    if (error instanceof HttpErrorResponse && error.status === 404) {
-                        const cached = this.localCache.get(`schema.${appName}.${id}`);
-
-                        if (cached) {
-                            return Observable.of(cached);
-                        }
-                    }
-
-                    return Observable.throw(error);
-                })
                 .pretifyError('Failed to load schema. Please reload.');
     }
 
@@ -864,9 +891,6 @@ export class SchemasService {
                 })
                 .do(schema => {
                     this.analytics.trackEvent('Schema', 'Created', appName);
-
-                    this.localCache.set(`schema.${appName}.${schema.id}`, schema, 5000);
-                    this.localCache.set(`schema.${appName}.${schema.name}`, schema, 5000);
                 })
                 .pretifyError('Failed to create schema. Please reload.');
     }
@@ -899,9 +923,6 @@ export class SchemasService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}`);
 
         return HTTP.deleteVersioned(this.http, url, version)
-                .do(() => {
-                    this.localCache.remove(`schema.${appName}.${schemaName}`);
-                })
                 .do(() => {
                     this.analytics.trackEvent('Schema', 'Deleted', appName);
                 })

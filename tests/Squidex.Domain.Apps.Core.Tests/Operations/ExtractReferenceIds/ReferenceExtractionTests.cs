@@ -1,9 +1,8 @@
 ﻿// ==========================================================================
-//  ReferenceExtractionTests.cs
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex Group
-//  All rights reserved.
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using System;
@@ -204,7 +203,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
 
             var result = sut.CleanReferences(CreateValue(id1, id2), new HashSet<Guid>(new[] { id2 }));
 
-            Assert.Equal(CreateValue(id1, schemaId), result);
+            Assert.Equal(CreateValue(id1), result);
         }
 
         [Fact]

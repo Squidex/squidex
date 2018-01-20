@@ -1,18 +1,17 @@
 ﻿// ==========================================================================
-//  EnrichWithActorCommandMiddleware.cs
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex Group
-//  All rights reserved.
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using System;
 using System.Security;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Squidex.Domain.Apps.Write;
+using Squidex.Domain.Apps.Entities;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.CQRS.Commands;
+using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Security;
 
 namespace Squidex.Pipeline.CommandMiddlewares
@@ -28,13 +27,21 @@ namespace Squidex.Pipeline.CommandMiddlewares
 
         public Task HandleAsync(CommandContext context, Func<Task> next)
         {
-            if (context.Command is SquidexCommand squidexCommand && squidexCommand.Actor == null)
+            if (context.Command is SquidexCommand squidexCommand)
             {
-                var actorToken =
-                    FindActorFromSubject() ??
-                    FindActorFromClient();
+                if (squidexCommand.Actor == null)
+                {
+                    var actorToken =
+                        FindActorFromSubject() ??
+                        FindActorFromClient();
 
-                squidexCommand.Actor = actorToken ?? throw new SecurityException("No actor with subject or client id available.");
+                    squidexCommand.Actor = actorToken ?? throw new SecurityException("No actor with subject or client id available.");
+                }
+
+                if (squidexCommand.User == null)
+                {
+                    squidexCommand.User = httpContextAccessor.HttpContext.User;
+                }
             }
 
             return next();

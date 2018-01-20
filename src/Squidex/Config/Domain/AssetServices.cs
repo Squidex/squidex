@@ -1,9 +1,8 @@
 ﻿// ==========================================================================
-//  AssetServices.cs
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex Group
-//  All rights reserved.
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using Microsoft.Extensions.Configuration;
@@ -26,7 +25,7 @@ namespace Squidex.Config.Domain
 
                     services.AddSingletonAs(c => new FolderAssetStore(path, c.GetRequiredService<ISemanticLog>()))
                         .As<IAssetStore>()
-                        .As<IExternalSystem>();
+                        .As<IInitializable>();
                 },
                 ["GoogleCloud"] = () =>
                 {
@@ -34,7 +33,7 @@ namespace Squidex.Config.Domain
 
                     services.AddSingletonAs(c => new GoogleCloudAssetStore(bucketName))
                         .As<IAssetStore>()
-                        .As<IExternalSystem>();
+                        .As<IInitializable>();
                 },
                 ["AzureBlob"] = () =>
                 {
@@ -43,7 +42,7 @@ namespace Squidex.Config.Domain
 
                     services.AddSingletonAs(c => new AzureBlobAssetStore(connectionString, containerName))
                         .As<IAssetStore>()
-                        .As<IExternalSystem>();
+                        .As<IInitializable>();
                 }
             });
         }

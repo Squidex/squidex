@@ -1,9 +1,8 @@
 ﻿// ==========================================================================
-//  LanguageTests.cs
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex Group
-//  All rights reserved.
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using System;
@@ -90,6 +89,18 @@ namespace Squidex.Infrastructure
         [InlineData("EN", "en")]
         [InlineData("EN ", "en")]
         public void Should_parse_valid_languages(string input, string languageCode)
+        {
+            var language = Language.ParseOrNull(input);
+
+            Assert.Equal(language, Language.GetLanguage(languageCode));
+        }
+
+        [Theory]
+        [InlineData("en-US", "en")]
+        [InlineData("en-GB", "en")]
+        [InlineData("EN-US", "en")]
+        [InlineData("EN-GB", "en")]
+        public void Should_parse_lanuages_from_culture(string input, string languageCode)
         {
             var language = Language.ParseOrNull(input);
 

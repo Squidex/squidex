@@ -1,9 +1,8 @@
 ﻿// ==========================================================================
-//  SchemasSwaggerGenerator.cs
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex Group
-//  All rights reserved.
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using System.Collections.Generic;
@@ -16,8 +15,8 @@ using NSwag;
 using NSwag.AspNetCore;
 using NSwag.SwaggerGeneration;
 using Squidex.Config;
-using Squidex.Domain.Apps.Read.Apps;
-using Squidex.Domain.Apps.Read.Schemas;
+using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Pipeline.Swagger;
 
