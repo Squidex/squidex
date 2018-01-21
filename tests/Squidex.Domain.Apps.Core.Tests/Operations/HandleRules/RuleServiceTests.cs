@@ -37,10 +37,18 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
         public sealed class InvalidAction : RuleAction
         {
+            public InvalidAction()
+            {
+                Validator = A.Fake<IRuleActionValidator>();
+                A.CallTo(() => Validator.Validate(A<RuleAction>._)).Throws<NotSupportedException>();
+            }
+            
             public override T Accept<T>(IRuleActionVisitor<T> visitor)
             {
                 return default(T);
             }
+
+            public override IRuleActionValidator Validator { get; }
         }
 
         public sealed class InvalidTrigger : RuleTrigger

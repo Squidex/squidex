@@ -68,6 +68,12 @@
                             (actionChanged)="selectAction($event)">
                         </sqx-webhook-action>
                     </div>
+                    <div *ngSwitchCase="'Index to ElasticSearch'">
+                        <sqx-elasticsearch-action #actionControl
+                                            [action]="action"
+                                            (actionChanged)="selectAction($event)">
+                        </sqx-elasticsearch-action>
+                    </div>
                 </div>
             </div>
         </div>

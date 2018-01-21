@@ -5,7 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Linq;
+using Elasticsearch.Net;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -60,6 +62,8 @@ namespace Squidex.Config.Domain
                 .As<IInitializable>()
                 .As<IStateFactory>();
 
+            var searchEngineType = config.GetOptionalValue("searchIndexing:engineType", string.Empty);
+
             services.AddSingletonAs(c => c.GetService<IOptions<MyUsageOptions>>()?.Value?.Plans.OrEmpty());
 
             services.AddSingletonAs<CachingGraphQLService>()
@@ -94,6 +98,24 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<WebhookActionHandler>()
                 .As<IRuleActionHandler>();
+
+            if (searchEngineType == "elasticsearch")
+            {
+                // address must be in format: http://host:port or https://host:port
+                var elasticSearchAddress = config.GetRequiredValue("searchIndexing:host");
+
+                services.AddSingletonAs(p =>
+                {
+                    // todo: add support for password auth
+                    var settings = new ConnectionConfiguration(new Uri(elasticSearchAddress))
+                        .RequestTimeout(TimeSpan.FromMinutes(2));
+
+                    return new ElasticLowLevelClient(settings);
+                }).As<IElasticLowLevelClient>();
+
+                services.AddSingletonAs<ElasticSearchActionHandler>()
+                    .As<IRuleActionHandler>();
+            }
 
             services.AddSingletonAs<DefaultEventNotifier>()
                 .As<IEventNotifier>();

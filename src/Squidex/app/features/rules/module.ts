@@ -18,7 +18,8 @@ import {
     RuleEventsPageComponent,
     RulesPageComponent,
     RuleWizardComponent,
-    WebhookActionComponent
+    WebhookActionComponent,
+    ElasticSearchActionComponent
 } from './declarations';
 
 const routes: Routes = [
@@ -45,7 +46,8 @@ const routes: Routes = [
         RuleEventsPageComponent,
         RulesPageComponent,
         RuleWizardComponent,
-        WebhookActionComponent
+        WebhookActionComponent,
+        ElasticSearchActionComponent
     ]
 })
 export class SqxFeatureRulesModule { }

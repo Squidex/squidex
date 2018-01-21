@@ -7,6 +7,9 @@ $trigger-content-changed-icon: #297ff6;
 $action-webhook-text:         #4bb958;
 $action-webhook-icon:         #47b353;
 
+$action-elasticsearch-text:         #4bb958;
+$action-elasticsearch-icon:         #47b353;
+
 @mixin build-element($text-color, $icon-color) {
     & {
         background: $text-color;
@@ -53,4 +56,8 @@ $action-webhook-icon:         #47b353;
 
 .rule-element-Webhook {
     @include build-element($action-webhook-text, $action-webhook-icon)
+}
+
+.rule-element-ElasticSearch {
+    @include build-element($action-elasticsearch-text, $action-elasticsearch-icon)
 }

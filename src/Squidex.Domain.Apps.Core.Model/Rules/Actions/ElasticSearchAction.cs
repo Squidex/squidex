@@ -1,4 +1,5 @@
 ﻿// ==========================================================================
+//  ElasticSearchAction.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
@@ -10,42 +11,41 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Rules.Actions
 {
-    [TypeName(nameof(WebhookAction))]
-    public sealed class WebhookAction : RuleAction
+    [TypeName(nameof(ElasticSearchAction))]
+    public class ElasticSearchAction : RuleAction
     {
-        private Uri url;
-        private string sharedSecret;
+        private Uri addressOfElasticSearch;
+        private string indexName;
+        private string typeNameForSchema;
 
-        public WebhookAction()
+        public ElasticSearchAction()
         {
-            Validator = new WebhookActionValidator();
+            Validator = new ElasticSearchActionValidator();
         }
 
-        public Uri Url
+        /// <summary>
+        /// The name of the type for the elasticsearch mappings of the schema.
+        /// </summary>
+        public string TypeNameForSchema
         {
-            get
-            {
-                return url;
-            }
+            get => typeNameForSchema;
             set
             {
                 ThrowIfFrozen();
-
-                url = value;
+                typeNameForSchema = value;
             }
         }
 
-        public string SharedSecret
+        /// <summary>
+        /// The name of the index this action will operate on.
+        /// </summary>
+        public string IndexName
         {
-            get
-            {
-                return sharedSecret;
-            }
+            get => indexName;
             set
             {
                 ThrowIfFrozen();
-
-                sharedSecret = value;
+                indexName = value;
             }
         }
 

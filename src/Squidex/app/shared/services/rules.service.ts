@@ -25,7 +25,8 @@ export const ruleTriggers: any = {
 };
 
 export const ruleActions: any = {
-    'Webhook': 'Send Webhook'
+    'Webhook': 'Send Webhook',
+    'ElasticSearch': 'Index in ElasticSearch'
 };
 
 export class RuleDto {

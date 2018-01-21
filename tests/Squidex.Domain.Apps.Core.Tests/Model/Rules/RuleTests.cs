@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using FakeItEasy;
 using FluentAssertions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -33,10 +34,18 @@ namespace Squidex.Domain.Apps.Core.Model.Rules
 
         public sealed class OtherAction : RuleAction
         {
+            public OtherAction()
+            {
+                Validator = A.Fake<IRuleActionValidator>();
+                A.CallTo(() => Validator.Validate(A<RuleAction>._)).Throws<NotSupportedException>();
+            }
+            
             public override T Accept<T>(IRuleActionVisitor<T> visitor)
             {
                 throw new NotSupportedException();
             }
+
+            public override IRuleActionValidator Validator { get; }
         }
 
         [Fact]
