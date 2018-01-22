@@ -19,7 +19,7 @@
 </td>
 <td class="cell-actions" *ngIf="!isReadOnly">
     <div class="dropdown dropdown-options" *ngIf="content">
-        <button type="button" class="btn btn-link btn-decent" (click)="dropdown.toggle(); $event.stopPropagation()" [class.active]="dropdown.isOpen | async" #optionsButton>
+        <button type="button" class="btn btn-link btn-secondary" (click)="dropdown.toggle(); $event.stopPropagation()" [class.active]="dropdown.isOpen | async" #optionsButton>
             <i class="icon-dots"></i>
         </button>
         <div class="dropdown-menu" *sqxModalView="dropdown" closeAlways="true" [sqxModalTarget]="optionsButton" @fade>

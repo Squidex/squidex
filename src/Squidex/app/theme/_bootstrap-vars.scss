@@ -10,40 +10,22 @@ $font-size-h6:              1rem;
 
 $body-bg:                   $color-background;
 
-$brand-primary:             $color-theme-blue;
-$brand-success:             $color-theme-green;
-$brand-danger:              $color-theme-error;
-$brand-warning:             $color-theme-orange;
+$danger:                    $color-theme-error;
+$primary:                   $color-theme-blue;
+$secondary:                 $color-theme-secondary;
+$success:                   $color-theme-green;
+$warning:                   $color-theme-orange;
 
-$alert-success-bg:          $color-theme-green;
-$alert-success-border:      $color-theme-green;
-$alert-success-text:        #fff;
-
-$alert-info-bg:             $color-theme-blue;
-$alert-info-border:         $color-theme-blue;
-$alert-info-text:           #fff;
-
-$alert-warning-bg:          $color-theme-orange;
-$alert-warning-border:      $color-theme-orange;
-$alert-warning-text:        #fff;
-
-$alert-danger-bg:           $color-theme-error;
-$alert-danger-border:       $color-theme-error;
-$alert-danger-text:         #fff;
-
-$btn-secondary-bg:          $color-theme-secondary;
-$btn-secondary-border:      $color-theme-secondary;
+$alert-bg-level:            0;
+$alert-color-level:         -12.5;
 
 $input-bg-disabled:         $color-input-disabled;
 $input-border-color:        $color-input;
 $input-color-placeholder:   $color-text-decent;
 
-$badge-default-bg:          $color-badge-default-background;
-$badge-primary-bg:          $color-badge-primary-background;
-$badge-success-bg:          $color-badge-success-background;
-$badge-info-bg:             $color-badge-info-background;
-$badge-warning-bg:          $color-badge-warning-background;
-$badge-danger-bg:           $color-badge-danger-background;
+$btn-padding-y:             .5rem;
+
+$badge-bg-level: 2;
 
 $dropdown-border-color:     $color-border;
 

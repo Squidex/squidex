@@ -11,7 +11,7 @@
 
                     <button type="submit" class="btn btn-primary" [disabled]="!renameForm.valid || !hasNewName">Save</button>
 
-                    <button class="btn btn-link btn-decent btn-cancel" (click)="cancelRename()">
+                    <button class="btn btn-link btn-secondary btn-cancel" (click)="cancelRename()">
                         <i class="icon-close"></i>
                     </button>
                 </form>
@@ -70,7 +70,9 @@
             Permission:
         </div>
         <div class="col">
-            <input readonly class="form-control" value="{{ctx.appName}}:{{client.id}}" #inputName />
+            <select class="form-control" [ngModel]="client.permission" (ngModelChange)="updating.emit($event)">
+                <option *ngFor="let permission of clientPermissions" [ngValue]="permission">{{permission}}</option>
+            </select>
         </div>
         <div class="col col-auto cell-actions">
         </div>

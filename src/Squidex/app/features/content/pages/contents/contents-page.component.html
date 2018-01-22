@@ -4,7 +4,7 @@
     <div class="panel-header">
         <div class="panel-title-row">
             <div class="float-right">
-                <button class="btn btn-link btn-decent" (click)="load(true)" title="Refresh Contents (CTRL + SHIFT + R)">
+                <button class="btn btn-link btn-secondary" (click)="load(true)" title="Refresh Contents (CTRL + SHIFT + R)">
                     <i class="icon-reset"></i> Refresh
                 </button>
 
@@ -94,19 +94,19 @@
             <div class="selection" *ngIf="selectionCount > 0">
                 {{selectionCount}} items selected:
 
-                <button class="btn btn-link btn-default" (click)="publishSelected()" *ngIf="canPublish">
+                <button class="btn btn-link btn-secondary" (click)="publishSelected()" *ngIf="canPublish">
                     Publish
                 </button>
                 
-                <button class="btn btn-link btn-default" (click)="unpublishSelected()" *ngIf="canUnpublish">
+                <button class="btn btn-link btn-secondary" (click)="unpublishSelected()" *ngIf="canUnpublish">
                     Unublish
                 </button>
                 
-                <button class="btn btn-link btn-default" (click)="archiveSelected()" *ngIf="!isArchive">
+                <button class="btn btn-link btn-secondary" (click)="archiveSelected()" *ngIf="!isArchive">
                     Archive
                 </button>
                 
-                <button class="btn btn-link btn-default" (click)="restoreSelected()" *ngIf="isArchive">
+                <button class="btn btn-link btn-secondary" (click)="restoreSelected()" *ngIf="isArchive">
                     Restore
                 </button>
                 
@@ -156,10 +156,10 @@
                 <div class="float-right pagination">
                     <span class="pagination-text">{{contentsPager.itemFirst}}-{{contentsPager.itemLast}} of {{contentsPager.numberOfItems}}</span>
 
-                    <button class="btn btn-link btn-decent pagination-button" [disabled]="!contentsPager.canGoPrev" (click)="goPrev()">
+                    <button class="btn btn-link btn-secondary pagination-button" [disabled]="!contentsPager.canGoPrev" (click)="goPrev()">
                         <i class="icon-angle-left"></i>
                     </button>
-                    <button class="btn btn-link btn-decent pagination-button" [disabled]="!contentsPager.canGoNext" (click)="goNext()">
+                    <button class="btn btn-link btn-secondary pagination-button" [disabled]="!contentsPager.canGoNext" (click)="goNext()">
                         <i class="icon-angle-right"></i>
                     </button>
                 </div>

@@ -8,7 +8,7 @@
     </div>
 
     <div class="app card float-left" *ngFor="let app of apps" title="{{app.name}}">
-        <div class="card-block app-content">
+        <div class="card-body app-content">
             <h4 class="card-title app-title">{{app.name}}</h4>
 
             <a [routerLink]="['/app', app.name]">Edit</a>

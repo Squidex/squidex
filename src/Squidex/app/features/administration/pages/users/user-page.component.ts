@@ -31,7 +31,7 @@ export class UserPageComponent  implements OnInit {
 
     public userFormSubmitted = false;
     public userForm: FormGroup;
-    public userFormError? = '';
+    public userFormError = '';
 
     public isCurrentUser = false;
     public isNewMode = false;

@@ -160,13 +160,13 @@
         }
 
         &:hover {
-            color: $color-theme-blue-dark;
+            color: $color-theme-blue-dark !important;
         }
 
         &.active {
-            background: $color-theme-blue;
-            border-color: $color-theme-blue;
-            color: $color-dark-foreground;
+            background: $color-theme-blue !important;
+            border-color: $color-theme-blue !important;
+            color: $color-dark-foreground !important;
         }
     }
 

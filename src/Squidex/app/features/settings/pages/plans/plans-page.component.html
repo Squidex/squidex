@@ -4,7 +4,7 @@
     <div class="panel-header">
         <div class="panel-title-row">
             <div class="float-right">
-                <button class="btn btn-link btn-decent" (click)="load(true)" title="Refresh Plans (CTRL + SHIFT + R)">
+                <button class="btn btn-link btn-secondary" (click)="load(true)" title="Refresh Plans (CTRL + SHIFT + R)">
                     <i class="icon-reset"></i> Refresh
                 </button>
 
@@ -32,13 +32,13 @@
 
                 <div class="clearfix">
                     <div class="card plan float-left" *ngFor="let plan of plans.plans">
-                        <div class="card-block plan-header text-center">
+                        <div class="card-body plan-header text-center">
                             <h4 class="card-title">{{plan.name}}</h4>
                             <h5 class="plan-price">{{plan.costs}}</h5>
 
                             <small class="text-muted">Per Month</small>
                         </div>
-                        <div class="card-block">
+                        <div class="card-body">
                             <div class="plan-fact">
                                 {{plan.maxApiCalls | sqxKNumber}} API Calls
                             </div>
@@ -49,7 +49,7 @@
                                 {{plan.maxContributors}} Contributors
                             </div>
                         </div>
-                        <div class="card-block">
+                        <div class="card-body">
                             <button *ngIf="plan.id === plans.currentPlanId" class="btn btn-block btn-link btn-success plan-selected">
                                 &#10003; Selected
                             </button>
