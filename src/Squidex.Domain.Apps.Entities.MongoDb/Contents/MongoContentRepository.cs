@@ -87,17 +87,31 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                 throw new ValidationException("This odata operation is not supported.");
             }
 
-            var contentItems = Collection.Find(filter).Take(odataQuery).Skip(odataQuery).Sort(odataQuery, schema.SchemaDef).ToListAsync();
-            var contentCount = Collection.Find(filter).CountAsync();
-
-            await Task.WhenAll(contentItems, contentCount);
-
-            foreach (var entity in contentItems.Result)
+            try
             {
-                entity.ParseData(schema.SchemaDef);
-            }
+                var contentItems = Collection.Find(filter).Take(odataQuery).Skip(odataQuery).Sort(odataQuery, schema.SchemaDef).ToListAsync();
+                var contentCount = Collection.Find(filter).CountAsync();
 
-            return ResultList.Create<IContentEntity>(contentItems.Result, contentCount.Result);
+                await Task.WhenAll(contentItems, contentCount);
+
+                foreach (var entity in contentItems.Result)
+                {
+                    entity.ParseData(schema.SchemaDef);
+                }
+
+                return ResultList.Create<IContentEntity>(contentItems.Result, contentCount.Result);
+            }
+            catch (MongoQueryException ex)
+            {
+                if (ex.Message.Contains("17406"))
+                {
+                    throw new DomainException("Result set is too large to be retrieved. Use $top parameter to reduce the number of items.");
+                }
+                else
+                {
+                    throw;
+                }
+            }
         }
 
         public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, Status[] status, HashSet<Guid> ids)
