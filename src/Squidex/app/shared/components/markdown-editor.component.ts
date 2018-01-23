@@ -48,6 +48,8 @@ export class MarkdownEditorComponent implements ControlValueAccessor, AfterViewI
     @Output()
     public assetPluginClicked = new EventEmitter<any>();
 
+    public isFullscreen = false;
+
     public draggedOver = false;
 
     constructor(
@@ -154,6 +156,11 @@ export class MarkdownEditorComponent implements ControlValueAccessor, AfterViewI
                         className: 'fa fa-eye no-disable',
                         title: 'Toggle Preview'
                     }, {
+                        name: 'fullscreen',
+                        action: SimpleMDE.toggleFullScreen,
+                        className: 'fa fa-arrows-alt no-disable no-mobile',
+                        title: 'Toggle Fullscreen'
+                    }, {
                         name: 'side-by-side',
                         action: SimpleMDE.toggleSideBySide,
                         className: 'fa fa-columns no-disable no-mobile',
@@ -191,6 +198,16 @@ export class MarkdownEditorComponent implements ControlValueAccessor, AfterViewI
                 }
             });
 
+            this.simplemde.codemirror.on('refresh', () => {
+                this.isFullscreen = this.simplemde.isFullscreenActive();
+
+                if (this.isFullscreen) {
+                    document.body.appendChild(this.inner.nativeElement);
+                } else {
+                    this.container.nativeElement.appendChild(this.inner.nativeElement);
+                }
+            });
+
             this.simplemde.codemirror.on('blur', () => {
                 this.callTouched();
             });
@@ -201,7 +218,7 @@ export class MarkdownEditorComponent implements ControlValueAccessor, AfterViewI
         const content = event.dragData;
 
         if (content instanceof AssetDto) {
-            const img = `![${content.fileName}](${content.url} "${content.fileName}")`;
+            const img = `![${content.fileName}](${content.url} '${content.fileName}')`;
 
             this.simplemde.codemirror.replaceSelection(img);
         }

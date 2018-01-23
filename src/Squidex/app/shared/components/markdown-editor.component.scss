@@ -43,3 +43,10 @@ $background: #fff;
         background: $color-dark-foreground;
     }
 }
+
+.fullscreen {
+    @include fixed(0, 0, 0, 0);
+    border: 0;
+    background: $background;
+    z-index: 100000;
+}
