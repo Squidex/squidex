@@ -56,7 +56,7 @@ export class ContentFieldComponent implements OnInit {
         }
     }
 
-    public richTextEditorAssetPluginClicked(event: any) {
+    public assetPluginClicked() {
         this.router.navigate(['assets'], { relativeTo: this.route });
     }
 

@@ -1,9 +1,9 @@
 @import '_mixins';
 @import '_vars';
 
+$background: #fff;
+
 .editor {
-    background: $color-dark-foreground;
-    border: 1px solid $color-input;
     height: 30rem;
 }
 
@@ -12,7 +12,7 @@
 
     .drop-area {
         & {
-            @include absolute(115px, 30px, 66px, 30px);
+            @include absolute(80px, 30px, 66px, 30px);
             @include border-radius;
             z-index: 1;
             align-content: center;

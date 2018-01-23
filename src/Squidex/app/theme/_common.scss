@@ -31,6 +31,21 @@ body {
     font-size: .8rem;
 }
 
+// Rich editor icon. Must be placed here, because element is not created by angular.
+.mce-i-assets {
+    & {
+        font-family: 'icomoon' !important;
+    }
+
+    &::before {
+        content: '\e948';
+    }
+}
+
+.icon-bold {
+    font-weight: bold;
+}
+
 //
 // Profile picture in circle
 //
