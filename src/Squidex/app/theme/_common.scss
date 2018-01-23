@@ -118,3 +118,43 @@ body {
 .invisible {
     visibility: hidden;
 }
+
+//
+// Drop area for drag and drop features.
+//
+.drop-container {
+    position: relative;
+
+    .drop-area {
+        & {
+            @include absolute(30px, 30px, 30px, 30px);
+            @include border-radius;
+            z-index: 10;
+            align-content: center;
+            align-items: center;
+            display: none;
+            border: 2px dashed $color-border;
+            font-size: 1.2rem;
+            font-weight: normal;
+            justify-content: center;
+            color: darken($color-border, 30%);
+        }
+
+        &.dragging {
+            @include flex-box;
+        }
+
+        &.drag,
+        &.dnd-drag-over,
+        &.dnd-drag-enter {
+            border-color: darken($color-border, 10%);
+            cursor: copy;
+            color: darken($color-border, 40%);
+            text-decoration: none;
+        }
+    }
+
+    .drop-text {
+        background: $color-dark-foreground;
+    }
+}
