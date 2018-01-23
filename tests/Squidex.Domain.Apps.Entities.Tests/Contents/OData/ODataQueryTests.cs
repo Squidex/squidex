@@ -383,7 +383,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.OData
         {
             var parser = edmModel.ParseQuery(value);
 
-            var query = FilterBuilder.Build(parser, schemaDef).Render(serializer, registry).ToString();
+            var query = FilterBuilder.Build(parser, schemaDef).Filter.Render(serializer, registry).ToString();
 
             return query;
         }
