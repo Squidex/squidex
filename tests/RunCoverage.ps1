@@ -64,6 +64,6 @@ if ($all -Or $users) {
 	-oldStyle
 }
 
-&"$folderHome\.nuget\packages\ReportGenerator\3.0.2\tools\ReportGenerator.exe" `
+&"$folderHome\.nuget\packages\ReportGenerator\3.1.1\tools\ReportGenerator.exe" `
 -reports:"$folderWorking\$folderReports\*.xml" `
 -targetdir:"$folderWorking\$folderReports\Output"
