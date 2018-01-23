@@ -127,12 +127,12 @@ describe('BooleanField', () => {
         expect(field.formatValue(null)).toBe('');
     });
 
-    it('should format to checkmark if true', () => {
-        expect(field.formatValue(true)).toBe('✔');
+    it('should format to Yes if true', () => {
+        expect(field.formatValue(true)).toBe('Yes');
     });
 
-    it('should format to minus if false', () => {
-        expect(field.formatValue(false)).toBe('-');
+    it('should format to No if false', () => {
+        expect(field.formatValue(false)).toBe('No');
     });
 
     it('should return default value for default properties', () => {

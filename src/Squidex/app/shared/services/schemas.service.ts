@@ -525,7 +525,7 @@ export class BooleanFieldPropertiesDto extends FieldPropertiesDto {
             return '';
         }
 
-        return value ? '✔' : '-';
+        return value ? 'Yes' : 'No';
     }
 
     public createValidators(isOptional: boolean): ValidatorFn[] {
