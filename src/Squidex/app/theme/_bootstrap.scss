@@ -259,7 +259,7 @@ a {
 .btn {
     // Buttons for external logins.
     &-github {
-        @include button-variant($color-dark-foreground, $color-extern-github, $color-extern-github);
+        @include button-variant($color-extern-github, $color-extern-github);
 
         &:hover,
         &:focus {
@@ -270,7 +270,7 @@ a {
     }
 
     &-google {
-        @include button-variant($color-dark-foreground, $color-extern-google, $color-extern-google);
+        @include button-variant($color-extern-google, $color-extern-google);
 
         &:hover,
         &:focus {
@@ -281,7 +281,7 @@ a {
     }
 
     &-microsoft {
-        @include button-variant($color-dark-foreground, $color-extern-microsoft, $color-extern-microsoft);
+        @include button-variant($color-extern-microsoft, $color-extern-microsoft);
 
         &:hover,
         &:focus {
