@@ -49,6 +49,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         protected override async Task SetupCollectionAsync(IMongoCollection<MongoContentEntity> collection)
         {
+            await collection.Indexes.TryDropOneAsync("si_1_st_1_dl_1_dt_text");
+
             await archiveCollection.Indexes.CreateOneAsync(
                 Index
                     .Ascending(x => x.Id)
@@ -56,10 +58,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
             await collection.Indexes.CreateOneAsync(
                 Index
+                    .Text(x => x.DataText)
                     .Ascending(x => x.SchemaId)
                     .Ascending(x => x.Status)
-                    .Ascending(x => x.IsDeleted)
-                    .Text(x => x.DataText));
+                    .Ascending(x => x.IsDeleted));
 
             await collection.Indexes.CreateOneAsync(
                 Index

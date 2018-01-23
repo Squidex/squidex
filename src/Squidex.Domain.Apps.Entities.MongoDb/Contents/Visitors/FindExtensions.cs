@@ -73,9 +73,16 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors
 
             var filter = FilterBuilder.Build(query, schema);
 
-            if (filter != null)
+            if (filter.Filter != null)
             {
-                filters.Add(filter);
+                if (filter.Last)
+                {
+                    filters.Add(filter.Filter);
+                }
+                else
+                {
+                    filters.Insert(0, filter.Filter);
+                }
             }
 
             if (filters.Count == 1)

@@ -17,7 +17,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors
     {
         private static readonly FilterDefinitionBuilder<MongoContentEntity> Filter = Builders<MongoContentEntity>.Filter;
 
-        public static FilterDefinition<MongoContentEntity> Build(ODataUriParser query, Schema schema)
+        public static (FilterDefinition<MongoContentEntity> Filter, bool Last) Build(ODataUriParser query, Schema schema)
         {
             SearchClause search;
             try
@@ -31,7 +31,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors
 
             if (search != null)
             {
-                return Filter.Text(SearchTermVisitor.Visit(search.Expression).ToString());
+                return (Filter.Text(SearchTermVisitor.Visit(search.Expression).ToString()), false);
             }
 
             FilterClause filter;
@@ -46,10 +46,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors
 
             if (filter != null)
             {
-                return FilterVisitor.Visit(filter.Expression, schema);
+                return (FilterVisitor.Visit(filter.Expression, schema), true);
             }
 
-            return null;
+            return (null, false);
         }
     }
 }
