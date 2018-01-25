@@ -111,6 +111,9 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<EdmModelBuilder>()
                 .AsSelf();
 
+            services.AddSingletonAs<Squidex.Domain.Apps.Entities.Assets.Edm.EdmModelBuilder>()
+                .AsSelf();
+
             services.AddSingletonAs<RuleService>()
                 .AsSelf();
         }

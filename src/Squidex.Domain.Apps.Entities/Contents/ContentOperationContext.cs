@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.EnrichContent;
 using Squidex.Domain.Apps.Core.Scripting;
@@ -106,7 +107,20 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         private async Task<IReadOnlyList<IAssetInfo>> QueryAssetsAsync(Guid appId, IEnumerable<Guid> assetIds)
         {
-            return await assetRepository.QueryAsync(appId, null, new HashSet<Guid>(assetIds), null, int.MaxValue, 0);
+            StringBuilder sb = new StringBuilder();
+            if (assetIds.Count() > 0)
+            {
+                sb.Append("$filter=");
+
+                foreach (var assetId in assetIds)
+                {
+                    sb.Append($"Id eq {assetId} or");
+                }
+
+                sb.Remove(sb.Length - 2, 2);
+            }
+
+            return await assetRepository.QueryAsync(appId, sb.ToString());
         }
 
         private async Task<IReadOnlyList<Guid>> QueryContentsAsync(Guid appId, Guid schemaId, IEnumerable<Guid> contentIds)

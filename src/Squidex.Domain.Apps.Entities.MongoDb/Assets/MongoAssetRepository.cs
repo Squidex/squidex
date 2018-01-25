@@ -6,13 +6,16 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using MongoDB.Bson;
+using Microsoft.OData;
+using Microsoft.OData.UriParser;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Entities.Assets;
+using Squidex.Domain.Apps.Entities.Assets.Edm;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
+using Squidex.Domain.Apps.Entities.Assets.State;
+using Squidex.Domain.Apps.Entities.MongoDb.Assets.Visitors;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 
@@ -20,9 +23,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 {
     public sealed partial class MongoAssetRepository : MongoRepositoryBase<MongoAssetEntity>, IAssetRepository
     {
-        public MongoAssetRepository(IMongoDatabase database)
+        private readonly EdmModelBuilder modelBuilder;
+
+        public MongoAssetRepository(IMongoDatabase database, EdmModelBuilder modelBuilder)
             : base(database)
         {
+            this.modelBuilder = modelBuilder;
         }
 
         protected override string CollectionName()
@@ -34,44 +40,28 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
         {
             return collection.Indexes.CreateOneAsync(
                 Index
-                    .Ascending(x => x.State.AppId)
-                    .Ascending(x => x.State.IsDeleted)
-                    .Ascending(x => x.State.FileName)
-                    .Ascending(x => x.State.MimeType)
-                    .Descending(x => x.State.LastModified));
+                    .Ascending(x => x.AppId)
+                    .Ascending(x => x.IsDeleted)
+                    .Ascending(x => x.FileName)
+                    .Ascending(x => x.MimeType)
+                    .Descending(x => x.LastModified));
         }
 
-        public async Task<IResultList<IAssetEntity>> QueryAsync(Guid appId, HashSet<string> mimeTypes = null, HashSet<Guid> ids = null, string query = null, int take = 10, int skip = 0)
+        public async Task<IResultList<IAssetEntity>> QueryAsync(Guid appId, string query = null)
         {
-            var filters = new List<FilterDefinition<MongoAssetEntity>>
-            {
-                Filter.Eq(x => x.State.AppId, appId),
-                Filter.Eq(x => x.State.IsDeleted, false)
-            };
+            var parsedQuery = ParseQuery(query);
 
-            if (ids != null && ids.Count > 0)
-            {
-                filters.Add(Filter.In(x => x.Id, ids));
-            }
+            var assetEntities =
+                await Collection
+                    .Find(parsedQuery, appId)
+                    .Skip(parsedQuery)
+                    .Take(parsedQuery)
+                    .SortByDescending(x => x.LastModified)
+                    .ToListAsync();
 
-            if (mimeTypes != null && mimeTypes.Count > 0)
-            {
-                filters.Add(Filter.In(x => x.State.MimeType, mimeTypes));
-            }
+            var assetCount = await Collection.Find(parsedQuery, appId).CountAsync();
 
-            if (!string.IsNullOrWhiteSpace(query))
-            {
-                filters.Add(Filter.Regex(x => x.State.FileName, new BsonRegularExpression(query, "i")));
-            }
-
-            var filter = Filter.And(filters);
-
-            var assetItems = Collection.Find(filter).Skip(skip).Limit(take).SortByDescending(x => x.State.LastModified).ToListAsync();
-            var assetCount = Collection.Find(filter).CountAsync();
-
-            await Task.WhenAll(assetItems, assetCount);
-
-            return ResultList.Create<IAssetEntity>(assetItems.Result.Select(x => x.State), assetCount.Result);
+            return ResultList.Create(assetEntities.OfType<IAssetEntity>().ToList(), assetCount);
         }
 
         public async Task<IAssetEntity> FindAssetAsync(Guid id)
@@ -80,7 +70,21 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                 await Collection.Find(x => x.Id == id)
                     .FirstOrDefaultAsync();
 
-            return assetEntity?.State;
+            return assetEntity;
+        }
+
+        private ODataUriParser ParseQuery(string query)
+        {
+            try
+            {
+                var model = modelBuilder.BuildEdmModel(new AssetState());
+
+                return model.ParseQuery(query);
+            }
+            catch (ODataException ex)
+            {
+                throw new ValidationException($"Failed to parse query: {ex.Message}", ex);
+            }
         }
     }
 }

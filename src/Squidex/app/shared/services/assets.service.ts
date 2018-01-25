@@ -111,21 +111,26 @@ export class AssetsService {
 
     public getAssets(appName: string, take: number, skip: number, query?: string, mimeTypes?: string[], ids?: string[]): Observable<AssetsDto> {
         const queries: string[] = [];
+        const filters: string[] = [];
 
         if (mimeTypes && mimeTypes.length > 0) {
-            queries.push(`mimeTypes=${mimeTypes.join(',')}`);
+            filters.push(mimeTypes.map(mimeType => `MimeType eq '${mimeType}'`).join(' or '));
         }
 
         if (ids && ids.length > 0) {
-            queries.push(`ids=${ids.join(',')}`);
+            filters.push(ids.map(id => `Id eq ${id}`).join(' or '));
+        }
+
+        if (filters.length > 0) {
+            queries.push(`$filter=${filters.join(' and ')}`);
         }
 
         if (query && query.length > 0) {
-            queries.push(`query=${query}`);
+            queries.push(`$search=${encodeURIComponent(query)}`);
         }
 
-        queries.push(`take=${take}`);
-        queries.push(`skip=${skip}`);
+        queries.push(`$top=${take}`);
+        queries.push(`$skip=${skip}`);
 
         const fullQuery = queries.join('&');
 
