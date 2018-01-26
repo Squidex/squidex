@@ -112,7 +112,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             if (notLoadedAssets.Count > 0)
             {
-                var assets = await assetRepository.QueryAsync(app.Id, null);
+                var assets = await assetRepository.QueryAsync(app.Id, notLoadedAssets);
 
                 foreach (var asset in assets)
                 {

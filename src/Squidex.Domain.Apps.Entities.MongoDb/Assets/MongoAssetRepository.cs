@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.OData;
@@ -60,6 +61,18 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                     .ToListAsync();
 
             var assetCount = await Collection.Find(parsedQuery, appId).CountAsync();
+
+            return ResultList.Create(assetEntities.OfType<IAssetEntity>().ToList(), assetCount);
+        }
+
+        public async Task<IResultList<IAssetEntity>> QueryAsync(Guid appId, HashSet<Guid> ids)
+        {
+            var find = Collection
+                .Find(Filter.In(x => x.Id, ids))
+                .SortByDescending(x => x.LastModified);
+
+            var assetEntities = await find.ToListAsync();
+            var assetCount = await find.CountAsync();
 
             return ResultList.Create(assetEntities.OfType<IAssetEntity>().ToList(), assetCount);
         }
