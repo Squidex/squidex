@@ -107,20 +107,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         private async Task<IReadOnlyList<IAssetInfo>> QueryAssetsAsync(Guid appId, IEnumerable<Guid> assetIds)
         {
-            StringBuilder sb = new StringBuilder();
-            if (assetIds.Count() > 0)
-            {
-                sb.Append("$filter=");
-
-                foreach (var assetId in assetIds)
-                {
-                    sb.Append($"Id eq {assetId} or");
-                }
-
-                sb.Remove(sb.Length - 2, 2);
-            }
-
-            return await assetRepository.QueryAsync(appId, sb.ToString());
+            return await assetRepository.QueryAsync(appId, new HashSet<Guid>(assetIds));
         }
 
         private async Task<IReadOnlyList<Guid>> QueryContentsAsync(Guid appId, Guid schemaId, IEnumerable<Guid> contentIds)

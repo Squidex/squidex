@@ -5,57 +5,51 @@
 //  Copyright (c) Squidex Group
 //  All rights reserved.
 // ==========================================================================
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.OData.Edm;
-using Squidex.Infrastructure;
+using Squidex.Domain.Apps.Entities.Assets.State;
 
 namespace Squidex.Domain.Apps.Entities.Assets.Edm
 {
-    public class EdmModelBuilder : CachingProviderBase
+    public class EdmModelBuilder
     {
-        public EdmModelBuilder(IMemoryCache cache)
-            : base(cache)
+        private readonly IEdmModel edmModel;
+        public EdmModelBuilder()
         {
+            edmModel = BuildEdmModel();
         }
 
-        public virtual IEdmModel BuildEdmModel(IAssetEntity asset)
+        public virtual IEdmModel EdmModel
         {
-            Guard.NotNull(asset, nameof(asset));
+            get { return edmModel; }
+        }
 
-            var cacheKey = $"Assets_EdmModel";
+        private IEdmModel BuildEdmModel()
+        {
+            var model = new EdmModel();
+            var container = new EdmEntityContainer("Squidex", "Container");
+            var entityType = new EdmEntityType("Squidex", "Asset");
 
-            var result = Cache.GetOrCreate<IEdmModel>(cacheKey, entry =>
-            {
-                var model = new EdmModel();
+            entityType.AddStructuralProperty(nameof(AssetState.Id), EdmPrimitiveTypeKind.Guid);
+            entityType.AddStructuralProperty(nameof(AssetState.AppId), EdmPrimitiveTypeKind.Guid);
+            entityType.AddStructuralProperty(nameof(AssetState.Created), EdmPrimitiveTypeKind.DateTimeOffset);
+            entityType.AddStructuralProperty(nameof(AssetState.CreatedBy), EdmPrimitiveTypeKind.String);
+            entityType.AddStructuralProperty(nameof(AssetState.LastModified), EdmPrimitiveTypeKind.DateTimeOffset);
+            entityType.AddStructuralProperty(nameof(AssetState.LastModifiedBy), EdmPrimitiveTypeKind.String);
+            entityType.AddStructuralProperty(nameof(AssetState.Version), EdmPrimitiveTypeKind.Int64);
+            entityType.AddStructuralProperty(nameof(AssetState.FileName), EdmPrimitiveTypeKind.String);
+            entityType.AddStructuralProperty(nameof(AssetState.FileSize), EdmPrimitiveTypeKind.Int64);
+            entityType.AddStructuralProperty(nameof(AssetState.FileVersion), EdmPrimitiveTypeKind.Int64);
+            entityType.AddStructuralProperty(nameof(AssetState.IsImage), EdmPrimitiveTypeKind.Boolean);
+            entityType.AddStructuralProperty(nameof(AssetState.MimeType), EdmPrimitiveTypeKind.String);
+            entityType.AddStructuralProperty(nameof(AssetState.PixelHeight), EdmPrimitiveTypeKind.Int32);
+            entityType.AddStructuralProperty(nameof(AssetState.PixelWidth), EdmPrimitiveTypeKind.Int32);
 
-                var container = new EdmEntityContainer("Squidex", "Container");
+            model.AddElement(container);
+            model.AddElement(entityType);
 
-                var entityType = new EdmEntityType("Squidex", "Asset");
-                entityType.AddStructuralProperty(nameof(asset.Id), EdmPrimitiveTypeKind.Guid);
-                entityType.AddStructuralProperty(nameof(asset.AppId), EdmPrimitiveTypeKind.Guid);
-                entityType.AddStructuralProperty(nameof(asset.Created), EdmPrimitiveTypeKind.DateTimeOffset);
-                entityType.AddStructuralProperty(nameof(asset.CreatedBy), EdmPrimitiveTypeKind.String);
-                entityType.AddStructuralProperty(nameof(asset.LastModified), EdmPrimitiveTypeKind.DateTimeOffset);
-                entityType.AddStructuralProperty(nameof(asset.LastModifiedBy), EdmPrimitiveTypeKind.String);
-                entityType.AddStructuralProperty(nameof(asset.Version), EdmPrimitiveTypeKind.Int64);
+            container.AddEntitySet("AssetSet", entityType);
 
-                entityType.AddStructuralProperty(nameof(asset.FileName), EdmPrimitiveTypeKind.String);
-                entityType.AddStructuralProperty(nameof(asset.FileSize), EdmPrimitiveTypeKind.Int64);
-                entityType.AddStructuralProperty(nameof(asset.FileVersion), EdmPrimitiveTypeKind.Int64);
-                entityType.AddStructuralProperty(nameof(asset.IsImage), EdmPrimitiveTypeKind.Boolean);
-                entityType.AddStructuralProperty(nameof(asset.MimeType), EdmPrimitiveTypeKind.String);
-                entityType.AddStructuralProperty(nameof(asset.PixelHeight), EdmPrimitiveTypeKind.Int32);
-                entityType.AddStructuralProperty(nameof(asset.PixelWidth), EdmPrimitiveTypeKind.Int32);
-
-                model.AddElement(container);
-                model.AddElement(entityType);
-
-                container.AddEntitySet("AssetSet", entityType);
-
-                return model;
-            });
-
-            return result;
+            return model;
         }
     }
 }
