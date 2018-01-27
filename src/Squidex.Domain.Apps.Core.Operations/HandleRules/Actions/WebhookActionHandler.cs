@@ -97,8 +97,8 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
 
         private static HttpRequestMessage BuildRequest(Dictionary<string, JToken> job, string requestBody)
         {
-            var requestUrl = job["RequestUrl"].ToString();
-            var requestSignature = job["RequestSignature"].ToString();
+            var requestUrl = job["RequestUrl"].Value<string>();
+            var requestSignature = job["RequestSignature"].Value<string>();
 
             var request = new HttpRequestMessage(HttpMethod.Post, requestUrl)
             {

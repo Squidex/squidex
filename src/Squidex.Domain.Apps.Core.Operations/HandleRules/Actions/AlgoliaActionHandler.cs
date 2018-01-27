@@ -87,9 +87,9 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
 
         public override async Task<(string Dump, Exception Exception)> ExecuteJobAsync(RuleJobData job)
         {
-            var appId = (string)job["AppId"];
-            var apiKey = (string)job["ApiKey"];
-            var indexName = (string)job["IndexName"];
+            var appId = job["AppId"].Value<string>();
+            var apiKey = job["ApiKey"].Value<string>();
+            var indexName = job["IndexName"].Value<string>();
 
             var index = clients.GetOrAdd((appId, apiKey, indexName), s =>
             {
@@ -98,9 +98,9 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
                 return client.InitIndex(indexName);
             });
 
-            var operation = (string)job["Operation"];
-            var content = (JObject)job["Content"];
-            var contentId = (string)job["ContentId"];
+            var operation = job["Operation"].Value<string>();
+            var content = job["Content"].Value<JObject>();
+            var contentId = job["ContentId"].Value<string>();
 
             try
             {
