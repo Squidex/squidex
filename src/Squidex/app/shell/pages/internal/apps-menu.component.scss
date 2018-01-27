@@ -68,6 +68,14 @@ $color-apps-border: #65a6ff;
         margin-left: 2rem;
     }
 
+    .btn {
+        padding: .375rem;
+    }
+
+    .btn-warning {
+        color: $color-dark-foreground;
+    }
+
     .btn-primary {
         @include box-shadow-inner;
         background: $color-theme-blue-dark;
