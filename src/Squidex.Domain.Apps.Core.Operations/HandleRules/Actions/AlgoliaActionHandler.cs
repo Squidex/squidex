@@ -53,6 +53,11 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
                 {
                     case ContentCreated created:
                     {
+                        /*
+                         * Do not add the status property here. Sometimes the published event is faster and therefore
+                         * a content item would never become published. We have to find a way to improve the scheduling
+                         * of rules first before we can fix it.
+                         */
                         ruleDescription = $"Add entry to Algolia index: {action.IndexName}";
                         ruleData["Content"] = new JObject(
                             new JProperty("id", contentEvent.ContentId),
