@@ -7,6 +7,9 @@ $trigger-content-changed-icon: #297ff6;
 $action-webhook-text:         #4bb958;
 $action-webhook-icon:         #47b353;
 
+$action-algolia-text:         #0d9bf9;
+$action-algolia-icon:         #1690f5;
+
 @mixin build-element($text-color, $icon-color) {
     & {
         background: $text-color;
@@ -53,4 +56,8 @@ $action-webhook-icon:         #47b353;
 
 .rule-element-Webhook {
     @include build-element($action-webhook-text, $action-webhook-icon)
+}
+
+.rule-element-Algolia {
+    @include build-element($action-algolia-text, $action-algolia-icon)
 }

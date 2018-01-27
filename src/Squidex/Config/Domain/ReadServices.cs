@@ -92,6 +92,9 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<ContentChangedTriggerHandler>()
                 .As<IRuleTriggerHandler>();
 
+            services.AddSingletonAs<AlgoliaActionHandler>()
+                .As<IRuleActionHandler>();
+
             services.AddSingletonAs<WebhookActionHandler>()
                 .As<IRuleActionHandler>();
 
