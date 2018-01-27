@@ -22,6 +22,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
 {
     public class ElasticSearchActionHandler : RuleActionHandler<ElasticSearchAction>
     {
+        private const string SchemaNamePlaceholder = "$SCHEMA_NAME";
         private readonly ISearchEngine searchEngine;
         private readonly JsonSerializer serializer;
 
@@ -39,13 +40,14 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
         {
             // todo: get the contentId from the event envelope
             var payload = CreatePayload(@event, eventName);
+            var schemaName = ExtractSchemaName(eventName);
             var ruleDescription = $"Indexing event data in elasticsearch index {action.IndexName}";
             var ruleData = new RuleJobData
             {
-                ["IndexName"] = action.IndexName,
+                ["IndexName"] = action.IndexName.Replace(SchemaNamePlaceholder, schemaName),
                 ["Payload"] = payload,
                 ["EventType"] = eventName,
-                ["TypeNameForSchema"] = action.TypeNameForSchema,
+                ["TypeNameForSchema"] = action.TypeNameForSchema.Replace(SchemaNamePlaceholder, schemaName),
                 ["HostUrl"] = action.HostUrl,
                 ["RequiresAuthentication"] = action.RequiresAuthentication,
                 ["Username"] = action.Username,
@@ -124,6 +126,13 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
             };
 
             return JObject.FromObject(conentEntity, serializer);
+        }
+
+        private string ExtractSchemaName(string eventName)
+        {
+            var splitted = eventName.SplitCamelCase();
+            var parts = splitted.Split(' ');
+            return parts.Length > 0 ? parts[0] : "";
         }
     }
 }

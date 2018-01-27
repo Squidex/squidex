@@ -26,21 +26,34 @@ namespace Squidex.Infrastructure.ElasticSearch
             Guard.NotNull(clientFactory, nameof(clientFactory));
             this.clientFactory = clientFactory;
         }
-        
-        public async Task<bool> AddContentToIndexAsync(JObject content, Guid contentId, string typeName, string indexName)
+
+        public async Task<bool> AddContentToIndexAsync(JObject content, Guid contentId, string typeName,
+            string indexName)
         {
-            var response = await elasticClient.IndexAsync<StringResponse>(indexName, typeName, contentId.ToString(), PostData.Serializable(content));
+            Guard.NotNullOrEmpty(typeName, nameof(typeName));
+            Guard.NotNullOrEmpty(indexName, nameof(indexName));
+
+            var response = await elasticClient.IndexAsync<StringResponse>(indexName, typeName, contentId.ToString(),
+                PostData.Serializable(content));
             return response.HttpStatusCode == 201 || response.HttpStatusCode == 200;
         }
 
-        public async Task<bool> UpdateContentInIndexAsync(JObject content, Guid contentId, string typeName, string indexName)
+        public async Task<bool> UpdateContentInIndexAsync(JObject content, Guid contentId, string typeName,
+            string indexName)
         {
-            var response = await elasticClient.IndexAsync<StringResponse>(indexName, typeName, contentId.ToString(), PostData.Serializable(content));
+            Guard.NotNullOrEmpty(typeName, nameof(typeName));
+            Guard.NotNullOrEmpty(indexName, nameof(indexName));
+
+            var response = await elasticClient.IndexAsync<StringResponse>(indexName, typeName, contentId.ToString(),
+                PostData.Serializable(content));
             return response.HttpStatusCode == 200;
         }
 
         public async Task<bool> DeleteContentFromIndexAsync(Guid contentId, string typeName, string indexName)
         {
+            Guard.NotNullOrEmpty(typeName, nameof(typeName));
+            Guard.NotNullOrEmpty(indexName, nameof(indexName));
+
             var response = await elasticClient.DeleteAsync<StringResponse>(indexName, typeName, contentId.ToString());
             return response.HttpStatusCode == 200;
         }
@@ -59,7 +72,7 @@ namespace Squidex.Infrastructure.ElasticSearch
         {
             Guard.NotNullOrEmpty(hostUrl, nameof(hostUrl));
             var result = false;
-            
+
             if (Uri.TryCreate(hostUrl, UriKind.Absolute, out var hostParsedUri))
             {
                 if (string.IsNullOrEmpty(username) && string.IsNullOrEmpty(password))
@@ -70,7 +83,7 @@ namespace Squidex.Infrastructure.ElasticSearch
                 {
                     elasticClient = clientFactory.Create(hostParsedUri, username, password);
                 }
-                
+
                 result = true;
             }
 

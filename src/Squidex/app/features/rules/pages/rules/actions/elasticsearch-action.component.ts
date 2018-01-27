@@ -41,8 +41,8 @@ export class ElasticSearchActionComponent implements OnInit {
             requiresAuthentication: false,
             username: '',
             password: '',
-            indexName: '',
-            typeNameForSchema: ''
+            indexName: '$SCHEMA_NAME',
+            typeNameForSchema: '$SCHEMA_NAME'
         }, this.action || {});
 
         this.actionFormSubmitted = false;
