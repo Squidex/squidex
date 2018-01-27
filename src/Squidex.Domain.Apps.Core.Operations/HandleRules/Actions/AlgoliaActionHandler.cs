@@ -47,12 +47,19 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
                 ruleData["ContentId"] = contentEvent.ContentId.ToString();
                 ruleData["Operation"] = "Upsert";
 
+                var timestamp = @event.Headers.Timestamp().ToString();
+
                 switch (@event.Payload)
                 {
                     case ContentCreated created:
                     {
                         ruleDescription = $"Add entry to Algolia index: {action.IndexName}";
                         ruleData["Content"] = new JObject(
+                            new JProperty("id", contentEvent.ContentId),
+                            new JProperty("created", timestamp),
+                            new JProperty("createdBy", created.Actor.ToString()),
+                            new JProperty("lastModified", timestamp),
+                            new JProperty("lastModifiedBy", created.Actor.ToString()),
                             new JProperty("data", JObject.FromObject(created.Data, serializer)));
                         break;
                     }
@@ -61,6 +68,8 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
                     {
                         ruleDescription = $"Update entry in Algolia index: {action.IndexName}";
                         ruleData["Content"] = new JObject(
+                            new JProperty("lastModified", timestamp),
+                            new JProperty("lastModifiedBy", updated.Actor.ToString()),
                             new JProperty("data", JObject.FromObject(updated.Data, serializer)));
                         break;
                     }
