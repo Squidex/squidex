@@ -38,14 +38,14 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
             var ruleData = new RuleJobData
             {
                 ["AppId"] = action.AppId,
-                ["ApiKey"] = action.ApiKey,
-                ["IndexName"] = action.IndexName
+                ["ApiKey"] = action.ApiKey
             };
 
             if (@event.Payload is ContentEvent contentEvent)
             {
                 ruleData["ContentId"] = contentEvent.ContentId.ToString();
                 ruleData["Operation"] = "Upsert";
+                ruleData["IndexName"] = action.IndexName.Replace("$SCHEMA_NAME", contentEvent.SchemaId.Name);
 
                 var timestamp = @event.Headers.Timestamp().ToString();
 
