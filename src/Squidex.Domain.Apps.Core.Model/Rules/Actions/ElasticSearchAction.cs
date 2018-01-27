@@ -17,10 +17,24 @@ namespace Squidex.Domain.Apps.Core.Rules.Actions
         private Uri addressOfElasticSearch;
         private string indexName;
         private string typeNameForSchema;
+        private string hostUrl;
 
         public ElasticSearchAction()
         {
             Validator = new ElasticSearchActionValidator();
+        }
+
+        /// <summary>
+        /// The url of elastic search. e.g. http://localhost:9200
+        /// </summary>
+        public string HostUrl
+        {
+            get => hostUrl;
+            set
+            {
+                ThrowIfFrozen();
+                hostUrl = value;
+            }
         }
 
         /// <summary>

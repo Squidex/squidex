@@ -27,8 +27,10 @@ using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Users;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
+using Squidex.Infrastructure.ElasticSearch;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.EventSourcing.Grains;
+using Squidex.Infrastructure.SearchEngines;
 using Squidex.Infrastructure.States;
 using Squidex.Pipeline;
 
@@ -61,8 +63,6 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<StateFactory>()
                 .As<IInitializable>()
                 .As<IStateFactory>();
-
-            var searchEngineType = config.GetOptionalValue("searchIndexing:engineType", string.Empty);
 
             services.AddSingletonAs(c => c.GetService<IOptions<MyUsageOptions>>()?.Value?.Plans.OrEmpty());
 
@@ -99,23 +99,16 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<WebhookActionHandler>()
                 .As<IRuleActionHandler>();
 
-            if (searchEngineType == "elasticsearch")
-            {
-                // address must be in format: http://host:port or https://host:port
-                var elasticSearchAddress = config.GetRequiredValue("searchIndexing:host");
+            // todo: add support for password auth
+            services.AddSingletonAs<DefaultElasticClientFactory>()
+                .As<IElasticLowLevelClientFactory>();
 
-                services.AddSingletonAs(p =>
-                {
-                    // todo: add support for password auth
-                    var settings = new ConnectionConfiguration(new Uri(elasticSearchAddress))
-                        .RequestTimeout(TimeSpan.FromMinutes(2));
+            services.AddSingletonAs<ElasticSearchActionHandler>()
+                .As<IRuleActionHandler>();
 
-                    return new ElasticLowLevelClient(settings);
-                }).As<IElasticLowLevelClient>();
-
-                services.AddSingletonAs<ElasticSearchActionHandler>()
-                    .As<IRuleActionHandler>();
-            }
+            // todo: create abstraction for this - the system should support any search engine
+            services.AddSingletonAs<ElasticSearchClient>()
+                .As<ISearchEngine>();
 
             services.AddSingletonAs<DefaultEventNotifier>()
                 .As<IEventNotifier>();

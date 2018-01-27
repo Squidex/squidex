@@ -19,5 +19,7 @@ namespace Squidex.Infrastructure.SearchEngines
         Task<bool> UpdateContentInIndexAsync(JObject content, Guid contentId, string typeName, string indexName);
 
         Task<bool> DeleteContentFromIndexAsync(Guid contentId, string typeName, string indexName);
+
+        bool Connect(string hostUrl);
     }
 }

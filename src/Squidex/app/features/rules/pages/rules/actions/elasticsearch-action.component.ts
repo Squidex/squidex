@@ -16,6 +16,9 @@ export class ElasticSearchActionComponent implements OnInit {
     public actionFormSubmitted = false;
     public actionForm =
         this.formBuilder.group({
+            hostUrl: ['', [
+                    Validators.required
+                ]],
             indexName: ['',
                 [
                     Validators.required

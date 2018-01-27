@@ -18,12 +18,13 @@ namespace Squidex.Infrastructure.ElasticSearch
 {
     public class ElasticSearchClient : ISearchEngine
     {
-        private readonly IElasticLowLevelClient elasticClient;
+        private IElasticLowLevelClient elasticClient;
+        private IElasticLowLevelClientFactory clientFactory;
 
-        public ElasticSearchClient(IElasticLowLevelClient elasticClient)
+        public ElasticSearchClient(IElasticLowLevelClientFactory clientFactory)
         {
-            Guard.NotNull(elasticClient, nameof(elasticClient));
-            this.elasticClient = elasticClient;
+            Guard.NotNull(clientFactory, nameof(clientFactory));
+            this.clientFactory = clientFactory;
         }
         
         public async Task<bool> AddContentToIndexAsync(JObject content, Guid contentId, string typeName, string indexName)
@@ -42,6 +43,20 @@ namespace Squidex.Infrastructure.ElasticSearch
         {
             var response = await elasticClient.DeleteAsync<StringResponse>(indexName, typeName, contentId.ToString());
             return response.HttpStatusCode == 200;
+        }
+
+        public bool Connect(string hostUrl)
+        {
+            Guard.NotNullOrEmpty(hostUrl, nameof(hostUrl));
+            var result = false;
+            
+            if (Uri.TryCreate(hostUrl, UriKind.Absolute, out var hostParsedUri))
+            {
+                elasticClient = clientFactory.Create(hostParsedUri);
+                result = true;
+            }
+
+            return result;
         }
     }
 }

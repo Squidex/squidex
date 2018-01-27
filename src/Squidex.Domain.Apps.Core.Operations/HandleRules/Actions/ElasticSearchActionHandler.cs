@@ -45,7 +45,8 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
                 ["IndexName"] = action.IndexName,
                 ["Payload"] = payload,
                 ["EventType"] = eventName,
-                ["TypeNameForSchema"] = action.TypeNameForSchema
+                ["TypeNameForSchema"] = action.TypeNameForSchema,
+                ["HostUrl"] = action.HostUrl
             };
 
             return (ruleDescription, ruleData);
@@ -58,9 +59,15 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
             var typeName = job["TypeNameForSchema"].Value<string>();
             var indexName = job["IndexName"].Value<string>();
             var contentId = job["ContentId"].Value<Guid>();
+            var hostUrl = job["HostUrl"].Value<string>();
 
             try
             {
+                if (!searchEngine.Connect(hostUrl))
+                {
+                    throw new Exception("Couldn't connect to the elastic search service.");
+                }
+
                 if (eventType.Contains("Deleted"))
                 {
                     await searchEngine.DeleteContentFromIndexAsync(contentId, typeName, indexName);

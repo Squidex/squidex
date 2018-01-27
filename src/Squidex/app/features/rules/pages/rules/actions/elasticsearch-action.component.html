@@ -1,11 +1,25 @@
 <form [formGroup]="actionForm" class="form-horizontal" (ngSubmit)="save()">
     <div class="form-group row">
+        <label class="col col-2 col-form-label" for="indexName">Host Url</label>
+
+        <div class="col col-10">
+            <sqx-control-errors for="hostUrl" [submitted]="actionFormSubmitted"></sqx-control-errors>
+
+            <input type="url" class="form-control" id="hostUrl" formControlName="hostUrl" />
+
+            <small class="form-text text-muted">
+                The url of elastic search with port number. e.g. http://localhost:9200
+            </small>
+        </div>
+    </div>
+    
+    <div class="form-group row">
         <label class="col col-2 col-form-label" for="indexName">Index name</label>
 
         <div class="col col-10">
-            <sqx-control-errors for="url" [submitted]="actionFormSubmitted"></sqx-control-errors>
+            <sqx-control-errors for="indexName" [submitted]="actionFormSubmitted"></sqx-control-errors>
 
-            <input type="url" class="form-control" id="indexName" formControlName="indexName" />
+            <input type="text" class="form-control" id="indexName" formControlName="indexName" />
 
             <small class="form-text text-muted">
                 The name of the index where the event data is going to be indexed to.
@@ -17,7 +31,7 @@
         <label class="col col-2 col-form-label" for="typeNameForSchema">Type name</label>
 
         <div class="col col-10">
-            <sqx-control-errors for="sharedSecret" [submitted]="actionFormSubmitted"></sqx-control-errors>
+            <sqx-control-errors for="typeNameForSchema" [submitted]="actionFormSubmitted"></sqx-control-errors>
 
             <input type="text" class="form-control" id="typeNameForSchema" formControlName="typeNameForSchema" />
 
