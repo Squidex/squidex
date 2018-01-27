@@ -14,6 +14,7 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
 {
     [JsonConverter(typeof(JsonInheritanceConverter), "actionType")]
     [KnownType(typeof(WebhookActionDto))]
+    [KnownType(typeof(ElasticSearchActionDto))]
     public abstract class RuleActionDto
     {
         public abstract RuleAction ToAction();
