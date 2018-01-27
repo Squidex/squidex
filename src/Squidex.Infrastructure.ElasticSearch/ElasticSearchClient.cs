@@ -47,12 +47,30 @@ namespace Squidex.Infrastructure.ElasticSearch
 
         public bool Connect(string hostUrl)
         {
+            return ConnectCore(hostUrl, null, null);
+        }
+
+        public bool Connect(string hostUrl, string username, string password)
+        {
+            return ConnectCore(hostUrl, username, password);
+        }
+
+        private bool ConnectCore(string hostUrl, string username, string password)
+        {
             Guard.NotNullOrEmpty(hostUrl, nameof(hostUrl));
             var result = false;
             
             if (Uri.TryCreate(hostUrl, UriKind.Absolute, out var hostParsedUri))
             {
-                elasticClient = clientFactory.Create(hostParsedUri);
+                if (string.IsNullOrEmpty(username) && string.IsNullOrEmpty(password))
+                {
+                    elasticClient = clientFactory.Create(hostParsedUri);
+                }
+                else
+                {
+                    elasticClient = clientFactory.Create(hostParsedUri, username, password);
+                }
+                
                 result = true;
             }
 

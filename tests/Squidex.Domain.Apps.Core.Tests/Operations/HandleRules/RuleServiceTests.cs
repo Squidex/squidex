@@ -42,7 +42,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                 Validator = A.Fake<IRuleActionValidator>();
                 A.CallTo(() => Validator.Validate(A<RuleAction>._)).Throws<NotSupportedException>();
             }
-            
+
             public override T Accept<T>(IRuleActionVisitor<T> visitor)
             {
                 return default(T);
@@ -70,7 +70,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             A.CallTo(() => ruleTriggerHandler.TriggerType)
                 .Returns(typeof(ContentChangedTrigger));
 
-            sut = new RuleService(new[] { ruleTriggerHandler }, new[] { ruleActionHandler }, clock, typeNameRegistry);
+            sut = new RuleService(new[] {ruleTriggerHandler}, new[] {ruleActionHandler}, clock, typeNameRegistry);
         }
 
         [Fact]
@@ -123,7 +123,11 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public void Should_not_create_job_if_too_old()
         {
-            var e = new ContentCreated { SchemaId = new NamedId<Guid>(Guid.NewGuid(), "my-schema"), AppId = new NamedId<Guid>(Guid.NewGuid(), "my-event") };
+            var e = new ContentCreated
+            {
+                SchemaId = new NamedId<Guid>(Guid.NewGuid(), "my-schema"),
+                AppId = new NamedId<Guid>(Guid.NewGuid(), "my-event")
+            };
 
             var now = SystemClock.Instance.GetCurrentInstant();
 
@@ -154,7 +158,11 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public void Should_create_job_if_triggered()
         {
-            var e = new ContentCreated { SchemaId = new NamedId<Guid>(Guid.NewGuid(), "my-schema"), AppId = new NamedId<Guid>(Guid.NewGuid(), "my-event") };
+            var e = new ContentCreated
+            {
+                SchemaId = new NamedId<Guid>(Guid.NewGuid(), "my-schema"),
+                AppId = new NamedId<Guid>(Guid.NewGuid(), "my-event")
+            };
 
             var now = SystemClock.Instance.GetCurrentInstant();
 

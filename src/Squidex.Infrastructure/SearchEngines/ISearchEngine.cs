@@ -21,5 +21,7 @@ namespace Squidex.Infrastructure.SearchEngines
         Task<bool> DeleteContentFromIndexAsync(Guid contentId, string typeName, string indexName);
 
         bool Connect(string hostUrl);
+
+        bool Connect(string hostUrl, string username, string password);
     }
 }

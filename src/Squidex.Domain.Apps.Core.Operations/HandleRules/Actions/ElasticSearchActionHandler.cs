@@ -46,7 +46,10 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
                 ["Payload"] = payload,
                 ["EventType"] = eventName,
                 ["TypeNameForSchema"] = action.TypeNameForSchema,
-                ["HostUrl"] = action.HostUrl
+                ["HostUrl"] = action.HostUrl,
+                ["RequiresAuthentication"] = action.RequiresAuthentication,
+                ["Username"] = action.Username,
+                ["Password"] = action.Password
             };
 
             return (ruleDescription, ruleData);
@@ -60,10 +63,17 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
             var indexName = job["IndexName"].Value<string>();
             var contentId = job["ContentId"].Value<Guid>();
             var hostUrl = job["HostUrl"].Value<string>();
+            var requiresAuth = job["RequiresAuthentication"].Value<bool>();
+            var username = job["Username"].Value<string>();
+            var password = job["Password"].Value<string>();
 
             try
             {
-                if (!searchEngine.Connect(hostUrl))
+                bool connectResult = requiresAuth
+                    ? searchEngine.Connect(hostUrl, username, password)
+                    : searchEngine.Connect(hostUrl);
+
+                if (!connectResult)
                 {
                     throw new Exception("Couldn't connect to the elastic search service.");
                 }

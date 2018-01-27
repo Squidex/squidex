@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Core.Model.Rules
                 Validator = A.Fake<IRuleActionValidator>();
                 A.CallTo(() => Validator.Validate(A<RuleAction>._)).Throws<NotSupportedException>();
             }
-            
+
             public override T Accept<T>(IRuleActionVisitor<T> visitor)
             {
                 throw new NotSupportedException();

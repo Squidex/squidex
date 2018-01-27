@@ -1,6 +1,6 @@
 <form [formGroup]="actionForm" class="form-horizontal" (ngSubmit)="save()">
     <div class="form-group row">
-        <label class="col col-2 col-form-label" for="indexName">Host Url</label>
+        <label class="col col-2 col-form-label" for="hostUrl">Host Url</label>
 
         <div class="col col-10">
             <sqx-control-errors for="hostUrl" [submitted]="actionFormSubmitted"></sqx-control-errors>
@@ -12,7 +12,47 @@
             </small>
         </div>
     </div>
-    
+
+    <div class="form-group row">
+        <div class="col col-2">
+            <input type="checkbox" style="height:100%;" class="form-control" id="requiresAuthentication" (change)="requiresAuthenticationChanged($event)" formControlName="requiresAuthentication" />
+        </div>
+        <div class="col col-10">
+            <label class="col-form-label" for="requiresAuthentication">Requires authentication</label>
+            <small class="form-text text-muted">
+                <b>Important</b>: Squidex only supports basic authentication.
+            </small>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label class="col col-2 col-form-label" for="username">Username</label>
+
+        <div class="col col-10">
+            <sqx-control-errors for="username" [submitted]="actionFormSubmitted"></sqx-control-errors>
+
+            <input type="text" class="form-control" id="username" formControlName="username" />
+
+            <small class="form-text text-muted">
+                The username for basic authentication with elastic search.
+            </small>
+        </div>
+    </div>
+
+    <div class="form-group row" [ngClass]="{ 'disabled': requiresAuthentication }">
+        <label class="col col-2 col-form-label" for="password">Password</label>
+
+        <div class="col col-10">
+            <sqx-control-errors for="password" [submitted]="actionFormSubmitted"></sqx-control-errors>
+
+            <input type="password" class="form-control" id="password" formControlName="password" />
+
+            <small class="form-text text-muted">
+                The password for basic authentication with elastic search.
+            </small>
+        </div>
+    </div>
+
     <div class="form-group row">
         <label class="col col-2 col-form-label" for="indexName">Index name</label>
 

@@ -14,10 +14,12 @@ namespace Squidex.Domain.Apps.Core.Rules.Actions
     [TypeName(nameof(ElasticSearchAction))]
     public class ElasticSearchAction : RuleAction
     {
-        private Uri addressOfElasticSearch;
         private string indexName;
         private string typeNameForSchema;
         private string hostUrl;
+        private bool requiresAuthentication;
+        private string username;
+        private string password;
 
         public ElasticSearchAction()
         {
@@ -60,6 +62,36 @@ namespace Squidex.Domain.Apps.Core.Rules.Actions
             {
                 ThrowIfFrozen();
                 indexName = value;
+            }
+        }
+
+        public bool RequiresAuthentication
+        {
+            get => requiresAuthentication;
+            set
+            {
+                ThrowIfFrozen();
+                requiresAuthentication = value;
+            }
+        }
+
+        public string Username
+        {
+            get => username;
+            set
+            {
+                ThrowIfFrozen();
+                username = value;
+            }
+        }
+        
+        public string Password
+        {
+            get => password;
+            set
+            {
+                ThrowIfFrozen();
+                password = value;
             }
         }
 

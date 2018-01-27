@@ -16,15 +16,39 @@ namespace Squidex.Infrastructure.ElasticSearch
         public IElasticLowLevelClient Create(Uri hostUrl)
         {
             Guard.NotNull(hostUrl, nameof(hostUrl));
-            
+
             var settings = GetConfiguration(hostUrl);
             return new ElasticLowLevelClient(settings);
         }
 
-        private static ConnectionConfiguration GetConfiguration(Uri hostUrl)
+        public IElasticLowLevelClient Create(Uri hostUrl, string username, string password)
         {
-            return new ConnectionConfiguration(hostUrl)
-                .RequestTimeout(TimeSpan.FromSeconds(2));
+            Guard.NotNull(hostUrl, nameof(hostUrl));
+            Guard.NotNullOrEmpty(username, nameof(username));
+            Guard.NotNullOrEmpty(password, nameof(password));
+
+            var settings = GetConfiguration(hostUrl, username, password, true);
+            return new ElasticLowLevelClient(settings);
+        }
+
+        private static ConnectionConfiguration GetConfiguration(Uri hostUrl, string username = "", string password = "",
+            bool requiresAuth = false)
+        {
+            ConnectionConfiguration result;
+
+            if (requiresAuth)
+            {
+                result = new ConnectionConfiguration(hostUrl)
+                    .RequestTimeout(TimeSpan.FromSeconds(2))
+                    .BasicAuthentication(username, password);
+            }
+            else
+            {
+                result = new ConnectionConfiguration(hostUrl)
+                    .RequestTimeout(TimeSpan.FromSeconds(2));
+            }
+
+            return result;
         }
     }
 }

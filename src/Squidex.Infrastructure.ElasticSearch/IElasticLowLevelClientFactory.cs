@@ -14,5 +14,7 @@ namespace Squidex.Infrastructure.ElasticSearch
     public interface IElasticLowLevelClientFactory
     {
         IElasticLowLevelClient Create(Uri hostUrl);
+
+        IElasticLowLevelClient Create(Uri hostUrl, string username, string password);
     }
 }
