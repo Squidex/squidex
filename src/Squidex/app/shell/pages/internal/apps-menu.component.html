@@ -22,7 +22,7 @@
         </div>
     </li>
 
-    <li class="nav-item" *ngIf="true || selectedApp && selectedApp.planUpgrade && selectedApp.planName && selectedApp.permission === 'Owner'">
+    <li class="nav-item" *ngIf="selectedApp && selectedApp.planUpgrade && selectedApp.planName && selectedApp.permission === 'Owner'">
         <div class="btn-group app-upgrade">
             <button type="button" class="btn btn-primary">
                 You are on the <strong>{{selectedApp.planName}}</strong> plan.
