@@ -22,6 +22,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
 {
     public sealed class AlgoliaActionHandler : RuleActionHandler<AlgoliaAction>
     {
+        private const string SchemaNamePlaceholder = "$SCHEMA_NAME";
         private readonly ConcurrentDictionary<(string AppId, string ApiKey, string IndexName), Index> clients = new ConcurrentDictionary<(string AppId, string ApiKey, string IndexName), Index>();
         private readonly JsonSerializer serializer;
 
@@ -45,7 +46,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
             {
                 ruleData["ContentId"] = contentEvent.ContentId.ToString();
                 ruleData["Operation"] = "Upsert";
-                ruleData["IndexName"] = action.IndexName.Replace("$SCHEMA_NAME", contentEvent.SchemaId.Name);
+                ruleData["IndexName"] = action.IndexName.Replace(SchemaNamePlaceholder, contentEvent.SchemaId.Name);
 
                 var timestamp = @event.Headers.Timestamp().ToString();
 
