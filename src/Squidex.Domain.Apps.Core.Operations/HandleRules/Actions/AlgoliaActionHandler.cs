@@ -24,13 +24,13 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
     {
         private const string SchemaNamePlaceholder = "$SCHEMA_NAME";
         private readonly ConcurrentDictionary<(string AppId, string ApiKey, string IndexName), Index> clients = new ConcurrentDictionary<(string AppId, string ApiKey, string IndexName), Index>();
-        private readonly JsonSerializer serializer;
+        private readonly RuleEventFormatter formatter;
 
-        public AlgoliaActionHandler(JsonSerializer serializer)
+        public AlgoliaActionHandler(RuleEventFormatter formatter)
         {
-            Guard.NotNull(serializer, nameof(serializer));
+            Guard.NotNull(formatter, nameof(formatter));
 
-            this.serializer = serializer;
+            this.formatter = formatter;
         }
 
         protected override (string Description, RuleJobData Data) CreateJob(Envelope<AppEvent> @event, string eventName, AlgoliaAction action)
@@ -46,7 +46,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
             {
                 ruleData["ContentId"] = contentEvent.ContentId.ToString();
                 ruleData["Operation"] = "Upsert";
-                ruleData["IndexName"] = action.IndexName.Replace(SchemaNamePlaceholder, contentEvent.SchemaId.Name);
+                ruleData["IndexName"] = formatter.FormatString(action.IndexName, @event);
 
                 var timestamp = @event.Headers.Timestamp().ToString();
 
@@ -66,7 +66,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
                             new JProperty("createdBy", created.Actor.ToString()),
                             new JProperty("lastModified", timestamp),
                             new JProperty("lastModifiedBy", created.Actor.ToString()),
-                            new JProperty("data", JObject.FromObject(created.Data, serializer)));
+                            new JProperty("data", formatter.ToRouteData(created.Data)));
                         break;
                     }
 
@@ -76,7 +76,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
                         ruleData["Content"] = new JObject(
                             new JProperty("lastModified", timestamp),
                             new JProperty("lastModifiedBy", updated.Actor.ToString()),
-                            new JProperty("data", JObject.FromObject(updated.Data, serializer)));
+                            new JProperty("data", formatter.ToRouteData(updated.Data)));
                         break;
                     }
 
