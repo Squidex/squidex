@@ -47,7 +47,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                 AppId = new NamedId<Guid>(appId, "my-app")
             };
 
-            var result = sut.FormatString("Name $APP_NAME has id $APP_ID", Envelope.Create(@event).To<AppEvent>());
+            var result = sut.FormatString("Name $APP_NAME has id $APP_ID", AsEnvelope(@event));
 
             Assert.Equal($"Name my-app has id {appId}", result);
         }
@@ -62,7 +62,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                 SchemaId = new NamedId<Guid>(schemaId, "my-schema")
             };
 
-            var result = sut.FormatString("Name $SCHEMA_NAME has id $SCHEMA_ID", Envelope.Create(@event).To<AppEvent>());
+            var result = sut.FormatString("Name $SCHEMA_NAME has id $SCHEMA_ID", AsEnvelope(@event));
 
             Assert.Equal($"Name my-schema has id {schemaId}", result);
         }
@@ -90,7 +90,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                             .AddValue("iv", "Berlin"))
             };
 
-            var result = sut.FormatString("$CONTENT_DATA.country.iv", Envelope.Create(@event).To<AppEvent>());
+            var result = sut.FormatString("$CONTENT_DATA.country.iv", AsEnvelope(@event));
 
             Assert.Equal("UNDEFINED", result);
         }
@@ -106,7 +106,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                             .AddValue("iv", "Berlin"))
             };
 
-            var result = sut.FormatString("$CONTENT_DATA.city.de", Envelope.Create(@event).To<AppEvent>());
+            var result = sut.FormatString("$CONTENT_DATA.city.de", AsEnvelope(@event));
 
             Assert.Equal("UNDEFINED", result);
         }
@@ -122,7 +122,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                             .AddValue("iv", new JArray()))
             };
 
-            var result = sut.FormatString("$CONTENT_DATA.city.de.10", Envelope.Create(@event).To<AppEvent>());
+            var result = sut.FormatString("$CONTENT_DATA.city.de.10", AsEnvelope(@event));
 
             Assert.Equal("UNDEFINED", result);
         }
@@ -139,7 +139,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                                 new JProperty("name", "Berlin"))))
             };
 
-            var result = sut.FormatString("$CONTENT_DATA.city.de.Name", Envelope.Create(@event).To<AppEvent>());
+            var result = sut.FormatString("$CONTENT_DATA.city.de.Name", AsEnvelope(@event));
 
             Assert.Equal("UNDEFINED", result);
         }
@@ -155,7 +155,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                             .AddValue("iv", "Berlin"))
             };
 
-            var result = sut.FormatString("$CONTENT_DATA.city.iv", Envelope.Create(@event).To<AppEvent>());
+            var result = sut.FormatString("$CONTENT_DATA.city.iv", AsEnvelope(@event));
 
             Assert.Equal("Berlin", result);
         }
@@ -171,7 +171,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                             .AddValue("iv", JValue.CreateNull()))
             };
 
-            var result = sut.FormatString("$CONTENT_DATA.city.iv", Envelope.Create(@event).To<AppEvent>());
+            var result = sut.FormatString("$CONTENT_DATA.city.iv", AsEnvelope(@event));
 
             Assert.Equal("UNDEFINED", result);
         }
@@ -187,7 +187,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                             .AddValue("iv", JValue.CreateUndefined()))
             };
 
-            var result = sut.FormatString("$CONTENT_DATA.city.iv", Envelope.Create(@event).To<AppEvent>());
+            var result = sut.FormatString("$CONTENT_DATA.city.iv", AsEnvelope(@event));
 
             Assert.Equal("UNDEFINED", result);
         }
@@ -204,7 +204,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                                 new JProperty("name", "Berlin"))))
             };
 
-            var result = sut.FormatString("$CONTENT_DATA.city.iv", Envelope.Create(@event).To<AppEvent>());
+            var result = sut.FormatString("$CONTENT_DATA.city.iv", AsEnvelope(@event));
 
             Assert.Equal(JObject.FromObject(new { name = "Berlin" }).ToString(Formatting.Indented), result);
         }
@@ -221,7 +221,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                                 "Berlin")))
             };
 
-            var result = sut.FormatString("$CONTENT_DATA.city.iv.0", Envelope.Create(@event).To<AppEvent>());
+            var result = sut.FormatString("$CONTENT_DATA.city.iv.0", AsEnvelope(@event));
 
             Assert.Equal("Berlin", result);
         }
@@ -238,9 +238,24 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                                 new JProperty("name", "Berlin"))))
             };
 
-            var result = sut.FormatString("$CONTENT_DATA.city.iv.name", Envelope.Create(@event).To<AppEvent>());
+            var result = sut.FormatString("$CONTENT_DATA.city.iv.name", AsEnvelope(@event));
 
             Assert.Equal("Berlin", result);
+        }
+
+        [Fact]
+        public void Should_format_content_action_for_created_when_found()
+        {
+            Assert.Equal("created", sut.FormatString("$CONTENT_ACTION", AsEnvelope(new ContentCreated())));
+            Assert.Equal("updated", sut.FormatString("$CONTENT_ACTION", AsEnvelope(new ContentUpdated())));
+            Assert.Equal("deleted", sut.FormatString("$CONTENT_ACTION", AsEnvelope(new ContentDeleted())));
+
+            Assert.Equal("set to archived", sut.FormatString("$CONTENT_ACTION", AsEnvelope(new ContentStatusChanged { Status = Status.Archived })));
+        }
+
+        private static Envelope<AppEvent> AsEnvelope<T>(T @event) where T : AppEvent
+        {
+            return Envelope.Create<AppEvent>(@event).To<AppEvent>();
         }
     }
 }

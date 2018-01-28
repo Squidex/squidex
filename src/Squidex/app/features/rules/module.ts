@@ -9,6 +9,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
 import {
+    HelpComponent,
     SqxFrameworkModule,
     SqxSharedModule
 } from 'shared';
@@ -19,6 +20,7 @@ import {
     RuleEventsPageComponent,
     RulesPageComponent,
     RuleWizardComponent,
+    SlackActionComponent,
     WebhookActionComponent
 } from './declarations';
 
@@ -30,6 +32,13 @@ const routes: Routes = [
             {
                 path: 'events',
                 component: RuleEventsPageComponent
+            },
+            {
+                path: 'help',
+                component: HelpComponent,
+                data: {
+                    helpPage: '06-integrated/rules'
+                }
             }
         ]
     }
@@ -47,6 +56,7 @@ const routes: Routes = [
         RuleEventsPageComponent,
         RulesPageComponent,
         RuleWizardComponent,
+        SlackActionComponent,
         WebhookActionComponent
     ]
 })

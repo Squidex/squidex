@@ -98,6 +98,9 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<AlgoliaActionHandler>()
                 .As<IRuleActionHandler>();
 
+            services.AddSingletonAs<SlackActionHandler>()
+                .As<IRuleActionHandler>();
+
             services.AddSingletonAs<WebhookActionHandler>()
                 .As<IRuleActionHandler>();
 
