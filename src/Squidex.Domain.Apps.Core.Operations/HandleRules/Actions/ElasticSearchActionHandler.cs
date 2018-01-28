@@ -41,10 +41,11 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
             // todo: get the contentId from the event envelope
             var payload = CreatePayload(@event, eventName);
             var schemaName = ExtractSchemaName(eventName);
-            var ruleDescription = $"Indexing event data in elasticsearch index {action.IndexName}";
+            var indexName = action.IndexName.Replace(SchemaNamePlaceholder, schemaName);
+            var ruleDescription = $"Indexing event data in elasticsearch index {indexName}";
             var ruleData = new RuleJobData
             {
-                ["IndexName"] = action.IndexName.Replace(SchemaNamePlaceholder, schemaName),
+                ["IndexName"] = indexName,
                 ["Payload"] = payload,
                 ["EventType"] = eventName,
                 ["TypeNameForSchema"] = action.TypeNameForSchema.Replace(SchemaNamePlaceholder, schemaName),
@@ -59,11 +60,12 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
 
         public override async Task<(string Dump, Exception Exception)> ExecuteJobAsync(RuleJobData job)
         {
+            // todo: improve performance, it shouldn't serialize back and forth
             var payload = ReformatContentPayload(job["Payload"] as JObject);
             var eventType = job["EventType"].Value<string>();
             var typeName = job["TypeNameForSchema"].Value<string>();
             var indexName = job["IndexName"].Value<string>();
-            var contentId = job["ContentId"].Value<Guid>();
+            var contentId = (Guid)((JValue)payload["id"]).Value;
             var hostUrl = job["HostUrl"].Value<string>();
             var requiresAuth = job["RequiresAuthentication"].Value<bool>();
             var username = job["Username"].Value<string>();
@@ -114,8 +116,8 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
             // lets try to keep the original format, because when we query from ES, we expect the same DTO.
             var conentEntity = new
             {
-                Id = content["payload"]["contentId"].Value<Guid>(),
-                AppId = content["payload"]["appId"].Value<Guid>(),
+                Id = Guid.Parse(content["payload"]["contentId"].Value<string>()),
+                AppId = Guid.Parse(content["payload"]["appId"].Value<string>().Split(',')[0]),
                 CreatedBy = string.Empty,
                 LastModifiedBy = string.Empty,
                 Created = Instant.FromDateTimeUtc(DateTime.UtcNow),
@@ -132,7 +134,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
         {
             var splitted = eventName.SplitCamelCase();
             var parts = splitted.Split(' ');
-            return parts.Length > 0 ? parts[0] : "";
+            return parts.Length > 0 ? parts[0].ToLowerInvariant() : string.Empty;
         }
     }
 }

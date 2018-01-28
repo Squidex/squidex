@@ -84,7 +84,7 @@ namespace Squidex.Domain.Apps.Core.Rules.Actions
                 username = value;
             }
         }
-        
+
         public string Password
         {
             get => password;

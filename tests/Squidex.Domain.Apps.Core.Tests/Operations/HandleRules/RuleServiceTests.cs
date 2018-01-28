@@ -19,7 +19,7 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Xunit;
 
-#pragma warning disable xUnit2009 // Do not use boolean check to check for string equality
+#pragma warning disable xUnit2009 // Do not use boolean check to check for string equality.
 
 namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 {
@@ -70,7 +70,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             A.CallTo(() => ruleTriggerHandler.TriggerType)
                 .Returns(typeof(ContentChangedTrigger));
 
-            sut = new RuleService(new[] {ruleTriggerHandler}, new[] {ruleActionHandler}, clock, typeNameRegistry);
+            sut = new RuleService(new[] { ruleTriggerHandler }, new[] { ruleActionHandler }, clock, typeNameRegistry);
         }
 
         [Fact]

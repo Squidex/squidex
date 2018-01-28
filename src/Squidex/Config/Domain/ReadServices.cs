@@ -99,7 +99,6 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<WebhookActionHandler>()
                 .As<IRuleActionHandler>();
 
-            // todo: add support for password auth
             services.AddSingletonAs<DefaultElasticClientFactory>()
                 .As<IElasticLowLevelClientFactory>();
 
