@@ -24,14 +24,13 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
     public sealed class WebhookActionHandler : RuleActionHandler<WebhookAction>
     {
         private static readonly TimeSpan Timeout = TimeSpan.FromSeconds(2);
+        private readonly RuleEventFormatter formatter;
 
-        private readonly JsonSerializer serializer;
-
-        public WebhookActionHandler(JsonSerializer serializer)
+        public WebhookActionHandler(RuleEventFormatter formatter)
         {
-            Guard.NotNull(serializer, nameof(serializer));
+            Guard.NotNull(formatter, nameof(formatter));
 
-            this.serializer = serializer;
+            this.formatter = formatter;
         }
 
         protected override (string Description, RuleJobData Data) CreateJob(Envelope<AppEvent> @event, string eventName, WebhookAction action)
@@ -55,7 +54,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
         {
             return new JObject(
                 new JProperty("type", eventName),
-                new JProperty("payload", JObject.FromObject(@event.Payload, serializer)),
+                new JProperty("payload", formatter.ToRouteData(@event.Payload)),
                 new JProperty("timestamp", @event.Headers.Timestamp().ToString()));
         }
 
@@ -97,8 +96,8 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
 
         private static HttpRequestMessage BuildRequest(Dictionary<string, JToken> job, string requestBody)
         {
-            var requestUrl = job["RequestUrl"].ToString();
-            var requestSignature = job["RequestSignature"].ToString();
+            var requestUrl = job["RequestUrl"].Value<string>();
+            var requestSignature = job["RequestSignature"].Value<string>();
 
             var request = new HttpRequestMessage(HttpMethod.Post, requestUrl)
             {

@@ -89,8 +89,14 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<AppProvider>()
                 .As<IAppProvider>();
 
+            services.AddSingletonAs<RuleEventFormatter>()
+                .AsSelf();
+
             services.AddSingletonAs<ContentChangedTriggerHandler>()
                 .As<IRuleTriggerHandler>();
+
+            services.AddSingletonAs<AlgoliaActionHandler>()
+                .As<IRuleActionHandler>();
 
             services.AddSingletonAs<WebhookActionHandler>()
                 .As<IRuleActionHandler>();

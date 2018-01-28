@@ -25,6 +25,11 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models.Converters
             return properties.Accept(Instance);
         }
 
+        public RuleActionDto Visit(AlgoliaAction action)
+        {
+            return SimpleMapper.Map(action, new AlgoliaActionDto());
+        }
+
         public RuleActionDto Visit(WebhookAction action)
         {
             return SimpleMapper.Map(action, new WebhookActionDto());

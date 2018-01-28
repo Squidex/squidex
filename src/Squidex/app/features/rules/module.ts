@@ -14,6 +14,7 @@ import {
 } from 'shared';
 
 import {
+    AlgoliaActionComponent,
     ContentChangedTriggerComponent,
     RuleEventsPageComponent,
     RulesPageComponent,
@@ -41,6 +42,7 @@ const routes: Routes = [
         RouterModule.forChild(routes)
     ],
     declarations: [
+        AlgoliaActionComponent,
         ContentChangedTriggerComponent,
         RuleEventsPageComponent,
         RulesPageComponent,

@@ -62,6 +62,12 @@
         
             <div *ngIf="step === 4" class="modal-form">
                 <div [ngSwitch]="actionType">
+                    <div *ngSwitchCase="'Algolia'">
+                        <sqx-algolia-action #actionControl
+                            [action]="action" 
+                            (actionChanged)="selectAction($event)">
+                        </sqx-algolia-action>
+                    </div>
                     <div *ngSwitchCase="'Webhook'">
                         <sqx-webhook-action #actionControl
                             [action]="action" 

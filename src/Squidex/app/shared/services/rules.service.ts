@@ -25,6 +25,7 @@ export const ruleTriggers: any = {
 };
 
 export const ruleActions: any = {
+    'Algolia': 'Populate Algolia Index',
     'Webhook': 'Send Webhook'
 };
 

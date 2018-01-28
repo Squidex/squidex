@@ -13,6 +13,7 @@ using Squidex.Domain.Apps.Core.Rules;
 namespace Squidex.Areas.Api.Controllers.Rules.Models
 {
     [JsonConverter(typeof(JsonInheritanceConverter), "actionType")]
+    [KnownType(typeof(AlgoliaActionDto))]
     [KnownType(typeof(WebhookActionDto))]
     public abstract class RuleActionDto
     {
