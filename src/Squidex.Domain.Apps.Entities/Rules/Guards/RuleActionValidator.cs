@@ -46,6 +46,18 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
             return Task.FromResult<IEnumerable<ValidationError>>(errors);
         }
 
+        public Task<IEnumerable<ValidationError>> Visit(SlackAction action)
+        {
+            var errors = new List<ValidationError>();
+
+            if (action.WebhookUrl == null || !action.WebhookUrl.IsAbsoluteUri)
+            {
+                errors.Add(new ValidationError("Webhook Url must be specified and absolute.", nameof(action.WebhookUrl)));
+            }
+
+            return Task.FromResult<IEnumerable<ValidationError>>(errors);
+        }
+
         public Task<IEnumerable<ValidationError>> Visit(WebhookAction action)
         {
             var errors = new List<ValidationError>();

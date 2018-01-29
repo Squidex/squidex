@@ -13,6 +13,8 @@ namespace Squidex.Domain.Apps.Core.Rules
     {
         T Visit(AlgoliaAction action);
 
+        T Visit(SlackAction action);
+
         T Visit(WebhookAction action);
     }
 }

@@ -22,7 +22,7 @@
             <input type="text" class="form-control" id="sharedSecret" formControlName="sharedSecret" />
 
             <small class="form-text text-muted">
-                The shared secret will be used to add a header X-Signature=Sha256(RequestBody + Secret)
+                The shared secret will be used to add a header X-Signature=Base64(Sha256(RequestBody + Secret))
             </small>
         </div>
     </div>

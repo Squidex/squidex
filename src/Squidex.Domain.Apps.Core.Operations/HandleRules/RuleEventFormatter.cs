@@ -27,6 +27,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
         private const string SchemaNamePlaceholder = "$SCHEMA_NAME";
         private const string TimestampDatePlaceholder = "$TIMESTAMP_DATE";
         private const string TimestampDateTimePlaceholder = "$TIMESTAMP_DATETIME";
+        private const string ContentActionPlaceholder = "$CONTENT_ACTION";
         private static readonly Regex ContentDataPlaceholder = new Regex(@"\$CONTENT_DATA(\.([0-9A-Za-z\-_]*)){2,}", RegexOptions.Compiled);
         private readonly JsonSerializer serializer;
 
@@ -66,6 +67,8 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                 sb.Replace(SchemaNamePlaceholder, schemaEvent.SchemaId.Name);
             }
 
+            FormatContentAction(@event, sb);
+
             var result = sb.ToString();
 
             if (@event.Payload is ContentCreated contentCreated && contentCreated.Data != null)
@@ -79,6 +82,28 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             }
 
             return result;
+        }
+
+        private static void FormatContentAction(Envelope<AppEvent> @event, StringBuilder sb)
+        {
+            switch (@event.Payload)
+            {
+                case ContentCreated contentCreated:
+                    sb.Replace(ContentActionPlaceholder, "created");
+                    break;
+
+                case ContentUpdated contentUpdated:
+                    sb.Replace(ContentActionPlaceholder, "updated");
+                    break;
+
+                case ContentStatusChanged contentStatusChanged:
+                    sb.Replace(ContentActionPlaceholder, $"set to {contentStatusChanged.Status.ToString().ToLowerInvariant()}");
+                    break;
+
+                case ContentDeleted contentDeleted:
+                    sb.Replace(ContentActionPlaceholder, "deleted");
+                    break;
+            }
         }
 
         private static string ReplaceData(NamedContentData data, string text)

@@ -21,41 +21,36 @@ using Squidex.Infrastructure.Http;
 
 namespace Squidex.Domain.Apps.Core.HandleRules.Actions
 {
-    public sealed class WebhookActionHandler : RuleActionHandler<WebhookAction>
+    public sealed class SlackActionHandler : RuleActionHandler<SlackAction>
     {
-        private static readonly TimeSpan Timeout = TimeSpan.FromSeconds(2);
+        private static readonly HttpClient Client = new HttpClient { Timeout = TimeSpan.FromSeconds(2) };
         private readonly RuleEventFormatter formatter;
 
-        public WebhookActionHandler(RuleEventFormatter formatter)
+        public SlackActionHandler(RuleEventFormatter formatter)
         {
             Guard.NotNull(formatter, nameof(formatter));
 
             this.formatter = formatter;
         }
 
-        protected override (string Description, RuleJobData Data) CreateJob(Envelope<AppEvent> @event, string eventName, WebhookAction action)
+        protected override (string Description, RuleJobData Data) CreateJob(Envelope<AppEvent> @event, string eventName, SlackAction action)
         {
-            var body = CreatePayload(@event, eventName);
+            var body = CreatePayload(@event, action.Text);
 
-            var signature = $"{body.ToString(Formatting.Indented)}{action.SharedSecret}".Sha256Base64();
-
-            var ruleDescription = $"Send event to webhook {action.Url}";
+            var ruleDescription = "Send message to slack";
             var ruleData = new RuleJobData
             {
-                ["RequestUrl"] = action.Url,
-                ["RequestBody"] = body,
-                ["RequestSignature"] = signature
+                ["RequestUrl"] = action.WebhookUrl,
+                ["RequestBody"] = body
             };
 
             return (ruleDescription, ruleData);
         }
 
-        private JObject CreatePayload(Envelope<AppEvent> @event, string eventName)
+        private JObject CreatePayload(Envelope<AppEvent> @event, string text)
         {
             return new JObject(
-                new JProperty("type", eventName),
-                new JProperty("payload", formatter.ToRouteData(@event.Payload)),
-                new JProperty("timestamp", @event.Headers.Timestamp().ToString()));
+                new JProperty("text", formatter.FormatString(text, @event)));
         }
 
         public override async Task<(string Dump, Exception Exception)> ExecuteJobAsync(RuleJobData job)
@@ -67,15 +62,12 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
 
             try
             {
-                using (var client = new HttpClient { Timeout = Timeout })
-                {
-                    response = await client.SendAsync(request);
+                response = await Client.SendAsync(request);
 
-                    var responseString = await response.Content.ReadAsStringAsync();
-                    var requestDump = DumpFormatter.BuildDump(request, response, requestBody, responseString, TimeSpan.Zero, false);
+                var responseString = await response.Content.ReadAsStringAsync();
+                var requestDump = DumpFormatter.BuildDump(request, response, requestBody, responseString, TimeSpan.Zero, false);
 
-                    return (requestDump, null);
-                }
+                return (requestDump, null);
             }
             catch (Exception ex)
             {
@@ -97,15 +89,11 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
         private static HttpRequestMessage BuildRequest(Dictionary<string, JToken> job, string requestBody)
         {
             var requestUrl = job["RequestUrl"].Value<string>();
-            var requestSig = job["RequestSignature"].Value<string>();
 
             var request = new HttpRequestMessage(HttpMethod.Post, requestUrl)
             {
                 Content = new StringContent(requestBody, Encoding.UTF8, "application/json")
             };
-
-            request.Headers.Add("X-Signature", requestSig);
-            request.Headers.Add("User-Agent", "Squidex Webhook");
 
             return request;
         }
