@@ -82,11 +82,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 ResolvedType = new ListGraphType(new NonNullGraphType(assetType)),
                 Resolver = ResolveAsync((c, e) =>
                 {
-                    var argTake = c.GetArgument("take", 20);
-                    var argSkip = c.GetArgument("skip", 0);
-                    var argQuery = c.GetArgument("search", string.Empty);
+                    var assetQuery = BuildODataQuery(c);
 
-                    return e.QueryAssetsAsync(argQuery, argSkip, argTake);
+                    return e.QueryAssetsAsync(assetQuery);
                 }),
                 Description = "Get assets."
             });
@@ -98,11 +96,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 ResolvedType = new AssetsResultGraphType(assetType),
                 Resolver = ResolveAsync((c, e) =>
                 {
-                    var argTake = c.GetArgument("take", 20);
-                    var argSkip = c.GetArgument("skip", 0);
-                    var argQuery = c.GetArgument("search", string.Empty);
+                    var assetQuery = BuildODataQuery(c);
 
-                    return e.QueryAssetsAsync(argQuery, argSkip, argTake);
+                    return e.QueryAssetsAsync(assetQuery);
                 }),
                 Description = "Get assets and total count."
             });
