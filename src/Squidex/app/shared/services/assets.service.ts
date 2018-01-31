@@ -109,30 +109,24 @@ export class AssetsService {
     ) {
     }
 
-    public getAssets(appName: string, take: number, skip: number, query?: string, mimeTypes?: string[], ids?: string[]): Observable<AssetsDto> {
-        const queries: string[] = [];
-        const filters: string[] = [];
+    public getAssets(appName: string, take: number, skip: number, query?: string, ids?: string[]): Observable<AssetsDto> {
+        let fullQuery = '';
 
-        if (mimeTypes && mimeTypes.length > 0) {
-            filters.push(mimeTypes.map(mimeType => `MimeType eq '${mimeType}'`).join(' or '));
+        if (ids) {
+            fullQuery = `ids=${ids.join(',')}`;
+        } else {
+            const queries: string[] = [];
+
+            if (query && query.length > 0) {
+                queries.push(`$filter=contains(fileName,'${encodeURIComponent(query)}')`);
+            }
+
+            queries.push(`$top=${take}`);
+            queries.push(`$skip=${skip}`);
+
+            fullQuery = queries.join('&');
         }
 
-        if (ids && ids.length > 0) {
-            filters.push(ids.map(id => `Id eq ${id}`).join(' or '));
-        }
-
-        if (filters.length > 0) {
-            queries.push(`$filter=${filters.join(' and ')}`);
-        }
-
-        if (query && query.length > 0) {
-            queries.push(`$search=${encodeURIComponent(query)}`);
-        }
-
-        queries.push(`$top=${take}`);
-        queries.push(`$skip=${skip}`);
-
-        const fullQuery = queries.join('&');
 
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets?${fullQuery}`);
 

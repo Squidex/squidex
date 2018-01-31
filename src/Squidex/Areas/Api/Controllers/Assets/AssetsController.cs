@@ -59,21 +59,44 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// Get assets.
         /// </summary>
         /// <param name="app">The name of the app.</param>
+        /// <param name="ids">The optional asset ids.</param>
         /// <returns>
         /// 200 => Assets returned.
         /// 404 => App not found.
         /// </returns>
         /// <remarks>
-        /// Get all assets for the app. Mime types can be comma-separated, e.g. application/json,text/html.
+        /// Get all assets for the app.
         /// </remarks>
         [MustBeAppReader]
         [HttpGet]
         [Route("apps/{app}/assets/")]
         [ProducesResponseType(typeof(AssetsDto), 200)]
         [ApiCosts(1)]
-        public async Task<IActionResult> GetAssets(string app)
+        public async Task<IActionResult> GetAssets(string app, [FromQuery] string ids = null)
         {
-            var assets = await assetRepository.QueryAsync(App.Id, Request.QueryString.ToString());
+            var idsList = new HashSet<Guid>();
+
+            if (!string.IsNullOrWhiteSpace(ids))
+            {
+                foreach (var id in ids.Split(','))
+                {
+                    if (Guid.TryParse(id, out var guid))
+                    {
+                        idsList.Add(guid);
+                    }
+                }
+            }
+
+            IResultList<IAssetEntity> assets;
+
+            if (idsList.Count > 0)
+            {
+                assets = await assetRepository.QueryAsync(App.Id, idsList);
+            }
+            else
+            {
+                assets = await assetRepository.QueryAsync(App.Id, Request.QueryString.ToString());
+            }
 
             var response = new AssetsDto
             {

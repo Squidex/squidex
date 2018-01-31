@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Microsoft.OData.Edm;
+using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Assets.Edm
 {
@@ -17,20 +18,20 @@ namespace Squidex.Domain.Apps.Entities.Assets.Edm
         {
             var entityType = new EdmEntityType("Squidex", "Asset");
 
-            entityType.AddStructuralProperty(nameof(IAssetEntity.Id), EdmPrimitiveTypeKind.Guid);
-            entityType.AddStructuralProperty(nameof(IAssetEntity.AppId), EdmPrimitiveTypeKind.Guid);
-            entityType.AddStructuralProperty(nameof(IAssetEntity.Created), EdmPrimitiveTypeKind.DateTimeOffset);
-            entityType.AddStructuralProperty(nameof(IAssetEntity.CreatedBy), EdmPrimitiveTypeKind.String);
-            entityType.AddStructuralProperty(nameof(IAssetEntity.LastModified), EdmPrimitiveTypeKind.DateTimeOffset);
-            entityType.AddStructuralProperty(nameof(IAssetEntity.LastModifiedBy), EdmPrimitiveTypeKind.String);
-            entityType.AddStructuralProperty(nameof(IAssetEntity.Version), EdmPrimitiveTypeKind.Int64);
-            entityType.AddStructuralProperty(nameof(IAssetEntity.FileName), EdmPrimitiveTypeKind.String);
-            entityType.AddStructuralProperty(nameof(IAssetEntity.FileSize), EdmPrimitiveTypeKind.Int64);
-            entityType.AddStructuralProperty(nameof(IAssetEntity.FileVersion), EdmPrimitiveTypeKind.Int64);
-            entityType.AddStructuralProperty(nameof(IAssetEntity.IsImage), EdmPrimitiveTypeKind.Boolean);
-            entityType.AddStructuralProperty(nameof(IAssetEntity.MimeType), EdmPrimitiveTypeKind.String);
-            entityType.AddStructuralProperty(nameof(IAssetEntity.PixelHeight), EdmPrimitiveTypeKind.Int32);
-            entityType.AddStructuralProperty(nameof(IAssetEntity.PixelWidth), EdmPrimitiveTypeKind.Int32);
+            entityType.AddStructuralProperty(nameof(IAssetEntity.Id).ToCamelCase(), EdmPrimitiveTypeKind.Guid);
+            entityType.AddStructuralProperty(nameof(IAssetEntity.AppId).ToCamelCase(), EdmPrimitiveTypeKind.Guid);
+            entityType.AddStructuralProperty(nameof(IAssetEntity.Created).ToCamelCase(), EdmPrimitiveTypeKind.DateTimeOffset);
+            entityType.AddStructuralProperty(nameof(IAssetEntity.CreatedBy).ToCamelCase(), EdmPrimitiveTypeKind.String);
+            entityType.AddStructuralProperty(nameof(IAssetEntity.LastModified).ToCamelCase(), EdmPrimitiveTypeKind.DateTimeOffset);
+            entityType.AddStructuralProperty(nameof(IAssetEntity.LastModifiedBy).ToCamelCase(), EdmPrimitiveTypeKind.String);
+            entityType.AddStructuralProperty(nameof(IAssetEntity.Version).ToCamelCase(), EdmPrimitiveTypeKind.Int64);
+            entityType.AddStructuralProperty(nameof(IAssetEntity.FileName).ToCamelCase(), EdmPrimitiveTypeKind.String);
+            entityType.AddStructuralProperty(nameof(IAssetEntity.FileSize).ToCamelCase(), EdmPrimitiveTypeKind.Int64);
+            entityType.AddStructuralProperty(nameof(IAssetEntity.FileVersion).ToCamelCase(), EdmPrimitiveTypeKind.Int64);
+            entityType.AddStructuralProperty(nameof(IAssetEntity.IsImage).ToCamelCase(), EdmPrimitiveTypeKind.Boolean);
+            entityType.AddStructuralProperty(nameof(IAssetEntity.MimeType).ToCamelCase(), EdmPrimitiveTypeKind.String);
+            entityType.AddStructuralProperty(nameof(IAssetEntity.PixelHeight).ToCamelCase(), EdmPrimitiveTypeKind.Int32);
+            entityType.AddStructuralProperty(nameof(IAssetEntity.PixelWidth).ToCamelCase(), EdmPrimitiveTypeKind.Int32);
 
             var container = new EdmEntityContainer("Squidex", "Container");
 

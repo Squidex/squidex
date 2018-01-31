@@ -219,7 +219,7 @@ describe('AssetsService', () => {
 
         assetsService.getAssets('my-app', 17, 13, 'my-query').subscribe();
 
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets?$search=my-query&$top=17&$skip=13');
+        const req = httpMock.expectOne(`http://service/p/api/apps/my-app/assets?$filter=contains(fileName,'my-query')&$top=17&$skip=13`);
 
         expect(req.request.method).toEqual('GET');
         expect(req.request.headers.get('If-Match')).toBeNull();
@@ -227,25 +227,12 @@ describe('AssetsService', () => {
         req.flush({ total: 10, items: [] });
     }));
 
-    it('should append mime types to find by types',
+    it('should append ids query to find by ids',
         inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
 
-        assetsService.getAssets('my-app', 17, 13, undefined, ['image/png', 'image/png']).subscribe();
+        assetsService.getAssets('my-app', 0, 0, undefined, ['12', '23']).subscribe();
 
-        const req = httpMock.expectOne(`http://service/p/api/apps/my-app/assets?$filter=MimeType eq 'image/png' or MimeType eq 'image/png'&$top=17&$skip=13`);
-
-        expect(req.request.method).toEqual('GET');
-        expect(req.request.headers.get('If-Match')).toBeNull();
-
-        req.flush({ total: 10, items: [] });
-    }));
-
-    it('should append mime types to find by ids',
-        inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
-
-        assetsService.getAssets('my-app', 17, 13, undefined, undefined, ['12', '23']).subscribe();
-
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets?$filter=Id eq 12 or Id eq 23&$top=17&$skip=13');
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets?ids=12,23');
 
         expect(req.request.method).toEqual('GET');
         expect(req.request.headers.get('If-Match')).toBeNull();

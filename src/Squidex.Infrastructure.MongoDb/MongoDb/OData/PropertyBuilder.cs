@@ -17,7 +17,7 @@ namespace Squidex.Infrastructure.MongoDb.OData
     {
         private static readonly PropertyCalculator DefaultCalculator = parts =>
         {
-            return string.Join(".", parts);
+            return string.Join(".", parts).ToPascalCase();
         };
 
         public static StringFieldDefinition<T, object> BuildFieldDefinition<T>(this QueryNode node, PropertyCalculator propertyCalculator)
