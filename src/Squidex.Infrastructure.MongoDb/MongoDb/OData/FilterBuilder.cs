@@ -1,26 +1,20 @@
 ﻿// ==========================================================================
-//  FilterBuilder.cs
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex Group
-//  All rights reserved.
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
-using System.Collections.Generic;
+
 using Microsoft.OData;
 using Microsoft.OData.UriParser;
 using MongoDB.Driver;
-using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.MongoDb.Assets.Visitors
+namespace Squidex.Infrastructure.MongoDb.OData
 {
     public static class FilterBuilder
     {
-        private static readonly FilterDefinitionBuilder<MongoAssetEntity> Filter = Builders<MongoAssetEntity>.Filter;
-
-        public static List<FilterDefinition<MongoAssetEntity>> Build(ODataUriParser query)
+        public static (FilterDefinition<T> Filter, bool Last) BuildFilter<T>(this ODataUriParser query, PropertyCalculator propertyCalculator = null, bool supportsSearch = true)
         {
-            List<FilterDefinition<MongoAssetEntity>> filters = new List<FilterDefinition<MongoAssetEntity>>();
-
             SearchClause search;
             try
             {
@@ -33,7 +27,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets.Visitors
 
             if (search != null)
             {
-                filters.Add(Filter.Text(SearchTermVisitor.Visit(search.Expression).ToString()));
+                if (!supportsSearch)
+                {
+                    throw new ValidationException("Query $search clause not supported.");
+                }
+
+                return (Builders<T>.Filter.Text(SearchTermVisitor.Visit(search.Expression).ToString()), false);
             }
 
             FilterClause filter;
@@ -48,10 +47,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets.Visitors
 
             if (filter != null)
             {
-                filters.Add(FilterVisitor.Visit(filter.Expression));
+                return (FilterVisitor<T>.Visit(filter.Expression, propertyCalculator), true);
             }
 
-            return filters;
+            return (null, false);
         }
     }
 }

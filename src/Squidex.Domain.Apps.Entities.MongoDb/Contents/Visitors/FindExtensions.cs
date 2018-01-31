@@ -7,10 +7,13 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.OData.UriParser;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.GenerateEdmSchema;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Infrastructure.MongoDb.OData;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors
 {
@@ -18,51 +21,46 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors
     {
         private static readonly FilterDefinitionBuilder<MongoContentEntity> Filter = Builders<MongoContentEntity>.Filter;
 
-        public static IFindFluent<MongoContentEntity, MongoContentEntity> Sort(this IFindFluent<MongoContentEntity, MongoContentEntity> cursor, ODataUriParser query, Schema schema)
+        public static PropertyCalculator CreatePropertyCalculator(Schema schema)
         {
-            return cursor.Sort(SortBuilder.BuildSort(query, schema));
+            return propertyNames =>
+            {
+                if (propertyNames.Length == 3)
+                {
+                    var edmName = propertyNames[1].UnescapeEdmField();
+
+                    if (!schema.FieldsByName.TryGetValue(edmName, out var field))
+                    {
+                        throw new NotSupportedException();
+                    }
+
+                    propertyNames[1] = field.Id.ToString();
+                }
+
+                var propertyName = $"do.{string.Join(".", propertyNames.Skip(1))}";
+
+                return propertyName;
+            };
         }
 
-        public static IFindFluent<MongoContentEntity, MongoContentEntity> Take(this IFindFluent<MongoContentEntity, MongoContentEntity> cursor, ODataUriParser query)
+        public static IFindFluent<MongoContentEntity, MongoContentEntity> ContentSort(this IFindFluent<MongoContentEntity, MongoContentEntity> cursor, ODataUriParser query, PropertyCalculator propertyCalculator)
         {
-            var top = query.ParseTop();
+            var sort = query.BuildSort<MongoContentEntity>(propertyCalculator);
 
-            if (top.HasValue)
-            {
-                cursor = cursor.Limit(Math.Min((int)top.Value, 200));
-            }
-            else
-            {
-                cursor = cursor.Limit(20);
-            }
-
-            return cursor;
+            return sort != null ? cursor.Sort(sort) : cursor.SortByDescending(x => x.LastModified);
         }
 
-        public static IFindFluent<MongoContentEntity, MongoContentEntity> Skip(this IFindFluent<MongoContentEntity, MongoContentEntity> cursor, ODataUriParser query)
+        public static IFindFluent<MongoContentEntity, MongoContentEntity> ContentTake(this IFindFluent<MongoContentEntity, MongoContentEntity> cursor, ODataUriParser query)
         {
-            var skip = query.ParseSkip();
-
-            if (skip.HasValue)
-            {
-                cursor = cursor.Skip((int)skip.Value);
-            }
-            else
-            {
-                cursor = cursor.Skip(null);
-            }
-
-            return cursor;
+            return cursor.Take(query, 200, 20);
         }
 
-        public static IFindFluent<MongoContentEntity, MongoContentEntity> Find(this IMongoCollection<MongoContentEntity> cursor, ODataUriParser query, Guid schemaId, Schema schema, Status[] status)
+        public static IFindFluent<MongoContentEntity, MongoContentEntity> ContentSkip(this IFindFluent<MongoContentEntity, MongoContentEntity> cursor, ODataUriParser query)
         {
-            var filter = BuildQuery(query, schemaId, schema, status);
-
-            return cursor.Find(filter);
+            return cursor.Skip(query);
         }
 
-        public static FilterDefinition<MongoContentEntity> BuildQuery(ODataUriParser query, Guid schemaId, Schema schema, Status[] status)
+        public static FilterDefinition<MongoContentEntity> BuildQuery(ODataUriParser query, Guid schemaId, Status[] status, PropertyCalculator propertyCalculator)
         {
             var filters = new List<FilterDefinition<MongoContentEntity>>
             {
@@ -71,7 +69,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors
                 Filter.Eq(x => x.IsDeleted, false)
             };
 
-            var filter = FilterBuilder.Build(query, schema);
+            var filter = query.BuildFilter<MongoContentEntity>(propertyCalculator);
 
             if (filter.Filter != null)
             {

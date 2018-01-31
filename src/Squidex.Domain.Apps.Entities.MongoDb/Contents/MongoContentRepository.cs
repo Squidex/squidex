@@ -75,24 +75,19 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, Status[] status, ODataUriParser odataQuery)
         {
-            FilterDefinition<MongoContentEntity> filter;
             try
             {
-                filter = FindExtensions.BuildQuery(odataQuery, schema.Id, schema.SchemaDef, status);
-            }
-            catch (NotSupportedException)
-            {
-                throw new ValidationException("This odata operation is not supported.");
-            }
-            catch (NotImplementedException)
-            {
-                throw new ValidationException("This odata operation is not supported.");
-            }
+                var propertyCalculator = FindExtensions.CreatePropertyCalculator(schema.SchemaDef);
 
-            try
-            {
-                var contentItems = Collection.Find(filter).Take(odataQuery).Skip(odataQuery).Sort(odataQuery, schema.SchemaDef).ToListAsync();
+                var filter = FindExtensions.BuildQuery(odataQuery, schema.Id, status, propertyCalculator);
+
                 var contentCount = Collection.Find(filter).CountAsync();
+                var contentItems =
+                    Collection.Find(filter)
+                        .ContentTake(odataQuery)
+                        .ContentSkip(odataQuery)
+                        .ContentSort(odataQuery, propertyCalculator)
+                        .ToListAsync();
 
                 await Task.WhenAll(contentItems, contentCount);
 
@@ -102,6 +97,14 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                 }
 
                 return ResultList.Create<IContentEntity>(contentItems.Result, contentCount.Result);
+            }
+            catch (NotSupportedException)
+            {
+                throw new ValidationException("This odata operation is not supported.");
+            }
+            catch (NotImplementedException)
+            {
+                throw new ValidationException("This odata operation is not supported.");
             }
             catch (MongoQueryException ex)
             {

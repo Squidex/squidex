@@ -1,14 +1,14 @@
 ﻿// ==========================================================================
-//  SearchTermVisitor.cs
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex Group
-//  All rights reserved.
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
+
 using System;
 using Microsoft.OData.UriParser;
 
-namespace Squidex.Domain.Apps.Entities.MongoDb.Assets.Visitors
+namespace Squidex.Infrastructure.MongoDb.OData
 {
     public class SearchTermVisitor : QueryNodeVisitor<string>
     {

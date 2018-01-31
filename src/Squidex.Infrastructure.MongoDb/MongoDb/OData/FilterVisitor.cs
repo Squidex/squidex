@@ -10,33 +10,32 @@ using System.Linq;
 using Microsoft.OData.UriParser;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using Squidex.Domain.Apps.Core.Schemas;
 
-namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors
+namespace Squidex.Infrastructure.MongoDb.OData
 {
-    public class FilterVisitor : QueryNodeVisitor<FilterDefinition<MongoContentEntity>>
+    public sealed class FilterVisitor<T> : QueryNodeVisitor<FilterDefinition<T>>
     {
-        private static readonly FilterDefinitionBuilder<MongoContentEntity> Filter = Builders<MongoContentEntity>.Filter;
-        private readonly Schema schema;
+        private static readonly FilterDefinitionBuilder<T> Filter = Builders<T>.Filter;
+        private readonly PropertyCalculator propertyCalculator;
 
-        private FilterVisitor(Schema schema)
+        private FilterVisitor(PropertyCalculator propertyCalculator)
         {
-            this.schema = schema;
+            this.propertyCalculator = propertyCalculator;
         }
 
-        public static FilterDefinition<MongoContentEntity> Visit(QueryNode node, Schema schema)
+        public static FilterDefinition<T> Visit(QueryNode node, PropertyCalculator propertyCalculator)
         {
-            var visitor = new FilterVisitor(schema);
+            var visitor = new FilterVisitor<T>(propertyCalculator);
 
             return node.Accept(visitor);
         }
 
-        public override FilterDefinition<MongoContentEntity> Visit(ConvertNode nodeIn)
+        public override FilterDefinition<T> Visit(ConvertNode nodeIn)
         {
             return nodeIn.Source.Accept(this);
         }
 
-        public override FilterDefinition<MongoContentEntity> Visit(UnaryOperatorNode nodeIn)
+        public override FilterDefinition<T> Visit(UnaryOperatorNode nodeIn)
         {
             if (nodeIn.OperatorKind == UnaryOperatorKind.Not)
             {
@@ -46,7 +45,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors
             throw new NotSupportedException();
         }
 
-        public override FilterDefinition<MongoContentEntity> Visit(SingleValueFunctionCallNode nodeIn)
+        public override FilterDefinition<T> Visit(SingleValueFunctionCallNode nodeIn)
         {
             var fieldNode = nodeIn.Parameters.ElementAt(0);
             var valueNode = nodeIn.Parameters.ElementAt(1);
@@ -75,7 +74,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors
             throw new NotSupportedException();
         }
 
-        public override FilterDefinition<MongoContentEntity> Visit(BinaryOperatorNode nodeIn)
+        public override FilterDefinition<T> Visit(BinaryOperatorNode nodeIn)
         {
             if (nodeIn.OperatorKind == BinaryOperatorKind.And)
             {
@@ -149,9 +148,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors
             return new BsonRegularExpression(formatter(BuildValue(node).ToString()), "i");
         }
 
-        private FieldDefinition<MongoContentEntity, object> BuildFieldDefinition(QueryNode nodeIn)
+        private FieldDefinition<T, object> BuildFieldDefinition(QueryNode nodeIn)
         {
-            return PropertyVisitor.Visit(nodeIn, schema);
+            return nodeIn.BuildFieldDefinition<T>(propertyCalculator);
         }
 
         private static object BuildValue(QueryNode nodeIn)

@@ -1,26 +1,23 @@
 ﻿// ==========================================================================
-//  PropertyVisitor.cs
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex Group
-//  All rights reserved.
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
+
 using System.Collections.Immutable;
-using System.Linq;
 using Microsoft.OData.UriParser;
-using MongoDB.Driver;
 
-namespace Squidex.Domain.Apps.Entities.MongoDb.Assets.Visitors
+#pragma warning disable RECS0108 // Warns about static fields in generic types
+
+namespace Squidex.Infrastructure.MongoDb.OData
 {
-    public sealed class PropertyVisitor : QueryNodeVisitor<ImmutableList<string>>
+    public sealed class PropertyNameVisitor : QueryNodeVisitor<ImmutableList<string>>
     {
-        private static readonly PropertyVisitor Instance = new PropertyVisitor();
+        public static readonly PropertyNameVisitor Instance = new PropertyNameVisitor();
 
-        public static StringFieldDefinition<MongoAssetEntity, object> Visit(QueryNode node)
+        private PropertyNameVisitor()
         {
-            var propertyNames = node.Accept(Instance).ToArray();
-
-            return new StringFieldDefinition<MongoAssetEntity, object>(propertyNames.First());
         }
 
         public override ImmutableList<string> Visit(ConvertNode nodeIn)

@@ -34,6 +34,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
         public async Task WriteAsync(Guid key, AssetState value, long oldVersion, long newVersion)
         {
             var entity = SimpleMapper.Map(value, new MongoAssetEntity());
+
             entity.Version = newVersion;
 
             await Collection.ReplaceOneAsync(x => x.Id == key && x.Version == oldVersion, entity, Upsert);

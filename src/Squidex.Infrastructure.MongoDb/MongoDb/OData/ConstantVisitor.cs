@@ -11,10 +11,14 @@ using Microsoft.OData.UriParser;
 using NodaTime;
 using NodaTime.Text;
 
-namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors
+namespace Squidex.Infrastructure.MongoDb.OData
 {
     public sealed class ConstantVisitor : QueryNodeVisitor<object>
     {
+        private static readonly IEdmPrimitiveType BooleanType = EdmCoreModel.Instance.GetPrimitiveType(EdmPrimitiveTypeKind.Boolean);
+        private static readonly IEdmPrimitiveType DateTimeType = EdmCoreModel.Instance.GetPrimitiveType(EdmPrimitiveTypeKind.DateTimeOffset);
+        private static readonly IEdmPrimitiveType GuidType = EdmCoreModel.Instance.GetPrimitiveType(EdmPrimitiveTypeKind.Guid);
+
         private static readonly ConstantVisitor Instance = new ConstantVisitor();
 
         private ConstantVisitor()
@@ -28,16 +32,17 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors
 
         public override object Visit(ConvertNode nodeIn)
         {
-            var booleanType = EdmCoreModel.Instance.GetPrimitiveType(EdmPrimitiveTypeKind.Boolean);
-
-            if (nodeIn.TypeReference.Definition == booleanType)
+            if (nodeIn.TypeReference.Definition == BooleanType)
             {
                 return bool.Parse(Visit(nodeIn.Source).ToString());
             }
 
-            var dateTimeType = EdmCoreModel.Instance.GetPrimitiveType(EdmPrimitiveTypeKind.DateTimeOffset);
+            if (nodeIn.TypeReference.Definition == GuidType)
+            {
+                return Guid.Parse(Visit(nodeIn.Source).ToString());
+            }
 
-            if (nodeIn.TypeReference.Definition == dateTimeType)
+            if (nodeIn.TypeReference.Definition == DateTimeType)
             {
                 var value = Visit(nodeIn.Source);
 

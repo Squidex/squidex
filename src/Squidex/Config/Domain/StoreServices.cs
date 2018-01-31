@@ -102,7 +102,7 @@ namespace Squidex.Config.Domain
                         .As<ISnapshotStore<AppState, Guid>>()
                         .As<IInitializable>();
 
-                    services.AddSingletonAs(c => new MongoAssetRepository(mongoDatabase, c.GetRequiredService<EdmModelBuilder>()))
+                    services.AddSingletonAs(c => new MongoAssetRepository(mongoDatabase))
                         .As<IAssetRepository>()
                         .As<ISnapshotStore<AssetState, Guid>>()
                         .As<IInitializable>();

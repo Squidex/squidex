@@ -1,60 +1,57 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using System.Collections.Generic;
 using Microsoft.OData.UriParser;
 using MongoDB.Driver;
-using Squidex.Domain.Apps.Core.Schemas;
 
-namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors
+namespace Squidex.Infrastructure.MongoDb.OData
 {
     public static class SortBuilder
     {
-        private static readonly SortDefinitionBuilder<MongoContentEntity> Sort = Builders<MongoContentEntity>.Sort;
-
-        public static SortDefinition<MongoContentEntity> BuildSort(ODataUriParser query, Schema schema)
+        public static SortDefinition<T> BuildSort<T>(this ODataUriParser query, PropertyCalculator propertyCalculator = null)
         {
             var orderBy = query.ParseOrderBy();
 
             if (orderBy != null)
             {
-                var sorts = new List<SortDefinition<MongoContentEntity>>();
+                var sorts = new List<SortDefinition<T>>();
 
                 while (orderBy != null)
                 {
-                    sorts.Add(OrderBy(orderBy, schema));
+                    sorts.Add(OrderBy<T>(orderBy, propertyCalculator));
 
                     orderBy = orderBy.ThenBy;
                 }
 
                 if (sorts.Count > 1)
                 {
-                    return Sort.Combine(sorts);
+                    return Builders<T>.Sort.Combine(sorts);
                 }
                 else
                 {
                     return sorts[0];
                 }
             }
-            else
-            {
-                return Sort.Descending(x => x.LastModified);
-            }
+
+            return null;
         }
 
-        public static SortDefinition<MongoContentEntity> OrderBy(OrderByClause clause, Schema schema)
+        public static SortDefinition<T> OrderBy<T>(OrderByClause clause, PropertyCalculator propertyCalculator = null)
         {
+            var propertyName = clause.Expression.BuildFieldDefinition<T>(propertyCalculator);
+
             if (clause.Direction == OrderByDirection.Ascending)
             {
-                return Sort.Ascending(PropertyVisitor.Visit(clause.Expression, schema));
+                return Builders<T>.Sort.Ascending(propertyName);
             }
             else
             {
-                return Sort.Descending(PropertyVisitor.Visit(clause.Expression, schema));
+                return Builders<T>.Sort.Descending(propertyName);
             }
         }
     }

@@ -29,16 +29,8 @@ namespace Squidex.Areas.Api.Config.Swagger
                 var urlOptions = s.GetService<IOptions<MyUrlsOptions>>().Value;
 
                 var settings =
-                    new SwaggerSettings
-                        {
-                            Title = "Squidex API",
-                            Version = "1.0",
-                            IsAspNetCore = false,
-                            OperationProcessors =
-                            {
-                                new Docs.AddODataQueryParams()
-                            }
-                        }
+                    new SwaggerSettings { Title = "Squidex API", Version = "1.0", IsAspNetCore = false }
+                        .AddAssetODataParams()
                         .ConfigurePaths(urlOptions)
                         .ConfigureSchemaSettings()
                         .ConfigureIdentity(urlOptions);
@@ -47,6 +39,13 @@ namespace Squidex.Areas.Api.Config.Swagger
             });
 
             services.AddTransient<SchemasSwaggerGenerator>();
+        }
+
+        private static SwaggerSettings AddAssetODataParams(this SwaggerSettings settings)
+        {
+            settings.OperationProcessors.Add(new ODataQueryParamsProcessor("/apps/{app}/assets", "assets", false));
+
+            return settings;
         }
 
         private static SwaggerSettings ConfigureIdentity(this SwaggerSettings settings, MyUrlsOptions urlOptions)

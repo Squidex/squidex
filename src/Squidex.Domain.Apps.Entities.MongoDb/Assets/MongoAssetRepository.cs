@@ -9,8 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.OData;
-using Microsoft.OData.UriParser;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Edm;
@@ -23,12 +21,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 {
     public sealed partial class MongoAssetRepository : MongoRepositoryBase<MongoAssetEntity>, IAssetRepository
     {
-        private readonly EdmModelBuilder modelBuilder;
-
-        public MongoAssetRepository(IMongoDatabase database, EdmModelBuilder modelBuilder)
+        public MongoAssetRepository(IMongoDatabase database)
             : base(database)
         {
-            this.modelBuilder = modelBuilder;
         }
 
         protected override string CollectionName()
@@ -48,32 +43,55 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 
         public async Task<IResultList<IAssetEntity>> QueryAsync(Guid appId, string query = null)
         {
-            var parsedQuery = ParseQuery(query);
+            try
+            {
+                var odataQuery = EdmAssetQuery.ParseQuery(query);
 
-            var assetEntities =
-                await Collection
-                    .Find(parsedQuery, appId)
-                    .Skip(parsedQuery)
-                    .Take(parsedQuery)
-                    .SortByDescending(x => x.LastModified)
-                    .ToListAsync();
+                var filter = FindExtensions.BuildQuery(odataQuery, appId);
 
-            var assetCount = await Collection.Find(parsedQuery, appId).CountAsync();
+                var contentCount = Collection.Find(filter).CountAsync();
+                var contentItems =
+                    Collection.Find(filter)
+                        .AssetTake(odataQuery)
+                        .AssetSkip(odataQuery)
+                        .AssetSort(odataQuery)
+                        .ToListAsync();
 
-            return ResultList.Create(assetEntities.OfType<IAssetEntity>().ToList(), assetCount);
+                await Task.WhenAll(contentItems, contentCount);
+
+                return ResultList.Create<IAssetEntity>(contentItems.Result, contentCount.Result);
+            }
+            catch (NotSupportedException)
+            {
+                throw new ValidationException("This odata operation is not supported.");
+            }
+            catch (NotImplementedException)
+            {
+                throw new ValidationException("This odata operation is not supported.");
+            }
+            catch (MongoQueryException ex)
+            {
+                if (ex.Message.Contains("17406"))
+                {
+                    throw new DomainException("Result set is too large to be retrieved. Use $top parameter to reduce the number of items.");
+                }
+                else
+                {
+                    throw;
+                }
+            }
         }
 
         public async Task<IResultList<IAssetEntity>> QueryAsync(Guid appId, HashSet<Guid> ids)
         {
-            var find = Collection
-                .Find(Filter.In(x => x.Id, ids))
-                .SortByDescending(x => x.LastModified);
+            var find = Collection.Find(Filter.In(x => x.Id, ids)).SortByDescending(x => x.LastModified);
 
-            var assetEntities = find.ToListAsync();
+            var assetItems = find.ToListAsync();
             var assetCount = find.CountAsync();
-            await Task.WhenAll(assetEntities, assetCount);
 
-            return ResultList.Create(assetEntities.Result.OfType<IAssetEntity>().ToList(), assetCount.Result);
+            await Task.WhenAll(assetItems, assetCount);
+
+            return ResultList.Create(assetItems.Result.OfType<IAssetEntity>().ToList(), assetCount.Result);
         }
 
         public async Task<IAssetEntity> FindAssetAsync(Guid id)
@@ -83,20 +101,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                     .FirstOrDefaultAsync();
 
             return assetEntity;
-        }
-
-        private ODataUriParser ParseQuery(string query)
-        {
-            try
-            {
-                var model = modelBuilder.EdmModel;
-
-                return model.ParseQuery(query);
-            }
-            catch (ODataException ex)
-            {
-                throw new ValidationException($"Failed to parse query: {ex.Message}", ex);
-            }
         }
     }
 }
