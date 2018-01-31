@@ -23,6 +23,7 @@ using Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
+using Squidex.Infrastructure.MongoDb.OData;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents.OData
@@ -307,7 +308,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.OData
             var parser = edmModel.ParseQuery("$top=3");
             var cursor = A.Fake<IFindFluent<MongoContentEntity, MongoContentEntity>>();
 
-            cursor.Take(parser);
+            cursor.ContentTake(parser);
 
             A.CallTo(() => cursor.Limit(3)).MustHaveHappened();
         }
@@ -318,7 +319,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.OData
             var parser = edmModel.ParseQuery("$top=300");
             var cursor = A.Fake<IFindFluent<MongoContentEntity, MongoContentEntity>>();
 
-            cursor.Take(parser);
+            cursor.ContentTake(parser);
 
             A.CallTo(() => cursor.Limit(200)).MustHaveHappened();
         }
@@ -329,7 +330,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.OData
             var parser = edmModel.ParseQuery(string.Empty);
             var cursor = A.Fake<IFindFluent<MongoContentEntity, MongoContentEntity>>();
 
-            cursor.Take(parser);
+            cursor.ContentTake(parser);
 
             A.CallTo(() => cursor.Limit(20)).MustHaveHappened();
         }
@@ -340,7 +341,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.OData
             var parser = edmModel.ParseQuery("$skip=3");
             var cursor = A.Fake<IFindFluent<MongoContentEntity, MongoContentEntity>>();
 
-            cursor.Skip(parser);
+            cursor.ContentSkip(parser);
 
             A.CallTo(() => cursor.Skip(3)).MustHaveHappened();
         }
@@ -351,7 +352,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.OData
             var parser = edmModel.ParseQuery(string.Empty);
             var cursor = A.Fake<IFindFluent<MongoContentEntity, MongoContentEntity>>();
 
-            cursor.Take(parser);
+            cursor.ContentSkip(parser);
 
             A.CallTo(() => cursor.Skip(A<int>.Ignored)).MustNotHaveHappened();
         }
@@ -374,7 +375,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.OData
                     i = sortDefinition.Render(serializer, registry).ToString();
                 });
 
-            cursor.Sort(parser, schemaDef);
+            cursor.ContentSort(parser, FindExtensions.CreatePropertyCalculator(schemaDef));
 
             return i;
         }
@@ -383,7 +384,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.OData
         {
             var parser = edmModel.ParseQuery(value);
 
-            var query = FilterBuilder.Build(parser, schemaDef).Filter.Render(serializer, registry).ToString();
+            var query =
+                parser.BuildFilter<MongoContentEntity>(FindExtensions.CreatePropertyCalculator(schemaDef))
+                    .Filter.Render(serializer, registry).ToString();
 
             return query;
         }
