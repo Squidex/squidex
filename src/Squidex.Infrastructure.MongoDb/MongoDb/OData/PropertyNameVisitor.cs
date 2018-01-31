@@ -8,8 +8,6 @@
 using System.Collections.Immutable;
 using Microsoft.OData.UriParser;
 
-#pragma warning disable RECS0108 // Warns about static fields in generic types
-
 namespace Squidex.Infrastructure.MongoDb.OData
 {
     public sealed class PropertyNameVisitor : QueryNodeVisitor<ImmutableList<string>>
