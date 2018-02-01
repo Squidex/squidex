@@ -43,6 +43,14 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             return JToken.FromObject(value, serializer);
         }
 
+        public virtual JToken ToRouteData(Envelope<AppEvent> @event, string eventName)
+        {
+            return new JObject(
+                new JProperty("type", eventName),
+                new JProperty("payload", JToken.FromObject(@event.Payload, serializer)),
+                new JProperty("timestamp", @event.Headers.Timestamp().ToString()));
+        }
+
         public virtual string FormatString(string text, Envelope<AppEvent> @event)
         {
             var sb = new StringBuilder(text);

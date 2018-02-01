@@ -1,21 +1,20 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Rules.Actions
 {
-    [TypeName(nameof(WebhookAction))]
-    public sealed class WebhookAction : RuleAction
+    [TypeName(nameof(AzureQueueAction))]
+    public sealed class AzureQueueAction : RuleAction
     {
-        public Uri Url { get; set; }
+        public string ConnectionString { get; set; }
 
-        public string SharedSecret { get; set; }
+        public string Queue { get; set; }
 
         public override T Accept<T>(IRuleActionVisitor<T> visitor)
         {

@@ -68,6 +68,12 @@
                             (actionChanged)="selectAction($event)">
                         </sqx-algolia-action>
                     </div>
+                    <div *ngSwitchCase="'AzureQueue'">
+                        <sqx-azure-queue-action #actionControl
+                            [action]="action" 
+                            (actionChanged)="selectAction($event)">
+                        </sqx-azure-queue-action>
+                    </div>
                     <div *ngSwitchCase="'Slack'">
                         <sqx-slack-action #actionControl
                             [action]="action" 

@@ -35,11 +35,11 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
 
         protected override (string Description, RuleJobData Data) CreateJob(Envelope<AppEvent> @event, string eventName, WebhookAction action)
         {
-            var body = CreatePayload(@event, eventName);
+            var body = formatter.ToRouteData(@event, eventName);
 
             var signature = $"{body.ToString(Formatting.Indented)}{action.SharedSecret}".Sha256Base64();
 
-            var ruleDescription = $"Send event to webhook {action.Url}";
+            var ruleDescription = $"Send event to webhook '{action.Url}'";
             var ruleData = new RuleJobData
             {
                 ["RequestUrl"] = action.Url,
@@ -50,18 +50,10 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
             return (ruleDescription, ruleData);
         }
 
-        private JObject CreatePayload(Envelope<AppEvent> @event, string eventName)
-        {
-            return new JObject(
-                new JProperty("type", eventName),
-                new JProperty("payload", formatter.ToRouteData(@event.Payload)),
-                new JProperty("timestamp", @event.Headers.Timestamp().ToString()));
-        }
-
         public override async Task<(string Dump, Exception Exception)> ExecuteJobAsync(RuleJobData job)
         {
             var requestBody = job["RequestBody"].ToString(Formatting.Indented);
-            var request = BuildRequest(job, requestBody);
+            var requestMsg = BuildRequest(job, requestBody);
 
             HttpResponseMessage response = null;
 
@@ -69,19 +61,19 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
             {
                 using (var client = new HttpClient { Timeout = Timeout })
                 {
-                    response = await client.SendAsync(request);
+                    response = await client.SendAsync(requestMsg);
 
                     var responseString = await response.Content.ReadAsStringAsync();
-                    var requestDump = DumpFormatter.BuildDump(request, response, requestBody, responseString, TimeSpan.Zero, false);
+                    var requestDump = DumpFormatter.BuildDump(requestMsg, response, requestBody, responseString, TimeSpan.Zero, false);
 
                     return (requestDump, null);
                 }
             }
             catch (Exception ex)
             {
-                if (request != null)
+                if (requestMsg != null)
                 {
-                    var requestDump = DumpFormatter.BuildDump(request, response, requestBody, ex.ToString(), TimeSpan.Zero, false);
+                    var requestDump = DumpFormatter.BuildDump(requestMsg, response, requestBody, ex.ToString(), TimeSpan.Zero, false);
 
                     return (requestDump, ex);
                 }

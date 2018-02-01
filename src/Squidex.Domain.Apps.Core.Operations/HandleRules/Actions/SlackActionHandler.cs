@@ -49,31 +49,30 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
 
         private JObject CreatePayload(Envelope<AppEvent> @event, string text)
         {
-            return new JObject(
-                new JProperty("text", formatter.FormatString(text, @event)));
+            return new JObject(new JProperty("text", formatter.FormatString(text, @event)));
         }
 
         public override async Task<(string Dump, Exception Exception)> ExecuteJobAsync(RuleJobData job)
         {
             var requestBody = job["RequestBody"].ToString(Formatting.Indented);
-            var request = BuildRequest(job, requestBody);
+            var requestMsg = BuildRequest(job, requestBody);
 
             HttpResponseMessage response = null;
 
             try
             {
-                response = await Client.SendAsync(request);
+                response = await Client.SendAsync(requestMsg);
 
                 var responseString = await response.Content.ReadAsStringAsync();
-                var requestDump = DumpFormatter.BuildDump(request, response, requestBody, responseString, TimeSpan.Zero, false);
+                var requestDump = DumpFormatter.BuildDump(requestMsg, response, requestBody, responseString, TimeSpan.Zero, false);
 
                 return (requestDump, null);
             }
             catch (Exception ex)
             {
-                if (request != null)
+                if (requestMsg != null)
                 {
-                    var requestDump = DumpFormatter.BuildDump(request, response, requestBody, ex.ToString(), TimeSpan.Zero, false);
+                    var requestDump = DumpFormatter.BuildDump(requestMsg, response, requestBody, ex.ToString(), TimeSpan.Zero, false);
 
                     return (requestDump, ex);
                 }

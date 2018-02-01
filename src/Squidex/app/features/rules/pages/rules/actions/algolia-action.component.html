@@ -1,8 +1,8 @@
 <form [formGroup]="actionForm" class="form-horizontal" (ngSubmit)="save()">
     <div class="form-group row">
-        <label class="col col-2 col-form-label" for="appId">App ID</label>
+        <label class="col col-3 col-form-label" for="appId">App ID</label>
 
-        <div class="col col-10">
+        <div class="col col-9">
             <sqx-control-errors for="text" [submitted]="actionFormSubmitted"></sqx-control-errors>
 
             <input type="text" class="form-control" id="appId" formControlName="appId" />
@@ -14,9 +14,9 @@
     </div>
 
     <div class="form-group row">
-        <label class="col col-2 col-form-label" for="apiKey">Api Key</label>
+        <label class="col col-3 col-form-label" for="apiKey">Api Key</label>
 
-        <div class="col col-10">
+        <div class="col col-9">
             <sqx-control-errors for="apiKey" [submitted]="actionFormSubmitted"></sqx-control-errors>
 
             <input type="text" class="form-control" id="apiKey" formControlName="apiKey" />
@@ -28,9 +28,9 @@
     </div>
 
     <div class="form-group row">
-        <label class="col col-2 col-form-label" for="sharedSecret">Index Name</label>
+        <label class="col col-3 col-form-label" for="sharedSecret">Index Name</label>
 
-        <div class="col col-10">
+        <div class="col col-9">
             <sqx-control-errors for="indexName" [submitted]="actionFormSubmitted"></sqx-control-errors>
 
             <input type="text" class="form-control" id="indexName" formControlName="indexName" />
