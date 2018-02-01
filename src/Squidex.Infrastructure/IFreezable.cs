@@ -1,14 +1,14 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Core.Rules
+namespace Squidex.Infrastructure
 {
-    public abstract class RuleTrigger : Freezable
+    public interface IFreezable
     {
-        public abstract T Accept<T>(IRuleTriggerVisitor<T> visitor);
+        void Freeze();
     }
 }

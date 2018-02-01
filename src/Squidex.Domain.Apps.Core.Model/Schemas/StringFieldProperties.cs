@@ -13,111 +13,19 @@ namespace Squidex.Domain.Apps.Core.Schemas
     [TypeName(nameof(StringField))]
     public sealed class StringFieldProperties : FieldProperties
     {
-        private int? minLength;
-        private int? maxLength;
-        private string pattern;
-        private string patternMessage;
-        private string defaultValue;
-        private ImmutableList<string> allowedValues;
-        private StringFieldEditor editor;
+        public int? MinLength { get; set; }
 
-        public int? MinLength
-        {
-            get
-            {
-                return minLength;
-            }
-            set
-            {
-                ThrowIfFrozen();
+        public int? MaxLength { get; set; }
 
-                minLength = value;
-            }
-        }
+        public string DefaultValue { get; set; }
 
-        public int? MaxLength
-        {
-            get
-            {
-                return maxLength;
-            }
-            set
-            {
-                ThrowIfFrozen();
+        public string Pattern { get; set; }
 
-                maxLength = value;
-            }
-        }
+        public string PatternMessage { get; set; }
 
-        public string DefaultValue
-        {
-            get
-            {
-                return defaultValue;
-            }
-            set
-            {
-                ThrowIfFrozen();
+        public ImmutableList<string> AllowedValues { get; set; }
 
-                defaultValue = value;
-            }
-        }
-
-        public string Pattern
-        {
-            get
-            {
-                return pattern;
-            }
-            set
-            {
-                ThrowIfFrozen();
-
-                pattern = value;
-            }
-        }
-
-        public string PatternMessage
-        {
-            get
-            {
-                return patternMessage;
-            }
-            set
-            {
-                ThrowIfFrozen();
-
-                patternMessage = value;
-            }
-        }
-
-        public ImmutableList<string> AllowedValues
-        {
-            get
-            {
-                return allowedValues;
-            }
-            set
-            {
-                ThrowIfFrozen();
-
-                allowedValues = value;
-            }
-        }
-
-        public StringFieldEditor Editor
-        {
-            get
-            {
-                return editor;
-            }
-            set
-            {
-                ThrowIfFrozen();
-
-                editor = value;
-            }
-        }
+        public StringFieldEditor Editor { get; set; }
 
         public override T Accept<T>(IFieldPropertiesVisitor<T> visitor)
         {

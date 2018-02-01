@@ -13,36 +13,9 @@ namespace Squidex.Domain.Apps.Core.Rules.Actions
     [TypeName(nameof(SlackAction))]
     public sealed class SlackAction : RuleAction
     {
-        private Uri webhookUrl;
-        private string text;
+        public Uri WebhookUrl { get; set; }
 
-        public Uri WebhookUrl
-        {
-            get
-            {
-                return webhookUrl;
-            }
-            set
-            {
-                ThrowIfFrozen();
-
-                webhookUrl = value;
-            }
-        }
-
-        public string Text
-        {
-            get
-            {
-                return text;
-            }
-            set
-            {
-                ThrowIfFrozen();
-
-                text = value;
-            }
-        }
+        public string Text { get; set; }
 
         public override T Accept<T>(IRuleActionVisitor<T> visitor)
         {

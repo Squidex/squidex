@@ -12,36 +12,9 @@ namespace Squidex.Domain.Apps.Core.Rules.Actions
     [TypeName(nameof(AzureQueueAction))]
     public sealed class AzureQueueAction : RuleAction
     {
-        private string connectionString;
-        private string queue;
+        public string ConnectionString { get; set; }
 
-        public string ConnectionString
-        {
-            get
-            {
-                return connectionString;
-            }
-            set
-            {
-                ThrowIfFrozen();
-
-                connectionString = value;
-            }
-        }
-
-        public string Queue
-        {
-            get
-            {
-                return queue;
-            }
-            set
-            {
-                ThrowIfFrozen();
-
-                queue = value;
-            }
-        }
+        public string Queue { get; set; }
 
         public override T Accept<T>(IRuleActionVisitor<T> visitor)
         {

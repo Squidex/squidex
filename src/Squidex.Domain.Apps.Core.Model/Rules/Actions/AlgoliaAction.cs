@@ -12,51 +12,11 @@ namespace Squidex.Domain.Apps.Core.Rules.Actions
     [TypeName(nameof(AlgoliaAction))]
     public sealed class AlgoliaAction : RuleAction
     {
-        private string appId;
-        private string apiKey;
-        private string indexName;
+        public string AppId { get; set; }
 
-        public string AppId
-        {
-            get
-            {
-                return appId;
-            }
-            set
-            {
-                ThrowIfFrozen();
+        public string ApiKey { get; set; }
 
-                appId = value;
-            }
-        }
-
-        public string ApiKey
-        {
-            get
-            {
-                return apiKey;
-            }
-            set
-            {
-                ThrowIfFrozen();
-
-                apiKey = value;
-            }
-        }
-
-        public string IndexName
-        {
-            get
-            {
-                return indexName;
-            }
-            set
-            {
-                ThrowIfFrozen();
-
-                indexName = value;
-            }
-        }
+        public string IndexName { get; set; }
 
         public override T Accept<T>(IRuleActionVisitor<T> visitor)
         {

@@ -6,16 +6,22 @@
 // ==========================================================================
 
 using System;
+using Squidex.Infrastructure;
 
-namespace Squidex.Infrastructure
+namespace Squidex.Domain.Apps.Core
 {
-    public abstract class Freezable
+    public abstract class Freezable : IFreezable
     {
-        public bool IsFrozen { get; private set; }
+        private bool isFrozen;
 
-        protected void ThrowIfFrozen()
+        public bool IsFrozen
         {
-            if (IsFrozen)
+            get { return isFrozen; }
+        }
+
+        protected void CheckIfFrozen()
+        {
+            if (isFrozen)
             {
                 throw new InvalidOperationException("Object is frozen");
             }
@@ -23,7 +29,7 @@ namespace Squidex.Infrastructure
 
         public void Freeze()
         {
-            IsFrozen = true;
+            isFrozen = true;
         }
     }
 }
