@@ -78,7 +78,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
 
             var response = SimpleMapper.Map(request, new AppPatternDto { PatternId = command.PatternId });
 
-            return CreatedAtAction(nameof(GetPatterns), new { app }, request);
+            return CreatedAtAction(nameof(GetPatterns), new { app }, response);
         }
 
         /// <summary>
