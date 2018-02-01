@@ -26,6 +26,7 @@ export const ruleTriggers: any = {
 
 export const ruleActions: any = {
     'Algolia': 'Populate Algolia Index',
+    'AzureQueue': 'Send to Azure Queue',
     'Slack': 'Send to Slack',
     'Webhook': 'Send Webhook'
 };

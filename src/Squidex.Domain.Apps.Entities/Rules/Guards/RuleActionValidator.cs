@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Actions;
@@ -41,6 +42,27 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
             if (string.IsNullOrWhiteSpace(action.IndexName))
             {
                 errors.Add(new ValidationError("Index name key must be defined.", nameof(action.ApiKey)));
+            }
+
+            return Task.FromResult<IEnumerable<ValidationError>>(errors);
+        }
+
+        public Task<IEnumerable<ValidationError>> Visit(AzureQueueAction action)
+        {
+            var errors = new List<ValidationError>();
+
+            if (string.IsNullOrWhiteSpace(action.ConnectionString))
+            {
+                errors.Add(new ValidationError("Connection string must be defined.", nameof(action.ConnectionString)));
+            }
+
+            if (string.IsNullOrWhiteSpace(action.Queue))
+            {
+                errors.Add(new ValidationError("Queue must be defined.", nameof(action.Queue)));
+            }
+            else if (!Regex.IsMatch(action.Queue, "^[a-z][a-z0-9]{2,}(\\-[a-z0-9]+)*$"))
+            {
+                errors.Add(new ValidationError("Queue must be valid azure queue name.", nameof(action.Queue)));
             }
 
             return Task.FromResult<IEnumerable<ValidationError>>(errors);

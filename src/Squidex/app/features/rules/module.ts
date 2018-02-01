@@ -16,6 +16,7 @@ import {
 
 import {
     AlgoliaActionComponent,
+    AzureQueueActionComponent,
     ContentChangedTriggerComponent,
     RuleEventsPageComponent,
     RulesPageComponent,
@@ -52,6 +53,7 @@ const routes: Routes = [
     ],
     declarations: [
         AlgoliaActionComponent,
+        AzureQueueActionComponent,
         ContentChangedTriggerComponent,
         RuleEventsPageComponent,
         RulesPageComponent,

@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'icomoon';
-  src:  url('fonts/icomoon.eot?fb43dg');
-  src:  url('fonts/icomoon.eot?fb43dg#iefix') format('embedded-opentype'),
-    url('fonts/icomoon.ttf?fb43dg') format('truetype'),
-    url('fonts/icomoon.woff?fb43dg') format('woff'),
-    url('fonts/icomoon.svg?fb43dg#icomoon') format('svg');
+  src:  url('fonts/icomoon.eot?knmn0p');
+  src:  url('fonts/icomoon.eot?knmn0p#iefix') format('embedded-opentype'),
+    url('fonts/icomoon.ttf?knmn0p') format('truetype'),
+    url('fonts/icomoon.woff?knmn0p') format('woff'),
+    url('fonts/icomoon.svg?knmn0p#icomoon') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -263,6 +263,9 @@
   content: "\e934";
 }
 .icon-microsoft:before {
+  content: "\e940";
+}
+.icon-action-AzureQueue:before {
   content: "\e940";
 }
 .icon-pause:before {

@@ -98,6 +98,9 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<AlgoliaActionHandler>()
                 .As<IRuleActionHandler>();
 
+            services.AddSingletonAs<AzureQueueActionHandler>()
+                .As<IRuleActionHandler>();
+
             services.AddSingletonAs<SlackActionHandler>()
                 .As<IRuleActionHandler>();
 

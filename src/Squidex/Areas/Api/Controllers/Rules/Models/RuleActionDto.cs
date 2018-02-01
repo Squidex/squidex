@@ -14,6 +14,7 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
 {
     [JsonConverter(typeof(JsonInheritanceConverter), "actionType")]
     [KnownType(typeof(AlgoliaActionDto))]
+    [KnownType(typeof(AzureQueueActionDto))]
     [KnownType(typeof(SlackActionDto))]
     [KnownType(typeof(WebhookActionDto))]
     public abstract class RuleActionDto
