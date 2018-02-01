@@ -6,6 +6,8 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Squidex.Domain.Apps.Core.Schemas;
 using Xunit;
 
@@ -15,6 +17,13 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
 {
     public class SchemaFieldTests
     {
+        public static readonly List<object[]> FieldProperties =
+            typeof(Schema).Assembly.GetTypes()
+                .Where(x => x.BaseType == typeof(FieldProperties))
+                .Select(Activator.CreateInstance)
+                .Select(x => new object[] { x })
+                .ToList();
+
         private readonly NumberField field_0 = new NumberField(1, "my-field", Partitioning.Invariant);
 
         [Fact]
@@ -97,58 +106,11 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
             Assert.Throws<ArgumentException>(() => field_0.Update(new StringFieldProperties()));
         }
 
-        [Fact]
-        public void Should_freeze_asset_field_properties()
+        [Theory]
+        [MemberData(nameof(FieldProperties))]
+        public void Should_freeze_field_properties(FieldProperties action)
         {
-            TestData.TestFreeze(new AssetsFieldProperties());
-        }
-
-        [Fact]
-        public void Should_freeze_boolean_field_properties()
-        {
-            TestData.TestFreeze(new BooleanFieldProperties());
-        }
-
-        [Fact]
-        public void Should_freeze_datetime_field_properties()
-        {
-            TestData.TestFreeze(new DateTimeFieldProperties());
-        }
-
-        [Fact]
-        public void Should_freeze_geolocation_field_properties()
-        {
-            TestData.TestFreeze(new GeolocationFieldProperties());
-        }
-
-        [Fact]
-        public void Should_freeze_json_field_properties()
-        {
-            TestData.TestFreeze(new JsonFieldProperties());
-        }
-
-        [Fact]
-        public void Should_freeze_number_field_properties()
-        {
-            TestData.TestFreeze(new NumberFieldProperties());
-        }
-
-        [Fact]
-        public void Should_freeze_references_field_properties()
-        {
-            TestData.TestFreeze(new ReferencesFieldProperties());
-        }
-
-        [Fact]
-        public void Should_freeze_string_field_properties()
-        {
-            TestData.TestFreeze(new StringFieldProperties());
-        }
-
-        [Fact]
-        public void Should_freeze_tags_field_properties()
-        {
-            TestData.TestFreeze(new TagsFieldProperties());
+            TestData.TestFreeze(action);
         }
     }
 }
