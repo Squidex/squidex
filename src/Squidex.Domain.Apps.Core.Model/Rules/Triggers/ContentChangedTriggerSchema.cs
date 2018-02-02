@@ -9,7 +9,7 @@ using System;
 
 namespace Squidex.Domain.Apps.Core.Rules.Triggers
 {
-    public sealed class ContentChangedTriggerSchema
+    public sealed class ContentChangedTriggerSchema : Freezable
     {
         public Guid SchemaId { get; set; }
 

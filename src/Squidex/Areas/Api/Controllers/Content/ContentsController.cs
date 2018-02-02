@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Primitives;
 using NSwag.Annotations;
 using Squidex.Areas.Api.Controllers.Contents.Models;
 using Squidex.Domain.Apps.Core.Contents;
@@ -106,6 +105,8 @@ namespace Squidex.Areas.Api.Controllers.Contents
                 }).ToArray()
             };
 
+            Response.Headers["Surrogate-Key"] = string.Join(" ", response.Items.Select(x => x.Id));
+
             return Ok(response);
         }
 
@@ -115,18 +116,19 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(1)]
         public async Task<IActionResult> GetContent(string name, Guid id)
         {
-            var content = await contentQuery.FindContentAsync(App, name, User, id);
+            var (schema, entity) = await contentQuery.FindContentAsync(App, name, User, id);
 
-            var response = SimpleMapper.Map(content.Content, new ContentDto());
+            var response = SimpleMapper.Map(entity, new ContentDto());
 
-            if (content.Content.Data != null)
+            if (entity.Data != null)
             {
                 var isFrontendClient = User.IsFrontendClient();
 
-                response.Data = content.Content.Data.ToApiModel(content.Schema.SchemaDef, App.LanguagesConfig, !isFrontendClient);
+                response.Data = entity.Data.ToApiModel(schema.SchemaDef, App.LanguagesConfig, !isFrontendClient);
             }
 
-            Response.Headers["ETag"] = new StringValues(content.Content.Version.ToString());
+            Response.Headers["ETag"] = entity.Version.ToString();
+            Response.Headers["Surrogate-Key"] = entity.Id.ToString();
 
             return Ok(response);
         }
@@ -148,7 +150,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
                 response.Data = content.Content.Data.ToApiModel(content.Schema.SchemaDef, App.LanguagesConfig, !isFrontendClient);
             }
 
-            Response.Headers["ETag"] = new StringValues(version.ToString());
+            Response.Headers["ETag"] = version.ToString();
 
             return Ok(response.Data);
         }

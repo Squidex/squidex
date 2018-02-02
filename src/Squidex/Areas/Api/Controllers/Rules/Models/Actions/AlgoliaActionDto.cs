@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.ComponentModel.DataAnnotations;
 using NJsonSchema.Annotations;
 using Squidex.Domain.Apps.Core.Rules;

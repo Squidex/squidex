@@ -12,7 +12,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using Microsoft.Extensions.Primitives;
 using NSwag.Annotations;
 using Squidex.Areas.Api.Controllers.Assets.Models;
 using Squidex.Domain.Apps.Entities.Apps.Services;
@@ -104,6 +103,8 @@ namespace Squidex.Areas.Api.Controllers.Assets
                 Items = assets.Select(x => SimpleMapper.Map(x, new AssetDto { FileType = x.FileName.FileType() })).ToArray()
             };
 
+            Response.Headers["Surrogate-Key"] = string.Join(" ", response.Items.Select(x => x.Id));
+
             return Ok(response);
         }
 
@@ -132,7 +133,8 @@ namespace Squidex.Areas.Api.Controllers.Assets
 
             var response = SimpleMapper.Map(entity, new AssetDto { FileType = entity.FileName.FileType() });
 
-            Response.Headers["ETag"] = new StringValues(entity.Version.ToString());
+            Response.Headers["ETag"] = entity.Version.ToString();
+            Response.Headers["Surrogate-Key"] = entity.Id.ToString();
 
             return Ok(response);
         }

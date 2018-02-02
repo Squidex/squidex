@@ -62,24 +62,24 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [ApiCosts(0.5)]
         public async Task<IActionResult> GetAssetContent(string app, Guid id, [FromQuery] int version = -1, [FromQuery] int? width = null, [FromQuery] int? height = null, [FromQuery] string mode = null)
         {
-            var asset = await assetRepository.FindAssetAsync(id);
+            var entity = await assetRepository.FindAssetAsync(id);
 
-            if (asset == null || asset.FileVersion < version || width == 0 || height == 0)
+            if (entity == null || entity.FileVersion < version || width == 0 || height == 0)
             {
                 return NotFound();
             }
 
-            var assetId = asset.Id.ToString();
+            var assetId = entity.Id.ToString();
 
-            return new FileCallbackResult(asset.MimeType, asset.FileName, async bodyStream =>
+            return new FileCallbackResult(entity.MimeType, entity.FileName, async bodyStream =>
             {
-                if (asset.IsImage && (width.HasValue || height.HasValue))
+                if (entity.IsImage && (width.HasValue || height.HasValue))
                 {
                     var assetSuffix = $"{width}_{height}_{mode}";
 
                     try
                     {
-                        await assetStorage.DownloadAsync(assetId, asset.FileVersion, assetSuffix, bodyStream);
+                        await assetStorage.DownloadAsync(assetId, entity.FileVersion, assetSuffix, bodyStream);
                     }
                     catch (AssetNotFoundException)
                     {
@@ -87,13 +87,13 @@ namespace Squidex.Areas.Api.Controllers.Assets
                         {
                             using (var destinationStream = GetTempStream())
                             {
-                                await assetStorage.DownloadAsync(assetId, asset.FileVersion, null, sourceStream);
+                                await assetStorage.DownloadAsync(assetId, entity.FileVersion, null, sourceStream);
                                 sourceStream.Position = 0;
 
                                 await assetThumbnailGenerator.CreateThumbnailAsync(sourceStream, destinationStream, width, height, mode);
                                 destinationStream.Position = 0;
 
-                                await assetStorage.UploadAsync(assetId, asset.FileVersion, assetSuffix, destinationStream);
+                                await assetStorage.UploadAsync(assetId, entity.FileVersion, assetSuffix, destinationStream);
                                 destinationStream.Position = 0;
 
                                 await destinationStream.CopyToAsync(bodyStream);
@@ -103,7 +103,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
                 }
                 else
                 {
-                    await assetStorage.DownloadAsync(assetId, asset.FileVersion, null, bodyStream);
+                    await assetStorage.DownloadAsync(assetId, entity.FileVersion, null, bodyStream);
                 }
             });
         }

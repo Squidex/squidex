@@ -19,5 +19,18 @@ namespace Squidex.Domain.Apps.Core.Rules.Triggers
         {
             return visitor.Visit(this);
         }
+
+        public override void Freeze()
+        {
+            base.Freeze();
+
+            if (Schemas != null)
+            {
+                foreach (var schema in Schemas)
+                {
+                    schema.Freeze();
+                }
+            }
+        }
     }
 }

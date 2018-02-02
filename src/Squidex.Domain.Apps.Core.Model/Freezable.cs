@@ -27,7 +27,7 @@ namespace Squidex.Domain.Apps.Core
             }
         }
 
-        public void Freeze()
+        public virtual void Freeze()
         {
             isFrozen = true;
         }

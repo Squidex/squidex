@@ -9,7 +9,6 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Primitives;
 using NSwag.Annotations;
 using Squidex.Areas.Api.Controllers.Schemas.Models;
 using Squidex.Areas.Api.Controllers.Schemas.Models.Converters;
@@ -96,7 +95,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
 
             var response = entity.ToDetailsModel();
 
-            Response.Headers["ETag"] = new StringValues(entity.Version.ToString());
+            Response.Headers["ETag"] = entity.Version.ToString();
 
             return Ok(response);
         }
