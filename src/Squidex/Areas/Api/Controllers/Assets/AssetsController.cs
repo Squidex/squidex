@@ -73,10 +73,12 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [ApiCosts(1)]
         public async Task<IActionResult> GetAssets(string app, [FromQuery] string ids = null)
         {
-            var idsList = new HashSet<Guid>();
+            HashSet<Guid> idsList = null;
 
             if (!string.IsNullOrWhiteSpace(ids))
             {
+                idsList = new HashSet<Guid>();
+
                 foreach (var id in ids.Split(','))
                 {
                     if (Guid.TryParse(id, out var guid))
@@ -86,16 +88,10 @@ namespace Squidex.Areas.Api.Controllers.Assets
                 }
             }
 
-            IResultList<IAssetEntity> assets;
-
-            if (idsList.Count > 0)
-            {
-                assets = await assetRepository.QueryAsync(App.Id, idsList);
-            }
-            else
-            {
-                assets = await assetRepository.QueryAsync(App.Id, Request.QueryString.ToString());
-            }
+            var assets =
+                idsList?.Count > 0 ?
+                    await assetRepository.QueryAsync(App.Id, idsList) :
+                    await assetRepository.QueryAsync(App.Id, Request.QueryString.ToString());
 
             var response = new AssetsDto
             {

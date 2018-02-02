@@ -85,7 +85,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
             var isFrontendClient = User.IsFrontendClient();
 
             var result =
-                idsList != null ?
+                idsList?.Count > 0 ?
                     await contentQuery.QueryAsync(App, name, User, archived, idsList) :
                     await contentQuery.QueryAsync(App, name, User, archived, Request.QueryString.ToString());
 
