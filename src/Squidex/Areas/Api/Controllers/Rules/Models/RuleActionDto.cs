@@ -5,21 +5,23 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Runtime.Serialization;
+using System;
+using System.Linq;
 using Newtonsoft.Json;
-using Squidex.Areas.Api.Controllers.Rules.Models.Actions;
 using Squidex.Domain.Apps.Core.Rules;
 
 namespace Squidex.Areas.Api.Controllers.Rules.Models
 {
-    [JsonConverter(typeof(JsonInheritanceConverter), "actionType")]
-    [KnownType(typeof(AlgoliaActionDto))]
-    [KnownType(typeof(AzureQueueActionDto))]
-    [KnownType(typeof(FastlyActionDto))]
-    [KnownType(typeof(SlackActionDto))]
-    [KnownType(typeof(WebhookActionDto))]
+    [JsonConverter(typeof(JsonInheritanceConverter), "actionType", typeof(RuleActionDto))]
     public abstract class RuleActionDto
     {
         public abstract RuleAction ToAction();
+
+        public static Type[] Subtypes()
+        {
+            var type = typeof(RuleActionDto);
+
+            return type.Assembly.GetTypes().Where(type.IsAssignableFrom).ToArray();
+        }
     }
 }
