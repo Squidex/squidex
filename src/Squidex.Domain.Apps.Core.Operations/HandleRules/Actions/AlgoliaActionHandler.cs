@@ -108,7 +108,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
 
         public override async Task<(string Dump, Exception Exception)> ExecuteJobAsync(RuleJobData job)
         {
-            if (job["Operation"] == null)
+            if (!job.TryGetValue("Operation", out var operationToken))
             {
                 return (null, new InvalidOperationException("The action cannot handle this event."));
             }
@@ -119,7 +119,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
 
             var index = clients.GetClient((appId, apiKey, indexName));
 
-            var operation = job["Operation"].Value<string>();
+            var operation = operationToken.Value<string>();
             var content = job["Content"].Value<JObject>();
             var contentId = job["ContentId"].Value<string>();
 

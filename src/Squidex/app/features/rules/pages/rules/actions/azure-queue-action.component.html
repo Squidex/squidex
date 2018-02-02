@@ -1,8 +1,8 @@
-<h3>Send event payload to Azure Storage Queue</h3>
+<h3 class="rule-title">Send event payload to Azure Storage Queue</h3>
 
 <form [formGroup]="actionForm" class="form-horizontal" (ngSubmit)="save()">
     <div class="form-group row">
-        <label class="col col-3 col-form-label" for="queue">Connection String</label>
+        <label class="col col-3 col-form-label" for="connectionString">Connection String</label>
 
         <div class="col col-9">
             <sqx-control-errors for="text" [submitted]="actionFormSubmitted"></sqx-control-errors>

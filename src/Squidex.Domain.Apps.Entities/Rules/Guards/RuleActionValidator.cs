@@ -41,7 +41,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
 
             if (string.IsNullOrWhiteSpace(action.IndexName))
             {
-                errors.Add(new ValidationError("Index name key must be defined.", nameof(action.ApiKey)));
+                errors.Add(new ValidationError("Index name must be defined.", nameof(action.ApiKey)));
             }
 
             return Task.FromResult<IEnumerable<ValidationError>>(errors);
@@ -63,6 +63,23 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
             else if (!Regex.IsMatch(action.Queue, "^[a-z][a-z0-9]{2,}(\\-[a-z0-9]+)*$"))
             {
                 errors.Add(new ValidationError("Queue must be valid azure queue name.", nameof(action.Queue)));
+            }
+
+            return Task.FromResult<IEnumerable<ValidationError>>(errors);
+        }
+
+        public Task<IEnumerable<ValidationError>> Visit(FastlyAction action)
+        {
+            var errors = new List<ValidationError>();
+
+            if (string.IsNullOrWhiteSpace(action.ApiKey))
+            {
+                errors.Add(new ValidationError("Api key must be defined.", nameof(action.ApiKey)));
+            }
+
+            if (string.IsNullOrWhiteSpace(action.ServiceId))
+            {
+                errors.Add(new ValidationError("Service name must be defined.", nameof(action.ServiceId)));
             }
 
             return Task.FromResult<IEnumerable<ValidationError>>(errors);

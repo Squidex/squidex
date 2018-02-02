@@ -8,6 +8,7 @@ $action-webhook:          #4bb958;
 $action-algolia:          #0d9bf9;
 $action-slack:            #5c3a58;
 $action-azure:            #55b3ff;
+$action-fastly:           #e23335;
 
 @mixin build-element($color) {
     & {
@@ -21,6 +22,10 @@ $action-azure:            #55b3ff;
     .rule-element-icon {
         background: darken($color, 5%);
     }
+}
+
+.rule-title {
+    margin-bottom: 1rem;
 }
 
 .rule-element {
@@ -63,6 +68,10 @@ $action-azure:            #55b3ff;
 
 .rule-element-Algolia {
     @include build-element($action-algolia);
+}
+
+.rule-element-Fastly {
+    @include build-element($action-fastly);
 }
 
 .rule-element-Slack {
