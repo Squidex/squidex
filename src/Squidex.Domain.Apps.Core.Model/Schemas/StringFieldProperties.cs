@@ -13,6 +13,8 @@ namespace Squidex.Domain.Apps.Core.Schemas
     [TypeName(nameof(StringField))]
     public sealed class StringFieldProperties : FieldProperties
     {
+        public ImmutableList<string> AllowedValues { get; set; }
+
         public int? MinLength { get; set; }
 
         public int? MaxLength { get; set; }
@@ -22,8 +24,6 @@ namespace Squidex.Domain.Apps.Core.Schemas
         public string Pattern { get; set; }
 
         public string PatternMessage { get; set; }
-
-        public ImmutableList<string> AllowedValues { get; set; }
 
         public StringFieldEditor Editor { get; set; }
 

@@ -41,6 +41,7 @@ export * from './angular/router-utils';
 export * from './angular/scroll-active.directive';
 export * from './angular/shortcut.component';
 export * from './angular/slider.component';
+export * from './angular/slugify-input.directive';
 export * from './angular/sorted.directive';
 export * from './angular/stars.component';
 export * from './angular/tag-editor.component';

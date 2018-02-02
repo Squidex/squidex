@@ -21,6 +21,13 @@
 
                 <span class="radio-label">Input</span>
             </label>
+            <label class="btn btn-radio" [class.active]="editForm.controls.editor.value === 'Slug'">
+                <input type="radio" class="radio-input" formControlName="editor" value="Slug" />
+
+                <i class="icon-control-Slug"></i>
+
+                <span class="radio-label">Slug</span>
+            </label>
             <label class="btn btn-radio" [class.active]="editForm.controls.editor.value === 'TextArea'">
                 <input type="radio" class="radio-input" formControlName="editor" value="TextArea" />
 

@@ -49,6 +49,9 @@
                             <div *ngSwitchCase="'Input'">
                                 <input class="form-control" type="text" [formControlName]="partition" [placeholder]="field.properties.placeholder || ''">
                             </div>
+                            <div *ngSwitchCase="'Slug'">
+                                <input class="form-control" type="text" [formControlName]="partition" [placeholder]="field.properties.placeholder || ''" sqxSlugifyInput>
+                            </div>
                             <div *ngSwitchCase="'TextArea'">
                                 <textarea class="form-control" [formControlName]="partition" rows="5" [placeholder]="field.properties.placeholder || ''"></textarea>
                             </div>

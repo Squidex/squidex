@@ -13,13 +13,13 @@ namespace Squidex.Domain.Apps.Core.Schemas
     [TypeName(nameof(NumberField))]
     public sealed class NumberFieldProperties : FieldProperties
     {
+        public ImmutableList<double> AllowedValues { get; set; }
+
         public double? MaxValue { get; set; }
 
         public double? MinValue { get; set; }
 
         public double? DefaultValue { get; set; }
-
-        public ImmutableList<double> AllowedValues { get; set; }
 
         public NumberFieldEditor Editor { get; set; }
 
