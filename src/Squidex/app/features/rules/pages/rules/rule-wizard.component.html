@@ -39,6 +39,12 @@
             
             <div *ngIf="step === 2 && schemas" class="modal-form">       
                 <div [ngSwitch]="triggerType">
+                    <div *ngSwitchCase="'AssetChanged'">
+                        <sqx-asset-changed-trigger #triggerControl
+                            [trigger]="trigger" 
+                            (triggerChanged)="selectTrigger($event)">
+                        </sqx-asset-changed-trigger>
+                    </div>
                     <div *ngSwitchCase="'ContentChanged'">
                         <sqx-content-changed-trigger #triggerControl
                             [schemas]="schemas" 

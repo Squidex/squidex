@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Queue;
@@ -22,7 +21,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
 {
     public sealed class AzureQueueActionHandler : RuleActionHandler<AzureQueueAction>
     {
-        private readonly ConcurrentDictionary<(string ConnectionString, string QueueName), CloudQueue> queues = new ConcurrentDictionary<(string ConnectionString, string QueueName), CloudQueue>();
+        private readonly ClientPool<(string ConnectionString, string QueueName), CloudQueue> clients;
         private readonly RuleEventFormatter formatter;
 
         public AzureQueueActionHandler(RuleEventFormatter formatter)
@@ -30,6 +29,16 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
             Guard.NotNull(formatter, nameof(formatter));
 
             this.formatter = formatter;
+
+            clients = new ClientPool<(string ConnectionString, string QueueName), CloudQueue>(key =>
+            {
+                var storageAccount = CloudStorageAccount.Parse(key.ConnectionString);
+
+                var queueClient = storageAccount.CreateCloudQueueClient();
+                var queueRef = queueClient.GetQueueReference(key.QueueName);
+
+                return queueRef;
+            });
         }
 
         protected override (string Description, RuleJobData Data) CreateJob(Envelope<AppEvent> @event, string eventName, AzureQueueAction action)
@@ -52,15 +61,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
             var queueConnectionString = job["QueueConnectionString"].Value<string>();
             var queueName = job["QueueName"].Value<string>();
 
-            var queue = queues.GetOrAdd((queueConnectionString, queueName), s =>
-            {
-                var storageAccount = CloudStorageAccount.Parse(queueConnectionString);
-
-                var queueClient = storageAccount.CreateCloudQueueClient();
-                var queueRef = queueClient.GetQueueReference(queueName);
-
-                return queueRef;
-            });
+            var queue = clients.GetClient((queueConnectionString, queueName));
 
             var messageBody = job["MessageBody"].ToString(Formatting.Indented);
 

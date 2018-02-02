@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using Algolia.Search;
 using Newtonsoft.Json;
@@ -23,7 +22,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
     public sealed class AlgoliaActionHandler : RuleActionHandler<AlgoliaAction>
     {
         private const string SchemaNamePlaceholder = "$SCHEMA_NAME";
-        private readonly ConcurrentDictionary<(string AppId, string ApiKey, string IndexName), Index> clients = new ConcurrentDictionary<(string AppId, string ApiKey, string IndexName), Index>();
+        private readonly ClientPool<(string AppId, string ApiKey, string IndexName), Index> clients;
         private readonly RuleEventFormatter formatter;
 
         public AlgoliaActionHandler(RuleEventFormatter formatter)
@@ -31,6 +30,13 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
             Guard.NotNull(formatter, nameof(formatter));
 
             this.formatter = formatter;
+
+            clients = new ClientPool<(string AppId, string ApiKey, string IndexName), Index>(key =>
+            {
+                var client = new AlgoliaClient(key.AppId, key.ApiKey);
+
+                return client.InitIndex(key.IndexName);
+            });
         }
 
         protected override (string Description, RuleJobData Data) CreateJob(Envelope<AppEvent> @event, string eventName, AlgoliaAction action)
@@ -102,16 +108,16 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
 
         public override async Task<(string Dump, Exception Exception)> ExecuteJobAsync(RuleJobData job)
         {
+            if (job["Operation"] == null)
+            {
+                return (null, new InvalidOperationException("The action cannot handle this event."));
+            }
+
             var appId = job["AppId"].Value<string>();
             var apiKey = job["ApiKey"].Value<string>();
             var indexName = job["IndexName"].Value<string>();
 
-            var index = clients.GetOrAdd((appId, apiKey, indexName), s =>
-            {
-                var client = new AlgoliaClient(appId, apiKey);
-
-                return client.InitIndex(indexName);
-            });
+            var index = clients.GetClient((appId, apiKey, indexName));
 
             var operation = job["Operation"].Value<string>();
             var content = job["Content"].Value<JObject>();
@@ -138,9 +144,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
                     }
 
                     default:
-                    {
-                        return ("Nothing to do!", null);
-                    }
+                        return (null, null);
                 }
             }
             catch (AlgoliaException ex)

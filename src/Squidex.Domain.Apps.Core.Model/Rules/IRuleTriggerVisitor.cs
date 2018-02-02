@@ -11,6 +11,8 @@ namespace Squidex.Domain.Apps.Core.Rules
 {
     public interface IRuleTriggerVisitor<out T>
     {
+        T Visit(AssetChangedTrigger trigger);
+
         T Visit(ContentChangedTrigger trigger);
     }
 }

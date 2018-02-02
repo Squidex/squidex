@@ -9,6 +9,7 @@ export * from './pages/rules/actions/algolia-action.component';
 export * from './pages/rules/actions/azure-queue-action.component';
 export * from './pages/rules/actions/slack-action.component';
 export * from './pages/rules/actions/webhook-action.component';
+export * from './pages/rules/triggers/asset-changed-trigger.component';
 export * from './pages/rules/triggers/content-changed-trigger.component';
 export * from './pages/rules/rule-wizard.component';
 export * from './pages/rules/rules-page.component';

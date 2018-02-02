@@ -17,22 +17,22 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models.Triggers
         public Guid SchemaId { get; set; }
 
         /// <summary>
-        /// True, when to send a message for created events.
+        /// Determines whether to handle the event when a content is created.
         /// </summary>
         public bool SendCreate { get; set; }
 
         /// <summary>
-        /// True, when to send a message for updated events.
+        /// Determines whether to handle the event when a content is updated.
         /// </summary>
         public bool SendUpdate { get; set; }
 
         /// <summary>
-        /// True, when to send a message for deleted events.
+        /// Determines whether to handle the event when a content is deleted.
         /// </summary>
         public bool SendDelete { get; set; }
 
         /// <summary>
-        /// True, when to send a message for published events.
+        /// Determines whether to handle the event when a content is published.
         /// </summary>
         public bool SendPublish { get; set; }
     }

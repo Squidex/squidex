@@ -92,6 +92,9 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<RuleEventFormatter>()
                 .AsSelf();
 
+            services.AddSingletonAs<AssetChangedTriggerHandler>()
+                .As<IRuleTriggerHandler>();
+
             services.AddSingletonAs<ContentChangedTriggerHandler>()
                 .As<IRuleTriggerHandler>();
 

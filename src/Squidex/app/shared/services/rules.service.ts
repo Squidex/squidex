@@ -21,6 +21,7 @@ import {
 } from 'framework';
 
 export const ruleTriggers: any = {
+    'AssetChanged': 'Asset changed',
     'ContentChanged': 'Content changed'
 };
 

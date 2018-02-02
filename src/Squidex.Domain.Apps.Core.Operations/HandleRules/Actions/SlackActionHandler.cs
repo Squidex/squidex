@@ -23,7 +23,6 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
 {
     public sealed class SlackActionHandler : RuleActionHandler<SlackAction>
     {
-        private static readonly HttpClient Client = new HttpClient { Timeout = TimeSpan.FromSeconds(2) };
         private readonly RuleEventFormatter formatter;
 
         public SlackActionHandler(RuleEventFormatter formatter)
@@ -61,7 +60,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
 
             try
             {
-                response = await Client.SendAsync(requestMsg);
+                response = await HttpClientPool.GetHttpClient().SendAsync(requestMsg);
 
                 var responseString = await response.Content.ReadAsStringAsync();
                 var requestDump = DumpFormatter.BuildDump(requestMsg, response, requestBody, responseString, TimeSpan.Zero, false);

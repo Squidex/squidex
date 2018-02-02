@@ -1,6 +1,7 @@
 @import '_mixins';
 @import '_vars';
 
+$trigger-asset-changed:   #3389ff;
 $trigger-content-changed: #3389ff;
 
 $action-webhook:          #4bb958;
@@ -46,6 +47,10 @@ $action-azure:            #55b3ff;
         margin-right: .5rem;
         padding: 0 .8rem;
     }
+}
+
+.rule-element-AssetChanged {
+    @include build-element($trigger-asset-changed);
 }
 
 .rule-element-ContentChanged {

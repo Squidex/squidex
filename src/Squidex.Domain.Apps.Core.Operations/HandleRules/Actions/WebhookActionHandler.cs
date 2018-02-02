@@ -23,7 +23,6 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
 {
     public sealed class WebhookActionHandler : RuleActionHandler<WebhookAction>
     {
-        private static readonly TimeSpan Timeout = TimeSpan.FromSeconds(2);
         private readonly RuleEventFormatter formatter;
 
         public WebhookActionHandler(RuleEventFormatter formatter)
@@ -59,15 +58,12 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
 
             try
             {
-                using (var client = new HttpClient { Timeout = Timeout })
-                {
-                    response = await client.SendAsync(requestMsg);
+                response = await HttpClientPool.GetHttpClient().SendAsync(requestMsg);
 
-                    var responseString = await response.Content.ReadAsStringAsync();
-                    var requestDump = DumpFormatter.BuildDump(requestMsg, response, requestBody, responseString, TimeSpan.Zero, false);
+                var responseString = await response.Content.ReadAsStringAsync();
+                var requestDump = DumpFormatter.BuildDump(requestMsg, response, requestBody, responseString, TimeSpan.Zero, false);
 
-                    return (requestDump, null);
-                }
+                return (requestDump, null);
             }
             catch (Exception ex)
             {
