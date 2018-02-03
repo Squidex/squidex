@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.1.4 - 2018-02-03
+
+### Features
+
+* **Login**: Consent screen to inform the user about privacy policies.
+
 ## v1.1.3 - 2018-02-03
 
 ### Features
