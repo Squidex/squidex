@@ -1,6 +1,23 @@
 # Changelog
 
-## v1.1.2
+## v1.1.3 - 2018-02-03
+
+### Features
+
+* **Rules**: Trigger when asset has changed
+* **Rules**: Action to purge cache items in fastly
+* **Rules**: Action to push events to Azure storage queues.
+
+### Bugfixes
+
+* **Rules**: Layout fixes.
+
+### Refactorings
+
+* Freeze action, triggers and field properties using Fody.
+* Fetch derived types automatically for Swagger generation.
+
+## v1.1.2 - 2018-01-31
 
 ### Features
 
