@@ -44,6 +44,10 @@ noscript {
         margin-top: 2rem;
     }
 
+    &-section-sm {
+        margin-top: 1rem;
+    }
+
     &-picture-col {
         max-width: 7rem;
     }
@@ -109,6 +113,20 @@ noscript {
             font-weight: normal;
             vertical-align: middle;
             width: 1.6rem;
+        }
+    }
+
+    .personal-information {
+        margin: 1rem 0;
+    }
+
+    p {
+        & {
+            margin-bottom: .5rem;
+        }
+
+        &:last-child {
+            margin-bottom: 0;
         }
     }
 }

@@ -111,7 +111,7 @@ namespace Squidex.Domain.Users.MongoDb
             Id = ObjectId.GenerateNewId().ToString();
         }
 
-        public void UpdateEmail(string email)
+        public void SetEmail(string email)
         {
             Email = UserName = email;
         }

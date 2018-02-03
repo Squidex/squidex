@@ -20,7 +20,7 @@ namespace Squidex.Config.Authentication
 
             if (!string.IsNullOrEmpty(displayName))
             {
-                context.Identity.AddClaim(new Claim(SquidexClaimTypes.SquidexDisplayName, displayName));
+                context.Identity.SetDisplayName(displayName);
             }
 
             var id = context.User.Value<string>("id");
@@ -29,7 +29,7 @@ namespace Squidex.Config.Authentication
             {
                 var pictureUrl = $"https://apis.live.net/v5.0/{id}/picture";
 
-                context.Identity.AddClaim(new Claim(SquidexClaimTypes.SquidexPictureUrl, pictureUrl));
+                context.Identity.SetPictureUrl(pictureUrl);
             }
 
             return base.CreatingTicket(context);
