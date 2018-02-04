@@ -14,7 +14,7 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.Scripting
 {
-    public sealed class ContentDataObjectTests
+    public class ContentDataObjectTests
     {
         [Fact]
         public void Should_update_data_when_setting_field()

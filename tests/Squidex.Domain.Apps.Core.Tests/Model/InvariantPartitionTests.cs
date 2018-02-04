@@ -14,7 +14,7 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Model
 {
-    public sealed class InvariantPartitionTests
+    public class InvariantPartitionTests
     {
         [Fact]
         public void Should_provide_single_value()

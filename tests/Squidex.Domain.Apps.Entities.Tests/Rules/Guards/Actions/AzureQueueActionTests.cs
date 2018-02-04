@@ -11,7 +11,7 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Rules.Guards.Actions
 {
-    public sealed class AzureQueueActionTests
+    public class AzureQueueActionTests
     {
         [Fact]
         public async Task Should_add_error_if_connection_string_is_null()

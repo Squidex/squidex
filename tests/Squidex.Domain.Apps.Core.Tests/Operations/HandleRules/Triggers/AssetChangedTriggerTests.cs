@@ -17,7 +17,7 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.HandleRules.Triggers
 {
-    public sealed class AssetChangedTriggerTests
+    public class AssetChangedTriggerTests
     {
         private readonly IRuleTriggerHandler sut = new AssetChangedTriggerHandler();
 

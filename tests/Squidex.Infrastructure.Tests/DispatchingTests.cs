@@ -12,7 +12,7 @@ using Xunit;
 
 namespace Squidex.Infrastructure
 {
-    public sealed class DispatchingTests
+    public class DispatchingTests
     {
         private interface IMyEvent
         {

@@ -22,7 +22,7 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.HandleRules.Triggers
 {
-    public sealed class ContentChangedTriggerTests
+    public class ContentChangedTriggerTests
     {
         private readonly IRuleTriggerHandler sut = new ContentChangedTriggerHandler();
         private static readonly NamedId<Guid> SchemaMatch = new NamedId<Guid>(Guid.NewGuid(), "my-schema1");

@@ -8,12 +8,14 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using Squidex.Domain.Apps.Core.Schemas;
 
 namespace Squidex.Areas.Api.Controllers.Schemas.Models
 {
     [JsonConverter(typeof(JsonInheritanceConverter), "fieldType", typeof(FieldPropertiesDto))]
+    [KnownType(nameof(Subtypes))]
     public abstract class FieldPropertiesDto
     {
         /// <summary>

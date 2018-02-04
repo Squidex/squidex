@@ -12,7 +12,7 @@ using Xunit;
 
 namespace Squidex.Infrastructure.Json
 {
-    public sealed class InstantConverterTests
+    public class InstantConverterTests
     {
         [Fact]
         public void Should_serialize_and_deserialize()

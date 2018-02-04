@@ -14,7 +14,7 @@ using Squidex.Domain.Apps.Core.Rules;
 namespace Squidex.Areas.Api.Controllers.Rules.Models
 {
     [JsonConverter(typeof(JsonInheritanceConverter), "triggerType", typeof(RuleTriggerDto))]
-    [KnownType("Subtypes")]
+    [KnownType(nameof(Subtypes))]
     public abstract class RuleTriggerDto
     {
         public abstract RuleTrigger ToTrigger();

@@ -13,7 +13,7 @@ using Xunit;
 
 namespace Squidex.Infrastructure.Commands
 {
-    public sealed class EnrichWithTimestampCommandMiddlewareTests
+    public class EnrichWithTimestampCommandMiddlewareTests
     {
         private readonly IClock clock = A.Fake<IClock>();
 

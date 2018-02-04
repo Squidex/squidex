@@ -11,7 +11,7 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Rules.Guards.Actions
 {
-    public sealed class FastlyActionTests
+    public class FastlyActionTests
     {
         [Fact]
         public async Task Should_add_error_if_service_id_not_defined()

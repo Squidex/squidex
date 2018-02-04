@@ -10,7 +10,7 @@ using Xunit;
 
 namespace Squidex.Infrastructure
 {
-    public sealed class ValidationExtensionsTests
+    public class ValidationExtensionsTests
     {
         [Fact]
         public void Should_return_true_if_is_between()
