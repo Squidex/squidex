@@ -25,20 +25,29 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models.Converters
             return properties.Accept(Instance);
         }
 
-        public RuleActionDto Visit(RuleAction action)
+        public RuleActionDto Visit(AlgoliaAction action)
         {
-            // todo: this needs a better solution, which is robust
-            if (action.GetType().Name.Contains("Webhook"))
-            {
-                return SimpleMapper.Map(action, new WebhookActionDto());
-            }
+            return SimpleMapper.Map(action, new AlgoliaActionDto());
+        }
 
-            if (action.GetType().Name.Contains("ElasticSearch"))
-            {
-                return SimpleMapper.Map(action, new ElasticSearchActionDto());
-            }
+        public RuleActionDto Visit(AzureQueueAction action)
+        {
+            return SimpleMapper.Map(action, new AzureQueueActionDto());
+        }
 
-            return null;
+        public RuleActionDto Visit(FastlyAction action)
+        {
+            return SimpleMapper.Map(action, new FastlyActionDto());
+        }
+
+        public RuleActionDto Visit(SlackAction action)
+        {
+            return SimpleMapper.Map(action, new SlackActionDto());
+        }
+
+        public RuleActionDto Visit(WebhookAction action)
+        {
+            return SimpleMapper.Map(action, new WebhookActionDto());
         }
     }
 }

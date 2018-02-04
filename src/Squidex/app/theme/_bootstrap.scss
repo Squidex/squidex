@@ -13,28 +13,34 @@
         padding: .3rem .6rem;
     }
 
-    &-default {
-        color: $color-badge-default-foreground;
-    }
-
     &-primary {
         color: $color-badge-primary-foreground;
+        background: $color-badge-primary-background;
+    }
+
+    &-secondary {
+        color: $color-badge-secondary-foreground;
+        background: $color-badge-secondary-background;
     }
 
     &-success {
         color: $color-badge-success-foreground;
+        background: $color-badge-success-background;
     }
 
     &-info {
         color: $color-badge-info-foreground;
+        background: $color-badge-info-background;
     }
 
     &-warning {
         color: $color-badge-warning-foreground;
+        background: $color-badge-warning-background;
     }
 
     &-danger {
         color: $color-badge-danger-foreground;
+        background: $color-badge-danger-background;
     }
 }
 
@@ -56,6 +62,7 @@
         & {
             font-weight: 400;
             font-size: 1.6rem;
+            padding-top: .25rem;
         }
 
         &:hover,
@@ -252,7 +259,7 @@ a {
 .btn {
     // Buttons for external logins.
     &-github {
-        @include button-variant($color-dark-foreground, $color-extern-github, $color-extern-github);
+        @include button-variant($color-extern-github, $color-extern-github);
 
         &:hover,
         &:focus {
@@ -263,7 +270,7 @@ a {
     }
 
     &-google {
-        @include button-variant($color-dark-foreground, $color-extern-google, $color-extern-google);
+        @include button-variant($color-extern-google, $color-extern-google);
 
         &:hover,
         &:focus {
@@ -274,7 +281,7 @@ a {
     }
 
     &-microsoft {
-        @include button-variant($color-dark-foreground, $color-extern-microsoft, $color-extern-microsoft);
+        @include button-variant($color-extern-microsoft, $color-extern-microsoft);
 
         &:hover,
         &:focus {
@@ -381,8 +388,12 @@ a {
             @include build-link-button($color-theme-green);
         }
 
-        &.btn-decent {
-            @include build-link-button($color-text-decent);
+        &.btn-info {
+            @include build-link-button($color-theme-info);
+        }
+
+        &.btn-warning {
+            @include build-link-button($color-theme-orange);
         }
     }
 }

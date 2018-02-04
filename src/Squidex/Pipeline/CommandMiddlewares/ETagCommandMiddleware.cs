@@ -9,7 +9,6 @@ using System;
 using System.Globalization;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Primitives;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 
@@ -42,7 +41,7 @@ namespace Squidex.Pipeline.CommandMiddlewares
 
             if (context.Result<object>() is EntitySavedResult result)
             {
-                httpContextAccessor.HttpContext.Response.Headers["ETag"] = new StringValues(result.Version.ToString());
+                httpContextAccessor.HttpContext.Response.Headers["ETag"] = result.Version.ToString();
             }
         }
     }

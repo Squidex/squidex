@@ -6,6 +6,8 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using FakeItEasy;
 using FluentAssertions;
 using Newtonsoft.Json;
@@ -22,6 +24,21 @@ namespace Squidex.Domain.Apps.Core.Model.Rules
     public class RuleTests
     {
         private readonly JsonSerializer serializer = TestData.DefaultSerializer();
+
+        public static readonly List<object[]> Actions =
+            typeof(Rule).Assembly.GetTypes()
+                .Where(x => x.BaseType == typeof(RuleAction))
+                .Select(Activator.CreateInstance)
+                .Select(x => new object[] { x })
+                .ToList();
+
+        public static readonly List<object[]> Triggers =
+            typeof(Rule).Assembly.GetTypes()
+                .Where(x => x.BaseType == typeof(RuleTrigger))
+                .Select(Activator.CreateInstance)
+                .Select(x => new object[] { x })
+                .ToList();
+
         private readonly Rule rule_0 = new Rule(new ContentChangedTrigger(), new WebhookAction());
 
         public sealed class OtherTrigger : RuleTrigger
@@ -126,16 +143,18 @@ namespace Squidex.Domain.Apps.Core.Model.Rules
             appClients.ShouldBeEquivalentTo(rule_0);
         }
 
-        [Fact]
-        public void Should_freeze_webhook_action()
+        [Theory]
+        [MemberData(nameof(Actions))]
+        public void Should_freeze_actions(RuleAction action)
         {
-            TestData.TestFreeze(new WebhookAction());
+            TestData.TestFreeze(action);
         }
 
-        [Fact]
-        public void Should_freeze_contentchanged_trigger()
+        [Theory]
+        [MemberData(nameof(Triggers))]
+        public void Should_freeze_triggers(RuleTrigger trigger)
         {
-            TestData.TestFreeze(new ContentChangedTrigger());
+            TestData.TestFreeze(trigger);
         }
     }
 }

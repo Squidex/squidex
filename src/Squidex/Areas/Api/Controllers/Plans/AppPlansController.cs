@@ -8,7 +8,6 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Primitives;
 using NSwag.Annotations;
 using Squidex.Areas.Api.Controllers.Plans.Models;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
@@ -65,7 +64,7 @@ namespace Squidex.Areas.Api.Controllers.Plans
                 HasPortal = appPlansBillingManager.HasPortal
             };
 
-            Response.Headers["ETag"] = new StringValues(App.Version.ToString());
+            Response.Headers["ETag"] = App.Version.ToString();
 
             return Ok(response);
         }

@@ -72,7 +72,7 @@ namespace Squidex.Pipeline.Swagger
                 document.Host = context.Request.Host.Value;
             }
 
-            document.SecurityDefinitions.Add("OAuth2", CreateOAuthSchema(urlOptions));
+            document.SecurityDefinitions.Add(Constants.SecurityDefinition, CreateOAuthSchema(urlOptions));
 
             return document;
         }

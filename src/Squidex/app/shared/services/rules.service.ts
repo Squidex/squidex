@@ -21,11 +21,16 @@ import {
 } from 'framework';
 
 export const ruleTriggers: any = {
+    'AssetChanged': 'Asset changed',
     'ContentChanged': 'Content changed'
 };
 
 export const ruleActions: any = {
-    'Webhook': 'Send Webhook',
+    'Algolia': 'Populate Algolia Index',
+    'AzureQueue': 'Send to Azure Queue',
+    'Fastly': 'Purge fastly Cache',
+    'Slack': 'Send to Slack',
+    'Webhook': 'Send Webhook'
     'ElasticSearch': 'Index in ElasticSearch'
 };
 

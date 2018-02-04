@@ -1,0 +1,31 @@
+<h3 class="rule-title">Send custom text to an incoming webhook in Slack</h3>
+
+<form [formGroup]="actionForm" class="form-horizontal" (ngSubmit)="save()">
+    <div class="form-group row">
+        <label class="col col-3 col-form-label" for="webhookUrl">Webhook Url</label>
+
+        <div class="col col-9">
+            <sqx-control-errors for="webhookUrl" [submitted]="actionFormSubmitted"></sqx-control-errors>
+
+            <input type="webhookUrl" class="form-control" id="webhookUrl" formControlName="webhookUrl" />
+
+            <small class="form-text text-muted">
+                The url to the incoming slack webhook.
+            </small>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label class="col col-3 col-form-label" for="text">Text</label>
+
+        <div class="col col-9">
+            <sqx-control-errors for="text" [submitted]="actionFormSubmitted"></sqx-control-errors>
+
+            <textarea class="form-control" id="text" formControlName="text"></textarea>
+
+            <small class="form-text text-muted">
+                The text to send to slack. Read the <a routerLink="help">help</a> section for information about advanced formatting.
+            </small>
+        </div>
+    </div>
+</form>

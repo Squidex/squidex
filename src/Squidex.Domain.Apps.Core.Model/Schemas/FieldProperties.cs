@@ -9,51 +9,11 @@ namespace Squidex.Domain.Apps.Core.Schemas
 {
     public abstract class FieldProperties : NamedElementPropertiesBase
     {
-        private bool isRequired;
-        private bool isListField;
-        private string placeholder;
+        public bool IsRequired { get; set; }
 
-        public bool IsRequired
-        {
-            get
-            {
-                return isRequired;
-            }
-            set
-            {
-                ThrowIfFrozen();
+        public bool IsListField { get; set; }
 
-                isRequired = value;
-            }
-        }
-
-        public bool IsListField
-        {
-            get
-            {
-                return isListField;
-            }
-            set
-            {
-                ThrowIfFrozen();
-
-                isListField = value;
-            }
-        }
-
-        public string Placeholder
-        {
-            get
-            {
-                return placeholder;
-            }
-            set
-            {
-                ThrowIfFrozen();
-
-                placeholder = value;
-            }
-        }
+        public string Placeholder { get; set; }
 
         public abstract T Accept<T>(IFieldPropertiesVisitor<T> visitor);
 

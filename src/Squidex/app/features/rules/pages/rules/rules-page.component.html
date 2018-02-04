@@ -4,7 +4,7 @@
     <div class="panel-header">
         <div class="panel-title-row">
             <div class="float-right">
-                <button class="btn btn-link btn-decent" (click)="load(true)" title="Refresh Assets (CTRL + SHIFT + R)">
+                <button class="btn btn-link btn-secondary" (click)="load(true)" title="Refresh Assets (CTRL + SHIFT + R)">
                     <i class="icon-reset"></i> Refresh
                 </button>
 
@@ -82,6 +82,14 @@
             <a class="panel-link" routerLink="events" routerLinkActive="active" #linkHistory>
                 <i class="icon-time"></i>
             </a>
+            
+            <a class="panel-link" routerLink="help" routerLinkActive="active" #linkHelp>
+                <i class="icon-help"></i>
+            </a>
+            
+            <sqx-onboarding-tooltip id="help" [for]="linkHelp" position="leftTop" after="180000">
+                Click the help icon to show a context specific help page. Go to <a href="https://docs.squidex.io" target="_blank">https://docs.squidex.io</a> for the full documentation.
+            </sqx-onboarding-tooltip>
         </div>
     </div>
 </sqx-panel>

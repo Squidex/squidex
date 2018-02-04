@@ -54,7 +54,7 @@ namespace Squidex.Pipeline
 
         private static IActionResult OnValidationException(ValidationException ex)
         {
-            return ErrorResult(400, new ErrorDto { Message = ex.Message, Details = ex.Errors.Select(e => e.Message).ToArray() });
+            return ErrorResult(400, new ErrorDto { Message = ex.Summary, Details = ex.Errors.Select(e => e.Message).ToArray() });
         }
 
         private static IActionResult ErrorResult(int statusCode, ErrorDto error)
@@ -68,12 +68,18 @@ namespace Squidex.Pipeline
         {
             if (!context.ModelState.IsValid)
             {
-                var errors =
-                    context.ModelState.SelectMany(m =>
+                var errors = new List<ValidationError>();
+
+                foreach (var m in context.ModelState)
+                {
+                    foreach (var e in m.Value.Errors)
+                    {
+                        if (!string.IsNullOrWhiteSpace(e.ErrorMessage))
                         {
-                            return m.Value.Errors.Where(e => !string.IsNullOrWhiteSpace(e.ErrorMessage))
-                                .Select(e => new ValidationError(e.ErrorMessage, m.Key));
-                        }).ToList();
+                            errors.Add(new ValidationError(e.ErrorMessage, m.Key));
+                        }
+                    }
+                }
 
                 throw new ValidationException("The model is not valid.", errors);
             }

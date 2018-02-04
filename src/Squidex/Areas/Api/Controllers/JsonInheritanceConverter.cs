@@ -6,9 +6,9 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NJsonSchema.Annotations;
@@ -20,6 +20,8 @@ namespace Squidex.Areas.Api.Controllers
     public sealed class JsonInheritanceConverter : JsonConverter
     {
         private readonly string discriminator;
+        private readonly Dictionary<string, Type> mapNameToType = new Dictionary<string, Type>(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<Type, string> mapTypeToName = new Dictionary<Type, string>();
 
         [ThreadStatic]
         private static bool IsReading;
@@ -53,9 +55,17 @@ namespace Squidex.Areas.Api.Controllers
             }
         }
 
-        public JsonInheritanceConverter(string discriminator)
+        public JsonInheritanceConverter(string discriminator, Type baseType)
         {
             this.discriminator = discriminator;
+
+            foreach (var type in baseType.Assembly.GetTypes().Where(x => x != baseType && baseType.IsAssignableFrom(x)))
+            {
+                var name = type.GetTypeInfo().GetCustomAttribute<JsonSchemaAttribute>()?.Name ?? type.Name;
+
+                mapTypeToName[type] = name;
+                mapNameToType[name] = type;
+            }
         }
 
         public override bool CanConvert(Type objectType)
@@ -70,7 +80,7 @@ namespace Squidex.Areas.Api.Controllers
             {
                 var jsonObject = JObject.FromObject(value, serializer);
 
-                jsonObject.AddFirst(new JProperty(discriminator, GetSchemaName(value.GetType())));
+                jsonObject.AddFirst(new JProperty(discriminator, mapTypeToName[value.GetType()]));
 
                 writer.WriteToken(jsonObject.CreateReader());
             }
@@ -94,11 +104,9 @@ namespace Squidex.Areas.Api.Controllers
                     return null;
                 }
 
-                var subType = GetObjectSubtype(objectType, subName);
-
-                if (subType == null)
+                if (subName == null || !mapNameToType.TryGetValue(subName, out var subType))
                 {
-                    return null;
+                    throw new InvalidOperationException($"Could not find subtype of '{objectType.Name}' with discriminator '{subName}'.");
                 }
 
                 return serializer.Deserialize(jsonObject.CreateReader(), subType);
@@ -107,29 +115,6 @@ namespace Squidex.Areas.Api.Controllers
             {
                 IsReading = false;
             }
-        }
-
-        private static Type GetObjectSubtype(Type objectType, string discriminatorValue)
-        {
-            var knownTypeAttribute =
-                objectType.GetTypeInfo().GetCustomAttributes<KnownTypeAttribute>()
-                    .FirstOrDefault(a => IsKnownType(a, discriminatorValue));
-
-            return knownTypeAttribute?.Type;
-        }
-
-        private static bool IsKnownType(KnownTypeAttribute attribute, string discriminator)
-        {
-            var type = attribute.Type;
-
-            return type != null && GetSchemaName(type) == discriminator;
-        }
-
-        private static string GetSchemaName(Type type)
-        {
-            var schenaName = type.GetTypeInfo().GetCustomAttribute<JsonSchemaAttribute>()?.Name;
-
-            return schenaName ?? type.Name;
         }
     }
 }

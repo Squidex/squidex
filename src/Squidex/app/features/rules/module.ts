@@ -9,16 +9,22 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
 import {
+    HelpComponent,
     SqxFrameworkModule,
     SqxSharedModule
 } from 'shared';
 
 import {
+    AlgoliaActionComponent,
+    AssetChangedTriggerComponent,
+    AzureQueueActionComponent,
     ContentChangedTriggerComponent,
+    FastlyActionComponent,
     RuleEventsPageComponent,
     RulesPageComponent,
     RuleWizardComponent,
-    WebhookActionComponent,
+    SlackActionComponent,
+    WebhookActionComponent
     ElasticSearchActionComponent
 } from './declarations';
 
@@ -30,6 +36,13 @@ const routes: Routes = [
             {
                 path: 'events',
                 component: RuleEventsPageComponent
+            },
+            {
+                path: 'help',
+                component: HelpComponent,
+                data: {
+                    helpPage: '06-integrated/rules'
+                }
             }
         ]
     }
@@ -42,12 +55,17 @@ const routes: Routes = [
         RouterModule.forChild(routes)
     ],
     declarations: [
+        AlgoliaActionComponent,
+        AssetChangedTriggerComponent,
+        AzureQueueActionComponent,
         ContentChangedTriggerComponent,
+        FastlyActionComponent,
         RuleEventsPageComponent,
         RulesPageComponent,
         RuleWizardComponent,
-        WebhookActionComponent,
         ElasticSearchActionComponent
+        SlackActionComponent,
+        WebhookActionComponent
     ]
 })
 export class SqxFeatureRulesModule { }

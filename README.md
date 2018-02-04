@@ -10,7 +10,7 @@ Read the docs at [https://docs.squidex.io/](https://docs.squidex.io/) (work in p
 
 ## Status
 
-Current Version 1.0-beta3. Roadmap: https://trello.com/b/KakM4F3S/squidex-roadmap
+Current Version 1.1. Roadmap: https://trello.com/b/KakM4F3S/squidex-roadmap
 
 ## Prerequisites
 
@@ -22,7 +22,7 @@ Current Version 1.0-beta3. Roadmap: https://trello.com/b/KakM4F3S/squidex-roadma
 
 ## Contributors
 
-### Core Team
+### Core Team and Founders
 
 * [Qaisar Ahmad](http://www.qaisarahmad.com/) Interaction Designer, Pakistan
 * [Sebastian Stehle](https://github.com/SebastianStehle) Software Engineer, Germany (currently Sweden)

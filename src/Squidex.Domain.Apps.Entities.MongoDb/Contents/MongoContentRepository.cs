@@ -49,6 +49,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         protected override async Task SetupCollectionAsync(IMongoCollection<MongoContentEntity> collection)
         {
+            await collection.Indexes.TryDropOneAsync("si_1_st_1_dl_1_dt_text");
+
             await archiveCollection.Indexes.CreateOneAsync(
                 Index
                     .Ascending(x => x.Id)
@@ -56,10 +58,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
             await collection.Indexes.CreateOneAsync(
                 Index
+                    .Text(x => x.DataText)
                     .Ascending(x => x.SchemaId)
                     .Ascending(x => x.Status)
-                    .Ascending(x => x.IsDeleted)
-                    .Text(x => x.DataText));
+                    .Ascending(x => x.IsDeleted));
 
             await collection.Indexes.CreateOneAsync(
                 Index
@@ -73,10 +75,28 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, Status[] status, ODataUriParser odataQuery)
         {
-            FilterDefinition<MongoContentEntity> filter;
             try
             {
-                filter = FindExtensions.BuildQuery(odataQuery, schema.Id, schema.SchemaDef, status);
+                var propertyCalculator = FindExtensions.CreatePropertyCalculator(schema.SchemaDef);
+
+                var filter = FindExtensions.BuildQuery(odataQuery, schema.Id, status, propertyCalculator);
+
+                var contentCount = Collection.Find(filter).CountAsync();
+                var contentItems =
+                    Collection.Find(filter)
+                        .ContentTake(odataQuery)
+                        .ContentSkip(odataQuery)
+                        .ContentSort(odataQuery, propertyCalculator)
+                        .ToListAsync();
+
+                await Task.WhenAll(contentItems, contentCount);
+
+                foreach (var entity in contentItems.Result)
+                {
+                    entity.ParseData(schema.SchemaDef);
+                }
+
+                return ResultList.Create<IContentEntity>(contentItems.Result, contentCount.Result);
             }
             catch (NotSupportedException)
             {
@@ -86,18 +106,17 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             {
                 throw new ValidationException("This odata operation is not supported.");
             }
-
-            var contentItems = Collection.Find(filter).Take(odataQuery).Skip(odataQuery).Sort(odataQuery, schema.SchemaDef).ToListAsync();
-            var contentCount = Collection.Find(filter).CountAsync();
-
-            await Task.WhenAll(contentItems, contentCount);
-
-            foreach (var entity in contentItems.Result)
+            catch (MongoQueryException ex)
             {
-                entity.ParseData(schema.SchemaDef);
+                if (ex.Message.Contains("17406"))
+                {
+                    throw new DomainException("Result set is too large to be retrieved. Use $top parameter to reduce the number of items.");
+                }
+                else
+                {
+                    throw;
+                }
             }
-
-            return ResultList.Create<IContentEntity>(contentItems.Result, contentCount.Result);
         }
 
         public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, Status[] status, HashSet<Guid> ids)

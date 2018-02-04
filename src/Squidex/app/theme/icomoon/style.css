@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'icomoon';
-  src:  url('fonts/icomoon.eot?pcikfl');
-  src:  url('fonts/icomoon.eot?pcikfl#iefix') format('embedded-opentype'),
-    url('fonts/icomoon.ttf?pcikfl') format('truetype'),
-    url('fonts/icomoon.woff?pcikfl') format('woff'),
-    url('fonts/icomoon.svg?pcikfl#icomoon') format('svg');
+  src:  url('fonts/icomoon.eot?uoafl5');
+  src:  url('fonts/icomoon.eot?uoafl5#iefix') format('embedded-opentype'),
+    url('fonts/icomoon.ttf?uoafl5') format('truetype'),
+    url('fonts/icomoon.woff?uoafl5') format('woff'),
+    url('fonts/icomoon.svg?uoafl5#icomoon') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -24,6 +24,15 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.icon-action-Fastly:before {
+  content: "\e94e";
+}
+.icon-control-Slug:before {
+  content: "\e94f";
+}
+.icon-action-Algolia:before {
+  content: "\e94c";
+}
 .icon-type-Tags:before {
   content: "\e94a";
   color: #c1c6c8;
@@ -127,6 +136,9 @@
 .icon-type-Assets:before {
   content: "\e91d";
 }
+.icon-trigger-AssetChanged:before {
+  content: "\e91d";
+}
 .icon-more:before {
   content: "\e91e";
 }
@@ -168,6 +180,9 @@
 }
 .icon-user:before {
   content: "\e928";
+}
+.icon-action-Slack:before {
+  content: "\e94d";
 }
 .icon-orleans:before {
   content: "\e94b";
@@ -260,6 +275,9 @@
   content: "\e934";
 }
 .icon-microsoft:before {
+  content: "\e940";
+}
+.icon-action-AzureQueue:before {
   content: "\e940";
 }
 .icon-pause:before {

@@ -13,186 +13,29 @@ namespace Squidex.Domain.Apps.Core.Schemas
     [TypeName(nameof(AssetsField))]
     public sealed class AssetsFieldProperties : FieldProperties
     {
-        private bool mustBeImage;
-        private int? minItems;
-        private int? maxItems;
-        private int? minWidth;
-        private int? maxWidth;
-        private int? minHeight;
-        private int? maxHeight;
-        private int? minSize;
-        private int? maxSize;
-        private int? aspectWidth;
-        private int? aspectHeight;
-        private ImmutableList<string> allowedExtensions;
+        public bool MustBeImage { get; set; }
 
-        public bool MustBeImage
-        {
-            get
-            {
-                return mustBeImage;
-            }
-            set
-            {
-                ThrowIfFrozen();
+        public int? MinItems { get; set; }
 
-                mustBeImage = value;
-            }
-        }
+        public int? MaxItems { get; set; }
 
-        public int? MinItems
-        {
-            get
-            {
-                return minItems;
-            }
-            set
-            {
-                ThrowIfFrozen();
+        public int? MinWidth { get; set; }
 
-                minItems = value;
-            }
-        }
+        public int? MaxWidth { get; set; }
 
-        public int? MaxItems
-        {
-            get
-            {
-                return maxItems;
-            }
-            set
-            {
-                ThrowIfFrozen();
+        public int? MinHeight { get; set; }
 
-                maxItems = value;
-            }
-        }
+        public int? MaxHeight { get; set; }
 
-        public int? MinWidth
-        {
-            get
-            {
-                return minWidth;
-            }
-            set
-            {
-                ThrowIfFrozen();
+        public int? MinSize { get; set; }
 
-                minWidth = value;
-            }
-        }
+        public int? MaxSize { get; set; }
 
-        public int? MaxWidth
-        {
-            get
-            {
-                return maxWidth;
-            }
-            set
-            {
-                ThrowIfFrozen();
+        public int? AspectWidth { get; set; }
 
-                maxWidth = value;
-            }
-        }
+        public int? AspectHeight { get; set; }
 
-        public int? MinHeight
-        {
-            get
-            {
-                return minHeight;
-            }
-            set
-            {
-                ThrowIfFrozen();
-
-                minHeight = value;
-            }
-        }
-
-        public int? MaxHeight
-        {
-            get
-            {
-                return maxHeight;
-            }
-            set
-            {
-                ThrowIfFrozen();
-
-                maxHeight = value;
-            }
-        }
-
-        public int? MinSize
-        {
-            get
-            {
-                return minSize;
-            }
-            set
-            {
-                ThrowIfFrozen();
-
-                minSize = value;
-            }
-        }
-
-        public int? MaxSize
-        {
-            get
-            {
-                return maxSize;
-            }
-            set
-            {
-                ThrowIfFrozen();
-
-                maxSize = value;
-            }
-        }
-
-        public int? AspectWidth
-        {
-            get
-            {
-                return aspectWidth;
-            }
-            set
-            {
-                ThrowIfFrozen();
-
-                aspectWidth = value;
-            }
-        }
-
-        public int? AspectHeight
-        {
-            get
-            {
-                return aspectHeight;
-            }
-            set
-            {
-                ThrowIfFrozen();
-
-                aspectHeight = value;
-            }
-        }
-
-        public ImmutableList<string> AllowedExtensions
-        {
-            get
-            {
-                return allowedExtensions;
-            }
-            set
-            {
-                ThrowIfFrozen();
-
-                allowedExtensions = value;
-            }
-        }
+        public ImmutableList<string> AllowedExtensions { get; set; }
 
         public override T Accept<T>(IFieldPropertiesVisitor<T> visitor)
         {

@@ -14,6 +14,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         Dropdown,
         Radio,
         RichText,
+        Slug,
         TextArea
     }
 }

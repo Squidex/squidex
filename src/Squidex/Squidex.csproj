@@ -45,34 +45,38 @@
     <ProjectReference Include="..\Squidex.Shared\Squidex.Shared.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Ben.BlockingDetector" Version="0.0.1" />
+    <PackageReference Include="Algolia.Search" Version="4.2.1" />
+    <PackageReference Include="Ben.BlockingDetector" Version="0.0.2" />
     <PackageReference Include="Elasticsearch.Net" Version="6.0.0-rc1" />
     <PackageReference Include="EventStore.ClientAPI.NetCore" Version="4.0.2-rc" />
-    <PackageReference Include="IdentityServer4" Version="2.0.6" />
-    <PackageReference Include="IdentityServer4.AccessTokenValidation" Version="2.2.0" />
-    <PackageReference Include="IdentityServer4.AspNetIdentity" Version="2.0.0" />
+    <PackageReference Include="IdentityServer4" Version="2.1.1" />
+    <PackageReference Include="IdentityServer4.AccessTokenValidation" Version="2.3.0" />
+    <PackageReference Include="IdentityServer4.AspNetIdentity" Version="2.1.0" />
     <PackageReference Include="Microsoft.AspNetCore" Version="2.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Cookies" Version="2.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="2.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.MicrosoftAccount" Version="2.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.HttpOverrides" Version="2.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.0.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.0.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.ViewCompilation" Version="2.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.0.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.ViewCompilation" Version="2.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.0.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.0.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.0.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="2.0.1" />
     <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="2.0.4" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="2.0.0" />
-    <PackageReference Include="Microsoft.Data.Edm" Version="5.8.2" />
-    <PackageReference Include="Microsoft.OData.Core" Version="7.3.1" />
-    <PackageReference Include="Microsoft.Orleans.Core" Version="2.0.0-beta1" />
-    <PackageReference Include="Microsoft.Orleans.OrleansRuntime" Version="2.0.0-beta1" />
+    <PackageReference Include="Microsoft.Data.Edm" Version="5.8.3" />
+    <PackageReference Include="Microsoft.OData.Core" Version="7.4.0" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.BrowserLink" Version="2.0.1" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.0.2" />
     <PackageReference Include="MongoDB.Driver" Version="2.5.0" />
-    <PackageReference Include="NJsonSchema" Version="9.10.15" />
+    <PackageReference Include="NJsonSchema" Version="9.10.19" />
     <PackageReference Include="NodaTime.Serialization.JsonNet" Version="2.0.0" />
-    <PackageReference Include="NSwag.AspNetCore" Version="11.12.14" />
+    <PackageReference Include="NSwag.AspNetCore" Version="11.12.16" />
     <PackageReference Include="OpenCover" Version="4.6.519" />
-    <PackageReference Include="RefactoringEssentials" Version="5.4.0" />
-    <PackageReference Include="ReportGenerator" Version="3.1.0" />
+    <PackageReference Include="RefactoringEssentials" Version="5.6.0" />
+    <PackageReference Include="ReportGenerator" Version="3.1.1" />
     <PackageReference Include="StackExchange.Redis.StrongName" Version="1.2.6" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.0.2" />
     <PackageReference Include="System.Linq" Version="4.3.0" />

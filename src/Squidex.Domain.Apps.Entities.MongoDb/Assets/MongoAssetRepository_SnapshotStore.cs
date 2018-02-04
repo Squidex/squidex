@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Entities.Assets.State;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.MongoDb;
+using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
@@ -25,15 +25,19 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 
             if (existing != null)
             {
-                return (existing.State, existing.Version);
+                return (SimpleMapper.Map(existing, new AssetState()), existing.Version);
             }
 
             return (null, EtagVersion.NotFound);
         }
 
-        public Task WriteAsync(Guid key, AssetState value, long oldVersion, long newVersion)
+        public async Task WriteAsync(Guid key, AssetState value, long oldVersion, long newVersion)
         {
-            return Collection.UpsertVersionedAsync(key, oldVersion, newVersion, u => u.Set(x => x.State, value));
+            var entity = SimpleMapper.Map(value, new MongoAssetEntity());
+
+            entity.Version = newVersion;
+
+            await Collection.ReplaceOneAsync(x => x.Id == key && x.Version == oldVersion, entity, Upsert);
         }
     }
 }

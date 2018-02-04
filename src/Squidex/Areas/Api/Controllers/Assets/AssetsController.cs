@@ -12,7 +12,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using Microsoft.Extensions.Primitives;
 using NSwag.Annotations;
 using Squidex.Areas.Api.Controllers.Assets.Models;
 using Squidex.Domain.Apps.Entities.Apps.Services;
@@ -60,38 +59,26 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="ids">The optional asset ids.</param>
-        /// <param name="skip">Optional number of assets to skip.</param>
-        /// <param name="take">Optional number of assets to take (Default: 20).</param>
-        /// <param name="query">Optional query to limit the files by name.</param>
-        /// <param name="mimeTypes">Comma separated list of mime types to get.</param>
         /// <returns>
         /// 200 => Assets returned.
         /// 404 => App not found.
         /// </returns>
         /// <remarks>
-        /// Get all assets for the app. Mime types can be comma-separated, e.g. application/json,text/html.
+        /// Get all assets for the app.
         /// </remarks>
         [MustBeAppReader]
         [HttpGet]
         [Route("apps/{app}/assets/")]
         [ProducesResponseType(typeof(AssetsDto), 200)]
         [ApiCosts(1)]
-        public async Task<IActionResult> GetAssets(string app, [FromQuery] string query = null, [FromQuery] string mimeTypes = null, [FromQuery] string ids = null, [FromQuery] int skip = 0, [FromQuery] int take = 20)
+        public async Task<IActionResult> GetAssets(string app, [FromQuery] string ids = null)
         {
-            var mimeTypeList = new HashSet<string>();
-
-            if (!string.IsNullOrWhiteSpace(mimeTypes))
-            {
-                foreach (var mimeType in mimeTypes.Split(','))
-                {
-                    mimeTypeList.Add(mimeType.Trim());
-                }
-            }
-
-            var idsList = new HashSet<Guid>();
+            HashSet<Guid> idsList = null;
 
             if (!string.IsNullOrWhiteSpace(ids))
             {
+                idsList = new HashSet<Guid>();
+
                 foreach (var id in ids.Split(','))
                 {
                     if (Guid.TryParse(id, out var guid))
@@ -101,13 +88,18 @@ namespace Squidex.Areas.Api.Controllers.Assets
                 }
             }
 
-            var assets = await assetRepository.QueryAsync(App.Id, mimeTypeList, idsList, query, take, skip);
+            var assets =
+                idsList?.Count > 0 ?
+                    await assetRepository.QueryAsync(App.Id, idsList) :
+                    await assetRepository.QueryAsync(App.Id, Request.QueryString.ToString());
 
             var response = new AssetsDto
             {
                 Total = assets.Total,
                 Items = assets.Select(x => SimpleMapper.Map(x, new AssetDto { FileType = x.FileName.FileType() })).ToArray()
             };
+
+            Response.Headers["Surrogate-Key"] = string.Join(" ", response.Items.Select(x => x.Id));
 
             return Ok(response);
         }
@@ -137,7 +129,8 @@ namespace Squidex.Areas.Api.Controllers.Assets
 
             var response = SimpleMapper.Map(entity, new AssetDto { FileType = entity.FileName.FileType() });
 
-            Response.Headers["ETag"] = new StringValues(entity.Version.ToString());
+            Response.Headers["ETag"] = entity.Version.ToString();
+            Response.Headers["Surrogate-Key"] = entity.Id.ToString();
 
             return Ok(response);
         }

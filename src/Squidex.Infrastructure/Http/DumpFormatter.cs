@@ -66,7 +66,7 @@ namespace Squidex.Infrastructure.Http
                 writer.AppendLine(responseBody);
             }
 
-            if (response != null)
+            if (response != null && elapsed != TimeSpan.Zero)
             {
                 writer.AppendLine();
                 writer.AppendLine($"Elapsed: {elapsed}");

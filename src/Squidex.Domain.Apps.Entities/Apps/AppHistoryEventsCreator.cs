@@ -133,7 +133,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         protected override Task<HistoryEventToStore> CreateEventCoreAsync(Envelope<IEvent> @event)
         {
-            return this.DispatchFuncAsync(@event.Payload, @event.Headers, (HistoryEventToStore)null);
+            return this.DispatchFuncAsync(@event.Payload, (HistoryEventToStore)null);
         }
 
         private static string ClientName(AppClientRenamed @event)

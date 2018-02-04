@@ -1,8 +1,10 @@
+<h3 class="rule-title">Send event payload to webhook</h3>
+
 <form [formGroup]="actionForm" class="form-horizontal" (ngSubmit)="save()">
     <div class="form-group row">
-        <label class="col col-2 col-form-label" for="url">Url</label>
+        <label class="col col-3 col-form-label" for="url">Url</label>
 
-        <div class="col col-10">
+        <div class="col col-9">
             <sqx-control-errors for="url" [submitted]="actionFormSubmitted"></sqx-control-errors>
 
             <input type="url" class="form-control" id="url" formControlName="url" />
@@ -14,15 +16,15 @@
     </div>
 
     <div class="form-group row">
-        <label class="col col-2 col-form-label" for="sharedSecret">Secret</label>
+        <label class="col col-3 col-form-label" for="sharedSecret">Secret</label>
 
-        <div class="col col-10">
+        <div class="col col-9">
             <sqx-control-errors for="sharedSecret" [submitted]="actionFormSubmitted"></sqx-control-errors>
 
             <input type="text" class="form-control" id="sharedSecret" formControlName="sharedSecret" />
 
             <small class="form-text text-muted">
-                The shared secret will be used to add a header X-Signature=Sha256(RequestBody + Secret)
+                The shared secret will be used to add a header X-Signature=Base64(Sha256(RequestBody + Secret))
             </small>
         </div>
     </div>

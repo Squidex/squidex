@@ -30,7 +30,7 @@ export class AppFormComponent {
     @Output()
     public cancelled = new EventEmitter();
 
-    public createFormError? = '';
+    public createFormError = '';
     public createFormSubmitted = false;
     public createForm =
         this.formBuilder.group({

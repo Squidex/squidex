@@ -8,7 +8,6 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Primitives;
 using NSwag.Annotations;
 using Squidex.Areas.Api.Controllers.Apps.Models;
 using Squidex.Domain.Apps.Core.Apps;
@@ -53,7 +52,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         {
             var response = App.Clients.Select(x => SimpleMapper.Map(x.Value, new ClientDto { Id = x.Key })).ToList();
 
-            Response.Headers["ETag"] = new StringValues(App.Version.ToString());
+            Response.Headers["ETag"] = App.Version.ToString();
 
             return Ok(response);
         }

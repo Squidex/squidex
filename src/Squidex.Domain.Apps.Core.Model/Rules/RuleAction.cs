@@ -5,9 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Core.Rules.Actions;
-using Squidex.Infrastructure;
-
 namespace Squidex.Domain.Apps.Core.Rules
 {
     public abstract class RuleAction : Freezable

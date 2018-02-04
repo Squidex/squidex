@@ -1,0 +1,45 @@
+<h3 class="rule-title">Populate index in algolia with content</h3>
+
+<form [formGroup]="actionForm" class="form-horizontal" (ngSubmit)="save()">
+    <div class="form-group row">
+        <label class="col col-3 col-form-label" for="appId">App ID</label>
+
+        <div class="col col-9">
+            <sqx-control-errors for="text" [submitted]="actionFormSubmitted"></sqx-control-errors>
+
+            <input type="text" class="form-control" id="appId" formControlName="appId" />
+
+            <small class="form-text text-muted">
+                The ID to you algolia application.
+            </small>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label class="col col-3 col-form-label" for="apiKey">Api Key</label>
+
+        <div class="col col-9">
+            <sqx-control-errors for="apiKey" [submitted]="actionFormSubmitted"></sqx-control-errors>
+
+            <input type="text" class="form-control" id="apiKey" formControlName="apiKey" />
+
+            <small class="form-text text-muted">
+                The API Key to access you algolia app.
+            </small>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label class="col col-3 col-form-label" for="sharedSecret">Index Name</label>
+
+        <div class="col col-9">
+            <sqx-control-errors for="indexName" [submitted]="actionFormSubmitted"></sqx-control-errors>
+
+            <input type="text" class="form-control" id="indexName" formControlName="indexName" />
+
+            <small class="form-text text-muted">
+                The name of the index. You can use advanced formatting (read help section).
+            </small>
+        </div>
+    </div>
+</form>

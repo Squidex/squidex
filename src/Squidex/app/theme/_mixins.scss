@@ -23,6 +23,7 @@
     & {
         color: $color;
         cursor: pointer;
+        border: 1px solid transparent;
     }
 
     &:focus {
@@ -215,12 +216,6 @@
 @mixin text-shadow-none() {
     -webkit-text-shadow: none;
             text-shadow: none;
-}
-
-@mixin box-shadow-colored($axis, $color) {
-    -webkit-box-shadow: 0 0 $axis $color; 
-       -moz-box-shadow: 0 0 $axis $color;  
-            box-shadow: 0 0 $axis $color;
 }
 
 @mixin box-shadow-none() {

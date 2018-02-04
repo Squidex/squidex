@@ -12,6 +12,7 @@ using System.Security;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using IdentityServer4.Models;
 using IdentityServer4.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -88,6 +89,44 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
         }
 
         [HttpGet]
+        [Route("account/consent/")]
+        public IActionResult Consent(string returnUrl = null)
+        {
+            return View(new ConsentVM { PrivacyUrl = identityOptions.Value.PrivacyUrl, ReturnUrl = returnUrl });
+        }
+
+        [HttpPost]
+        [Route("account/consent/")]
+        public async Task<IActionResult> Consent(ConsentModel model, string returnUrl = null)
+        {
+            if (!model.ConsentToCookies)
+            {
+                ModelState.AddModelError(nameof(model.ConsentToCookies), "You have to give consent.");
+            }
+
+            if (!model.ConsentToPersonalInformation)
+            {
+                ModelState.AddModelError(nameof(model.ConsentToPersonalInformation), "You have to give consent.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                var vm = new ConsentVM { PrivacyUrl = identityOptions.Value.PrivacyUrl, ReturnUrl = returnUrl };
+
+                return View(vm);
+            }
+
+            var user = await userManager.GetUserAsync(User);
+
+            user.SetConsentForEmails(model.ConsentToAutomatedEmails);
+            user.SetConsent();
+
+            await userManager.UpdateAsync(user);
+
+            return RedirectToReturnUrl(returnUrl);
+        }
+
+        [HttpGet]
         [Route("account/logout/")]
         public async Task<IActionResult> Logout(string logoutId)
         {
@@ -95,14 +134,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
 
             await signInManager.SignOutAsync();
 
-            var logoutUrl = context.PostLogoutRedirectUri;
-
-            if (string.IsNullOrWhiteSpace(logoutUrl))
-            {
-                logoutUrl = urlOptions.Value.BuildUrl("logout/");
-            }
-
-            return Redirect(logoutUrl);
+            return RedirectToLogoutUrl(context);
         }
 
         [HttpGet]
@@ -143,13 +175,9 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
             {
                 return await LoginViewAsync(returnUrl, true, true);
             }
-            else if (!string.IsNullOrWhiteSpace(returnUrl))
-            {
-                return Redirect(returnUrl);
-            }
             else
             {
-                return Redirect("~/../");
+                return RedirectToReturnUrl(returnUrl);
             }
         }
 
@@ -203,11 +231,13 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
 
             var isLoggedIn = result.Succeeded;
 
+            IUser user = null;
+
             if (!isLoggedIn)
             {
                 var email = externalLogin.Principal.FindFirst(ClaimTypes.Email).Value;
 
-                var user = await userManager.FindByEmailAsync(email);
+                user = await userManager.FindByEmailAsync(email);
 
                 if (user != null)
                 {
@@ -241,13 +271,13 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
             {
                 return RedirectToAction(nameof(Login));
             }
-            else if (!string.IsNullOrWhiteSpace(returnUrl))
+            else if (user != null && !user.HasConsent())
             {
-                return Redirect(returnUrl);
+                return RedirectToAction(nameof(Consent), new { returnUrl });
             }
             else
             {
-                return Redirect("~/../");
+                return RedirectToReturnUrl(returnUrl);
             }
         }
 
@@ -292,22 +322,46 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
         {
             var user = userFactory.Create(email);
 
-            if (!externalLogin.Principal.HasClaim(x => x.Type == SquidexClaimTypes.SquidexPictureUrl))
-            {
-                user.SetClaim(SquidexClaimTypes.SquidexPictureUrl, GravatarHelper.CreatePictureUrl(email));
-            }
-
-            if (!externalLogin.Principal.HasClaim(x => x.Type == SquidexClaimTypes.SquidexDisplayName))
-            {
-                user.SetClaim(SquidexClaimTypes.SquidexDisplayName, email);
-            }
-
-            foreach (var squidexClaim in externalLogin.Principal.Claims.Where(c => c.Type.StartsWith(SquidexClaimTypes.Prefix, StringComparison.Ordinal)))
+            foreach (var squidexClaim in externalLogin.Principal.GetSquidexClaims())
             {
                 user.AddClaim(squidexClaim);
             }
 
+            if (!user.HasPictureUrl())
+            {
+                user.SetPictureUrl(GravatarHelper.CreatePictureUrl(email));
+            }
+
+            if (!user.HasDisplayName())
+            {
+                user.SetDisplayName(email);
+            }
+
             return user;
+        }
+
+        private IActionResult RedirectToLogoutUrl(LogoutRequest context)
+        {
+            if (!string.IsNullOrWhiteSpace(context.PostLogoutRedirectUri))
+            {
+                return Redirect(context.PostLogoutRedirectUri);
+            }
+            else
+            {
+                return Redirect("~/../");
+            }
+        }
+
+        private IActionResult RedirectToReturnUrl(string returnUrl)
+        {
+            if (!string.IsNullOrWhiteSpace(returnUrl))
+            {
+                return Redirect(returnUrl);
+            }
+            else
+            {
+                return Redirect("~/../");
+            }
         }
 
         private async Task<bool> MakeIdentityOperation(Func<Task<IdentityResult>> action, [CallerMemberName] string operationName = null)
