@@ -18,8 +18,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.Edm
         {
             var entityType = new EdmEntityType("Squidex", "Asset");
 
-            entityType.AddStructuralProperty(nameof(IAssetEntity.Id).ToCamelCase(), EdmPrimitiveTypeKind.Guid);
-            entityType.AddStructuralProperty(nameof(IAssetEntity.AppId).ToCamelCase(), EdmPrimitiveTypeKind.Guid);
             entityType.AddStructuralProperty(nameof(IAssetEntity.Created).ToCamelCase(), EdmPrimitiveTypeKind.DateTimeOffset);
             entityType.AddStructuralProperty(nameof(IAssetEntity.CreatedBy).ToCamelCase(), EdmPrimitiveTypeKind.String);
             entityType.AddStructuralProperty(nameof(IAssetEntity.LastModified).ToCamelCase(), EdmPrimitiveTypeKind.DateTimeOffset);

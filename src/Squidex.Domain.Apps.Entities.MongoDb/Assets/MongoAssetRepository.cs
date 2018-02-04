@@ -45,7 +45,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
         {
             try
             {
-                var odataQuery = EdmAssetQuery.ParseQuery(query);
+                var odataQuery = EdmAssetModel.Edm.ParseQuery(query);
 
                 var filter = FindExtensions.BuildQuery(odataQuery, appId);
 

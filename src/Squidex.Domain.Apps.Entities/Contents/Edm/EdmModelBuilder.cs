@@ -44,8 +44,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Edm
         {
             var model = new EdmModel();
 
-            var container = new EdmEntityContainer("Squidex", "Container");
-
             var schemaType = schema.BuildEdmType(partitionResolver, x =>
             {
                 model.AddElement(x);
@@ -54,18 +52,20 @@ namespace Squidex.Domain.Apps.Entities.Contents.Edm
             });
 
             var entityType = new EdmEntityType("Squidex", schema.Name);
-            entityType.AddStructuralProperty("data", new EdmComplexTypeReference(schemaType, false));
-            entityType.AddStructuralProperty("version", EdmPrimitiveTypeKind.Int32);
-            entityType.AddStructuralProperty("created", EdmPrimitiveTypeKind.DateTimeOffset);
-            entityType.AddStructuralProperty("createdBy", EdmPrimitiveTypeKind.String);
-            entityType.AddStructuralProperty("lastModified", EdmPrimitiveTypeKind.DateTimeOffset);
-            entityType.AddStructuralProperty("lastModifiedBy", EdmPrimitiveTypeKind.String);
+            entityType.AddStructuralProperty(nameof(IContentEntity.Created).ToCamelCase(), EdmPrimitiveTypeKind.DateTimeOffset);
+            entityType.AddStructuralProperty(nameof(IContentEntity.CreatedBy).ToCamelCase(), EdmPrimitiveTypeKind.String);
+            entityType.AddStructuralProperty(nameof(IContentEntity.LastModified).ToCamelCase(), EdmPrimitiveTypeKind.DateTimeOffset);
+            entityType.AddStructuralProperty(nameof(IContentEntity.LastModifiedBy).ToCamelCase(), EdmPrimitiveTypeKind.String);
+            entityType.AddStructuralProperty(nameof(IContentEntity.Version).ToCamelCase(), EdmPrimitiveTypeKind.Int32);
+            entityType.AddStructuralProperty(nameof(IContentEntity.Data).ToCamelCase(), new EdmComplexTypeReference(schemaType, false));
+
+            var container = new EdmEntityContainer("Squidex", "Container");
+
+            container.AddEntitySet("ContentSet", entityType);
 
             model.AddElement(container);
             model.AddElement(schemaType);
             model.AddElement(entityType);
-
-            container.AddEntitySet("ContentSet", entityType);
 
             return model;
         }

@@ -8,7 +8,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Microsoft.OData.UriParser;
+using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.GenerateEdmSchema;
@@ -21,11 +23,20 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors
     {
         private static readonly FilterDefinitionBuilder<MongoContentEntity> Filter = Builders<MongoContentEntity>.Filter;
 
+        private static readonly Dictionary<string, string> PropertyMap =
+            typeof(MongoContentEntity).GetProperties()
+                .ToDictionary(x => x.Name, x => x.GetCustomAttribute<BsonElementAttribute>()?.ElementName ?? x.Name, StringComparer.OrdinalIgnoreCase);
+
+        static FindExtensions()
+        {
+            PropertyMap["Data"] = "do";
+        }
+
         public static PropertyCalculator CreatePropertyCalculator(Schema schema)
         {
             return propertyNames =>
             {
-                if (propertyNames.Length == 3)
+                if (propertyNames.Length > 1)
                 {
                     var edmName = propertyNames[1].UnescapeEdmField();
 
@@ -37,7 +48,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors
                     propertyNames[1] = field.Id.ToString();
                 }
 
-                var propertyName = $"do.{string.Join(".", propertyNames.Skip(1))}";
+                if (propertyNames.Length > 0)
+                {
+                    propertyNames[0] = PropertyMap[propertyNames[0]];
+                }
+
+                var propertyName = string.Join(".", propertyNames);
 
                 return propertyName;
             };

@@ -10,7 +10,7 @@ using System.Linq;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 
-namespace Squidex.Domain.Apps.Entities.Contents.Edm
+namespace Squidex.Domain.Apps.Entities
 {
     public static class EdmModelExtensions
     {
