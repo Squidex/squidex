@@ -49,5 +49,10 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models.Converters
         {
             return SimpleMapper.Map(action, new WebhookActionDto());
         }
+
+        public RuleActionDto Visit(ElasticSearchAction action)
+        {
+            return SimpleMapper.Map(action, new ElasticSearchActionDto());
+        }
     }
 }

@@ -85,5 +85,5 @@ $action-elasticsearch-icon:         #47b353;
 }
 
 .rule-element-ElasticSearch {
-    @include build-element($action-elasticsearch-text, $action-elasticsearch-icon)
+    @include build-element($action-elasticsearch-icon)
 }

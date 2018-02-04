@@ -21,7 +21,5 @@ namespace Squidex.Domain.Apps.Core.Rules.Actions
         {
             return visitor.Visit(this);
         }
-
-        public override IRuleActionValidator Validator { get; }
     }
 }

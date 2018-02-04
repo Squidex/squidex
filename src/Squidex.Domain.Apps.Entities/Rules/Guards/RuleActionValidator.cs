@@ -99,7 +99,21 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
 
         public Task<IEnumerable<ValidationError>> Visit(WebhookAction action)
         {
-            var errors = action.Validator.Validate(action); // todo: lazy way of doing this... needs better solution.
+            var errors = new List<ValidationError>();
+
+            if (action.Url == null || !action.Url.IsAbsoluteUri)
+            {
+                errors.Add(new ValidationError("Url must be specified and absolute.", nameof(action.Url)));
+            }
+
+            return Task.FromResult<IEnumerable<ValidationError>>(errors);
+        }
+
+        public Task<IEnumerable<ValidationError>> Visit(ElasticSearchAction action)
+        {
+            var errors = new List<ValidationError>();
+
+            // todo: validation
 
             return Task.FromResult<IEnumerable<ValidationError>>(errors);
         }

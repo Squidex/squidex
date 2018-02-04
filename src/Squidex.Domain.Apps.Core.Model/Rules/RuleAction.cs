@@ -10,7 +10,5 @@ namespace Squidex.Domain.Apps.Core.Rules
     public abstract class RuleAction : Freezable
     {
         public abstract T Accept<T>(IRuleActionVisitor<T> visitor);
-
-        public abstract IRuleActionValidator Validator { get; }
     }
 }

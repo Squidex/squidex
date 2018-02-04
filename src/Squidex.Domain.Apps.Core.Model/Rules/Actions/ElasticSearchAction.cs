@@ -21,85 +21,30 @@ namespace Squidex.Domain.Apps.Core.Rules.Actions
         private string username;
         private string password;
 
-        public ElasticSearchAction()
-        {
-            Validator = new ElasticSearchActionValidator();
-        }
-
         /// <summary>
         /// The url of elastic search. e.g. http://localhost:9200
         /// </summary>
-        public string HostUrl
-        {
-            get => hostUrl;
-            set
-            {
-                ThrowIfFrozen();
-                hostUrl = value;
-            }
-        }
+        public string HostUrl { get; set; }
 
         /// <summary>
         /// The name of the type for the elasticsearch mappings of the schema.
         /// </summary>
-        public string TypeNameForSchema
-        {
-            get => typeNameForSchema;
-            set
-            {
-                ThrowIfFrozen();
-                typeNameForSchema = value;
-            }
-        }
+        public string TypeNameForSchema { get; set; }
 
         /// <summary>
         /// The name of the index this action will operate on.
         /// </summary>
-        public string IndexName
-        {
-            get => indexName;
-            set
-            {
-                ThrowIfFrozen();
-                indexName = value;
-            }
-        }
+        public string IndexName { get; set; }
 
-        public bool RequiresAuthentication
-        {
-            get => requiresAuthentication;
-            set
-            {
-                ThrowIfFrozen();
-                requiresAuthentication = value;
-            }
-        }
+        public bool RequiresAuthentication { get; set; }
 
-        public string Username
-        {
-            get => username;
-            set
-            {
-                ThrowIfFrozen();
-                username = value;
-            }
-        }
+        public string Username { get; set; }
 
-        public string Password
-        {
-            get => password;
-            set
-            {
-                ThrowIfFrozen();
-                password = value;
-            }
-        }
+        public string Password { get; set; }
 
         public override T Accept<T>(IRuleActionVisitor<T> visitor)
         {
             return visitor.Visit(this);
         }
-
-        public override IRuleActionValidator Validator { get; }
     }
 }
