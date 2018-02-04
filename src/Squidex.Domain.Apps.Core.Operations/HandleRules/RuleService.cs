@@ -87,11 +87,17 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                 @event.Headers.Timestamp() :
                 now;
 
+            var aggregateId =
+                @event.Headers.Contains(CommonHeaders.AggregateId) ?
+                @event.Headers.AggregateId() :
+                Guid.NewGuid();
+
             var job = new RuleJob
             {
                 JobId = Guid.NewGuid(),
                 ActionName = actionName,
                 ActionData = actionData.Data,
+                AggregateId = aggregateId,
                 AppId = appEvent.AppId.Id,
                 Created = now,
                 EventName = eventName,

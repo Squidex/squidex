@@ -16,13 +16,14 @@ using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Repositories;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
+using Squidex.Infrastructure.Tasks;
 using Squidex.Infrastructure.Timers;
 
 namespace Squidex.Domain.Apps.Entities.Rules
 {
     public class RuleDequeuer : DisposableObjectBase, IRunnable
     {
-        private readonly ActionBlock<IRuleEventEntity> requestBlock;
+        private readonly ITargetBlock<IRuleEventEntity> requestBlock;
         private readonly IRuleEventRepository ruleEventRepository;
         private readonly RuleService ruleService;
         private readonly CompletionTimer timer;
@@ -45,7 +46,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
             this.log = log;
 
             requestBlock =
-                new ActionBlock<IRuleEventEntity>(HandleAsync,
+                new PartitionedActionBlock<IRuleEventEntity>(HandleAsync, x => x.Job.AggregateId.GetHashCode(),
                     new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = 32, BoundedCapacity = 32 });
 
             timer = new CompletionTimer(5000, QueryAsync);

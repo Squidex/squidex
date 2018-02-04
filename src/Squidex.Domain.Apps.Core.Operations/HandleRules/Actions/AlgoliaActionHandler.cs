@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Algolia.Search;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Actions;
 using Squidex.Domain.Apps.Events;
@@ -60,11 +61,6 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
                 {
                     case ContentCreated created:
                     {
-                        /*
-                         * Do not add the status property here. Sometimes the published event is faster and therefore
-                         * a content item would never become published. We have to find a way to improve the scheduling
-                         * of rules first before we can fix it.
-                         */
                         ruleDescription = $"Add entry to Algolia index: {action.IndexName}";
                         ruleData["Content"] = new JObject(
                             new JProperty("id", contentEvent.ContentId),
@@ -72,6 +68,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
                             new JProperty("createdBy", created.Actor.ToString()),
                             new JProperty("lastModified", timestamp),
                             new JProperty("lastModifiedBy", created.Actor.ToString()),
+                            new JProperty("status", Status.Draft.ToString()),
                             new JProperty("data", formatter.ToRouteData(created.Data)));
                         break;
                     }

@@ -16,6 +16,8 @@ namespace Squidex.Domain.Apps.Core.Rules
 
         public Guid AppId { get; set; }
 
+        public Guid AggregateId { get; set; }
+
         public string EventName { get; set; }
 
         public string ActionName { get; set; }

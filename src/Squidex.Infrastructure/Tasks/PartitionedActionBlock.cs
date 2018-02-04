@@ -66,7 +66,7 @@ namespace Squidex.Infrastructure.Tasks
 
             distributor = new ActionBlock<TInput>(x =>
             {
-                var partition = partitioner(x) % workers.Length;
+                var partition = Math.Abs(partitioner(x)) % workers.Length;
 
                 return workers[partition].SendAsync(x);
             }, distributorOption);
