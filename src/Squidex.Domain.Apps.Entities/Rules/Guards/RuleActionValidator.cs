@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -113,7 +114,36 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
         {
             var errors = new List<ValidationError>();
 
-            // todo: validation
+            if (action.RequiresAuthentication && string.IsNullOrWhiteSpace(action.Username))
+            {
+                errors.Add(new ValidationError("Username must be defined.", nameof(action.Username)));
+            }
+
+            if (action.RequiresAuthentication && string.IsNullOrWhiteSpace(action.Password))
+            {
+                errors.Add(new ValidationError("Password must be defined.", nameof(action.Password)));
+            }
+
+            if (string.IsNullOrWhiteSpace(action.HostUrl))
+            {
+                errors.Add(new ValidationError("HostUrl must be defined.", nameof(action.HostUrl)));
+            }
+
+            if (string.IsNullOrWhiteSpace(action.TypeNameForSchema))
+            {
+                errors.Add(new ValidationError("Type name must be defined.", nameof(action.TypeNameForSchema)));
+            }
+
+            if (string.IsNullOrWhiteSpace(action.IndexName))
+            {
+                errors.Add(new ValidationError("Index name must be defined.", nameof(action.IndexName)));
+            }
+
+            if (!string.IsNullOrWhiteSpace(action.HostUrl) &&
+                !Uri.TryCreate(action.HostUrl, UriKind.Absolute, out var dummy))
+            {
+                errors.Add(new ValidationError("Invalid host url.", nameof(action.IndexName)));
+            }
 
             return Task.FromResult<IEnumerable<ValidationError>>(errors);
         }
