@@ -72,6 +72,9 @@ namespace Squidex.Config.Domain
             services.AddTransientAs<Migration03_SplitContentCollections>()
                 .As<IMigration>();
 
+            services.AddTransientAs<Migration04_FlattenAssetEntity>()
+                .As<IMigration>();
+
             services.AddTransientAs<Rebuilder>()
                 .AsSelf();
 
