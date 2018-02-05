@@ -2,14 +2,19 @@
 @import '_mixins';
 
 .apps {
-    @include clearfix;
-    padding: 1.25rem;
-    padding-left: $size-sidebar-width + .25rem;
-    display: block;
-}
+    &-title {
+        font-weight: light;
+        font-size: 1.4rem;
+    }
 
-h4 {
-    line-height: 2rem;
+    &-section {
+        @include clearfix;
+        padding-top: 2rem;
+        padding-right: 1.25rem;
+        padding-bottom: 0;
+        padding-left: $size-sidebar-width + .25rem;
+        display: block;
+    }
 }
 
 .app {
@@ -26,7 +31,65 @@ h4 {
     }
 }
 
-.empty-headline {
-    margin: 1.25rem;
-    margin-top: 6.25rem;
+.card {
+    & {
+        margin-right: 1rem;
+        margin-bottom: 1rem;
+        width: 16rem;
+        float: left;
+    }
+
+    &-lg {
+        width: 33rem;
+    }
+
+    &-image {
+        text-align: center;
+    }
+
+    &-text {
+        color: $color-text-decent;
+        font-weight: normal;
+        font-size: .9rem;
+    }
+
+    &-more {
+        color: $color-text-decent;
+        font-weight: normal;
+        font-size: .8rem;
+        margin-top: .4rem;
+    }
+
+    &-title {
+        color: $color-title;
+        font-weight: light;
+        font-size: 1.2rem;
+        margin-top: .4rem;
+    }
+
+    &-template {
+        .card-body {
+            min-height: 15.5rem;
+        }
+    }
+
+    &-href {
+        & {
+            cursor: pointer;
+        }
+
+        &:hover {
+            @include box-shadow(0, 3px, 16px, .2px);
+        }
+
+        &:focus {
+            outline: none;
+        }
+
+        &:hover,
+        &:focus,
+        &:active {
+            text-decoration: none;
+        }
+    }
 }

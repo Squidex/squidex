@@ -1,21 +1,17 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
+using System.Threading.Tasks;
+using Squidex.Infrastructure.Commands;
 
-namespace Squidex.Domain.Apps.Entities.Contents.Commands
+namespace Squidex.Domain.Apps.Entities.Apps
 {
-    public sealed class CreateContent : ContentDataCommand
+    public interface IAppTemplateBuilder
     {
-        public bool Publish { get; set; }
-
-        public CreateContent()
-        {
-            ContentId = Guid.NewGuid();
-        }
+        Task PopulateTemplate(IAppEntity app, string name, ICommandBus bus);
     }
 }

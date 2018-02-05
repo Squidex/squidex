@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
     {
         private readonly Guid contentId = Guid.NewGuid();
         private readonly IContentEntity content;
-        private readonly CommandContext commandContext = new CommandContext(new PatchContent());
+        private readonly CommandContext commandContext = new CommandContext(new PatchContent(), A.Dummy<ICommandBus>());
 
         public GraphQLMutationTests()
         {

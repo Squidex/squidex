@@ -1,6 +1,6 @@
 <div class="table-items-row" [class.invalid]="fieldForm.invalid">
     <label>
-        {{field | sqxDisplayName:'properties.label':'name'}} <span class="field-required" [class.hidden]="!field.properties.isRequired">*</span>
+        {{field.displayName}} <span class="field-required" [class.hidden]="!field.properties.isRequired">*</span>
     </label> 
     
     <span class="field-disabled" *ngIf="field.isDisabled">Disabled</span>
@@ -18,7 +18,7 @@
 
         <div *ngFor="let partition of fieldPartitions">
             <div *ngIf="partition == fieldPartition">
-                <sqx-control-errors [for]="partition" fieldName="{{field | sqxDisplayName:'properties.label':'name'}}" [submitted]="contentFormSubmitted"></sqx-control-errors>
+                <sqx-control-errors [for]="partition" fieldName="{{field.displayName}}" [submitted]="contentFormSubmitted"></sqx-control-errors>
 
                 <div [ngSwitch]="field.properties.fieldType">
                     <div *ngSwitchCase="'Number'">

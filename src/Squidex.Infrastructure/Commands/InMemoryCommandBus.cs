@@ -28,7 +28,7 @@ namespace Squidex.Infrastructure.Commands
         {
             Guard.NotNull(command, nameof(command));
 
-            var context = new CommandContext(command);
+            var context = new CommandContext(command, this);
 
             var next = new Func<Task>(() => TaskHelper.Done);
 

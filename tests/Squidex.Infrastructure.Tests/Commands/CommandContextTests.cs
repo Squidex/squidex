@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using FakeItEasy;
 using Squidex.Infrastructure.TestHelpers;
 using Xunit;
 
@@ -18,7 +19,7 @@ namespace Squidex.Infrastructure.Commands
 
         public CommandContextTests()
         {
-            sut = new CommandContext(command);
+            sut = new CommandContext(command, A.Dummy<ICommandBus>());
         }
 
         [Fact]

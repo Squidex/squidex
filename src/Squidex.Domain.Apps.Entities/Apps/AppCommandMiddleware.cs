@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Guards;
@@ -24,30 +25,34 @@ namespace Squidex.Domain.Apps.Entities.Apps
         private readonly IAppPlansProvider appPlansProvider;
         private readonly IAppPlanBillingManager appPlansBillingManager;
         private readonly IUserResolver userResolver;
+        private readonly IEnumerable<IAppTemplateBuilder> templateBuilders;
 
         public AppCommandMiddleware(
             IAggregateHandler handler,
             IAppProvider appProvider,
             IAppPlansProvider appPlansProvider,
             IAppPlanBillingManager appPlansBillingManager,
-            IUserResolver userResolver)
+            IUserResolver userResolver,
+            IEnumerable<IAppTemplateBuilder> templateBuilders)
         {
             Guard.NotNull(handler, nameof(handler));
             Guard.NotNull(appProvider, nameof(appProvider));
             Guard.NotNull(userResolver, nameof(userResolver));
             Guard.NotNull(appPlansProvider, nameof(appPlansProvider));
             Guard.NotNull(appPlansBillingManager, nameof(appPlansBillingManager));
+            Guard.NotNull(templateBuilders, nameof(templateBuilders));
 
             this.handler = handler;
             this.userResolver = userResolver;
             this.appProvider = appProvider;
             this.appPlansProvider = appPlansProvider;
             this.appPlansBillingManager = appPlansBillingManager;
+            this.templateBuilders = templateBuilders;
         }
 
-        protected Task On(CreateApp command, CommandContext context)
+        protected async Task On(CreateApp command, CommandContext context)
         {
-            return handler.CreateSyncedAsync<AppDomainObject>(context, async a =>
+            var app = await handler.CreateSyncedAsync<AppDomainObject>(context, async a =>
             {
                 await GuardApp.CanCreate(command, appProvider);
 
@@ -55,6 +60,14 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
                 context.Complete(EntityCreatedResult.Create(command.AppId, a.Version));
             });
+
+            if (!string.IsNullOrWhiteSpace(command.Template))
+            {
+                foreach (var templateBuilder in templateBuilders)
+                {
+                    await templateBuilder.PopulateTemplate(app.Snapshot, command.Template, context.CommandBus);
+                }
+            }
         }
 
         protected Task On(AssignContributor command, CommandContext context)

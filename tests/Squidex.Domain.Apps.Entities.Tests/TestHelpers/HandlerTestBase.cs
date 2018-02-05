@@ -98,7 +98,7 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
 
         protected CommandContext CreateContextForCommand<TCommand>(TCommand command) where TCommand : SquidexCommand
         {
-            return new CommandContext(CreateCommand(command));
+            return new CommandContext(CreateCommand(command), A.Dummy<ICommandBus>());
         }
 
         protected async Task TestCreate(T domainObject, Func<T, Task> action, bool shouldCreate = true)
