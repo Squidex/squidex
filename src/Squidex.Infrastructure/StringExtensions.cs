@@ -357,7 +357,7 @@ namespace Squidex.Infrastructure
             }
         }
 
-        public static string Simplify(this string value, ISet<char> preserveHash = null, bool singleCharDiactric = false, char separator = '-')
+        public static string Slugify(this string value, ISet<char> preserveHash = null, bool singleCharDiactric = false, char separator = '-')
         {
             var result = new StringBuilder(value.Length);
 

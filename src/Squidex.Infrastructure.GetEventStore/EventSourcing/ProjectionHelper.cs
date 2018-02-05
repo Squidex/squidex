@@ -25,7 +25,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         private static string ParseFilter(string prefix, string filter)
         {
-            return string.Format(CultureInfo.InvariantCulture, ProjectionName, prefix.Simplify(), filter.Simplify());
+            return string.Format(CultureInfo.InvariantCulture, ProjectionName, prefix.Slugify(), filter.Slugify());
         }
 
         public static async Task<string> CreateProjectionAsync(this IEventStoreConnection connection, ProjectionsManager projectionsManager, string prefix, string streamFilter = null)

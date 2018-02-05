@@ -115,7 +115,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
             }
             catch (ParserException ex)
             {
-                throw new ValidationException("Failed to execute script with javascript syntaxs error.", new ValidationError(ex.Message));
+                throw new ValidationException("Failed to execute script with javascript syntax error.", new ValidationError(ex.Message));
             }
             catch (JavaScriptException ex)
             {
@@ -150,6 +150,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
             }
 
             engine.SetValue("ctx", contextInstance);
+            engine.SetValue("slugify", new Func<string, string>(x => x.Slugify()));
 
             return engine;
         }
