@@ -28,6 +28,7 @@ namespace Squidex
                 {
                     builder.AddAppConfiguration(hostContext.HostingEnvironment.EnvironmentName, args);
                 })
+                .UseUrls("http://localhost:5000/")
                 .Build()
                 .Run();
         }
