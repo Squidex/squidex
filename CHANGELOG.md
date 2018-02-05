@@ -1,5 +1,17 @@
 # Changelog
 
+## v1.1.5 - 2018-02-03
+
+### Features
+
+* **Content**: Slugify function for custom scripts.
+
+### Bugfixes
+
+* **Migration**: Assets and schemas were not removed before recreation.
+* **Content**: OData queries only worked for data fields.
+* **Assets**: OData queries did not work at all and included too many fields (e.g. AppId, Id).
+
 ## v1.1.4 - 2018-02-03
 
 ### Features
