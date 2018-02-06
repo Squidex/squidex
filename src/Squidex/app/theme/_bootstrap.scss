@@ -72,6 +72,10 @@
     }
 }
 
+.alert-info {
+    background: $color-theme-blue;
+}
+
 a {
     &:disabled,
     &.disabled {
