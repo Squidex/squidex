@@ -71,7 +71,7 @@ export class UserNameRefPipe extends UserAsyncPipe implements PipeTransform {
         super(users, changeDetector);
     }
 
-    public transform(userId: string, placeholder = 'Me'): string | null {
+    public transform(userId: string, placeholder: string | null = 'Me'): string | null {
         return super.transformInternal(userId, users => {
             const parts = userId.split(':');
 

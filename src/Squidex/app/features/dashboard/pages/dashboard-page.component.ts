@@ -6,14 +6,18 @@
  */
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 
 import {
     AppContext,
     AppDto,
     DateTime,
     fadeAnimation,
-    UsagesService
+    formatHistoryMessage,
+    HistoryEventDto,
+    HistoryService,
+    UsagesService,
+    UsersProviderService
 } from 'shared';
 
 declare var _urq: any;
@@ -60,6 +64,8 @@ export class DashboardPageComponent implements OnDestroy, OnInit {
         maintainAspectRatio: false
     };
 
+    public history: HistoryEventDto[] = [];
+
     public assetsCurrent = 0;
     public assetsMax = 0;
 
@@ -67,6 +73,8 @@ export class DashboardPageComponent implements OnDestroy, OnInit {
     public callsMax = 0;
 
     constructor(public readonly ctx: AppContext,
+        private readonly historyService: HistoryService,
+        private readonly users: UsersProviderService,
         private readonly usagesService: UsagesService
     ) {
     }
@@ -94,6 +102,13 @@ export class DashboardPageComponent implements OnDestroy, OnInit {
                 .subscribe(dto => {
                     this.callsCurrent = dto.count;
                     this.callsMax = dto.maxAllowed;
+                }));
+
+        this.subscriptions.push(
+            this.app
+                .switchMap(app => this.historyService.getHistory(app.name, ''))
+                .subscribe(dto => {
+                    this.history = dto;
                 }));
 
         this.subscriptions.push(
@@ -161,6 +176,10 @@ export class DashboardPageComponent implements OnDestroy, OnInit {
                         ]
                     };
                 }));
+    }
+
+    public format(message: string): Observable<string> {
+        return formatHistoryMessage(message, this.users);
     }
 
     public showForum() {

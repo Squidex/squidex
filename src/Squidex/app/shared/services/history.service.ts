@@ -11,6 +11,8 @@ import { Observable } from 'rxjs';
 
 import 'framework/angular/http-extensions';
 
+import { UsersProviderService } from './users-provider.service';
+
 import {
     ApiUrlConfig,
     HTTP,
@@ -26,6 +28,47 @@ export class HistoryEventDto {
         public readonly created: DateTime
     ) {
     }
+}
+
+const REPLACEMENT_TEMP = '$TEMP$';
+
+export function formatHistoryMessage(message: string, users: UsersProviderService): Observable<string> {
+    const userName = (userId: string) => {
+        const parts = userId.split(':');
+
+        if (parts.length === 1) {
+            return users.getUser(parts[0], null).map(u => u.displayName);
+        } else if (parts[0] === 'subject') {
+            return users.getUser(parts[1], null).map(u => u.displayName);
+        } else {
+            if (parts[1].endsWith('client')) {
+                return Observable.of(parts[1]);
+            } else {
+                return Observable.of(`${parts[1]}-client`);
+            }
+        }
+    };
+
+    let foundUserId: string | null = null;
+
+    message = message.replace(/{([^\s:]*):([^}]*)}/, (match: string, type: string, id: string) => {
+        if (type === 'user') {
+            foundUserId = id;
+            return REPLACEMENT_TEMP;
+        } else {
+            return id;
+        }
+    });
+
+    message = message.replace(/{([^}]*)}/g, (match: string, marker: string) => {
+        return `<span class="marker-ref">${marker}</span>`;
+    });
+
+    if (foundUserId) {
+        return userName(foundUserId).map(t => message.replace(REPLACEMENT_TEMP, `<span class="user-ref">${t}</span>`));
+    }
+
+    return Observable.of(message);
 }
 
 @Injectable()

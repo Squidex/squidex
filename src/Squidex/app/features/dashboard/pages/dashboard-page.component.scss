@@ -49,17 +49,16 @@
         text-align: center;
     }
 
+    &-history {
+        min-height: 12.4rem;
+        max-height: 12.4rem;
+        overflow-y: auto;
+    }
+
     &-text {
         color: $color-text-decent;
         font-weight: normal;
         font-size: .9rem;
-    }
-
-    &-more {
-        color: $color-text-decent;
-        font-weight: normal;
-        font-size: .8rem;
-        margin-top: .4rem;
     }
 
     &-title {
@@ -108,4 +107,41 @@
 
 .app-name {
     color: $color-title;
+}
+
+.event {
+    & {
+        @include flex-box;
+        margin-bottom: 1rem;
+    }
+
+    &-main {
+        @include flex-grow(1);
+    }
+
+    &-load {
+        & {
+            font-size: .9rem;
+            font-weight: normal;
+            cursor: pointer;
+            color: $color-theme-blue !important;
+        }
+
+        &:focus,
+        &:hover {
+            text-decoration: underline !important;
+        }
+    }
+
+    &-left {
+        min-width: 2.8rem;
+        max-width: 2.8rem;
+        margin-top: .3rem;
+    }
+
+    &-created {
+        font-size: .65rem;
+        font-weight: normal;
+        color: $color-text-decent;
+    }
 }
