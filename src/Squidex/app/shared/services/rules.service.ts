@@ -21,16 +21,30 @@ import {
 } from 'framework';
 
 export const ruleTriggers: any = {
-    'AssetChanged': 'Asset changed',
-    'ContentChanged': 'Content changed'
+    'AssetChanged': {
+        name: 'Asset changed'
+    },
+    'ContentChanged': {
+        name: 'Content changed'
+    }
 };
 
 export const ruleActions: any = {
-    'Algolia': 'Populate Algolia Index',
-    'AzureQueue': 'Send to Azure Queue',
-    'Fastly': 'Purge fastly Cache',
-    'Slack': 'Send to Slack',
-    'Webhook': 'Send Webhook'
+    'Algolia': {
+        name: 'Populate Algolia Index'
+    },
+    'AzureQueue': {
+        name: 'Send to Azure Queue'
+    },
+    'Fastly': {
+        name: 'Purge fastly Cache'
+    },
+    'Slack': {
+        name: 'Send to Slack'
+    },
+    'Webhook': {
+        name: 'Send Webhook'
+    }
 };
 
 export class RuleDto {
@@ -154,125 +168,125 @@ export class RulesService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/rules`);
 
         return HTTP.getVersioned<any>(this.http, url)
-                .map(response => {
-                    const items: any[] = response.payload.body;
+            .map(response => {
+                const items: any[] = response.payload.body;
 
-                    return items.map(item => {
-                        return new RuleDto(
-                            item.id,
-                            item.createdBy,
-                            item.lastModifiedBy,
-                            DateTime.parseISO_UTC(item.created),
-                            DateTime.parseISO_UTC(item.lastModified),
-                            new Version(item.version.toString()),
-                            item.isEnabled,
-                            item.trigger,
-                            item.trigger.triggerType,
-                            item.action,
-                            item.action.actionType);
-                    });
-                })
-                .pretifyError('Failed to load Rules. Please reload.');
+                return items.map(item => {
+                    return new RuleDto(
+                        item.id,
+                        item.createdBy,
+                        item.lastModifiedBy,
+                        DateTime.parseISO_UTC(item.created),
+                        DateTime.parseISO_UTC(item.lastModified),
+                        new Version(item.version.toString()),
+                        item.isEnabled,
+                        item.trigger,
+                        item.trigger.triggerType,
+                        item.action,
+                        item.action.actionType);
+                });
+            })
+            .pretifyError('Failed to load Rules. Please reload.');
     }
 
     public postRule(appName: string, dto: CreateRuleDto, user: string, now: DateTime): Observable<RuleDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/rules`);
 
         return HTTP.postVersioned<any>(this.http, url, dto)
-                .map(response => {
-                    const body = response.payload.body;
+            .map(response => {
+                const body = response.payload.body;
 
-                    return new RuleDto(
-                        body.id,
-                        user,
-                        user,
-                        now,
-                        now,
-                        response.version,
-                        true,
-                        dto.trigger,
-                        dto.trigger.triggerType,
-                        dto.action,
-                        dto.action.actionType);
-                })
-                .do(() => {
-                    this.analytics.trackEvent('Rule', 'Created', appName);
-                })
-                .pretifyError('Failed to create rule. Please reload.');
+                return new RuleDto(
+                    body.id,
+                    user,
+                    user,
+                    now,
+                    now,
+                    response.version,
+                    true,
+                    dto.trigger,
+                    dto.trigger.triggerType,
+                    dto.action,
+                    dto.action.actionType);
+            })
+            .do(() => {
+                this.analytics.trackEvent('Rule', 'Created', appName);
+            })
+            .pretifyError('Failed to create rule. Please reload.');
     }
 
     public putRule(appName: string, id: string, dto: UpdateRuleDto, version: Version): Observable<Versioned<any>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/rules/${id}`);
 
         return HTTP.putVersioned(this.http, url, dto, version)
-                .do(() => {
-                    this.analytics.trackEvent('Rule', 'Updated', appName);
-                })
-                .pretifyError('Failed to update rule. Please reload.');
+            .do(() => {
+                this.analytics.trackEvent('Rule', 'Updated', appName);
+            })
+            .pretifyError('Failed to update rule. Please reload.');
     }
 
     public enableRule(appName: string, id: string, version: Version): Observable<Versioned<any>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/rules/${id}/enable`);
 
         return HTTP.putVersioned(this.http, url, {}, version)
-                .do(() => {
-                    this.analytics.trackEvent('Rule', 'Updated', appName);
-                })
-                .pretifyError('Failed to enable rule. Please reload.');
+            .do(() => {
+                this.analytics.trackEvent('Rule', 'Updated', appName);
+            })
+            .pretifyError('Failed to enable rule. Please reload.');
     }
 
     public disableRule(appName: string, id: string, version: Version): Observable<Versioned<any>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/rules/${id}/disable`);
 
         return HTTP.putVersioned(this.http, url, {}, version)
-                .do(() => {
-                    this.analytics.trackEvent('Rule', 'Updated', appName);
-                })
-                .pretifyError('Failed to disable rule. Please reload.');
+            .do(() => {
+                this.analytics.trackEvent('Rule', 'Updated', appName);
+            })
+            .pretifyError('Failed to disable rule. Please reload.');
     }
 
     public deleteRule(appName: string, id: string, version: Version): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/rules/${id}`);
 
         return HTTP.deleteVersioned(this.http, url, version)
-                .do(() => {
-                    this.analytics.trackEvent('Rule', 'Deleted', appName);
-                })
-                .pretifyError('Failed to delete rule. Please reload.');
+            .do(() => {
+                this.analytics.trackEvent('Rule', 'Deleted', appName);
+            })
+            .pretifyError('Failed to delete rule. Please reload.');
     }
 
     public getEvents(appName: string, take: number, skip: number): Observable<RuleEventsDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/rules/events?take=${take}&skip=${skip}`);
 
         return HTTP.getVersioned<any>(this.http, url)
-                .map(response => {
-                    const body = response.payload.body;
+            .map(response => {
+                const body = response.payload.body;
 
-                    const items: any[] = body.items;
+                const items: any[] = body.items;
 
-                    return new RuleEventsDto(body.total, items.map(item => {
-                        return new RuleEventDto(
-                            item.id,
-                            DateTime.parseISO_UTC(item.created),
-                            item.nextAttempt ? DateTime.parseISO_UTC(item.nextAttempt) : null,
-                            item.eventName,
-                            item.description,
-                            item.lastDump,
-                            item.result,
-                            item.jobResult,
-                            item.numCalls);
-                    }));
-                })
-                .pretifyError('Failed to load events. Please reload.');
+                return new RuleEventsDto(body.total, items.map(item => {
+                    return new RuleEventDto(
+                        item.id,
+                        DateTime.parseISO_UTC(item.created),
+                        item.nextAttempt ? DateTime.parseISO_UTC(item.nextAttempt) : null,
+                        item.eventName,
+                        item.description,
+                        item.lastDump,
+                        item.result,
+                        item.jobResult,
+                        item.numCalls);
+                }));
+            })
+            .pretifyError('Failed to load events. Please reload.');
     }
 
     public enqueueEvent(appName: string, id: string): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/rules/events/${id}`);
 
         return HTTP.putVersioned(this.http, url, {})
-                .do(() => {
-                    this.analytics.trackEvent('Rule', 'EventEnqueued', appName);
-                })
-                .pretifyError('Failed to enqueue rule event. Please reload.');
+            .do(() => {
+                this.analytics.trackEvent('Rule', 'EventEnqueued', appName);
+            })
+            .pretifyError('Failed to enqueue rule event. Please reload.');
     }
 }

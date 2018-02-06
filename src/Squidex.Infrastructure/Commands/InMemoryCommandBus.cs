@@ -15,24 +15,24 @@ namespace Squidex.Infrastructure.Commands
 {
     public sealed class InMemoryCommandBus : ICommandBus
     {
-        private readonly List<ICommandMiddleware> handlers;
+        private readonly List<ICommandMiddleware> middlewares;
 
-        public InMemoryCommandBus(IEnumerable<ICommandMiddleware> handlers)
+        public InMemoryCommandBus(IEnumerable<ICommandMiddleware> middlewares)
         {
-            Guard.NotNull(handlers, nameof(handlers));
+            Guard.NotNull(middlewares, nameof(middlewares));
 
-            this.handlers = handlers.Reverse().ToList();
+            this.middlewares = middlewares.Reverse().ToList();
         }
 
         public async Task<CommandContext> PublishAsync(ICommand command)
         {
             Guard.NotNull(command, nameof(command));
 
-            var context = new CommandContext(command);
+            var context = new CommandContext(command, this);
 
             var next = new Func<Task>(() => TaskHelper.Done);
 
-            foreach (var handler in handlers)
+            foreach (var handler in middlewares)
             {
                 next = Join(handler, context, next);
             }

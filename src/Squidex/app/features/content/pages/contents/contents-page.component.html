@@ -1,4 +1,4 @@
-<sqx-title message="{app} | {schema} | Contents" parameter1="app" parameter2="schema" [value1]="ctx.appName" [value2]="schema?.name"></sqx-title>
+<sqx-title message="{app} | {schema} | Contents" parameter1="app" parameter2="schema" [value1]="ctx.appName" [value2]="schema?.displayName"></sqx-title>
 
 <sqx-panel [desiredWidth]="isReadOnly ? '40rem' : '60rem'">
     <div class="panel-header">
@@ -75,7 +75,7 @@
                                 <input type="checkbox" class="form-control" [ngModel]="isAllSelected" (ngModelChange)="selectAll($event)" />
                             </th>
                             <th class="cell-auto" *ngFor="let field of contentFields">
-                                <span class="field">{{field | sqxDisplayName:'properties.label':'name'}}</span>
+                                <span class="field">{{field.displayName}}</span>
                             </th>
                             <th class="cell-time">
                                 Updated

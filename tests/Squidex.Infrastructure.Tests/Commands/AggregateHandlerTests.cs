@@ -26,7 +26,7 @@ namespace Squidex.Infrastructure.Commands
         private readonly Envelope<IEvent> event1 = new Envelope<IEvent>(new MyEvent());
         private readonly Envelope<IEvent> event2 = new Envelope<IEvent>(new MyEvent());
         private readonly CommandContext context;
-        private readonly CommandContext invalidContext = new CommandContext(A.Dummy<ICommand>());
+        private readonly CommandContext invalidContext = new CommandContext(A.Dummy<ICommand>(), A.Dummy<ICommandBus>());
         private readonly Guid domainObjectId = Guid.NewGuid();
         private readonly MyCommand command;
         private readonly MyDomainObject domainObject = new MyDomainObject();
@@ -35,7 +35,7 @@ namespace Squidex.Infrastructure.Commands
         public AggregateHandlerTests()
         {
             command = new MyCommand { AggregateId = domainObjectId, ExpectedVersion = EtagVersion.Any };
-            context = new CommandContext(command);
+            context = new CommandContext(command, A.Dummy<ICommandBus>());
 
             A.CallTo(() => store.WithSnapshotsAndEventSourcing(domainObjectId, A<Func<MyDomainState, Task>>.Ignored, A<Func<Envelope<IEvent>, Task>>.Ignored))
                 .Returns(persistence);

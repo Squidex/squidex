@@ -16,6 +16,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Commands
 
         public string Name { get; set; }
 
+        public string Template { get; set; }
+
         Guid IAggregateCommand.AggregateId
         {
             get { return AppId; }

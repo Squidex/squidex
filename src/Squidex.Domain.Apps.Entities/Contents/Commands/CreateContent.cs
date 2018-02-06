@@ -5,10 +5,17 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
+
 namespace Squidex.Domain.Apps.Entities.Contents.Commands
 {
     public sealed class CreateContent : ContentDataCommand
     {
         public bool Publish { get; set; }
+
+        public CreateContent()
+        {
+            ContentId = Guid.NewGuid();
+        }
     }
 }

@@ -9,6 +9,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 
 import {
+    AppContext,
     AppDto,
     AppsStoreService,
     fadeAnimation,
@@ -20,6 +21,9 @@ import {
     selector: 'sqx-apps-page',
     styleUrls: ['./apps-page.component.scss'],
     templateUrl: './apps-page.component.html',
+    providers: [
+        AppContext
+    ],
     animations: [
         fadeAnimation
     ]
@@ -30,9 +34,12 @@ export class AppsPageComponent implements OnDestroy, OnInit {
     public addAppDialog = new ModalView();
     public apps: AppDto[];
 
+    public template = '';
+
     public onboardingModal = new ModalView();
 
     constructor(
+        public readonly ctx: AppContext,
         private readonly appsStore: AppsStoreService,
         private readonly onboardingService: OnboardingService
     ) {
@@ -53,5 +60,11 @@ export class AppsPageComponent implements OnDestroy, OnInit {
 
                     this.apps = apps;
                 });
+    }
+
+    public createNewApp(template: string) {
+        this.template = template;
+
+        this.addAppDialog.show();
     }
 }
