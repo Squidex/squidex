@@ -1,5 +1,20 @@
 # Changelog
 
+## v1.1.6 - 2018-02-06
+
+### Features
+
+* **Rules**: Allow content triggers to catch all content events.
+* **Rules**: Ensure that the events for an aggregate are handled sequentially.
+* **UI**: History stream in the dashboard.
+* **UI**: Better UI for apps overview.
+* **Apps**: Added a ready to use blog sample.
+
+### Bugfixes
+
+* **UI**: History UI was throwing an exception when a user was referenced in the message.
+* **UI**: A lot of style fixes. 
+
 ## v1.1.5 - 2018-02-03
 
 ### Features
