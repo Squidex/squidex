@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.1.7 - 2018-02-06
+
+### Bugfixes
+
+* **UI**: Checkbox style fixed.
+
+
 ## v1.1.6 - 2018-02-06
 
 ### Features
