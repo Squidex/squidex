@@ -7,6 +7,7 @@
 
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.History;
+using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
@@ -19,16 +20,16 @@ namespace Squidex.Domain.Apps.Entities.Contents
             : base(typeNameRegistry)
         {
             AddEventMessage<ContentCreated>(
-                "created content item.");
+                "created {[Schema]} content item to.");
 
             AddEventMessage<ContentUpdated>(
-                "updated content item.");
+                "updated {[Schema]} content item.");
 
             AddEventMessage<ContentDeleted>(
-                "deleted content item.");
+                "deleted {[Schema]} content item.");
 
             AddEventMessage<ContentStatusChanged>(
-                "changed status of content item to {[Status]}.");
+                "changed status of {[Schema]} content item to {[Status]}.");
         }
 
         protected override Task<HistoryEventToStore> CreateEventCoreAsync(Envelope<IEvent> @event)
@@ -36,6 +37,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
             var channel = $"contents.{@event.Headers.AggregateId()}";
 
             var result = ForEvent(@event.Payload, channel);
+
+            if (@event.Payload is SchemaEvent schemaEvent)
+            {
+                result = result.AddParameter("Schema", schemaEvent.SchemaId.Name);
+            }
 
             if (@event.Payload is ContentStatusChanged contentStatusChanged)
             {
