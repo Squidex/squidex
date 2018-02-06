@@ -26,8 +26,9 @@
     </div>
     
     <div class="form-check" *ngIf="canArchive">
-        <label class="form-check-label">
-            <input class="form-check-input" type="checkbox" [ngModel]="archived" (ngModelChange)="archivedChanged.emit($event)" /> Archived items
+        <input class="form-check-input" type="checkbox" id="archivedItems" [ngModel]="archived" (ngModelChange)="archivedChanged.emit($event)" />
+        <label class="form-check-label" for="archivedItems">
+            Archived items
         </label>
     </div>
 

@@ -61,6 +61,16 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules.Triggers
             Assert.False(result);
         }
 
+        [Fact]
+        public void Should_return_true_when_cathing_all_events()
+        {
+            var trigger = new ContentChangedTrigger { HandleAll = true };
+
+            var result = sut.Triggers(new Envelope<AppEvent>(new ContentCreated()), trigger);
+
+            Assert.True(result);
+        }
+
         [Theory]
         [MemberData(nameof(TestData))]
         public void Should_return_result_depending_on_event(int expected, int sendCreate, int sendUpdate, int sendDelete, int sendPublish, AppEvent @event)

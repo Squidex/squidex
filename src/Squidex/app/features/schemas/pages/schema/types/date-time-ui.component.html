@@ -1,9 +1,9 @@
 <div [formGroup]="editForm">
     <div class="form-group row">
-        <label for="field-placeholder" class="col col-3 col-form-label">Placeholder</label>
+        <label class="col col-3 col-form-label" for="fieldPlaceholder">Placeholder</label>
 
         <div class="col col-6">
-            <input type="text" class="form-control" id="field-placeholder" maxlength="100" formControlName="placeholder" />
+            <input type="text" class="form-control" id="fieldPlaceholder" maxlength="100" formControlName="placeholder" />
 
             <small class="form-text text-muted">
                 Define the placeholder for the input control.
@@ -11,7 +11,7 @@
         </div>
     </div>
     <div class="form-group row">
-        <label for="field-editor" class="col col-3 col-form-label">Editor</label>
+        <label class="col col-3 col-form-label">Editor</label>
 
         <div class="col col-9">
             <label class="btn btn-radio" [class.active]="editForm.controls.editor.value === 'Date'">

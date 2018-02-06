@@ -15,6 +15,8 @@ namespace Squidex.Domain.Apps.Core.Rules.Triggers
     {
         public ImmutableList<ContentChangedTriggerSchema> Schemas { get; set; }
 
+        public bool HandleAll { get; set; }
+
         public override T Accept<T>(IRuleTriggerVisitor<T> visitor)
         {
             return visitor.Visit(this);

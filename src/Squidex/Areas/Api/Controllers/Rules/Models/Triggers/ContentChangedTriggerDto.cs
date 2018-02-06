@@ -25,12 +25,16 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models.Triggers
         [Required]
         public List<ContentChangedTriggerSchemaDto> Schemas { get; set; }
 
+        /// <summary>
+        /// Determines whether the trigger should handle all content changes events.
+        /// </summary>
+        public bool HandleAll { get; set; }
+
         public override RuleTrigger ToTrigger()
         {
-            return new ContentChangedTrigger
-            {
-                Schemas = Schemas.Select(x => SimpleMapper.Map(x, new ContentChangedTriggerSchema())).ToImmutableList()
-            };
+            var schemas = Schemas.Select(x => SimpleMapper.Map(x, new ContentChangedTriggerSchema())).ToImmutableList();
+
+            return new ContentChangedTrigger { HandleAll = HandleAll, Schemas = schemas };
         }
     }
 }

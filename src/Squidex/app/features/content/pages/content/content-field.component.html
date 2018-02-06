@@ -1,6 +1,6 @@
 <div class="table-items-row" [class.invalid]="fieldForm.invalid">
     <label>
-        {{field.displayName}} <span class="field-required" [class.hidden]="!field.properties.isRequired">*</span>
+        {{field.displayName}} <span class="fieldRequired" [class.hidden]="!field.properties.isRequired">*</span>
     </label> 
     
     <span class="field-disabled" *ngIf="field.isDisabled">Disabled</span>
@@ -24,7 +24,7 @@
                     <div *ngSwitchCase="'Number'">
                         <div [ngSwitch]="field.properties.editor">
                             <div *ngSwitchCase="'Input'">
-                                <input class="form-control" type="number" [formControlName]="partition" [placeholder]="field.properties.placeholder || ''">
+                                <input class="form-control" type="number" [formControlName]="partition" [placeholder]="field.properties.placeholder || ''" />
                             </div>
                             <div *ngSwitchCase="'Stars'">
                                 <sqx-stars [formControlName]="partition" [maximumStars]="field.properties.maxValue"></sqx-stars>
@@ -37,8 +37,9 @@
                             </div>
                             <div *ngSwitchCase="'Radio'">
                                 <div class="form-check form-check-inline" *ngFor="let value of field.properties.allowedValues">
+                                    <input class="form-check-input" type="radio" [value]="value" [formControlName]="partition" />
                                     <label class="form-check-label">
-                                        <input class="form-check-input" type="radio" [value]="value" [formControlName]="partition"> {{value}}
+                                        {{value}}
                                     </label>
                                 </div>
                             </div>
@@ -47,10 +48,10 @@
                     <div *ngSwitchCase="'String'">
                         <div [ngSwitch]="field.properties.editor">
                             <div *ngSwitchCase="'Input'">
-                                <input class="form-control" type="text" [formControlName]="partition" [placeholder]="field.properties.placeholder || ''">
+                                <input class="form-control" type="text" [formControlName]="partition" [placeholder]="field.properties.placeholder || ''" />
                             </div>
                             <div *ngSwitchCase="'Slug'">
-                                <input class="form-control" type="text" [formControlName]="partition" [placeholder]="field.properties.placeholder || ''" sqxSlugifyInput>
+                                <input class="form-control" type="text" [formControlName]="partition" [placeholder]="field.properties.placeholder || ''" sqxSlugifyInput />
                             </div>
                             <div *ngSwitchCase="'TextArea'">
                                 <textarea class="form-control" [formControlName]="partition" rows="5" [placeholder]="field.properties.placeholder || ''"></textarea>
@@ -69,8 +70,9 @@
                             </div>
                             <div *ngSwitchCase="'Radio'">
                                 <div class="form-check form-check-inline" *ngFor="let value of field.properties.allowedValues">
+                                    <input class="form-check-input" type="radio" value="{{value}}" [formControlName]="partition" />
                                     <label class="form-check-label">
-                                        <input class="form-check-input" type="radio" value="{{value}}" [formControlName]="partition"> {{value}}
+                                         {{value}}
                                     </label>
                                 </div>
                             </div>
@@ -82,10 +84,8 @@
                                 <sqx-toggle [formControlName]="partition"></sqx-toggle>
                             </div>
                             <div *ngSwitchCase="'Checkbox'">
-                                <div class="form-check form-check-inline">
-                                    <label class="form-check-label">
-                                        <input class="form-check-input" type="checkbox" [formControlName]="partition" sqxIndeterminateValue />
-                                    </label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" [formControlName]="partition" sqxIndeterminateValue />
                                 </div>
                             </div>
                         </div>

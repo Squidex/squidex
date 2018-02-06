@@ -1,6 +1,6 @@
 <h3 class="rule-title">Trigger rule when an events for a schemas happens</h3>
 
-<table class="table table-middle table-sm table-fixed table-borderless">
+<table class="table table-middle table-sm table-fixed table-borderless" *ngIf="!handleAll">
     <colgroup>
         <col style="width: 100%" />
         <col style="width: 40px" />
@@ -70,4 +70,11 @@
 
         <button type="submit" class="btn btn-success" [disabled]="!hasSchema">Add Schema</button>
     </form>
+</div>
+
+<div class="form-check">
+    <input class="form-check-input" type="checkbox" [(ngModel)]="handleAll" id="handleAll" />
+    <label class="form-check-label" for="handleAll">
+        Trigger on all content events
+    </label>
 </div>
