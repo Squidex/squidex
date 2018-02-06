@@ -33,8 +33,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
         public Task HandleAsync(CommandContext context, Func<Task> next)
         {
             if (context.IsCompleted &&
-                context.Command is CreateApp createApp &&
-                string.Equals(createApp.Template, TemplateName, StringComparison.OrdinalIgnoreCase))
+                context.Command is global::Squidex.Domain.Apps.Entities.Apps.Commands.CreateApp createApp &&
+                IsRightTemplate(createApp))
             {
                 var appId = new NamedId<Guid>(createApp.AppId, createApp.Name);
 
@@ -52,6 +52,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
             }
 
             return TaskHelper.Done;
+        }
+
+        private static bool IsRightTemplate(CreateApp createApp)
+        {
+            return string.Equals(createApp.Template, TemplateName, StringComparison.OrdinalIgnoreCase);
         }
 
         private static async Task CreateClientAsync(Func<AppCommand, Task> publishAsync, NamedId<Guid> appId)
