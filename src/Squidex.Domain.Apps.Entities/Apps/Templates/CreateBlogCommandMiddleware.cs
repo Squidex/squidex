@@ -16,11 +16,13 @@ using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Templates
 {
-    public sealed class Blog : IAppTemplateBuilder
+    public sealed class CreateBlogCommandMiddleware : ICommandMiddleware
     {
+        private const string TemplateName = "Blog";
         private const string SlugScript = @"
             var data = ctx.data;
 
@@ -28,52 +30,71 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
 
             replace(data);";
 
-        public async Task PopulateTemplate(IAppEntity app, string name, ICommandBus bus)
+        public Task HandleAsync(CommandContext context, Func<Task> next)
         {
-            if (string.Equals("Blog", name, StringComparison.OrdinalIgnoreCase))
+            if (context.IsCompleted &&
+                context.Command is CreateApp createApp &&
+                string.Equals(createApp.Template, TemplateName, StringComparison.OrdinalIgnoreCase))
             {
-                var appId = new NamedId<Guid>(app.Id, app.Name);
+                var appId = new NamedId<Guid>(createApp.AppId, createApp.Name);
 
                 Task publishAsync(AppCommand command)
                 {
                     command.AppId = appId;
 
-                    return bus.PublishAsync(command);
+                    return context.CommandBus.PublishAsync(command);
                 }
 
-                var pagesId = await CreatePagesSchema(publishAsync);
-                var postsId = await CreatePostsSchema(publishAsync);
-
-                await publishAsync(new CreateContent
-                {
-                    SchemaId = pagesId,
-                    Data =
-                        new NamedContentData()
-                            .AddField("title",
-                                new ContentFieldData()
-                                    .AddValue("iv", "About Me"))
-                            .AddField("text",
-                                new ContentFieldData()
-                                    .AddValue("iv", "I love Squidex and SciFi!")),
-                    Publish = true
-                });
-
-                await publishAsync(new CreateContent
-                {
-                    SchemaId = postsId,
-                    Data =
-                        new NamedContentData()
-                            .AddField("title",
-                                new ContentFieldData()
-                                    .AddValue("iv", "My first post with Squidex"))
-                            .AddField("text",
-                                new ContentFieldData()
-                                    .AddValue("iv", "Just created a blog with Squidex. I love it!")),
-                    Publish = true,
-                });
-
-                await publishAsync(new AttachClient { Id = "sample-client" });
+                return Task.WhenAll(
+                    CreatePagesAsync(publishAsync, appId),
+                    CreatePostsAsync(publishAsync, appId),
+                    CreateClientAsync(publishAsync, appId));
             }
+
+            return TaskHelper.Done;
+        }
+
+        private static async Task CreateClientAsync(Func<AppCommand, Task> publishAsync, NamedId<Guid> appId)
+        {
+            await publishAsync(new AttachClient { Id = "sample-client" });
+        }
+
+        private async Task CreatePostsAsync(Func<AppCommand, Task> publishAsync, NamedId<Guid> appId)
+        {
+            var postsId = await CreatePostsSchema(publishAsync);
+
+            await publishAsync(new CreateContent
+            {
+                SchemaId = postsId,
+                Data =
+                    new NamedContentData()
+                        .AddField("title",
+                            new ContentFieldData()
+                                .AddValue("iv", "My first post with Squidex"))
+                        .AddField("text",
+                            new ContentFieldData()
+                                .AddValue("iv", "Just created a blog with Squidex. I love it!")),
+                Publish = true,
+            });
+        }
+
+        private async Task CreatePagesAsync(Func<AppCommand, Task> publishAsync, NamedId<Guid> appId)
+        {
+            var pagesId = await CreatePagesSchema(publishAsync);
+
+            await publishAsync(new CreateContent
+            {
+                SchemaId = pagesId,
+                Data =
+                    new NamedContentData()
+                        .AddField("title",
+                            new ContentFieldData()
+                                .AddValue("iv", "About Me"))
+                        .AddField("text",
+                            new ContentFieldData()
+                                .AddValue("iv", "I love Squidex and SciFi!")),
+                Publish = true
+            });
         }
 
         private async Task<NamedId<Guid>> CreatePostsSchema(Func<AppCommand, Task> publishAsync)

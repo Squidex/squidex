@@ -64,6 +64,9 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<RuleCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
+            services.AddSingletonAs<CreateBlogCommandMiddleware>()
+                .As<ICommandMiddleware>();
+
             services.AddTransientAs<Migration01_FromCqrs>()
                 .As<IMigration>();
 
@@ -75,9 +78,6 @@ namespace Squidex.Config.Domain
 
             services.AddTransientAs<Migration04_FlattenAssetEntity>()
                 .As<IMigration>();
-
-            services.AddTransientAs<Blog>()
-                .As<IAppTemplateBuilder>();
 
             services.AddTransientAs<Rebuilder>()
                 .AsSelf();

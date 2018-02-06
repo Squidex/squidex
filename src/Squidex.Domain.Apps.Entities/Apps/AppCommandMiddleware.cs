@@ -25,29 +25,25 @@ namespace Squidex.Domain.Apps.Entities.Apps
         private readonly IAppPlansProvider appPlansProvider;
         private readonly IAppPlanBillingManager appPlansBillingManager;
         private readonly IUserResolver userResolver;
-        private readonly IEnumerable<IAppTemplateBuilder> templateBuilders;
 
         public AppCommandMiddleware(
             IAggregateHandler handler,
             IAppProvider appProvider,
             IAppPlansProvider appPlansProvider,
             IAppPlanBillingManager appPlansBillingManager,
-            IUserResolver userResolver,
-            IEnumerable<IAppTemplateBuilder> templateBuilders)
+            IUserResolver userResolver)
         {
             Guard.NotNull(handler, nameof(handler));
             Guard.NotNull(appProvider, nameof(appProvider));
             Guard.NotNull(userResolver, nameof(userResolver));
             Guard.NotNull(appPlansProvider, nameof(appPlansProvider));
             Guard.NotNull(appPlansBillingManager, nameof(appPlansBillingManager));
-            Guard.NotNull(templateBuilders, nameof(templateBuilders));
 
             this.handler = handler;
             this.userResolver = userResolver;
             this.appProvider = appProvider;
             this.appPlansProvider = appPlansProvider;
             this.appPlansBillingManager = appPlansBillingManager;
-            this.templateBuilders = templateBuilders;
         }
 
         protected async Task On(CreateApp command, CommandContext context)
@@ -60,14 +56,6 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
                 context.Complete(EntityCreatedResult.Create(command.AppId, a.Version));
             });
-
-            if (!string.IsNullOrWhiteSpace(command.Template))
-            {
-                foreach (var templateBuilder in templateBuilders)
-                {
-                    await templateBuilder.PopulateTemplate(app.Snapshot, command.Template, context.CommandBus);
-                }
-            }
         }
 
         protected Task On(AssignContributor command, CommandContext context)
@@ -206,10 +194,8 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         public async Task HandleAsync(CommandContext context, Func<Task> next)
         {
-            if (!await this.DispatchActionAsync(context.Command, context))
-            {
-                await next();
-            }
+            await this.DispatchActionAsync(context.Command, context);
+            await next();
         }
     }
 }

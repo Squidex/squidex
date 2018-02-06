@@ -25,8 +25,6 @@ namespace Squidex.Domain.Apps.Entities.Apps
         private readonly IAppPlansProvider appPlansProvider = A.Fake<IAppPlansProvider>();
         private readonly IAppPlanBillingManager appPlansBillingManager = A.Fake<IAppPlanBillingManager>();
         private readonly IUserResolver userResolver = A.Fake<IUserResolver>();
-        private readonly IAppTemplateBuilder templateBuilder1 = A.Fake<IAppTemplateBuilder>();
-        private readonly IAppTemplateBuilder templateBuilder2 = A.Fake<IAppTemplateBuilder>();
         private readonly Language language = Language.DE;
         private readonly string contributorId = Guid.NewGuid().ToString();
         private readonly string clientName = "client";
@@ -47,13 +45,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             A.CallTo(() => userResolver.FindByIdAsync(contributorId))
                 .Returns(A.Fake<IUser>());
 
-            var templateBuilders = new[]
-            {
-                templateBuilder1,
-                templateBuilder2
-            };
-
-            sut = new AppCommandMiddleware(Handler, appProvider, appPlansProvider, appPlansBillingManager, userResolver, templateBuilders);
+            sut = new AppCommandMiddleware(Handler, appProvider, appPlansProvider, appPlansBillingManager, userResolver);
         }
 
         [Fact]
@@ -67,29 +59,6 @@ namespace Squidex.Domain.Apps.Entities.Apps
             });
 
             Assert.Equal(AppId, context.Result<EntityCreatedResult<Guid>>().IdOrValue);
-
-            A.CallTo(() => templateBuilder1.PopulateTemplate(A<IAppEntity>.Ignored, A<string>.Ignored, context.CommandBus))
-                .MustNotHaveHappened();
-            A.CallTo(() => templateBuilder2.PopulateTemplate(A<IAppEntity>.Ignored, A<string>.Ignored, context.CommandBus))
-                .MustNotHaveHappened();
-        }
-
-        [Fact]
-        public async Task Create_should_call_template_builders_with_template_name()
-        {
-            var context = CreateContextForCommand(new CreateApp { Name = AppName, AppId = AppId, Template = "Blog" });
-
-            await TestCreate(app, async _ =>
-            {
-                await sut.HandleAsync(context);
-            });
-
-            Assert.Equal(AppId, context.Result<EntityCreatedResult<Guid>>().IdOrValue);
-
-            A.CallTo(() => templateBuilder1.PopulateTemplate(A<IAppEntity>.Ignored, "Blog", context.CommandBus))
-                .MustHaveHappened();
-            A.CallTo(() => templateBuilder2.PopulateTemplate(A<IAppEntity>.Ignored, "Blog", context.CommandBus))
-                .MustHaveHappened();
         }
 
         [Fact]

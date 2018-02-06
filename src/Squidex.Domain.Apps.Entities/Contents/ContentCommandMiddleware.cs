@@ -133,10 +133,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public async Task HandleAsync(CommandContext context, Func<Task> next)
         {
-            if (!await this.DispatchActionAsync(context.Command, context))
-            {
-                await next();
-            }
+            await this.DispatchActionAsync(context.Command, context);
+            await next();
         }
 
         private async Task<ContentOperationContext> CreateContext(ContentCommand command, ContentDomainObject content, Func<string> message)
