@@ -20,5 +20,7 @@ namespace Squidex.Domain.Apps.Core.Rules
         T Visit(SlackAction action);
 
         T Visit(WebhookAction action);
+
+        T Visit(ElasticSearchAction action);
     }
 }

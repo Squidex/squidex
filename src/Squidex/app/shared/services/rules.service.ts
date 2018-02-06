@@ -30,7 +30,8 @@ export const ruleActions: any = {
     'AzureQueue': 'Send to Azure Queue',
     'Fastly': 'Purge fastly Cache',
     'Slack': 'Send to Slack',
-    'Webhook': 'Send Webhook'
+    'Webhook': 'Send Webhook',
+    'ElasticSearch': 'Index in ElasticSearch'
 };
 
 export class RuleDto {

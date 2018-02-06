@@ -418,5 +418,10 @@ namespace Squidex.Infrastructure
 
             return url;
         }
+
+        public static string SplitCamelCase(this string camelCasedStr)
+        {
+            return Regex.Replace(camelCasedStr, "(?<=[a-z])([A-Z])", " $1", RegexOptions.Compiled).Trim();
+        }
     }
 }

@@ -1,0 +1,83 @@
+<form [formGroup]="actionForm" class="form-horizontal" (ngSubmit)="save()">
+    <div class="form-group row">
+        <label class="col col-2 col-form-label" for="hostUrl">Host Url</label>
+
+        <div class="col col-10">
+            <sqx-control-errors for="hostUrl" [submitted]="actionFormSubmitted"></sqx-control-errors>
+
+            <input type="url" class="form-control" id="hostUrl" formControlName="hostUrl" />
+
+            <small class="form-text text-muted">
+                The url of elastic search with port number. e.g. http://localhost:9200
+            </small>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <div class="col col-2">
+            <input type="checkbox" style="height:100%;" class="form-control" id="requiresAuthentication" (change)="requiresAuthenticationChanged($event)" formControlName="requiresAuthentication" />
+        </div>
+        <div class="col col-10">
+            <label class="col-form-label" for="requiresAuthentication">Requires authentication</label>
+            <small class="form-text text-muted">
+                <b>Important</b>: Squidex only supports basic authentication.
+            </small>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label class="col col-2 col-form-label" for="username">Username</label>
+
+        <div class="col col-10">
+            <sqx-control-errors for="username" [submitted]="actionFormSubmitted"></sqx-control-errors>
+
+            <input type="text" class="form-control" id="username" formControlName="username" />
+
+            <small class="form-text text-muted">
+                The username for basic authentication with elastic search.
+            </small>
+        </div>
+    </div>
+
+    <div class="form-group row" [ngClass]="{ 'disabled': requiresAuthentication }">
+        <label class="col col-2 col-form-label" for="password">Password</label>
+
+        <div class="col col-10">
+            <sqx-control-errors for="password" [submitted]="actionFormSubmitted"></sqx-control-errors>
+
+            <input type="password" class="form-control" id="password" formControlName="password" />
+
+            <small class="form-text text-muted">
+                The password for basic authentication with elastic search.
+            </small>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label class="col col-2 col-form-label" for="indexName">Index name</label>
+
+        <div class="col col-10">
+            <sqx-control-errors for="indexName" [submitted]="actionFormSubmitted"></sqx-control-errors>
+
+            <input type="text" class="form-control" id="indexName" formControlName="indexName" />
+
+            <small class="form-text text-muted">
+                The name of the index where the event data is going to be indexed to. <br/> You can use <i>$SCHEMA_NAME</i> placeholder to use the schema's name.
+            </small>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label class="col col-2 col-form-label" for="typeNameForSchema">Type name</label>
+
+        <div class="col col-10">
+            <sqx-control-errors for="typeNameForSchema" [submitted]="actionFormSubmitted"></sqx-control-errors>
+
+            <input type="text" class="form-control" id="typeNameForSchema" formControlName="typeNameForSchema" />
+
+            <small class="form-text text-muted">
+                The name of the type which holds the <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html" target="_blank">elasticsearch mappings</a> for the selected schema. <br/> You can use <i>$SCHEMA_NAME</i> placeholder to use the schema's name. 
+            </small>
+        </div>
+    </div>
+</form>

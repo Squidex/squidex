@@ -256,6 +256,9 @@
 .icon-action-Webhook:before {
   content: "\e947";
 }
+.icon-action-ElasticSearch:before {
+  content: "\e80e";
+}
 .icon-bin2:before {
   content: "\e902";
 }

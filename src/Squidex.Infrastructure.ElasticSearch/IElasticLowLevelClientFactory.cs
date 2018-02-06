@@ -1,14 +1,20 @@
 ﻿// ==========================================================================
+//  IElasticLowLevelClientFactory.cs
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Core.Rules
+using System;
+using Elasticsearch.Net;
+
+namespace Squidex.Infrastructure.ElasticSearch
 {
-    public abstract class RuleAction : Freezable
+    public interface IElasticLowLevelClientFactory
     {
-        public abstract T Accept<T>(IRuleActionVisitor<T> visitor);
+        IElasticLowLevelClient Create(Uri hostUrl);
+
+        IElasticLowLevelClient Create(Uri hostUrl, string username, string password);
     }
 }

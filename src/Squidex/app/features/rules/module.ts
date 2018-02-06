@@ -24,7 +24,8 @@ import {
     RulesPageComponent,
     RuleWizardComponent,
     SlackActionComponent,
-    WebhookActionComponent
+    WebhookActionComponent,
+    ElasticSearchActionComponent
 } from './declarations';
 
 const routes: Routes = [
@@ -62,6 +63,7 @@ const routes: Routes = [
         RuleEventsPageComponent,
         RulesPageComponent,
         RuleWizardComponent,
+        ElasticSearchActionComponent,
         SlackActionComponent,
         WebhookActionComponent
     ]

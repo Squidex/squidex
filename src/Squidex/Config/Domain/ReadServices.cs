@@ -5,7 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Linq;
+using Elasticsearch.Net;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -25,8 +27,10 @@ using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Users;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
+using Squidex.Infrastructure.ElasticSearch;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.EventSourcing.Grains;
+using Squidex.Infrastructure.SearchEngines;
 using Squidex.Infrastructure.States;
 using Squidex.Pipeline;
 
@@ -112,6 +116,16 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<WebhookActionHandler>()
                 .As<IRuleActionHandler>();
+
+            services.AddSingletonAs<DefaultElasticClientFactory>()
+                .As<IElasticLowLevelClientFactory>();
+
+            services.AddSingletonAs<ElasticSearchActionHandler>()
+                .As<IRuleActionHandler>();
+
+            // todo: create abstraction for this - the system should support any search engine
+            services.AddSingletonAs<ElasticSearchClient>()
+                .As<ISearchEngine>();
 
             services.AddSingletonAs<DefaultEventNotifier>()
                 .As<IEventNotifier>();

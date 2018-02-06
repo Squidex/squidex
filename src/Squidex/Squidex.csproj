@@ -1,5 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
-
   <PropertyGroup>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <MvcRazorCompileOnPublish>true</MvcRazorCompileOnPublish>
@@ -10,24 +9,19 @@
     <TypeScriptToolsVersion>Latest</TypeScriptToolsVersion>
     <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
   </PropertyGroup>
-
   <ItemGroup>
     <EmbeddedResource Include="Areas\IdentityServer\Config\Cert\*.*;Docs\*.md" />
     <EmbeddedResource Include="Areas\Api\Controllers\Users\Assets\Avatar.png" />
     <EmbeddedResource Remove="Assets\**" />
-
     <Compile Remove="Assets\**" />
     <Content Remove="Assets\**" />
-
     <None Remove="Assets\**" />
   </ItemGroup>
-
   <ItemGroup>
     <None Update="dockerfile">
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </None>
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\tools\Migrate_01\Migrate_01.csproj" />
     <ProjectReference Include="..\Squidex.Domain.Apps.Core.Model\Squidex.Domain.Apps.Core.Model.csproj" />
@@ -38,6 +32,10 @@
     <ProjectReference Include="..\Squidex.Domain.Users\Squidex.Domain.Users.csproj" />
     <ProjectReference Include="..\Squidex.Domain.Users.MongoDb\Squidex.Domain.Users.MongoDb.csproj" />
     <ProjectReference Include="..\Squidex.Infrastructure.Azure\Squidex.Infrastructure.Azure.csproj" />
+    <ProjectReference Include="..\Squidex.Infrastructure.ElasticSearch\Squidex.Infrastructure.ElasticSearch.csproj">
+      <Project>{539E830E-2C79-44E5-9F57-7C6074842D48}</Project>
+      <Name>Squidex.Infrastructure.ElasticSearch</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Squidex.Infrastructure.GetEventStore\Squidex.Infrastructure.GetEventStore.csproj" />
     <ProjectReference Include="..\Squidex.Infrastructure.GoogleCloud\Squidex.Infrastructure.GoogleCloud.csproj" />
     <ProjectReference Include="..\Squidex.Infrastructure.RabbitMq\Squidex.Infrastructure.RabbitMq.csproj" />
@@ -46,10 +44,10 @@
     <ProjectReference Include="..\Squidex.Infrastructure.Redis\Squidex.Infrastructure.Redis.csproj" />
     <ProjectReference Include="..\Squidex.Shared\Squidex.Shared.csproj" />
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="Algolia.Search" Version="4.2.1" />
     <PackageReference Include="Ben.BlockingDetector" Version="0.0.2" />
+    <PackageReference Include="Elasticsearch.Net" Version="6.0.0-rc1" />
     <PackageReference Include="EventStore.ClientAPI.NetCore" Version="4.0.2-rc" />
     <PackageReference Include="IdentityServer4" Version="2.1.1" />
     <PackageReference Include="IdentityServer4.AccessTokenValidation" Version="2.3.0" />
@@ -84,20 +82,16 @@
     <PackageReference Include="System.Linq" Version="4.3.0" />
     <PackageReference Include="System.ValueTuple" Version="4.4.0" />
   </ItemGroup>
-
   <Target Name="IncludeDocFile" BeforeTargets="PrepareForPublish">
     <ItemGroup Condition=" '$(DocumentationFile)' != '' ">
       <_DocumentationFile Include="$(DocumentationFile)" />
       <ContentWithTargetPath Include="@(_DocumentationFile->'%(FullPath)')" RelativePath="%(_DocumentationFile.Identity)" TargetPath="%(_DocumentationFile.Filename)%(_DocumentationFile.Extension)" CopyToPublishDirectory="PreserveNewest" />
     </ItemGroup>
   </Target>
-
   <PropertyGroup>
     <CodeAnalysisRuleSet>..\..\Squidex.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
-
   <ItemGroup>
     <AdditionalFiles Include="..\..\stylecop.json" Link="stylecop.json" />
   </ItemGroup>
-
 </Project>

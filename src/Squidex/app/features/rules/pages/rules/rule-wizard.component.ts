@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
 
 import {
     AppContext,
@@ -22,7 +22,7 @@ import {
 
 export const MODE_WIZARD = 'Wizard';
 export const MODE_EDIT_TRIGGER = 'EditTrigger';
-export const MODE_EDIT_ACTION  = 'EditAction';
+export const MODE_EDIT_ACTION = 'EditAction';
 
 @Component({
     selector: 'sqx-rule-wizard',
@@ -70,8 +70,7 @@ export class RuleWizardComponent implements OnInit {
     public mode = MODE_WIZARD;
 
     constructor(public readonly ctx: AppContext,
-        private readonly rulesService: RulesService
-    ) {
+                private readonly rulesService: RulesService) {
     }
 
     public ngOnInit() {
@@ -103,7 +102,7 @@ export class RuleWizardComponent implements OnInit {
     }
 
     public selectTrigger(value: any) {
-        this.trigger = Object.assign({}, value, { triggerType: this.triggerType });
+        this.trigger = Object.assign({}, value, {triggerType: this.triggerType});
 
         if (this.mode === MODE_WIZARD) {
             this.step++;
@@ -113,7 +112,7 @@ export class RuleWizardComponent implements OnInit {
     }
 
     public selectAction(value: any) {
-        this.action = Object.assign({}, value, { actionType: this.actionType });
+        this.action = Object.assign({}, value, {actionType: this.actionType});
 
         if (this.mode === MODE_WIZARD) {
             this.createRule();

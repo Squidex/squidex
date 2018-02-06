@@ -19,7 +19,7 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Xunit;
 
-#pragma warning disable xUnit2009 // Do not use boolean check to check for string equality
+#pragma warning disable xUnit2009 // Do not use boolean check to check for string equality.
 
 namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 {
@@ -115,7 +115,11 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public void Should_not_create_job_if_too_old()
         {
-            var e = new ContentCreated { SchemaId = new NamedId<Guid>(Guid.NewGuid(), "my-schema"), AppId = new NamedId<Guid>(Guid.NewGuid(), "my-event") };
+            var e = new ContentCreated
+            {
+                SchemaId = new NamedId<Guid>(Guid.NewGuid(), "my-schema"),
+                AppId = new NamedId<Guid>(Guid.NewGuid(), "my-event")
+            };
 
             var now = SystemClock.Instance.GetCurrentInstant();
 
@@ -146,7 +150,11 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public void Should_create_job_if_triggered()
         {
-            var e = new ContentCreated { SchemaId = new NamedId<Guid>(Guid.NewGuid(), "my-schema"), AppId = new NamedId<Guid>(Guid.NewGuid(), "my-event") };
+            var e = new ContentCreated
+            {
+                SchemaId = new NamedId<Guid>(Guid.NewGuid(), "my-schema"),
+                AppId = new NamedId<Guid>(Guid.NewGuid(), "my-event")
+            };
 
             var now = SystemClock.Instance.GetCurrentInstant();
 
