@@ -32,9 +32,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
 
         public Task HandleAsync(CommandContext context, Func<Task> next)
         {
-            if (context.IsCompleted &&
-                context.Command is global::Squidex.Domain.Apps.Entities.Apps.Commands.CreateApp createApp &&
-                IsRightTemplate(createApp))
+            if (context.IsCompleted && context.Command is CreateApp createApp && IsRightTemplate(createApp))
             {
                 var appId = new NamedId<Guid>(createApp.AppId, createApp.Name);
 
