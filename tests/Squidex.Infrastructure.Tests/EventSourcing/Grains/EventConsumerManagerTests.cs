@@ -9,7 +9,6 @@ using System;
 using System.Threading.Tasks;
 using FakeItEasy;
 using FluentAssertions;
-using Squidex.Infrastructure.EventSourcing.Grains.Messages;
 using Squidex.Infrastructure.States;
 using Xunit;
 
@@ -25,7 +24,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         private readonly IPubSub pubSub = new InMemoryPubSub();
         private readonly string consumerName1 = "Consumer1";
         private readonly string consumerName2 = "Consumer2";
-        private readonly EventConsumerGrainManager sut;
+        private readonly EventConsumerManagerGrain sut;
 
         public EventConsumerManagerTests()
         {
@@ -35,7 +34,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             A.CallTo(() => factory.CreateAsync<EventConsumerGrain>(consumerName1)).Returns(actor1);
             A.CallTo(() => factory.CreateAsync<EventConsumerGrain>(consumerName2)).Returns(actor2);
 
-            sut = new EventConsumerGrainManager(new IEventConsumer[] { consumer1, consumer2 }, pubSub, factory);
+            sut = new EventConsumerManagerGrain(new IEventConsumer[] { consumer1, consumer2 }, pubSub, factory);
         }
 
         [Fact]

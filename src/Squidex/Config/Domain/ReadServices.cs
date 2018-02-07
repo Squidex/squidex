@@ -40,10 +40,6 @@ namespace Squidex.Config.Domain
 
             if (consumeEvents)
             {
-                services.AddTransient<EventConsumerGrain>();
-
-                services.AddSingletonAs<EventConsumerGrainManager>()
-                    .As<IRunnable>();
                 services.AddSingletonAs<RuleDequeuer>()
                     .As<IRunnable>();
             }
@@ -113,7 +109,7 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<WebhookActionHandler>()
                 .As<IRuleActionHandler>();
 
-            services.AddSingletonAs<DefaultEventNotifier>()
+            services.AddSingletonAs<OrleansEventNotifier>()
                 .As<IEventNotifier>();
 
             services.AddSingletonAs<RuleEnqueuer>()

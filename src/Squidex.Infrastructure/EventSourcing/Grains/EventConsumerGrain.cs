@@ -8,120 +8,104 @@
 using System;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using Orleans;
+using Orleans.Concurrency;
+using Orleans.Core;
+using Orleans.Runtime;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.EventSourcing.Grains
 {
-    public class EventConsumerGrain : DisposableObjectBase, IStatefulObject<string>, IEventSubscriber
+    public class EventConsumerGrain : Grain, IEventConsumerGrain
     {
+        private readonly EventConsumerFactory eventConsumerFactory;
         private readonly IEventDataFormatter eventDataFormatter;
         private readonly IEventStore eventStore;
         private readonly ISemanticLog log;
-        private readonly SingleThreadedDispatcher dispatcher = new SingleThreadedDispatcher(1);
+        private readonly IPersistence<EventConsumerState> persistence;
+        private TaskScheduler scheduler;
         private IEventSubscription currentSubscription;
         private IEventConsumer eventConsumer;
-        private IPersistence<EventConsumerState> persistence;
         private EventConsumerState state = new EventConsumerState();
 
         public EventConsumerGrain(
+            EventConsumerFactory eventConsumerFactory,
+            IStore<string> store,
             IEventStore eventStore,
             IEventDataFormatter eventDataFormatter,
             ISemanticLog log)
+            : this (eventConsumerFactory, store, eventStore, eventDataFormatter, null, null, log)
+        {
+        }
+
+        protected EventConsumerGrain(
+            EventConsumerFactory eventConsumerFactory,
+            IStore<string> store,
+            IEventStore eventStore,
+            IEventDataFormatter eventDataFormatter,
+            IGrainIdentity identity,
+            IGrainRuntime runtime,
+            ISemanticLog log)
         {
             Guard.NotNull(log, nameof(log));
+            Guard.NotNull(store, nameof(store));
             Guard.NotNull(eventStore, nameof(eventStore));
             Guard.NotNull(eventDataFormatter, nameof(eventDataFormatter));
+            Guard.NotNull(eventConsumerFactory, nameof(eventConsumerFactory));
 
             this.log = log;
 
             this.eventStore = eventStore;
             this.eventDataFormatter = eventDataFormatter;
+            this.eventConsumerFactory = eventConsumerFactory;
+
+            persistence = store.WithSnapshots<EventConsumerState, string>(this.GetPrimaryKeyString(), s => state = s);
         }
 
-        protected override void DisposeObject(bool disposing)
+        public override Task OnActivateAsync()
         {
-            if (disposing)
-            {
-                dispatcher.StopAndWaitAsync().Wait();
-            }
-        }
+            scheduler = TaskScheduler.Current;
 
-        public Task ActivateAsync(string key, IStore<string> store)
-        {
-            persistence = store.WithSnapshots<EventConsumerState, string>(key, s => state = s);
+            eventConsumer = eventConsumerFactory(this.GetPrimaryKeyString());
 
             return persistence.ReadAsync();
         }
 
         protected virtual IEventSubscription CreateSubscription(IEventStore eventStore, string streamFilter, string position)
         {
-            return new RetrySubscription(eventStore, this, streamFilter, position);
+            return new RetrySubscription(eventStore, new WrapperSubscription(this.AsReference<IEventConsumerGrain>(), scheduler), streamFilter, position);
         }
 
-        public virtual EventConsumerInfo GetState()
+        public virtual Task<Immutable<EventConsumerInfo>> GetStateAsync()
         {
-            return state.ToInfo(this.eventConsumer.Name);
+            return Task.FromResult(state.ToInfo(this.eventConsumer.Name).AsImmutable());
         }
 
-        public virtual void Stop()
+        public Task OnEventAsync(Immutable<IEventSubscription> subscription, Immutable<StoredEvent> storedEvent)
         {
-            dispatcher.DispatchAsync(HandleStopAsync).Forget();
-        }
-
-        public virtual void Start()
-        {
-            dispatcher.DispatchAsync(HandleStartAsync).Forget();
-        }
-
-        public virtual void Reset()
-        {
-            dispatcher.DispatchAsync(HandleResetAsync).Forget();
-        }
-
-        public virtual void Activate(IEventConsumer eventConsumer)
-        {
-            Guard.NotNull(eventConsumer, nameof(eventConsumer));
-
-            dispatcher.DispatchAsync(() => HandleSetupAsync(eventConsumer)).Forget();
-        }
-
-        private Task HandleSetupAsync(IEventConsumer consumer)
-        {
-            eventConsumer = consumer;
-
-            if (!state.IsStopped)
-            {
-                Subscribe(state.Position);
-            }
-
-            return TaskHelper.Done;
-        }
-
-        private Task HandleEventAsync(IEventSubscription subscription, StoredEvent storedEvent)
-        {
-            if (subscription != currentSubscription)
+            if (subscription.Value != currentSubscription)
             {
                 return TaskHelper.Done;
             }
 
             return DoAndUpdateStateAsync(async () =>
             {
-                var @event = ParseKnownEvent(storedEvent);
+                var @event = ParseKnownEvent(storedEvent.Value);
 
                 if (@event != null)
                 {
                     await DispatchConsumerAsync(@event);
                 }
 
-                state = state.Handled(storedEvent.EventPosition);
+                state = state.Handled(storedEvent.Value.EventPosition);
             });
         }
 
-        private Task HandleErrorAsync(IEventSubscription subscription, Exception exception)
+        public Task OnErrorAsync(Immutable<IEventSubscription> subscription, Immutable<Exception> exception)
         {
-            if (subscription != currentSubscription)
+            if (subscription.Value != currentSubscription)
             {
                 return TaskHelper.Done;
             }
@@ -130,11 +114,28 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             {
                 Unsubscribe();
 
-                state = state.Failed(exception);
+                state = state.Failed(exception.Value);
             });
         }
 
-        private Task HandleStartAsync()
+        public Task WakeUpAsync()
+        {
+            currentSubscription?.WakeUp();
+
+            return TaskHelper.Done;
+        }
+
+        public Task ActivateAsync()
+        {
+            if (!state.IsStopped)
+            {
+                Subscribe(state.Position);
+            }
+
+            return TaskHelper.Done;
+        }
+
+        public Task StartAsync()
         {
             if (!state.IsStopped)
             {
@@ -149,7 +150,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             });
         }
 
-        private Task HandleStopAsync()
+        public Task StopAsync()
         {
             if (state.IsStopped)
             {
@@ -164,7 +165,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             });
         }
 
-        private Task HandleResetAsync()
+        public Task ResetAsync()
         {
             return DoAndUpdateStateAsync(async () =>
             {
@@ -176,16 +177,6 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
                 state = state.Reset();
             });
-        }
-
-        Task IEventSubscriber.OnEventAsync(IEventSubscription subscription, StoredEvent storedEvent)
-        {
-            return dispatcher.DispatchAsync(() => HandleEventAsync(subscription, storedEvent));
-        }
-
-        Task IEventSubscriber.OnErrorAsync(IEventSubscription subscription, Exception exception)
-        {
-            return dispatcher.DispatchAsync(() => HandleErrorAsync(subscription, exception));
         }
 
         private Task DoAndUpdateStateAsync(Action action, [CallerMemberName] string caller = null)

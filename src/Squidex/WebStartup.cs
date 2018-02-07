@@ -15,6 +15,7 @@ using Squidex.Areas.Frontend;
 using Squidex.Areas.IdentityServer;
 using Squidex.Areas.Portal;
 using Squidex.Config.Domain;
+using Squidex.Config.Orleans;
 using Squidex.Config.Web;
 
 namespace Squidex
@@ -30,6 +31,7 @@ namespace Squidex
 
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
+            services.AddAppClient();
             services.AddAppServices(configuration);
 
             return services.BuildServiceProvider();
