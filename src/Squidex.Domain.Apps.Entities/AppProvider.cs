@@ -92,7 +92,7 @@ namespace Squidex.Domain.Apps.Entities
         {
             var schema = await stateFactory.GetSingleAsync<SchemaDomainObject>(id);
 
-            if (!IsFound(schema))
+            if (!IsFound(schema) || schema.Snapshot.IsDeleted || schema.Snapshot.AppId != appId)
             {
                 return null;
             }
