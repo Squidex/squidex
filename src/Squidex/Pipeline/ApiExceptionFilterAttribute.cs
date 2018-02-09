@@ -62,28 +62,7 @@ namespace Squidex.Pipeline
             error.StatusCode = statusCode;
 
             return new ObjectResult(error) { StatusCode = statusCode };
-        }
-
-        public override void OnActionExecuting(ActionExecutingContext context)
-        {
-            if (!context.ModelState.IsValid)
-            {
-                var errors = new List<ValidationError>();
-
-                foreach (var m in context.ModelState)
-                {
-                    foreach (var e in m.Value.Errors)
-                    {
-                        if (!string.IsNullOrWhiteSpace(e.ErrorMessage))
-                        {
-                            errors.Add(new ValidationError(e.ErrorMessage, m.Key));
-                        }
-                    }
-                }
-
-                throw new ValidationException("The model is not valid.", errors);
-            }
-        }
+        }+
 
         public void OnException(ExceptionContext context)
         {

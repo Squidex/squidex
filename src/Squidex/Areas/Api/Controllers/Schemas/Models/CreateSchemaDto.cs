@@ -28,5 +28,10 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// Optional fields.
         /// </summary>
         public List<CreateSchemaFieldDto> Fields { get; set; }
+
+        /// <summary>
+        /// Set it to true to autopublish the schema.
+        /// </summary>
+        public bool Publish { get; set; }
     }
 }

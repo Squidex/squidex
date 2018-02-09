@@ -70,6 +70,11 @@ namespace Squidex.Domain.Apps.Entities.Schemas.State
                 schema = schema.Update(@event.Properties);
             }
 
+            if (@event.Publish)
+            {
+                schema = schema.Publish();
+            }
+
             if (@event.Fields != null)
             {
                 foreach (var eventField in @event.Fields)
