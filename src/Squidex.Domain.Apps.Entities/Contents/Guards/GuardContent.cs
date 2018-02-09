@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Infrastructure;
@@ -63,18 +64,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
                 {
                     error(new ValidationError($"Content cannot be changed from status {status} to {command.Status}.", nameof(command.Status)));
                 }
-            });
-        }
 
-        public static void CanPublishAt(PublishContentAt command)
-        {
-            Guard.NotNull(command, nameof(command));
-
-            Validate.It(() => "Cannot schedule content tol publish.", error =>
-            {
-                if (command.PublishAt < DateTime.UtcNow)
+                if (command.DueDate.HasValue && command.DueDate.Value < SystemClock.Instance.GetCurrentInstant())
                 {
-                    error(new ValidationError("Date must be in the future.", nameof(command.PublishAt)));
+                    error(new ValidationError("DueDate must be in the future.", nameof(command.DueDate)));
                 }
             });
         }

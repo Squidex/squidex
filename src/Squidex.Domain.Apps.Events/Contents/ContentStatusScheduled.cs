@@ -5,12 +5,17 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
+using NodaTime;
+using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Entities.Contents.Commands
+namespace Squidex.Domain.Apps.Events.Contents
 {
-    public sealed class PublishContentAt : ContentDataCommand
+    [EventType(nameof(ContentStatusScheduled))]
+    public sealed class ContentStatusScheduled : ContentEvent
     {
-        public DateTimeOffset PublishAt { get; set; }
+        public Status Status { get; set; }
+
+        public Instant DueTime { get; set; }
     }
 }

@@ -33,10 +33,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.State
         public Status Status { get; set; }
 
         [JsonProperty]
-        public RefToken PublishAtBy { get; set; }
+        public Status? ScheduledTo { get; set; }
 
         [JsonProperty]
-        public Instant? PublishAt { get; set; }
+        public Instant? ScheduledAt { get; set; }
+
+        [JsonProperty]
+        public RefToken ScheduledBy { get; set; }
 
         [JsonProperty]
         public bool IsDeleted { get; set; }
@@ -55,18 +58,20 @@ namespace Squidex.Domain.Apps.Entities.Contents.State
             Data = @event.Data;
         }
 
-        protected void On(ContentPublishScheduled @event)
+        protected void On(ContentStatusScheduled @event)
         {
-            PublishAt = @event.PublishAt;
-            PublishAtBy = @event.Actor;
+            ScheduledAt = @event.DueTime;
+            ScheduledBy = @event.Actor;
+            ScheduledTo = @event.Status;
         }
 
         protected void On(ContentStatusChanged @event)
         {
             Status = @event.Status;
 
-            PublishAt = null;
-            PublishAtBy = null;
+            ScheduledAt = null;
+            ScheduledBy = null;
+            ScheduledTo = null;
         }
 
         protected void On(ContentDeleted @event)

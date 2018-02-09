@@ -46,16 +46,14 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             VerifyCreatedAndNotDeleted();
 
-            RaiseEvent(SimpleMapper.Map(command, new ContentStatusChanged()));
-
-            return this;
-        }
-
-        public ContentDomainObject PublishAt(PublishContentAt command)
-        {
-            VerifyCreatedAndNotDeleted();
-
-            RaiseEvent(SimpleMapper.Map(command, new ContentPublishScheduled()));
+            if (command.DueDate.HasValue)
+            {
+                RaiseEvent(SimpleMapper.Map(command, new ContentStatusScheduled()));
+            }
+            else
+            {
+                RaiseEvent(SimpleMapper.Map(command, new ContentStatusChanged()));
+            }
 
             return this;
         }

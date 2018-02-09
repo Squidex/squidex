@@ -7,7 +7,6 @@
 
 using System.Threading.Tasks;
 using NodaTime;
-using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Infrastructure;
@@ -16,14 +15,14 @@ using Squidex.Infrastructure.Timers;
 
 namespace Squidex.Domain.Apps.Entities.Contents
 {
-    public sealed class ContentPublisher : IRunnable
+    public sealed class ContentScheduler : IRunnable
     {
         private readonly CompletionTimer timer;
         private readonly IContentRepository contentRepository;
         private readonly ICommandBus commandBus;
         private readonly IClock clock;
 
-        public ContentPublisher(
+        public ContentScheduler(
             IContentRepository contentRepository,
             ICommandBus commandBus,
             IClock clock)
@@ -47,9 +46,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var now = clock.GetCurrentInstant();
 
-            return contentRepository.QueryContentToPublishAsync(now, content =>
+            return contentRepository.QueryScheduledWithoutDataAsync(now, content =>
             {
-                var command = new ChangeContentStatus { ContentId = content.Id, Status = Status.Published, Actor = content.PublishAtBy };
+                var command = new ChangeContentStatus { ContentId = content.Id, Status = content.ScheduledTo.Value, Actor = content.ScheduledBy };
 
                 return commandBus.PublishAsync(command);
             });

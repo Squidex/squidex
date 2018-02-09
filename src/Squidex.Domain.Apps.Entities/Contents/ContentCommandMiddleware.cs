@@ -109,9 +109,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
             {
                 GuardContent.CanChangeContentStatus(content.Snapshot.Status, command);
 
-                var operationContext = await CreateContext(command, content, () => "Failed to patch content.");
+                if (!command.DueDate.HasValue)
+                {
+                    var operationContext = await CreateContext(command, content, () => "Failed to patch content.");
 
-                await operationContext.ExecuteScriptAsync(x => x.ScriptChange, command.Status);
+                    await operationContext.ExecuteScriptAsync(x => x.ScriptChange, command.Status);
+                }
 
                 content.ChangeStatus(command);
             });
@@ -128,16 +131,6 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 await operationContext.ExecuteScriptAsync(x => x.ScriptDelete, "Delete");
 
                 content.Delete(command);
-            });
-        }
-
-        protected Task On(PublishContentAt command, CommandContext context)
-        {
-            return handler.UpdateAsync<ContentDomainObject>(context, content =>
-            {
-                GuardContent.CanPublishAt(command);
-
-                content.PublishAt(command);
             });
         }
 

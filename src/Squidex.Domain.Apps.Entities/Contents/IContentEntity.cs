@@ -25,9 +25,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         Status Status { get; }
 
-        Instant? PublishAt { get; }
+        Status? ScheduledTo { get; }
 
-        RefToken PublishAtBy { get; }
+        Instant? ScheduledAt { get; }
+
+        RefToken ScheduledBy { get; }
 
         NamedContentData Data { get; }
     }
