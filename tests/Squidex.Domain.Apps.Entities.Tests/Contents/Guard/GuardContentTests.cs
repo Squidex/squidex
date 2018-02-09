@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Contents.Guards;
@@ -15,6 +16,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
 {
     public class GuardContentTests
     {
+        private readonly Instant dueTimeInPast = SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromHours(1));
+
         [Fact]
         public void CanCreate_should_throw_exception_if_data_is_null()
         {
@@ -77,6 +80,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
             var command = new ChangeContentStatus { Status = Status.Published };
 
             Assert.Throws<ValidationException>(() => GuardContent.CanChangeContentStatus(Status.Archived, command));
+        }
+
+        [Fact]
+        public void CanChangeContentStatus_should_throw_exception_if_due_date_in_past()
+        {
+            var command = new ChangeContentStatus { Status = Status.Published, DueTime = dueTimeInPast };
+
+            Assert.Throws<ValidationException>(() => GuardContent.CanChangeContentStatus(Status.Draft, command));
         }
 
         [Fact]

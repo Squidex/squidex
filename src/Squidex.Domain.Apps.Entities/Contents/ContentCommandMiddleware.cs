@@ -109,7 +109,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             {
                 GuardContent.CanChangeContentStatus(content.Snapshot.Status, command);
 
-                if (!command.DueDate.HasValue)
+                if (!command.DueTime.HasValue)
                 {
                     var operationContext = await CreateContext(command, content, () => "Failed to patch content.");
 

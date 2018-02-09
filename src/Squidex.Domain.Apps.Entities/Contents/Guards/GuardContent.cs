@@ -65,9 +65,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
                     error(new ValidationError($"Content cannot be changed from status {status} to {command.Status}.", nameof(command.Status)));
                 }
 
-                if (command.DueDate.HasValue && command.DueDate.Value < SystemClock.Instance.GetCurrentInstant())
+                if (command.DueTime.HasValue && command.DueTime.Value < SystemClock.Instance.GetCurrentInstant())
                 {
-                    error(new ValidationError("DueDate must be in the future.", nameof(command.DueDate)));
+                    error(new ValidationError("DueTime must be in the future.", nameof(command.DueTime)));
                 }
             });
         }

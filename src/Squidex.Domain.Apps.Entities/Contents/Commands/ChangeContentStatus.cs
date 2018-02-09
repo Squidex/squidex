@@ -14,6 +14,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Commands
     {
         public Status Status { get; set; }
 
-        public Instant? DueDate { get; set; }
+        public Instant? DueTime { get; set; }
     }
 }

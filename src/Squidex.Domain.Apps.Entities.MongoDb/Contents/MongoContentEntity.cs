@@ -71,15 +71,15 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         public NamedId<Guid> SchemaId { get; set; }
 
         [BsonIgnoreIfNull]
-        [BsonElement("st")]
+        [BsonElement("sdt")]
         public Status? ScheduledTo { get; set; }
 
         [BsonIgnoreIfNull]
-        [BsonElement("sa")]
+        [BsonElement("sda")]
         public Instant? ScheduledAt { get; set; }
 
         [BsonIgnoreIfNull]
-        [BsonElement("sb")]
+        [BsonElement("sdb")]
         public RefToken ScheduledBy { get; set; }
 
         [BsonRequired]

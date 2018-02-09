@@ -46,9 +46,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             VerifyCreatedAndNotDeleted();
 
-            if (command.DueDate.HasValue)
+            if (command.DueTime.HasValue)
             {
-                RaiseEvent(SimpleMapper.Map(command, new ContentStatusScheduled()));
+                RaiseEvent(SimpleMapper.Map(command, new ContentStatusScheduled { DueTime = command.DueTime.Value }));
             }
             else
             {

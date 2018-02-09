@@ -215,11 +215,11 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [HttpPut]
         [Route("content/{app}/{name}/{id}/publish/")]
         [ApiCosts(1)]
-        public async Task<IActionResult> PublishContent(string name, Guid id, string dueDate = null)
+        public async Task<IActionResult> PublishContent(string name, Guid id, string dueTime = null)
         {
             await contentQuery.FindSchemaAsync(App, name);
 
-            var command = CreateCommand(id, Status.Published, dueDate);
+            var command = CreateCommand(id, Status.Published, dueTime);
 
             await CommandBus.PublishAsync(command);
 
@@ -230,11 +230,11 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [HttpPut]
         [Route("content/{app}/{name}/{id}/unpublish/")]
         [ApiCosts(1)]
-        public async Task<IActionResult> UnpublishContent(string name, Guid id, string dueDate = null)
+        public async Task<IActionResult> UnpublishContent(string name, Guid id, string dueTime = null)
         {
             await contentQuery.FindSchemaAsync(App, name);
 
-            var command = CreateCommand(id, Status.Draft, dueDate);
+            var command = CreateCommand(id, Status.Draft, dueTime);
 
             await CommandBus.PublishAsync(command);
 
@@ -245,11 +245,11 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [HttpPut]
         [Route("content/{app}/{name}/{id}/archive/")]
         [ApiCosts(1)]
-        public async Task<IActionResult> ArchiveContent(string name, Guid id, string dueDate = null)
+        public async Task<IActionResult> ArchiveContent(string name, Guid id, string dueTime = null)
         {
             await contentQuery.FindSchemaAsync(App, name);
 
-            var command = CreateCommand(id, Status.Archived, dueDate);
+            var command = CreateCommand(id, Status.Archived, dueTime);
 
             await CommandBus.PublishAsync(command);
 
@@ -260,11 +260,11 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [HttpPut]
         [Route("content/{app}/{name}/{id}/restore/")]
         [ApiCosts(1)]
-        public async Task<IActionResult> RestoreContent(string name, Guid id, string dueDate = null)
+        public async Task<IActionResult> RestoreContent(string name, Guid id, string dueTime = null)
         {
             await contentQuery.FindSchemaAsync(App, name);
 
-            var command = CreateCommand(id, Status.Draft, dueDate);
+            var command = CreateCommand(id, Status.Draft, dueTime);
 
             await CommandBus.PublishAsync(command);
 
@@ -286,13 +286,13 @@ namespace Squidex.Areas.Api.Controllers.Contents
             return NoContent();
         }
 
-        private static ChangeContentStatus CreateCommand(Guid id, Status status, string dueDate)
+        private static ChangeContentStatus CreateCommand(Guid id, Status status, string dueTime)
         {
             Instant? dt = null;
 
-            if (string.IsNullOrWhiteSpace(dueDate))
+            if (string.IsNullOrWhiteSpace(dueTime))
             {
-                var parseResult = InstantPattern.General.Parse(dueDate);
+                var parseResult = InstantPattern.General.Parse(dueTime);
 
                 if (!parseResult.Success)
                 {
@@ -300,7 +300,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
                 }
             }
 
-            return new ChangeContentStatus { Status = status, ContentId = id, DueDate = dt };
+            return new ChangeContentStatus { Status = status, ContentId = id, DueTime = dt };
         }
     }
 }
