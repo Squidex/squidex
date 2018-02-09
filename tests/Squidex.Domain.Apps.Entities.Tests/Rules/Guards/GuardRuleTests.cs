@@ -87,13 +87,13 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
         {
             var command = new UpdateRule();
 
-            await Assert.ThrowsAsync<ValidationException>(() => GuardRule.CanUpdate(command, appProvider));
+            await Assert.ThrowsAsync<ValidationException>(() => GuardRule.CanUpdate(command, appId.Id, appProvider));
         }
 
         [Fact]
         public async Task CanUpdate_should_not_throw_exception_if_trigger_and_action_valid()
         {
-            var command = CreateCommand(new UpdateRule
+            var command = new UpdateRule
             {
                 Trigger = new ContentChangedTrigger
                 {
@@ -103,9 +103,9 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
                 {
                     Url = validUrl
                 }
-            });
+            };
 
-            await GuardRule.CanUpdate(command, appProvider);
+            await GuardRule.CanUpdate(command, appId.Id, appProvider);
         }
 
         [Fact]
@@ -156,7 +156,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
             GuardRule.CanDelete(command);
         }
 
-        private T CreateCommand<T>(T command) where T : AppCommand
+        private CreateRule CreateCommand(CreateRule command)
         {
             command.AppId = appId;
 

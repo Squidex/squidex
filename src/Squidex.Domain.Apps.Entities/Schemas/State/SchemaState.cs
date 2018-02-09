@@ -11,6 +11,7 @@ using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Schemas;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
@@ -18,16 +19,13 @@ using Squidex.Infrastructure.Reflection;
 namespace Squidex.Domain.Apps.Entities.Schemas.State
 {
     public class SchemaState : DomainObjectState<SchemaState>,
-        ISchemaEntity,
-        IUpdateableEntityWithAppRef,
-        IUpdateableEntityWithCreatedBy,
-        IUpdateableEntityWithLastModifiedBy
+        ISchemaEntity
     {
         [JsonProperty]
-        public string Name { get; set; }
+        public NamedId<Guid> AppId { get; set; }
 
         [JsonProperty]
-        public Guid AppId { get; set; }
+        public string Name { get; set; }
 
         [JsonProperty]
         public int TotalFields { get; set; } = 0;
@@ -108,6 +106,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.State
             }
 
             SchemaDef = schema;
+
+            AppId = @event.AppId;
         }
 
         protected void On(FieldAdded @event, FieldRegistry registry)

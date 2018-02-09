@@ -131,6 +131,16 @@ namespace Squidex.Domain.Apps.Entities.Contents
             });
         }
 
+        protected Task On(PublishContentAt command, CommandContext context)
+        {
+            return handler.UpdateAsync<ContentDomainObject>(context, content =>
+            {
+                GuardContent.CanPublishAt(command);
+
+                content.PublishAt(command);
+            });
+        }
+
         public async Task HandleAsync(CommandContext context, Func<Task> next)
         {
             await this.DispatchActionAsync(context.Command, context);

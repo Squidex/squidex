@@ -7,7 +7,7 @@
 
 namespace Squidex.Domain.Apps.Entities.Rules.Commands
 {
-    public sealed class DisableRule : RuleAggregateCommand
+    public sealed class DisableRule : RuleCommand
     {
     }
 }

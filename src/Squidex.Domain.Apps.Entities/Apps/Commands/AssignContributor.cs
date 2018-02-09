@@ -9,7 +9,7 @@ using Squidex.Domain.Apps.Core.Apps;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Commands
 {
-    public sealed class AssignContributor : AppAggregateCommand
+    public sealed class AssignContributor : AppCommand
     {
         public string ContributorId { get; set; }
 

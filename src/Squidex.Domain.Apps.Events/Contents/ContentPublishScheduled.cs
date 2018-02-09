@@ -5,13 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using Squidex.Infrastructure;
+using NodaTime;
+using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Entities
+namespace Squidex.Domain.Apps.Events.Contents
 {
-    public abstract class AppCommand : SquidexCommand
+    [EventType(nameof(ContentPublishScheduled))]
+    public sealed class ContentPublishScheduled : ContentEvent
     {
-        public NamedId<Guid> AppId { get; set; }
+        public Instant PublishAt { get; set; }
     }
 }

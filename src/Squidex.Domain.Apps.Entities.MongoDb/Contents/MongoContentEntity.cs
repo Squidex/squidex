@@ -35,12 +35,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         [BsonRequired]
         [BsonElement("ai")]
         [BsonRepresentation(BsonType.String)]
-        public Guid AppId { get; set; }
+        public Guid IdxAppId { get; set; }
 
         [BsonRequired]
         [BsonElement("si")]
         [BsonRepresentation(BsonType.String)]
-        public Guid SchemaId { get; set; }
+        public Guid IdxSchemaId { get; set; }
 
         [BsonRequired]
         [BsonElement("rf")]
@@ -61,6 +61,22 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         [BsonElement("do")]
         [BsonJson]
         public IdContentData DataByIds { get; set; }
+
+        [BsonRequired]
+        [BsonElement("ai2")]
+        public NamedId<Guid> AppId { get; set; }
+
+        [BsonRequired]
+        [BsonElement("si2")]
+        public NamedId<Guid> SchemaId { get; set; }
+
+        [BsonIgnoreIfNull]
+        [BsonElement("pa")]
+        public Instant? PublishAt { get; set; }
+
+        [BsonIgnoreIfNull]
+        [BsonElement("pb")]
+        public RefToken PublishAtBy { get; set; }
 
         [BsonRequired]
         [BsonElement("ct")]

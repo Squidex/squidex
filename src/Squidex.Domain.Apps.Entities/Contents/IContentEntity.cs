@@ -6,18 +6,28 @@
 // ==========================================================================
 // ==========================================================================
 
+using System;
+using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents
 {
     public interface IContentEntity :
         IEntity,
-        IEntityWithAppRef,
         IEntityWithCreatedBy,
         IEntityWithLastModifiedBy,
         IEntityWithVersion
     {
+        NamedId<Guid> AppId { get; }
+
+        NamedId<Guid> SchemaId { get; }
+
         Status Status { get; }
+
+        Instant? PublishAt { get; }
+
+        RefToken PublishAtBy { get; }
 
         NamedContentData Data { get; }
     }

@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets.Visitors
         {
             var filters = new List<FilterDefinition<MongoAssetEntity>>
             {
-                Filter.Eq(x => x.AppId, appId),
+                Filter.Eq(x => x.IdxAppId, appId),
                 Filter.Eq(x => x.IsDeleted, false)
             };
 

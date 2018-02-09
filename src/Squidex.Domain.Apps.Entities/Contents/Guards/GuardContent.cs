@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Infrastructure;
@@ -61,6 +62,19 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
                 if (!StatusFlow.Exists(command.Status) || !StatusFlow.CanChange(status, command.Status))
                 {
                     error(new ValidationError($"Content cannot be changed from status {status} to {command.Status}.", nameof(command.Status)));
+                }
+            });
+        }
+
+        public static void CanPublishAt(PublishContentAt command)
+        {
+            Guard.NotNull(command, nameof(command));
+
+            Validate.It(() => "Cannot schedule content tol publish.", error =>
+            {
+                if (command.PublishAt < DateTime.UtcNow)
+                {
+                    error(new ValidationError("Date must be in the future.", nameof(command.PublishAt)));
                 }
             });
         }

@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
             if (contentEntity != null)
             {
-                var schema = await GetSchemaAsync(contentEntity.AppId, contentEntity.SchemaId);
+                var schema = await GetSchemaAsync(contentEntity.IdxAppId, contentEntity.IdxSchemaId);
 
                 contentEntity?.ParseData(schema.SchemaDef);
 
@@ -40,12 +40,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         public async Task WriteAsync(Guid key, ContentState value, long oldVersion, long newVersion)
         {
-            if (value.SchemaId == Guid.Empty)
+            if (value.SchemaId.Id == Guid.Empty)
             {
                 return;
             }
 
-            var schema = await GetSchemaAsync(value.AppId, value.SchemaId);
+            var schema = await GetSchemaAsync(value.SchemaId.Id, value.SchemaId.Id);
 
             var idData = value.Data?.ToIdModel(schema.SchemaDef, true);
 
@@ -53,6 +53,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
             var document = SimpleMapper.Map(value, new MongoContentEntity
             {
+                IdxAppId = value.AppId.Id,
+                IdxSchemaId = value.SchemaId.Id,
                 IsDeleted = value.IsDeleted,
                 DocumentId = key.ToString(),
                 DataText = idData?.ToFullText(),

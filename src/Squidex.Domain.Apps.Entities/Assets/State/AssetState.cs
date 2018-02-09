@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using Squidex.Domain.Apps.Core.ValidateContent;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Assets;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
@@ -18,11 +19,10 @@ namespace Squidex.Domain.Apps.Entities.Assets.State
 {
     public class AssetState : DomainObjectState<AssetState>,
         IAssetEntity,
-        IAssetInfo,
-        IUpdateableEntityWithAppRef
+        IAssetInfo
     {
         [JsonProperty]
-        public Guid AppId { get; set; }
+        public NamedId<Guid> AppId { get; set; }
 
         [JsonProperty]
         public string FileName { get; set; }
@@ -61,6 +61,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.State
             SimpleMapper.Map(@event, this);
 
             TotalSize += @event.FileSize;
+
+            AppId = @event.AppId;
         }
 
         protected void On(AssetUpdated @event)

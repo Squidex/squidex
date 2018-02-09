@@ -10,11 +10,13 @@ using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Domain.Apps.Entities
 {
-    public class AppAggregateCommand : AppCommand, IAggregateCommand
+    public abstract class SchemaCommand : SquidexCommand, IAggregateCommand
     {
+        public Guid SchemaId { get; set; }
+
         Guid IAggregateCommand.AggregateId
         {
-            get { return AppId.Id; }
+            get { return SchemaId; }
         }
     }
 }

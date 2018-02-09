@@ -18,13 +18,19 @@ namespace Squidex.Domain.Apps.Entities.Contents
     {
         public Guid Id { get; set; }
 
-        public Guid AppId { get; set; }
+        public NamedId<Guid> AppId { get; set; }
+
+        public NamedId<Guid> SchemaId { get; set; }
 
         public long Version { get; set; }
 
         public Instant Created { get; set; }
 
         public Instant LastModified { get; set; }
+
+        public Instant? PublishAt { get; set; }
+
+        public RefToken PublishAtBy { get; set; }
 
         public RefToken CreatedBy { get; set; }
 

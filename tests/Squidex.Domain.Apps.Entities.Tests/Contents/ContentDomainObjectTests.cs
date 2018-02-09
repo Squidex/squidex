@@ -6,12 +6,14 @@
 // ==========================================================================
 
 using System;
+using FakeItEasy;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.States;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents
@@ -40,6 +42,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
         public ContentDomainObjectTests()
         {
             patched = otherData.MergeInto(data);
+
+            sut.ActivateAsync(Id, A.Fake<IStore<Guid>>());
         }
 
         [Fact]

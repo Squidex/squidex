@@ -20,9 +20,16 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
         IAssetEntity,
         IUpdateableEntityWithVersion,
         IUpdateableEntityWithCreatedBy,
-        IUpdateableEntityWithLastModifiedBy,
-        IUpdateableEntityWithAppRef
+        IUpdateableEntityWithLastModifiedBy
     {
+        [BsonRequired]
+        [BsonElement]
+        public Guid IdxAppId { get; set; }
+
+        [BsonRequired]
+        [BsonElement]
+        public NamedId<Guid> AppId { get; set; }
+
         [BsonRequired]
         [BsonElement]
         public string MimeType { get; set; }
@@ -54,10 +61,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
         [BsonRequired]
         [BsonElement]
         public int? PixelHeight { get; set; }
-
-        [BsonRequired]
-        [BsonElement]
-        public Guid AppId { get; set; }
 
         [BsonRequired]
         [BsonElement]

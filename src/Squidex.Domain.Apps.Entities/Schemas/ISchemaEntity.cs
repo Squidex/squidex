@@ -5,17 +5,20 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Schemas
 {
     public interface ISchemaEntity :
         IEntity,
-        IEntityWithAppRef,
         IEntityWithCreatedBy,
         IEntityWithLastModifiedBy,
         IEntityWithVersion
     {
+        NamedId<Guid> AppId { get; }
+
         string Name { get; }
 
         bool IsPublished { get; }

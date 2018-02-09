@@ -6,17 +6,11 @@
 // ==========================================================================
 
 using System;
-using Squidex.Infrastructure.Commands;
 
-namespace Squidex.Domain.Apps.Entities.Rules.Commands
+namespace Squidex.Domain.Apps.Entities.Contents.Commands
 {
-    public abstract class RuleAggregateCommand : AppCommand, IAggregateCommand
+    public sealed class PublishContentAt : ContentDataCommand
     {
-        public Guid RuleId { get; set; }
-
-        Guid IAggregateCommand.AggregateId
-        {
-            get { return RuleId; }
-        }
+        public DateTimeOffset PublishAt { get; set; }
     }
 }

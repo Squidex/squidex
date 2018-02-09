@@ -7,38 +7,47 @@
 
 using System;
 using Newtonsoft.Json;
+using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Contents;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Entities.Contents.State
 {
     public class ContentState : DomainObjectState<ContentState>,
-        IContentEntity,
-        IUpdateableEntityWithAppRef
+        IContentEntity
     {
+        [JsonProperty]
+        public NamedId<Guid> AppId { get; set; }
+
+        [JsonProperty]
+        public NamedId<Guid> SchemaId { get; set; }
+
         [JsonProperty]
         public NamedContentData Data { get; set; }
 
         [JsonProperty]
-        public Guid AppId { get; set; }
-
-        [JsonProperty]
-        public Guid SchemaId { get; set; }
-
-        [JsonProperty]
         public Status Status { get; set; }
+
+        [JsonProperty]
+        public RefToken PublishAtBy { get; set; }
+
+        [JsonProperty]
+        public Instant? PublishAt { get; set; }
 
         [JsonProperty]
         public bool IsDeleted { get; set; }
 
         protected void On(ContentCreated @event)
         {
-            SchemaId = @event.SchemaId.Id;
+            SchemaId = @event.SchemaId;
 
             Data = @event.Data;
+
+            AppId = @event.AppId;
         }
 
         protected void On(ContentUpdated @event)
@@ -46,9 +55,18 @@ namespace Squidex.Domain.Apps.Entities.Contents.State
             Data = @event.Data;
         }
 
+        protected void On(ContentPublishScheduled @event)
+        {
+            PublishAt = @event.PublishAt;
+            PublishAtBy = @event.Actor;
+        }
+
         protected void On(ContentStatusChanged @event)
         {
             Status = @event.Status;
+
+            PublishAt = null;
+            PublishAtBy = null;
         }
 
         protected void On(ContentDeleted @event)

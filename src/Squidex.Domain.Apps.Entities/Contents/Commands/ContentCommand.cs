@@ -10,7 +10,7 @@ using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Commands
 {
-    public abstract class ContentCommand : SchemaCommand, IAggregateCommand
+    public abstract class ContentCommand : SquidexCommand, IAggregateCommand
     {
         public Guid ContentId { get; set; }
 
