@@ -115,11 +115,11 @@ namespace Squidex.Domain.Apps.Core.Scripting
             }
             catch (ParserException ex)
             {
-                throw new ValidationException("Failed to execute script with javascript syntax error.", new ValidationError(ex.Message));
+                throw new ValidationException($"Failed to execute script with javascript syntax error: {ex.Message}", new ValidationError(ex.Message));
             }
             catch (JavaScriptException ex)
             {
-                throw new ValidationException("Failed to execute script with javascript error.", new ValidationError(ex.Message));
+                throw new ValidationException($"Failed to execute script with javascript error: {ex.Message}", new ValidationError(ex.Message));
             }
         }
 

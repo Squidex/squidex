@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
             {
                 if (command.Trigger == null)
                 {
-                    error(new ValidationError("Trigger must be defined.", nameof(command.Trigger)));
+                    error(new ValidationError("Trigger is required.", nameof(command.Trigger)));
                 }
                 else
                 {
@@ -33,7 +33,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
 
                 if (command.Action == null)
                 {
-                    error(new ValidationError("Trigger must be defined.", nameof(command.Action)));
+                    error(new ValidationError("Trigger is required.", nameof(command.Action)));
                 }
                 else
                 {
@@ -52,7 +52,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
             {
                 if (command.Trigger == null && command.Action == null)
                 {
-                    error(new ValidationError("Either trigger or action must be defined.", nameof(command.Trigger), nameof(command.Action)));
+                    error(new ValidationError("Either trigger or action is required.", nameof(command.Trigger), nameof(command.Action)));
                 }
 
                 if (command.Trigger != null)

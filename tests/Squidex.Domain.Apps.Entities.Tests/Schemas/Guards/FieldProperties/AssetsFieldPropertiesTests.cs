@@ -82,7 +82,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards.FieldProperties
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("Aspect width and height must be defined.", "AspectWidth", "AspectHeight")
+                    new ValidationError("Aspect width and height is required.", "AspectWidth", "AspectHeight")
                 });
         }
 
@@ -96,7 +96,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards.FieldProperties
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("Aspect width and height must be defined.", "AspectWidth", "AspectHeight")
+                    new ValidationError("Aspect width and height is required.", "AspectWidth", "AspectHeight")
                 });
         }
     }

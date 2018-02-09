@@ -146,7 +146,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// 400 => Asset exceeds the maximum size.
         /// </returns>
         /// <remarks>
-        /// You can only upload one file at a time. The mime type of the file is not calculated by Squidex and must be defined correctly.
+        /// You can only upload one file at a time. The mime type of the file is not calculated by Squidex and is required correctly.
         /// </remarks>
         [MustBeAppEditor]
         [HttpPost]
@@ -248,7 +248,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         {
             if (file.Count != 1)
             {
-                var error = new ValidationError($"Can only upload one file, found {file.Count}.");
+                var error = new ValidationError($"Can only upload one file, found {file.Count} files.");
 
                 throw new ValidationException("Cannot create asset.", error);
             }
