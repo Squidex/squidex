@@ -89,7 +89,7 @@ describe('AssetsService', () => {
         });
 
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets?$top=17&$skip=13');
-        
+
         expect(req.request.method).toEqual('GET');
         expect(req.request.headers.get('If-Match')).toBeNull();
 

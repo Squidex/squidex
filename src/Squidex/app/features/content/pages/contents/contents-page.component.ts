@@ -11,9 +11,8 @@ import { Observable, Subscription } from 'rxjs';
 
 import {
     ContentCreated,
-    ContentPublished,
     ContentRemoved,
-    ContentUnpublished,
+    ContentStatusChanged,
     ContentUpdated
 } from './../messages';
 
@@ -27,7 +26,8 @@ import {
     ImmutableArray,
     ModalView,
     Pager,
-    SchemaDetailsDto
+    SchemaDetailsDto,
+    DateTime
 } from 'shared';
 
 @Component({
@@ -118,7 +118,7 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
     }
 
     public publishContent(content: ContentDto) {
-        this.publishContentItem(content).subscribe();
+        this.changeContentItem(content, 'publish', 'Published').subscribe();
     }
 
     public publishSelected() {
@@ -126,29 +126,15 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
             this.contentItems.values
                 .filter(c => this.selectedItems[c.id])
                 .filter(c => c.status !== 'Published')
-                .map(c => this.publishContentItem(c)))
+                .map(c => this.changeContentItem(c, 'publish', 'Published')))
             .finally(() => {
                 this.updateSelectionSummary();
             })
             .subscribe();
     }
 
-    private publishContentItem(content: ContentDto): Observable<any> {
-        return this.contentsService.publishContent(this.ctx.appName, this.schema.name, content.id, content.version)
-            .catch(error => {
-                this.ctx.notifyError(error);
-
-                return Observable.throw(error);
-            })
-            .do(dto => {
-                this.contentItems = this.contentItems.replaceBy('id', content.publish(this.ctx.userToken, dto.version));
-
-                this.emitContentPublished(content);
-            });
-    }
-
     public unpublishContent(content: ContentDto) {
-        this.unpublishContentItem(content).subscribe();
+        this.changeContentItem(content, 'unpublish', 'Draft').subscribe();
     }
 
     public unpublishSelected() {
@@ -156,31 +142,31 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
             this.contentItems.values
                 .filter(c => this.selectedItems[c.id])
                 .filter(c => c.status !== 'Unpublished')
-                .map(c => this.unpublishContentItem(c)))
+                .map(c => this.changeContentItem(c, 'unpublish', 'Draft')))
             .finally(() => {
                 this.updateSelectionSummary();
             })
             .subscribe();
     }
 
-    private unpublishContentItem(content: ContentDto): Observable<any> {
-        return this.contentsService.unpublishContent(this.ctx.appName, this.schema.name, content.id, content.version)
+    private changeContentItem(content: ContentDto, action: string, status: string): Observable<any> {
+        return this.contentsService.changeContentStatus(this.ctx.appName, this.schema.name, content.id, action, content.version)
             .catch(error => {
                 this.ctx.notifyError(error);
 
                 return Observable.throw(error);
             })
             .do(dto => {
-                this.contentItems = this.contentItems.replaceBy('id', content.unpublish(this.ctx.userToken, dto.version));
+                this.contentItems = this.contentItems.replaceBy('id', content.changeStatus(status, this.ctx.userToken, dto.version));
 
-                this.emitContentUnpublished(content);
+                this.emitContentStatusChanged(content);
             });
     }
 
     public archiveSelected() {
         Observable.forkJoin(
             this.contentItems.values.filter(c => this.selectedItems[c.id])
-                .map(c => this.archiveContentItem(c)))
+                .map(c => this.changeContentItem(c, 'archive', 'Archived')))
             .finally(() => {
                 this.load();
             })
@@ -188,26 +174,17 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
     }
 
     public archiveContent(content: ContentDto) {
-        this.archiveContentItem(content)
+        this.changeContentItem(content, 'archive', 'Archived')
             .finally(() => {
                 this.load();
             })
             .subscribe();
     }
 
-    public archiveContentItem(content: ContentDto): Observable<any> {
-        return this.contentsService.archiveContent(this.ctx.appName, this.schema.name, content.id, content.version)
-            .catch(error => {
-                this.ctx.notifyError(error);
-
-                return Observable.throw(error);
-            });
-    }
-
     public restoreSelected() {
         Observable.forkJoin(
             this.contentItems.values.filter(c => this.selectedItems[c.id])
-                .map(c => this.restoreContentItem(c)))
+                .map(c => this.changeContentItem(c, 'restore', 'Draft')))
             .finally(() => {
                 this.load();
             })
@@ -215,20 +192,11 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
     }
 
     public restoreContent(content: ContentDto) {
-        this.restoreContentItem(content)
+        this.changeContentItem(content, 'restore', 'Draft')
             .finally(() => {
                 this.load();
             })
             .subscribe();
-    }
-
-    public restoreContentItem(content: ContentDto): Observable<any> {
-        return this.contentsService.restoreContent(this.ctx.appName, this.schema.name, content.id, content.version)
-            .catch(error => {
-                this.ctx.notifyError(error);
-
-                return Observable.throw(error);
-            });
     }
 
     public deleteSelected(content: ContentDto) {
@@ -359,12 +327,8 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
         this.languageSelected = language;
     }
 
-    private emitContentPublished(content: ContentDto) {
-        this.ctx.bus.emit(new ContentPublished(content));
-    }
-
-    private emitContentUnpublished(content: ContentDto) {
-        this.ctx.bus.emit(new ContentUnpublished(content));
+    private emitContentStatusChanged(content: ContentDto) {
+        this.ctx.bus.emit(new ContentStatusChanged(content));
     }
 
     private emitContentRemoved(content: ContentDto) {

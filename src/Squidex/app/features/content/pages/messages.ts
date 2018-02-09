@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ContentDto } from 'shared';
+import { ContentDto, DateTime } from 'shared';
 
 export class ContentCreated {
     constructor(
@@ -35,14 +35,7 @@ export class ContentVersionSelected {
     }
 }
 
-export class ContentPublished {
-    constructor(
-        public readonly content: ContentDto
-    ) {
-    }
-}
-
-export class ContentUnpublished {
+export class ContentStatusChanged {
     constructor(
         public readonly content: ContentDto
     ) {
