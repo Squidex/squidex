@@ -62,7 +62,7 @@ namespace Squidex.Pipeline
             error.StatusCode = statusCode;
 
             return new ObjectResult(error) { StatusCode = statusCode };
-        }+
+        }
 
         public void OnException(ExceptionContext context)
         {
