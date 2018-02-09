@@ -33,6 +33,22 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         }
 
         [Fact]
+        public void Should_update_data_when_setting_lazy_field()
+        {
+            var original = new NamedContentData();
+
+            var expected =
+                new NamedContentData()
+                    .AddField("number",
+                        new ContentFieldData()
+                            .AddValue("iv", 1.0));
+
+            var result = ExecuteScript(original, @"data.number.iv = 1");
+
+            Assert.Equal(expected, result);
+        }
+
+        [Fact]
         public void Should_update_data_defining_property_for_content()
         {
             var original = new NamedContentData();

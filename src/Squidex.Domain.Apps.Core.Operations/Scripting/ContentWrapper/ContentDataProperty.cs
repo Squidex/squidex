@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
                 {
                     if (value == null || !value.IsObject())
                     {
-                        throw new JavaScriptException("Can only assign object to content data.");
+                        throw new JavaScriptException("You can only assign objects to content data.");
                     }
 
                     var obj = value.AsObject();
