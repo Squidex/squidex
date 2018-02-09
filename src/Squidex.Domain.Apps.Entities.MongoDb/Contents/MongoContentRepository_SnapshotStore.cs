@@ -45,7 +45,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                 return;
             }
 
-            var schema = await GetSchemaAsync(value.SchemaId.Id, value.SchemaId.Id);
+            var schema = await GetSchemaAsync(value.AppId.Id, value.SchemaId.Id);
 
             var idData = value.Data?.ToIdModel(schema.SchemaDef, true);
 
@@ -94,7 +94,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         private async Task<ISchemaEntity> GetSchemaAsync(Guid appId, Guid schemaId)
         {
-            var schema = await appProvider.GetSchemaAsync(appId, schemaId);
+            var schema = await appProvider.GetSchemaAsync(appId, schemaId, true);
 
             if (schema == null)
             {

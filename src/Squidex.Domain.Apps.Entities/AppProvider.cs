@@ -88,11 +88,11 @@ namespace Squidex.Domain.Apps.Entities
             return (await stateFactory.GetSingleAsync<SchemaDomainObject>(schemaId)).Snapshot;
         }
 
-        public async Task<ISchemaEntity> GetSchemaAsync(Guid appId, Guid id)
+        public async Task<ISchemaEntity> GetSchemaAsync(Guid appId, Guid id, bool allowDeleted = false)
         {
             var schema = await stateFactory.GetSingleAsync<SchemaDomainObject>(id);
 
-            if (!IsFound(schema) || schema.Snapshot.IsDeleted || schema.Snapshot.AppId.Id != appId)
+            if (!IsFound(schema) || (schema.Snapshot.IsDeleted && !allowDeleted) || schema.Snapshot.AppId.Id != appId)
             {
                 return null;
             }
