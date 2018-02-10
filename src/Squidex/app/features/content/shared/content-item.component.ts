@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
 
 import {
     AppContext,
@@ -27,7 +27,8 @@ import {
     ],
     animations: [
         fadeAnimation
-    ]
+    ],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ContentItemComponent implements OnInit, OnChanges {
     @Output()
@@ -73,8 +74,6 @@ export class ContentItemComponent implements OnInit, OnChanges {
     public content: ContentDto;
 
     public dropdown = new ModalView(false, true);
-
-    public scheduleTooltip = new ModalView(false, true);
 
     public values: any[] = [];
 

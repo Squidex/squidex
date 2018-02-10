@@ -5,7 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights r vbeserved
  */
 
-import { Component, Host, Input, OnChanges, Optional } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Host, Input, OnChanges, Optional } from '@angular/core';
 import { AbstractControl, FormGroupDirective } from '@angular/forms';
 
 import { fadeAnimation } from './animations';
@@ -30,7 +30,8 @@ const DEFAULT_ERRORS: { [key: string]: string } = {
     templateUrl: './control-errors.component.html',
     animations: [
         fadeAnimation
-    ]
+    ],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ControlErrorsComponent implements OnChanges {
     private displayFieldName: string;

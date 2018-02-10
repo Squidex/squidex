@@ -71,6 +71,7 @@ import {
     TitleService,
     TitleComponent,
     ToggleComponent,
+    TooltipComponent,
     UserReportComponent
 } from './declarations';
 
@@ -131,6 +132,7 @@ import {
         TemplateWrapperDirective,
         TitleComponent,
         ToggleComponent,
+        TooltipComponent,
         UserReportComponent
     ],
     exports: [
@@ -182,6 +184,7 @@ import {
         TemplateWrapperDirective,
         TitleComponent,
         ToggleComponent,
+        TooltipComponent,
         UserReportComponent,
         HttpClientModule,
         FormsModule,

@@ -28,7 +28,7 @@
                     Search for content using full text search over all fields and languages!
                 </sqx-onboarding-tooltip>
                 
-                <div class="dropdown-menu" *sqxModalView="searchModal" closeAlways="true" [sqxModalTarget]="inputFind">
+                <div class="dropdown-menu" *sqxModalView="searchModal" [sqxModalTarget]="inputFind">
                     <sqx-search-form
                         [canArchive]="!isReadOnly"
                         (queryChanged)="contentsFilter.setValue($event, { emitEvent: false })" 
@@ -175,21 +175,21 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">{{dueTimeAction}} content items</h4>
+                <h4 class="modal-title">{{dueTimeAction}} content item(s)</h4>
             </div>
 
             <div class="modal-body">
                 <div class="form-check">
                     <input class="form-check-input" type="radio" [(ngModel)]="dueTimeMode" value="Immediately" id="immediately">
                     <label class="form-check-label" for="immediately">
-                        {{dueTimeAction}} content items immediately.
+                        {{dueTimeAction}} content item(s) immediately.
                     </label>
                 </div>
 
                 <div class="form-check">
                     <input class="form-check-input" type="radio" [(ngModel)]="dueTimeMode" value="Scheduled" id="scheduled">
                     <label class="form-check-label" for="scheduled">
-                        {{dueTimeAction}} content items at a later point date and time.
+                        {{dueTimeAction}} content item(s) at a later point date and time.
                     </label>
                 </div>
 
