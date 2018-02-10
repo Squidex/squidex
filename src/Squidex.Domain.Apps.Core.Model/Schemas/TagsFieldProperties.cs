@@ -12,36 +12,9 @@ namespace Squidex.Domain.Apps.Core.Schemas
     [TypeName(nameof(TagsField))]
     public sealed class TagsFieldProperties : FieldProperties
     {
-        private int? minItems;
-        private int? maxItems;
+        public int? MinItems { get; set; }
 
-        public int? MinItems
-        {
-            get
-            {
-                return minItems;
-            }
-            set
-            {
-                ThrowIfFrozen();
-
-                minItems = value;
-            }
-        }
-
-        public int? MaxItems
-        {
-            get
-            {
-                return maxItems;
-            }
-            set
-            {
-                ThrowIfFrozen();
-
-                maxItems = value;
-            }
-        }
+        public int? MaxItems { get; set; }
 
         public override T Accept<T>(IFieldPropertiesVisitor<T> visitor)
         {

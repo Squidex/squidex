@@ -12,6 +12,8 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Infrastructure.States;
 
+#pragma warning disable RECS0022 // A catch clause that catches System.Exception and has an empty body
+
 namespace Squidex.Infrastructure.MongoDb
 {
     public static class MongoExtensions
@@ -35,6 +37,18 @@ namespace Squidex.Infrastructure.MongoDb
             }
 
             return true;
+        }
+
+        public static async Task TryDropOneAsync<T>(this IMongoIndexManager<T> indexes, string name)
+        {
+            try
+            {
+                await indexes.DropOneAsync(name);
+            }
+            catch
+            {
+                /* NOOP */
+            }
         }
 
         public static IFindFluent<TDocument, BsonDocument> Only<TDocument>(this IFindFluent<TDocument, TDocument> find,

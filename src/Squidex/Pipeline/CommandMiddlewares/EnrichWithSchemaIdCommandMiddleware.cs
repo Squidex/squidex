@@ -29,8 +29,35 @@ namespace Squidex.Pipeline.CommandMiddlewares
 
         public async Task HandleAsync(CommandContext context, Func<Task> next)
         {
-            if (context.Command is SchemaCommand schemaCommand && schemaCommand.SchemaId == null)
+            if (actionContextAccessor.ActionContext == null)
             {
+                await next();
+            }
+
+            if (context.Command is ISchemaCommand schemaCommand && schemaCommand.SchemaId == null)
+            {
+                NamedId<Guid> appId = null;
+
+                if (context.Command is IAppCommand appCommand)
+                {
+                    appId = appCommand.AppId;
+                }
+
+                if (appId == null)
+                {
+                    var appFeature = actionContextAccessor.ActionContext.HttpContext.Features.Get<IAppFeature>();
+
+                    if (appFeature != null && appFeature.App != null)
+                    {
+                        appId = new NamedId<Guid>(appFeature.App.Id, appFeature.App.Name);
+                    }
+                }
+
+                if (appId == null)
+                {
+                    return;
+                }
+
                 var routeValues = actionContextAccessor.ActionContext.RouteData.Values;
 
                 if (routeValues.ContainsKey("name"))
@@ -41,11 +68,11 @@ namespace Squidex.Pipeline.CommandMiddlewares
 
                     if (Guid.TryParse(schemaName, out var id))
                     {
-                        schema = await appProvider.GetSchemaAsync(schemaCommand.AppId.Id, id);
+                        schema = await appProvider.GetSchemaAsync(appId.Id, id);
                     }
                     else
                     {
-                        schema = await appProvider.GetSchemaAsync(schemaCommand.AppId.Id, schemaName);
+                        schema = await appProvider.GetSchemaAsync(appId.Id, schemaName);
                     }
 
                     if (schema == null)

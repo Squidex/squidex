@@ -75,12 +75,8 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
         [Route("/account/profile/login-add-callback/")]
         public Task<IActionResult> AddLoginCallback()
         {
-            return MakeChangeAsync(async user =>
-            {
-                var externalLogin = await signInManager.GetExternalLoginInfoWithDisplayNameAsync(userManager.GetUserId(User));
-
-                return await userManager.AddLoginAsync(user, externalLogin);
-            }, "Login added successfully.");
+            return MakeChangeAsync(user => AddLoginAsync(user),
+                "Login added successfully.");
         }
 
         [HttpPost]
@@ -119,31 +115,41 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
         [Route("/account/profile/upload-picture/")]
         public Task<IActionResult> UploadPicture(List<IFormFile> file)
         {
-            return MakeChangeAsync(async user =>
+            return MakeChangeAsync(user => UpdatePictureAsync(file, user),
+                "Picture uploaded successfully.");
+        }
+
+        private async Task<IdentityResult> AddLoginAsync(IUser user)
+        {
+            var externalLogin = await signInManager.GetExternalLoginInfoWithDisplayNameAsync(userManager.GetUserId(User));
+
+            return await userManager.AddLoginAsync(user, externalLogin);
+        }
+
+        private async Task<IdentityResult> UpdatePictureAsync(List<IFormFile> file, IUser user)
+        {
+            if (file.Count != 1)
             {
-                if (file.Count != 1)
-                {
-                    return IdentityResult.Failed(new IdentityError { Description = "Please upload a single file." });
-                }
+                return IdentityResult.Failed(new IdentityError { Description = "Please upload a single file." });
+            }
 
-                var thumbnailStream = new MemoryStream();
-                try
-                {
-                    await assetThumbnailGenerator.CreateThumbnailAsync(file[0].OpenReadStream(), thumbnailStream, 128, 128, "Crop");
+            var thumbnailStream = new MemoryStream();
+            try
+            {
+                await assetThumbnailGenerator.CreateThumbnailAsync(file[0].OpenReadStream(), thumbnailStream, 128, 128, "Crop");
 
-                    thumbnailStream.Position = 0;
-                }
-                catch
-                {
-                    return IdentityResult.Failed(new IdentityError { Description = "Picture is not a valid image." });
-                }
+                thumbnailStream.Position = 0;
+            }
+            catch
+            {
+                return IdentityResult.Failed(new IdentityError { Description = "Picture is not a valid image." });
+            }
 
-                await userPictureStore.UploadAsync(user.Id, thumbnailStream);
+            await userPictureStore.UploadAsync(user.Id, thumbnailStream);
 
-                user.SetPictureUrlToStore();
+            user.SetPictureUrlToStore();
 
-                return await userManager.UpdateAsync(user);
-            }, "Picture uploaded successfully.");
+            return await userManager.UpdateAsync(user);
         }
 
         private async Task<IActionResult> MakeChangeAsync(Func<IUser, Task<IdentityResult>> action, string successMessage, ChangeProfileModel model = null)

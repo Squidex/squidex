@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
 
 import {
     AppContext,
@@ -27,7 +27,8 @@ import {
     ],
     animations: [
         fadeAnimation
-    ]
+    ],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ContentItemComponent implements OnInit, OnChanges {
     @Output()
@@ -46,7 +47,7 @@ export class ContentItemComponent implements OnInit, OnChanges {
     public deleting = new EventEmitter();
 
     @Output()
-    public selectedChange = new EventEmitter<boolean>();
+    public selectedChange = new EventEmitter();
 
     @Input()
     public selected = false;

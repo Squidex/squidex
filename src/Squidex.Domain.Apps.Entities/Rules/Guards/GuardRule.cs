@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
@@ -22,7 +23,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
             {
                 if (command.Trigger == null)
                 {
-                    error(new ValidationError("Trigger must be defined.", nameof(command.Trigger)));
+                    error(new ValidationError("Trigger is required.", nameof(command.Trigger)));
                 }
                 else
                 {
@@ -33,7 +34,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
 
                 if (command.Action == null)
                 {
-                    error(new ValidationError("Trigger must be defined.", nameof(command.Action)));
+                    error(new ValidationError("Trigger is required.", nameof(command.Action)));
                 }
                 else
                 {
@@ -44,7 +45,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
             });
         }
 
-        public static Task CanUpdate(UpdateRule command, IAppProvider appProvider)
+        public static Task CanUpdate(UpdateRule command, Guid appId, IAppProvider appProvider)
         {
             Guard.NotNull(command, nameof(command));
 
@@ -52,12 +53,12 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
             {
                 if (command.Trigger == null && command.Action == null)
                 {
-                    error(new ValidationError("Either trigger or action must be defined.", nameof(command.Trigger), nameof(command.Action)));
+                    error(new ValidationError("Either trigger or action is required.", nameof(command.Trigger), nameof(command.Action)));
                 }
 
                 if (command.Trigger != null)
                 {
-                    var errors = await RuleTriggerValidator.ValidateAsync(command.AppId.Id, command.Trigger, appProvider);
+                    var errors = await RuleTriggerValidator.ValidateAsync(appId, command.Trigger, appProvider);
 
                     errors.Foreach(error);
                 }

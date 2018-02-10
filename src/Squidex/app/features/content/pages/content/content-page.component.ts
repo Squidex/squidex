@@ -12,9 +12,8 @@ import { Observable, Subscription } from 'rxjs';
 
 import {
     ContentCreated,
-    ContentPublished,
     ContentRemoved,
-    ContentUnpublished,
+    ContentStatusChanged,
     ContentUpdated,
     ContentVersionSelected
 } from './../messages';
@@ -39,8 +38,7 @@ import {
     ]
 })
 export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, OnInit {
-    private contentPublishedSubscription: Subscription;
-    private contentUnpublishedSubscription: Subscription;
+    private contentStatusChangedSubscription: Subscription;
     private contentDeletedSubscription: Subscription;
     private contentVersionSelectedSubscription: Subscription;
 
@@ -63,8 +61,7 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
 
     public ngOnDestroy() {
         this.contentVersionSelectedSubscription.unsubscribe();
-        this.contentUnpublishedSubscription.unsubscribe();
-        this.contentPublishedSubscription.unsubscribe();
+        this.contentStatusChangedSubscription.unsubscribe();
         this.contentDeletedSubscription.unsubscribe();
     }
 
@@ -75,27 +72,25 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
                     this.loadVersion(message.version);
                 });
 
-        this.contentPublishedSubscription =
-            this.ctx.bus.of(ContentPublished)
-                .subscribe(message => {
-                    if (this.content && message.content.id === this.content.id) {
-                        this.content = this.content.publish(message.content.lastModifiedBy, message.content.version, message.content.lastModified);
-                    }
-                });
-
-        this.contentUnpublishedSubscription =
-            this.ctx.bus.of(ContentUnpublished)
-                .subscribe(message => {
-                    if (this.content && message.content.id === this.content.id) {
-                        this.content = this.content.unpublish(message.content.lastModifiedBy, message.content.version, message.content.lastModified);
-                    }
-                });
-
         this.contentDeletedSubscription =
             this.ctx.bus.of(ContentRemoved)
                 .subscribe(message => {
                     if (this.content && message.content.id === this.content.id) {
                         this.router.navigate(['../'], { relativeTo: this.ctx.route });
+                    }
+                });
+
+        this.contentStatusChangedSubscription =
+            this.ctx.bus.of(ContentStatusChanged)
+                .subscribe(message => {
+                    if (this.content && message.content.id === this.content.id) {
+                        this.content =
+                            this.content.changeStatus(
+                                message.content.scheduledTo || message.content.status,
+                                message.content.scheduledAt,
+                                message.content.lastModifiedBy,
+                                message.content.version,
+                                message.content.lastModified);
                     }
                 });
 

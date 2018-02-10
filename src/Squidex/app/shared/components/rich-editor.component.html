@@ -1,7 +1,7 @@
-<div class="editor-container">
+<div class="drop-container">
     <div class="editor" #editor></div>
 
     <div class="file-drop drag drop-area" [class.dragging]="draggedOver" dnd-droppable (onDropSuccess)="onItemDropped($event)">
-        <div class="drop-text">Drop files or assets here to add them.</div>
+        <div class="drop-text">Drop assets here to add them.</div>
     </div>
 </div>

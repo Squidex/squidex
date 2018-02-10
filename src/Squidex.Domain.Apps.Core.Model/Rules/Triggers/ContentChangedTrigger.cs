@@ -13,25 +13,26 @@ namespace Squidex.Domain.Apps.Core.Rules.Triggers
     [TypeName(nameof(ContentChangedTrigger))]
     public sealed class ContentChangedTrigger : RuleTrigger
     {
-        private ImmutableList<ContentChangedTriggerSchema> schemas;
+        public ImmutableList<ContentChangedTriggerSchema> Schemas { get; set; }
 
-        public ImmutableList<ContentChangedTriggerSchema> Schemas
-        {
-            get
-            {
-                return schemas;
-            }
-            set
-            {
-                ThrowIfFrozen();
-
-                schemas = value;
-            }
-        }
+        public bool HandleAll { get; set; }
 
         public override T Accept<T>(IRuleTriggerVisitor<T> visitor)
         {
             return visitor.Visit(this);
+        }
+
+        public override void Freeze()
+        {
+            base.Freeze();
+
+            if (Schemas != null)
+            {
+                foreach (var schema in Schemas)
+                {
+                    schema.Freeze();
+                }
+            }
         }
     }
 }

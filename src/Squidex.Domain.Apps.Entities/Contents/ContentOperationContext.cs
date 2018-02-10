@@ -42,7 +42,16 @@ namespace Squidex.Domain.Apps.Entities.Contents
             IScriptEngine scriptEngine,
             Func<string> message)
         {
-            var (appEntity, schemaEntity) = await appProvider.GetAppWithSchemaAsync(command.AppId.Id, command.SchemaId.Id);
+            var a = content.Snapshot.AppId;
+            var s = content.Snapshot.SchemaId;
+
+            if (command is CreateContent createContent)
+            {
+                a = a ?? createContent.AppId;
+                s = s ?? createContent.SchemaId;
+            }
+
+            var (appEntity, schemaEntity) = await appProvider.GetAppWithSchemaAsync(a.Id, s.Id);
 
             var context = new ContentOperationContext
             {
@@ -75,17 +84,15 @@ namespace Squidex.Domain.Apps.Entities.Contents
             {
                 var errors = new List<ValidationError>();
 
-                var appId = command.AppId.Id;
-
                 var ctx =
                     new ValidationContext(
                         (contentIds, schemaId) =>
                         {
-                            return QueryContentsAsync(appId, schemaId, contentIds);
+                            return QueryContentsAsync(content.Snapshot.AppId.Id, schemaId, contentIds);
                         },
                         assetIds =>
                         {
-                            return QueryAssetsAsync(appId, assetIds);
+                            return QueryAssetsAsync(content.Snapshot.AppId.Id, assetIds);
                         });
 
                 if (partial)
@@ -106,7 +113,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         private async Task<IReadOnlyList<IAssetInfo>> QueryAssetsAsync(Guid appId, IEnumerable<Guid> assetIds)
         {
-            return await assetRepository.QueryAsync(appId, null, new HashSet<Guid>(assetIds), null, int.MaxValue, 0);
+            return await assetRepository.QueryAsync(appId, new HashSet<Guid>(assetIds));
         }
 
         private async Task<IReadOnlyList<Guid>> QueryContentsAsync(Guid appId, Guid schemaId, IEnumerable<Guid> contentIds)

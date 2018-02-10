@@ -35,15 +35,15 @@ export class RichEditorComponent implements ControlValueAccessor, AfterViewInit,
     private tinyInitTimer: any;
     private value: string;
     private isDisabled = false;
-
-    public draggedOver = false;
     private assetDraggedSubscription: any;
 
     @ViewChild('editor')
     public editor: ElementRef;
 
     @Output()
-    public assetPluginClicked = new EventEmitter<object>();
+    public assetPluginClicked = new EventEmitter<any>();
+
+    public draggedOver = false;
 
     public assetsForm = this.formBuilder.group({
         name: ['']
@@ -94,17 +94,17 @@ export class RichEditorComponent implements ControlValueAccessor, AfterViewInit,
             removed_menuitems: 'newdocument',
             resize: true,
             theme: 'modern',
-            toolbar: 'undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | image media assets',
+            toolbar: 'undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | image media | assets',
             setup: (editor: any) => {
                 self.tinyEditor = editor;
                 self.tinyEditor.setMode(this.isDisabled ? 'readonly' : 'design');
 
                 self.tinyEditor.addButton('assets', {
                     text: '',
-                    icon: 'browse',
+                    icon: 'assets',
                     tooltip: 'Insert Assets',
                     onclick: (event: any) => {
-                        self.assetPluginClicked.emit(event);
+                        self.assetPluginClicked.emit();
                     }
                 });
 

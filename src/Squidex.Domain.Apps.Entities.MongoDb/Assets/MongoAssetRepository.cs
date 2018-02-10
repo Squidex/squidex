@@ -9,10 +9,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Entities.Assets;
+using Squidex.Domain.Apps.Entities.Assets.Edm;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
+using Squidex.Domain.Apps.Entities.MongoDb.Assets.Visitors;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 
@@ -34,44 +35,63 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
         {
             return collection.Indexes.CreateOneAsync(
                 Index
-                    .Ascending(x => x.State.AppId)
-                    .Ascending(x => x.State.IsDeleted)
-                    .Ascending(x => x.State.FileName)
-                    .Ascending(x => x.State.MimeType)
-                    .Descending(x => x.State.LastModified));
+                    .Ascending(x => x.AppId)
+                    .Ascending(x => x.IsDeleted)
+                    .Ascending(x => x.FileName)
+                    .Descending(x => x.LastModified));
         }
 
-        public async Task<IResultList<IAssetEntity>> QueryAsync(Guid appId, HashSet<string> mimeTypes = null, HashSet<Guid> ids = null, string query = null, int take = 10, int skip = 0)
+        public async Task<IResultList<IAssetEntity>> QueryAsync(Guid appId, string query = null)
         {
-            var filters = new List<FilterDefinition<MongoAssetEntity>>
+            try
             {
-                Filter.Eq(x => x.State.AppId, appId),
-                Filter.Eq(x => x.State.IsDeleted, false)
-            };
+                var odataQuery = EdmAssetModel.Edm.ParseQuery(query);
 
-            if (ids != null && ids.Count > 0)
-            {
-                filters.Add(Filter.In(x => x.Id, ids));
+                var filter = FindExtensions.BuildQuery(odataQuery, appId);
+
+                var contentCount = Collection.Find(filter).CountAsync();
+                var contentItems =
+                    Collection.Find(filter)
+                        .AssetTake(odataQuery)
+                        .AssetSkip(odataQuery)
+                        .AssetSort(odataQuery)
+                        .ToListAsync();
+
+                await Task.WhenAll(contentItems, contentCount);
+
+                return ResultList.Create<IAssetEntity>(contentItems.Result, contentCount.Result);
             }
-
-            if (mimeTypes != null && mimeTypes.Count > 0)
+            catch (NotSupportedException)
             {
-                filters.Add(Filter.In(x => x.State.MimeType, mimeTypes));
+                throw new ValidationException("This odata operation is not supported.");
             }
-
-            if (!string.IsNullOrWhiteSpace(query))
+            catch (NotImplementedException)
             {
-                filters.Add(Filter.Regex(x => x.State.FileName, new BsonRegularExpression(query, "i")));
+                throw new ValidationException("This odata operation is not supported.");
             }
+            catch (MongoQueryException ex)
+            {
+                if (ex.Message.Contains("17406"))
+                {
+                    throw new DomainException("Result set is too large to be retrieved. Use $top parameter to reduce the number of items.");
+                }
+                else
+                {
+                    throw;
+                }
+            }
+        }
 
-            var filter = Filter.And(filters);
+        public async Task<IResultList<IAssetEntity>> QueryAsync(Guid appId, HashSet<Guid> ids)
+        {
+            var find = Collection.Find(Filter.In(x => x.Id, ids)).SortByDescending(x => x.LastModified);
 
-            var assetItems = Collection.Find(filter).Skip(skip).Limit(take).SortByDescending(x => x.State.LastModified).ToListAsync();
-            var assetCount = Collection.Find(filter).CountAsync();
+            var assetItems = find.ToListAsync();
+            var assetCount = find.CountAsync();
 
             await Task.WhenAll(assetItems, assetCount);
 
-            return ResultList.Create<IAssetEntity>(assetItems.Result.Select(x => x.State), assetCount.Result);
+            return ResultList.Create(assetItems.Result.OfType<IAssetEntity>().ToList(), assetCount.Result);
         }
 
         public async Task<IAssetEntity> FindAssetAsync(Guid id)
@@ -80,7 +100,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                 await Collection.Find(x => x.Id == id)
                     .FirstOrDefaultAsync();
 
-            return assetEntity?.State;
+            return assetEntity;
         }
     }
 }

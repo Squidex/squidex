@@ -13,9 +13,10 @@ using Xunit;
 
 namespace Squidex.Infrastructure.Commands
 {
-    public sealed class EnrichWithTimestampCommandMiddlewareTests
+    public class EnrichWithTimestampCommandMiddlewareTests
     {
         private readonly IClock clock = A.Fake<IClock>();
+        private readonly ICommandBus commandBus = A.Dummy<ICommandBus>();
 
         [Fact]
         public async Task Should_set_timestamp_for_timestamp_command()
@@ -28,7 +29,7 @@ namespace Squidex.Infrastructure.Commands
 
             var command = new MyCommand();
 
-            await sut.HandleAsync(new CommandContext(command));
+            await sut.HandleAsync(new CommandContext(command, commandBus));
 
             Assert.Equal(utc, command.Timestamp);
         }
@@ -38,7 +39,7 @@ namespace Squidex.Infrastructure.Commands
         {
             var sut = new EnrichWithTimestampCommandMiddleware(clock);
 
-            await sut.HandleAsync(new CommandContext(A.Dummy<ICommand>()));
+            await sut.HandleAsync(new CommandContext(A.Dummy<ICommand>(), commandBus));
 
             A.CallTo(() => clock.GetCurrentInstant()).MustNotHaveHappened();
         }

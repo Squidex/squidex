@@ -32,13 +32,19 @@
                         <i class="icon-trigger-{{trigger}}"></i>
                     </span>
                     <span class="rule-element-text">
-                        {{ruleTriggers[trigger]}}
+                        {{ruleTriggers[trigger].name}}
                     </span>
                 </span>
             </div>
             
             <div *ngIf="step === 2 && schemas" class="modal-form">       
                 <div [ngSwitch]="triggerType">
+                    <div *ngSwitchCase="'AssetChanged'">
+                        <sqx-asset-changed-trigger #triggerControl
+                            [trigger]="trigger" 
+                            (triggerChanged)="selectTrigger($event)">
+                        </sqx-asset-changed-trigger>
+                    </div>
                     <div *ngSwitchCase="'ContentChanged'">
                         <sqx-content-changed-trigger #triggerControl
                             [schemas]="schemas" 
@@ -55,13 +61,37 @@
                         <i class="icon-action-{{action}}"></i>
                     </span>
                     <span class="rule-element-text">
-                        {{ruleActions[action]}}
+                        {{ruleActions[action].name}}
                     </span>
                 </span>
             </div>
         
             <div *ngIf="step === 4" class="modal-form">
                 <div [ngSwitch]="actionType">
+                    <div *ngSwitchCase="'Algolia'">
+                        <sqx-algolia-action #actionControl
+                            [action]="action" 
+                            (actionChanged)="selectAction($event)">
+                        </sqx-algolia-action>
+                    </div>
+                    <div *ngSwitchCase="'AzureQueue'">
+                        <sqx-azure-queue-action #actionControl
+                            [action]="action" 
+                            (actionChanged)="selectAction($event)">
+                        </sqx-azure-queue-action>
+                    </div>
+                    <div *ngSwitchCase="'Fastly'">
+                        <sqx-fastly-action #actionControl
+                            [action]="action" 
+                            (actionChanged)="selectAction($event)">
+                        </sqx-fastly-action>
+                    </div>
+                    <div *ngSwitchCase="'Slack'">
+                        <sqx-slack-action #actionControl
+                            [action]="action" 
+                            (actionChanged)="selectAction($event)">
+                        </sqx-slack-action>
+                    </div>
                     <div *ngSwitchCase="'Webhook'">
                         <sqx-webhook-action #actionControl
                             [action]="action" 

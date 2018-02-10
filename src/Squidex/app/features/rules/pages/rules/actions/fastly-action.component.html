@@ -1,0 +1,31 @@
+<h3 class="rule-title">Purge cache entries in Fastly</h3>
+
+<form [formGroup]="actionForm" class="form-horizontal" (ngSubmit)="save()">
+    <div class="form-group row">
+        <label class="col col-3 col-form-label" for="serviceId">Service ID</label>
+
+        <div class="col col-9">
+            <sqx-control-errors for="text" [submitted]="actionFormSubmitted"></sqx-control-errors>
+
+            <input type="text" class="form-control" id="serviceId" formControlName="serviceId" />
+
+            <small class="form-text text-muted">
+                The service ID of the fastly account.
+            </small>
+        </div>
+    </div>
+
+    <div class="form-group row">
+            <label class="col col-3 col-form-label" for="apiKey">Api Key</label>
+
+        <div class="col col-9">
+            <sqx-control-errors for="apiKey" [submitted]="actionFormSubmitted"></sqx-control-errors>
+
+            <input type="text" class="form-control" id="apiKey" formControlName="apiKey" />
+
+            <small class="form-text text-muted">
+                The API key for the fastly account.
+            </small>
+        </div>
+    </div>
+</form>

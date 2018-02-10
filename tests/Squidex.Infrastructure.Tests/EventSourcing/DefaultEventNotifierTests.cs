@@ -10,7 +10,7 @@ using Xunit;
 
 namespace Squidex.Infrastructure.EventSourcing
 {
-    public sealed class DefaultEventNotifierTests
+    public class DefaultEventNotifierTests
     {
         private readonly DefaultEventNotifier sut = new DefaultEventNotifier(new InMemoryPubSub());
 

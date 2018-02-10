@@ -8,6 +8,7 @@
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Contents.State;
+using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
@@ -44,7 +45,14 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             VerifyCreatedAndNotDeleted();
 
-            RaiseEvent(SimpleMapper.Map(command, new ContentStatusChanged()));
+            if (command.DueTime.HasValue)
+            {
+                RaiseEvent(SimpleMapper.Map(command, new ContentStatusScheduled { DueTime = command.DueTime.Value }));
+            }
+            else
+            {
+                RaiseEvent(SimpleMapper.Map(command, new ContentStatusChanged()));
+            }
 
             return this;
         }
@@ -77,6 +85,21 @@ namespace Squidex.Domain.Apps.Entities.Contents
             }
 
             return this;
+        }
+
+        private void RaiseEvent(SchemaEvent @event)
+        {
+            if (@event.AppId == null)
+            {
+                @event.AppId = Snapshot.AppId;
+            }
+
+            if (@event.SchemaId == null)
+            {
+                @event.SchemaId = Snapshot.SchemaId;
+            }
+
+            RaiseEvent(Envelope.Create(@event));
         }
 
         private void VerifyNotCreated()

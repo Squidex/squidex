@@ -22,15 +22,11 @@
     &-footer {
         @include flex-shrink(0);
     }
-    
+
     &-form {
-        padding-top: 2em;
+        padding-top: 1em;
         padding-bottom: 0;
     }
-}
-
-.clearfix {
-    width: 100%;
 }
 
 .rule-element {

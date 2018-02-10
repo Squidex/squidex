@@ -41,7 +41,9 @@ export class IndeterminateValueDirective implements ControlValueAccessor {
     public writeValue(value: boolean | number | undefined) {
         if (!Types.isBoolean(value)) {
             this.renderer.setElementProperty(this.element.nativeElement, 'indeterminate', true);
+            this.renderer.setElementProperty(this.element.nativeElement, 'checked', false);
         } else {
+            this.renderer.setElementProperty(this.element.nativeElement, 'indeterminate', false);
             this.renderer.setElementProperty(this.element.nativeElement, 'checked', value);
         }
     }

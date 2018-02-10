@@ -1,0 +1,91 @@
+﻿@model Squidex.Areas.IdentityServer.Controllers.Account.ConsentVM
+
+@{
+    ViewBag.Theme = "white";
+    ViewBag.Title = "Consent";
+}
+
+@functions {
+    public string ErrorClass(string error)
+    {
+        return ViewData.ModelState[error]?.ValidationState == Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid ? "border-danger" : "";
+    }
+}
+
+<form asp-controller="Account" asp-action="Consent" asp-route-returnurl="@Model.ReturnUrl" method="post">
+    <div class="profile profile-lg">
+        <img class="profile-logo" src="~/images/logo-small.png" />
+
+        <h2>We need your consent</h2>
+        
+        <div class="card profile-section-sm @ErrorClass("ConsentToAutomatedEmails")">
+            <div class="card-body">
+                <h4 class="card-title">Automated E-Mails (Optional)</h4>
+
+                <div class="card-text row">
+                    <div class="col col-auto">
+                        <input type="checkbox" name="consentToAutomatedEmails" value="True" />
+                    </div>
+                    <div class="col">
+                        I understand and agree that Squidex sends e-mails to inform me about new features, breaking changes and downtimes.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card profile-section-sm @ErrorClass("ConsentToCookies")">
+            <div class="card-body">
+                <h4 class="card-title">Cookies & Analytics</h4>
+
+                <div class="card-text row">
+                    <div class="col col-auto">
+                        <input type="checkbox" name="consentToCookies" value="True" />
+                    </div>
+                    <div class="col">
+                        <p>
+                            I understand and agree that Squidex uses cookies to ensure you get the best experience on our platform and to store your login status.
+                        </p>
+                        <p>
+                            I understand and agree that Squidex has integrated Google Analytics (with the anonymizer function). Google Analytics is a web analytics service to gather and analyse data about the behavior of users.
+                        </p>
+                        <p>
+                            I have read the <a href="@Model.PrivacyUrl" target="_blank">privacy policies</a> and understand them.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card profile-section-sm @ErrorClass("ConsentToPersonalInformation")">
+            <div class="card-body">
+                <h4 class="card-title">Personal Information</h4>
+
+                <div class="card-text row">
+                    <div class="col col-auto">
+                        <input type="checkbox" name="consentToPersonalInformation" value="True" />
+                    </div>
+                    <div class="col">
+                        I understand and agree that Squidex collects the following private information that are retrieved from external authentication providers such as Google, Microsoft or Github.
+
+                        <ul class="personal-information">
+                            <li>
+                                Basic personal information (e-mail address, name and picture) are provided to all other users so that they can add you to their working space.
+                            </li>
+                            <li>
+                                At anytime you have the option to change these information to anonymize your account.
+                            </li>
+                            <li>
+                                Your user account has an unique identifier and for all your changes we track, that you made these changes and provide this information to other users.
+                            </li>
+                        </ul>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="profile-section-sm text-right">
+            <button type="submit" class="btn btn-success">I agree!</button>
+        </div>
+    </div>
+</form>

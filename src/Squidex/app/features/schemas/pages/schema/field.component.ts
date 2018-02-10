@@ -45,7 +45,7 @@ export class FieldComponent implements OnInit {
     public showing = new EventEmitter();
 
     @Output()
-    public saving= new EventEmitter();
+    public saving = new EventEmitter();
 
     @Output()
     public enabling = new EventEmitter();

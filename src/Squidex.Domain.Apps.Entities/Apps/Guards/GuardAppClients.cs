@@ -21,7 +21,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             {
                 if (string.IsNullOrWhiteSpace(command.Id))
                 {
-                    error(new ValidationError("Client id must be defined.", nameof(command.Id)));
+                    error(new ValidationError("Client id is required.", nameof(command.Id)));
                 }
                 else if (clients.ContainsKey(command.Id))
                 {
@@ -40,7 +40,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             {
                 if (string.IsNullOrWhiteSpace(command.Id))
                 {
-                    error(new ValidationError("Client id must be defined.", nameof(command.Id)));
+                    error(new ValidationError("Client id is required.", nameof(command.Id)));
                 }
             });
         }
@@ -55,12 +55,12 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             {
                 if (string.IsNullOrWhiteSpace(command.Id))
                 {
-                    error(new ValidationError("Client id must be defined.", nameof(command.Id)));
+                    error(new ValidationError("Client id is required.", nameof(command.Id)));
                 }
 
                 if (string.IsNullOrWhiteSpace(command.Name) && command.Permission == null)
                 {
-                    error(new ValidationError("Either name or permission must be defined.", nameof(command.Name), nameof(command.Permission)));
+                    error(new ValidationError("Either name or permission is required.", nameof(command.Name), nameof(command.Permission)));
                 }
 
                 if (command.Permission.HasValue && !command.Permission.Value.IsEnumValue())

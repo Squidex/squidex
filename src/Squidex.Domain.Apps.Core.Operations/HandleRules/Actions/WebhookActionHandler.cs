@@ -23,24 +23,22 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
 {
     public sealed class WebhookActionHandler : RuleActionHandler<WebhookAction>
     {
-        private static readonly TimeSpan Timeout = TimeSpan.FromSeconds(2);
+        private readonly RuleEventFormatter formatter;
 
-        private readonly JsonSerializer serializer;
-
-        public WebhookActionHandler(JsonSerializer serializer)
+        public WebhookActionHandler(RuleEventFormatter formatter)
         {
-            Guard.NotNull(serializer, nameof(serializer));
+            Guard.NotNull(formatter, nameof(formatter));
 
-            this.serializer = serializer;
+            this.formatter = formatter;
         }
 
         protected override (string Description, RuleJobData Data) CreateJob(Envelope<AppEvent> @event, string eventName, WebhookAction action)
         {
-            var body = CreatePayload(@event, eventName);
+            var body = formatter.ToRouteData(@event, eventName);
 
             var signature = $"{body.ToString(Formatting.Indented)}{action.SharedSecret}".Sha256Base64();
 
-            var ruleDescription = $"Send event to webhook {action.Url}";
+            var ruleDescription = $"Send event to webhook '{action.Url}'";
             var ruleData = new RuleJobData
             {
                 ["RequestUrl"] = action.Url,
@@ -51,38 +49,27 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
             return (ruleDescription, ruleData);
         }
 
-        private JObject CreatePayload(Envelope<AppEvent> @event, string eventName)
-        {
-            return new JObject(
-                new JProperty("type", eventName),
-                new JProperty("payload", JObject.FromObject(@event.Payload, serializer)),
-                new JProperty("timestamp", @event.Headers.Timestamp().ToString()));
-        }
-
         public override async Task<(string Dump, Exception Exception)> ExecuteJobAsync(RuleJobData job)
         {
             var requestBody = job["RequestBody"].ToString(Formatting.Indented);
-            var request = BuildRequest(job, requestBody);
+            var requestMsg = BuildRequest(job, requestBody);
 
             HttpResponseMessage response = null;
 
             try
             {
-                using (var client = new HttpClient { Timeout = Timeout })
-                {
-                    response = await client.SendAsync(request);
+                response = await HttpClientPool.GetHttpClient().SendAsync(requestMsg);
 
-                    var responseString = await response.Content.ReadAsStringAsync();
-                    var requestDump = DumpFormatter.BuildDump(request, response, requestBody, responseString, TimeSpan.Zero, false);
+                var responseString = await response.Content.ReadAsStringAsync();
+                var requestDump = DumpFormatter.BuildDump(requestMsg, response, requestBody, responseString, TimeSpan.Zero, false);
 
-                    return (requestDump, null);
-                }
+                return (requestDump, null);
             }
             catch (Exception ex)
             {
-                if (request != null)
+                if (requestMsg != null)
                 {
-                    var requestDump = DumpFormatter.BuildDump(request, response, requestBody, ex.ToString(), TimeSpan.Zero, false);
+                    var requestDump = DumpFormatter.BuildDump(requestMsg, response, requestBody, ex.ToString(), TimeSpan.Zero, false);
 
                     return (requestDump, ex);
                 }
@@ -97,15 +84,15 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
 
         private static HttpRequestMessage BuildRequest(Dictionary<string, JToken> job, string requestBody)
         {
-            var requestUrl = job["RequestUrl"].ToString();
-            var requestSignature = job["RequestSignature"].ToString();
+            var requestUrl = job["RequestUrl"].Value<string>();
+            var requestSig = job["RequestSignature"].Value<string>();
 
             var request = new HttpRequestMessage(HttpMethod.Post, requestUrl)
             {
                 Content = new StringContent(requestBody, Encoding.UTF8, "application/json")
             };
 
-            request.Headers.Add("X-Signature", requestSignature);
+            request.Headers.Add("X-Signature", requestSig);
             request.Headers.Add("User-Agent", "Squidex Webhook");
 
             return request;

@@ -30,7 +30,7 @@ export class LowerCaseInputDirective implements ControlValueAccessor {
 
     @HostListener('input', ['$event.target.value'])
     public onChange(value: any) {
-        const normalizedValue = (value == null ? '' : value.toString()).toLowerCase();
+        const normalizedValue = this.transform(value);
 
         this.renderer.setElementProperty(this.element.nativeElement, 'value', normalizedValue);
         this.callChange(normalizedValue);
@@ -42,7 +42,7 @@ export class LowerCaseInputDirective implements ControlValueAccessor {
     }
 
     public writeValue(value: string) {
-        const normalizedValue = Types.isString(value) ? value.toLowerCase() : '';
+        const normalizedValue = this.transform(value);
 
         this.renderer.setElementProperty(this.element.nativeElement, 'value', normalizedValue);
     }
@@ -57,5 +57,9 @@ export class LowerCaseInputDirective implements ControlValueAccessor {
 
     public registerOnTouched(fn: any) {
         this.callTouched = fn;
+    }
+
+    private transform(value: any): string {
+        return Types.isString(value) ? value.toLowerCase() : '';
     }
 }

@@ -101,7 +101,7 @@ namespace Squidex.Domain.Apps.Core
             return schema;
         }
 
-        public static void TestFreeze(Freezable freezable)
+        public static void TestFreeze(IFreezable freezable)
         {
             var sut = new AssetsFieldProperties();
 

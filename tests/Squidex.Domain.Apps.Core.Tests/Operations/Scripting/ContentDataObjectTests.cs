@@ -14,7 +14,7 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.Scripting
 {
-    public sealed class ContentDataObjectTests
+    public class ContentDataObjectTests
     {
         [Fact]
         public void Should_update_data_when_setting_field()
@@ -28,6 +28,22 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                             .AddValue("iv", 1.0));
 
             var result = ExecuteScript(original, @"data.number = { iv: 1 }");
+
+            Assert.Equal(expected, result);
+        }
+
+        [Fact]
+        public void Should_update_data_when_setting_lazy_field()
+        {
+            var original = new NamedContentData();
+
+            var expected =
+                new NamedContentData()
+                    .AddField("number",
+                        new ContentFieldData()
+                            .AddValue("iv", 1.0));
+
+            var result = ExecuteScript(original, @"data.number.iv = 1");
 
             Assert.Equal(expected, result);
         }

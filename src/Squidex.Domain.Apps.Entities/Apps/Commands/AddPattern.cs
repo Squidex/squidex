@@ -9,7 +9,7 @@ using System;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Commands
 {
-    public sealed class AddPattern : AppAggregateCommand
+    public sealed class AddPattern : AppCommand
     {
         public Guid PatternId { get; set; }
 

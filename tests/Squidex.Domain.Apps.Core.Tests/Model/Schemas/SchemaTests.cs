@@ -26,7 +26,6 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
         [Fact]
         public void Should_instantiate_schema()
         {
-            Assert.True(schema_0.Properties.IsFrozen);
             Assert.Equal("my-schema", schema_0.Name);
         }
 

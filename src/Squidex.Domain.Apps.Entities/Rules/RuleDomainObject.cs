@@ -7,6 +7,7 @@
 
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.Rules.State;
+using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Rules;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
@@ -49,6 +50,16 @@ namespace Squidex.Domain.Apps.Entities.Rules
             VerifyCreatedAndNotDeleted();
 
             RaiseEvent(SimpleMapper.Map(command, new RuleDeleted()));
+        }
+
+        private void RaiseEvent(AppEvent @event)
+        {
+            if (@event.AppId == null)
+            {
+                @event.AppId = Snapshot.AppId;
+            }
+
+            RaiseEvent(Envelope.Create(@event));
         }
 
         private void VerifyNotCreated()

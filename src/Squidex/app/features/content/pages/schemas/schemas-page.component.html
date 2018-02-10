@@ -25,7 +25,7 @@
         <div class="panel-content">
             <ul class="nav nav-panel nav-dark nav-dark-bordered flex-column">
                 <li class="nav-item" *ngFor="let schema of schemasFiltered | async">
-                    <a class="nav-link" [routerLink]="schema.name" routerLinkActive="active">{{schema | sqxDisplayName}} <i class="icon-angle-right"></i></a>
+                    <a class="nav-link" [routerLink]="schema.name" routerLinkActive="active">{{schema.displayName}} <i class="icon-angle-right"></i></a>
                 </li>
             </ul>
         </div>

@@ -50,7 +50,7 @@
                     </div>
 
                     <div class="bs-component">
-                        <nav class="navbar navbar-toggleable-md navbar-inverse bg-primary">
+                        <nav class="navbar navbar-toggleable-md navbar-dark bg-primary">
                             <button class="navbar-toggler navbar-toggler-right" type="button">
                                 <span class="navbar-toggler-icon"></span>
                             </button>
@@ -82,7 +82,7 @@
                     </div>
 
                     <div class="bs-component">
-                        <nav class="navbar navbar-toggleable-md navbar-inverse bg-inverse">
+                        <nav class="navbar navbar-toggleable-md navbar-dark bg-inverse">
                             <button class="navbar-toggler navbar-toggler-right" type="button">
                                 <span class="navbar-toggler-icon"></span>
                             </button>
@@ -134,7 +134,15 @@
                         <button type="button" class="btn btn-info">Info</button>
                         <button type="button" class="btn btn-warning">Warning</button>
                         <button type="button" class="btn btn-danger">Danger</button>
-                        <button type="button" class="btn btn-link">Link</button>
+                    </p>
+
+                    <p class="bs-component">
+                        <button type="button" class="btn btn-link btn-primary">Primary</button>
+                        <button type="button" class="btn btn-link btn-secondary">Secondary</button>
+                        <button type="button" class="btn btn-link btn-success">Success</button>
+                        <button type="button" class="btn btn-link btn-info">Info</button>
+                        <button type="button" class="btn btn-link btn-warning">Warning</button>
+                        <button type="button" class="btn btn-link btn-danger">Danger</button>
                     </p>
 
                     <p class="bs-component">
@@ -144,7 +152,6 @@
                         <button type="button" class="btn btn-info disabled">Info</button>
                         <button type="button" class="btn btn-warning disabled">Warning</button>
                         <button type="button" class="btn btn-danger disabled">Danger</button>
-                        <button type="button" class="btn btn-link disabled">Link</button>
                     </p>
 
                     <p class="bs-component">
@@ -562,7 +569,7 @@
                                 </fieldset>
                                 <div class="form-check">
                                     <label class="form-check-label">
-                                        <input type="checkbox" class="form-check-input">
+                                        <input class="form-check-input" type="checkbox">
                                         Check me out
                                     </label>
                                 </div>
@@ -590,20 +597,14 @@
 
                         <div class="form-group has-success">
                             <label class="form-control-label" for="inputSuccess1">Input with success</label>
-                            <input type="text" class="form-control form-control-success">
-                            <div class="form-control-feedback">Success! You've done it.</div>
+                            <input type="text" class="form-control is-valid">
+                            <div class="valid-feedback">Success! You've done it.</div>
                         </div>
 
                         <div class="form-group has-warning">
                             <label class="form-control-label" for="inputWarning1">Input with warning</label>
-                            <input type="text" class="form-control form-control-warning">
-                            <div class="form-control-feedback">Shucks, try again.</div>
-                        </div>
-
-                        <div class="form-group has-danger">
-                            <label class="form-control-label" for="inputDanger1">Input with danger</label>
-                            <input type="text" class="form-control form-control-danger">
-                            <div class="form-control-feedback">Sorry, that username's taken. Try another?</div>
+                            <input type="text" class="form-control is-invalid">
+                            <div class="invalid-feedback">Shucks, try again.</div>
                         </div>
 
                         <div class="form-group">
@@ -623,14 +624,18 @@
 
                         <div class="form-group">
                             <label class="control-label">Input addons</label>
-                            <div class="form-group">
-                                <label class="sr-only" for="exampleInputAmount">Amount (in dollars)</label>
-                                <div class="input-group">
-                                    <div class="input-group-addon">$</div>
-                                    <input type="text" class="form-control" placeholder="Amount">
-                                    <div class="input-group-addon">.00</div>
+                            
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">$</span>
                                 </div>
-                            </div>
+                                
+                                <input type="text" class="form-control" aria-label="Amount (to the nearest dollar)">
+                                
+                                <div class="input-group-append">
+                                    <span class="input-group-text">.00</span>
+                                </div>
+                              </div>
                         </div>
                     </form>
 
@@ -916,20 +921,24 @@
             <div>
                 <h2>Badges</h2>
                 <div class="bs-component" style="margin-bottom: 40px;">
-                    <span class="badge badge-default">Default</span>
                     <span class="badge badge-primary">Primary</span>
+                    <span class="badge badge-secondary">Secondary</span>
                     <span class="badge badge-success">Success</span>
-                    <span class="badge badge-warning">Warning</span>
                     <span class="badge badge-danger">Danger</span>
+                    <span class="badge badge-warning">Warning</span>
                     <span class="badge badge-info">Info</span>
+                    <span class="badge badge-light">Light</span>
+                    <span class="badge badge-dark">Dark</span>
                 </div>
                 <div class="bs-component">
-                    <span class="badge badge-pill badge-default">Default</span>
                     <span class="badge badge-pill badge-primary">Primary</span>
+                    <span class="badge badge-pill badge-secondary">Secondary</span>
                     <span class="badge badge-pill badge-success">Success</span>
-                    <span class="badge badge-pill badge-warning">Warning</span>
                     <span class="badge badge-pill badge-danger">Danger</span>
+                    <span class="badge badge-pill badge-warning">Warning</span>
                     <span class="badge badge-pill badge-info">Info</span>
+                    <span class="badge badge-pill badge-light">Light</span>
+                    <span class="badge badge-pill badge-dark">Dark</span>
                 </div>
             </div>
         </div>
@@ -1093,41 +1102,41 @@
             <div class="row">
                 <div class="col-lg-4">
                     <div class="bs-component">
-                        <div class="card card-inverse card-primary text-xs-center">
-                            <div class="card-block">
-                                <blockquote class="card-blockquote">
+                        <div class="card text-white bg-primary text-xs-center">
+                            <div class="card-body">
+                                <blockquote class="card-bodyquote">
                                     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante.</p>
                                     <footer>Someone famous in <cite title="Source Title">Source Title</cite></footer>
                                 </blockquote>
                             </div>
                         </div>
-                        <div class="card card-inverse card-success text-xs-center">
-                            <div class="card-block">
-                                <blockquote class="card-blockquote">
+                        <div class="card text-white bg-success text-xs-center">
+                            <div class="card-body">
+                                <blockquote class="card-bodyquote">
                                     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante.</p>
                                     <footer>Someone famous in <cite title="Source Title">Source Title</cite></footer>
                                 </blockquote>
                             </div>
                         </div>
-                        <div class="card card-inverse card-info text-xs-center">
-                            <div class="card-block">
-                                <blockquote class="card-blockquote">
+                        <div class="card text-white bg-info text-xs-center">
+                            <div class="card-body">
+                                <blockquote class="card-bodyquote">
                                     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante.</p>
                                     <footer>Someone famous in <cite title="Source Title">Source Title</cite></footer>
                                 </blockquote>
                             </div>
                         </div>
-                        <div class="card card-inverse card-warning text-xs-center">
-                            <div class="card-block">
-                                <blockquote class="card-blockquote">
+                        <div class="card text-white bg-warning text-xs-center">
+                            <div class="card-body">
+                                <blockquote class="card-bodyquote">
                                     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante.</p>
                                     <footer>Someone famous in <cite title="Source Title">Source Title</cite></footer>
                                 </blockquote>
                             </div>
                         </div>
-                        <div class="card card-inverse card-danger text-xs-center">
-                            <div class="card-block">
-                                <blockquote class="card-blockquote">
+                        <div class="card text-white bg-danger text-xs-center">
+                            <div class="card-body">
+                                <blockquote class="card-bodyquote">
                                     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante.</p>
                                     <footer>Someone famous in <cite title="Source Title">Source Title</cite></footer>
                                 </blockquote>
@@ -1137,41 +1146,41 @@
                 </div>
                 <div class="col-lg-4">
                     <div class="bs-component">
-                        <div class="card card-outline-primary text-xs-center">
-                            <div class="card-block">
-                                <blockquote class="card-blockquote">
+                        <div class="card border-primary text-xs-center">
+                            <div class="card-body">
+                                <blockquote class="card-bodyquote">
                                     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante.</p>
                                     <footer>Someone famous in <cite title="Source Title">Source Title</cite></footer>
                                 </blockquote>
                             </div>
                         </div>
-                        <div class="card card-outline-success text-xs-center">
-                            <div class="card-block">
-                                <blockquote class="card-blockquote">
+                        <div class="card border-success text-xs-center">
+                            <div class="card-body">
+                                <blockquote class="card-bodyquote">
                                     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante.</p>
                                     <footer>Someone famous in <cite title="Source Title">Source Title</cite></footer>
                                 </blockquote>
                             </div>
                         </div>
-                        <div class="card card-outline-info text-xs-center">
-                            <div class="card-block">
-                                <blockquote class="card-blockquote">
+                        <div class="card border-info text-xs-center">
+                            <div class="card-body">
+                                <blockquote class="card-bodyquote">
                                     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante.</p>
                                     <footer>Someone famous in <cite title="Source Title">Source Title</cite></footer>
                                 </blockquote>
                             </div>
                         </div>
-                        <div class="card card-outline-warning text-xs-center">
-                            <div class="card-block">
-                                <blockquote class="card-blockquote">
+                        <div class="card border-warning text-xs-center">
+                            <div class="card-body">
+                                <blockquote class="card-bodyquote">
                                     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante.</p>
                                     <footer>Someone famous in <cite title="Source Title">Source Title</cite></footer>
                                 </blockquote>
                             </div>
                         </div>
-                        <div class="card card-outline-danger text-xs-center">
-                            <div class="card-block">
-                                <blockquote class="card-blockquote">
+                        <div class="card border-danger text-xs-center">
+                            <div class="card-body">
+                                <blockquote class="card-bodyquote">
                                     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante.</p>
                                     <footer>Someone famous in <cite title="Source Title">Source Title</cite></footer>
                                 </blockquote>
@@ -1184,14 +1193,14 @@
                     <div class="bs-component">
                         <div class="card">
                             <h3 class="card-header">Card header</h3>
-                            <div class="card-block">
+                            <div class="card-body">
                                 <h5 class="card-title">Special title treatment</h5>
                                 <h6 class="card-subtitle text-muted">Support card subtitle</h6>
                             </div>
                             
                             <img style="height: 200px; width: 100%; display: block;" src="data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22318%22%20height%3D%22180%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20318%20180%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_158bd1d28ef%20text%20%7B%20fill%3Argba(255%2C255%2C255%2C.75)%3Bfont-weight%3Anormal%3Bfont-family%3AHelvetica%2C%20monospace%3Bfont-size%3A16pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_158bd1d28ef%22%3E%3Crect%20width%3D%22318%22%20height%3D%22180%22%20fill%3D%22%23777%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%22129.359375%22%20y%3D%2297.35%22%3EImage%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E" alt="Card image">
                             
-                            <div class="card-block">
+                            <div class="card-body">
                                 <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
                                 <a href="#" class="card-link">Card link</a>
                                 <a href="#" class="card-link">Another link</a>

@@ -35,7 +35,7 @@
 
             <div class="table-items-row-details-tab">
                 <div class="form-group row" *ngIf="allLanguages.length > 1">
-                    <label for="field-label" class="col col-3 col-form-label fallback-label">Fallback</label>
+                    <label class="col col-3 col-form-label fallback-label">Fallback</label>
 
                     <div class="col col-9">
                         <div class="fallback-languages" dnd-sortable-container [sortableData]="fallbackLanguages" *ngIf="fallbackLanguages.length > 0">
@@ -60,24 +60,34 @@
                     </div>
                 </div>
 
-                <div class="form-check offset-3 col col-9" *ngIf="!language.isMaster">
-                    <label class="form-check-label">
-                        <input class="form-check-input" type="checkbox" formControlName="isMaster"> Is Master
-                    </label>
-
-                    <small class="form-text text-muted">
-                        Master language is the last fallback language, when no value for a content and a language is available.
-                    </small>
+                <div class="form-group row" *ngIf="!language.isMaster">
+                    <div class="col offset-3 col-9">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="isMaster" formControlName="isMaster" />
+                            <label class="form-check-label" for="isMaster">
+                                    Is Master
+                            </label>
+                        </div>
+    
+                        <small class="form-text text-muted">
+                            Master language is the last fallback language, when no value for a content and a language is available.
+                        </small>
+                    </div>
                 </div>
 
-                <div class="form-check offset-3 col col-9" *ngIf="!isMaster">
-                    <label class="form-check-label">
-                        <input class="form-check-input" type="checkbox" formControlName="isOptional"> Is Optional
-                    </label>
+                <div class="form-group row" *ngIf="!language.isMaster">
+                    <div class="col offset-3 col-9" *ngIf="!isMaster">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" is="isOptional" formControlName="isOptional" />
+                            <label class="form-check-label" for="isOptional">
+                                Is Optional
+                            </label> 
+                        </div>
 
-                    <small class="form-text text-muted">
-                        Values for optional languages must not be specified, even if the field is set to required.
-                    </small>
+                        <small class="form-text text-muted">
+                            Values for optional languages must not be specified, even if the field is set to required.
+                        </small>
+                    </div>
                 </div>
             </div>
         </form>

@@ -9,7 +9,7 @@ using Squidex.Domain.Apps.Core.Schemas;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.Commands
 {
-    public sealed class AddField : SchemaAggregateCommand
+    public sealed class AddField : SchemaCommand
     {
         public string Name { get; set; }
 

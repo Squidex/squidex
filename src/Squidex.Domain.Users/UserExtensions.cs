@@ -35,19 +35,64 @@ namespace Squidex.Domain.Users
             user.SetClaim(SquidexClaimTypes.SquidexPictureUrl, GravatarHelper.CreatePictureUrl(email));
         }
 
+        public static void SetConsent(this IUser user)
+        {
+            user.SetClaim(SquidexClaimTypes.SquidexConsent, "true");
+        }
+
+        public static void SetConsentForEmails(this IUser user, bool value)
+        {
+            user.SetClaim(SquidexClaimTypes.SquidexConsentForEmails, value.ToString());
+        }
+
+        public static bool HasConsent(this IUser user)
+        {
+            return user.HasClaimValue(SquidexClaimTypes.SquidexConsent, "true");
+        }
+
+        public static bool HasConsentForEmails(this IUser user)
+        {
+            return user.HasClaimValue(SquidexClaimTypes.SquidexConsentForEmails, "true");
+        }
+
+        public static bool HasDisplayName(this IUser user)
+        {
+            return user.HasClaim(SquidexClaimTypes.SquidexDisplayName);
+        }
+
+        public static bool HasPictureUrl(this IUser user)
+        {
+            return user.HasClaim(SquidexClaimTypes.SquidexPictureUrl);
+        }
+
         public static bool IsPictureUrlStored(this IUser user)
         {
-            return string.Equals(user.Claims.FirstOrDefault(x => x.Type == SquidexClaimTypes.SquidexPictureUrl)?.Value, "store", StringComparison.OrdinalIgnoreCase);
+            return user.HasClaimValue(SquidexClaimTypes.SquidexPictureUrl, "store");
         }
 
         public static string PictureUrl(this IUser user)
         {
-            return user.Claims.FirstOrDefault(x => x.Type == SquidexClaimTypes.SquidexPictureUrl)?.Value;
+            return user.GetClaimValue(SquidexClaimTypes.SquidexPictureUrl);
         }
 
         public static string DisplayName(this IUser user)
         {
-            return user.Claims.FirstOrDefault(x => x.Type == SquidexClaimTypes.SquidexDisplayName)?.Value;
+            return user.GetClaimValue(SquidexClaimTypes.SquidexDisplayName);
+        }
+
+        public static string GetClaimValue(this IUser user, string claim)
+        {
+            return user.Claims.FirstOrDefault(x => string.Equals(x.Type, claim, StringComparison.OrdinalIgnoreCase))?.Value;
+        }
+
+        public static bool HasClaim(this IUser user, string claim)
+        {
+            return user.Claims.Any(x => string.Equals(x.Type, claim, StringComparison.OrdinalIgnoreCase));
+        }
+
+        public static bool HasClaimValue(this IUser user, string claim, string value)
+        {
+            return user.Claims.Any(x => string.Equals(x.Type, claim, StringComparison.OrdinalIgnoreCase) && string.Equals(x.Value, value, StringComparison.OrdinalIgnoreCase));
         }
 
         public static string PictureNormalizedUrl(this IUser user)

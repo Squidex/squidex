@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Repositories;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.States;
 
@@ -45,7 +44,7 @@ namespace Migrate_01.Migrations
                             new AddPattern
                             {
                                 Actor = app.Snapshot.CreatedBy,
-                                AppId = new NamedId<Guid>(app.Snapshot.Id, app.Snapshot.Name),
+                                AppId = app.Snapshot.Id,
                                 Name = pattern.Name,
                                 PatternId = Guid.NewGuid(),
                                 Pattern = pattern.Pattern,

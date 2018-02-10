@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Immutable;
+using FakeItEasy;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Actions;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
@@ -14,6 +15,7 @@ using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Rules;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.States;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Rules
@@ -28,6 +30,11 @@ namespace Squidex.Domain.Apps.Entities.Rules
         protected override Guid Id
         {
             get { return ruleId; }
+        }
+
+        public RuleDomainObjectTests()
+        {
+            sut.ActivateAsync(Id, A.Fake<IStore<Guid>>());
         }
 
         [Fact]
@@ -48,7 +55,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
             sut.Create(CreateRuleCommand(command));
 
-            Assert.Equal(AppId, sut.Snapshot.AppId);
+            Assert.Equal(AppId, sut.Snapshot.AppId.Id);
 
             Assert.Same(ruleTrigger, sut.Snapshot.RuleDef.Trigger);
             Assert.Same(ruleAction, sut.Snapshot.RuleDef.Action);
@@ -239,7 +246,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
             return CreateEvent(@event);
         }
 
-        protected T CreateRuleCommand<T>(T command) where T : RuleAggregateCommand
+        protected T CreateRuleCommand<T>(T command) where T : RuleCommand
         {
             command.RuleId = ruleId;
 

@@ -46,6 +46,8 @@ namespace Squidex.Config.Domain
                     .As<IRunnable>();
                 services.AddSingletonAs<RuleDequeuer>()
                     .As<IRunnable>();
+                services.AddSingletonAs<ContentScheduler>()
+                    .As<IRunnable>();
             }
 
             var exposeSourceUrl = config.GetOptionalValue("assetStore:exposeSourceUrl", true);
@@ -89,8 +91,26 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<AppProvider>()
                 .As<IAppProvider>();
 
+            services.AddSingletonAs<RuleEventFormatter>()
+                .AsSelf();
+
+            services.AddSingletonAs<AssetChangedTriggerHandler>()
+                .As<IRuleTriggerHandler>();
+
             services.AddSingletonAs<ContentChangedTriggerHandler>()
                 .As<IRuleTriggerHandler>();
+
+            services.AddSingletonAs<AlgoliaActionHandler>()
+                .As<IRuleActionHandler>();
+
+            services.AddSingletonAs<AzureQueueActionHandler>()
+                .As<IRuleActionHandler>();
+
+            services.AddSingletonAs<FastlyActionHandler>()
+                .As<IRuleActionHandler>();
+
+            services.AddSingletonAs<SlackActionHandler>()
+                .As<IRuleActionHandler>();
 
             services.AddSingletonAs<WebhookActionHandler>()
                 .As<IRuleActionHandler>();

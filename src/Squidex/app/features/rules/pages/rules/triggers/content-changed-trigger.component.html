@@ -1,4 +1,6 @@
-<table class="table table-middle table-sm table-fixed table-borderless">
+<h3 class="rule-title">Trigger rule when an events for a schemas happens</h3>
+
+<table class="table table-middle table-sm table-fixed table-borderless" *ngIf="!handleAll">
     <colgroup>
         <col style="width: 100%" />
         <col style="width: 40px" />
@@ -13,27 +15,27 @@
         <th>
             Schema
         </th>
-        <th class="text-center" title="All">
-            All
+        <th class="text-center">
+            <div class="rotated-label">All</div>
         </th>
-        <th class="text-center" title="Created">
-            C
+        <th class="text-center">
+            <div class="rotated-label">Created</div>
         </th>
-        <th class="text-center" title="Updated">
-            U
+        <th class="text-center">
+            <div class="rotated-label">Updated</div>
         </th>
-        <th class="text-center" title="Deleted">
-            D
+        <th class="text-center">
+            <div class="rotated-label">Deleted</div>
         </th>
-        <th class="text-center" title="Published">
-            P
+        <th class="text-center">
+            <div class="rotated-label">Published</div>
         </th>
         <th></th>
     </tr>
 
     <tr *ngFor="let schema of triggerSchemas">
         <td>
-            <span class="truncate">{{schema.schema.name}}</span>
+            <span class="truncate">{{schema.schema.displayName}}</span>
         </td>
         <td class="text-center" title="Created">
             <input type="checkbox" [ngModel]="schema.sendAll" (ngModelChange)="toggleAll(schema)" />
@@ -62,10 +64,17 @@
     <form class="form-inline" (ngSubmit)="addSchema()">
         <div class="form-group mr-1">
             <select class="form-control schemas-control" [(ngModel)]="schemaToAdd" name="schema">
-                <option *ngFor="let schema of schemasToAdd" [ngValue]="schema">{{schema.name}}</option>
+                <option *ngFor="let schema of schemasToAdd" [ngValue]="schema">{{schema.displayName}}</option>
             </select>
         </div>
 
         <button type="submit" class="btn btn-success" [disabled]="!hasSchema">Add Schema</button>
     </form>
+</div>
+
+<div class="form-check">
+    <input class="form-check-input" type="checkbox" [(ngModel)]="handleAll" id="handleAll" />
+    <label class="form-check-label" for="handleAll">
+        Trigger on all content events
+    </label>
 </div>

@@ -17,6 +17,7 @@ import {
     ApiUrlConfig,
     DateTime,
     HTTP,
+    StringHelper,
     ValidatorsEx,
     Version,
     Versioned
@@ -77,6 +78,10 @@ export function createProperties(fieldType: string, values: Object | null = null
 }
 
 export class SchemaDto {
+    public get displayName() {
+        return StringHelper.firstNonEmpty(this.properties.label || '', this.name);
+    }
+
     constructor(
         public readonly id: string,
         public readonly name: string,
@@ -274,6 +279,10 @@ export class SchemaDetailsDto extends SchemaDto {
 }
 
 export class FieldDto {
+    public get displayName() {
+        return StringHelper.firstNonEmpty(this.properties.label || '', this.name);
+    }
+
     constructor(
         public readonly fieldId: number,
         public readonly name: string,
@@ -525,7 +534,7 @@ export class BooleanFieldPropertiesDto extends FieldPropertiesDto {
             return '';
         }
 
-        return value ? '✔' : '-';
+        return value ? 'Yes' : 'No';
     }
 
     public createValidators(isOptional: boolean): ValidatorFn[] {

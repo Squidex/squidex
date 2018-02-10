@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Actions;
@@ -24,13 +25,85 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
             return action.Accept(visitor);
         }
 
+        public Task<IEnumerable<ValidationError>> Visit(AlgoliaAction action)
+        {
+            var errors = new List<ValidationError>();
+
+            if (string.IsNullOrWhiteSpace(action.ApiKey))
+            {
+                errors.Add(new ValidationError("Api key is required.", nameof(action.ApiKey)));
+            }
+
+            if (string.IsNullOrWhiteSpace(action.AppId))
+            {
+                errors.Add(new ValidationError("Application ID key is required.", nameof(action.AppId)));
+            }
+
+            if (string.IsNullOrWhiteSpace(action.IndexName))
+            {
+                errors.Add(new ValidationError("Index name is required.", nameof(action.IndexName)));
+            }
+
+            return Task.FromResult<IEnumerable<ValidationError>>(errors);
+        }
+
+        public Task<IEnumerable<ValidationError>> Visit(AzureQueueAction action)
+        {
+            var errors = new List<ValidationError>();
+
+            if (string.IsNullOrWhiteSpace(action.ConnectionString))
+            {
+                errors.Add(new ValidationError("Connection string is required.", nameof(action.ConnectionString)));
+            }
+
+            if (string.IsNullOrWhiteSpace(action.Queue))
+            {
+                errors.Add(new ValidationError("Queue is required.", nameof(action.Queue)));
+            }
+            else if (!Regex.IsMatch(action.Queue, "^[a-z][a-z0-9]{2,}(\\-[a-z0-9]+)*$"))
+            {
+                errors.Add(new ValidationError("Queue must be valid azure queue name.", nameof(action.Queue)));
+            }
+
+            return Task.FromResult<IEnumerable<ValidationError>>(errors);
+        }
+
+        public Task<IEnumerable<ValidationError>> Visit(FastlyAction action)
+        {
+            var errors = new List<ValidationError>();
+
+            if (string.IsNullOrWhiteSpace(action.ApiKey))
+            {
+                errors.Add(new ValidationError("Api key is required.", nameof(action.ApiKey)));
+            }
+
+            if (string.IsNullOrWhiteSpace(action.ServiceId))
+            {
+                errors.Add(new ValidationError("Service ID is required.", nameof(action.ServiceId)));
+            }
+
+            return Task.FromResult<IEnumerable<ValidationError>>(errors);
+        }
+
+        public Task<IEnumerable<ValidationError>> Visit(SlackAction action)
+        {
+            var errors = new List<ValidationError>();
+
+            if (action.WebhookUrl == null || !action.WebhookUrl.IsAbsoluteUri)
+            {
+                errors.Add(new ValidationError("Webhook Url is required and must be an absolute URL.", nameof(action.WebhookUrl)));
+            }
+
+            return Task.FromResult<IEnumerable<ValidationError>>(errors);
+        }
+
         public Task<IEnumerable<ValidationError>> Visit(WebhookAction action)
         {
             var errors = new List<ValidationError>();
 
             if (action.Url == null || !action.Url.IsAbsoluteUri)
             {
-                errors.Add(new ValidationError("Url must be specified and absolute.", nameof(action.Url)));
+                errors.Add(new ValidationError("Url is required and must be an absolute URL.", nameof(action.Url)));
             }
 
             return Task.FromResult<IEnumerable<ValidationError>>(errors);

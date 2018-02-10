@@ -12,6 +12,7 @@
 
         &:hover,
         &:focus {
+            @include box-shadow-colored(0, 0, .2rem, $color-theme-error);
             border-color: $color-theme-error-dark;
         }
     }

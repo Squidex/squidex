@@ -45,9 +45,9 @@ namespace Squidex.Domain.Apps.Entities.Apps
             this.appPlansBillingManager = appPlansBillingManager;
         }
 
-        protected Task On(CreateApp command, CommandContext context)
+        protected async Task On(CreateApp command, CommandContext context)
         {
-            return handler.CreateSyncedAsync<AppDomainObject>(context, async a =>
+            var app = await handler.CreateSyncedAsync<AppDomainObject>(context, async a =>
             {
                 await GuardApp.CanCreate(command, appProvider);
 
@@ -179,7 +179,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 }
                 else
                 {
-                    var result = await appPlansBillingManager.ChangePlanAsync(command.Actor.Identifier, command.AppId.Id, a.Snapshot.Name, command.PlanId);
+                    var result = await appPlansBillingManager.ChangePlanAsync(command.Actor.Identifier, a.Snapshot.Id, a.Snapshot.Name, command.PlanId);
 
                     if (result is PlanChangedResult)
                     {
@@ -193,10 +193,8 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         public async Task HandleAsync(CommandContext context, Func<Task> next)
         {
-            if (!await this.DispatchActionAsync(context.Command, context))
-            {
-                await next();
-            }
+            await this.DispatchActionAsync(context.Command, context);
+            await next();
         }
     }
 }

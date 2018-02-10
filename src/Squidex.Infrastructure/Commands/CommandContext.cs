@@ -12,12 +12,18 @@ namespace Squidex.Infrastructure.Commands
     public sealed class CommandContext
     {
         private readonly ICommand command;
+        private readonly ICommandBus commandBus;
         private readonly Guid contextId = Guid.NewGuid();
         private Tuple<object> result;
 
         public ICommand Command
         {
             get { return command; }
+        }
+
+        public ICommandBus CommandBus
+        {
+            get { return commandBus; }
         }
 
         public Guid ContextId
@@ -30,11 +36,13 @@ namespace Squidex.Infrastructure.Commands
             get { return result != null; }
         }
 
-        public CommandContext(ICommand command)
+        public CommandContext(ICommand command, ICommandBus commandBus)
         {
             Guard.NotNull(command, nameof(command));
+            Guard.NotNull(commandBus, nameof(commandBus));
 
             this.command = command;
+            this.commandBus = commandBus;
         }
 
         public void Complete(object resultValue = null)

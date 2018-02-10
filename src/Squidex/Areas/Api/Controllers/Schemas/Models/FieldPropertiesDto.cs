@@ -5,24 +5,17 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
-using Squidex.Areas.Api.Controllers.Schemas.Models.Fields;
 using Squidex.Domain.Apps.Core.Schemas;
 
 namespace Squidex.Areas.Api.Controllers.Schemas.Models
 {
-    [JsonConverter(typeof(JsonInheritanceConverter), "fieldType")]
-    [KnownType(typeof(AssetsFieldPropertiesDto))]
-    [KnownType(typeof(BooleanFieldPropertiesDto))]
-    [KnownType(typeof(DateTimeFieldPropertiesDto))]
-    [KnownType(typeof(GeolocationFieldPropertiesDto))]
-    [KnownType(typeof(JsonFieldPropertiesDto))]
-    [KnownType(typeof(NumberFieldPropertiesDto))]
-    [KnownType(typeof(ReferencesFieldPropertiesDto))]
-    [KnownType(typeof(StringFieldPropertiesDto))]
-    [KnownType(typeof(TagsFieldPropertiesDto))]
+    [JsonConverter(typeof(JsonInheritanceConverter), "fieldType", typeof(FieldPropertiesDto))]
+    [KnownType(nameof(Subtypes))]
     public abstract class FieldPropertiesDto
     {
         /// <summary>
@@ -59,5 +52,12 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         public string Partitioning { get; set; }
 
         public abstract FieldProperties ToProperties();
+
+        public static Type[] Subtypes()
+        {
+            var type = typeof(SchemaPropertiesDto);
+
+            return type.Assembly.GetTypes().Where(type.IsAssignableFrom).ToArray();
+        }
     }
 }

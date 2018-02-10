@@ -7,11 +7,13 @@
 
 using System;
 using System.IO;
+using FakeItEasy;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
+using Squidex.Infrastructure.States;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Assets
@@ -26,6 +28,11 @@ namespace Squidex.Domain.Apps.Entities.Assets
         protected override Guid Id
         {
             get { return assetId; }
+        }
+
+        public AssetDomainObjectTests()
+        {
+            sut.ActivateAsync(Id, A.Fake<IStore<Guid>>());
         }
 
         [Fact]
@@ -203,7 +210,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             return CreateEvent(@event);
         }
 
-        protected T CreateAssetCommand<T>(T command) where T : AssetAggregateCommand
+        protected T CreateAssetCommand<T>(T command) where T : AssetCommand
         {
             command.AssetId = assetId;
 

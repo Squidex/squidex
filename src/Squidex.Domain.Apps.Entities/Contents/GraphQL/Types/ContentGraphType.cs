@@ -10,92 +10,81 @@ using System.Linq;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 using Squidex.Domain.Apps.Entities.Schemas;
-using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {
     public sealed class ContentGraphType : ObjectGraphType<IContentEntity>
     {
-        private readonly ISchemaEntity schema;
-        private readonly IGraphQLContext context;
-
-        public ContentGraphType(ISchemaEntity schema, IGraphQLContext context)
+        public void Initialize(IGraphModel model, ISchemaEntity schema, IComplexGraphType contentDataType)
         {
-            this.context = context;
-            this.schema = schema;
+            var schemaType = schema.TypeName();
+            var schemaName = schema.DisplayName();
 
-            Name = $"{schema.Name.ToPascalCase()}Dto";
-        }
-
-        public void Initialize()
-        {
-            var schemaName = schema.SchemaDef.Properties.Label.WithFallback(schema.Name);
+            Name = $"{schemaType}Dto";
 
             AddField(new FieldType
             {
                 Name = "id",
-                Resolver = Resolver(x => x.Id.ToString()),
-                ResolvedType = new NonNullGraphType(new StringGraphType()),
+                ResolvedType = AllTypes.NonNullGuid,
+                Resolver = Resolve(x => x.Id),
                 Description = $"The id of the {schemaName} content."
             });
 
             AddField(new FieldType
             {
                 Name = "version",
-                Resolver = Resolver(x => x.Version),
-                ResolvedType = new NonNullGraphType(new IntGraphType()),
+                ResolvedType = AllTypes.NonNullInt,
+                Resolver = Resolve(x => x.Version),
                 Description = $"The version of the {schemaName} content."
             });
 
             AddField(new FieldType
             {
                 Name = "created",
-                Resolver = Resolver(x => x.Created.ToDateTimeUtc()),
-                ResolvedType = new NonNullGraphType(new DateGraphType()),
+                ResolvedType = AllTypes.NonNullDate,
+                Resolver = Resolve(x => x.Created.ToDateTimeUtc()),
                 Description = $"The date and time when the {schemaName} content has been created."
             });
 
             AddField(new FieldType
             {
                 Name = "createdBy",
-                Resolver = Resolver(x => x.CreatedBy.ToString()),
-                ResolvedType = new NonNullGraphType(new StringGraphType()),
+                ResolvedType = AllTypes.NonNullString,
+                Resolver = Resolve(x => x.CreatedBy.ToString()),
                 Description = $"The user that has created the {schemaName} content."
             });
 
             AddField(new FieldType
             {
                 Name = "lastModified",
-                Resolver = Resolver(x => x.LastModified.ToDateTimeUtc()),
-                ResolvedType = new NonNullGraphType(new DateGraphType()),
+                ResolvedType = AllTypes.NonNullDate,
+                Resolver = Resolve(x => x.LastModified.ToDateTimeUtc()),
                 Description = $"The date and time when the {schemaName} content has been modified last."
             });
 
             AddField(new FieldType
             {
                 Name = "lastModifiedBy",
-                Resolver = Resolver(x => x.LastModifiedBy.ToString()),
-                ResolvedType = new NonNullGraphType(new StringGraphType()),
+                ResolvedType = AllTypes.NonNullString,
+                Resolver = Resolve(x => x.LastModifiedBy.ToString()),
                 Description = $"The user that has updated the {schemaName} content last."
             });
 
             AddField(new FieldType
             {
                 Name = "url",
-                Resolver = context.ResolveContentUrl(schema),
-                ResolvedType = new NonNullGraphType(new StringGraphType()),
+                ResolvedType = AllTypes.NonNullString,
+                Resolver = model.ResolveContentUrl(schema),
                 Description = $"The url to the the {schemaName} content."
             });
 
-            var dataType = new ContentDataGraphType(schema.SchemaDef, context);
-
-            if (dataType.Fields.Any())
+            if (contentDataType.Fields.Any())
             {
                 AddField(new FieldType
                 {
                     Name = "data",
-                    Resolver = Resolver(x => x.Data),
-                    ResolvedType = new NonNullGraphType(dataType),
+                    ResolvedType = new NonNullGraphType(contentDataType),
+                    Resolver = Resolve(x => x.Data),
                     Description = $"The data of the {schemaName} content."
                 });
             }
@@ -103,7 +92,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             Description = $"The structure of a {schemaName} content type.";
         }
 
-        private static IFieldResolver Resolver(Func<IContentEntity, object> action)
+        private static IFieldResolver Resolve(Func<IContentEntity, object> action)
         {
             return new FuncFieldResolver<IContentEntity, object>(c => action(c.Source));
         }

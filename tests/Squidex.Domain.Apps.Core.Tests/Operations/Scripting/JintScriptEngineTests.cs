@@ -139,6 +139,36 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         }
 
         [Fact]
+        public void Should_slugify_value()
+        {
+            var content =
+                new NamedContentData()
+                    .AddField("title",
+                        new ContentFieldData()
+                            .AddValue("iv", "Hello World"));
+
+            var expected =
+                new NamedContentData()
+                    .AddField("title",
+                        new ContentFieldData()
+                            .AddValue("iv", "Hello World"))
+                    .AddField("slug",
+                        new ContentFieldData()
+                            .AddValue("iv", "hello-world"));
+
+            var context = new ScriptContext { Data = content };
+
+            var result = scriptEngine.Transform(context, @"
+                var data = ctx.data;
+
+                data.slug = { iv: slugify(data.title.iv) };
+
+                replace(data);");
+
+            Assert.Equal(expected, result);
+        }
+
+        [Fact]
         public void Should_transform_content_and_return_with_execute_transform()
         {
             var content =

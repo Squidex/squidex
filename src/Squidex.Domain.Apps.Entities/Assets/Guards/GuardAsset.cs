@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
             {
                 if (string.IsNullOrWhiteSpace(command.FileName))
                 {
-                    error(new ValidationError("Name must be defined.", nameof(command.FileName)));
+                    error(new ValidationError("Name is required.", nameof(command.FileName)));
                 }
 
                 if (string.Equals(command.FileName, oldName))

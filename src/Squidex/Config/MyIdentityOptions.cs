@@ -23,6 +23,8 @@ namespace Squidex.Config
 
         public string AuthorityUrl { get; set; }
 
+        public string PrivacyUrl { get; set; }
+
         public bool RequiresHttps { get; set; }
 
         public bool AllowPasswordAuth { get; set; }

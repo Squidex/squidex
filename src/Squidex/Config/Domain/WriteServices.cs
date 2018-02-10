@@ -13,6 +13,7 @@ using Migrate_01.Migrations;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Entities.Apps.Templates;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Rules;
@@ -64,19 +65,28 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<RuleCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
+            services.AddSingletonAs<CreateBlogCommandMiddleware>()
+                .As<ICommandMiddleware>();
+
             services.AddTransientAs<MigrationPath>()
                 .As<IMigrationPath>();
 
-            services.AddTransientAs<AddPatterns>()
+            services.AddTransientAs<ConvertEventStore>()
                 .As<IMigration>();
 
-            services.AddTransientAs<ConvertEventStore>()
+            services.AddTransientAs<AddPatterns>()
                 .As<IMigration>();
 
             services.AddTransientAs<RebuildContentCollections>()
                 .As<IMigration>();
 
             services.AddTransientAs<RebuildSnapshots>()
+                .As<IMigration>();
+
+            services.AddTransientAs<Migration04_FlattenAssetEntity>()
+                .As<IMigration>();
+
+            services.AddTransientAs<Migration05_RebuildForNewCommands>()
                 .As<IMigration>();
 
             services.AddTransientAs<Rebuilder>()

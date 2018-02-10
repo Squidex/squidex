@@ -13,6 +13,10 @@ namespace Squidex.Shared.Identity
 
         public static readonly string SquidexPictureUrl = "urn:squidex:picture";
 
+        public static readonly string SquidexConsent = "urn:squidex:consent";
+
+        public static readonly string SquidexConsentForEmails = "urn:squidex:consent:emails";
+
         public static readonly string Prefix = "urn:squidex:";
     }
 }

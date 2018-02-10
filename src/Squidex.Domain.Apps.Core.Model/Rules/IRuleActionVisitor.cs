@@ -11,6 +11,14 @@ namespace Squidex.Domain.Apps.Core.Rules
 {
     public interface IRuleActionVisitor<out T>
     {
+        T Visit(AlgoliaAction action);
+
+        T Visit(AzureQueueAction action);
+
+        T Visit(FastlyAction action);
+
+        T Visit(SlackAction action);
+
         T Visit(WebhookAction action);
     }
 }

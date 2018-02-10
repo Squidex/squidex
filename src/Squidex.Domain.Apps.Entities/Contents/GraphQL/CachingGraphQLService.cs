@@ -13,6 +13,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 {
@@ -20,6 +21,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
     {
         private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(10);
         private readonly IContentQueryService contentQuery;
+        private readonly ICommandBus commandBus;
         private readonly IGraphQLUrlGenerator urlGenerator;
         private readonly IAssetRepository assetRepository;
         private readonly IAppProvider appProvider;
@@ -27,17 +29,20 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         public CachingGraphQLService(IMemoryCache cache,
             IAppProvider appProvider,
             IAssetRepository assetRepository,
+            ICommandBus commandBus,
             IContentQueryService contentQuery,
             IGraphQLUrlGenerator urlGenerator)
             : base(cache)
         {
             Guard.NotNull(appProvider, nameof(appProvider));
             Guard.NotNull(assetRepository, nameof(assetRepository));
-            Guard.NotNull(contentQuery, nameof(urlGenerator));
+            Guard.NotNull(commandBus, nameof(commandBus));
             Guard.NotNull(contentQuery, nameof(contentQuery));
+            Guard.NotNull(urlGenerator, nameof(urlGenerator));
 
             this.appProvider = appProvider;
             this.assetRepository = assetRepository;
+            this.commandBus = commandBus;
             this.contentQuery = contentQuery;
             this.urlGenerator = urlGenerator;
         }
@@ -53,9 +58,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             }
 
             var modelContext = await GetModelAsync(app);
-            var queryContext = new GraphQLQueryContext(app, assetRepository, contentQuery, user, urlGenerator);
 
-            return await modelContext.ExecuteAsync(queryContext, query);
+            var ctx = new GraphQLExecutionContext(app, assetRepository, commandBus, contentQuery, user, urlGenerator);
+
+            return await modelContext.ExecuteAsync(ctx, query);
         }
 
         private async Task<GraphQLModel> GetModelAsync(IAppEntity app)

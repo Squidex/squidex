@@ -7,7 +7,7 @@
 
 namespace Squidex.Domain.Apps.Entities.Rules.Commands
 {
-    public sealed class DeleteRule : RuleAggregateCommand
+    public sealed class DeleteRule : RuleCommand
     {
     }
 }

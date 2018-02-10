@@ -109,9 +109,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
             {
                 GuardContent.CanChangeContentStatus(content.Snapshot.Status, command);
 
-                var operationContext = await CreateContext(command, content, () => "Failed to patch content.");
+                if (!command.DueTime.HasValue)
+                {
+                    var operationContext = await CreateContext(command, content, () => "Failed to patch content.");
 
-                await operationContext.ExecuteScriptAsync(x => x.ScriptChange, command.Status);
+                    await operationContext.ExecuteScriptAsync(x => x.ScriptChange, command.Status);
+                }
 
                 content.ChangeStatus(command);
             });
@@ -133,10 +136,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public async Task HandleAsync(CommandContext context, Func<Task> next)
         {
-            if (!await this.DispatchActionAsync(context.Command, context))
-            {
-                await next();
-            }
+            await this.DispatchActionAsync(context.Command, context);
+            await next();
         }
 
         private async Task<ContentOperationContext> CreateContext(ContentCommand command, ContentDomainObject content, Func<string> message)

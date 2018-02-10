@@ -2,7 +2,7 @@
     <li class="nav-item dropdown">
         <span class="nav-link dropdown-toggle" id="app-name" (click)="appsMenu.toggle()">{{selectedApp ? selectedApp.name : 'Apps Overview'}}</span>
 
-        <div class="dropdown-menu" *sqxModalView="appsMenu" closeAlways="true" @fade>
+        <div class="dropdown-menu" *sqxModalView="appsMenu" @fade>
             <a class="dropdown-item all-apps" routerLink="/app">
                 <span class="all-apps-text">All Apps</span> 
                 <span class="all-apps-pill badge badge-pill badge-primary">{{apps.length}}</span>
@@ -24,7 +24,7 @@
 
     <li class="nav-item" *ngIf="selectedApp && selectedApp.planUpgrade && selectedApp.planName && selectedApp.permission === 'Owner'">
         <div class="btn-group app-upgrade">
-            <button type="button" class="btn btn-primary">
+            <button type="button" class="btn btn-primary btn-plan">
                 You are on the <strong>{{selectedApp.planName}}</strong> plan.
             </button>
             <button type="button" class="btn btn-warning" [routerLink]="['/app', selectedApp.name, 'settings', 'plans']">

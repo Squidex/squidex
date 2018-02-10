@@ -24,10 +24,10 @@ namespace Squidex.Shared.Users
 
         IReadOnlyList<ExternalLogin> Logins { get; }
 
-        void UpdateEmail(string email);
-
-        void AddClaim(Claim claim);
+        void SetEmail(string email);
 
         void SetClaim(string type, string value);
+
+        void AddClaim(Claim claim);
     }
 }

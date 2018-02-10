@@ -9,7 +9,8 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 
 import {
     ImmutableArray,
-    SchemaDto
+    SchemaDto,
+    Types
 } from 'shared';
 
 export interface TriggerSchemaForm {
@@ -36,6 +37,8 @@ export class ContentChangedTriggerComponent implements OnInit {
     @Output()
     public triggerChanged = new EventEmitter<object>();
 
+    public handleAll = false;
+
     public triggerSchemas: ImmutableArray<TriggerSchemaForm>;
 
     public schemaToAdd: SchemaDto;
@@ -47,6 +50,8 @@ export class ContentChangedTriggerComponent implements OnInit {
 
     public ngOnInit() {
         const triggerSchemas: any[] = (this.trigger.schemas = this.trigger.schemas || []);
+
+        this.handleAll = Types.isBoolean(this.trigger.handleAll) ? this.trigger.handleAll : false;
 
         this.triggerSchemas =
             ImmutableArray.of(
@@ -88,7 +93,7 @@ export class ContentChangedTriggerComponent implements OnInit {
                 };
             });
 
-        this.triggerChanged.emit({ schemas });
+        this.triggerChanged.emit({ schemas, handleAll: this.handleAll });
     }
 
     public removeSchema(schemaForm: TriggerSchemaForm) {

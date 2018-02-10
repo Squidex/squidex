@@ -73,7 +73,7 @@ namespace Squidex.Domain.Users
 
         public static Task<IdentityResult> UpdateAsync(this UserManager<IUser> userManager, IUser user, string email, string displayName)
         {
-            user.UpdateEmail(email);
+            user.SetEmail(email);
             user.SetDisplayName(displayName);
 
             return userManager.UpdateAsync(user);

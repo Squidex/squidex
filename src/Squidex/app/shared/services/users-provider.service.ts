@@ -22,7 +22,7 @@ export class UsersProviderService {
     ) {
     }
 
-    public getUser(id: string, me = 'Me'): Observable<UserDto> {
+    public getUser(id: string, me: string | null = 'Me'): Observable<UserDto> {
         let result = this.caches[id];
 
         if (!result) {

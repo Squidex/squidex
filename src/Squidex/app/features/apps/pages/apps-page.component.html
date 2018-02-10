@@ -1,17 +1,56 @@
 ﻿<sqx-title message="Apps"></sqx-title>
 
-<div class="apps">
-    <div class="empty text-center" *ngIf="apps?.length === 0">
-        <h3 class="empty-headline">You are not collaborating to any app yet</h3>
+<div class="apps-section">
+    <h1 class="apps-title">Hi {{ctx.user.displayName}}</h1>
 
-        <button class="apps-empty-button btn btn-success" (click)="addAppDialog.show()"><i class="icon-plus"></i> Create New App</button>
+    <div class="subtext">
+        Welcome to  Squidex.
+    </div>
+</div>
+
+<div class="apps-section">
+    <div class="empty" *ngIf="apps?.length === 0">
+        <h3 class="empty-headline">You are not collaborating to any app yet</h3>
     </div>
 
-    <div class="app card float-left" *ngFor="let app of apps" title="{{app.name}}">
-        <div class="card-block app-content">
-            <h4 class="card-title app-title">{{app.name}}</h4>
+    <div class="card card-href card-app float-left" *ngFor="let app of apps" [routerLink]="['/app', app.name]">
+        <div class="card-body">
+            <h4 class="card-title">{{app.name}}</h4>
 
-            <a [routerLink]="['/app', app.name]">Edit</a>
+            <div class="card-text">
+                <a [routerLink]="['/app', app.name]">Edit</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="apps-section">
+    <div class="card card-template card-href" (click)="createNewApp('')">
+        <div class="card-body">
+            <div class="card-image">
+                <img src="/images/add-app.png" />
+            </div>
+
+            <h4 class="card-title">New App</h4>
+
+            <div class="card-text">
+                Create a new blank app without content and schemas.
+            </div>
+        </div>
+    </div>
+
+    <div class="card card-template card-href" (click)="createNewApp('Blog')">
+        <div class="card-body">
+            <div class="card-image">
+                <img src="/images/add-blog.png" />
+            </div>
+
+            <h4 class="card-title">New Blog Sample</h4>
+
+            <div class="card-text">
+                <div>Start with our ready to use blog.</div>
+                <div>Sample Code: <a href="https://github.com/Squidex/squidex-samples/tree/master/csharp/Sample.Blog" (click)="$event.stopPropagation()" target="_blank">ASP.NET Core</a></div>
+            </div>
         </div>
     </div>
 </div>
@@ -21,7 +60,8 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">Create App</h4>
+                <h4 class="modal-title" *ngIf="template">Create {{template}} Sample</h4>
+                <h4 class="modal-title" *ngIf="!template">Create App</h4>
                 
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="addAppDialog.hide()">
                     <span aria-hidden="true">&times;</span>
@@ -29,7 +69,8 @@
             </div>
 
             <div class="modal-body">
-                <sqx-app-form 
+                <sqx-app-form
+                    [template]="template"
                     (created)="addAppDialog.hide()"
                     (cancelled)="addAppDialog.hide()">
                 </sqx-app-form>

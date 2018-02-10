@@ -44,7 +44,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
         {
             return handler.UpdateSyncedAsync<RuleDomainObject>(context, async r =>
             {
-                await GuardRule.CanUpdate(command, appProvider);
+                await GuardRule.CanUpdate(command, r.Snapshot.AppId.Id, appProvider);
 
                 r.Update(command);
             });
@@ -82,10 +82,8 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
         public async Task HandleAsync(CommandContext context, Func<Task> next)
         {
-            if (!await this.DispatchActionAsync(context.Command, context))
-            {
-                await next();
-            }
+            await this.DispatchActionAsync(context.Command, context);
+            await next();
         }
     }
 }

@@ -16,7 +16,7 @@ using Xunit;
 
 namespace Squidex.Infrastructure.Migrations
 {
-    public sealed class MigratorTests
+    public class MigratorTests
     {
         private readonly IMigrationStatus status = A.Fake<IMigrationStatus>();
         private readonly IMigrationPath path = A.Fake<IMigrationPath>();

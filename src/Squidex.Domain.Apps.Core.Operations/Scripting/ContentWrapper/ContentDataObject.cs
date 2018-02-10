@@ -102,7 +102,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
         {
             EnsurePropertiesInitialized();
 
-            return fieldProperties.GetOrDefault(propertyName) ?? new PropertyDescriptor(new ObjectInstance(Engine) { Extensible = true }, true, false, true);
+            return fieldProperties.GetOrAdd(propertyName, x => new ContentDataProperty(this, new ContentFieldObject(this, new ContentFieldData(), false)));
         }
 
         public override IEnumerable<KeyValuePair<string, PropertyDescriptor>> GetOwnProperties()

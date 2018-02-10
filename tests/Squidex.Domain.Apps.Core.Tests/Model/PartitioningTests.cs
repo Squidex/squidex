@@ -9,7 +9,7 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Model
 {
-    public sealed class PartitioningTests
+    public class PartitioningTests
     {
         [Fact]
         public void Should_consider_null_as_valid_partitioning()

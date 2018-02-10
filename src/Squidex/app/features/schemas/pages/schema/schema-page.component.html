@@ -1,4 +1,4 @@
-<sqx-title message="{app} | {schema}" parameter1="app" [value1]="ctx.appName" parameter2="schema" [value2]="schema?.name"></sqx-title>
+<sqx-title message="{app} | {schema}" parameter1="app" [value1]="ctx.appName" parameter2="schema" [value2]="schema?.displayName"></sqx-title>
 
 <sqx-panel desiredWidth="56rem">
     <div class="panel-header">
@@ -18,10 +18,10 @@
                 </div>
 
                <div class="dropdown dropdown-options">
-                    <button type="button" class="btn btn-link btn-decent" (click)="editOptionsDropdown.toggle()" [class.active]="editOptionsDropdown.isOpen | async" #buttonOptions>
+                    <button type="button" class="btn btn-link btn-secondary" (click)="editOptionsDropdown.toggle()" [class.active]="editOptionsDropdown.isOpen | async" #buttonOptions>
                         <i class="icon-dots"></i>
                     </button>
-                    <div class="dropdown-menu" *sqxModalView="editOptionsDropdown" closeAlways="true" [sqxModalTarget]="buttonOptions" @fade>
+                    <div class="dropdown-menu" *sqxModalView="editOptionsDropdown" [sqxModalTarget]="buttonOptions" @fade>
                         <a class="dropdown-item" (click)="configureScriptsDialog.show()">
                             Scripts
                         </a>
@@ -49,7 +49,7 @@
             </div>
 
             <h3 class="panel-title">
-                <i class="schema-edit icon-pencil" (click)="editSchemaDialog.show()"></i> {{schema | sqxDisplayName:'properties.label':'name'}} 
+                <i class="schema-edit icon-pencil" (click)="editSchemaDialog.show()"></i> {{schema.displayName}} 
             </h3>
         </div>
 
@@ -93,8 +93,9 @@
                     <div class="row no-gutters mt-3">
                         <div class="col pr-2">
                             <div class="form-check">
-                                <label class="form-check-label">
-                                    <input class="form-check-input" type="checkbox" formControlName="isLocalizable"> Localizable
+                                <input class="form-check-input" type="checkbox" id="isLocalizable" formControlName="isLocalizable" />
+                                <label class="form-check-label" for="isLocalizable">
+                                     Localizable
                                 </label>
                             </div>
     

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 
 import { ApiUrlConfig, ValidatorsEx } from 'framework';
@@ -30,7 +30,10 @@ export class AppFormComponent {
     @Output()
     public cancelled = new EventEmitter();
 
-    public createFormError? = '';
+    @Input()
+    public template = '';
+
+    public createFormError = '';
     public createFormSubmitted = false;
     public createForm =
         this.formBuilder.group({
@@ -64,7 +67,7 @@ export class AppFormComponent {
         if (this.createForm.valid) {
             this.createForm.disable();
 
-            const request = new CreateAppDto(this.createForm.controls['name'].value);
+            const request = new CreateAppDto(this.createForm.controls['name'].value, this.template);
 
             this.appsStore.createApp(request)
                 .subscribe(dto => {

@@ -12,13 +12,12 @@ import { AppContext } from './app-context';
 
 import {
     allParams,
+    formatHistoryMessage,
     HistoryChannelUpdated,
     HistoryEventDto,
     HistoryService,
     UsersProviderService
 } from './../declarations-base';
-
-const REPLACEMENT_TEMP = '$TEMP$';
 
 @Component({
     selector: 'sqx-history',
@@ -57,40 +56,7 @@ export class HistoryComponent {
     ) {
     }
 
-    private userName(userId: string): Observable<string> {
-        const parts = userId.split(':');
-
-        if (parts[0] === 'subject') {
-            return this.users.getUser(parts[1], 'Me').map(u => u.displayName);
-        } else {
-            if (parts[1].endsWith('client')) {
-                return Observable.of(parts[1]);
-            } else {
-                return Observable.of(`${parts[1]}-client`);
-            }
-        }
-    }
-
     public format(message: string): Observable<string> {
-        let foundUserId: string | null = null;
-
-        message = message.replace(/{([^\s:]*):([^}]*)}/, (match: string, type: string, id: string) => {
-            if (type === 'user') {
-                foundUserId = id;
-                return REPLACEMENT_TEMP;
-            } else {
-                return id;
-            }
-        });
-
-        message = message.replace(/{([^}]*)}/g, (match: string, marker: string) => {
-            return `<span class="marker-ref">${marker}</span>`;
-        });
-
-        if (foundUserId) {
-            return this.userName(foundUserId).map(t => message.replace(REPLACEMENT_TEMP, `<span class="user-ref">${t}</span>`));
-        }
-
-        return Observable.of(message);
+        return formatHistoryMessage(message, this.users);
     }
 }

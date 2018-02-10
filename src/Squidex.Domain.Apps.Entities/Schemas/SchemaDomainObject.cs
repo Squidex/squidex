@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Domain.Apps.Entities.Schemas.State;
+using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
@@ -187,6 +188,21 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             }
 
             RaiseEvent(@event);
+        }
+
+        private void RaiseEvent(SchemaEvent @event)
+        {
+            if (@event.SchemaId == null)
+            {
+                @event.SchemaId = new NamedId<Guid>(Snapshot.Id, Snapshot.Name);
+            }
+
+            if (@event.AppId == null)
+            {
+                @event.AppId = Snapshot.AppId;
+            }
+
+            RaiseEvent(Envelope.Create(@event));
         }
 
         private void VerifyNotCreated()

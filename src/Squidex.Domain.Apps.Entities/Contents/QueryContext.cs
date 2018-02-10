@@ -80,9 +80,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return content;
         }
 
-        public async Task<IReadOnlyList<IAssetEntity>> QueryAssetsAsync(string query, int skip = 0, int take = 10)
+        public async Task<IResultList<IAssetEntity>> QueryAssetsAsync(string query)
         {
-            var assets = await assetRepository.QueryAsync(app.Id, null, null, query, take, skip);
+            var assets = await assetRepository.QueryAsync(app.Id, query);
 
             foreach (var asset in assets)
             {
@@ -92,7 +92,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return assets;
         }
 
-        public async Task<IReadOnlyList<IContentEntity>> QueryContentsAsync(string schemaIdOrName, string query)
+        public async Task<IResultList<IContentEntity>> QueryContentsAsync(string schemaIdOrName, string query)
         {
             var result = await contentQuery.QueryAsync(app, schemaIdOrName, user, false, query);
 
@@ -112,7 +112,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             if (notLoadedAssets.Count > 0)
             {
-                var assets = await assetRepository.QueryAsync(app.Id, null, notLoadedAssets, null, int.MaxValue);
+                var assets = await assetRepository.QueryAsync(app.Id, notLoadedAssets);
 
                 foreach (var asset in assets)
                 {

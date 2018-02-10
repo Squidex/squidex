@@ -60,7 +60,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_return_schema_from_id_if_string_is_guid()
         {
-            A.CallTo(() => appProvider.GetSchemaAsync(appId, schemaId))
+            A.CallTo(() => appProvider.GetSchemaAsync(appId, schemaId, false))
                 .Returns(schema);
 
             var result = await sut.FindSchemaAsync(app, schemaId.ToString());
@@ -91,7 +91,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_return_content_from_repository_and_transform()
         {
-            A.CallTo(() => appProvider.GetSchemaAsync(appId, schemaId))
+            A.CallTo(() => appProvider.GetSchemaAsync(appId, schemaId, false))
                 .Returns(schema);
             A.CallTo(() => contentRepository.FindContentAsync(app, schema, contentId))
                 .Returns(content);
@@ -113,7 +113,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_throw_if_content_to_find_does_not_exist()
         {
-            A.CallTo(() => appProvider.GetSchemaAsync(appId, schemaId))
+            A.CallTo(() => appProvider.GetSchemaAsync(appId, schemaId, false))
                 .Returns(schema);
 
             A.CallTo(() => contentRepository.FindContentAsync(app, schema, contentId))
@@ -196,7 +196,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         private void SetupFakeWithIdQuery(Status[] status, HashSet<Guid> ids)
         {
-            A.CallTo(() => appProvider.GetSchemaAsync(appId, schemaId))
+            A.CallTo(() => appProvider.GetSchemaAsync(appId, schemaId, false))
                 .Returns(schema);
 
             A.CallTo(() => contentRepository.QueryAsync(app, schema, A<Status[]>.That.IsSameSequenceAs(status), ids))
@@ -205,7 +205,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         private void SetupFakeWithOdataQuery(Status[] status)
         {
-            A.CallTo(() => appProvider.GetSchemaAsync(appId, schemaId))
+            A.CallTo(() => appProvider.GetSchemaAsync(appId, schemaId, false))
                 .Returns(schema);
 
             A.CallTo(() => contentRepository.QueryAsync(app, schema, A<Status[]>.That.IsSameSequenceAs(status), A<ODataUriParser>.Ignored))

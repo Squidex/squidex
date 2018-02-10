@@ -22,7 +22,7 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.HandleRules.Triggers
 {
-    public sealed class ContentChangedTriggerTests
+    public class ContentChangedTriggerTests
     {
         private readonly IRuleTriggerHandler sut = new ContentChangedTriggerHandler();
         private static readonly NamedId<Guid> SchemaMatch = new NamedId<Guid>(Guid.NewGuid(), "my-schema1");
@@ -59,6 +59,16 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules.Triggers
             var result = sut.Triggers(new Envelope<AppEvent>(new ContentCreated()), trigger);
 
             Assert.False(result);
+        }
+
+        [Fact]
+        public void Should_return_true_when_cathing_all_events()
+        {
+            var trigger = new ContentChangedTrigger { HandleAll = true };
+
+            var result = sut.Triggers(new Envelope<AppEvent>(new ContentCreated()), trigger);
+
+            Assert.True(result);
         }
 
         [Theory]

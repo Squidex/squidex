@@ -98,7 +98,7 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
 
         protected CommandContext CreateContextForCommand<TCommand>(TCommand command) where TCommand : SquidexCommand
         {
-            return new CommandContext(CreateCommand(command));
+            return new CommandContext(CreateCommand(command), A.Dummy<ICommandBus>());
         }
 
         protected async Task TestCreate(T domainObject, Func<T, Task> action, bool shouldCreate = true)
@@ -134,16 +134,12 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
                 command.Actor = User;
             }
 
-            var appCommand = command as AppCommand;
-
-            if (appCommand != null && appCommand.AppId == null)
+            if (command is IAppCommand appCommand && appCommand.AppId == null)
             {
                 appCommand.AppId = AppNamedId;
             }
 
-            var schemaCommand = command as SchemaCommand;
-
-            if (schemaCommand != null && schemaCommand.SchemaId == null)
+            if (command is ISchemaCommand schemaCommand && schemaCommand.SchemaId == null)
             {
                 schemaCommand.SchemaId = SchemaNamedId;
             }

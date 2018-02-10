@@ -20,6 +20,7 @@ namespace Squidex.Infrastructure.Commands
         private readonly MyLog log = new MyLog();
         private readonly LogCommandMiddleware sut;
         private readonly ICommand command = A.Dummy<ICommand>();
+        private readonly ICommandBus commandBus = A.Dummy<ICommandBus>();
 
         private sealed class MyLog : ISemanticLog
         {
@@ -47,7 +48,7 @@ namespace Squidex.Infrastructure.Commands
         [Fact]
         public async Task Should_log_before_and_after_request()
         {
-            var context = new CommandContext(command);
+            var context = new CommandContext(command, commandBus);
 
             await sut.HandleAsync(context, () =>
             {
@@ -63,7 +64,7 @@ namespace Squidex.Infrastructure.Commands
         [Fact]
         public async Task Should_log_error_if_command_failed()
         {
-            var context = new CommandContext(command);
+            var context = new CommandContext(command, commandBus);
 
             await Assert.ThrowsAsync<InvalidOperationException>(async () =>
             {
@@ -78,7 +79,7 @@ namespace Squidex.Infrastructure.Commands
         [Fact]
         public async Task Should_log_if_command_is_not_handled()
         {
-            var context = new CommandContext(command);
+            var context = new CommandContext(command, commandBus);
 
             await sut.HandleAsync(context, () => TaskHelper.Done);
 

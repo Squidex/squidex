@@ -33,7 +33,8 @@ export class AppDto {
 
 export class CreateAppDto {
     constructor(
-        public readonly name: string
+        public readonly name: string,
+        public readonly template?: string
     ) {
     }
 }
