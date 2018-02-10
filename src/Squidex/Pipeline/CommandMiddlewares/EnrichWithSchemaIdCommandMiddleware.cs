@@ -29,6 +29,11 @@ namespace Squidex.Pipeline.CommandMiddlewares
 
         public async Task HandleAsync(CommandContext context, Func<Task> next)
         {
+            if (actionContextAccessor.ActionContext == null)
+            {
+                await next();
+            }
+
             if (context.Command is ISchemaCommand schemaCommand && schemaCommand.SchemaId == null)
             {
                 NamedId<Guid> appId = null;
