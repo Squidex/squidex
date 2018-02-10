@@ -15,6 +15,7 @@ namespace Migrate_01
 {
     public sealed class MigrationPath : IMigrationPath
     {
+        private const int CurrentVersion = 6;
         private readonly IServiceProvider serviceProvider;
 
         public MigrationPath(IServiceProvider serviceProvider)
@@ -24,41 +25,32 @@ namespace Migrate_01
 
         public (int Version, IEnumerable<IMigration> Migrations) GetNext(int version)
         {
-            switch (version)
+            if (version == CurrentVersion)
             {
-                case 0:
-                    return (4,
-                        new IMigration[]
-                        {
-                            serviceProvider.GetRequiredService<ConvertEventStore>(),
-                            serviceProvider.GetRequiredService<RebuildSnapshots>(),
-                            serviceProvider.GetRequiredService<AddPatterns>()
-                        });
-                case 1:
-                    return (4,
-                        new IMigration[]
-                        {
-                            serviceProvider.GetRequiredService<ConvertEventStore>(),
-                            serviceProvider.GetRequiredService<AddPatterns>(),
-                            serviceProvider.GetRequiredService<RebuildContentCollections>()
-                        });
-                case 2:
-                    return (4,
-                        new IMigration[]
-                        {
-                            serviceProvider.GetRequiredService<ConvertEventStore>(),
-                            serviceProvider.GetRequiredService<AddPatterns>(),
-                            serviceProvider.GetRequiredService<RebuildContentCollections>()
-                        });
-                case 3:
-                    return (4,
-                        new IMigration[]
-                        {
-                            serviceProvider.GetRequiredService<ConvertEventStore>()
-                        });
+                return (CurrentVersion, null);
             }
 
-            return (0, null);
+            var migrations = new List<IMigration>();
+
+            // Version 6: Convert Event store. Must always be executed first.
+            if (version < 6)
+            {
+                migrations.Add(serviceProvider.GetRequiredService<ConvertEventStore>());
+            }
+
+            // Version 5: Fixes the broken command architecture and requires a rebuild of all snapshots.
+            if (version < 5)
+            {
+                migrations.Add(serviceProvider.GetRequiredService<RebuildSnapshots>());
+            }
+
+            // Version 1: Introduce App patterns.
+            if (version <= 1)
+            {
+                migrations.Add(serviceProvider.GetRequiredService<AddPatterns>());
+            }
+
+            return (CurrentVersion, migrations);
         }
     }
 }

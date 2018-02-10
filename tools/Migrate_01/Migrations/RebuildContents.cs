@@ -10,11 +10,11 @@ using Squidex.Infrastructure.Migrations;
 
 namespace Migrate_01.Migrations
 {
-    public class RebuildContentCollections : IMigration
+    public class RebuildContents : IMigration
     {
         private readonly Rebuilder rebuilder;
 
-        public RebuildContentCollections(Rebuilder rebuilder)
+        public RebuildContents(Rebuilder rebuilder)
         {
             this.rebuilder = rebuilder;
         }

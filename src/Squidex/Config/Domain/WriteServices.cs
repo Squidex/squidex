@@ -77,16 +77,13 @@ namespace Squidex.Config.Domain
             services.AddTransientAs<AddPatterns>()
                 .As<IMigration>();
 
-            services.AddTransientAs<RebuildContentCollections>()
+            services.AddTransientAs<RebuildContents>()
                 .As<IMigration>();
 
             services.AddTransientAs<RebuildSnapshots>()
                 .As<IMigration>();
 
-            services.AddTransientAs<Migration04_FlattenAssetEntity>()
-                .As<IMigration>();
-
-            services.AddTransientAs<Migration05_RebuildForNewCommands>()
+            services.AddTransientAs<RebuildAssets>()
                 .As<IMigration>();
 
             services.AddTransientAs<Rebuilder>()

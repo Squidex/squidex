@@ -148,7 +148,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 operation.AddBodyParameter("data", dataSchema, SchemaBodyDescription);
                 operation.AddQueryParameter("publish", JsonObjectType.Boolean, "Set to true to autopublish content.");
 
-                operation.AddResponse("201", $"{schemaName} created.", contentSchema);
+                operation.AddResponse("201", $"{schemaName} content created.", contentSchema);
             });
         }
 
@@ -162,7 +162,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
 
                 operation.AddBodyParameter("data", dataSchema, SchemaBodyDescription);
 
-                operation.AddResponse("201", $"{schemaName} item updated.", dataSchema);
+                operation.AddResponse("200", $"{schemaName} content updated.", dataSchema);
             });
         }
 
@@ -176,7 +176,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
 
                 operation.AddBodyParameter("data", dataSchema, SchemaBodyDescription);
 
-                operation.AddResponse("201", $"{schemaName} item patched.", dataSchema);
+                operation.AddResponse("200", $"{schemaName} content patched.", dataSchema);
             });
         }
 
@@ -188,7 +188,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 operation.Summary = $"Publish a {schemaName} content.";
                 operation.Security = EditorSecurity;
 
-                operation.AddResponse("204", $"{schemaName} item published.");
+                operation.AddResponse("204", $"{schemaName} content published.");
             });
         }
 
@@ -200,7 +200,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 operation.Summary = $"Unpublish a {schemaName} content.";
                 operation.Security = EditorSecurity;
 
-                operation.AddResponse("204", $"{schemaName} item unpublished.");
+                operation.AddResponse("204", $"{schemaName} content unpublished.");
             });
         }
 
@@ -212,7 +212,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 operation.Summary = $"Archive a {schemaName} content.";
                 operation.Security = EditorSecurity;
 
-                operation.AddResponse("204", $"{schemaName} item restored.");
+                operation.AddResponse("204", $"{schemaName} content restored.");
             });
         }
 
@@ -224,7 +224,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 operation.Summary = $"Restore a {schemaName} content.";
                 operation.Security = EditorSecurity;
 
-                operation.AddResponse("204", $"{schemaName} item restored.");
+                operation.AddResponse("204", $"{schemaName} content restored.");
             });
         }
 

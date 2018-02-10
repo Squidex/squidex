@@ -35,12 +35,12 @@ namespace Squidex.Infrastructure.EventSourcing
 
         private string CreateFilterProjectionName(string filter)
         {
-            return $"by-{prefix.Simplify()}-{filter.Simplify()}";
+            return $"by-{prefix.Slugify()}-{filter.Slugify()}";
         }
 
         private string CreatePropertyProjectionName(string property)
         {
-            return $"by-{prefix.Simplify()}-{property.Simplify()}-property";
+            return $"by-{prefix.Slugify()}-{property.Slugify()}-property";
         }
 
         public async Task<string> CreateProjectionAsync(string property, object value)
