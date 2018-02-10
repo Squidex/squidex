@@ -52,6 +52,12 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
     public contentsQuery = '';
     public contentsPager = new Pager(0);
 
+    public dueTimeDialog = new ModalView();
+    public dueTime: string | null = '';
+    public dueTimeFunction: Function | null;
+    public dueTimeAction: string | null = '';
+    public dueTimeMode = 'Immediately';
+
     public selectedItems:  { [id: string]: boolean; } = {};
     public selectionCount = 0;
 
@@ -118,85 +124,90 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
     }
 
     public publishContent(content: ContentDto) {
-        this.changeContentItem(content, 'publish', 'Published').subscribe();
+        this.changeContentItems([content], 'Publish', 'Published', false);
     }
 
-    public publishSelected() {
-        Observable.forkJoin(
-            this.contentItems.values
-                .filter(c => this.selectedItems[c.id])
-                .filter(c => c.status !== 'Published')
-                .map(c => this.changeContentItem(c, 'publish', 'Published')))
-            .finally(() => {
-                this.updateSelectionSummary();
-            })
-            .subscribe();
+    public publishSelected(scheduled: boolean) {
+        const contents = this.contentItems.filter(c => c.status !== 'Published' && this.selectedItems[c.id]).values;
+
+        this.changeContentItems(contents, 'Publish', 'Published', false);
     }
 
     public unpublishContent(content: ContentDto) {
-        this.changeContentItem(content, 'unpublish', 'Draft').subscribe();
+        this.changeContentItems([content], 'Unpublish', 'Draft', false);
     }
 
-    public unpublishSelected() {
-        Observable.forkJoin(
-            this.contentItems.values
-                .filter(c => this.selectedItems[c.id])
-                .filter(c => c.status !== 'Unpublished')
-                .map(c => this.changeContentItem(c, 'unpublish', 'Draft')))
-            .finally(() => {
-                this.updateSelectionSummary();
-            })
-            .subscribe();
+    public unpublishSelected(scheduled: boolean) {
+        const contents = this.contentItems.filter(c => c.status === 'Published' && this.selectedItems[c.id]).values;
+
+        this.changeContentItems(contents, 'Unpublish', 'Draft', false);
     }
 
-    private changeContentItem(content: ContentDto, action: string, status: string): Observable<any> {
-        return this.contentsService.changeContentStatus(this.ctx.appName, this.schema.name, content.id, action, content.version)
+    public archiveContent(content: ContentDto) {
+        this.changeContentItems([content], 'Archive', 'Archived', true);
+    }
+
+    public archiveSelected(scheduled: boolean) {
+        const contents = this.contentItems.filter(c => this.selectedItems[c.id]).values;
+
+        this.changeContentItems(contents, 'Archive', 'Archived', true);
+    }
+
+    public restoreContent(content: ContentDto) {
+        this.changeContentItems([content], 'Restore', 'Draft', true);
+    }
+
+    public restoreSelected(scheduled: boolean) {
+        const contents = this.contentItems.filter(c => this.selectedItems[c.id]).values;
+
+        this.changeContentItems(contents, 'Restore', 'Draft', true);
+    }
+
+    private changeContentItems(contents: ContentDto[], action: string, status: string, reload: boolean) {
+        if (contents.length === 0) {
+            return;
+        }
+
+        this.dueTimeFunction = () => {
+            if (this.dueTime) {
+                reload = false;
+            }
+            Observable.forkJoin(
+                contents
+                    .map(c => this.changeContentItem(c, action, status, this.dueTime, reload)))
+                .finally(() => {
+                    if (reload) {
+                        this.load();
+                    } else {
+                        this.updateSelectionSummary();
+                    }
+                })
+                .subscribe();
+        };
+
+        this.dueTimeAction = action;
+        this.dueTimeDialog.show();
+    }
+
+    private changeContentItem(content: ContentDto, action: string, status: string, dueTime: string | null, reload: boolean): Observable<any> {
+        return this.contentsService.changeContentStatus(this.ctx.appName, this.schema.name, content.id, action, dueTime, content.version)
             .catch(error => {
                 this.ctx.notifyError(error);
 
                 return Observable.throw(error);
             })
             .do(dto => {
-                this.contentItems = this.contentItems.replaceBy('id', content.changeStatus(status, this.ctx.userToken, dto.version));
+                if (!reload) {
+                    const dt =
+                        dueTime ?
+                            DateTime.parseISO_UTC(dueTime) :
+                            null;
 
-                this.emitContentStatusChanged(content);
+                    this.contentItems = this.contentItems.replaceBy('id', content.changeStatus(status, dt, this.ctx.userToken, dto.version));
+
+                    this.emitContentStatusChanged(content);
+                }
             });
-    }
-
-    public archiveSelected() {
-        Observable.forkJoin(
-            this.contentItems.values.filter(c => this.selectedItems[c.id])
-                .map(c => this.changeContentItem(c, 'archive', 'Archived')))
-            .finally(() => {
-                this.load();
-            })
-            .subscribe();
-    }
-
-    public archiveContent(content: ContentDto) {
-        this.changeContentItem(content, 'archive', 'Archived')
-            .finally(() => {
-                this.load();
-            })
-            .subscribe();
-    }
-
-    public restoreSelected() {
-        Observable.forkJoin(
-            this.contentItems.values.filter(c => this.selectedItems[c.id])
-                .map(c => this.changeContentItem(c, 'restore', 'Draft')))
-            .finally(() => {
-                this.load();
-            })
-            .subscribe();
-    }
-
-    public restoreContent(content: ContentDto) {
-        this.changeContentItem(content, 'restore', 'Draft')
-            .finally(() => {
-                this.load();
-            })
-            .subscribe();
     }
 
     public deleteSelected(content: ContentDto) {
@@ -356,6 +367,19 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
         if (this.contentFields.length === 0) {
             this.contentFields = [<any>{}];
         }
+    }
+
+    public confirmStatusChange() {
+        this.dueTimeFunction!();
+
+        this.cancelStatusChange();
+    }
+
+    public cancelStatusChange() {
+        this.dueTimeMode = 'Immediately';
+        this.dueTimeDialog.hide();
+        this.dueTimeFunction = null;
+        this.dueTime = null;
     }
 }
 

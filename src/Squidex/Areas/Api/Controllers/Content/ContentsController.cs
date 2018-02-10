@@ -290,11 +290,11 @@ namespace Squidex.Areas.Api.Controllers.Contents
         {
             Instant? dt = null;
 
-            if (string.IsNullOrWhiteSpace(dueTime))
+            if (!string.IsNullOrWhiteSpace(dueTime))
             {
                 var parseResult = InstantPattern.General.Parse(dueTime);
 
-                if (!parseResult.Success)
+                if (parseResult.Success)
                 {
                     dt = parseResult.Value;
                 }

@@ -10,7 +10,26 @@
     </span>
 </td>
 <td class="cell-time">
-    <span class="item-published" [class.unpublished]="content.status !== 'Published'"></span>
+    <span *ngIf="!content.scheduledTo">
+        <span class="content-status content-status-{{content.status | lowercase}}" (click)="scheduleTooltip.toggle(); $event.stopPropagation()" #statusIcon>
+            <i class="icon-circle"></i>
+        </span>
+    
+        <div class="content-status-tooltip" *sqxModalView="scheduleTooltip" closeAlways="true" [sqxModalTarget]="statusIcon" position="topLeft" @fade>
+            {{content.status}}
+        </div>
+    </span>
+
+    <span *ngIf="content.scheduledTo">
+        <span class="content-status content-status-{{content.scheduledTo | lowercase}}" (click)="scheduleTooltip.toggle(); $event.stopPropagation()" #statusIcon>
+            <i class="icon-clock"></i>
+        </span>
+    
+        <div class="content-status-tooltip" *sqxModalView="scheduleTooltip" closeAlways="true" [sqxModalTarget]="statusIcon" position="topLeft" @fade>
+            Will be set {{content.scheduledTo}} at {{content.scheduledAt | sqxFullDateTime}}
+        </div>
+    </span>
+    
     
     <small class="item-modified">{{content.lastModified | sqxFromNow}}</small>
 </td>

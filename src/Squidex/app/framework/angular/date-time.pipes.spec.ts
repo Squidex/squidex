@@ -13,6 +13,7 @@ import {
     DayPipe,
     DurationPipe,
     FromNowPipe,
+    FullDateTimePipe,
     MonthPipe,
     ShortDatePipe,
     ShortTimePipe
@@ -28,6 +29,17 @@ describe('DurationPipe', () => {
 
         const actual = pipe.transform(duration);
         const expected = '312:10h';
+
+        expect(actual).toBe(expected);
+    });
+});
+
+describe('FullDateTimePipe', () => {
+    it('should format to nice string', () => {
+        const pipe = new FullDateTimePipe();
+
+        const actual = pipe.transform(dateTime);
+        const expected = 'Thursday, October 3, 2013 12:13 PM';
 
         expect(actual).toBe(expected);
     });

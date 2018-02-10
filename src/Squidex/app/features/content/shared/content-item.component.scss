@@ -1,22 +1,31 @@
 @import '_vars';
 @import '_mixins';
 
-.content {
+.content-status {
     & {
+        vertical-align: middle;
         cursor: pointer;
     }
 
     &-published {
-        & {
-            @include circle(.5rem);
-            display: inline-block;
-            border: 0;
-            background: $color-theme-green;
-            margin-left: .4rem;
-        }
+        color: $color-theme-green;
+    }
 
-        &.unpublished {
-            background: $color-theme-error;
-        }
+    &-draft {
+        color: $color-text-decent;
+    }
+
+    &-archived {
+        color: $color-theme-error;
+    }
+
+    &-tooltip {
+        @include border-radius;
+        background: $color-tooltip;
+        border: 0;
+        font-size: .9rem;
+        font-weight: normal;
+        color: $color-dark-foreground;
+        padding: .75rem;
     }
 }

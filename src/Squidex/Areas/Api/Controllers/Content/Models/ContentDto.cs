@@ -43,17 +43,17 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         /// <summary>
         /// The scheduled status.
         /// </summary>
-        public Status? ScheduledTo { get; }
+        public Status? ScheduledTo { get; set; }
 
         /// <summary>
         /// The scheduled date.
         /// </summary>
-        public Instant? ScheduledAt { get; }
+        public Instant? ScheduledAt { get; set; }
 
         /// <summary>
         /// The user that has scheduled the content.
         /// </summary>
-        public RefToken ScheduledBy { get; }
+        public RefToken ScheduledBy { get; set; }
 
         /// <summary>
         /// The date and time when the content item has been created.

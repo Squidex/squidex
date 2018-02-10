@@ -46,7 +46,7 @@ export class ContentItemComponent implements OnInit, OnChanges {
     public deleting = new EventEmitter();
 
     @Output()
-    public selectedChange = new EventEmitter<boolean>();
+    public selectedChange = new EventEmitter();
 
     @Input()
     public selected = false;
@@ -73,6 +73,8 @@ export class ContentItemComponent implements OnInit, OnChanges {
     public content: ContentDto;
 
     public dropdown = new ModalView(false, true);
+
+    public scheduleTooltip = new ModalView(false, true);
 
     public values: any[] = [];
 

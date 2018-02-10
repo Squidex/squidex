@@ -59,7 +59,7 @@ export class ContentDto {
             this.version);
     }
 
-    public changeStatus(status: string, user: string, version: Version, now?: DateTime, dueTime: DateTime | null = null): ContentDto {
+    public changeStatus(status: string, dueTime: DateTime | null, user: string, version: Version, now?: DateTime): ContentDto {
         if (dueTime) {
             return new ContentDto(
                 this.id,
@@ -249,11 +249,11 @@ export class ContentsService {
                 .pretifyError('Failed to delete content. Please reload.');
     }
 
-    public changeContentStatus(appName: string, schemaName: string, id: string, action: string, version: Version, dueTime?: DateTime): Observable<Versioned<any>> {
+    public changeContentStatus(appName: string, schemaName: string, id: string, action: string, dueTime: string | null, version: Version): Observable<Versioned<any>> {
         let url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}/${action}`);
 
         if (dueTime) {
-            url += `?dueTime=${dueTime.toISOString()}`;
+            url += `?dueTime=${dueTime}`;
         }
 
         return HTTP.putVersioned(this.http, url, {}, version)

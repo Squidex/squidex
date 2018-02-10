@@ -39,7 +39,7 @@ describe('ContentDto', () => {
 
     it('should update status property and user info when changing status', () => {
         const content_1 = new ContentDto('1', 'Draft', creator, creator, creation, creation, null, null, null, { data: 1 }, version);
-        const content_2 = content_1.changeStatus('Published', modifier, newVersion, modified);
+        const content_2 = content_1.changeStatus('Published', null, modifier, newVersion, modified);
 
         expect(content_2.status).toEqual('Published');
         expect(content_2.lastModified).toEqual(modified);
@@ -49,7 +49,7 @@ describe('ContentDto', () => {
 
     it('should update schedules property and user info when changing status with due time', () => {
         const content_1 = new ContentDto('1', 'Draft', creator, creator, creation, creation, null, null, null, { data: 1 }, version);
-        const content_2 = content_1.changeStatus('Published', modifier, newVersion, modified, dueTime);
+        const content_2 = content_1.changeStatus('Published', dueTime, modifier, newVersion, modified);
 
         expect(content_2.status).toEqual('Draft');
         expect(content_2.lastModified).toEqual(modified);
@@ -315,7 +315,7 @@ describe('ContentsService', () => {
     it('should make put request to change content status',
         inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
 
-        contentsService.changeContentStatus('my-app', 'my-schema', 'content1', 'publish', version).subscribe();
+        contentsService.changeContentStatus('my-app', 'my-schema', 'content1', 'publish', null, version).subscribe();
 
         const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema/content1/publish');
 
@@ -328,11 +328,11 @@ describe('ContentsService', () => {
     it('should make put request with due time when status change is scheduled',
         inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
 
-        const dueTime = DateTime.parseISO_UTC('2016-12-12T10:10');
+        const dueTime = '2016-12-12T10:10:00';
 
-        contentsService.changeContentStatus('my-app', 'my-schema', 'content1', 'publish', version, dueTime).subscribe();
+        contentsService.changeContentStatus('my-app', 'my-schema', 'content1', 'publish', dueTime, version).subscribe();
 
-        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema/content1/publish?dueTime=2016-12-12T10:10:00.000Z');
+        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema/content1/publish?dueTime=2016-12-12T10:10:00');
 
         expect(req.request.method).toEqual('PUT');
         expect(req.request.headers.get('If-Match')).toEqual(version.value);

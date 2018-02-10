@@ -87,10 +87,10 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
                         this.content =
                             this.content.changeStatus(
                                 message.content.scheduledTo || message.content.status,
+                                message.content.scheduledAt,
                                 message.content.lastModifiedBy,
                                 message.content.version,
-                                message.content.lastModified,
-                                message.content.scheduledAt);
+                                message.content.lastModified);
                     }
                 });
 
