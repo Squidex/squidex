@@ -27,7 +27,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
             await WaitAndStopAsync(sut);
 
-            A.CallTo(() => eventStore.GetEventsAsync(A<Func<StoredEvent, Task>>.Ignored, "^my-stream", position, A<CancellationToken>.Ignored))
+            A.CallTo(() => eventStore.QueryAsync(A<Func<StoredEvent, Task>>.Ignored, "^my-stream", position, A<CancellationToken>.Ignored))
                 .MustHaveHappened(Repeated.Exactly.Once);
         }
 
@@ -36,7 +36,7 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             var ex = new InvalidOperationException();
 
-            A.CallTo(() => eventStore.GetEventsAsync(A<Func<StoredEvent, Task>>.Ignored, "^my-stream", position, A<CancellationToken>.Ignored))
+            A.CallTo(() => eventStore.QueryAsync(A<Func<StoredEvent, Task>>.Ignored, "^my-stream", position, A<CancellationToken>.Ignored))
                 .Throws(ex);
 
             var sut = new PollingSubscription(eventStore, eventNotifier, eventSubscriber, "^my-stream", position);
@@ -52,7 +52,7 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             var ex = new OperationCanceledException();
 
-            A.CallTo(() => eventStore.GetEventsAsync(A<Func<StoredEvent, Task>>.Ignored, "^my-stream", position, A<CancellationToken>.Ignored))
+            A.CallTo(() => eventStore.QueryAsync(A<Func<StoredEvent, Task>>.Ignored, "^my-stream", position, A<CancellationToken>.Ignored))
                 .Throws(ex);
 
             var sut = new PollingSubscription(eventStore, eventNotifier, eventSubscriber, "^my-stream", position);
@@ -68,7 +68,7 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             var ex = new AggregateException(new OperationCanceledException());
 
-            A.CallTo(() => eventStore.GetEventsAsync(A<Func<StoredEvent, Task>>.Ignored, "^my-stream", position, A<CancellationToken>.Ignored))
+            A.CallTo(() => eventStore.QueryAsync(A<Func<StoredEvent, Task>>.Ignored, "^my-stream", position, A<CancellationToken>.Ignored))
                 .Throws(ex);
 
             var sut = new PollingSubscription(eventStore, eventNotifier, eventSubscriber, "^my-stream", position);
@@ -88,7 +88,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
             await WaitAndStopAsync(sut);
 
-            A.CallTo(() => eventStore.GetEventsAsync(A<Func<StoredEvent, Task>>.Ignored, "^my-stream", position, A<CancellationToken>.Ignored))
+            A.CallTo(() => eventStore.QueryAsync(A<Func<StoredEvent, Task>>.Ignored, "^my-stream", position, A<CancellationToken>.Ignored))
                 .MustHaveHappened(Repeated.Exactly.Once);
         }
 
@@ -101,7 +101,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
             await WaitAndStopAsync(sut);
 
-            A.CallTo(() => eventStore.GetEventsAsync(A<Func<StoredEvent, Task>>.Ignored, "^my-stream", position, A<CancellationToken>.Ignored))
+            A.CallTo(() => eventStore.QueryAsync(A<Func<StoredEvent, Task>>.Ignored, "^my-stream", position, A<CancellationToken>.Ignored))
                 .MustHaveHappened(Repeated.Exactly.Twice);
         }
 

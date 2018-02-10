@@ -28,10 +28,10 @@ namespace Squidex.Config.Domain
     {
         private static readonly TypeNameRegistry TypeNameRegistry =
             new TypeNameRegistry()
-                .MapUnmapped(typeof(SquidexCoreModel).Assembly)
-                .MapUnmapped(typeof(SquidexEvents).Assembly)
-                .MapUnmapped(typeof(SquidexInfrastructure).Assembly)
-                .MapUnmapped(typeof(SquidexMigrations).Assembly);
+                .MapUnmapped(SquidexCoreModel.Assembly)
+                .MapUnmapped(SquidexEvents.Assembly)
+                .MapUnmapped(SquidexInfrastructure.Assembly)
+                .MapUnmapped(SquidexMigrations.Assembly);
 
         private static readonly FieldRegistry FieldRegistry = new FieldRegistry(TypeNameRegistry);
 

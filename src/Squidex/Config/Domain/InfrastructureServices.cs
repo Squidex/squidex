@@ -89,7 +89,7 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<ImageSharpAssetThumbnailGenerator>()
                 .As<IAssetThumbnailGenerator>();
 
-            services.AddSingletonAs<JsonEventDataFormatter>()
+            services.AddSingletonAs<DefaultEventDataFormatter>()
                 .As<IEventDataFormatter>();
 
             services.AddSingletonAs<Migrator>()

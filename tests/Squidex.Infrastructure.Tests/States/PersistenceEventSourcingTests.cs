@@ -118,7 +118,7 @@ namespace Squidex.Infrastructure.States
 
             await sut.GetSingleAsync<MyStatefulObjectWithSnapshot>(key);
 
-            A.CallTo(() => eventStore.GetEventsAsync(key, 3))
+            A.CallTo(() => eventStore.QueryAsync(key, 3))
                 .MustHaveHappened();
         }
 
@@ -199,9 +199,9 @@ namespace Squidex.Infrastructure.States
             await statefulObject.WriteEventsAsync(new MyEvent(), new MyEvent());
             await statefulObject.WriteEventsAsync(new MyEvent(), new MyEvent());
 
-            A.CallTo(() => eventStore.AppendEventsAsync(A<Guid>.Ignored, key, 2, A<ICollection<EventData>>.That.Matches(x => x.Count == 2)))
+            A.CallTo(() => eventStore.AppendAsync(A<Guid>.Ignored, key, 2, A<ICollection<EventData>>.That.Matches(x => x.Count == 2)))
                 .MustHaveHappened();
-            A.CallTo(() => eventStore.AppendEventsAsync(A<Guid>.Ignored, key, 4, A<ICollection<EventData>>.That.Matches(x => x.Count == 2)))
+            A.CallTo(() => eventStore.AppendAsync(A<Guid>.Ignored, key, 4, A<ICollection<EventData>>.That.Matches(x => x.Count == 2)))
                 .MustHaveHappened();
         }
 
@@ -212,7 +212,7 @@ namespace Squidex.Infrastructure.States
 
             var actualObject = await sut.GetSingleAsync<MyStatefulObject>(key);
 
-            A.CallTo(() => eventStore.AppendEventsAsync(A<Guid>.Ignored, key, 2, A<ICollection<EventData>>.That.Matches(x => x.Count == 2)))
+            A.CallTo(() => eventStore.AppendAsync(A<Guid>.Ignored, key, 2, A<ICollection<EventData>>.That.Matches(x => x.Count == 2)))
                 .Throws(new WrongEventVersionException(1, 1));
 
             await Assert.ThrowsAsync<DomainObjectVersionException>(() => statefulObject.WriteEventsAsync(new MyEvent(), new MyEvent()));
@@ -221,7 +221,7 @@ namespace Squidex.Infrastructure.States
         [Fact]
         public async Task Should_not_remove_from_cache_when_write_failed()
         {
-            A.CallTo(() => eventStore.AppendEventsAsync(A<Guid>.Ignored, A<string>.Ignored, A<long>.Ignored, A<ICollection<EventData>>.Ignored))
+            A.CallTo(() => eventStore.AppendAsync(A<Guid>.Ignored, A<string>.Ignored, A<long>.Ignored, A<ICollection<EventData>>.Ignored))
                 .Throws(new InvalidOperationException());
 
             var actualObject = await sut.GetSingleAsync<MyStatefulObject>(key);
@@ -251,7 +251,7 @@ namespace Squidex.Infrastructure.States
                 Assert.Same(retrievedStates[0], retrievedState);
             }
 
-            A.CallTo(() => eventStore.GetEventsAsync(key, 0))
+            A.CallTo(() => eventStore.QueryAsync(key, 0))
                 .MustHaveHappened(Repeated.Exactly.Once);
         }
 
@@ -284,7 +284,7 @@ namespace Squidex.Infrastructure.States
                 i++;
             }
 
-            A.CallTo(() => eventStore.GetEventsAsync(key, readPosition))
+            A.CallTo(() => eventStore.QueryAsync(key, readPosition))
                 .Returns(eventsStored);
         }
     }

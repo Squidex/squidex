@@ -5,12 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Reflection;
+using System.Collections.Generic;
 
-namespace Migrate_01
+namespace Squidex.Infrastructure.Migrations
 {
-    public static class SquidexMigrations
+    public interface IMigrationPath
     {
-        public static readonly Assembly Assembly = typeof(SquidexMigrations).Assembly;
+        (int Version, IEnumerable<IMigration> Migrations) GetNext(int version);
     }
 }

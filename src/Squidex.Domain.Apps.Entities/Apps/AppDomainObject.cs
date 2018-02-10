@@ -13,13 +13,12 @@ using Squidex.Domain.Apps.Entities.Apps.State;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Entities.Apps
 {
-    public sealed class AppDomainObject : DomainObjectBase<AppState>
+    public sealed class AppDomainObject : SquidexDomainObjectBase<AppState>
     {
         private readonly InitialPatterns initialPatterns;
 

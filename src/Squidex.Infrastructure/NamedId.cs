@@ -6,9 +6,12 @@
 // ==========================================================================
 
 using System;
+using System.Linq;
 
 namespace Squidex.Infrastructure
 {
+    public delegate bool Parser<T>(string input, out T result);
+
     public sealed class NamedId<T> : IEquatable<NamedId<T>>
     {
         public T Id { get; }
@@ -43,6 +46,25 @@ namespace Squidex.Infrastructure
         public override int GetHashCode()
         {
             return (Id.GetHashCode() * 397) ^ Name.GetHashCode();
+        }
+
+        public static NamedId<T> Parse(string value, Parser<T> parser)
+        {
+            Guard.NotNull(value, nameof(value));
+
+            var parts = value.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+
+            if (parts.Length < 2)
+            {
+                throw new ArgumentException("Named id must have more than 2 parts divided by commata.");
+            }
+
+            if (!parser(parts[0], out var id))
+            {
+                throw new ArgumentException("Named id must be a valid guid.");
+            }
+
+            return new NamedId<T>(id, string.Join(",", parts.Skip(1)));
         }
     }
 }

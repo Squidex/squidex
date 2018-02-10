@@ -37,23 +37,6 @@ namespace Squidex.Infrastructure.Commands
         }
 
         [Fact]
-        public void Should_add_event_to_uncommitted_events_and_increase_version_when_raised()
-        {
-            var event1 = new MyEvent();
-            var event2 = new MyEvent();
-
-            sut.RaiseEvent(event1);
-            sut.RaiseEvent(event2);
-
-            Assert.Equal(1, sut.Version);
-            Assert.Equal(new IEvent[] { event1, event2 }, sut.GetUncomittedEvents().Select(x => x.Payload).ToArray());
-
-            sut.ClearUncommittedEvents();
-
-            Assert.Equal(0, sut.GetUncomittedEvents().Count);
-        }
-
-        [Fact]
         public async Task Should_write_state_and_events_when_saved()
         {
             await sut.ActivateAsync(id, store);
