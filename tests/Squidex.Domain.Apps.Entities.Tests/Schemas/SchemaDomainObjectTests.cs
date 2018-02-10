@@ -8,11 +8,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using FakeItEasy;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.States;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Schemas
@@ -35,6 +37,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             var fieldRegistry = new FieldRegistry(new TypeNameRegistry());
 
             sut = new SchemaDomainObject(fieldRegistry);
+            sut.ActivateAsync(Id, A.Fake<IStore<Guid>>());
         }
 
         [Fact]
@@ -55,7 +58,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             sut.Create(CreateCommand(new CreateSchema { Name = SchemaName, SchemaId = SchemaId, Properties = properties }));
 
-            Assert.Equal(AppId, sut.Snapshot.AppId);
+            Assert.Equal(AppId, sut.Snapshot.AppId.Id);
 
             Assert.Equal(SchemaName, sut.Snapshot.Name);
             Assert.Equal(SchemaName, sut.Snapshot.SchemaDef.Name);
@@ -81,7 +84,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             var @event = (SchemaCreated)sut.GetUncomittedEvents().Single().Payload;
 
-            Assert.Equal(AppId, sut.Snapshot.AppId);
+            Assert.Equal(AppId, sut.Snapshot.AppId.Id);
             Assert.Equal(SchemaName, sut.Snapshot.Name);
             Assert.Equal(SchemaName, sut.Snapshot.SchemaDef.Name);
 

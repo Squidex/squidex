@@ -17,7 +17,6 @@ namespace Squidex.Domain.Apps.Entities
         public static T Update<T>(this T entity, SquidexEvent @event, EnvelopeHeaders headers, Action<T> updater = null) where T : IEntity
         {
             SetId(entity, headers);
-            SetAppId(entity, @event);
             SetCreated(entity, headers);
             SetCreatedBy(entity, @event);
             SetLastModified(entity, headers);
@@ -74,14 +73,6 @@ namespace Squidex.Domain.Apps.Entities
             if (entity is IUpdateableEntityWithLastModifiedBy withModifiedBy)
             {
                 withModifiedBy.LastModifiedBy = @event.Actor;
-            }
-        }
-
-        private static void SetAppId(IEntity entity, SquidexEvent @event)
-        {
-            if (entity is IUpdateableEntityWithAppRef appEntity && @event is AppEvent appEvent)
-            {
-                appEntity.AppId = appEvent.AppId.Id;
             }
         }
     }

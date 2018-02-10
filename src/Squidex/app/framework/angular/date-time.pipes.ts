@@ -81,6 +81,16 @@ export class ShortTimePipe implements PipeTransform {
 }
 
 @Pipe({
+    name: 'sqxFullDateTime',
+    pure: true
+})
+export class FullDateTimePipe implements PipeTransform {
+    public transform(value: DateTime): any {
+        return value.toStringFormat('LLLL');
+    }
+}
+
+@Pipe({
     name: 'sqxDuration',
     pure: true
 })

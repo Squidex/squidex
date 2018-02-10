@@ -1,12 +1,10 @@
 @import '_mixins';
 @import '_vars';
 
-$color: #1a2129;
-
 .onboarding {
     &-help {
         @include border-radius;
-        background: $color;
+        background: $color-tooltip;
         border: 0;
         max-width: 20rem;
         padding: .75rem;

@@ -5,18 +5,17 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using Squidex.Infrastructure.Commands;
+using NodaTime;
+using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Entities.Assets.Commands
+namespace Squidex.Domain.Apps.Events.Contents
 {
-    public abstract class AssetAggregateCommand : AppCommand, IAggregateCommand
+    [EventType(nameof(ContentStatusScheduled))]
+    public sealed class ContentStatusScheduled : ContentEvent
     {
-        public Guid AssetId { get; set; }
+        public Status Status { get; set; }
 
-        Guid IAggregateCommand.AggregateId
-        {
-            get { return AssetId; }
-        }
+        public Instant DueTime { get; set; }
     }
 }

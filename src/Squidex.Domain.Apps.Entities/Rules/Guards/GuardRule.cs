@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
@@ -44,7 +45,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
             });
         }
 
-        public static Task CanUpdate(UpdateRule command, IAppProvider appProvider)
+        public static Task CanUpdate(UpdateRule command, Guid appId, IAppProvider appProvider)
         {
             Guard.NotNull(command, nameof(command));
 
@@ -57,7 +58,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
 
                 if (command.Trigger != null)
                 {
-                    var errors = await RuleTriggerValidator.ValidateAsync(command.AppId.Id, command.Trigger, appProvider);
+                    var errors = await RuleTriggerValidator.ValidateAsync(appId, command.Trigger, appProvider);
 
                     errors.Foreach(error);
                 }

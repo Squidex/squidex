@@ -289,15 +289,24 @@
 
     .grid-content {
         @include flex-grow(1);
-        margin: 0;
-        margin-top: .25rem;
+        padding-top: .5rem;
+        padding-bottom: .5rem;
         overflow-y: scroll;
     }
 
     .grid-header {
-        padding-top: .75 * $panel-padding;
-        border: 0;
-        border-bottom: 2px solid $color-border;
+        & {
+            border: 0;
+            border-bottom: 2px solid $color-border;
+        }
+
+        th {
+            padding: .7rem;
+        }
+
+        .table-items {
+            margin: 0;
+        }
     }
 
     .grid-footer {
@@ -305,6 +314,6 @@
     }
 
     .pagination {
-        margin-top: .25rem;
+        margin: .25rem 0;
     }
 }

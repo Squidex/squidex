@@ -6,11 +6,17 @@
 // ==========================================================================
 
 using System;
+using Squidex.Infrastructure.Commands;
 
-namespace Squidex.Domain.Apps.Entities
+namespace Squidex.Domain.Apps.Entities.Rules.Commands
 {
-    public interface IEntityWithAppRef
+    public abstract class RuleCommand : SquidexCommand, IAggregateCommand
     {
-        Guid AppId { get; }
+        public Guid RuleId { get; set; }
+
+        Guid IAggregateCommand.AggregateId
+        {
+            get { return RuleId; }
+        }
     }
 }

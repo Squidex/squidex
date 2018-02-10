@@ -134,16 +134,12 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
                 command.Actor = User;
             }
 
-            var appCommand = command as AppCommand;
-
-            if (appCommand != null && appCommand.AppId == null)
+            if (command is IAppCommand appCommand && appCommand.AppId == null)
             {
                 appCommand.AppId = AppNamedId;
             }
 
-            var schemaCommand = command as SchemaCommand;
-
-            if (schemaCommand != null && schemaCommand.SchemaId == null)
+            if (command is ISchemaCommand schemaCommand && schemaCommand.SchemaId == null)
             {
                 schemaCommand.SchemaId = SchemaNamedId;
             }

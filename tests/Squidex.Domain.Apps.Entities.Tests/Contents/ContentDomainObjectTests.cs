@@ -6,12 +6,15 @@
 // ==========================================================================
 
 using System;
+using FakeItEasy;
 using FluentAssertions;
+using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.States;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents
@@ -40,6 +43,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
         public ContentDomainObjectTests()
         {
             patched = otherData.MergeInto(data);
+
+            sut.ActivateAsync(Id, A.Fake<IStore<Guid>>());
         }
 
         [Fact]
@@ -200,6 +205,25 @@ namespace Squidex.Domain.Apps.Entities.Contents
             sut.GetUncomittedEvents()
                 .ShouldHaveSameEvents(
                     CreateContentEvent(new ContentStatusChanged { Status = Status.Published })
+                );
+        }
+
+        [Fact]
+        public void ChangeStatus_should_refresh_properties_and_create_scheduled_events_when_command_has_due_time()
+        {
+            CreateContent();
+
+            var dueTime = Instant.MaxValue;
+
+            sut.ChangeStatus(CreateContentCommand(new ChangeContentStatus { Status = Status.Published, DueTime = dueTime }));
+
+            Assert.Equal(Status.Draft, sut.Snapshot.Status);
+            Assert.Equal(Status.Published, sut.Snapshot.ScheduledTo);
+            Assert.Equal(dueTime, sut.Snapshot.ScheduledAt);
+
+            sut.GetUncomittedEvents()
+                .ShouldHaveSameEvents(
+                    CreateContentEvent(new ContentStatusScheduled { Status = Status.Published, DueTime = dueTime })
                 );
         }
 

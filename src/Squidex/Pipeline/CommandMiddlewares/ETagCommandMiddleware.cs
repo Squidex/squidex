@@ -25,6 +25,11 @@ namespace Squidex.Pipeline.CommandMiddlewares
 
         public async Task HandleAsync(CommandContext context, Func<Task> next)
         {
+            if (httpContextAccessor.HttpContext == null)
+            {
+                return;
+            }
+
             var headers = httpContextAccessor.HttpContext.Request.Headers;
             var headerMatch = headers["If-Match"].ToString();
 

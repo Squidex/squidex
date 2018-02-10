@@ -38,13 +38,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 var inputType = new ContentDataGraphInputType(model, schema);
 
                 AddContentCreate(schemaId, schemaType, schemaName, inputType, contentDataType, contentType);
-                AddContentUpdate(schemaId, schemaType, schemaName, inputType, resultType);
-                AddContentPatch(schemaId, schemaType, schemaName, inputType, resultType);
-                AddContentPublish(schemaId, schemaType, schemaName);
-                AddContentUnpublish(schemaId, schemaType, schemaName);
-                AddContentArchive(schemaId, schemaType, schemaName);
-                AddContentRestore(schemaId, schemaType, schemaName);
-                AddContentDelete(schemaId, schemaType, schemaName);
+                AddContentUpdate(schemaType, schemaName, inputType, resultType);
+                AddContentPatch(schemaType, schemaName, inputType, resultType);
+                AddContentPublish(schemaType, schemaName);
+                AddContentUnpublish(schemaType, schemaName);
+                AddContentArchive(schemaType, schemaName);
+                AddContentRestore(schemaType, schemaName);
+                AddContentDelete(schemaType, schemaName);
             }
 
             Description = "The app mutations.";
@@ -86,7 +86,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
                     var contentData = GetContentData(c);
 
-                    var command = new CreateContent { SchemaId = schemaId, ContentId = Guid.NewGuid(), Data = contentData, Publish = argPublish };
+                    var command = new CreateContent { SchemaId = schemaId, Data = contentData, Publish = argPublish };
                     var commandContext = await publish(command);
 
                     var result = commandContext.Result<EntityCreatedResult<NamedContentData>>();
@@ -98,7 +98,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             });
         }
 
-        private void AddContentUpdate(NamedId<Guid> schemaId, string schemaType, string schemaName, ContentDataGraphInputType inputType, IComplexGraphType resultType)
+        private void AddContentUpdate(string schemaType, string schemaName, ContentDataGraphInputType inputType, IComplexGraphType resultType)
         {
             AddField(new FieldType
             {
@@ -133,7 +133,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                     var contentId = c.GetArgument<Guid>("id");
                     var contentData = GetContentData(c);
 
-                    var command = new UpdateContent { SchemaId = schemaId, ContentId = contentId, Data = contentData };
+                    var command = new UpdateContent { ContentId = contentId, Data = contentData };
                     var commandContext = await publish(command);
 
                     var result = commandContext.Result<ContentDataChangedResult>();
@@ -144,7 +144,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             });
         }
 
-        private void AddContentPatch(NamedId<Guid> schemaId, string schemaType, string schemaName, ContentDataGraphInputType inputType, IComplexGraphType resultType)
+        private void AddContentPatch(string schemaType, string schemaName, ContentDataGraphInputType inputType, IComplexGraphType resultType)
         {
             AddField(new FieldType
             {
@@ -179,7 +179,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                     var contentId = c.GetArgument<Guid>("id");
                     var contentData = GetContentData(c);
 
-                    var command = new PatchContent { SchemaId = schemaId, ContentId = contentId, Data = contentData };
+                    var command = new PatchContent { ContentId = contentId, Data = contentData };
                     var commandContext = await publish(command);
 
                     var result = commandContext.Result<ContentDataChangedResult>();
@@ -190,7 +190,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             });
         }
 
-        private void AddContentPublish(NamedId<Guid> schemaId, string schemaType, string schemaName)
+        private void AddContentPublish(string schemaType, string schemaName)
         {
             AddField(new FieldType
             {
@@ -201,7 +201,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 {
                     var contentId = c.GetArgument<Guid>("id");
 
-                    var command = new ChangeContentStatus { SchemaId = schemaId, ContentId = contentId, Status = Status.Published };
+                    var command = new ChangeContentStatus { ContentId = contentId, Status = Status.Published };
 
                     return publish(command);
                 }),
@@ -209,7 +209,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             });
         }
 
-        private void AddContentUnpublish(NamedId<Guid> schemaId, string schemaType, string schemaName)
+        private void AddContentUnpublish(string schemaType, string schemaName)
         {
             AddField(new FieldType
             {
@@ -220,7 +220,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 {
                     var contentId = c.GetArgument<Guid>("id");
 
-                    var command = new ChangeContentStatus { SchemaId = schemaId, ContentId = contentId, Status = Status.Draft };
+                    var command = new ChangeContentStatus { ContentId = contentId, Status = Status.Draft };
 
                     return publish(command);
                 }),
@@ -228,7 +228,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             });
         }
 
-        private void AddContentArchive(NamedId<Guid> schemaId, string schemaType, string schemaName)
+        private void AddContentArchive(string schemaType, string schemaName)
         {
             AddField(new FieldType
             {
@@ -239,7 +239,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 {
                     var contentId = c.GetArgument<Guid>("id");
 
-                    var command = new ChangeContentStatus { SchemaId = schemaId, ContentId = contentId, Status = Status.Archived };
+                    var command = new ChangeContentStatus { ContentId = contentId, Status = Status.Archived };
 
                     return publish(command);
                 }),
@@ -247,7 +247,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             });
         }
 
-        private void AddContentRestore(NamedId<Guid> schemaId, string schemaType, string schemaName)
+        private void AddContentRestore(string schemaType, string schemaName)
         {
             AddField(new FieldType
             {
@@ -258,7 +258,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 {
                     var contentId = c.GetArgument<Guid>("id");
 
-                    var command = new ChangeContentStatus { SchemaId = schemaId, ContentId = contentId, Status = Status.Draft };
+                    var command = new ChangeContentStatus { ContentId = contentId, Status = Status.Draft };
 
                     return publish(command);
                 }),
@@ -266,7 +266,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             });
         }
 
-        private void AddContentDelete(NamedId<Guid> schemaId, string schemaType, string schemaName)
+        private void AddContentDelete(string schemaType, string schemaName)
         {
             AddField(new FieldType
             {
@@ -277,7 +277,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 {
                     var contentId = c.GetArgument<Guid>("id");
 
-                    var command = new DeleteContent { SchemaId = schemaId, ContentId = contentId };
+                    var command = new DeleteContent { ContentId = contentId };
 
                     return publish(command);
                 }),

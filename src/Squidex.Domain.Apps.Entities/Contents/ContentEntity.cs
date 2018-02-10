@@ -18,7 +18,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
     {
         public Guid Id { get; set; }
 
-        public Guid AppId { get; set; }
+        public NamedId<Guid> AppId { get; set; }
+
+        public NamedId<Guid> SchemaId { get; set; }
 
         public long Version { get; set; }
 
@@ -26,13 +28,19 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public Instant LastModified { get; set; }
 
+        public Status Status { get; set; }
+
+        public Status? ScheduledTo { get; set; }
+
+        public Instant? ScheduledAt { get; set; }
+
+        public RefToken ScheduledBy { get; set; }
+
         public RefToken CreatedBy { get; set; }
 
         public RefToken LastModifiedBy { get; set; }
 
         public NamedContentData Data { get; set; }
-
-        public Status Status { get; set; }
 
         public static ContentEntity Create(CreateContent command, EntityCreatedResult<NamedContentData> result)
         {

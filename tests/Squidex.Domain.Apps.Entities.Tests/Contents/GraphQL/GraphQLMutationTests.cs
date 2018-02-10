@@ -11,7 +11,6 @@ using FakeItEasy;
 using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
-using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Xunit;
@@ -328,7 +327,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             A.CallTo(() => commandBus.PublishAsync(
                 A<ChangeContentStatus>.That.Matches(x =>
-                    x.SchemaId.Equals(schema.NamedId()) &&
                     x.ContentId == contentId &&
                     x.Status == Status.Published &&
                     x.ExpectedVersion == 10)))
@@ -364,7 +362,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             A.CallTo(() => commandBus.PublishAsync(
                 A<ChangeContentStatus>.That.Matches(x =>
-                    x.SchemaId.Equals(schema.NamedId()) &&
                     x.ContentId == contentId &&
                     x.Status == Status.Draft &&
                     x.ExpectedVersion == 10)))
@@ -400,7 +397,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             A.CallTo(() => commandBus.PublishAsync(
                 A<ChangeContentStatus>.That.Matches(x =>
-                    x.SchemaId.Equals(schema.NamedId()) &&
                     x.ContentId == contentId &&
                     x.Status == Status.Archived &&
                     x.ExpectedVersion == 10)))
@@ -436,7 +432,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             A.CallTo(() => commandBus.PublishAsync(
                 A<ChangeContentStatus>.That.Matches(x =>
-                    x.SchemaId.Equals(schema.NamedId()) &&
                     x.ContentId == contentId &&
                     x.Status == Status.Draft &&
                     x.ExpectedVersion == 10)))
@@ -472,7 +467,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             A.CallTo(() => commandBus.PublishAsync(
                 A<DeleteContent>.That.Matches(x =>
-                    x.SchemaId.Equals(schema.NamedId()) &&
                     x.ContentId == contentId &&
                     x.ExpectedVersion == 10)))
                 .MustHaveHappened();

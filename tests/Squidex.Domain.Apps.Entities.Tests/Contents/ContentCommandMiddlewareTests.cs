@@ -9,6 +9,7 @@ using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using FakeItEasy;
+using NodaTime;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
@@ -223,6 +224,21 @@ namespace Squidex.Domain.Apps.Entities.Contents
             });
 
             A.CallTo(() => scriptEngine.Execute(A<ScriptContext>.Ignored, "<change-script>")).MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task ChangeStatus_should_not_invoke_scripts_when_scheduled()
+        {
+            CreateContent();
+
+            var context = CreateContextForCommand(new ChangeContentStatus { ContentId = contentId, User = user, Status = Status.Published, DueTime = Instant.MaxValue });
+
+            await TestUpdate(content, async _ =>
+            {
+                await sut.HandleAsync(context);
+            });
+
+            A.CallTo(() => scriptEngine.Execute(A<ScriptContext>.Ignored, "<change-script>")).MustNotHaveHappened();
         }
 
         [Fact]

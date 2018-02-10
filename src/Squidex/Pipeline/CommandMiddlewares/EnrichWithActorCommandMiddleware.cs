@@ -27,6 +27,11 @@ namespace Squidex.Pipeline.CommandMiddlewares
 
         public Task HandleAsync(CommandContext context, Func<Task> next)
         {
+            if (httpContextAccessor.HttpContext == null)
+            {
+                return next();
+            }
+
             if (context.Command is SquidexCommand squidexCommand)
             {
                 if (squidexCommand.Actor == null)

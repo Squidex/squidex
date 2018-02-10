@@ -35,14 +35,7 @@ export class ContentVersionSelected {
     }
 }
 
-export class ContentPublished {
-    constructor(
-        public readonly content: ContentDto
-    ) {
-    }
-}
-
-export class ContentUnpublished {
+export class ContentStatusChanged {
     constructor(
         public readonly content: ContentDto
     ) {

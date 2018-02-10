@@ -9,10 +9,15 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Commands
 {
-    public sealed class AttachClient : AppAggregateCommand
+    public sealed class AttachClient : AppCommand
     {
         public string Id { get; set; }
 
-        public string Secret { get; } = RandomHash.New();
+        public string Secret { get; set; }
+
+        public AttachClient()
+        {
+            Secret = RandomHash.New();
+        }
     }
 }

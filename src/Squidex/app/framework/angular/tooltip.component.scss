@@ -1,0 +1,12 @@
+@import '_vars';
+@import '_mixins';
+
+.tooltip-container {
+    @include border-radius;
+    background: $color-tooltip;
+    border: 0;
+    font-size: .9rem;
+    font-weight: normal;
+    color: $color-dark-foreground;
+    padding: .5rem;
+}
