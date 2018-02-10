@@ -22,12 +22,12 @@ import {
     AppLanguageDto,
     ContentDto,
     ContentsService,
+    DateTime,
     FieldDto,
     ImmutableArray,
     ModalView,
     Pager,
-    SchemaDetailsDto,
-    DateTime
+    SchemaDetailsDto
 } from 'shared';
 
 @Component({
