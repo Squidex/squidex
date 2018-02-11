@@ -10,6 +10,8 @@ $action-slack:            #5c3a58;
 $action-azure:            #55b3ff;
 $action-fastly:           #e23335;
 
+// sass-lint:disable class-name-format
+
 @mixin build-element($color) {
     & {
         background: $color;
