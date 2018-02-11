@@ -8,15 +8,15 @@
 using System;
 using Squidex.Infrastructure.Commands;
 
-namespace Squidex.Domain.Apps.Entities.Rules.Commands
+namespace Squidex.Domain.Apps.Entities.Assets.Commands
 {
-    public abstract class RuleAggregateCommand : AppCommand, IAggregateCommand
+    public abstract class AssetCommand : SquidexCommand, IAggregateCommand
     {
-        public Guid RuleId { get; set; }
+        public Guid AssetId { get; set; }
 
         Guid IAggregateCommand.AggregateId
         {
-            get { return RuleId; }
+            get { return AssetId; }
         }
     }
 }

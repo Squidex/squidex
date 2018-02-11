@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.OData.UriParser;
+using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Schemas;
@@ -27,5 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Repositories
         Task<IContentEntity> FindContentAsync(IAppEntity app, ISchemaEntity schema, Guid id);
 
         Task<IContentEntity> FindContentAsync(IAppEntity app, ISchemaEntity schema, Guid id, long version);
+
+        Task QueryScheduledWithoutDataAsync(Instant now, Func<IContentEntity, Task> callback);
     }
 }

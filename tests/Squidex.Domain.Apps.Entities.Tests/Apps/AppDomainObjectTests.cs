@@ -8,11 +8,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using FakeItEasy;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.States;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Apps
@@ -29,6 +31,11 @@ namespace Squidex.Domain.Apps.Entities.Apps
         protected override Guid Id
         {
             get { return AppId; }
+        }
+
+        public AppDomainObjectTests()
+        {
+            sut.ActivateAsync(Id, A.Fake<IStore<Guid>>());
         }
 
         [Fact]

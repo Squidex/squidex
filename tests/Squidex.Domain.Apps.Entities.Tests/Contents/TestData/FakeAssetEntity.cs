@@ -14,9 +14,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.TestData
 {
     public sealed class FakeAssetEntity : IAssetEntity
     {
-        public Guid Id { get; set; }
+        public NamedId<Guid> AppId { get; set; }
 
-        public Guid AppId { get; set; }
+        public Guid Id { get; set; }
 
         public Guid AssetId { get; set; }
 

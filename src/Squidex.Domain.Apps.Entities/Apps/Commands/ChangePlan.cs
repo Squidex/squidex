@@ -7,7 +7,7 @@
 
 namespace Squidex.Domain.Apps.Entities.Apps.Commands
 {
-    public sealed class ChangePlan : AppAggregateCommand
+    public sealed class ChangePlan : AppCommand
     {
         public bool FromCallback { get; set; }
 

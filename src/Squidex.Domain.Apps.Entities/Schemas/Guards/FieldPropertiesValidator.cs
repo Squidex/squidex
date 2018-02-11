@@ -57,7 +57,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
             if (properties.AspectWidth.HasValue != properties.AspectHeight.HasValue)
             {
-                yield return new ValidationError("Aspect width and height must be defined.",
+                yield return new ValidationError("Aspect width and height is required.",
                     nameof(properties.AspectWidth),
                     nameof(properties.AspectHeight));
             }

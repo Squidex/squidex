@@ -1,20 +1,16 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using Squidex.Infrastructure.Commands;
+using System.Collections.Generic;
 
-namespace Squidex.Domain.Apps.Entities
+namespace Squidex.Infrastructure.Migrations
 {
-    public class AppAggregateCommand : AppCommand, IAggregateCommand
+    public interface IMigrationPath
     {
-        Guid IAggregateCommand.AggregateId
-        {
-            get { return AppId.Id; }
-        }
+        (int Version, IEnumerable<IMigration> Migrations) GetNext(int version);
     }
 }

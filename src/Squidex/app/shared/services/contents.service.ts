@@ -36,6 +36,9 @@ export class ContentDto {
         public readonly lastModifiedBy: string,
         public readonly created: DateTime,
         public readonly lastModified: DateTime,
+        public readonly scheduledTo: string | null,
+        public readonly scheduledBy: string | null,
+        public readonly scheduledAt: DateTime | null,
         public readonly data: any,
         public readonly version: Version
     ) {
@@ -49,34 +52,37 @@ export class ContentDto {
             this.lastModifiedBy,
             this.created,
             this.lastModified,
+            this.scheduledTo,
+            this.scheduledBy,
+            this.scheduledAt,
             data,
             this.version);
     }
 
-    public publish(user: string, version: Version, now?: DateTime): ContentDto {
-        return this.changeStatus('Published', user, version, now);
-    }
-
-    public unpublish(user: string, version: Version, now?: DateTime): ContentDto {
-        return this.changeStatus('Draft', user, version, now);
-    }
-
-    public archive(user: string, version: Version, now?: DateTime): ContentDto {
-        return this.changeStatus('Archived', user, version, now);
-    }
-
-    public restore(user: string, version: Version, now?: DateTime): ContentDto {
-        return this.changeStatus('Draft', user, version, now);
-    }
-
-    private changeStatus(status: string, user: string, version: Version, now?: DateTime): ContentDto {
-        return new ContentDto(
-            this.id,
-            status,
-            this.createdBy, user,
-            this.created, now || DateTime.now(),
-            this.data,
-            version);
+    public changeStatus(status: string, dueTime: DateTime | null, user: string, version: Version, now?: DateTime): ContentDto {
+        if (dueTime) {
+            return new ContentDto(
+                this.id,
+                this.status,
+                this.createdBy, user,
+                this.created, now || DateTime.now(),
+                status,
+                user,
+                dueTime,
+                this.data,
+                version);
+        } else {
+            return new ContentDto(
+                this.id,
+                status,
+                this.createdBy, user,
+                this.created, now || DateTime.now(),
+                null,
+                null,
+                null,
+                this.data,
+                version);
+        }
     }
 
     public update(data: any, user: string, version: Version, now?: DateTime): ContentDto {
@@ -85,6 +91,9 @@ export class ContentDto {
             this.status,
             this.createdBy, user,
             this.created, now || DateTime.now(),
+            this.scheduledTo,
+            this.scheduledBy,
+            this.scheduledAt,
             data,
             version);
     }
@@ -146,6 +155,9 @@ export class ContentsService {
                             item.lastModifiedBy,
                             DateTime.parseISO_UTC(item.created),
                             DateTime.parseISO_UTC(item.lastModified),
+                            item.scheduledTo || null,
+                            item.scheduledBy || null,
+                            item.scheduledAt ? DateTime.parseISO_UTC(item.scheduledAt) : null,
                             item.data,
                             new Version(item.version.toString()));
                     }));
@@ -167,6 +179,9 @@ export class ContentsService {
                         body.lastModifiedBy,
                         DateTime.parseISO_UTC(body.created),
                         DateTime.parseISO_UTC(body.lastModified),
+                        body.scheduledTo || null,
+                        body.scheduledBy || null,
+                        body.scheduledAt || null ? DateTime.parseISO_UTC(body.scheduledAt) : null,
                         body.data,
                         response.version);
                 })
@@ -197,6 +212,9 @@ export class ContentsService {
                         body.lastModifiedBy,
                         DateTime.parseISO_UTC(body.created),
                         DateTime.parseISO_UTC(body.lastModified),
+                        null,
+                        null,
+                        null,
                         body.data,
                         response.version);
                 })
@@ -231,43 +249,17 @@ export class ContentsService {
                 .pretifyError('Failed to delete content. Please reload.');
     }
 
-    public publishContent(appName: string, schemaName: string, id: string, version: Version): Observable<Versioned<any>> {
-        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}/publish`);
+    public changeContentStatus(appName: string, schemaName: string, id: string, action: string, dueTime: string | null, version: Version): Observable<Versioned<any>> {
+        let url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}/${action}`);
 
-        return HTTP.putVersioned(this.http, url, {}, version)
-                .do(() => {
-                    this.analytics.trackEvent('Content', 'Published', appName);
-                })
-                .pretifyError('Failed to publish content. Please reload.');
-    }
-
-    public unpublishContent(appName: string, schemaName: string, id: string, version: Version): Observable<Versioned<any>> {
-        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}/unpublish`);
-
-        return HTTP.putVersioned(this.http, url, {}, version)
-                .do(() => {
-                    this.analytics.trackEvent('Content', 'Unpublished', appName);
-                })
-                .pretifyError('Failed to unpublish content. Please reload.');
-    }
-
-    public archiveContent(appName: string, schemaName: string, id: string, version: Version): Observable<Versioned<any>> {
-        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}/archive`);
+        if (dueTime) {
+            url += `?dueTime=${dueTime}`;
+        }
 
         return HTTP.putVersioned(this.http, url, {}, version)
                 .do(() => {
                     this.analytics.trackEvent('Content', 'Archived', appName);
                 })
-                .pretifyError('Failed to archive content. Please reload.');
-    }
-
-    public restoreContent(appName: string, schemaName: string, id: string, version: Version): Observable<Versioned<any>> {
-        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}/restore`);
-
-        return HTTP.putVersioned(this.http, url, {}, version)
-                .do(() => {
-                    this.analytics.trackEvent('Content', 'Restored', appName);
-                })
-                .pretifyError('Failed to restore content. Please reload.');
+                .pretifyError(`Failed to ${action} content. Please reload.`);
     }
 }

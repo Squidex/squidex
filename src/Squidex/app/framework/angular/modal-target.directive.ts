@@ -87,6 +87,10 @@ export class ModalTargetDirective implements AfterViewInit, OnDestroy, OnInit {
     }
 
     private updatePosition() {
+        if (!this.targetElement) {
+            return;
+        }
+
         const viewportHeight = document.documentElement.clientHeight;
         const viewportWidth = document.documentElement.clientWidth;
 

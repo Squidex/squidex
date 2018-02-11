@@ -9,7 +9,7 @@ using Squidex.Domain.Apps.Core.Rules;
 
 namespace Squidex.Domain.Apps.Entities.Rules.Commands
 {
-    public abstract class RuleEditCommand : RuleAggregateCommand
+    public abstract class RuleEditCommand : RuleCommand
     {
         public RuleTrigger Trigger { get; set; }
 

@@ -21,7 +21,7 @@
                     <button type="button" class="btn btn-link btn-secondary" (click)="editOptionsDropdown.toggle()" [class.active]="editOptionsDropdown.isOpen | async" #buttonOptions>
                         <i class="icon-dots"></i>
                     </button>
-                    <div class="dropdown-menu" *sqxModalView="editOptionsDropdown" closeAlways="true" [sqxModalTarget]="buttonOptions" @fade>
+                    <div class="dropdown-menu" *sqxModalView="editOptionsDropdown" [sqxModalTarget]="buttonOptions" @fade>
                         <a class="dropdown-item" (click)="configureScriptsDialog.show()">
                             Scripts
                         </a>

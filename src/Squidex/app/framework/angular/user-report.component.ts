@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 
 import { ResourceLoaderService } from './../services/resource-loader.service';
 import { UserReportConfig } from './../configurations';
@@ -17,9 +17,11 @@ import { UserReportConfig } from './../configurations';
 export class UserReportComponent implements OnDestroy, OnInit {
     private loadingTimer: any;
 
-    constructor(config: UserReportConfig,
+    constructor(config: UserReportConfig, changeDetector: ChangeDetectorRef,
         private readonly resourceLoader: ResourceLoaderService
     ) {
+        changeDetector.detach();
+
         window['_urq'] = window['_urq'] || [];
         window['_urq'].push(['initSite', config.siteId]);
     }

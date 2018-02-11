@@ -6,35 +6,29 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Repositories;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.States;
 
-namespace Migrate_01
+namespace Migrate_01.Migrations
 {
-    public sealed class Migration02_AddPatterns : IMigration
+    public sealed class AddPatterns : IMigration
     {
         private readonly InitialPatterns initialPatterns;
         private readonly IStateFactory stateFactory;
         private readonly IAppRepository appRepository;
 
-        public int FromVersion { get; } = 1;
-
-        public int ToVersion { get; } = 2;
-
-        public Migration02_AddPatterns(InitialPatterns initialPatterns, IAppRepository appRepository, IStateFactory stateFactory)
+        public AddPatterns(InitialPatterns initialPatterns, IAppRepository appRepository, IStateFactory stateFactory)
         {
             this.initialPatterns = initialPatterns;
             this.appRepository = appRepository;
             this.stateFactory = stateFactory;
         }
 
-        public async Task UpdateAsync(IEnumerable<IMigration> previousMigrations)
+        public async Task UpdateAsync()
         {
             var ids = await appRepository.QueryAppIdsAsync();
 
@@ -50,7 +44,7 @@ namespace Migrate_01
                             new AddPattern
                             {
                                 Actor = app.Snapshot.CreatedBy,
-                                AppId = new NamedId<Guid>(app.Snapshot.Id, app.Snapshot.Name),
+                                AppId = app.Snapshot.Id,
                                 Name = pattern.Name,
                                 PatternId = Guid.NewGuid(),
                                 Pattern = pattern.Pattern,

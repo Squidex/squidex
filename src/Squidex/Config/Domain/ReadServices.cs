@@ -42,6 +42,8 @@ namespace Squidex.Config.Domain
             {
                 services.AddSingletonAs<RuleDequeuer>()
                     .As<IRunnable>();
+                services.AddSingletonAs<ContentScheduler>()
+                    .As<IRunnable>();
             }
 
             var exposeSourceUrl = config.GetOptionalValue("assetStore:exposeSourceUrl", true);

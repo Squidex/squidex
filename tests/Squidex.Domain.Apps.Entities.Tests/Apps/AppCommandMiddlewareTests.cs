@@ -14,6 +14,7 @@ using Squidex.Domain.Apps.Entities.Apps.Services.Implementations;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.States;
 using Squidex.Shared.Users;
 using Xunit;
 
@@ -46,6 +47,8 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 .Returns(A.Fake<IUser>());
 
             sut = new AppCommandMiddleware(Handler, appProvider, appPlansProvider, appPlansBillingManager, userResolver);
+
+            app.ActivateAsync(Id, A.Fake<IStore<Guid>>());
         }
 
         [Fact]

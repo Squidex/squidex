@@ -5,30 +5,23 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Squidex.Infrastructure.Migrations;
 
-namespace Migrate_01
+namespace Migrate_01.Migrations
 {
-    public sealed class Migration01_FromCqrs : IMigration
+    public class RebuildContents : IMigration
     {
         private readonly Rebuilder rebuilder;
 
-        public int FromVersion { get; } = 0;
-
-        public int ToVersion { get; } = 1;
-
-        public Migration01_FromCqrs(Rebuilder rebuilder)
+        public RebuildContents(Rebuilder rebuilder)
         {
             this.rebuilder = rebuilder;
         }
 
-        public async Task UpdateAsync(IEnumerable<IMigration> previousMigrations)
+        public Task UpdateAsync()
         {
-            await rebuilder.RebuildConfigAsync();
-            await rebuilder.RebuildContentAsync();
-            await rebuilder.RebuildAssetsAsync();
+            return rebuilder.RebuildContentAsync();
         }
     }
 }

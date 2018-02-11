@@ -5,6 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
+using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Infrastructure;
@@ -61,6 +63,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
                 if (!StatusFlow.Exists(command.Status) || !StatusFlow.CanChange(status, command.Status))
                 {
                     error(new ValidationError($"Content cannot be changed from status {status} to {command.Status}.", nameof(command.Status)));
+                }
+
+                if (command.DueTime.HasValue && command.DueTime.Value < SystemClock.Instance.GetCurrentInstant())
+                {
+                    error(new ValidationError("DueTime must be in the future.", nameof(command.DueTime)));
                 }
             });
         }

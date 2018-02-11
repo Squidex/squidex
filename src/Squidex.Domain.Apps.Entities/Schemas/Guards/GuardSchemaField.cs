@@ -32,7 +32,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
                 if (command.Properties == null)
                 {
-                    error(new ValidationError("Properties must be defined.", nameof(command.Properties)));
+                    error(new ValidationError("Properties is required.", nameof(command.Properties)));
                 }
 
                 var propertyErrors = FieldPropertiesValidator.Validate(command.Properties);
@@ -57,7 +57,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             {
                 if (command.Properties == null)
                 {
-                    error(new ValidationError("Properties must be defined.", nameof(command.Properties)));
+                    error(new ValidationError("Properties is required.", nameof(command.Properties)));
                 }
 
                 var propertyErrors = FieldPropertiesValidator.Validate(command.Properties);

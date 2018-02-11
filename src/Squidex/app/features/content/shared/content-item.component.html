@@ -10,7 +10,21 @@
     </span>
 </td>
 <td class="cell-time">
-    <span class="item-published" [class.unpublished]="content.status !== 'Published'"></span>
+    <span *ngIf="!content.scheduledTo">
+        <span class="content-status content-status-{{content.status | lowercase}}" #statusIcon>
+            <i class="icon-circle"></i>
+        </span>
+    
+        <sqx-tooltip [target]="statusIcon">{{content.status}}</sqx-tooltip>
+    </span>
+
+    <span *ngIf="content.scheduledTo">
+        <span class="content-status content-status-{{content.scheduledTo | lowercase}}" #statusIcon>
+            <i class="icon-clock"></i>
+        </span>
+    
+        <sqx-tooltip [target]="statusIcon">Will be set to '{{content.scheduledTo}}' at {{content.scheduledAt | sqxFullDateTime}}</sqx-tooltip>
+    </span>
     
     <small class="item-modified">{{content.lastModified | sqxFromNow}}</small>
 </td>
@@ -22,7 +36,7 @@
         <button type="button" class="btn btn-link btn-secondary" (click)="dropdown.toggle(); $event.stopPropagation()" [class.active]="dropdown.isOpen | async" #optionsButton>
             <i class="icon-dots"></i>
         </button>
-        <div class="dropdown-menu" *sqxModalView="dropdown" closeAlways="true" [sqxModalTarget]="optionsButton" @fade>
+        <div class="dropdown-menu" *sqxModalView="dropdown" [sqxModalTarget]="optionsButton" @fade>
             <a class="dropdown-item" (click)="publishing.emit(); $event.stopPropagation()" *ngIf="content.status === 'Draft'">
                 Publish
             </a>

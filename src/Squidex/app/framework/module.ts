@@ -32,6 +32,7 @@ import {
     FileSizePipe,
     FocusOnInitDirective,
     FromNowPipe,
+    FullDateTimePipe,
     IgnoreScrollbarDirective,
     ImageSourceDirective,
     IndeterminateValueDirective,
@@ -70,6 +71,7 @@ import {
     TitleService,
     TitleComponent,
     ToggleComponent,
+    TooltipComponent,
     UserReportComponent
 } from './declarations';
 
@@ -98,6 +100,7 @@ import {
         FileSizePipe,
         FocusOnInitDirective,
         FromNowPipe,
+        FullDateTimePipe,
         IgnoreScrollbarDirective,
         ImageSourceDirective,
         IndeterminateValueDirective,
@@ -129,6 +132,7 @@ import {
         TemplateWrapperDirective,
         TitleComponent,
         ToggleComponent,
+        TooltipComponent,
         UserReportComponent
     ],
     exports: [
@@ -148,6 +152,7 @@ import {
         FileSizePipe,
         FocusOnInitDirective,
         FromNowPipe,
+        FullDateTimePipe,
         IgnoreScrollbarDirective,
         ImageSourceDirective,
         IndeterminateValueDirective,
@@ -179,6 +184,7 @@ import {
         TemplateWrapperDirective,
         TitleComponent,
         ToggleComponent,
+        TooltipComponent,
         UserReportComponent,
         HttpClientModule,
         FormsModule,

@@ -7,7 +7,7 @@
 
 namespace Squidex.Domain.Apps.Entities.Schemas.Commands
 {
-    public sealed class ConfigureScripts : SchemaAggregateCommand
+    public sealed class ConfigureScripts : SchemaCommand
     {
         public string ScriptQuery { get; set; }
 

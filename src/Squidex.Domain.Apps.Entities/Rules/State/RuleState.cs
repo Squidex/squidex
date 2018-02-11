@@ -10,18 +10,17 @@ using Newtonsoft.Json;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Rules;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Entities.Rules.State
 {
     public class RuleState : DomainObjectState<RuleState>,
-        IRuleEntity,
-        IEntityWithAppRef,
-        IUpdateableEntityWithAppRef
+        IRuleEntity
     {
         [JsonProperty]
-        public Guid AppId { get; set; }
+        public NamedId<Guid> AppId { get; set; }
 
         [JsonProperty]
         public Rule RuleDef { get; set; }
@@ -32,6 +31,8 @@ namespace Squidex.Domain.Apps.Entities.Rules.State
         protected void On(RuleCreated @event)
         {
             RuleDef = new Rule(@event.Trigger, @event.Action);
+
+            AppId = @event.AppId;
         }
 
         protected void On(RuleUpdated @event)

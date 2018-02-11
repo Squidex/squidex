@@ -15,7 +15,7 @@ using Xunit;
 
 namespace Squidex.Infrastructure.EventSourcing
 {
-    public class EventDataFormatterTests
+    public class DefaultEventDataFormatterTests
     {
         public sealed class MyOldEvent : IEvent, IMigratedEvent
         {
@@ -29,16 +29,16 @@ namespace Squidex.Infrastructure.EventSourcing
 
         private readonly JsonSerializerSettings serializerSettings = new JsonSerializerSettings();
         private readonly TypeNameRegistry typeNameRegistry = new TypeNameRegistry();
-        private readonly JsonEventDataFormatter sut;
+        private readonly DefaultEventDataFormatter sut;
 
-        public EventDataFormatterTests()
+        public DefaultEventDataFormatterTests()
         {
             serializerSettings.Converters.Add(new PropertiesBagConverter<EnvelopeHeaders>());
 
             typeNameRegistry.Map(typeof(MyEvent), "Event");
             typeNameRegistry.Map(typeof(MyOldEvent), "OldEvent");
 
-            sut = new JsonEventDataFormatter(typeNameRegistry, serializerSettings);
+            sut = new DefaultEventDataFormatter(typeNameRegistry, JsonSerializer.Create(serializerSettings));
         }
 
         [Fact]

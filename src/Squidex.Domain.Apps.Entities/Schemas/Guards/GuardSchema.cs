@@ -52,7 +52,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
                         if (field.Properties == null)
                         {
-                            error(new ValidationError("Properties must be defined.", $"{prefix}.{nameof(field.Properties)}"));
+                            error(new ValidationError("Properties is required.", $"{prefix}.{nameof(field.Properties)}"));
                         }
 
                         var propertyErrors = FieldPropertiesValidator.Validate(field.Properties);
@@ -79,7 +79,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             {
                 if (command.FieldIds == null)
                 {
-                    error(new ValidationError("Field ids must be specified.", nameof(command.FieldIds)));
+                    error(new ValidationError("Field ids is required.", nameof(command.FieldIds)));
                 }
 
                 if (command.FieldIds.Count != schema.Fields.Count || command.FieldIds.Any(x => !schema.FieldsById.ContainsKey(x)))

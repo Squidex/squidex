@@ -48,6 +48,7 @@ export * from './angular/tag-editor.component';
 export * from './angular/template-wrapper.directive';
 export * from './angular/title.component';
 export * from './angular/toggle.component';
+export * from './angular/tooltip.component';
 export * from './angular/user-report.component';
 export * from './angular/validators';
 export * from './configurations';

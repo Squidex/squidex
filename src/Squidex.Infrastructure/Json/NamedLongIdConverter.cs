@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System;
-using System.Linq;
 using Newtonsoft.Json;
 
 namespace Squidex.Infrastructure.Json
@@ -25,19 +24,14 @@ namespace Squidex.Infrastructure.Json
                 throw new JsonException($"Expected String, but got {reader.TokenType}.");
             }
 
-            var parts = reader.Value.ToString().Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-
-            if (parts.Length < 2)
+            try
             {
-                throw new JsonException("Named id must have more than 2 parts divided by commata.");
+                return NamedId<long>.Parse(reader.Value.ToString(), long.TryParse);
             }
-
-            if (!long.TryParse(parts[0], out var id))
+            catch (ArgumentException ex)
             {
-                throw new JsonException("Named id must be a valid long.");
+                throw new JsonException(ex.Message);
             }
-
-            return new NamedId<long>(id, string.Join(",", parts.Skip(1)));
         }
     }
 }

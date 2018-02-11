@@ -7,15 +7,15 @@
 
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.Assets.State;
+using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public sealed class AssetDomainObject : DomainObjectBase<AssetState>
+    public sealed class AssetDomainObject : SquidexDomainObjectBase<AssetState>
     {
         public AssetDomainObject Create(CreateAsset command)
         {
@@ -72,6 +72,16 @@ namespace Squidex.Domain.Apps.Entities.Assets
             RaiseEvent(SimpleMapper.Map(command, new AssetRenamed()));
 
             return this;
+        }
+
+        private void RaiseEvent(AppEvent @event)
+        {
+            if (@event.AppId == null)
+            {
+                @event.AppId = Snapshot.AppId;
+            }
+
+            RaiseEvent(Envelope.Create(@event));
         }
 
         private void VerifyNotCreated()

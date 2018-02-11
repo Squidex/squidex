@@ -14,13 +14,17 @@ namespace Squidex.Infrastructure.EventSourcing
 {
     public interface IEventStore
     {
-        Task<IReadOnlyList<StoredEvent>> GetEventsAsync(string streamName, long streamPosition = 0);
+        Task CreateIndexAsync(string property);
 
-        Task GetEventsAsync(Func<StoredEvent, Task> callback, string streamFilter = null, string position = null, CancellationToken cancellationToken = default(CancellationToken));
+        Task<IReadOnlyList<StoredEvent>> QueryAsync(string streamName, long streamPosition = 0);
 
-        Task AppendEventsAsync(Guid commitId, string streamName, ICollection<EventData> events);
+        Task QueryAsync(Func<StoredEvent, Task> callback, string streamFilter = null, string position = null, CancellationToken ct = default(CancellationToken));
 
-        Task AppendEventsAsync(Guid commitId, string streamName, long expectedVersion, ICollection<EventData> events);
+        Task QueryAsync(Func<StoredEvent, Task> callback, string property, object value, string position = null, CancellationToken ct = default(CancellationToken));
+
+        Task AppendAsync(Guid commitId, string streamName, ICollection<EventData> events);
+
+        Task AppendAsync(Guid commitId, string streamName, long expectedVersion, ICollection<EventData> events);
 
         IEventSubscription CreateSubscription(IEventSubscriber subscriber, string streamFilter, string position = null);
     }

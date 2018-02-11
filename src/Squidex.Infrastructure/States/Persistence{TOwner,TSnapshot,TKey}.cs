@@ -101,7 +101,7 @@ namespace Squidex.Infrastructure.States
         {
             if (UseEventSourcing())
             {
-                var events = await eventStore.GetEventsAsync(GetStreamName(), versionEvents + 1);
+                var events = await eventStore.QueryAsync(GetStreamName(), versionEvents + 1);
 
                 foreach (var @event in events)
                 {
@@ -160,7 +160,7 @@ namespace Squidex.Infrastructure.States
 
                 try
                 {
-                    await eventStore.AppendEventsAsync(commitId, GetStreamName(), expectedVersion, eventData);
+                    await eventStore.AppendAsync(commitId, GetStreamName(), expectedVersion, eventData);
                 }
                 catch (WrongEventVersionException ex)
                 {

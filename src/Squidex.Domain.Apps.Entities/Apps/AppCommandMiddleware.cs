@@ -179,7 +179,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 }
                 else
                 {
-                    var result = await appPlansBillingManager.ChangePlanAsync(command.Actor.Identifier, command.AppId.Id, a.Snapshot.Name, command.PlanId);
+                    var result = await appPlansBillingManager.ChangePlanAsync(command.Actor.Identifier, a.Snapshot.Id, a.Snapshot.Name, command.PlanId);
 
                     if (result is PlanChangedResult)
                     {

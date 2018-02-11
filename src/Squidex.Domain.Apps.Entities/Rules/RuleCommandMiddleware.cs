@@ -44,7 +44,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
         {
             return handler.UpdateSyncedAsync<RuleDomainObject>(context, async r =>
             {
-                await GuardRule.CanUpdate(command, appProvider);
+                await GuardRule.CanUpdate(command, r.Snapshot.AppId.Id, appProvider);
 
                 r.Update(command);
             });

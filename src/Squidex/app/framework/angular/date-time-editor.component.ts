@@ -40,6 +40,9 @@ export class DateTimeEditorComponent implements ControlValueAccessor, OnDestroy,
     @Input()
     public enforceTime: boolean;
 
+    @Input()
+    public hideClear: boolean;
+
     public timeControl = new FormControl();
 
     public dateControl = new FormControl();
@@ -169,7 +172,7 @@ export class DateTimeEditorComponent implements ControlValueAccessor, OnDestroy,
         let result: string | null = null;
 
         if ((this.dateValue && !this.dateValue.isValid()) || (this.timeValue && !this.timeValue.isValid())) {
-            result = 'Invalid DateTime';
+            result = null;
         } else if (!this.dateValue && !this.timeValue) {
             result = null;
         } else {

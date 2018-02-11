@@ -1,11 +1,19 @@
 # Changelog
 
+## v1.2.0 - 2018-02-10
+
+### Features
+
+* **EventStore**: Event metadata are stored as json objects in MongoDB now and you cacn query by metadata.
+* **Content**: Updated to state can be scheduled, e.g. to publish them.
+
+> This releases will run a migration, which might take a while and also effects the events. We recommend to make a backup first.
+
 ## v1.1.7 - 2018-02-06
 
 ### Bugfixes
 
 * **UI**: Checkbox style fixed.
-
 
 ## v1.1.6 - 2018-02-06
 

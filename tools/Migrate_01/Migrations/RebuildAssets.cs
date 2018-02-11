@@ -12,25 +12,18 @@ using Squidex.Infrastructure.Migrations;
 
 namespace Migrate_01
 {
-    public class Migration03_SplitContentCollections : IMigration
+    public class RebuildAssets : IMigration
     {
         private readonly Rebuilder rebuilder;
 
-        public int FromVersion { get; } = 2;
-
-        public int ToVersion { get; } = 3;
-
-        public Migration03_SplitContentCollections(Rebuilder rebuilder)
+        public RebuildAssets(Rebuilder rebuilder)
         {
             this.rebuilder = rebuilder;
         }
 
-        public async Task UpdateAsync(IEnumerable<IMigration> previousMigrations)
+        public Task UpdateAsync()
         {
-            if (!previousMigrations.Any(x => x is Migration01_FromCqrs))
-            {
-                await rebuilder.RebuildContentAsync();
-            }
+            return rebuilder.RebuildAssetsAsync();
         }
     }
 }

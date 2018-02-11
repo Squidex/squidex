@@ -71,7 +71,7 @@ namespace Migrate_01
 
             var handledIds = new HashSet<Guid>();
 
-            await eventStore.GetEventsAsync(async storedEvent =>
+            await eventStore.QueryAsync(async storedEvent =>
             {
                 var @event = ParseKnownEvent(storedEvent);
 
@@ -86,7 +86,7 @@ namespace Migrate_01
                         await asset.WriteSnapshotAsync();
                     }
                 }
-            }, filter, cancellationToken: CancellationToken.None);
+            }, filter, ct: CancellationToken.None);
         }
 
         public async Task RebuildConfigAsync()
@@ -99,7 +99,7 @@ namespace Migrate_01
 
             var handledIds = new HashSet<Guid>();
 
-            await eventStore.GetEventsAsync(async storedEvent =>
+            await eventStore.QueryAsync(async storedEvent =>
             {
                 var @event = ParseKnownEvent(storedEvent);
 
@@ -124,7 +124,7 @@ namespace Migrate_01
                         await app.WriteSnapshotAsync();
                     }
                 }
-            }, filter, cancellationToken: CancellationToken.None);
+            }, filter, ct: CancellationToken.None);
         }
 
         public async Task RebuildContentAsync()
@@ -135,7 +135,7 @@ namespace Migrate_01
 
             var handledIds = new HashSet<Guid>();
 
-            await eventStore.GetEventsAsync(async storedEvent =>
+            await eventStore.QueryAsync(async storedEvent =>
             {
                 var @event = ParseKnownEvent(storedEvent);
 
@@ -161,7 +161,7 @@ namespace Migrate_01
                         // Schema has been deleted.
                     }
                 }
-            }, filter, cancellationToken: CancellationToken.None);
+            }, filter, ct: CancellationToken.None);
         }
 
         private Envelope<IEvent> ParseKnownEvent(StoredEvent storedEvent)

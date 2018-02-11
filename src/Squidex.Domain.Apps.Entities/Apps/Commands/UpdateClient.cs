@@ -9,7 +9,7 @@ using Squidex.Domain.Apps.Core.Apps;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Commands
 {
-    public sealed class UpdateClient : AppAggregateCommand
+    public sealed class UpdateClient : AppCommand
     {
         public string Id { get; set; }
 

@@ -2,7 +2,7 @@
     <li class="nav-item dropdown">
         <span class="nav-link dropdown-toggle" id="app-name" (click)="appsMenu.toggle()">{{selectedApp ? selectedApp.name : 'Apps Overview'}}</span>
 
-        <div class="dropdown-menu" *sqxModalView="appsMenu" closeAlways="true" @fade>
+        <div class="dropdown-menu" *sqxModalView="appsMenu" @fade>
             <a class="dropdown-item all-apps" routerLink="/app">
                 <span class="all-apps-text">All Apps</span> 
                 <span class="all-apps-pill badge badge-pill badge-primary">{{apps.length}}</span>

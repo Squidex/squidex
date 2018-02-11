@@ -77,7 +77,7 @@
                                         Attempts: {{event.numCalls}}
                                     </div>
                                     <div class="col-3">
-                                        Next: <span *ngIf="event.nextAttempt">{{event.nextAttempt.toStringFormat('MMM DD h:mm:ss a')}}</span>
+                                        Next: <span *ngIf="event.nextAttempt">{{event.nextAttempt | sqxFromNow}}</span>
                                     </div>
                                     <div class="col-3 text-right">
                                         <button class="btn btn-success btn-sm" (click)="enqueueEvent(event)">
