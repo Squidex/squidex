@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 using Newtonsoft.Json;
@@ -22,18 +23,38 @@ namespace Squidex.Infrastructure.MongoDb
             this.serializer = serializer;
         }
 
-        protected override T DeserializeValue(BsonDeserializationContext context, BsonDeserializationArgs args)
+        public override T Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)
         {
-            var jsonReader = new BsonJsonReader(context.Reader);
+            var bsonReader = context.Reader;
 
-            return serializer.Deserialize<T>(jsonReader);
+            if (bsonReader.GetCurrentBsonType() == BsonType.Null)
+            {
+                bsonReader.ReadNull();
+
+                return null;
+            }
+            else
+            {
+                var jsonReader = new BsonJsonReader(bsonReader);
+
+                return serializer.Deserialize<T>(jsonReader);
+            }
         }
 
-        protected override void SerializeValue(BsonSerializationContext context, BsonSerializationArgs args, T value)
+        public override void Serialize(BsonSerializationContext context, BsonSerializationArgs args, T value)
         {
-            var jsonWriter = new BsonJsonWriter(context.Writer);
+            var bsonWriter = context.Writer;
 
-            serializer.Serialize(jsonWriter, value);
+            if (value == null)
+            {
+                bsonWriter.WriteNull();
+            }
+            else
+            {
+                var jsonWriter = new BsonJsonWriter(bsonWriter);
+
+                serializer.Serialize(jsonWriter, value);
+            }
         }
     }
 }
