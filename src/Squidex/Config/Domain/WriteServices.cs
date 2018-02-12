@@ -12,11 +12,13 @@ using Migrate_01;
 using Migrate_01.Migrations;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Scripting;
+using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Templates;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Rules;
+using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Users;
 using Squidex.Infrastructure.Commands;
@@ -59,10 +61,10 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<ContentCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
-            services.AddSingletonAs<SchemaCommandMiddleware>()
+            services.AddSingletonAs<GrainCommandMiddleware<SchemaCommand, ISchemaGrain>>()
                 .As<ICommandMiddleware>();
 
-            services.AddSingletonAs<RuleCommandMiddleware>()
+            services.AddSingletonAs<GrainCommandMiddleware<RuleCommand, IRuleGrain>>()
                 .As<ICommandMiddleware>();
 
             services.AddSingletonAs<CreateBlogCommandMiddleware>()
@@ -92,19 +94,10 @@ namespace Squidex.Config.Domain
             services.AddTransientAs<AppDomainObject>()
                 .AsSelf();
 
-            services.AddTransientAs<AssetDomainObject>()
-                .AsSelf();
-
             services.AddTransientAs<ContentDomainObject>()
                 .AsSelf();
 
-            services.AddTransientAs<RuleDomainObject>()
-                .AsSelf();
-
-            services.AddTransientAs<SchemaDomainObject>()
-                .AsSelf();
-
-            services.AddSingleton<InitialPatterns>(c =>
+            services.AddSingleton(c =>
             {
                 var config = c.GetRequiredService<IOptions<MyUIOptions>>();
 

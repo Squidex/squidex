@@ -11,9 +11,11 @@ using Microsoft.Extensions.Configuration;
 using Orleans;
 using Orleans.Hosting;
 using Orleans.Runtime.Configuration;
+using Squidex.Config.Domain;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log.Adapter;
+using Squidex.Infrastructure.Orleans;
 
 namespace Squidex.Config.Orleans
 {
@@ -38,6 +40,8 @@ namespace Squidex.Config.Orleans
 
         public SiloWrapper(IConfiguration configuration)
         {
+            J.Serializer = SerializationServices.DefaultJsonSerializer;
+
             silo = SiloHostBuilder.CreateDefault()
                .UseConfiguration(ClusterConfiguration.LocalhostPrimarySilo(33333).WithDashboard())
                .UseContentRoot(Directory.GetCurrentDirectory())
