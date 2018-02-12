@@ -14,6 +14,7 @@ using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Templates;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Contents;
@@ -52,13 +53,13 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<EnrichWithSchemaIdCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
-            services.AddSingletonAs<AppCommandMiddleware>()
-                .As<ICommandMiddleware>();
-
             services.AddSingletonAs<AssetCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
             services.AddSingletonAs<ContentCommandMiddleware>()
+                .As<ICommandMiddleware>();
+
+            services.AddSingletonAs<GrainCommandMiddleware<AppCommand, IAppGrain>>()
                 .As<ICommandMiddleware>();
 
             services.AddSingletonAs<GrainCommandMiddleware<SchemaCommand, ISchemaGrain>>()
@@ -91,7 +92,7 @@ namespace Squidex.Config.Domain
             services.AddTransientAs<Rebuilder>()
                 .AsSelf();
 
-            services.AddTransientAs<AppDomainObject>()
+            services.AddTransientAs<AppGrain>()
                 .AsSelf();
 
             services.AddTransientAs<ContentDomainObject>()

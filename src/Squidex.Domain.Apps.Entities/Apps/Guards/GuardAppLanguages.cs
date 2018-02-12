@@ -90,7 +90,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             if (!languages.TryGetConfig(language, out var languageConfig))
             {
-                throw new DomainObjectNotFoundException(language, "Languages", typeof(AppDomainObject));
+                throw new DomainObjectNotFoundException(language, "Languages", typeof(AppGrain));
             }
 
             return languageConfig;

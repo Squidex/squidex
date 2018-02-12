@@ -9,10 +9,10 @@ using System.Threading.Tasks;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Orleans;
 
-namespace Squidex.Domain.Apps.Entities.Rules
+namespace Squidex.Domain.Apps.Entities.Apps
 {
-    public interface IRuleGrain : IDomainObjectGrain
+    public interface IAppGrain : IDomainObjectGrain
     {
-        Task<J<IRuleEntity>> GetStateAsync();
+        Task<J<IAppEntity>> GetStateAsync();
     }
 }

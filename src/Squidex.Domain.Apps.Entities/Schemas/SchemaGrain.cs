@@ -18,6 +18,7 @@ using Squidex.Domain.Apps.Events.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
 
@@ -41,6 +42,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
         public override Task<object> ExecuteAsync(IAggregateCommand command)
         {
+            VerifyNotDeleted();
+
             switch (command)
             {
                 case CreateSchema createSchema:
@@ -191,99 +194,71 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
         public void Add(AddField command)
         {
-            VerifyNotDeleted();
-
             RaiseEvent(SimpleMapper.Map(command, new FieldAdded { FieldId = new NamedId<long>(Snapshot.TotalFields + 1, command.Name) }));
         }
 
         public void UpdateField(UpdateField command)
         {
-            VerifyNotDeleted();
-
             RaiseEvent(command, SimpleMapper.Map(command, new FieldUpdated()));
         }
 
         public void LockField(LockField command)
         {
-            VerifyNotDeleted();
-
             RaiseEvent(command, new FieldLocked());
         }
 
         public void HideField(HideField command)
         {
-            VerifyNotDeleted();
-
             RaiseEvent(command, new FieldHidden());
         }
 
         public void ShowField(ShowField command)
         {
-            VerifyNotDeleted();
-
             RaiseEvent(command, new FieldShown());
         }
 
         public void DisableField(DisableField command)
         {
-            VerifyNotDeleted();
-
             RaiseEvent(command, new FieldDisabled());
         }
 
         public void EnableField(EnableField command)
         {
-            VerifyNotDeleted();
-
             RaiseEvent(command, new FieldEnabled());
         }
 
         public void DeleteField(DeleteField command)
         {
-            VerifyNotDeleted();
-
             RaiseEvent(command, new FieldDeleted());
         }
 
         public void Reorder(ReorderFields command)
         {
-            VerifyNotDeleted();
-
             RaiseEvent(SimpleMapper.Map(command, new SchemaFieldsReordered()));
         }
 
         public void Publish(PublishSchema command)
         {
-            VerifyNotDeleted();
-
             RaiseEvent(SimpleMapper.Map(command, new SchemaPublished()));
         }
 
         public void Unpublish(UnpublishSchema command)
         {
-            VerifyNotDeleted();
-
             RaiseEvent(SimpleMapper.Map(command, new SchemaUnpublished()));
         }
 
         public void ConfigureScripts(ConfigureScripts command)
         {
-            VerifyNotDeleted();
-
             RaiseEvent(SimpleMapper.Map(command, new ScriptsConfigured()));
         }
 
         public void Delete(DeleteSchema command)
         {
-            VerifyNotDeleted();
-
             RaiseEvent(SimpleMapper.Map(command, new SchemaDeleted()));
         }
 
         public void Update(UpdateSchema command)
         {
-            VerifyNotDeleted();
-
             RaiseEvent(SimpleMapper.Map(command, new SchemaUpdated()));
         }
 
@@ -325,6 +300,11 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         public override void ApplyEvent(Envelope<IEvent> @event)
         {
             ApplySnapshot(Snapshot.Apply(@event, registry));
+        }
+
+        public Task<J<ISchemaEntity>> GetStateAsync()
+        {
+            return Task.FromResult(new J<ISchemaEntity>(Snapshot));
         }
     }
 }

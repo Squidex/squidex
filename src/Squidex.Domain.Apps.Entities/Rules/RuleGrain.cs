@@ -15,6 +15,7 @@ using Squidex.Domain.Apps.Events.Rules;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
 
@@ -34,6 +35,8 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
         public override Task<object> ExecuteAsync(IAggregateCommand command)
         {
+            VerifyNotDeleted();
+
             switch (command)
             {
                 case CreateRule createRule:
@@ -83,29 +86,21 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
         public void Update(UpdateRule command)
         {
-            VerifyNotDeleted();
-
             RaiseEvent(SimpleMapper.Map(command, new RuleUpdated()));
         }
 
         public void Enable(EnableRule command)
         {
-            VerifyNotDeleted();
-
             RaiseEvent(SimpleMapper.Map(command, new RuleEnabled()));
         }
 
         public void Disable(DisableRule command)
         {
-            VerifyNotDeleted();
-
             RaiseEvent(SimpleMapper.Map(command, new RuleDisabled()));
         }
 
         public void Delete(DeleteRule command)
         {
-            VerifyNotDeleted();
-
             RaiseEvent(SimpleMapper.Map(command, new RuleDeleted()));
         }
 
@@ -130,6 +125,11 @@ namespace Squidex.Domain.Apps.Entities.Rules
         public override void ApplyEvent(Envelope<IEvent> @event)
         {
             ApplySnapshot(Snapshot.Apply(@event));
+        }
+
+        public Task<J<IRuleEntity>> GetStateAsync()
+        {
+            return Task.FromResult(new J<IRuleEntity>(Snapshot));
         }
     }
 }

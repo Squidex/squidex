@@ -77,7 +77,7 @@ namespace Squidex.Pipeline.CommandMiddlewares
 
                     if (schema == null)
                     {
-                        throw new DomainObjectNotFoundException(schemaName, typeof(SchemaDomainObject));
+                        throw new DomainObjectNotFoundException(schemaName, typeof(ISchemaEntity));
                     }
 
                     schemaCommand.SchemaId = new NamedId<Guid>(schema.Id, schema.Name);
