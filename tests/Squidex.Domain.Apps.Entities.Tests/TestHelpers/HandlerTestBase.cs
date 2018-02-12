@@ -6,76 +6,35 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using FakeItEasy;
+using Orleans.Core;
+using Orleans.Runtime;
 using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.States;
 
 #pragma warning disable IDE0019 // Use pattern matching
 
 namespace Squidex.Domain.Apps.Entities.TestHelpers
 {
-    public abstract class HandlerTestBase<T> where T : IDomainObject
+    public abstract class HandlerTestBase<T, TState> where T : IDomainObjectGrain
     {
-        private sealed class MockupHandler : IAggregateHandler
-        {
-            private T domainObject;
-
-            public bool IsCreated { get; private set; }
-            public bool IsUpdated { get; private set; }
-
-            public void Init(T newDomainObject)
-            {
-                domainObject = newDomainObject;
-
-                IsCreated = false;
-                IsUpdated = false;
-            }
-
-            public Task<V> CreateSyncedAsync<V>(CommandContext context, Func<V, Task> creator) where V : class, IDomainObject
-            {
-                return CreateAsync(context, creator);
-            }
-
-            public Task<V> UpdateSyncedAsync<V>(CommandContext context, Func<V, Task> creator) where V : class, IDomainObject
-            {
-                return UpdateAsync(context, creator);
-            }
-
-            public async Task<V> CreateAsync<V>(CommandContext context, Func<V, Task> creator) where V : class, IDomainObject
-            {
-                IsCreated = true;
-
-                var @do = domainObject as V;
-
-                await creator(domainObject as V);
-
-                return @do;
-            }
-
-            public async Task<V> UpdateAsync<V>(CommandContext context, Func<V, Task> updater) where V : class, IDomainObject
-            {
-                IsUpdated = true;
-
-                var @do = domainObject as V;
-
-                await updater(domainObject as V);
-
-                return @do;
-            }
-        }
-
-        private readonly MockupHandler handler = new MockupHandler();
+        private readonly IGrainIdentity identity = A.Fake<IGrainIdentity>();
+        private readonly IGrainRuntime runtime = A.Fake<IGrainRuntime>();
+        private readonly IStore<Guid> store = A.Fake<IStore<Guid>>();
+        private readonly IPersistence<TState> persistence = A.Fake<IPersistence<TState>>();
 
         protected RefToken User { get; } = new RefToken("subject", Guid.NewGuid().ToString());
 
         protected Guid AppId { get; } = Guid.NewGuid();
 
         protected Guid SchemaId { get; } = Guid.NewGuid();
-
-        protected abstract Guid Id { get; }
 
         protected string AppName { get; } = "my-app";
 
@@ -91,9 +50,38 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
             get { return new NamedId<Guid>(SchemaId, SchemaName); }
         }
 
-        protected IAggregateHandler Handler
+        protected abstract Guid Id { get; }
+
+        public IGrainIdentity Identity
         {
-            get { return handler; }
+            get { return identity; }
+        }
+
+        public IGrainRuntime Runtime
+        {
+            get { return runtime; }
+        }
+
+        public IStore<Guid> Store
+        {
+            get { return store; }
+        }
+
+        public IEnumerable<Envelope<IEvent>> LastEvents { get; private set; } = Enumerable.Empty<Envelope<IEvent>>();
+
+        protected HandlerTestBase()
+        {
+            A.CallTo(() => identity.PrimaryKey)
+                .Returns(Id);
+
+            A.CallTo(() => store.WithSnapshotsAndEventSourcing(A<Type>.Ignored, Id, A<Func<TState, Task>>.Ignored, A<Func<Envelope<IEvent>, Task>>.Ignored))
+                .Returns(persistence);
+
+            A.CallTo(() => persistence.WriteEventsAsync(A<IEnumerable<Envelope<IEvent>>>.Ignored))
+                .Invokes(new Action<IEnumerable<Envelope<IEvent>>>(events =>
+                {
+                    LastEvents = events;
+                }));
         }
 
         protected CommandContext CreateContextForCommand<TCommand>(TCommand command) where TCommand : SquidexCommand
@@ -101,34 +89,10 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
             return new CommandContext(CreateCommand(command), A.Dummy<ICommandBus>());
         }
 
-        protected async Task TestCreate(T domainObject, Func<T, Task> action, bool shouldCreate = true)
-        {
-            handler.Init(domainObject);
-
-            await domainObject.ActivateAsync(Id, A.Fake<IStore<Guid>>());
-            await action(domainObject);
-
-            if (!handler.IsCreated && shouldCreate)
-            {
-                throw new InvalidOperationException("Create not called.");
-            }
-        }
-
-        protected async Task TestUpdate(T domainObject, Func<T, Task> action, bool shouldUpdate = true)
-        {
-            handler.Init(domainObject);
-
-            await domainObject.ActivateAsync(Id, A.Fake<IStore<Guid>>());
-            await action(domainObject);
-
-            if (!handler.IsUpdated && shouldUpdate)
-            {
-                throw new InvalidOperationException("Update not called.");
-            }
-        }
-
         protected TCommand CreateCommand<TCommand>(TCommand command) where TCommand : SquidexCommand
         {
+            command.ExpectedVersion = EtagVersion.Any;
+
             if (command.Actor == null)
             {
                 command.Actor = User;
@@ -147,25 +111,35 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
             return command;
         }
 
+        protected static J<IAggregateCommand> J(IAggregateCommand command)
+        {
+            return command.AsJ();
+        }
+
         protected TEvent CreateEvent<TEvent>(TEvent @event) where TEvent : SquidexEvent
         {
             @event.Actor = User;
 
-            var appEvent = @event as AppEvent;
+            EnrichAppInfo(@event);
+            EnrichSchemaInfo(@event);
 
-            if (appEvent != null)
+            return @event;
+        }
+
+        private void EnrichAppInfo(IEvent @event)
+        {
+            if (@event is AppEvent appEvent)
             {
                 appEvent.AppId = AppNamedId;
             }
+        }
 
-            var schemaEvent = @event as SchemaEvent;
-
-            if (schemaEvent != null)
+        private void EnrichSchemaInfo(IEvent @event)
+        {
+            if (@event is SchemaEvent schemaEvent)
             {
                 schemaEvent.SchemaId = SchemaNamedId;
             }
-
-            return @event;
         }
     }
 }

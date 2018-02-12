@@ -69,8 +69,6 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
             await sut.HandleAsync(@event);
 
-            sut.Dispose();
-
             A.CallTo(() => ruleEventRepository.MarkSentAsync(@event.Id, requestDump, result, jobResult, requestElapsed, nextCall))
                 .MustHaveHappened();
         }

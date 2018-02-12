@@ -7,6 +7,8 @@
 
 using System;
 using System.Threading.Tasks;
+using Orleans.Core;
+using Orleans.Runtime;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.Rules.Guards;
 using Squidex.Domain.Apps.Entities.Rules.State;
@@ -21,12 +23,17 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Rules
 {
-    public sealed class RuleGrain : DomainObjectGrain<RuleState>, IRuleGrain
+    public class RuleGrain : DomainObjectGrain<RuleState>, IRuleGrain
     {
         private readonly IAppProvider appProvider;
 
         public RuleGrain(IStore<Guid> store, IAppProvider appProvider)
-            : base(store)
+            : this(store, appProvider, null, null)
+        {
+        }
+
+        protected RuleGrain(IStore<Guid> store, IAppProvider appProvider, IGrainIdentity identity, IGrainRuntime runtime)
+            : base(store, identity, runtime)
         {
             Guard.NotNull(appProvider, nameof(appProvider));
 
@@ -116,7 +123,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
         private void VerifyNotDeleted()
         {
-            if (Snapshot.IsDeleted || Snapshot.RuleDef == null)
+            if (Snapshot.IsDeleted)
             {
                 throw new DomainException("Webhook has already been deleted.");
             }

@@ -1,304 +1,304 @@
-﻿// ==========================================================================
-//  Squidex Headless CMS
-// ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
-//  All rights reserved. Licensed under the MIT license.
-// ==========================================================================
+﻿//// ==========================================================================
+////  Squidex Headless CMS
+//// ==========================================================================
+////  Copyright (c) Squidex UG (haftungsbeschränkt)
+////  All rights reserved. Licensed under the MIT license.
+//// ==========================================================================
 
-using System;
-using FakeItEasy;
-using FluentAssertions;
-using NodaTime;
-using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Domain.Apps.Entities.Contents.Commands;
-using Squidex.Domain.Apps.Entities.TestHelpers;
-using Squidex.Domain.Apps.Events.Contents;
-using Squidex.Infrastructure;
-using Squidex.Infrastructure.States;
-using Xunit;
+//using System;
+//using FakeItEasy;
+//using FluentAssertions;
+//using NodaTime;
+//using Squidex.Domain.Apps.Core.Contents;
+//using Squidex.Domain.Apps.Entities.Contents.Commands;
+//using Squidex.Domain.Apps.Entities.TestHelpers;
+//using Squidex.Domain.Apps.Events.Contents;
+//using Squidex.Infrastructure;
+//using Squidex.Infrastructure.States;
+//using Xunit;
 
-namespace Squidex.Domain.Apps.Entities.Contents
-{
-    public class ContentDomainObjectTests : HandlerTestBase<ContentDomainObject>
-    {
-        private readonly NamedContentData data =
-            new NamedContentData()
-                .AddField("field1",
-                    new ContentFieldData()
-                        .AddValue("iv", 1));
-        private readonly NamedContentData otherData =
-            new NamedContentData()
-                .AddField("field2",
-                    new ContentFieldData()
-                        .AddValue("iv", 2));
-        private readonly NamedContentData patched;
-        private readonly Guid contentId = Guid.NewGuid();
-        private readonly ContentDomainObject sut = new ContentDomainObject();
+//namespace Squidex.Domain.Apps.Entities.Contents
+//{
+//    public class ContentDomainObjectTests : HandlerTestBase<ContentDomainObject>
+//    {
+//        private readonly NamedContentData data =
+//            new NamedContentData()
+//                .AddField("field1",
+//                    new ContentFieldData()
+//                        .AddValue("iv", 1));
+//        private readonly NamedContentData otherData =
+//            new NamedContentData()
+//                .AddField("field2",
+//                    new ContentFieldData()
+//                        .AddValue("iv", 2));
+//        private readonly NamedContentData patched;
+//        private readonly Guid contentId = Guid.NewGuid();
+//        private readonly ContentDomainObject sut = new ContentDomainObject();
 
-        protected override Guid Id
-        {
-            get { return contentId; }
-        }
+//        protected override Guid Id
+//        {
+//            get { return contentId; }
+//        }
 
-        public ContentDomainObjectTests()
-        {
-            patched = otherData.MergeInto(data);
+//        public ContentDomainObjectTests()
+//        {
+//            patched = otherData.MergeInto(data);
 
-            sut.ActivateAsync(Id, A.Fake<IStore<Guid>>());
-        }
+//            sut.ActivateAsync(Id, A.Fake<IStore<Guid>>());
+//        }
 
-        [Fact]
-        public void Create_should_throw_exception_if_created()
-        {
-            sut.Create(CreateCommand(new CreateContent { Data = data }));
+//        [Fact]
+//        public void Create_should_throw_exception_if_created()
+//        {
+//            sut.Create(CreateCommand(new CreateContent { Data = data }));
 
-            Assert.Throws<DomainException>(() =>
-            {
-                sut.Create(CreateContentCommand(new CreateContent { Data = data }));
-            });
-        }
+//            Assert.Throws<DomainException>(() =>
+//            {
+//                sut.Create(CreateContentCommand(new CreateContent { Data = data }));
+//            });
+//        }
 
-        [Fact]
-        public void Create_should_create_events()
-        {
-            sut.Create(CreateContentCommand(new CreateContent { Data = data }));
+//        [Fact]
+//        public void Create_should_create_events()
+//        {
+//            sut.Create(CreateContentCommand(new CreateContent { Data = data }));
 
-            sut.GetUncomittedEvents()
-                .ShouldHaveSameEvents(
-                    CreateContentEvent(new ContentCreated { Data = data })
-                );
-        }
+//            sut.GetUncomittedEvents()
+//                .ShouldHaveSameEvents(
+//                    CreateContentEvent(new ContentCreated { Data = data })
+//                );
+//        }
 
-        [Fact]
-        public void Create_should_also_publish_if_set_to_true()
-        {
-            sut.Create(CreateContentCommand(new CreateContent { Data = data, Publish = true }));
+//        [Fact]
+//        public void Create_should_also_publish_if_set_to_true()
+//        {
+//            sut.Create(CreateContentCommand(new CreateContent { Data = data, Publish = true }));
 
-            sut.GetUncomittedEvents()
-                .ShouldHaveSameEvents(
-                    CreateContentEvent(new ContentCreated { Data = data }),
-                    CreateContentEvent(new ContentStatusChanged { Status = Status.Published })
-                );
-        }
+//            sut.GetUncomittedEvents()
+//                .ShouldHaveSameEvents(
+//                    CreateContentEvent(new ContentCreated { Data = data }),
+//                    CreateContentEvent(new ContentStatusChanged { Status = Status.Published })
+//                );
+//        }
 
-        [Fact]
-        public void Update_should_throw_exception_if_not_created()
-        {
-            Assert.Throws<DomainException>(() =>
-            {
-                sut.Update(CreateContentCommand(new UpdateContent { Data = data }));
-            });
-        }
+//        [Fact]
+//        public void Update_should_throw_exception_if_not_created()
+//        {
+//            Assert.Throws<DomainException>(() =>
+//            {
+//                sut.Update(CreateContentCommand(new UpdateContent { Data = data }));
+//            });
+//        }
 
-        [Fact]
-        public void Update_should_throw_exception_if_content_is_deleted()
-        {
-            CreateContent();
-            DeleteContent();
+//        [Fact]
+//        public void Update_should_throw_exception_if_content_is_deleted()
+//        {
+//            CreateContent();
+//            DeleteContent();
 
-            Assert.Throws<DomainException>(() =>
-            {
-                sut.Update(CreateContentCommand(new UpdateContent()));
-            });
-        }
+//            Assert.Throws<DomainException>(() =>
+//            {
+//                sut.Update(CreateContentCommand(new UpdateContent()));
+//            });
+//        }
 
-        [Fact]
-        public void Update_should_create_events()
-        {
-            CreateContent();
+//        [Fact]
+//        public void Update_should_create_events()
+//        {
+//            CreateContent();
 
-            sut.Update(CreateContentCommand(new UpdateContent { Data = otherData }));
+//            sut.Update(CreateContentCommand(new UpdateContent { Data = otherData }));
 
-            sut.GetUncomittedEvents()
-                .ShouldHaveSameEvents(
-                    CreateContentEvent(new ContentUpdated { Data = otherData })
-                );
-        }
+//            sut.GetUncomittedEvents()
+//                .ShouldHaveSameEvents(
+//                    CreateContentEvent(new ContentUpdated { Data = otherData })
+//                );
+//        }
 
-        [Fact]
-        public void Update_should_not_create_event_for_same_data()
-        {
-            CreateContent();
-            UpdateContent();
+//        [Fact]
+//        public void Update_should_not_create_event_for_same_data()
+//        {
+//            CreateContent();
+//            UpdateContent();
 
-            sut.Update(CreateContentCommand(new UpdateContent { Data = data }));
+//            sut.Update(CreateContentCommand(new UpdateContent { Data = data }));
 
-            sut.GetUncomittedEvents().Should().BeEmpty();
-        }
+//            sut.GetUncomittedEvents().Should().BeEmpty();
+//        }
 
-        [Fact]
-        public void Patch_should_throw_exception_if_not_created()
-        {
-            Assert.Throws<DomainException>(() =>
-            {
-                sut.Patch(CreateContentCommand(new PatchContent { Data = data }));
-            });
-        }
+//        [Fact]
+//        public void Patch_should_throw_exception_if_not_created()
+//        {
+//            Assert.Throws<DomainException>(() =>
+//            {
+//                sut.Patch(CreateContentCommand(new PatchContent { Data = data }));
+//            });
+//        }
 
-        [Fact]
-        public void Patch_should_throw_exception_if_content_is_deleted()
-        {
-            CreateContent();
-            DeleteContent();
+//        [Fact]
+//        public void Patch_should_throw_exception_if_content_is_deleted()
+//        {
+//            CreateContent();
+//            DeleteContent();
 
-            Assert.Throws<DomainException>(() =>
-            {
-                sut.Patch(CreateContentCommand(new PatchContent()));
-            });
-        }
+//            Assert.Throws<DomainException>(() =>
+//            {
+//                sut.Patch(CreateContentCommand(new PatchContent()));
+//            });
+//        }
 
-        [Fact]
-        public void Patch_should_create_events()
-        {
-            CreateContent();
-            UpdateContent();
+//        [Fact]
+//        public void Patch_should_create_events()
+//        {
+//            CreateContent();
+//            UpdateContent();
 
-            sut.Patch(CreateContentCommand(new PatchContent { Data = otherData }));
+//            sut.Patch(CreateContentCommand(new PatchContent { Data = otherData }));
 
-            sut.GetUncomittedEvents()
-                .ShouldHaveSameEvents(
-                    CreateContentEvent(new ContentUpdated { Data = patched })
-                );
-        }
+//            sut.GetUncomittedEvents()
+//                .ShouldHaveSameEvents(
+//                    CreateContentEvent(new ContentUpdated { Data = patched })
+//                );
+//        }
 
-        [Fact]
-        public void Patch_should_not_create_event_for_same_data()
-        {
-            CreateContent();
-            UpdateContent();
+//        [Fact]
+//        public void Patch_should_not_create_event_for_same_data()
+//        {
+//            CreateContent();
+//            UpdateContent();
 
-            sut.Patch(CreateContentCommand(new PatchContent { Data = data }));
+//            sut.Patch(CreateContentCommand(new PatchContent { Data = data }));
 
-            sut.GetUncomittedEvents().Should().BeEmpty();
-        }
+//            sut.GetUncomittedEvents().Should().BeEmpty();
+//        }
 
-        [Fact]
-        public void ChangeStatus_should_throw_exception_if_not_created()
-        {
-            Assert.Throws<DomainException>(() =>
-            {
-                sut.ChangeStatus(CreateContentCommand(new ChangeContentStatus()));
-            });
-        }
+//        [Fact]
+//        public void ChangeStatus_should_throw_exception_if_not_created()
+//        {
+//            Assert.Throws<DomainException>(() =>
+//            {
+//                sut.ChangeStatus(CreateContentCommand(new ChangeContentStatus()));
+//            });
+//        }
 
-        [Fact]
-        public void ChangeStatus_should_throw_exception_if_content_is_deleted()
-        {
-            CreateContent();
-            DeleteContent();
+//        [Fact]
+//        public void ChangeStatus_should_throw_exception_if_content_is_deleted()
+//        {
+//            CreateContent();
+//            DeleteContent();
 
-            Assert.Throws<DomainException>(() =>
-            {
-                sut.ChangeStatus(CreateContentCommand(new ChangeContentStatus()));
-            });
-        }
+//            Assert.Throws<DomainException>(() =>
+//            {
+//                sut.ChangeStatus(CreateContentCommand(new ChangeContentStatus()));
+//            });
+//        }
 
-        [Fact]
-        public void ChangeStatus_should_refresh_properties_and_create_events()
-        {
-            CreateContent();
+//        [Fact]
+//        public void ChangeStatus_should_refresh_properties_and_create_events()
+//        {
+//            CreateContent();
 
-            sut.ChangeStatus(CreateContentCommand(new ChangeContentStatus { Status = Status.Published }));
+//            sut.ChangeStatus(CreateContentCommand(new ChangeContentStatus { Status = Status.Published }));
 
-            Assert.Equal(Status.Published, sut.Snapshot.Status);
+//            Assert.Equal(Status.Published, sut.Snapshot.Status);
 
-            sut.GetUncomittedEvents()
-                .ShouldHaveSameEvents(
-                    CreateContentEvent(new ContentStatusChanged { Status = Status.Published })
-                );
-        }
+//            sut.GetUncomittedEvents()
+//                .ShouldHaveSameEvents(
+//                    CreateContentEvent(new ContentStatusChanged { Status = Status.Published })
+//                );
+//        }
 
-        [Fact]
-        public void ChangeStatus_should_refresh_properties_and_create_scheduled_events_when_command_has_due_time()
-        {
-            CreateContent();
+//        [Fact]
+//        public void ChangeStatus_should_refresh_properties_and_create_scheduled_events_when_command_has_due_time()
+//        {
+//            CreateContent();
 
-            var dueTime = Instant.MaxValue;
+//            var dueTime = Instant.MaxValue;
 
-            sut.ChangeStatus(CreateContentCommand(new ChangeContentStatus { Status = Status.Published, DueTime = dueTime }));
+//            sut.ChangeStatus(CreateContentCommand(new ChangeContentStatus { Status = Status.Published, DueTime = dueTime }));
 
-            Assert.Equal(Status.Draft, sut.Snapshot.Status);
-            Assert.Equal(Status.Published, sut.Snapshot.ScheduledTo);
-            Assert.Equal(dueTime, sut.Snapshot.ScheduledAt);
+//            Assert.Equal(Status.Draft, sut.Snapshot.Status);
+//            Assert.Equal(Status.Published, sut.Snapshot.ScheduledTo);
+//            Assert.Equal(dueTime, sut.Snapshot.ScheduledAt);
 
-            sut.GetUncomittedEvents()
-                .ShouldHaveSameEvents(
-                    CreateContentEvent(new ContentStatusScheduled { Status = Status.Published, DueTime = dueTime })
-                );
-        }
+//            sut.GetUncomittedEvents()
+//                .ShouldHaveSameEvents(
+//                    CreateContentEvent(new ContentStatusScheduled { Status = Status.Published, DueTime = dueTime })
+//                );
+//        }
 
-        [Fact]
-        public void Delete_should_throw_exception_if_not_created()
-        {
-            Assert.Throws<DomainException>(() =>
-            {
-                sut.Delete(CreateContentCommand(new DeleteContent()));
-            });
-        }
+//        [Fact]
+//        public void Delete_should_throw_exception_if_not_created()
+//        {
+//            Assert.Throws<DomainException>(() =>
+//            {
+//                sut.Delete(CreateContentCommand(new DeleteContent()));
+//            });
+//        }
 
-        [Fact]
-        public void Delete_should_throw_exception_if_already_deleted()
-        {
-            CreateContent();
-            DeleteContent();
+//        [Fact]
+//        public void Delete_should_throw_exception_if_already_deleted()
+//        {
+//            CreateContent();
+//            DeleteContent();
 
-            Assert.Throws<DomainException>(() =>
-            {
-                sut.Delete(CreateContentCommand(new DeleteContent()));
-            });
-        }
+//            Assert.Throws<DomainException>(() =>
+//            {
+//                sut.Delete(CreateContentCommand(new DeleteContent()));
+//            });
+//        }
 
-        [Fact]
-        public void Delete_should_update_properties_and_create_events()
-        {
-            CreateContent();
+//        [Fact]
+//        public void Delete_should_update_properties_and_create_events()
+//        {
+//            CreateContent();
 
-            sut.Delete(CreateContentCommand(new DeleteContent()));
+//            sut.Delete(CreateContentCommand(new DeleteContent()));
 
-            Assert.True(sut.Snapshot.IsDeleted);
+//            Assert.True(sut.Snapshot.IsDeleted);
 
-            sut.GetUncomittedEvents()
-                .ShouldHaveSameEvents(
-                    CreateContentEvent(new ContentDeleted())
-                );
-        }
+//            sut.GetUncomittedEvents()
+//                .ShouldHaveSameEvents(
+//                    CreateContentEvent(new ContentDeleted())
+//                );
+//        }
 
-        private void CreateContent()
-        {
-            sut.Create(CreateContentCommand(new CreateContent { Data = data }));
-            sut.ClearUncommittedEvents();
-        }
+//        private void CreateContent()
+//        {
+//            sut.Create(CreateContentCommand(new CreateContent { Data = data }));
+//            sut.ClearUncommittedEvents();
+//        }
 
-        private void UpdateContent()
-        {
-            sut.Update(CreateContentCommand(new UpdateContent { Data = data }));
-            sut.ClearUncommittedEvents();
-        }
+//        private void UpdateContent()
+//        {
+//            sut.Update(CreateContentCommand(new UpdateContent { Data = data }));
+//            sut.ClearUncommittedEvents();
+//        }
 
-        private void ChangeStatus(Status status)
-        {
-            sut.ChangeStatus(CreateContentCommand(new ChangeContentStatus { Status = status }));
-            sut.ClearUncommittedEvents();
-        }
+//        private void ChangeStatus(Status status)
+//        {
+//            sut.ChangeStatus(CreateContentCommand(new ChangeContentStatus { Status = status }));
+//            sut.ClearUncommittedEvents();
+//        }
 
-        private void DeleteContent()
-        {
-            sut.Delete(CreateContentCommand(new DeleteContent()));
-            sut.ClearUncommittedEvents();
-        }
+//        private void DeleteContent()
+//        {
+//            sut.Delete(CreateContentCommand(new DeleteContent()));
+//            sut.ClearUncommittedEvents();
+//        }
 
-        protected T CreateContentEvent<T>(T @event) where T : ContentEvent
-        {
-            @event.ContentId = contentId;
+//        protected T CreateContentEvent<T>(T @event) where T : ContentEvent
+//        {
+//            @event.ContentId = contentId;
 
-            return CreateEvent(@event);
-        }
+//            return CreateEvent(@event);
+//        }
 
-        protected T CreateContentCommand<T>(T command) where T : ContentCommand
-        {
-            command.ContentId = contentId;
+//        protected T CreateContentCommand<T>(T command) where T : ContentCommand
+//        {
+//            command.ContentId = contentId;
 
-            return CreateCommand(command);
-        }
-    }
-}
+//            return CreateCommand(command);
+//        }
+//    }
+//}
