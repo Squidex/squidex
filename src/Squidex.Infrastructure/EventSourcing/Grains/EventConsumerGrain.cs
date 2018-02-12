@@ -71,7 +71,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
             eventConsumer = eventConsumerFactory(this.GetPrimaryKeyString());
 
-            persistence = store.WithSnapshots<EventConsumerGrain, EventConsumerState, string>(this.GetPrimaryKeyString(), s => state = s);
+            persistence = store.WithSnapshots<EventConsumerState, string>(GetType(), this.GetPrimaryKeyString(), s => state = s);
 
             return persistence.ReadAsync();
         }
@@ -81,7 +81,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             return new RetrySubscription(eventStore, new WrapperSubscription(this.AsReference<IEventConsumerGrain>(), scheduler), streamFilter, position);
         }
 
-        public virtual Task<Immutable<EventConsumerInfo>> GetStateAsync()
+        public Task<Immutable<EventConsumerInfo>> GetStateAsync()
         {
             return Task.FromResult(state.ToInfo(this.eventConsumer.Name).AsImmutable());
         }

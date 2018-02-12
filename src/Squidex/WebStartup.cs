@@ -54,7 +54,6 @@ namespace Squidex
             app.ConfigurePortal();
             app.ConfigureOrleansDashboard();
             app.ConfigureIdentityServer();
-
             app.ConfigureFrontend();
         }
     }

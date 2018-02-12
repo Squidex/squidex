@@ -26,10 +26,10 @@ namespace Squidex.Areas.Api.Controllers.EventConsumers
     {
         private readonly IEventConsumerManagerGrain eventConsumerManagerGrain;
 
-        public EventConsumersController(ICommandBus commandBus, IClusterClient orleans)
+        public EventConsumersController(ICommandBus commandBus, IGrainFactory grainFactory)
             : base(commandBus)
         {
-            eventConsumerManagerGrain = orleans.GetGrain<IEventConsumerManagerGrain>("Default");
+            eventConsumerManagerGrain = grainFactory.GetGrain<IEventConsumerManagerGrain>("Default");
         }
 
         [HttpGet]

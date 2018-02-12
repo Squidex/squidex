@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Infrastructure.Migrations;
 

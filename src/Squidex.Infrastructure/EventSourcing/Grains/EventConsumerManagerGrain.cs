@@ -14,10 +14,11 @@ using Orleans;
 using Orleans.Concurrency;
 using Orleans.Core;
 using Orleans.Runtime;
+using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.EventSourcing.Grains
 {
-    public class EventConsumerManagerGrain : Grain, IEventConsumerManagerGrain
+    public class EventConsumerManagerGrain : Grain, IEventConsumerManagerGrain, IRemindable
     {
         private readonly IEnumerable<IEventConsumer> eventConsumers;
 
@@ -37,17 +38,12 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             this.eventConsumers = eventConsumers;
         }
 
-        public Task ReceiveReminder(string reminderName, TickStatus status)
-        {
-            return ActivateAsync();
-        }
-
         public override Task OnActivateAsync()
         {
             DelayDeactivation(TimeSpan.FromDays(1));
 
-            // RegisterOrUpdateReminder("Default", TimeSpan.Zero, TimeSpan.FromMinutes(10));
-            //  RegisterTimer(x => ActivateAsync(), null, TimeSpan.Zero, TimeSpan.FromSeconds(10));
+            RegisterOrUpdateReminder("Default", TimeSpan.Zero, TimeSpan.FromMinutes(10));
+            RegisterTimer(x => WakeUpAsync(null), null, TimeSpan.Zero, TimeSpan.FromSeconds(10));
 
             return Task.FromResult(true);
         }
@@ -73,14 +69,16 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             return Task.WhenAll(tasks);
         }
 
-        public Task<Immutable<List<EventConsumerInfo>>> GetConsumersAsync()
+        public async Task<Immutable<List<EventConsumerInfo>>> GetConsumersAsync()
         {
             var tasks =
                 eventConsumers
                     .Select(c => GrainFactory.GetGrain<IEventConsumerGrain>(c.Name))
                     .Select(c => c.GetStateAsync());
 
-            return Task.WhenAll(tasks).ContinueWith(x => new Immutable<List<EventConsumerInfo>>(x.Result.Select(r => r.Value).ToList()));
+            var consumerInfos = await Task.WhenAll(tasks);
+
+            return new Immutable<List<EventConsumerInfo>>(consumerInfos.Select(r => r.Value).ToList());
         }
 
         public Task ResetAsync(string consumerName)
@@ -102,6 +100,11 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             var eventConsumer = GrainFactory.GetGrain<IEventConsumerGrain>(consumerName);
 
             return eventConsumer.StopAsync();
+        }
+
+        public Task ReceiveReminder(string reminderName, TickStatus status)
+        {
+            return TaskHelper.Done;
         }
     }
 }

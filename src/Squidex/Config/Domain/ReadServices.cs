@@ -27,6 +27,7 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.EventSourcing.Grains;
+using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.States;
 using Squidex.Pipeline;
 
@@ -36,18 +37,13 @@ namespace Squidex.Config.Domain
     {
         public static void AddMyReadServices(this IServiceCollection services, IConfiguration config)
         {
-            var consumeEvents = config.GetOptionalValue("eventStore:consume", false);
+            services.AddSingletonAs<StateFactory>()
+                .As<IStateFactory>()
+                .As<IInitializable>();
 
-            if (consumeEvents)
-            {
-                services.AddSingletonAs<RuleDequeuer>()
-                    .As<IRunnable>();
-                services.AddSingletonAs<ContentScheduler>()
-                    .As<IRunnable>();
-
-                services.AddSingletonAs<EventConsumerBootstrap>()
-                    .As<IRunnable>();
-            }
+            services.AddSingletonAs<OrleansEventNotifier>()
+                .As<IEventNotifier>()
+                .As<IInitializable>();
 
             var exposeSourceUrl = config.GetOptionalValue("assetStore:exposeSourceUrl", true);
 
@@ -56,9 +52,6 @@ namespace Squidex.Config.Domain
                     c.GetRequiredService<IAssetStore>(),
                     exposeSourceUrl))
                 .As<IGraphQLUrlGenerator>();
-
-            services.AddSingletonAs<StateFactory>()
-                .As<IStateFactory>().As<IInitializable>();
 
             services.AddSingletonAs(c => c.GetService<IOptions<MyUsageOptions>>()?.Value?.Plans.OrEmpty());
 
@@ -113,8 +106,14 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<WebhookActionHandler>()
                 .As<IRuleActionHandler>();
 
-            services.AddSingletonAs<OrleansEventNotifier>()
-                .As<IEventNotifier>().As<IInitializable>();
+            services.AddSingletonAs<Bootstrap<IRuleDequeuerGrain>>()
+                .As<IRunnable>();
+
+            services.AddSingletonAs<Bootstrap<IContentSchedulerGrain>>()
+                .As<IRunnable>();
+
+            services.AddSingletonAs<Bootstrap<IEventConsumerManagerGrain>>()
+                .As<IRunnable>();
 
             services.AddSingletonAs<RuleEnqueuer>()
                 .As<IEventConsumer>();

@@ -7,16 +7,14 @@
 
 using System;
 using System.Threading.Tasks;
-using Orleans;
 using Orleans.Concurrency;
+using Squidex.Infrastructure.Orleans;
 
 namespace Squidex.Infrastructure.EventSourcing.Grains
 {
-    public interface IEventConsumerGrain : IGrainWithStringKey
+    public interface IEventConsumerGrain : IBackgroundGrain
     {
         Task<Immutable<EventConsumerInfo>> GetStateAsync();
-
-        Task ActivateAsync();
 
         Task StopAsync();
 

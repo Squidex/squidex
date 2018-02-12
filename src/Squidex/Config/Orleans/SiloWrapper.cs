@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Orleans;
 using Orleans.Hosting;
 using Orleans.Runtime.Configuration;
+using Squidex.Domain.Apps.Entities;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log.Adapter;
 
@@ -38,19 +39,20 @@ namespace Squidex.Config.Orleans
         public SiloWrapper(IConfiguration configuration)
         {
             silo = SiloHostBuilder.CreateDefault()
-               .UseConfiguration(ClusterConfiguration.LocalhostPrimarySilo(33333))
+               .UseConfiguration(ClusterConfiguration.LocalhostPrimarySilo(33333).WithDashboard())
                .UseContentRoot(Directory.GetCurrentDirectory())
                .UseDashboard(options =>
                {
                    options.HostSelf = false;
                })
-               .ConfigureApplicationParts(builder =>
-               {
-                   builder.AddApplicationPart(SquidexInfrastructure.Assembly);
-               })
                .ConfigureLogging(builder =>
                {
                    builder.AddSemanticLog();
+               })
+               .ConfigureApplicationParts(builder =>
+               {
+                   builder.AddApplicationPart(SquidexEntities.Assembly);
+                   builder.AddApplicationPart(SquidexInfrastructure.Assembly);
                })
                .ConfigureServices((context, services) =>
                {
@@ -78,13 +80,6 @@ namespace Squidex.Config.Orleans
         public void Dispose()
         {
             silo.StopAsync().Wait();
-        }
-
-        private static string GetEnvironment()
-        {
-            var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-
-            return environment ?? "Development";
         }
     }
 }

@@ -8,6 +8,7 @@
 using System;
 using Orleans;
 using Orleans.Runtime.Configuration;
+using Squidex.Domain.Apps.Entities;
 using Squidex.Infrastructure;
 
 namespace Squidex.Config.Orleans
@@ -28,6 +29,7 @@ namespace Squidex.Config.Orleans
                 .UseDashboard()
                 .ConfigureApplicationParts(builder =>
                 {
+                    builder.AddApplicationPart(SquidexEntities.Assembly);
                     builder.AddApplicationPart(SquidexInfrastructure.Assembly);
                 })
                 .UseStaticGatewayListProvider(options =>

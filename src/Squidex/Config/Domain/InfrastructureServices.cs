@@ -23,10 +23,15 @@ using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.UsageTracking;
 using Squidex.Pipeline;
 
+#pragma warning disable RECS0092 // Convert field to readonly
+
 namespace Squidex.Config.Domain
 {
     public static class InfrastructureServices
     {
+        private static ILogChannel console = new ConsoleLogChannel();
+        private static ILogChannel file;
+
         public static void AddMyInfrastructureServices(this IServiceCollection services, IConfiguration config)
         {
             if (config.GetValue<bool>("logging:human"))
@@ -42,10 +47,13 @@ namespace Squidex.Config.Domain
 
             if (!string.IsNullOrWhiteSpace(loggingFile))
             {
-                services.AddSingletonAs(new FileChannel(loggingFile))
+                services.AddSingletonAs(file ?? (file = new FileChannel(loggingFile)))
                     .As<ILogChannel>()
                     .As<IInitializable>();
             }
+
+            services.AddSingletonAs(console)
+                .As<ILogChannel>();
 
             services.AddSingletonAs(c => new ApplicationInfoLogAppender(typeof(Program).Assembly, Guid.NewGuid()))
                 .As<ILogAppender>();
@@ -57,9 +65,6 @@ namespace Squidex.Config.Domain
                 .As<ILogAppender>();
 
             services.AddSingletonAs<DebugLogChannel>()
-                .As<ILogChannel>();
-
-            services.AddSingletonAs<ConsoleLogChannel>()
                 .As<ILogChannel>();
 
             services.AddSingletonAs<SemanticLog>()

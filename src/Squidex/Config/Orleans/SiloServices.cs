@@ -11,10 +11,7 @@ using System.Net;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Orleans;
-using Orleans.Runtime;
 using Orleans.Runtime.Configuration;
-using Squidex.Infrastructure;
-using Squidex.Infrastructure.EventSourcing.Grains;
 
 namespace Squidex.Config.Orleans
 {
