@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.Extensions.Caching.Memory;
@@ -18,45 +17,9 @@ using Xunit;
 
 namespace Squidex.Infrastructure.States
 {
-    public class PersistenceSnapshotTests : IDisposable
+    public class PersistenceSnapshotTests
     {
-        private class MyStatefulObject : IStatefulObject<string>
-        {
-            private IPersistence<int> persistence;
-            private int state;
-
-            public long ExpectedVersion { get; set; } = EtagVersion.Any;
-
-            public long Version
-            {
-                get { return persistence.Version; }
-            }
-
-            public int State
-            {
-                get { return state; }
-            }
-
-            public Task ActivateAsync(string key, IStore<string> store)
-            {
-                persistence = store.WithSnapshots<int, string>(key, s => state = s);
-
-                return persistence.ReadAsync(ExpectedVersion);
-            }
-
-            public void SetState(int value)
-            {
-                state = value;
-            }
-
-            public Task WriteStateAsync()
-            {
-                return persistence.WriteSnapshotAsync(state);
-            }
-        }
-
         private readonly string key = Guid.NewGuid().ToString();
-        private readonly MyStatefulObject statefulObject = new MyStatefulObject();
         private readonly IEventDataFormatter eventDataFormatter = A.Fake<IEventDataFormatter>();
         private readonly IEventStore eventStore = A.Fake<IEventStore>();
         private readonly IMemoryCache cache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
@@ -64,99 +27,101 @@ namespace Squidex.Infrastructure.States
         private readonly IServiceProvider services = A.Fake<IServiceProvider>();
         private readonly ISnapshotStore<int, string> snapshotStore = A.Fake<ISnapshotStore<int, string>>();
         private readonly IStreamNameResolver streamNameResolver = A.Fake<IStreamNameResolver>();
-        private readonly StateFactory sut;
+        private readonly IStore<string> sut;
 
         public PersistenceSnapshotTests()
         {
-            A.CallTo(() => services.GetService(typeof(MyStatefulObject)))
-                .Returns(statefulObject);
             A.CallTo(() => services.GetService(typeof(ISnapshotStore<int, string>)))
                 .Returns(snapshotStore);
 
-            sut = new StateFactory(pubSub, cache, eventStore, eventDataFormatter, services, streamNameResolver);
-            sut.Initialize();
-        }
-
-        public void Dispose()
-        {
-            sut.Dispose();
+            sut = new Store<string>(eventStore, eventDataFormatter, services, streamNameResolver);
         }
 
         [Fact]
         public async Task Should_read_from_store()
         {
-            statefulObject.ExpectedVersion = 1;
-
             A.CallTo(() => snapshotStore.ReadAsync(key))
-                .Returns((123, 1));
+                .Returns((20, 10));
 
-            var actualObject = await sut.GetSingleAsync<MyStatefulObject, string>(key);
+            var persistedState = 0;
+            var persistence = sut.WithSnapshots<object, int, string>(key, x => persistedState = x);
 
-            Assert.Same(statefulObject, actualObject);
-            Assert.NotNull(cache.Get<object>(key));
+            await persistence.ReadAsync();
 
-            Assert.Equal(123, statefulObject.State);
+            Assert.Equal(10, persistence.Version);
+            Assert.Equal(20, persistedState);
+        }
+
+        [Fact]
+        public async Task Should_return_empty_version_when_version_negative()
+        {
+            A.CallTo(() => snapshotStore.ReadAsync(key))
+                .Returns((20, -10));
+
+            var persistedState = 0;
+            var persistence = sut.WithSnapshots<object, int, string>(key, x => persistedState = x);
+
+            await persistence.ReadAsync();
+
+            Assert.Equal(EtagVersion.Empty, persistence.Version);
         }
 
         [Fact]
         public async Task Should_set_to_empty_when_store_returns_not_found()
         {
             A.CallTo(() => snapshotStore.ReadAsync(key))
-                .Returns((123, EtagVersion.NotFound));
+                .Returns((20, EtagVersion.Empty));
 
-            var actualObject = await sut.GetSingleAsync<MyStatefulObject, string>(key);
+            var persistedState = 0;
+            var persistence = sut.WithSnapshots<object, int, string>(key, x => persistedState = x);
 
-            Assert.Equal(-1, statefulObject.Version);
-            Assert.Equal( 0, statefulObject.State);
+            await persistence.ReadAsync();
+
+            Assert.Equal(-1, persistence.Version);
+            Assert.Equal( 0, persistedState);
         }
 
         [Fact]
-        public async Task Should_throw_exception_if_not_found()
+        public async Task Should_throw_exception_if_not_found_and_version_expected()
         {
-            statefulObject.ExpectedVersion = 0;
-
             A.CallTo(() => snapshotStore.ReadAsync(key))
-                .Returns((0, EtagVersion.Empty));
+                .Returns((123, EtagVersion.Empty));
 
-            await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.GetSingleAsync<MyStatefulObject, string>(key));
+            var persistedState = 0;
+            var persistence = sut.WithSnapshots<object, int, string>(key, x => persistedState = x);
+
+            await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => persistence.ReadAsync(1));
         }
 
         [Fact]
         public async Task Should_throw_exception_if_other_version_found()
         {
-            statefulObject.ExpectedVersion = 1;
-
             A.CallTo(() => snapshotStore.ReadAsync(key))
-                .Returns((2, 2));
+                .Returns((123, 2));
 
-            await Assert.ThrowsAsync<DomainObjectVersionException>(() => sut.GetSingleAsync<MyStatefulObject, string>(key));
-        }
+            var persistedState = 0;
+            var persistence = sut.WithSnapshots<object, int, string>(key, x => persistedState = x);
 
-        [Fact]
-        public async Task Should_not_throw_exception_if_noting_expected()
-        {
-            A.CallTo(() => snapshotStore.ReadAsync(key))
-                .Returns((0, EtagVersion.Empty));
-
-            await sut.GetSingleAsync<MyStatefulObject, string>(key);
+            await Assert.ThrowsAsync<DomainObjectVersionException>(() => persistence.ReadAsync(1));
         }
 
         [Fact]
         public async Task Should_write_to_store_with_previous_version()
         {
             A.CallTo(() => snapshotStore.ReadAsync(key))
-                .Returns((123, 13));
+                .Returns((20, 10));
 
-            var actualObject = await sut.GetSingleAsync<MyStatefulObject, string>(key);
+            var persistedState = 0;
+            var persistence = sut.WithSnapshots<object, int, string>(key, x => persistedState = x);
 
-            Assert.Same(statefulObject, actualObject);
-            Assert.Equal(123, statefulObject.State);
+            await persistence.ReadAsync();
 
-            statefulObject.SetState(456);
+            Assert.Equal(10, persistence.Version);
+            Assert.Equal(20, persistedState);
 
-            await statefulObject.WriteStateAsync();
+            await persistence.WriteSnapshotAsync(100);
 
-            A.CallTo(() => snapshotStore.WriteAsync(key, 456, 13, 14))
+            A.CallTo(() => snapshotStore.WriteAsync(key, 100, 10, 11))
                 .MustHaveHappened();
         }
 
@@ -164,51 +129,17 @@ namespace Squidex.Infrastructure.States
         public async Task Should_wrap_exception_when_writing_to_store_with_previous_version()
         {
             A.CallTo(() => snapshotStore.ReadAsync(key))
-                .Returns((123, 13));
+                .Returns((20, 10));
 
-            A.CallTo(() => snapshotStore.WriteAsync(key, 123, 13, 14))
+            A.CallTo(() => snapshotStore.WriteAsync(key, 100, 10, 11))
                 .Throws(new InconsistentStateException(1, 1, new InvalidOperationException()));
 
-            var actualObject = await sut.GetSingleAsync<MyStatefulObject, string>(key);
+            var persistedState = 0;
+            var persistence = sut.WithSnapshots<object, int, string>(key, x => persistedState = x);
 
-            await Assert.ThrowsAsync<DomainObjectVersionException>(() => statefulObject.WriteStateAsync());
-        }
+            await persistence.ReadAsync();
 
-        [Fact]
-        public async Task Should_not_remove_from_cache_when_write_failed()
-        {
-            A.CallTo(() => snapshotStore.WriteAsync(A<string>.Ignored, A<int>.Ignored, A<long>.Ignored, A<long>.Ignored))
-                .Throws(new InvalidOperationException());
-
-            var actualObject = await sut.GetSingleAsync<MyStatefulObject>(key);
-
-            await Assert.ThrowsAsync<InvalidOperationException>(() => statefulObject.WriteStateAsync());
-
-            Assert.True(cache.TryGetValue(key, out var t));
-        }
-
-        [Fact]
-        public async Task Should_return_same_instance_for_parallel_requests()
-        {
-            A.CallTo(() => snapshotStore.ReadAsync(key))
-                .ReturnsLazily(() => Task.Delay(1).ContinueWith(x => (1, 1L)));
-
-            var tasks = new List<Task<MyStatefulObject>>();
-
-            for (var i = 0; i < 1000; i++)
-            {
-                tasks.Add(Task.Run(() => sut.GetSingleAsync<MyStatefulObject, string>(key)));
-            }
-
-            var retrievedStates = await Task.WhenAll(tasks);
-
-            foreach (var retrievedState in retrievedStates)
-            {
-                Assert.Same(retrievedStates[0], retrievedState);
-            }
-
-            A.CallTo(() => snapshotStore.ReadAsync(key))
-                .MustHaveHappened(Repeated.Exactly.Once);
+            await Assert.ThrowsAsync<DomainObjectVersionException>(() => persistence.WriteSnapshotAsync(100));
         }
     }
 }

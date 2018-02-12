@@ -1,15 +1,15 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using Squidex.Infrastructure.Commands;
 
-namespace Squidex.Infrastructure.TestHelpers
+namespace Squidex.Domain.Apps.Entities.Contents
 {
-    internal sealed class MyDomainObject : DomainObjectBase<MyDomainState>
+    public interface IContentGrain : IDomainObjectGrain
     {
     }
 }

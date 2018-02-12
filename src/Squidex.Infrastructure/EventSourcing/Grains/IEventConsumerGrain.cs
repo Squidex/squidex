@@ -7,6 +7,7 @@
 
 using System;
 using System.Threading.Tasks;
+using Orleans;
 using Orleans.Concurrency;
 using Squidex.Infrastructure.Orleans;
 
@@ -21,8 +22,6 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         Task StartAsync();
 
         Task ResetAsync();
-
-        Task WakeUpAsync();
 
         Task OnEventAsync(Immutable<IEventSubscription> subscription, Immutable<StoredEvent> storedEvent);
 

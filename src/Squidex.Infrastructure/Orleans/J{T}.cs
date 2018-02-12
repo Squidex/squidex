@@ -45,13 +45,13 @@ namespace Squidex.Infrastructure.Orleans
         }
 
         [CopierMethod]
-        private static object Copy(object input, ICopyContext context)
+        public static object Copy(object input, ICopyContext context)
         {
             return input;
         }
 
         [SerializerMethod]
-        private static void Serialize(object input, ISerializationContext context, Type expected)
+        public static void Serialize(object input, ISerializationContext context, Type expected)
         {
             var stream = new MemoryStream();
 
@@ -69,7 +69,7 @@ namespace Squidex.Infrastructure.Orleans
         }
 
         [DeserializerMethod]
-        private static object Deserialize(Type expected, IDeserializationContext context)
+        public static object Deserialize(Type expected, IDeserializationContext context)
         {
             var outLength = context.StreamReader.ReadInt();
             var outBytes = context.StreamReader.ReadBytes(outLength);

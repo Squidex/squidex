@@ -13,7 +13,6 @@ using FakeItEasy;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.Tasks;
 using Squidex.Infrastructure.TestHelpers;
 using Xunit;
 
@@ -21,48 +20,7 @@ namespace Squidex.Infrastructure.States
 {
     public class PersistenceEventSourcingTests
     {
-        private class MyStatefulObject : IStatefulObject<string>
-        {
-            private readonly List<IEvent> appliedEvents = new List<IEvent>();
-            private IPersistence persistence;
-
-            public long ExpectedVersion { get; set; } = EtagVersion.Any;
-
-            public List<IEvent> AppliedEvents
-            {
-                get { return appliedEvents; }
-            }
-
-            public Task ActivateAsync(string key, IStore<string> store)
-            {
-                persistence = store.WithEventSourcing(key, e => appliedEvents.Add(e.Payload));
-
-                return persistence.ReadAsync(ExpectedVersion);
-            }
-
-            public Task WriteEventsAsync(params IEvent[] events)
-            {
-                return persistence.WriteEventsAsync(events.Select(Envelope.Create).ToArray());
-            }
-        }
-
-        private class MyStatefulObjectWithSnapshot : IStatefulObject<string>
-        {
-            private IPersistence<object> persistence;
-
-            public long ExpectedVersion { get; set; } = EtagVersion.Any;
-
-            public Task ActivateAsync(string key, IStore<string> store)
-            {
-                persistence = store.WithSnapshotsAndEventSourcing<object>(key, s => TaskHelper.Done, s => TaskHelper.Done);
-
-                return persistence.ReadAsync(ExpectedVersion);
-            }
-        }
-
         private readonly string key = Guid.NewGuid().ToString();
-        private readonly MyStatefulObject statefulObject = new MyStatefulObject();
-        private readonly MyStatefulObjectWithSnapshot statefulObjectWithSnapShot = new MyStatefulObjectWithSnapshot();
         private readonly IEventDataFormatter eventDataFormatter = A.Fake<IEventDataFormatter>();
         private readonly IEventStore eventStore = A.Fake<IEventStore>();
         private readonly IMemoryCache cache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
@@ -70,42 +28,53 @@ namespace Squidex.Infrastructure.States
         private readonly IServiceProvider services = A.Fake<IServiceProvider>();
         private readonly ISnapshotStore<object, string> snapshotStore = A.Fake<ISnapshotStore<object, string>>();
         private readonly IStreamNameResolver streamNameResolver = A.Fake<IStreamNameResolver>();
-        private readonly StateFactory sut;
+        private readonly IStore<string> sut;
 
         public PersistenceEventSourcingTests()
         {
-            A.CallTo(() => services.GetService(typeof(MyStatefulObject)))
-                .Returns(statefulObject);
-            A.CallTo(() => services.GetService(typeof(MyStatefulObjectWithSnapshot)))
-                .Returns(statefulObjectWithSnapShot);
             A.CallTo(() => services.GetService(typeof(ISnapshotStore<object, string>)))
                 .Returns(snapshotStore);
 
-            A.CallTo(() => streamNameResolver.GetStreamName(typeof(MyStatefulObject), key))
-                .Returns(key);
-            A.CallTo(() => streamNameResolver.GetStreamName(typeof(MyStatefulObjectWithSnapshot), key))
+            A.CallTo(() => streamNameResolver.GetStreamName(typeof(object), key))
                 .Returns(key);
 
-            sut = new StateFactory(pubSub, cache, eventStore, eventDataFormatter, services, streamNameResolver);
-            sut.Initialize();
+            sut = new Store<string>(eventStore, eventDataFormatter, services, streamNameResolver);
         }
 
         [Fact]
         public async Task Should_read_from_store()
         {
-            statefulObject.ExpectedVersion = 1;
-
             var event1 = new MyEvent();
             var event2 = new MyEvent();
 
             SetupEventStore(event1, event2);
 
-            var actualObject = await sut.GetSingleAsync<MyStatefulObject>(key);
+            var persistedEvents = new List<IEvent>();
+            var persistence = sut.WithEventSourcing<object, string>(key, x => persistedEvents.Add(x.Payload));
 
-            Assert.Same(statefulObject, actualObject);
-            Assert.NotNull(cache.Get<object>(key));
+            await persistence.ReadAsync();
 
-            Assert.Equal(actualObject.AppliedEvents, new[] { event1, event2 });
+            Assert.Equal(persistedEvents.ToArray(), new[] { event1, event2 });
+        }
+
+        [Fact]
+        public async Task Should_ignore_old_events()
+        {
+            var storedEvent = new StoredEvent("1", 0, new EventData());
+
+            A.CallTo(() => eventStore.QueryAsync(key, 0))
+                .Returns(new List<StoredEvent> { storedEvent });
+
+            A.CallTo(() => eventDataFormatter.Parse(storedEvent.Data, true))
+                .Throws(new TypeNameNotFoundException());
+
+            var persistedEvents = new List<IEvent>();
+            var persistence = sut.WithEventSourcing<object, string>(key, x => persistedEvents.Add(x.Payload));
+
+            await persistence.ReadAsync();
+
+            Assert.Empty(persistedEvents);
+            Assert.Equal(0, persistence.Version);
         }
 
         [Fact]
@@ -116,7 +85,11 @@ namespace Squidex.Infrastructure.States
 
             SetupEventStore(3, 2);
 
-            await sut.GetSingleAsync<MyStatefulObjectWithSnapshot>(key);
+            var persistedState = (object)null;
+            var persistedEvents = new List<IEvent>();
+            var persistence = sut.WithSnapshotsAndEventSourcing<object, object, string>(key, x => persistedState = x, x => persistedEvents.Add(x.Payload));
+
+            await persistence.ReadAsync();
 
             A.CallTo(() => eventStore.QueryAsync(key, 3))
                 .MustHaveHappened();
@@ -130,7 +103,11 @@ namespace Squidex.Infrastructure.States
 
             SetupEventStore(3, 0, 3);
 
-            await Assert.ThrowsAsync<InvalidOperationException>(() => sut.GetSingleAsync<MyStatefulObjectWithSnapshot>(key));
+            var persistedState = (object)null;
+            var persistedEvents = new List<IEvent>();
+            var persistence = sut.WithSnapshotsAndEventSourcing<object, object, string>(key, x => persistedState = x, x => persistedEvents.Add(x.Payload));
+
+            await Assert.ThrowsAsync<InvalidOperationException>(() => persistence.ReadAsync());
         }
 
         [Fact]
@@ -141,50 +118,60 @@ namespace Squidex.Infrastructure.States
 
             SetupEventStore(3, 4, 3);
 
-            await Assert.ThrowsAsync<InvalidOperationException>(() => sut.GetSingleAsync<MyStatefulObjectWithSnapshot>(key));
+            var persistedState = (object)null;
+            var persistedEvents = new List<IEvent>();
+            var persistence = sut.WithSnapshotsAndEventSourcing<object, object, string>(key, x => persistedState = x, x => persistedEvents.Add(x.Payload));
+
+            await Assert.ThrowsAsync<InvalidOperationException>(() => persistence.ReadAsync());
         }
 
         [Fact]
         public async Task Should_throw_exception_if_not_found()
         {
-            statefulObject.ExpectedVersion = 0;
-
             SetupEventStore(0);
 
-            await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.GetSingleAsync<MyStatefulObject>(key));
+            var persistedEvents = new List<IEvent>();
+            var persistence = sut.WithEventSourcing<object, string>(key, x => persistedEvents.Add(x.Payload));
+
+            await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => persistence.ReadAsync(1));
         }
 
         [Fact]
         public async Task Should_throw_exception_if_other_version_found()
         {
-            statefulObject.ExpectedVersion = 1;
-
             SetupEventStore(3);
 
-            await Assert.ThrowsAsync<DomainObjectVersionException>(() => sut.GetSingleAsync<MyStatefulObject>(key));
+            var persistedEvents = new List<IEvent>();
+            var persistence = sut.WithEventSourcing<object, string>(key, x => persistedEvents.Add(x.Payload));
+
+            await Assert.ThrowsAsync<DomainObjectVersionException>(() => persistence.ReadAsync(1));
         }
 
         [Fact]
         public async Task Should_throw_exception_if_other_version_found_from_snapshot()
         {
-            statefulObjectWithSnapShot.ExpectedVersion = 1;
-
             A.CallTo(() => snapshotStore.ReadAsync(key))
                 .Returns((2, 2L));
 
             SetupEventStore(0);
 
-            await Assert.ThrowsAsync<DomainObjectVersionException>(() => sut.GetSingleAsync<MyStatefulObjectWithSnapshot>(key));
+            var persistedState = (object)null;
+            var persistedEvents = new List<IEvent>();
+            var persistence = sut.WithSnapshotsAndEventSourcing<object, object, string>(key, x => persistedState = x, x => persistedEvents.Add(x.Payload));
+
+            await Assert.ThrowsAsync<DomainObjectVersionException>(() => persistence.ReadAsync(1));
         }
 
         [Fact]
         public async Task Should_not_throw_exception_if_nothing_expected()
         {
-            statefulObject.ExpectedVersion = EtagVersion.Any;
-
             SetupEventStore(0);
 
-            await sut.GetSingleAsync<MyStatefulObject>(key);
+            var persistedState = (object)null;
+            var persistedEvents = new List<IEvent>();
+            var persistence = sut.WithSnapshotsAndEventSourcing<object, object, string>(key, x => persistedState = x, x => persistedEvents.Add(x.Payload));
+
+            await persistence.ReadAsync();
         }
 
         [Fact]
@@ -192,12 +179,13 @@ namespace Squidex.Infrastructure.States
         {
             SetupEventStore(3);
 
-            var actualObject = await sut.GetSingleAsync<MyStatefulObject>(key);
+            var persistedEvents = new List<IEvent>();
+            var persistence = sut.WithEventSourcing<object, string>(key, x => persistedEvents.Add(x.Payload));
 
-            Assert.Same(statefulObject, actualObject);
+            await persistence.ReadAsync();
 
-            await statefulObject.WriteEventsAsync(new MyEvent(), new MyEvent());
-            await statefulObject.WriteEventsAsync(new MyEvent(), new MyEvent());
+            await persistence.WriteEventsAsync(new[] { new MyEvent(), new MyEvent() }.Select(Envelope.Create));
+            await persistence.WriteEventsAsync(new[] { new MyEvent(), new MyEvent() }.Select(Envelope.Create));
 
             A.CallTo(() => eventStore.AppendAsync(A<Guid>.Ignored, key, 2, A<ICollection<EventData>>.That.Matches(x => x.Count == 2)))
                 .MustHaveHappened();
@@ -210,49 +198,15 @@ namespace Squidex.Infrastructure.States
         {
             SetupEventStore(3);
 
-            var actualObject = await sut.GetSingleAsync<MyStatefulObject>(key);
+            var persistedEvents = new List<IEvent>();
+            var persistence = sut.WithEventSourcing<object, string>(key, x => persistedEvents.Add(x.Payload));
+
+            await persistence.ReadAsync();
 
             A.CallTo(() => eventStore.AppendAsync(A<Guid>.Ignored, key, 2, A<ICollection<EventData>>.That.Matches(x => x.Count == 2)))
                 .Throws(new WrongEventVersionException(1, 1));
 
-            await Assert.ThrowsAsync<DomainObjectVersionException>(() => statefulObject.WriteEventsAsync(new MyEvent(), new MyEvent()));
-        }
-
-        [Fact]
-        public async Task Should_not_remove_from_cache_when_write_failed()
-        {
-            A.CallTo(() => eventStore.AppendAsync(A<Guid>.Ignored, A<string>.Ignored, A<long>.Ignored, A<ICollection<EventData>>.Ignored))
-                .Throws(new InvalidOperationException());
-
-            var actualObject = await sut.GetSingleAsync<MyStatefulObject>(key);
-
-            await Assert.ThrowsAsync<InvalidOperationException>(() => statefulObject.WriteEventsAsync(new MyEvent()));
-
-            Assert.True(cache.TryGetValue(key, out var t));
-        }
-
-        [Fact]
-        public async Task Should_return_same_instance_for_parallel_requests()
-        {
-            A.CallTo(() => snapshotStore.ReadAsync(key))
-                .ReturnsLazily(() => Task.Delay(1).ContinueWith(x => ((object)1, 1L)));
-
-            var tasks = new List<Task<MyStatefulObject>>();
-
-            for (var i = 0; i < 1000; i++)
-            {
-                tasks.Add(Task.Run(() => sut.GetSingleAsync<MyStatefulObject>(key)));
-            }
-
-            var retrievedStates = await Task.WhenAll(tasks);
-
-            foreach (var retrievedState in retrievedStates)
-            {
-                Assert.Same(retrievedStates[0], retrievedState);
-            }
-
-            A.CallTo(() => eventStore.QueryAsync(key, 0))
-                .MustHaveHappened(Repeated.Exactly.Once);
+            await Assert.ThrowsAsync<DomainObjectVersionException>(() => persistence.WriteEventsAsync(new[] { new MyEvent(), new MyEvent() }.Select(Envelope.Create)));
         }
 
         private void SetupEventStore(int count, int eventOffset = 0, int readPosition = 0)

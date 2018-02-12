@@ -9,6 +9,8 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Orleans;
+using Orleans.Core;
+using Orleans.Runtime;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.States;
@@ -32,12 +34,18 @@ namespace Squidex.Infrastructure.Commands
             get { return snapshot.Version + uncomittedEvents.Count; }
         }
 
-        protected T Snapshot
+        public T Snapshot
         {
             get { return snapshot; }
         }
 
         protected DomainObjectGrain(IStore<Guid> store)
+            : this(store, null, null)
+        {
+        }
+
+        protected DomainObjectGrain(IStore<Guid> store, IGrainIdentity identity, IGrainRuntime runtime)
+            : base(identity, runtime)
         {
             Guard.NotNull(store, nameof(store));
 
@@ -194,9 +202,11 @@ namespace Squidex.Infrastructure.Commands
             }
         }
 
-        public Task<J<object>> ExecuteAsync(J<IAggregateCommand> command)
+        public async Task<J<object>> ExecuteAsync(J<IAggregateCommand> command)
         {
-            return ExecuteAsync(command.Value).ContinueWith(x => x.Result.AsJ());
+            var result = await ExecuteAsync(command.Value);
+
+            return result.AsJ();
         }
 
         public abstract Task<object> ExecuteAsync(IAggregateCommand command);

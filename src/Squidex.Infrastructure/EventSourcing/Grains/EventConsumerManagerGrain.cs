@@ -14,7 +14,6 @@ using Orleans;
 using Orleans.Concurrency;
 using Orleans.Core;
 using Orleans.Runtime;
-using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.EventSourcing.Grains
 {
@@ -43,28 +42,18 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             DelayDeactivation(TimeSpan.FromDays(1));
 
             RegisterOrUpdateReminder("Default", TimeSpan.Zero, TimeSpan.FromMinutes(10));
-            RegisterTimer(x => WakeUpAsync(null), null, TimeSpan.Zero, TimeSpan.FromSeconds(10));
+            RegisterTimer(x => ActivateAsync(null), null, TimeSpan.Zero, TimeSpan.FromSeconds(10));
 
             return Task.FromResult(true);
         }
 
-        public Task ActivateAsync()
-        {
-            var tasks =
-                eventConsumers
-                    .Select(c => GrainFactory.GetGrain<IEventConsumerGrain>(c.Name))
-                    .Select(c => c.ActivateAsync());
-
-            return Task.WhenAll(tasks);
-        }
-
-        public Task WakeUpAsync(string streamName)
+        public Task ActivateAsync(string streamName)
         {
             var tasks =
                 eventConsumers
                     .Where(c => streamName == null || Regex.IsMatch(streamName, c.EventsFilter))
                     .Select(c => GrainFactory.GetGrain<IEventConsumerGrain>(c.Name))
-                    .Select(c => c.WakeUpAsync());
+                    .Select(c => c.ActivateAsync());
 
             return Task.WhenAll(tasks);
         }
@@ -102,9 +91,14 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             return eventConsumer.StopAsync();
         }
 
+        public Task ActivateAsync()
+        {
+            return ActivateAsync(null);
+        }
+
         public Task ReceiveReminder(string reminderName, TickStatus status)
         {
-            return TaskHelper.Done;
+            return ActivateAsync(null);
         }
     }
 }

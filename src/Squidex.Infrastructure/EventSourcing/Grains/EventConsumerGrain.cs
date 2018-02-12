@@ -49,6 +49,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             IGrainIdentity identity,
             IGrainRuntime runtime,
             ISemanticLog log)
+            : base(identity, runtime)
         {
             Guard.NotNull(log, nameof(log));
             Guard.NotNull(store, nameof(store));
@@ -71,14 +72,9 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
             eventConsumer = eventConsumerFactory(this.GetPrimaryKeyString());
 
-            persistence = store.WithSnapshots<EventConsumerState, string>(GetType(), this.GetPrimaryKeyString(), s => state = s);
+            persistence = store.WithSnapshots<EventConsumerState, string>(GetType(), eventConsumer.Name, s => state = s);
 
             return persistence.ReadAsync();
-        }
-
-        protected virtual IEventSubscription CreateSubscription(IEventStore eventStore, string streamFilter, string position)
-        {
-            return new RetrySubscription(eventStore, new WrapperSubscription(this.AsReference<IEventConsumerGrain>(), scheduler), streamFilter, position);
         }
 
         public Task<Immutable<EventConsumerInfo>> GetStateAsync()
@@ -119,13 +115,6 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
                 state = state.Failed(exception.Value);
             });
-        }
-
-        public Task WakeUpAsync()
-        {
-            currentSubscription?.WakeUp();
-
-            return TaskHelper.Done;
         }
 
         public Task ActivateAsync()
@@ -276,6 +265,10 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
                 currentSubscription?.StopAsync().Forget();
                 currentSubscription = CreateSubscription(eventStore, eventConsumer.EventsFilter, position);
             }
+            else
+            {
+                currentSubscription.WakeUp();
+            }
         }
 
         private Envelope<IEvent> ParseKnownEvent(StoredEvent message)
@@ -295,6 +288,21 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
                 return null;
             }
+        }
+
+        protected virtual IEventConsumerGrain GetSelf()
+        {
+            return this.AsReference<IEventConsumerGrain>();
+        }
+
+        protected virtual IEventSubscription CreateSubscription(IEventStore eventStore, IEventSubscriber subscriber, string streamFilter, string position)
+        {
+            return new RetrySubscription(eventStore, subscriber, streamFilter, position);
+        }
+
+        private IEventSubscription CreateSubscription(IEventStore eventStore, string streamFilter, string position)
+        {
+            return CreateSubscription(eventStore, new WrapperSubscription(GetSelf(), scheduler), streamFilter, position);
         }
     }
 }

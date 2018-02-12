@@ -28,7 +28,6 @@ using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.EventSourcing.Grains;
 using Squidex.Infrastructure.Orleans;
-using Squidex.Infrastructure.States;
 using Squidex.Pipeline;
 
 namespace Squidex.Config.Domain
@@ -37,10 +36,6 @@ namespace Squidex.Config.Domain
     {
         public static void AddMyReadServices(this IServiceCollection services, IConfiguration config)
         {
-            services.AddSingletonAs<StateFactory>()
-                .As<IStateFactory>()
-                .As<IInitializable>();
-
             services.AddSingletonAs<OrleansEventNotifier>()
                 .As<IEventNotifier>()
                 .As<IInitializable>();

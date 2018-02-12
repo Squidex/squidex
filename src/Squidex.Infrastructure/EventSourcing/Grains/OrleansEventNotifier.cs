@@ -29,7 +29,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
         public void NotifyEventsStored(string streamName)
         {
-            eventConsumerManagerGrain?.WakeUpAsync(streamName);
+            eventConsumerManagerGrain?.ActivateAsync(streamName);
         }
 
         public IDisposable Subscribe(Action<string> handler)

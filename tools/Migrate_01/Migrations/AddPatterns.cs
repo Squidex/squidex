@@ -12,7 +12,6 @@ using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Repositories;
 using Squidex.Infrastructure.Migrations;
-using Squidex.Infrastructure.States;
 
 namespace Migrate_01.Migrations
 {

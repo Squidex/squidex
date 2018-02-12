@@ -9,6 +9,7 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Squidex.Domain.Apps.Entities;
+using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 
@@ -32,17 +33,31 @@ namespace Squidex.Pipeline.CommandMiddlewares
 
             if (context.Command is IAppCommand appCommand && appCommand.AppId == null)
             {
-                var appFeature = httpContextAccessor.HttpContext.Features.Get<IAppFeature>();
+                var appId = GetAppId();
 
-                if (appFeature == null)
-                {
-                    throw new InvalidOperationException("Cannot resolve app.");
-                }
+                appCommand.AppId = appId;
+            }
 
-                appCommand.AppId = new NamedId<Guid>(appFeature.App.Id, appFeature.App.Name);
+            if (context.Command is AppCommand appSelfCommand && appSelfCommand.AppId == Guid.Empty)
+            {
+                var appId = GetAppId();
+
+                appSelfCommand.AppId = appId.Id;
             }
 
             return next();
+        }
+
+        private NamedId<Guid> GetAppId()
+        {
+            var appFeature = httpContextAccessor.HttpContext.Features.Get<IAppFeature>();
+
+            if (appFeature?.App == null)
+            {
+                throw new InvalidOperationException("Cannot resolve app.");
+            }
+
+            return new NamedId<Guid>(appFeature.App.Id, appFeature.App.Name);
         }
     }
 }

@@ -24,9 +24,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
 {
     public sealed class ContentOperationContext
     {
-        private ContentDomainObject content;
         private ContentCommand command;
         private IContentRepository contentRepository;
+        private IContentEntity content;
         private IAssetRepository assetRepository;
         private IScriptEngine scriptEngine;
         private ISchemaEntity schemaEntity;
@@ -34,16 +34,16 @@ namespace Squidex.Domain.Apps.Entities.Contents
         private Func<string> message;
 
         public static async Task<ContentOperationContext> CreateAsync(
-            IContentRepository contentRepository,
-            ContentDomainObject content,
             ContentCommand command,
+            IContentEntity content,
+            IContentRepository contentRepository,
             IAppProvider appProvider,
             IAssetRepository assetRepository,
             IScriptEngine scriptEngine,
             Func<string> message)
         {
-            var a = content.Snapshot.AppId;
-            var s = content.Snapshot.SchemaId;
+            var a = content.AppId;
+            var s = content.SchemaId;
 
             if (command is CreateContent createContent)
             {
@@ -88,11 +88,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     new ValidationContext(
                         (contentIds, schemaId) =>
                         {
-                            return QueryContentsAsync(content.Snapshot.AppId.Id, schemaId, contentIds);
+                            return QueryContentsAsync(content.AppId.Id, schemaId, contentIds);
                         },
                         assetIds =>
                         {
-                            return QueryAssetsAsync(content.Snapshot.AppId.Id, assetIds);
+                            return QueryAssetsAsync(content.AppId.Id, assetIds);
                         });
 
                 if (partial)
@@ -125,7 +125,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             if (command is ContentDataCommand dataCommand)
             {
-                var ctx = new ScriptContext { ContentId = content.Snapshot.Id, OldData = content.Snapshot.Data, User = command.User, Operation = operation.ToString(), Data = dataCommand.Data };
+                var ctx = new ScriptContext { ContentId = content.Id, OldData = content.Data, User = command.User, Operation = operation.ToString(), Data = dataCommand.Data };
 
                 dataCommand.Data = scriptEngine.ExecuteAndTransform(ctx, script(schemaEntity));
             }
@@ -135,7 +135,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public Task ExecuteScriptAsync(Func<ISchemaEntity, string> script, object operation)
         {
-            var ctx = new ScriptContext { ContentId = content.Snapshot.Id, OldData = content.Snapshot.Data, User = command.User, Operation = operation.ToString() };
+            var ctx = new ScriptContext { ContentId = content.Id, OldData = content.Data, User = command.User, Operation = operation.ToString() };
 
             scriptEngine.Execute(ctx, script(schemaEntity));
 

@@ -18,6 +18,7 @@ using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Templates;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Contents;
+using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.Schemas;
@@ -56,10 +57,10 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<AssetCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
-            services.AddSingletonAs<ContentCommandMiddleware>()
+            services.AddSingletonAs<GrainCommandMiddleware<AppCommand, IAppGrain>>()
                 .As<ICommandMiddleware>();
 
-            services.AddSingletonAs<GrainCommandMiddleware<AppCommand, IAppGrain>>()
+            services.AddSingletonAs<GrainCommandMiddleware<ContentCommand, IContentGrain>>()
                 .As<ICommandMiddleware>();
 
             services.AddSingletonAs<GrainCommandMiddleware<SchemaCommand, ISchemaGrain>>()
@@ -95,7 +96,7 @@ namespace Squidex.Config.Domain
             services.AddTransientAs<AppGrain>()
                 .AsSelf();
 
-            services.AddTransientAs<ContentDomainObject>()
+            services.AddTransientAs<ContentGrain>()
                 .AsSelf();
 
             services.AddSingleton(c =>

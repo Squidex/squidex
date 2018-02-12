@@ -14,7 +14,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 {
     public interface IEventConsumerManagerGrain : IBackgroundGrain
     {
-        Task WakeUpAsync(string streamName);
+        Task ActivateAsync(string streamName);
 
         Task StopAsync(string consumerName);
 

@@ -17,7 +17,6 @@ using Squidex.Domain.Apps.Entities.Rules.Repositories;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Repositories;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities
 {
