@@ -44,6 +44,9 @@ namespace Squidex.Config.Domain
                     .As<IRunnable>();
                 services.AddSingletonAs<ContentScheduler>()
                     .As<IRunnable>();
+
+                services.AddSingletonAs<EventConsumerBootstrap>()
+                    .As<IRunnable>();
             }
 
             var exposeSourceUrl = config.GetOptionalValue("assetStore:exposeSourceUrl", true);
@@ -55,8 +58,7 @@ namespace Squidex.Config.Domain
                 .As<IGraphQLUrlGenerator>();
 
             services.AddSingletonAs<StateFactory>()
-                .As<IInitializable>()
-                .As<IStateFactory>();
+                .As<IStateFactory>().As<IInitializable>();
 
             services.AddSingletonAs(c => c.GetService<IOptions<MyUsageOptions>>()?.Value?.Plans.OrEmpty());
 
@@ -112,7 +114,7 @@ namespace Squidex.Config.Domain
                 .As<IRuleActionHandler>();
 
             services.AddSingletonAs<OrleansEventNotifier>()
-                .As<IEventNotifier>();
+                .As<IEventNotifier>().As<IInitializable>();
 
             services.AddSingletonAs<RuleEnqueuer>()
                 .As<IEventConsumer>();

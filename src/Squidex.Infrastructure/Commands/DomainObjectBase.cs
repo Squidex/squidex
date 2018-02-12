@@ -34,7 +34,7 @@ namespace Squidex.Infrastructure.Commands
         {
             id = key;
 
-            persistence = store.WithSnapshotsAndEventSourcing<T, Guid>(key, ApplySnapshot, ApplyEvent);
+            persistence = store.WithSnapshotsAndEventSourcing<T, Guid>(GetType(), key, ApplySnapshot, ApplyEvent);
 
             return persistence.ReadAsync();
         }

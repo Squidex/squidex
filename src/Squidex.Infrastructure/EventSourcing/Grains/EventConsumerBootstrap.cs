@@ -7,10 +7,11 @@
 
 using Orleans;
 using Orleans.Runtime;
+using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.EventSourcing.Grains
 {
-    public sealed class EventConsumerBootstrap : ILifecycleParticipant<ISiloLifecycle>
+    public sealed class EventConsumerBootstrap : IRunnable
     {
         private readonly IGrainFactory grainFactory;
 
@@ -21,14 +22,11 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             this.grainFactory = grainFactory;
         }
 
-        public void Participate(ISiloLifecycle lifecycle)
+        public void Run()
         {
-            lifecycle.Subscribe(SiloLifecycleStage.SiloActive, ct =>
-            {
-                var grain = grainFactory.GetGrain<IEventConsumerManagerGrain>("Default");
+            var grain = grainFactory.GetGrain<IEventConsumerManagerGrain>("Default");
 
-                return grain.ActivateAsync();
-            });
+            grain.ActivateAsync().Forget();
         }
     }
 }

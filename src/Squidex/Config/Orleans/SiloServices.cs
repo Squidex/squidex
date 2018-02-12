@@ -13,6 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Orleans;
 using Orleans.Runtime;
 using Orleans.Runtime.Configuration;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing.Grains;
 
 namespace Squidex.Config.Orleans
@@ -21,10 +22,6 @@ namespace Squidex.Config.Orleans
     {
         public static void AddAppSiloServices(this IServiceCollection services, IConfiguration config)
         {
-            services.AddSingletonAs<EventConsumerBootstrap>()
-                .As<ILifecycleParticipant<ISiloLifecycle>>();
-
-            /*
             var clusterConfiguration =
                 services.Where(x => x.ServiceType == typeof(ClusterConfiguration))
                     .Select(x => x.ImplementationInstance)
@@ -33,8 +30,6 @@ namespace Squidex.Config.Orleans
 
             if (clusterConfiguration != null)
             {
-                clusterConfiguration.Globals.RegisterBootstrapProvider<EventConsumerBootstrap>("EventConsumers");
-
                 var ipConfig = config.GetRequiredValue("orleans:hostNameOrIPAddress");
 
                 if (ipConfig.Equals("Host", StringComparison.OrdinalIgnoreCase))
@@ -51,7 +46,30 @@ namespace Squidex.Config.Orleans
                 clusterConfiguration.Defaults.PropagateActivityId = true;
                 clusterConfiguration.Defaults.ProxyGatewayEndpoint = new IPEndPoint(IPAddress.Any, 40000);
                 clusterConfiguration.Defaults.HostNameOrIPAddress = ipConfig;
-            }*/
+            }
+
+            config.ConfigureByOption("store:type", new Options
+            {
+                ["MongoDB"] = () =>
+                {
+                    var mongoConfiguration = config.GetRequiredValue("store:mongoDb:configuration");
+                    var mongoDatabaseName = config.GetRequiredValue("store:mongoDb:database");
+
+                    services.AddMongoDBMembershipTable(c =>
+                    {
+                        c.ConnectionString = mongoConfiguration;
+                        c.CollectionPrefix = "Orleans_";
+                        c.DatabaseName = mongoDatabaseName;
+                    });
+
+                    services.AddMongoDBReminders(c =>
+                    {
+                        c.ConnectionString = mongoConfiguration;
+                        c.CollectionPrefix = "Orleans_";
+                        c.DatabaseName = mongoDatabaseName;
+                    });
+                }
+            });
         }
     }
 }

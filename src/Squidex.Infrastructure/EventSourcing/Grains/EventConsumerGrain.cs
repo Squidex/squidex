@@ -21,11 +21,12 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
     public class EventConsumerGrain : Grain, IEventConsumerGrain
     {
         private readonly EventConsumerFactory eventConsumerFactory;
+        private readonly IStore<string> store;
         private readonly IEventDataFormatter eventDataFormatter;
         private readonly IEventStore eventStore;
         private readonly ISemanticLog log;
-        private readonly IPersistence<EventConsumerState> persistence;
         private TaskScheduler scheduler;
+        private IPersistence<EventConsumerState> persistence;
         private IEventSubscription currentSubscription;
         private IEventConsumer eventConsumer;
         private EventConsumerState state = new EventConsumerState();
@@ -61,7 +62,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             this.eventDataFormatter = eventDataFormatter;
             this.eventConsumerFactory = eventConsumerFactory;
 
-            persistence = store.WithSnapshots<EventConsumerState, string>(this.GetPrimaryKeyString(), s => state = s);
+            this.store = store;
         }
 
         public override Task OnActivateAsync()
@@ -69,6 +70,8 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             scheduler = TaskScheduler.Current;
 
             eventConsumer = eventConsumerFactory(this.GetPrimaryKeyString());
+
+            persistence = store.WithSnapshots<EventConsumerGrain, EventConsumerState, string>(this.GetPrimaryKeyString(), s => state = s);
 
             return persistence.ReadAsync();
         }

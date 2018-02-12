@@ -32,18 +32,6 @@ namespace Squidex.Infrastructure.MongoDb
 
                     memberMap.SetSerializer((IBsonSerializer)bsonSerializer);
                 }
-                else if (memberMap.MemberType == typeof(JToken))
-                {
-                    memberMap.SetSerializer(JTokenSerializer<JToken>.Instance);
-                }
-                else if (memberMap.MemberType == typeof(JObject))
-                {
-                    memberMap.SetSerializer(JTokenSerializer<JObject>.Instance);
-                }
-                else if (memberMap.MemberType == typeof(JValue))
-                {
-                    memberMap.SetSerializer(JTokenSerializer<JValue>.Instance);
-                }
             });
 
             ConventionRegistry.Register("json", pack, t => true);

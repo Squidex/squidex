@@ -46,8 +46,8 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         {
             DelayDeactivation(TimeSpan.FromDays(1));
 
-            RegisterOrUpdateReminder("Default", TimeSpan.Zero, TimeSpan.FromMinutes(10));
-            RegisterTimer(x => ActivateAsync(), null, TimeSpan.Zero, TimeSpan.FromSeconds(10));
+            // RegisterOrUpdateReminder("Default", TimeSpan.Zero, TimeSpan.FromMinutes(10));
+            //  RegisterTimer(x => ActivateAsync(), null, TimeSpan.Zero, TimeSpan.FromSeconds(10));
 
             return Task.FromResult(true);
         }
