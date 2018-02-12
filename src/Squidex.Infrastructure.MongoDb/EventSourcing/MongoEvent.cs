@@ -26,7 +26,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public static MongoEvent FromEventData(EventData data)
         {
-            return new MongoEvent { Type = data.Type, Metadata = data.Metadata, Payload = data.ToString() };
+            return new MongoEvent { Type = data.Type, Metadata = data.Metadata, Payload = data.Payload.ToString() };
         }
 
         public EventData ToEventData()
