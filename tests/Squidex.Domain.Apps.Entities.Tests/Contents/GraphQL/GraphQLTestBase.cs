@@ -97,26 +97,35 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             data = data ??
                 new NamedContentData()
                     .AddField("my-string",
-                        new ContentFieldData().AddValue("de", "value"))
+                        new ContentFieldData()
+                            .AddValue("de", "value"))
                     .AddField("my-assets",
-                        new ContentFieldData().AddValue("iv", JToken.FromObject(new[] { assetId })))
+                        new ContentFieldData()
+                            .AddValue("iv", JToken.FromObject(new[] { assetId })))
                     .AddField("my-number",
-                        new ContentFieldData().AddValue("iv", 1))
+                        new ContentFieldData()
+                            .AddValue("iv", 1))
                     .AddField("my-boolean",
-                        new ContentFieldData().AddValue("iv", true))
+                        new ContentFieldData()
+                            .AddValue("iv", true))
                     .AddField("my-datetime",
-                        new ContentFieldData().AddValue("iv", now.ToDateTimeUtc()))
+                        new ContentFieldData()
+                            .AddValue("iv", now.ToDateTimeUtc()))
                     .AddField("my-tags",
-                        new ContentFieldData().AddValue("iv", JToken.FromObject(new[] { "tag1", "tag2" })))
+                        new ContentFieldData()
+                            .AddValue("iv", JToken.FromObject(new[] { "tag1", "tag2" })))
                     .AddField("my-references",
-                        new ContentFieldData().AddValue("iv", JToken.FromObject(new[] { refId })))
+                        new ContentFieldData()
+                            .AddValue("iv", JToken.FromObject(new[] { refId })))
                     .AddField("my-geolocation",
-                        new ContentFieldData().AddValue("iv", JToken.FromObject(new { latitude = 10, longitude = 20 })));
+                        new ContentFieldData()
+                            .AddValue("iv", JToken.FromObject(new { latitude = 10, longitude = 20 })));
 
             if (!noJson)
             {
                 data.AddField("my-json",
-                    new ContentFieldData().AddValue("iv", JToken.FromObject(new { value = 1 })));
+                    new ContentFieldData()
+                        .AddValue("iv", JToken.FromObject(new { value = 1 })));
             }
 
             var content = new ContentEntity

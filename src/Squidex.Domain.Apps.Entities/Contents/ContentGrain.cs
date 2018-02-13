@@ -7,6 +7,8 @@
 
 using System;
 using System.Threading.Tasks;
+using Orleans.Core;
+using Orleans.Runtime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
@@ -24,7 +26,7 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Contents
 {
-    public sealed class ContentGrain : DomainObjectGrain<ContentState>, IContentGrain
+    public class ContentGrain : DomainObjectGrain<ContentState>, IContentGrain
     {
         private readonly IAppProvider appProvider;
         private readonly IAssetRepository assetRepository;
@@ -37,7 +39,19 @@ namespace Squidex.Domain.Apps.Entities.Contents
             IAssetRepository assetRepository,
             IScriptEngine scriptEngine,
             IContentRepository contentRepository)
-            : base(store)
+            : this(store, appProvider, assetRepository, scriptEngine, contentRepository, null, null)
+        {
+        }
+
+        protected ContentGrain(
+            IStore<Guid> store,
+            IAppProvider appProvider,
+            IAssetRepository assetRepository,
+            IScriptEngine scriptEngine,
+            IContentRepository contentRepository,
+            IGrainIdentity identity,
+            IGrainRuntime runtime)
+            : base(store, identity, runtime)
         {
             Guard.NotNull(appProvider, nameof(appProvider));
             Guard.NotNull(scriptEngine, nameof(scriptEngine));
@@ -74,7 +88,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                         Create(c);
 
-                        return EntityCreatedResult.Create(c.Data, Version);
+                        return EntityCreatedResult.Create(c.Data, NewVersion);
                     });
 
                 case UpdateContent updateContent:
@@ -89,7 +103,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                         Update(c);
 
-                        return new ContentDataChangedResult(Snapshot.Data, Version);
+                        return new ContentDataChangedResult(Snapshot.Data, NewVersion);
                     });
 
                 case PatchContent patchContent:
@@ -104,7 +118,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                         Patch(c);
 
-                        return new ContentDataChangedResult(Snapshot.Data, Version);
+                        return new ContentDataChangedResult(Snapshot.Data, NewVersion);
                     });
 
                 case ChangeContentStatus patchContent:
