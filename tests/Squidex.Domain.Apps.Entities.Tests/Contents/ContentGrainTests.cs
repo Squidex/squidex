@@ -32,7 +32,7 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents
 {
-    public class ContentDomainObjectTests : HandlerTestBase<ContentGrain, ContentState>
+    public class ContentGrainTests : HandlerTestBase<ContentGrain, ContentState>
     {
         private readonly ISchemaEntity schema = A.Fake<ISchemaEntity>();
         private readonly IScriptEngine scriptEngine = A.Fake<IScriptEngine>();
@@ -91,7 +91,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             get { return contentId; }
         }
 
-        public ContentDomainObjectTests()
+        public ContentGrainTests()
         {
             var schemaDef =
                  new Schema("my-schema")
