@@ -1,4 +1,5 @@
 ![Squidex Logo](https://raw.githubusercontent.com/Squidex/squidex/master/media/logo-wide.png "Squidex")
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FSquidex%2Fsquidex.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2FSquidex%2Fsquidex?ref=badge_shield)
 
 # What is Squidex??
 
@@ -40,3 +41,7 @@ Please create issues to report bugs, suggest new functionalities, ask questions 
 ## Cloud Version
 
 Although Squidex is free we are also working on a Saas version on [https://cloud.squidex.io](https://cloud.squidex.io) (More information coming soon). We have also have plans to sell a premium version with first class support and some exlusive features. But don't be afraid, our first priority is to deliver a state of the art, stable, fast and free content management hub to make the life for developers a little bit easier.
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FSquidex%2Fsquidex.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2FSquidex%2Fsquidex?ref=badge_large)
