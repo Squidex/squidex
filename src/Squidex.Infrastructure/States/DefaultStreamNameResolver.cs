@@ -11,15 +11,20 @@ namespace Squidex.Infrastructure.States
 {
     public sealed class DefaultStreamNameResolver : IStreamNameResolver
     {
-        private const string Suffix = "DomainObject";
+        private static readonly string[] Suffixes = new string[] { "DomainObject", "Grain" };
 
         public string GetStreamName(Type aggregateType, string id)
         {
             var typeName = char.ToLower(aggregateType.Name[0]) + aggregateType.Name.Substring(1);
 
-            if (typeName.EndsWith(Suffix, StringComparison.Ordinal))
+            foreach (var suffix in Suffixes)
             {
-                typeName = typeName.Substring(0, typeName.Length - Suffix.Length);
+                if (typeName.EndsWith(suffix, StringComparison.Ordinal))
+                {
+                    typeName = typeName.Substring(0, typeName.Length - suffix.Length);
+
+                    break;
+                }
             }
 
             return $"{typeName}-{id}";
