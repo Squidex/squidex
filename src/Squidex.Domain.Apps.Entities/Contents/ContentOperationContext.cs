@@ -31,6 +31,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         private IScriptEngine scriptEngine;
         private ISchemaEntity schemaEntity;
         private IAppEntity appEntity;
+        private Guid appId;
         private Func<string> message;
 
         public static async Task<ContentOperationContext> CreateAsync(
@@ -56,6 +57,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             var context = new ContentOperationContext
             {
                 appEntity = appEntity,
+                appId = a.Id,
                 assetRepository = assetRepository,
                 contentRepository = contentRepository,
                 content = content,
@@ -88,11 +90,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     new ValidationContext(
                         (contentIds, schemaId) =>
                         {
-                            return QueryContentsAsync(content.Snapshot.AppId.Id, schemaId, contentIds);
+                            return QueryContentsAsync(schemaId, contentIds);
                         },
                         assetIds =>
                         {
-                            return QueryAssetsAsync(content.Snapshot.AppId.Id, assetIds);
+                            return QueryAssetsAsync(assetIds);
                         });
 
                 if (partial)
@@ -111,12 +113,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
             }
         }
 
-        private async Task<IReadOnlyList<IAssetInfo>> QueryAssetsAsync(Guid appId, IEnumerable<Guid> assetIds)
+        private async Task<IReadOnlyList<IAssetInfo>> QueryAssetsAsync(IEnumerable<Guid> assetIds)
         {
             return await assetRepository.QueryAsync(appId, new HashSet<Guid>(assetIds));
         }
 
-        private async Task<IReadOnlyList<Guid>> QueryContentsAsync(Guid appId, Guid schemaId, IEnumerable<Guid> contentIds)
+        private async Task<IReadOnlyList<Guid>> QueryContentsAsync(Guid schemaId, IEnumerable<Guid> contentIds)
         {
             return await contentRepository.QueryNotFoundAsync(appId, schemaId, contentIds.ToList());
         }

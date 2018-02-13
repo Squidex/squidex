@@ -52,6 +52,8 @@ namespace Squidex.Infrastructure.Commands
 
             ApplyEvent(@event);
 
+            snapshot.Version++;
+
             uncomittedEvents.Add(@event);
         }
 
