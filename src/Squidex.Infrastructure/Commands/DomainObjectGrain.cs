@@ -14,6 +14,7 @@ using Orleans.Runtime;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.States;
+using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.Commands
 {
@@ -108,17 +109,17 @@ namespace Squidex.Infrastructure.Commands
 
         protected Task<object> CreateReturnAsync<TCommand>(TCommand command, Func<TCommand, object> handler) where TCommand : class, IAggregateCommand
         {
-            return InvokeAsync(command, x => Task.FromResult(handler(x)), false);
+            return InvokeAsync(command, handler?.ToAsync(), false);
         }
 
         protected Task<object> CreateAsync<TCommand>(TCommand command, Func<TCommand, Task> handler) where TCommand : class, IAggregateCommand
         {
-            return InvokeAsync(command, x => handler(x).ContinueWith<object>(t => null), false);
+            return InvokeAsync(command, handler.ToDefault<TCommand, object>(), false);
         }
 
         protected Task<object> CreateAsync<TCommand>(TCommand command, Action<TCommand> handler) where TCommand : class, IAggregateCommand
         {
-            return InvokeAsync(command, x => { handler(x); return Task.FromResult<object>(null); }, false);
+            return InvokeAsync(command, handler?.ToDefault<TCommand, object>()?.ToAsync(), false);
         }
 
         protected Task<object> UpdateReturnAsync<TCommand>(TCommand command, Func<TCommand, Task<object>> handler) where TCommand : class, IAggregateCommand
@@ -128,17 +129,17 @@ namespace Squidex.Infrastructure.Commands
 
         protected Task<object> UpdateReturnAsync<TCommand>(TCommand command, Func<TCommand, object> handler) where TCommand : class, IAggregateCommand
         {
-            return InvokeAsync(command, x => Task.FromResult(handler(x)), true);
+            return InvokeAsync(command, handler?.ToAsync(), true);
         }
 
         protected Task<object> UpdateAsync<TCommand>(TCommand command, Func<TCommand, Task> handler) where TCommand : class, IAggregateCommand
         {
-            return InvokeAsync(command, x => handler(x).ContinueWith<object>(t => null), true);
+            return InvokeAsync(command, handler?.ToDefault<TCommand, object>(), true);
         }
 
         protected Task<object> UpdateAsync<TCommand>(TCommand command, Action<TCommand> handler) where TCommand : class, IAggregateCommand
         {
-            return InvokeAsync(command, x => { handler(x); return Task.FromResult<object>(null); }, true);
+            return InvokeAsync(command, handler?.ToDefault<TCommand, object>()?.ToAsync(), true);
         }
 
         private async Task<object> InvokeAsync<TCommand>(TCommand command, Func<TCommand, Task<object>> handler, bool isUpdate) where TCommand : class, IAggregateCommand
