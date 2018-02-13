@@ -64,6 +64,13 @@ namespace Squidex.Domain.Apps.Entities.Contents
             this.contentRepository = contentRepository;
         }
 
+        public override Task OnActivateAsync()
+        {
+            DelayDeactivation(TimeSpan.FromMinutes(10));
+
+            return base.OnActivateAsync();
+        }
+
         public override Task<object> ExecuteAsync(IAggregateCommand command)
         {
             VerifyNotDeleted();
