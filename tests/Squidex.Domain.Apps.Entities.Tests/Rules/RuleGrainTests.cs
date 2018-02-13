@@ -65,7 +65,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
             var result = await sut.ExecuteAsync(J(CreateRuleCommand(command)));
 
-            result.ShouldBeEquaivalent(EntityCreatedResult.Create(Id, 0));
+            result.ShouldBeEquivalent(EntityCreatedResult.Create(Id, 0));
 
             Assert.Equal(AppId, sut.Snapshot.AppId.Id);
 
@@ -87,7 +87,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
             var result = await sut.ExecuteAsync(J(CreateRuleCommand(command)));
 
-            result.ShouldBeEquaivalent(new EntitySavedResult(1));
+            result.ShouldBeEquivalent(new EntitySavedResult(1));
 
             Assert.Same(command.Trigger, sut.Snapshot.RuleDef.Trigger);
             Assert.Same(command.Action, sut.Snapshot.RuleDef.Action);
@@ -115,7 +115,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
             var result = await sut.ExecuteAsync(J(CreateRuleCommand(command)));
 
-            result.ShouldBeEquaivalent(new EntitySavedResult(2));
+            result.ShouldBeEquivalent(new EntitySavedResult(2));
 
             Assert.True(sut.Snapshot.RuleDef.IsEnabled);
 
@@ -134,7 +134,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
             var result = await sut.ExecuteAsync(J(CreateRuleCommand(command)));
 
-            result.ShouldBeEquaivalent(new EntitySavedResult(1));
+            result.ShouldBeEquivalent(new EntitySavedResult(1));
 
             Assert.False(sut.Snapshot.RuleDef.IsEnabled);
 
@@ -153,7 +153,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
             var result = await sut.ExecuteAsync(J(CreateRuleCommand(command)));
 
-            result.ShouldBeEquaivalent(new EntitySavedResult(1));
+            result.ShouldBeEquivalent(new EntitySavedResult(1));
 
             Assert.True(sut.Snapshot.IsDeleted);
 

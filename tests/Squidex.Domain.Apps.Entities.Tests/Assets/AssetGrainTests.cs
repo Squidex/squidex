@@ -8,7 +8,6 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using FakeItEasy;
 using Orleans.Core;
 using Orleans.Runtime;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
@@ -65,7 +64,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             var result = await sut.ExecuteAsync(J(CreateAssetCommand(command)));
 
-            result.ShouldBeEquaivalent(new AssetSavedResult(0, 0));
+            result.ShouldBeEquivalent(new AssetSavedResult(0, 0));
 
             Assert.Equal(0, sut.Snapshot.FileVersion);
 
@@ -93,7 +92,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             var result = await sut.ExecuteAsync(J(CreateAssetCommand(command)));
 
-            result.ShouldBeEquaivalent(new AssetSavedResult(1, 1));
+            result.ShouldBeEquivalent(new AssetSavedResult(1, 1));
 
             Assert.Equal(1, sut.Snapshot.FileVersion);
 
@@ -120,7 +119,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             var result = await sut.ExecuteAsync(J(CreateAssetCommand(command)));
 
-            result.ShouldBeEquaivalent(new EntitySavedResult(1));
+            result.ShouldBeEquivalent(new EntitySavedResult(1));
 
             Assert.Equal("my-new-image.png", sut.Snapshot.FileName);
 
@@ -140,7 +139,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             var result = await sut.ExecuteAsync(J(CreateAssetCommand(command)));
 
-            result.ShouldBeEquaivalent(new EntitySavedResult(2));
+            result.ShouldBeEquivalent(new EntitySavedResult(2));
 
             Assert.True(sut.Snapshot.IsDeleted);
 

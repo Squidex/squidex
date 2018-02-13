@@ -8,6 +8,8 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Orleans.Core;
+using Orleans.Runtime;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Guards;
@@ -25,7 +27,7 @@ using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Apps
 {
-    public sealed class AppGrain : DomainObjectGrain<AppState>, IAppGrain
+    public class AppGrain : DomainObjectGrain<AppState>, IAppGrain
     {
         private readonly InitialPatterns initialPatterns;
         private readonly IAppProvider appProvider;
@@ -34,13 +36,26 @@ namespace Squidex.Domain.Apps.Entities.Apps
         private readonly IUserResolver userResolver;
 
         public AppGrain(
+            InitialPatterns initialPatterns,
+            IStore<Guid> store,
+            IAppProvider appProvider,
+            IAppPlansProvider appPlansProvider,
+            IAppPlanBillingManager appPlansBillingManager,
+            IUserResolver userResolver)
+            : this(initialPatterns, store, appProvider, appPlansProvider, appPlansBillingManager, userResolver, null, null)
+        {
+        }
+
+        protected AppGrain(
+            InitialPatterns initialPatterns,
             IStore<Guid> store,
             IAppProvider appProvider,
             IAppPlansProvider appPlansProvider,
             IAppPlanBillingManager appPlansBillingManager,
             IUserResolver userResolver,
-            InitialPatterns initialPatterns)
-            : base(store)
+            IGrainIdentity identity,
+            IGrainRuntime runtime)
+            : base(store, identity, runtime)
         {
             Guard.NotNull(initialPatterns, nameof(initialPatterns));
             Guard.NotNull(appProvider, nameof(appProvider));
