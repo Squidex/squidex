@@ -36,28 +36,42 @@ namespace Squidex.Pipeline.CommandMiddlewares
 
             if (context.Command is ISchemaCommand schemaCommand && schemaCommand.SchemaId == null)
             {
-                NamedId<Guid> appId = null;
+                var schemaId = await GetSchemaIdAsync(context);
 
-                if (context.Command is IAppCommand appCommand)
+                schemaCommand.SchemaId = schemaId;
+            }
+
+            if (context.Command is SchemaCommand schemaSelfCommand && schemaSelfCommand.SchemaId == Guid.Empty)
+            {
+                var schemaId = await GetSchemaIdAsync(context);
+
+                schemaSelfCommand.SchemaId = schemaId?.Id ?? Guid.Empty;
+            }
+
+            await next();
+        }
+
+        private async Task<NamedId<Guid>> GetSchemaIdAsync(CommandContext context)
+        {
+            NamedId<Guid> appId = null;
+
+            if (context.Command is IAppCommand appCommand)
+            {
+                appId = appCommand.AppId;
+            }
+
+            if (appId == null)
+            {
+                var appFeature = actionContextAccessor.ActionContext.HttpContext.Features.Get<IAppFeature>();
+
+                if (appFeature != null && appFeature.App != null)
                 {
-                    appId = appCommand.AppId;
+                    appId = new NamedId<Guid>(appFeature.App.Id, appFeature.App.Name);
                 }
+            }
 
-                if (appId == null)
-                {
-                    var appFeature = actionContextAccessor.ActionContext.HttpContext.Features.Get<IAppFeature>();
-
-                    if (appFeature != null && appFeature.App != null)
-                    {
-                        appId = new NamedId<Guid>(appFeature.App.Id, appFeature.App.Name);
-                    }
-                }
-
-                if (appId == null)
-                {
-                    return;
-                }
-
+            if (appId != null)
+            {
                 var routeValues = actionContextAccessor.ActionContext.RouteData.Values;
 
                 if (routeValues.ContainsKey("name"))
@@ -77,14 +91,14 @@ namespace Squidex.Pipeline.CommandMiddlewares
 
                     if (schema == null)
                     {
-                        throw new DomainObjectNotFoundException(schemaName, typeof(SchemaDomainObject));
+                        throw new DomainObjectNotFoundException(schemaName, typeof(ISchemaEntity));
                     }
 
-                    schemaCommand.SchemaId = new NamedId<Guid>(schema.Id, schema.Name);
+                    return new NamedId<Guid>(schema.Id, schema.Name);
                 }
             }
 
-            await next();
+            return null;
         }
     }
 }
