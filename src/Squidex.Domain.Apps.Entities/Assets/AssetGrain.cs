@@ -7,6 +7,8 @@
 
 using System;
 using System.Threading.Tasks;
+using Orleans.Core;
+using Orleans.Runtime;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.Assets.Guards;
 using Squidex.Domain.Apps.Entities.Assets.State;
@@ -20,10 +22,15 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public sealed class AssetGrain : DomainObjectGrain<AssetState>, IAssetGrain
+    public class AssetGrain : DomainObjectGrain<AssetState>, IAssetGrain
     {
         public AssetGrain(IStore<Guid> store)
-            : base(store)
+            : this(store, null, null)
+        {
+        }
+
+        protected AssetGrain(IStore<Guid> store, IGrainIdentity identity, IGrainRuntime runtime)
+            : base(store, identity, runtime)
         {
         }
 

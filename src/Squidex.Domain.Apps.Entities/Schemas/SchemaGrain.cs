@@ -9,6 +9,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Orleans.Core;
+using Orleans.Runtime;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Domain.Apps.Entities.Schemas.Guards;
@@ -24,13 +26,18 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Schemas
 {
-    public sealed class SchemaGrain : DomainObjectGrain<SchemaState>, ISchemaGrain
+    public class SchemaGrain : DomainObjectGrain<SchemaState>, ISchemaGrain
     {
         private readonly IAppProvider appProvider;
         private readonly FieldRegistry registry;
 
         public SchemaGrain(IStore<Guid> store, IAppProvider appProvider, FieldRegistry registry)
-            : base(store)
+            : this(store, appProvider, registry, null, null)
+        {
+        }
+
+        protected SchemaGrain(IStore<Guid> store, IAppProvider appProvider, FieldRegistry registry, IGrainIdentity identity, IGrainRuntime runtime)
+            : base(store, identity, runtime)
         {
             Guard.NotNull(appProvider, nameof(appProvider));
             Guard.NotNull(registry, nameof(registry));
@@ -61,7 +68,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
                         Add(c);
 
-                        return EntityCreatedResult.Create(Snapshot.SchemaDef.FieldsById.Values.First(x => x.Name == addField.Name).Id, Version);
+                        return EntityCreatedResult.Create(Snapshot.SchemaDef.FieldsById.Values.First(x => x.Name == addField.Name).Id, NewVersion);
                     });
 
                 case DeleteField deleteField:

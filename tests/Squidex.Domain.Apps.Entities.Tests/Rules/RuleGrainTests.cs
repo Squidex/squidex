@@ -24,7 +24,7 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Rules
 {
-    public class RuleDomainObjectTests : HandlerTestBase<RuleGrain, RuleState>
+    public class RuleGrainTests : HandlerTestBase<RuleGrain, RuleState>
     {
         private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
         private readonly Guid ruleId = Guid.NewGuid();
@@ -43,7 +43,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
             get { return ruleId; }
         }
 
-        public RuleDomainObjectTests()
+        public RuleGrainTests()
         {
             sut = new MyRuleGrain(Store, appProvider, Identity, Runtime);
             sut.OnActivateAsync().Wait();
@@ -52,23 +52,20 @@ namespace Squidex.Domain.Apps.Entities.Rules
         [Fact]
         public async Task Command_should_throw_exception_if_rule_is_deleted()
         {
-            await CreateAsync();
-            await DeleteAsync();
+            await ExecuteCreateAsync();
+            await ExecuteDeleteAsync();
 
-            await Assert.ThrowsAsync<DomainException>(() =>
-            {
-                return sut.ExecuteAsync(J(CreateRuleCommand(MakeUpdateCommand())));
-            });
+            await Assert.ThrowsAsync<DomainException>(ExecuteDisableAsync);
         }
 
         [Fact]
-        public async Task Create_should_create_events()
+        public async Task Create_should_create_events_and_update_state()
         {
             var command = MakeCreateCommand();
 
             var result = await sut.ExecuteAsync(J(CreateRuleCommand(command)));
 
-            Assert.True(result.Value is EntityCreatedResult<Guid>);
+            result.ShouldBeEquaivalent(EntityCreatedResult.Create(Id, 0));
 
             Assert.Equal(AppId, sut.Snapshot.AppId.Id);
 
@@ -82,25 +79,15 @@ namespace Squidex.Domain.Apps.Entities.Rules
         }
 
         [Fact]
-        public async Task Update_should_handle_command()
-        {
-            await sut.ExecuteAsync(J(CreateRuleCommand(MakeCreateCommand())));
-
-            var result = await sut.ExecuteAsync(J(CreateRuleCommand(MakeUpdateCommand())));
-
-            Assert.True(result.Value is EntitySavedResult);
-        }
-
-        [Fact]
-        public async Task Update_should_create_events()
+        public async Task Update_should_create_events_and_update_state()
         {
             var command = MakeUpdateCommand();
 
-            await CreateAsync();
+            await ExecuteCreateAsync();
 
             var result = await sut.ExecuteAsync(J(CreateRuleCommand(command)));
 
-            Assert.True(result.Value is EntitySavedResult);
+            result.ShouldBeEquaivalent(new EntitySavedResult(1));
 
             Assert.Same(command.Trigger, sut.Snapshot.RuleDef.Trigger);
             Assert.Same(command.Action, sut.Snapshot.RuleDef.Action);
@@ -119,14 +106,16 @@ namespace Squidex.Domain.Apps.Entities.Rules
         }
 
         [Fact]
-        public async Task Enable_should_create_events()
+        public async Task Enable_should_create_events_and_update_state()
         {
-            await CreateAsync();
-            await sut.ExecuteAsync(J(CreateRuleCommand(new DisableRule())));
+            var command = new EnableRule();
 
-            var result = await sut.ExecuteAsync(J(CreateRuleCommand(new EnableRule())));
+            await ExecuteCreateAsync();
+            await ExecuteDisableAsync();
 
-            Assert.True(result.Value is EntitySavedResult);
+            var result = await sut.ExecuteAsync(J(CreateRuleCommand(command)));
+
+            result.ShouldBeEquaivalent(new EntitySavedResult(2));
 
             Assert.True(sut.Snapshot.RuleDef.IsEnabled);
 
@@ -137,13 +126,15 @@ namespace Squidex.Domain.Apps.Entities.Rules
         }
 
         [Fact]
-        public async Task Disable_should_create_events()
+        public async Task Disable_should_create_events_and_update_state()
         {
-            await CreateAsync();
+            var command = new DisableRule();
 
-            var result = await sut.ExecuteAsync(J(CreateRuleCommand(new DisableRule())));
+            await ExecuteCreateAsync();
 
-            Assert.True(result.Value is EntitySavedResult);
+            var result = await sut.ExecuteAsync(J(CreateRuleCommand(command)));
+
+            result.ShouldBeEquaivalent(new EntitySavedResult(1));
 
             Assert.False(sut.Snapshot.RuleDef.IsEnabled);
 
@@ -156,11 +147,13 @@ namespace Squidex.Domain.Apps.Entities.Rules
         [Fact]
         public async Task Delete_should_update_create_events()
         {
-            await CreateAsync();
+            var command = new DeleteRule();
 
-            var result = await sut.ExecuteAsync(J(CreateRuleCommand(new DeleteRule())));
+            await ExecuteCreateAsync();
 
-            Assert.True(result.Value is EntitySavedResult);
+            var result = await sut.ExecuteAsync(J(CreateRuleCommand(command)));
+
+            result.ShouldBeEquaivalent(new EntitySavedResult(1));
 
             Assert.True(sut.Snapshot.IsDeleted);
 
@@ -170,12 +163,17 @@ namespace Squidex.Domain.Apps.Entities.Rules
                 );
         }
 
-        private Task CreateAsync()
+        private Task ExecuteCreateAsync()
         {
             return sut.ExecuteAsync(J(CreateRuleCommand(MakeCreateCommand())));
         }
 
-        private Task DeleteAsync()
+        private Task ExecuteDisableAsync()
+        {
+            return sut.ExecuteAsync(J(CreateRuleCommand(new DisableRule())));
+        }
+
+        private Task ExecuteDeleteAsync()
         {
             return sut.ExecuteAsync(J(CreateRuleCommand(new DeleteRule())));
         }

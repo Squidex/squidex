@@ -1,145 +1,133 @@
-﻿//// ==========================================================================
-////  Squidex Headless CMS
-//// ==========================================================================
-////  Copyright (c) Squidex UG (haftungsbeschränkt)
-////  All rights reserved. Licensed under the MIT license.
-//// ==========================================================================
+﻿// ==========================================================================
+//  Squidex Headless CMS
+// ==========================================================================
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  All rights reserved. Licensed under the MIT license.
+// ==========================================================================
 
-//using System;
-//using System.IO;
-//using System.Threading.Tasks;
-//using FakeItEasy;
-//using Squidex.Domain.Apps.Entities.Assets.Commands;
-//using Squidex.Domain.Apps.Entities.TestHelpers;
-//using Squidex.Infrastructure.Assets;
-//using Squidex.Infrastructure.Commands;
-//using Squidex.Infrastructure.Tasks;
-//using Xunit;
+using System;
+using System.IO;
+using System.Threading.Tasks;
+using FakeItEasy;
+using Orleans;
+using Orleans.Core;
+using Orleans.Runtime;
+using Squidex.Domain.Apps.Entities.Assets.Commands;
+using Squidex.Domain.Apps.Entities.Assets.State;
+using Squidex.Domain.Apps.Entities.TestHelpers;
+using Squidex.Infrastructure.Assets;
+using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.States;
+using Squidex.Infrastructure.Tasks;
+using Xunit;
 
-//namespace Squidex.Domain.Apps.Entities.Assets
-//{
-//    public class AssetCommandMiddlewareTests : HandlerTestBase<AssetDomainObject>
-//    {
-//        private readonly IAssetThumbnailGenerator assetThumbnailGenerator = A.Fake<IAssetThumbnailGenerator>();
-//        private readonly IAssetStore assetStore = A.Fake<IAssetStore>();
-//        private readonly Guid assetId = Guid.NewGuid();
-//        private readonly Stream stream = new MemoryStream();
-//        private readonly ImageInfo image = new ImageInfo(2048, 2048);
-//        private readonly AssetDomainObject asset = new AssetDomainObject();
-//        private readonly AssetFile file;
-//        private readonly AssetCommandMiddleware sut;
+namespace Squidex.Domain.Apps.Entities.Assets
+{
+    public class AssetCommandMiddlewareTests : HandlerTestBase<AssetGrain, AssetState>
+    {
+        private readonly IAssetThumbnailGenerator assetThumbnailGenerator = A.Fake<IAssetThumbnailGenerator>();
+        private readonly IAssetStore assetStore = A.Fake<IAssetStore>();
+        private readonly IGrainFactory grainFactory = A.Fake<IGrainFactory>();
+        private readonly Guid assetId = Guid.NewGuid();
+        private readonly Stream stream = new MemoryStream();
+        private readonly ImageInfo image = new ImageInfo(2048, 2048);
+        private readonly AssetGrain asset;
+        private readonly AssetFile file;
+        private readonly AssetCommandMiddleware sut;
 
-//        protected override Guid Id
-//        {
-//            get { return assetId; }
-//        }
+        public class MyAssetGrain : AssetGrain
+        {
+            public MyAssetGrain(IStore<Guid> store, IGrainIdentity identity, IGrainRuntime runtime)
+                : base(store, identity, runtime)
+            {
+            }
+        }
 
-//        public AssetCommandMiddlewareTests()
-//        {
-//            file = new AssetFile("my-image.png", "image/png", 1024, () => stream);
+        protected override Guid Id
+        {
+            get { return assetId; }
+        }
 
-//            sut = new AssetCommandMiddleware(Handler, assetStore, assetThumbnailGenerator);
-//        }
+        public AssetCommandMiddlewareTests()
+        {
+            file = new AssetFile("my-image.png", "image/png", 1024, () => stream);
 
-//        [Fact]
-//        public async Task Create_should_create_domain_object()
-//        {
-//            var context = CreateContextForCommand(new CreateAsset { AssetId = assetId, File = file });
+            asset = new MyAssetGrain(Store, Identity, Runtime);
+            asset.OnActivateAsync();
 
-//            SetupStore(0, context.ContextId);
-//            SetupImageInfo();
+            A.CallTo(() => grainFactory.GetGrain<IAssetGrain>(Id, null))
+                .Returns(asset);
 
-//            await TestCreate(asset, async _ =>
-//            {
-//                await sut.HandleAsync(context);
-//            });
+            sut = new AssetCommandMiddleware(grainFactory, assetStore, assetThumbnailGenerator);
+        }
 
-//            Assert.Equal(assetId, context.Result<EntityCreatedResult<Guid>>().IdOrValue);
+        [Fact]
+        public async Task Create_should_create_domain_object()
+        {
+            var context = CreateContextForCommand(new CreateAsset { AssetId = assetId, File = file });
 
-//            AssertAssetHasBeenUploaded(0, context.ContextId);
-//            AssertAssetImageChecked();
-//        }
+            SetupStore(0, context.ContextId);
+            SetupImageInfo();
 
-//        [Fact]
-//        public async Task Update_should_update_domain_object()
-//        {
-//            var context = CreateContextForCommand(new UpdateAsset { AssetId = assetId, File = file });
+            await sut.HandleAsync(context);
 
-//            SetupStore(1, context.ContextId);
-//            SetupImageInfo();
+            Assert.Equal(assetId, context.Result<EntityCreatedResult<Guid>>().IdOrValue);
 
-//            CreateAsset();
+            AssertAssetHasBeenUploaded(0, context.ContextId);
+            AssertAssetImageChecked();
+        }
 
-//            await TestUpdate(asset, async _ =>
-//            {
-//                await sut.HandleAsync(context);
-//            });
+        [Fact]
+        public async Task Update_should_update_domain_object()
+        {
+            var context = CreateContextForCommand(new UpdateAsset { AssetId = assetId, File = file });
 
-//            AssertAssetHasBeenUploaded(1, context.ContextId);
-//            AssertAssetImageChecked();
-//        }
+            SetupStore(1, context.ContextId);
+            SetupImageInfo();
 
-//        [Fact]
-//        public async Task Rename_should_update_domain_object()
-//        {
-//            CreateAsset();
+            await ExecuteCreateAsync();
 
-//            var context = CreateContextForCommand(new RenameAsset { AssetId = assetId, FileName = "my-new-image.png" });
+            await sut.HandleAsync(context);
 
-//            await TestUpdate(asset, async _ =>
-//            {
-//                await sut.HandleAsync(context);
-//            });
-//        }
+            AssertAssetHasBeenUploaded(1, context.ContextId);
+            AssertAssetImageChecked();
+        }
 
-//        [Fact]
-//        public async Task Delete_should_update_domain_object()
-//        {
-//            CreateAsset();
+        private Task ExecuteCreateAsync()
+        {
+            return asset.ExecuteAsync(J(CreateCommand(new CreateAsset { AssetId = Id, File = file })));
+        }
 
-//            var command = CreateContextForCommand(new DeleteAsset { AssetId = assetId });
+        private void SetupStore(long version, Guid commitId)
+        {
+            A.CallTo(() => assetStore.UploadTemporaryAsync(commitId.ToString(), stream))
+                .Returns(TaskHelper.Done);
+            A.CallTo(() => assetStore.CopyTemporaryAsync(commitId.ToString(), assetId.ToString(), version, null))
+                .Returns(TaskHelper.Done);
+            A.CallTo(() => assetStore.DeleteTemporaryAsync(commitId.ToString()))
+                .Returns(TaskHelper.Done);
+        }
 
-//            await TestUpdate(asset, async _ =>
-//            {
-//                await sut.HandleAsync(command);
-//            });
-//        }
+        private void AssertAssetHasBeenUploaded(long version, Guid commitId)
+        {
+            A.CallTo(() => assetStore.UploadTemporaryAsync(commitId.ToString(), stream))
+                .MustHaveHappened();
+            A.CallTo(() => assetStore.CopyTemporaryAsync(commitId.ToString(), assetId.ToString(), version, null))
+                .MustHaveHappened();
+            A.CallTo(() => assetStore.DeleteTemporaryAsync(commitId.ToString()))
+                .MustHaveHappened();
+        }
 
-//        private void CreateAsset()
-//        {
-//            asset.Create(CreateCommand(new CreateAsset { File = file }));
-//        }
+        private void SetupImageInfo()
+        {
+            A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(stream))
+                .Returns(image);
+        }
 
-//        private void SetupImageInfo()
-//        {
-//            A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(stream))
-//                .Returns(image);
-//        }
-
-//        private void SetupStore(long version, Guid commitId)
-//        {
-//            A.CallTo(() => assetStore.UploadTemporaryAsync(commitId.ToString(), stream))
-//                .Returns(TaskHelper.Done);
-//            A.CallTo(() => assetStore.CopyTemporaryAsync(commitId.ToString(), assetId.ToString(), version, null))
-//                .Returns(TaskHelper.Done);
-//            A.CallTo(() => assetStore.DeleteTemporaryAsync(commitId.ToString()))
-//                .Returns(TaskHelper.Done);
-//        }
-
-//        private void AssertAssetImageChecked()
-//        {
-//            A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(stream))
-//                .MustHaveHappened();
-//        }
-
-//        private void AssertAssetHasBeenUploaded(long version, Guid commitId)
-//        {
-//            A.CallTo(() => assetStore.UploadTemporaryAsync(commitId.ToString(), stream))
-//                .MustHaveHappened();
-//            A.CallTo(() => assetStore.CopyTemporaryAsync(commitId.ToString(), assetId.ToString(), version, null))
-//                .MustHaveHappened();
-//            A.CallTo(() => assetStore.DeleteTemporaryAsync(commitId.ToString()))
-//                .MustHaveHappened();
-//        }
-//    }
-//}
+        private void AssertAssetImageChecked()
+        {
+            A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(stream))
+                .MustHaveHappened();
+        }
+    }
+}
