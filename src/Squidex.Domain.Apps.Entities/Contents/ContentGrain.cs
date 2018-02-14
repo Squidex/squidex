@@ -91,7 +91,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                         await operationContext.ExecuteScriptAndTransformAsync(x => x.ScriptCreate, "Create");
                         await operationContext.EnrichAsync();
-                        await operationContext.ValidateAsync(false);
+                        await operationContext.ValidateAsync();
 
                         Create(c);
 
@@ -105,7 +105,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                         var operationContext = await CreateContext(c, () => "Failed to update content.");
 
-                        await operationContext.ValidateAsync(true);
+                        await operationContext.ValidateAsync();
                         await operationContext.ExecuteScriptAndTransformAsync(x => x.ScriptUpdate, "Update");
 
                         Update(c);
@@ -120,7 +120,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                         var operationContext = await CreateContext(c, () => "Failed to patch content.");
 
-                        await operationContext.ValidateAsync(true);
+                        await operationContext.ValidatePartialAsync();
                         await operationContext.ExecuteScriptAndTransformAsync(x => x.ScriptUpdate, "Patch");
 
                         Patch(c);
