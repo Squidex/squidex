@@ -8,7 +8,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
@@ -16,7 +15,6 @@ using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Templates
 {
@@ -36,13 +34,23 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
             {
                 var appId = new NamedId<Guid>(createApp.AppId, createApp.Name);
 
+                var publish = new Func<ICommand, Task>(command =>
+                {
+                    if (command is IAppCommand appCommand)
+                    {
+                        appCommand.AppId = appId;
+                    }
+
+                    return context.CommandBus.PublishAsync(command);
+                });
+
                 return Task.WhenAll(
-                    CreatePagesAsync(context.CommandBus, appId),
-                    CreatePostsAsync(context.CommandBus, appId),
-                    CreateClientAsync(context.CommandBus, appId));
+                    CreatePagesAsync(publish),
+                    CreatePostsAsync(publish),
+                    CreateClientAsync(publish, appId.Id));
             }
 
-            return TaskHelper.Done;
+            return next();
         }
 
         private static bool IsRightTemplate(CreateApp createApp)
@@ -50,16 +58,16 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
             return string.Equals(createApp.Template, TemplateName, StringComparison.OrdinalIgnoreCase);
         }
 
-        private static async Task CreateClientAsync(ICommandBus bus, NamedId<Guid> appId)
+        private static async Task CreateClientAsync(Func<ICommand, Task> publish, Guid appId)
         {
-            await bus.PublishAsync(new AttachClient { Id = "sample-client" });
+            await publish(new AttachClient { Id = "sample-client", AppId = appId });
         }
 
-        private async Task CreatePostsAsync(ICommandBus bus, NamedId<Guid> appId)
+        private async Task CreatePostsAsync(Func<ICommand, Task> publish)
         {
-            var postsId = await CreatePostsSchema(bus, appId);
+            var postsId = await CreatePostsSchemaAsync(publish);
 
-            await bus.PublishAsync(new CreateContent
+            await publish(new CreateContent
             {
                 SchemaId = postsId,
                 Data =
@@ -74,11 +82,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
             });
         }
 
-        private async Task CreatePagesAsync(ICommandBus bus, NamedId<Guid> appId)
+        private async Task CreatePagesAsync(Func<ICommand, Task> publish)
         {
-            var pagesId = await CreatePagesSchema(bus, appId);
+            var pagesId = await CreatePagesSchemaAsync(publish);
 
-            await bus.PublishAsync(new CreateContent
+            await publish(new CreateContent
             {
                 SchemaId = pagesId,
                 Data =
@@ -93,7 +101,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
             });
         }
 
-        private async Task<NamedId<Guid>> CreatePostsSchema(ICommandBus bus, NamedId<Guid> appId)
+        private async Task<NamedId<Guid>> CreatePostsSchemaAsync(Func<ICommand, Task> publish)
         {
             var command = new CreateSchema
             {
@@ -108,7 +116,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
                     new CreateSchemaField
                     {
                         Name = "title",
-                        Partitioning = Partitioning.Invariant.Key,
                         Properties = new StringFieldProperties
                         {
                             Editor = StringFieldEditor.Input,
@@ -122,7 +129,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
                     new CreateSchemaField
                     {
                         Name = "slug",
-                        Partitioning = Partitioning.Invariant.Key,
                         Properties = new StringFieldProperties
                         {
                             Editor = StringFieldEditor.Slug,
@@ -137,7 +143,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
                     new CreateSchemaField
                     {
                         Name = "text",
-                        Partitioning = Partitioning.Invariant.Key,
                         Properties = new StringFieldProperties
                         {
                             Editor = StringFieldEditor.RichText,
@@ -146,15 +151,14 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
                             Label = "Text"
                         }
                     }
-                },
-                AppId = appId
+                }
             };
 
-            await bus.PublishAsync(command);
+            await publish(command);
 
             var schemaId = new NamedId<Guid>(command.SchemaId, command.Name);
 
-            await bus.PublishAsync(new ConfigureScripts
+            await publish(new ConfigureScripts
             {
                 SchemaId = schemaId.Id,
                 ScriptCreate = SlugScript,
@@ -164,7 +168,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
             return schemaId;
         }
 
-        private async Task<NamedId<Guid>> CreatePagesSchema(ICommandBus bus, NamedId<Guid> appId)
+        private async Task<NamedId<Guid>> CreatePagesSchemaAsync(Func<ICommand, Task> publish)
         {
             var command = new CreateSchema
             {
@@ -178,7 +182,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
                     new CreateSchemaField
                     {
                         Name = "title",
-                        Partitioning = Partitioning.Invariant.Key,
                         Properties = new StringFieldProperties
                         {
                             Editor = StringFieldEditor.Input,
@@ -192,7 +195,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
                     new CreateSchemaField
                     {
                         Name = "slug",
-                        Partitioning = Partitioning.Invariant.Key,
                         Properties = new StringFieldProperties
                         {
                             Editor = StringFieldEditor.Slug,
@@ -207,7 +209,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
                     new CreateSchemaField
                     {
                         Name = "text",
-                        Partitioning = Partitioning.Invariant.Key,
                         Properties = new StringFieldProperties
                         {
                             Editor = StringFieldEditor.RichText,
@@ -216,15 +217,14 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
                             Label = "Text"
                         }
                     }
-                },
-                AppId = appId
+                }
             };
 
-            await bus.PublishAsync(command);
+            await publish(command);
 
             var schemaId = new NamedId<Guid>(command.SchemaId, command.Name);
 
-            await bus.PublishAsync(new ConfigureScripts
+            await publish(new ConfigureScripts
             {
                 SchemaId = schemaId.Id,
                 ScriptCreate = SlugScript,

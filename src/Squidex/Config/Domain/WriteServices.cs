@@ -68,6 +68,9 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<CreateBlogCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
+            services.AddSingletonAs<CreateProfileCommandMiddleware>()
+                .As<ICommandMiddleware>();
+
             services.AddTransientAs<MigrationPath>()
                 .As<IMigrationPath>();
 

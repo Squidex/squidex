@@ -53,6 +53,21 @@
             </div>
         </div>
     </div>
+
+    <div class="card card-template card-href" (click)="createNewApp('Profile')">
+        <div class="card-body">
+            <div class="card-image">
+                <img src="/images/add-profile.png" />
+            </div>
+
+            <h4 class="card-title">New Profile Sample</h4>
+
+            <div class="card-text">
+                <div>Create your profile page.</div>
+                <div>Sample Code: <a href="https://github.com/Squidex/squidex-samples/tree/master/csharp/Sample.Profile" (click)="$event.stopPropagation()" target="_blank">ASP.NET Core</a></div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div class="modal" *sqxModalView="addAppDialog;onRoot:true" @fade>
