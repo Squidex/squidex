@@ -97,7 +97,7 @@ export class AssetsEditorComponent implements ControlValueAccessor, OnDestroy, O
         const component = this;
 
         return (dragData: any) => {
-            return dragData instanceof AssetDto && !component.oldAssets.find(a => a.id === dragData.id);
+            return !component.isDisabled && dragData instanceof AssetDto && !component.oldAssets.find(a => a.id === dragData.id);
         };
     }
 

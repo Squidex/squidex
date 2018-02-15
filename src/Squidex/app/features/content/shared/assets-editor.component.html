@@ -1,6 +1,6 @@
 <div class="assets-container" [class.disabled]="isDisabled">
     <div class="row">
-        <div class="col-4 drop-area-container" *ngIf="!isDisabled">
+        <div class="col-4 drop-area-container">
             <div class="drop-area" dnd-droppable (onDropSuccess)="onAssetDropped($event.dragData)" [allowDrop]="canDrop()" (sqxFileDrop)="addFiles($event)" routerLink="assets">
                 Drop files or assets here to add them.
             </div>
