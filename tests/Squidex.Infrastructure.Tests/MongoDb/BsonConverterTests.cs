@@ -126,6 +126,18 @@ namespace Squidex.Infrastructure.MongoDb
         }
 
         [Fact]
+        public void Should_serialize_to_iso()
+        {
+            source.DateTime = new DateTime(2012, 12, 12, 12, 12, 12, DateTimeKind.Utc);
+            source.DateTimeOffset = new DateTime(2012, 12, 12, 12, 12, 12, DateTimeKind.Utc);
+
+            var target = JObject.FromObject(source).ToBson();
+
+            Assert.Equal("2012-12-12T12:12:12Z", target["DateTime"].ToString());
+            Assert.Equal("2012-12-12T12:12:12Z", target["DateTimeOffset"].ToString());
+        }
+
+        [Fact]
         public void Should_write_problematic_object()
         {
             var buggy = new

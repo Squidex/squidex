@@ -82,15 +82,15 @@ namespace Squidex.Infrastructure.MongoDb
                 case JTokenType.Undefined:
                     return BsonUndefined.Value;
                 case JTokenType.Date:
-                    return BsonValue.Create(((JValue)source).Value.ToString());
+                    return BsonValue.Create(((JValue)source).ToString("yyyy-MM-ddTHH:mm:ssK"));
                 case JTokenType.Bytes:
                     return BsonValue.Create(((JValue)source).Value);
                 case JTokenType.Guid:
-                    return BsonValue.Create(((JValue)source).Value.ToString());
+                    return BsonValue.Create(((JValue)source).ToString());
                 case JTokenType.Uri:
-                    return BsonValue.Create(((JValue)source).Value.ToString());
+                    return BsonValue.Create(((JValue)source).ToString());
                 case JTokenType.TimeSpan:
-                    return BsonValue.Create(((JValue)source).Value.ToString());
+                    return BsonValue.Create(((JValue)source).ToString());
             }
 
             throw new NotSupportedException($"Cannot convert {source.GetType()} to Bson.");
