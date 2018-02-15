@@ -121,8 +121,7 @@ namespace Squidex.Domain.Apps.Core.Apps
                     .ToImmutableDictionary(x => x.Language);
 
             var newMaster =
-                Master.Language != language ?
-                Master :
+                newLanguages.Values.FirstOrDefault(x => x.Language == Master.Language) ??
                 newLanguages.Values.FirstOrDefault();
 
             return new LanguagesConfig(newLanguages, newMaster);
