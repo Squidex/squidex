@@ -34,7 +34,7 @@ namespace Migrate_01.Migrations
 
             foreach (var id in ids)
             {
-                var app = await stateFactory.GetSingleAsync<AppDomainObject>(id);
+                var app = await stateFactory.GetSingleAsync<AppGrain>(id);
 
                 if (app.Snapshot.Patterns.Count == 0)
                 {
@@ -51,10 +51,8 @@ namespace Migrate_01.Migrations
                                 Message = pattern.Message
                             };
 
-                        app.AddPattern(command);
+                        await app.ExecuteAsync(command);
                     }
-
-                    await app.WriteAsync();
                 }
             }
         }

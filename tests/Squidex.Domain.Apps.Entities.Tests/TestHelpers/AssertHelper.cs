@@ -40,5 +40,10 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
         {
             lhs.Should().BeOfType(rhs.GetType());
         }
+
+        public static void ShouldBeEquivalent<T>(this T result, T value)
+        {
+            result.ShouldBeEquivalentTo(value, o => o.IncludingAllDeclaredProperties());
+        }
     }
 }

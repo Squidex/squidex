@@ -79,7 +79,7 @@ namespace Migrate_01
                 {
                     if (@event.Payload is AssetEvent assetEvent && handledIds.Add(assetEvent.AssetId))
                     {
-                        var asset = await stateFactory.CreateAsync<AssetDomainObject>(assetEvent.AssetId);
+                        var asset = await stateFactory.CreateAsync<AssetGrain>(assetEvent.AssetId);
 
                         asset.ApplySnapshot(asset.Snapshot.Apply(@event));
 
@@ -107,19 +107,19 @@ namespace Migrate_01
                 {
                     if (@event.Payload is SchemaEvent schemaEvent && handledIds.Add(schemaEvent.SchemaId.Id))
                     {
-                        var schema = await stateFactory.GetSingleAsync<SchemaDomainObject>(schemaEvent.SchemaId.Id);
+                        var schema = await stateFactory.GetSingleAsync<SchemaGrain>(schemaEvent.SchemaId.Id);
 
                         await schema.WriteSnapshotAsync();
                     }
                     else if (@event.Payload is RuleEvent ruleEvent && handledIds.Add(ruleEvent.RuleId))
                     {
-                        var rule = await stateFactory.GetSingleAsync<RuleDomainObject>(ruleEvent.RuleId);
+                        var rule = await stateFactory.GetSingleAsync<RuleGrain>(ruleEvent.RuleId);
 
                         await rule.WriteSnapshotAsync();
                     }
                     else if (@event.Payload is AppEvent appEvent && handledIds.Add(appEvent.AppId.Id))
                     {
-                        var app = await stateFactory.GetSingleAsync<AppDomainObject>(appEvent.AppId.Id);
+                        var app = await stateFactory.GetSingleAsync<AppGrain>(appEvent.AppId.Id);
 
                         await app.WriteSnapshotAsync();
                     }

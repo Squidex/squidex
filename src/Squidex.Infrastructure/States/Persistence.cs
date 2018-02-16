@@ -11,15 +11,15 @@ using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Infrastructure.States
 {
-    internal sealed class Persistence<TOwner, TKey> : Persistence<TOwner, object, TKey>, IPersistence
+    internal sealed class Persistence<TKey> : Persistence<object, TKey>, IPersistence
     {
-        public Persistence(TKey ownerKey,
+        public Persistence(TKey ownerKey, Type ownerType,
             IEventStore eventStore,
             IEventDataFormatter eventDataFormatter,
             ISnapshotStore<object, TKey> snapshotStore,
             IStreamNameResolver streamNameResolver,
             Func<Envelope<IEvent>, Task> applyEvent)
-            : base(ownerKey, eventStore, eventDataFormatter, snapshotStore, streamNameResolver, PersistenceMode.EventSourcing, null, applyEvent)
+            : base(ownerKey, ownerType, eventStore, eventDataFormatter, snapshotStore, streamNameResolver, PersistenceMode.EventSourcing, null, applyEvent)
         {
         }
     }

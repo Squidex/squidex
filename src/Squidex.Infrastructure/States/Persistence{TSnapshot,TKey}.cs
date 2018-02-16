@@ -15,9 +15,10 @@ using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Infrastructure.States
 {
-    internal class Persistence<TOwner, TSnapshot, TKey> : IPersistence<TSnapshot>
+    internal class Persistence<TSnapshot, TKey> : IPersistence<TSnapshot>
     {
         private readonly TKey ownerKey;
+        private readonly Type ownerType;
         private readonly ISnapshotStore<TSnapshot, TKey> snapshotStore;
         private readonly IStreamNameResolver streamNameResolver;
         private readonly IEventStore eventStore;
@@ -34,7 +35,7 @@ namespace Squidex.Infrastructure.States
             get { return version; }
         }
 
-        public Persistence(TKey ownerKey,
+        public Persistence(TKey ownerKey, Type ownerType,
             IEventStore eventStore,
             IEventDataFormatter eventDataFormatter,
             ISnapshotStore<TSnapshot, TKey> snapshotStore,
@@ -44,6 +45,7 @@ namespace Squidex.Infrastructure.States
             Func<Envelope<IEvent>, Task> applyEvent)
         {
             this.ownerKey = ownerKey;
+            this.ownerType = ownerType;
             this.applyState = applyState;
             this.applyEvent = applyEvent;
             this.eventStore = eventStore;
@@ -67,11 +69,11 @@ namespace Squidex.Infrastructure.States
             {
                 if (version == EtagVersion.Empty)
                 {
-                    throw new DomainObjectNotFoundException(ownerKey.ToString(), typeof(TOwner));
+                    throw new DomainObjectNotFoundException(ownerKey.ToString(), ownerType);
                 }
                 else
                 {
-                    throw new DomainObjectVersionException(ownerKey.ToString(), typeof(TOwner), version, expectedVersion);
+                    throw new DomainObjectVersionException(ownerKey.ToString(), ownerType, version, expectedVersion);
                 }
             }
         }
@@ -134,7 +136,7 @@ namespace Squidex.Infrastructure.States
                 }
                 catch (InconsistentStateException ex)
                 {
-                    throw new DomainObjectVersionException(ownerKey.ToString(), typeof(TOwner), ex.CurrentVersion, ex.ExpectedVersion);
+                    throw new DomainObjectVersionException(ownerKey.ToString(), ownerType, ex.CurrentVersion, ex.ExpectedVersion);
                 }
 
                 versionSnapshot = newVersion;
@@ -164,7 +166,7 @@ namespace Squidex.Infrastructure.States
                 }
                 catch (WrongEventVersionException ex)
                 {
-                    throw new DomainObjectVersionException(ownerKey.ToString(), typeof(TOwner), ex.CurrentVersion, ex.ExpectedVersion);
+                    throw new DomainObjectVersionException(ownerKey.ToString(), ownerType, ex.CurrentVersion, ex.ExpectedVersion);
                 }
 
                 versionEvents += eventArray.Length;
@@ -180,7 +182,7 @@ namespace Squidex.Infrastructure.States
 
         private string GetStreamName()
         {
-            return streamNameResolver.GetStreamName(typeof(TOwner), ownerKey.ToString());
+            return streamNameResolver.GetStreamName(ownerType, ownerKey.ToString());
         }
 
         private bool UseSnapshots()

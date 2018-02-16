@@ -16,7 +16,43 @@ namespace Squidex.Infrastructure.Tasks
         {
         }
 
-        public static Func<T, Task> ToAsync<T>(this Action<T> action)
+        public static Func<TInput, TOutput> ToDefault<TInput, TOutput>(this Action<TInput> action)
+        {
+            Guard.NotNull(action, nameof(action));
+
+            return x =>
+            {
+                action(x);
+
+                return default(TOutput);
+            };
+        }
+
+        public static Func<TInput, Task<TOutput>> ToDefault<TInput, TOutput>(this Func<TInput, Task> action)
+        {
+            Guard.NotNull(action, nameof(action));
+
+            return async x =>
+            {
+                await action(x);
+
+                return default(TOutput);
+            };
+        }
+
+        public static Func<TInput, Task<TOutput>> ToAsync<TInput, TOutput>(this Func<TInput, TOutput> action)
+        {
+            Guard.NotNull(action, nameof(action));
+
+            return x =>
+            {
+                var result = action(x);
+
+                return Task.FromResult(result);
+            };
+        }
+
+        public static Func<TInput, Task> ToAsync<TInput>(this Action<TInput> action)
         {
             return x =>
             {

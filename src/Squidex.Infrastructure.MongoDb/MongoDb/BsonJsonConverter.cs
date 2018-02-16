@@ -81,8 +81,6 @@ namespace Squidex.Infrastructure.MongoDb
                     return BsonNull.Value;
                 case JTokenType.Undefined:
                     return BsonUndefined.Value;
-                case JTokenType.Date:
-                    return BsonValue.Create(((JValue)source).ToString("yyyy-MM-ddTHH:mm:ssK"));
                 case JTokenType.Bytes:
                     return BsonValue.Create(((JValue)source).Value);
                 case JTokenType.Guid:
@@ -91,6 +89,23 @@ namespace Squidex.Infrastructure.MongoDb
                     return BsonValue.Create(((JValue)source).ToString());
                 case JTokenType.TimeSpan:
                     return BsonValue.Create(((JValue)source).ToString());
+                case JTokenType.Date:
+                    {
+                        var value = ((JValue)source).Value;
+
+                        if (value is DateTime dateTime)
+                        {
+                            return dateTime.ToString("yyyy-MM-ddTHH:mm:ssK");
+                        }
+                        else if (value is DateTimeOffset dateTimeOffset)
+                        {
+                            return dateTimeOffset.UtcDateTime.ToString("yyyy-MM-ddTHH:mm:ssK");
+                        }
+                        else
+                        {
+                            return value.ToString();
+                        }
+                    }
             }
 
             throw new NotSupportedException($"Cannot convert {source.GetType()} to Bson.");

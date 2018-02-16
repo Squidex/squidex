@@ -20,8 +20,8 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
     {
         public sealed class MyEventConsumerGrain : EventConsumerGrain
         {
-            public MyEventConsumerGrain(IEventStore eventStore, IEventDataFormatter eventDataFormatter, ISemanticLog log)
-                : base(eventStore, eventDataFormatter, log)
+            public MyEventConsumerGrain(IStore<string> store, IEventStore eventStore, IEventDataFormatter eventDataFormatter, ISemanticLog log)
+                : base(store, eventStore, eventDataFormatter, log)
             {
             }
 
@@ -53,8 +53,8 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
             consumerName = eventConsumer.GetType().Name;
 
-            A.CallTo(() => store.WithSnapshots(consumerName, A<Func<EventConsumerState, Task>>.Ignored))
-                .Invokes(new Action<string, Func<EventConsumerState, Task>>((key, a) => apply = a))
+            A.CallTo(() => store.WithSnapshots(typeof(EventConsumerGrain), consumerName, A<Func<EventConsumerState, Task>>.Ignored))
+                .Invokes(new Action<Type, string, Func<EventConsumerState, Task>>((type, key, a) => apply = a))
                 .Returns(persistence);
 
             A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber>.Ignored, A<string>.Ignored, A<string>.Ignored))
@@ -71,7 +71,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
             A.CallTo(() => formatter.Parse(eventData, true)).Returns(envelope);
 
-            sut = new MyEventConsumerGrain(eventStore, formatter, log);
+            sut = new MyEventConsumerGrain(store, eventStore, formatter, log);
             sutSubscriber = sut;
         }
 
@@ -80,7 +80,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         {
             state = state.Stopped();
 
-            sut.ActivateAsync(consumerName, store).Wait();
+            sut.ActivateAsync(consumerName).Wait();
             sut.Activate(eventConsumer);
             sut.Dispose();
 
@@ -93,7 +93,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         [Fact]
         public void Should_subscribe_to_event_store_when_not_found_in_db()
         {
-            sut.ActivateAsync(consumerName, store).Wait();
+            sut.ActivateAsync(consumerName).Wait();
             sut.Activate(eventConsumer);
             sut.Dispose();
 
@@ -106,7 +106,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         [Fact]
         public void Should_subscribe_to_event_store_when_not_stopped_in_db()
         {
-            sut.ActivateAsync(consumerName, store).Wait();
+            sut.ActivateAsync(consumerName).Wait();
             sut.Activate(eventConsumer);
             sut.Dispose();
 
@@ -119,7 +119,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         [Fact]
         public void Should_stop_subscription_when_stopped()
         {
-            sut.ActivateAsync(consumerName, store).Wait();
+            sut.ActivateAsync(consumerName).Wait();
             sut.Activate(eventConsumer);
             sut.Stop();
             sut.Stop();
@@ -138,7 +138,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         [Fact]
         public void Should_reset_consumer_when_resetting()
         {
-            sut.ActivateAsync(consumerName, store).Wait();
+            sut.ActivateAsync(consumerName).Wait();
             sut.Activate(eventConsumer);
             sut.Stop();
             sut.Reset();
@@ -165,7 +165,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         [Fact]
         public async Task Should_invoke_and_update_position_when_event_received()
         {
-            sut.ActivateAsync(consumerName, store).Wait();
+            sut.ActivateAsync(consumerName).Wait();
             sut.Activate(eventConsumer);
 
             var @event = new StoredEvent(Guid.NewGuid().ToString(), 123, eventData);
@@ -186,7 +186,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         [Fact]
         public async Task Should_ignore_old_events()
         {
-            sut.ActivateAsync(consumerName, store).Wait();
+            sut.ActivateAsync(consumerName).Wait();
             sut.Activate(eventConsumer);
 
             A.CallTo(() => formatter.Parse(eventData, true))
@@ -210,7 +210,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         [Fact]
         public async Task Should_not_invoke_and_update_position_when_event_is_from_another_subscription()
         {
-            sut.ActivateAsync(consumerName, store).Wait();
+            sut.ActivateAsync(consumerName).Wait();
             sut.Activate(eventConsumer);
 
             var @event = new StoredEvent(Guid.NewGuid().ToString(), 123, eventData);
@@ -228,7 +228,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         [Fact]
         public async Task Should_stop_if_consumer_failed()
         {
-            sut.ActivateAsync(consumerName, store).Wait();
+            sut.ActivateAsync(consumerName).Wait();
             sut.Activate(eventConsumer);
 
             var ex = new InvalidOperationException();
@@ -249,7 +249,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         [Fact]
         public async Task Should_not_make_error_handling_when_exception_is_from_another_subscription()
         {
-            sut.ActivateAsync(consumerName, store).Wait();
+            sut.ActivateAsync(consumerName).Wait();
             sut.Activate(eventConsumer);
 
             var ex = new InvalidOperationException();
@@ -267,7 +267,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         [Fact]
         public void Should_stop_if_resetting_failed()
         {
-            sut.ActivateAsync(consumerName, store).Wait();
+            sut.ActivateAsync(consumerName).Wait();
             sut.Activate(eventConsumer);
 
             var ex = new InvalidOperationException();
@@ -290,7 +290,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         [Fact]
         public async Task Should_stop_if_handling_failed()
         {
-            sut.ActivateAsync(consumerName, store).Wait();
+            sut.ActivateAsync(consumerName).Wait();
             sut.Activate(eventConsumer);
 
             var ex = new InvalidOperationException();
@@ -321,7 +321,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         [Fact]
         public async Task Should_stop_if_deserialization_failed()
         {
-            sut.ActivateAsync(consumerName, store).Wait();
+            sut.ActivateAsync(consumerName).Wait();
             sut.Activate(eventConsumer);
 
             var ex = new InvalidOperationException();
@@ -350,7 +350,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         [Fact]
         public async Task Should_start_after_stop_when_handling_failed()
         {
-            sut.ActivateAsync(consumerName, store).Wait();
+            sut.ActivateAsync(consumerName).Wait();
             sut.Activate(eventConsumer);
 
             var exception = new InvalidOperationException();

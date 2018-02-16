@@ -10,22 +10,25 @@ using System.IO;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
+using Squidex.Domain.Apps.Entities.Assets.State;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.Tasks;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public class AssetCommandMiddlewareTests : HandlerTestBase<AssetDomainObject>
+    public class AssetCommandMiddlewareTests : HandlerTestBase<AssetGrain, AssetState>
     {
         private readonly IAssetThumbnailGenerator assetThumbnailGenerator = A.Fake<IAssetThumbnailGenerator>();
         private readonly IAssetStore assetStore = A.Fake<IAssetStore>();
+        private readonly IStateFactory stateFactory = A.Fake<IStateFactory>();
         private readonly Guid assetId = Guid.NewGuid();
         private readonly Stream stream = new MemoryStream();
         private readonly ImageInfo image = new ImageInfo(2048, 2048);
-        private readonly AssetDomainObject asset = new AssetDomainObject();
+        private readonly AssetGrain asset;
         private readonly AssetFile file;
         private readonly AssetCommandMiddleware sut;
 
@@ -38,7 +41,13 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             file = new AssetFile("my-image.png", "image/png", 1024, () => stream);
 
-            sut = new AssetCommandMiddleware(Handler, assetStore, assetThumbnailGenerator);
+            asset = new AssetGrain(Store);
+            asset.ActivateAsync(Id).Wait();
+
+            A.CallTo(() => stateFactory.CreateAsync<AssetGrain>(Id))
+                .Returns(asset);
+
+            sut = new AssetCommandMiddleware(stateFactory, assetStore, assetThumbnailGenerator);
         }
 
         [Fact]
@@ -49,10 +58,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             SetupStore(0, context.ContextId);
             SetupImageInfo();
 
-            await TestCreate(asset, async _ =>
-            {
-                await sut.HandleAsync(context);
-            });
+            await sut.HandleAsync(context);
 
             Assert.Equal(assetId, context.Result<EntityCreatedResult<Guid>>().IdOrValue);
 
@@ -68,52 +74,17 @@ namespace Squidex.Domain.Apps.Entities.Assets
             SetupStore(1, context.ContextId);
             SetupImageInfo();
 
-            CreateAsset();
+            await ExecuteCreateAsync();
 
-            await TestUpdate(asset, async _ =>
-            {
-                await sut.HandleAsync(context);
-            });
+            await sut.HandleAsync(context);
 
             AssertAssetHasBeenUploaded(1, context.ContextId);
             AssertAssetImageChecked();
         }
 
-        [Fact]
-        public async Task Rename_should_update_domain_object()
+        private Task ExecuteCreateAsync()
         {
-            CreateAsset();
-
-            var context = CreateContextForCommand(new RenameAsset { AssetId = assetId, FileName = "my-new-image.png" });
-
-            await TestUpdate(asset, async _ =>
-            {
-                await sut.HandleAsync(context);
-            });
-        }
-
-        [Fact]
-        public async Task Delete_should_update_domain_object()
-        {
-            CreateAsset();
-
-            var command = CreateContextForCommand(new DeleteAsset { AssetId = assetId });
-
-            await TestUpdate(asset, async _ =>
-            {
-                await sut.HandleAsync(command);
-            });
-        }
-
-        private void CreateAsset()
-        {
-            asset.Create(CreateCommand(new CreateAsset { File = file }));
-        }
-
-        private void SetupImageInfo()
-        {
-            A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(stream))
-                .Returns(image);
+            return asset.ExecuteAsync(CreateCommand(new CreateAsset { AssetId = Id, File = file }));
         }
 
         private void SetupStore(long version, Guid commitId)
@@ -126,12 +97,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 .Returns(TaskHelper.Done);
         }
 
-        private void AssertAssetImageChecked()
-        {
-            A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(stream))
-                .MustHaveHappened();
-        }
-
         private void AssertAssetHasBeenUploaded(long version, Guid commitId)
         {
             A.CallTo(() => assetStore.UploadTemporaryAsync(commitId.ToString(), stream))
@@ -139,6 +104,18 @@ namespace Squidex.Domain.Apps.Entities.Assets
             A.CallTo(() => assetStore.CopyTemporaryAsync(commitId.ToString(), assetId.ToString(), version, null))
                 .MustHaveHappened();
             A.CallTo(() => assetStore.DeleteTemporaryAsync(commitId.ToString()))
+                .MustHaveHappened();
+        }
+
+        private void SetupImageInfo()
+        {
+            A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(stream))
+                .Returns(image);
+        }
+
+        private void AssertAssetImageChecked()
+        {
+            A.CallTo(() => assetThumbnailGenerator.GetImageInfoAsync(stream))
                 .MustHaveHappened();
         }
     }

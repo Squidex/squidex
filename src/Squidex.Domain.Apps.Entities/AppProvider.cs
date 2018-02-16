@@ -47,14 +47,14 @@ namespace Squidex.Domain.Apps.Entities
 
         public async Task<(IAppEntity, ISchemaEntity)> GetAppWithSchemaAsync(Guid appId, Guid id)
         {
-            var app = await stateFactory.GetSingleAsync<AppDomainObject>(appId);
+            var app = await stateFactory.GetSingleAsync<AppGrain>(appId);
 
             if (!IsFound(app))
             {
                 return (null, null);
             }
 
-            var schema = await stateFactory.GetSingleAsync<SchemaDomainObject>(id);
+            var schema = await stateFactory.GetSingleAsync<SchemaGrain>(id);
 
             if (!IsFound(schema) || schema.Snapshot.IsDeleted)
             {
@@ -73,7 +73,7 @@ namespace Squidex.Domain.Apps.Entities
                 return null;
             }
 
-            return (await stateFactory.GetSingleAsync<AppDomainObject>(appId)).Snapshot;
+            return (await stateFactory.GetSingleAsync<AppGrain>(appId)).Snapshot;
         }
 
         public async Task<ISchemaEntity> GetSchemaAsync(Guid appId, string name)
@@ -85,12 +85,12 @@ namespace Squidex.Domain.Apps.Entities
                 return null;
             }
 
-            return (await stateFactory.GetSingleAsync<SchemaDomainObject>(schemaId)).Snapshot;
+            return (await stateFactory.GetSingleAsync<SchemaGrain>(schemaId)).Snapshot;
         }
 
         public async Task<ISchemaEntity> GetSchemaAsync(Guid appId, Guid id, bool allowDeleted = false)
         {
-            var schema = await stateFactory.GetSingleAsync<SchemaDomainObject>(id);
+            var schema = await stateFactory.GetSingleAsync<SchemaGrain>(id);
 
             if (!IsFound(schema) || (schema.Snapshot.IsDeleted && !allowDeleted) || schema.Snapshot.AppId.Id != appId)
             {
@@ -106,7 +106,7 @@ namespace Squidex.Domain.Apps.Entities
 
             var schemas =
                 await Task.WhenAll(
-                    ids.Select(id => stateFactory.GetSingleAsync<SchemaDomainObject>(id)));
+                    ids.Select(id => stateFactory.GetSingleAsync<SchemaGrain>(id)));
 
             return schemas.Where(IsFound).Select(s => (ISchemaEntity)s.Snapshot).ToList();
         }
@@ -117,7 +117,7 @@ namespace Squidex.Domain.Apps.Entities
 
             var rules =
                 await Task.WhenAll(
-                    ids.Select(id => stateFactory.GetSingleAsync<RuleDomainObject>(id)));
+                    ids.Select(id => stateFactory.GetSingleAsync<RuleGrain>(id)));
 
             return rules.Where(IsFound).Select(r => (IRuleEntity)r.Snapshot).ToList();
         }
@@ -128,7 +128,7 @@ namespace Squidex.Domain.Apps.Entities
 
             var apps =
                 await Task.WhenAll(
-                    ids.Select(id => stateFactory.GetSingleAsync<AppDomainObject>(id)));
+                    ids.Select(id => stateFactory.GetSingleAsync<AppGrain>(id)));
 
             return apps.Where(IsFound).Select(a => (IAppEntity)a.Snapshot).ToList();
         }
@@ -143,7 +143,7 @@ namespace Squidex.Domain.Apps.Entities
             return await schemaRepository.FindSchemaIdAsync(appId, name);
         }
 
-        private static bool IsFound(IDomainObject app)
+        private static bool IsFound(IDomainObjectGrain app)
         {
             return app.Version > EtagVersion.Empty;
         }
