@@ -91,6 +91,8 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<Migrator>()
                 .AsSelf();
+
+            services.AddSingleton(typeof(IStore<>), typeof(Store<>));
         }
     }
 }

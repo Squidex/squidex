@@ -23,19 +23,14 @@ namespace Squidex.Infrastructure
 
             lock (namesByType)
             {
-                try
+                if (typesByName.TryGetValue(name, out var existingType) && existingType != type)
                 {
-                    typesByName.Add(name, type);
-                }
-                catch (ArgumentException)
-                {
-                    if (typesByName[name] != type)
-                    {
-                        var message = $"The name '{name}' is already registered with type '{typesByName[name]}'";
+                    var message = $"The name '{name}' is already registered with type '{typesByName[name]}'";
 
-                        throw new ArgumentException(message, nameof(type));
-                    }
+                    throw new ArgumentException(message, nameof(type));
                 }
+
+                typesByName[name] = type;
             }
 
             return this;
@@ -62,33 +57,23 @@ namespace Squidex.Infrastructure
 
             lock (namesByType)
             {
-                try
+                if (namesByType.TryGetValue(type, out var existingName) && existingName != name)
                 {
-                    namesByType.Add(type, name);
-                }
-                catch (ArgumentException)
-                {
-                    if (namesByType[type] != name)
-                    {
-                        var message = $"The type '{type}' is already registered with name '{namesByType[type]}'";
+                    var message = $"The type '{type}' is already registered with name '{namesByType[type]}'";
 
-                        throw new ArgumentException(message, nameof(type));
-                    }
+                    throw new ArgumentException(message, nameof(type));
                 }
 
-                try
-                {
-                    typesByName.Add(name, type);
-                }
-                catch (ArgumentException)
-                {
-                    if (typesByName[name] != type)
-                    {
-                        var message = $"The name '{name}' is already registered with type '{typesByName[name]}'";
+                namesByType[type] = name;
 
-                        throw new ArgumentException(message, nameof(type));
-                    }
+                if (typesByName.TryGetValue(name, out var existingType) && existingType != type)
+                {
+                    var message = $"The name '{name}' is already registered with type '{typesByName[name]}'";
+
+                    throw new ArgumentException(message, nameof(type));
                 }
+
+                typesByName[name] = type;
             }
 
             return this;
