@@ -1,7 +1,7 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
@@ -11,10 +11,12 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Infrastructure.Commands
 {
-    public interface IDomainObject : IStatefulObject<Guid>
+    public interface IDomainObjectGrain : IStatefulObject<Guid>
     {
-        long Version { get; }
+        Task<object> ExecuteAsync(IAggregateCommand command);
 
-        Task WriteAsync();
+        Task WriteSnapshotAsync();
+
+        long Version { get; }
     }
 }

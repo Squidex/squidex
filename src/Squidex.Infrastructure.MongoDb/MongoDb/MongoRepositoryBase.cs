@@ -68,13 +68,16 @@ namespace Squidex.Infrastructure.MongoDb
         {
             return new Lazy<IMongoCollection<TEntity>>(() =>
             {
-                var databaseCollection = mongoDatabase.GetCollection<TEntity>(
-                    CollectionName(),
-                    CollectionSettings() ?? new MongoCollectionSettings());
+                return Task.Run(async () =>
+                {
+                    var databaseCollection = mongoDatabase.GetCollection<TEntity>(
+                        CollectionName(),
+                        CollectionSettings() ?? new MongoCollectionSettings());
 
-                SetupCollectionAsync(databaseCollection).Wait();
+                    await SetupCollectionAsync(databaseCollection).ConfigureAwait(false);
 
-                return databaseCollection;
+                    return databaseCollection;
+                }).Result;
             });
         }
 

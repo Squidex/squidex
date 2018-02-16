@@ -5,22 +5,71 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
+using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
+using Squidex.Domain.Apps.Entities.Assets.Guards;
 using Squidex.Domain.Apps.Entities.Assets.State;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public sealed class AssetDomainObject : SquidexDomainObjectBase<AssetState>
+    public class AssetGrain : DomainObjectGrain<AssetState>
     {
-        public AssetDomainObject Create(CreateAsset command)
+        public AssetGrain(IStore<Guid> store)
+            : base(store)
         {
-            VerifyNotCreated();
+        }
 
+        public override Task<object> ExecuteAsync(IAggregateCommand command)
+        {
+            switch (command)
+            {
+                case CreateAsset createRule:
+                    return CreateReturnAsync(createRule, c =>
+                    {
+                        GuardAsset.CanCreate(c);
+
+                        Create(c);
+
+                        return new AssetSavedResult(NewVersion, Snapshot.FileVersion);
+                    });
+                case UpdateAsset updateRule:
+                    return UpdateReturnAsync(updateRule, c =>
+                    {
+                        GuardAsset.CanUpdate(c);
+
+                        Update(c);
+
+                        return new AssetSavedResult(NewVersion, Snapshot.FileVersion);
+                    });
+                case RenameAsset renameAsset:
+                    return UpdateAsync(renameAsset, c =>
+                    {
+                        GuardAsset.CanRename(c, Snapshot.FileName);
+
+                        Rename(c);
+                    });
+                case DeleteAsset deleteAsset:
+                    return UpdateAsync(deleteAsset, c =>
+                    {
+                        GuardAsset.CanDelete(c);
+
+                        Delete(c);
+                    });
+                default:
+                    throw new NotSupportedException();
+            }
+        }
+
+        public void Create(CreateAsset command)
+        {
             var @event = SimpleMapper.Map(command, new AssetCreated
             {
                 FileName = command.File.FileName,
@@ -33,13 +82,11 @@ namespace Squidex.Domain.Apps.Entities.Assets
             });
 
             RaiseEvent(@event);
-
-            return this;
         }
 
-        public AssetDomainObject Update(UpdateAsset command)
+        public void Update(UpdateAsset command)
         {
-            VerifyCreatedAndNotDeleted();
+            VerifyNotDeleted();
 
             var @event = SimpleMapper.Map(command, new AssetUpdated
             {
@@ -52,26 +99,20 @@ namespace Squidex.Domain.Apps.Entities.Assets
             });
 
             RaiseEvent(@event);
-
-            return this;
         }
 
-        public AssetDomainObject Delete(DeleteAsset command)
+        public void Delete(DeleteAsset command)
         {
-            VerifyCreatedAndNotDeleted();
+            VerifyNotDeleted();
 
             RaiseEvent(SimpleMapper.Map(command, new AssetDeleted { DeletedSize = Snapshot.TotalSize }));
-
-            return this;
         }
 
-        public AssetDomainObject Rename(RenameAsset command)
+        public void Rename(RenameAsset command)
         {
-            VerifyCreatedAndNotDeleted();
+            VerifyNotDeleted();
 
             RaiseEvent(SimpleMapper.Map(command, new AssetRenamed()));
-
-            return this;
         }
 
         private void RaiseEvent(AppEvent @event)
@@ -84,19 +125,11 @@ namespace Squidex.Domain.Apps.Entities.Assets
             RaiseEvent(Envelope.Create(@event));
         }
 
-        private void VerifyNotCreated()
+        private void VerifyNotDeleted()
         {
-            if (!string.IsNullOrWhiteSpace(Snapshot.FileName))
+            if (Snapshot.IsDeleted)
             {
-                throw new DomainException("Asset has already been created.");
-            }
-        }
-
-        private void VerifyCreatedAndNotDeleted()
-        {
-            if (Snapshot.IsDeleted || string.IsNullOrWhiteSpace(Snapshot.FileName))
-            {
-                throw new DomainException("Asset has already been deleted or not created yet.");
+                throw new DomainException("Asset has already been deleted");
             }
         }
 

@@ -17,6 +17,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
     public class EventConsumerGrain : DisposableObjectBase, IStatefulObject<string>, IEventSubscriber
     {
         private readonly IEventDataFormatter eventDataFormatter;
+        private readonly IStore<string> store;
         private readonly IEventStore eventStore;
         private readonly ISemanticLog log;
         private readonly SingleThreadedDispatcher dispatcher = new SingleThreadedDispatcher(1);
@@ -26,16 +27,18 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         private EventConsumerState state = new EventConsumerState();
 
         public EventConsumerGrain(
+            IStore<string> store,
             IEventStore eventStore,
             IEventDataFormatter eventDataFormatter,
             ISemanticLog log)
         {
             Guard.NotNull(log, nameof(log));
+            Guard.NotNull(store, nameof(store));
             Guard.NotNull(eventStore, nameof(eventStore));
             Guard.NotNull(eventDataFormatter, nameof(eventDataFormatter));
 
             this.log = log;
-
+            this.store = store;
             this.eventStore = eventStore;
             this.eventDataFormatter = eventDataFormatter;
         }
@@ -48,9 +51,9 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             }
         }
 
-        public Task ActivateAsync(string key, IStore<string> store)
+        public Task ActivateAsync(string key)
         {
-            persistence = store.WithSnapshots<EventConsumerState, string>(key, s => state = s);
+            persistence = store.WithSnapshots<EventConsumerGrain, EventConsumerState, string>(key, s => state = s);
 
             return persistence.ReadAsync();
         }

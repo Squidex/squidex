@@ -1,22 +1,27 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using System;
-using NodaTime;
+using System.Threading.Tasks;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.States;
 
 namespace Squidex.Infrastructure.TestHelpers
 {
-    public class MyCommand : IAggregateCommand, ITimestampCommand
+    public class MyGrain : DomainObjectGrain<MyDomainState>
     {
-        public Guid AggregateId { get; set; }
+        public MyGrain(IStore<Guid> store)
+            : base(store)
+        {
+        }
 
-        public long ExpectedVersion { get; set; } = EtagVersion.Any;
-
-        public Instant Timestamp { get; set; }
+        public override Task<object> ExecuteAsync(IAggregateCommand command)
+        {
+            return Task.FromResult<object>(null);
+        }
     }
 }

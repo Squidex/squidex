@@ -74,7 +74,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             if (!contributors.ContainsKey(command.ContributorId))
             {
-                throw new DomainObjectNotFoundException(command.ContributorId, "Contributors", typeof(AppDomainObject));
+                throw new DomainObjectNotFoundException(command.ContributorId, "Contributors", typeof(IAppEntity));
             }
         }
     }

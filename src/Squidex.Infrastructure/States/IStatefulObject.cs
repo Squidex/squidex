@@ -11,6 +11,6 @@ namespace Squidex.Infrastructure.States
 {
     public interface IStatefulObject<TKey>
     {
-        Task ActivateAsync(TKey key, IStore<TKey> store);
+        Task ActivateAsync(TKey key);
     }
 }

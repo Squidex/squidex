@@ -12,11 +12,15 @@ using Migrate_01;
 using Migrate_01.Migrations;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Scripting;
+using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Templates;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Contents;
+using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Rules;
+using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Users;
 using Squidex.Infrastructure.Commands;
@@ -50,19 +54,19 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<EnrichWithSchemaIdCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
-            services.AddSingletonAs<AppCommandMiddleware>()
+            services.AddSingletonAs<SyncedGrainCommandMiddleware<AppCommand, AppGrain>>()
                 .As<ICommandMiddleware>();
 
             services.AddSingletonAs<AssetCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
-            services.AddSingletonAs<ContentCommandMiddleware>()
+            services.AddSingletonAs<GrainCommandMiddleware<ContentCommand, ContentGrain>>()
                 .As<ICommandMiddleware>();
 
-            services.AddSingletonAs<SchemaCommandMiddleware>()
+            services.AddSingletonAs<SyncedGrainCommandMiddleware<SchemaCommand, SchemaGrain>>()
                 .As<ICommandMiddleware>();
 
-            services.AddSingletonAs<RuleCommandMiddleware>()
+            services.AddSingletonAs<SyncedGrainCommandMiddleware<RuleCommand, RuleGrain>>()
                 .As<ICommandMiddleware>();
 
             services.AddSingletonAs<CreateBlogCommandMiddleware>()
@@ -92,19 +96,19 @@ namespace Squidex.Config.Domain
             services.AddTransientAs<Rebuilder>()
                 .AsSelf();
 
-            services.AddTransientAs<AppDomainObject>()
+            services.AddTransientAs<AppGrain>()
                 .AsSelf();
 
-            services.AddTransientAs<AssetDomainObject>()
+            services.AddTransientAs<AssetGrain>()
                 .AsSelf();
 
-            services.AddTransientAs<ContentDomainObject>()
+            services.AddTransientAs<ContentGrain>()
                 .AsSelf();
 
-            services.AddTransientAs<RuleDomainObject>()
+            services.AddTransientAs<RuleGrain>()
                 .AsSelf();
 
-            services.AddTransientAs<SchemaDomainObject>()
+            services.AddTransientAs<SchemaGrain>()
                 .AsSelf();
 
             services.AddSingleton<InitialPatterns>(c =>

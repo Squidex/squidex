@@ -8,7 +8,6 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
-using Squidex.Infrastructure.EventSourcing;
 
 #pragma warning disable RECS0096 // Type parameter is never used
 
@@ -20,9 +19,6 @@ namespace Squidex.Infrastructure.States
         private readonly IPubSub pubSub;
         private readonly IMemoryCache statesCache;
         private readonly IServiceProvider services;
-        private readonly IStreamNameResolver streamNameResolver;
-        private readonly IEventStore eventStore;
-        private readonly IEventDataFormatter eventDataFormatter;
         private readonly object lockObject = new object();
         private IDisposable pubSubSubscription;
 
@@ -31,11 +27,11 @@ namespace Squidex.Infrastructure.States
             private readonly Task activationTask;
             private readonly T obj;
 
-            public ObjectHolder(T obj, TKey key, IStore<TKey> store)
+            public ObjectHolder(T obj, TKey key)
             {
                 this.obj = obj;
 
-                activationTask = obj.ActivateAsync(key, store);
+                activationTask = obj.ActivateAsync(key);
             }
 
             public async Task<T> ActivateAsync()
@@ -46,27 +42,15 @@ namespace Squidex.Infrastructure.States
             }
         }
 
-        public StateFactory(
-            IPubSub pubSub,
-            IMemoryCache statesCache,
-            IEventStore eventStore,
-            IEventDataFormatter eventDataFormatter,
-            IServiceProvider services,
-            IStreamNameResolver streamNameResolver)
+        public StateFactory(IPubSub pubSub, IMemoryCache statesCache, IServiceProvider services)
         {
-            Guard.NotNull(services, nameof(services));
-            Guard.NotNull(eventStore, nameof(eventStore));
-            Guard.NotNull(eventDataFormatter, nameof(eventDataFormatter));
             Guard.NotNull(pubSub, nameof(pubSub));
+            Guard.NotNull(services, nameof(services));
             Guard.NotNull(statesCache, nameof(statesCache));
-            Guard.NotNull(streamNameResolver, nameof(streamNameResolver));
 
-            this.eventStore = eventStore;
-            this.eventDataFormatter = eventDataFormatter;
             this.pubSub = pubSub;
             this.services = services;
             this.statesCache = statesCache;
-            this.streamNameResolver = streamNameResolver;
         }
 
         public void Initialize()
@@ -94,10 +78,9 @@ namespace Squidex.Infrastructure.States
         {
             Guard.NotNull(key, nameof(key));
 
-            var stateStore = new Store<T, TKey>(eventStore, eventDataFormatter, services, streamNameResolver);
             var state = (T)services.GetService(typeof(T));
 
-            await state.ActivateAsync(key, stateStore);
+            await state.ActivateAsync(key);
 
             return state;
         }
@@ -124,9 +107,8 @@ namespace Squidex.Infrastructure.States
                 }
 
                 var state = (T)services.GetService(typeof(T));
-                var stateStore = new Store<T, TKey>(eventStore, eventDataFormatter, services, streamNameResolver);
 
-                stateObj = new ObjectHolder<T, TKey>(state, key, stateStore);
+                stateObj = new ObjectHolder<T, TKey>(state, key);
 
                 statesCache.CreateEntry(key)
                     .SetValue(stateObj)

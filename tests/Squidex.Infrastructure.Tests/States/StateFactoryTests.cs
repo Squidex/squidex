@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
-using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Tasks;
 using Xunit;
 
@@ -22,7 +21,7 @@ namespace Squidex.Infrastructure.States
     {
         private class MyStatefulObject : IStatefulObject<string>
         {
-            public Task ActivateAsync(string key, IStore<string> store)
+            public Task ActivateAsync(string key)
             {
                 return TaskHelper.Done;
             }
@@ -30,23 +29,17 @@ namespace Squidex.Infrastructure.States
 
         private readonly string key = Guid.NewGuid().ToString();
         private readonly MyStatefulObject statefulObject = new MyStatefulObject();
-        private readonly IEventDataFormatter eventDataFormatter = A.Fake<IEventDataFormatter>();
-        private readonly IEventStore eventStore = A.Fake<IEventStore>();
         private readonly IMemoryCache cache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
         private readonly IPubSub pubSub = new InMemoryPubSub(true);
         private readonly IServiceProvider services = A.Fake<IServiceProvider>();
-        private readonly ISnapshotStore<int, string> snapshotStore = A.Fake<ISnapshotStore<int, string>>();
-        private readonly IStreamNameResolver streamNameResolver = A.Fake<IStreamNameResolver>();
         private readonly StateFactory sut;
 
         public StateFactoryTests()
         {
             A.CallTo(() => services.GetService(typeof(MyStatefulObject)))
                 .Returns(statefulObject);
-            A.CallTo(() => services.GetService(typeof(ISnapshotStore<int, string>)))
-                .Returns(snapshotStore);
 
-            sut = new StateFactory(pubSub, cache, eventStore, eventDataFormatter, services, streamNameResolver);
+            sut = new StateFactory(pubSub, cache, services);
             sut.Initialize();
         }
 

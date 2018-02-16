@@ -10,8 +10,12 @@ using Newtonsoft.Json.Linq;
 
 namespace Squidex.Infrastructure.EventSourcing
 {
-    public class MongoEvent
+    public sealed class MongoEvent
     {
+        [BsonElement]
+        [BsonRequired]
+        public string Type { get; set; }
+
         [BsonElement]
         [BsonRequired]
         public string Payload { get; set; }
@@ -19,10 +23,6 @@ namespace Squidex.Infrastructure.EventSourcing
         [BsonElement]
         [BsonRequired]
         public JToken Metadata { get; set; }
-
-        [BsonElement]
-        [BsonRequired]
-        public string Type { get; set; }
 
         public static MongoEvent FromEventData(EventData data)
         {

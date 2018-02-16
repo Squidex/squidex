@@ -77,9 +77,6 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<ActionContextAccessor>()
                 .As<IActionContextAccessor>();
 
-            services.AddSingletonAs<AggregateHandler>()
-                .As<IAggregateHandler>();
-
             services.AddSingletonAs<InMemoryCommandBus>()
                 .As<ICommandBus>();
 
@@ -94,6 +91,8 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<Migrator>()
                 .AsSelf();
+
+            services.AddSingleton(typeof(IStore<>), typeof(Store<>));
         }
     }
 }
