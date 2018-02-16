@@ -16,6 +16,23 @@ namespace Squidex.Infrastructure.Reflection
 {
     public static class SimpleMapper
     {
+        private sealed class StringConversionPropertyMapper : PropertyMapper
+        {
+            public StringConversionPropertyMapper(
+                IPropertyAccessor sourceAccessor,
+                IPropertyAccessor targetAccessor)
+                : base(sourceAccessor, targetAccessor)
+            {
+            }
+
+            public override void MapProperty(object source, object target, CultureInfo culture)
+            {
+                var value = GetValue(source);
+
+                SetValue(target, value?.ToString());
+            }
+        }
+
         private sealed class ConversionPropertyMapper : PropertyMapper
         {
             private readonly Type targetType;
@@ -38,21 +55,15 @@ namespace Squidex.Infrastructure.Reflection
                     return;
                 }
 
-                object converted;
                 try
                 {
-                    converted = Convert.ChangeType(value, targetType, culture);
+                    var converted = Convert.ChangeType(value, targetType, culture);
 
                     SetValue(target, converted);
                 }
-                catch (InvalidCastException)
+                catch
                 {
-                    if (targetType == typeof(string))
-                    {
-                        converted = value.ToString();
-
-                        SetValue(target, converted);
-                    }
+                    return;
                 }
             }
         }
@@ -120,7 +131,13 @@ namespace Squidex.Infrastructure.Reflection
                             new PropertyAccessor(sourceClassType, sourceProperty),
                             new PropertyAccessor(targetClassType, targetProperty)));
                     }
-                    else if (targetType.Implements<IConvertible>())
+                    else if (targetType == typeof(string))
+                    {
+                        Mappers.Add(new StringConversionPropertyMapper(
+                            new PropertyAccessor(sourceClassType, sourceProperty),
+                            new PropertyAccessor(targetClassType, targetProperty)));
+                    }
+                    else if (sourceType.Implements<IConvertible>())
                     {
                         Mappers.Add(new ConversionPropertyMapper(
                             new PropertyAccessor(sourceClassType, sourceProperty),
