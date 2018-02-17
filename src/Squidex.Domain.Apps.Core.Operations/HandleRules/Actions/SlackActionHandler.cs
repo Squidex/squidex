@@ -77,9 +77,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
                 }
                 else
                 {
-                    var requestDump = ex.ToString();
-
-                    return (requestDump, ex);
+                    throw;
                 }
             }
         }

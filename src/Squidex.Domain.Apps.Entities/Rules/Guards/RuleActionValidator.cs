@@ -68,6 +68,28 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
             return Task.FromResult<IEnumerable<ValidationError>>(errors);
         }
 
+        public Task<IEnumerable<ValidationError>> Visit(ElasticSearchAction action)
+        {
+            var errors = new List<ValidationError>();
+
+            if (action.Host == null || !action.Host.IsAbsoluteUri)
+            {
+                errors.Add(new ValidationError("Host is required and must be an absolute URL.", nameof(action.Host)));
+            }
+
+            if (string.IsNullOrWhiteSpace(action.IndexType))
+            {
+                errors.Add(new ValidationError("TypeName is required.", nameof(action.IndexType)));
+            }
+
+            if (string.IsNullOrWhiteSpace(action.IndexName))
+            {
+                errors.Add(new ValidationError("IndexName is required.", nameof(action.IndexName)));
+            }
+
+            return Task.FromResult<IEnumerable<ValidationError>>(errors);
+        }
+
         public Task<IEnumerable<ValidationError>> Visit(FastlyAction action)
         {
             var errors = new List<ValidationError>();

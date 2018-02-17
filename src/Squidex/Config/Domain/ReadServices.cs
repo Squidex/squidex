@@ -106,6 +106,9 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<AzureQueueActionHandler>()
                 .As<IRuleActionHandler>();
 
+            services.AddSingletonAs<ElasticSearchActionHandler>()
+                .As<IRuleActionHandler>();
+
             services.AddSingletonAs<FastlyActionHandler>()
                 .As<IRuleActionHandler>();
 

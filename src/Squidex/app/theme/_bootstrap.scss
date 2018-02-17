@@ -51,6 +51,10 @@
 .alert-warning,
 .alert-info,
 .alert-danger {
+    & {
+        border: 0;
+    }
+
     .alert-link {
         color: $color-dark-foreground;
         font-size: inherit;

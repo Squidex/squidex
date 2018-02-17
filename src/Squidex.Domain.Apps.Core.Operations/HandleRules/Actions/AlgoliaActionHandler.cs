@@ -22,7 +22,6 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
 {
     public sealed class AlgoliaActionHandler : RuleActionHandler<AlgoliaAction>
     {
-        private const string SchemaNamePlaceholder = "$SCHEMA_NAME";
         private readonly ClientPool<(string AppId, string ApiKey, string IndexName), Index> clients;
         private readonly RuleEventFormatter formatter;
 
@@ -62,6 +61,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
                     case ContentCreated created:
                     {
                         ruleDescription = $"Add entry to Algolia index: {action.IndexName}";
+
                         ruleData["Content"] = new JObject(
                             new JProperty("id", contentEvent.ContentId),
                             new JProperty("created", timestamp),
@@ -76,6 +76,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
                     case ContentUpdated updated:
                     {
                         ruleDescription = $"Update entry in Algolia index: {action.IndexName}";
+
                         ruleData["Content"] = new JObject(
                             new JProperty("lastModified", timestamp),
                             new JProperty("lastModifiedBy", updated.Actor.ToString()),
@@ -86,7 +87,10 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
                     case ContentStatusChanged statusChanged:
                     {
                         ruleDescription = $"Update entry in Algolia index: {action.IndexName}";
+
                         ruleData["Content"] = new JObject(
+                            new JProperty("lastModified", timestamp),
+                            new JProperty("lastModifiedBy", statusChanged.Actor.ToString()),
                             new JProperty("status", statusChanged.Status.ToString()));
                         break;
                     }
@@ -94,7 +98,9 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
                     case ContentDeleted deleted:
                     {
                         ruleDescription = $"Delete entry from Index: {action.IndexName}";
+
                         ruleData["Content"] = new JObject();
+                        ruleData["Operation"] = "Delete";
                         break;
                     }
                 }
@@ -128,16 +134,16 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
                     {
                         content["objectID"] = contentId;
 
-                        var resonse = await index.PartialUpdateObjectAsync(content);
+                        var response = await index.PartialUpdateObjectAsync(content);
 
-                        return (resonse.ToString(Formatting.Indented), null);
+                        return (response.ToString(Formatting.Indented), null);
                     }
 
                     case "Delete":
                     {
-                        var resonse = await index.DeleteObjectAsync(contentId);
+                        var response = await index.DeleteObjectAsync(contentId);
 
-                        return (resonse.ToString(Formatting.Indented), null);
+                        return (response.ToString(Formatting.Indented), null);
                     }
 
                     default:
@@ -147,10 +153,6 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
             catch (AlgoliaException ex)
             {
                 return (ex.Message, ex);
-            }
-            catch (Exception ex)
-            {
-                return (null, ex);
             }
         }
     }

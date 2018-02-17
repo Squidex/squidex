@@ -24,9 +24,9 @@ export class SlackActionComponent implements OnInit {
     public actionForm =
         this.formBuilder.group({
             webhookUrl: ['',
-            [
-                Validators.required
-            ]],
+                [
+                    Validators.required
+                ]],
             text: ['']
         });
 

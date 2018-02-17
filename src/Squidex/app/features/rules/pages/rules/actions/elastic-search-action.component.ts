@@ -8,14 +8,12 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 
-import { ValidatorsEx } from 'shared';
-
 @Component({
-    selector: 'sqx-azure-queue-action',
-    styleUrls: ['./azure-queue-action.component.scss'],
-    templateUrl: './azure-queue-action.component.html'
+    selector: 'sqx-elastic-search-action',
+    styleUrls: ['./elastic-search-action.component.scss'],
+    templateUrl: './elastic-search-action.component.html'
 })
-export class AzureQueueActionComponent implements OnInit {
+export class ElasticSearchActionComponent implements OnInit {
     @Input()
     public action: any;
 
@@ -25,15 +23,20 @@ export class AzureQueueActionComponent implements OnInit {
     public actionFormSubmitted = false;
     public actionForm =
         this.formBuilder.group({
-            connectionString: ['',
+            host: ['',
                 [
                     Validators.required
                 ]],
-            queue: ['squidex',
+            indexName: ['$APP_NAME',
                 [
-                    Validators.required,
-                    ValidatorsEx.pattern('[a-z][a-z0-9]{2,}(\-[a-z0-9]+)*', 'Name must be a valid azure queue name.')
-                ]]
+                    Validators.required
+                ]],
+            indexType: ['$SCHEMA_NAME',
+                [
+                    // Validators.required
+                ]],
+            username: '',
+            password: ''
         });
 
     constructor(
@@ -42,7 +45,13 @@ export class AzureQueueActionComponent implements OnInit {
     }
 
     public ngOnInit() {
-        this.action = Object.assign({}, { connectionString: '', queue: 'squidex' }, this.action || {});
+        this.action = Object.assign({}, {
+            host: '',
+            indexName: '$APP_NAME',
+            indexType: '$SCHEMA_NAME',
+            username: '',
+            password: ''
+        }, this.action || {});
 
         this.actionFormSubmitted = false;
         this.actionForm.reset();

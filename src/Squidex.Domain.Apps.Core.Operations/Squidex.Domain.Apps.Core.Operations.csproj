@@ -14,6 +14,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Algolia.Search" Version="4.2.1" />
+    <PackageReference Include="Elasticsearch.Net" Version="6.0.1" />
     <PackageReference Include="Jint" Version="2.11.58" />
     <PackageReference Include="Microsoft.OData.Core" Version="7.4.0" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />

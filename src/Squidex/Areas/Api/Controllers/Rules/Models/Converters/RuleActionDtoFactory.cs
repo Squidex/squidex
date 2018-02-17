@@ -35,6 +35,11 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models.Converters
             return SimpleMapper.Map(action, new AzureQueueActionDto());
         }
 
+        public RuleActionDto Visit(ElasticSearchAction action)
+        {
+            return SimpleMapper.Map(action, new ElasticSearchActionDto());
+        }
+
         public RuleActionDto Visit(FastlyAction action)
         {
             return SimpleMapper.Map(action, new FastlyActionDto());

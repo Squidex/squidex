@@ -24,13 +24,13 @@ export class FastlyActionComponent implements OnInit {
     public actionForm =
         this.formBuilder.group({
             serviceId: ['',
-            [
-                Validators.required
-            ]],
+                [
+                    Validators.required
+                ]],
             apiKey: ['',
-            [
-                Validators.required
-            ]]
+                [
+                    Validators.required
+                ]]
         });
 
     constructor(

@@ -1,0 +1,73 @@
+<h3 class="rule-title">Populate index in ElasticSearch with content</h3>
+
+<form [formGroup]="actionForm" class="form-horizontal" (ngSubmit)="save()">
+    <div class="form-group row">
+        <label class="col col-3 col-form-label" for="host">Host</label>
+
+        <div class="col col-9">
+            <sqx-control-errors for="host" [submitted]="actionFormSubmitted"></sqx-control-errors>
+
+            <input type="text" class="form-control" id="host" formControlName="host" placeholder="http://localhost:9200" />
+
+            <small class="form-text text-muted">
+                The url to your elastic search instance.
+            </small>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label class="col col-3 col-form-label" for="username">Username</label>
+
+        <div class="col col-9">
+            <sqx-control-errors for="username" [submitted]="actionFormSubmitted"></sqx-control-errors>
+
+            <input type="text" class="form-control" id="username" formControlName="username" />
+
+            <small class="form-text text-muted">
+                The username for authentication. Highly recommended.
+            </small>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label class="col col-3 col-form-label" for="username">Password</label>
+
+        <div class="col col-9">
+            <sqx-control-errors for="password" [submitted]="actionFormSubmitted"></sqx-control-errors>
+
+            <input type="text" class="form-control" id="password" formControlName="password" />
+
+            <small class="form-text text-muted">
+                The password for authentication. Highly recommended.
+            </small>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label class="col col-3 col-form-label" for="sharedSecret">Index Name</label>
+
+        <div class="col col-9">
+            <sqx-control-errors for="indexName" [submitted]="actionFormSubmitted"></sqx-control-errors>
+
+            <input type="text" class="form-control" id="indexName" formControlName="indexName" />
+
+            <small class="form-text text-muted">
+                The name of the index. You can use advanced formatting (read help section).
+            </small>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label class="col col-3 col-form-label" for="sharedSecret">Type Name</label>
+
+        <div class="col col-9">
+            <sqx-control-errors for="indexType" [submitted]="actionFormSubmitted"></sqx-control-errors>
+
+            <input type="text" class="form-control" id="indexType" formControlName="indexType" />
+
+            <small class="form-text text-muted">
+                The name of the type. You can use advanced formatting (read help section).
+            </small>
+        </div>
+    </div>
+</form>

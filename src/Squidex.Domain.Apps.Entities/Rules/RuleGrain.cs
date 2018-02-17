@@ -39,16 +39,16 @@ namespace Squidex.Domain.Apps.Entities.Rules
             switch (command)
             {
                 case CreateRule createRule:
-                    return CreateAsync(createRule, c =>
+                    return CreateAsync(createRule, async c =>
                     {
-                        GuardRule.CanCreate(c, appProvider);
+                        await GuardRule.CanCreate(c, appProvider);
 
                         Create(c);
                     });
                 case UpdateRule updateRule:
-                    return UpdateAsync(updateRule, c =>
+                    return UpdateAsync(updateRule, async c =>
                     {
-                        GuardRule.CanUpdate(c, Snapshot.AppId.Id, appProvider);
+                        await GuardRule.CanUpdate(c, Snapshot.AppId.Id, appProvider);
 
                         Update(c);
                     });
