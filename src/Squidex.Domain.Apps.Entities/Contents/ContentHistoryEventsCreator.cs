@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             : base(typeNameRegistry)
         {
             AddEventMessage<ContentCreated>(
-                "created {[Schema]} content item to.");
+                "created {[Schema]} content item.");
 
             AddEventMessage<ContentUpdated>(
                 "updated {[Schema]} content item.");
