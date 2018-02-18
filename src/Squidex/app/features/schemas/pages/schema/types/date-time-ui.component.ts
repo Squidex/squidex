@@ -28,11 +28,12 @@ export class DateTimeUIComponent implements OnInit {
     public hideAllowedValues: Observable<boolean>;
 
     public ngOnInit() {
-        this.editForm.addControl('editor',
+        this.editForm.setControl('editor',
             new FormControl(this.properties.editor, [
                 Validators.required
             ]));
-        this.editForm.addControl('placeholder',
+
+        this.editForm.setControl('placeholder',
             new FormControl(this.properties.placeholder, [
                 Validators.maxLength(100)
             ]));

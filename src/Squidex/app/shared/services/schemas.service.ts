@@ -355,7 +355,7 @@ export class StringFieldPropertiesDto extends FieldPropertiesDto {
     constructor(label: string | null, hints: string | null, placeholder: string | null,
         isRequired: boolean,
         isListField: boolean,
-        public readonly isInlineEditable: boolean,
+        public readonly inlineEditable: boolean,
         public readonly editor: string,
         public readonly defaultValue?: string,
         public readonly pattern?: string,
@@ -416,7 +416,7 @@ export class NumberFieldPropertiesDto extends FieldPropertiesDto {
     constructor(label: string | null, hints: string | null, placeholder: string | null,
         isRequired: boolean,
         isListField: boolean,
-        public readonly isInlineEditable: boolean,
+        public readonly inlineEditable: boolean,
         public readonly editor: string,
         public readonly defaultValue?: number,
         public readonly maxValue?: number,
@@ -525,7 +525,7 @@ export class BooleanFieldPropertiesDto extends FieldPropertiesDto {
     constructor(label: string | null, hints: string | null, placeholder: string | null,
         isRequired: boolean,
         isListField: boolean,
-        public readonly isInlineEditable: boolean,
+        public readonly inlineEditable: boolean,
         public readonly editor: string,
         public readonly defaultValue?: boolean
     ) {
