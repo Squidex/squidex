@@ -40,6 +40,7 @@ import {
 export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, OnInit {
     private contentStatusChangedSubscription: Subscription;
     private contentDeletedSubscription: Subscription;
+    private contentUpdatedSubscription: Subscription;
     private contentVersionSelectedSubscription: Subscription;
 
     public schema: SchemaDetailsDto;
@@ -62,6 +63,7 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
     public ngOnDestroy() {
         this.contentVersionSelectedSubscription.unsubscribe();
         this.contentStatusChangedSubscription.unsubscribe();
+        this.contentUpdatedSubscription.unsubscribe();
         this.contentDeletedSubscription.unsubscribe();
     }
 
@@ -77,6 +79,14 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
                 .subscribe(message => {
                     if (this.content && message.content.id === this.content.id) {
                         this.router.navigate(['../'], { relativeTo: this.ctx.route });
+                    }
+                });
+
+        this.contentUpdatedSubscription =
+            this.ctx.bus.of(ContentUpdated)
+                .subscribe(message => {
+                    if (this.content && message.content.id === this.content.id) {
+                        this.reloadContentForm(message.content);
                     }
                 });
 
@@ -102,9 +112,7 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
 
         this.ctx.route.data.map(d => d.content)
             .subscribe((content: ContentDto) => {
-                this.content = content;
-
-                this.populateContentForm();
+                this.reloadContentForm(content);
             });
     }
 
@@ -122,7 +130,7 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
             this.contentOld = null;
 
             this.emitContentUpdated(this.content);
-            this.populateContentForm();
+            this.reloadContentForm(this.content);
         }
     }
 
@@ -159,13 +167,13 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
             } else {
                 this.contentsService.putContent(this.ctx.appName, this.schema.name, this.content.id, requestDto, this.content.version)
                     .subscribe(dto => {
-                        this.content = this.content.update(dto.payload, this.ctx.userToken, dto.version);
+                        const content = this.content.update(dto.payload, this.ctx.userToken, dto.version);
 
                         this.ctx.notifyInfo('Content saved successfully.');
 
                         this.emitContentUpdated(this.content);
                         this.enableContentForm();
-                        this.populateContentForm();
+                        this.reloadContentForm(content);
                     }, error => {
                         this.ctx.notifyError(error);
 
@@ -187,12 +195,9 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
                         this.contentOld = null;
                     }
 
-                    this.content = this.content.setData(dto);
-
                     this.ctx.notifyInfo('Content version loaded successfully.');
 
-                    this.emitContentUpdated(this.content);
-                    this.populateContentForm();
+                    this.reloadContentForm(this.content.setData(dto));
                 }, error => {
                     this.ctx.notifyError(error);
                 });
@@ -235,12 +240,12 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
         for (const field of schema.fields) {
             const group = new FormGroup({});
 
-            if (field.partitioning === 'language') {
+            if (field.isLocalizable) {
                 for (let language of this.languages) {
-                    group.addControl(language.iso2Code, new FormControl(undefined, field.createValidators(language.isOptional)));
+                    group.setControl(language.iso2Code, new FormControl(undefined, field.createValidators(language.isOptional)));
                 }
             } else {
-                group.addControl('iv', new FormControl(undefined, field.createValidators(false)));
+                group.setControl('iv', new FormControl(undefined, field.createValidators(false)));
             }
 
             controls[field.name] = group;
@@ -249,7 +254,8 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
         this.contentForm = new FormGroup(controls);
     }
 
-    private populateContentForm() {
+    private reloadContentForm(content: ContentDto) {
+        this.content = content;
         this.contentForm.markAsPristine();
 
         this.isNewMode = !this.content;

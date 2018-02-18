@@ -5,8 +5,9 @@
  * Copyright (c) Sebastian Stehle. All rights r vbeserved
  */
 
-import { ChangeDetectionStrategy, Component, Host, Input, OnChanges, Optional } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Host, Input, OnChanges, OnDestroy, Optional } from '@angular/core';
 import { AbstractControl, FormGroupDirective } from '@angular/forms';
+import { Observable, Subscription } from 'rxjs';
 
 import { fadeAnimation } from './animations';
 
@@ -33,9 +34,11 @@ const DEFAULT_ERRORS: { [key: string]: string } = {
     ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ControlErrorsComponent implements OnChanges {
+export class ControlErrorsComponent implements OnChanges, OnDestroy {
     private displayFieldName: string;
     private control: AbstractControl;
+    private controlSubscription: Subscription | null = null;
+    private originalMarkAsTouched: any;
 
     @Input()
     public for: string;
@@ -52,17 +55,74 @@ export class ControlErrorsComponent implements OnChanges {
     @Input()
     public submitOnly = false;
 
-    public get errorMessages(): string[] | null {
-        if (!this.control) {
-            return null;
+    public errorMessages: string[] = [];
+
+    constructor(
+        @Optional() @Host() private readonly formGroupDirective: FormGroupDirective,
+        private readonly changeDetector: ChangeDetectorRef
+    ) {
+        if (!this.formGroupDirective) {
+            throw new Error('control-errors must be used with a parent formGroup directive');
+        }
+    }
+
+    public ngOnDestroy() {
+        this.unsubscribe();
+    }
+
+    public ngOnChanges() {
+        if (this.fieldName) {
+            this.displayFieldName = this.fieldName;
+        } else if (this.for) {
+            this.displayFieldName = this.for.substr(0, 1).toUpperCase() + this.for.substr(1);
         }
 
-        if (this.control.invalid && ((this.control.touched && !this.submitOnly) || this.submitted) && this.control.errors) {
-            const errors: string[] = [];
+        const control = this.formGroupDirective.form.controls[this.for];
 
+        if (this.control !== control) {
+            this.unsubscribe();
+
+            this.control = control;
+
+            if (control) {
+                const self = this;
+
+                this.controlSubscription =
+                    Observable.merge(control.valueChanges, control.statusChanges)
+                        .subscribe(() => {
+                            this.createMessages();
+                        });
+
+                this.originalMarkAsTouched = this.control.markAsTouched;
+
+                this.control['markAsTouched'] = function () {
+                    self.originalMarkAsTouched.apply(this, arguments);
+
+                    self.createMessages();
+                };
+            }
+        }
+
+        this.createMessages();
+    }
+
+    private unsubscribe() {
+        if (this.controlSubscription) {
+            this.controlSubscription.unsubscribe();
+        }
+
+        if (this.control && this.originalMarkAsTouched) {
+            this.control['markAsTouched'] = this.originalMarkAsTouched;
+        }
+    }
+
+    private createMessages() {
+        const errors: string[] = [];
+
+        if (this.control.invalid && ((this.control.touched && !this.submitOnly) || this.submitted) && this.control.errors) {
             for (let key in <any>this.control.errors) {
                 if (this.control.errors.hasOwnProperty(key)) {
-                    let message = (this.errors ? this.errors[key] : null) || DEFAULT_ERRORS[key];
+                    let message = (this.errors ? this.errors[key] : null) || DEFAULT_ERRORS[key.toLowerCase()];
 
                     if (!message) {
                         continue;
@@ -81,28 +141,10 @@ export class ControlErrorsComponent implements OnChanges {
                     errors.push(message);
                 }
             }
-
-            return errors.length > 0 ? errors : null;
         }
 
-        return null;
-    }
+        this.errorMessages = errors;
 
-    constructor(
-        @Optional() @Host() private readonly formGroupDirective: FormGroupDirective
-    ) {
-        if (!this.formGroupDirective) {
-            throw new Error('control-errors must be used with a parent formGroup directive');
-        }
-    }
-
-    public ngOnChanges() {
-        if (this.fieldName) {
-            this.displayFieldName = this.fieldName;
-        } else if (this.for) {
-            this.displayFieldName = this.for.substr(0, 1).toUpperCase() + this.for.substr(1);
-        }
-
-        this.control = this.formGroupDirective.form.controls[this.for];
+        this.changeDetector.detectChanges();
     }
 }

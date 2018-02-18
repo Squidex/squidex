@@ -22,6 +22,7 @@ import {
     Version,
     Versioned
 } from 'framework';
+import { partition } from 'rxjs/operator/partition';
 
 export const fieldTypes: string[] = [
     'Assets',
@@ -78,9 +79,7 @@ export function createProperties(fieldType: string, values: Object | null = null
 }
 
 export class SchemaDto {
-    public get displayName() {
-        return StringHelper.firstNonEmpty(this.properties.label || '', this.name);
-    }
+    public readonly displayName = StringHelper.firstNonEmpty(this.properties.label, this.name);
 
     constructor(
         public readonly id: string,
@@ -279,9 +278,10 @@ export class SchemaDetailsDto extends SchemaDto {
 }
 
 export class FieldDto {
-    public get displayName() {
-        return StringHelper.firstNonEmpty(this.properties.label || '', this.name);
-    }
+    public readonly displayName = StringHelper.firstNonEmpty(this.properties.label, this.name);
+    public readonly displayPlaceholder = this.properties.placeholder || '';
+
+    public readonly isLocalizable = this.partitioning !== 'invariant';
 
     constructor(
         public readonly fieldId: number,

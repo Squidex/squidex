@@ -6,7 +6,7 @@
     <span class="field-disabled" *ngIf="field.isDisabled">Disabled</span>
 
     <div [formGroup]="fieldForm">
-        <div *ngIf="field.partitioning === 'language' && languages.length > 1">
+        <div *ngIf="field.isLocalizable && languages.length > 1">
             <div class="languages-buttons" #buttonLanguages>
                 <sqx-language-selector size="sm" (selectedLanguageChanged)="selectLanguage($event)" [languages]="languages"></sqx-language-selector>
             </div>
@@ -24,7 +24,7 @@
                     <div *ngSwitchCase="'Number'">
                         <div [ngSwitch]="field.properties.editor">
                             <div *ngSwitchCase="'Input'">
-                                <input class="form-control" type="number" [formControlName]="partition" [placeholder]="field.properties.placeholder || ''" />
+                                <input class="form-control" type="number" [formControlName]="partition" [placeholder]="field.displayPlaceholder" />
                             </div>
                             <div *ngSwitchCase="'Stars'">
                                 <sqx-stars [formControlName]="partition" [maximumStars]="field.properties.maxValue"></sqx-stars>
@@ -48,13 +48,13 @@
                     <div *ngSwitchCase="'String'">
                         <div [ngSwitch]="field.properties.editor">
                             <div *ngSwitchCase="'Input'">
-                                <input class="form-control" type="text" [formControlName]="partition" [placeholder]="field.properties.placeholder || ''" />
+                                <input class="form-control" type="text" [formControlName]="partition" [placeholder]="field.displayPlaceholder" />
                             </div>
                             <div *ngSwitchCase="'Slug'">
-                                <input class="form-control" type="text" [formControlName]="partition" [placeholder]="field.properties.placeholder || ''" sqxSlugifyInput />
+                                <input class="form-control" type="text" [formControlName]="partition" [placeholder]="field.displayPlaceholder" sqxSlugifyInput />
                             </div>
                             <div *ngSwitchCase="'TextArea'">
-                                <textarea class="form-control" [formControlName]="partition" rows="5" [placeholder]="field.properties.placeholder || ''"></textarea>
+                                <textarea class="form-control" [formControlName]="partition" rows="5" [placeholder]="field.displayPlaceholder"></textarea>
                             </div>
                             <div *ngSwitchCase="'RichText'">
                                 <sqx-rich-editor [formControlName]="partition" (assetPluginClicked)="assetPluginClicked()"></sqx-rich-editor>
@@ -106,7 +106,7 @@
                         <sqx-tag-editor [formControlName]="partition"></sqx-tag-editor>
                     </div>
                     <div *ngSwitchCase="'References'">
-                        <sqx-references-editor [formControlName]="partition" [languageCode]="selectFieldLanguage(partition)" [schemaId]="field.properties.schemaId"></sqx-references-editor>
+                        <sqx-references-editor [formControlName]="partition" [language]="selectedLanguage" [schemaId]="field.properties.schemaId"></sqx-references-editor>
                     </div>
                 </div>
             </div>

@@ -12,6 +12,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import {
     AppContext,
+    AppLanguageDto,
     ContentDto,
     ContentsService,
     FieldDto,
@@ -43,7 +44,7 @@ export class ReferencesEditorComponent implements ControlValueAccessor, OnInit {
     public schemaId: string;
 
     @Input()
-    public languageCode: string;
+    public language: AppLanguageDto;
 
     public schema: SchemaDetailsDto;
 

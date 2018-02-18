@@ -87,6 +87,12 @@ export module HTTP {
         return handleVersion(http.put<T>(url, body, { observe: 'response', headers }), version);
     }
 
+    export function patchVersioned<T>(http: HttpClient, url: string, body: any, version?: Version): Observable<Versioned<HttpResponse<T>>> {
+        const headers = createHeaders(version);
+
+        return handleVersion(http.request<T>('PATCH', url, { body, observe: 'response', headers }), version);
+    }
+
     export function deleteVersioned<T>(http: HttpClient, url: string, version?: Version): Observable<Versioned<HttpResponse<T>>> {
         const headers = createHeaders(version);
 
