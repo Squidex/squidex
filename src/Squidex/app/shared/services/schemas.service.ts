@@ -40,13 +40,13 @@ export function createProperties(fieldType: string, values: Object | null = null
 
     switch (fieldType) {
         case 'Number':
-            properties = new NumberFieldPropertiesDto(null, null, null, false, false, 'Input');
+            properties = new NumberFieldPropertiesDto(null, null, null, false, false, false, 'Input');
             break;
         case 'String':
-            properties = new StringFieldPropertiesDto(null, null, null, false, false, 'Input');
+            properties = new StringFieldPropertiesDto(null, null, null, false, false, false, 'Input');
             break;
         case 'Boolean':
-            properties = new BooleanFieldPropertiesDto(null, null, null, false, false, 'Checkbox');
+            properties = new BooleanFieldPropertiesDto(null, null, null, false, false, false, 'Checkbox');
             break;
         case 'DateTime':
             properties = new DateTimeFieldPropertiesDto(null, null, null, false, false, 'DateTime');
@@ -355,6 +355,7 @@ export class StringFieldPropertiesDto extends FieldPropertiesDto {
     constructor(label: string | null, hints: string | null, placeholder: string | null,
         isRequired: boolean,
         isListField: boolean,
+        public readonly isInlineEditable: boolean,
         public readonly editor: string,
         public readonly defaultValue?: string,
         public readonly pattern?: string,
@@ -415,6 +416,7 @@ export class NumberFieldPropertiesDto extends FieldPropertiesDto {
     constructor(label: string | null, hints: string | null, placeholder: string | null,
         isRequired: boolean,
         isListField: boolean,
+        public readonly isInlineEditable: boolean,
         public readonly editor: string,
         public readonly defaultValue?: number,
         public readonly maxValue?: number,
@@ -523,6 +525,7 @@ export class BooleanFieldPropertiesDto extends FieldPropertiesDto {
     constructor(label: string | null, hints: string | null, placeholder: string | null,
         isRequired: boolean,
         isListField: boolean,
+        public readonly isInlineEditable: boolean,
         public readonly editor: string,
         public readonly defaultValue?: boolean
     ) {
