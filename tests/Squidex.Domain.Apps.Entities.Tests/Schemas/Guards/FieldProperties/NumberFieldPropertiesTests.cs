@@ -129,5 +129,33 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards.FieldProperties
                     new ValidationError("Editor is not a valid value.", "Editor")
                 });
         }
+
+        [Theory]
+        [InlineData(NumberFieldEditor.Radio)]
+        [InlineData(NumberFieldEditor.Stars)]
+        public void Should_add_error_if_inline_editing_is_not_allowed_for_editor(NumberFieldEditor editor)
+        {
+            var sut = new NumberFieldProperties { InlineEditable = true, Editor = editor };
+
+            var errors = FieldPropertiesValidator.Validate(sut).ToList();
+
+            errors.ShouldBeEquivalentTo(
+                new List<ValidationError>
+                {
+                    new ValidationError("Inline editing is only allowed for dropdowns and input fields.", "InlineEditable", "Editor")
+                });
+        }
+
+        [Theory]
+        [InlineData(NumberFieldEditor.Input)]
+        [InlineData(NumberFieldEditor.Dropdown)]
+        public void Should_not_add_error_if_inline_editing_is_allowed_for_editor(NumberFieldEditor editor)
+        {
+            var sut = new NumberFieldProperties { InlineEditable = true, Editor = editor };
+
+            var errors = FieldPropertiesValidator.Validate(sut).ToList();
+
+            Assert.Empty(errors);
+        }
     }
 }

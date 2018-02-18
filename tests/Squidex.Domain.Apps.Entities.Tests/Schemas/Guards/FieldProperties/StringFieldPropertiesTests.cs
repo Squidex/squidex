@@ -100,5 +100,36 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards.FieldProperties
                     new ValidationError("Pattern is not a valid expression.", "Pattern")
                 });
         }
+
+        [Theory]
+        [InlineData(StringFieldEditor.Markdown)]
+        [InlineData(StringFieldEditor.Radio)]
+        [InlineData(StringFieldEditor.RichText)]
+        [InlineData(StringFieldEditor.TextArea)]
+        public void Should_add_error_if_inline_editing_is_not_allowed_for_editor(StringFieldEditor editor)
+        {
+            var sut = new StringFieldProperties { InlineEditable = true, Editor = editor };
+
+            var errors = FieldPropertiesValidator.Validate(sut).ToList();
+
+            errors.ShouldBeEquivalentTo(
+                new List<ValidationError>
+                {
+                    new ValidationError("Inline editing is only allowed for dropdowns, slugs and input fields.", "InlineEditable", "Editor")
+                });
+        }
+
+        [Theory]
+        [InlineData(StringFieldEditor.Dropdown)]
+        [InlineData(StringFieldEditor.Input)]
+        [InlineData(StringFieldEditor.Slug)]
+        public void Should_not_add_error_if_inline_editing_is_allowed_for_editor(StringFieldEditor editor)
+        {
+            var sut = new StringFieldProperties { InlineEditable = true, Editor = editor };
+
+            var errors = FieldPropertiesValidator.Validate(sut).ToList();
+
+            Assert.Empty(errors);
+        }
     }
 }

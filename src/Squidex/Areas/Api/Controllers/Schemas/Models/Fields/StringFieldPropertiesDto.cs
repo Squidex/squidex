@@ -48,6 +48,11 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
         public string[] AllowedValues { get; set; }
 
         /// <summary>
+        /// Indicates that the inline editor is enabled for this field.
+        /// </summary>
+        public bool InlineEditable { get; set; }
+
+        /// <summary>
         /// The editor that is used to manage this field.
         /// </summary>
         [JsonConverter(typeof(StringEnumConverter))]
