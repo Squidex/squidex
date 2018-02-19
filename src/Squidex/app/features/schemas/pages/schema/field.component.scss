@@ -4,7 +4,13 @@
 $field-header: #e7ebef;
 
 .table-items-row-details {
-    cursor: default;
+    & {
+        cursor: default;
+    }
+
+    &::before {
+        right: 4.6rem;
+    }
 }
 
 .col {

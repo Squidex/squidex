@@ -18,6 +18,7 @@ import {
     createProperties,
     fadeAnimation,
     FieldDto,
+    FieldPropertiesDto,
     fieldTypes,
     HistoryChannelUpdated,
     ImmutableArray,
@@ -213,12 +214,12 @@ export class SchemaPageComponent implements OnDestroy, OnInit {
             });
     }
 
-    public saveField(field: FieldDto) {
+    public saveField(field: FieldDto, properties: FieldPropertiesDto) {
         const requestDto = new UpdateFieldDto(field.properties);
 
         this.schemasService.putField(this.ctx.appName, this.schema.name, field.fieldId, requestDto, this.schema.version)
             .subscribe(dto => {
-                this.updateSchema(this.schema.updateField(field, this.ctx.userToken, dto.version));
+                this.updateSchema(this.schema.updateField(field.update(properties), this.ctx.userToken, dto.version));
             }, error => {
                 this.ctx.notifyError(error);
             });

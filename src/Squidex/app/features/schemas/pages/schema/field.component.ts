@@ -13,6 +13,7 @@ import {
     createProperties,
     fadeAnimation,
     FieldDto,
+    FieldPropertiesDto,
     ModalView,
     SchemaDto
 } from 'shared';
@@ -45,7 +46,7 @@ export class FieldComponent implements OnInit {
     public showing = new EventEmitter();
 
     @Output()
-    public saving = new EventEmitter();
+    public saving = new EventEmitter<FieldPropertiesDto>();
 
     @Output()
     public enabling = new EventEmitter();
@@ -107,22 +108,12 @@ export class FieldComponent implements OnInit {
         if (this.editForm.valid) {
             const properties = createProperties(this.field.properties['fieldType'], this.editForm.value);
 
-            const field =
-                new FieldDto(
-                    this.field.fieldId,
-                    this.field.name,
-                    this.field.isLocked,
-                    this.field.isHidden,
-                    this.field.isHidden,
-                    this.field.partitioning,
-                    properties);
-
-            this.emitSaving(field);
+            this.emitSaving(properties);
         }
     }
 
-    private emitSaving(field: FieldDto) {
-        this.saving.emit(field);
+    private emitSaving(properties: FieldPropertiesDto) {
+        this.saving.emit(properties);
     }
 
     private resetEditForm() {
