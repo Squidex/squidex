@@ -135,7 +135,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards.FieldProperties
         [InlineData(NumberFieldEditor.Stars)]
         public void Should_add_error_if_inline_editing_is_not_allowed_for_editor(NumberFieldEditor editor)
         {
-            var sut = new NumberFieldProperties { InlineEditable = true, Editor = editor };
+            var sut = new NumberFieldProperties { InlineEditable = true, Editor = editor, AllowedValues = ImmutableList.Create(1.0) };
 
             var errors = FieldPropertiesValidator.Validate(sut).ToList();
 
@@ -151,7 +151,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards.FieldProperties
         [InlineData(NumberFieldEditor.Dropdown)]
         public void Should_not_add_error_if_inline_editing_is_allowed_for_editor(NumberFieldEditor editor)
         {
-            var sut = new NumberFieldProperties { InlineEditable = true, Editor = editor };
+            var sut = new NumberFieldProperties { InlineEditable = true, Editor = editor, AllowedValues = ImmutableList.Create(1.0) };
 
             var errors = FieldPropertiesValidator.Validate(sut).ToList();
 

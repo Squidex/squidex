@@ -224,7 +224,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                     nameof(properties.MaxLength));
             }
 
-            if (properties.InlineEditable && properties.Editor != StringFieldEditor.Input && properties.Editor != StringFieldEditor.Input && properties.Editor != StringFieldEditor.Slug)
+            if (properties.InlineEditable && properties.Editor != StringFieldEditor.Dropdown && properties.Editor != StringFieldEditor.Input && properties.Editor != StringFieldEditor.Slug)
             {
                 yield return new ValidationError("Inline editing is only allowed for dropdowns, slugs and input fields.",
                     nameof(properties.InlineEditable),
