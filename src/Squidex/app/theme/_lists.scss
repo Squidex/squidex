@@ -127,7 +127,7 @@
             // Caret that is placed next to the expand button.
             &::before {
                 @include caret-top($color-border);
-                @include absolute(-1.1rem, 5.2rem, auto, auto);
+                @include absolute(-1.1rem, 0, auto, auto);
             }
 
             &-tab {

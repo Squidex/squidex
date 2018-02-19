@@ -66,7 +66,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
                 {
                     case ContentCreated created:
                         {
-                            ruleDescription = $"Add entry to Algolia index: {action.IndexName}";
+                            ruleDescription = $"Add entry to ElasticSearch index: {action.IndexName}";
 
                             ruleData["Operation"] = "Create";
                             ruleData["Content"] = new JObject(
@@ -82,7 +82,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
 
                     case ContentUpdated updated:
                         {
-                            ruleDescription = $"Update entry in Algolia index: {action.IndexName}";
+                            ruleDescription = $"Update entry in ElasticSearch index: {action.IndexName}";
 
                             ruleData["Operation"] = "Update";
                             ruleData["Content"] = new JObject(
@@ -94,7 +94,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
 
                     case ContentStatusChanged statusChanged:
                         {
-                            ruleDescription = $"Update entry in Algolia index: {action.IndexName}";
+                            ruleDescription = $"Update entry in ElasticSearch index: {action.IndexName}";
 
                             ruleData["Operation"] = "Update";
                             ruleData["Content"] = new JObject(

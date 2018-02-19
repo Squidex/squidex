@@ -215,7 +215,7 @@ export class SchemaPageComponent implements OnDestroy, OnInit {
     }
 
     public saveField(field: FieldDto, properties: FieldPropertiesDto) {
-        const requestDto = new UpdateFieldDto(field.properties);
+        const requestDto = new UpdateFieldDto(properties);
 
         this.schemasService.putField(this.ctx.appName, this.schema.name, field.fieldId, requestDto, this.schema.version)
             .subscribe(dto => {
