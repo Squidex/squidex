@@ -6,7 +6,7 @@
  */
 
 import { ModuleWithProviders } from '@angular/core';
-import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
+import { RouterModule, Routes } from '@angular/router';
 
 import {
     AppAreaComponent,
@@ -96,4 +96,4 @@ export const routes: Routes = [
     }
 ];
 
-export const routing: ModuleWithProviders = RouterModule.forRoot(routes, { useHash: false, preloadingStrategy: PreloadAllModules });
+export const routing: ModuleWithProviders = RouterModule.forRoot(routes, { useHash: false });

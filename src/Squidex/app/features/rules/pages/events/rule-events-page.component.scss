@@ -35,7 +35,7 @@ h3 {
 
         &::before {
             @include caret-top($color-border);
-            @include absolute(-1.1rem, 2.5rem, auto, auto);
+            @include absolute(-1.1rem, 1.8rem, auto, auto);
         }
 
         h3 {

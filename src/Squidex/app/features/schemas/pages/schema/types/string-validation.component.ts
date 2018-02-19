@@ -64,13 +64,13 @@ export class StringValidationComponent implements OnDestroy, OnInit {
                 .startWith(this.properties.isRequired)
                 .map(x => !x);
 
-        this.showPatternMessage =
-            this.editForm.controls['pattern'].value && this.editForm.controls['pattern'].value.trim().length > 0;
-
         this.showPatternSuggestions =
             this.editForm.controls['pattern'].valueChanges
                 .startWith('')
                 .map(x => !x || x.trim().length === 0);
+
+        this.showPatternMessage =
+            this.editForm.controls['pattern'].value && this.editForm.controls['pattern'].value.trim().length > 0;
 
         this.patternSubscription =
             this.editForm.controls['pattern'].valueChanges

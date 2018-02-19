@@ -239,6 +239,21 @@ export class ContentsService {
                 .pretifyError('Failed to update content. Please reload.');
     }
 
+    public patchContent(appName: string, schemaName: string, id: string, dto: any, version: Version): Observable<Versioned<any>> {
+        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}`);
+
+        return HTTP.patchVersioned(this.http, url, dto, version)
+                .map(response => {
+                    const body = response.payload.body;
+
+                    return new Versioned(response.version, body);
+                })
+                .do(() => {
+                    this.analytics.trackEvent('Content', 'Updated', appName);
+                })
+                .pretifyError('Failed to update content. Please reload.');
+    }
+
     public deleteContent(appName: string, schemaName: string, id: string, version: Version): Observable<Versioned<any>> {
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}`);
 

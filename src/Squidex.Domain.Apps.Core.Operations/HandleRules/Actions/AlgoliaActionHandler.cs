@@ -97,7 +97,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
 
                     case ContentDeleted deleted:
                     {
-                        ruleDescription = $"Delete entry from Index: {action.IndexName}";
+                        ruleDescription = $"Delete entry from Algolia index: {action.IndexName}";
 
                         ruleData["Content"] = new JObject();
                         ruleData["Operation"] = "Delete";

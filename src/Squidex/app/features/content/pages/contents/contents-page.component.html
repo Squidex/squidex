@@ -122,9 +122,9 @@
                 <div sqxIgnoreScrollbar>
                     <table class="table table-items table-fixed" *ngIf="contentItems" >
                         <tbody *ngIf="!isReadOnly">
-                            <ng-template ngFor let-content [ngForOf]="contentItems">
+                            <ng-template ngFor let-content [ngForOf]="contentItems" [ngForTrackBy]="trackBy">
                                 <tr [sqxContent]="content" [routerLink]="[content.id]" routerLinkActive="active"
-                                    [languageCode]="languageSelected.iso2Code"
+                                    [language]="languageSelected"
                                     [schemaFields]="contentFields"
                                     [schema]="schema"
                                     [selected]="isItemSelected(content)"
@@ -133,7 +133,8 @@
                                     (publishing)="publishContent(content)"
                                     (archiving)="archiveContent(content)"
                                     (restoring)="restoreContent(content)"
-                                    (deleting)="deleteContent(content)"></tr>
+                                    (deleting)="deleteContent(content)"
+                                    (saved)="onContentSaved(content, $event)"></tr>
                                 <tr class="spacer"></tr>
                             </ng-template>
                         </tbody>
@@ -141,7 +142,7 @@
                         <tbody *ngIf="isReadOnly">
                             <ng-template ngFor let-content [ngForOf]="contentItems">
                                 <tr [sqxContent]="content" dnd-draggable [dragData]="dropData(content)"
-                                    [languageCode]="languageSelected.iso2Code"
+                                    [language]="languageSelected"
                                     [schemaFields]="contentFields"
                                     [schema]="schema" 
                                     isReadOnly="true"></tr>

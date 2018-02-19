@@ -25,6 +25,7 @@ import {
     CanComponentDeactivate,
     ContentDto,
     ContentsService,
+    fieldInvariant,
     SchemaDetailsDto,
     Version
 } from 'shared';
@@ -40,6 +41,7 @@ import {
 export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, OnInit {
     private contentStatusChangedSubscription: Subscription;
     private contentDeletedSubscription: Subscription;
+    private contentUpdatedSubscription: Subscription;
     private contentVersionSelectedSubscription: Subscription;
 
     public schema: SchemaDetailsDto;
@@ -62,6 +64,7 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
     public ngOnDestroy() {
         this.contentVersionSelectedSubscription.unsubscribe();
         this.contentStatusChangedSubscription.unsubscribe();
+        this.contentUpdatedSubscription.unsubscribe();
         this.contentDeletedSubscription.unsubscribe();
     }
 
@@ -77,6 +80,14 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
                 .subscribe(message => {
                     if (this.content && message.content.id === this.content.id) {
                         this.router.navigate(['../'], { relativeTo: this.ctx.route });
+                    }
+                });
+
+        this.contentUpdatedSubscription =
+            this.ctx.bus.of(ContentUpdated)
+                .subscribe(message => {
+                    if (this.content && message.content.id === this.content.id) {
+                        this.reloadContentForm(message.content);
                     }
                 });
 
@@ -96,15 +107,12 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
 
         const routeData = allData(this.ctx.route);
 
-        this.languages = routeData.appLanguages;
-
+        this.setupLanguages(routeData);
         this.setupContentForm(routeData.schema);
 
         this.ctx.route.data.map(d => d.content)
             .subscribe((content: ContentDto) => {
-                this.content = content;
-
-                this.populateContentForm();
+                this.reloadContentForm(content);
             });
     }
 
@@ -122,7 +130,7 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
             this.contentOld = null;
 
             this.emitContentUpdated(this.content);
-            this.populateContentForm();
+            this.reloadContentForm(this.content);
         }
     }
 
@@ -159,13 +167,13 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
             } else {
                 this.contentsService.putContent(this.ctx.appName, this.schema.name, this.content.id, requestDto, this.content.version)
                     .subscribe(dto => {
-                        this.content = this.content.update(dto.payload, this.ctx.userToken, dto.version);
+                        const content = this.content.update(dto.payload, this.ctx.userToken, dto.version);
 
                         this.ctx.notifyInfo('Content saved successfully.');
 
-                        this.emitContentUpdated(this.content);
+                        this.emitContentUpdated(content);
                         this.enableContentForm();
-                        this.populateContentForm();
+                        this.reloadContentForm(content);
                     }, error => {
                         this.ctx.notifyError(error);
 
@@ -187,12 +195,9 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
                         this.contentOld = null;
                     }
 
-                    this.content = this.content.setData(dto);
-
                     this.ctx.notifyInfo('Content version loaded successfully.');
 
-                    this.emitContentUpdated(this.content);
-                    this.populateContentForm();
+                    this.reloadContentForm(this.content.setData(dto));
                 }, error => {
                     this.ctx.notifyError(error);
                 });
@@ -221,10 +226,20 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
         if (this.schema.fields.length === 0) {
             this.contentForm.enable();
         } else {
-            for (const field of this.schema.fields.filter(f => !f.isDisabled)) {
-                this.contentForm.controls[field.name].enable();
+            for (const field of this.schema.fields) {
+                const fieldForm = <FormGroup>this.contentForm.controls[field.name];
+
+                if (field.isDisabled) {
+                    fieldForm.disable();
+                } else {
+                    fieldForm.enable();
+                }
             }
         }
+    }
+
+    private setupLanguages(routeData: { [name: string]: any; }) {
+        this.languages = routeData.appLanguages;
     }
 
     private setupContentForm(schema: SchemaDetailsDto) {
@@ -233,23 +248,26 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
         const controls: { [key: string]: AbstractControl } = {};
 
         for (const field of schema.fields) {
-            const group = new FormGroup({});
+            const fieldForm = new FormGroup({});
 
-            if (field.partitioning === 'language') {
+            if (field.isLocalizable) {
                 for (let language of this.languages) {
-                    group.addControl(language.iso2Code, new FormControl(undefined, field.createValidators(language.isOptional)));
+                    fieldForm.setControl(language.iso2Code, new FormControl(undefined, field.createValidators(language.isOptional)));
                 }
             } else {
-                group.addControl('iv', new FormControl(undefined, field.createValidators(false)));
+                fieldForm.setControl(fieldInvariant, new FormControl(undefined, field.createValidators(false)));
             }
 
-            controls[field.name] = group;
+            controls[field.name] = fieldForm;
         }
 
         this.contentForm = new FormGroup(controls);
+
+        this.enableContentForm();
     }
 
-    private populateContentForm() {
+    private reloadContentForm(content: ContentDto) {
+        this.content = content;
         this.contentForm.markAsPristine();
 
         this.isNewMode = !this.content;
@@ -257,14 +275,14 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
         if (!this.isNewMode) {
             for (const field of this.schema.fields) {
                 const fieldValue = this.content.data[field.name] || {};
-                const fieldForm = <FormGroup>this.contentForm.get(field.name);
+                const fieldForm = <FormGroup>this.contentForm.controls[field.name];
 
-                if (field.partitioning === 'language') {
+                if (field.isLocalizable) {
                     for (let language of this.languages) {
                         fieldForm.controls[language.iso2Code].setValue(fieldValue[language.iso2Code]);
                     }
                 } else {
-                    fieldForm.controls['iv'].setValue(fieldValue['iv'] === undefined ? null : fieldValue['iv']);
+                    fieldForm.controls[fieldInvariant].setValue(fieldValue[fieldInvariant] === undefined ? null : fieldValue[fieldInvariant]);
                 }
             }
             if (this.content.status === 'Archived') {
@@ -273,14 +291,16 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
         } else {
             for (const field of this.schema.fields) {
                 const defaultValue = field.defaultValue();
+
                 if (defaultValue) {
-                    const fieldForm = <FormGroup>this.contentForm.get(field.name);
-                    if (field.partitioning === 'language') {
+                    const fieldForm = <FormGroup>this.contentForm.controls[field.name];
+
+                    if (field.isLocalizable) {
                         for (let language of this.languages) {
                             fieldForm.controls[language.iso2Code].setValue(defaultValue);
                         }
                     } else {
-                        fieldForm.controls['iv'].setValue(defaultValue);
+                        fieldForm.controls[fieldInvariant].setValue(defaultValue);
                     }
                 }
             }

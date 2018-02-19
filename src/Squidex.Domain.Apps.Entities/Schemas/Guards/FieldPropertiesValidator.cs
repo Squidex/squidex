@@ -170,6 +170,13 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                     nameof(properties.MinValue),
                     nameof(properties.MaxValue));
             }
+
+            if (properties.InlineEditable && properties.Editor != NumberFieldEditor.Input && properties.Editor != NumberFieldEditor.Dropdown)
+            {
+                yield return new ValidationError("Inline editing is only allowed for dropdowns and input fields.",
+                    nameof(properties.InlineEditable),
+                    nameof(properties.Editor));
+            }
         }
 
         public IEnumerable<ValidationError> Visit(ReferencesFieldProperties properties)
@@ -215,6 +222,13 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                     nameof(properties.AllowedValues),
                     nameof(properties.MinLength),
                     nameof(properties.MaxLength));
+            }
+
+            if (properties.InlineEditable && properties.Editor != StringFieldEditor.Dropdown && properties.Editor != StringFieldEditor.Input && properties.Editor != StringFieldEditor.Slug)
+            {
+                yield return new ValidationError("Inline editing is only allowed for dropdowns, slugs and input fields.",
+                    nameof(properties.InlineEditable),
+                    nameof(properties.Editor));
             }
         }
 

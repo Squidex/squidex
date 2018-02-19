@@ -23,7 +23,7 @@ export class GeolocationUIComponent implements OnInit {
     public properties: GeolocationFieldPropertiesDto;
 
     public ngOnInit() {
-        this.editForm.addControl('editor',
+        this.editForm.setControl('editor',
             new FormControl(this.properties.editor, [
                 Validators.required
             ]));
