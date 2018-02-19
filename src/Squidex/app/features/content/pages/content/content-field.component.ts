@@ -6,10 +6,14 @@
  */
 
 import { Component, Input, OnInit } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { AbstractControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
-import { AppLanguageDto, FieldDto } from 'shared';
+import {
+    AppLanguageDto,
+    FieldDto,
+    fieldInvariant
+} from 'shared';
 
 @Component({
     selector: 'sqx-content-field',
@@ -29,7 +33,7 @@ export class ContentFieldComponent implements OnInit {
     @Input()
     public contentFormSubmitted: boolean;
 
-    public selectedFormControl: string;
+    public selectedFormControl: AbstractControl;
     public selectedLanguage: AppLanguageDto;
 
     constructor(
@@ -39,23 +43,21 @@ export class ContentFieldComponent implements OnInit {
     }
 
     public ngOnInit() {
-        if (this.field.isDisabled) {
-            this.fieldForm.disable();
-        }
-
-        const masterLanguage = this.languages.find(l => l.isMaster)!;
+        const masterLanguage = this.languages[0];
 
         if (this.field.isLocalizable) {
-            this.selectedFormControl = masterLanguage.iso2Code;
+            this.selectedFormControl = this.fieldForm.controls[masterLanguage.iso2Code];
         } else {
-            this.selectedFormControl = 'iv';
+            this.selectedFormControl = this.fieldForm.controls[fieldInvariant];
         }
 
         this.selectedLanguage = masterLanguage;
     }
 
     public selectLanguage(language: AppLanguageDto) {
-        this.selectedFormControl = language.iso2Code;
+        this.selectedFormControl['_clearChangeFns']();
+
+        this.selectedFormControl = this.fieldForm.controls[language.iso2Code];
         this.selectedLanguage = language;
     }
 

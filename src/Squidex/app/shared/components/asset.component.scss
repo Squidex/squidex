@@ -23,7 +23,7 @@
 }
 
 @mixin asset-type {
-    padding: .1rem .3rem;
+    padding: .1rem .25rem;
     text-transform: uppercase;
     font-size: .7rem;
     font-weight: normal;
@@ -62,7 +62,7 @@
     &-text {
         @include absolute(40%, 0, 0, 0);
         text-align: center;
-        font-size: 1.3rem;
+        font-size: 1.25rem;
         font-weight: lighter;
     }
 }

@@ -25,6 +25,7 @@ import {
     CanComponentDeactivate,
     ContentDto,
     ContentsService,
+    fieldInvariant,
     SchemaDetailsDto,
     Version
 } from 'shared';
@@ -106,8 +107,7 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
 
         const routeData = allData(this.ctx.route);
 
-        this.languages = routeData.appLanguages;
-
+        this.setupLanguages(routeData);
         this.setupContentForm(routeData.schema);
 
         this.ctx.route.data.map(d => d.content)
@@ -171,7 +171,7 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
 
                         this.ctx.notifyInfo('Content saved successfully.');
 
-                        this.emitContentUpdated(this.content);
+                        this.emitContentUpdated(content);
                         this.enableContentForm();
                         this.reloadContentForm(content);
                     }, error => {
@@ -226,10 +226,20 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
         if (this.schema.fields.length === 0) {
             this.contentForm.enable();
         } else {
-            for (const field of this.schema.fields.filter(f => !f.isDisabled)) {
-                this.contentForm.controls[field.name].enable();
+            for (const field of this.schema.fields) {
+                const fieldForm = <FormGroup>this.contentForm.controls[field.name];
+
+                if (field.isDisabled) {
+                    fieldForm.disable();
+                } else {
+                    fieldForm.enable();
+                }
             }
         }
+    }
+
+    private setupLanguages(routeData: { [name: string]: any; }) {
+        this.languages = routeData.appLanguages;
     }
 
     private setupContentForm(schema: SchemaDetailsDto) {
@@ -238,20 +248,22 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
         const controls: { [key: string]: AbstractControl } = {};
 
         for (const field of schema.fields) {
-            const group = new FormGroup({});
+            const fieldForm = new FormGroup({});
 
             if (field.isLocalizable) {
                 for (let language of this.languages) {
-                    group.setControl(language.iso2Code, new FormControl(undefined, field.createValidators(language.isOptional)));
+                    fieldForm.setControl(language.iso2Code, new FormControl(undefined, field.createValidators(language.isOptional)));
                 }
             } else {
-                group.setControl('iv', new FormControl(undefined, field.createValidators(false)));
+                fieldForm.setControl(fieldInvariant, new FormControl(undefined, field.createValidators(false)));
             }
 
-            controls[field.name] = group;
+            controls[field.name] = fieldForm;
         }
 
         this.contentForm = new FormGroup(controls);
+
+        this.enableContentForm();
     }
 
     private reloadContentForm(content: ContentDto) {
@@ -263,14 +275,14 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
         if (!this.isNewMode) {
             for (const field of this.schema.fields) {
                 const fieldValue = this.content.data[field.name] || {};
-                const fieldForm = <FormGroup>this.contentForm.get(field.name);
+                const fieldForm = <FormGroup>this.contentForm.controls[field.name];
 
-                if (field.partitioning === 'language') {
+                if (field.isLocalizable) {
                     for (let language of this.languages) {
                         fieldForm.controls[language.iso2Code].setValue(fieldValue[language.iso2Code]);
                     }
                 } else {
-                    fieldForm.controls['iv'].setValue(fieldValue['iv'] === undefined ? null : fieldValue['iv']);
+                    fieldForm.controls[fieldInvariant].setValue(fieldValue[fieldInvariant] === undefined ? null : fieldValue[fieldInvariant]);
                 }
             }
             if (this.content.status === 'Archived') {
@@ -279,14 +291,16 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
         } else {
             for (const field of this.schema.fields) {
                 const defaultValue = field.defaultValue();
+
                 if (defaultValue) {
-                    const fieldForm = <FormGroup>this.contentForm.get(field.name);
-                    if (field.partitioning === 'language') {
+                    const fieldForm = <FormGroup>this.contentForm.controls[field.name];
+
+                    if (field.isLocalizable) {
                         for (let language of this.languages) {
                             fieldForm.controls[language.iso2Code].setValue(defaultValue);
                         }
                     } else {
-                        fieldForm.controls['iv'].setValue(defaultValue);
+                        fieldForm.controls[fieldInvariant].setValue(defaultValue);
                     }
                 }
             }

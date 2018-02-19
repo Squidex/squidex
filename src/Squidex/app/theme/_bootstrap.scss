@@ -10,7 +10,7 @@
     & {
         font-size: .9rem;
         font-weight: normal;
-        padding: .3rem .6rem;
+        padding: .25rem .6rem;
     }
 
     &-primary {
@@ -421,7 +421,7 @@ a {
     }
 
     &-header {
-        @include border-radius-top(.3rem);
+        @include border-radius-top(.25rem);
         background: $color-modal-header-background;
         font-size: 1rem;
         font-weight: normal;

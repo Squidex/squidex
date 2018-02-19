@@ -15,6 +15,7 @@ import {
     ContentsService,
     fadeAnimation,
     FieldDto,
+    fieldInvariant,
     ModalView,
     SchemaDto,
     Types,
@@ -122,10 +123,10 @@ export class ContentItemComponent implements OnInit, OnChanges {
                 if (field.properties['inlineEditable']) {
                     const value = this.form.controls[field.name].value;
 
-                    if (field.partitioning === 'invariant') {
-                        request[field.name] = { iv: value };
-                    } else {
+                    if (field.isLocalizable) {
                         request[field.name] = { [this.language.iso2Code]: value };
+                    } else {
+                        request[field.name] = { iv: value };
                     }
                 }
             }
@@ -176,10 +177,10 @@ export class ContentItemComponent implements OnInit, OnChanges {
         const contentField = this.content.data[field.name];
 
         if (contentField) {
-            if (field.partitioning === 'language') {
+            if (field.isLocalizable) {
                 return contentField[this.language.iso2Code];
             } else {
-                return contentField['iv'];
+                return contentField[fieldInvariant];
             }
         }
 

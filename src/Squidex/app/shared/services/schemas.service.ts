@@ -22,7 +22,6 @@ import {
     Version,
     Versioned
 } from 'framework';
-import { partition } from 'rxjs/operator/partition';
 
 export const fieldTypes: string[] = [
     'Assets',
@@ -35,6 +34,8 @@ export const fieldTypes: string[] = [
     'String',
     'Tags'
 ];
+
+export const fieldInvariant = 'iv';
 
 export function createProperties(fieldType: string, values: Object | null = null): FieldPropertiesDto {
     let properties: FieldPropertiesDto;

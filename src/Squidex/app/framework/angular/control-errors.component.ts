@@ -41,7 +41,7 @@ export class ControlErrorsComponent implements OnChanges, OnDestroy {
     private originalMarkAsTouched: any;
 
     @Input()
-    public for: string;
+    public for: string | AbstractControl;
 
     @Input()
     public fieldName: string;
@@ -61,9 +61,6 @@ export class ControlErrorsComponent implements OnChanges, OnDestroy {
         @Optional() @Host() private readonly formGroupDirective: FormGroupDirective,
         private readonly changeDetector: ChangeDetectorRef
     ) {
-        if (!this.formGroupDirective) {
-            throw new Error('control-errors must be used with a parent formGroup directive');
-        }
     }
 
     public ngOnDestroy() {
@@ -74,10 +71,20 @@ export class ControlErrorsComponent implements OnChanges, OnDestroy {
         if (this.fieldName) {
             this.displayFieldName = this.fieldName;
         } else if (this.for) {
-            this.displayFieldName = this.for.substr(0, 1).toUpperCase() + this.for.substr(1);
+            if (this.for instanceof String) {
+                this.displayFieldName = this.for.substr(0, 1).toUpperCase() + this.for.substr(1);
+            } else {
+                this.displayFieldName = 'field';
+            }
         }
 
-        const control = this.formGroupDirective.form.controls[this.for];
+        let control: AbstractControl | null = null;
+
+        if (typeof this.for === 'string') {
+            control = this.formGroupDirective.form.controls[this.for];
+        } else {
+            control = this.for;
+        }
 
         if (this.control !== control) {
             this.unsubscribe();
@@ -85,8 +92,6 @@ export class ControlErrorsComponent implements OnChanges, OnDestroy {
             this.control = control;
 
             if (control) {
-                const self = this;
-
                 this.controlSubscription =
                     Observable.merge(control.valueChanges, control.statusChanges)
                         .subscribe(() => {
@@ -94,6 +99,8 @@ export class ControlErrorsComponent implements OnChanges, OnDestroy {
                         });
 
                 this.originalMarkAsTouched = this.control.markAsTouched;
+
+                const self = this;
 
                 this.control['markAsTouched'] = function () {
                     self.originalMarkAsTouched.apply(this, arguments);
@@ -119,7 +126,7 @@ export class ControlErrorsComponent implements OnChanges, OnDestroy {
     private createMessages() {
         const errors: string[] = [];
 
-        if (this.control.invalid && ((this.control.touched && !this.submitOnly) || this.submitted) && this.control.errors) {
+        if (this.control && this.control.invalid && ((this.control.touched && !this.submitOnly) || this.submitted) && this.control.errors) {
             for (let key in <any>this.control.errors) {
                 if (this.control.errors.hasOwnProperty(key)) {
                     let message = (this.errors ? this.errors[key] : null) || DEFAULT_ERRORS[key.toLowerCase()];

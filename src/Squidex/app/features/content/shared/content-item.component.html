@@ -39,8 +39,8 @@
             </div>
             <div *ngSwitchCase="'Boolean'">
                 <div [ngSwitch]="field.properties.editor">
-                    <div *ngSwitchCase="'Toggle'" [formControlName]="field.name">
-                        <sqx-toggle></sqx-toggle>
+                    <div *ngSwitchCase="'Toggle'">
+                        <sqx-toggle [formControlName]="field.name"></sqx-toggle>
                     </div>
                     <div *ngSwitchCase="'Checkbox'">
                         <div class="form-check form-check-inline">
