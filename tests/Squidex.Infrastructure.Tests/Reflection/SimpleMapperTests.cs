@@ -101,6 +101,20 @@ namespace Squidex.Infrastructure.Reflection
         }
 
         [Fact]
+        public void Should_map_nullables()
+        {
+            var obj1 = new Class1<bool?, bool?>
+            {
+                P1 = true,
+                P2 = true
+            };
+            var obj2 = SimpleMapper.Map(obj1, new Class2<bool, bool>());
+
+            Assert.True(obj2.P2);
+            Assert.False(obj2.P3);
+        }
+
+        [Fact]
         public void Should_map_when_convertible_is_null()
         {
             var obj1 = new Class1<int?, int?>

@@ -18,7 +18,7 @@ namespace Squidex.Domain.Apps.Core.Apps
     public sealed class LanguagesConfig : IFieldPartitioning
     {
         public static readonly LanguagesConfig Empty = new LanguagesConfig(ImmutableDictionary<Language, LanguageConfig>.Empty, null, false);
-        public static readonly LanguagesConfig English = LanguagesConfig.Build(Language.EN);
+        public static readonly LanguagesConfig English = Build(Language.EN);
 
         private readonly ImmutableDictionary<Language, LanguageConfig> languages;
         private readonly LanguageConfig master;
