@@ -15,7 +15,7 @@
     <ProjectReference Include="..\Squidex.Domain.Apps.Entities\Squidex.Domain.Apps.Entities.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.OData.Core" Version="7.4.0" />
+    <PackageReference Include="Microsoft.OData.Core" Version="7.4.1" />
     <PackageReference Include="MongoDB.Driver" Version="2.5.0" />
     <PackageReference Include="RefactoringEssentials" Version="5.6.0" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.0.2" />

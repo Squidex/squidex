@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Orleans;
 using Orleans.Hosting;
-using Squidex.Config.Orleans;
 using Squidex.Infrastructure.Log.Adapter;
 
 namespace Squidex

@@ -5,13 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Linq;
-using System.Net;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Orleans;
-using Orleans.Runtime.Configuration;
+using Orleans.Hosting;
 
 namespace Squidex.Config.Orleans
 {
@@ -19,32 +15,6 @@ namespace Squidex.Config.Orleans
     {
         public static void AddAppSiloServices(this IServiceCollection services, IConfiguration config)
         {
-            var clusterConfiguration =
-                services.Where(x => x.ServiceType == typeof(ClusterConfiguration))
-                    .Select(x => x.ImplementationInstance)
-                    .Select(x => (ClusterConfiguration)x)
-                    .FirstOrDefault();
-
-            if (clusterConfiguration != null)
-            {
-                var ipConfig = config.GetRequiredValue("orleans:hostNameOrIPAddress");
-
-                if (ipConfig.Equals("Host", StringComparison.OrdinalIgnoreCase))
-                {
-                    ipConfig = Dns.GetHostName();
-                }
-                else if (ipConfig.Equals("FirstIPAddressOfHost"))
-                {
-                    var ips = Dns.GetHostAddressesAsync(Dns.GetHostName()).Result;
-
-                    ipConfig = ips.FirstOrDefault()?.ToString();
-                }
-
-                clusterConfiguration.Defaults.PropagateActivityId = true;
-                clusterConfiguration.Defaults.ProxyGatewayEndpoint = new IPEndPoint(IPAddress.Any, 40000);
-                clusterConfiguration.Defaults.HostNameOrIPAddress = ipConfig;
-            }
-
             config.ConfigureByOption("store:type", new Options
             {
                 ["MongoDB"] = () =>

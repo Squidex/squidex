@@ -6,11 +6,13 @@
 // ==========================================================================
 
 using System;
-using System.IO;
+using System.Net;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Orleans;
+using Orleans.Configuration;
 using Orleans.Hosting;
-using Orleans.Runtime.Configuration;
 using Squidex.Config.Domain;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Infrastructure;
@@ -19,7 +21,7 @@ using Squidex.Infrastructure.Orleans;
 
 namespace Squidex.Config.Orleans
 {
-    public class SiloWrapper : IInitializable, IDisposable
+    public class SiloWrapper : DisposableObjectBase, IInitializable, IDisposable
     {
         private readonly ISiloHost silo;
 
@@ -42,38 +44,40 @@ namespace Squidex.Config.Orleans
         {
             J.Serializer = SerializationServices.DefaultJsonSerializer;
 
-            silo = SiloHostBuilder.CreateDefault()
-               .UseConfiguration(ClusterConfiguration.LocalhostPrimarySilo(33333).WithDashboard())
-               .UseContentRoot(Directory.GetCurrentDirectory())
-               .UseDashboard(options =>
-               {
-                   options.HostSelf = false;
-               })
-               .ConfigureLogging(builder =>
-               {
-                   builder.AddSemanticLog();
-               })
-               .ConfigureApplicationParts(builder =>
-               {
-                   builder.AddApplicationPart(SquidexEntities.Assembly);
-                   builder.AddApplicationPart(SquidexInfrastructure.Assembly);
-               })
-               .ConfigureServices((context, services) =>
-               {
-                   services.AddAppSiloServices(context.Configuration);
-                   services.AddAppServices(context.Configuration);
-               })
-               .ConfigureAppConfiguration((hostContext, builder) =>
-               {
-                   if (configuration is IConfigurationRoot root)
-                   {
-                       foreach (var provider in root.Providers)
-                       {
-                           builder.Add(new Source(provider));
-                       }
-                   }
-               })
-               .Build();
+            silo = new SiloHostBuilder()
+                .UseDashboard(options => options.HostSelf = true)
+                .ConfigureEndpoints(Dns.GetHostName(), 11111, 40000, listenOnAllHostAddresses: true)
+                .Configure(options =>
+                {
+                    options.ClusterId = "squidex";
+                })
+                .ConfigureLogging(builder =>
+                {
+                    builder.AddSemanticLog();
+                })
+                .ConfigureApplicationParts(builder =>
+                {
+                    builder.AddApplicationPart(SquidexEntities.Assembly);
+                    builder.AddApplicationPart(SquidexInfrastructure.Assembly);
+                })
+                .ConfigureServices((context, services) =>
+                {
+                    services.AddAppSiloServices(context.Configuration);
+                    services.AddAppServices(context.Configuration);
+
+                    services.Configure<ProcessExitHandlingOptions>(options => options.FastKillOnProcessExit = false);
+                })
+                .ConfigureAppConfiguration((hostContext, builder) =>
+                {
+                    if (configuration is IConfigurationRoot root)
+                    {
+                        foreach (var provider in root.Providers)
+                        {
+                            builder.Add(new Source(provider));
+                        }
+                    }
+                })
+                .Build();
         }
 
         public void Initialize()
@@ -81,9 +85,12 @@ namespace Squidex.Config.Orleans
             silo.StartAsync().Wait();
         }
 
-        public void Dispose()
+        protected override void DisposeObject(bool disposing)
         {
-            silo.StopAsync().Wait();
+            if (disposing)
+            {
+                Task.Run(() => silo.StopAsync()).Wait();
+            }
         }
     }
 }

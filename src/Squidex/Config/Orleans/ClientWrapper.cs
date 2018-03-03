@@ -6,14 +6,15 @@
 // ==========================================================================
 
 using System;
+using System.Net;
 using Orleans;
-using Orleans.Runtime.Configuration;
+using Orleans.Runtime;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Infrastructure;
 
 namespace Squidex.Config.Orleans
 {
-    public sealed class ClientWrapper : IInitializable, IDisposable
+    public sealed class ClientWrapper : DisposableObjectBase, IInitializable, IDisposable
     {
         private readonly IClusterClient client;
 
@@ -25,16 +26,19 @@ namespace Squidex.Config.Orleans
         public ClientWrapper()
         {
             client = new ClientBuilder()
-                .UseConfiguration(ClientConfiguration.LocalhostSilo())
                 .UseDashboard()
+                .UseStaticClustering(options =>
+                {
+                    options.Gateways.Add(new IPEndPoint(IPAddress.Loopback, 40000).ToGatewayUri());
+                })
+                .ConfigureCluster(options =>
+                {
+                    options.ClusterId = "squidex";
+                })
                 .ConfigureApplicationParts(builder =>
                 {
                     builder.AddApplicationPart(SquidexEntities.Assembly);
                     builder.AddApplicationPart(SquidexInfrastructure.Assembly);
-                })
-                .UseStaticGatewayListProvider(options =>
-                {
-                    options.Gateways.Add(new Uri("gwy.tcp://127.0.0.1:40000/0"));
                 })
                 .Build();
         }
@@ -44,9 +48,12 @@ namespace Squidex.Config.Orleans
             client.Connect().Wait();
         }
 
-        public void Dispose()
+        protected override void DisposeObject(bool disposing)
         {
-            client.Close().Wait();
+            if (disposing)
+            {
+                client.Close().Wait();
+            }
         }
     }
 }
