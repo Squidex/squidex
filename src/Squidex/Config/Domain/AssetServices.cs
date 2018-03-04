@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
+using Squidex.Infrastructure.Assets.ImageSharp;
 using Squidex.Infrastructure.Log;
 
 namespace Squidex.Config.Domain
@@ -45,6 +46,9 @@ namespace Squidex.Config.Domain
                         .As<IInitializable>();
                 }
             });
+
+            services.AddSingletonAs<ImageSharpAssetThumbnailGenerator>()
+                .As<IAssetThumbnailGenerator>();
         }
     }
 }

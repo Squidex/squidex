@@ -5,23 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
 using NodaTime;
-using Squidex.Infrastructure;
-using Squidex.Infrastructure.Assets;
-using Squidex.Infrastructure.Assets.ImageSharp;
-using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.Log;
-using Squidex.Infrastructure.Migrations;
-using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.UsageTracking;
-using Squidex.Pipeline;
 
 #pragma warning disable RECS0092 // Convert field to readonly
 
@@ -29,47 +17,8 @@ namespace Squidex.Config.Domain
 {
     public static class InfrastructureServices
     {
-        private static ILogChannel console = new ConsoleLogChannel();
-        private static ILogChannel file;
-
-        public static void AddMyInfrastructureServices(this IServiceCollection services, IConfiguration config)
+        public static void AddMyInfrastructureServices(this IServiceCollection services)
         {
-            if (config.GetValue<bool>("logging:human"))
-            {
-                services.AddSingletonAs(c => new Func<IObjectWriter>(() => new JsonLogWriter(Formatting.Indented, true)));
-            }
-            else
-            {
-                services.AddSingletonAs(c => new Func<IObjectWriter>(() => new JsonLogWriter()));
-            }
-
-            var loggingFile = config.GetValue<string>("logging:file");
-
-            if (!string.IsNullOrWhiteSpace(loggingFile))
-            {
-                services.AddSingletonAs(file ?? (file = new FileChannel(loggingFile)))
-                    .As<ILogChannel>()
-                    .As<IInitializable>();
-            }
-
-            services.AddSingletonAs(console)
-                .As<ILogChannel>();
-
-            services.AddSingletonAs(c => new ApplicationInfoLogAppender(typeof(Program).Assembly, Guid.NewGuid()))
-                .As<ILogAppender>();
-
-            services.AddSingletonAs<ActionContextLogAppender>()
-                .As<ILogAppender>();
-
-            services.AddSingletonAs<TimestampLogAppender>()
-                .As<ILogAppender>();
-
-            services.AddSingletonAs<DebugLogChannel>()
-                .As<ILogChannel>();
-
-            services.AddSingletonAs<SemanticLog>()
-                .As<ISemanticLog>();
-
             services.AddSingletonAs(SystemClock.Instance)
                 .As<IClock>();
 
@@ -81,23 +30,6 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<ActionContextAccessor>()
                 .As<IActionContextAccessor>();
-
-            services.AddSingletonAs<InMemoryCommandBus>()
-                .As<ICommandBus>();
-
-            services.AddSingletonAs<DefaultStreamNameResolver>()
-                .As<IStreamNameResolver>();
-
-            services.AddSingletonAs<ImageSharpAssetThumbnailGenerator>()
-                .As<IAssetThumbnailGenerator>();
-
-            services.AddSingletonAs<DefaultEventDataFormatter>()
-                .As<IEventDataFormatter>();
-
-            services.AddSingletonAs<Migrator>()
-                .AsSelf();
-
-            services.AddSingleton(typeof(IStore<>), typeof(Store<>));
         }
     }
 }

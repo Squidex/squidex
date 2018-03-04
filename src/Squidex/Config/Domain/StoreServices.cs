@@ -73,17 +73,6 @@ namespace Squidex.Config.Domain
                         .As<ISnapshotStore<EventConsumerState, string>>()
                         .As<IInitializable>();
 
-                    services.AddSingletonAs(c => new MongoUserStore(mongoDatabase))
-                        .As<IUserStore<IUser>>()
-                        .As<IUserFactory>()
-                        .As<IUserResolver>()
-                        .As<IInitializable>();
-
-                    services.AddSingletonAs(c => new MongoRoleStore(mongoDatabase))
-                        .As<IRoleStore<IRole>>()
-                        .As<IRoleFactory>()
-                        .As<IInitializable>();
-
                     services.AddSingletonAs(c => new MongoPersistedGrantStore(mongoDatabase))
                         .As<IPersistedGrantStore>()
                         .As<IInitializable>();
@@ -94,6 +83,17 @@ namespace Squidex.Config.Domain
 
                     services.AddSingletonAs(c => new MongoRuleEventRepository(mongoDatabase))
                         .As<IRuleEventRepository>()
+                        .As<IInitializable>();
+
+                    services.AddSingletonAs(c => new MongoUserStore(mongoDatabase))
+                        .As<IUserStore<IUser>>()
+                        .As<IUserFactory>()
+                        .As<IUserResolver>()
+                        .As<IInitializable>();
+
+                    services.AddSingletonAs(c => new MongoRoleStore(mongoDatabase))
+                        .As<IRoleStore<IRole>>()
+                        .As<IRoleFactory>()
                         .As<IInitializable>();
 
                     services.AddSingletonAs(c => new MongoAppRepository(mongoDatabase))
@@ -133,6 +133,8 @@ namespace Squidex.Config.Domain
                         .As<IInitializable>();
                 }
             });
+
+            services.AddSingleton(typeof(IStore<>), typeof(Store<>));
         }
     }
 }

@@ -63,7 +63,14 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
                 var responseString = await response.Content.ReadAsStringAsync();
                 var requestDump = DumpFormatter.BuildDump(requestMsg, response, requestBody, responseString, TimeSpan.Zero, false);
 
-                return (requestDump, null);
+                Exception ex = null;
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    ex = new HttpRequestException($"Response code does not indicate success: {(int)response.StatusCode} ({response.StatusCode}).");
+                }
+
+                return (requestDump, ex);
             }
             catch (Exception ex)
             {

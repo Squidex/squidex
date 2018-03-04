@@ -83,7 +83,7 @@ export class RuleEventsPageComponent implements OnInit {
         } else if (status === 'Failed') {
             return 'danger';
         } else if (status === 'Pending') {
-            return 'default';
+            return 'secondary';
         } else {
             return status.toLowerCase();
         }
