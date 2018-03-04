@@ -17,7 +17,8 @@ import { FloatConverter, NumberFieldPropertiesDto } from 'shared';
     templateUrl: 'number-ui.component.html'
 })
 export class NumberUIComponent implements OnDestroy, OnInit {
-    private editorSubscription: Subscription;
+    private hideAllowedValuesSubscription: Subscription;
+    private hideInlineEditableSubscription: Subscription;
 
     @Input()
     public editForm: FormGroup;
@@ -28,32 +29,51 @@ export class NumberUIComponent implements OnDestroy, OnInit {
     public converter = new FloatConverter();
 
     public hideAllowedValues: Observable<boolean>;
+    public hideInlineEditable: Observable<boolean>;
 
     public ngOnDestroy() {
-        this.editorSubscription.unsubscribe();
+        this.hideAllowedValuesSubscription.unsubscribe();
+        this.hideInlineEditableSubscription.unsubscribe();
     }
 
     public ngOnInit() {
-        this.editForm.addControl('editor',
+        this.editForm.setControl('editor',
             new FormControl(this.properties.editor, [
                 Validators.required
             ]));
-        this.editForm.addControl('placeholder',
+
+        this.editForm.setControl('placeholder',
             new FormControl(this.properties.placeholder, [
                 Validators.maxLength(100)
             ]));
-        this.editForm.addControl('allowedValues',
+
+        this.editForm.setControl('allowedValues',
             new FormControl(this.properties.allowedValues, []));
+
+        this.editForm.setControl('inlineEditable',
+            new FormControl(this.properties.inlineEditable));
 
         this.hideAllowedValues =
             this.editForm.controls['editor'].valueChanges
                 .startWith(this.properties.editor)
-                .map(x => !x || x === 'Input' || x === 'Textarea');
+                .map(x => !(x && (x === 'Radio' || x === 'Dropdown')));
 
-        this.editorSubscription =
+        this.hideInlineEditable =
+            this.editForm.controls['editor'].valueChanges
+                .startWith(this.properties.editor)
+                .map(x => !(x && (x === 'Input' || x === 'Dropdown')));
+
+        this.hideAllowedValuesSubscription =
             this.hideAllowedValues.subscribe(isSelection => {
                 if (isSelection) {
                     this.editForm.controls['allowedValues'].setValue(undefined);
+                }
+            });
+
+        this.hideInlineEditableSubscription =
+            this.hideInlineEditable.subscribe(isSelection => {
+                if (isSelection) {
+                    this.editForm.controls['inlineEditable'].setValue(false);
                 }
             });
     }

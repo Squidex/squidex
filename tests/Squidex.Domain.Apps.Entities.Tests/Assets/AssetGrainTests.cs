@@ -8,8 +8,6 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using Orleans.Core;
-using Orleans.Runtime;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.Assets.State;
 using Squidex.Domain.Apps.Entities.TestHelpers;
@@ -17,7 +15,6 @@ using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.States;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Assets
@@ -29,14 +26,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
         private readonly AssetFile file = new AssetFile("my-image.png", "image/png", 1024, () => new MemoryStream());
         private readonly AssetGrain sut;
 
-        public class MyAssetGrain : AssetGrain
-        {
-            public MyAssetGrain(IStore<Guid> store, IGrainIdentity identity, IGrainRuntime runtime)
-                : base(store, identity, runtime)
-            {
-            }
-        }
-
         protected override Guid Id
         {
             get { return assetId; }
@@ -44,8 +33,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public AssetGrainTests()
         {
-            sut = new MyAssetGrain(Store, Identity, Runtime);
-            sut.OnActivateAsync();
+            sut = new AssetGrain(Store);
+            sut.OnActivateAsync(Id).Wait();
         }
 
         [Fact]
@@ -62,7 +51,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             var command = new CreateAsset { File = file, ImageInfo = image };
 
-            var result = await sut.ExecuteAsync(J(CreateAssetCommand(command)));
+            var result = await sut.ExecuteAsync(CreateAssetCommand(command));
 
             result.ShouldBeEquivalent(new AssetSavedResult(0, 0));
 
@@ -90,7 +79,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             await ExecuteCreateAsync();
 
-            var result = await sut.ExecuteAsync(J(CreateAssetCommand(command)));
+            var result = await sut.ExecuteAsync(CreateAssetCommand(command));
 
             result.ShouldBeEquivalent(new AssetSavedResult(1, 1));
 
@@ -117,7 +106,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             await ExecuteCreateAsync();
 
-            var result = await sut.ExecuteAsync(J(CreateAssetCommand(command)));
+            var result = await sut.ExecuteAsync(CreateAssetCommand(command));
 
             result.ShouldBeEquivalent(new EntitySavedResult(1));
 
@@ -137,7 +126,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             await ExecuteCreateAsync();
             await ExecuteUpdateAsync();
 
-            var result = await sut.ExecuteAsync(J(CreateAssetCommand(command)));
+            var result = await sut.ExecuteAsync(CreateAssetCommand(command));
 
             result.ShouldBeEquivalent(new EntitySavedResult(2));
 
@@ -151,17 +140,17 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         private Task ExecuteCreateAsync()
         {
-            return sut.ExecuteAsync(J(CreateAssetCommand(new CreateAsset { File = file })));
+            return sut.ExecuteAsync(CreateAssetCommand(new CreateAsset { File = file }));
         }
 
         private Task ExecuteUpdateAsync()
         {
-            return sut.ExecuteAsync(J(CreateAssetCommand(new UpdateAsset { File = file })));
+            return sut.ExecuteAsync(CreateAssetCommand(new UpdateAsset { File = file }));
         }
 
         private Task ExecuteDeleteAsync()
         {
-            return sut.ExecuteAsync(J(CreateAssetCommand(new DeleteAsset())));
+            return sut.ExecuteAsync(CreateAssetCommand(new DeleteAsset()));
         }
 
         protected T CreateAssetEvent<T>(T @event) where T : AssetEvent

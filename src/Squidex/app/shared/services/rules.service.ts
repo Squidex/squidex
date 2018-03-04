@@ -36,6 +36,9 @@ export const ruleActions: any = {
     'AzureQueue': {
         name: 'Send to Azure Queue'
     },
+    'ElasticSearch': {
+        name: 'Populate ElasticSearch Index'
+    },
     'Fastly': {
         name: 'Purge fastly Cache'
     },

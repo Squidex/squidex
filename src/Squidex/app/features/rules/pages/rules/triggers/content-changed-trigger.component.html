@@ -60,7 +60,7 @@
     </tr>
 </table>
 
-<div class="section" *ngIf="schemasToAdd.length > 0">
+<div class="section" *ngIf="!handleAll && schemasToAdd.length > 0">
     <form class="form-inline" (ngSubmit)="addSchema()">
         <div class="form-group mr-1">
             <select class="form-control schemas-control" [(ngModel)]="schemaToAdd" name="schema">

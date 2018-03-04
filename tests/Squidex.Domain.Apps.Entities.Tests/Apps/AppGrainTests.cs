@@ -9,8 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FakeItEasy;
-using Orleans.Core;
-using Orleans.Runtime;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Services;
@@ -19,7 +17,6 @@ using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.States;
 using Squidex.Shared.Users;
 using Xunit;
 
@@ -41,22 +38,6 @@ namespace Squidex.Domain.Apps.Entities.Apps
         private readonly Guid patternId3 = Guid.NewGuid();
         private readonly InitialPatterns initialPatterns;
 
-        public class MyAppGrain : AppGrain
-        {
-            public MyAppGrain(
-                InitialPatterns initialPatterns,
-                IStore<Guid> store,
-                IAppProvider appProvider,
-                IAppPlansProvider appPlansProvider,
-                IAppPlanBillingManager appPlansBillingManager,
-                IUserResolver userResolver,
-                IGrainIdentity identity,
-                IGrainRuntime runtime)
-                : base(initialPatterns, store, appProvider, appPlansProvider, appPlansBillingManager, userResolver, identity, runtime)
-            {
-            }
-        }
-
         protected override Guid Id
         {
             get { return AppId; }
@@ -76,8 +57,8 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 { patternId2, new AppPattern("Numbers", "[0-9]*") }
             };
 
-            sut = new MyAppGrain(initialPatterns, Store, appProvider, appPlansProvider, appPlansBillingManager, userResolver, Identity, Runtime);
-            sut.OnActivateAsync();
+            sut = new AppGrain(initialPatterns, Store, appProvider, appPlansProvider, appPlansBillingManager, userResolver);
+            sut.OnActivateAsync(Id).Wait();
         }
 
         [Fact]
@@ -85,7 +66,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             var command = new CreateApp { Name = AppName, Actor = User, AppId = AppId };
 
-            var result = await sut.ExecuteAsync(J(CreateCommand(command)));
+            var result = await sut.ExecuteAsync(CreateCommand(command));
 
             result.ShouldBeEquivalent(EntityCreatedResult.Create(Id, 4));
 
@@ -114,7 +95,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             await ExecuteCreateAsync();
 
-            var result = await sut.ExecuteAsync(J(CreateCommand(command)));
+            var result = await sut.ExecuteAsync(CreateCommand(command));
 
             Assert.True(result.Value is PlanChangedResult);
 
@@ -139,7 +120,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             await ExecuteCreateAsync();
 
-            var result = await sut.ExecuteAsync(J(CreateCommand(command)));
+            var result = await sut.ExecuteAsync(CreateCommand(command));
 
             result.ShouldBeEquivalent(new RedirectToCheckoutResult(new Uri("http://squidex.io")));
 
@@ -156,7 +137,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             await ExecuteCreateAsync();
 
-            var result = await sut.ExecuteAsync(J(CreateCommand(command)));
+            var result = await sut.ExecuteAsync(CreateCommand(command));
 
             result.ShouldBeEquivalent(new EntitySavedResult(5));
 
@@ -171,7 +152,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             await ExecuteCreateAsync();
 
-            var result = await sut.ExecuteAsync(J(CreateCommand(command)));
+            var result = await sut.ExecuteAsync(CreateCommand(command));
 
             result.ShouldBeEquivalent(new EntitySavedResult(5));
 
@@ -191,7 +172,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             await ExecuteCreateAsync();
             await ExecuteAssignContributorAsync();
 
-            var result = await sut.ExecuteAsync(J(CreateCommand(command)));
+            var result = await sut.ExecuteAsync(CreateCommand(command));
 
             result.ShouldBeEquivalent(new EntitySavedResult(6));
 
@@ -210,7 +191,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             await ExecuteCreateAsync();
 
-            var result = await sut.ExecuteAsync(J(CreateCommand(command)));
+            var result = await sut.ExecuteAsync(CreateCommand(command));
 
             result.ShouldBeEquivalent(new EntitySavedResult(5));
 
@@ -230,7 +211,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             await ExecuteCreateAsync();
             await ExecuteAttachClientAsync();
 
-            var result = await sut.ExecuteAsync(J(CreateCommand(command)));
+            var result = await sut.ExecuteAsync(CreateCommand(command));
 
             result.ShouldBeEquivalent(new EntitySavedResult(6));
 
@@ -250,7 +231,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             await ExecuteCreateAsync();
             await ExecuteAttachClientAsync();
 
-            var result = await sut.ExecuteAsync(J(CreateCommand(command)));
+            var result = await sut.ExecuteAsync(CreateCommand(command));
 
             result.ShouldBeEquivalent(new EntitySavedResult(7));
 
@@ -270,7 +251,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             await ExecuteCreateAsync();
 
-            var result = await sut.ExecuteAsync(J(CreateCommand(command)));
+            var result = await sut.ExecuteAsync(CreateCommand(command));
 
             result.ShouldBeEquivalent(new EntitySavedResult(5));
 
@@ -290,7 +271,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             await ExecuteCreateAsync();
             await ExecuteAddLanguageAsync(Language.DE);
 
-            var result = await sut.ExecuteAsync(J(CreateCommand(command)));
+            var result = await sut.ExecuteAsync(CreateCommand(command));
 
             result.ShouldBeEquivalent(new EntitySavedResult(6));
 
@@ -310,7 +291,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             await ExecuteCreateAsync();
             await ExecuteAddLanguageAsync(Language.DE);
 
-            var result = await sut.ExecuteAsync(J(CreateCommand(command)));
+            var result = await sut.ExecuteAsync(CreateCommand(command));
 
             result.ShouldBeEquivalent(new EntitySavedResult(6));
 
@@ -329,7 +310,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             await ExecuteCreateAsync();
 
-            var result = await sut.ExecuteAsync(J(CreateCommand(command)));
+            var result = await sut.ExecuteAsync(CreateCommand(command));
 
             result.ShouldBeEquivalent(new EntitySavedResult(5));
 
@@ -349,7 +330,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             await ExecuteCreateAsync();
             await ExecuteAddPatternAsync();
 
-            var result = await sut.ExecuteAsync(J(CreateCommand(command)));
+            var result = await sut.ExecuteAsync(CreateCommand(command));
 
             result.ShouldBeEquivalent(new EntitySavedResult(6));
 
@@ -369,7 +350,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             await ExecuteCreateAsync();
             await ExecuteAddPatternAsync();
 
-            var result = await sut.ExecuteAsync(J(CreateCommand(command)));
+            var result = await sut.ExecuteAsync(CreateCommand(command));
 
             result.ShouldBeEquivalent(new EntitySavedResult(6));
 
@@ -381,27 +362,27 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         private Task ExecuteAddPatternAsync()
         {
-            return sut.ExecuteAsync(J(CreateCommand(new AddPattern { PatternId = patternId3, Name = "Name", Pattern = ".*" })));
+            return sut.ExecuteAsync(CreateCommand(new AddPattern { PatternId = patternId3, Name = "Name", Pattern = ".*" }));
         }
 
         private Task ExecuteCreateAsync()
         {
-            return sut.ExecuteAsync(J(CreateCommand(new CreateApp { Name = AppName })));
+            return sut.ExecuteAsync(CreateCommand(new CreateApp { Name = AppName }));
         }
 
         private Task ExecuteAssignContributorAsync()
         {
-            return sut.ExecuteAsync(J(CreateCommand(new AssignContributor { ContributorId = contributorId, Permission = AppContributorPermission.Editor })));
+            return sut.ExecuteAsync(CreateCommand(new AssignContributor { ContributorId = contributorId, Permission = AppContributorPermission.Editor }));
         }
 
         private Task ExecuteAttachClientAsync()
         {
-            return sut.ExecuteAsync(J(CreateCommand(new AttachClient { Id = clientId })));
+            return sut.ExecuteAsync(CreateCommand(new AttachClient { Id = clientId }));
         }
 
         private Task ExecuteAddLanguageAsync(Language language)
         {
-            return sut.ExecuteAsync(J(CreateCommand(new AddLanguage { Language = language })));
+            return sut.ExecuteAsync(CreateCommand(new AddLanguage { Language = language }));
         }
     }
 }

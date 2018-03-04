@@ -1,15 +1,61 @@
-<td class="cell-select" *ngIf="!isReadOnly">
-    <input type="checkbox" class="form-control" 
+<td class="cell-select" *ngIf="!isReadOnly" (click)="shouldStop($event)">
+    <input type="checkbox" class="form-control"
         [ngModel]="selected" 
         (ngModelChange)="selectedChange.emit($event);"
         (click)="$event.stopPropagation()" />
 </td>
-<td class="cell-auto" *ngFor="let value of values">
-    <span class="table-cell">
-        {{value}}
-    </span>
+
+<td class="cell-auto" *ngFor="let field of schemaFields; let i = index" (click)="shouldStop($event)">
+    <div *ngIf="field.properties.inlineEditable && !isReadOnly" [formGroup]="form" (click)="$event.stopPropagation()">
+        <div [ngSwitch]="field.properties.fieldType">
+            <div *ngSwitchCase="'Number'">
+                <div [ngSwitch]="field.properties.editor">
+                    <div *ngSwitchCase="'Input'">
+                        <input class="form-control" type="number" [formControlName]="field.name" [placeholder]="field.displayPlaceholder" />
+                    </div>
+                    <div *ngSwitchCase="'Dropdown'">
+                        <select class="form-control" [formControlName]="field.name">
+                            <option [ngValue]="null"></option>
+                            <option *ngFor="let value of field.properties.allowedValues" [ngValue]="value">{{value}}</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div *ngSwitchCase="'String'">
+                <div [ngSwitch]="field.properties.editor">
+                    <div *ngSwitchCase="'Input'">
+                        <input class="form-control" type="text" [formControlName]="field.name" [placeholder]="field.displayPlaceholder" />
+                    </div>
+                    <div *ngSwitchCase="'Slug'">
+                        <input class="form-control" type="text" [formControlName]="field.name" [placeholder]="field.displayPlaceholder" sqxSlugifyInput />
+                    </div>
+                    <div *ngSwitchCase="'Dropdown'">
+                        <select class="form-control" [formControlName]="field.name">
+                            <option [ngValue]="null"></option>
+                            <option *ngFor="let value of field.properties.allowedValues" [ngValue]="value">{{value}}</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div *ngSwitchCase="'Boolean'">
+                <div [ngSwitch]="field.properties.editor">
+                    <div *ngSwitchCase="'Toggle'">
+                        <sqx-toggle [formControlName]="field.name"></sqx-toggle>
+                    </div>
+                    <div *ngSwitchCase="'Checkbox'">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" [formControlName]="field.name" sqxIndeterminateValue />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div *ngIf="!field.properties.inlineEditable || isReadOnly" class="truncate">
+        {{values[i]}}
+    </div>
 </td>
-<td class="cell-time">
+<td class="cell-time" (click)="shouldStop($event)">
     <span *ngIf="!content.scheduledTo">
         <span class="content-status content-status-{{content.status | lowercase}}" #statusIcon>
             <i class="icon-circle"></i>
@@ -28,10 +74,23 @@
     
     <small class="item-modified">{{content.lastModified | sqxFromNow}}</small>
 </td>
-<td class="cell-user">
+
+<td class="cell-user" *ngIf="form.dirty" (click)="shouldStop($event)">
+    <button type="button" class="btn btn-success" (click)="save(); $event.stopPropagation()">
+        <i class="icon-checkmark"></i>
+    </button>
+</td>
+<td class="cell-actions" *ngIf="form.dirty" (click)="shouldStop($event)">
+    <button type="button" class="btn btn-link btn-secondary btn-cancel" (click)="save(); $event.stopPropagation()">
+        <i class="icon-close"></i>
+    </button>
+</td>
+
+<td class="cell-user" *ngIf="form.pristine" (click)="shouldStop($event)">
     <img class="user-picture" [attr.title]="content.lastModifiedBy | sqxUserNameRef" [attr.src]="content.lastModifiedBy | sqxUserPictureRef" />
 </td>
-<td class="cell-actions" *ngIf="!isReadOnly">
+
+<td class="cell-actions" *ngIf="!isReadOnly && form.pristine" (click)="shouldStop($event)">
     <div class="dropdown dropdown-options" *ngIf="content">
         <button type="button" class="btn btn-link btn-secondary" (click)="dropdown.toggle(); $event.stopPropagation()" [class.active]="dropdown.isOpen | async" #optionsButton>
             <i class="icon-dots"></i>
@@ -58,7 +117,7 @@
         </div>
     </div>
 </td>
-<td class="cell-actions" *ngIf="isReference">
+<td class="cell-actions" *ngIf="isReference" (click)="shouldStop($event)">
     <button type="button" class="btn btn-link btn-secondary" (click)="deleting.emit(); $event.stopPropagation()">
         <i class="icon-close"></i>
     </button>

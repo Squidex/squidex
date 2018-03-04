@@ -1,6 +1,10 @@
 @import '_vars';
 @import '_mixins';
 
+.truncate {
+    @include truncate;
+}
+
 .content-status {
     & {
         vertical-align: middle;

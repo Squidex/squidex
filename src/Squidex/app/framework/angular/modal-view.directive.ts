@@ -21,7 +21,7 @@ export class ModalViewDirective implements OnChanges, OnDestroy {
     private renderedView: EmbeddedViewRef<any> | null = null;
 
     @Input('sqxModalView')
-    public modalView: ModalView;
+    public modalView: ModalView | any;
 
     @Input('sqxModalViewOnRoot')
     public placeOnRoot = false;
@@ -40,7 +40,9 @@ export class ModalViewDirective implements OnChanges, OnDestroy {
     public ngOnDestroy() {
         this.stopListening();
 
-        this.modalView.hide();
+        if (this.modalView instanceof ModalView) {
+            this.modalView.hide();
+        }
     }
 
     public ngOnChanges(changes: SimpleChanges) {
@@ -53,36 +55,42 @@ export class ModalViewDirective implements OnChanges, OnDestroy {
             this.subscription = null;
         }
 
-        if (this.modalView) {
+        if (this.modalView instanceof ModalView) {
             this.subscription =
                 this.modalView.isOpen.subscribe(isOpen => {
-                    if (isOpen === (this.renderedView !== null)) {
-                        return;
-                    }
+                    this.update(isOpen);
+                });
+        } else {
+            this.update(!!this.modalView);
+        }
+    }
 
-                    if (isOpen && !this.renderedView) {
-                        if (this.placeOnRoot) {
-                            this.renderedView = this.rootContainer.createEmbeddedView(this.templateRef);
-                        } else {
-                            this.renderedView = this.viewContainer.createEmbeddedView(this.templateRef);
-                        }
-                        this.renderer.setElementStyle(this.renderedView.rootNodes[0], 'display', 'block');
+    private update(isOpen: boolean) {
+        if (isOpen === (this.renderedView !== null)) {
+            return;
+        }
 
-                        setTimeout(() => {
-                            this.startListening();
-                        });
-                    } else if (!isOpen && this.renderedView) {
-                        this.renderedView = null;
+        if (isOpen && !this.renderedView) {
+            if (this.placeOnRoot) {
+                this.renderedView = this.rootContainer.createEmbeddedView(this.templateRef);
+            } else {
+                this.renderedView = this.viewContainer.createEmbeddedView(this.templateRef);
+            }
+            this.renderer.setElementStyle(this.renderedView.rootNodes[0], 'display', 'block');
 
-                        if (this.placeOnRoot) {
-                            this.rootContainer.clear();
-                        } else {
-                            this.viewContainer.clear();
-                        }
-
-                        this.stopListening();
-                    }
+            setTimeout(() => {
+                this.startListening();
             });
+        } else if (!isOpen && this.renderedView) {
+            this.renderedView = null;
+
+            if (this.placeOnRoot) {
+                this.rootContainer.clear();
+            } else {
+                this.viewContainer.clear();
+            }
+
+            this.stopListening();
         }
     }
 

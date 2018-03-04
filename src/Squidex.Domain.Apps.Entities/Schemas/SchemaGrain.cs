@@ -9,8 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Orleans.Core;
-using Orleans.Runtime;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Domain.Apps.Entities.Schemas.Guards;
@@ -32,12 +30,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         private readonly FieldRegistry registry;
 
         public SchemaGrain(IStore<Guid> store, IAppProvider appProvider, FieldRegistry registry)
-            : this(store, appProvider, registry, null, null)
-        {
-        }
-
-        protected SchemaGrain(IStore<Guid> store, IAppProvider appProvider, FieldRegistry registry, IGrainIdentity identity, IGrainRuntime runtime)
-            : base(store, identity, runtime)
+            : base(store)
         {
             Guard.NotNull(appProvider, nameof(appProvider));
             Guard.NotNull(registry, nameof(registry));
@@ -47,7 +40,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             this.registry = registry;
         }
 
-        public override Task<object> ExecuteAsync(IAggregateCommand command)
+        protected override Task<object> ExecuteAsync(IAggregateCommand command)
         {
             VerifyNotDeleted();
 

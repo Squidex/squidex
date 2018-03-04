@@ -11,19 +11,19 @@ using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Infrastructure.EventSourcing
 {
-    public class MongoEvent
+    public sealed class MongoEvent
     {
         [BsonElement]
         [BsonRequired]
-        public string Payload { get; set; }
+        public string Type { get; set; }
 
         [BsonJson]
         [BsonRequired]
-        public JToken Metadata { get; set; }
+        public string Payload { get; set; }
 
         [BsonElement]
         [BsonRequired]
-        public string Type { get; set; }
+        public JToken Metadata { get; set; }
 
         public static MongoEvent FromEventData(EventData data)
         {

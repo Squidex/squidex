@@ -7,8 +7,6 @@
 
 using System;
 using System.Threading.Tasks;
-using Orleans.Core;
-using Orleans.Runtime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
@@ -39,19 +37,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             IAssetRepository assetRepository,
             IScriptEngine scriptEngine,
             IContentRepository contentRepository)
-            : this(store, appProvider, assetRepository, scriptEngine, contentRepository, null, null)
-        {
-        }
-
-        protected ContentGrain(
-            IStore<Guid> store,
-            IAppProvider appProvider,
-            IAssetRepository assetRepository,
-            IScriptEngine scriptEngine,
-            IContentRepository contentRepository,
-            IGrainIdentity identity,
-            IGrainRuntime runtime)
-            : base(store, identity, runtime)
+            : base(store)
         {
             Guard.NotNull(appProvider, nameof(appProvider));
             Guard.NotNull(scriptEngine, nameof(scriptEngine));
@@ -64,14 +50,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             this.contentRepository = contentRepository;
         }
 
-        public override Task OnActivateAsync()
-        {
-            DelayDeactivation(TimeSpan.FromMinutes(10));
-
-            return base.OnActivateAsync();
-        }
-
-        public override Task<object> ExecuteAsync(IAggregateCommand command)
+        protected override Task<object> ExecuteAsync(IAggregateCommand command)
         {
             VerifyNotDeleted();
 

@@ -29,20 +29,20 @@ export class DateTimeValidationComponent implements OnInit {
     public calculatedDefaultValues = ['Now', 'Today'];
 
     public ngOnInit() {
-        this.editForm.addControl('calculatedDefaultValue',
+        this.editForm.setControl('calculatedDefaultValue',
             new FormControl(this.properties.calculatedDefaultValue));
 
-        this.editForm.addControl('maxValue',
+        this.editForm.setControl('maxValue',
             new FormControl(this.properties.maxValue, [
                 ValidatorsEx.validDateTime()
             ]));
 
-        this.editForm.addControl('minValue',
+        this.editForm.setControl('minValue',
             new FormControl(this.properties.minValue, [
                 ValidatorsEx.validDateTime()
             ]));
 
-        this.editForm.addControl('defaultValue',
+        this.editForm.setControl('defaultValue',
             new FormControl(this.properties.defaultValue, [
                 ValidatorsEx.validDateTime()
             ]));

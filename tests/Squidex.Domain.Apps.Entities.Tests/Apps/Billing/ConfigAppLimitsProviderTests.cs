@@ -13,7 +13,7 @@ using Squidex.Domain.Apps.Entities.Apps.Services.Implementations;
 using Squidex.Infrastructure;
 using Xunit;
 
-namespace Squidex.Domain.Apps.Entities.Apps
+namespace Squidex.Domain.Apps.Entities.Apps.Billing
 {
     public class ConfigAppLimitsProviderTests
     {

@@ -10,8 +10,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FakeItEasy;
-using Orleans.Core;
-using Orleans.Runtime;
 using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
@@ -25,8 +23,6 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
 {
     public abstract class HandlerTestBase<T, TState> where T : IDomainObjectGrain
     {
-        private readonly IGrainIdentity identity = A.Fake<IGrainIdentity>();
-        private readonly IGrainRuntime runtime = A.Fake<IGrainRuntime>();
         private readonly IStore<Guid> store = A.Fake<IStore<Guid>>();
         private readonly IPersistence<TState> persistence = A.Fake<IPersistence<TState>>();
 
@@ -52,16 +48,6 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
 
         protected abstract Guid Id { get; }
 
-        public IGrainIdentity Identity
-        {
-            get { return identity; }
-        }
-
-        public IGrainRuntime Runtime
-        {
-            get { return runtime; }
-        }
-
         public IStore<Guid> Store
         {
             get { return store; }
@@ -71,9 +57,6 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
 
         protected HandlerTestBase()
         {
-            A.CallTo(() => identity.PrimaryKey)
-                .Returns(Id);
-
             A.CallTo(() => store.WithSnapshotsAndEventSourcing(A<Type>.Ignored, Id, A<Func<TState, Task>>.Ignored, A<Func<Envelope<IEvent>, Task>>.Ignored))
                 .Returns(persistence);
 

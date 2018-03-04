@@ -11,7 +11,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Commands
 {
     public sealed class CreateSchemaField
     {
-        public string Partitioning { get; set; }
+        public string Partitioning { get; set; } = Core.Partitioning.Invariant.Key;
 
         public string Name { get; set; }
 

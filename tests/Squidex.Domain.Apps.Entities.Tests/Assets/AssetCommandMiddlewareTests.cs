@@ -10,14 +10,11 @@ using System.IO;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Orleans;
-using Orleans.Core;
-using Orleans.Runtime;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.Assets.State;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.Tasks;
 using Xunit;
 
@@ -35,14 +32,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
         private readonly AssetFile file;
         private readonly AssetCommandMiddleware sut;
 
-        public class MyAssetGrain : AssetGrain
-        {
-            public MyAssetGrain(IStore<Guid> store, IGrainIdentity identity, IGrainRuntime runtime)
-                : base(store, identity, runtime)
-            {
-            }
-        }
-
         protected override Guid Id
         {
             get { return assetId; }
@@ -52,8 +41,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             file = new AssetFile("my-image.png", "image/png", 1024, () => stream);
 
-            asset = new MyAssetGrain(Store, Identity, Runtime);
-            asset.OnActivateAsync();
+            asset = new AssetGrain(Store);
+            asset.OnActivateAsync(Id).Wait();
 
             A.CallTo(() => grainFactory.GetGrain<IAssetGrain>(Id, null))
                 .Returns(asset);
@@ -95,7 +84,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         private Task ExecuteCreateAsync()
         {
-            return asset.ExecuteAsync(J(CreateCommand(new CreateAsset { AssetId = Id, File = file })));
+            return asset.ExecuteAsync(CreateCommand(new CreateAsset { AssetId = Id, File = file }));
         }
 
         private void SetupStore(long version, Guid commitId)

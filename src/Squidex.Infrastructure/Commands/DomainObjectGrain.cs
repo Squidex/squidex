@@ -8,9 +8,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Orleans;
-using Orleans.Core;
-using Orleans.Runtime;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.States;
@@ -18,12 +15,18 @@ using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.Commands
 {
-    public abstract class DomainObjectGrain<T> : Grain, IDomainObjectGrain where T : IDomainState, new()
+    public abstract class DomainObjectGrain<T> : GrainOfGuid, IDomainObjectGrain where T : IDomainState, new()
     {
         private readonly List<Envelope<IEvent>> uncomittedEvents = new List<Envelope<IEvent>>();
         private readonly IStore<Guid> store;
+        private Guid id;
         private T snapshot = new T { Version = EtagVersion.Empty };
         private IPersistence<T> persistence;
+
+        public Guid Id
+        {
+            get { return id; }
+        }
 
         public long Version
         {
@@ -41,21 +44,17 @@ namespace Squidex.Infrastructure.Commands
         }
 
         protected DomainObjectGrain(IStore<Guid> store)
-            : this(store, null, null)
-        {
-        }
-
-        protected DomainObjectGrain(IStore<Guid> store, IGrainIdentity identity, IGrainRuntime runtime)
-            : base(identity, runtime)
         {
             Guard.NotNull(store, nameof(store));
 
             this.store = store;
         }
 
-        public override Task OnActivateAsync()
+        public override Task OnActivateAsync(Guid key)
         {
-            persistence = store.WithSnapshotsAndEventSourcing<T, Guid>(GetType(), this.GetPrimaryKey(), ApplySnapshot, ApplyEvent);
+            id = key;
+
+            persistence = store.WithSnapshotsAndEventSourcing<T, Guid>(GetType(), id, ApplySnapshot, ApplyEvent);
 
             return persistence.ReadAsync();
         }
@@ -69,7 +68,7 @@ namespace Squidex.Infrastructure.Commands
         {
             Guard.NotNull(@event, nameof(@event));
 
-            @event.SetAggregateId(this.GetPrimaryKey());
+            @event.SetAggregateId(id);
 
             ApplyEvent(@event);
 
@@ -148,14 +147,20 @@ namespace Squidex.Infrastructure.Commands
 
             if (command.ExpectedVersion != EtagVersion.Any && command.ExpectedVersion != Version)
             {
-                throw new DomainObjectVersionException(this.GetPrimaryKey().ToString(), GetType(), Version, command.ExpectedVersion);
+                throw new DomainObjectVersionException(id.ToString(), GetType(), Version, command.ExpectedVersion);
             }
 
             if (isUpdate && Version < 0)
             {
-                DeactivateOnIdle();
+                try
+                {
+                    DeactivateOnIdle();
+                }
+                catch (InvalidOperationException)
+                {
+                }
 
-                throw new DomainObjectNotFoundException(this.GetPrimaryKey().ToString(), GetType());
+                throw new DomainObjectNotFoundException(id.ToString(), GetType());
             }
             else if (!isUpdate && Version >= 0)
             {
@@ -185,7 +190,7 @@ namespace Squidex.Infrastructure.Commands
                     }
                     else
                     {
-                        result = EntityCreatedResult.Create(this.GetPrimaryKey(), Version);
+                        result = EntityCreatedResult.Create(id, Version);
                     }
                 }
 
@@ -210,6 +215,6 @@ namespace Squidex.Infrastructure.Commands
             return result.AsJ();
         }
 
-        public abstract Task<object> ExecuteAsync(IAggregateCommand command);
+        protected abstract Task<object> ExecuteAsync(IAggregateCommand command);
     }
 }

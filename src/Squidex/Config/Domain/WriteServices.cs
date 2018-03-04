@@ -72,6 +72,9 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<CreateBlogCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
+            services.AddSingletonAs<CreateProfileCommandMiddleware>()
+                .As<ICommandMiddleware>();
+
             services.AddTransientAs<MigrationPath>()
                 .As<IMigrationPath>();
 
@@ -96,7 +99,16 @@ namespace Squidex.Config.Domain
             services.AddTransientAs<AppGrain>()
                 .AsSelf();
 
+            services.AddTransientAs<AssetGrain>()
+                .AsSelf();
+
             services.AddTransientAs<ContentGrain>()
+                .AsSelf();
+
+            services.AddTransientAs<RuleGrain>()
+                .AsSelf();
+
+            services.AddTransientAs<SchemaGrain>()
                 .AsSelf();
 
             services.AddSingleton(c =>

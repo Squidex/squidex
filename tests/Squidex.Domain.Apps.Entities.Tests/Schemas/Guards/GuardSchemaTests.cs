@@ -170,6 +170,15 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         }
 
         [Fact]
+        public void CanReorder_should_throw_exception_if_field_ids_null()
+        {
+            var command = new ReorderFields { FieldIds = null };
+
+            Assert.Throws<ValidationException>(() => GuardSchema.CanReorder(schema_0, command));
+        }
+
+        [Fact]
+
         public void CanReorder_should_not_throw_exception_if_field_ids_are_valid()
         {
             var command = new ReorderFields { FieldIds = new List<long> { 1, 2 } };

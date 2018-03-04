@@ -9,8 +9,5 @@ namespace Squidex.Domain.Apps.Entities.Apps.Services
 {
     public sealed class PlanChangeAsyncResult : IChangePlanResult
     {
-        public PlanChangeAsyncResult()
-        {
-        }
     }
 }

@@ -15,6 +15,8 @@ namespace Squidex.Domain.Apps.Core.Rules
 
         T Visit(AzureQueueAction action);
 
+        T Visit(ElasticSearchAction action);
+
         T Visit(FastlyAction action);
 
         T Visit(SlackAction action);

@@ -139,6 +139,8 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
             var config_0 = LanguagesConfig.Build(Language.DE, Language.IT, Language.RU);
             var config_1 = config_0.Remove(Language.IT);
 
+            Assert.Same(config_1.Master, config_1.OfType<LanguageConfig>().FirstOrDefault(x => x.Language == Language.DE));
+
             config_1.ToList().ShouldBeEquivalentTo(
                 new List<LanguageConfig>
                 {

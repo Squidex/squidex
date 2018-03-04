@@ -10,8 +10,6 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using FakeItEasy;
 using NodaTime;
-using Orleans.Core;
-using Orleans.Runtime;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
@@ -27,7 +25,6 @@ using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.States;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents
@@ -71,21 +68,6 @@ namespace Squidex.Domain.Apps.Entities.Contents
         private readonly Guid contentId = Guid.NewGuid();
         private readonly ContentGrain sut;
 
-        public class MyContentGrain : ContentGrain
-        {
-            public MyContentGrain(
-                IStore<Guid> store,
-                IAppProvider appProvider,
-                IAssetRepository assetRepository,
-                IScriptEngine scriptEngine,
-                IContentRepository contentRepository,
-                IGrainIdentity identity,
-                IGrainRuntime runtime)
-                : base(store, appProvider, assetRepository, scriptEngine, contentRepository, identity, runtime)
-            {
-            }
-        }
-
         protected override Guid Id
         {
             get { return contentId; }
@@ -125,8 +107,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             patched = patch.MergeInto(data);
 
-            sut = new MyContentGrain(Store, appProvider, A.Dummy<IAssetRepository>(), scriptEngine, A.Dummy<IContentRepository>(), Identity, Runtime);
-            sut.OnActivateAsync();
+            sut = new ContentGrain(Store, appProvider, A.Dummy<IAssetRepository>(), scriptEngine, A.Dummy<IContentRepository>());
+            sut.OnActivateAsync(Id).Wait();
         }
 
         [Fact]
@@ -143,7 +125,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var command = new CreateContent { Data = data };
 
-            var result = await sut.ExecuteAsync(J(CreateContentCommand(command)));
+            var result = await sut.ExecuteAsync(CreateContentCommand(command));
 
             result.ShouldBeEquivalent(EntityCreatedResult.Create(data, 0));
 
@@ -163,7 +145,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var command = new CreateContent { Data = data, Publish = true };
 
-            var result = await sut.ExecuteAsync(J(CreateContentCommand(command)));
+            var result = await sut.ExecuteAsync(CreateContentCommand(command));
 
             result.ShouldBeEquivalent(EntityCreatedResult.Create(data, 1));
 
@@ -184,7 +166,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var command = new CreateContent { Data = invalidData };
 
-            await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(J(CreateContentCommand(command))));
+            await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(CreateContentCommand(command)));
         }
 
         [Fact]
@@ -194,7 +176,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             await ExecuteCreateAsync();
 
-            var result = await sut.ExecuteAsync(J(CreateContentCommand(command)));
+            var result = await sut.ExecuteAsync(CreateContentCommand(command));
 
             result.ShouldBeEquivalent(new ContentDataChangedResult(otherData, 1));
 
@@ -214,7 +196,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             await ExecuteCreateAsync();
 
-            var result = await sut.ExecuteAsync(J(CreateContentCommand(command)));
+            var result = await sut.ExecuteAsync(CreateContentCommand(command));
 
             result.ShouldBeEquivalent(new ContentDataChangedResult(data, 0));
 
@@ -234,7 +216,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             await ExecuteCreateAsync();
 
-            await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(J(CreateContentCommand(command))));
+            await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(CreateContentCommand(command)));
         }
 
         [Fact]
@@ -244,7 +226,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             await ExecuteCreateAsync();
 
-            var result = await sut.ExecuteAsync(J(CreateContentCommand(command)));
+            var result = await sut.ExecuteAsync(CreateContentCommand(command));
 
             result.ShouldBeEquivalent(new ContentDataChangedResult(otherData, 1));
 
@@ -264,7 +246,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             await ExecuteCreateAsync();
 
-            var result = await sut.ExecuteAsync(J(CreateContentCommand(command)));
+            var result = await sut.ExecuteAsync(CreateContentCommand(command));
 
             result.ShouldBeEquivalent(new ContentDataChangedResult(data, 0));
 
@@ -284,7 +266,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             await ExecuteCreateAsync();
 
-            var result = await sut.ExecuteAsync(J(CreateContentCommand(command)));
+            var result = await sut.ExecuteAsync(CreateContentCommand(command));
 
             result.ShouldBeEquivalent(new EntitySavedResult(1));
 
@@ -308,7 +290,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             await ExecuteCreateAsync();
 
-            var result = await sut.ExecuteAsync(J(CreateContentCommand(command)));
+            var result = await sut.ExecuteAsync(CreateContentCommand(command));
 
             result.ShouldBeEquivalent(new EntitySavedResult(1));
 
@@ -332,7 +314,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             await ExecuteCreateAsync();
 
-            var result = await sut.ExecuteAsync(J(CreateContentCommand(command)));
+            var result = await sut.ExecuteAsync(CreateContentCommand(command));
 
             result.ShouldBeEquivalent(new EntitySavedResult(1));
 
@@ -349,17 +331,17 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         private Task ExecuteCreateAsync()
         {
-            return sut.ExecuteAsync(J(CreateContentCommand(new CreateContent { Data = data })));
+            return sut.ExecuteAsync(CreateContentCommand(new CreateContent { Data = data }));
         }
 
         private Task ExecuteUpdateAsync()
         {
-            return sut.ExecuteAsync(J(CreateContentCommand(new UpdateContent { Data = data })));
+            return sut.ExecuteAsync(CreateContentCommand(new UpdateContent { Data = data }));
         }
 
         private Task ExecuteDeleteAsync()
         {
-            return sut.ExecuteAsync(J(CreateContentCommand(new DeleteContent())));
+            return sut.ExecuteAsync(CreateContentCommand(new DeleteContent()));
         }
 
         protected T CreateContentEvent<T>(T @event) where T : ContentEvent

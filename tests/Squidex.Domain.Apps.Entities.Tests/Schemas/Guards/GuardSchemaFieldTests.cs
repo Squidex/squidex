@@ -204,6 +204,22 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         }
 
         [Fact]
+        public void CanUpdate_should_throw_exception_if_properties_null()
+        {
+            var command = new UpdateField { FieldId = 2, Properties = null };
+
+            Assert.Throws<ValidationException>(() => GuardSchemaField.CanUpdate(schema_0, command));
+        }
+
+        [Fact]
+        public void CanUpdate_should_throw_exception_if_properties_not_valid()
+        {
+            var command = new UpdateField { FieldId = 2, Properties = new StringFieldProperties { MinLength = 10, MaxLength = 5 } };
+
+            Assert.Throws<ValidationException>(() => GuardSchemaField.CanUpdate(schema_0, command));
+        }
+
+        [Fact]
         public void CanAdd_should_throw_exception_if_field_already_exists()
         {
             var command = new AddField { Name = "field1", Properties = new StringFieldProperties() };
@@ -223,6 +239,14 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         public void CanAdd_should_throw_exception_if_properties_not_valid()
         {
             var command = new AddField { Name = "field3", Properties = invalidProperties };
+
+            Assert.Throws<ValidationException>(() => GuardSchemaField.CanAdd(schema_0, command));
+        }
+
+        [Fact]
+        public void CanAdd_should_throw_exception_if_properties_null()
+        {
+            var command = new AddField { Name = "field3", Properties = null };
 
             Assert.Throws<ValidationException>(() => GuardSchemaField.CanAdd(schema_0, command));
         }

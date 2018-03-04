@@ -6,6 +6,8 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System.Threading;
+using System.Threading.Tasks;
 using FakeItEasy;
 using Orleans;
 using Xunit;
@@ -28,9 +30,9 @@ namespace Squidex.Infrastructure.Orleans
         }
 
         [Fact]
-        public void Should_activate_grain_on_run()
+        public async Task Should_activate_grain_on_run()
         {
-            sut.Run();
+            await sut.Execute(CancellationToken.None);
 
             A.CallTo(() => grain.ActivateAsync())
                 .MustHaveHappened();

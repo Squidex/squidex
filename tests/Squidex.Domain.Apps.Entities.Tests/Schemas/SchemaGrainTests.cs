@@ -10,8 +10,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FakeItEasy;
-using Orleans.Core;
-using Orleans.Runtime;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Domain.Apps.Entities.Schemas.State;
@@ -19,7 +17,6 @@ using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.States;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Schemas
@@ -31,14 +28,6 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         private readonly string fieldName = "age";
         private readonly NamedId<long> fieldId;
         private readonly SchemaGrain sut;
-
-        public sealed class MySchemaGrain : SchemaGrain
-        {
-            public MySchemaGrain(IStore<Guid> store, IAppProvider appProvider, FieldRegistry registry, IGrainIdentity identity, IGrainRuntime runtime)
-                : base(store, appProvider, registry, identity, runtime)
-            {
-            }
-        }
 
         protected override Guid Id
         {
@@ -52,8 +41,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             fieldId = new NamedId<long>(1, fieldName);
 
-            sut = new MySchemaGrain(Store, appProvider, registry, Identity, Runtime);
-            sut.OnActivateAsync().Wait();
+            sut = new SchemaGrain(Store, appProvider, registry);
+            sut.OnActivateAsync(Id).Wait();
         }
 
         [Fact]
@@ -72,7 +61,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             var command = new CreateSchema { Name = SchemaName, SchemaId = SchemaId, Properties = properties };
 
-            var result = await sut.ExecuteAsync(J(CreateCommand(command)));
+            var result = await sut.ExecuteAsync(CreateCommand(command));
 
             result.ShouldBeEquivalent(EntityCreatedResult.Create(Id, 0));
 
@@ -100,7 +89,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             var command = new CreateSchema { Name = SchemaName, SchemaId = SchemaId, Properties = properties, Fields = fields };
 
-            var result = await sut.ExecuteAsync(J(CreateCommand(command)));
+            var result = await sut.ExecuteAsync(CreateCommand(command));
 
             result.ShouldBeEquivalent(EntityCreatedResult.Create(Id, 0));
 
@@ -120,7 +109,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             await ExecuteCreateAsync();
 
-            var result = await sut.ExecuteAsync(J(CreateCommand(command)));
+            var result = await sut.ExecuteAsync(CreateCommand(command));
 
             result.ShouldBeEquivalent(new EntitySavedResult(1));
 
@@ -146,7 +135,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             await ExecuteCreateAsync();
 
-            var result = await sut.ExecuteAsync(J(CreateCommand(command)));
+            var result = await sut.ExecuteAsync(CreateCommand(command));
 
             result.ShouldBeEquivalent(new EntitySavedResult(1));
 
@@ -172,7 +161,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             await ExecuteAddFieldAsync("field1");
             await ExecuteAddFieldAsync("field2");
 
-            var result = await sut.ExecuteAsync(J(CreateCommand(command)));
+            var result = await sut.ExecuteAsync(CreateCommand(command));
 
             result.ShouldBeEquivalent(new EntitySavedResult(3));
 
@@ -189,7 +178,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             await ExecuteCreateAsync();
 
-            var result = await sut.ExecuteAsync(J(CreateCommand(command)));
+            var result = await sut.ExecuteAsync(CreateCommand(command));
 
             result.ShouldBeEquivalent(new EntitySavedResult(1));
 
@@ -209,7 +198,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             await ExecuteCreateAsync();
             await ExecutePublishAsync();
 
-            var result = await sut.ExecuteAsync(J(CreateCommand(command)));
+            var result = await sut.ExecuteAsync(CreateCommand(command));
 
             result.ShouldBeEquivalent(new EntitySavedResult(2));
 
@@ -228,7 +217,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             await ExecuteCreateAsync();
 
-            var result = await sut.ExecuteAsync(J(CreateCommand(command)));
+            var result = await sut.ExecuteAsync(CreateCommand(command));
 
             result.ShouldBeEquivalent(new EntitySavedResult(1));
 
@@ -247,7 +236,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             await ExecuteCreateAsync();
 
-            var result = await sut.ExecuteAsync(J(CreateCommand(command)));
+            var result = await sut.ExecuteAsync(CreateCommand(command));
 
             result.ShouldBeEquivalent(EntityCreatedResult.Create(1, 1));
 
@@ -267,7 +256,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             await ExecuteCreateAsync();
             await ExecuteAddFieldAsync(fieldName);
 
-            var result = await sut.ExecuteAsync(J(CreateCommand(command)));
+            var result = await sut.ExecuteAsync(CreateCommand(command));
 
             result.ShouldBeEquivalent(new EntitySavedResult(2));
 
@@ -287,7 +276,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             await ExecuteCreateAsync();
             await ExecuteAddFieldAsync(fieldName);
 
-            var result = await sut.ExecuteAsync(J(CreateCommand(command)));
+            var result = await sut.ExecuteAsync(CreateCommand(command));
 
             result.ShouldBeEquivalent(new EntitySavedResult(2));
 
@@ -307,7 +296,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             await ExecuteCreateAsync();
             await ExecuteAddFieldAsync(fieldName);
 
-            var result = await sut.ExecuteAsync(J(CreateCommand(command)));
+            var result = await sut.ExecuteAsync(CreateCommand(command));
 
             result.ShouldBeEquivalent(new EntitySavedResult(2));
 
@@ -328,7 +317,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             await ExecuteAddFieldAsync(fieldName);
             await ExecuteHideFieldAsync(1);
 
-            var result = await sut.ExecuteAsync(J(CreateCommand(command)));
+            var result = await sut.ExecuteAsync(CreateCommand(command));
 
             result.ShouldBeEquivalent(new EntitySavedResult(3));
 
@@ -348,7 +337,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             await ExecuteCreateAsync();
             await ExecuteAddFieldAsync(fieldName);
 
-            var result = await sut.ExecuteAsync(J(CreateCommand(command)));
+            var result = await sut.ExecuteAsync(CreateCommand(command));
 
             result.ShouldBeEquivalent(new EntitySavedResult(2));
 
@@ -369,7 +358,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             await ExecuteAddFieldAsync(fieldName);
             await ExecuteDisableFieldAsync(1);
 
-            var result = await sut.ExecuteAsync(J(CreateCommand(command)));
+            var result = await sut.ExecuteAsync(CreateCommand(command));
 
             result.ShouldBeEquivalent(new EntitySavedResult(3));
 
@@ -389,7 +378,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             await ExecuteCreateAsync();
             await ExecuteAddFieldAsync(fieldName);
 
-            var result = await sut.ExecuteAsync(J(CreateCommand(command)));
+            var result = await sut.ExecuteAsync(CreateCommand(command));
 
             result.ShouldBeEquivalent(new EntitySavedResult(2));
 
@@ -403,32 +392,32 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
         private Task ExecuteCreateAsync()
         {
-            return sut.ExecuteAsync(J(CreateCommand(new CreateSchema { Name = SchemaName })));
+            return sut.ExecuteAsync(CreateCommand(new CreateSchema { Name = SchemaName }));
         }
 
         private Task ExecuteAddFieldAsync(string name)
         {
-            return sut.ExecuteAsync(J(CreateCommand(new AddField { Properties = ValidProperties(), Name = name })));
+            return sut.ExecuteAsync(CreateCommand(new AddField { Properties = ValidProperties(), Name = name }));
         }
 
         private Task ExecuteHideFieldAsync(long id)
         {
-            return sut.ExecuteAsync(J(CreateCommand(new HideField { FieldId = id })));
+            return sut.ExecuteAsync(CreateCommand(new HideField { FieldId = id }));
         }
 
         private Task ExecuteDisableFieldAsync(long id)
         {
-            return sut.ExecuteAsync(J(CreateCommand(new DisableField { FieldId = id })));
+            return sut.ExecuteAsync(CreateCommand(new DisableField { FieldId = id }));
         }
 
         private Task ExecutePublishAsync()
         {
-            return sut.ExecuteAsync(J(CreateCommand(new PublishSchema())));
+            return sut.ExecuteAsync(CreateCommand(new PublishSchema()));
         }
 
         private Task ExecuteDeleteAsync()
         {
-            return sut.ExecuteAsync(J(CreateCommand(new DeleteSchema())));
+            return sut.ExecuteAsync(CreateCommand(new DeleteSchema()));
         }
 
         private static StringFieldProperties ValidProperties()

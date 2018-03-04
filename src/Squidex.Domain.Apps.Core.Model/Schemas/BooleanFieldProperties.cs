@@ -14,6 +14,8 @@ namespace Squidex.Domain.Apps.Core.Schemas
     {
         public bool? DefaultValue { get; set; }
 
+        public bool InlineEditable { get; set; }
+
         public BooleanFieldEditor Editor { get; set; }
 
         public override T Accept<T>(IFieldPropertiesVisitor<T> visitor)

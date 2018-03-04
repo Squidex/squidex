@@ -13,7 +13,7 @@
         <tbody dnd-sortable-container [sortableData]="contentItems.mutableValues">
             <ng-template ngFor let-content let-i="index" [ngForOf]="contentItems">
                 <tr [sqxContent]="content" dnd-sortable [sortableIndex]="i" (sqxSorted)="onContentsSorted($event)"
-                    [languageCode]="languageCode"
+                    [language]="language"
                     [schemaFields]="contentFields"
                     [schema]="schema"
                     (deleting)="onContentRemoving(content)"

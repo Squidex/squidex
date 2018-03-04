@@ -312,6 +312,21 @@ describe('ContentsService', () => {
         req.flush({});
     }));
 
+    it('should make patch request to update content',
+        inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
+
+        const dto = {};
+
+        contentsService.patchContent('my-app', 'my-schema', 'content1', dto, version).subscribe();
+
+        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema/content1');
+
+        expect(req.request.method).toEqual('PATCH');
+        expect(req.request.headers.get('If-Match')).toBe(version.value);
+
+        req.flush({});
+    }));
+
     it('should make put request to change content status',
         inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
 

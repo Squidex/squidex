@@ -7,8 +7,6 @@
 
 using System;
 using System.Threading.Tasks;
-using Orleans.Core;
-using Orleans.Runtime;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.Rules.Guards;
 using Squidex.Domain.Apps.Entities.Rules.State;
@@ -23,40 +21,35 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Rules
 {
-    public class RuleGrain : DomainObjectGrain<RuleState>, IRuleGrain
+    public sealed class RuleGrain : DomainObjectGrain<RuleState>, IRuleGrain
     {
         private readonly IAppProvider appProvider;
 
         public RuleGrain(IStore<Guid> store, IAppProvider appProvider)
-            : this(store, appProvider, null, null)
-        {
-        }
-
-        protected RuleGrain(IStore<Guid> store, IAppProvider appProvider, IGrainIdentity identity, IGrainRuntime runtime)
-            : base(store, identity, runtime)
+            : base(store)
         {
             Guard.NotNull(appProvider, nameof(appProvider));
 
             this.appProvider = appProvider;
         }
 
-        public override Task<object> ExecuteAsync(IAggregateCommand command)
+        protected override Task<object> ExecuteAsync(IAggregateCommand command)
         {
             VerifyNotDeleted();
 
             switch (command)
             {
                 case CreateRule createRule:
-                    return CreateAsync(createRule, c =>
+                    return CreateAsync(createRule, async c =>
                     {
-                        GuardRule.CanCreate(c, appProvider);
+                        await GuardRule.CanCreate(c, appProvider);
 
                         Create(c);
                     });
                 case UpdateRule updateRule:
-                    return UpdateAsync(updateRule, c =>
+                    return UpdateAsync(updateRule, async c =>
                     {
-                        GuardRule.CanUpdate(c, Snapshot.AppId.Id, appProvider);
+                        await GuardRule.CanUpdate(c, Snapshot.AppId.Id, appProvider);
 
                         Update(c);
                     });

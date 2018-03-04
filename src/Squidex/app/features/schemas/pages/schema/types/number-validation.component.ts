@@ -26,13 +26,13 @@ export class NumberValidationComponent implements OnInit {
     public showDefaultValue: Observable<boolean>;
 
     public ngOnInit() {
-        this.editForm.addControl('maxValue',
+        this.editForm.setControl('maxValue',
             new FormControl(this.properties.maxValue));
 
-        this.editForm.addControl('minValue',
+        this.editForm.setControl('minValue',
             new FormControl(this.properties.minValue));
 
-        this.editForm.addControl('defaultValue',
+        this.editForm.setControl('defaultValue',
             new FormControl(this.properties.defaultValue));
 
         this.showDefaultValue =

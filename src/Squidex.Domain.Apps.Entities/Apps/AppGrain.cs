@@ -8,8 +8,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Orleans.Core;
-using Orleans.Runtime;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Guards;
@@ -42,20 +40,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             IAppPlansProvider appPlansProvider,
             IAppPlanBillingManager appPlansBillingManager,
             IUserResolver userResolver)
-            : this(initialPatterns, store, appProvider, appPlansProvider, appPlansBillingManager, userResolver, null, null)
-        {
-        }
-
-        protected AppGrain(
-            InitialPatterns initialPatterns,
-            IStore<Guid> store,
-            IAppProvider appProvider,
-            IAppPlansProvider appPlansProvider,
-            IAppPlanBillingManager appPlansBillingManager,
-            IUserResolver userResolver,
-            IGrainIdentity identity,
-            IGrainRuntime runtime)
-            : base(store, identity, runtime)
+            : base(store)
         {
             Guard.NotNull(initialPatterns, nameof(initialPatterns));
             Guard.NotNull(appProvider, nameof(appProvider));
@@ -70,7 +55,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             this.initialPatterns = initialPatterns;
         }
 
-        public override Task<object> ExecuteAsync(IAggregateCommand command)
+        protected override Task<object> ExecuteAsync(IAggregateCommand command)
         {
             switch (command)
             {

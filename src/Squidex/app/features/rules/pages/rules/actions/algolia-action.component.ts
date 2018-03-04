@@ -24,17 +24,17 @@ export class AlgoliaActionComponent implements OnInit {
     public actionForm =
         this.formBuilder.group({
             appId: ['',
-            [
-                Validators.required
-            ]],
+                [
+                    Validators.required
+                ]],
             apiKey: ['',
-            [
-                Validators.required
-            ]],
+                [
+                    Validators.required
+                ]],
             indexName: ['$SCHEMA_NAME',
-            [
-                Validators.required
-            ]]
+                [
+                    Validators.required
+                ]]
         });
 
     constructor(

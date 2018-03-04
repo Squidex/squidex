@@ -80,6 +80,12 @@
                             (actionChanged)="selectAction($event)">
                         </sqx-azure-queue-action>
                     </div>
+                    <div *ngSwitchCase="'ElasticSearch'">
+                        <sqx-elastic-search-action #actionControl
+                            [action]="action" 
+                            (actionChanged)="selectAction($event)">
+                        </sqx-elastic-search-action>
+                    </div>
                     <div *ngSwitchCase="'Fastly'">
                         <sqx-fastly-action #actionControl
                             [action]="action" 

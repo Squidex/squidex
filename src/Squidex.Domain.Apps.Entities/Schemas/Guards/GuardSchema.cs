@@ -82,7 +82,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                     error(new ValidationError("Field ids is required.", nameof(command.FieldIds)));
                 }
 
-                if (command.FieldIds.Count != schema.Fields.Count || command.FieldIds.Any(x => !schema.FieldsById.ContainsKey(x)))
+                if (command.FieldIds != null && (command.FieldIds.Count != schema.Fields.Count || command.FieldIds.Any(x => !schema.FieldsById.ContainsKey(x))))
                 {
                     error(new ValidationError("Ids must cover all fields.", nameof(command.FieldIds)));
                 }

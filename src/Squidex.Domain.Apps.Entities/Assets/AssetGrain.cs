@@ -7,8 +7,6 @@
 
 using System;
 using System.Threading.Tasks;
-using Orleans.Core;
-using Orleans.Runtime;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.Assets.Guards;
 using Squidex.Domain.Apps.Entities.Assets.State;
@@ -17,6 +15,7 @@ using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
 
@@ -25,16 +24,11 @@ namespace Squidex.Domain.Apps.Entities.Assets
     public class AssetGrain : DomainObjectGrain<AssetState>, IAssetGrain
     {
         public AssetGrain(IStore<Guid> store)
-            : this(store, null, null)
+            : base(store)
         {
         }
 
-        protected AssetGrain(IStore<Guid> store, IGrainIdentity identity, IGrainRuntime runtime)
-            : base(store, identity, runtime)
-        {
-        }
-
-        public override Task<object> ExecuteAsync(IAggregateCommand command)
+        protected override Task<object> ExecuteAsync(IAggregateCommand command)
         {
             switch (command)
             {
@@ -143,6 +137,11 @@ namespace Squidex.Domain.Apps.Entities.Assets
         public override void ApplyEvent(Envelope<IEvent> @event)
         {
             ApplySnapshot(Snapshot.Apply(@event));
+        }
+
+        public Task<J<IAssetEntity>> GetStateAsync()
+        {
+            return Task.FromResult(new J<IAssetEntity>(Snapshot));
         }
     }
 }

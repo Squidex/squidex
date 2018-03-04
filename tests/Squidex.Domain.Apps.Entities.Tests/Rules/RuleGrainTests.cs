@@ -9,8 +9,6 @@ using System;
 using System.Collections.Immutable;
 using System.Threading.Tasks;
 using FakeItEasy;
-using Orleans.Core;
-using Orleans.Runtime;
 using Squidex.Domain.Apps.Core.Rules.Actions;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
@@ -19,7 +17,6 @@ using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Rules;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.States;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Rules
@@ -30,14 +27,6 @@ namespace Squidex.Domain.Apps.Entities.Rules
         private readonly Guid ruleId = Guid.NewGuid();
         private readonly RuleGrain sut;
 
-        public sealed class MyRuleGrain : RuleGrain
-        {
-            public MyRuleGrain(IStore<Guid> store, IAppProvider appProvider, IGrainIdentity identity, IGrainRuntime runtime)
-                : base(store, appProvider, identity, runtime)
-            {
-            }
-        }
-
         protected override Guid Id
         {
             get { return ruleId; }
@@ -45,8 +34,8 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
         public RuleGrainTests()
         {
-            sut = new MyRuleGrain(Store, appProvider, Identity, Runtime);
-            sut.OnActivateAsync().Wait();
+            sut = new RuleGrain(Store, appProvider);
+            sut.OnActivateAsync(Id).Wait();
         }
 
         [Fact]
@@ -63,7 +52,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
         {
             var command = MakeCreateCommand();
 
-            var result = await sut.ExecuteAsync(J(CreateRuleCommand(command)));
+            var result = await sut.ExecuteAsync(CreateRuleCommand(command));
 
             result.ShouldBeEquivalent(EntityCreatedResult.Create(Id, 0));
 
@@ -85,7 +74,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
             await ExecuteCreateAsync();
 
-            var result = await sut.ExecuteAsync(J(CreateRuleCommand(command)));
+            var result = await sut.ExecuteAsync(CreateRuleCommand(command));
 
             result.ShouldBeEquivalent(new EntitySavedResult(1));
 
@@ -101,8 +90,8 @@ namespace Squidex.Domain.Apps.Entities.Rules
         [Fact]
         public async Task Enable_should_handle_command()
         {
-            await sut.ExecuteAsync(J(CreateRuleCommand(MakeCreateCommand())));
-            await sut.ExecuteAsync(J(CreateRuleCommand(new DisableRule())));
+            await sut.ExecuteAsync(CreateRuleCommand(MakeCreateCommand()));
+            await sut.ExecuteAsync(CreateRuleCommand(new DisableRule()));
         }
 
         [Fact]
@@ -113,7 +102,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
             await ExecuteCreateAsync();
             await ExecuteDisableAsync();
 
-            var result = await sut.ExecuteAsync(J(CreateRuleCommand(command)));
+            var result = await sut.ExecuteAsync(CreateRuleCommand(command));
 
             result.ShouldBeEquivalent(new EntitySavedResult(2));
 
@@ -132,7 +121,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
             await ExecuteCreateAsync();
 
-            var result = await sut.ExecuteAsync(J(CreateRuleCommand(command)));
+            var result = await sut.ExecuteAsync(CreateRuleCommand(command));
 
             result.ShouldBeEquivalent(new EntitySavedResult(1));
 
@@ -151,7 +140,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
             await ExecuteCreateAsync();
 
-            var result = await sut.ExecuteAsync(J(CreateRuleCommand(command)));
+            var result = await sut.ExecuteAsync(CreateRuleCommand(command));
 
             result.ShouldBeEquivalent(new EntitySavedResult(1));
 
@@ -165,17 +154,17 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
         private Task ExecuteCreateAsync()
         {
-            return sut.ExecuteAsync(J(CreateRuleCommand(MakeCreateCommand())));
+            return sut.ExecuteAsync(CreateRuleCommand(MakeCreateCommand()));
         }
 
         private Task ExecuteDisableAsync()
         {
-            return sut.ExecuteAsync(J(CreateRuleCommand(new DisableRule())));
+            return sut.ExecuteAsync(CreateRuleCommand(new DisableRule()));
         }
 
         private Task ExecuteDeleteAsync()
         {
-            return sut.ExecuteAsync(J(CreateRuleCommand(new DeleteRule())));
+            return sut.ExecuteAsync(CreateRuleCommand(new DeleteRule()));
         }
 
         protected T CreateRuleEvent<T>(T @event) where T : RuleEvent

@@ -6,111 +6,172 @@
 // ==========================================================================
 
 using System;
-using NodaTime;
+using System.Diagnostics;
 using Xunit;
 
 namespace Squidex.Infrastructure.Reflection
 {
     public class SimpleMapperTests
     {
-        public class MyClass1Base
+        public class Class1Base<T1>
         {
-            public Guid MappedGuid { get; set; }
-
-            public string MappedString { get; set; }
-
-            public string MappedNull { get; set; }
-
-            public long MappedNumber { get; set; }
-
-            public long WrongType1 { get; set; }
-
-            public long WrongType2 { get; set; }
+            public T1 P1 { get; set; }
         }
 
-        public class MyClass1 : MyClass1Base
+        public class Class1<T1, T2> : Class1Base<T1>
         {
-            public string UnmappedString { get; set; }
+            public T2 P2 { get; set; }
         }
 
-        public class MyClass2Base
+        public class Class2Base<T2>
         {
-            public string MappedString { get; protected set; }
-
-            public int MappedNull { get; set; }
-
-            public int MappedNumber { get; set; }
-
-            public string MappedGuid { get; set; }
+            public T2 P2 { get; set; }
         }
 
-        public class MyClass2 : MyClass2Base
+        public class Class2<T2, T3> : Class2Base<T2>
         {
-            public string UnmappedString
+            public T3 P3 { get; set; }
+        }
+
+        public class Readonly<T>
+        {
+            public T P1 { get; }
+        }
+
+        public class Writeonly<T>
+        {
+            public T P1
             {
-                get { return "Value"; }
+                set { Debug.WriteLine(value); }
             }
-
-            public Instant WrongType1 { get; set; }
-
-            public Duration WrongType2 { get; set; }
         }
 
         [Fact]
         public void Should_throw_exception_if_mapping_with_null_source()
         {
-            Assert.Throws<ArgumentNullException>(() => SimpleMapper.Map((MyClass1)null, new MyClass2()));
+            Assert.Throws<ArgumentNullException>(() => SimpleMapper.Map((Class2<int, int>)null, new Class2<int, int>()));
         }
 
         [Fact]
         public void Should_throw_exception_if_mapping_with_null_target()
         {
-            Assert.Throws<ArgumentNullException>(() => SimpleMapper.Map(new MyClass1(), (MyClass2)null));
+            Assert.Throws<ArgumentNullException>(() => SimpleMapper.Map(new Class2<int, int>(), (Class2<int, int>)null));
         }
 
         [Fact]
-        public void Should_map_to_type()
+        public void Should_map_to_same_type()
         {
-            var class1 = new MyClass1
+            var obj1 = new Class1<int, int>
             {
-                UnmappedString = Guid.NewGuid().ToString(),
-                MappedString = Guid.NewGuid().ToString(),
-                MappedNumber = 123,
-                MappedGuid = Guid.NewGuid()
+                P1 = 6,
+                P2 = 8
             };
+            var obj2 = SimpleMapper.Map(obj1, new Class2<int, int>());
 
-            var class2 = SimpleMapper.Map<MyClass1, MyClass2>(class1);
-
-            AssertObjectEquality(class1, class2);
+            Assert.Equal(8, obj2.P2);
+            Assert.Equal(0, obj2.P3);
         }
 
         [Fact]
-        public void Should_map_between_types()
+        public void Should_map_all_properties()
         {
-            var class1 = new MyClass1
+            var obj1 = new Class1<int, int>
             {
-                UnmappedString = Guid.NewGuid().ToString(),
-                MappedString = Guid.NewGuid().ToString(),
-                MappedNumber = 123,
-                MappedGuid = Guid.NewGuid()
+                P1 = 6,
+                P2 = 8
             };
-            var class2 = new MyClass2();
+            var obj2 = SimpleMapper.Map(obj1, new Class1<int, int>());
 
-            SimpleMapper.Map(class1, class2);
-
-            AssertObjectEquality(class1, class2);
+            Assert.Equal(6, obj2.P1);
+            Assert.Equal(8, obj2.P2);
         }
 
-        private static void AssertObjectEquality(MyClass1 class1, MyClass2 class2)
+        [Fact]
+        public void Should_map_to_convertible_type()
         {
-            Assert.Equal(class1.MappedString, class2.MappedString);
-            Assert.Equal(class1.MappedNumber, class2.MappedNumber);
-            Assert.Equal(class1.MappedGuid.ToString(), class2.MappedGuid);
+            var obj1 = new Class1<long, long>
+            {
+                P1 = 6,
+                P2 = 8
+            };
+            var obj2 = SimpleMapper.Map(obj1, new Class2<int, int>());
 
-            Assert.NotEqual(class1.UnmappedString, class2.UnmappedString);
+            Assert.Equal(8, obj2.P2);
+            Assert.Equal(0, obj2.P3);
+        }
 
-            Assert.Equal(0L, class1.WrongType1);
-            Assert.Equal(0L, class1.WrongType2);
+        [Fact]
+        public void Should_map_nullables()
+        {
+            var obj1 = new Class1<bool?, bool?>
+            {
+                P1 = true,
+                P2 = true
+            };
+            var obj2 = SimpleMapper.Map(obj1, new Class2<bool, bool>());
+
+            Assert.True(obj2.P2);
+            Assert.False(obj2.P3);
+        }
+
+        [Fact]
+        public void Should_map_when_convertible_is_null()
+        {
+            var obj1 = new Class1<int?, int?>
+            {
+                P1 = null,
+                P2 = null
+            };
+            var obj2 = SimpleMapper.Map(obj1, new Class1<int, int>());
+
+            Assert.Equal(0, obj2.P1);
+            Assert.Equal(0, obj2.P2);
+        }
+
+        [Fact]
+        public void Should_convert_to_string()
+        {
+            var obj1 = new Class1<RefToken, RefToken>
+            {
+                P1 = new RefToken("user", "1"),
+                P2 = new RefToken("user", "2")
+            };
+            var obj2 = SimpleMapper.Map(obj1, new Class2<string, string>());
+
+            Assert.Equal("user:2", obj2.P2);
+            Assert.Null(obj2.P3);
+        }
+
+        [Fact]
+        public void Should_return_default_if_conversion_failed()
+        {
+            var obj1 = new Class1<long, long>
+            {
+                P1 = long.MaxValue,
+                P2 = long.MaxValue
+            };
+            var obj2 = SimpleMapper.Map(obj1, new Class2<int, int>());
+
+            Assert.Equal(0, obj2.P2);
+            Assert.Equal(0, obj2.P3);
+        }
+
+        [Fact]
+        public void Should_ignore_write_only()
+        {
+            var obj1 = new Writeonly<int>();
+            var obj2 = SimpleMapper.Map(obj1, new Class1<int, int>());
+
+            Assert.Equal(0, obj2.P1);
+        }
+
+        [Fact]
+        public void Should_ignore_read_only()
+        {
+            var obj1 = new Class1<int, int> { P1 = 10 };
+            var obj2 = SimpleMapper.Map(obj1, new Readonly<int>());
+
+            Assert.Equal(0, obj2.P1);
         }
     }
 }

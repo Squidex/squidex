@@ -5,12 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Threading;
+using System.Threading.Tasks;
 using Orleans;
-using Squidex.Infrastructure.Tasks;
+using Orleans.Runtime;
 
 namespace Squidex.Infrastructure.Orleans
 {
-    public sealed class Bootstrap<T> : IRunnable where T : IBackgroundGrain
+    public sealed class Bootstrap<T> : IStartupTask where T : IBackgroundGrain
     {
         private readonly IGrainFactory grainFactory;
 
@@ -21,11 +23,11 @@ namespace Squidex.Infrastructure.Orleans
             this.grainFactory = grainFactory;
         }
 
-        public void Run()
+        public Task Execute(CancellationToken cancellationToken)
         {
             var grain = grainFactory.GetGrain<T>("Default");
 
-            grain.ActivateAsync().Forget();
+            return grain.ActivateAsync();
         }
     }
 }

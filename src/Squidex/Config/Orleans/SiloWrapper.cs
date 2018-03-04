@@ -15,7 +15,10 @@ using Orleans.Configuration;
 using Orleans.Hosting;
 using Squidex.Config.Domain;
 using Squidex.Domain.Apps.Entities;
+using Squidex.Domain.Apps.Entities.Contents;
+using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.EventSourcing.Grains;
 using Squidex.Infrastructure.Log.Adapter;
 using Squidex.Infrastructure.Orleans;
 
@@ -46,6 +49,9 @@ namespace Squidex.Config.Orleans
 
             silo = new SiloHostBuilder()
                 .UseDashboard(options => options.HostSelf = true)
+                .AddStartupTask<Bootstrap<IContentSchedulerGrain>>()
+                .AddStartupTask<Bootstrap<IEventConsumerManagerGrain>>()
+                .AddStartupTask<Bootstrap<IRuleDequeuerGrain>>()
                 .ConfigureEndpoints(Dns.GetHostName(), 11111, 40000, listenOnAllHostAddresses: true)
                 .Configure(options =>
                 {

@@ -27,7 +27,6 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.EventSourcing.Grains;
-using Squidex.Infrastructure.Orleans;
 using Squidex.Pipeline;
 
 namespace Squidex.Config.Domain
@@ -92,6 +91,9 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<AzureQueueActionHandler>()
                 .As<IRuleActionHandler>();
 
+            services.AddSingletonAs<ElasticSearchActionHandler>()
+                .As<IRuleActionHandler>();
+
             services.AddSingletonAs<FastlyActionHandler>()
                 .As<IRuleActionHandler>();
 
@@ -100,15 +102,6 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<WebhookActionHandler>()
                 .As<IRuleActionHandler>();
-
-            services.AddSingletonAs<Bootstrap<IRuleDequeuerGrain>>()
-                .As<IRunnable>();
-
-            services.AddSingletonAs<Bootstrap<IContentSchedulerGrain>>()
-                .As<IRunnable>();
-
-            services.AddSingletonAs<Bootstrap<IEventConsumerManagerGrain>>()
-                .As<IRunnable>();
 
             services.AddSingletonAs<RuleEnqueuer>()
                 .As<IEventConsumer>();

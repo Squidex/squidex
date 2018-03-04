@@ -24,9 +24,9 @@ export class WebhookActionComponent implements OnInit {
     public actionForm =
         this.formBuilder.group({
             url: ['',
-            [
-                Validators.required
-            ]],
+                [
+                    Validators.required
+                ]],
             sharedSecret: ['']
         });
 

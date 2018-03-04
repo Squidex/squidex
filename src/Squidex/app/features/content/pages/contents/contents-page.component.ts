@@ -27,7 +27,8 @@ import {
     ImmutableArray,
     ModalView,
     Pager,
-    SchemaDetailsDto
+    SchemaDetailsDto,
+    Versioned
 } from 'shared';
 
 @Component({
@@ -203,7 +204,9 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
                             DateTime.parseISO_UTC(dueTime) :
                             null;
 
-                    this.contentItems = this.contentItems.replaceBy('id', content.changeStatus(status, dt, this.ctx.userToken, dto.version));
+                    content = content.changeStatus(status, dt, this.ctx.userToken, dto.version);
+
+                    this.contentItems = this.contentItems.replaceBy('id', content);
 
                     this.emitContentStatusChanged(content);
                 }
@@ -238,6 +241,14 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
 
                 return Observable.throw(error);
             });
+    }
+
+    public onContentSaved(content: ContentDto, update: Versioned<any>) {
+        content = content.update(update.payload, this.ctx.userToken, update.version);
+
+        this.contentItems = this.contentItems.replaceBy('id', content);
+
+        this.emitContentUpdated(content);
     }
 
     public load(showInfo = false) {
@@ -342,8 +353,16 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
         this.ctx.bus.emit(new ContentStatusChanged(content));
     }
 
+    private emitContentUpdated(content: ContentDto) {
+        this.ctx.bus.emit(new ContentUpdated(content));
+    }
+
     private emitContentRemoved(content: ContentDto) {
         this.ctx.bus.emit(new ContentRemoved(content));
+    }
+
+    public trackBy(content: ContentDto): string {
+        return content.id;
     }
 
     private resetContents() {

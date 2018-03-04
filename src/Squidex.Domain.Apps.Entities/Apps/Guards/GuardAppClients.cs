@@ -92,7 +92,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             if (!clients.TryGetValue(id, out var client))
             {
-                throw new DomainObjectNotFoundException(id, "Clients", typeof(AppGrain));
+                throw new DomainObjectNotFoundException(id, "Clients", typeof(IAppEntity));
             }
 
             return client;

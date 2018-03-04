@@ -10,15 +10,14 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Orleans;
 using Orleans.Concurrency;
-using Orleans.Core;
-using Orleans.Runtime;
 using Squidex.Infrastructure.Log;
+using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.EventSourcing.Grains
 {
-    public class EventConsumerGrain : Grain, IEventConsumerGrain
+    public class EventConsumerGrain : GrainOfString, IEventConsumerGrain
     {
         private readonly EventConsumerFactory eventConsumerFactory;
         private readonly IStore<string> store;
@@ -37,19 +36,6 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             IEventStore eventStore,
             IEventDataFormatter eventDataFormatter,
             ISemanticLog log)
-            : this (eventConsumerFactory, store, eventStore, eventDataFormatter, null, null, log)
-        {
-        }
-
-        protected EventConsumerGrain(
-            EventConsumerFactory eventConsumerFactory,
-            IStore<string> store,
-            IEventStore eventStore,
-            IEventDataFormatter eventDataFormatter,
-            IGrainIdentity identity,
-            IGrainRuntime runtime,
-            ISemanticLog log)
-            : base(identity, runtime)
         {
             Guard.NotNull(log, nameof(log));
             Guard.NotNull(store, nameof(store));
@@ -58,19 +44,17 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             Guard.NotNull(eventConsumerFactory, nameof(eventConsumerFactory));
 
             this.log = log;
-
+            this.store = store;
             this.eventStore = eventStore;
             this.eventDataFormatter = eventDataFormatter;
             this.eventConsumerFactory = eventConsumerFactory;
-
-            this.store = store;
         }
 
-        public override Task OnActivateAsync()
+        public override Task OnActivateAsync(string key)
         {
             scheduler = TaskScheduler.Current;
 
-            eventConsumer = eventConsumerFactory(this.GetPrimaryKeyString());
+            eventConsumer = eventConsumerFactory(key);
 
             persistence = store.WithSnapshots<EventConsumerState, string>(GetType(), eventConsumer.Name, s => state = s);
 
@@ -263,7 +247,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             if (currentSubscription == null)
             {
                 currentSubscription?.StopAsync().Forget();
-                currentSubscription = CreateSubscription(eventStore, eventConsumer.EventsFilter, position);
+                currentSubscription = CreateSubscription(eventConsumer.EventsFilter, position);
             }
             else
             {
@@ -295,12 +279,12 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             return this.AsReference<IEventConsumerGrain>();
         }
 
-        protected virtual IEventSubscription CreateSubscription(IEventStore eventStore, IEventSubscriber subscriber, string streamFilter, string position)
+        protected virtual IEventSubscription CreateSubscription(IEventStore store, IEventSubscriber subscriber, string streamFilter, string position)
         {
-            return new RetrySubscription(eventStore, subscriber, streamFilter, position);
+            return new RetrySubscription(store, subscriber, streamFilter, position);
         }
 
-        private IEventSubscription CreateSubscription(IEventStore eventStore, string streamFilter, string position)
+        private IEventSubscription CreateSubscription(string streamFilter, string position)
         {
             return CreateSubscription(eventStore, new WrapperSubscription(GetSelf(), scheduler), streamFilter, position);
         }
