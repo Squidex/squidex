@@ -29,6 +29,9 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<AssetUserPictureStore>()
                 .As<IUserPictureStore>();
+
+            services.AddSingletonAs<NoopUserEvents>()
+                .As<IUserEvents>();
         }
     }
 }
