@@ -79,7 +79,7 @@
     <PackageReference Include="NodaTime.Serialization.JsonNet" Version="2.0.0" />
     <PackageReference Include="NSwag.AspNetCore" Version="11.15.3" />
     <PackageReference Include="OpenCover" Version="4.6.519" />
-    <PackageReference Include="Orleans.Providers.MongoDB" Version="2.0.0-rc1" />
+    <PackageReference Include="Orleans.Providers.MongoDB" Version="2.0.0-rc2" />
     <PackageReference Include="OrleansDashboard" Version="2.0.0-rc1" />
     <PackageReference Include="RefactoringEssentials" Version="5.6.0" />
     <PackageReference Include="ReportGenerator" Version="3.1.2" />

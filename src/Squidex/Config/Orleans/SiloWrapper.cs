@@ -10,6 +10,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Orleans;
 using Orleans.Configuration;
 using Orleans.Hosting;
@@ -57,9 +58,11 @@ namespace Squidex.Config.Orleans
                 {
                     options.ClusterId = "squidex";
                 })
-                .ConfigureLogging(builder =>
+                .ConfigureLogging((hostingContext, builder) =>
                 {
+                    builder.AddConfiguration(hostingContext.Configuration.GetSection("logging"));
                     builder.AddSemanticLog();
+                    builder.AddFilter("Orleans.Runtime.SiloControl", LogLevel.Warning);
                 })
                 .ConfigureApplicationParts(builder =>
                 {
