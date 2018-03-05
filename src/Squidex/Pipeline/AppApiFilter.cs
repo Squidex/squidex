@@ -17,7 +17,7 @@ namespace Squidex.Pipeline
     {
         private readonly IAppProvider appProvider;
 
-        private sealed class AppFeature : IAppFeature
+        public class AppFeature : IAppFeature
         {
             public IAppEntity App { get; }
 
