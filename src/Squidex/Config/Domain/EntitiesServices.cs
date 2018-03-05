@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Migrate_01;
 using Migrate_01.Migrations;
+using Orleans;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Entities;
@@ -108,6 +109,8 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<JintScriptEngine>()
                 .As<IScriptEngine>();
+
+            services.AddSingleton<Func<IGrainCallContext, string>>(DomainObjectGrainFormatter.Format);
 
             services.AddTransientAs<AppGrain>()
                 .AsSelf();

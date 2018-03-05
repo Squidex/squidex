@@ -39,6 +39,11 @@ namespace Squidex.Infrastructure.Orleans
             return new J<T>(d);
         }
 
+        public override string ToString()
+        {
+            return value?.ToString() ?? string.Empty;
+        }
+
         public static Task<J<T>> AsTask(T value)
         {
             return Task.FromResult<J<T>>(value);
