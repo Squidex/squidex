@@ -32,7 +32,7 @@ namespace Squidex.Tests.Pipeline
     {
         private readonly Mock<HttpContext> httpContextMock = new Mock<HttpContext>();
         private readonly Mock<ClaimsPrincipal> mockUser = new Mock<ClaimsPrincipal>();
-        private readonly Mock<ActionDescriptor> actionDescriptor = new Mock<ActionDescriptor>();
+        private readonly ActionDescriptor actionDescriptor = new ActionDescriptor();
         private readonly Mock<IActionContextAccessor> actionContextAccessor = new Mock<IActionContextAccessor>();
         private readonly IAppEntity appEntity = A.Fake<IAppEntity>();
         private readonly ClaimsIdentity identity = new ClaimsIdentity();
@@ -48,7 +48,7 @@ namespace Squidex.Tests.Pipeline
 
         public AppPermissionAttributeTests()
         {
-            actionContext = new ActionContext(httpContextMock.Object, routeData, actionDescriptor.Object);
+            actionContext = new ActionContext(httpContextMock.Object, routeData, actionDescriptor);
             actionContextAccessor.Setup(x => x.ActionContext).Returns(actionContext);
             clientClaim = new Claim("client_id", $"test:clientId");
             subjectClaim = new Claim("sub", "user");

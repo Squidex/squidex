@@ -24,7 +24,7 @@ namespace Squidex.Tests.Pipeline
     {
         private readonly ILoggerFactory loggerFactory = A.Fake<ILoggerFactory>();
         private readonly ActionContext context;
-        private readonly Mock<ActionDescriptor> actionDescriptor = new Mock<ActionDescriptor>();
+        private readonly ActionDescriptor actionDescriptor = new ActionDescriptor();
         private readonly Mock<HttpContext> httpContext = new Mock<HttpContext>();
         private readonly Mock<HttpRequest> requestMock = new Mock<HttpRequest>();
         private readonly Mock<HttpResponse> responseMock = new Mock<HttpResponse>();
@@ -42,7 +42,7 @@ namespace Squidex.Tests.Pipeline
             httpContext.Setup(x => x.Request).Returns(requestMock.Object);
             httpContext.Setup(x => x.Response).Returns(responseMock.Object);
 
-            context = new ActionContext(httpContext.Object, new RouteData(), actionDescriptor.Object);
+            context = new ActionContext(httpContext.Object, new RouteData(), actionDescriptor);
             callback = async bodyStream => { callbackWasCalled = true; };
             callbackExecutor = new FileCallbackResultExecutor(loggerFactory);
             sut = new FileCallbackResult("text/plain", "test.txt", callback);

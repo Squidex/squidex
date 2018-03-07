@@ -22,7 +22,7 @@ namespace Squidex.Tests.Pipeline
     public class ApiExceptionFilterAttributeTests
     {
         private readonly Mock<HttpContext> httpContextMock = new Mock<HttpContext>();
-        private readonly Mock<ActionDescriptor> actionDescriptor = new Mock<ActionDescriptor>();
+        private readonly ActionDescriptor actionDescriptor = new ActionDescriptor();
         private readonly RouteData routeData = new RouteData();
         private readonly ApiExceptionFilterAttribute sut = new ApiExceptionFilterAttribute();
         private readonly ExceptionContext context;
@@ -30,7 +30,7 @@ namespace Squidex.Tests.Pipeline
 
         public ApiExceptionFilterAttributeTests()
         {
-            actionContext = new ActionContext(httpContextMock.Object, routeData, actionDescriptor.Object);
+            actionContext = new ActionContext(httpContextMock.Object, routeData, actionDescriptor);
             context = new ExceptionContext(actionContext, new List<IFilterMetadata>());
         }
 

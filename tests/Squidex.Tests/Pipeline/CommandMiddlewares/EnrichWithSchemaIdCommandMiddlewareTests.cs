@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.AspNetCore.Http;
@@ -17,7 +16,6 @@ using Moq;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities;
-using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.State;
@@ -33,7 +31,7 @@ namespace Squidex.Tests.Pipeline.CommandMiddlewares
         private readonly Mock<IActionContextAccessor> actionContextAccessor = new Mock<IActionContextAccessor>();
         private readonly ICommandBus commandBus = A.Fake<ICommandBus>();
         private readonly Mock<HttpContext> httpContextMock = new Mock<HttpContext>();
-        private readonly Mock<ActionDescriptor> actionDescriptor = new Mock<ActionDescriptor>();
+        private readonly ActionDescriptor actionDescriptor = new ActionDescriptor();
         private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
         private readonly Guid appId = Guid.NewGuid();
         private readonly string appName = "app";
@@ -116,7 +114,7 @@ namespace Squidex.Tests.Pipeline.CommandMiddlewares
                 A.CallTo(() => appProvider.GetSchemaAsync(appId, schemaName)).Returns(schema);
             }
 
-            var actionContext = new ActionContext(httpContextMock.Object, routeData, actionDescriptor.Object);
+            var actionContext = new ActionContext(httpContextMock.Object, routeData, actionDescriptor);
             actionContextAccessor.Setup(x => x.ActionContext).Returns(actionContext);
             return new EnrichWithSchemaIdCommandMiddleware(appProvider, actionContextAccessor.Object);
         }

@@ -31,7 +31,7 @@ namespace Squidex.Tests.Pipeline
     {
         private readonly Mock<IActionContextAccessor> actionContextAccessor = new Mock<IActionContextAccessor>();
         private readonly RouteData routeData = new RouteData();
-        private readonly Mock<ActionDescriptor> actionDescriptor = new Mock<ActionDescriptor>();
+        private readonly ActionDescriptor actionDescriptor = new ActionDescriptor();
         private readonly IAppPlansProvider appPlanProvider = A.Fake<IAppPlansProvider>();
         private readonly IUsageTracker usageTracker = A.Fake<IUsageTracker>();
         private readonly long usage = 1;
@@ -47,7 +47,7 @@ namespace Squidex.Tests.Pipeline
 
         public AppApiTests()
         {
-            var actionContext = new ActionContext(httpContextMock.Object, routeData, actionDescriptor.Object);
+            var actionContext = new ActionContext(httpContextMock.Object, routeData, actionDescriptor);
             actionContextAccessor.Setup(x => x.ActionContext).Returns(actionContext);
             context = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object>(), null);
             context.Filters.Add(new AppApiAttribute());

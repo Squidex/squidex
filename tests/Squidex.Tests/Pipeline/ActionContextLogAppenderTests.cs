@@ -24,7 +24,7 @@ namespace Squidex.Tests.Pipeline
     {
         private readonly Mock<IActionContextAccessor> actionContextAccessor = new Mock<IActionContextAccessor>();
         private readonly Mock<HttpContext> httpContextMock = new Mock<HttpContext>();
-        private readonly Mock<ActionDescriptor> actionDescriptor = new Mock<ActionDescriptor>();
+        private readonly ActionDescriptor actionDescriptor = new ActionDescriptor();
         private readonly RouteData routeData = new RouteData();
         private readonly Guid requestId = Guid.NewGuid();
         private readonly IDictionary<object, object> items = new Dictionary<object, object>();
@@ -66,7 +66,7 @@ namespace Squidex.Tests.Pipeline
         {
             A.CallTo(() => request.Method).Returns(string.Empty);
             httpContextMock.Setup(x => x.Request).Returns(request);
-            actionContext = new ActionContext(httpContextMock.Object, routeData, actionDescriptor.Object);
+            actionContext = new ActionContext(httpContextMock.Object, routeData, actionDescriptor);
             actionContextAccessor.Setup(x => x.ActionContext).Returns(actionContext);
             sut = new ActionContextLogAppender(actionContextAccessor.Object);
 
@@ -78,7 +78,7 @@ namespace Squidex.Tests.Pipeline
             A.CallTo(() => request.Method).Returns("Get");
             httpContextMock.Setup(x => x.Items).Returns(items);
             httpContextMock.Setup(x => x.Request).Returns(request);
-            actionContext = new ActionContext(httpContextMock.Object, routeData, actionDescriptor.Object);
+            actionContext = new ActionContext(httpContextMock.Object, routeData, actionDescriptor);
             actionContextAccessor.Setup(x => x.ActionContext).Returns(actionContext);
             sut = new ActionContextLogAppender(actionContextAccessor.Object);
         }
