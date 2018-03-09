@@ -8,7 +8,6 @@
 using System;
 using System.Threading.Tasks;
 using Elasticsearch.Net;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Rules;

@@ -7,7 +7,9 @@
 
 using System;
 using System.Linq.Expressions;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Threading.Tasks.Dataflow;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Infrastructure.States;
@@ -125,6 +127,52 @@ namespace Squidex.Infrastructure.MongoDb
                 else
                 {
                     throw;
+                }
+            }
+        }
+
+        public static async Task ForEachPipelineAsync<TDocument>(this IAsyncCursorSource<TDocument> source, Func<TDocument, Task> processor, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            var cursor = await source.ToCursorAsync(cancellationToken);
+
+            await cursor.ForEachPipelineAsync(processor, cancellationToken);
+        }
+
+        public static async Task ForEachPipelineAsync<TDocument>(this IAsyncCursor<TDocument> source, Func<TDocument, Task> processor, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            var actionBlock =
+                new ActionBlock<TDocument>(processor,
+                    new ExecutionDataflowBlockOptions
+                    {
+                        MaxDegreeOfParallelism = 1,
+                        MaxMessagesPerTask = 1,
+                        BoundedCapacity = 100
+                    });
+
+            using (var selfToken = new CancellationTokenSource())
+            {
+                using (var combined = CancellationTokenSource.CreateLinkedTokenSource(selfToken.Token, cancellationToken))
+                {
+                    try
+                    {
+                        await source.ForEachAsync(async i =>
+                        {
+                            if (!await actionBlock.SendAsync(i, combined.Token))
+                            {
+                                selfToken.Cancel();
+                            }
+                        }, combined.Token);
+
+                        actionBlock.Complete();
+                    }
+                    catch (Exception ex)
+                    {
+                        ((IDataflowBlock)actionBlock).Fault(ex);
+                    }
+                    finally
+                    {
+                        await actionBlock.Completion;
+                    }
                 }
             }
         }
