@@ -1,6 +1,3 @@
-// ReSharper disable InconsistentNaming
-// ReSharper disable PossiblyUnassignedProperty
-
         var webpack = require('webpack'),
                path = require('path'),
   HtmlWebpackPlugin = require('html-webpack-plugin'),

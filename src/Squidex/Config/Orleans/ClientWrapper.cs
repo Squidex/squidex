@@ -8,6 +8,7 @@
 using System;
 using System.Net;
 using Orleans;
+using Orleans.Configuration;
 using Orleans.Runtime;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Infrastructure;
@@ -31,7 +32,7 @@ namespace Squidex.Config.Orleans
                 {
                     options.Gateways.Add(new IPEndPoint(IPAddress.Loopback, 40000).ToGatewayUri());
                 })
-                .ConfigureCluster(options =>
+                .Configure<ClusterOptions>(options =>
                 {
                     options.ClusterId = "squidex";
                 })

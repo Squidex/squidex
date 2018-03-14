@@ -53,8 +53,8 @@ namespace Squidex.Config.Orleans
                 .AddStartupTask<Bootstrap<IContentSchedulerGrain>>()
                 .AddStartupTask<Bootstrap<IEventConsumerManagerGrain>>()
                 .AddStartupTask<Bootstrap<IRuleDequeuerGrain>>()
-                .ConfigureEndpoints(Dns.GetHostName(), 11111, 40000, listenOnAllHostAddresses: true)
-                .Configure(options =>
+                .ConfigureEndpoints(Dns.GetHostName(), 11111, 40000, listenOnAnyHostAddress: true)
+                .Configure<ClusterOptions>(options =>
                 {
                     options.ClusterId = "squidex";
                 })
