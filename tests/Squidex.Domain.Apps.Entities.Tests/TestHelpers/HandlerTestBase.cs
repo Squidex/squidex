@@ -14,6 +14,7 @@ using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.States;
 
 #pragma warning disable IDE0019 // Use pattern matching
@@ -91,6 +92,11 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
             }
 
             return command;
+        }
+
+        protected static J<IAggregateCommand> J(IAggregateCommand command)
+        {
+            return command.AsJ();
         }
 
         protected TEvent CreateEvent<TEvent>(TEvent @event) where TEvent : SquidexEvent

@@ -7,25 +7,25 @@
 
 using System;
 using System.Threading.Tasks;
+using Orleans;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Repositories;
 using Squidex.Infrastructure.Migrations;
-using Squidex.Infrastructure.States;
 
 namespace Migrate_01.Migrations
 {
     public sealed class AddPatterns : IMigration
     {
         private readonly InitialPatterns initialPatterns;
-        private readonly IStateFactory stateFactory;
+        private readonly IGrainFactory grainFactory;
         private readonly IAppRepository appRepository;
 
-        public AddPatterns(InitialPatterns initialPatterns, IAppRepository appRepository, IStateFactory stateFactory)
+        public AddPatterns(InitialPatterns initialPatterns, IAppRepository appRepository, IGrainFactory grainFactory)
         {
             this.initialPatterns = initialPatterns;
             this.appRepository = appRepository;
-            this.stateFactory = stateFactory;
+            this.grainFactory = grainFactory;
         }
 
         public async Task UpdateAsync()
@@ -34,17 +34,19 @@ namespace Migrate_01.Migrations
 
             foreach (var id in ids)
             {
-                var app = await stateFactory.GetSingleAsync<AppGrain>(id);
+                var app = grainFactory.GetGrain<IAppGrain>(id);
 
-                if (app.Snapshot.Patterns.Count == 0)
+                var state = await app.GetStateAsync();
+
+                if (state.Value.Patterns.Count == 0)
                 {
                     foreach (var pattern in initialPatterns.Values)
                     {
                         var command =
                             new AddPattern
                             {
-                                Actor = app.Snapshot.CreatedBy,
-                                AppId = app.Snapshot.Id,
+                                Actor = state.Value.CreatedBy,
+                                AppId = state.Value.Id,
                                 Name = pattern.Name,
                                 PatternId = Guid.NewGuid(),
                                 Pattern = pattern.Pattern,
@@ -53,6 +55,8 @@ namespace Migrate_01.Migrations
 
                         await app.ExecuteAsync(command);
                     }
+
+                    await app.WriteSnapshotAsync();
                 }
             }
         }

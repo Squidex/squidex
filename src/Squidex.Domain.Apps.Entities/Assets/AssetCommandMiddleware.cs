@@ -7,24 +7,24 @@
 
 using System;
 using System.Threading.Tasks;
+using Orleans;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public sealed class AssetCommandMiddleware : GrainCommandMiddleware<AssetCommand, AssetGrain>
+    public sealed class AssetCommandMiddleware : GrainCommandMiddleware<AssetCommand, IAssetGrain>
     {
         private readonly IAssetStore assetStore;
         private readonly IAssetThumbnailGenerator assetThumbnailGenerator;
 
         public AssetCommandMiddleware(
-            IStateFactory stateFactory,
+            IGrainFactory grainFactory,
             IAssetStore assetStore,
             IAssetThumbnailGenerator assetThumbnailGenerator)
-            : base(stateFactory)
+            : base(grainFactory)
         {
             Guard.NotNull(assetStore, nameof(assetStore));
             Guard.NotNull(assetThumbnailGenerator, nameof(assetThumbnailGenerator));

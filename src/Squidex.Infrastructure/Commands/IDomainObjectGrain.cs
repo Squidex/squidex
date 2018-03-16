@@ -5,18 +5,16 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Threading.Tasks;
-using Squidex.Infrastructure.States;
+using Orleans;
+using Squidex.Infrastructure.Orleans;
 
 namespace Squidex.Infrastructure.Commands
 {
-    public interface IDomainObjectGrain : IStatefulObject<Guid>
+    public interface IDomainObjectGrain : IGrainWithGuidKey
     {
-        Task<object> ExecuteAsync(IAggregateCommand command);
-
         Task WriteSnapshotAsync();
 
-        long Version { get; }
+        Task<J<object>> ExecuteAsync(J<IAggregateCommand> command);
     }
 }

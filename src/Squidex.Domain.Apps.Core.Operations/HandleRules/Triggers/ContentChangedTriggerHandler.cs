@@ -17,7 +17,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Triggers
     {
         protected override bool Triggers(Envelope<AppEvent> @event, ContentChangedTrigger trigger)
         {
-            if (trigger.HandleAll)
+            if (trigger.HandleAll && @event.Payload is ContentEvent)
             {
                 return true;
             }

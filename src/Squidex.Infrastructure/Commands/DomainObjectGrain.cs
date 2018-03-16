@@ -9,12 +9,13 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.Commands
 {
-    public abstract class DomainObjectGrain<T> : IDomainObjectGrain where T : IDomainState, new()
+    public abstract class DomainObjectGrain<T> : GrainOfGuid, IDomainObjectGrain where T : IDomainState, new()
     {
         private readonly List<Envelope<IEvent>> uncomittedEvents = new List<Envelope<IEvent>>();
         private readonly IStore<Guid> store;
@@ -49,11 +50,11 @@ namespace Squidex.Infrastructure.Commands
             this.store = store;
         }
 
-        public Task ActivateAsync(Guid key)
+        public override Task OnActivateAsync(Guid key)
         {
             id = key;
 
-            persistence = store.WithSnapshotsAndEventSourcing<T, Guid>(GetType(), key, ApplySnapshot, ApplyEvent);
+            persistence = store.WithSnapshotsAndEventSourcing<T, Guid>(GetType(), id, ApplySnapshot, ApplyEvent);
 
             return persistence.ReadAsync();
         }
@@ -67,7 +68,7 @@ namespace Squidex.Infrastructure.Commands
         {
             Guard.NotNull(@event, nameof(@event));
 
-            @event.SetAggregateId(Id);
+            @event.SetAggregateId(id);
 
             ApplyEvent(@event);
 
@@ -146,12 +147,20 @@ namespace Squidex.Infrastructure.Commands
 
             if (command.ExpectedVersion != EtagVersion.Any && command.ExpectedVersion != Version)
             {
-                throw new DomainObjectVersionException(Id.ToString(), GetType(), Version, command.ExpectedVersion);
+                throw new DomainObjectVersionException(id.ToString(), GetType(), Version, command.ExpectedVersion);
             }
 
             if (isUpdate && Version < 0)
             {
-                throw new DomainObjectNotFoundException(Id.ToString(), GetType());
+                try
+                {
+                    DeactivateOnIdle();
+                }
+                catch (InvalidOperationException)
+                {
+                }
+
+                throw new DomainObjectNotFoundException(id.ToString(), GetType());
             }
             else if (!isUpdate && Version >= 0)
             {
@@ -181,7 +190,7 @@ namespace Squidex.Infrastructure.Commands
                     }
                     else
                     {
-                        result = EntityCreatedResult.Create(Id, Version);
+                        result = EntityCreatedResult.Create(id, Version);
                     }
                 }
 
@@ -195,10 +204,17 @@ namespace Squidex.Infrastructure.Commands
             }
             finally
             {
-                ClearUncommittedEvents();
+                uncomittedEvents.Clear();
             }
         }
 
-        public abstract Task<object> ExecuteAsync(IAggregateCommand command);
+        public async Task<J<object>> ExecuteAsync(J<IAggregateCommand> command)
+        {
+            var result = await ExecuteAsync(command.Value);
+
+            return result.AsJ();
+        }
+
+        protected abstract Task<object> ExecuteAsync(IAggregateCommand command);
     }
 }

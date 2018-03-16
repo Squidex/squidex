@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>OrleansDashboard</id>
+    <version>2.0.0-rc1</version>
+    <authors>OrleansContrib</authors>
+    <owners>OrleansContrib</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <licenseUrl>https://opensource.org/licenses/MIT</licenseUrl>
+    <projectUrl>https://github.com/OrleansContrib/OrleansDashboard</projectUrl>
+    <iconUrl>http://dotnet.github.io/orleans/assets/logo.png</iconUrl>
+    <description>An admin dashboard for Microsoft Orleans</description>
+    <copyright>Copyright © 2017</copyright>
+    <tags>orleans dashboard metrics monitor</tags>
+    <repository url="https://github.com/OrleansContrib/OrleansDashboard" />
+    <dependencies>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="Microsoft.AspNetCore" version="2.0.1" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Orleans.Core" version="2.0.0-rc1" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Orleans.OrleansCodeGenerator.Build" version="2.0.0-rc1" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Orleans.OrleansRuntime" version="2.0.0-rc1" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>

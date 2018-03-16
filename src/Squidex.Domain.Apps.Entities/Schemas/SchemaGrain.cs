@@ -18,12 +18,13 @@ using Squidex.Domain.Apps.Events.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Schemas
 {
-    public class SchemaGrain : DomainObjectGrain<SchemaState>
+    public class SchemaGrain : DomainObjectGrain<SchemaState>, ISchemaGrain
     {
         private readonly IAppProvider appProvider;
         private readonly FieldRegistry registry;
@@ -39,7 +40,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             this.registry = registry;
         }
 
-        public override Task<object> ExecuteAsync(IAggregateCommand command)
+        protected override Task<object> ExecuteAsync(IAggregateCommand command)
         {
             VerifyNotDeleted();
 
@@ -299,6 +300,11 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         public override void ApplyEvent(Envelope<IEvent> @event)
         {
             ApplySnapshot(Snapshot.Apply(@event, registry));
+        }
+
+        public Task<J<ISchemaEntity>> GetStateAsync()
+        {
+            return Task.FromResult(new J<ISchemaEntity>(Snapshot));
         }
     }
 }

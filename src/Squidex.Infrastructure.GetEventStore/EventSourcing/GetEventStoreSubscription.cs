@@ -45,6 +45,10 @@ namespace Squidex.Infrastructure.EventSourcing
             return TaskHelper.Done;
         }
 
+        public void WakeUp()
+        {
+        }
+
         private EventStoreCatchUpSubscription SubscribeToStream(string streamName)
         {
             var settings = CatchUpSubscriptionSettings.Default;

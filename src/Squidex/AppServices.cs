@@ -26,17 +26,19 @@ namespace Squidex
 
             services.AddMyAssetServices(config);
             services.AddMyAuthentication(config);
+            services.AddMyEntitiesServices(config);
             services.AddMyEventPublishersServices(config);
             services.AddMyEventStoreServices(config);
             services.AddMyIdentityServer();
-            services.AddMyInfrastructureServices(config);
+            services.AddMyInfrastructureServices();
+            services.AddMyLoggingServices(config);
+            services.AddMyMigrationServices();
             services.AddMyMvc();
-            services.AddMyPubSubServices(config);
-            services.AddMyReadServices(config);
+            services.AddMyRuleServices();
             services.AddMySerializers();
             services.AddMyStoreServices(config);
             services.AddMySwaggerSettings();
-            services.AddMyWriteServices();
+            services.AddMySubscriptionServices(config);
 
             services.Configure<MyUrlsOptions>(
                 config.GetSection("urls"));

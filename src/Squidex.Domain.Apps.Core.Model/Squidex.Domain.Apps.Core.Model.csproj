@@ -8,7 +8,7 @@
     <DebugSymbols>True</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Fody" Version="2.3.24" />
+    <PackageReference Include="Fody" Version="2.4.6" />
     <PackageReference Include="Freezable.Fody" Version="1.8.0" />
     <PackageReference Include="System.Collections.Immutable" Version="1.4.0" />
     <PackageReference Include="System.ValueTuple" Version="4.4.0" />

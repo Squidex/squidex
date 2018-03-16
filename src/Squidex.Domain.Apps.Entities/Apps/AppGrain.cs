@@ -18,13 +18,14 @@ using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
 using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Apps
 {
-    public class AppGrain : DomainObjectGrain<AppState>
+    public class AppGrain : DomainObjectGrain<AppState>, IAppGrain
     {
         private readonly InitialPatterns initialPatterns;
         private readonly IAppProvider appProvider;
@@ -54,7 +55,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             this.initialPatterns = initialPatterns;
         }
 
-        public override Task<object> ExecuteAsync(IAggregateCommand command)
+        protected override Task<object> ExecuteAsync(IAggregateCommand command)
         {
             switch (command)
             {
@@ -309,6 +310,11 @@ namespace Squidex.Domain.Apps.Entities.Apps
         public override void ApplyEvent(Envelope<IEvent> @event)
         {
             ApplySnapshot(Snapshot.Apply(@event));
+        }
+
+        public Task<J<IAppEntity>> GetStateAsync()
+        {
+            return Task.FromResult(new J<IAppEntity>(Snapshot));
         }
     }
 }

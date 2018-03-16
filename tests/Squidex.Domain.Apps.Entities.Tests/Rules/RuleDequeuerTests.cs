@@ -27,13 +27,13 @@ namespace Squidex.Domain.Apps.Entities.Rules
         private readonly IRuleEventRepository ruleEventRepository = A.Fake<IRuleEventRepository>();
         private readonly Instant now = SystemClock.Instance.GetCurrentInstant();
         private readonly RuleService ruleService = A.Fake<RuleService>();
-        private readonly RuleDequeuer sut;
+        private readonly RuleDequeuerGrain sut;
 
         public RuleDequeuerTests()
         {
             A.CallTo(() => clock.GetCurrentInstant()).Returns(now);
 
-            sut = new RuleDequeuer(
+            sut = new RuleDequeuerGrain(
                 ruleService,
                 ruleEventRepository,
                 log,
@@ -68,8 +68,6 @@ namespace Squidex.Domain.Apps.Entities.Rules
             }
 
             await sut.HandleAsync(@event);
-
-            sut.Dispose();
 
             A.CallTo(() => ruleEventRepository.MarkSentAsync(@event.Id, requestDump, result, jobResult, requestElapsed, nextCall))
                 .MustHaveHappened();

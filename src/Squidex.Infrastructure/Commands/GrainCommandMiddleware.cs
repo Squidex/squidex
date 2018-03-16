@@ -7,19 +7,19 @@
 
 using System;
 using System.Threading.Tasks;
-using Squidex.Infrastructure.States;
+using Orleans;
 
 namespace Squidex.Infrastructure.Commands
 {
     public class GrainCommandMiddleware<TCommand, TGrain> : ICommandMiddleware where TCommand : IAggregateCommand where TGrain : IDomainObjectGrain
     {
-        private readonly IStateFactory stateFactory;
+        private readonly IGrainFactory grainFactory;
 
-        public GrainCommandMiddleware(IStateFactory stateFactory)
+        public GrainCommandMiddleware(IGrainFactory grainFactory)
         {
-            Guard.NotNull(stateFactory, nameof(stateFactory));
+            Guard.NotNull(grainFactory, nameof(grainFactory));
 
-            this.stateFactory = stateFactory;
+            this.grainFactory = grainFactory;
         }
 
         public async virtual Task HandleAsync(CommandContext context, Func<Task> next)
@@ -36,11 +36,11 @@ namespace Squidex.Infrastructure.Commands
 
         protected async Task<object> ExecuteCommandAsync(TCommand typedCommand)
         {
-            var grain = await stateFactory.CreateAsync<TGrain>(typedCommand.AggregateId);
+            var grain = grainFactory.GetGrain<TGrain>(typedCommand.AggregateId);
 
             var result = await grain.ExecuteAsync(typedCommand);
 
-            return result;
+            return result.Value;
         }
     }
 }

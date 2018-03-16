@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Orleans;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.State;
@@ -39,7 +40,7 @@ namespace Migrate_01
         private readonly ISnapshotStore<ContentState, Guid> snapshotContentStore;
         private readonly ISnapshotStore<RuleState, Guid> snapshotRuleStore;
         private readonly ISnapshotStore<SchemaState, Guid> snapshotSchemaStore;
-        private readonly IStateFactory stateFactory;
+        private readonly IGrainFactory grainFactory;
 
         public Rebuilder(
             FieldRegistry fieldRegistry,
@@ -50,7 +51,7 @@ namespace Migrate_01
             ISnapshotStore<AssetState, Guid> snapshotAssetStore,
             ISnapshotStore<RuleState, Guid> snapshotRuleStore,
             ISnapshotStore<SchemaState, Guid> snapshotSchemaStore,
-            IStateFactory stateFactory)
+            IGrainFactory grainFactory)
         {
             this.fieldRegistry = fieldRegistry;
             this.eventDataFormatter = eventDataFormatter;
@@ -60,7 +61,7 @@ namespace Migrate_01
             this.snapshotContentStore = snapshotContentStore;
             this.snapshotRuleStore = snapshotRuleStore;
             this.snapshotSchemaStore = snapshotSchemaStore;
-            this.stateFactory = stateFactory;
+            this.grainFactory = grainFactory;
         }
 
         public async Task RebuildAssetsAsync()
@@ -79,9 +80,7 @@ namespace Migrate_01
                 {
                     if (@event.Payload is AssetEvent assetEvent && handledIds.Add(assetEvent.AssetId))
                     {
-                        var asset = await stateFactory.CreateAsync<AssetGrain>(assetEvent.AssetId);
-
-                        asset.ApplySnapshot(asset.Snapshot.Apply(@event));
+                        var asset = grainFactory.GetGrain<IAssetGrain>(assetEvent.AssetId);
 
                         await asset.WriteSnapshotAsync();
                     }
@@ -107,19 +106,19 @@ namespace Migrate_01
                 {
                     if (@event.Payload is SchemaEvent schemaEvent && handledIds.Add(schemaEvent.SchemaId.Id))
                     {
-                        var schema = await stateFactory.GetSingleAsync<SchemaGrain>(schemaEvent.SchemaId.Id);
+                        var schema = grainFactory.GetGrain<ISchemaGrain>(schemaEvent.SchemaId.Id);
 
                         await schema.WriteSnapshotAsync();
                     }
                     else if (@event.Payload is RuleEvent ruleEvent && handledIds.Add(ruleEvent.RuleId))
                     {
-                        var rule = await stateFactory.GetSingleAsync<RuleGrain>(ruleEvent.RuleId);
+                        var rule = grainFactory.GetGrain<IRuleGrain>(ruleEvent.RuleId);
 
                         await rule.WriteSnapshotAsync();
                     }
                     else if (@event.Payload is AppEvent appEvent && handledIds.Add(appEvent.AppId.Id))
                     {
-                        var app = await stateFactory.GetSingleAsync<AppGrain>(appEvent.AppId.Id);
+                        var app = grainFactory.GetGrain<IAppGrain>(appEvent.AppId.Id);
 
                         await app.WriteSnapshotAsync();
                     }

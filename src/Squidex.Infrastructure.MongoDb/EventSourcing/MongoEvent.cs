@@ -7,6 +7,7 @@
 
 using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json.Linq;
+using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Infrastructure.EventSourcing
 {
@@ -16,7 +17,7 @@ namespace Squidex.Infrastructure.EventSourcing
         [BsonRequired]
         public string Type { get; set; }
 
-        [BsonElement]
+        [BsonJson]
         [BsonRequired]
         public string Payload { get; set; }
 

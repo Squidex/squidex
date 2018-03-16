@@ -7,6 +7,10 @@
 
 using System.IO;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using Orleans;
+using Orleans.Hosting;
 using Squidex.Infrastructure.Log.Adapter;
 
 namespace Squidex
@@ -20,13 +24,21 @@ namespace Squidex
                 .UseContentRoot(Directory.GetCurrentDirectory())
                 .UseIISIntegration()
                 .UseStartup<WebStartup>()
-                .ConfigureLogging(builder =>
+                .ConfigureLogging((hostingContext, builder) =>
                 {
+                    builder.AddConfiguration(hostingContext.Configuration.GetSection("logging"));
                     builder.AddSemanticLog();
                 })
                 .ConfigureAppConfiguration((hostContext, builder) =>
                 {
-                    builder.AddAppConfiguration(hostContext.HostingEnvironment.EnvironmentName, args);
+                    builder.Sources.Clear();
+
+                    builder.AddJsonFile("appsettings.json", true, true);
+                    builder.AddJsonFile($"appsettings.{hostContext.HostingEnvironment.EnvironmentName}.json", true);
+
+                    builder.AddEnvironmentVariables();
+
+                    builder.AddCommandLine(args);
                 })
                 .Build()
                 .Run();

@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         public AssetGrainTests()
         {
             sut = new AssetGrain(Store);
-            sut.ActivateAsync(Id).Wait();
+            sut.OnActivateAsync(Id).Wait();
         }
 
         [Fact]

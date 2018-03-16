@@ -15,12 +15,13 @@ using Squidex.Domain.Apps.Events.Rules;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Rules
 {
-    public class RuleGrain : DomainObjectGrain<RuleState>
+    public sealed class RuleGrain : DomainObjectGrain<RuleState>, IRuleGrain
     {
         private readonly IAppProvider appProvider;
 
@@ -32,7 +33,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
             this.appProvider = appProvider;
         }
 
-        public override Task<object> ExecuteAsync(IAggregateCommand command)
+        protected override Task<object> ExecuteAsync(IAggregateCommand command)
         {
             VerifyNotDeleted();
 
@@ -124,6 +125,11 @@ namespace Squidex.Domain.Apps.Entities.Rules
         public override void ApplyEvent(Envelope<IEvent> @event)
         {
             ApplySnapshot(Snapshot.Apply(@event));
+        }
+
+        public Task<J<IRuleEntity>> GetStateAsync()
+        {
+            return Task.FromResult(new J<IRuleEntity>(Snapshot));
         }
     }
 }

@@ -58,7 +58,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             };
 
             sut = new AppGrain(initialPatterns, Store, appProvider, appPlansProvider, appPlansBillingManager, userResolver);
-            sut.ActivateAsync(Id).Wait();
+            sut.OnActivateAsync(Id).Wait();
         }
 
         [Fact]
@@ -97,7 +97,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             var result = await sut.ExecuteAsync(CreateCommand(command));
 
-            Assert.True(result is PlanChangedResult);
+            Assert.True(result.Value is PlanChangedResult);
 
             Assert.Equal(planId, sut.Snapshot.Plan.PlanId);
 

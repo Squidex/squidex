@@ -24,7 +24,7 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Contents
 {
-    public class ContentGrain : DomainObjectGrain<ContentState>
+    public class ContentGrain : DomainObjectGrain<ContentState>, IContentGrain
     {
         private readonly IAppProvider appProvider;
         private readonly IAssetRepository assetRepository;
@@ -50,7 +50,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             this.contentRepository = contentRepository;
         }
 
-        public override Task<object> ExecuteAsync(IAggregateCommand command)
+        protected override Task<object> ExecuteAsync(IAggregateCommand command)
         {
             VerifyNotDeleted();
 

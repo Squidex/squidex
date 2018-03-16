@@ -9,12 +9,12 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using FakeItEasy;
+using Orleans;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.Assets.State;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.Tasks;
 using Xunit;
 
@@ -24,7 +24,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
     {
         private readonly IAssetThumbnailGenerator assetThumbnailGenerator = A.Fake<IAssetThumbnailGenerator>();
         private readonly IAssetStore assetStore = A.Fake<IAssetStore>();
-        private readonly IStateFactory stateFactory = A.Fake<IStateFactory>();
+        private readonly IGrainFactory grainFactory = A.Fake<IGrainFactory>();
         private readonly Guid assetId = Guid.NewGuid();
         private readonly Stream stream = new MemoryStream();
         private readonly ImageInfo image = new ImageInfo(2048, 2048);
@@ -42,12 +42,12 @@ namespace Squidex.Domain.Apps.Entities.Assets
             file = new AssetFile("my-image.png", "image/png", 1024, () => stream);
 
             asset = new AssetGrain(Store);
-            asset.ActivateAsync(Id).Wait();
+            asset.OnActivateAsync(Id).Wait();
 
-            A.CallTo(() => stateFactory.CreateAsync<AssetGrain>(Id))
+            A.CallTo(() => grainFactory.GetGrain<IAssetGrain>(Id, null))
                 .Returns(asset);
 
-            sut = new AssetCommandMiddleware(stateFactory, assetStore, assetThumbnailGenerator);
+            sut = new AssetCommandMiddleware(grainFactory, assetStore, assetThumbnailGenerator);
         }
 
         [Fact]

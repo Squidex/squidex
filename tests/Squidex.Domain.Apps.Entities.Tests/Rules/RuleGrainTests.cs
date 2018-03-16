@@ -35,7 +35,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
         public RuleGrainTests()
         {
             sut = new RuleGrain(Store, appProvider);
-            sut.ActivateAsync(Id).Wait();
+            sut.OnActivateAsync(Id).Wait();
         }
 
         [Fact]

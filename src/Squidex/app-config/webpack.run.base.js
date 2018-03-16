@@ -1,7 +1,4 @@
-﻿// ReSharper disable InconsistentNaming
-// ReSharper disable PossiblyUnassignedProperty
-
-      var webpack = require('webpack'),
+﻿      var webpack = require('webpack'),
      webpackMerge = require('webpack-merge'),
 HtmlWebpackPlugin = require('html-webpack-plugin'),
      commonConfig = require('./webpack.config.js'),

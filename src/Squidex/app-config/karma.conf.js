@@ -34,7 +34,7 @@ module.exports = function (config) {
         },
 
         /*
-         *  leave Jasmine Spec Runner output visible in browser
+         * Leave Jasmine Spec Runner output visible in browser
          */
         client: {
             clearContext: false

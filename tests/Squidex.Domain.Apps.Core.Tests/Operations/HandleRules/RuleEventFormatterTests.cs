@@ -86,8 +86,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             {
                 Data =
                     new NamedContentData()
-                        .AddField("city", new ContentFieldData()
-                            .AddValue("iv", "Berlin"))
+                        .AddField("city",
+                            new ContentFieldData()
+                                .AddValue("iv", "Berlin"))
             };
 
             var result = sut.FormatString("$CONTENT_DATA.country.iv", AsEnvelope(@event));
@@ -102,8 +103,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             {
                 Data =
                     new NamedContentData()
-                        .AddField("city", new ContentFieldData()
-                            .AddValue("iv", "Berlin"))
+                        .AddField("city",
+                            new ContentFieldData()
+                                .AddValue("iv", "Berlin"))
             };
 
             var result = sut.FormatString("$CONTENT_DATA.city.de", AsEnvelope(@event));
@@ -118,8 +120,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             {
                 Data =
                     new NamedContentData()
-                        .AddField("city", new ContentFieldData()
-                            .AddValue("iv", new JArray()))
+                        .AddField("city",
+                            new ContentFieldData()
+                                .AddValue("iv", new JArray()))
             };
 
             var result = sut.FormatString("$CONTENT_DATA.city.de.10", AsEnvelope(@event));
@@ -134,9 +137,10 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             {
                 Data =
                     new NamedContentData()
-                        .AddField("city", new ContentFieldData()
-                            .AddValue("iv", new JObject(
-                                new JProperty("name", "Berlin"))))
+                        .AddField("city",
+                            new ContentFieldData()
+                                .AddValue("iv", new JObject(
+                                    new JProperty("name", "Berlin"))))
             };
 
             var result = sut.FormatString("$CONTENT_DATA.city.de.Name", AsEnvelope(@event));
@@ -151,8 +155,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             {
                 Data =
                     new NamedContentData()
-                        .AddField("city", new ContentFieldData()
-                            .AddValue("iv", "Berlin"))
+                        .AddField("city",
+                            new ContentFieldData()
+                                .AddValue("iv", "Berlin"))
             };
 
             var result = sut.FormatString("$CONTENT_DATA.city.iv", AsEnvelope(@event));
@@ -167,8 +172,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             {
                 Data =
                     new NamedContentData()
-                        .AddField("city", new ContentFieldData()
-                            .AddValue("iv", JValue.CreateNull()))
+                        .AddField("city",
+                            new ContentFieldData()
+                                .AddValue("iv", JValue.CreateNull()))
             };
 
             var result = sut.FormatString("$CONTENT_DATA.city.iv", AsEnvelope(@event));
@@ -183,8 +189,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             {
                 Data =
                     new NamedContentData()
-                        .AddField("city", new ContentFieldData()
-                            .AddValue("iv", JValue.CreateUndefined()))
+                        .AddField("city",
+                            new ContentFieldData()
+                                .AddValue("iv", JValue.CreateUndefined()))
             };
 
             var result = sut.FormatString("$CONTENT_DATA.city.iv", AsEnvelope(@event));
@@ -199,9 +206,10 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             {
                 Data =
                     new NamedContentData()
-                        .AddField("city", new ContentFieldData()
-                            .AddValue("iv", new JObject(
-                                new JProperty("name", "Berlin"))))
+                        .AddField("city",
+                            new ContentFieldData()
+                                .AddValue("iv", new JObject(
+                                    new JProperty("name", "Berlin"))))
             };
 
             var result = sut.FormatString("$CONTENT_DATA.city.iv", AsEnvelope(@event));
@@ -216,9 +224,10 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             {
                 Data =
                     new NamedContentData()
-                        .AddField("city", new ContentFieldData()
-                            .AddValue("iv", new JArray(
-                                "Berlin")))
+                        .AddField("city",
+                            new ContentFieldData()
+                                .AddValue("iv", new JArray(
+                                    "Berlin")))
             };
 
             var result = sut.FormatString("$CONTENT_DATA.city.iv.0", AsEnvelope(@event));
@@ -233,9 +242,10 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             {
                 Data =
                     new NamedContentData()
-                        .AddField("city", new ContentFieldData()
-                            .AddValue("iv", new JObject(
-                                new JProperty("name", "Berlin"))))
+                        .AddField("city",
+                            new ContentFieldData()
+                                .AddValue("iv", new JObject(
+                                    new JProperty("name", "Berlin"))))
             };
 
             var result = sut.FormatString("$CONTENT_DATA.city.iv.name", AsEnvelope(@event));

@@ -1,7 +1,4 @@
-﻿// ReSharper disable InconsistentNaming
-// ReSharper disable PossiblyUnassignedProperty
-
-     var webpackMerge = require('webpack-merge'),
+﻿     var webpackMerge = require('webpack-merge'),
     ExtractTextPlugin = require('extract-text-webpack-plugin'),
             runConfig = require('./webpack.run.base.js'),
               helpers = require('./helpers');

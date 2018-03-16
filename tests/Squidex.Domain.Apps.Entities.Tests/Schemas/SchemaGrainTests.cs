@@ -42,7 +42,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             fieldId = new NamedId<long>(1, fieldName);
 
             sut = new SchemaGrain(Store, appProvider, registry);
-            sut.ActivateAsync(Id).Wait();
+            sut.OnActivateAsync(Id).Wait();
         }
 
         [Fact]
