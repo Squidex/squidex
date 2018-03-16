@@ -6,7 +6,7 @@
  */
 
 import { Observable } from 'rxjs';
-import { It, IMock, Mock, Times } from 'typemoq';
+import { IMock, Mock, Times } from 'typemoq';
 
 import {
     AppDto,
