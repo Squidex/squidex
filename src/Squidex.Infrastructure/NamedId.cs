@@ -56,7 +56,7 @@ namespace Squidex.Infrastructure
 
             if (parts.Length < 2)
             {
-                throw new ArgumentException("Named id must have more than 2 parts divided by commata.");
+                throw new ArgumentException("Named id must have more than 2 parts divided by comma.");
             }
 
             if (!parser(parts[0], out var id))
