@@ -55,7 +55,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Apps
         public async Task<Guid> FindAppIdByNameAsync(string name)
         {
             var appEntity =
-                await Collection.Find(x => x.Name == name).Only(x => x.Id)
+                await Collection.Find(x => x.Name == name && x.IsArchived != true).Only(x => x.Id)
                     .FirstOrDefaultAsync();
 
             return appEntity != null ? Guid.Parse(appEntity["_id"].AsString) : Guid.Empty;
