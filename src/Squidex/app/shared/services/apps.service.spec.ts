@@ -103,4 +103,17 @@ describe('AppsService', () => {
 
         expect(app).toEqual(new AppDto('123', dto.name, 'Reader', now, now, 'Basic', 'Enterprise'));
     }));
+
+    it('should make delete request to archive app',
+    inject([AppsService, HttpTestingController], (appsService: AppsService, httpMock: HttpTestingController) => {
+
+        appsService.deleteApp('my-app').subscribe();
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app');
+
+        expect(req.request.method).toEqual('DELETE');
+        expect(req.request.headers.get('If-Match')).toBeNull();
+
+        req.flush({});
+    }));
 });

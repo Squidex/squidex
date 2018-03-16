@@ -39,6 +39,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.State
         [JsonProperty]
         public LanguagesConfig LanguagesConfig { get; set; } = English;
 
+        [JsonProperty]
+        public bool IsArchived { get; set; }
+
         protected void On(AppCreated @event)
         {
             SimpleMapper.Map(@event, this);
@@ -112,6 +115,13 @@ namespace Squidex.Domain.Apps.Entities.Apps.State
             {
                 LanguagesConfig = LanguagesConfig.MakeMaster(@event.Language);
             }
+        }
+
+        protected void On(AppArchived @event)
+        {
+            Plan = null;
+
+            IsArchived = true;
         }
 
         public AppState Apply(Envelope<IEvent> @event)

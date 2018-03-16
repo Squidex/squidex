@@ -87,4 +87,14 @@ export class AppsService {
                 })
                 .pretifyError('Failed to create app. Please reload.');
     }
+
+    public deleteApp(appName: string): Observable<any> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}`);
+
+        return this.http.delete(url)
+                .do(() => {
+                    this.analytics.trackEvent('App', 'Archived', appName);
+                })
+                .pretifyError('Failed to archive app. Please reload.');
+    }
 }

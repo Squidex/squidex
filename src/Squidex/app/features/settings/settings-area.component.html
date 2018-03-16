@@ -44,6 +44,12 @@
                         <i class="icon-angle-right"></i>
                     </a>
                 </li>
+                <li class="nav-item" *ngIf="ctx.app.permission === 'Owner'">
+                    <a class="nav-link" routerLink="more" routerLinkActive="active">
+                        More
+                        <i class="icon-angle-right"></i>
+                    </a>
+                </li>
             </ul>
         </div>
     </div>

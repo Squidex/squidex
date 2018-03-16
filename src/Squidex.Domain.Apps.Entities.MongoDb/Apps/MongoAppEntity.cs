@@ -36,5 +36,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Apps
         [BsonElement]
         [BsonRequired]
         public string[] UserIds { get; set; }
+
+        [BsonElement]
+        [BsonIgnoreIfDefault]
+        public bool IsArchived { get; set; }
     }
 }

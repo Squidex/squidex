@@ -62,6 +62,15 @@ namespace Squidex.Domain.Apps.Entities.Apps
         }
 
         [Fact]
+        public async Task Command_should_throw_exception_if_app_is_archived()
+        {
+            await ExecuteCreateAsync();
+            await ExecuteArchiveAsync();
+
+            await Assert.ThrowsAsync<DomainException>(ExecuteAttachClientAsync);
+        }
+
+        [Fact]
         public async Task Create_should_create_events_and_update_state()
         {
             var command = new CreateApp { Name = AppName, Actor = User, AppId = AppId };
@@ -360,6 +369,25 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 );
         }
 
+        [Fact]
+        public async Task ArchiveApp_should_create_events_and_update_state()
+        {
+            var command = new ArchiveApp();
+
+            await ExecuteCreateAsync();
+
+            var result = await sut.ExecuteAsync(CreateCommand(command));
+
+            result.ShouldBeEquivalent(new EntitySavedResult(5));
+
+            LastEvents
+                .ShouldHaveSameEvents(
+                    CreateEvent(new AppArchived())
+                );
+
+            A.CallTo(() => appPlansBillingManager.ChangePlanAsync(command.Actor.Identifier, AppId, AppName, null));
+        }
+
         private Task ExecuteAddPatternAsync()
         {
             return sut.ExecuteAsync(CreateCommand(new AddPattern { PatternId = patternId3, Name = "Name", Pattern = ".*" }));
@@ -383,6 +411,11 @@ namespace Squidex.Domain.Apps.Entities.Apps
         private Task ExecuteAddLanguageAsync(Language language)
         {
             return sut.ExecuteAsync(CreateCommand(new AddLanguage { Language = language }));
+        }
+
+        private Task ExecuteArchiveAsync()
+        {
+            return sut.ExecuteAsync(CreateCommand(new ArchiveApp()));
         }
     }
 }

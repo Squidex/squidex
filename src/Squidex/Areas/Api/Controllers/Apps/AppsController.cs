@@ -112,5 +112,25 @@ namespace Squidex.Areas.Api.Controllers.Apps
 
             return CreatedAtAction(nameof(GetApps), response);
         }
+
+        /// <summary>
+        /// Archive the app.
+        /// /// </summary>
+        /// <param name="app">The name of the app to archive.</param>
+        /// <returns>
+        /// 204 => App archived.
+        /// 404 => App not found.
+        /// </returns>
+        [HttpDelete]
+        [Route("apps/{app}/")]
+        [AppApi]
+        [ApiCosts(1)]
+        [MustBeAppOwner]
+        public async Task<IActionResult> DeleteApp(string app)
+        {
+            await CommandBus.PublishAsync(new ArchiveApp());
+
+            return NoContent();
+        }
     }
 }

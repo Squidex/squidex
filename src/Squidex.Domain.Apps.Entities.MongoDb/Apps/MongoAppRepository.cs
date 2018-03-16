@@ -46,7 +46,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Apps
         public async Task<IReadOnlyList<Guid>> QueryUserAppIdsAsync(string userId)
         {
             var appEntities =
-                await Collection.Find(x => x.UserIds.Contains(userId)).Only(x => x.Id)
+                await Collection.Find(x => x.UserIds.Contains(userId) && x.IsArchived != true).Only(x => x.Id)
                     .ToListAsync();
 
             return appEntities.Select(x => Guid.Parse(x["_id"].AsString)).ToList();

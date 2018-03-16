@@ -22,6 +22,7 @@ import {
     ContributorsPageComponent,
     LanguageComponent,
     LanguagesPageComponent,
+    MorePageComponent,
     PatternComponent,
     PatternsPageComponent,
     PlansPageComponent,
@@ -39,6 +40,10 @@ const routes: Routes = [
             {
                 path: 'plans',
                 component: PlansPageComponent
+            },
+            {
+                path: 'more',
+                component: MorePageComponent
             },
             {
                 path: 'clients',
@@ -137,6 +142,7 @@ const routes: Routes = [
         ContributorsPageComponent,
         LanguageComponent,
         LanguagesPageComponent,
+        MorePageComponent,
         PatternComponent,
         PatternsPageComponent,
         PlansPageComponent,

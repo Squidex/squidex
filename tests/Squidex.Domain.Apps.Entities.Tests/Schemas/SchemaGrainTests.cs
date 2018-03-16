@@ -46,7 +46,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         }
 
         [Fact]
-        public async Task Command_should_throw_exception_if_rule_is_deleted()
+        public async Task Command_should_throw_exception_if_schema_is_deleted()
         {
             await ExecuteCreateAsync();
             await ExecuteDeleteAsync();

@@ -37,7 +37,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Apps
             return Collection.UpsertVersionedAsync(key, oldVersion, newVersion, u => u
                 .Set(x => x.Name, value.Name)
                 .Set(x => x.State, value)
-                .Set(x => x.UserIds, value.Contributors.Keys.ToArray()));
+                .Set(x => x.UserIds, value.Contributors.Keys.ToArray())
+                .Set(x => x.IsArchived, value.IsArchived));
         }
     }
 }

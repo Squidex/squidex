@@ -26,5 +26,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         AppContributors Contributors { get; }
 
         LanguagesConfig LanguagesConfig { get; }
+
+        bool IsArchived { get; }
     }
 }

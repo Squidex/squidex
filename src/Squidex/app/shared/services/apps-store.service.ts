@@ -67,4 +67,13 @@ export class AppsStoreService {
                 });
             });
     }
+
+    public deleteApp(appName: string): Observable<any> {
+        return this.appsService.deleteApp(appName)
+            .do(app => {
+                this.apps$.take(1).subscribe(apps => {
+                    this.apps$.next(apps.filter(a => a.name !== appName));
+                });
+            });
+    }
 }

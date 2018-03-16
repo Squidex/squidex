@@ -57,6 +57,8 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         protected override Task<object> ExecuteAsync(IAggregateCommand command)
         {
+            VerifyNotArchived();
+
             switch (command)
             {
                 case CreateApp createApp:
@@ -179,6 +181,14 @@ namespace Squidex.Domain.Apps.Entities.Apps
                         }
                     });
 
+                case ArchiveApp archiveApp:
+                    return UpdateAsync(archiveApp, async c =>
+                    {
+                        await appPlansBillingManager.ChangePlanAsync(c.Actor.Identifier, Snapshot.Id, Snapshot.Name, null);
+
+                        ArchiveApp(c);
+                    });
+
                 default:
                     throw new NotSupportedException();
             }
@@ -275,6 +285,19 @@ namespace Squidex.Domain.Apps.Entities.Apps
         public void UpdatePattern(UpdatePattern command)
         {
             RaiseEvent(SimpleMapper.Map(command, new AppPatternUpdated()));
+        }
+
+        public void ArchiveApp(ArchiveApp command)
+        {
+            RaiseEvent(SimpleMapper.Map(command, new AppArchived()));
+        }
+
+        private void VerifyNotArchived()
+        {
+            if (Snapshot.IsArchived)
+            {
+                throw new DomainException("App has already been archived.");
+            }
         }
 
         private void RaiseEvent(AppEvent @event)
