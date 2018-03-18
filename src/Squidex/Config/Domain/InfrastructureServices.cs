@@ -5,10 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.UsageTracking;
 
 #pragma warning disable RECS0092 // Convert field to readonly
@@ -30,6 +32,8 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<ActionContextAccessor>()
                 .As<IActionContextAccessor>();
+
+            services.AddTransient(typeof(Lazy<>), typeof(Lazier<>));
         }
     }
 }

@@ -20,13 +20,13 @@ namespace Squidex.Domain.Apps.Entities.Contents
 {
     public sealed class ContentSchedulerGrain : Grain, IContentSchedulerGrain, IRemindable
     {
-        private readonly IContentRepository contentRepository;
-        private readonly ICommandBus commandBus;
+        private readonly Lazy<IContentRepository> contentRepository;
+        private readonly Lazy<ICommandBus> commandBus;
         private readonly IClock clock;
 
         public ContentSchedulerGrain(
-            IContentRepository contentRepository,
-            ICommandBus commandBus,
+            Lazy<IContentRepository> contentRepository,
+            Lazy<ICommandBus> commandBus,
             IClock clock)
         {
             Guard.NotNull(contentRepository, nameof(contentRepository));
@@ -57,11 +57,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var now = clock.GetCurrentInstant();
 
-            return contentRepository.QueryScheduledWithoutDataAsync(now, content =>
+            return contentRepository.Value.QueryScheduledWithoutDataAsync(now, content =>
             {
                 var command = new ChangeContentStatus { ContentId = content.Id, Status = content.ScheduledTo.Value, Actor = content.ScheduledBy };
 
-                return commandBus.PublishAsync(command);
+                return commandBus.Value.PublishAsync(command);
             });
         }
 

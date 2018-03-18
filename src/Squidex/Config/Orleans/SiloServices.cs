@@ -22,18 +22,18 @@ namespace Squidex.Config.Orleans
                     var mongoConfiguration = config.GetRequiredValue("store:mongoDb:configuration");
                     var mongoDatabaseName = config.GetRequiredValue("store:mongoDb:database");
 
-                    services.AddMongoDBMembershipTable(c =>
+                    services.AddMongoDBMembershipTable(options =>
                     {
-                        c.ConnectionString = mongoConfiguration;
-                        c.CollectionPrefix = "Orleans_";
-                        c.DatabaseName = mongoDatabaseName;
+                        options.ConnectionString = mongoConfiguration;
+                        options.CollectionPrefix = "Orleans_";
+                        options.DatabaseName = mongoDatabaseName;
                     });
 
-                    services.AddMongoDBReminders(c =>
+                    services.AddMongoDBReminders(options =>
                     {
-                        c.ConnectionString = mongoConfiguration;
-                        c.CollectionPrefix = "Orleans_";
-                        c.DatabaseName = mongoDatabaseName;
+                        options.ConnectionString = mongoConfiguration;
+                        options.CollectionPrefix = "Orleans_";
+                        options.DatabaseName = mongoDatabaseName;
                     });
                 }
             });

@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Diagnostics;
 using System.Net;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
@@ -20,6 +21,7 @@ using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing.Grains;
+using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Log.Adapter;
 using Squidex.Infrastructure.Orleans;
 
@@ -27,7 +29,8 @@ namespace Squidex.Config.Orleans
 {
     public class SiloWrapper : DisposableObjectBase, IInitializable, IDisposable
     {
-        private readonly ISiloHost silo;
+        private readonly Lazy<ISiloHost> silo;
+        private readonly ISemanticLog log;
 
         internal sealed class Source : IConfigurationSource
         {
@@ -44,61 +47,121 @@ namespace Squidex.Config.Orleans
             }
         }
 
-        public SiloWrapper(IConfiguration configuration)
+        public SiloWrapper(IConfiguration config, ISemanticLog log)
         {
-            J.Serializer = SerializationServices.DefaultJsonSerializer;
+            this.log = log;
 
-            silo = new SiloHostBuilder()
-                .UseDashboard(options => options.HostSelf = true)
-                .AddStartupTask<Bootstrap<IContentSchedulerGrain>>()
-                .AddStartupTask<Bootstrap<IEventConsumerManagerGrain>>()
-                .AddStartupTask<Bootstrap<IRuleDequeuerGrain>>()
-                .ConfigureEndpoints(Dns.GetHostName(), 11111, 40000, listenOnAnyHostAddress: true)
-                .Configure<ClusterOptions>(options =>
-                {
-                    options.ClusterId = "squidex";
-                })
-                .ConfigureLogging((hostingContext, builder) =>
-                {
-                    builder.AddConfiguration(hostingContext.Configuration.GetSection("logging"));
-                    builder.AddSemanticLog();
-                    builder.AddFilter("Orleans.Runtime.SiloControl", LogLevel.Warning);
-                })
-                .ConfigureApplicationParts(builder =>
-                {
-                    builder.AddApplicationPart(SquidexEntities.Assembly);
-                    builder.AddApplicationPart(SquidexInfrastructure.Assembly);
-                })
-                .ConfigureServices((context, services) =>
-                {
-                    services.AddAppSiloServices(context.Configuration);
-                    services.AddAppServices(context.Configuration);
+            silo = new Lazy<ISiloHost>(() =>
+            {
+                J.Serializer = SerializationServices.DefaultJsonSerializer;
 
-                    services.Configure<ProcessExitHandlingOptions>(options => options.FastKillOnProcessExit = false);
-                })
-                .ConfigureAppConfiguration((hostContext, builder) =>
-                {
-                    if (configuration is IConfigurationRoot root)
+                var hostBuilder = new SiloHostBuilder()
+                    .UseDashboard(options => options.HostSelf = true)
+                    .AddStartupTask<Bootstrap<IContentSchedulerGrain>>()
+                    .AddStartupTask<Bootstrap<IEventConsumerManagerGrain>>()
+                    .AddStartupTask<Bootstrap<IRuleDequeuerGrain>>()
+                    .Configure<ClusterOptions>(options =>
                     {
-                        foreach (var provider in root.Providers)
+                        options.ClusterId = "squidex";
+                    })
+                    .ConfigureLogging((hostingContext, builder) =>
+                    {
+                        builder.AddConfiguration(hostingContext.Configuration.GetSection("logging"));
+                        builder.AddSemanticLog();
+                        builder.AddFilter("Orleans.Runtime.SiloControl", LogLevel.Warning);
+                    })
+                    .ConfigureApplicationParts(builder =>
+                    {
+                        builder.AddApplicationPart(SquidexEntities.Assembly);
+                        builder.AddApplicationPart(SquidexInfrastructure.Assembly);
+                    })
+                    .ConfigureServices((context, services) =>
+                    {
+                        services.AddAppSiloServices(context.Configuration);
+                        services.AddAppServices(context.Configuration);
+
+                        services.Configure<ProcessExitHandlingOptions>(options => options.FastKillOnProcessExit = false);
+                    })
+                    .ConfigureAppConfiguration((hostContext, builder) =>
+                    {
+                        if (config is IConfigurationRoot root)
                         {
-                            builder.Add(new Source(provider));
+                            foreach (var provider in root.Providers)
+                            {
+                                builder.Add(new Source(provider));
+                            }
                         }
+                    });
+
+                config.ConfigureByOption("orleans:clustering", new Options
+                {
+                    ["MongoDB"] = () =>
+                    {
+                        hostBuilder.ConfigureEndpoints(Dns.GetHostName(), 11111, 40000, listenOnAnyHostAddress: true);
+
+                        var mongoConfiguration = config.GetRequiredValue("store:mongoDb:configuration");
+                        var mongoDatabaseName = config.GetRequiredValue("store:mongoDb:database");
+
+                        hostBuilder.UseMongoDBClustering(options =>
+                        {
+                            options.ConnectionString = mongoConfiguration;
+                            options.CollectionPrefix = "Orleans_";
+                            options.DatabaseName = mongoDatabaseName;
+                        });
+                    },
+                    ["Development"] = () =>
+                    {
+                        hostBuilder.UseLocalhostClustering(gatewayPort: 40000, clusterId: "squidex");
+                        hostBuilder.Configure<ClusterMembershipOptions>(options => options.ExpectedClusterSize = 1);
                     }
-                })
-                .Build();
+                });
+
+                config.ConfigureByOption("store:type", new Options
+                {
+                    ["MongoDB"] = () =>
+                    {
+                        var mongoConfiguration = config.GetRequiredValue("store:mongoDb:configuration");
+                        var mongoDatabaseName = config.GetRequiredValue("store:mongoDb:database");
+
+                        hostBuilder.UseMongoDBReminders(options =>
+                        {
+                            options.ConnectionString = mongoConfiguration;
+                            options.CollectionPrefix = "Orleans_";
+                            options.DatabaseName = mongoDatabaseName;
+                        });
+                    }
+                });
+
+                return hostBuilder.Build();
+            });
         }
 
         public void Initialize()
         {
-            silo.StartAsync().Wait();
+            var watch = Stopwatch.StartNew();
+            try
+            {
+                silo.Value.StartAsync().Wait();
+            }
+            finally
+            {
+                watch.Stop();
+
+                log.LogInformation(w => w
+                    .WriteProperty("message", "Silo started")
+                    .WriteProperty("elapsed", watch.Elapsed)
+                    .WriteProperty("elapsedMs", watch.ElapsedMilliseconds));
+            }
         }
 
         protected override void DisposeObject(bool disposing)
         {
             if (disposing)
             {
-                Task.Run(() => silo.StopAsync()).Wait();
+                if (silo.IsValueCreated)
+                {
+                    Task.Run(() => silo.Value.StopAsync()).Wait();
+                }
             }
         }
     }
