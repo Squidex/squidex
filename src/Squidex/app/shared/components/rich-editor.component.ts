@@ -90,11 +90,11 @@ export class RichEditorComponent implements ControlValueAccessor, AfterViewInit,
         return {
             convert_fonts_to_spans: true,
             convert_urls: false,
-            plugins: 'code image media',
+            plugins: 'code image media link',
             removed_menuitems: 'newdocument',
             resize: true,
             theme: 'modern',
-            toolbar: 'undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | image media | assets',
+            toolbar: 'undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media | assets',
             setup: (editor: any) => {
                 self.tinyEditor = editor;
                 self.tinyEditor.setMode(this.isDisabled ? 'readonly' : 'design');
