@@ -12,7 +12,7 @@
     </div>
 
     <div class="clearfix">
-        <a class="card card-href" [routerLink]="['schemas', { showDialog: true }]">
+        <a class="card card-href" [routerLink]="['schemas', { showDialog: true }]" *ngIf="ctx.app.permission !== 'Editor'">
             <div class="card-body">
                 <div class="card-image">
                     <img src="/images/dashboard-schema.png" />
