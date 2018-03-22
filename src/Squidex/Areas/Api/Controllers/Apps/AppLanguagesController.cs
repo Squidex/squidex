@@ -98,7 +98,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// <returns>
         /// 204 => Language updated.
         /// 400 => Language object is invalid.
-        /// 404 => App not found.
+        /// 404 => Language or app not found.
         /// </returns>
         [MustBeAppEditor]
         [HttpPut]
@@ -118,7 +118,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// <param name="language">The language to delete from the app.</param>
         /// <returns>
         /// 204 => Language deleted.
-        /// 404 => App not found.
+        /// 404 => Language or app not found.
         /// </returns>
         [MustBeAppEditor]
         [HttpDelete]

@@ -5,12 +5,16 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Reflection;
+using System;
+using System.IO;
+using System.Threading.Tasks;
 
-namespace Squidex.Domain.Apps.Entities
+namespace Squidex.Domain.Apps.Entities.Backup
 {
-    public static class SquidexEntities
+    public interface IBackupArchiveLocation
     {
-        public static readonly Assembly Assembly = typeof(SquidexEntities).Assembly;
+        Task<Stream> OpenStreamAsync(Guid backupId);
+
+        Task DeleteArchiveAsync(Guid backupId);
     }
 }

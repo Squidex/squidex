@@ -5,12 +5,21 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Reflection;
+using System;
+using NodaTime;
 
-namespace Squidex.Domain.Apps.Entities
+namespace Squidex.Domain.Apps.Backup
 {
-    public static class SquidexEntities
+    public interface IBackupJob
     {
-        public static readonly Assembly Assembly = typeof(SquidexEntities).Assembly;
+        Guid Id { get; }
+
+        Instant Started { get; }
+
+        Instant? Stopped { get; }
+
+        bool Failed { get; }
+
+        string DownloadPath { get; }
     }
 }

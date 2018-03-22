@@ -5,12 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Reflection;
+using System.Collections.Generic;
+using Newtonsoft.Json;
 
-namespace Squidex.Domain.Apps.Entities
+namespace Squidex.Domain.Apps.Backup.State
 {
-    public static class SquidexEntities
+    public sealed class BackupState
     {
-        public static readonly Assembly Assembly = typeof(SquidexEntities).Assembly;
+        [JsonProperty]
+        public List<BackupStateJob> Jobs { get; set; } = new List<BackupStateJob>();
     }
 }

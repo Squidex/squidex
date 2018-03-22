@@ -5,12 +5,18 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Reflection;
+using NodaTime;
+using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities
+namespace Squidex.Domain.Apps.Entities.Contents
 {
-    public static class SquidexEntities
+    public interface IContentScheduleItem
     {
-        public static readonly Assembly Assembly = typeof(SquidexEntities).Assembly;
+        Status ScheduledTo { get; }
+
+        Instant ScheduledAt { get; }
+
+        RefToken ScheduledBy { get; }
     }
 }

@@ -5,12 +5,20 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Reflection;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Orleans;
+using Squidex.Infrastructure.Orleans;
 
-namespace Squidex.Domain.Apps.Entities
+namespace Squidex.Domain.Apps.Entities.Backup
 {
-    public static class SquidexEntities
+    public interface IBackupGrain : IGrainWithGuidKey
     {
-        public static readonly Assembly Assembly = typeof(SquidexEntities).Assembly;
+        Task StartNewAsync();
+
+        Task DeleteAsync(Guid id);
+
+        Task<J<List<IBackupJob>>> GetStateAsync();
     }
 }

@@ -5,12 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Reflection;
+using System;
+using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Entities
+namespace Squidex.Domain.Apps.Events.Contents
 {
-    public static class SquidexEntities
+    [EventType(nameof(ContentStatusChanged))]
+    public sealed class ContentScheduleItemRemoved : ContentEvent
     {
-        public static readonly Assembly Assembly = typeof(SquidexEntities).Assembly;
+        public Guid ScheduleItemId { get; set; }
     }
 }
