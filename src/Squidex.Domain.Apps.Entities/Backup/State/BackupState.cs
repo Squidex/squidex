@@ -13,6 +13,6 @@ namespace Squidex.Domain.Apps.Entities.Backup.State
     public sealed class BackupState
     {
         [JsonProperty]
-        public List<BackupStateJob> Jobs { get; set; } = new List<BackupStateJob>();
+        public List<BackupStateJob> Jobs { get; } = new List<BackupStateJob>();
     }
 }

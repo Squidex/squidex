@@ -1,0 +1,34 @@
+<sqx-title message="{app} | Backups | Settings" parameter1="app" [value1]="ctx.appName"></sqx-title>
+
+<sqx-panel desiredWidth="50rem">
+    <div class="panel-header">
+        <div class="panel-title-row">
+            <div class="float-right">
+                <button class="btn btn-success" (click)="startBackup()">
+                    Start Backup
+                </button>
+            </div>
+
+            <h3 class="panel-title">Backups</h3>
+        </div>
+
+        <a class="panel-close" sqxParentLink>
+            <i class="icon-close"></i>
+        </a>
+    </div>
+
+    <div class="panel-main">
+        <div class="panel-content">
+            <table class="table table-items table-fixed">
+                <tbody>
+                    <ng-template ngFor let-backup [ngForOf]="backups | async">
+                        <tr>
+                            <td>{{backup.started | sqxFullDateTime }}</td>
+                        </tr>
+                        <tr class="spacer"></tr>
+                    </ng-template>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</sqx-panel>

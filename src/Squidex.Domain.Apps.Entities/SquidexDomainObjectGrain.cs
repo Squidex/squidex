@@ -26,6 +26,8 @@ namespace Squidex.Domain.Apps.Entities
             {
                 @event.SetAppId(appEvent.AppId.Id);
             }
+
+            base.RaiseEvent(@event);
         }
     }
 }

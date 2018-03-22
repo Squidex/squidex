@@ -14,8 +14,10 @@ using NSwag.Annotations;
 using Orleans;
 using Squidex.Areas.Api.Controllers.Backup.Models;
 using Squidex.Domain.Apps.Entities.Backup;
+using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Infrastructure.Tasks;
 using Squidex.Pipeline;
 
 namespace Squidex.Areas.Api.Controllers.Backup
@@ -31,11 +33,13 @@ namespace Squidex.Areas.Api.Controllers.Backup
     public class BackupController : ApiController
     {
         private readonly IGrainFactory grainFactory;
+        private readonly IAssetStore assetStore;
 
-        public BackupController(ICommandBus commandBus, IGrainFactory grainFactory)
+        public BackupController(ICommandBus commandBus, IGrainFactory grainFactory, IAssetStore assetStore)
             : base(commandBus)
         {
             this.grainFactory = grainFactory;
+            this.assetStore = assetStore;
         }
 
         /// <summary>
@@ -71,13 +75,31 @@ namespace Squidex.Areas.Api.Controllers.Backup
         [Route("apps/{app}/backups/")]
         [ProducesResponseType(typeof(List<BackupJobDto>), 200)]
         [ApiCosts(0)]
-        public async Task<IActionResult> PostBackup(string app)
+        public IActionResult PostBackup(string app)
         {
             var backupGrain = grainFactory.GetGrain<IBackupGrain>(App.Id);
 
-            await backupGrain.StartNewAsync();
+            backupGrain.RunAsync().Forget();
 
             return NoContent();
+        }
+
+        /// <summary>
+        /// Get the backup content.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <param name="id">The id of the asset.</param>
+        /// <returns>
+        /// 200 => Backup found and content returned.
+        /// 404 => Backup or app not found.
+        /// </returns>
+        [HttpGet]
+        [Route("apps/{app}/backups/{id}")]
+        [ProducesResponseType(200)]
+        [ApiCosts(0.5)]
+        public IActionResult GetBackupContent(string app, Guid id)
+        {
+            return new FileCallbackResult("application/zip", "Backup.zip", bodyStream => assetStore.DownloadAsync(id.ToString(), 0, null, bodyStream));
         }
 
         /// <summary>
@@ -89,15 +111,15 @@ namespace Squidex.Areas.Api.Controllers.Backup
         /// 204 => Backup started.
         /// 404 => Backup or app not found.
         /// </returns>
-        [HttpPost]
+        [HttpDelete]
         [Route("apps/{app}/backups/{id}")]
         [ProducesResponseType(typeof(List<BackupJobDto>), 200)]
         [ApiCosts(0)]
-        public async Task<IActionResult> PostBackup(string app, Guid id)
+        public async Task<IActionResult> DeleteBackup(string app, Guid id)
         {
             var backupGrain = grainFactory.GetGrain<IBackupGrain>(App.Id);
 
-            await backupGrain.StartNewAsync();
+            await backupGrain.DeleteAsync(id);
 
             return NoContent();
         }

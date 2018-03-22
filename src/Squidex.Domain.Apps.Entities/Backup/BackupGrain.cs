@@ -14,6 +14,7 @@ using NodaTime;
 using Orleans;
 using Orleans.Concurrency;
 using Squidex.Domain.Apps.Entities.Backup.State;
+using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
@@ -38,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
         private CancellationTokenSource currentTask;
         private BackupStateJob currentJob;
         private Guid appId;
-        private BackupState state;
+        private BackupState state = new BackupState();
         private IPersistence<BackupState> persistence;
 
         public BackupGrain(
@@ -120,7 +121,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             await backupArchiveLocation.DeleteArchiveAsync(job.Id);
         }
 
-        public async Task StartNewAsync()
+        public async Task RunAsync()
         {
             if (currentTask != null)
             {
@@ -180,7 +181,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                             {
                                 await writer.WriteEventAsync(eventData);
                             }
-                        }, "AppId", appId, null, currentTask.Token);
+                        }, SquidexHeaders.AppId, appId.ToString(), null, currentTask.Token);
                     }
 
                     stream.Position = 0;

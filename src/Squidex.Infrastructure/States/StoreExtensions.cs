@@ -21,12 +21,12 @@ namespace Squidex.Infrastructure.States
 
         public static IPersistence<TState> WithSnapshots<TOwner, TState, TKey>(this IStore<TKey> store, TKey key, Func<TState, Task> applySnapshot)
         {
-            return store.WithSnapshots<TState>(typeof(TOwner), key, applySnapshot);
+            return store.WithSnapshots(typeof(TOwner), key, applySnapshot);
         }
 
         public static IPersistence<TState> WithSnapshotsAndEventSourcing<TOwner, TState, TKey>(this IStore<TKey> store, TKey key, Func<TState, Task> applySnapshot, Func<Envelope<IEvent>, Task> applyEvent)
         {
-            return store.WithSnapshotsAndEventSourcing<TState>(typeof(TOwner), key, applySnapshot, applyEvent);
+            return store.WithSnapshotsAndEventSourcing(typeof(TOwner), key, applySnapshot, applyEvent);
         }
 
         public static IPersistence WithEventSourcing<TKey>(this IStore<TKey> store, Type owner, TKey key, Action<Envelope<IEvent>> applyEvent)
@@ -36,12 +36,12 @@ namespace Squidex.Infrastructure.States
 
         public static IPersistence<TState> WithSnapshots<TState, TKey>(this IStore<TKey> store, Type owner, TKey key, Action<TState> applySnapshot)
         {
-            return store.WithSnapshots<TState>(owner, key, applySnapshot.ToAsync());
+            return store.WithSnapshots(owner, key, applySnapshot.ToAsync());
         }
 
         public static IPersistence<TState> WithSnapshotsAndEventSourcing<TState, TKey>(this IStore<TKey> store, Type owner, TKey key, Action<TState> applySnapshot, Action<Envelope<IEvent>> applyEvent)
         {
-            return store.WithSnapshotsAndEventSourcing<TState>(owner, key, applySnapshot.ToAsync(), applyEvent.ToAsync());
+            return store.WithSnapshotsAndEventSourcing(owner, key, applySnapshot.ToAsync(), applyEvent.ToAsync());
         }
 
         public static IPersistence WithEventSourcing<TOwner, TKey>(this IStore<TKey> store, TKey key, Action<Envelope<IEvent>> applyEvent)
@@ -51,12 +51,12 @@ namespace Squidex.Infrastructure.States
 
         public static IPersistence<TState> WithSnapshots<TOwner, TState, TKey>(this IStore<TKey> store, TKey key, Action<TState> applySnapshot)
         {
-            return store.WithSnapshots<TState>(typeof(TOwner), key, applySnapshot.ToAsync());
+            return store.WithSnapshots(typeof(TOwner), key, applySnapshot.ToAsync());
         }
 
         public static IPersistence<TState> WithSnapshotsAndEventSourcing<TOwner, TState, TKey>(this IStore<TKey> store, TKey key, Action<TState> applySnapshot, Action<Envelope<IEvent>> applyEvent)
         {
-            return store.WithSnapshotsAndEventSourcing<TState>(typeof(TOwner), key, applySnapshot.ToAsync(), applyEvent.ToAsync());
+            return store.WithSnapshotsAndEventSourcing(typeof(TOwner), key, applySnapshot.ToAsync(), applyEvent.ToAsync());
         }
     }
 }

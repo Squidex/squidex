@@ -18,7 +18,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
         {
             var tempFile = GetTempFile(backupId);
 
-            return Task.FromResult<Stream>(new FileStream(tempFile, FileMode.Open, FileAccess.ReadWrite));
+            return Task.FromResult<Stream>(new FileStream(tempFile, FileMode.Create, FileAccess.ReadWrite));
         }
 
         public Task DeleteArchiveAsync(Guid backupId)

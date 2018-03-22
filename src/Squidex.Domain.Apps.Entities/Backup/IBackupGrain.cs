@@ -15,7 +15,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 {
     public interface IBackupGrain : IGrainWithGuidKey
     {
-        Task StartNewAsync();
+        Task RunAsync();
 
         Task DeleteAsync(Guid id);
 
