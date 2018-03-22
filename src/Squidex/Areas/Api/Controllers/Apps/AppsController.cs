@@ -83,7 +83,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// <param name="request">The app object that needs to be added to squidex.</param>
         /// <returns>
         /// 201 => App created.
-        /// 400 => App object is not valid.
+        /// 400 => App request not valid.
         /// 409 => App name is already in use.
         /// </returns>
         /// <remarks>
