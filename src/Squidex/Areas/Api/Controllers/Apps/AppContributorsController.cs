@@ -88,7 +88,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// <returns>
         /// 204 => User removed from app.
         /// 400 => User is not assigned to the app.
-        /// 404 => App not found.
+        /// 404 => Contributor or app not found.
         /// </returns>
         [HttpDelete]
         [Route("apps/{app}/contributors/{id}/")]

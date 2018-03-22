@@ -93,7 +93,8 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// <param name="request">Client object that needs to be updated.</param>
         /// <returns>
         /// 204 => Client updated.
-        /// 404 => App not found or client not found.
+        /// 400 => Client request not valid.
+        /// 404 => Client or app not found.
         /// </returns>
         /// <remarks>
         /// Only the display name can be changed, create a new client if necessary.
@@ -115,7 +116,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// <param name="clientId">The id of the client that must be deleted.</param>
         /// <returns>
         /// 204 => Client revoked.
-        /// 404 => App not found or client not found.
+        /// 404 => Client or app not found.
         /// </returns>
         /// <remarks>
         /// The application that uses this client credentials cannot access the API after it has been revoked.

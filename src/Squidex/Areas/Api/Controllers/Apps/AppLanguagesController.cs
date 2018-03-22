@@ -71,7 +71,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// <param name="request">The language to add to the app.</param>
         /// <returns>
         /// 201 => Language created.
-        /// 400 => Language is an invalid language.
+        /// 400 => Language request not valid.
         /// 404 => App not found.
         /// </returns>
         [MustBeAppEditor]
@@ -97,7 +97,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// <param name="request">The language object.</param>
         /// <returns>
         /// 204 => Language updated.
-        /// 400 => Language object is invalid.
+        /// 400 => Language request not valid.
         /// 404 => Language or app not found.
         /// </returns>
         [MustBeAppEditor]

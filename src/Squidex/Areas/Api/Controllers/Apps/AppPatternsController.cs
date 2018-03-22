@@ -64,6 +64,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// <param name="request">Pattern to be added to the app.</param>
         /// <returns>
         /// 201 => Pattern generated.
+        /// 400 => Pattern request not valid.
         /// 404 => App not found.
         /// </returns>
         [HttpPost]
@@ -89,7 +90,8 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// <param name="request">Pattern to be updated for the app.</param>
         /// <returns>
         /// 204 => Pattern updated.
-        /// 404 => App not found or pattern not found.
+        /// 400 => Pattern request not valid.
+        /// 404 => Pattern or app not found.
         /// </returns>
         [HttpPut]
         [Route("apps/{app}/patterns/{id}/")]
@@ -111,7 +113,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// <param name="id">The id of the pattern to be deleted.</param>
         /// <returns>
         /// 204 => Pattern removed.
-        /// 404 => App or pattern not found.
+        /// 404 => Pattern or app not found.
         /// </returns>
         /// <remarks>
         /// Schemas using this pattern will still function using the same Regular Expression
