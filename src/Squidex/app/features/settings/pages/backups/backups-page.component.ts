@@ -14,6 +14,7 @@ import {
     BackupDto,
     BackupsService,
     DateTime,
+    Duration,
     ImmutableArray
 } from 'shared';
 
@@ -76,6 +77,14 @@ export class BackupsPageComponent implements OnInit, OnDestroy {
 
     public getDownloadUrl(backup: BackupDto) {
         return this.apiUrl.buildUrl(`api/apps/${this.ctx.appName}/backups/${backup.id}`);
+    }
+
+    public getDuration(backup: BackupDto) {
+        return Duration.create(backup.started, backup.stopped!);
+    }
+
+    public trackBy(index: number, item: BackupDto) {
+        return item.id;
     }
 }
 

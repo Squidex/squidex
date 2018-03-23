@@ -114,18 +114,25 @@ namespace Squidex.Infrastructure.Assets
             await blobRef.SetMetadataAsync();
         }
 
-        public async Task UploadAsync(string name, Stream stream, CancellationToken ct = default(CancellationToken))
+        public Task UploadAsync(string name, Stream stream, CancellationToken ct = default(CancellationToken))
         {
             var tempBlob = blobContainer.GetBlockBlobReference(name);
 
-            await tempBlob.UploadFromStreamAsync(stream, null, null, null, ct);
+            return tempBlob.UploadFromStreamAsync(stream, null, null, null, ct);
         }
 
-        public async Task DeleteAsync(string name)
+        public Task DeleteAsync(string name)
         {
             var tempBlob = blobContainer.GetBlockBlobReference(name);
 
-            await tempBlob.DeleteIfExistsAsync();
+            return tempBlob.DeleteIfExistsAsync();
+        }
+
+        public Task DeleteAsync(string id, long version, string suffix)
+        {
+            var tempBlob = blobContainer.GetBlockBlobReference(GetObjectName(id, version, suffix));
+
+            return tempBlob.DeleteIfExistsAsync();
         }
 
         private string GetObjectName(string id, long version, string suffix)

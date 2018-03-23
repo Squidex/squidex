@@ -38,6 +38,36 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         }
 
         [Fact]
+        public void Should_create_route_data()
+        {
+            var appId = Guid.NewGuid();
+
+            var @event = new ContentCreated
+            {
+                AppId = new NamedId<Guid>(appId, "my-app")
+            };
+
+            var result = sut.ToRouteData(AsEnvelope(@event));
+
+            Assert.True(result is JObject);
+        }
+
+        [Fact]
+        public void Should_create_route_data_from_event()
+        {
+            var appId = Guid.NewGuid();
+
+            var @event = new ContentCreated
+            {
+                AppId = new NamedId<Guid>(appId, "my-app")
+            };
+
+            var result = sut.ToRouteData(AsEnvelope(@event), "MyEventName");
+
+            Assert.Equal("MyEventName", result["type"]);
+        }
+
+        [Fact]
         public void Should_replace_app_information_from_event()
         {
             var appId = Guid.NewGuid();
@@ -152,6 +182,23 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         public void Should_return_plain_value_when_found()
         {
             var @event = new ContentCreated
+            {
+                Data =
+                    new NamedContentData()
+                        .AddField("city",
+                            new ContentFieldData()
+                                .AddValue("iv", "Berlin"))
+            };
+
+            var result = sut.FormatString("$CONTENT_DATA.city.iv", AsEnvelope(@event));
+
+            Assert.Equal("Berlin", result);
+        }
+
+        [Fact]
+        public void Should_return_plain_value_when_found_from_update_event()
+        {
+            var @event = new ContentUpdated
             {
                 Data =
                     new NamedContentData()

@@ -29,6 +29,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
     public sealed class BackupGrain : Grain, IBackupGrain
     {
         private const int MaxBackups = 10;
+        private static readonly Duration UpdateDuration = Duration.FromSeconds(1);
         private readonly IClock clock;
         private readonly IAssetStore assetStore;
         private readonly IEventDataFormatter eventDataFormatter;
@@ -95,8 +96,6 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         private async Task CleanupAsync()
         {
-            var hasUpdated = false;
-
             foreach (var job in state.Jobs)
             {
                 if (!job.Stopped.HasValue)
@@ -104,21 +103,38 @@ namespace Squidex.Domain.Apps.Entities.Backup
                     await CleanupAsync(job);
 
                     job.Stopped = clock.GetCurrentInstant();
-                    job.Failed = true;
+                    job.IsFailed = true;
 
-                    hasUpdated = true;
+                    await WriteAsync();
                 }
-            }
-
-            if (hasUpdated)
-            {
-                await WriteAsync();
             }
         }
 
         private async Task CleanupAsync(BackupStateJob job)
         {
-            await backupArchiveLocation.DeleteArchiveAsync(job.Id);
+            try
+            {
+                await backupArchiveLocation.DeleteArchiveAsync(job.Id);
+            }
+            catch (Exception ex)
+            {
+                log.LogError(ex, w => w
+                    .WriteProperty("action", "deleteArchive")
+                    .WriteProperty("status", "failed")
+                    .WriteProperty("backupId", job.Id.ToString()));
+            }
+
+            try
+            {
+                await assetStore.DeleteAsync(job.Id.ToString(), 0, null);
+            }
+            catch (Exception ex)
+            {
+                log.LogError(ex, w => w
+                    .WriteProperty("action", "deleteBackup")
+                    .WriteProperty("status", "failed")
+                    .WriteProperty("backupId", job.Id.ToString()));
+            }
         }
 
         public async Task RunAsync()
@@ -138,7 +154,9 @@ namespace Squidex.Domain.Apps.Entities.Backup
             currentTask = new CancellationTokenSource();
             currentJob = job;
 
-            state.Jobs.Add(job);
+            var lastTimestamp = job.Started;
+
+            state.Jobs.Insert(0, job);
 
             await WriteAsync();
 
@@ -152,8 +170,8 @@ namespace Squidex.Domain.Apps.Entities.Backup
                         {
                             var eventData = @event.Data;
 
-                            if (eventData.Type == nameof(AssetCreated) ||
-                                eventData.Type == nameof(AssetUpdated))
+                            if (eventData.Type == "AssetCreatedEvent" ||
+                                eventData.Type == "AssetUpdatedEvent")
                             {
                                 var parsedEvent = eventDataFormatter.Parse(eventData);
 
@@ -176,10 +194,23 @@ namespace Squidex.Domain.Apps.Entities.Backup
                                 {
                                     await assetStore.DownloadAsync(assetId.ToString(), assetVersion, null, attachmentStream);
                                 });
+
+                                job.HandledAssets++;
                             }
                             else
                             {
                                 await writer.WriteEventAsync(eventData);
+                            }
+
+                            job.HandledEvents++;
+
+                            var now = clock.GetCurrentInstant();
+
+                            if ((now - lastTimestamp) >= UpdateDuration)
+                            {
+                                lastTimestamp = now;
+
+                                await WriteAsync();
                             }
                         }, SquidexHeaders.AppId, appId.ToString(), null, currentTask.Token);
                     }
@@ -189,16 +220,21 @@ namespace Squidex.Domain.Apps.Entities.Backup
                     currentTask.Token.ThrowIfCancellationRequested();
 
                     await assetStore.UploadAsync(job.Id.ToString(), 0, null, stream, currentTask.Token);
-
-                    currentTask.Token.ThrowIfCancellationRequested();
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                job.Failed = true;
+                log.LogError(ex, w => w
+                    .WriteProperty("action", "makeBackup")
+                    .WriteProperty("status", "failed")
+                    .WriteProperty("backupId", job.Id.ToString()));
+
+                job.IsFailed = true;
             }
             finally
             {
+                await CleanupAsync(job);
+
                 job.Stopped = clock.GetCurrentInstant();
 
                 await WriteAsync();

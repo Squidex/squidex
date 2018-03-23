@@ -23,12 +23,12 @@ const dateTime = DateTime.parse('2013-10-03T12:13:14.125', DateTime.iso8601());
 
 describe('DurationPipe', () => {
     it('should format to standard duration string', () => {
-        const duration = Duration.create(dateTime, dateTime.addMinutes(10).addDays(13));
+        const duration = Duration.create(dateTime, dateTime.addMinutes(10).addDays(13).addSeconds(10));
 
         const pipe = new DurationPipe();
 
         const actual = pipe.transform(duration);
-        const expected = '312:10h';
+        const expected = '312:10:10';
 
         expect(actual).toBe(expected);
     });

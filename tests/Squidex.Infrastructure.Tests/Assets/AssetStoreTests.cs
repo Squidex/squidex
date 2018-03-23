@@ -84,7 +84,7 @@ namespace Squidex.Infrastructure.Assets
         }
 
         [Fact]
-        public async Task Should_ignore_when_deleting_twice()
+        public async Task Should_ignore_when_deleting_twice_by_name()
         {
             ((IInitializable)Sut).Initialize();
 
@@ -95,6 +95,20 @@ namespace Squidex.Infrastructure.Assets
             await Sut.UploadAsync(tempId, assetData);
             await Sut.DeleteAsync(tempId);
             await Sut.DeleteAsync(tempId);
+        }
+
+        [Fact]
+        public async Task Should_ignore_when_deleting_twice_by_id()
+        {
+            ((IInitializable)Sut).Initialize();
+
+            var tempId = Id();
+
+            var assetData = new MemoryStream(new byte[] { 0x1, 0x2, 0x3, 0x4 });
+
+            await Sut.UploadAsync(tempId, 0, null, assetData);
+            await Sut.DeleteAsync(tempId, 0, null);
+            await Sut.DeleteAsync(tempId, 0, null);
         }
 
         private static string Id()

@@ -18,6 +18,10 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         Instant? Stopped { get; }
 
-        bool Failed { get; }
+        int HandledEvents { get; }
+
+        int HandledAssets { get; }
+
+        bool IsFailed { get; }
     }
 }

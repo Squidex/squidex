@@ -104,6 +104,21 @@ namespace Squidex.Infrastructure.Assets
             }
         }
 
+        public async Task DeleteAsync(string id, long version, string suffix)
+        {
+            try
+            {
+                await storageClient.DeleteObjectAsync(bucketName, GetObjectName(id, version, suffix));
+            }
+            catch (GoogleApiException ex)
+            {
+                if (ex.HttpStatusCode != HttpStatusCode.NotFound)
+                {
+                    throw;
+                }
+            }
+        }
+
         private string GetObjectName(string id, long version, string suffix)
         {
             Guard.NotNullOrEmpty(id, nameof(id));

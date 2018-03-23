@@ -17,15 +17,14 @@ namespace Squidex.Areas.Api.Controllers.Backups
     /// <summary>
     /// Manages backups for app.
     /// </summary>
-    [ApiAuthorize]
     [ApiExceptionFilter]
     [AppApi]
     [SwaggerTag(nameof(Backups))]
-    public class BackupsContentController : ApiController
+    public class BackupContentController : ApiController
     {
         private readonly IAssetStore assetStore;
 
-        public BackupsContentController(ICommandBus commandBus, IAssetStore assetStore)
+        public BackupContentController(ICommandBus commandBus, IAssetStore assetStore)
             : base(commandBus)
         {
             this.assetStore = assetStore;

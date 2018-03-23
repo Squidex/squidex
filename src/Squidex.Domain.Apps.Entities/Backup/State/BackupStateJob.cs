@@ -23,6 +23,12 @@ namespace Squidex.Domain.Apps.Entities.Backup.State
         public Instant? Stopped { get; set; }
 
         [JsonProperty]
-        public bool Failed { get; set; }
+        public int HandledEvents { get; set; }
+
+        [JsonProperty]
+        public int HandledAssets { get; set; }
+
+        [JsonProperty]
+        public bool IsFailed { get; set; }
     }
 }

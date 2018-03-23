@@ -47,7 +47,7 @@ if ($all -Or $appsEntities) {
 	-register:user `
 	-target:"C:\Program Files\dotnet\dotnet.exe" `
 	-targetargs:"test $folderWorking\Squidex.Domain.Apps.Entities.Tests\Squidex.Domain.Apps.Entities.Tests.csproj" `
-	-filter:"+[Squidex.Domain.Apps.Entities*]*" `
+	-filter:"+[Squidex.Domain.Apps.Entities*]* -[Squidex.Domain.Apps.Entities*]*CodeGen*" `
 	-skipautoprops `
 	-output:"$folderWorking\$folderReports\Entities.xml" `
 	-oldStyle

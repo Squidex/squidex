@@ -24,5 +24,7 @@ namespace Squidex.Infrastructure.Assets
         Task UploadAsync(string id, long version, string suffix, Stream stream, CancellationToken ct = default(CancellationToken));
 
         Task DeleteAsync(string name);
+
+        Task DeleteAsync(string id, long version, string suffix);
     }
 }

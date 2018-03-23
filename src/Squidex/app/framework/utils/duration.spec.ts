@@ -28,24 +28,24 @@ describe('Duration', () => {
 
     it('should print to string correctly', () => {
         const s = DateTime.today();
-        const d = s.addHours(1).addMinutes(30).addSeconds(60);
+        const d = s.addHours(12).addMinutes(30).addSeconds(60);
 
         const duration = Duration.create(s, d);
 
         const actual = duration.toString();
-        const expected = '1:31h';
+        const expected = '12:31:00';
 
         expect(actual).toBe(expected);
     });
 
     it('should print to string correctly for one digit minutes', () => {
         const s = DateTime.today();
-        const d = s.addHours(1).addMinutes(1).addSeconds(60);
+        const d = s.addHours(1).addMinutes(2).addSeconds(5);
 
         const duration = Duration.create(s, d);
 
         const actual = duration.toString();
-        const expected = '1:02h';
+        const expected = '01:02:05';
 
         expect(actual).toBe(expected);
     });

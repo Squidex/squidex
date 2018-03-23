@@ -112,20 +112,22 @@ namespace Squidex.Infrastructure.Assets
             }
         }
 
+        public Task DeleteAsync(string id, long version, string suffix)
+        {
+            var file = GetFile(id, version, suffix);
+
+            file.Delete();
+
+            return TaskHelper.Done;
+        }
+
         public Task DeleteAsync(string name)
         {
-            try
-            {
-                var file = GetFile(name);
+            var file = GetFile(name);
 
-                file.Delete();
+            file.Delete();
 
-                return TaskHelper.Done;
-            }
-            catch (FileNotFoundException ex)
-            {
-                throw new AssetNotFoundException($"Asset {name} not found.", ex);
-            }
+            return TaskHelper.Done;
         }
 
         private FileInfo GetFile(string id, long version, string suffix)

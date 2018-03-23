@@ -1,10 +1,10 @@
 <sqx-title message="{app} | Backups | Settings" parameter1="app" [value1]="ctx.appName"></sqx-title>
 
-<sqx-panel desiredWidth="60rem">
+<sqx-panel desiredWidth="50rem">
     <div class="panel-header">
         <div class="panel-title-row">
             <div class="float-right">
-                <button class="btn btn-success" [disabled]="backups.length === 0" (click)="startBackup()">
+                <button class="btn btn-success" [disabled]="backups.length === 10" (click)="startBackup()">
                     Start Backup
                 </button>
             </div>
@@ -23,10 +23,10 @@
                 Your have reached the maximum number of backups: 10.
             </div>
             
-            <div class="table-items-row" *ngFor="let backup of backups">
-                <div class="row">
+            <div class="table-items-row" *ngFor="let backup of backups; trackBy: trackBy">
+                <div class="row no-gutter">
                     <div class="col col-auto">
-                        <div *ngIf="!backup.stopped" class="backup-status backup-status-pending icon-spin">
+                        <div *ngIf="!backup.stopped" class="backup-status backup-status-pending spin">
                             <i class="icon-hour-glass"></i>
                         </div>
                         <div *ngIf="backup.stopped && backup.isFailed" class="backup-status backup-status-failed">
@@ -37,32 +37,34 @@
                         </div>
                     </div>
                     <div class="col col-auto">
-                        <div>Started:</div>
-                        <div>Stopped:</div>
+                        <div>
+                            Started:
+                        </div>
+                        <div>
+                            Duration:
+                        </div>
                     </div>
-                    <div class="col">
+                    <div class="col col-auto">
                         <div>
                             {{backup.started.toISOString()}}
                         </div>
                         <div *ngIf="backup.stopped">
-                            {{backup.stopped.toISOString()}}
+                            {{getDuration(backup) | sqxDuration}}
                         </div>
-                    </div>
-                    <div class="col col-auto">
-                        <div>Progress:</div>
-                        <div>Download:</div>
                     </div>
                     <div class="col">
                         <div>
                             <span title="Archived events">
-                                <strong>{{backup.handledEvents}}</strong> <i class="icon-time"></i>
+                                Events: <strong class="backup-progress">{{backup.handledEvents | sqxKNumber}}</strong>
                             </span>, 
                             <span title="Archived assets">
-                                <strong>{{backup.handledAssets}}</strong> <i class="icon-media"></i>
+                                Assets: <strong class="backup-progress">{{backup.handledAssets | sqxKNumber}}</strong> 
                             </span>
                         </div>
-                        <div>
-                            <a *ngIf="backup.stopped && !backup.isFailed" href="{{getDownloadUrl(backup)}}" target="_blank">
+                        <div *ngIf="backup.stopped && !backup.isFailed">
+                            Download:
+
+                            <a href="{{getDownloadUrl(backup)}}" target="_blank">
                                 Ready
                             </a>
                         </div>

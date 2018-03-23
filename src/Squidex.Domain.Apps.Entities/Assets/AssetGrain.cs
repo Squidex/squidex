@@ -21,7 +21,7 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public class AssetGrain : DomainObjectGrain<AssetState>, IAssetGrain
+    public class AssetGrain : SquidexDomainObjectGrain<AssetState>, IAssetGrain
     {
         public AssetGrain(IStore<Guid> store)
             : base(store)
