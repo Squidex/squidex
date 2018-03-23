@@ -20,9 +20,11 @@ import {
 export class BackupDto {
     constructor(
         public readonly id: string,
-        public readonly isFailed: string,
         public readonly started: DateTime,
-        public readonly stopped: DateTime | null
+        public readonly stopped: DateTime | null,
+        public readonly handledEvents: number,
+        public readonly handledAssets: number,
+        public readonly isFailed: boolean
     ) {
     }
 }
@@ -46,9 +48,11 @@ export class BackupsService {
                     return items.map(item => {
                         return new BackupDto(
                             item.id,
-                            item.isFailed,
-                            DateTime.parseISO_UTC(item.stopped),
-                            item.stopped ? DateTime.parseISO_UTC(item.stopped) : null);
+                            DateTime.parseISO_UTC(item.started),
+                            item.stopped ? DateTime.parseISO_UTC(item.stopped) : null,
+                            item.handledEvents,
+                            item.handledAssets,
+                            item.isFailed);
                     });
                 })
                 .pretifyError('Failed to load backups.');

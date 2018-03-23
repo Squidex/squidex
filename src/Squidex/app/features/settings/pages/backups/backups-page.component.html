@@ -1,10 +1,10 @@
 <sqx-title message="{app} | Backups | Settings" parameter1="app" [value1]="ctx.appName"></sqx-title>
 
-<sqx-panel desiredWidth="50rem">
+<sqx-panel desiredWidth="60rem">
     <div class="panel-header">
         <div class="panel-title-row">
             <div class="float-right">
-                <button class="btn btn-success" (click)="startBackup()">
+                <button class="btn btn-success" [disabled]="backups.length === 0" (click)="startBackup()">
                     Start Backup
                 </button>
             </div>
@@ -19,16 +19,62 @@
 
     <div class="panel-main">
         <div class="panel-content">
-            <table class="table table-items table-fixed">
-                <tbody>
-                    <ng-template ngFor let-backup [ngForOf]="backups | async">
-                        <tr>
-                            <td>{{backup.started | sqxFullDateTime }}</td>
-                        </tr>
-                        <tr class="spacer"></tr>
-                    </ng-template>
-                </tbody>
-            </table>
+            <div class="panel-alert panel-alert-danger" *ngIf="backups.length >= 10">
+                Your have reached the maximum number of backups: 10.
+            </div>
+            
+            <div class="table-items-row" *ngFor="let backup of backups">
+                <div class="row">
+                    <div class="col col-auto">
+                        <div *ngIf="!backup.stopped" class="backup-status backup-status-pending icon-spin">
+                            <i class="icon-hour-glass"></i>
+                        </div>
+                        <div *ngIf="backup.stopped && backup.isFailed" class="backup-status backup-status-failed">
+                            <i class="icon-exclamation"></i>
+                        </div>
+                        <div *ngIf="backup.stopped && !backup.isFailed" class="backup-status backup-status-success">
+                            <i class="icon-checkmark"></i>
+                        </div>
+                    </div>
+                    <div class="col col-auto">
+                        <div>Started:</div>
+                        <div>Stopped:</div>
+                    </div>
+                    <div class="col">
+                        <div>
+                            {{backup.started.toISOString()}}
+                        </div>
+                        <div *ngIf="backup.stopped">
+                            {{backup.stopped.toISOString()}}
+                        </div>
+                    </div>
+                    <div class="col col-auto">
+                        <div>Progress:</div>
+                        <div>Download:</div>
+                    </div>
+                    <div class="col">
+                        <div>
+                            <span title="Archived events">
+                                <strong>{{backup.handledEvents}}</strong> <i class="icon-time"></i>
+                            </span>, 
+                            <span title="Archived assets">
+                                <strong>{{backup.handledAssets}}</strong> <i class="icon-media"></i>
+                            </span>
+                        </div>
+                        <div>
+                            <a *ngIf="backup.stopped && !backup.isFailed" href="{{getDownloadUrl(backup)}}" target="_blank">
+                                Ready
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col col-auto">
+                        <button type="button" class="btn btn-link btn-danger" (sqxConfirmClick)="deleteBackup(backup)" confirmTitle="Delete backup"
+                            confirmText="Do you really want to delete the backup?">
+                            <i class="icon-bin2"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </sqx-panel>

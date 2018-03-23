@@ -12,15 +12,14 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using Orleans;
-using Squidex.Areas.Api.Controllers.Backup.Models;
+using Squidex.Areas.Api.Controllers.Backups.Models;
 using Squidex.Domain.Apps.Entities.Backup;
-using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Tasks;
 using Squidex.Pipeline;
 
-namespace Squidex.Areas.Api.Controllers.Backup
+namespace Squidex.Areas.Api.Controllers.Backups
 {
     /// <summary>
     /// Manages backups for app.
@@ -29,17 +28,15 @@ namespace Squidex.Areas.Api.Controllers.Backup
     [ApiExceptionFilter]
     [AppApi]
     [MustBeAppOwner]
-    [SwaggerTag(nameof(Backup))]
-    public class BackupController : ApiController
+    [SwaggerTag(nameof(Backups))]
+    public class BackupsController : ApiController
     {
         private readonly IGrainFactory grainFactory;
-        private readonly IAssetStore assetStore;
 
-        public BackupController(ICommandBus commandBus, IGrainFactory grainFactory, IAssetStore assetStore)
+        public BackupsController(ICommandBus commandBus, IGrainFactory grainFactory)
             : base(commandBus)
         {
             this.grainFactory = grainFactory;
-            this.assetStore = assetStore;
         }
 
         /// <summary>
@@ -82,24 +79,6 @@ namespace Squidex.Areas.Api.Controllers.Backup
             backupGrain.RunAsync().Forget();
 
             return NoContent();
-        }
-
-        /// <summary>
-        /// Get the backup content.
-        /// </summary>
-        /// <param name="app">The name of the app.</param>
-        /// <param name="id">The id of the asset.</param>
-        /// <returns>
-        /// 200 => Backup found and content returned.
-        /// 404 => Backup or app not found.
-        /// </returns>
-        [HttpGet]
-        [Route("apps/{app}/backups/{id}")]
-        [ProducesResponseType(200)]
-        [ApiCosts(0.5)]
-        public IActionResult GetBackupContent(string app, Guid id)
-        {
-            return new FileCallbackResult("application/zip", "Backup.zip", bodyStream => assetStore.DownloadAsync(id.ToString(), 0, null, bodyStream));
         }
 
         /// <summary>

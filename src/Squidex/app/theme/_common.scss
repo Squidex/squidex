@@ -158,3 +158,32 @@ body {
         background: $color-dark-foreground;
     }
 }
+
+//
+// Animations
+//
+.spin {
+    @include animation(spin 3s infinite linear);
+}
+
+@include keyframes (spin) {
+    20% {
+        @include rotate(0deg);
+    }
+
+    30% {
+        @include rotate(180deg);
+    }
+
+    70% {
+        @include rotate(180deg);
+    }
+
+    80% {
+        @include rotate(360deg);
+    }
+
+    100% {
+        @include rotate(360deg);
+    }
+}

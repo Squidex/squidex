@@ -5,10 +5,17 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Observable, Subscription } from 'rxjs';
 
-import { AppContext, BackupsService } from 'shared';
+import {
+    ApiUrlConfig,
+    AppContext,
+    BackupDto,
+    BackupsService,
+    DateTime,
+    ImmutableArray
+} from 'shared';
 
 @Component({
     selector: 'sqx-backups-page',
@@ -18,32 +25,57 @@ import { AppContext, BackupsService } from 'shared';
         AppContext
     ]
 })
-export class BackupsPageComponent {
-    public backups =
-        Observable.timer(0, 5000)
-            .switchMap(t => this.backupsService.getBackups(this.ctx.appName));
+export class BackupsPageComponent implements OnInit, OnDestroy {
+    private loadSubscription: Subscription;
 
-    constructor(public readonly ctx: AppContext,
+    public backups = ImmutableArray.empty<BackupDto>();
+
+    constructor(
+        public readonly ctx: AppContext,
+        private readonly apiUrl: ApiUrlConfig,
         private readonly backupsService: BackupsService
     ) {
+    }
+
+    public ngOnDestroy() {
+        this.loadSubscription.unsubscribe();
+    }
+
+    public ngOnInit() {
+        this.loadSubscription =
+            Observable.timer(0, 5000)
+                .switchMap(t => this.backupsService.getBackups(this.ctx.appName))
+                .subscribe(dtos => {
+                    this.backups = ImmutableArray.of(dtos);
+                });
     }
 
     public startBackup() {
         this.backupsService.postBackup(this.ctx.appName)
             .subscribe(() => {
+                const backup = new BackupDto('', DateTime.now(), null, 0, 0, false);
+
+                this.backups = this.backups.pushFront(backup);
+
                 this.ctx.notifyInfo('Backup started.');
             }, error => {
                 this.ctx.notifyError(error);
             });
     }
 
-    public deleteBackup(id: string) {
-        this.backupsService.deleteBackup(this.ctx.appName, id)
+    public deleteBackup(backup: BackupDto) {
+        this.backupsService.deleteBackup(this.ctx.appName, backup.id)
             .subscribe(() => {
+                this.backups = this.backups.filter(x => x.id !== backup.id);
+
                 this.ctx.notifyInfo('Backup deleting.');
             }, error => {
                 this.ctx.notifyError(error);
             });
+    }
+
+    public getDownloadUrl(backup: BackupDto) {
+        return this.apiUrl.buildUrl(`api/apps/${this.ctx.appName}/backups/${backup.id}`);
     }
 }
 

@@ -1,2 +1,28 @@
 @import '_vars';
 @import '_mixins';
+
+$cicle-size: 2.8rem;
+
+.backup-status {
+    & {
+        @include circle($cicle-size);
+        line-height: $cicle-size;
+        text-align: center;
+        font-size: .4 * $cicle-size;
+        font-weight: normal;
+        background: $color-border;
+        color: $color-dark-foreground;
+    }
+
+    &-pending {
+        color: inherit;
+    }
+
+    &-failed {
+        background: $color-theme-error;
+    }
+
+    &-success {
+        background: $color-theme-green;
+    }
+}
