@@ -13,7 +13,6 @@ import {
     AppContext,
     BackupDto,
     BackupsService,
-    DateTime,
     Duration,
     ImmutableArray
 } from 'shared';
@@ -54,7 +53,7 @@ export class BackupsPageComponent implements OnInit, OnDestroy {
     public startBackup() {
         this.backupsService.postBackup(this.ctx.appName)
             .subscribe(() => {
-                this.ctx.notifyInfo('Backup started.');
+                this.ctx.notifyInfo('Backup started, it can take several minutes to complete.');
             }, error => {
                 this.ctx.notifyError(error);
             });
@@ -63,7 +62,7 @@ export class BackupsPageComponent implements OnInit, OnDestroy {
     public deleteBackup(backup: BackupDto) {
         this.backupsService.deleteBackup(this.ctx.appName, backup.id)
             .subscribe(() => {
-                this.ctx.notifyInfo('Backup deleting.');
+                this.ctx.notifyInfo('Backup is about to be deleted.');
             }, error => {
                 this.ctx.notifyError(error);
             });
