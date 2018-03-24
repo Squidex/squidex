@@ -18,6 +18,7 @@ using Squidex.Domain.Apps.Entities.Apps.Repositories;
 using Squidex.Domain.Apps.Entities.Apps.State;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Domain.Apps.Entities.Assets.State;
+using Squidex.Domain.Apps.Entities.Backup.State;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.Contents.State;
 using Squidex.Domain.Apps.Entities.History;
@@ -67,6 +68,10 @@ namespace Squidex.Config.Domain
 
                     services.AddSingletonAs(c => new MongoMigrationStatus(mongoDatabase))
                         .As<IMigrationStatus>()
+                        .As<IInitializable>();
+
+                    services.AddSingletonAs(c => new MongoSnapshotStore<BackupState, Guid>(mongoDatabase, c.GetRequiredService<JsonSerializer>()))
+                        .As<ISnapshotStore<BackupState, Guid>>()
                         .As<IInitializable>();
 
                     services.AddSingletonAs(c => new MongoSnapshotStore<EventConsumerState, string>(mongoDatabase, c.GetRequiredService<JsonSerializer>()))

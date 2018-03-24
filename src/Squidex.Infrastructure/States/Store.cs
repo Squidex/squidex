@@ -32,12 +32,12 @@ namespace Squidex.Infrastructure.States
 
         public IPersistence<TState> WithSnapshots<TState>(Type owner, TKey key, Func<TState, Task> applySnapshot)
         {
-            return CreatePersistence<TState>(owner, key, PersistenceMode.Snapshots, applySnapshot, null);
+            return CreatePersistence(owner, key, PersistenceMode.Snapshots, applySnapshot, null);
         }
 
         public IPersistence<TState> WithSnapshotsAndEventSourcing<TState>(Type owner, TKey key, Func<TState, Task> applySnapshot, Func<Envelope<IEvent>, Task> applyEvent)
         {
-            return CreatePersistence<TState>(owner, key, PersistenceMode.SnapshotsAndEventSourcing, applySnapshot, applyEvent);
+            return CreatePersistence(owner, key, PersistenceMode.SnapshotsAndEventSourcing, applySnapshot, applyEvent);
         }
 
         public IPersistence WithEventSourcing(Type owner, TKey key, Func<Envelope<IEvent>, Task> applyEvent)

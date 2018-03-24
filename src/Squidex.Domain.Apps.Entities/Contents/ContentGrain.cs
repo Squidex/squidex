@@ -24,7 +24,7 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Contents
 {
-    public class ContentGrain : DomainObjectGrain<ContentState>, IContentGrain
+    public class ContentGrain : SquidexDomainObjectGrain<ContentState>, IContentGrain
     {
         private readonly IAppProvider appProvider;
         private readonly IAssetRepository assetRepository;

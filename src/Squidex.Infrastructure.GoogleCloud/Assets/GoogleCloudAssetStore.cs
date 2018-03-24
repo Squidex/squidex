@@ -9,6 +9,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using Google;
 using Google.Cloud.Storage.V1;
@@ -48,25 +49,25 @@ namespace Squidex.Infrastructure.Assets
             return $"https://storage.cloud.google.com/{bucketName}/{objectName}";
         }
 
-        public Task UploadTemporaryAsync(string name, Stream stream)
+        public Task UploadAsync(string name, Stream stream, CancellationToken ct = default(CancellationToken))
         {
-            return storageClient.UploadObjectAsync(bucketName, name, "application/octet-stream", stream);
+            return storageClient.UploadObjectAsync(bucketName, name, "application/octet-stream", stream, cancellationToken: ct);
         }
 
-        public async Task UploadAsync(string id, long version, string suffix, Stream stream)
+        public async Task UploadAsync(string id, long version, string suffix, Stream stream, CancellationToken ct = default(CancellationToken))
         {
             var objectName = GetObjectName(id, version, suffix);
 
-            await storageClient.UploadObjectAsync(bucketName, objectName, "application/octet-stream", stream);
+            await storageClient.UploadObjectAsync(bucketName, objectName, "application/octet-stream", stream, cancellationToken: ct);
         }
 
-        public async Task CopyTemporaryAsync(string name, string id, long version, string suffix)
+        public async Task CopyAsync(string name, string id, long version, string suffix, CancellationToken ct = default(CancellationToken))
         {
             var objectName = GetObjectName(id, version, suffix);
 
             try
             {
-                await storageClient.CopyObjectAsync(bucketName, name, bucketName, objectName);
+                await storageClient.CopyObjectAsync(bucketName, name, bucketName, objectName, cancellationToken: ct);
             }
             catch (GoogleApiException ex) when (ex.HttpStatusCode == HttpStatusCode.NotFound)
             {
@@ -74,13 +75,13 @@ namespace Squidex.Infrastructure.Assets
             }
         }
 
-        public async Task DownloadAsync(string id, long version, string suffix, Stream stream)
+        public async Task DownloadAsync(string id, long version, string suffix, Stream stream, CancellationToken ct = default(CancellationToken))
         {
             var objectName = GetObjectName(id, version, suffix);
 
             try
             {
-                await storageClient.DownloadObjectAsync(bucketName, objectName, stream);
+                await storageClient.DownloadObjectAsync(bucketName, objectName, stream, cancellationToken: ct);
             }
             catch (GoogleApiException ex) when (ex.HttpStatusCode == HttpStatusCode.NotFound)
             {
@@ -88,11 +89,26 @@ namespace Squidex.Infrastructure.Assets
             }
         }
 
-        public async Task DeleteTemporaryAsync(string name)
+        public async Task DeleteAsync(string name)
         {
             try
             {
                 await storageClient.DeleteObjectAsync(bucketName, name);
+            }
+            catch (GoogleApiException ex)
+            {
+                if (ex.HttpStatusCode != HttpStatusCode.NotFound)
+                {
+                    throw;
+                }
+            }
+        }
+
+        public async Task DeleteAsync(string id, long version, string suffix)
+        {
+            try
+            {
+                await storageClient.DeleteObjectAsync(bucketName, GetObjectName(id, version, suffix));
             }
             catch (GoogleApiException ex)
             {

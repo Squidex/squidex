@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'icomoon';
-  src:  url('fonts/icomoon.eot?asl9vj');
-  src:  url('fonts/icomoon.eot?asl9vj#iefix') format('embedded-opentype'),
-    url('fonts/icomoon.ttf?asl9vj') format('truetype'),
-    url('fonts/icomoon.woff?asl9vj') format('woff'),
-    url('fonts/icomoon.svg?asl9vj#icomoon') format('svg');
+  src:  url('fonts/icomoon.eot?y97utm');
+  src:  url('fonts/icomoon.eot?y97utm#iefix') format('embedded-opentype'),
+    url('fonts/icomoon.ttf?y97utm') format('truetype'),
+    url('fonts/icomoon.woff?y97utm') format('woff'),
+    url('fonts/icomoon.svg?y97utm#icomoon') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -24,6 +24,9 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.icon-exclamation:before {
+  content: "\e955";
+}
 .icon-action-ElasticSearch:before {
   content: "\e952";
 }
@@ -68,6 +71,87 @@
 }
 .icon-caret-right:before {
   content: "\e929";
+}
+.icon-caret-up:before {
+  content: "\e92b";
+}
+.icon-contents:before {
+  content: "\e946";
+}
+.icon-trigger-ContentChanged:before {
+  content: "\e946";
+}
+.icon-control-Date:before {
+  content: "\e936";
+}
+.icon-control-DateTime:before {
+  content: "\e937";
+}
+.icon-control-Markdown:before {
+  content: "\e938";
+}
+.icon-grid:before {
+  content: "\f00a";
+}
+.icon-list:before {
+  content: "\f0c9";
+}
+.icon-user-o:before {
+  content: "\e932";
+}
+.icon-rules:before {
+  content: "\e947";
+}
+.icon-action-Webhook:before {
+  content: "\e947";
+}
+.icon-hour-glass:before {
+  content: "\e954";
+}
+.icon-spinner:before {
+  content: "\e953";
+}
+.icon-clock:before {
+  content: "\e950";
+}
+.icon-bin2:before {
+  content: "\e902";
+}
+.icon-earth:before {
+  content: "\e9ca";
+}
+.icon-elapsed:before {
+  content: "\e943";
+}
+.icon-google:before {
+  content: "\e93b";
+}
+.icon-lock:before {
+  content: "\e934";
+}
+.icon-microsoft:before {
+  content: "\e940";
+}
+.icon-action-AzureQueue:before {
+  content: "\e940";
+}
+.icon-pause:before {
+  content: "\e92f";
+}
+.icon-play:before {
+  content: "\e930";
+}
+.icon-reset:before {
+  content: "\e92e";
+}
+.icon-settings2:before {
+  content: "\e92d";
+}
+.icon-timeout:before {
+  content: "\e944";
+}
+.icon-unlocked:before {
+  content: "\e933";
 }
 .icon-caret-up:before {
   content: "\e92b";
@@ -261,48 +345,6 @@
 }
 .icon-user:before {
   content: "\e928";
-}
-.icon-clock:before {
-  content: "\e950";
-}
-.icon-bin2:before {
-  content: "\e902";
-}
-.icon-earth:before {
-  content: "\e9ca";
-}
-.icon-elapsed:before {
-  content: "\e943";
-}
-.icon-google:before {
-  content: "\e93b";
-}
-.icon-lock:before {
-  content: "\e934";
-}
-.icon-microsoft:before {
-  content: "\e940";
-}
-.icon-action-AzureQueue:before {
-  content: "\e940";
-}
-.icon-pause:before {
-  content: "\e92f";
-}
-.icon-play:before {
-  content: "\e930";
-}
-.icon-reset:before {
-  content: "\e92e";
-}
-.icon-settings2:before {
-  content: "\e92d";
-}
-.icon-timeout:before {
-  content: "\e944";
-}
-.icon-unlocked:before {
-  content: "\e933";
 }
 .icon-browser:before {
   content: "\e935";

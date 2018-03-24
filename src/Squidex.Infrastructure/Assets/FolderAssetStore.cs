@@ -7,6 +7,7 @@
 
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Tasks;
@@ -15,6 +16,7 @@ namespace Squidex.Infrastructure.Assets
 {
     public sealed class FolderAssetStore : IAssetStore, IInitializable
     {
+        private const int BufferSize = 81920;
         private readonly ISemanticLog log;
         private readonly DirectoryInfo directory;
 
@@ -57,27 +59,27 @@ namespace Squidex.Infrastructure.Assets
             return file.FullName;
         }
 
-        public async Task UploadTemporaryAsync(string name, Stream stream)
+        public async Task UploadAsync(string name, Stream stream, CancellationToken ct = default(CancellationToken))
         {
             var file = GetFile(name);
 
             using (var fileStream = file.OpenWrite())
             {
-                await stream.CopyToAsync(fileStream);
+                await stream.CopyToAsync(fileStream, BufferSize, ct);
             }
         }
 
-        public async Task UploadAsync(string id, long version, string suffix, Stream stream)
+        public async Task UploadAsync(string id, long version, string suffix, Stream stream, CancellationToken ct = default(CancellationToken))
         {
             var file = GetFile(id, version, suffix);
 
             using (var fileStream = file.OpenWrite())
             {
-                await stream.CopyToAsync(fileStream);
+                await stream.CopyToAsync(fileStream, BufferSize, ct);
             }
         }
 
-        public async Task DownloadAsync(string id, long version, string suffix, Stream stream)
+        public async Task DownloadAsync(string id, long version, string suffix, Stream stream, CancellationToken ct = default(CancellationToken))
         {
             var file = GetFile(id, version, suffix);
 
@@ -85,7 +87,7 @@ namespace Squidex.Infrastructure.Assets
             {
                 using (var fileStream = file.OpenRead())
                 {
-                    await fileStream.CopyToAsync(stream);
+                    await fileStream.CopyToAsync(stream, BufferSize, ct);
                 }
             }
             catch (FileNotFoundException ex)
@@ -94,7 +96,7 @@ namespace Squidex.Infrastructure.Assets
             }
         }
 
-        public Task CopyTemporaryAsync(string name, string id, long version, string suffix)
+        public Task CopyAsync(string name, string id, long version, string suffix, CancellationToken ct = default(CancellationToken))
         {
             try
             {
@@ -110,20 +112,22 @@ namespace Squidex.Infrastructure.Assets
             }
         }
 
-        public Task DeleteTemporaryAsync(string name)
+        public Task DeleteAsync(string id, long version, string suffix)
         {
-            try
-            {
-                var file = GetFile(name);
+            var file = GetFile(id, version, suffix);
 
-                file.Delete();
+            file.Delete();
 
-                return TaskHelper.Done;
-            }
-            catch (FileNotFoundException ex)
-            {
-                throw new AssetNotFoundException($"Asset {name} not found.", ex);
-            }
+            return TaskHelper.Done;
+        }
+
+        public Task DeleteAsync(string name)
+        {
+            var file = GetFile(name);
+
+            file.Delete();
+
+            return TaskHelper.Done;
         }
 
         private FileInfo GetFile(string id, long version, string suffix)

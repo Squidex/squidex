@@ -5,6 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+export * from './pages/backups/backups-page.component';
 export * from './pages/clients/client.component';
 export * from './pages/clients/clients-page.component';
 export * from './pages/contributors/contributors-page.component';

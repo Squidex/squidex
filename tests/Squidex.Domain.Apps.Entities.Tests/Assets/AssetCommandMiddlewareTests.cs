@@ -7,6 +7,7 @@
 
 using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Orleans;
@@ -89,21 +90,21 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         private void SetupStore(long version, Guid commitId)
         {
-            A.CallTo(() => assetStore.UploadTemporaryAsync(commitId.ToString(), stream))
+            A.CallTo(() => assetStore.UploadAsync(commitId.ToString(), stream, CancellationToken.None))
                 .Returns(TaskHelper.Done);
-            A.CallTo(() => assetStore.CopyTemporaryAsync(commitId.ToString(), assetId.ToString(), version, null))
+            A.CallTo(() => assetStore.CopyAsync(commitId.ToString(), assetId.ToString(), version, null, CancellationToken.None))
                 .Returns(TaskHelper.Done);
-            A.CallTo(() => assetStore.DeleteTemporaryAsync(commitId.ToString()))
+            A.CallTo(() => assetStore.DeleteAsync(commitId.ToString()))
                 .Returns(TaskHelper.Done);
         }
 
         private void AssertAssetHasBeenUploaded(long version, Guid commitId)
         {
-            A.CallTo(() => assetStore.UploadTemporaryAsync(commitId.ToString(), stream))
+            A.CallTo(() => assetStore.UploadAsync(commitId.ToString(), stream, CancellationToken.None))
                 .MustHaveHappened();
-            A.CallTo(() => assetStore.CopyTemporaryAsync(commitId.ToString(), assetId.ToString(), version, null))
+            A.CallTo(() => assetStore.CopyAsync(commitId.ToString(), assetId.ToString(), version, null, CancellationToken.None))
                 .MustHaveHappened();
-            A.CallTo(() => assetStore.DeleteTemporaryAsync(commitId.ToString()))
+            A.CallTo(() => assetStore.DeleteAsync(commitId.ToString()))
                 .MustHaveHappened();
         }
 

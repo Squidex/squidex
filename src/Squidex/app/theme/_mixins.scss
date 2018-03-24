@@ -293,6 +293,21 @@
 	        border-radius: $radius $radius 0 0;
 }
 
+@mixin keyframes($name) {
+    @-webkit-keyframes #{$name} {
+        @content; 
+    }
+    @-moz-keyframes #{$name} {
+        @content;
+    }
+    @keyframes #{$name} {
+        @content;
+    }
+    @-ms-keyframes #{$name} {
+        @content;
+    }
+}
+
 @mixin animation($animation...) {
     -webkit-animation: $animation;
        -moz-animation: $animation;

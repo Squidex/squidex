@@ -14,6 +14,12 @@
     <div class="panel-main">
         <div class="panel-content">
             <ul class="nav nav-panel nav-dark flex-column">
+                <li class="nav-item" *ngIf="ctx.app.permission === 'Owner'">
+                    <a class="nav-link" routerLink="backups" routerLinkActive="active">
+                        Backups
+                        <i class="icon-angle-right"></i>
+                    </a>
+                </li>
                 <li class="nav-item">
                     <a class="nav-link" routerLink="clients" routerLinkActive="active">
                         Clients
@@ -40,7 +46,7 @@
                 </li>
                 <li class="nav-item" *ngIf="ctx.app.permission === 'Owner'">
                     <a class="nav-link" routerLink="plans" routerLinkActive="active">
-                        Update Plan
+                        Subscription
                         <i class="icon-angle-right"></i>
                     </a>
                 </li>

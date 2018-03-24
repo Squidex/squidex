@@ -19,6 +19,7 @@ using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Templates;
 using Squidex.Domain.Apps.Entities.Assets;
+using Squidex.Domain.Apps.Entities.Backup;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Contents.Edm;
@@ -49,6 +50,9 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<CachingGraphQLService>()
                 .As<IGraphQLService>();
+
+            services.AddSingletonAs<TempFolderBackupArchiveLocation>()
+                .As<IBackupArchiveLocation>();
 
             services.AddSingletonAs<AppProvider>()
                 .As<IAppProvider>();
@@ -155,6 +159,9 @@ namespace Squidex.Config.Domain
                 .As<IMigrationPath>();
 
             services.AddTransientAs<ConvertEventStore>()
+                .As<IMigration>();
+
+            services.AddTransientAs<ConvertEventStoreAppId>()
                 .As<IMigration>();
 
             services.AddTransientAs<AddPatterns>()

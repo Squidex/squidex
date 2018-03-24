@@ -7,6 +7,7 @@
 
 using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
@@ -56,7 +57,7 @@ namespace Squidex.Infrastructure.Assets
             return new Uri(blobContainer.StorageUri.PrimaryUri, $"/{containerName}/{blobName}").ToString();
         }
 
-        public async Task CopyTemporaryAsync(string name, string id, long version, string suffix)
+        public async Task CopyAsync(string name, string id, long version, string suffix, CancellationToken ct = default(CancellationToken))
         {
             var blobName = GetObjectName(id, version, suffix);
             var blobRef = blobContainer.GetBlobReference(blobName);
@@ -65,12 +66,14 @@ namespace Squidex.Infrastructure.Assets
 
             try
             {
-                await blobRef.StartCopyAsync(tempBlob.Uri);
+                await blobRef.StartCopyAsync(tempBlob.Uri, null, null, null, null, ct);
 
                 while (blobRef.CopyState.Status == CopyStatus.Pending)
                 {
+                    ct.ThrowIfCancellationRequested();
+
                     await Task.Delay(50);
-                    await blobRef.FetchAttributesAsync();
+                    await blobRef.FetchAttributesAsync(null, null, null, ct);
                 }
 
                 if (blobRef.CopyState.Status != CopyStatus.Success)
@@ -84,14 +87,14 @@ namespace Squidex.Infrastructure.Assets
             }
         }
 
-        public async Task DownloadAsync(string id, long version, string suffix, Stream stream)
+        public async Task DownloadAsync(string id, long version, string suffix, Stream stream, CancellationToken ct = default(CancellationToken))
         {
             var blobName = GetObjectName(id, version, suffix);
             var blobRef = blobContainer.GetBlockBlobReference(blobName);
 
             try
             {
-                await blobRef.DownloadToStreamAsync(stream);
+                await blobRef.DownloadToStreamAsync(stream, null, null, null, ct);
             }
             catch (StorageException ex) when (ex.RequestInformation.HttpStatusCode == 404)
             {
@@ -99,7 +102,7 @@ namespace Squidex.Infrastructure.Assets
             }
         }
 
-        public async Task UploadAsync(string id, long version, string suffix, Stream stream)
+        public async Task UploadAsync(string id, long version, string suffix, Stream stream, CancellationToken ct = default(CancellationToken))
         {
             var blobName = GetObjectName(id, version, suffix);
             var blobRef = blobContainer.GetBlockBlobReference(blobName);
@@ -107,22 +110,29 @@ namespace Squidex.Infrastructure.Assets
             blobRef.Metadata[AssetVersion] = version.ToString();
             blobRef.Metadata[AssetId] = id;
 
-            await blobRef.UploadFromStreamAsync(stream);
+            await blobRef.UploadFromStreamAsync(stream, null, null, null, ct);
             await blobRef.SetMetadataAsync();
         }
 
-        public async Task UploadTemporaryAsync(string name, Stream stream)
+        public Task UploadAsync(string name, Stream stream, CancellationToken ct = default(CancellationToken))
         {
             var tempBlob = blobContainer.GetBlockBlobReference(name);
 
-            await tempBlob.UploadFromStreamAsync(stream);
+            return tempBlob.UploadFromStreamAsync(stream, null, null, null, ct);
         }
 
-        public async Task DeleteTemporaryAsync(string name)
+        public Task DeleteAsync(string name)
         {
             var tempBlob = blobContainer.GetBlockBlobReference(name);
 
-            await tempBlob.DeleteIfExistsAsync();
+            return tempBlob.DeleteIfExistsAsync();
+        }
+
+        public Task DeleteAsync(string id, long version, string suffix)
+        {
+            var tempBlob = blobContainer.GetBlockBlobReference(GetObjectName(id, version, suffix));
+
+            return tempBlob.DeleteIfExistsAsync();
         }
 
         private string GetObjectName(string id, long version, string suffix)

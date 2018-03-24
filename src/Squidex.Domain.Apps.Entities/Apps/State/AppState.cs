@@ -9,7 +9,6 @@ using Newtonsoft.Json;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Apps;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
@@ -19,8 +18,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.State
     public class AppState : DomainObjectState<AppState>,
         IAppEntity
     {
-        private static readonly LanguagesConfig English = LanguagesConfig.Build(Language.EN);
-
         [JsonProperty]
         public string Name { get; set; }
 
@@ -37,7 +34,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.State
         public AppContributors Contributors { get; set; } = AppContributors.Empty;
 
         [JsonProperty]
-        public LanguagesConfig LanguagesConfig { get; set; } = English;
+        public LanguagesConfig LanguagesConfig { get; set; } = LanguagesConfig.English;
 
         [JsonProperty]
         public bool IsArchived { get; set; }
