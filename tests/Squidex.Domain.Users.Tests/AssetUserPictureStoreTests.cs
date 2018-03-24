@@ -10,6 +10,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
+using FakeItEasy.Core;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Tasks;
 using Xunit;
@@ -46,8 +47,10 @@ namespace Squidex.Domain.Users
         public async Task Should_invoke_asset_store_to_download_picture()
         {
             A.CallTo(() => assetStore.DownloadAsync(userId, 0, "picture", A<Stream>.Ignored, CancellationToken.None))
-                .Invokes(async (string id, long version, string suffix, Stream stream) =>
+                .Invokes(async (IFakeObjectCall call) =>
                 {
+                    var stream = call.GetArgument<Stream>(3);
+
                     await stream.WriteAsync(new byte[] { 1, 2, 3, 4 }, 0, 4);
                 });
 
