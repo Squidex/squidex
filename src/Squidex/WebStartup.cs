@@ -42,9 +42,9 @@ namespace Squidex
         public void Configure(IApplicationBuilder app)
         {
             app.ApplicationServices.LogConfiguration();
-            app.ApplicationServices.InitializeAll();
-            app.ApplicationServices.Migrate();
-            app.ApplicationServices.RunAll();
+            app.ApplicationServices.RunInitialization();
+            app.ApplicationServices.RunMigrate();
+            app.ApplicationServices.RunRunnables();
 
             app.UseMyCors();
             app.UseMyForwardingRules();

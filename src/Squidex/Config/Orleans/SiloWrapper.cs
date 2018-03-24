@@ -24,6 +24,7 @@ using Squidex.Infrastructure.EventSourcing.Grains;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Log.Adapter;
 using Squidex.Infrastructure.Orleans;
+using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Config.Orleans
 {
@@ -60,6 +61,12 @@ namespace Squidex.Config.Orleans
                     .AddStartupTask<Bootstrap<IContentSchedulerGrain>>()
                     .AddStartupTask<Bootstrap<IEventConsumerManagerGrain>>()
                     .AddStartupTask<Bootstrap<IRuleDequeuerGrain>>()
+                    .AddStartupTask((services, ct) =>
+                    {
+                        services.RunInitialization();
+
+                        return TaskHelper.Done;
+                    })
                     .Configure<ClusterOptions>(options =>
                     {
                         options.ClusterId = "squidex";
