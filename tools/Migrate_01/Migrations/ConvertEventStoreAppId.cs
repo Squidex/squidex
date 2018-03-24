@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -32,22 +33,64 @@ namespace Migrate_01.Migrations
             {
                 var collection = mongoEventStore.RawCollection;
 
-                var filter = Builders<BsonDocument>.Filter;
+                var filterer = Builders<BsonDocument>.Filter;
+                var updater = Builders<BsonDocument>.Update;
+
+                var writesBatches = new List<WriteModel<BsonDocument>>();
+
+                async Task WriteAsync(WriteModel<BsonDocument> model, bool force)
+                {
+                    if (model != null)
+                    {
+                        writesBatches.Add(model);
+                    }
+
+                    if (writesBatches.Count == 1000 || (force && writesBatches.Count > 0))
+                    {
+                        await collection.BulkWriteAsync(writesBatches);
+
+                        writesBatches.Clear();
+                    }
+                }
 
                 await collection.Find(new BsonDocument()).ForEachAsync(async commit =>
                 {
+                    UpdateDefinition<BsonDocument> update = null;
+
+                    var index = 0;
+
                     foreach (BsonDocument @event in commit["Events"].AsBsonArray)
                     {
                         var data = JObject.Parse(@event["Payload"].AsString);
 
-                        if (data.TryGetValue("appId", out var appId))
+                        if (data.TryGetValue("appId", out var appIdValue))
                         {
-                            @event["Metadata"][SquidexHeaders.AppId] = NamedId<Guid>.Parse(appId.ToString(), Guid.TryParse).Id.ToString();
+                            var appId = NamedId<Guid>.Parse(appIdValue.ToString(), Guid.TryParse).Id.ToString();
+
+                            var eventUpdate = updater.Set($"Events.{index}.Metadata.{SquidexHeaders.AppId}", appId);
+
+                            if (update != null)
+                            {
+                                update = updater.Combine(update, eventUpdate);
+                            }
+                            else
+                            {
+                                update = eventUpdate;
+                            }
                         }
+
+                        index++;
                     }
 
-                    await collection.ReplaceOneAsync(filter.Eq("_id", commit["_id"].AsString), commit);
+                    if (update != null)
+                    {
+                        var write = new UpdateOneModel<BsonDocument>(filterer.Eq("_id", commit["_id"].AsString), update);
+
+                        await WriteAsync(write, false);
+                    }
                 });
+
+                await WriteAsync(null, true);
             }
         }
     }

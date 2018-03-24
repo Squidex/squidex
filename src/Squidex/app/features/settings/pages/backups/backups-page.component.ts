@@ -44,7 +44,7 @@ export class BackupsPageComponent implements OnInit, OnDestroy {
 
     public ngOnInit() {
         this.loadSubscription =
-            Observable.timer(0, 5000)
+            Observable.timer(0, 2000)
                 .switchMap(t => this.backupsService.getBackups(this.ctx.appName))
                 .subscribe(dtos => {
                     this.backups = ImmutableArray.of(dtos);
@@ -54,10 +54,6 @@ export class BackupsPageComponent implements OnInit, OnDestroy {
     public startBackup() {
         this.backupsService.postBackup(this.ctx.appName)
             .subscribe(() => {
-                const backup = new BackupDto('', DateTime.now(), null, 0, 0, false);
-
-                this.backups = this.backups.pushFront(backup);
-
                 this.ctx.notifyInfo('Backup started.');
             }, error => {
                 this.ctx.notifyError(error);
@@ -67,8 +63,6 @@ export class BackupsPageComponent implements OnInit, OnDestroy {
     public deleteBackup(backup: BackupDto) {
         this.backupsService.deleteBackup(this.ctx.appName, backup.id)
             .subscribe(() => {
-                this.backups = this.backups.filter(x => x.id !== backup.id);
-
                 this.ctx.notifyInfo('Backup deleting.');
             }, error => {
                 this.ctx.notifyError(error);
