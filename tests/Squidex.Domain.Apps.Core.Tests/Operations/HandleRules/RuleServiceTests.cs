@@ -77,7 +77,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         }
 
         [Fact]
-        public void Should_not_create_trigger_if_no_trigger_handler_registered()
+        public void Should_not_create_job_if_no_trigger_handler_registered()
         {
             var ruleConfig = new Rule(new InvalidTrigger(), new WebhookAction());
             var ruleEnvelope = Envelope.Create(new ContentCreated());
@@ -88,7 +88,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         }
 
         [Fact]
-        public void Should_not_create_trigger_if_no_action_handler_registered()
+        public void Should_not_create_job_if_no_action_handler_registered()
         {
             var ruleConfig = new Rule(new ContentChangedTrigger(), new InvalidAction());
             var ruleEnvelope = Envelope.Create(new ContentCreated());
@@ -101,7 +101,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public void Should_not_create_if_not_triggered()
         {
-            var ruleConfig = new Rule(new ContentChangedTrigger(), new InvalidAction());
+            var ruleConfig = new Rule(new ContentChangedTrigger(), new WebhookAction());
             var ruleEnvelope = Envelope.Create(new ContentCreated());
 
             A.CallTo(() => ruleTriggerHandler.Triggers(A<Envelope<AppEvent>>.Ignored, ruleConfig.Trigger))

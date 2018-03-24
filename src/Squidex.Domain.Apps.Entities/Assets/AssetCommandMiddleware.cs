@@ -41,18 +41,18 @@ namespace Squidex.Domain.Apps.Entities.Assets
                     {
                         createAsset.ImageInfo = await assetThumbnailGenerator.GetImageInfoAsync(createAsset.File.OpenRead());
 
-                        await assetStore.UploadTemporaryAsync(context.ContextId.ToString(), createAsset.File.OpenRead());
+                        await assetStore.UploadAsync(context.ContextId.ToString(), createAsset.File.OpenRead());
                         try
                         {
                             var result = await ExecuteCommandAsync(createAsset) as AssetSavedResult;
 
                             context.Complete(EntityCreatedResult.Create(createAsset.AssetId, result.Version));
 
-                            await assetStore.CopyTemporaryAsync(context.ContextId.ToString(), createAsset.AssetId.ToString(), result.FileVersion, null);
+                            await assetStore.CopyAsync(context.ContextId.ToString(), createAsset.AssetId.ToString(), result.FileVersion, null);
                         }
                         finally
                         {
-                            await assetStore.DeleteTemporaryAsync(context.ContextId.ToString());
+                            await assetStore.DeleteAsync(context.ContextId.ToString());
                         }
 
                         break;
@@ -62,18 +62,18 @@ namespace Squidex.Domain.Apps.Entities.Assets
                     {
                         updateAsset.ImageInfo = await assetThumbnailGenerator.GetImageInfoAsync(updateAsset.File.OpenRead());
 
-                        await assetStore.UploadTemporaryAsync(context.ContextId.ToString(), updateAsset.File.OpenRead());
+                        await assetStore.UploadAsync(context.ContextId.ToString(), updateAsset.File.OpenRead());
                         try
                         {
                             var result = await ExecuteCommandAsync(updateAsset) as AssetSavedResult;
 
                             context.Complete(result);
 
-                            await assetStore.CopyTemporaryAsync(context.ContextId.ToString(), updateAsset.AssetId.ToString(), result.FileVersion, null);
+                            await assetStore.CopyAsync(context.ContextId.ToString(), updateAsset.AssetId.ToString(), result.FileVersion, null);
                         }
                         finally
                         {
-                            await assetStore.DeleteTemporaryAsync(context.ContextId.ToString());
+                            await assetStore.DeleteAsync(context.ContextId.ToString());
                         }
 
                         break;

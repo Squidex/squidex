@@ -15,7 +15,7 @@ namespace Migrate_01
 {
     public sealed class MigrationPath : IMigrationPath
     {
-        private const int CurrentVersion = 6;
+        private const int CurrentVersion = 7;
         private readonly IServiceProvider serviceProvider;
 
         public MigrationPath(IServiceProvider serviceProvider)
@@ -36,6 +36,12 @@ namespace Migrate_01
             if (version < 6)
             {
                 migrations.Add(serviceProvider.GetRequiredService<ConvertEventStore>());
+            }
+
+            // Version 7: Introduces AppId for backups.
+            else if (version < 7)
+            {
+                migrations.Add(serviceProvider.GetRequiredService<ConvertEventStoreAppId>());
             }
 
             // Version 5: Fixes the broken command architecture and requires a rebuild of all snapshots.

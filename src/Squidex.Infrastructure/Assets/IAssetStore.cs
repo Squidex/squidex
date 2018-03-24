@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Squidex.Infrastructure.Assets
@@ -14,14 +15,16 @@ namespace Squidex.Infrastructure.Assets
     {
         string GenerateSourceUrl(string id, long version, string suffix);
 
-        Task CopyTemporaryAsync(string name, string id, long version, string suffix);
+        Task CopyAsync(string name, string id, long version, string suffix, CancellationToken ct = default(CancellationToken));
 
-        Task DownloadAsync(string id, long version, string suffix, Stream stream);
+        Task DownloadAsync(string id, long version, string suffix, Stream stream, CancellationToken ct = default(CancellationToken));
 
-        Task UploadTemporaryAsync(string name, Stream stream);
+        Task UploadAsync(string name, Stream stream, CancellationToken ct = default(CancellationToken));
 
-        Task UploadAsync(string id, long version, string suffix, Stream stream);
+        Task UploadAsync(string id, long version, string suffix, Stream stream, CancellationToken ct = default(CancellationToken));
 
-        Task DeleteTemporaryAsync(string name);
+        Task DeleteAsync(string name);
+
+        Task DeleteAsync(string id, long version, string suffix);
     }
 }

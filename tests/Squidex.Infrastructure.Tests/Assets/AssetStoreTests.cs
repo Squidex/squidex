@@ -43,7 +43,7 @@ namespace Squidex.Infrastructure.Assets
         {
             ((IInitializable)Sut).Initialize();
 
-            return Assert.ThrowsAsync<AssetNotFoundException>(() => Sut.CopyTemporaryAsync(Id(), Id(), 1, null));
+            return Assert.ThrowsAsync<AssetNotFoundException>(() => Sut.CopyAsync(Id(), Id(), 1, null));
         }
 
         [Fact]
@@ -73,8 +73,8 @@ namespace Squidex.Infrastructure.Assets
             var assetId = Id();
             var assetData = new MemoryStream(new byte[] { 0x1, 0x2, 0x3, 0x4 });
 
-            await Sut.UploadTemporaryAsync(tempId, assetData);
-            await Sut.CopyTemporaryAsync(tempId, assetId, 1, "suffix");
+            await Sut.UploadAsync(tempId, assetData);
+            await Sut.CopyAsync(tempId, assetId, 1, "suffix");
 
             var readData = new MemoryStream();
 
@@ -84,7 +84,7 @@ namespace Squidex.Infrastructure.Assets
         }
 
         [Fact]
-        public async Task Should_ignore_when_deleting_twice()
+        public async Task Should_ignore_when_deleting_twice_by_name()
         {
             ((IInitializable)Sut).Initialize();
 
@@ -92,9 +92,23 @@ namespace Squidex.Infrastructure.Assets
 
             var assetData = new MemoryStream(new byte[] { 0x1, 0x2, 0x3, 0x4 });
 
-            await Sut.UploadTemporaryAsync(tempId, assetData);
-            await Sut.DeleteTemporaryAsync(tempId);
-            await Sut.DeleteTemporaryAsync(tempId);
+            await Sut.UploadAsync(tempId, assetData);
+            await Sut.DeleteAsync(tempId);
+            await Sut.DeleteAsync(tempId);
+        }
+
+        [Fact]
+        public async Task Should_ignore_when_deleting_twice_by_id()
+        {
+            ((IInitializable)Sut).Initialize();
+
+            var tempId = Id();
+
+            var assetData = new MemoryStream(new byte[] { 0x1, 0x2, 0x3, 0x4 });
+
+            await Sut.UploadAsync(tempId, 0, null, assetData);
+            await Sut.DeleteAsync(tempId, 0, null);
+            await Sut.DeleteAsync(tempId, 0, null);
         }
 
         private static string Id()

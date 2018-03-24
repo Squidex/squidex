@@ -32,7 +32,7 @@ namespace Squidex.Infrastructure.States
         public async Task<(T Value, long Version)> ReadAsync(TKey key)
         {
             var existing =
-                await Collection.Find(x => Equals(x.Id, key))
+                await Collection.Find(x => x.Id.Equals(key))
                     .FirstOrDefaultAsync();
 
             if (existing != null)

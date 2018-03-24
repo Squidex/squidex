@@ -27,18 +27,18 @@ namespace Squidex.Areas.Api.Controllers.Assets
     [SwaggerTag(nameof(Assets))]
     public sealed class AssetContentController : ApiController
     {
-        private readonly IAssetStore assetStorage;
+        private readonly IAssetStore assetStore;
         private readonly IAssetRepository assetRepository;
         private readonly IAssetThumbnailGenerator assetThumbnailGenerator;
 
         public AssetContentController(
             ICommandBus commandBus,
-            IAssetStore assetStorage,
+            IAssetStore assetStore,
             IAssetRepository assetRepository,
             IAssetThumbnailGenerator assetThumbnailGenerator)
             : base(commandBus)
         {
-            this.assetStorage = assetStorage;
+            this.assetStore = assetStore;
             this.assetRepository = assetRepository;
             this.assetThumbnailGenerator = assetThumbnailGenerator;
         }
@@ -53,7 +53,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// <param name="height">The target height of the asset, if it is an image.</param>
         /// <param name="mode">The resize mode when the width and height is defined.</param>
         /// <returns>
-        /// 200 => Asset found and content or (resize) image returned.
+        /// 200 => Asset found and content or (resized) image returned.
         /// 404 => Asset or app not found.
         /// </returns>
         [HttpGet]
@@ -79,7 +79,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
 
                     try
                     {
-                        await assetStorage.DownloadAsync(assetId, entity.FileVersion, assetSuffix, bodyStream);
+                        await assetStore.DownloadAsync(assetId, entity.FileVersion, assetSuffix, bodyStream);
                     }
                     catch (AssetNotFoundException)
                     {
@@ -87,13 +87,13 @@ namespace Squidex.Areas.Api.Controllers.Assets
                         {
                             using (var destinationStream = GetTempStream())
                             {
-                                await assetStorage.DownloadAsync(assetId, entity.FileVersion, null, sourceStream);
+                                await assetStore.DownloadAsync(assetId, entity.FileVersion, null, sourceStream);
                                 sourceStream.Position = 0;
 
                                 await assetThumbnailGenerator.CreateThumbnailAsync(sourceStream, destinationStream, width, height, mode);
                                 destinationStream.Position = 0;
 
-                                await assetStorage.UploadAsync(assetId, entity.FileVersion, assetSuffix, destinationStream);
+                                await assetStore.UploadAsync(assetId, entity.FileVersion, assetSuffix, destinationStream);
                                 destinationStream.Position = 0;
 
                                 await destinationStream.CopyToAsync(bodyStream);
@@ -103,7 +103,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
                 }
                 else
                 {
-                    await assetStorage.DownloadAsync(assetId, entity.FileVersion, null, bodyStream);
+                    await assetStore.DownloadAsync(assetId, entity.FileVersion, null, bodyStream);
                 }
             });
         }

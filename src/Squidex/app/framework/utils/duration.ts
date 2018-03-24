@@ -25,12 +25,24 @@ export class Duration {
     public toString(): string {
         const duration = moment.duration(this.value);
 
+        let hoursString = Math.floor(duration.asHours()).toString();
+
+        if (hoursString.length === 1) {
+            hoursString = `0${hoursString}`;
+        }
+
         let minutesString = duration.minutes().toString();
 
         if (minutesString.length === 1) {
             minutesString = `0${minutesString}`;
         }
 
-        return Math.floor(duration.asHours()) + ':' + minutesString + 'h';
+        let secondsString = duration.seconds().toString();
+
+        if (secondsString.length === 1) {
+            secondsString = `0${secondsString}`;
+        }
+
+        return `${hoursString}:${minutesString}:${secondsString}`;
     }
 }
