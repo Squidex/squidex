@@ -35,6 +35,10 @@ namespace Squidex.Pipeline
             {
                 return (ApiCostsAttribute)((IFilterContainer)this).FilterDefinition;
             }
+            set
+            {
+                ((IFilterContainer)this).FilterDefinition = value;
+            }
         }
 
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)

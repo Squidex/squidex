@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27130.2010
+VisualStudioVersion = 15.0.27130.2036
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex", "src\Squidex\Squidex.csproj", "{61F6BBCE-A080-4400-B194-70E2F5D2096E}"
 EndProject
@@ -60,6 +60,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex.Domain.Apps.Entities.MongoDb", "src\Squidex.Domain.Apps.Entities.MongoDb\Squidex.Domain.Apps.Entities.MongoDb.csproj", "{7DA5B308-D950-4496-93D5-21D6C4D91644}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Migrate_01", "tools\Migrate_01\Migrate_01.csproj", "{A4823E14-C0E5-4A4D-B28F-27424C25C3C7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex.Tests", "tests\Squidex.Tests\Squidex.Tests.csproj", "{7E8CC864-4C6E-496F-A672-9F9AD8874835}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -307,6 +309,18 @@ Global
 		{A4823E14-C0E5-4A4D-B28F-27424C25C3C7}.Release|x64.Build.0 = Release|Any CPU
 		{A4823E14-C0E5-4A4D-B28F-27424C25C3C7}.Release|x86.ActiveCfg = Release|Any CPU
 		{A4823E14-C0E5-4A4D-B28F-27424C25C3C7}.Release|x86.Build.0 = Release|Any CPU
+		{7E8CC864-4C6E-496F-A672-9F9AD8874835}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7E8CC864-4C6E-496F-A672-9F9AD8874835}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7E8CC864-4C6E-496F-A672-9F9AD8874835}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{7E8CC864-4C6E-496F-A672-9F9AD8874835}.Debug|x64.Build.0 = Debug|Any CPU
+		{7E8CC864-4C6E-496F-A672-9F9AD8874835}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{7E8CC864-4C6E-496F-A672-9F9AD8874835}.Debug|x86.Build.0 = Debug|Any CPU
+		{7E8CC864-4C6E-496F-A672-9F9AD8874835}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7E8CC864-4C6E-496F-A672-9F9AD8874835}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7E8CC864-4C6E-496F-A672-9F9AD8874835}.Release|x64.ActiveCfg = Release|Any CPU
+		{7E8CC864-4C6E-496F-A672-9F9AD8874835}.Release|x64.Build.0 = Release|Any CPU
+		{7E8CC864-4C6E-496F-A672-9F9AD8874835}.Release|x86.ActiveCfg = Release|Any CPU
+		{7E8CC864-4C6E-496F-A672-9F9AD8874835}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
