@@ -11,6 +11,11 @@
     <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DebugType>full</DebugType>
+    <DebugSymbols>True</DebugSymbols>
+  </PropertyGroup>
+  
   <ItemGroup>
     <EmbeddedResource Include="Areas\IdentityServer\Config\Cert\*.*;Docs\*.md" />
     <EmbeddedResource Include="Areas\Api\Controllers\Users\Assets\Avatar.png" />

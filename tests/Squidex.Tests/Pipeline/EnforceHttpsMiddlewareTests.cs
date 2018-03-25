@@ -5,73 +5,79 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Options;
-using Moq;
 using Squidex.Config;
-using Squidex.Pipeline;
+using Squidex.Infrastructure.Tasks;
 using Xunit;
+using Options = Microsoft.Extensions.Options.Options;
 
-namespace Squidex.Tests.Pipeline
+namespace Squidex.Pipeline
 {
     public class EnforceHttpsMiddlewareTests
     {
-        private readonly Mock<RequestDelegate> next = new Mock<RequestDelegate>();
-        private readonly Mock<HttpContext> httpContextMock = new Mock<HttpContext>();
-        private readonly Mock<HttpRequest> requestMock = new Mock<HttpRequest>();
-        private readonly Mock<HttpResponse> responseMock = new Mock<HttpResponse>();
-        private IOptions<MyUrlsOptions> urls;
-        private EnforceHttpsMiddleware sut;
+        private bool isNextCalled;
+        private RequestDelegate next;
 
         public EnforceHttpsMiddlewareTests()
         {
-            requestMock.Setup(x => x.Host).Returns(new HostString("test.squidex.com"));
-            requestMock.Setup(x => x.Scheme).Returns("https");
-            httpContextMock.Setup(x => x.Request).Returns(requestMock.Object);
-            httpContextMock.Setup(x => x.Response).Returns(responseMock.Object);
+            next = (context) =>
+            {
+                isNextCalled = true;
+
+                return TaskHelper.Done;
+            };
         }
 
         [Fact]
-        public async Task Should_Continue_EnforceHTTPS_Is_False_Then_Return()
+        public async Task Should_make_permanent_redirect_if_redirect_is_required()
         {
-            urls = new OptionsManager<MyUrlsOptions>(new OptionsFactory<MyUrlsOptions>(
-                new List<IConfigureOptions<MyUrlsOptions>>(), new List<IPostConfigureOptions<MyUrlsOptions>>()));
-            urls.Value.EnforceHTTPS = false;
+            var httpContext = CreateHttpContext();
 
-            sut = new EnforceHttpsMiddleware(next.Object, urls);
-            await sut.Invoke(httpContextMock.Object);
+            var sut = new EnforceHttpsMiddleware(next, Options.Create(new MyUrlsOptions { EnforceHTTPS = true }));
 
-            next.Verify(x => x(It.IsAny<HttpContext>()), Times.Once);
+            await sut.Invoke(httpContext);
+
+            Assert.False(isNextCalled);
+            Assert.Equal("https://squidex.local/path?query=1", httpContext.Response.Headers["Location"]);
         }
 
         [Fact]
-        public async Task Should_Call_Next_If_EnforceHTTPS_Is_True_And_Request_Scheme_Is_Https()
+        public async Task Should_not_redirect_if_already_on_https()
         {
-            urls = new OptionsManager<MyUrlsOptions>(new OptionsFactory<MyUrlsOptions>(
-                new List<IConfigureOptions<MyUrlsOptions>>(), new List<IPostConfigureOptions<MyUrlsOptions>>()));
-            urls.Value.EnforceHTTPS = true;
+            var httpContext = CreateHttpContext("https");
 
-            sut = new EnforceHttpsMiddleware(next.Object, urls);
-            await sut.Invoke(httpContextMock.Object);
+            var sut = new EnforceHttpsMiddleware(next, Options.Create(new MyUrlsOptions { EnforceHTTPS = true }));
 
-            next.Verify(x => x(It.IsAny<HttpContext>()), Times.Once);
+            await sut.Invoke(httpContext);
+
+            Assert.True(isNextCalled);
+            Assert.Null((string)httpContext.Response.Headers["Location"]);
         }
 
         [Fact]
-        public async Task Should_Call_Next_If_EnforceHTTPS_Is_False_Then_Return()
+        public async Task Should_not_redirect_if_not_required()
         {
-            urls = new OptionsManager<MyUrlsOptions>(new OptionsFactory<MyUrlsOptions>(
-                new List<IConfigureOptions<MyUrlsOptions>>(), new List<IPostConfigureOptions<MyUrlsOptions>>()));
-            urls.Value.EnforceHTTPS = true;
+            var httpContext = CreateHttpContext("http");
 
-            requestMock.Setup(x => x.Scheme).Returns("http");
-            sut = new EnforceHttpsMiddleware(next.Object, urls);
-            await sut.Invoke(httpContextMock.Object);
+            var sut = new EnforceHttpsMiddleware(next, Options.Create(new MyUrlsOptions { EnforceHTTPS = false }));
 
-            next.Verify(x => x(It.IsAny<HttpContext>()), Times.Never);
-            responseMock.Verify(x => x.Redirect(It.IsAny<string>(), true), Times.Once);
+            await sut.Invoke(httpContext);
+
+            Assert.True(isNextCalled);
+            Assert.Null((string)httpContext.Response.Headers["Location"]);
+        }
+
+        private static DefaultHttpContext CreateHttpContext(string scheme = "http")
+        {
+            var httpContext = new DefaultHttpContext();
+
+            httpContext.Request.QueryString = new QueryString("?query=1");
+            httpContext.Request.Host = new HostString("squidex.local");
+            httpContext.Request.Path = new PathString("/path");
+            httpContext.Request.Scheme = scheme;
+
+            return httpContext;
         }
     }
 }

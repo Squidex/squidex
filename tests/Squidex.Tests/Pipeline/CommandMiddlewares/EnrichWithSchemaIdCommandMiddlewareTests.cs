@@ -4,62 +4,100 @@
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
+
 using System;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Routing;
-using Moq;
-using Squidex.Domain.Apps.Core;
-using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities;
+using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Schemas;
-using Squidex.Domain.Apps.Entities.Schemas.State;
+using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
-using Squidex.Pipeline.CommandMiddlewares;
 using Xunit;
 
-namespace Squidex.Tests.Pipeline.CommandMiddlewares
+namespace Squidex.Pipeline.CommandMiddlewares
 {
     public class EnrichWithSchemaIdCommandMiddlewareTests
     {
-        private readonly Mock<IActionContextAccessor> actionContextAccessor = new Mock<IActionContextAccessor>();
-        private readonly ICommandBus commandBus = A.Fake<ICommandBus>();
-        private readonly Mock<HttpContext> httpContextMock = new Mock<HttpContext>();
-        private readonly ActionDescriptor actionDescriptor = new ActionDescriptor();
+        private readonly IActionContextAccessor actionContextAccessor = A.Fake<IActionContextAccessor>();
         private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
-        private readonly Guid appId = Guid.NewGuid();
-        private readonly string appName = "app";
-        private readonly Guid schemaId = Guid.NewGuid();
-        private readonly string schemaName = "schema";
-        private readonly CreateContent command = new CreateContent();
-        private readonly RouteData routeData = new RouteData();
-        private ISchemaEntity schema;
+        private readonly ICommandBus commandBus = A.Fake<ICommandBus>();
+        private readonly HttpContext httpContext = new DefaultHttpContext();
+        private readonly ActionContext actionContext = new ActionContext();
+        private readonly EnrichWithSchemaIdCommandMiddleware sut;
 
-        [Fact]
-        public async Task HandleAsync_should_throw_exception_if_schema_not_found()
+        public EnrichWithSchemaIdCommandMiddlewareTests()
         {
-            var context = new CommandContext(command, commandBus);
-            var sut = SetupSchemaCommand(false);
+            actionContext.RouteData = new RouteData();
+            actionContext.HttpContext = httpContext;
 
-            await Assert.ThrowsAsync<DomainObjectNotFoundException>(() =>
-            {
-                return sut.HandleAsync(context);
-            });
+            A.CallTo(() => actionContextAccessor.ActionContext)
+                .Returns(actionContext);
+
+            sut = new EnrichWithSchemaIdCommandMiddleware(appProvider, actionContextAccessor);
         }
 
         [Fact]
-        public async Task HandleAsync_should_find_schema_id_by_name()
+        public async Task Should_throw_exception_if_app_not_found()
         {
-            var context = new CommandContext(command, commandBus);
-            SetupSchema();
+            SetupApp(out var appId, out var appName);
+            SetupSchema(appId, out var schemaId, out var schemaName);
 
-            var sut = SetupSchemaCommand(false);
+            A.CallTo(() => appProvider.GetSchemaAsync(appId, "other-schema"))
+                .Returns(Task.FromResult<ISchemaEntity>(null));
+
+            actionContext.RouteData.Values["name"] = "other-schema";
+
+            var command = new CreateContent();
+            var context = new CommandContext(command, commandBus);
+
+            await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.HandleAsync(context));
+        }
+
+        [Fact]
+        public async Task Should_do_nothing_when_context_is_null()
+        {
+            A.CallTo(() => actionContextAccessor.ActionContext)
+                .Returns(null);
+
+            var command = new CreateContent();
+            var context = new CommandContext(command, commandBus);
+
+            await sut.HandleAsync(context);
+
+            Assert.Null(command.Actor);
+        }
+
+        [Fact]
+        public async Task Should_do_nothing_when_route_has_no_parameter()
+        {
+            SetupApp(out var appId, out var appName);
+            SetupSchema(appId, out var schemaId, out var schemaName);
+
+            var command = new CreateContent();
+            var context = new CommandContext(command, commandBus);
+
+            await sut.HandleAsync(context);
+
+            Assert.Null(command.Actor);
+        }
+
+        [Fact]
+        public async Task Should_assign_schema_id_and_name_from_name()
+        {
+            SetupApp(out var appId, out var appName);
+            SetupSchema(appId, out var schemaId, out var schemaName);
+
+            actionContext.RouteData.Values["name"] = schemaName;
+
+            var command = new CreateContent();
+            var context = new CommandContext(command, commandBus);
 
             await sut.HandleAsync(context);
 
@@ -67,56 +105,110 @@ namespace Squidex.Tests.Pipeline.CommandMiddlewares
         }
 
         [Fact]
-        public async Task HandleAsync_should_find_schema_id_by_id()
+        public async Task Should_assign_schema_id_and_name_from_id()
         {
-            var context = new CommandContext(command, commandBus);
-            SetupSchema();
+            SetupApp(out var appId, out var appName);
+            SetupSchema(appId, out var schemaId, out var schemaName);
 
-            var sut = SetupSchemaCommand(true);
+            actionContext.RouteData.Values["name"] = schemaId.ToString();
+
+            var command = new CreateContent();
+            var context = new CommandContext(command, commandBus);
 
             await sut.HandleAsync(context);
 
             Assert.Equal(new NamedId<Guid>(schemaId, schemaName), command.SchemaId);
         }
 
-        private void SetupSchema()
+        [Fact]
+        public async Task Should_assign_schema_id_from_id()
         {
-            var schemaDef = new Schema(schemaName);
-            var stringValidatorProperties = new StringFieldProperties
-            {
-                Pattern = "A-Z"
-            };
-            var stringFieldWithValidator = new StringField(1, "validator", Partitioning.Invariant, stringValidatorProperties);
+            SetupApp(out var appId, out var appName);
+            SetupSchema(appId, out var schemaId, out var schemaName);
 
-            schemaDef = schemaDef.AddField(stringFieldWithValidator);
+            actionContext.RouteData.Values["name"] = schemaId.ToString();
 
-            schema = new SchemaState
-            {
-                Name = schemaName,
-                Id = schemaId,
-                AppId = new NamedId<Guid>(appId, appName),
-                SchemaDef = schemaDef
-            };
+            var command = new UpdateSchema();
+            var context = new CommandContext(command, commandBus);
+
+            await sut.HandleAsync(context);
+
+            Assert.Equal(schemaId, command.SchemaId);
         }
 
-        private EnrichWithSchemaIdCommandMiddleware SetupSchemaCommand(bool byId)
+        [Fact]
+        public async Task Should_use_app_id_from_command()
         {
-            command.AppId = new NamedId<Guid>(appId, appName);
+            var appId = new NamedId<Guid>(Guid.NewGuid(), "my-app");
 
-            if (byId)
-            {
-                routeData.Values.Add("name", schemaId.ToString());
-                A.CallTo(() => appProvider.GetSchemaAsync(appId, schemaId, false)).Returns(schema);
-            }
-            else
-            {
-                routeData.Values.Add("name", "schema");
-                A.CallTo(() => appProvider.GetSchemaAsync(appId, schemaName)).Returns(schema);
-            }
+            SetupSchema(appId.Id, out var schemaId, out var schemaName);
 
-            var actionContext = new ActionContext(httpContextMock.Object, routeData, actionDescriptor);
-            actionContextAccessor.Setup(x => x.ActionContext).Returns(actionContext);
-            return new EnrichWithSchemaIdCommandMiddleware(appProvider, actionContextAccessor.Object);
+            actionContext.RouteData.Values["name"] = schemaId.ToString();
+
+            var command = new CreateContent { AppId = appId };
+            var context = new CommandContext(command, commandBus);
+
+            await sut.HandleAsync(context);
+
+            Assert.Equal(new NamedId<Guid>(schemaId, schemaName), command.SchemaId);
+        }
+
+        [Fact]
+        public async Task Should_not_override_schema_id()
+        {
+            SetupApp(out var appId, out var appName);
+            SetupSchema(appId, out var schemaId, out var schemaName);
+
+            var command = new CreateSchema { SchemaId = Guid.NewGuid() };
+            var context = new CommandContext(command, commandBus);
+
+            await sut.HandleAsync(context);
+
+            Assert.NotEqual(schemaId, command.SchemaId);
+        }
+
+        [Fact]
+        public async Task Should_not_override_schema_id_and_name()
+        {
+            SetupApp(out var appId, out var appName);
+            SetupSchema(appId, out var schemaId, out var schemaName);
+
+            var command = new CreateContent { SchemaId = new NamedId<Guid>(Guid.NewGuid(), "other-schema") };
+            var context = new CommandContext(command, commandBus);
+
+            await sut.HandleAsync(context);
+
+            Assert.NotEqual(new NamedId<Guid>(appId, appName), command.AppId);
+        }
+
+        private void SetupSchema(Guid appId, out Guid schemaId, out string schemaName)
+        {
+            schemaId = Guid.NewGuid();
+            schemaName = "my-schema";
+
+            var schemaEntity = A.Fake<ISchemaEntity>();
+            A.CallTo(() => schemaEntity.Id).Returns(schemaId);
+            A.CallTo(() => schemaEntity.Name).Returns(schemaName);
+
+            var temp1 = schemaName;
+            var temp2 = schemaId;
+
+            A.CallTo(() => appProvider.GetSchemaAsync(appId, temp1))
+                .Returns(schemaEntity);
+            A.CallTo(() => appProvider.GetSchemaAsync(appId, temp2, false))
+                .Returns(schemaEntity);
+        }
+
+        private void SetupApp(out Guid appId, out string appName)
+        {
+            appId = Guid.NewGuid();
+            appName = "my-app";
+
+            var appEntity = A.Fake<IAppEntity>();
+            A.CallTo(() => appEntity.Id).Returns(appId);
+            A.CallTo(() => appEntity.Name).Returns(appName);
+
+            httpContext.Features.Set<IAppFeature>(new AppApiFilter.AppFeature(appEntity));
         }
     }
 }

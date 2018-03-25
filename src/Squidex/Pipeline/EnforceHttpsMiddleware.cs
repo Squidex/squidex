@@ -36,9 +36,9 @@ namespace Squidex.Pipeline
 
                 if (!string.Equals(context.Request.Scheme, "https", StringComparison.OrdinalIgnoreCase))
                 {
-                    var newUrl = string.Concat("https://", hostName, context.Request.Path);
+                    var newUrl = string.Concat("https://", hostName, context.Request.Path, context.Request.QueryString);
 
-                    context.Response.Redirect(newUrl + context.Request.QueryString, true);
+                    context.Response.Redirect(newUrl, true);
                 }
                 else
                 {
