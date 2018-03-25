@@ -32,6 +32,8 @@ namespace Squidex.Pipeline.CommandMiddlewares
             if (actionContextAccessor.ActionContext == null)
             {
                 await next();
+
+                return;
             }
 
             if (context.Command is ISchemaCommand schemaCommand && schemaCommand.SchemaId == null)
