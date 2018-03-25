@@ -47,20 +47,20 @@ namespace Squidex.Pipeline
 
             if (appFeature?.App != null && FilterDefinition.Weight > 0)
             {
+                var plan = appPlanProvider.GetPlanForApp(appFeature.App);
+
+                var usage = await usageTracker.GetMonthlyCallsAsync(appFeature.App.Id.ToString(), DateTime.Today);
+
+                if (plan.MaxApiCalls >= 0 && usage > plan.MaxApiCalls * 1.1)
+                {
+                    context.Result = new StatusCodeResult(429);
+                    return;
+                }
+
                 var stopWatch = Stopwatch.StartNew();
 
                 try
                 {
-                    var plan = appPlanProvider.GetPlanForApp(appFeature.App);
-
-                    var usage = await usageTracker.GetMonthlyCalls(appFeature.App.Id.ToString(), DateTime.Today);
-
-                    if (plan.MaxApiCalls >= 0 && (usage * 1.1) > plan.MaxApiCalls)
-                    {
-                        context.Result = new StatusCodeResult(429);
-                        return;
-                    }
-
                     await next();
                 }
                 finally

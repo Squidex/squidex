@@ -16,8 +16,8 @@ namespace Squidex.Pipeline
 {
     public class EnforceHttpsMiddlewareTests
     {
+        private readonly RequestDelegate next;
         private bool isNextCalled;
-        private RequestDelegate next;
 
         public EnforceHttpsMiddlewareTests()
         {

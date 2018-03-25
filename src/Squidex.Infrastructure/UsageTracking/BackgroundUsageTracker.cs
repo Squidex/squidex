@@ -108,7 +108,7 @@ namespace Squidex.Infrastructure.UsageTracking
             return enrichedUsages;
         }
 
-        public async Task<long> GetMonthlyCalls(string key, DateTime date)
+        public async Task<long> GetMonthlyCallsAsync(string key, DateTime date)
         {
             ThrowIfDisposed();
 

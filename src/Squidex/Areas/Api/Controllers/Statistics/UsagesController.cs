@@ -60,7 +60,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics
         [ApiCosts(0)]
         public async Task<IActionResult> GetMonthlyCalls(string app)
         {
-            var count = await usageTracker.GetMonthlyCalls(App.Id.ToString(), DateTime.Today);
+            var count = await usageTracker.GetMonthlyCallsAsync(App.Id.ToString(), DateTime.Today);
 
             var plan = appPlanProvider.GetPlanForApp(App);
 
