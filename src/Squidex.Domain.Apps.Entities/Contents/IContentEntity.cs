@@ -32,5 +32,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         RefToken ScheduledBy { get; }
 
         NamedContentData Data { get; }
+
+        NamedContentData PendingData { get; }
     }
 }

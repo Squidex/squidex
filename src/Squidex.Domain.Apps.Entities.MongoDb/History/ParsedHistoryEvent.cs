@@ -23,19 +23,16 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.History
         public Guid Id
         {
             get { return inner.Id; }
-            set { }
         }
 
         public Instant Created
         {
             get { return inner.Created; }
-            set { }
         }
 
         public Instant LastModified
         {
             get { return inner.LastModified; }
-            set { }
         }
 
         public RefToken Actor
@@ -56,6 +53,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.History
         public string Channel
         {
             get { return inner.Channel; }
+        }
+
+        public string EventType
+        {
+            get { return inner.Message; }
         }
 
         public string Message

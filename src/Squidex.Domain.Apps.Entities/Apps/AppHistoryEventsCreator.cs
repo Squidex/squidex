@@ -20,34 +20,43 @@ namespace Squidex.Domain.Apps.Entities.Apps
             : base(typeNameRegistry)
         {
             AddEventMessage<AppContributorAssigned>(
-                "assigned {user:[Contributor]} as [Permission]");
+                "assigned {user:[Contributor]} as [Permission].");
 
             AddEventMessage<AppContributorRemoved>(
-                "removed {user:[Contributor]} from app");
+                "removed {user:[Contributor]}.");
 
             AddEventMessage<AppClientAttached>(
-                "added client {[Id]} to app");
+                "added client {[Id]}.");
 
             AddEventMessage<AppClientRevoked>(
-                "revoked client {[Id]}");
+                "revoked client {[Id]}.");
 
             AddEventMessage<AppClientUpdated>(
-                "updated client {[Id]}");
+                "updated client {[Id]}.");
 
             AddEventMessage<AppClientRenamed>(
-                "renamed client {[Id]} to {[Name]}");
+                "renamed client {[Id]} to {[Name]}.");
 
             AddEventMessage<AppLanguageAdded>(
-                "added language {[Language]}");
+                "added language {[Language]}.");
 
             AddEventMessage<AppLanguageRemoved>(
-                "removed language {[Language]}");
+                "removed language {[Language]}.");
 
             AddEventMessage<AppLanguageUpdated>(
-                "updated language {[Language]}");
+                "updated language {[Language]}.");
 
             AddEventMessage<AppMasterLanguageSet>(
-                "changed master language to {[Language]}");
+                "changed master language to {[Language]}.");
+
+            AddEventMessage<AppPatternAdded>(
+                "added pattern {[Pattern]}.");
+
+            AddEventMessage<AppPatternDeleted>(
+                "deleted pattern {[Pattern]}.");
+
+            AddEventMessage<AppPatternUpdated>(
+                "updated pattern {[Pattern]}.");
         }
 
         protected Task<HistoryEventToStore> On(AppContributorRemoved @event)
@@ -129,6 +138,33 @@ namespace Squidex.Domain.Apps.Entities.Apps
             return Task.FromResult(
                 ForEvent(@event, channel)
                     .AddParameter("Language", @event.Language));
+        }
+
+        protected Task<HistoryEventToStore> On(AppPatternAdded @event)
+        {
+            const string channel = "settings.patterns";
+
+            return Task.FromResult(
+                ForEvent(@event, channel)
+                    .AddParameter("Pattern", @event.Name));
+        }
+
+        protected Task<HistoryEventToStore> On(AppPatternDeleted @event)
+        {
+            const string channel = "settings.patterns";
+
+            return Task.FromResult(
+                ForEvent(@event, channel)
+                    .AddParameter("Pattern", @event.Name));
+        }
+
+        protected Task<HistoryEventToStore> On(AppPatternUpdated @event)
+        {
+            const string channel = "settings.patterns";
+
+            return Task.FromResult(
+                ForEvent(@event, channel)
+                    .AddParameter("Pattern", @event.Name));
         }
 
         protected override Task<HistoryEventToStore> CreateEventCoreAsync(Envelope<IEvent> @event)

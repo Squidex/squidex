@@ -59,6 +59,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                 DocumentId = key.ToString(),
                 DataText = idData?.ToFullText(),
                 DataByIds = idData,
+                PendingDataByIds = value.PendingData?.ToIdModel(schema.SchemaDef, true),
                 ReferencedIds = idData?.ToReferencedIds(schema.SchemaDef),
             });
 

@@ -21,6 +21,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
     public sealed class MongoContentEntity : IContentEntity
     {
         private NamedContentData data;
+        private NamedContentData pendingData;
 
         [BsonId]
         [BsonRequired]
@@ -61,6 +62,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         [BsonElement("do")]
         [BsonJson]
         public IdContentData DataByIds { get; set; }
+
+        [BsonIgnoreIfNull]
+        [BsonElement("dop")]
+        [BsonJson]
+        public IdContentData PendingDataByIds { get; set; }
 
         [BsonRequired]
         [BsonElement("ai2")]
@@ -116,9 +122,20 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             get { return data; }
         }
 
+        [BsonIgnore]
+        public NamedContentData PendingData
+        {
+            get { return pendingData; }
+        }
+
         public void ParseData(Schema schema)
         {
             data = DataByIds.ToData(schema, ReferencedIdsDeleted);
+
+            if (PendingDataByIds != null)
+            {
+                pendingData = PendingDataByIds.ToData(schema, ReferencedIdsDeleted);
+            }
         }
     }
 }

@@ -1,2 +1,18 @@
 @import '_vars';
 @import '_mixins';
+
+.content-status {
+    & {
+        color: $color-text;
+    }
+
+    &:hover {
+        background: transparent;
+    }
+}
+
+.discard-changes {
+    color: $color-theme-blue !important;
+    font-size: .9rem;
+    font-weight: normal;
+}

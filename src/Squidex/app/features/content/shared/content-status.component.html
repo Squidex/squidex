@@ -1,0 +1,17 @@
+<span *ngIf="!scheduledTo">
+    <span class="content-status content-status-{{displayStatus | lowercase}}" #statusIcon>
+        <i class="icon-circle"></i>
+    </span>
+
+    <sqx-tooltip [target]="statusIcon">{{displayStatus}}</sqx-tooltip>
+</span>
+
+<span *ngIf="scheduledTo">
+    <span class="content-status content-status-{{scheduledTo | lowercase}}" #statusIcon>
+        <i class="icon-clock"></i>
+    </span>
+
+    <sqx-tooltip [target]="statusIcon">Will be set to '{{scheduledTo}}' at {{scheduledAt | sqxFullDateTime}}</sqx-tooltip>
+</span>
+
+<span *ngIf="showLabel">{{displayStatus}}</span>

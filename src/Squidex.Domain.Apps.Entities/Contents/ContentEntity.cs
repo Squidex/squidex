@@ -42,6 +42,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public NamedContentData Data { get; set; }
 
+        public NamedContentData PendingData { get; set; }
+
         public static ContentEntity Create(CreateContent command, EntityCreatedResult<NamedContentData> result)
         {
             var now = SystemClock.Instance.GetCurrentInstant();

@@ -5,22 +5,48 @@
         <div class="panel-header">
             <div class="panel-title-row">
                 <div class="float-right" *ngIf="!content || content.status !== 'Archived'">
+                    <div class="btn btn-outline-secondary content-status" *ngIf="content">
+                        <sqx-content-status 
+                            [status]="content.status"
+                            [scheduledTo]="content.scheduledTo"
+                            [scheduledAt]="content.scheduledAt"
+                            [hasPendingChanges]="content.pendingData"
+                            [showLabel]="true">
+                        </sqx-content-status>
+
+                        <a *ngIf="content.pendingData" (click)="discardChanges()" class="discard-changes">
+                            Discard changes
+                        </a>
+                    </div>
                     <span *ngIf="isNewMode">
                         <button type="button" class="btn btn-secondary" (click)="saveAsDraft()" title="CTRL + S">
-                            Save as Draft
+                            Save
                         </button>
 
-                        <button type="submit" class="btn btn-primary">
+                        <button type="submit" class="btn btn-success">
                             Save and Publish
                         </button>
                     </span>
-                    <span *ngIf="!isNewMode">
-                        <button type="submit" class="btn btn-primary" title="CTRL + S">
+                    <span *ngIf="!isNewMode && !content.pendingData">
+                        <button type="button" class="btn btn-secondary" (click)="saveAsDraft()" title="CTRL + S">
                             Save
+                        </button>
+
+                        <button type="submit" class="btn btn-success">
+                            Save and Publish
+                        </button>
+                    </span>
+                    <span *ngIf="!isNewMode && content.pendingData">
+                        <button type="button" class="btn btn-secondary" (click)="saveAsDraft()" title="CTRL + S">
+                            Save
+                        </button>
+
+                        <button type="button" class="btn btn-success" (click)="confirmChanges()">
+                            Publish Changes
                         </button>
                     </span>
                     
-                    <sqx-shortcut keys="ctrl+s" (trigger)="saveAndPublish()"></sqx-shortcut>
+                    <sqx-shortcut keys="ctrl+s" (trigger)="saveAsDraft()"></sqx-shortcut>
                 </div>
                 
                 <h3 class="panel-title" *ngIf="isNewMode">

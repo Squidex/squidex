@@ -7,8 +7,7 @@
 
 namespace Squidex.Domain.Apps.Entities.Contents.Commands
 {
-    public sealed class UpdateContent : ContentDataCommand
+    public sealed class DiscardChanges : ContentCommand
     {
-        public bool AsProposal { get; set; }
     }
 }

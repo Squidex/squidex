@@ -14,6 +14,7 @@ using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Entities.Contents.State
 {
@@ -28,6 +29,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.State
 
         [JsonProperty]
         public NamedContentData Data { get; set; }
+
+        [JsonProperty]
+        public NamedContentData PendingData { get; set; }
 
         [JsonProperty]
         public Status Status { get; set; }
@@ -46,15 +50,23 @@ namespace Squidex.Domain.Apps.Entities.Contents.State
 
         protected void On(ContentCreated @event)
         {
-            SchemaId = @event.SchemaId;
+            SimpleMapper.Map(@event, this);
+        }
 
-            Data = @event.Data;
+        protected void On(ContentUpdateProposed @event)
+        {
+            PendingData = @event.Data;
+        }
 
-            AppId = @event.AppId;
+        protected void On(ContentChangesDiscarded @event)
+        {
+            PendingData = null;
         }
 
         protected void On(ContentUpdated @event)
         {
+            PendingData = null;
+
             Data = @event.Data;
         }
 

@@ -41,6 +41,11 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         public object Data { get; set; }
 
         /// <summary>
+        /// The pending changes of the content item.
+        /// </summary>
+        public object PendingData { get; set; }
+
+        /// <summary>
         /// The scheduled status.
         /// </summary>
         public Status? ScheduledTo { get; set; }

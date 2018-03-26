@@ -28,7 +28,7 @@ describe('ContentDto', () => {
     const newVersion = new Version('2');
 
     it('should update data property and user info when updating', () => {
-        const content_1 = new ContentDto('1', 'Published', creator, creator, creation, creation, null, null, null, { data: 1 }, version);
+        const content_1 = new ContentDto('1', 'Published', creator, creator, creation, creation, null, null, null, { data: 1 }, {}, version);
         const content_2 = content_1.update({ data: 2 }, modifier, newVersion, modified);
 
         expect(content_2.data).toEqual({ data: 2 });
@@ -38,7 +38,7 @@ describe('ContentDto', () => {
     });
 
     it('should update status property and user info when changing status', () => {
-        const content_1 = new ContentDto('1', 'Draft', creator, creator, creation, creation, null, null, null, { data: 1 }, version);
+        const content_1 = new ContentDto('1', 'Draft', creator, creator, creation, creation, null, null, null, { data: 1 }, {}, version);
         const content_2 = content_1.changeStatus('Published', null, modifier, newVersion, modified);
 
         expect(content_2.status).toEqual('Published');
@@ -48,7 +48,7 @@ describe('ContentDto', () => {
     });
 
     it('should update schedules property and user info when changing status with due time', () => {
-        const content_1 = new ContentDto('1', 'Draft', creator, creator, creation, creation, null, null, null, { data: 1 }, version);
+        const content_1 = new ContentDto('1', 'Draft', creator, creator, creation, creation, null, null, null, { data: 1 }, {}, version);
         const content_2 = content_1.changeStatus('Published', dueTime, modifier, newVersion, modified);
 
         expect(content_2.status).toEqual('Draft');
@@ -63,7 +63,7 @@ describe('ContentDto', () => {
     it('should update data property when setting data', () => {
         const newData = {};
 
-        const content_1 = new ContentDto('1', 'Published', creator, creator, creation, creation, null, null, null, { data: 1 }, version);
+        const content_1 = new ContentDto('1', 'Published', creator, creator, creation, creation, null, null, null, { data: 1 }, {}, version);
         const content_2 = content_1.setData(newData);
 
         expect(content_2.data).toBe(newData);
@@ -142,6 +142,7 @@ describe('ContentsService', () => {
                     'Scheduler1',
                     DateTime.parseISO_UTC('2018-12-12T10:10'),
                     {},
+                    undefined,
                     new Version('11')),
                 new ContentDto('id2', 'Published', 'Created2', 'LastModifiedBy2',
                     DateTime.parseISO_UTC('2016-10-12T10:10'),
@@ -150,6 +151,7 @@ describe('ContentsService', () => {
                     null,
                     null,
                     {},
+                    undefined,
                     new Version('22'))
         ]));
     }));
@@ -232,6 +234,7 @@ describe('ContentsService', () => {
                 'Scheduler1',
                 DateTime.parseISO_UTC('2018-12-12T10:10'),
                 {},
+                undefined,
                 new Version('2')));
     }));
 
@@ -273,6 +276,7 @@ describe('ContentsService', () => {
                 null,
                 null,
                 {},
+                undefined,
                 new Version('2')));
     }));
 
@@ -302,9 +306,9 @@ describe('ContentsService', () => {
 
         const dto = {};
 
-        contentsService.putContent('my-app', 'my-schema', 'content1', dto, version).subscribe();
+        contentsService.putContent('my-app', 'my-schema', 'content1', dto, true, version).subscribe();
 
-        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema/content1');
+        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema/content1?asProposal=true');
 
         expect(req.request.method).toEqual('PUT');
         expect(req.request.headers.get('If-Match')).toBe(version.value);

@@ -129,6 +129,11 @@ namespace Squidex.Areas.Api.Controllers.Contents
                         itemModel.Data = item.Data.ToApiModel(result.Schema.SchemaDef, App.LanguagesConfig, !isFrontendClient);
                     }
 
+                    if (item.PendingData != null && isFrontendClient)
+                    {
+                        itemModel.PendingData = item.PendingData.ToApiModel(result.Schema.SchemaDef, App.LanguagesConfig, !isFrontendClient);
+                    }
+
                     return itemModel;
                 }).ToArray()
             };
@@ -165,7 +170,15 @@ namespace Squidex.Areas.Api.Controllers.Contents
             {
                 var isFrontendClient = User.IsFrontendClient();
 
-                response.Data = entity.Data.ToApiModel(schema.SchemaDef, App.LanguagesConfig, !isFrontendClient);
+                if (entity.Data != null)
+                {
+                    response.Data = entity.Data.ToApiModel(schema.SchemaDef, App.LanguagesConfig, !isFrontendClient);
+                }
+
+                if (entity.PendingData != null && isFrontendClient)
+                {
+                    response.PendingData = entity.PendingData.ToApiModel(schema.SchemaDef, App.LanguagesConfig, !isFrontendClient);
+                }
             }
 
             Response.Headers["ETag"] = entity.Version.ToString();
@@ -195,15 +208,23 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(1)]
         public async Task<IActionResult> GetContentVersion(string app, string name, Guid id, int version)
         {
-            var content = await contentQuery.FindContentAsync(App, name, User, id, version);
+            var (schema, entity) = await contentQuery.FindContentAsync(App, name, User, id, version);
 
-            var response = SimpleMapper.Map(content.Content, new ContentDto());
+            var response = SimpleMapper.Map(entity, new ContentDto());
 
-            if (content.Content.Data != null)
+            if (entity.Data != null)
             {
                 var isFrontendClient = User.IsFrontendClient();
 
-                response.Data = content.Content.Data.ToApiModel(content.Schema.SchemaDef, App.LanguagesConfig, !isFrontendClient);
+                if (entity.Data != null)
+                {
+                    response.Data = entity.Data.ToApiModel(schema.SchemaDef, App.LanguagesConfig, !isFrontendClient);
+                }
+
+                if (entity.PendingData != null && isFrontendClient)
+                {
+                    response.PendingData = entity.PendingData.ToApiModel(schema.SchemaDef, App.LanguagesConfig, !isFrontendClient);
+                }
             }
 
             Response.Headers["ETag"] = version.ToString();
@@ -251,6 +272,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// <param name="name">The name of the schema.</param>
         /// <param name="id">The id of the content item to update.</param>
         /// <param name="request">The full data for the content item.</param>
+        /// <param name="asProposal">Indicates whether the update is a proposal.</param>
         /// <returns>
         /// 200 => Content updated.
         /// 404 => Content, schema or app not found.
@@ -263,11 +285,11 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [HttpPut]
         [Route("content/{app}/{name}/{id}/")]
         [ApiCosts(1)]
-        public async Task<IActionResult> PutContent(string app, string name, Guid id, [FromBody] NamedContentData request)
+        public async Task<IActionResult> PutContent(string app, string name, Guid id, [FromBody] NamedContentData request, [FromQuery] bool asProposal = false)
         {
             await contentQuery.FindSchemaAsync(App, name);
 
-            var command = new UpdateContent { ContentId = id, Data = request.ToCleaned() };
+            var command = new UpdateContent { ContentId = id, Data = request.ToCleaned(), AsProposal = asProposal };
 
             var context = await CommandBus.PublishAsync(command);
 
@@ -284,6 +306,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// <param name="name">The name of the schema.</param>
         /// <param name="id">The id of the content item to patch.</param>
         /// <param name="request">The patch for the content item.</param>
+        /// <param name="asProposal">Indicates whether the patch is a proposal.</param>
         /// <returns>
         /// 200 => Content patched.
         /// 404 => Content, schema or app not found.
@@ -296,11 +319,11 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [HttpPatch]
         [Route("content/{app}/{name}/{id}/")]
         [ApiCosts(1)]
-        public async Task<IActionResult> PatchContent(string app, string name, Guid id, [FromBody] NamedContentData request)
+        public async Task<IActionResult> PatchContent(string app, string name, Guid id, [FromBody] NamedContentData request, [FromQuery] bool asProposal = false)
         {
             await contentQuery.FindSchemaAsync(App, name);
 
-            var command = new PatchContent { ContentId = id, Data = request.ToCleaned() };
+            var command = new PatchContent { ContentId = id, Data = request.ToCleaned(), AsProposal = asProposal };
 
             var context = await CommandBus.PublishAsync(command);
 
@@ -424,6 +447,35 @@ namespace Squidex.Areas.Api.Controllers.Contents
             await contentQuery.FindSchemaAsync(App, name);
 
             var command = CreateCommand(id, Status.Draft, dueTime);
+
+            await CommandBus.PublishAsync(command);
+
+            return NoContent();
+        }
+
+        /// <summary>
+        /// Discard changes of a content item.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <param name="name">The name of the schema.</param>
+        /// <param name="id">The id of the content item to discard changes.</param>
+        /// <returns>
+        /// 204 => Content restored.
+        /// 404 => Content, schema or app not found.
+        /// 400 => Content was not archived.
+        /// </returns>
+        /// <remarks>
+        /// You can read the generated documentation for your app at /api/content/{appName}/docs
+        /// </remarks>
+        [MustBeAppEditor]
+        [HttpPut]
+        [Route("content/{app}/{name}/{id}/discard/")]
+        [ApiCosts(1)]
+        public async Task<IActionResult> DiscardChanges(string app, string name, Guid id)
+        {
+            await contentQuery.FindSchemaAsync(App, name);
+
+            var command = new DiscardChanges { ContentId = id };
 
             await CommandBus.PublishAsync(command);
 

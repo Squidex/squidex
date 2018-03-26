@@ -174,7 +174,7 @@ export class ContentItemComponent implements OnInit, OnChanges {
     }
 
     private getRawValue(field: FieldDto): any {
-        const contentField = this.content.data[field.name];
+        const contentField = this.content.displayData[field.name];
 
         if (contentField) {
             if (field.isLocalizable) {

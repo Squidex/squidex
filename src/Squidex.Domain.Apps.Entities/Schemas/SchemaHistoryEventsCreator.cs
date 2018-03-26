@@ -20,49 +20,49 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             : base(typeNameRegistry)
         {
             AddEventMessage<SchemaCreated>(
-                "created schema {[Name]}");
+                "created schema {[Name]}.");
 
             AddEventMessage<SchemaUpdated>(
-                "updated schema {[Name]}");
+                "updated schema {[Name]}.");
 
             AddEventMessage<SchemaDeleted>(
-                "deleted schema {[Name]}");
+                "deleted schema {[Name]}.");
 
             AddEventMessage<SchemaPublished>(
-                "published schema {[Name]}");
+                "published schema {[Name]}.");
 
             AddEventMessage<SchemaUnpublished>(
-                "unpublished schema {[Name]}");
+                "unpublished schema {[Name]}.");
 
             AddEventMessage<SchemaFieldsReordered>(
-                "reordered fields of schema {[Name]}");
+                "reordered fields of schema {[Name]}.");
 
             AddEventMessage<FieldAdded>(
-                "added field {[Field]} to schema {[Name]}");
+                "added field {[Field]} to schema {[Name]}.");
 
             AddEventMessage<FieldDeleted>(
-                "deleted field {[Field]} from schema {[Name]}");
+                "deleted field {[Field]} from schema {[Name]}.");
 
             AddEventMessage<FieldLocked>(
-                "has locked field {[Field]} of schema {[Name]}");
+                "has locked field {[Field]} of schema {[Name]}.");
 
             AddEventMessage<FieldHidden>(
-                "has hidden field {[Field]} of schema {[Name]}");
+                "has hidden field {[Field]} of schema {[Name]}.");
 
             AddEventMessage<FieldShown>(
-                "has shown field {[Field]} of schema {[Name]}");
+                "has shown field {[Field]} of schema {[Name]}.");
 
             AddEventMessage<FieldDisabled>(
-                "disabled field {[Field]} of schema {[Name]}");
+                "disabled field {[Field]} of schema {[Name]}.");
 
             AddEventMessage<FieldEnabled>(
-                "disabled field {[Field]} of schema {[Name]}");
+                "disabled field {[Field]} of schema {[Name]}.");
 
             AddEventMessage<FieldUpdated>(
-                "has updated field {[Field]} of schema {[Name]}");
+                "has updated field {[Field]} of schema {[Name]}.");
 
             AddEventMessage<FieldDeleted>(
-                "deleted field {[Field]} of schema {[Name]}");
+                "deleted field {[Field]} of schema {[Name]}.");
         }
 
         protected override Task<HistoryEventToStore> CreateEventCoreAsync(Envelope<IEvent> @event)

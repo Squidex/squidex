@@ -94,7 +94,7 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
         this.contentUpdatedSubscription =
             this.ctx.bus.of(ContentUpdated)
                 .subscribe(message => {
-                    this.contentItems = this.contentItems.replaceBy('id', message.content, (o, n) => o.update(n.data, n.lastModifiedBy, n.version, n.lastModified));
+                    this.contentItems = this.contentItems.replaceBy('id', message.content);
                 });
 
         const routeData = allData(this.ctx.route);

@@ -165,15 +165,26 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
                         this.enableContentForm();
                     });
             } else {
-                this.contentsService.putContent(this.ctx.appName, this.schema.name, this.content.id, requestDto, this.content.version)
+                this.contentsService.putContent(this.ctx.appName, this.schema.name, this.content.id, requestDto, !publish, this.content.version)
                     .subscribe(dto => {
-                        const content = this.content.update(dto.payload, this.ctx.userToken, dto.version);
+                        let content = this.content;
 
-                        this.ctx.notifyInfo('Content saved successfully.');
+                        if (dto.version.value !== content.version.value) {
+                            if (publish) {
+                                content = this.content.update(dto.payload, this.ctx.userToken, dto.version);
+                            } else {
+                                content = this.content.proposeUpdate(dto.payload, this.ctx.userToken, dto.version);
+                            }
 
-                        this.emitContentUpdated(content);
+                            this.ctx.notifyInfo('Content saved successfully.');
+
+                            this.emitContentUpdated(content);
+                            this.reloadContentForm(content);
+                        } else {
+                            this.ctx.notifyInfo('Content has not changed.');
+                        }
+
                         this.enableContentForm();
-                        this.reloadContentForm(content);
                     }, error => {
                         this.ctx.notifyError(error);
 
@@ -183,6 +194,34 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
         } else {
             this.ctx.notifyError('Content element not valid, please check the field with the red bar on the left in all languages (if localizable).');
         }
+    }
+
+    public confirmChanges() {
+        this.contentsService.changeContentStatus(this.ctx.appName, this.schema.name, this.content.id, 'publish', null, this.content.version)
+            .subscribe(dto => {
+                const content = this.content.confirmChanges(this.ctx.userToken, dto.version);
+
+                this.ctx.notifyInfo('Content changes have been updated.');
+
+                this.emitContentUpdated(content);
+                this.reloadContentForm(content);
+            }, error => {
+                this.ctx.notifyError(error);
+            });
+    }
+
+    public discardChanges() {
+        this.contentsService.discardChanges(this.ctx.appName, this.schema.name, this.content.id, this.content.version)
+            .subscribe(dto => {
+                const content = this.content.discardChanges(this.ctx.userToken, dto.version);
+
+                this.ctx.notifyInfo('Content changes have been discarded.');
+
+                this.emitContentUpdated(content);
+                this.reloadContentForm(content);
+            }, error => {
+                this.ctx.notifyError(error);
+            });
     }
 
     private loadVersion(version: number) {
@@ -274,7 +313,7 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
 
         if (!this.isNewMode) {
             for (const field of this.schema.fields) {
-                const fieldValue = this.content.data[field.name] || {};
+                const fieldValue = this.content.displayData[field.name] || {};
                 const fieldForm = <FormGroup>this.contentForm.controls[field.name];
 
                 if (field.isLocalizable) {

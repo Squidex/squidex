@@ -9,5 +9,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Commands
 {
     public sealed class PatchContent : ContentDataCommand
     {
+        public bool AsProposal { get; set; }
     }
 }
