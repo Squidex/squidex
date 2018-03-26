@@ -4,6 +4,7 @@
 .content-status {
     & {
         color: $color-text;
+        cursor: default !important;
     }
 
     &:hover {
@@ -12,7 +13,14 @@
 }
 
 .discard-changes {
-    color: $color-theme-blue !important;
-    font-size: .9rem;
-    font-weight: normal;
+    & {
+        color: $color-theme-blue !important;
+        cursor: pointer;
+        font-size: .9rem;
+        font-weight: normal;
+    }
+
+    &:hover {
+        text-decoration: underline !important;
+    }
 }
