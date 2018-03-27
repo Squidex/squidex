@@ -5,18 +5,17 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 
 import {
     AppContext,
     UserDto,
-    UserManagementService,
     ValidatorsEx
 } from 'shared';
 
-import { UserCreated, UserUpdated } from './../messages';
+import { UsersState } from './../../state/users.state';
 
 @Component({
     selector: 'sqx-user-page',
@@ -26,8 +25,8 @@ import { UserCreated, UserUpdated } from './../messages';
         AppContext
     ]
 })
-export class UserPageComponent  implements OnInit {
-    public user: UserDto;
+export class UserPageComponent implements OnDestroy, OnInit {
+    private selectedUserSubscription: Subscription;
 
     public userFormSubmitted = false;
     public userForm: FormGroup;
@@ -38,18 +37,17 @@ export class UserPageComponent  implements OnInit {
 
     constructor(public readonly ctx: AppContext,
         private readonly formBuilder: FormBuilder,
-        private readonly router: Router,
-        private readonly userManagementService: UserManagementService
+        private readonly state: UsersState
     ) {
     }
 
-    public ngOnInit() {
-        this.ctx.route.data.map(d => d.user)
-            .subscribe((user: UserDto) => {
-                this.user = user;
+    public ngOnDestroy() {
+        this.selectedUserSubscription.unsubscribe();
+    }
 
-                this.setupAndPopulateForm();
-            });
+    public ngOnInit() {
+        this.selectedUserSubscription =
+            this.state.selectedUser.subscribe(user => this.setupAndPopulateForm(user!));
     }
 
     public save() {
@@ -61,34 +59,19 @@ export class UserPageComponent  implements OnInit {
             const requestDto = this.userForm.value;
 
             if (this.isNewMode) {
-                this.userManagementService.postUser(requestDto)
-                    .subscribe(created => {
-                        this.user =
-                            new UserDto(
-                                created.id,
-                                requestDto.email,
-                                requestDto.displayName,
-                                created.pictureUrl!,
-                                false);
-
+                this.state.createUser(requestDto)
+                    .subscribe(() => {
                         this.ctx.notifyInfo('User created successfully.');
 
-                        this.emitUserCreated(this.user);
-                        this.back();
+                        this.resetUserForm();
                     }, error => {
                         this.resetUserForm(error.displayMessage);
                     });
             } else {
-                this.userManagementService.putUser(this.user.id, requestDto)
+                this.state.updateUser(requestDto)
                     .subscribe(() => {
-                        this.user =
-                            this.user.update(
-                                requestDto.email,
-                                requestDto.displayMessage);
-
                         this.ctx.notifyInfo('User saved successfully.');
 
-                        this.emitUserUpdated(this.user);
                         this.resetUserForm();
                     }, error => {
                         this.resetUserForm(error.displayMessage);
@@ -97,31 +80,21 @@ export class UserPageComponent  implements OnInit {
         }
     }
 
-    private back() {
-        this.router.navigate(['../'], { relativeTo: this.ctx.route, replaceUrl: true });
-    }
+    private setupAndPopulateForm(user: UserDto | null) {
+        const userData: any = user || {};
 
-    private emitUserCreated(user: UserDto) {
-        this.ctx.bus.emit(new UserCreated(user));
-    }
+        this.isNewMode = !user;
+        this.isCurrentUser = user !== null && user.id === this.ctx.userId;
 
-    private emitUserUpdated(user: UserDto) {
-        this.ctx.bus.emit(new UserUpdated(user));
-    }
-
-    private setupAndPopulateForm() {
-        const input = this.user || {};
-
-        this.isNewMode = !this.user;
         this.userForm =
             this.formBuilder.group({
-                email: [input['email'],
+                email: [userData.email,
                     [
                         Validators.email,
                         Validators.required,
                         Validators.maxLength(100)
                     ]],
-                displayName: [input['displayName'],
+                displayName: [userData.displayName,
                     [
                         Validators.required,
                         Validators.maxLength(100)
@@ -136,7 +109,6 @@ export class UserPageComponent  implements OnInit {
                     ]]
             });
 
-        this.isCurrentUser = this.user && this.user.id === this.ctx.userId;
 
         this.resetUserForm();
     }
