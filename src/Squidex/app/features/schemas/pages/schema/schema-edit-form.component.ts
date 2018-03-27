@@ -8,36 +8,21 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 
-import {
-    AppContext,
-    SchemaPropertiesDto,
-    SchemasService,
-    Version
-} from 'shared';
+import { SchemaDetailsDto, UpdateSchemaDto } from 'shared';
+
+import { SchemasState } from './../../state/schemas.state';
 
 @Component({
     selector: 'sqx-schema-edit-form',
     styleUrls: ['./schema-edit-form.component.scss'],
-    templateUrl: './schema-edit-form.component.html',
-    providers: [
-        AppContext
-    ]
+    templateUrl: './schema-edit-form.component.html'
 })
 export class SchemaEditFormComponent implements OnInit {
     @Output()
-    public saved = new EventEmitter<SchemaPropertiesDto>();
-
-    @Output()
-    public cancelled = new EventEmitter();
+    public completed = new EventEmitter();
 
     @Input()
-    public name: string;
-
-    @Input()
-    public properties: SchemaPropertiesDto;
-
-    @Input()
-    public version: Version;
+    public schema: SchemaDetailsDto;
 
     public editFormSubmitted = false;
     public editForm =
@@ -52,19 +37,18 @@ export class SchemaEditFormComponent implements OnInit {
                 ]]
         });
 
-    constructor(public readonly ctx: AppContext,
-        private readonly schemas: SchemasService,
+    constructor(
+        private readonly schemasState: SchemasState,
         private readonly formBuilder: FormBuilder
     ) {
     }
 
     public ngOnInit() {
-        this.editForm.patchValue(this.properties);
+        this.editForm.patchValue(this.schema.properties);
     }
 
-    public cancel() {
-        this.emitCancelled();
-        this.resetEditForm();
+    public complete() {
+        this.completed.emit();
     }
 
     public saveSchema() {
@@ -73,34 +57,18 @@ export class SchemaEditFormComponent implements OnInit {
         if (this.editForm.valid) {
             this.editForm.disable();
 
-            const requestDto = this.editForm.value;
+            const requestDto = <UpdateSchemaDto>this.editForm.value;
 
-            this.schemas.putSchema(this.ctx.appName, this.name, requestDto, this.version)
+            this.schemasState.update(this.schema, requestDto)
                 .subscribe(dto => {
-                    this.emitSaved(requestDto);
-                    this.resetEditForm();
+                    this.complete();
                 }, error => {
-                    this.ctx.notifyError(error);
                     this.enableEditForm();
                 });
         }
     }
 
-    private emitCancelled() {
-        this.cancelled.emit();
-    }
-
-    private emitSaved(requestDto: any) {
-        this.saved.emit(new SchemaPropertiesDto(requestDto.label, requestDto.hints));
-    }
-
     private enableEditForm() {
-        this.editForm.enable();
-        this.editFormSubmitted = false;
-    }
-
-    private resetEditForm() {
-        this.editForm.reset();
         this.editForm.enable();
         this.editFormSubmitted = false;
     }

@@ -36,7 +36,7 @@ import { SchemasState } from './../../state/schemas.state';
     ]
 })
 export class SchemaPageComponent implements OnDestroy, OnInit {
-    private schemaCreatedSubscription: Subscription;
+    private selectedSchemaSubscription: Subscription;
 
     public fieldTypes = fieldTypes;
 
@@ -59,16 +59,17 @@ export class SchemaPageComponent implements OnDestroy, OnInit {
     }
 
     public ngOnDestroy() {
-        this.schemaCreatedSubscription.unsubscribe();
+        this.selectedSchemaSubscription.unsubscribe();
     }
 
     public ngOnInit() {
-        this.schemasState.selectedSchema
-            .subscribe(schema => {
-                this.schema = schema!;
+        this.selectedSchemaSubscription =
+            this.schemasState.selectedSchema
+                .subscribe(schema => {
+                    this.schema = schema!;
 
-                this.export();
-            });
+                    this.export();
+                });
     }
 
     public publish() {

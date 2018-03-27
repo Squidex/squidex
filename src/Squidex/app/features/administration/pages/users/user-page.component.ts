@@ -63,9 +63,7 @@ export class UserPageComponent implements OnDestroy, OnInit {
     }
 
     public ngOnDestroy() {
-        if (this.selectedUserSubscription) {
-            this.selectedUserSubscription.unsubscribe();
-        }
+        this.selectedUserSubscription.unsubscribe();
     }
 
     public ngOnInit() {
@@ -120,10 +118,10 @@ export class UserPageComponent implements OnDestroy, OnInit {
     }
 
     private resetFormState(message: string = '') {
+        this.userFormSubmitted = false;
         this.userForm.enable();
         this.userForm.controls['password'].reset();
         this.userForm.controls['passwordConfirm'].reset();
-        this.userFormSubmitted = false;
         this.userFormError = message;
     }
 }

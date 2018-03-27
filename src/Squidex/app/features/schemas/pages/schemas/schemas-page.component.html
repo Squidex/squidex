@@ -29,7 +29,7 @@
     <div class="panel-main">
         <div class="panel-content">
             <ul class="nav nav-panel nav-dark nav-dark-bordered flex-column">
-                <li class="nav-item" *ngFor="let schema of schemasFiltered | async; trackBy: schemasState.trackBy">
+                <li class="nav-item" *ngFor="let schema of schemasFiltered | async; trackBy: schemasState.trackBySchema">
                     <a class="nav-link" [routerLink]="[schema.name]" routerLinkActive="active">
                         <div class="row">
                             <div class="col col-4">

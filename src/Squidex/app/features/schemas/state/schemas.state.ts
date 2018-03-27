@@ -24,7 +24,9 @@ import {
     SchemaDto,
     SchemaDetailsDto,
     SchemasService,
-    UpdateFieldDto
+    UpdateFieldDto,
+    UpdateSchemaScriptsDto,
+    UpdateSchemaDto
 } from 'shared';
 
 @Injectable()
@@ -171,6 +173,22 @@ export class SchemasState {
             });
     }
 
+    public configureScripts(schema: SchemaDetailsDto, request: UpdateSchemaScriptsDto): Observable<any> {
+        return this.schemasService.putSchemaScripts(this.app, schema.name, request, schema.version)
+            .catch(error => this.notifyError(error))
+            .do(dto => {
+                this.replaceSchema(schema.configureScripts(request, this.user, dto.version));
+            });
+    }
+
+    public update(schema: SchemaDetailsDto, request: UpdateSchemaDto): Observable<any> {
+        return this.schemasService.putSchema(this.app, schema.name, request, schema.version)
+            .catch(error => this.notifyError(error))
+            .do(dto => {
+                this.replaceSchema(schema.update(request, this.user, dto.version));
+            });
+    }
+
     public delete(schema: SchemaDto): Observable<any> {
         return this.schemasService.deleteSchema(this.app, schema.name, schema.version)
             .catch(error => this.notifyError(error))
@@ -185,8 +203,12 @@ export class SchemasState {
         this.selectedSchema.nextBy(v => v !== null && v.id === schema.id ? <SchemaDetailsDto>schema : v);
     }
 
-    public trackBy(index: number, schema: SchemaDto): any {
+    public trackBySchema(index: number, schema: SchemaDto): any {
         return schema.id;
+    }
+
+    public trackByField(index: number, field: FieldDto): any {
+        return field.fieldId;
     }
 
     private notifyError(error: string | ErrorDto) {

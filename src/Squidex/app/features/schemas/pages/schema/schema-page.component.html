@@ -60,7 +60,7 @@
 
     <div class="panel-main">
         <div class="panel-content panel-content-scroll" dnd-sortable-container [sortableData]="schema.fields">
-            <div *ngFor="let field of schema.fields; let i = index" dnd-sortable [sortableIndex]="i" (sqxSorted)="sortFields($event)">
+            <div *ngFor="let field of schema.fields; let i = index; trackBy: schemasState.trackByField" dnd-sortable [sortableIndex]="i" (sqxSorted)="sortFields($event)">
                 <sqx-field [field]="field" [schema]="schema"></sqx-field>
             </div>
 
@@ -89,21 +89,26 @@
 
 <div class="modal" *sqxModalView="editSchemaDialog;onRoot:true" @fade>
     <div class="modal-backdrop"></div>
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">Edit Schema</h4>
+ 
+    <sqx-schema-edit-form [schema]="schema" 
+        (completed)="editSchemaDialog.hide()">
+    </sqx-schema-edit-form>
+</div>
 
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="editSchemaDialog.hide()">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
+<div class="modal" *sqxModalView="addFieldDialog;onRoot:true;closeAuto:false" @fade>
+    <div class="modal-backdrop"></div>
 
-            <div class="modal-body">
-                <sqx-schema-edit-form [name]="schema.name" [properties]="schema.properties" [version]="schema.version" (saved)="onSchemaSaved($event)" (cancelled)="editSchemaDialog.hide()"></sqx-schema-edit-form>
-            </div>
-        </div>
-    </div>
+    <sqx-field-wizard [schema]="schema"
+        (completed)="addFieldDialog.hide()">
+    </sqx-field-wizard>
+</div>
+
+<div class="modal" *sqxModalView="configureScriptsDialog;onRoot:true" @fade>
+    <div class="modal-backdrop"></div>
+
+    <sqx-schema-scripts-form [schema]="schema"
+        (completed)="configureScriptsDialog.hide()">
+    </sqx-schema-scripts-form>
 </div>
 
 <div class="modal" *sqxModalView="exportSchemaDialog;onRoot:true" @fade>
@@ -121,24 +126,6 @@
             <div class="modal-body">
                 <sqx-json-editor disabled [ngModel]="schemaExport"></sqx-json-editor>
             </div>
-        </div>
-    </div>
-</div>
-
-
-<div class="modal" *sqxModalView="addFieldDialog;onRoot:true;closeAuto:false" @fade>
-    <div class="modal-backdrop"></div>
-
-    <sqx-field-wizard
-        (completed)="addFieldDialog.hide()" [schema]="schema">
-    </sqx-field-wizard>
-</div>
-
-<div class="modal" *sqxModalView="configureScriptsDialog;onRoot:true" @fade>
-    <div class="modal-backdrop"></div>
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <sqx-schema-scripts-form [schema]="schema" (saved)="onSchemaScriptsSaved($event)" (cancelled)="configureScriptsDialog.hide()"></sqx-schema-scripts-form>
         </div>
     </div>
 </div>

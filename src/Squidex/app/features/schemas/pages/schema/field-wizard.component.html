@@ -44,7 +44,7 @@
                 <div class="form-group">
                     <sqx-control-errors for="name" [submitted]="addFieldFormSubmitted"></sqx-control-errors>
 
-                    <input type="text" class="form-control" formControlName="name" maxlength="40" placeholder="Enter field name" sqxFocusOnInit />
+                    <input type="text" class="form-control" formControlName="name" maxlength="40" #nameInput placeholder="Enter field name" sqxFocusOnInit />
                 </div>
 
                 <div class="form-group">
@@ -77,15 +77,8 @@
     <div class="modal-content" *ngIf="editForm">
         <form [formGroup]="editForm">
             <div class="modal-header">
-                
-                <h4 class="modal-title" *ngIf="editStep === 1">
-                    Step 1 of 3: Common Properties
-                </h4>
-                <h4 class="modal-title" *ngIf="editStep === 2">
-                    Step 2 of 3: Validation
-                </h4>
-                <h4 class="modal-title" *ngIf="editStep === 3">
-                    Step 3 of 3: Editing Settings
+                <h4 class="modal-title">
+                    Configure Field
                 </h4>
                 
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="complete()">
@@ -93,20 +86,30 @@
                 </button>
             </div>
 
+            <div class="modal-tabs">
+                <ul class="nav nav-tabs2">
+                    <li class="nav-item">
+                        <a class="nav-link" [class.active]="editTab === 1" (click)="selectTab(1)">Common</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" [class.active]="editTab === 2" (click)="selectTab(2)">Validation</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" [class.active]="editTab === 3" (click)="selectTab(3)">Editing</a>
+                    </li>
+                </ul>
+            </div>
+            
             <div class="modal-body">
-                <h3 class="wizard-title" *ngIf="editStep === 1">Common</h3>
-                <h3 class="wizard-title" *ngIf="editStep === 2">Validation</h3>
-                <h3 class="wizard-title" *ngIf="editStep === 3">Editing</h3>
-
-                <div [class.hidden]="editStep !== 1">
+                <div [class.hidden]="editTab !== 1">
                     <sqx-field-form-common [editForm]="editForm" [editFormSubmitted]="editFormSubmitted" [showName]="false" [field]="editField"></sqx-field-form-common>
                 </div>
     
-                <div [class.hidden]="editStep !== 2">
+                <div [class.hidden]="editTab !== 2">
                     <sqx-field-form-validation [editForm]="editForm" [field]="editField"></sqx-field-form-validation>
                 </div>
     
-                <div [class.hidden]="editStep !== 3">
+                <div [class.hidden]="editTab !== 3">
                     <sqx-field-form-ui [editForm]="editForm" [field]="editField"></sqx-field-form-ui>
                 </div>
             </div>
@@ -114,10 +117,7 @@
                 <div class="clearfix">
                     <button type="reset" class="float-left btn btn-secondary" (click)="complete()">Cancel</button>
 
-                    <div class="float-right" *ngIf="editStep !== 2">
-                        <button class="btn btn-primary" (click)="next()">Next</button>
-                    </div>
-                    <div class="float-right" *ngIf="editStep === 2">
+                    <div class="float-right">
                         <button class="btn btn-success" (click)="configureField(false)">Configure and close</button>
                         <button class="btn btn-success" (click)="configureField(true)">Configure and new field</button>
                     </div>

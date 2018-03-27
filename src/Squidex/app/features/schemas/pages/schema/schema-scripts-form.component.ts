@@ -8,27 +8,18 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 
-import {
-    AppContext,
-    SchemaDetailsDto,
-    SchemasService,
-    UpdateSchemaScriptsDto
-} from 'shared';
+import { SchemaDetailsDto, UpdateSchemaScriptsDto } from 'shared';
+
+import { SchemasState } from './../../state/schemas.state';
 
 @Component({
     selector: 'sqx-schema-scripts-form',
     styleUrls: ['./schema-scripts-form.component.scss'],
-    templateUrl: './schema-scripts-form.component.html',
-    providers: [
-        AppContext
-    ]
+    templateUrl: './schema-scripts-form.component.html'
 })
 export class SchemaScriptsFormComponent implements OnInit {
     @Output()
-    public saved = new EventEmitter<UpdateSchemaScriptsDto>();
-
-    @Output()
-    public cancelled = new EventEmitter();
+    public completed = new EventEmitter();
 
     @Input()
     public schema: SchemaDetailsDto;
@@ -53,8 +44,8 @@ export class SchemaScriptsFormComponent implements OnInit {
             scriptChange: ''
         });
 
-    constructor(public readonly ctx: AppContext,
-        private readonly schemas: SchemasService,
+    constructor(
+        private readonly schemasState: SchemasState,
         private readonly formBuilder: FormBuilder
     ) {
     }
@@ -63,9 +54,8 @@ export class SchemaScriptsFormComponent implements OnInit {
         this.editForm.patchValue(this.schema);
     }
 
-    public cancel() {
-        this.emitCancelled();
-        this.resetEditForm();
+    public complete() {
+        this.completed.emit();
     }
 
     public saveSchema() {
@@ -74,31 +64,15 @@ export class SchemaScriptsFormComponent implements OnInit {
         if (this.editForm.valid) {
             this.editForm.disable();
 
-            const requestDto =
-                new UpdateSchemaScriptsDto(
-                    this.editForm.controls['scriptQuery'].value,
-                    this.editForm.controls['scriptCreate'].value,
-                    this.editForm.controls['scriptUpdate'].value,
-                    this.editForm.controls['scriptDelete'].value,
-                    this.editForm.controls['scriptChange'].value);
+            const requestDto = <UpdateSchemaScriptsDto>this.editForm.value;
 
-            this.schemas.putSchemaScripts(this.ctx.appName, this.schema.name, requestDto, this.schema.version)
+            this.schemasState.configureScripts(this.schema, requestDto)
                 .subscribe(dto => {
-                    this.emitSaved(requestDto);
-                    this.resetEditForm();
+                    this.complete();
                 }, error => {
-                    this.ctx.notifyError(error);
                     this.enableEditForm();
                 });
         }
-    }
-
-    private emitCancelled() {
-        this.cancelled.emit();
-    }
-
-    private emitSaved(requestDto: UpdateSchemaScriptsDto) {
-        this.saved.emit(requestDto);
     }
 
     public selectField(field: string) {
@@ -106,12 +80,6 @@ export class SchemaScriptsFormComponent implements OnInit {
     }
 
     private enableEditForm() {
-        this.editForm.enable();
-        this.editFormSubmitted = false;
-    }
-
-    private resetEditForm() {
-        this.editForm.reset();
         this.editForm.enable();
         this.editFormSubmitted = false;
     }

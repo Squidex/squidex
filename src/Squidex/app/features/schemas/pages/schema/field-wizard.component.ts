@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { FormBuilder, Validators, FormGroup } from '@angular/forms';
 
 import {
@@ -37,7 +37,7 @@ export class FieldWizardComponent {
     public fieldTypes = fieldTypes;
 
     public editFormSubmitted = false;
-    public editStep = 0;
+    public editTab = 0;
     public editForm: FormGroup | null;
     public editField: FieldDto | null;
 
@@ -58,6 +58,9 @@ export class FieldWizardComponent {
             isLocalizable: [false]
         });
 
+    @ViewChild('nameInput')
+    public nameInput: ElementRef;
+
     @Input()
     public schema: SchemaDetailsDto;
 
@@ -74,8 +77,8 @@ export class FieldWizardComponent {
         this.completed.emit();
     }
 
-    public next() {
-        this.editStep++;
+    public selectTab(tab: number) {
+        this.editTab = tab;
     }
 
     public addField(next: boolean, configure: boolean) {
@@ -99,9 +102,11 @@ export class FieldWizardComponent {
 
                     if (configure) {
                         this.editField = dto;
-                        this.editStep = 1;
+                        this.editTab = 1;
                         this.editForm = new FormGroup({});
-                    } else if (!next) {
+                    } else if (next) {
+                        this.nameInput.nativeElement.focus();
+                    } else {
                         this.complete();
                     }
                 }, error => {
@@ -120,10 +125,10 @@ export class FieldWizardComponent {
                 .subscribe(() => {
                     this.resetEditForm();
 
-                    if (this.next) {
+                    if (next) {
                         this.editField = null;
                         this.editForm = null;
-                        this.editStep = 1;
+                        this.editTab = 1;
                     } else {
                         this.complete();
                     }
@@ -134,16 +139,16 @@ export class FieldWizardComponent {
     }
 
     private resetEditForm() {
+        this.editFormSubmitted = false;
         this.editForm!.enable();
         this.editForm!.reset(this.editField!.properties);
-        this.editFormSubmitted = false;
     }
 
     private resetFieldForm(error = '') {
-        this.addFieldError = error;
-        this.addFieldForm.enable();
-        this.addFieldForm.reset({ type: 'String' });
         this.addFieldFormSubmitted = false;
+        this.addFieldForm.enable();
+        this.addFieldForm.reset({ type: 'String' }, { emitEvent: false });
+        this.addFieldError = error;
     }
 }
 
