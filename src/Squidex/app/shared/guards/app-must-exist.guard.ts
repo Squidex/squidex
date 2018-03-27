@@ -9,12 +9,12 @@ import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from '@angular/router';
 import { Observable } from 'rxjs';
 
-import { AppsStoreService } from './../services/apps-store.service';
+import { AppsState } from './../state/apps.state';
 
 @Injectable()
 export class AppMustExistGuard implements CanActivate {
     constructor(
-        private readonly appsStore: AppsStoreService,
+        private readonly appsStore: AppsState,
         private readonly router: Router
     ) {
     }
@@ -28,12 +28,7 @@ export class AppMustExistGuard implements CanActivate {
                     if (!dto) {
                         this.router.navigate(['/404']);
                     }
-                })
-                .catch(error => {
-                    this.router.navigate(['/404']);
-
-                    return Observable.of(false);
-                });
+                }).map(a => a !== null);
 
         return result;
     }

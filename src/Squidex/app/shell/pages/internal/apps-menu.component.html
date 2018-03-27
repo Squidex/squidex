@@ -36,22 +36,8 @@
 
 <div class="modal" *sqxModalView="addAppDialog;onRoot:true" @fade>
     <div class="modal-backdrop"></div>
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">Create App</h4>
 
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="addAppDialog.hide()">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-
-            <div class="modal-body">
-                <sqx-app-form 
-                    (created)="addAppDialog.hide()" 
-                    (cancelled)="addAppDialog.hide()">
-                </sqx-app-form>
-            </div>
-        </div>
-    </div>
+    <sqx-app-form 
+        (completed)="addAppDialog.hide()">
+    </sqx-app-form>
 </div>

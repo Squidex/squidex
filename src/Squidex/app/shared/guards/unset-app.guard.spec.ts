@@ -8,22 +8,22 @@
 import { IMock, Mock, Times } from 'typemoq';
 import { Observable } from 'rxjs';
 
-import { AppsStoreService } from 'shared';
+import { AppsState } from 'shared';
 
 import { UnsetAppGuard } from './unset-app.guard';
 
 describe('UnsetAppGuard', () => {
-    let appStoreService: IMock<AppsStoreService>;
+    let appsState: IMock<AppsState>;
 
     beforeEach(() => {
-        appStoreService = Mock.ofType(AppsStoreService);
+        appsState = Mock.ofType(AppsState);
     });
 
     it('should unselect app', () => {
-        appStoreService.setup(x => x.selectApp(null))
-            .returns(() => Observable.of(false));
+        appsState.setup(x => x.selectApp(null))
+            .returns(() => Observable.of(null));
 
-        const guard = new UnsetAppGuard(appStoreService.object);
+        const guard = new UnsetAppGuard(appsState.object);
 
         let result = false;
 
@@ -34,6 +34,6 @@ describe('UnsetAppGuard', () => {
 
         expect(result).toBeTruthy();
 
-        appStoreService.verify(x => x.selectApp(null), Times.once());
+        appsState.verify(x => x.selectApp(null), Times.once());
     });
 });

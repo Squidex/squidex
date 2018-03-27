@@ -11,8 +11,9 @@ import { Subscription } from 'rxjs';
 import {
     AppContext,
     AppDto,
-    AppsStoreService,
+    AppsState,
     fadeAnimation,
+    ImmutableArray,
     ModalView,
     OnboardingService
 } from 'shared';
@@ -32,15 +33,15 @@ export class AppsPageComponent implements OnDestroy, OnInit {
     private appsSubscription: Subscription;
 
     public addAppDialog = new ModalView();
-    public apps: AppDto[];
 
-    public template = '';
+    public apps: ImmutableArray<AppDto>;
+    public apptemplate = '';
 
     public onboardingModal = new ModalView();
 
     constructor(
         public readonly ctx: AppContext,
-        private readonly appsStore: AppsStoreService,
+        private readonly appsState: AppsState,
         private readonly onboardingService: OnboardingService
     ) {
     }
@@ -51,7 +52,7 @@ export class AppsPageComponent implements OnDestroy, OnInit {
 
     public ngOnInit() {
         this.appsSubscription =
-            this.appsStore.apps
+            this.appsState.apps
                 .subscribe(apps => {
                     if (apps.length === 0 && this.onboardingService.shouldShow('dialog')) {
                         this.onboardingService.disable('dialog');
@@ -63,7 +64,7 @@ export class AppsPageComponent implements OnDestroy, OnInit {
     }
 
     public createNewApp(template: string) {
-        this.template = template;
+        this.apptemplate = template;
 
         this.addAppDialog.show();
     }

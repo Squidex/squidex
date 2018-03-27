@@ -9,9 +9,9 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 
 import {
-    AppContext,
     AppDto,
-    AppsStoreService,
+    AppsState,
+    ImmutableArray,
     fadeAnimation,
     ModalView
 } from 'shared';
@@ -20,9 +20,6 @@ import {
     selector: 'sqx-apps-menu',
     styleUrls: ['./apps-menu.component.scss'],
     templateUrl: './apps-menu.component.html',
-    providers: [
-        AppContext
-    ],
     animations: [
         fadeAnimation
     ]
@@ -34,12 +31,12 @@ export class AppsMenuComponent implements OnDestroy, OnInit {
     public addAppDialog = new ModalView();
 
     public appsMenu = new ModalView(false, true);
-    public apps: AppDto[] = [];
+    public apps = ImmutableArray.of<AppDto>([]);
 
     public selectedApp: AppDto | null;
 
     constructor(
-        private readonly appsStore: AppsStoreService
+        private readonly appsStore: AppsState
     ) {
     }
 

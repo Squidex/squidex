@@ -20,7 +20,6 @@ export * from './services/app-contributors.service';
 export * from './services/app-clients.service';
 export * from './services/app-languages.service';
 export * from './services/app-patterns.service';
-export * from './services/apps-store.service';
 export * from './services/apps.service';
 export * from './services/assets.service';
 export * from './services/auth.service';

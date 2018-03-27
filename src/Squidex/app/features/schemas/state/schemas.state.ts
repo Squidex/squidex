@@ -12,7 +12,7 @@ import 'framework/utils/rxjs-extensions';
 
 import {
     AddFieldDto,
-    AppsStoreService,
+    AppsState,
     AuthService,
     CreateSchemaDto,
     DateTime,
@@ -34,7 +34,7 @@ export class SchemasState {
     public selectedSchema = new BehaviorSubject<SchemaDetailsDto | null>(null);
 
     private get app() {
-        return this.appsState.app$.value!.name;
+        return this.appsState.selectedApp.value!.name;
     }
 
     private get user() {
@@ -45,7 +45,7 @@ export class SchemasState {
         private readonly schemasService: SchemasService,
         private readonly dialogs: DialogService,
         private readonly authState: AuthService,
-        private readonly appsState: AppsStoreService
+        private readonly appsState: AppsState
     ) {
     }
 
@@ -56,7 +56,7 @@ export class SchemasState {
             Observable.of(<SchemaDetailsDto>this.schemasItems.value.find(x => x.id === id && x instanceof SchemaDetailsDto))
                 .switchMap(schema => {
                     if (!schema) {
-                        return this.schemasService.getSchema(this.appsState.app$.value!.name, id).catch(() => Observable.of(null));
+                        return this.schemasService.getSchema(this.app, id).catch(() => Observable.of(null));
                     } else {
                         return Observable.of(schema);
                     }

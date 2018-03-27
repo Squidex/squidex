@@ -11,12 +11,13 @@ import { IMock, Mock, Times } from 'typemoq';
 import {
     AppDto,
     AppsService,
-    AppsStoreService,
+    AppsState,
     CreateAppDto,
-    DateTime
+    DateTime,
+    ImmutableArray
 } from './../';
 
-describe('AppsStoreService', () => {
+describe('AppsState', () => {
     const now = DateTime.now();
 
     const oldApps = [
@@ -36,10 +37,10 @@ describe('AppsStoreService', () => {
     });
 
     it('should load automatically', () => {
-        const store = new AppsStoreService(appsService.object);
+        const store = new AppsState(appsService.object);
 
-        let result1: AppDto[] | null = null;
-        let result2: AppDto[] | null = null;
+        let result1: ImmutableArray<AppDto>;
+        let result2: ImmutableArray<AppDto>;
 
         store.apps.subscribe(x => {
             result1 = x;
@@ -49,8 +50,8 @@ describe('AppsStoreService', () => {
             result2 = x;
         }).unsubscribe();
 
-        expect(result1).toEqual(oldApps);
-        expect(result2).toEqual(oldApps);
+        expect(result1!.values).toEqual(oldApps);
+        expect(result2!.values).toEqual(oldApps);
 
         appsService.verifyAll();
     });
@@ -62,10 +63,10 @@ describe('AppsStoreService', () => {
             .returns(() => Observable.of(newApp))
             .verifiable(Times.once());
 
-        const store = new AppsStoreService(appsService.object);
+        const store = new AppsState(appsService.object);
 
-        let result1: AppDto[] | null = null;
-        let result2: AppDto[] | null = null;
+        let result1: ImmutableArray<AppDto>;
+        let result2: ImmutableArray<AppDto>;
 
         store.apps.subscribe(x => {
             result1 = x;
@@ -77,8 +78,8 @@ describe('AppsStoreService', () => {
             result2 = x;
         }).unsubscribe();
 
-        expect(result1).toEqual(oldApps);
-        expect(result2).toEqual(oldApps.concat([newApp]));
+        expect(result1!.values).toEqual(oldApps);
+        expect(result2!.values).toEqual(oldApps.concat([newApp]));
 
         appsService.verifyAll();
     });
@@ -94,11 +95,11 @@ describe('AppsStoreService', () => {
             .returns(() => Observable.of({}))
             .verifiable(Times.once());
 
-        const store = new AppsStoreService(appsService.object);
+        const store = new AppsState(appsService.object);
 
-        let result1: AppDto[] | null = null;
-        let result2: AppDto[] | null = null;
-        let result3: AppDto[] | null = null;
+        let result1: ImmutableArray<AppDto>;
+        let result2: ImmutableArray<AppDto>;
+        let result3: ImmutableArray<AppDto>;
 
         store.apps.subscribe(x => {
             result1 = x;
@@ -116,15 +117,15 @@ describe('AppsStoreService', () => {
             result3 = x;
         }).unsubscribe();
 
-        expect(result1).toEqual(oldApps);
-        expect(result2).toEqual(oldApps.concat([newApp]));
-        expect(result3).toEqual(oldApps);
+        expect(result1!.values).toEqual(oldApps);
+        expect(result2!.values).toEqual(oldApps.concat([newApp]));
+        expect(result3!.values).toEqual(oldApps);
 
         appsService.verifyAll();
     });
 
     it('should select app', (done) => {
-        const store = new AppsStoreService(appsService.object);
+        const store = new AppsState(appsService.object);
 
         store.selectApp(oldApps[0].name).subscribe(isSelected => {
             expect(isSelected).toBeTruthy();

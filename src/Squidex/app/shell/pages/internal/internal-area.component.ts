@@ -9,7 +9,11 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 
-import { DialogService, Notification } from 'shared';
+import {
+    AppsState,
+    DialogService,
+    Notification
+} from 'shared';
 
 @Component({
     selector: 'sqx-internal-area',
@@ -23,7 +27,8 @@ export class InternalAreaComponent implements OnDestroy, OnInit {
 
     constructor(
         private readonly dialogs: DialogService,
-        private readonly route: ActivatedRoute
+        private readonly route: ActivatedRoute,
+        private readonly appState: AppsState
     ) {
     }
 
@@ -32,6 +37,8 @@ export class InternalAreaComponent implements OnDestroy, OnInit {
     }
 
     public ngOnInit() {
+        this.appState.loadApps().subscribe();
+
         this.queryParamsSubscription =
             this.route.queryParams.subscribe(params => {
                 const successMessage = params['successMessage'];
