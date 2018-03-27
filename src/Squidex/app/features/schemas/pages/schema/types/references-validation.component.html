@@ -4,7 +4,7 @@
 
         <div class="col col-6">
             <select class="form-control" id="fieldSchemaId" formControlName="schemaId">
-                <option *ngFor="let schema of schemas" [ngValue]="schema.id">{{schema.displayName}}</option>
+                <option *ngFor="let schema of schemasState.schemas | async" [ngValue]="schema.id">{{schema.displayName}}</option>
             </select>
         </div>
     </div>

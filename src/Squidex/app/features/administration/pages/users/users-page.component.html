@@ -56,7 +56,7 @@
                 <div sqxIgnoreScrollbar>
                     <table class="table table-items table-fixed">
                         <tbody>
-                            <ng-template ngFor let-user [ngForOf]="state.usersItems | async" [ngForTrackBy]="state.trackByUser">
+                            <ng-template ngFor let-user [ngForOf]="usersState.users | async" [ngForTrackBy]="usersState.trackByUser">
                                 <tr [routerLink]="user.id" routerLinkActive="active">
                                     <td class="cell-user">
                                         <img class="user-picture" [attr.title]="user.name" [attr.src]="user | sqxUserDtoPicture" />
@@ -68,7 +68,7 @@
                                         <span class="user-email table-cell">{{user.email}}</span>
                                     </td>
                                     <td class="cell-actions">
-                                        <span *ngIf="user.id !== ctx.userId">
+                                        <span *ngIf="user.id !== authState.user.id">
                                             <button class="btn btn-link" (click)="lock(user); $event.stopPropagation();" *ngIf="!user.isLocked" title="Lock User">
                                                 <i class="icon icon-unlocked"></i>
                                             </button>
@@ -76,7 +76,7 @@
                                                 <i class="icon icon-lock"></i>
                                             </button>
                                         </span>
-                                        <button *ngIf="user.id === ctx.userId" class="btn btn-link invisible">
+                                        <button *ngIf="user.id === authState.user.id" class="btn btn-link invisible">
                                             &nbsp;
                                         </button>
                                     </td>

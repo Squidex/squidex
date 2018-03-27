@@ -10,7 +10,6 @@ import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 
 import {
-    AppsState,
     DialogService,
     Notification
 } from 'shared';
@@ -27,8 +26,7 @@ export class InternalAreaComponent implements OnDestroy, OnInit {
 
     constructor(
         private readonly dialogs: DialogService,
-        private readonly route: ActivatedRoute,
-        private readonly appState: AppsState
+        private readonly route: ActivatedRoute
     ) {
     }
 
@@ -37,8 +35,6 @@ export class InternalAreaComponent implements OnDestroy, OnInit {
     }
 
     public ngOnInit() {
-        this.appState.loadApps().subscribe();
-
         this.queryParamsSubscription =
             this.route.queryParams.subscribe(params => {
                 const successMessage = params['successMessage'];

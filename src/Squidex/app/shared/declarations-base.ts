@@ -6,6 +6,7 @@
  */
 
 export * from './guards/app-must-exist.guard';
+export * from './guards/load-apps.guard';
 export * from './guards/must-be-authenticated.guard';
 export * from './guards/must-be-not-authenticated.guard';
 export * from './guards/resolve-app-languages.guard';

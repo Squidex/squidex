@@ -8,7 +8,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 
-import { DialogService } from 'shared';
+import { AuthService, DialogService } from 'shared';
 
 import { UserDto } from './../../services/users.service';
 import { UsersState } from './../../state/users.state';
@@ -21,7 +21,9 @@ import { UsersState } from './../../state/users.state';
 export class UsersPageComponent implements OnInit {
     public usersFilter = new FormControl();
 
-    constructor(public readonly usersState: UsersState,
+    constructor(
+        public readonly usersState: UsersState,
+        public readonly authState: AuthService,
         private readonly dialogs: DialogService
     ) {
     }
