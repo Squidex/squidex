@@ -18,7 +18,6 @@ export class AssetUpdated {
 }
 
 export class AssetDragged {
-
     public static readonly DRAG_START = 'Start';
     public static readonly DRAG_END = 'End';
 

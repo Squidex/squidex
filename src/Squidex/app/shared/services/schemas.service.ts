@@ -23,16 +23,35 @@ import {
     Versioned
 } from 'framework';
 
-export const fieldTypes: string[] = [
-    'Assets',
-    'Boolean',
-    'DateTime',
-    'Geolocation',
-    'Json',
-    'Number',
-    'References',
-    'String',
-    'Tags'
+export const fieldTypes = [
+    {
+        type: 'String',
+        description: 'Titles, names, paragraphs.'
+    }, {
+        type: 'Assets',
+        description: 'Images, videos, documents.'
+    }, {
+        type: 'Boolean',
+        description: 'Yes or no, true or false, 1 or 0.'
+    }, {
+        type: 'DateTime',
+        description: 'Events date, opening hours.'
+    }, {
+        type: 'Geolocation',
+        description: 'Coordinates: latitude and longitude.'
+    }, {
+        type: 'Json',
+        description: 'Data in JSON format, for developers.'
+    }, {
+        type: 'Number',
+        description: 'ID, order number, rating, quantity.'
+    }, {
+        type: 'References',
+        description: 'Links to other content items.'
+    }, {
+        type: 'Tags',
+        description: 'Special format for tags.'
+    }
 ];
 
 export const fieldInvariant = 'iv';

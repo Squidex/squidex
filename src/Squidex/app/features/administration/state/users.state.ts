@@ -26,7 +26,7 @@ import {
 
 @Injectable()
 export class UsersState {
-    public usersItems = new BehaviorSubject<ImmutableArray<UserDto>>(ImmutableArray.empty());
+    public users = new BehaviorSubject<ImmutableArray<UserDto>>(ImmutableArray.empty());
     public usersPager = new BehaviorSubject(new Pager(0));
     public usersQuery = new BehaviorSubject('');
 
@@ -38,11 +38,11 @@ export class UsersState {
     ) {
     }
 
-    public selectUser(id: string | null): Observable<boolean> {
+    public selectUser(id: string | null): Observable<UserDto | null> {
         const observable =
             !id ?
             Observable.of(null) :
-            Observable.of(this.usersItems.value.find(x => x.id === id))
+            Observable.of(this.users.value.find(x => x.id === id))
                 .switchMap(user => {
                     if (!user) {
                         return this.usersService.getUser(id).catch(() => Observable.of(null));
@@ -54,23 +54,22 @@ export class UsersState {
         return observable
             .do(user => {
                 this.selectedUser.next(user);
-            })
-            .map(u => u !== null);
+            });
     }
 
     public loadUsers(): Observable<any> {
         return this.usersService.getUsers(this.usersPager.value.pageSize, this.usersPager.value.skip, this.usersQuery.value)
             .catch(error => this.notifyError(error))
             .do(dtos => {
-                this.usersItems.nextBy(v => ImmutableArray.of(dtos.items));
+                this.users.nextBy(v => ImmutableArray.of(dtos.items));
                 this.usersPager.nextBy(v => v.setCount(dtos.total));
             });
     }
 
     public createUser(request: CreateUserDto): Observable<UserDto> {
         return this.usersService.postUser(request)
-            .do(user => {
-                this.usersItems.nextBy(v => v.pushFront(user));
+            .do(dto => {
+                this.users.nextBy(v => v.pushFront(dto));
                 this.usersPager.nextBy(v => v.incrementCount());
             });
     }
@@ -124,7 +123,7 @@ export class UsersState {
     }
 
     private replaceUser(user: UserDto) {
-        this.usersItems.nextBy(v => v.replaceBy('id', user));
+        this.users.nextBy(v => v.replaceBy('id', user));
 
         this.selectedUser.nextBy(v => v !== null && v.id === user.id ? user : v);
     }

@@ -11,12 +11,12 @@ import { Observable } from 'rxjs';
 
 import { allParams } from 'framework';
 
-import { UsersState } from './../state/users.state';
+import { SchemasState } from './../state/schemas.state';
 
 @Injectable()
-export class UserMustExistGuard implements CanActivate {
+export class SchemaMustExistGuard implements CanActivate {
     constructor(
-        private readonly usersState: UsersState,
+        private readonly schemasState: SchemasState,
         private readonly router: Router
     ) {
     }
@@ -24,14 +24,14 @@ export class UserMustExistGuard implements CanActivate {
     public canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> {
         const params = allParams(route);
 
-        const userId = params['userId'];
+        const schemaName = params['schemaName'];
 
-        if (!userId) {
-            throw 'Route must contain user id.';
+        if (!schemaName) {
+            throw 'Route must contain schema name.';
         }
 
         const result =
-            this.usersState.selectUser(userId)
+            this.schemasState.selectSchema(schemaName)
                 .do(dto => {
                     if (!dto) {
                         this.router.navigate(['/404']);

@@ -5,18 +5,19 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FormBuilder, Validators } from '@angular/forms';
+import { Component, Input, OnInit } from '@angular/core';
+import { FormGroup } from '@angular/forms';
 
 import {
-    AppPatternDto,
     createProperties,
     fadeAnimation,
     FieldDto,
-    FieldPropertiesDto,
     ModalView,
-    SchemaDto
+    SchemaDetailsDto,
+    UpdateFieldDto
 } from 'shared';
+
+import { SchemasState } from './../../state/schemas.state';
 
 @Component({
     selector: 'sqx-field',
@@ -31,58 +32,18 @@ export class FieldComponent implements OnInit {
     public field: FieldDto;
 
     @Input()
-    public schemas: SchemaDto[];
-
-    @Input()
-    public regexSuggestions: AppPatternDto[] = [];
-
-    @Output()
-    public locking = new EventEmitter();
-
-    @Output()
-    public hiding = new EventEmitter();
-
-    @Output()
-    public showing = new EventEmitter();
-
-    @Output()
-    public saving = new EventEmitter<FieldPropertiesDto>();
-
-    @Output()
-    public enabling = new EventEmitter();
-
-    @Output()
-    public disabling = new EventEmitter();
-
-    @Output()
-    public deleting = new EventEmitter();
+    public schema: SchemaDetailsDto;
 
     public dropdown = new ModalView(false, true);
 
     public isEditing = false;
     public selectedTab = 0;
 
-    public get displayName() {
-        return this.field.properties.label && this.field.properties.label.length > 0 ? this.field.properties.label : this.field.name;
-    }
-
     public editFormSubmitted = false;
-    public editForm =
-        this.formBuilder.group({
-            label: ['',
-                [
-                    Validators.maxLength(100)
-                ]],
-            hints: ['',
-                [
-                    Validators.maxLength(100)
-                ]],
-            isRequired: [false],
-            isListField: [false]
-        });
+    public editForm = new FormGroup({});
 
     constructor(
-        private readonly formBuilder: FormBuilder
+        private readonly schemasState: SchemasState
     ) {
     }
 
@@ -102,18 +63,38 @@ export class FieldComponent implements OnInit {
         this.resetEditForm();
     }
 
+    public deleteField() {
+        this.schemasState.deleteField(this.schema, this.field).subscribe();
+    }
+
+    public enableField() {
+        this.schemasState.enableField(this.schema, this.field).subscribe();
+    }
+
+    public disableField() {
+        this.schemasState.disableField(this.schema, this.field).subscribe();
+    }
+
+    public showField() {
+        this.schemasState.showField(this.schema, this.field).subscribe();
+    }
+
+    public hideField() {
+        this.schemasState.hideField(this.schema, this.field).subscribe();
+    }
+
+    public lockField() {
+        this.schemasState.lockField(this.schema, this.field).subscribe();
+    }
+
     public save() {
         this.editFormSubmitted = true;
 
         if (this.editForm.valid) {
             const properties = createProperties(this.field.properties['fieldType'], this.editForm.value);
 
-            this.emitSaving(properties);
+            this.schemasState.updateField(this.schema, this.field, new UpdateFieldDto(properties)).subscribe();
         }
-    }
-
-    private emitSaving(properties: FieldPropertiesDto) {
-        this.saving.emit(properties);
     }
 
     private resetEditForm() {

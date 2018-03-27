@@ -29,7 +29,7 @@
     <div class="panel-main">
         <div class="panel-content">
             <ul class="nav nav-panel nav-dark nav-dark-bordered flex-column">
-                <li class="nav-item" *ngFor="let schema of schemasFiltered">
+                <li class="nav-item" *ngFor="let schema of schemasFiltered | async; trackBy: schemasState.trackBy">
                     <a class="nav-link" [routerLink]="[schema.name]" routerLinkActive="active">
                         <div class="row">
                             <div class="col col-4">
@@ -67,10 +67,7 @@
             </div>
 
             <div class="modal-body">
-                <sqx-schema-form
-                    [import]="import"
-                    (created)="onSchemaCreated($event)" 
-                    (cancelled)="addSchemaDialog.hide()">
+                <sqx-schema-form [import]="import" (completed)="addSchemaDialog.hide()">
                 </sqx-schema-form>
             </div>
         </div>

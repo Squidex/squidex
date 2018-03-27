@@ -303,6 +303,7 @@ a {
     // Special radio button.
     &-radio {
         & {
+            @include border-radius;
             color: $color-border-dark;
             cursor: pointer;
             border: 1px solid $color-border;

@@ -12,7 +12,6 @@ import { DndModule } from 'ng2-dnd';
 import {
     HelpComponent,
     HistoryComponent,
-    ResolveSchemaGuard,
     SqxFrameworkModule,
     SqxSharedModule
 } from 'shared';
@@ -25,6 +24,10 @@ import {
     BooleanValidationComponent,
     DateTimeUIComponent,
     DateTimeValidationComponent,
+    FieldFormCommonComponent,
+    FieldFormUIComponent,
+    FieldFormValidationComponent,
+    FieldWizardComponent,
     GeolocationUIComponent,
     GeolocationValidationComponent,
     JsonUIComponent,
@@ -35,9 +38,11 @@ import {
     ReferencesValidationComponent,
     SchemaEditFormComponent,
     SchemaFormComponent,
+    SchemaMustExistGuard,
     SchemaPageComponent,
     SchemasPageComponent,
     SchemaScriptsFormComponent,
+    SchemasState,
     StringUIComponent,
     StringValidationComponent,
     TagsUIComponent,
@@ -55,9 +60,7 @@ const routes: Routes = [
             {
                 path: ':schemaName',
                 component: SchemaPageComponent,
-                resolve: {
-                    schema: ResolveSchemaGuard
-                },
+                canActivate: [SchemaMustExistGuard],
                 children: [
                     {
                         path: 'history',
@@ -85,6 +88,10 @@ const routes: Routes = [
         DndModule,
         RouterModule.forChild(routes)
     ],
+    providers: [
+        SchemaMustExistGuard,
+        SchemasState
+    ],
     declarations: [
         FieldComponent,
         AssetsUIComponent,
@@ -93,6 +100,10 @@ const routes: Routes = [
         BooleanValidationComponent,
         DateTimeUIComponent,
         DateTimeValidationComponent,
+        FieldFormCommonComponent,
+        FieldFormUIComponent,
+        FieldFormValidationComponent,
+        FieldWizardComponent,
         GeolocationUIComponent,
         GeolocationValidationComponent,
         JsonUIComponent,

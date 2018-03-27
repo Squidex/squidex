@@ -19,6 +19,6 @@ export class UnsetUserGuard implements CanActivate {
     }
 
     public canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> {
-        return this.usersState.selectUser(null).map(r => !r);
+        return this.usersState.selectUser(null).map(u => u === null);
     }
 }

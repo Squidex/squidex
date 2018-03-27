@@ -11,12 +11,10 @@ import { FormBuilder, Validators } from '@angular/forms';
 import {
     ApiUrlConfig,
     AppContext,
-    DateTime,
-    fadeAnimation,
-    SchemaDetailsDto,
-    SchemasService,
     ValidatorsEx
 } from 'shared';
+
+import { SchemasState } from './../../state/schemas.state';
 
 const FALLBACK_NAME = 'my-schema';
 
@@ -26,17 +24,11 @@ const FALLBACK_NAME = 'my-schema';
     templateUrl: './schema-form.component.html',
     providers: [
         AppContext
-    ],
-    animations: [
-        fadeAnimation
     ]
 })
 export class SchemaFormComponent implements OnInit {
     @Output()
-    public created = new EventEmitter<SchemaDetailsDto>();
-
-    @Output()
-    public cancelled = new EventEmitter();
+    public completed = new EventEmitter();
 
     @Input()
     public import: any;
@@ -63,7 +55,7 @@ export class SchemaFormComponent implements OnInit {
     constructor(
         public readonly apiUrl: ApiUrlConfig,
         public readonly ctx: AppContext,
-        private readonly schemas: SchemasService,
+        private readonly schemasState: SchemasState,
         private readonly formBuilder: FormBuilder
     ) {
     }
@@ -81,7 +73,7 @@ export class SchemaFormComponent implements OnInit {
     }
 
     public cancel() {
-        this.emitCancelled();
+        this.emitCompleted();
         this.resetCreateForm();
     }
 
@@ -94,9 +86,10 @@ export class SchemaFormComponent implements OnInit {
             const schemaName = this.createForm.controls['name'].value;
             const schemaDto = Object.assign(this.createForm.controls['import'].value || {}, { name: schemaName });
 
-            this.schemas.postSchema(this.ctx.appName, schemaDto, this.ctx.userToken, DateTime.now())
+            this.schemasState.create(schemaDto)
                 .subscribe(dto => {
-                    this.emitCreated(dto);
+                    this.emitCompleted();
+
                     this.resetCreateForm();
                 }, error => {
                     this.enableCreateForm(error.displayMessage);
@@ -104,12 +97,8 @@ export class SchemaFormComponent implements OnInit {
         }
     }
 
-    private emitCancelled() {
-        this.cancelled.emit();
-    }
-
-    private emitCreated(schema: SchemaDetailsDto) {
-        this.created.emit(schema);
+    private emitCompleted() {
+        this.completed.emit();
     }
 
     private enableCreateForm(message: string) {

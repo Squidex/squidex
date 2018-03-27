@@ -38,6 +38,8 @@ export * from './services/usages.service';
 export * from './services/users-provider.service';
 export * from './services/users.service';
 
+export * from './state/apps.state';
+
 export * from './utils/messages';
 
 export * from 'framework';
