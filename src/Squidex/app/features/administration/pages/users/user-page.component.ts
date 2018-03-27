@@ -117,10 +117,10 @@ export class UserPageComponent implements OnInit {
 
     private resetFormState(message: string = '') {
         this.userFormSubmitted = false;
+        this.userFormError = message;
         this.userForm.enable();
         this.userForm.controls['password'].reset();
         this.userForm.controls['passwordConfirm'].reset();
-        this.userFormError = message;
     }
 }
 

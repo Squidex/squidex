@@ -68,8 +68,6 @@ const routes: Routes = [
     ],
     providers: [
         EventConsumersService,
-        UnsetUserGuard,
-        UserMustExistGuard,
         UsersService
     ]
 })
