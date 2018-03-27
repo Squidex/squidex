@@ -6,7 +6,8 @@
  */
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { FormBuilder, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 
 import {
@@ -15,7 +16,7 @@ import {
     ValidatorsEx
 } from 'shared';
 
-import { UsersState } from './../../state/users.state';
+import { UserDto, UsersState } from './../../state/users.state';
 
 @Component({
     selector: 'sqx-user-page',
@@ -29,20 +30,45 @@ export class UserPageComponent implements OnDestroy, OnInit {
     private selectedUserSubscription: Subscription;
 
     public userFormSubmitted = false;
-    public userForm: FormGroup;
     public userFormError = '';
+    public userForm =
+        this.formBuilder.group({
+            email: ['',
+                [
+                    Validators.email,
+                    Validators.required,
+                    Validators.maxLength(100)
+                ]],
+            displayName: ['',
+                [
+                    Validators.required,
+                    Validators.maxLength(100)
+                ]],
+            password: ['',
+                [
+                    Validators.nullValidator
+                ]],
+            passwordConfirm: ['',
+                [
+                    ValidatorsEx.match('password', 'Passwords must be the same.')
+                ]]
+        });
+
+    public user: UserDto | null;
 
     public isCurrentUser = false;
-    public isNewMode = false;
 
     constructor(public readonly ctx: AppContext,
         private readonly formBuilder: FormBuilder,
+        private readonly router: Router,
         private readonly state: UsersState
     ) {
     }
 
     public ngOnDestroy() {
-        this.selectedUserSubscription.unsubscribe();
+        if (this.selectedUserSubscription) {
+            this.selectedUserSubscription.unsubscribe();
+        }
     }
 
     public ngOnInit() {
@@ -58,62 +84,45 @@ export class UserPageComponent implements OnDestroy, OnInit {
 
             const requestDto = this.userForm.value;
 
-            if (this.isNewMode) {
+            if (!this.user) {
                 this.state.createUser(requestDto)
-                    .subscribe(() => {
-                        this.ctx.notifyInfo('User created successfully.');
-
-                        this.resetUserForm();
+                    .subscribe(user => {
+                        this.back();
                     }, error => {
-                        this.resetUserForm(error.displayMessage);
+                        this.resetFormState(error.displayMessage);
                     });
             } else {
-                this.state.updateUser(requestDto)
+                this.state.updateUser(this.user!, requestDto)
                     .subscribe(() => {
-                        this.ctx.notifyInfo('User saved successfully.');
-
-                        this.resetUserForm();
+                        this.resetFormState();
                     }, error => {
-                        this.resetUserForm(error.displayMessage);
+                        this.resetFormState(error.displayMessage);
                     });
             }
         }
     }
 
-    private setupAndPopulateForm(user: UserDto | null) {
-        const userData: any = user || {};
-
-        this.isNewMode = !user;
-        this.isCurrentUser = user !== null && user.id === this.ctx.userId;
-
-        this.userForm =
-            this.formBuilder.group({
-                email: [userData.email,
-                    [
-                        Validators.email,
-                        Validators.required,
-                        Validators.maxLength(100)
-                    ]],
-                displayName: [userData.displayName,
-                    [
-                        Validators.required,
-                        Validators.maxLength(100)
-                    ]],
-                password: ['',
-                    [
-                        this.isNewMode ? Validators.required : Validators.nullValidator
-                    ]],
-                passwordConfirm: ['',
-                    [
-                        ValidatorsEx.match('password', 'Passwords must be the same.')
-                    ]]
-            });
-
-
-        this.resetUserForm();
+    private back() {
+        this.router.navigate(['../'], { relativeTo: this.ctx.route, replaceUrl: true });
     }
 
-    private resetUserForm(message: string = '') {
+    private setupAndPopulateForm(user: UserDto | null) {
+        this.user = user;
+
+        this.isCurrentUser = user !== null && user.id === this.ctx.userId;
+
+        this.userForm.controls['password'].setValidators(
+            user ?
+            Validators.nullValidator :
+            Validators.required);
+
+        this.resetFormState();
+
+        this.userForm.reset();
+        this.userForm.patchValue(user || {});
+    }
+
+    private resetFormState(message: string = '') {
         this.userForm.enable();
         this.userForm.controls['password'].reset();
         this.userForm.controls['passwordConfirm'].reset();

@@ -12,7 +12,6 @@ export * from './guards/resolve-app-languages.guard';
 export * from './guards/resolve-content.guard';
 export * from './guards/resolve-published-schema.guard';
 export * from './guards/resolve-schema.guard';
-export * from './guards/resolve-user.guard';
 export * from './guards/unset-app.guard';
 
 export * from './interceptors/auth.interceptor';
@@ -27,7 +26,6 @@ export * from './services/assets.service';
 export * from './services/auth.service';
 export * from './services/backups.service';
 export * from './services/contents.service';
-export * from './services/event-consumers.service';
 export * from './services/graphql.service';
 export * from './services/help.service';
 export * from './services/history.service';

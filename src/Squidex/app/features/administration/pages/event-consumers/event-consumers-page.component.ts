@@ -10,12 +10,12 @@ import { Observable, Subscription } from 'rxjs';
 
 import {
     AppContext,
-    EventConsumerDto,
-    EventConsumersService,
     fadeAnimation,
     ImmutableArray,
     ModalView
 } from 'shared';
+
+import { EventConsumerDto, EventConsumersService } from './../../services/event-consumers.service';
 
 @Component({
     selector: 'sqx-event-consumers-page',

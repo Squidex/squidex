@@ -7,8 +7,6 @@
 
 import { CommonModule } from '@angular/common';
 import { ModuleWithProviders, NgModule } from '@angular/core';
-import { RouterModule } from '@angular/router';
-import { HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import {
@@ -77,10 +75,8 @@ import {
 
 @NgModule({
     imports: [
-        HttpClientModule,
         FormsModule,
         CommonModule,
-        RouterModule,
         ReactiveFormsModule
     ],
     declarations: [
@@ -137,6 +133,7 @@ import {
     ],
     exports: [
         AutocompleteComponent,
+        CommonModule,
         ConfirmClickDirective,
         ControlErrorsComponent,
         CopyDirective,
@@ -151,6 +148,7 @@ import {
         FileDropDirective,
         FileSizePipe,
         FocusOnInitDirective,
+        FormsModule,
         FromNowPipe,
         FullDateTimePipe,
         IgnoreScrollbarDirective,
@@ -171,6 +169,7 @@ import {
         ParentLinkDirective,
         PopupLinkDirective,
         ProgressBarComponent,
+        ReactiveFormsModule,
         RootViewDirective,
         ScrollActiveDirective,
         ShortcutComponent,
@@ -185,12 +184,7 @@ import {
         TitleComponent,
         ToggleComponent,
         TooltipComponent,
-        UserReportComponent,
-        HttpClientModule,
-        FormsModule,
-        CommonModule,
-        RouterModule,
-        ReactiveFormsModule
+        UserReportComponent
     ]
 })
 export class SqxFrameworkModule {

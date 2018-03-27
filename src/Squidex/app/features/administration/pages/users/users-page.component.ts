@@ -8,8 +8,9 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 
-import { AppContext, UserDto } from 'shared';
+import { AppContext } from 'shared';
 
+import { UserDto } from './../../services/users.service';
 import { UsersState } from './../../state/users.state';
 
 @Component({
@@ -33,7 +34,7 @@ export class UsersPageComponent implements OnInit {
     }
 
     public search() {
-        this.state.search(this.usersFilter.value);
+        this.state.search(this.usersFilter.value).subscribe();
     }
 
     public load(showInfo = false) {
@@ -46,11 +47,19 @@ export class UsersPageComponent implements OnInit {
     }
 
     public lock(user: UserDto) {
-        this.state.lockUser(user.id).subscribe();
+        this.state.lockUser(user).subscribe();
     }
 
     public unlock(user: UserDto) {
-        this.state.unlockUser(user.id).subscribe();
+        this.state.unlockUser(user).subscribe();
+    }
+
+    public goPrev() {
+        this.state.goPrev().subscribe();
+    }
+
+    public goNext() {
+        this.state.goNext().subscribe();
     }
 }
 

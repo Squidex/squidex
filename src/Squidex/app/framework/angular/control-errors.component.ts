@@ -71,7 +71,7 @@ export class ControlErrorsComponent implements OnChanges, OnDestroy {
         if (this.fieldName) {
             this.displayFieldName = this.fieldName;
         } else if (this.for) {
-            if (this.for instanceof String) {
+            if (typeof this.for === 'string') {
                 this.displayFieldName = this.for.substr(0, 1).toUpperCase() + this.for.substr(1);
             } else {
                 this.displayFieldName = 'field';

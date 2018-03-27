@@ -7,6 +7,7 @@
 
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { ModuleWithProviders, NgModule } from '@angular/core';
+import { RouterModule } from '@angular/router';
 import { DndModule } from 'ng2-dnd';
 
 import { SqxFrameworkModule } from 'framework';
@@ -28,7 +29,6 @@ import {
     AuthService,
     BackupsService,
     ContentsService,
-    EventConsumersService,
     FileIconPipe,
     GeolocationEditorComponent,
     GraphQlService,
@@ -47,7 +47,6 @@ import {
     ResolvePublishedSchemaGuard,
     ResolveSchemaGuard,
     SchemasService,
-    ResolveUserGuard,
     RulesService,
     UIService,
     UnsetAppGuard,
@@ -60,7 +59,6 @@ import {
     UserIdPicturePipe,
     UserPicturePipe,
     UserPictureRefPipe,
-    UserManagementService,
     UsersProviderService,
     UsersService,
     RichEditorComponent
@@ -69,6 +67,7 @@ import {
 @NgModule({
     imports: [
         DndModule,
+        RouterModule,
         SqxFrameworkModule
     ],
     declarations: [
@@ -103,6 +102,7 @@ import {
         HistoryComponent,
         LanguageSelectorComponent,
         MarkdownEditorComponent,
+        RouterModule,
         UserDtoPicture,
         UserEmailPipe,
         UserEmailRefPipe,
@@ -130,7 +130,6 @@ export class SqxSharedModule {
                 AuthService,
                 BackupsService,
                 ContentsService,
-                EventConsumersService,
                 GraphQlService,
                 HelpService,
                 HistoryService,
@@ -142,13 +141,11 @@ export class SqxSharedModule {
                 ResolveContentGuard,
                 ResolvePublishedSchemaGuard,
                 ResolveSchemaGuard,
-                ResolveUserGuard,
                 RulesService,
                 SchemasService,
                 UIService,
                 UnsetAppGuard,
                 UsagesService,
-                UserManagementService,
                 UsersProviderService,
                 UsersService,
                 {

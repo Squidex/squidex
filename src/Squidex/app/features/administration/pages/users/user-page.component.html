@@ -14,10 +14,10 @@
                 
                 <sqx-shortcut keys="ctrl+s" (trigger)="save()"></sqx-shortcut>
 
-                <h3 class="panel-title" *ngIf="isNewMode">
+                <h3 class="panel-title" *ngIf="!user">
                     New User
                 </h3>
-                <h3 class="panel-title" *ngIf="!isNewMode">
+                <h3 class="panel-title" *ngIf="user">
                     Edit User
                 </h3>
             </div>

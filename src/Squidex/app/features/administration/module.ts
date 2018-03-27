@@ -9,6 +9,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
 import {
+    SqxSharedModule,
     SqxFrameworkModule
 } from 'shared';
 
@@ -60,6 +61,7 @@ const routes: Routes = [
 
 @NgModule({
     imports: [
+        SqxSharedModule,
         SqxFrameworkModule,
         RouterModule.forChild(routes)
     ],
@@ -71,6 +73,8 @@ const routes: Routes = [
     ],
     providers: [
         EventConsumersService,
+        UnsetUserGuard,
+        UserMustExistGuard,
         UsersService,
         UsersState
     ]
