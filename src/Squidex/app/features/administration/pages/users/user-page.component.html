@@ -1,27 +1,24 @@
 <sqx-title message="User Management"></sqx-title>
 
 <form [formGroup]="userForm" (ngSubmit)="save()">
-    <input style="display:none" type="password" name="foilautofill"/>
+    <input style="display:none" type="password" name="foilautofill" />
 
     <sqx-panel desiredWidth="26rem">
         <div class="panel-header">
             <div class="panel-title-row">
-                <div class="float-right">
+                <div class="float-right" *ngIf="!isNotFound">
                     <button type="submit" class="btn btn-primary" title="CTRL + S">
                         Save
                     </button>
                 </div>
-                
+
                 <sqx-shortcut keys="ctrl+s" (trigger)="save()"></sqx-shortcut>
 
-                <h3 class="panel-title" *ngIf="!user">
-                    New User
-                </h3>
-                <h3 class="panel-title" *ngIf="user">
-                    Edit User
+                <h3 class="panel-title">
+                    {{isNotFound || user ? 'Edit User' : 'New User'}}
                 </h3>
             </div>
-                
+
             <sqx-shortcut keys="ctrl+s" (trigger)="save()"></sqx-shortcut>
 
             <a class="panel-close" sqxParentLink>
@@ -31,43 +28,52 @@
 
         <div class="panel-main">
             <div class="panel-content panel-content-blank">
-                <div *ngIf="userFormError">
-                    <div class="form-alert form-alert-error" [innerHTML]="userFormError"></div>
+                <div *ngIf="isNotFound">
+                    The user does not exist.
                 </div>
 
-                <div class="form-group">
-                    <label for="email">Email</label>
-
-                    <sqx-control-errors for="email" [submitted]="userFormSubmitted"></sqx-control-errors>
-
-                    <input type="email" class="form-control" id="email" maxlength="100" formControlName="email" autocomplete="false"  />
-                </div>
-                <div class="form-group">
-                    <label for="displayName">Display Name</label>
-
-                    <sqx-control-errors for="displayName" [submitted]="userFormSubmitted"></sqx-control-errors>
-
-                    <input type="text" class="form-control" id="displayName" maxlength="100" formControlName="displayName" autocomplete="false"  />
-                </div>
-
-                <div class="form-group form-group-password" [class.hidden]="isCurrentUser">
-                    <div class="form-group">
-                        <label for="password">Password</label>
-
-                        <sqx-control-errors for="password" [submitted]="userFormSubmitted"></sqx-control-errors>
-
-                        <input type="password" class="form-control" id="password" maxlength="100" formControlName="password" autocomplete="false" />
+                <div *ngIf="!isNotFound">
+                    <div *ngIf="userFormError">
+                        <div class="form-alert form-alert-error" [innerHTML]="userFormError"></div>
                     </div>
 
                     <div class="form-group">
-                        <label for="password">Confirm Password</label>
+                        <label for="email">Email</label>
 
-                        <sqx-control-errors for="passwordConfirm" [submitted]="userFormSubmitted"></sqx-control-errors>
+                        <sqx-control-errors for="email" [submitted]="userFormSubmitted"></sqx-control-errors>
 
-                        <input type="password" class="form-control" id="passwordConfirm" maxlength="100" formControlName="passwordConfirm" autocomplete="false" />
+                        <input type="email" class="form-control" id="email" maxlength="100" formControlName="email" autocomplete="false" />
+                    </div>
+                    <div class="form-group">
+                        <label for="displayName">Display Name</label>
+
+                        <sqx-control-errors for="displayName" [submitted]="userFormSubmitted"></sqx-control-errors>
+
+                        <input type="text" class="form-control" id="displayName" maxlength="100" formControlName="displayName" autocomplete="false"
+                        />
+                    </div>
+
+                    <div class="form-group form-group-password" [class.hidden]="isCurrentUser">
+                        <div class="form-group">
+                            <label for="password">Password</label>
+
+                            <sqx-control-errors for="password" [submitted]="userFormSubmitted"></sqx-control-errors>
+
+                            <input type="password" class="form-control" id="password" maxlength="100" formControlName="password" autocomplete="false"
+                            />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="password">Confirm Password</label>
+
+                            <sqx-control-errors for="passwordConfirm" [submitted]="userFormSubmitted"></sqx-control-errors>
+
+                            <input type="password" class="form-control" id="passwordConfirm" maxlength="100" formControlName="passwordConfirm" autocomplete="false"
+                            />
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </sqx-panel>
-</form>   
+</form>

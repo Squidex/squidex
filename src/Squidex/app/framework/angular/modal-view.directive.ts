@@ -10,7 +10,7 @@ import { Subscription } from 'rxjs';
 
 import { ModalView } from './../utils/modal-view';
 
-import { RootViewService } from './../services/root-view.service';
+import { RootViewComponent } from './root-view.component';
 
 @Directive({
     selector: '[sqxModalView]'
@@ -33,7 +33,7 @@ export class ModalViewDirective implements OnChanges, OnDestroy {
         private readonly templateRef: TemplateRef<any>,
         private readonly renderer: Renderer,
         private readonly viewContainer: ViewContainerRef,
-        private readonly rootContainer: RootViewService
+        private readonly rootView: RootViewComponent
     ) {
     }
 
@@ -72,7 +72,7 @@ export class ModalViewDirective implements OnChanges, OnDestroy {
 
         if (isOpen && !this.renderedView) {
             if (this.placeOnRoot) {
-                this.renderedView = this.rootContainer.createEmbeddedView(this.templateRef);
+                this.renderedView = this.rootView.viewContainer.createEmbeddedView(this.templateRef);
             } else {
                 this.renderedView = this.viewContainer.createEmbeddedView(this.templateRef);
             }
@@ -85,7 +85,7 @@ export class ModalViewDirective implements OnChanges, OnDestroy {
             this.renderedView = null;
 
             if (this.placeOnRoot) {
-                this.rootContainer.clear();
+                this.rootView.viewContainer.clear();
             } else {
                 this.viewContainer.clear();
             }

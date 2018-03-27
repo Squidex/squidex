@@ -5,10 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Subscription } from 'rxjs';
 
 import { AuthService, ValidatorsEx } from 'shared';
 
@@ -20,9 +19,7 @@ import { UsersState } from './../../state/users.state';
     styleUrls: ['./user-page.component.scss'],
     templateUrl: './user-page.component.html'
 })
-export class UserPageComponent implements OnDestroy, OnInit {
-    private selectedUserSubscription: Subscription;
-
+export class UserPageComponent implements OnInit {
     public userFormSubmitted = false;
     public userFormError = '';
     public userForm =
@@ -51,6 +48,7 @@ export class UserPageComponent implements OnDestroy, OnInit {
     public user: UserDto | null;
 
     public isCurrentUser = false;
+    public isNotFound = false;
 
     constructor(
         private readonly authService: AuthService,
@@ -61,13 +59,14 @@ export class UserPageComponent implements OnDestroy, OnInit {
     ) {
     }
 
-    public ngOnDestroy() {
-        this.selectedUserSubscription.unsubscribe();
-    }
-
     public ngOnInit() {
-        this.selectedUserSubscription =
-            this.usersState.selectedUser.subscribe(user => this.setupAndPopulateForm(user!));
+        this.route.params.map(p => p['userId'])
+            .switchMap(id => this.usersState.selectUser(id).map(u => { return { user: u, expected: !!id }; }))
+            .subscribe(result => {
+                this.isNotFound = !result.user && result.expected;
+
+                this.setupAndPopulateForm(result.user);
+            });
     }
 
     public save() {

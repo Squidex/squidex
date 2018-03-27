@@ -8,11 +8,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 
-import {
-    ApiUrlConfig,
-    AppContext,
-    ValidatorsEx
-} from 'shared';
+import { ApiUrlConfig, ValidatorsEx } from 'shared';
 
 import { SchemasState } from './../../state/schemas.state';
 
@@ -21,10 +17,7 @@ const FALLBACK_NAME = 'my-schema';
 @Component({
     selector: 'sqx-schema-form',
     styleUrls: ['./schema-form.component.scss'],
-    templateUrl: './schema-form.component.html',
-    providers: [
-        AppContext
-    ]
+    templateUrl: './schema-form.component.html'
 })
 export class SchemaFormComponent implements OnInit {
     @Output()
@@ -54,7 +47,6 @@ export class SchemaFormComponent implements OnInit {
 
     constructor(
         public readonly apiUrl: ApiUrlConfig,
-        public readonly ctx: AppContext,
         private readonly schemasState: SchemasState,
         private readonly formBuilder: FormBuilder
     ) {
@@ -72,9 +64,8 @@ export class SchemaFormComponent implements OnInit {
         return false;
     }
 
-    public cancel() {
-        this.emitCompleted();
-        this.resetCreateForm();
+    public complete() {
+        this.completed.emit();
     }
 
     public createSchema() {
@@ -88,27 +79,15 @@ export class SchemaFormComponent implements OnInit {
 
             this.schemasState.create(schemaDto)
                 .subscribe(dto => {
-                    this.emitCompleted();
-
-                    this.resetCreateForm();
+                    this.complete();
                 }, error => {
                     this.enableCreateForm(error.displayMessage);
                 });
         }
     }
 
-    private emitCompleted() {
-        this.completed.emit();
-    }
-
     private enableCreateForm(message: string) {
         this.createForm.enable();
         this.createFormError = message;
-    }
-
-    private resetCreateForm() {
-        this.createFormError = '';
-        this.createForm.reset();
-        this.createFormSubmitted = false;
     }
 }

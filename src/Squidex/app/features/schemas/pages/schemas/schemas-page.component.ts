@@ -7,9 +7,10 @@
 
 import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 
 import {
-    AppContext,
+    AppsState,
     fadeAnimation,
     ModalView
 } from 'shared';
@@ -20,9 +21,6 @@ import { SchemasState } from './../../state/schemas.state';
     selector: 'sqx-schemas-page',
     styleUrls: ['./schemas-page.component.scss'],
     templateUrl: './schemas-page.component.html',
-    providers: [
-        AppContext
-    ],
     animations: [
         fadeAnimation
     ]
@@ -44,13 +42,14 @@ export class SchemasPageComponent implements OnInit {
 
     public import: any;
 
-    constructor(public readonly ctx: AppContext,
+    constructor(public readonly appsState: AppsState,
+        private readonly route: ActivatedRoute,
         private readonly schemasState: SchemasState
     ) {
     }
 
     public ngOnInit() {
-        this.ctx.route.params.map(q => q['showDialog'])
+        this.route.params.map(q => q['showDialog'])
             .subscribe(showDialog => {
                 if (showDialog) {
                     this.addSchemaDialog.show();

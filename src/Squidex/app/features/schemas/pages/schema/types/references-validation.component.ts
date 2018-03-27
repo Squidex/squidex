@@ -10,7 +10,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { ReferencesFieldPropertiesDto } from 'shared';
 
-import { SchemasState } from './../../..';
+import { SchemasState } from './../../../state/schemas.state';
 
 @Component({
     selector: 'sqx-references-validation',
