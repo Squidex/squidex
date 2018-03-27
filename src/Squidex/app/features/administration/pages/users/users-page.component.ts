@@ -8,7 +8,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 
-import { AppContext } from 'shared';
+import { DialogService } from 'shared';
 
 import { UserDto } from './../../services/users.service';
 import { UsersState } from './../../state/users.state';
@@ -16,16 +16,13 @@ import { UsersState } from './../../state/users.state';
 @Component({
     selector: 'sqx-users-page',
     styleUrls: ['./users-page.component.scss'],
-    templateUrl: './users-page.component.html',
-    providers: [
-        AppContext
-    ]
+    templateUrl: './users-page.component.html'
 })
 export class UsersPageComponent implements OnInit {
     public usersFilter = new FormControl();
 
-    constructor(public readonly ctx: AppContext,
-        public readonly state: UsersState
+    constructor(public readonly usersState: UsersState,
+        private readonly dialogs: DialogService
     ) {
     }
 
@@ -34,32 +31,32 @@ export class UsersPageComponent implements OnInit {
     }
 
     public search() {
-        this.state.search(this.usersFilter.value).subscribe();
+        this.usersState.search(this.usersFilter.value).subscribe();
     }
 
     public load(showInfo = false) {
-        this.state.loadUsers()
+        this.usersState.loadUsers()
             .subscribe(() => {
                 if (showInfo) {
-                    this.ctx.notifyInfo('Users reloaded.');
+                    this.dialogs.notifyInfo('Users reloaded.');
                 }
             });
     }
 
     public lock(user: UserDto) {
-        this.state.lockUser(user).subscribe();
+        this.usersState.lockUser(user).subscribe();
     }
 
     public unlock(user: UserDto) {
-        this.state.unlockUser(user).subscribe();
+        this.usersState.unlockUser(user).subscribe();
     }
 
     public goPrev() {
-        this.state.goPrev().subscribe();
+        this.usersState.goPrev().subscribe();
     }
 
     public goNext() {
-        this.state.goNext().subscribe();
+        this.usersState.goNext().subscribe();
     }
 }
 

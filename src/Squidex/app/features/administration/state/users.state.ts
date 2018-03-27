@@ -12,9 +12,7 @@ import 'framework/utils/rxjs-extensions';
 
 import {
     DialogService,
-    ErrorDto,
     ImmutableArray,
-    Notification,
     Pager
 } from 'shared';
 
@@ -59,7 +57,7 @@ export class UsersState {
 
     public loadUsers(): Observable<any> {
         return this.usersService.getUsers(this.usersPager.value.pageSize, this.usersPager.value.skip, this.usersQuery.value)
-            .catch(error => this.notifyError(error))
+            .catch(error => this.dialogs.notifyError(error))
             .do(dtos => {
                 this.users.nextBy(v => ImmutableArray.of(dtos.items));
                 this.usersPager.nextBy(v => v.setCount(dtos.total));
@@ -77,7 +75,7 @@ export class UsersState {
     public updateUser(user: UserDto, request: CreateUserDto): Observable<any> {
         return this.usersService.putUser(user.id, request)
             .do(() => {
-                this.dialogs.notify(Notification.info('User saved successsfull'));
+                this.dialogs.notifyInfo('User saved successsfull');
 
                 this.replaceUser(user.update(request.email, request.displayName));
             });
@@ -85,7 +83,7 @@ export class UsersState {
 
     public lockUser(user: UserDto): Observable<any> {
         return this.usersService.lockUser(user.id)
-            .catch(error => this.notifyError(error))
+            .catch(error => this.dialogs.notifyError(error))
             .do(() => {
                 this.replaceUser(user.lock());
             });
@@ -93,7 +91,7 @@ export class UsersState {
 
     public unlockUser(user: UserDto): Observable<any> {
         return this.usersService.unlockUser(user.id)
-            .catch(error => this.notifyError(error))
+            .catch(error => this.dialogs.notifyError(error))
             .do(() => {
                 this.replaceUser(user.unlock());
             });
@@ -118,7 +116,7 @@ export class UsersState {
         return this.loadUsers();
     }
 
-    public trackBy(index: number, user: UserDto): any {
+    public trackByUser(index: number, user: UserDto): any {
         return user.id;
     }
 
@@ -126,15 +124,5 @@ export class UsersState {
         this.users.nextBy(v => v.replaceBy('id', user));
 
         this.selectedUser.nextBy(v => v !== null && v.id === user.id ? user : v);
-    }
-
-    private notifyError(error: string | ErrorDto) {
-        if (error instanceof ErrorDto) {
-            this.dialogs.notify(Notification.error(error.displayMessage));
-        } else {
-            this.dialogs.notify(Notification.error(error));
-        }
-
-        return Observable.throw(error);
     }
 }

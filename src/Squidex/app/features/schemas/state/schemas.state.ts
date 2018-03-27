@@ -17,10 +17,8 @@ import {
     CreateSchemaDto,
     DateTime,
     DialogService,
-    ErrorDto,
     FieldDto,
     ImmutableArray,
-    Notification,
     SchemaDto,
     SchemaDetailsDto,
     SchemasService,
@@ -73,7 +71,7 @@ export class SchemasState {
 
     public load(): Observable<any> {
         return this.schemasService.getSchemas(this.app)
-            .catch(error => this.notifyError(error))
+            .catch(error => this.dialogs.notifyError(error))
             .do(dtos => {
                 this.schemasItems.nextBy(v => ImmutableArray.of(dtos));
             });
@@ -95,7 +93,7 @@ export class SchemasState {
 
     public publish(schema: SchemaDto): Observable<any> {
         return this.schemasService.publishSchema(this.app, schema.name, schema.version)
-            .catch(error => this.notifyError(error))
+            .catch(error => this.dialogs.notifyError(error))
             .do(dto => {
                 this.replaceSchema(schema.publish(this.user, dto.version));
             });
@@ -103,7 +101,7 @@ export class SchemasState {
 
     public unpublish(schema: SchemaDto): Observable<any> {
         return this.schemasService.unpublishSchema(this.app, schema.name, schema.version)
-            .catch(error => this.notifyError(error))
+            .catch(error => this.dialogs.notifyError(error))
             .do(dto => {
                 this.replaceSchema(schema.unpublish(this.user, dto.version));
             });
@@ -111,7 +109,7 @@ export class SchemasState {
 
     public enableField(schema: SchemaDetailsDto, field: FieldDto): Observable<any> {
         return this.schemasService.enableField(this.app, schema.name, field.fieldId, schema.version)
-            .catch(error => this.notifyError(error))
+            .catch(error => this.dialogs.notifyError(error))
             .do(dto => {
                 this.replaceSchema(schema.updateField(field.enable(), this.user, dto.version));
             });
@@ -119,7 +117,7 @@ export class SchemasState {
 
     public disableField(schema: SchemaDetailsDto, field: FieldDto): Observable<any> {
         return this.schemasService.disableField(this.app, schema.name, field.fieldId, schema.version)
-            .catch(error => this.notifyError(error))
+            .catch(error => this.dialogs.notifyError(error))
             .do(dto => {
                 this.replaceSchema(schema.updateField(field.disable(), this.user, dto.version));
             });
@@ -127,7 +125,7 @@ export class SchemasState {
 
     public lockField(schema: SchemaDetailsDto, field: FieldDto): Observable<any> {
         return this.schemasService.lockField(this.app, schema.name, field.fieldId, schema.version)
-            .catch(error => this.notifyError(error))
+            .catch(error => this.dialogs.notifyError(error))
             .do(dto => {
                 this.replaceSchema(schema.updateField(field.lock(), this.user, dto.version));
             });
@@ -135,7 +133,7 @@ export class SchemasState {
 
     public showField(schema: SchemaDetailsDto, field: FieldDto): Observable<any> {
         return this.schemasService.showField(this.app, schema.name, field.fieldId, schema.version)
-            .catch(error => this.notifyError(error))
+            .catch(error => this.dialogs.notifyError(error))
             .do(dto => {
                 this.replaceSchema(schema.updateField(field.show(), this.user, dto.version));
             });
@@ -143,7 +141,7 @@ export class SchemasState {
 
     public hideField(schema: SchemaDetailsDto, field: FieldDto): Observable<any> {
         return this.schemasService.hideField(this.app, schema.name, field.fieldId, schema.version)
-            .catch(error => this.notifyError(error))
+            .catch(error => this.dialogs.notifyError(error))
             .do(dto => {
                 this.replaceSchema(schema.updateField(field.hide(), this.user, dto.version));
             });
@@ -151,7 +149,7 @@ export class SchemasState {
 
     public deleteField(schema: SchemaDetailsDto, field: FieldDto): Observable<any> {
         return this.schemasService.deleteField(this.app, schema.name, field.fieldId, schema.version)
-            .catch(error => this.notifyError(error))
+            .catch(error => this.dialogs.notifyError(error))
             .do(dto => {
                 this.replaceSchema(schema.removeField(field, this.user, dto.version));
             });
@@ -159,7 +157,7 @@ export class SchemasState {
 
     public sortFields(schema: SchemaDetailsDto, fields: FieldDto[]): Observable<any> {
         return this.schemasService.putFieldOrdering(this.app, schema.name, fields.map(t => t.fieldId), schema.version)
-            .catch(error => this.notifyError(error))
+            .catch(error => this.dialogs.notifyError(error))
             .do(dto => {
                 this.replaceSchema(schema.replaceFields(fields, this.user, dto.version));
             });
@@ -167,7 +165,7 @@ export class SchemasState {
 
     public updateField(schema: SchemaDetailsDto, field: FieldDto, request: UpdateFieldDto): Observable<any> {
         return this.schemasService.putField(this.app, schema.name, field.fieldId, request, schema.version)
-            .catch(error => this.notifyError(error))
+            .catch(error => this.dialogs.notifyError(error))
             .do(dto => {
                 this.replaceSchema(schema.updateField(field.update(request.properties), this.user, dto.version));
             });
@@ -175,7 +173,7 @@ export class SchemasState {
 
     public configureScripts(schema: SchemaDetailsDto, request: UpdateSchemaScriptsDto): Observable<any> {
         return this.schemasService.putSchemaScripts(this.app, schema.name, request, schema.version)
-            .catch(error => this.notifyError(error))
+            .catch(error => this.dialogs.notifyError(error))
             .do(dto => {
                 this.replaceSchema(schema.configureScripts(request, this.user, dto.version));
             });
@@ -183,7 +181,7 @@ export class SchemasState {
 
     public update(schema: SchemaDetailsDto, request: UpdateSchemaDto): Observable<any> {
         return this.schemasService.putSchema(this.app, schema.name, request, schema.version)
-            .catch(error => this.notifyError(error))
+            .catch(error => this.dialogs.notifyError(error))
             .do(dto => {
                 this.replaceSchema(schema.update(request, this.user, dto.version));
             });
@@ -191,7 +189,7 @@ export class SchemasState {
 
     public delete(schema: SchemaDto): Observable<any> {
         return this.schemasService.deleteSchema(this.app, schema.name, schema.version)
-            .catch(error => this.notifyError(error))
+            .catch(error => this.dialogs.notifyError(error))
             .do(dto => {
                 this.schemasItems.nextBy(v => v.filter(s => s.id !== schema.id));
             });
@@ -209,15 +207,5 @@ export class SchemasState {
 
     public trackByField(index: number, field: FieldDto): any {
         return field.fieldId;
-    }
-
-    private notifyError(error: string | ErrorDto) {
-        if (error instanceof ErrorDto) {
-            this.dialogs.notify(Notification.error(error.displayMessage));
-        } else {
-            this.dialogs.notify(Notification.error(error));
-        }
-
-        return Observable.throw(error);
     }
 }

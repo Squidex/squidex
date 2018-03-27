@@ -11,3 +11,11 @@ export class Version {
     ) {
     }
 }
+
+export class Versioned<T> {
+    constructor(
+        public readonly version: Version,
+        public readonly payload: T
+    ) {
+    }
+}

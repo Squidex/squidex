@@ -8,65 +8,9 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-import { Version } from './../utils/version';
+import { ErrorDto } from './../utils/error';
 
-export class Versioned<T> {
-    constructor(
-        public readonly version: Version,
-        public readonly payload: T
-    ) {
-    }
-}
-
-function formatMessage(message: string, details?: string[]) {
-    const appendLast = (row: string, char: string) => {
-        const last = row[row.length - 1];
-
-        if (last !== char) {
-            return row + char;
-        } else {
-            return row;
-        }
-    };
-
-    const removeLast = (row: string, char: string) => {
-        const last = row[row.length - 1];
-
-        if (last === char) {
-            return row.substr(0, row.length - 1);
-        } else {
-            return row;
-        }
-    };
-
-    if (details && details.length > 1) {
-        let result = appendLast(message, '.') + '<ul>';
-
-        for (let detail of details) {
-            result += `<li>${appendLast(detail, '.')}</li>`;
-        }
-
-        result = result + '</ul>';
-
-        return result;
-    } else if (details && details.length === 1) {
-        return `${appendLast(removeLast(message, '.'), ':')} ${appendLast(details[0], '.')}`;
-    } else {
-        return appendLast(message, '.');
-    }
-}
-
-export class ErrorDto {
-    public readonly displayMessage: string;
-
-    constructor(
-        public readonly statusCode: number,
-        public readonly message: string,
-        public readonly details: string[] = []
-    ) {
-        this.displayMessage = formatMessage(message, details);
-    }
-}
+import { Version, Versioned } from './../utils/version';
 
 export module HTTP {
     export function getVersioned<T>(http: HttpClient, url: string, version?: Version): Observable<Versioned<HttpResponse<T>>> {

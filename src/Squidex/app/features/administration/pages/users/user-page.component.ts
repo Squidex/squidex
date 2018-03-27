@@ -7,10 +7,10 @@
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 
-import { AppContext, ValidatorsEx } from 'shared';
+import { AuthService, ValidatorsEx } from 'shared';
 
 import { UserDto } from './../../services/users.service';
 import { UsersState } from './../../state/users.state';
@@ -18,10 +18,7 @@ import { UsersState } from './../../state/users.state';
 @Component({
     selector: 'sqx-user-page',
     styleUrls: ['./user-page.component.scss'],
-    templateUrl: './user-page.component.html',
-    providers: [
-        AppContext
-    ]
+    templateUrl: './user-page.component.html'
 })
 export class UserPageComponent implements OnDestroy, OnInit {
     private selectedUserSubscription: Subscription;
@@ -55,10 +52,12 @@ export class UserPageComponent implements OnDestroy, OnInit {
 
     public isCurrentUser = false;
 
-    constructor(public readonly ctx: AppContext,
+    constructor(
+        private readonly authService: AuthService,
         private readonly formBuilder: FormBuilder,
+        private readonly route: ActivatedRoute,
         private readonly router: Router,
-        private readonly state: UsersState
+        private readonly usersState: UsersState
     ) {
     }
 
@@ -68,7 +67,7 @@ export class UserPageComponent implements OnDestroy, OnInit {
 
     public ngOnInit() {
         this.selectedUserSubscription =
-            this.state.selectedUser.subscribe(user => this.setupAndPopulateForm(user!));
+            this.usersState.selectedUser.subscribe(user => this.setupAndPopulateForm(user!));
     }
 
     public save() {
@@ -80,14 +79,14 @@ export class UserPageComponent implements OnDestroy, OnInit {
             const requestDto = this.userForm.value;
 
             if (!this.user) {
-                this.state.createUser(requestDto)
+                this.usersState.createUser(requestDto)
                     .subscribe(user => {
                         this.back();
                     }, error => {
                         this.resetFormState(error.displayMessage);
                     });
             } else {
-                this.state.updateUser(this.user!, requestDto)
+                this.usersState.updateUser(this.user!, requestDto)
                     .subscribe(() => {
                         this.resetFormState();
                     }, error => {
@@ -98,13 +97,13 @@ export class UserPageComponent implements OnDestroy, OnInit {
     }
 
     private back() {
-        this.router.navigate(['../'], { relativeTo: this.ctx.route, replaceUrl: true });
+        this.router.navigate(['../'], { relativeTo: this.route, replaceUrl: true });
     }
 
     private setupAndPopulateForm(user: UserDto | null) {
         this.user = user;
 
-        this.isCurrentUser = user !== null && user.id === this.ctx.userId;
+        this.isCurrentUser = user !== null && user.id === this.authService.user!.id;
 
         this.userForm.controls['password'].setValidators(
             user ?
