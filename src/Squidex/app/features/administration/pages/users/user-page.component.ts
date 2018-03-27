@@ -10,13 +10,10 @@ import { FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 
-import {
-    AppContext,
-    UserDto,
-    ValidatorsEx
-} from 'shared';
+import { AppContext, ValidatorsEx } from 'shared';
 
-import { UserDto, UsersState } from './../../state/users.state';
+import { UserDto } from './../../services/users.service';
+import { UsersState } from './../../state/users.state';
 
 @Component({
     selector: 'sqx-user-page',
