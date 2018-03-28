@@ -76,7 +76,7 @@ export class BackupsPageComponent implements OnInit, OnDestroy {
         return Duration.create(backup.started, backup.stopped!);
     }
 
-    public trackBy(index: number, item: BackupDto) {
+    public trackByBackup(index: number, item: BackupDto) {
         return item.id;
     }
 }

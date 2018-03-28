@@ -16,11 +16,11 @@
             Your have reached the maximum number of backups: 10.
         </div>
 
-        <div class="table-items-row table-items-row-empty" *ngIf="backups && backups.length === 0">
+        <div class="table-items-row table-items-row-empty" *ngIf="backups.length === 0">
             No backups created yet.
         </div>
         
-        <div class="table-items-row" *ngFor="let backup of backups; trackBy: trackBy">
+        <div class="table-items-row" *ngFor="let backup of backups; trackBy: trackByBackup">
             <div class="row no-gutter">
                 <div class="col col-auto">
                     <div *ngIf="!backup.stopped" class="backup-status backup-status-pending spin">
@@ -67,7 +67,9 @@
                     </div>
                 </div>
                 <div class="col col-auto">
-                    <button type="button" class="btn btn-link btn-danger" (sqxConfirmClick)="deleteBackup(backup)" confirmTitle="Delete backup"
+                    <button type="button" class="btn btn-link btn-danger" 
+                        (sqxConfirmClick)="deleteBackup(backup)" 
+                        confirmTitle="Delete backup"
                         confirmText="Do you really want to delete the backup?">
                         <i class="icon-bin2"></i>
                     </button>
