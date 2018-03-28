@@ -32,6 +32,9 @@ export class PanelComponent implements AfterViewInit, OnDestroy, OnInit {
     public isBlank = false;
 
     @Input()
+    public isFullSize = false;
+
+    @Input()
     public showScrollbar = false;
 
     @Input()

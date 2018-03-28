@@ -1,6 +1,8 @@
 <div #panel>
     <div class="panel panel-{{theme}}" [@slideRight]>
-        <div class="panel-header">
+        <ng-content select=[inner] *ngIf="isFullSize"></ng-content>
+
+        <div class="panel-header" *ngIf="!isFullSize">
             <div class="panel-title-row">
                 <div class="float-right">
                     <ng-content select=[menu]></ng-content>
