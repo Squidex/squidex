@@ -8,7 +8,11 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 
-import { ApiUrlConfig, ValidatorsEx } from 'shared';
+import {
+    ApiUrlConfig,
+    AppsState,
+    ValidatorsEx
+} from 'shared';
 
 import { SchemasState } from './../../state/schemas.state';
 
@@ -47,6 +51,7 @@ export class SchemaFormComponent implements OnInit {
 
     constructor(
         public readonly apiUrl: ApiUrlConfig,
+        public readonly appsState: AppsState,
         private readonly schemasState: SchemasState,
         private readonly formBuilder: FormBuilder
     ) {

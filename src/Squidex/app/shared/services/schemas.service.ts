@@ -32,7 +32,7 @@ export const fieldTypes = [
         description: 'Images, videos, documents.'
     }, {
         type: 'Boolean',
-        description: 'Yes or no, true or false, 1 or 0.'
+        description: 'Yes or no, true or false.'
     }, {
         type: 'DateTime',
         description: 'Events date, opening hours.'

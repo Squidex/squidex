@@ -17,9 +17,12 @@ import {
     AdministrationAreaComponent,
     EventConsumersPageComponent,
     EventConsumersService,
+    UnsetUserGuard,
+    UserMustExistGuard,
     UserPageComponent,
     UsersPageComponent,
-    UsersService
+    UsersService,
+    UsersState
 } from './declarations';
 
 const routes: Routes = [
@@ -40,11 +43,13 @@ const routes: Routes = [
                         children: [
                             {
                                 path: 'new',
-                                component: UserPageComponent
+                                component: UserPageComponent,
+                                canActivate: [UnsetUserGuard]
                             },
                             {
                                 path: ':userId',
-                                component: UserPageComponent
+                                component: UserPageComponent,
+                                canActivate: [UserMustExistGuard]
                             }
                         ]
                     }
@@ -68,7 +73,10 @@ const routes: Routes = [
     ],
     providers: [
         EventConsumersService,
-        UsersService
+        UnsetUserGuard,
+        UserMustExistGuard,
+        UsersService,
+        UsersState
     ]
 })
 export class SqxFeatureAdministrationModule { }

@@ -5,15 +5,19 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
+import { Subscription } from 'rxjs';
 
 import {
     AppsState,
     fadeAnimation,
+    MessageBus,
     ModalView
 } from 'shared';
+
+import { SchemaCloning } from './../messages';
 
 import { SchemasState } from './../../state/schemas.state';
 
@@ -25,7 +29,9 @@ import { SchemasState } from './../../state/schemas.state';
         fadeAnimation
     ]
 })
-export class SchemasPageComponent implements OnInit {
+export class SchemasPageComponent implements OnDestroy, OnInit {
+    private schemaCloningSubscription: Subscription;
+
     public addSchemaDialog = new ModalView();
 
     public schemasFilter = new FormControl();
@@ -42,13 +48,27 @@ export class SchemasPageComponent implements OnInit {
 
     public import: any;
 
-    constructor(public readonly appsState: AppsState,
+    constructor(
+        public readonly appsState: AppsState,
+        private readonly schemasState: SchemasState,
         private readonly route: ActivatedRoute,
-        private readonly schemasState: SchemasState
+        private readonly messageBus: MessageBus
     ) {
     }
 
+    public ngOnDestroy() {
+        this.schemaCloningSubscription.unsubscribe();
+    }
+
     public ngOnInit() {
+        this.schemaCloningSubscription =
+            this.messageBus.of(SchemaCloning)
+                .subscribe(m => {
+                    this.import = m.schema;
+
+                    this.addSchemaDialog.show();
+                });
+
         this.route.params.map(q => q['showDialog'])
             .subscribe(showDialog => {
                 if (showDialog) {

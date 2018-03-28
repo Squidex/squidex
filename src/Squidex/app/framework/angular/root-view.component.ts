@@ -16,6 +16,6 @@ import { Component, ViewChild, ViewContainerRef } from '@angular/core';
     `
 })
 export class RootViewComponent {
-    @ViewChild('element')
+    @ViewChild('element', { read: ViewContainerRef })
     public viewContainer: ViewContainerRef;
 }

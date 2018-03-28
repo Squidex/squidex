@@ -25,6 +25,10 @@ export class AppsState {
 
     public selectedApp = new BehaviorSubject<AppDto | null>(null);
 
+    public get appName() {
+        return this.selectedApp.value!.name;
+    }
+
     constructor(
         private readonly appsService: AppsService
     ) {

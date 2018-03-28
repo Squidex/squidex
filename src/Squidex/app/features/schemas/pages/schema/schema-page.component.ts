@@ -6,14 +6,15 @@
  */
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 
 import {
-    AppContext,
+    AppsState,
     fadeAnimation,
     FieldDto,
     fieldTypes,
+    MessageBus,
     ModalView,
     SchemaDetailsDto
 } from 'shared';
@@ -28,9 +29,6 @@ import { SchemasState } from './../../state/schemas.state';
     selector: 'sqx-schema-page',
     styleUrls: ['./schema-page.component.scss'],
     templateUrl: './schema-page.component.html',
-    providers: [
-        AppContext
-    ],
     animations: [
         fadeAnimation
     ]
@@ -52,9 +50,12 @@ export class SchemaPageComponent implements OnDestroy, OnInit {
 
     public addFieldDialog = new ModalView();
 
-    constructor(public readonly ctx: AppContext,
+    constructor(
+        public readonly appsState: AppsState,
+        public readonly schemasState: SchemasState,
+        private readonly route: ActivatedRoute,
         private readonly router: Router,
-        private readonly schemasState: SchemasState
+        private readonly messageBus: MessageBus
     ) {
     }
 
@@ -92,7 +93,7 @@ export class SchemaPageComponent implements OnDestroy, OnInit {
     }
 
     public cloneSchema() {
-        this.ctx.bus.emit(new SchemaCloning(this.schemaExport));
+        this.messageBus.emit(new SchemaCloning(this.schemaExport));
     }
 
     private export() {
@@ -127,7 +128,7 @@ export class SchemaPageComponent implements OnDestroy, OnInit {
     }
 
     private back() {
-        this.router.navigate(['../'], { relativeTo: this.ctx.route });
+        this.router.navigate(['../'], { relativeTo: this.route });
     }
 }
 

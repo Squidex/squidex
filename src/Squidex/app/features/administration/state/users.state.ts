@@ -37,8 +37,14 @@ export class UsersState {
     }
 
     public selectUser(id: string | null): Observable<UserDto | null> {
-        const observable =
-            !id ?
+        return this.loadUser(id)
+            .do(user => {
+                this.selectedUser.next(user);
+            });
+    }
+
+    private loadUser(id: string | null) {
+        return !id ?
             Observable.of(null) :
             Observable.of(this.users.value.find(x => x.id === id))
                 .switchMap(user => {
@@ -48,11 +54,6 @@ export class UsersState {
                         return Observable.of(user);
                     }
                 });
-
-        return observable
-            .do(user => {
-                this.selectedUser.next(user);
-            });
     }
 
     public loadUsers(): Observable<any> {

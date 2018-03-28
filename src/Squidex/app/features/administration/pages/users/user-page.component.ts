@@ -5,9 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 
 import { AuthService, ValidatorsEx } from 'shared';
 
@@ -19,7 +20,9 @@ import { UsersState } from './../../state/users.state';
     styleUrls: ['./user-page.component.scss'],
     templateUrl: './user-page.component.html'
 })
-export class UserPageComponent implements OnInit {
+export class UserPageComponent implements OnDestroy, OnInit {
+    private selectedUserSubscription: Subscription;
+
     public userFormSubmitted = false;
     public userFormError = '';
     public userForm =
@@ -48,7 +51,6 @@ export class UserPageComponent implements OnInit {
     public user: UserDto | null;
 
     public isCurrentUser = false;
-    public isNotFound = false;
 
     constructor(
         private readonly authService: AuthService,
@@ -59,14 +61,13 @@ export class UserPageComponent implements OnInit {
     ) {
     }
 
-    public ngOnInit() {
-        this.route.params.map(p => p['userId'])
-            .switchMap(id => this.usersState.selectUser(id).map(u => { return { user: u, expected: !!id }; }))
-            .subscribe(result => {
-                this.isNotFound = !result.user && result.expected;
+    public ngOnDestroy() {
+        this.selectedUserSubscription.unsubscribe();
+    }
 
-                this.setupAndPopulateForm(result.user);
-            });
+    public ngOnInit() {
+        this.selectedUserSubscription =
+            this.usersState.selectedUser.subscribe(user => this.setupAndPopulateForm(user!));
     }
 
     public save() {
@@ -118,9 +119,8 @@ export class UserPageComponent implements OnInit {
     private resetFormState(message: string = '') {
         this.userFormSubmitted = false;
         this.userFormError = message;
-        this.userForm.enable();
         this.userForm.controls['password'].reset();
         this.userForm.controls['passwordConfirm'].reset();
+        this.userForm.enable();
     }
 }
-

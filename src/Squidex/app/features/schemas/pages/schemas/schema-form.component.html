@@ -23,7 +23,7 @@
                     <input type="text" class="form-control" id="schemaName" formControlName="name" autocomplete="off" sqxLowerCaseInput sqxFocusOnInit />
                     
                     <small class="form-text text-muted">
-                        The schema name becomes part of the api url,<br /> e.g {{apiUrl.buildUrl("api/content/")}}{{ctx.appName}}/<b>{{schemaName | async}}</b>/.
+                        The schema name becomes part of the api url,<br /> e.g {{apiUrl.buildUrl("api/content/")}}{{appsState.appName}}/<b>{{schemaName | async}}</b>/.
                     </small>
                     <small class="form-text text-muted">
                         It must contain lower case letters (a-z), numbers and dashes only, and cannot be longer than 40 characters. The name cannot be changed later.

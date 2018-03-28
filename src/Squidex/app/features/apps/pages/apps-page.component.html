@@ -1,7 +1,7 @@
 ﻿<sqx-title message="Apps"></sqx-title>
 
 <div class="apps-section">
-    <h1 class="apps-title">Hi {{ctx.user.displayName}}</h1>
+    <h1 class="apps-title">Hi {{authState.user?.displayName}}</h1>
 
     <div class="subtext">
         Welcome to  Squidex.
@@ -49,7 +49,9 @@
 
             <div class="card-text">
                 <div>Start with our ready to use blog.</div>
-                <div>Sample Code: <a href="https://github.com/Squidex/squidex-samples/tree/master/csharp/Sample.Blog" (click)="$event.stopPropagation()" target="_blank">ASP.NET Core</a></div>
+                <div>
+                    Sample Code: <a href="https://github.com/Squidex/squidex-samples/tree/master/csharp/Sample.Blog" (click)="$event.stopPropagation()" target="_blank">C#</a>
+                </div>
             </div>
         </div>
     </div>
@@ -64,7 +66,9 @@
 
             <div class="card-text">
                 <div>Create your profile page.</div>
-                <div>Sample Code: <a href="https://github.com/Squidex/squidex-samples/tree/master/csharp/Sample.Profile" (click)="$event.stopPropagation()" target="_blank">ASP.NET Core</a></div>
+                <div>
+                    Sample Code: <a href="https://github.com/Squidex/squidex-samples/tree/master/csharp/Sample.Profile" (click)="$event.stopPropagation()" target="_blank">C#</a>
+                </div>
             </div>
         </div>
     </div>

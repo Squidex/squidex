@@ -42,7 +42,7 @@
                 </div>
                     
                 <div class="form-group">
-                    <sqx-control-errors for="name" [submitted]="addFieldFormSubmitted"></sqx-control-errors>
+                    <sqx-control-errors for="name" submitOnly="true" [submitted]="addFieldFormSubmitted"></sqx-control-errors>
 
                     <input type="text" class="form-control" formControlName="name" maxlength="40" #nameInput placeholder="Enter field name" sqxFocusOnInit />
                 </div>

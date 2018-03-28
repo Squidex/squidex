@@ -10,7 +10,6 @@ import { FormBuilder, Validators, FormGroup } from '@angular/forms';
 
 import {
     AddFieldDto,
-    AppContext,
     createProperties,
     fadeAnimation,
     FieldDto,
@@ -26,9 +25,6 @@ import { SchemasState } from './../../state/schemas.state';
     selector: 'sqx-field-wizard',
     styleUrls: ['./field-wizard.component.scss'],
     templateUrl: './field-wizard.component.html',
-    providers: [
-        AppContext
-    ],
     animations: [
         fadeAnimation
     ]
@@ -146,9 +142,9 @@ export class FieldWizardComponent {
 
     private resetFieldForm(error = '') {
         this.addFieldFormSubmitted = false;
+        this.addFieldError = error;
         this.addFieldForm.enable();
         this.addFieldForm.reset({ type: 'String' }, { emitEvent: false });
-        this.addFieldError = error;
     }
 }
 

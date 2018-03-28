@@ -93,19 +93,21 @@ export class FieldComponent implements OnInit {
         if (this.editForm.valid) {
             const properties = createProperties(this.field.properties['fieldType'], this.editForm.value);
 
-            this.schemasState.updateField(this.schema, this.field, new UpdateFieldDto(properties)).subscribe();
+            this.schemasState.updateField(this.schema, this.field, new UpdateFieldDto(properties))
+                .subscribe(() => {
+                    this.resetEditForm();
+                });
         }
     }
 
     private resetEditForm() {
+        this.isEditing = false;
         this.editFormSubmitted = false;
         this.editForm.reset(this.field.properties);
 
         if (this.field.isLocked) {
             this.editForm.disable();
         }
-
-        this.isEditing = false;
     }
 }
 

@@ -16,10 +16,7 @@ import { UsersState } from './../../state/users.state';
 @Component({
     selector: 'sqx-users-page',
     styleUrls: ['./users-page.component.scss'],
-    templateUrl: './users-page.component.html',
-    providers: [
-        UsersState
-    ]
+    templateUrl: './users-page.component.html'
 })
 export class UsersPageComponent implements OnInit {
     public usersFilter = new FormControl();
