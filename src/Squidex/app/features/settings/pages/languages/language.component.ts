@@ -77,12 +77,12 @@ export class LanguageComponent implements OnInit, OnChanges, OnDestroy {
         this.resetEditForm();
     }
 
-    public toggleEditing() {
-        this.isEditing = !this.isEditing;
-    }
-
     public addLanguage() {
         this.addFallbackLanguage(this.otherLanguage);
+    }
+
+    public toggleEditing() {
+        this.isEditing = !this.isEditing;
     }
 
     public removeFallbackLanguage(language: AppLanguageDto) {
