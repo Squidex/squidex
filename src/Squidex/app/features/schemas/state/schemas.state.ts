@@ -34,6 +34,14 @@ export class SchemasState {
     public selectedSchema = new BehaviorSubject<SchemaDetailsDto | null>(null);
     public selectedReferencedSchema = new BehaviorSubject<SchemaDetailsDto | null>(null);
 
+    public get schemaName() {
+        return this.selectedSchema.value!.name;
+    }
+
+    public get referencedSchemaName() {
+        return this.selectedReferencedSchema.value!.name;
+    }
+
     private get appName() {
         return this.appsState.appName;
     }

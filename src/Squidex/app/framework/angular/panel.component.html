@@ -1,0 +1,29 @@
+<div #panel>
+    <div class="panel panel-{{theme}}" [@slideRight]>
+        <div class="panel-header">
+            <div class="panel-title-row">
+                <div class="float-right">
+                    <ng-content select=[menu]></ng-content>
+                </div>
+
+                <h3 class="panel-title">
+                    <ng-content select=[title]></ng-content>
+                </h3>
+            </div>
+
+            <a class="panel-close" sqxParentLink isLazyLoaded="true" *ngIf="showClose">
+                <i class="icon-close"></i>
+            </a>
+        </div>
+
+        <div class="panel-main">
+            <div class="panel-content {{contentClass}} {{showScrollbar ? 'panel-content-scroll' : ''}} {{isBlank ? 'panel-content-blank' : ''}}">
+                <ng-content select=[content]></ng-content>
+            </div>
+
+            <div class="panel-sidebar" *ngIf="showSidebar">
+                <ng-content select=[sidebar]></ng-content>>
+            </div>
+        </div>
+    </div>
+</div>
