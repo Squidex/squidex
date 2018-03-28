@@ -8,7 +8,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 
-import { BooleanFieldPropertiesDto } from 'shared';
+import { BooleanFieldPropertiesDto } from '@app/shared';
 
 @Component({
     selector: 'sqx-boolean-ui',

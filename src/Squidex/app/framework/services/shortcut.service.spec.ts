@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ShortcutService, ShortcutServiceFactory } from './../';
+import { ShortcutService, ShortcutServiceFactory } from './shortcut.service';
 
 describe('ShortcutService', () => {
     it('should instantiate from factory', () => {

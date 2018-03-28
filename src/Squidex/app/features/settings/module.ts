@@ -14,7 +14,7 @@ import {
     HistoryComponent,
     SqxFrameworkModule,
     SqxSharedModule
-} from 'shared';
+} from '@app/shared';
 
 import {
     BackupsPageComponent,

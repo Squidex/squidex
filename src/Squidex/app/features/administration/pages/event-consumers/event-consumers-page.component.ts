@@ -13,7 +13,7 @@ import {
     DialogService,
     ImmutableArray,
     ModalView
-} from 'shared';
+} from '@app/shared';
 
 import { EventConsumerDto, EventConsumersService } from './../../services/event-consumers.service';
 

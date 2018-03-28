@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { FileSizePipe, KNumberPipe } from './..';
+import { FileSizePipe, KNumberPipe } from './numbers.pipes';
 
 describe('FileSizePipe', () => {
     it('should calculate correct human file size', () => {

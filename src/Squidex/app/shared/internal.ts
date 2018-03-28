@@ -42,4 +42,4 @@ export * from './state/apps.state';
 
 export * from './utils/messages';
 
-export * from 'framework';
+export * from '@app/framework';

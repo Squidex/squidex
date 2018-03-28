@@ -8,7 +8,7 @@
 import { Directive, EmbeddedViewRef, Input, OnChanges, OnDestroy, Renderer, SimpleChanges, TemplateRef, ViewContainerRef } from '@angular/core';
 import { Subscription } from 'rxjs';
 
-import { ModalView } from './../utils/modal-view';
+import { ModalView } from '@app/framework/internal';
 
 import { RootViewComponent } from './root-view.component';
 

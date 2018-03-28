@@ -9,7 +9,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 
-import { MessageBus } from 'framework';
+import { MessageBus } from '@app/framework';
 
 import {
     AppDto,
@@ -18,7 +18,7 @@ import {
     DialogService,
     ErrorDto,
     Profile
-} from './../declarations-base';
+} from '@app/shared/internal';
 
 @Injectable()
 export class AppContext {

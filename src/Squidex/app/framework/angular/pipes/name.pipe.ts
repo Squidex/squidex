@@ -7,7 +7,7 @@
 
 import { Pipe, PipeTransform } from '@angular/core';
 
-import { StringHelper } from './../utils/string-helper';
+import { StringHelper } from './../../utils/string-helper';
 
 @Pipe({
     name: 'sqxDisplayName',

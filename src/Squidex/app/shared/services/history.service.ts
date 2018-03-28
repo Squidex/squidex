@@ -9,7 +9,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import 'framework/angular/http-extensions';
+import '@app/framework/angular/http/http-extensions';
 
 import { UsersProviderService } from './users-provider.service';
 
@@ -17,7 +17,7 @@ import {
     ApiUrlConfig,
     HTTP,
     DateTime
-} from 'framework';
+} from '@app/framework';
 
 export class HistoryEventDto {
     constructor(

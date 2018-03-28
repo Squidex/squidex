@@ -8,7 +8,7 @@
 import { IMock, Mock, Times } from 'typemoq';
 import { Observable } from 'rxjs';
 
-import { AppsState } from 'shared';
+import { AppsState } from '@app/shared';
 
 import { UnsetAppGuard } from './unset-app.guard';
 

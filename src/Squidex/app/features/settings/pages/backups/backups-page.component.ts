@@ -15,7 +15,7 @@ import {
     BackupsService,
     Duration,
     ImmutableArray
-} from 'shared';
+} from '@app/shared';
 
 @Component({
     selector: 'sqx-backups-page',

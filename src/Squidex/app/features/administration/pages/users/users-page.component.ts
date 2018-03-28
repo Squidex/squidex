@@ -8,7 +8,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 
-import { AuthService, DialogService } from 'shared';
+import { AuthService, DialogService } from '@app/shared';
 
 import { UserDto } from './../../services/users.service';
 import { UsersState } from './../../state/users.state';

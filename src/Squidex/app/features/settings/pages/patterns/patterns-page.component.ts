@@ -14,7 +14,7 @@ import {
     AppPatternsService,
     HistoryChannelUpdated,
     UpdatePatternDto
-} from 'shared';
+} from '@app/shared';
 
 @Component({
     selector: 'sqx-patterns-page',

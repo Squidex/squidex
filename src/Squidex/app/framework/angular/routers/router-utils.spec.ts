@@ -5,10 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import {
-    allData,
-    allParams
-} from './router-utils';
+import { allData, allParams } from './router-utils';
 
 describe('RouterUtils', () => {
     it('should concat all params from route', () => {

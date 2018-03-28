@@ -19,7 +19,7 @@ import {
     RulesService,
     SchemaDto,
     SchemasService
-} from 'shared';
+} from '@app/shared';
 
 @Component({
     selector: 'sqx-rules-page',

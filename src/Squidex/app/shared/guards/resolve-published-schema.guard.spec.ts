@@ -8,7 +8,7 @@
 import { IMock, Mock } from 'typemoq';
 import { Observable } from 'rxjs';
 
-import { SchemasService } from 'shared';
+import { SchemasService } from '@app/shared';
 
 import { ResolvePublishedSchemaGuard } from './resolve-published-schema.guard';
 import { RouterMockup } from './router-mockup';

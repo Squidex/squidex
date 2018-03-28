@@ -14,7 +14,7 @@ import {
     AppPlansDto,
     ChangePlanDto,
     PlansService
-} from 'shared';
+} from '@app/shared';
 
 @Component({
     selector: 'sqx-plans-page',

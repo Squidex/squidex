@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Version, Versioned } from './../';
+import { Version, Versioned } from './version';
 
 describe('Version', () => {
     it('should initialize with init value', () => {

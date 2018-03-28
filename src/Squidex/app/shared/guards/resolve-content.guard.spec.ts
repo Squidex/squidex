@@ -8,7 +8,7 @@
 import { IMock, Mock } from 'typemoq';
 import { Observable } from 'rxjs';
 
-import { ContentsService } from 'shared';
+import { ContentsService } from '@app/shared';
 
 import { ResolveContentGuard } from './resolve-content.guard';
 import { RouterMockup } from './router-mockup';

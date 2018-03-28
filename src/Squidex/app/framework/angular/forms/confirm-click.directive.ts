@@ -7,7 +7,7 @@
 
 import { Directive, EventEmitter, HostListener, Input, OnDestroy, Output } from '@angular/core';
 
-import { DialogService } from './../services/dialog.service';
+import { DialogService } from '@app/framework/internal';
 
 class DelayEventEmitter<T> extends EventEmitter<T> {
     private delayedNexts: any[] | null = [];

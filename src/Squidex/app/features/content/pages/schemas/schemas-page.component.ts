@@ -13,7 +13,7 @@ import {
     AppContext,
     SchemaDto,
     SchemasService
-} from 'shared';
+} from '@app/shared';
 
 @Component({
     selector: 'sqx-schemas-page',

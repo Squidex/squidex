@@ -9,7 +9,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
 
-import { BooleanFieldPropertiesDto } from 'shared';
+import { BooleanFieldPropertiesDto } from '@app/shared';
 
 @Component({
     selector: 'sqx-boolean-validation',

@@ -14,14 +14,8 @@
     "suppressImplicitAnyIndexErrors": true,
     "target": "es5",
     "paths": {
-      "framework": [
-        "app/framework"
-      ],
-      "features": [
-        "app/features"
-      ],
-      "shared": [
-        "app/shared"
+      "@app*": [
+        "app/*"
       ]
     }
   }

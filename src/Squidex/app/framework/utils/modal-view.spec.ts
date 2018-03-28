@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ModalView } from './../';
+import { ModalView } from './modal-view';
 
 describe('ModalView', () => {
     it('should have default values', () => {

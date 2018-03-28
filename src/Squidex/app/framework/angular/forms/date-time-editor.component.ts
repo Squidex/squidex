@@ -10,7 +10,7 @@ import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR } from '@angular/f
 import { Subscription } from 'rxjs';
 import * as moment from 'moment';
 
-import { Types } from './../utils/types';
+import { Types } from '@app/framework/internal';
 
 let Pikaday = require('pikaday/pikaday');
 

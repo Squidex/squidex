@@ -7,17 +7,14 @@
 
 import { ChangeDetectionStrategy, Component, Input, OnDestroy, OnInit, Renderer } from '@angular/core';
 
-import { ModalView } from './../utils/modal-view';
+import { ModalView } from './../../utils/modal-view';
 
-import { fadeAnimation } from './animations';
+import { fadeAnimation } from './../animations';
 
 @Component({
     selector: 'sqx-tooltip',
     styleUrls: ['./tooltip.component.scss'],
-    template: `
-        <div class="tooltip-container" *sqxModalView="modal;onRoot:true;closeAuto:false" [sqxModalTarget]="target" position="topLeft">
-            <ng-content></ng-content>
-        </div>`,
+    template: './tooltip.component.html',
     animations: [
         fadeAnimation
     ],

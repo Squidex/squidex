@@ -9,7 +9,7 @@ import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, Resolve, Router, RouterStateSnapshot } from '@angular/router';
 import { Observable } from 'rxjs';
 
-import { allParams } from 'framework';
+import { allParams } from '@app/framework';
 
 import { SchemaDetailsDto, SchemasService } from './../services/schemas.service';
 

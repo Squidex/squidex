@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ErrorDto } from './../';
+import { ErrorDto } from './error';
 
 describe('ErrorDto', () => {
     it('Should create simple message when no details are specified.', () => {

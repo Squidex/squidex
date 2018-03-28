@@ -29,7 +29,7 @@ import {
     Pager,
     SchemaDetailsDto,
     Versioned
-} from 'shared';
+} from '@app/shared';
 
 @Component({
     selector: 'sqx-contents-page',

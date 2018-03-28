@@ -17,7 +17,7 @@ import {
     AutocompleteSource,
     HistoryChannelUpdated,
     UsersService
-} from 'shared';
+} from '@app/shared';
 
 export class UsersDataSource implements AutocompleteSource {
     constructor(

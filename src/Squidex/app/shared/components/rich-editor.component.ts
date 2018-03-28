@@ -14,7 +14,7 @@ import {
     MessageBus,
     ResourceLoaderService,
     Types
-} from './../declarations-base';
+} from '@app/shared/internal';
 
 declare var tinymce: any;
 

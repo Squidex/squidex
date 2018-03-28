@@ -13,7 +13,7 @@ import {
     fadeAnimation,
     ValidatorsEx,
     UpdatePatternDto
-} from 'shared';
+} from '@app/shared';
 
 @Component({
     selector: 'sqx-pattern',

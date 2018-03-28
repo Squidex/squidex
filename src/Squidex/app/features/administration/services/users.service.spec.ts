@@ -8,7 +8,7 @@
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
 
-import { ApiUrlConfig } from 'framework';
+import { ApiUrlConfig } from '@app/framework';
 
 import {
     CreateUserDto,

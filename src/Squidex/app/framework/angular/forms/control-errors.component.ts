@@ -9,7 +9,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Host, Input, OnC
 import { AbstractControl, FormGroupDirective } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 
-import { fadeAnimation } from './animations';
+import { fadeAnimation } from '@app/framework/internal';
 
 const DEFAULT_ERRORS: { [key: string]: string } = {
     required: '{field} is required.',

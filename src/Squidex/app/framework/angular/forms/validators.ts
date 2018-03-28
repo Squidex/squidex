@@ -5,14 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import {
-    AbstractControl,
-    ValidatorFn,
-    Validators
-} from '@angular/forms';
+import { AbstractControl, ValidatorFn, Validators } from '@angular/forms';
 
-import { DateTime } from './../utils/date-time';
-import { Types } from './../utils/types';
+import { DateTime, Types } from '@app/framework/internal';
 
 export module ValidatorsEx {
     export function pattern(regex: string | RegExp, message?: string): ValidatorFn {

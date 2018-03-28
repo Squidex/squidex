@@ -21,7 +21,7 @@ import {
     Version,
     Versioned,
     MessageBus
-} from './../declarations-base';
+} from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-asset',

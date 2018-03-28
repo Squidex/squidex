@@ -18,7 +18,7 @@ import {
     RulesService,
     SchemaDto,
     UpdateRuleDto
-} from 'shared';
+} from '@app/shared';
 
 export const MODE_WIZARD = 'Wizard';
 export const MODE_EDIT_TRIGGER = 'EditTrigger';

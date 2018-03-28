@@ -8,9 +8,9 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-import { ErrorDto } from './../utils/error';
+import { ErrorDto } from './../../utils/error';
 
-import { Version, Versioned } from './../utils/version';
+import { Version, Versioned } from './../../utils/version';
 
 export module HTTP {
     export function getVersioned<T>(http: HttpClient, url: string, version?: Version): Observable<Versioned<HttpResponse<T>>> {

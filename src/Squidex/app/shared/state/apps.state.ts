@@ -6,12 +6,12 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import 'framework/utils/rxjs-extensions';
+import '@app/framework/utils/rxjs-extensions';
 
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 
-import { DateTime, ImmutableArray } from 'framework';
+import { DateTime, ImmutableArray } from '@app/framework';
 
 import {
     AppDto,

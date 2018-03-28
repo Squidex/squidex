@@ -16,4 +16,4 @@ export * from './components/markdown-editor.component';
 export * from './components/pipes';
 export * from './components/rich-editor.component';
 
-export * from './declarations-base';
+export * from './internal';

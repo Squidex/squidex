@@ -15,7 +15,7 @@ import {
     ModalView,
     SchemaDetailsDto,
     UpdateFieldDto
-} from 'shared';
+} from '@app/shared';
 
 import { SchemasState } from './../../state/schemas.state';
 

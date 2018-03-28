@@ -18,7 +18,7 @@ import {
     AssetUpdated,
     ImmutableArray,
     Types
-} from 'shared';
+} from '@app/shared';
 
 export const SQX_ASSETS_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => AssetsEditorComponent), multi: true

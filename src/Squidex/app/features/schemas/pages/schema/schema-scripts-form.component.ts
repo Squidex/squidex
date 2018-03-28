@@ -8,7 +8,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 
-import { SchemaDetailsDto, UpdateSchemaScriptsDto } from 'shared';
+import { SchemaDetailsDto, UpdateSchemaScriptsDto } from '@app/shared';
 
 import { SchemasState } from './../../state/schemas.state';
 

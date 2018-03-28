@@ -17,7 +17,7 @@ import {
     HistoryChannelUpdated,
     UpdateAppClientDto,
     ValidatorsEx
-} from 'shared';
+} from '@app/shared';
 
 @Component({
     selector: 'sqx-clients-page',

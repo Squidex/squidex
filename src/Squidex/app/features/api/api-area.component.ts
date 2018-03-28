@@ -7,7 +7,7 @@
 
 import { Component } from '@angular/core';
 
-import { AppsState } from 'shared';
+import { AppsState } from '@app/shared';
 
 @Component({
     selector: 'sqx-api-area',

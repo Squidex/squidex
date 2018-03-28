@@ -8,13 +8,13 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 
-import 'framework/utils/rxjs-extensions';
+import '@app/framework/utils/rxjs-extensions';
 
 import {
     DialogService,
     ImmutableArray,
     Pager
-} from 'shared';
+} from '@app/shared';
 
 import {
     CreateUserDto,

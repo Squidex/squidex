@@ -7,7 +7,7 @@
 
 import { Pipe, PipeTransform } from '@angular/core';
 
-import { CurrencyConfig, DecimalSeparatorConfig } from './../configurations';
+import { CurrencyConfig, DecimalSeparatorConfig } from './../../configurations';
 
 @Pipe({
     name: 'sqxMoney',

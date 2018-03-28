@@ -9,7 +9,7 @@ import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, OnInit } 
 import { FormBuilder } from '@angular/forms';
 import { Subscription } from 'rxjs';
 
-import { AppLanguageDto, fadeAnimation } from 'shared';
+import { AppLanguageDto, fadeAnimation } from '@app/shared';
 
 @Component({
     selector: 'sqx-language',

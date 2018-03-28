@@ -11,7 +11,7 @@ import {
     fadeAnimation,
     ModalView,
     slideAnimation
-} from 'framework';
+} from '@app/framework';
 
 @Component({
     selector: 'sqx-onboarding-dialog',

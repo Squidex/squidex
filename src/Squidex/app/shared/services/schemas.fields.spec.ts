@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { DateTime } from 'framework';
+import { DateTime } from '@app/framework';
 
 import {
     AssetsFieldPropertiesDto,

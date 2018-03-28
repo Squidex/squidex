@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { CurrencyConfig, DecimalSeparatorConfig } from './../';
+import { CurrencyConfig, DecimalSeparatorConfig } from './../../';
 
 import { MoneyPipe } from './money.pipe';
 

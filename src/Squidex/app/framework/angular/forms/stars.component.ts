@@ -8,7 +8,7 @@
 import { Component, forwardRef, Input } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
-import { Types } from './../utils/types';
+import { Types } from '@app/framework/internal';
 
 export const SQX_STARS_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => StarsComponent), multi: true

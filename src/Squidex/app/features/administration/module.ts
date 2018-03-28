@@ -11,7 +11,7 @@ import { RouterModule, Routes } from '@angular/router';
 import {
     SqxSharedModule,
     SqxFrameworkModule
-} from 'shared';
+} from '@app/shared';
 
 import {
     AdministrationAreaComponent,

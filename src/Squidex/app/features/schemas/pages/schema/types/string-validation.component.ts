@@ -13,7 +13,7 @@ import {
     AppPatternDto,
     ModalView,
     StringFieldPropertiesDto
-} from 'shared';
+} from '@app/shared';
 
 @Component({
     selector: 'sqx-string-validation',

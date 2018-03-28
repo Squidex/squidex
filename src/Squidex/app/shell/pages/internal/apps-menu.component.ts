@@ -14,7 +14,7 @@ import {
     ImmutableArray,
     fadeAnimation,
     ModalView
-} from 'shared';
+} from '@app/shared';
 
 @Component({
     selector: 'sqx-apps-menu',

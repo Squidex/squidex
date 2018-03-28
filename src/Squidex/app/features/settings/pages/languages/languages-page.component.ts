@@ -18,7 +18,7 @@ import {
     ImmutableArray,
     LanguageDto,
     LanguagesService
-} from 'shared';
+} from '@app/shared';
 
 @Component({
     selector: 'sqx-languages-page',

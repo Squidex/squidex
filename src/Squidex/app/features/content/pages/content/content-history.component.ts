@@ -16,7 +16,7 @@ import {
     HistoryEventDto,
     HistoryService,
     UsersProviderService
-} from 'shared';
+} from '@app/shared';
 
 import { ContentVersionSelected } from './../messages';
 

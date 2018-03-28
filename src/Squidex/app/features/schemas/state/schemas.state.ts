@@ -8,7 +8,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 
-import 'framework/utils/rxjs-extensions';
+import '@app/framework/utils/rxjs-extensions';
 
 import {
     AddFieldDto,
@@ -25,7 +25,7 @@ import {
     UpdateFieldDto,
     UpdateSchemaScriptsDto,
     UpdateSchemaDto
-} from 'shared';
+} from '@app/shared';
 
 @Injectable()
 export class SchemasState {

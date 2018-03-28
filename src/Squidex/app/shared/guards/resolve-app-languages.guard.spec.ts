@@ -12,7 +12,7 @@ import {
     AppLanguagesDto,
     AppLanguagesService,
     Version
-} from 'shared';
+} from '@app/shared';
 
 import { ResolveAppLanguagesGuard } from './resolve-app-languages.guard';
 import { RouterMockup } from './router-mockup';

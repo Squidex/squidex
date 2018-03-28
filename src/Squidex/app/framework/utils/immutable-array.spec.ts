@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ImmutableArray } from './../';
+import { ImmutableArray } from './immutable-array';
 
 describe('ImmutableArray', () => {
     it('should create empty instance', () => {

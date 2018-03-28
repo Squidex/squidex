@@ -7,8 +7,9 @@
 
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 
-import { DateTime } from './../utils/date-time';
-import { ValidatorsEx } from './../';
+import { DateTime } from './../../utils/date-time';
+
+import { ValidatorsEx } from './validators';
 
 describe('ValidatorsEx.between', () => {
     it('should return null validator if no min value or max value', () => {

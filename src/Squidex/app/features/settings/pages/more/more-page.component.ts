@@ -8,7 +8,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { AppContext } from 'shared';
+import { AppContext } from '@app/shared';
 
 @Component({
     selector: 'sqx-more-page',

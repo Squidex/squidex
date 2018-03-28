@@ -8,7 +8,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 
-import { ValidatorsEx } from 'shared';
+import { ValidatorsEx } from '@app/shared';
 
 @Component({
     selector: 'sqx-azure-queue-action',

@@ -21,7 +21,7 @@ import {
     SchemaDetailsDto,
     SchemasService,
     Types
-} from 'shared';
+} from '@app/shared';
 
 export const SQX_REFERENCES_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ReferencesEditorComponent), multi: true

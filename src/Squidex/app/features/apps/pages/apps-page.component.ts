@@ -16,7 +16,7 @@ import {
     ImmutableArray,
     ModalView,
     OnboardingService
-} from 'shared';
+} from '@app/shared';
 
 @Component({
     selector: 'sqx-apps-page',

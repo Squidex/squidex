@@ -8,9 +8,12 @@
 import { ChangeDetectorRef, OnDestroy, Pipe, PipeTransform } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
 
-import { ApiUrlConfig, MathHelper } from 'framework';
-
-import { UserDto, UsersProviderService } from './../declarations-base';
+import {
+    ApiUrlConfig,
+    MathHelper,
+    UserDto,
+    UsersProviderService
+} from '@app/shared/internal';
 
 class UserAsyncPipe implements OnDestroy {
     private lastUserId: string;

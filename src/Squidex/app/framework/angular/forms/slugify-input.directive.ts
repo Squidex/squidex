@@ -10,7 +10,7 @@ import { ControlValueAccessor,  NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import slugify from 'slugify';
 
-import { Types } from './../utils/types';
+import { Types } from '@app/framework/internal';
 
 export const SQX_SLUGIFY_INPUT_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => SlugifyInputDirective), multi: true

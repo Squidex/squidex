@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { DateTime, Duration } from './../';
+import { DateTime, Duration } from './../../';
 
 import {
     DatePipe,

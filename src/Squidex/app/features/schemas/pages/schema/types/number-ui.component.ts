@@ -9,7 +9,7 @@ import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 
-import { FloatConverter, NumberFieldPropertiesDto } from 'shared';
+import { FloatConverter, NumberFieldPropertiesDto } from '@app/shared';
 
 @Component({
     selector: 'sqx-number-ui',

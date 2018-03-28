@@ -17,7 +17,7 @@ import {
     SchemaDetailsDto,
     UpdateFieldDto,
     ValidatorsEx
-} from 'shared';
+} from '@app/shared';
 
 import { SchemasState } from './../../state/schemas.state';
 

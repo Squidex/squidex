@@ -8,7 +8,7 @@
 import { IMock, Mock } from 'typemoq';
 import { Observable } from 'rxjs';
 
-import { AppsState } from 'shared';
+import { AppsState } from '@app/shared';
 
 import { AppMustExistGuard } from './app-must-exist.guard';
 import { RouterMockup } from './router-mockup';

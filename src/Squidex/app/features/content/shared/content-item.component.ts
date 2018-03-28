@@ -20,7 +20,7 @@ import {
     SchemaDto,
     Types,
     Versioned
-} from 'shared';
+} from '@app/shared';
 
 /* tslint:disable:component-selector */
 

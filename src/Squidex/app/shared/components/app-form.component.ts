@@ -8,9 +8,12 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 
-import { ApiUrlConfig, ValidatorsEx } from 'framework';
-
-import { AppsState, CreateAppDto } from './../declarations-base';
+import {
+    ApiUrlConfig,
+    AppsState,
+    CreateAppDto,
+    ValidatorsEx
+} from '@app/shared/internal';
 
 const FALLBACK_NAME = 'my-app';
 

@@ -5,9 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import {
-    KeysPipe
-} from './keys.pipe';
+import { KeysPipe } from './keys.pipe';
 
 describe('KeysPipe', () => {
     it('should return keys', () => {

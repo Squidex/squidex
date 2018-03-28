@@ -10,7 +10,7 @@ import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 
-import { AuthService, ValidatorsEx } from 'shared';
+import { AuthService, ValidatorsEx } from '@app/shared';
 
 import { UserDto } from './../../services/users.service';
 import { UsersState } from './../../state/users.state';

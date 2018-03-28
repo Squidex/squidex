@@ -7,8 +7,8 @@
 
 import { Pipe, PipeTransform } from '@angular/core';
 
-import { DateTime } from './../utils/date-time';
-import { Duration } from './../utils/duration';
+import { DateTime } from './../../utils/date-time';
+import { Duration } from './../../utils/duration';
 
 @Pipe({
     name: 'sqxShortDate',

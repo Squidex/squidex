@@ -15,7 +15,7 @@ import {
     WebStorageStateStore
 } from 'oidc-client';
 
-import { ApiUrlConfig } from 'framework';
+import { ApiUrlConfig } from '@app/framework';
 
 export class Profile {
     public get id(): string {

@@ -15,7 +15,7 @@ import {
     fadeAnimation,
     MessageBus,
     ModalView
-} from 'shared';
+} from '@app/shared';
 
 import { SchemaCloning } from './../messages';
 

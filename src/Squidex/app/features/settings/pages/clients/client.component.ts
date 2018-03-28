@@ -15,7 +15,7 @@ import {
     AppClientsService,
     fadeAnimation,
     ModalView
-} from 'shared';
+} from '@app/shared';
 
 const ESCAPE_KEY = 27;
 

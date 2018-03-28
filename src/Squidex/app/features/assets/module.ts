@@ -9,7 +9,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { DndModule } from 'ng2-dnd';
 
-import { SqxFrameworkModule, SqxSharedModule } from 'shared';
+import { SqxFrameworkModule, SqxSharedModule } from '@app/shared';
 
 import {
     AssetsPageComponent

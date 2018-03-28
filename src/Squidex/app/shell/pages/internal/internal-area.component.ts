@@ -12,7 +12,7 @@ import { Subscription } from 'rxjs';
 import {
     DialogService,
     Notification
-} from 'shared';
+} from '@app/shared';
 
 @Component({
     selector: 'sqx-internal-area',

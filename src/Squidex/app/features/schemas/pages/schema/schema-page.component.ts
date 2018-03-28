@@ -17,7 +17,7 @@ import {
     MessageBus,
     ModalView,
     SchemaDetailsDto
-} from 'shared';
+} from '@app/shared';
 
 import {
     SchemaCloning

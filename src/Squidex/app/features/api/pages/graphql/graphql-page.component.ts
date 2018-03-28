@@ -19,7 +19,7 @@ import {
     AppsState,
     GraphQlService,
     LocalStoreService
-} from 'shared';
+} from '@app/shared';
 
 @Component({
     selector: 'sqx-graphql-page',

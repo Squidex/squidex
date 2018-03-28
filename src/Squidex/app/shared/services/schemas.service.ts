@@ -10,7 +10,7 @@ import { Injectable } from '@angular/core';
 import { ValidatorFn, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
 
-import 'framework/angular/http-extensions';
+import '@app/framework/angular/http/http-extensions';
 
 import {
     AnalyticsService,
@@ -21,7 +21,7 @@ import {
     ValidatorsEx,
     Version,
     Versioned
-} from 'framework';
+} from '@app/framework';
 
 export const fieldTypes = [
     {

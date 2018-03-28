@@ -7,12 +7,12 @@
 
 import { Component, Input, OnDestroy, OnInit, Renderer } from '@angular/core';
 
-import { ModalView } from './../utils/modal-view';
-import { Types } from './../utils/types';
-
-import { OnboardingService } from './../services/onboarding.service';
-
-import { fadeAnimation } from './animations';
+import {
+    fadeAnimation,
+    ModalView,
+    OnboardingService,
+    Types
+} from '@app/framework/internal';
 
 @Component({
     selector: 'sqx-onboarding-tooltip',

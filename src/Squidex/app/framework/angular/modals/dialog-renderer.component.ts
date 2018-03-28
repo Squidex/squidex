@@ -8,15 +8,13 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 
-import { fadeAnimation } from './animations';
-
 import {
     DialogRequest,
     DialogService,
+    fadeAnimation,
+    ModalView,
     Notification
-} from './../services/dialog.service';
-
-import { ModalView } from './../utils/modal-view';
+} from '@app/framework/internal';
 
 @Component({
     selector: 'sqx-dialog-renderer',

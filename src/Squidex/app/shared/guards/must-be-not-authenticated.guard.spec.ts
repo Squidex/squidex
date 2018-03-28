@@ -8,7 +8,7 @@
 import { IMock, Mock } from 'typemoq';
 import { Observable } from 'rxjs';
 
-import { AuthService } from 'shared';
+import { AuthService } from '@app/shared';
 
 import { MustBeNotAuthenticatedGuard } from './must-be-not-authenticated.guard';
 import { RouterMockup } from './router-mockup';

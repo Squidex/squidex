@@ -9,7 +9,7 @@ import { AfterViewInit, Component, forwardRef, ElementRef, ViewChild } from '@an
 import { ControlValueAccessor,  NG_VALUE_ACCESSOR } from '@angular/forms';
 import { Subject } from 'rxjs';
 
-import { ResourceLoaderService } from './../services/resource-loader.service';
+import { ResourceLoaderService } from '@app/framework/internal';
 
 declare var ace: any;
 

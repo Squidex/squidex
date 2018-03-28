@@ -9,11 +9,8 @@ import { Component, ViewChild, ViewContainerRef } from '@angular/core';
 
 @Component({
     selector: 'sqx-root-view',
-    template: `
-        <div #element></div>
-
-        <ng-content></ng-content>
-    `
+    styleUrls: ['./root-view.component.scss'],
+    template: './root-view.component.html'
 })
 export class RootViewComponent {
     @ViewChild('element', { read: ViewContainerRef })

@@ -13,7 +13,7 @@ import {
     AppLanguageDto,
     FieldDto,
     fieldInvariant
-} from 'shared';
+} from '@app/shared';
 
 @Component({
     selector: 'sqx-content-field',

@@ -13,7 +13,7 @@ import {
     Pager,
     RuleEventDto,
     RulesService
-} from 'shared';
+} from '@app/shared';
 
 @Component({
     selector: 'sqx-rule-events-page',

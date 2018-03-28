@@ -16,7 +16,7 @@ import {
     ResolvePublishedSchemaGuard,
     SqxFrameworkModule,
     SqxSharedModule
-} from 'shared';
+} from '@app/shared';
 
 import {
     AssetsEditorComponent,

@@ -9,7 +9,7 @@ import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from '@angular/router';
 import { Observable } from 'rxjs';
 
-import { allParams } from 'framework';
+import { allParams } from '@app/framework';
 
 import { UsersState } from './../state/users.state';
 

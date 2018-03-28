@@ -10,7 +10,7 @@ import { ModuleWithProviders, NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { DndModule } from 'ng2-dnd';
 
-import { SqxFrameworkModule } from 'framework';
+import { SqxFrameworkModule } from '@app/framework';
 
 import {
     AppFormComponent,
