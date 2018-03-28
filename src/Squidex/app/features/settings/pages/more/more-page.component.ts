@@ -8,28 +8,27 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { AppContext } from '@app/shared';
+import { AppsState, DialogService } from '@app/shared';
 
 @Component({
     selector: 'sqx-more-page',
     styleUrls: ['./more-page.component.scss'],
-    templateUrl: './more-page.component.html',
-    providers: [
-        AppContext
-    ]
+    templateUrl: './more-page.component.html'
 })
 export class MorePageComponent {
-    constructor(public readonly ctx: AppContext,
+    constructor(
+        public readonly appsState: AppsState,
+        private readonly dialogs: DialogService,
         private readonly router: Router
     ) {
     }
 
     public archiveApp() {
-        this.ctx.appsState.deleteApp(this.ctx.appName)
+        this.appsState.deleteApp(this.appsState.appName)
             .subscribe(() => {
                 this.router.navigate(['/app']);
             }, error => {
-                this.ctx.notifyError(error);
+                this.dialogs.notifyError(error);
             });
     }
 }

@@ -71,7 +71,8 @@ export class AssetComponent implements OnInit {
             name: ['',
                 [
                     Validators.required
-                ]]
+                ]
+            ]
         });
 
     public progress = 0;

@@ -26,15 +26,18 @@ export class AlgoliaActionComponent implements OnInit {
             appId: ['',
                 [
                     Validators.required
-                ]],
+                ]
+            ],
             apiKey: ['',
                 [
                     Validators.required
-                ]],
+                ]
+            ],
             indexName: ['$SCHEMA_NAME',
                 [
                     Validators.required
-                ]]
+                ]
+            ]
         });
 
     constructor(

@@ -44,7 +44,7 @@
             Client Id:
         </div>
         <div class="col">
-            <input readonly class="form-control" value="{{ctx.appName}}:{{client.id}}" #inputName />
+            <input readonly class="form-control" value="{{appsState.appName}}:{{client.id}}" #inputName />
         </div>
         <div class="col col-auto cell-actions">
             <button type="button" class="btn btn-primary btn-link" [sqxCopy]="inputName">

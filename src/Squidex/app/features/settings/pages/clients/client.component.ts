@@ -10,11 +10,12 @@ import { FormBuilder, Validators } from '@angular/forms';
 
 import {
     AccessTokenDto,
-    AppContext,
     AppClientDto,
     AppClientsService,
+    DialogService,
     fadeAnimation,
-    ModalView
+    ModalView,
+    AppsState
 } from '@app/shared';
 
 const ESCAPE_KEY = 27;
@@ -23,9 +24,6 @@ const ESCAPE_KEY = 27;
     selector: 'sqx-client',
     styleUrls: ['./client.component.scss'],
     templateUrl: './client.component.html',
-    providers: [
-        AppContext
-    ],
     animations: [
         fadeAnimation
     ]
@@ -53,7 +51,9 @@ export class ClientComponent {
     public renameForm =
         this.formBuilder.group({
             name: ['',
-                Validators.required
+                [
+                    Validators.required
+                ]
             ]
         });
 
@@ -61,8 +61,10 @@ export class ClientComponent {
         return this.renameForm.controls['name'].value !== this.client.name;
     }
 
-    constructor(public readonly ctx: AppContext,
+    constructor(
+        public readonly appsState: AppsState,
         private readonly appClientsService: AppClientsService,
+        private readonly dialogs: DialogService,
         private readonly formBuilder: FormBuilder
     ) {
     }
@@ -84,12 +86,12 @@ export class ClientComponent {
     }
 
     public createToken(client: AppClientDto) {
-        this.appClientsService.createToken(this.ctx.appName, client)
+        this.appClientsService.createToken(this.appsState.appName, client)
             .subscribe(dto => {
                 this.token = dto;
                 this.tokenDialog.show();
             }, error => {
-                this.ctx.notifyError(error);
+                this.dialogs.notifyError(error);
             });
     }
 }

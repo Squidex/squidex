@@ -30,11 +30,13 @@ export class SchemaEditFormComponent implements OnInit {
             label: ['',
                 [
                     Validators.maxLength(100)
-                ]],
+                ]
+            ],
             hints: ['',
                 [
                     Validators.maxLength(1000)
-                ]]
+                ]
+            ]
         });
 
     constructor(

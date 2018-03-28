@@ -46,7 +46,7 @@ export class RichEditorComponent implements ControlValueAccessor, AfterViewInit,
     public draggedOver = false;
 
     public assetsForm = this.formBuilder.group({
-        name: ['']
+        name: ''
     });
 
     constructor(private readonly resourceLoader: ResourceLoaderService,

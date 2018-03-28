@@ -32,20 +32,24 @@ export class UserPageComponent implements OnDestroy, OnInit {
                     Validators.email,
                     Validators.required,
                     Validators.maxLength(100)
-                ]],
+                ]
+            ],
             displayName: ['',
                 [
                     Validators.required,
                     Validators.maxLength(100)
-                ]],
+                ]
+            ],
             password: ['',
                 [
                     Validators.nullValidator
-                ]],
+                ]
+            ],
             passwordConfirm: ['',
                 [
                     ValidatorsEx.match('password', 'Passwords must be the same.')
-                ]]
+                ]
+            ]
         });
 
     public user: UserDto | null;

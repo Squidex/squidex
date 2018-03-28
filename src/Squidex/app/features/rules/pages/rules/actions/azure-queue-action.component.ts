@@ -28,12 +28,14 @@ export class AzureQueueActionComponent implements OnInit {
             connectionString: ['',
                 [
                     Validators.required
-                ]],
+                ]
+            ],
             queue: ['squidex',
                 [
                     Validators.required,
                     ValidatorsEx.pattern('[a-z][a-z0-9]{2,}(\-[a-z0-9]+)*', 'Name must be a valid azure queue name.')
-                ]]
+                ]
+            ]
         });
 
     constructor(

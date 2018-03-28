@@ -45,8 +45,8 @@ export class LanguageComponent implements OnInit, OnChanges, OnDestroy {
     public editFormSubmitted = false;
     public editForm =
         this.formBuilder.group({
-            isMaster: [false, []],
-            isOptional: [false, []]
+            isMaster: false,
+            isOptional: false
         });
 
     constructor(
