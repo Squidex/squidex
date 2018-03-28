@@ -15,7 +15,6 @@ import {
     AppContributorsDto,
     AppContributorsService,
     AutocompleteSource,
-    HistoryChannelUpdated,
     UsersService
 } from '@app/shared';
 
@@ -135,7 +134,5 @@ export class ContributorsPageComponent implements OnInit {
 
     private updateContributors(appContributors: AppContributorsDto) {
         this.appContributors = appContributors;
-
-        this.ctx.bus.emit(new HistoryChannelUpdated());
     }
 }

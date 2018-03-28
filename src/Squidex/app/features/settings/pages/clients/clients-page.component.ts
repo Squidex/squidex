@@ -14,7 +14,6 @@ import {
     AppClientsService,
     AppContext,
     CreateAppClientDto,
-    HistoryChannelUpdated,
     UpdateAppClientDto,
     ValidatorsEx
 } from '@app/shared';
@@ -108,6 +107,7 @@ export class ClientsPageComponent implements OnInit {
                     this.resetClientForm();
                 }, error => {
                     this.ctx.notifyError(error);
+
                     this.resetClientForm();
                 });
         }
@@ -125,7 +125,5 @@ export class ClientsPageComponent implements OnInit {
 
     private updateClients(appClients: AppClientsDto) {
         this.appClients = appClients;
-
-        this.ctx.bus.emit(new HistoryChannelUpdated());
     }
 }

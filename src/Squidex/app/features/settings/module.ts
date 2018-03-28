@@ -10,8 +10,6 @@ import { RouterModule, Routes } from '@angular/router';
 import { DndModule } from 'ng2-dnd';
 
 import {
-    HelpComponent,
-    HistoryComponent,
     SqxFrameworkModule,
     SqxSharedModule
 } from '@app/shared';
@@ -52,83 +50,19 @@ const routes: Routes = [
             },
             {
                 path: 'clients',
-                component: ClientsPageComponent,
-                children: [
-                    {
-                        path: 'history',
-                        component: HistoryComponent,
-                        data: {
-                            channel: 'settings.clients'
-                        }
-                    },
-                    {
-                        path: 'help',
-                        component: HelpComponent,
-                        data: {
-                            helpPage: '05-integrated/clients'
-                        }
-                    }
-                ]
+                component: ClientsPageComponent
             },
             {
                 path: 'contributors',
-                component: ContributorsPageComponent,
-                children: [
-                    {
-                        path: 'history',
-                        component: HistoryComponent,
-                        data: {
-                            channel: 'settings.contributors'
-                        }
-                    },
-                    {
-                        path: 'help',
-                        component: HelpComponent,
-                        data: {
-                            helpPage: '05-integrated/contributors'
-                        }
-                    }
-                ]
+                component: ContributorsPageComponent
             },
             {
                 path: 'languages',
-                component: LanguagesPageComponent,
-                children: [
-                    {
-                        path: 'history',
-                        component: HistoryComponent,
-                        data: {
-                            channel: 'settings.languages'
-                        }
-                    },
-                    {
-                        path: 'help',
-                        component: HelpComponent,
-                        data: {
-                            helpPage: '05-integrated/languages'
-                        }
-                    }
-                ]
+                component: LanguagesPageComponent
             },
             {
                 path: 'patterns',
-                component: PatternsPageComponent,
-                children: [
-                    {
-                        path: 'history',
-                        component: HistoryComponent,
-                        data: {
-                            channel: 'settings.patterns'
-                        }
-                    },
-                    {
-                        path: 'help',
-                        component: HelpComponent,
-                        data: {
-                            helpPage: '05-integrated/patterns'
-                        }
-                    }
-                ]
+                component: PatternsPageComponent
             }
         ]
     }
