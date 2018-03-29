@@ -70,11 +70,13 @@ namespace Squidex.Domain.Apps.Entities.Apps
                     });
 
                 case AssignContributor assigneContributor:
-                    return UpdateAsync(assigneContributor, async c =>
+                    return UpdateReturnAsync(assigneContributor, async c =>
                     {
                         await GuardAppContributors.CanAssign(Snapshot.Contributors, c, userResolver, appPlansProvider.GetPlan(Snapshot.Plan?.PlanId));
 
                         AssignContributor(c);
+
+                        return EntityCreatedResult.Create(c.ContributorId, NewVersion);
                     });
 
                 case RemoveContributor removeContributor:

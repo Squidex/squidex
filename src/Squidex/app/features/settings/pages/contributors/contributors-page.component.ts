@@ -16,6 +16,7 @@ import {
     AppContributorsService,
     AutocompleteSource,
     HistoryChannelUpdated,
+    PublicUserDto,
     UsersService
 } from 'shared';
 
@@ -110,16 +111,20 @@ export class ContributorsPageComponent implements OnInit {
     }
 
     public assignContributor() {
-        const requestDto = new AppContributorDto(this.addContributorForm.controls['user'].value.id, 'Editor');
+        let value: any = this.addContributorForm.controls['user'].value;
+
+        if (value instanceof PublicUserDto) {
+            value = value.id;
+        }
+
+        const requestDto = new AppContributorDto(value, 'Editor');
 
         this.appContributorsService.postContributor(this.ctx.appName, requestDto, this.appContributors.version)
             .subscribe(dto => {
-                this.updateContributors(this.appContributors.addContributor(requestDto, dto.version));
+                this.updateContributors(this.appContributors.addContributor(new AppContributorDto(dto.payload.contributorId, requestDto.permission), dto.version));
                 this.resetContributorForm();
             }, error => {
                 this.ctx.notifyError(error);
-
-                this.resetContributorForm();
             });
     }
 

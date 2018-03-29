@@ -1,29 +1,20 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using System.ComponentModel.DataAnnotations;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using Squidex.Domain.Apps.Core.Apps;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models
 {
-    public sealed class AssignAppContributorDto
+    public sealed class ContributorAssignedDto
     {
         /// <summary>
-        /// The id or email of the user to add to the app.
+        /// The id of the user that has been assigned as contributor.
         /// </summary>
         [Required]
         public string ContributorId { get; set; }
-
-        /// <summary>
-        /// The permission level as a contributor.
-        /// </summary>
-        [JsonConverter(typeof(StringEnumConverter))]
-        public AppContributorPermission Permission { get; set; }
     }
 }

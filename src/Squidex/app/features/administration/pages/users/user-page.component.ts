@@ -68,7 +68,6 @@ export class UserPageComponent  implements OnInit {
                                 created.id,
                                 requestDto.email,
                                 requestDto.displayName,
-                                created.pictureUrl!,
                                 false);
 
                         this.ctx.notifyInfo('User created successfully.');
