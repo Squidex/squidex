@@ -96,7 +96,7 @@ describe('UsersProviderService', () => {
             resultingUser = result;
         }).unsubscribe();
 
-        expect(resultingUser).toEqual(new PublicUserDto('unknown', 'unknown'));
+        expect(resultingUser).toEqual(new PublicUserDto('Unknown', 'Unknown'));
 
         usersService.verifyAll();
     });

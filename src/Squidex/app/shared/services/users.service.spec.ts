@@ -87,8 +87,8 @@ describe('UsersService', () => {
 
         expect(users).toEqual(
             [
-                new UserDto('123', 'mail1@domain.com', 'User1', true),
-                new UserDto('456', 'mail2@domain.com', 'User2', true)
+                new PublicUserDto('123', 'User1'),
+                new PublicUserDto('456', 'User2')
             ]);
     }));
 
