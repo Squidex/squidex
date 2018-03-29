@@ -1,4 +1,4 @@
-<sqx-title message="{app} | Settings" parameter1="app" [value1]="ctx.appName"></sqx-title>
+<sqx-title message="{app} | Settings" parameter1="app" [value1]="appsState.appName"></sqx-title>
 
 <sqx-panel theme="dark" desiredWidth="16rem">
     <ng-container title>
@@ -7,7 +7,7 @@
     
     <ng-container content>
         <ul class="nav nav-panel nav-dark flex-column">
-            <li class="nav-item" *ngIf="ctx.app.permission === 'Owner'">
+            <li class="nav-item" *ngIf="appsState.selectedApp.value.permission === 'Owner'">
                 <a class="nav-link" routerLink="backups" routerLinkActive="active">
                     Backups
                     <i class="icon-angle-right"></i>
@@ -19,7 +19,7 @@
                     <i class="icon-angle-right"></i>
                 </a>
             </li>
-            <li class="nav-item" *ngIf="ctx.app.permission === 'Owner'">
+            <li class="nav-item" *ngIf="appsState.selectedApp.value.permission === 'Owner'">
                 <a class="nav-link" routerLink="contributors" routerLinkActive="active">
                     Contributors
                     <i class="icon-angle-right"></i>
@@ -37,13 +37,13 @@
                     <i class="icon-angle-right"></i>
                 </a>
             </li>
-            <li class="nav-item" *ngIf="ctx.app.permission === 'Owner'">
+            <li class="nav-item" *ngIf="appsState.selectedApp.value.permission === 'Owner'">
                 <a class="nav-link" routerLink="plans" routerLinkActive="active">
                     Subscription
                     <i class="icon-angle-right"></i>
                 </a>
             </li>
-            <li class="nav-item" *ngIf="ctx.app.permission === 'Owner'">
+            <li class="nav-item" *ngIf="appsState.selectedApp.value.permission === 'Owner'">
                 <a class="nav-link" routerLink="more" routerLinkActive="active">
                     More
                     <i class="icon-angle-right"></i>
