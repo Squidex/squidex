@@ -32,14 +32,14 @@ export class SchemasPageComponent implements OnDestroy, OnInit {
 
     public schemasFilter = new FormControl();
     public schemasFiltered =
-        this.schemasState.schemasItems
+        this.schemasState.changes.map(x => x.schemas)
             .combineLatest(this.schemasFilter.valueChanges.startWith(''),
                 (schemas, query) => {
                     if (query && query.length > 0) {
-                        schemas = schemas.filter(t => t.name.indexOf(query) >= 0);
+                        return schemas.filter(t => t.name.indexOf(query) >= 0);
+                    } else {
+                        return schemas;
                     }
-
-                    return schemas.sortByStringAsc(x => x.name);
                 });
 
     public import: any;

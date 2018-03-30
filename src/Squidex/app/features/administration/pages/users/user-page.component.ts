@@ -11,7 +11,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 
 import { UserDto } from './../../services/users.service';
-import { UserForm, UsersState, getSelectedUser } from './../../state/users.state';
+import { UserForm, UsersState } from './../../state/users.state';
 
 @Component({
     selector: 'sqx-user-page',
@@ -25,7 +25,7 @@ export class UserPageComponent implements OnDestroy, OnInit {
     public userForm: UserForm;
 
     public selectedUser =
-        this.usersState.changes.map(getSelectedUser)
+        this.usersState.changes.map(x => x.selectedUser)
             .distinctUntilChanged();
 
     public isCurrentUser =
@@ -46,10 +46,11 @@ export class UserPageComponent implements OnDestroy, OnInit {
 
     public ngOnInit() {
         this.selectedUserSubscription =
-            this.usersState.changes.map(getSelectedUser).subscribe(user => {
-                this.user = user;
-                this.userForm.load(user);
-            });
+            this.usersState.changes.map(x => x.selectedUser)
+                .subscribe(user => {
+                    this.user = user;
+                    this.userForm.load(user);
+                });
     }
 
     public save() {
