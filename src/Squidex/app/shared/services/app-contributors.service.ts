@@ -58,6 +58,13 @@ export class AppContributorDto {
     }
 }
 
+export class ContributorAssignedDto {
+    constructor(
+        public readonly contributorId: string
+    ) {
+    }
+}
+
 @Injectable()
 export class AppContributorsService {
     constructor(
@@ -87,10 +94,17 @@ export class AppContributorsService {
                 .pretifyError('Failed to load contributors. Please reload.');
     }
 
-    public postContributor(appName: string, dto: AppContributorDto, version: Version): Observable<Versioned<any>> {
+    public postContributor(appName: string, dto: AppContributorDto, version: Version): Observable<Versioned<ContributorAssignedDto>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/contributors`);
 
         return HTTP.postVersioned(this.http, url, dto, version)
+                .map(response => {
+                    const body: any = response.payload.body;
+
+                    const result = new ContributorAssignedDto(body.contributorId);
+
+                    return new Versioned(response.version, result);
+                })
                 .do(() => {
                     this.analytics.trackEvent('Contributor', 'Configured', appName);
                 })

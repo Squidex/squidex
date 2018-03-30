@@ -27,7 +27,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             A.CallTo(() => apps.GetAppAsync("new-app"))
                 .Returns(Task.FromResult<IAppEntity>(null));
 
-            A.CallTo(() => users.FindByIdAsync(A<string>.Ignored))
+            A.CallTo(() => users.FindByIdOrEmailAsync(A<string>.Ignored))
                 .Returns(A.Fake<IUser>());
 
             A.CallTo(() => appPlans.GetPlan("free"))

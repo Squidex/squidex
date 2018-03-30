@@ -82,7 +82,7 @@ namespace Squidex.Areas.Api.Controllers.Users
         {
             var user = await userManager.CreateAsync(userFactory, request.Email, request.DisplayName, request.Password);
 
-            var response = new UserCreatedDto { Id = user.Id, PictureUrl = user.PictureUrl() };
+            var response = new UserCreatedDto { Id = user.Id };
 
             return Ok(response);
         }
@@ -129,7 +129,7 @@ namespace Squidex.Areas.Api.Controllers.Users
 
         private static UserDto Map(IUser user)
         {
-            return SimpleMapper.Map(user, new UserDto { DisplayName = user.DisplayName(), PictureUrl = user.PictureUrl() });
+            return SimpleMapper.Map(user, new UserDto { DisplayName = user.DisplayName() });
         }
 
         private bool IsSelf(string id)

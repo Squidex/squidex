@@ -2,14 +2,11 @@
 @import '_mixins';
 
 .autocomplete-user {
-    &-picture {
-        float: left;
-        margin-top: .4rem;
+    & {
+        @include truncate;
     }
 
-    &-name,
-    &-email {
-        @include truncate;
-        margin-left: 3rem;
+    &-name {
+        margin-left: .25rem;
     }
 }

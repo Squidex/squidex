@@ -11,6 +11,6 @@ namespace Squidex.Shared.Users
 {
     public interface IUserResolver
     {
-        Task<IUser> FindByIdAsync(string id);
+        Task<IUser> FindByIdOrEmailAsync(string idOrEmail);
     }
 }

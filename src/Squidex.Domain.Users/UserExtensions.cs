@@ -35,6 +35,11 @@ namespace Squidex.Domain.Users
             user.SetClaim(SquidexClaimTypes.SquidexPictureUrl, GravatarHelper.CreatePictureUrl(email));
         }
 
+        public static void SetHidden(this IUser user, bool value)
+        {
+            user.SetClaim(SquidexClaimTypes.SquidexHidden, value.ToString());
+        }
+
         public static void SetConsent(this IUser user)
         {
             user.SetClaim(SquidexClaimTypes.SquidexConsent, "true");
@@ -43,6 +48,11 @@ namespace Squidex.Domain.Users
         public static void SetConsentForEmails(this IUser user, bool value)
         {
             user.SetClaim(SquidexClaimTypes.SquidexConsentForEmails, value.ToString());
+        }
+
+        public static bool IsHidden(this IUser user)
+        {
+            return user.HasClaimValue(SquidexClaimTypes.SquidexHidden, "true");
         }
 
         public static bool HasConsent(this IUser user)

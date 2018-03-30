@@ -71,8 +71,9 @@ namespace Squidex.Domain.Users
             return user;
         }
 
-        public static Task<IdentityResult> UpdateAsync(this UserManager<IUser> userManager, IUser user, string email, string displayName)
+        public static Task<IdentityResult> UpdateAsync(this UserManager<IUser> userManager, IUser user, string email, string displayName, bool hidden)
         {
+            user.SetHidden(hidden);
             user.SetEmail(email);
             user.SetDisplayName(displayName);
 

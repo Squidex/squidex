@@ -22,6 +22,8 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
 
         public string SuccessMessage { get; set; }
 
+        public bool IsHidden { get; set; }
+
         public bool HasPassword { get; set; }
 
         public bool HasPasswordAuth { get; set; }

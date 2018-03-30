@@ -65,12 +65,12 @@ namespace Squidex.Areas.Api.Controllers.Users
         [ApiAuthorize]
         [HttpGet]
         [Route("users/")]
-        [ProducesResponseType(typeof(UserDto[]), 200)]
+        [ProducesResponseType(typeof(PublicUserDto[]), 200)]
         public async Task<IActionResult> GetUsers(string query)
         {
             var entities = await userManager.QueryByEmailAsync(query ?? string.Empty);
 
-            var models = entities.Select(x => SimpleMapper.Map(x, new UserDto { DisplayName = x.DisplayName(), PictureUrl = x.PictureUrl() })).ToArray();
+            var models = entities.Where(x => !x.IsHidden()).Select(x => SimpleMapper.Map(x, new UserDto { DisplayName = x.DisplayName() })).ToArray();
 
             return Ok(models);
         }
@@ -86,7 +86,7 @@ namespace Squidex.Areas.Api.Controllers.Users
         [ApiAuthorize]
         [HttpGet]
         [Route("users/{id}/")]
-        [ProducesResponseType(typeof(UserDto), 200)]
+        [ProducesResponseType(typeof(PublicUserDto), 200)]
         public async Task<IActionResult> GetUser(string id)
         {
             var entity = await userManager.FindByIdAsync(id);
@@ -96,7 +96,7 @@ namespace Squidex.Areas.Api.Controllers.Users
                 return NotFound();
             }
 
-            var response = SimpleMapper.Map(entity, new UserDto { DisplayName = entity.DisplayName(), PictureUrl = entity.PictureUrl() });
+            var response = SimpleMapper.Map(entity, new UserDto { DisplayName = entity.DisplayName() });
 
             return Ok(response);
         }

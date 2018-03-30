@@ -11,7 +11,7 @@ import { IMock, Mock, Times } from 'typemoq';
 import {
     AuthService,
     Profile,
-    UserDto,
+    PublicUserDto,
     UsersProviderService,
     UsersService
 } from './../';
@@ -28,12 +28,12 @@ describe('UsersProviderService', () => {
     });
 
     it('should return users service when user not cached', () => {
-        const user = new UserDto('123', 'mail@domain.com', 'User1', 'path/to/image', true);
+        const user = new PublicUserDto('123', 'User1');
 
         usersService.setup(x => x.getUser('123'))
             .returns(() => Observable.of(user)).verifiable(Times.once());
 
-        let resultingUser: UserDto | null = null;
+        let resultingUser: PublicUserDto | null = null;
 
         usersProviderService.getUser('123').subscribe(result => {
             resultingUser = result;
@@ -45,14 +45,14 @@ describe('UsersProviderService', () => {
     });
 
     it('should return provide user from cache', () => {
-        const user = new UserDto('123', 'mail@domain.com', 'User1', 'path/to/image', true);
+        const user = new PublicUserDto('123', 'User1');
 
         usersService.setup(x => x.getUser('123'))
             .returns(() => Observable.of(user)).verifiable(Times.once());
 
         usersProviderService.getUser('123');
 
-        let resultingUser: UserDto | null = null;
+        let resultingUser: PublicUserDto | null = null;
 
         usersProviderService.getUser('123').subscribe(result => {
             resultingUser = result;
@@ -64,7 +64,7 @@ describe('UsersProviderService', () => {
     });
 
     it('should return me when user is current user', () => {
-        const user = new UserDto('123', 'mail@domain.com', 'User1', 'path/to/image', true);
+        const user = new PublicUserDto('123', 'User1');
 
         authService.setup(x => x.user)
             .returns(() => new Profile(<any>{ profile: { sub: '123'}}));
@@ -72,13 +72,13 @@ describe('UsersProviderService', () => {
         usersService.setup(x => x.getUser('123'))
             .returns(() => Observable.of(user)).verifiable(Times.once());
 
-        let resultingUser: UserDto | null = null;
+        let resultingUser: PublicUserDto | null = null;
 
         usersProviderService.getUser('123').subscribe(result => {
             resultingUser = result;
         }).unsubscribe();
 
-        expect(resultingUser).toEqual(new UserDto('123', 'mail@domain.com', 'Me', 'path/to/image', true));
+        expect(resultingUser).toEqual(new PublicUserDto('123', 'Me'));
 
         usersService.verifyAll();
     });
@@ -90,13 +90,13 @@ describe('UsersProviderService', () => {
         usersService.setup(x => x.getUser('123'))
             .returns(() => Observable.throw('NOT FOUND')).verifiable(Times.once());
 
-        let resultingUser: UserDto | null = null;
+        let resultingUser: PublicUserDto | null = null;
 
         usersProviderService.getUser('123').subscribe(result => {
             resultingUser = result;
         }).unsubscribe();
 
-        expect(resultingUser).toEqual(new UserDto('NOT FOUND', 'NOT FOUND', 'NOT FOUND', null, false));
+        expect(resultingUser).toEqual(new PublicUserDto('Unknown', 'Unknown'));
 
         usersService.verifyAll();
     });

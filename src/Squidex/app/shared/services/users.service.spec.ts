@@ -11,6 +11,7 @@ import { inject, TestBed } from '@angular/core/testing';
 import {
     ApiUrlConfig,
     CreateUserDto,
+    PublicUserDto,
     UpdateUserDto,
     UserDto,
     UserManagementService,
@@ -20,7 +21,7 @@ import {
 
 describe('UserDto', () => {
     it('should update email and display name property when unlocking', () => {
-        const user_1 = new UserDto('1', 'sebastian@squidex.io', 'Sebastian', 'picture', true);
+        const user_1 = new UserDto('1', 'sebastian@squidex.io', 'Sebastian',  true);
         const user_2 = user_1.update('qaisar@squidex.io', 'Qaisar');
 
         expect(user_2.email).toEqual('qaisar@squidex.io');
@@ -28,14 +29,14 @@ describe('UserDto', () => {
     });
 
     it('should update isLocked property when locking', () => {
-        const user_1 = new UserDto('1', 'sebastian@squidex.io', 'Sebastian', 'picture', false);
+        const user_1 = new UserDto('1', 'sebastian@squidex.io', 'Sebastian', false);
         const user_2 = user_1.lock();
 
         expect(user_2.isLocked).toBeTruthy();
     });
 
     it('should update isLocked property when unlocking', () => {
-        const user_1 = new UserDto('1', 'sebastian@squidex.io', 'Sebastian', 'picture', true);
+        const user_1 = new UserDto('1', 'sebastian@squidex.io', 'Sebastian', true);
         const user_2 = user_1.unlock();
 
         expect(user_2.isLocked).toBeFalsy();
@@ -62,7 +63,7 @@ describe('UsersService', () => {
     it('should make get request to get many users',
         inject([UsersService, HttpTestingController], (usersService: UsersService, httpMock: HttpTestingController) => {
 
-        let users: UserDto[] | null = null;
+        let users: PublicUserDto[] | null = null;
 
         usersService.getUsers().subscribe(result => {
             users = result;
@@ -76,31 +77,25 @@ describe('UsersService', () => {
         req.flush([
             {
                 id: '123',
-                email: 'mail1@domain.com',
-                displayName: 'User1',
-                pictureUrl: 'path/to/image1',
-                isLocked: true
+                displayName: 'User1'
             },
             {
                 id: '456',
-                email: 'mail2@domain.com',
-                displayName: 'User2',
-                pictureUrl: 'path/to/image2',
-                isLocked: true
+                displayName: 'User2'
             }
         ]);
 
         expect(users).toEqual(
             [
-                new UserDto('123', 'mail1@domain.com', 'User1', 'path/to/image1', true),
-                new UserDto('456', 'mail2@domain.com', 'User2', 'path/to/image2', true)
+                new PublicUserDto('123', 'User1'),
+                new PublicUserDto('456', 'User2')
             ]);
     }));
 
     it('should make get request with query to get many users',
         inject([UsersService, HttpTestingController], (usersService: UsersService, httpMock: HttpTestingController) => {
 
-        let users: UserDto[] | null = null;
+        let users: PublicUserDto[] | null = null;
 
         usersService.getUsers('my-query').subscribe(result => {
             users = result;
@@ -114,31 +109,25 @@ describe('UsersService', () => {
         req.flush([
             {
                 id: '123',
-                email: 'mail1@domain.com',
-                displayName: 'User1',
-                pictureUrl: 'path/to/image1',
-                isLocked: true
+                displayName: 'User1'
             },
             {
                 id: '456',
-                email: 'mail2@domain.com',
-                displayName: 'User2',
-                pictureUrl: 'path/to/image2',
-                isLocked: true
+                displayName: 'User2'
             }
         ]);
 
         expect(users).toEqual(
             [
-                new UserDto('123', 'mail1@domain.com', 'User1', 'path/to/image1', true),
-                new UserDto('456', 'mail2@domain.com', 'User2', 'path/to/image2', true)
+                new PublicUserDto('123', 'User1'),
+                new PublicUserDto('456', 'User2')
             ]);
     }));
 
     it('should make get request to get single user',
         inject([UsersService, HttpTestingController], (usersService: UsersService, httpMock: HttpTestingController) => {
 
-        let user: UserDto | null = null;
+        let user: PublicUserDto | null = null;
 
         usersService.getUser('123').subscribe(result => {
             user = result;
@@ -149,15 +138,9 @@ describe('UsersService', () => {
         expect(req.request.method).toEqual('GET');
         expect(req.request.headers.get('If-Match')).toBeNull();
 
-        req.flush({
-            id: '123',
-            email: 'mail1@domain.com',
-            displayName: 'User1',
-            pictureUrl: 'path/to/image1',
-            isLocked: true
-        });
+        req.flush({ id: '123', displayName: 'User1' });
 
-        expect(user).toEqual(new UserDto('123', 'mail1@domain.com', 'User1', 'path/to/image1', true));
+        expect(user).toEqual(new PublicUserDto('123', 'User1'));
     }));
 });
 
@@ -199,14 +182,12 @@ describe('UserManagementService', () => {
                     id: '123',
                     email: 'mail1@domain.com',
                     displayName: 'User1',
-                    pictureUrl: 'path/to/image1',
                     isLocked: true
                 },
                 {
                     id: '456',
                     email: 'mail2@domain.com',
                     displayName: 'User2',
-                    pictureUrl: 'path/to/image2',
                     isLocked: true
                 }
             ]
@@ -214,8 +195,8 @@ describe('UserManagementService', () => {
 
         expect(users).toEqual(
             new UsersDto(100, [
-                new UserDto('123', 'mail1@domain.com', 'User1', 'path/to/image1', true),
-                new UserDto('456', 'mail2@domain.com', 'User2', 'path/to/image2', true)
+                new UserDto('123', 'mail1@domain.com', 'User1', true),
+                new UserDto('456', 'mail2@domain.com', 'User2', true)
             ]));
     }));
 
@@ -255,8 +236,8 @@ describe('UserManagementService', () => {
 
         expect(users).toEqual(
             new UsersDto(100, [
-                new UserDto('123', 'mail1@domain.com', 'User1', 'path/to/image1', true),
-                new UserDto('456', 'mail2@domain.com', 'User2', 'path/to/image2', true)
+                new UserDto('123', 'mail1@domain.com', 'User1', true),
+                new UserDto('456', 'mail2@domain.com', 'User2', true)
             ]));
     }));
 
@@ -278,11 +259,10 @@ describe('UserManagementService', () => {
             id: '123',
             email: 'mail1@domain.com',
             displayName: 'User1',
-            pictureUrl: 'path/to/image1',
             isLocked: true
         });
 
-        expect(user).toEqual(new UserDto('123', 'mail1@domain.com', 'User1', 'path/to/image1', true));
+        expect(user).toEqual(new UserDto('123', 'mail1@domain.com', 'User1', true));
     }));
 
     it('should make post request to create user',
@@ -301,9 +281,9 @@ describe('UserManagementService', () => {
         expect(req.request.method).toEqual('POST');
         expect(req.request.headers.get('If-Match')).toBeNull();
 
-        req.flush({ id: '123', pictureUrl: 'path/to/image1' });
+        req.flush({ id: '123' });
 
-        expect(user).toEqual(new UserDto('123', dto.email, dto.displayName, 'path/to/image1', false));
+        expect(user).toEqual(new UserDto('123', dto.email, dto.displayName, false));
     }));
 
     it('should make put request to update user',
