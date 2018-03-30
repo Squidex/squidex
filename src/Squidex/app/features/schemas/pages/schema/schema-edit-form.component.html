@@ -1,44 +1,36 @@
-<div class="modal-dialog">
-    <div class="modal-content">
-        <form [formGroup]="editForm" (ngSubmit)="saveSchema()">
-            <div class="modal-header">
-                <h4 class="modal-title">Edit Schema</h4>
+<form [formGroup]="editForm" (ngSubmit)="saveSchema()">
+    <sqx-modal-dialog (close)="complete()">
+        <ng-container title>
+            Edit Schema
+        </ng-container>
 
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="complete()">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+        <ng-container content>
+            <div class="form-group">
+                <label for="schemaName">Name</label>
+
+                <input type="text" class="form-control" id="schemaName" readonly [ngModel]="schema.name" [ngModelOptions]="{standalone: true}" />
             </div>
 
-            <div class="modal-body">
-                <div class="form-group">
-                    <label for="schemaName">Name</label>
+            <div class="form-group">
+                <label for="schemaLabel">Label</label>
+                
+                <sqx-control-errors for="label" [submitted]="editFormSubmitted"></sqx-control-errors>
 
-                    <input type="text" class="form-control" id="schemaName" readonly [ngModel]="schema.name" [ngModelOptions]="{standalone: true}" />
-                </div>
-
-                <div class="form-group">
-                    <label for="schemaLabel">Label</label>
-                    
-                    <sqx-control-errors for="label" [submitted]="editFormSubmitted"></sqx-control-errors>
-
-                    <input type="text" class="form-control" id="schemaLabel" formControlName="label" />
-                </div>
-
-                <div class="form-group">
-                    <label for="schemaHints">Hints</label>
-                    
-                    <sqx-control-errors for="hints" [submitted]="editFormSubmitted"></sqx-control-errors>
-
-                    <textarea type="text" class="form-control" id="schemaHints" formControlName="hints" rows="4"></textarea>
-                </div>
+                <input type="text" class="form-control" id="schemaLabel" formControlName="label" />
             </div>
-        
-            <div class="modal-footer">
-                <div class="clearfix">
-                    <button type="reset" class="float-left btn btn-secondary" (click)="complete()" [disabled]="editFormSubmitted">Cancel</button>
-                    <button type="submit" class="float-right btn btn-primary">Save</button>
-                </div>
+
+            <div class="form-group">
+                <label for="schemaHints">Hints</label>
+                
+                <sqx-control-errors for="hints" [submitted]="editFormSubmitted"></sqx-control-errors>
+
+                <textarea type="text" class="form-control" id="schemaHints" formControlName="hints" rows="4"></textarea>
             </div>
-        </form>
-    </div>
-</div>
+        </ng-container>
+    
+        <ng-container footer>
+            <button type="reset" class="float-left btn btn-secondary" (click)="complete()" [disabled]="editFormSubmitted">Cancel</button>
+            <button type="submit" class="float-right btn btn-primary">Save</button>
+        </ng-container>
+    </sqx-modal-dialog>
+</form>

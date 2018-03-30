@@ -2,7 +2,7 @@
     <div class="panel panel-{{theme}}" [@slideRight]>
         <ng-content select=[inner] *ngIf="isFullSize"></ng-content>
 
-        <div class="panel-header" *ngIf="!isFullSize">
+        <div class="panel-header" [class.large]="showSecondHeader" *ngIf="!isFullSize">
             <div class="panel-title-row">
                 <div class="float-right">
                     <ng-content select=[menu]></ng-content>
@@ -16,6 +16,10 @@
             <a class="panel-close" sqxParentLink isLazyLoaded="true" *ngIf="showClose">
                 <i class="icon-close"></i>
             </a>
+
+            <div class="panel-header-row" *ngIf="showSecondHeader">
+                <ng-content select=[secondHeader]></ng-content>
+            </div>
         </div>
 
         <div class="panel-main">

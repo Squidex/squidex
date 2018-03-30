@@ -1,74 +1,66 @@
 <sqx-title message="{app} | {schema}" parameter1="app" [value1]="appsState.appName" parameter2="schema" [value2]="schemasState.schemaName"></sqx-title>
 
 <sqx-panel desiredWidth="56rem">
-    <div class="panel-header">
-        <div class="panel-title-row">
-            <div class="float-right">
-                <button type="button" class="btn btn-link btn-export" (click)="exportSchemaDialog.show()">
-                    JSON Preview
-                </button>
+    <ng-container title>
+        <i class="schema-edit icon-pencil" (click)="editSchemaDialog.show()"></i> {{schema.displayName}} 
+    </ng-container>
 
-                <div class="btn-group" data-toggle="buttons" #buttonPublish>
-                    <button type="button" class="btn btn-publishing btn-toggle" [class.btn-success]="schema.isPublished" [disabled]="schema.isPublished" (click)="publish()">
-                        Published
-                    </button>
-                    <button type="button" class="btn btn-publishing btn-toggle" [class.btn-danger]="!schema.isPublished" [disabled]="!schema.isPublished" (click)="unpublish()">
-                        Unpublished
-                    </button>
-                </div>
+    <ng-container menu>
+        <button type="button" class="btn btn-link btn-export" (click)="exportSchemaDialog.show()">
+            JSON Preview
+        </button>
 
-               <div class="dropdown dropdown-options">
-                    <button type="button" class="btn btn-link btn-secondary" (click)="editOptionsDropdown.toggle()" [class.active]="editOptionsDropdown.isOpen | async" #buttonOptions>
-                        <i class="icon-dots"></i>
-                    </button>
-                    <div class="dropdown-menu" *sqxModalView="editOptionsDropdown" [sqxModalTarget]="buttonOptions" @fade>
-                        <a class="dropdown-item" (click)="configureScriptsDialog.show()">
-                            Scripts
-                        </a>
-
-                        <a class="dropdown-item" (click)="cloneSchema()">
-                            Clone
-                        </a>
-
-                        <a class="dropdown-item dropdown-item-delete" 
-                            (sqxConfirmClick)="deleteSchema()" 
-                            confirmTitle="Delete schema" 
-                            confirmText="Do you really want to delete the schema?">
-                            Delete
-                        </a>
-                    </div>
-                </div>
-
-                <sqx-onboarding-tooltip id="history" [for]="buttonOptions" position="bottomRight" after="60000">
-                    Open the context menu to delete the schema or to create some scripts for content changes.
-                </sqx-onboarding-tooltip>
-
-                <sqx-onboarding-tooltip id="history" [for]="buttonPublish" position="bottomRight" after="240000">
-                    Note, that you have to publish the schema before you can add content to it.
-                </sqx-onboarding-tooltip>
-            </div>
-
-            <h3 class="panel-title">
-                <i class="schema-edit icon-pencil" (click)="editSchemaDialog.show()"></i> {{schema.displayName}} 
-            </h3>
+        <div class="btn-group" data-toggle="buttons" #buttonPublish>
+            <button type="button" class="btn btn-publishing btn-toggle" [class.btn-success]="schema.isPublished" [disabled]="schema.isPublished" (click)="publish()">
+                Published
+            </button>
+            <button type="button" class="btn btn-publishing btn-toggle" [class.btn-danger]="!schema.isPublished" [disabled]="!schema.isPublished" (click)="unpublish()">
+                Unpublished
+            </button>
         </div>
 
-        <a class="panel-close" sqxParentLink>
-            <i class="icon-close"></i>
-        </a>
-    </div>
+        <div class="dropdown dropdown-options">
+            <button type="button" class="btn btn-link btn-secondary" (click)="editOptionsDropdown.toggle()" [class.active]="editOptionsDropdown.isOpen | async" #buttonOptions>
+                <i class="icon-dots"></i>
+            </button>
+            <div class="dropdown-menu" *sqxModalView="editOptionsDropdown" [sqxModalTarget]="buttonOptions" @fade>
+                <a class="dropdown-item" (click)="configureScriptsDialog.show()">
+                    Scripts
+                </a>
 
-    <div class="panel-main">
-        <div class="panel-content panel-content-scroll" dnd-sortable-container [sortableData]="schema.fields">
+                <a class="dropdown-item" (click)="cloneSchema()">
+                    Clone
+                </a>
+
+                <a class="dropdown-item dropdown-item-delete" 
+                    (sqxConfirmClick)="deleteSchema()" 
+                    confirmTitle="Delete schema" 
+                    confirmText="Do you really want to delete the schema?">
+                    Delete
+                </a>
+            </div>
+        </div>
+
+        <sqx-onboarding-tooltip id="history" [for]="buttonOptions" position="bottomRight" after="60000">
+            Open the context menu to delete the schema or to create some scripts for content changes.
+        </sqx-onboarding-tooltip>
+
+        <sqx-onboarding-tooltip id="history" [for]="buttonPublish" position="bottomRight" after="240000">
+            Note, that you have to publish the schema before you can add content to it.
+        </sqx-onboarding-tooltip>
+    </ng-container>
+
+    <ng-container content>
+        <div dnd-sortable-container [sortableData]="schema.fields">
             <div *ngFor="let field of schema.fields; let i = index; trackBy: schemasState.trackByField" dnd-sortable [sortableIndex]="i" (sqxSorted)="sortFields($event)">
                 <sqx-field [field]="field" [schema]="schema"></sqx-field>
             </div>
-
+    
             <button class="btn btn-success field-button" (click)="addFieldDialog.show()">
                 <i class="icon icon-plus field-button-icon"></i> <div class="field-button-text">Add Field</div>
             </button>
         </div>
-    </div>
+    </ng-container>
 </sqx-panel>
 
 <div class="modal" *sqxModalView="editSchemaDialog;onRoot:true" @fade>
@@ -95,21 +87,14 @@
     </sqx-schema-scripts-form>
 </div>
 
-<div class="modal" *sqxModalView="exportSchemaDialog;onRoot:true" @fade>
-    <div class="modal-backdrop"></div>
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">Export Schema</h4>
+<ng-container *sqxModalView="exportSchemaDialog;onRoot:true">
+    <sqx-modal-dialog (close)="exportSchemaDialog.hide()">
+        <ng-container title>
+            Export Schema
+        </ng-container>
 
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="exportSchemaDialog.hide()">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-
-            <div class="modal-body">
-                <sqx-json-editor disabled [ngModel]="schemaExport"></sqx-json-editor>
-            </div>
-        </div>
-    </div>
-</div>
+        <ng-container content>
+            <sqx-json-editor disabled [ngModel]="schemaExport"></sqx-json-editor>
+        </ng-container>
+    </sqx-modal-dialog>
+</ng-container>

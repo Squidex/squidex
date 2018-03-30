@@ -49,7 +49,7 @@
             <div sqxIgnoreScrollbar>
                 <table class="table table-items table-fixed">
                     <tbody>
-                        <ng-template ngFor let-user [ngForOf]="usersState.users | async" [ngForTrackBy]="usersState.trackByUser">
+                        <ng-template ngFor let-user [ngForOf]="users | async">
                             <tr [routerLink]="user.id" routerLinkActive="active">
                                 <td class="cell-user">
                                     <img class="user-picture" [attr.title]="user.name" [attr.src]="user | sqxUserDtoPicture" />
@@ -81,20 +81,7 @@
             </div>
         </div>
 
-        <ng-container *ngIf="usersState.usersPager | async as pager">
-            <div class="grid-footer clearfix" *ngIf="pager.numberOfItems > 0">
-                <div class="float-right pagination">
-                    <span class="pagination-text">{{pager.itemFirst}}-{{pager.itemLast}} of {{pager.numberOfItems}}</span>
-
-                    <button class="btn btn-link btn-secondary pagination-button" [disabled]="!pager.canGoPrev" (click)="goPrev()">
-                        <i class="icon-angle-left"></i>
-                    </button>
-                    <button class="btn btn-link btn-secondary pagination-button" [disabled]="!pager.canGoNext" (click)="goNext()">
-                        <i class="icon-angle-right"></i>
-                    </button>
-                </div>
-            </div>
-        </ng-container>
+        <sqx-pager [pager]="usersPager | async" (prev)="goPrev()" (next)="goNext()"></sqx-pager>
     </ng-container>
 </sqx-panel>
 

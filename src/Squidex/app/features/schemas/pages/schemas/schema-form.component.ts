@@ -6,17 +6,11 @@
  */
 
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FormBuilder, Validators } from '@angular/forms';
+import { FormBuilder } from '@angular/forms';
 
-import {
-    ApiUrlConfig,
-    AppsState,
-    ValidatorsEx
-} from '@app/shared';
+import { ApiUrlConfig, AppsState } from '@app/shared';
 
-import { SchemasState } from './../../state/schemas.state';
-
-const FALLBACK_NAME = 'my-schema';
+import { CreateForm, SchemasState } from './../../state/schemas.state';
 
 @Component({
     selector: 'sqx-schema-form',
@@ -30,36 +24,20 @@ export class SchemaFormComponent implements OnInit {
     @Input()
     public import: any;
 
+    public createForm: CreateForm;
+
     public showImport = false;
 
-    public createFormError = '';
-    public createFormSubmitted = false;
-    public createForm =
-        this.formBuilder.group({
-            name: ['',
-                [
-                    Validators.required,
-                    Validators.maxLength(40),
-                    ValidatorsEx.pattern('[a-z0-9]+(\-[a-z0-9]+)*', 'Name can contain lower case letters (a-z), numbers and dashes only (not at the end).')
-                ]
-            ],
-            import: {}
-        });
-
-    public schemaName =
-        this.createForm.controls['name'].valueChanges.map(n => n || FALLBACK_NAME)
-            .startWith(FALLBACK_NAME);
-
-    constructor(
+    constructor(formBuilder: FormBuilder,
         public readonly apiUrl: ApiUrlConfig,
         public readonly appsState: AppsState,
-        private readonly schemasState: SchemasState,
-        private readonly formBuilder: FormBuilder
+        private readonly schemasState: SchemasState
     ) {
+        this.createForm = new CreateForm(formBuilder);
     }
 
     public ngOnInit() {
-        this.createForm.controls['import'].setValue(this.import || {});
+        this.createForm.load({ import: this.import });
 
         this.showImport = !!this.import;
     }
@@ -75,25 +53,18 @@ export class SchemaFormComponent implements OnInit {
     }
 
     public createSchema() {
-        this.createFormSubmitted = true;
+        const value = this.createForm.submit();
 
-        if (this.createForm.valid) {
-            this.createForm.disable();
-
-            const schemaName = this.createForm.controls['name'].value;
-            const schemaDto = Object.assign(this.createForm.controls['import'].value || {}, { name: schemaName });
+        if (value) {
+            const schemaName = value.name;
+            const schemaDto = Object.assign(value.import || {}, { name: schemaName });
 
             this.schemasState.create(schemaDto)
                 .subscribe(dto => {
                     this.complete();
                 }, error => {
-                    this.enableCreateForm(error.displayMessage);
+                    this.createForm.submitFailed(error);
                 });
         }
-    }
-
-    private enableCreateForm(message: string) {
-        this.createForm.enable();
-        this.createFormError = message;
     }
 }

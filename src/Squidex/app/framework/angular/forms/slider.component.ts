@@ -26,7 +26,6 @@ export class SliderComponent implements ControlValueAccessor {
     private windowMouseMoveListener: Function | null = null;
     private windowMouseUpListener: Function | null = null;
     private centerStartOffset = 0;
-    private startValue: number;
     private lastValue: number;
     private value: number;
     private isDragging = false;
@@ -86,8 +85,6 @@ export class SliderComponent implements ControlValueAccessor {
 
     public onThumbMouseDown(event: MouseEvent): boolean {
         this.centerStartOffset = event.offsetX - this.thumb.nativeElement.clientWidth * 0.5;
-
-        this.startValue = this.value;
 
         this.windowMouseMoveListener =
             this.renderer.listenGlobal('window', 'mousemove', (e: MouseEvent) => {

@@ -12,7 +12,6 @@ import { Subscription } from 'rxjs';
 
 import {
     AppsState,
-    fadeAnimation,
     MessageBus,
     ModalView
 } from '@app/shared';
@@ -24,10 +23,7 @@ import { SchemasState } from './../../state/schemas.state';
 @Component({
     selector: 'sqx-schemas-page',
     styleUrls: ['./schemas-page.component.scss'],
-    templateUrl: './schemas-page.component.html',
-    animations: [
-        fadeAnimation
-    ]
+    templateUrl: './schemas-page.component.html'
 })
 export class SchemasPageComponent implements OnDestroy, OnInit {
     private schemaCloningSubscription: Subscription;

@@ -6,14 +6,12 @@
  */
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { FormBuilder, Validators } from '@angular/forms';
+import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 
-import { AuthService, ValidatorsEx } from '@app/shared';
-
 import { UserDto } from './../../services/users.service';
-import { UsersState } from './../../state/users.state';
+import { UserForm, UsersState, getSelectedUser } from './../../state/users.state';
 
 @Component({
     selector: 'sqx-user-page',
@@ -22,47 +20,24 @@ import { UsersState } from './../../state/users.state';
 })
 export class UserPageComponent implements OnDestroy, OnInit {
     private selectedUserSubscription: Subscription;
+    private user?: UserDto;
 
-    public userFormSubmitted = false;
-    public userFormError = '';
-    public userForm =
-        this.formBuilder.group({
-            email: ['',
-                [
-                    Validators.email,
-                    Validators.required,
-                    Validators.maxLength(100)
-                ]
-            ],
-            displayName: ['',
-                [
-                    Validators.required,
-                    Validators.maxLength(100)
-                ]
-            ],
-            password: ['',
-                [
-                    Validators.nullValidator
-                ]
-            ],
-            passwordConfirm: ['',
-                [
-                    ValidatorsEx.match('password', 'Passwords must be the same.')
-                ]
-            ]
-        });
+    public userForm: UserForm;
 
-    public user: UserDto | null;
+    public selectedUser =
+        this.usersState.changes.map(getSelectedUser)
+            .distinctUntilChanged();
 
-    public isCurrentUser = false;
+    public isCurrentUser =
+        this.usersState.changes.map(x => x.isCurrentUser)
+            .distinctUntilChanged();
 
-    constructor(
-        private readonly authService: AuthService,
-        private readonly formBuilder: FormBuilder,
+    constructor(formBuilder: FormBuilder,
         private readonly route: ActivatedRoute,
         private readonly router: Router,
         private readonly usersState: UsersState
     ) {
+        this.userForm = new UserForm(formBuilder);
     }
 
     public ngOnDestroy() {
@@ -71,30 +46,29 @@ export class UserPageComponent implements OnDestroy, OnInit {
 
     public ngOnInit() {
         this.selectedUserSubscription =
-            this.usersState.selectedUser.subscribe(user => this.setupAndPopulateForm(user!));
+            this.usersState.changes.map(getSelectedUser).subscribe(user => {
+                this.user = user;
+                this.userForm.load(user);
+            });
     }
 
     public save() {
-        this.userFormSubmitted = true;
+        const request = this.userForm.submit();
 
-        if (this.userForm.valid) {
-            this.userForm.disable();
-
-            const requestDto = this.userForm.value;
-
-            if (!this.user) {
-                this.usersState.createUser(requestDto)
+        if (request) {
+            if (this.user) {
+                this.usersState.updateUser(this.user, request)
+                    .subscribe(user => {
+                        this.userForm.submitCompleted();
+                    }, error => {
+                        this.userForm.submitFailed(error);
+                    });
+            } else {
+                this.usersState.createUser(request)
                     .subscribe(user => {
                         this.back();
                     }, error => {
-                        this.resetFormState(error.displayMessage);
-                    });
-            } else {
-                this.usersState.updateUser(this.user!, requestDto)
-                    .subscribe(() => {
-                        this.resetFormState();
-                    }, error => {
-                        this.resetFormState(error.displayMessage);
+                        this.userForm.submitFailed(error);
                     });
             }
         }
@@ -102,29 +76,5 @@ export class UserPageComponent implements OnDestroy, OnInit {
 
     private back() {
         this.router.navigate(['../'], { relativeTo: this.route, replaceUrl: true });
-    }
-
-    private setupAndPopulateForm(user: UserDto | null) {
-        this.user = user;
-
-        this.isCurrentUser = user !== null && user.id === this.authService.user!.id;
-
-        this.userForm.controls['password'].setValidators(
-            user ?
-            Validators.nullValidator :
-            Validators.required);
-
-        this.resetFormState();
-
-        this.userForm.reset();
-        this.userForm.patchValue(user || {});
-    }
-
-    private resetFormState(message: string = '') {
-        this.userFormSubmitted = false;
-        this.userFormError = message;
-        this.userForm.controls['password'].reset();
-        this.userForm.controls['passwordConfirm'].reset();
-        this.userForm.enable();
     }
 }

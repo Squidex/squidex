@@ -6,14 +6,18 @@
  */
 
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { FormBuilder, Validators, FormGroup } from '@angular/forms';
+import { Observable } from 'rxjs';
 
 import '@app/framework/utils/rxjs-extensions';
 
 import {
+    AuthService,
     DialogService,
-    ImmutableArray,
-    Pager
+    Pager,
+    Form,
+    State,
+    ValidatorsEx
 } from '@app/shared';
 
 import {
@@ -22,54 +26,115 @@ import {
     UsersService
 } from './../services/users.service';
 
-@Injectable()
-export class UsersState {
-    public users = new BehaviorSubject<ImmutableArray<UserDto>>(ImmutableArray.empty());
-    public usersPager = new BehaviorSubject(new Pager(0));
-    public usersQuery = new BehaviorSubject('');
-
-    public selectedUser = new BehaviorSubject<UserDto | null>(null);
-
+export class UserForm extends Form<FormGroup> {
     constructor(
-        private readonly usersService: UsersService,
-        private readonly dialogs: DialogService
+        formBuilder: FormBuilder
     ) {
+        super(formBuilder.group({
+            email: ['',
+                [
+                    Validators.email,
+                    Validators.required,
+                    Validators.maxLength(100)
+                ]
+            ],
+            displayName: ['',
+                [
+                    Validators.required,
+                    Validators.maxLength(100)
+                ]
+            ],
+            password: ['',
+                [
+                    Validators.nullValidator
+                ]
+            ],
+            passwordConfirm: ['',
+                [
+                    ValidatorsEx.match('password', 'Passwords must be the same.')
+                ]
+            ]
+        }));
     }
 
-    public selectUser(id: string | null): Observable<UserDto | null> {
-        return this.loadUser(id)
+    public load(user?: UserDto) {
+        if (user) {
+            this.form.controls['password'].setValidators(null);
+        } else {
+            this.form.controls['password'].setValidators(Validators.required);
+        }
+
+        super.load(user);
+    }
+}
+
+interface Snapshot {
+    users: UserDto[];
+    usersPager: Pager;
+    usersQuery?: string;
+    selectedUserId?: string | null;
+    isCurrentUser?: boolean;
+}
+
+@Injectable()
+export class UsersState extends State<Snapshot> {
+    constructor(
+        private readonly authState: AuthService,
+        private readonly dialogs: DialogService,
+        private readonly usersService: UsersService
+    ) {
+        super({ users: [], usersPager: new Pager(10) });
+    }
+
+    public selectUser(selectedUserId: string | null): Observable<UserDto | null> {
+        return this.loadUser(selectedUserId)
             .do(user => {
-                this.selectedUser.next(user);
+                const isCurrentUser = selectedUserId === this.authState.user!.id;
+
+                this.next(s => ({...s, selectedUserId, isCurrentUser }));
             });
     }
 
     private loadUser(id: string | null) {
         return !id ?
             Observable.of(null) :
-            Observable.of(this.users.value.find(x => x.id === id))
+            Observable.of(this.snapshot.users.find(x => x.id === id))
                 .switchMap(user => {
                     if (!user) {
                         return this.usersService.getUser(id).catch(() => Observable.of(null));
                     } else {
+
                         return Observable.of(user);
                     }
                 });
     }
 
-    public loadUsers(): Observable<any> {
-        return this.usersService.getUsers(this.usersPager.value.pageSize, this.usersPager.value.skip, this.usersQuery.value)
+    public loadUsers(notify = false): Observable<any> {
+        return this.usersService.getUsers(this.snapshot.usersPager.pageSize, this.snapshot.usersPager.skip, this.snapshot.usersQuery)
             .catch(error => this.dialogs.notifyError(error))
             .do(dtos => {
-                this.users.nextBy(v => ImmutableArray.of(dtos.items));
-                this.usersPager.nextBy(v => v.setCount(dtos.total));
+                if (notify) {
+                    this.dialogs.notifyInfo('Users reloaded.');
+                }
+
+                this.next(s => {
+                    const users = dtos.items;
+                    const usersPager = s.usersPager.setCount(dtos.total);
+
+                    return { ...s, users, usersPager, usersLoading: false };
+                });
             });
     }
 
     public createUser(request: CreateUserDto): Observable<UserDto> {
         return this.usersService.postUser(request)
             .do(dto => {
-                this.users.nextBy(v => v.pushFront(dto));
-                this.usersPager.nextBy(v => v.incrementCount());
+                this.next(s => {
+                    const users = [dto, ...s.users];
+                    const usersPager = s.usersPager.incrementCount();
+
+                    return { ...s, users, usersPager };
+                });
             });
     }
 
@@ -78,7 +143,11 @@ export class UsersState {
             .do(() => {
                 this.dialogs.notifyInfo('User saved successsfull');
 
-                this.replaceUser(user.update(request.email, request.displayName));
+                this.next(s => {
+                    const users = s.users.map(u => u.id === user.id ? u.update(request.email, request.displayName) : u);
+
+                    return { ...s, users };
+                });
             });
     }
 
@@ -86,7 +155,11 @@ export class UsersState {
         return this.usersService.lockUser(user.id)
             .catch(error => this.dialogs.notifyError(error))
             .do(() => {
-                this.replaceUser(user.lock());
+                this.next(s => {
+                    const users = s.users.map(u => u.id === user.id ? u.lock() : u);
+
+                    return { ...s, users };
+                });
             });
     }
 
@@ -94,36 +167,31 @@ export class UsersState {
         return this.usersService.unlockUser(user.id)
             .catch(error => this.dialogs.notifyError(error))
             .do(() => {
-                this.replaceUser(user.unlock());
+                this.next(s => {
+                    const users = s.users.map(u => u.id === user.id ? u.unlock() : u);
+
+                    return { ...s, users };
+                });
             });
     }
 
-    public search(filter: string): Observable<any> {
-        this.usersPager.nextBy(v => new Pager(0));
-        this.usersQuery.nextBy(v => filter);
+    public search(query: string): Observable<any> {
+        this.next({ usersPager: new Pager(0), usersQuery: query });
 
         return this.loadUsers();
     }
 
     public goNext(): Observable<any> {
-        this.usersPager.nextBy(v => v.goNext());
+        this.next(s => ({ ...s, usersPager: s.usersPager.goNext() }));
 
         return this.loadUsers();
     }
 
     public goPrev(): Observable<any> {
-        this.usersPager.nextBy(v => v.goPrev());
+        this.next(s => ({ ...s, usersPager: s.usersPager.goPrev() }));
 
         return this.loadUsers();
     }
-
-    public trackByUser(index: number, user: UserDto): any {
-        return user.id;
-    }
-
-    private replaceUser(user: UserDto) {
-        this.users.nextBy(v => v.replaceBy('id', user));
-
-        this.selectedUser.nextBy(v => v !== null && v.id === user.id ? user : v);
-    }
 }
+
+export const getSelectedUser = (c: Snapshot) => c.users.find(x => x.id === c.selectedUserId);

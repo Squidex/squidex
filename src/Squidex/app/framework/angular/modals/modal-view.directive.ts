@@ -76,7 +76,10 @@ export class ModalViewDirective implements OnChanges, OnDestroy {
             } else {
                 this.renderedView = this.viewContainer.createEmbeddedView(this.templateRef);
             }
-            this.renderer.setElementStyle(this.renderedView.rootNodes[0], 'display', 'block');
+
+            if (this.renderedView.rootNodes[0].style) {
+                this.renderer.setElementStyle(this.renderedView.rootNodes[0], 'display', 'block');
+            }
 
             setTimeout(() => {
                 this.startListening();
@@ -112,15 +115,19 @@ export class ModalViewDirective implements OnChanges, OnDestroy {
                 if (this.modalView.closeAlways) {
                     this.modalView.hide();
                 } else {
-                    const rootNode = this.renderedView.rootNodes[0];
-                    const rootBounds = rootNode.getBoundingClientRect();
+                    try {
+                        const rootNode = this.renderedView.rootNodes[0];
+                        const rootBounds = rootNode.getBoundingClientRect();
 
-                    if (rootBounds.width > 0 && rootBounds.height > 0) {
-                        const clickedInside = rootNode.contains(event.target);
+                        if (rootBounds.width > 0 && rootBounds.height > 0) {
+                            const clickedInside = rootNode.contains(event.target);
 
-                        if (!clickedInside && this.modalView) {
-                            this.modalView.hide();
+                            if (!clickedInside && this.modalView) {
+                                this.modalView.hide();
+                            }
                         }
+                    } catch (ex) {
+                        return;
                     }
                 }
             });

@@ -38,6 +38,9 @@ export class PanelComponent implements AfterViewInit, OnDestroy, OnInit {
     public showScrollbar = false;
 
     @Input()
+    public showSecondHeader = false;
+
+    @Input()
     public showSidebar = false;
 
     @Input()

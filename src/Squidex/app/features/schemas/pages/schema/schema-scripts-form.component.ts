@@ -8,9 +8,9 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 
-import { SchemaDetailsDto, UpdateSchemaScriptsDto } from '@app/shared';
+import { SchemaDetailsDto } from '@app/shared';
 
-import { SchemasState } from './../../state/schemas.state';
+import { EditScriptsForm, SchemasState } from './../../state/schemas.state';
 
 @Component({
     selector: 'sqx-schema-scripts-form',
@@ -26,61 +26,36 @@ export class SchemaScriptsFormComponent implements OnInit {
 
     public selectedField = 'scriptQuery';
 
-    public scripts = [
-        'Query',
-        'Create',
-        'Update',
-        'Delete',
-        'Change'
-    ];
+    public editForm: EditScriptsForm;
 
-    public editFormSubmitted = false;
-    public editForm =
-        this.formBuilder.group({
-            scriptQuery: '',
-            scriptCreate: '',
-            scriptUpdate: '',
-            scriptDelete: '',
-            scriptChange: ''
-        });
-
-    constructor(
-        private readonly schemasState: SchemasState,
-        private readonly formBuilder: FormBuilder
+    constructor(formBuilder: FormBuilder,
+        private readonly schemasState: SchemasState
     ) {
+        this.editForm = new EditScriptsForm(formBuilder);
     }
 
     public ngOnInit() {
-        this.editForm.patchValue(this.schema);
+        this.editForm.load(this.schema);
     }
 
     public complete() {
         this.completed.emit();
     }
 
-    public saveSchema() {
-        this.editFormSubmitted = true;
-
-        if (this.editForm.valid) {
-            this.editForm.disable();
-
-            const requestDto = <UpdateSchemaScriptsDto>this.editForm.value;
-
-            this.schemasState.configureScripts(this.schema, requestDto)
-                .subscribe(dto => {
-                    this.complete();
-                }, error => {
-                    this.enableEditForm();
-                });
-        }
-    }
-
     public selectField(field: string) {
         this.selectedField = field;
     }
 
-    private enableEditForm() {
-        this.editForm.enable();
-        this.editFormSubmitted = false;
+    public saveSchema() {
+        const value = this.editForm.submit();
+
+        if (value) {
+            this.schemasState.configureScripts(this.schema, value)
+                .subscribe(dto => {
+                    this.complete();
+                }, error => {
+                    this.editForm.submitFailed();
+                });
+        }
     }
 }

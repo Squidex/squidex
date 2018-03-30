@@ -5,10 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 
-import { AuthService, DialogService } from '@app/shared';
+import { AuthService } from '@app/shared';
 
 import { UserDto } from './../../services/users.service';
 import { UsersState } from './../../state/users.state';
@@ -16,15 +16,21 @@ import { UsersState } from './../../state/users.state';
 @Component({
     selector: 'sqx-users-page',
     styleUrls: ['./users-page.component.scss'],
-    templateUrl: './users-page.component.html'
+    templateUrl: './users-page.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class UsersPageComponent implements OnInit {
     public usersFilter = new FormControl();
 
+    public users =
+        this.usersState.changes.map(x => x.users);
+
+    public usersPager =
+        this.usersState.changes.map(x => x.usersPager);
+
     constructor(
-        public readonly usersState: UsersState,
         public readonly authState: AuthService,
-        private readonly dialogs: DialogService
+        public readonly usersState: UsersState
     ) {
     }
 
@@ -36,13 +42,8 @@ export class UsersPageComponent implements OnInit {
         this.usersState.search(this.usersFilter.value).subscribe();
     }
 
-    public load(showInfo = false) {
-        this.usersState.loadUsers()
-            .subscribe(() => {
-                if (showInfo) {
-                    this.dialogs.notifyInfo('Users reloaded.');
-                }
-            });
+    public load(notify = false) {
+        this.usersState.loadUsers(notify).subscribe();
     }
 
     public lock(user: UserDto) {

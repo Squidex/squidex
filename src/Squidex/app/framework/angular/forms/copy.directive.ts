@@ -57,7 +57,7 @@ export class CopyDirective {
         }
 
         if (element instanceof HTMLInputElement) {
-            element.setSelectionRange(prevSelectionStart, prevSelectionEnd);
+            element.setSelectionRange(prevSelectionStart!, prevSelectionEnd!);
         }
     }
 }
