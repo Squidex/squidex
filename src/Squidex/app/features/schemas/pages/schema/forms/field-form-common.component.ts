@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { FormGroup } from '@angular/forms';
 
 import { FieldDto } from '@app/shared';
 
@@ -16,7 +16,7 @@ import { FieldDto } from '@app/shared';
     templateUrl: 'field-form-common.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class FieldFormCommonComponent implements OnInit {
+export class FieldFormCommonComponent {
     @Input()
     public editForm: FormGroup;
 
@@ -28,20 +28,4 @@ export class FieldFormCommonComponent implements OnInit {
 
     @Input()
     public field: FieldDto;
-
-    public ngOnInit() {
-        this.editForm.setControl('label',
-            new FormControl(this.field.properties.label,
-                Validators.maxLength(100)));
-
-        this.editForm.setControl('hints',
-            new FormControl(this.field.properties.label,
-                Validators.maxLength(100)));
-
-        this.editForm.setControl('isRequired',
-            new FormControl(this.field.properties.isRequired));
-
-        this.editForm.setControl('isListField',
-            new FormControl(this.field.properties.isListField));
-    }
 }

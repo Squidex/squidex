@@ -59,7 +59,7 @@
     </div>
 
     <div class="table-items-row-details" *ngIf="isEditing">
-        <form [formGroup]="editForm" (ngSubmit)="save()" [attr.disabled]="field.isLocked">
+        <form [formGroup]="editForm.form" (ngSubmit)="save()">
             <div class="table-items-row-details-tabs clearfix">
                 <ul class="nav nav-tabs2">
                     <li class="nav-item">
@@ -80,15 +80,15 @@
             </div>
 
             <div class="table-items-row-details-tab" [class.hidden]="selectedTab !== 0">
-                <sqx-field-form-common [editForm]="editForm" [editFormSubmitted]="editFormSubmitted" [field]="field"></sqx-field-form-common>
+                <sqx-field-form-common [editForm]="editForm.form" [editFormSubmitted]="editForm.submitted | async" [field]="field"></sqx-field-form-common>
             </div>
 
             <div class="table-items-row-details-tab" [class.hidden]="selectedTab !== 1">
-                <sqx-field-form-validation [editForm]="editForm" [field]="field"></sqx-field-form-validation>
+                <sqx-field-form-validation [editForm]="editForm.form" [field]="field"></sqx-field-form-validation>
             </div>
 
             <div class="table-items-row-details-tab" [class.hidden]="selectedTab !== 2">
-                <sqx-field-form-ui [editForm]="editForm" [field]="field"></sqx-field-form-ui>
+                <sqx-field-form-ui [editForm]="editForm.form" [field]="field"></sqx-field-form-ui>
             </div>
         </form> 
     </div>

@@ -15,6 +15,7 @@ import {
     AddFieldDto,
     AppsState,
     AuthService,
+    createProperties,
     CreateSchemaDto,
     DateTime,
     DialogService,
@@ -60,6 +61,75 @@ export class EditScriptsForm extends Form<FormGroup> {
             scriptDelete: '',
             scriptChange: ''
         }));
+    }
+}
+
+export class EditFieldForm extends Form<FormGroup> {
+    constructor(formBuilder: FormBuilder) {
+        super(formBuilder.group({
+            label: ['',
+                [
+                    Validators.maxLength(100)
+                ]
+            ],
+            hints: ['',
+                [
+                    Validators.maxLength(1000)
+                ]
+            ],
+            isRequired: false,
+            isListField: false
+        }));
+    }
+}
+
+export class EditSchemaForm extends Form<FormGroup> {
+    constructor(formBuilder: FormBuilder) {
+        super(formBuilder.group({
+            label: ['',
+                [
+                    Validators.maxLength(100)
+                ]
+            ],
+            hints: ['',
+                [
+                    Validators.maxLength(1000)
+                ]
+            ]
+        }));
+    }
+}
+
+export class AddFieldForm extends Form<FormGroup> {
+    constructor(formBuilder: FormBuilder) {
+        super(formBuilder.group({
+            type: ['String',
+                [
+                    Validators.required
+                ]
+            ],
+            name: ['',
+                [
+                    Validators.required,
+                    Validators.maxLength(40),
+                    ValidatorsEx.pattern('[a-zA-Z0-9]+(\\-[a-zA-Z0-9]+)*', 'Name must be a valid javascript name in camel case.')
+                ]
+            ],
+            isLocalizable: false
+        }));
+    }
+
+    public submit() {
+        const value = super.submit();
+
+        if (value) {
+            const properties = createProperties(value.type);
+            const partitioning = value.isLocalizable ? 'language' : 'invariant';
+
+            return { name: value.name, partitioning, properties };
+        }
+
+        return null;
     }
 }
 

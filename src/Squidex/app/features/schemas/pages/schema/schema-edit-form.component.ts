@@ -6,11 +6,10 @@
  */
 
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FormBuilder, Validators } from '@angular/forms';
+import { FormBuilder } from '@angular/forms';
 
-import { SchemaDetailsDto, UpdateSchemaDto } from '@app/shared';
-
-import { SchemasState } from './../../state/schemas.state';
+import { SchemaDetailsDto } from '@app/shared';
+import { SchemasState, EditSchemaForm } from './../../state/schemas.state';
 
 @Component({
     selector: 'sqx-schema-edit-form',
@@ -24,29 +23,16 @@ export class SchemaEditFormComponent implements OnInit {
     @Input()
     public schema: SchemaDetailsDto;
 
-    public editFormSubmitted = false;
-    public editForm =
-        this.formBuilder.group({
-            label: ['',
-                [
-                    Validators.maxLength(100)
-                ]
-            ],
-            hints: ['',
-                [
-                    Validators.maxLength(1000)
-                ]
-            ]
-        });
+    public editForm: EditSchemaForm;
 
-    constructor(
-        private readonly schemasState: SchemasState,
-        private readonly formBuilder: FormBuilder
+    constructor(formBuilder: FormBuilder,
+        private readonly schemasState: SchemasState
     ) {
+        this.editForm = new EditSchemaForm(formBuilder);
     }
 
     public ngOnInit() {
-        this.editForm.patchValue(this.schema.properties);
+        this.editForm.load(this.schema.properties);
     }
 
     public complete() {
@@ -54,24 +40,15 @@ export class SchemaEditFormComponent implements OnInit {
     }
 
     public saveSchema() {
-        this.editFormSubmitted = true;
+        const value = this.editForm.submit();
 
-        if (this.editForm.valid) {
-            this.editForm.disable();
-
-            const requestDto = <UpdateSchemaDto>this.editForm.value;
-
-            this.schemasState.update(this.schema, requestDto)
+        if (value) {
+            this.schemasState.update(this.schema, value)
                 .subscribe(dto => {
                     this.complete();
                 }, error => {
-                    this.enableEditForm();
+                    this.editForm.submitFailed(error);
                 });
         }
-    }
-
-    private enableEditForm() {
-        this.editForm.enable();
-        this.editFormSubmitted = false;
     }
 }

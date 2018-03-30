@@ -1,4 +1,4 @@
-<form [formGroup]="editForm" (ngSubmit)="saveSchema()">
+<form [formGroup]="editForm.form" (ngSubmit)="saveSchema()">
     <sqx-modal-dialog (close)="complete()">
         <ng-container title>
             Edit Schema
@@ -14,7 +14,7 @@
             <div class="form-group">
                 <label for="schemaLabel">Label</label>
                 
-                <sqx-control-errors for="label" [submitted]="editFormSubmitted"></sqx-control-errors>
+                <sqx-control-errors for="label" [submitted]="editForm.submitted | async"></sqx-control-errors>
 
                 <input type="text" class="form-control" id="schemaLabel" formControlName="label" />
             </div>
@@ -22,14 +22,14 @@
             <div class="form-group">
                 <label for="schemaHints">Hints</label>
                 
-                <sqx-control-errors for="hints" [submitted]="editFormSubmitted"></sqx-control-errors>
+                <sqx-control-errors for="hints" [submitted]="editForm.submitted | async"></sqx-control-errors>
 
                 <textarea type="text" class="form-control" id="schemaHints" formControlName="hints" rows="4"></textarea>
             </div>
         </ng-container>
     
         <ng-container footer>
-            <button type="reset" class="float-left btn btn-secondary" (click)="complete()" [disabled]="editFormSubmitted">Cancel</button>
+            <button type="reset" class="float-left btn btn-secondary" (click)="complete()">Cancel</button>
             <button type="submit" class="float-right btn btn-primary">Save</button>
         </ng-container>
     </sqx-modal-dialog>

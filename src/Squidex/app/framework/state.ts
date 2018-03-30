@@ -40,18 +40,24 @@ export class Form<T extends AbstractControl> {
         this.state.next({ submitted: true });
 
         if (this.form.valid) {
+            const value = this.form.value;
+
             this.form.disable();
 
-            return this.form.value;
+            return value;
         } else {
             return null;
         }
     }
 
-    public submitCompleted() {
+    public submitCompleted(newValue?: any) {
         this.state.next({ submitted: false, error: null });
 
         this.form.enable();
+
+        if (newValue) {
+            this.form.reset(newValue);
+        }
     }
 
     public submitFailed(error?: string | ErrorDto) {

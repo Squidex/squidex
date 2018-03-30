@@ -9,8 +9,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 
 import { SchemaDetailsDto } from '@app/shared';
-
-import { EditScriptsForm, SchemasState } from './../../state/schemas.state';
+import { SchemasState, EditScriptsForm } from './../../state/schemas.state';
 
 @Component({
     selector: 'sqx-schema-scripts-form',
@@ -54,7 +53,7 @@ export class SchemaScriptsFormComponent implements OnInit {
                 .subscribe(dto => {
                     this.complete();
                 }, error => {
-                    this.editForm.submitFailed();
+                    this.editForm.submitFailed(error);
                 });
         }
     }

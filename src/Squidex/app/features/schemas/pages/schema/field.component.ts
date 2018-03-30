@@ -6,7 +6,7 @@
  */
 
 import { Component, Input, OnInit } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { FormBuilder } from '@angular/forms';
 
 import {
     createProperties,
@@ -17,7 +17,7 @@ import {
     UpdateFieldDto
 } from '@app/shared';
 
-import { SchemasState } from './../../state/schemas.state';
+import { SchemasState, EditFieldForm } from './../../state/schemas.state';
 
 @Component({
     selector: 'sqx-field',
@@ -39,16 +39,21 @@ export class FieldComponent implements OnInit {
     public isEditing = false;
     public selectedTab = 0;
 
-    public editFormSubmitted = false;
-    public editForm = new FormGroup({});
+    public editForm: EditFieldForm;
 
     constructor(
+        private readonly formBuilder: FormBuilder,
         private readonly schemasState: SchemasState
     ) {
     }
 
     public ngOnInit() {
-        this.resetEditForm();
+        this.editForm = new EditFieldForm(this.formBuilder);
+        this.editForm.load(this.field.properties);
+
+        if (this.field.isLocked) {
+            this.editForm.form.disable();
+        }
     }
 
     public toggleEditing() {
@@ -60,7 +65,7 @@ export class FieldComponent implements OnInit {
     }
 
     public cancel() {
-        this.resetEditForm();
+        this.editForm.load(this.field);
     }
 
     public deleteField() {
@@ -88,25 +93,17 @@ export class FieldComponent implements OnInit {
     }
 
     public save() {
-        this.editFormSubmitted = true;
+        const value = this.editForm.submit();
 
-        if (this.editForm.valid) {
-            const properties = createProperties(this.field.properties['fieldType'], this.editForm.value);
+        if (value) {
+            const properties = createProperties(this.field.properties['fieldType'], value);
 
             this.schemasState.updateField(this.schema, this.field, new UpdateFieldDto(properties))
                 .subscribe(() => {
-                    this.resetEditForm();
+                    this.editForm.submitCompleted();
+                }, error => {
+                    this.editForm.submitFailed(error);
                 });
-        }
-    }
-
-    private resetEditForm() {
-        this.isEditing = false;
-        this.editFormSubmitted = false;
-        this.editForm.reset(this.field.properties);
-
-        if (this.field.isLocked) {
-            this.editForm.disable();
         }
     }
 }
