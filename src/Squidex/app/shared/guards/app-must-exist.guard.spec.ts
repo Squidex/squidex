@@ -5,54 +5,60 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { IMock, Mock } from 'typemoq';
+import { Router } from '@angular/router';
+import { IMock, Mock, Times } from 'typemoq';
 import { Observable } from 'rxjs';
 
 import { AppsState } from '@app/shared';
 
 import { AppMustExistGuard } from './app-must-exist.guard';
-import { RouterMockup } from './router-mockup';
 
 describe('AppMustExistGuard', () => {
+    const route: any = {
+        params: {
+            appName: 'my-app'
+        }
+    };
+
+    let router: IMock<Router>;
+
     let appsState: IMock<AppsState>;
+    let appGuard: AppMustExistGuard;
 
     beforeEach(() => {
-        appsState = Mock.ofType(AppsState);
+        router = Mock.ofType<Router>();
+
+        appsState = Mock.ofType<AppsState>();
+        appGuard = new AppMustExistGuard(appsState.object, router.object);
     });
 
-    it('should navigate to 404 page if app is not found', (done) => {
+    it('should navigate to 404 page if app is not found', () => {
         appsState.setup(x => x.selectApp('my-app'))
             .returns(() => Observable.of(null));
 
-        const router = new RouterMockup();
-        const route = <any> { params: { appName: 'my-app' } };
+        let result: boolean;
 
-        const guard = new AppMustExistGuard(appsState.object, <any>router);
+        appGuard.canActivate(route).subscribe(x => {
+            result = x;
+        });
 
-        guard.canActivate(route, <any>{})
-            .subscribe(result => {
-                expect(result).toBeFalsy();
-                expect(router.lastNavigation).toEqual(['/404']);
+        expect(result!).toBeFalsy();
 
-                done();
-            });
+        appsState.verify(x => x.selectApp('my-app'), Times.once());
     });
 
-    it('should return true if app is found', (done) => {
+    it('should return true if app is found', () => {
         appsState.setup(x => x.selectApp('my-app'))
             .returns(() => Observable.of(<any>{}));
 
-        const router = new RouterMockup();
-        const route = <any> { params: { appName: 'my-app' } };
+        let result: boolean;
 
-        const guard = new AppMustExistGuard(appsState.object, <any>router);
+        appGuard.canActivate(route).subscribe(x => {
+            result = x;
+        });
 
-        guard.canActivate(route, <any>{})
-            .subscribe(result => {
-                expect(result).toBeTruthy();
-                expect(router.lastNavigation).toBeUndefined();
+        expect(result!).toBeTruthy();
 
-                done();
-            });
+        // router.verify(x => x.navigate(['/404']), Times.once());
     });
 });

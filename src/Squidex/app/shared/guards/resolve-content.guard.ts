@@ -25,22 +25,8 @@ export class ResolveContentGuard implements Resolve<ContentDto | null> {
         const params = allParams(route);
 
         const appName = params['appName'];
-
-        if (!appName) {
-            throw 'Route must contain app name.';
-        }
-
-        const schemaName = params['schemaName'];
-
-        if (!schemaName) {
-            throw 'Route must contain schema name.';
-        }
-
         const contentId = params['contentId'];
-
-        if (!contentId) {
-            throw 'Route must contain content id.';
-        }
+        const schemaName = params['schemaName'];
 
         const result =
             this.contentsService.getContent(appName, schemaName, contentId)

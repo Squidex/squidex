@@ -29,7 +29,7 @@ describe('AppsState', () => {
     let appsState: AppsState;
 
     beforeEach(() => {
-        appsService = Mock.ofType(AppsService);
+        appsService = Mock.ofType<AppsService>();
 
         appsService.setup(x => x.getApps())
             .returns(() => Observable.of(oldApps))

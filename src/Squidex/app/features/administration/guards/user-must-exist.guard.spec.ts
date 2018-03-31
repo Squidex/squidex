@@ -14,6 +14,12 @@ import { UsersState } from './../state/users.state';
 import { UserMustExistGuard } from './user-must-exist.guard';
 
 describe('UserMustExistGuard', () => {
+    const route: any = {
+        params: {
+            userId: '123'
+        }
+    };
+
     let usersState: IMock<UsersState>;
     let router: IMock<Router>;
     let userGuard: UserMustExistGuard;
@@ -30,14 +36,6 @@ describe('UserMustExistGuard', () => {
 
         let result: boolean;
 
-        const route: any = {
-            snapshot: {
-                params: {
-                    userId: '123'
-                }
-            }
-        };
-
         userGuard.canActivate(route).subscribe(x => {
             result = x;
         }).unsubscribe();
@@ -52,14 +50,6 @@ describe('UserMustExistGuard', () => {
             .returns(() => Observable.of(null));
 
         let result: boolean;
-
-        const route: any = {
-            snapshot: {
-                params: {
-                    userId: '123'
-                }
-            }
-        };
 
         userGuard.canActivate(route).subscribe(x => {
             result = x;

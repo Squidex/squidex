@@ -10,19 +10,19 @@ import { Observable } from 'rxjs';
 
 import { AppsState } from '@app/shared';
 
-import { UnsetAppGuard } from './unset-app.guard';
+import { LoadAppsGuard } from './load-apps.guard';
 
-describe('UnsetAppGuard', () => {
+describe('LoadAppsGuard', () => {
     let appsState: IMock<AppsState>;
-    let appGuard: UnsetAppGuard;
+    let appGuard: LoadAppsGuard;
 
     beforeEach(() => {
         appsState = Mock.ofType<AppsState>();
-        appGuard = new UnsetAppGuard(appsState.object);
+        appGuard = new LoadAppsGuard(appsState.object);
     });
 
-    it('should unselect app', () => {
-        appsState.setup(x => x.selectApp(null))
+    it('should load apps', () => {
+        appsState.setup(x => x.loadApps())
             .returns(() => Observable.of(null));
 
         let result = false;
@@ -33,6 +33,6 @@ describe('UnsetAppGuard', () => {
 
         expect(result).toBeTruthy();
 
-        appsState.verify(x => x.selectApp(null), Times.once());
+        appsState.verify(x => x.loadApps(), Times.once());
     });
 });

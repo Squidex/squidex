@@ -22,8 +22,8 @@ describe('UsersProviderService', () => {
     let usersProviderService: UsersProviderService;
 
     beforeEach(() => {
-        authService = Mock.ofType(AuthService);
-        usersService = Mock.ofType(UsersService);
+        authService = Mock.ofType<AuthService>();
+        usersService = Mock.ofType<UsersService>();
         usersProviderService = new UsersProviderService(usersService.object, authService.object);
     });
 
