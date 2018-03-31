@@ -69,7 +69,7 @@ export class EventConsumersPageComponent implements OnDestroy, OnInit {
     public start(consumer: EventConsumerDto) {
         this.eventConsumersService.startEventConsumer(consumer.name)
             .subscribe(() => {
-                this.eventConsumers = this.eventConsumers.replaceBy('name', consumer.start());
+                this.eventConsumers = this.eventConsumers.replaceBy('name', start(consumer));
             }, error => {
                 this.dialogs.notifyError(error);
             });
@@ -78,7 +78,7 @@ export class EventConsumersPageComponent implements OnDestroy, OnInit {
     public stop(consumer: EventConsumerDto) {
         this.eventConsumersService.stopEventConsumer(consumer.name)
             .subscribe(() => {
-                this.eventConsumers = this.eventConsumers.replaceBy('name', consumer.stop());
+                this.eventConsumers = this.eventConsumers.replaceBy('name', stop(consumer));
             }, error => {
                 this.dialogs.notifyError(error);
             });
@@ -87,7 +87,7 @@ export class EventConsumersPageComponent implements OnDestroy, OnInit {
     public reset(consumer: EventConsumerDto) {
         this.eventConsumersService.resetEventConsumer(consumer.name)
             .subscribe(() => {
-                this.eventConsumers = this.eventConsumers.replaceBy('name', consumer.reset());
+                this.eventConsumers = this.eventConsumers.replaceBy('name', reset(consumer));
             }, error => {
                 this.dialogs.notifyError(error);
             });
@@ -99,3 +99,16 @@ export class EventConsumersPageComponent implements OnDestroy, OnInit {
     }
 }
 
+
+
+function start(es: EventConsumerDto) {
+    return new EventConsumerDto(es.name, false, false, es.error, es.position);
+}
+
+function stop(es: EventConsumerDto) {
+    return new EventConsumerDto(es.name, true, false, es.error, es.position);
+}
+
+function reset(es: EventConsumerDto) {
+    return new EventConsumerDto(es.name, es.isStopped, true, es.error, es.position);
+}

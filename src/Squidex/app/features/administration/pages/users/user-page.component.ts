@@ -24,18 +24,10 @@ export class UserPageComponent implements OnDestroy, OnInit {
 
     public userForm: UserForm;
 
-    public selectedUser =
-        this.usersState.changes.map(x => x.selectedUser)
-            .distinctUntilChanged();
-
-    public isCurrentUser =
-        this.usersState.changes.map(x => x.isCurrentUser)
-            .distinctUntilChanged();
-
     constructor(formBuilder: FormBuilder,
+        public readonly usersState: UsersState,
         private readonly route: ActivatedRoute,
-        private readonly router: Router,
-        private readonly usersState: UsersState
+        private readonly router: Router
     ) {
         this.userForm = new UserForm(formBuilder);
     }
@@ -46,7 +38,7 @@ export class UserPageComponent implements OnDestroy, OnInit {
 
     public ngOnInit() {
         this.selectedUserSubscription =
-            this.usersState.changes.map(x => x.selectedUser)
+            this.usersState.selectedUser
                 .subscribe(user => {
                     this.user = user;
                     this.userForm.load(user);

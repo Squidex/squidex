@@ -18,30 +18,6 @@ import {
     UsersDto
 } from './users.service';
 
-describe('UserDto', () => {
-    it('should update email and display name property when unlocking', () => {
-        const user_1 = new UserDto('1', 'sebastian@squidex.io', 'Sebastian', 'picture', true);
-        const user_2 = user_1.update('qaisar@squidex.io', 'Qaisar');
-
-        expect(user_2.email).toEqual('qaisar@squidex.io');
-        expect(user_2.displayName).toEqual('Qaisar');
-    });
-
-    it('should update isLocked property when locking', () => {
-        const user_1 = new UserDto('1', 'sebastian@squidex.io', 'Sebastian', 'picture', false);
-        const user_2 = user_1.lock();
-
-        expect(user_2.isLocked).toBeTruthy();
-    });
-
-    it('should update isLocked property when unlocking', () => {
-        const user_1 = new UserDto('1', 'sebastian@squidex.io', 'Sebastian', 'picture', true);
-        const user_2 = user_1.unlock();
-
-        expect(user_2.isLocked).toBeFalsy();
-    });
-});
-
 describe('UsersService', () => {
      beforeEach(() => {
         TestBed.configureTestingModule({
@@ -80,14 +56,12 @@ describe('UsersService', () => {
                     id: '123',
                     email: 'mail1@domain.com',
                     displayName: 'User1',
-                    pictureUrl: 'path/to/image1',
                     isLocked: true
                 },
                 {
                     id: '456',
                     email: 'mail2@domain.com',
                     displayName: 'User2',
-                    pictureUrl: 'path/to/image2',
                     isLocked: true
                 }
             ]
@@ -95,8 +69,8 @@ describe('UsersService', () => {
 
         expect(users).toEqual(
             new UsersDto(100, [
-                new UserDto('123', 'mail1@domain.com', 'User1', 'path/to/image1', true),
-                new UserDto('456', 'mail2@domain.com', 'User2', 'path/to/image2', true)
+                new UserDto('123', 'mail1@domain.com', 'User1', true),
+                new UserDto('456', 'mail2@domain.com', 'User2', true)
             ]));
     }));
 
@@ -121,14 +95,12 @@ describe('UsersService', () => {
                     id: '123',
                     email: 'mail1@domain.com',
                     displayName: 'User1',
-                    pictureUrl: 'path/to/image1',
                     isLocked: true
                 },
                 {
                     id: '456',
                     email: 'mail2@domain.com',
                     displayName: 'User2',
-                    pictureUrl: 'path/to/image2',
                     isLocked: true
                 }
             ]
@@ -136,8 +108,8 @@ describe('UsersService', () => {
 
         expect(users).toEqual(
             new UsersDto(100, [
-                new UserDto('123', 'mail1@domain.com', 'User1', 'path/to/image1', true),
-                new UserDto('456', 'mail2@domain.com', 'User2', 'path/to/image2', true)
+                new UserDto('123', 'mail1@domain.com', 'User1', true),
+                new UserDto('456', 'mail2@domain.com', 'User2', true)
             ]));
     }));
 
@@ -163,7 +135,7 @@ describe('UsersService', () => {
             isLocked: true
         });
 
-        expect(user).toEqual(new UserDto('123', 'mail1@domain.com', 'User1', 'path/to/image1', true));
+        expect(user).toEqual(new UserDto('123', 'mail1@domain.com', 'User1', true));
     }));
 
     it('should make post request to create user',
@@ -184,7 +156,7 @@ describe('UsersService', () => {
 
         req.flush({ id: '123', pictureUrl: 'path/to/image1' });
 
-        expect(user).toEqual(new UserDto('123', dto.email, dto.displayName, 'path/to/image1', false));
+        expect(user).toEqual(new UserDto('123', dto.email, dto.displayName, false));
     }));
 
     it('should make put request to update user',

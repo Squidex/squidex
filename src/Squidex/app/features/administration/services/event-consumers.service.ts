@@ -22,18 +22,6 @@ export class EventConsumerDto {
         public readonly position: string
     ) {
     }
-
-    public start(): EventConsumerDto {
-        return new EventConsumerDto(this.name, false, false, this.error, this.position);
-    }
-
-    public stop(): EventConsumerDto {
-        return new EventConsumerDto(this.name, true, false, this.error, this.position);
-    }
-
-    public reset(): EventConsumerDto {
-        return new EventConsumerDto(this.name, this.isStopped, true, this.error, this.position);
-    }
 }
 
 @Injectable()

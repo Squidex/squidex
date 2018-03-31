@@ -13,8 +13,7 @@ import {
     AppsService,
     AppsState,
     CreateAppDto,
-    DateTime,
-    ImmutableArray
+    DateTime
 } from './../';
 
 describe('AppsState', () => {
@@ -27,6 +26,7 @@ describe('AppsState', () => {
     const newApp = new AppDto('id3', 'new-name', 'Owner', now, now, 'Free', 'Plan');
 
     let appsService: IMock<AppsService>;
+    let appsState: AppsState;
 
     beforeEach(() => {
         appsService = Mock.ofType(AppsService);
@@ -34,57 +34,32 @@ describe('AppsState', () => {
         appsService.setup(x => x.getApps())
             .returns(() => Observable.of(oldApps))
             .verifiable(Times.once());
+
+        appsState = new AppsState(appsService.object);
+        appsState.loadApps().subscribe();
     });
 
-    it('should load automatically', () => {
-        const store = new AppsState(appsService.object);
-
-        let result1: ImmutableArray<AppDto>;
-        let result2: ImmutableArray<AppDto>;
-
-        store.apps.subscribe(x => {
-            result1 = x;
-        }).unsubscribe();
-
-        store.apps.subscribe(x => {
-            result2 = x;
-        }).unsubscribe();
-
-        expect(result1!.values).toEqual(oldApps);
-        expect(result2!.values).toEqual(oldApps);
+    it('should load apps', () => {
+        expect(appsState.snapshot.apps.values).toEqual(oldApps);
 
         appsService.verifyAll();
     });
 
-    it('should add app to cache when created', () => {
+    it('should add app to state when created', () => {
         const request = new CreateAppDto(newApp.name);
 
         appsService.setup(x => x.postApp(request))
             .returns(() => Observable.of(newApp))
             .verifiable(Times.once());
 
-        const store = new AppsState(appsService.object);
+        appsState.createApp(request, now).subscribe();
 
-        let result1: ImmutableArray<AppDto>;
-        let result2: ImmutableArray<AppDto>;
-
-        store.apps.subscribe(x => {
-            result1 = x;
-        }).unsubscribe();
-
-        store.createApp(request, now).subscribe();
-
-        store.apps.subscribe(x => {
-            result2 = x;
-        }).unsubscribe();
-
-        expect(result1!.values).toEqual(oldApps);
-        expect(result2!.values).toEqual(oldApps.concat([newApp]));
+        expect(appsState.snapshot.apps.values).toEqual([newApp, ...oldApps]);
 
         appsService.verifyAll();
     });
 
-    it('should remove app from cache when archived', () => {
+    it('should remove app from state when archived', () => {
         const request = new CreateAppDto(newApp.name);
 
         appsService.setup(x => x.postApp(request))
@@ -95,48 +70,50 @@ describe('AppsState', () => {
             .returns(() => Observable.of({}))
             .verifiable(Times.once());
 
-        const store = new AppsState(appsService.object);
+        appsState.createApp(request, now).subscribe();
 
-        let result1: ImmutableArray<AppDto>;
-        let result2: ImmutableArray<AppDto>;
-        let result3: ImmutableArray<AppDto>;
+        const appsAfterCreate = appsState.snapshot.apps.values;
 
-        store.apps.subscribe(x => {
-            result1 = x;
-        }).unsubscribe();
+        appsState.deleteApp(newApp.name).subscribe();
 
-        store.createApp(request, now).subscribe();
+        const appsAfterDelete = appsState.snapshot.apps.values;
 
-        store.apps.subscribe(x => {
-            result2 = x;
-        }).unsubscribe();
-
-        store.deleteApp(newApp.name).subscribe();
-
-        store.apps.subscribe(x => {
-            result3 = x;
-        }).unsubscribe();
-
-        expect(result1!.values).toEqual(oldApps);
-        expect(result2!.values).toEqual(oldApps.concat([newApp]));
-        expect(result3!.values).toEqual(oldApps);
+        expect(appsAfterCreate).toEqual([newApp, ...oldApps]);
+        expect(appsAfterDelete).toEqual(oldApps);
 
         appsService.verifyAll();
     });
 
-    it('should select app', (done) => {
-        const store = new AppsState(appsService.object);
+    it('should select app', () => {
+        let selectedApp: AppDto;
 
-        store.selectApp(oldApps[0].name).subscribe(isSelected => {
-            expect(isSelected).toBeTruthy();
+        appsState.selectApp(oldApps[0].name).subscribe(x => {
+            selectedApp = x!;
+        }).unsubscribe();
 
-            appsService.verifyAll();
+        expect(selectedApp!).toBe(oldApps[0]);
+        expect(appsState.snapshot.selectedApp).toBe(oldApps[0]);
+    });
 
-            done();
-        }, err => {
-            expect(err).toBeNull();
+    it('should return null when unselecting app', () => {
+        let selectedApp: AppDto;
 
-            done();
-        });
+        appsState.selectApp(null).subscribe(x => {
+            selectedApp = x!;
+        }).unsubscribe();
+
+        expect(selectedApp!).toBeNull();
+        expect(appsState.snapshot.selectedApp).toBeNull();
+    });
+
+    it('should return null when app to select is not found', () => {
+        let selectedApp: AppDto;
+
+        appsState.selectApp('unknown').subscribe(x => {
+            selectedApp = x!;
+        }).unsubscribe();
+
+        expect(selectedApp!).toBeNull();
+        expect(appsState.snapshot.selectedApp).toBeNull();
     });
 });

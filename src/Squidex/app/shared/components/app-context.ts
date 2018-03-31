@@ -23,7 +23,7 @@ import {
 @Injectable()
 export class AppContext {
     public get app(): AppDto {
-        return this.appsState.selectedApp.value!;
+        return this.appsState.snapshot.selectedApp!;
     }
 
     public get appChanges(): Observable<AppDto | null> {

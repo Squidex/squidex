@@ -5,7 +5,7 @@
 
     <sqx-panel desiredWidth="26rem" isBlank="true">
         <ng-container title>
-            <ng-container *ngIf="selectedUser | async; else noUser">
+            <ng-container *ngIf="usersState.selectedUser | async; else noUser">
                 Edit User
             </ng-container>
 
@@ -42,7 +42,7 @@
                 <input type="text" class="form-control" id="displayName" maxlength="100" formControlName="displayName" autocomplete="false"  />
             </div>
 
-            <div class="form-group form-group-password" [class.hidden]="isCurrentUser | async">
+            <div class="form-group form-group-password" [class.hidden]="usersState.isCurrentUser | async">
                 <div class="form-group">
                     <label for="password">Password</label>
 

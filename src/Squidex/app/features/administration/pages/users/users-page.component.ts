@@ -22,12 +22,6 @@ import { UsersState } from './../../state/users.state';
 export class UsersPageComponent implements OnInit {
     public usersFilter = new FormControl();
 
-    public users =
-        this.usersState.changes.map(x => x.users);
-
-    public usersPager =
-        this.usersState.changes.map(x => x.usersPager);
-
     constructor(
         public readonly authState: AuthService,
         public readonly usersState: UsersState

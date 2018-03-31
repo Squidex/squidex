@@ -6,7 +6,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { ActivatedRouteSnapshot, CanActivate, RouterStateSnapshot } from '@angular/router';
+import { CanActivate } from '@angular/router';
 import { Observable } from 'rxjs';
 
 import { UsersState } from './../state/users.state';
@@ -18,7 +18,7 @@ export class UnsetUserGuard implements CanActivate {
     ) {
     }
 
-    public canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> {
+    public canActivate(): Observable<boolean> {
         return this.usersState.selectUser(null).map(u => u === null);
     }
 }

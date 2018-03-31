@@ -6,15 +6,26 @@
  */
 
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { Observable } from 'rxjs/Observable';
 
-import { nextBy } from './rxjs-extensions-impl';
+import { DialogService } from './../services/dialog.service';
+
+import { nextBy, notify } from './rxjs-extensions-impl';
 
 /* tslint:disable:no-shadowed-variable */
 
 declare module 'rxjs/BehaviorSubject' {
-    interface BehaviorSubject<T> {
-        nextBy(updater: (value: T) => T): void;
+    interface Observable<T> {
+        notify(dialogs: DialogService): Observable<T>;
     }
 }
 
 BehaviorSubject.prototype['nextBy'] = nextBy;
+
+declare module 'rxjs/Observable' {
+    interface Observable<T> {
+        notify(dialogs: DialogService): Observable<T>;
+    }
+}
+
+Observable.prototype['notify'] = notify;

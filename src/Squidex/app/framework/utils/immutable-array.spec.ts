@@ -195,6 +195,12 @@ describe('ImmutableArray', () => {
         expect(array_1.mutableValues).toBe(array_1.mutableValues);
     });
 
+    it('should provider value at index', () => {
+        const array_1 = ImmutableArray.of([3, 1, 4, 2]);
+
+        expect(array_1.at(2)).toBe(4);
+    });
+
     it('should iterate over array items', () => {
         const array_1 = ImmutableArray.of([3, 1, 4, 2]);
 

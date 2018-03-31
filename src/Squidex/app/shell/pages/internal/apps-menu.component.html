@@ -1,37 +1,51 @@
 <ul class="nav navbar-nav" *ngIf="apps">
     <li class="nav-item dropdown">
-        <span class="nav-link dropdown-toggle" id="app-name" (click)="appsMenu.toggle()">{{selectedApp ? selectedApp.name : 'Apps Overview'}}</span>
+        <span class="nav-link dropdown-toggle" id="app-name" (click)="appsMenu.toggle()">
+            <ng-container *ngIf="appsState | selectedApp | async; let apps; else noApp">
+                {{selectedApp.name}}
+            </ng-container>
 
-        <div class="dropdown-menu" *sqxModalView="appsMenu" @fade>
-            <a class="dropdown-item all-apps" routerLink="/app">
-                <span class="all-apps-text">All Apps</span> 
-                <span class="all-apps-pill badge badge-pill badge-primary">{{apps.length}}</span>
-            </a>
+            <ng-template #noApp>
+                Apps Overview
+            </ng-template>
+        </span>
 
-            <div class="dropdown-divider"></div>
-
-            <div *ngIf="apps.length > 0">
-                <a class="dropdown-item" *ngFor="let app of apps" [routerLink]="['/app', app.name]" routerLinkActive="active">{{app.name}}</a>
-
+        <ng-container *ngIf="appsState.apps | async; let apps">
+            <div class="dropdown-menu" *sqxModalView="appsMenu" @fade>
+                <a class="dropdown-item all-apps" routerLink="/app">
+                    <span class="all-apps-text">All Apps</span> 
+                    <span class="all-apps-pill badge badge-pill badge-primary">{{apps.length}}</span>
+                </a>
+    
                 <div class="dropdown-divider"></div>
+    
+                <div *ngIf="apps.length > 0">
+                    <a class="dropdown-item" *ngFor="let app of apps" [routerLink]="['/app', app.name]" routerLinkActive="active">{{app.name}}</a>
+    
+                    <div class="dropdown-divider"></div>
+                </div>
+    
+                <div class="drodown-button">
+                    <button class="btn btn-block btn-success" (click)="createApp()">
+                        <i class="icon-plus"></i> Create New App
+                    </button>
+                </div>
             </div>
-
-            <div class="drodown-button">
-                <button class="btn btn-block btn-success" (click)="createApp()"><i class="icon-plus"></i> Create New App</button>
-            </div>
-        </div>
+        </ng-container>
     </li>
 
-    <li class="nav-item" *ngIf="selectedApp && selectedApp.planUpgrade && selectedApp.planName && selectedApp.permission === 'Owner'">
-        <div class="btn-group app-upgrade">
-            <button type="button" class="btn btn-primary btn-plan">
-                You are on the <strong>{{selectedApp.planName}}</strong> plan.
-            </button>
-            <button type="button" class="btn btn-warning" [routerLink]="['/app', selectedApp.name, 'settings', 'plans']">
-                Upgrade!
-            </button>
-        </div>
-    </li>
+    <ng-container *ngIf="appsState.selectedApp | async; let selectedApp">
+        <li class="nav-item" *ngIf="selectedApp.planUpgrade && selectedApp.planName && selectedApp.permission === 'Owner'">
+            <div class="btn-group app-upgrade">
+                <button type="button" class="btn btn-primary btn-plan">
+                    You are on the <strong>{{selectedApp.planName}}</strong> plan.
+                </button>
+                <button type="button" class="btn btn-warning" [routerLink]="['/app', selectedApp.name, 'settings', 'plans']">
+                    Upgrade!
+                </button>
+            </div>
+        </li>
+    </ng-container>
 </ul>
 
 <div class="modal" *sqxModalView="addAppDialog;onRoot:true" @fade>

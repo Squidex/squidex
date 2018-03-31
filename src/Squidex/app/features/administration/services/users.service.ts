@@ -26,21 +26,8 @@ export class UserDto {
         public readonly id: string,
         public readonly email: string,
         public readonly displayName: string,
-        public readonly pictureUrl: string | null,
         public readonly isLocked: boolean
     ) {
-    }
-
-    public update(email: string, displayName: string): UserDto {
-        return new UserDto(this.id, email, displayName, this.pictureUrl, this.isLocked);
-    }
-
-    public lock(): UserDto {
-        return new UserDto(this.id, this.email, this.displayName, this.pictureUrl, true);
-    }
-
-    public unlock(): UserDto {
-        return new UserDto(this.id, this.email, this.displayName, this.pictureUrl, false);
     }
 }
 
@@ -57,7 +44,7 @@ export class UpdateUserDto {
     constructor(
         public readonly email: string,
         public readonly displayName: string,
-        public readonly password: string
+        public readonly password?: string
     ) {
     }
 }
@@ -84,7 +71,6 @@ export class UsersService {
                             item.id,
                             item.email,
                             item.displayName,
-                            item.pictureUrl,
                             item.isLocked);
                     });
 
@@ -104,7 +90,6 @@ export class UsersService {
                         body.id,
                         body.email,
                         body.displayName,
-                        body.pictureUrl,
                         body.isLocked);
                 })
                 .pretifyError('Failed to load user. Please reload.');
@@ -117,7 +102,11 @@ export class UsersService {
                 .map(response => {
                     const body = response.payload.body;
 
-                    return new UserDto(body.id, dto.email, dto.displayName, body.pictureUrl, false);
+                    return new UserDto(
+                        body.id,
+                        dto.email,
+                        dto.displayName,
+                        false);
                 })
                 .pretifyError('Failed to create user. Please reload.');
     }
