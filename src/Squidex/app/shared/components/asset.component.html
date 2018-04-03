@@ -49,7 +49,7 @@
             {{asset.fileName}}
         </div>
         <div class="file-info">
-            <span *ngIf="asset.pixelWidth">{{asset.pixelWidth}}x{{asset.pixelHeight}}px, </span> {{asset.fileSize | sqxFileSize}}
+            <ng-container *ngIf="asset.pixelWidth">{{asset.pixelWidth}}x{{asset.pixelHeight}}px, </ng-container> {{asset.fileSize | sqxFileSize}}
         </div>
     </div>
 
@@ -64,34 +64,27 @@
     </div>
 </div>
 
-<div class="modal" *sqxModalView="renameDialog;onRoot:true" @fade>
-    <div class="modal-backdrop"></div>
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">Rename asset</h4>
+<ng-container *sqxModalView="renameDialog;onRoot:true">
+    <form [formGroup]="renameForm" (ngSubmit)="renameAsset()">
+        <sqx-modal-dialog (click)="cancelRenameAsset()">
+            <ng-container title>
+                Rename asset
+            </ng-container>
 
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="cancelRenameAsset()">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
+            <ng-container content>
+                <div class="form-group">
+                    <label for="assetName">Name</label>
+                    
+                    <sqx-control-errors for="name" [submitted]="renameFormSubmitted"></sqx-control-errors>
 
-            <div class="modal-body">
-                <form [formGroup]="renameForm" (ngSubmit)="renameAsset()">
-                    <div class="form-group">
-                        <label for="assetName">Name</label>
-                        
-                        <sqx-control-errors for="name" [submitted]="renameFormSubmitted"></sqx-control-errors>
+                    <input type="text" class="form-control" id="assetName" formControlName="name" autocomplete="off" sqxFocusOnInit />
+                </div>
+            </ng-container>
 
-                        <input type="text" class="form-control" id="assetName" formControlName="name" autocomplete="off" sqxFocusOnInit />
-                    </div>
-
-                    <div class="form-group clearfix">
-                        <button type="reset" class="float-left btn btn-secondary" (click)="cancelRenameAsset()">Cancel</button>
-                        <button type="submit" class="float-right btn btn-success">Rename</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
+            <ng-container footer>
+                <button type="reset" class="float-left btn btn-secondary" (click)="cancelRenameAsset()">Cancel</button>
+                <button type="submit" class="float-right btn btn-success">Rename</button>
+            </ng-container>
+        </sqx-modal-dialog>
+    </form>
+</ng-container>

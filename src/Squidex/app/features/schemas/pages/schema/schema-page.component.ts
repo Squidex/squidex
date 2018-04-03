@@ -65,7 +65,7 @@ export class SchemaPageComponent implements OnDestroy, OnInit {
 
     public ngOnInit() {
         this.selectedSchemaSubscription =
-            this.schemasState.changes.map(x => x.selectedSchema)
+            this.schemasState.selectedSchema
                 .subscribe(schema => {
                     this.schema = schema!;
 

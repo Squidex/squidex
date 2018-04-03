@@ -11,9 +11,7 @@
         </ng-container>
 
         <ng-container content>
-            <div *ngIf="createFormError">
-                <div class="form-alert form-alert-error" [innerHTML]="createFormError"></div>
-            </div>
+            <sqx-form-error [error]="createFormError"></sqx-form-error>
         
             <div class="form-group">
                 <label for="appName">Name</label>

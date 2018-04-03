@@ -52,7 +52,7 @@
 
     <ng-container content>
         <div dnd-sortable-container [sortableData]="schema.fields">
-            <div *ngFor="let field of schema.fields; let i = index; trackBy: schemasState.trackByField" dnd-sortable [sortableIndex]="i" (sqxSorted)="sortFields($event)">
+            <div *ngFor="let field of schema.fields; let i = index;" dnd-sortable [sortableIndex]="i" (sqxSorted)="sortFields($event)">
                 <sqx-field [field]="field" [schema]="schema"></sqx-field>
             </div>
     
@@ -63,29 +63,23 @@
     </ng-container>
 </sqx-panel>
 
-<div class="modal" *sqxModalView="editSchemaDialog;onRoot:true" @fade>
-    <div class="modal-backdrop"></div>
- 
+<ng-container *sqxModalView="editSchemaDialog;onRoot:true">
     <sqx-schema-edit-form [schema]="schema" 
         (completed)="editSchemaDialog.hide()">
     </sqx-schema-edit-form>
-</div>
+</ng-container>
 
-<div class="modal" *sqxModalView="addFieldDialog;onRoot:true;closeAuto:false" @fade>
-    <div class="modal-backdrop"></div>
-
+<ng-container *sqxModalView="addFieldDialog;onRoot:true;closeAuto:false">
     <sqx-field-wizard [schema]="schema"
         (completed)="addFieldDialog.hide()">
     </sqx-field-wizard>
-</div>
+</ng-container>
 
-<div class="modal" *sqxModalView="configureScriptsDialog;onRoot:true" @fade>
-    <div class="modal-backdrop"></div>
-
+<ng-container *sqxModalView="configureScriptsDialog;onRoot:true">
     <sqx-schema-scripts-form [schema]="schema"
         (completed)="configureScriptsDialog.hide()">
     </sqx-schema-scripts-form>
-</div>
+</ng-container>
 
 <ng-container *sqxModalView="exportSchemaDialog;onRoot:true">
     <sqx-modal-dialog (close)="exportSchemaDialog.hide()">

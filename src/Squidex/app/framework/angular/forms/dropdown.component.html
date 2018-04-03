@@ -6,7 +6,7 @@
             autocapitalize="off">
         
         <div class="control-dropdown-item" *ngIf="selectedItem">
-            <span *ngIf="!selectionTemplate">{{selectedItem}}</span>
+            <ng-container *ngIf="!selectionTemplate">{{selectedItem}}</ng-container>
             
             <ng-template *ngIf="selectionTemplate" [sqxTemplateWrapper]="selectionTemplate" [item]="selectedItem"></ng-template>
         </div>
@@ -17,7 +17,7 @@
     <div class="items-container">
         <div class="control-dropdown" #container *sqxModalView="dropdown" [sqxModalTarget]="input" position="bottomLeft">
             <div *ngFor="let item of items; let i = index;" class="control-dropdown-item control-dropdown-item-selectable" [class.active]="i === selectedIndex" (mousedown)="selectIndexAndClose(i)" [sqxScrollActive]="i === selectedIndex" [container]="container">
-                <span *ngIf="!itemTemplate">{{item}}</span>
+                <ng-container *ngIf="!itemTemplate">{{item}}</ng-container>
                 
                 <ng-template *ngIf="itemTemplate" [sqxTemplateWrapper]="itemTemplate" [item]="item" [index]="i"></ng-template>
             </div>

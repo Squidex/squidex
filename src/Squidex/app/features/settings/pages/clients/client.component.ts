@@ -13,7 +13,6 @@ import {
     AppClientDto,
     AppClientsService,
     DialogService,
-    fadeAnimation,
     ModalView,
     AppsState
 } from '@app/shared';
@@ -23,10 +22,7 @@ const ESCAPE_KEY = 27;
 @Component({
     selector: 'sqx-client',
     styleUrls: ['./client.component.scss'],
-    templateUrl: './client.component.html',
-    animations: [
-        fadeAnimation
-    ]
+    templateUrl: './client.component.html'
 })
 export class ClientComponent {
     @Output()

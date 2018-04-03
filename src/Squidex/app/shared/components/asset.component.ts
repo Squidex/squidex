@@ -15,7 +15,6 @@ import {
     AssetsService,
     AssetDragged,
     DateTime,
-    fadeAnimation,
     ModalView,
     UpdateAssetDto,
     Version,
@@ -29,9 +28,6 @@ import {
     templateUrl: './asset.component.html',
     providers: [
         AppContext
-    ],
-    animations: [
-        fadeAnimation
     ]
 })
 export class AssetComponent implements OnInit {

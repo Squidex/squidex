@@ -1,13 +1,11 @@
 <form [formGroup]="addFieldForm.form" (ngSubmit)="addField(false)">
-    <sqx-modal-dialog (close)="complete()">
+    <sqx-modal-dialog (close)="complete()" large="true">
         <ng-container title>
             Create Field
         </ng-container>
 
         <ng-container content>
-            <ng-container *ngIf="addFieldForm.error | async; let error">
-                <div class="form-alert form-alert-error" [innerHTML]="error"></div>
-            </ng-container>
+            <sqx-form-error [error]="addFieldForm.error | async"></sqx-form-error>
 
             <div class="form-group">
                 <div class="row">
@@ -17,7 +15,7 @@
                         
                             <div class="row no-gutters">
                                 <div class="col col-auto">
-                                    <div class="type-icon" [class.active]="addFieldForm.form.controls.type.value === fieldType.type">
+                                    <div class="type-icon" [class.active]="addFieldForm.form.controls['type'].value === fieldType.type">
                                         <i class="icon-type-{{fieldType.type}}"></i>
                                     </div>
                                 </div>

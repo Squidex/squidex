@@ -36,10 +36,12 @@ export class AppsState extends State<Snapshot> {
     }
 
     public selectedApp =
-        this.changes.map(s => s.selectedApp);
+        this.changes.map(s => s.selectedApp)
+            .distinctUntilChanged();
 
     public apps =
-        this.changes.map(s => s.apps);
+        this.changes.map(s => s.apps)
+            .distinctUntilChanged();
 
     constructor(
         private readonly appsService: AppsService

@@ -14,7 +14,7 @@
     </ng-container>
 
     <ng-container content>
-        <div *ngIf="plans">
+        <ng-container *ngIf="plans">
             <div class="panel-alert panel-alert-danger" *ngIf="!planOwned">
                 You have not created the subscription. Therefore you cannot change the plan.
             </div>
@@ -57,6 +57,6 @@
             <div *ngIf="plans.hasPortal" class="billing-portal-link">
                 Go to <a target="_blank" href="{{portalUrl}}">Billing Portal</a> for payment history and subscription overview.
             </div>
-        </div>
+        </ng-container>
     </ng-container>
 </sqx-panel>

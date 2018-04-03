@@ -152,6 +152,14 @@ export class SchemasState extends State<Snapshot> {
         return this.authState.user!.token;
     }
 
+    public selectedSchema =
+        this.changes.map(s => s.selectedSchema)
+            .distinctUntilChanged();
+
+    public schemas =
+        this.changes.map(s => s.schemas)
+            .distinctUntilChanged();
+
     constructor(
         private readonly appsState: AppsState,
         private readonly authState: AuthService,
@@ -161,13 +169,13 @@ export class SchemasState extends State<Snapshot> {
         super({ schemas: ImmutableArray.of() });
     }
 
-    public selectSchema(selectedSchemaId: string | null): Observable<SchemaDetailsDto | null> {
-        return this.loadSchema(selectedSchemaId)
+    public selectSchema(id: string | null): Observable<SchemaDetailsDto | null> {
+        return this.loadSchema(id)
             .do(schema => {
                 this.next(s => {
                     const schemas = schema ? s.schemas.replaceBy('id', schema) : s.schemas;
 
-                    return { ...s, selectedSchemaId, schemas };
+                    return { ...s, selectedSchema: schema, schemas };
                 });
             });
     }
@@ -238,7 +246,7 @@ export class SchemasState extends State<Snapshot> {
     public unpublish(schema: SchemaDto): Observable<any> {
         return this.schemasService.unpublishSchema(this.appName, schema.name, schema.version)
             .do(dto => {
-                this.replaceSchema(setPublished(schema, true, this.user, dto.version));
+                this.replaceSchema(setPublished(schema, false, this.user, dto.version));
             })
             .catch(error => this.dialogs.notifyError(error));
     }
@@ -339,7 +347,7 @@ const setPublished = (schema: SchemaDto | SchemaDetailsDto, publish: boolean, us
             schema.id,
             schema.name,
             schema.properties,
-            true,
+            publish,
             schema.createdBy, user,
             schema.created, now || DateTime.now(),
             version,
@@ -354,7 +362,7 @@ const setPublished = (schema: SchemaDto | SchemaDetailsDto, publish: boolean, us
             schema.id,
             schema.name,
             schema.properties,
-            true,
+            publish,
             schema.createdBy, user,
             schema.created, now || DateTime.now(),
             version);

@@ -13,7 +13,8 @@ import { Subscription } from 'rxjs';
 import {
     AppsState,
     MessageBus,
-    ModalView
+    ModalView,
+    SchemaDto
 } from '@app/shared';
 
 import { SchemaCloning } from './../messages';
@@ -32,7 +33,7 @@ export class SchemasPageComponent implements OnDestroy, OnInit {
 
     public schemasFilter = new FormControl();
     public schemasFiltered =
-        this.schemasState.changes.map(x => x.schemas)
+        this.schemasState.schemas
             .combineLatest(this.schemasFilter.valueChanges.startWith(''),
                 (schemas, query) => {
                     if (query && query.length > 0) {
@@ -79,6 +80,10 @@ export class SchemasPageComponent implements OnDestroy, OnInit {
         this.import = importing;
 
         this.addSchemaDialog.show();
+    }
+
+    public trackBySchema(index: number, schema: SchemaDto) {
+        return schema.id;
     }
 }
 

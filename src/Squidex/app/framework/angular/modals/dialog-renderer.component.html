@@ -1,26 +1,19 @@
 <ng-content></ng-content>
 
-<div class="modal" *sqxModalView="dialogView;onRoot:true">
-    <div class="modal-backdrop"></div>
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">{{dialogRequest.title}}</h4>
-            </div>
+<sqx-modal-dialog *sqxModalView="dialogView;onRoot:true" showClose="false">
+    <ng-container title>
+        {{dialogRequest.title}}
+    </ng-container>
 
-            <div class="modal-body">
-                {{dialogRequest.text}}
-            </div>
+    <ng-container content>
+        {{dialogRequest.text}}
+    </ng-container>
 
-            <div class="modal-footer">
-                <div class="clearfix">
-                    <button type="button" class="float-left btn btn-secondary" (click)="cancel()">No</button>
-                    <button type="button" class="float-right btn btn-danger" (click)="confirm()">Yes</button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+    <ng-container footer>
+        <button type="button" class="float-left btn btn-secondary" (click)="cancel()">No</button>
+        <button type="button" class="float-right btn btn-danger" (click)="confirm()">Yes</button>
+    </ng-container>
+</sqx-modal-dialog>
 
 <div class="notification-container notification-container-{{position}}">
     <div class="alert alert-dismissible alert-{{notification.messageType}}" *ngFor="let notification of notifications" (click)="close(notification)" @fade>

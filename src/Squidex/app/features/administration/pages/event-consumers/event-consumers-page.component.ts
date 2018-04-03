@@ -9,7 +9,6 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
 
 import {
-    fadeAnimation,
     DialogService,
     ImmutableArray,
     ModalView
@@ -20,10 +19,7 @@ import { EventConsumerDto, EventConsumersService } from './../../services/event-
 @Component({
     selector: 'sqx-event-consumers-page',
     styleUrls: ['./event-consumers-page.component.scss'],
-    templateUrl: './event-consumers-page.component.html',
-    animations: [
-        fadeAnimation
-    ]
+    templateUrl: './event-consumers-page.component.html'
 })
 export class EventConsumersPageComponent implements OnDestroy, OnInit {
     private subscription: Subscription;

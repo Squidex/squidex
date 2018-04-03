@@ -1,5 +1,5 @@
 <form [formGroup]="editForm.form" (ngSubmit)="saveSchema()">
-    <sqx-modal-dialog (close)="complete()">
+    <sqx-modal-dialog (close)="complete()" large="true">
         <ng-container title>
             Scripts
         </ng-container>
@@ -15,9 +15,9 @@
         <ng-container content>
             <div class="form-group">
                 <div *ngFor="let script of editForm.form.controls | sqxKeys">
-                    <div *ngIf="selectedField === script">
+                    <ng-container *ngIf="selectedField === script">
                         <sqx-jscript-editor name="script" [formControlName]="script"></sqx-jscript-editor>
-                    </div>
+                    </ng-container>
                 </div>
             </div>
         </ng-container>

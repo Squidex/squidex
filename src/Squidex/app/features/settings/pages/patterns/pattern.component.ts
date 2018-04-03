@@ -10,18 +10,14 @@ import { FormBuilder, Validators } from '@angular/forms';
 
 import {
     AppPatternDto,
-    fadeAnimation,
-    ValidatorsEx,
-    UpdatePatternDto
+    UpdatePatternDto,
+    ValidatorsEx
 } from '@app/shared';
 
 @Component({
     selector: 'sqx-pattern',
     styleUrls: ['./pattern.component.scss'],
-    templateUrl: './pattern.component.html',
-    animations: [
-        fadeAnimation
-    ]
+    templateUrl: './pattern.component.html'
 })
 export class PatternComponent implements OnInit {
     @Input()

@@ -23,9 +23,7 @@
         </ng-container>
 
         <ng-container content>
-            <ng-container *ngIf="userForm.error | async; let error">
-                <div class="form-alert form-alert-error" [innerHTML]="error"></div>
-            </ng-container>
+            <sqx-form-error [error]="userForm.error | async"></sqx-form-error>
 
             <div class="form-group">
                 <label for="email">Email</label>

@@ -74,12 +74,10 @@
     </div>
 </div>
 
-<div class="modal" *sqxModalView="addAppDialog;onRoot:true" @fade>
-    <div class="modal-backdrop"></div>
-
+<ng-container *sqxModalView="addAppDialog;onRoot:true">
     <sqx-app-form [template]="appTemplate"
         (completed)="addAppDialog.hide()">
     </sqx-app-form>
-</div>
+</ng-container>
 
 <sqx-onboarding-dialog [modalView]="onboardingModal"></sqx-onboarding-dialog>

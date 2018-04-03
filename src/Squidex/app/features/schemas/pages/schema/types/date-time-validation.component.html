@@ -26,7 +26,7 @@
         </div>
     </div>
 
-    <div *ngIf="showDefaultValues | async">
+    <ng-container *ngIf="showDefaultValues | async">
         <div class="form-group row">
             <label class="col col-3 col-form-label">Default Mode:</label>
 
@@ -45,5 +45,5 @@
                 <sqx-date-time-editor enforceTime="true" mode="DateTime" formControlName="defaultValue"></sqx-date-time-editor>
             </div>
         </div>
-    </div>
+    </ng-container>
 </div>

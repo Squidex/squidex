@@ -1,72 +1,64 @@
 <sqx-title message="{app} | {schema} | Contents" parameter1="app" parameter2="schema" [value1]="ctx.appName" [value2]="schema?.displayName"></sqx-title>
 
 <sqx-panel [desiredWidth]="isReadOnly ? '40rem' : '60rem'">
-    <div class="panel-header">
-        <div class="panel-title-row">
-            <div class="float-right">
-                <button class="btn btn-link btn-secondary" (click)="load(true)" title="Refresh Contents (CTRL + SHIFT + R)">
-                    <i class="icon-reset"></i> Refresh
-                </button>
+    <ng-container title>
+        <ng-container *ngIf="!isReadOnly && !isArchive">
+            Contents
+        </ng-container>
+        <ng-container *ngIf="isArchive">
+            Archive
+        </ng-container>
+        <ng-container *ngIf="isReadOnly">
+            References
+        </ng-container>
+    </ng-container>
 
-                <sqx-shortcut keys="ctrl+shift+r" (trigger)="load(true)"></sqx-shortcut>
-                <sqx-shortcut keys="ctrl+shift+f" (trigger)="inputFind.focus()"></sqx-shortcut>
-                <sqx-shortcut keys="ctrl+shift+g" (trigger)="newButton.click()" *ngIf="!isReadOnly"></sqx-shortcut>
+    <ng-container header>
+        <button class="btn btn-link btn-secondary" (click)="load(true)" title="Refresh Contents (CTRL + SHIFT + R)">
+            <i class="icon-reset"></i> Refresh
+        </button>
 
-                <form class="form-inline" (ngSubmit)="search()">
-                    <input class="form-control form-control-expandable" #inputFind [formControl]="contentsFilter" placeholder="Search for content" />
+        <sqx-shortcut keys="ctrl+shift+r" (trigger)="load(true)"></sqx-shortcut>
+        <sqx-shortcut keys="ctrl+shift+f" (trigger)="inputFind.focus()"></sqx-shortcut>
+        <sqx-shortcut keys="ctrl+shift+g" (trigger)="newButton.click()" *ngIf="!isReadOnly"></sqx-shortcut>
 
-                    <a class="expand-search" (click)="searchModal.toggle()" #archive>
-                        <i class="icon-caret-down"></i>
-                    </a>
-                </form>
+        <form class="form-inline" (ngSubmit)="search()">
+            <input class="form-control form-control-expandable" #inputFind [formControl]="contentsFilter" placeholder="Search for content" />
 
-                <sqx-onboarding-tooltip id="contentArchive" [for]="archive" position="bottomRight" after="60000">
-                    Click this icon to show the advanced search menu and to show the archive!
-                </sqx-onboarding-tooltip>
+            <a class="expand-search" (click)="searchModal.toggle()" #archive>
+                <i class="icon-caret-down"></i>
+            </a>
+        </form>
 
-                <sqx-onboarding-tooltip id="contentFind" [for]="inputFind" position="bottomRight" after="120000">
-                    Search for content using full text search over all fields and languages!
-                </sqx-onboarding-tooltip>
-                
-                <div class="dropdown-menu" *sqxModalView="searchModal" [sqxModalTarget]="inputFind">
-                    <sqx-search-form
-                        [canArchive]="!isReadOnly"
-                        (queryChanged)="contentsFilter.setValue($event, { emitEvent: false })" 
-                        [query]="contentsFilter.value"
-                        (archivedChanged)="updateArchive($event)"
-                        [archived]="isArchive">
-                    </sqx-search-form>
-                </div>
-                
-                <span *ngIf="!isReadOnly && languages.length > 1">
-                    <sqx-language-selector class="languages-buttons" (selectedLanguageChanged)="selectLanguage($event)" [languages]="languages"></sqx-language-selector>
-                </span>
+        <sqx-onboarding-tooltip id="contentArchive" [for]="archive" position="bottomRight" after="60000">
+            Click this icon to show the advanced search menu and to show the archive!
+        </sqx-onboarding-tooltip>
 
-                <button *ngIf="!isReadOnly" class="btn btn-success" #newButton routerLink="new" title="New Content (CTRL + SHIFT + G)">
-                    <i class="icon-plus"></i> New
-                </button>
-            </div>
+        <sqx-onboarding-tooltip id="contentFind" [for]="inputFind" position="bottomRight" after="120000">
+            Search for content using full text search over all fields and languages!
+        </sqx-onboarding-tooltip>
 
-            <h3 class="panel-title" *ngIf="!isReadOnly && !isArchive">
-                Contents
-            </h3>
-            
-            <h3 class="panel-title" *ngIf="isArchive">
-                Archive
-            </h3>
-
-            <h3 class="panel-title" *ngIf="isReadOnly">
-                References
-            </h3>
+        <div class="dropdown-menu" *sqxModalView="searchModal" [sqxModalTarget]="inputFind">
+            <sqx-search-form
+                [canArchive]="!isReadOnly"
+                (queryChanged)="contentsFilter.setValue($event, { emitEvent: false })" 
+                [query]="contentsFilter.value"
+                (archivedChanged)="updateArchive($event)"
+                [archived]="isArchive">
+            </sqx-search-form>
         </div>
 
-        <a class="panel-close" sqxParentLink>
-            <i class="icon-close"></i>
-        </a>
-    </div>
+        <ng-container *ngIf="!isReadOnly && languages.length > 1">
+            <sqx-language-selector class="languages-buttons" (selectedLanguageChanged)="selectLanguage($event)" [languages]="languages"></sqx-language-selector>
+        </ng-container>
 
-    <div class="panel-main">
-        <div class="panel-content grid">
+        <button *ngIf="!isReadOnly" class="btn btn-success" #newButton routerLink="new" title="New Content (CTRL + SHIFT + G)">
+            <i class="icon-plus"></i> New
+        </button>
+    </ng-container>
+
+    <ng-container content>
+        <div class="grid">
             <div class="grid-header">
                 <table class="table table-items table-fixed" *ngIf="contentItems">
                     <thead>
@@ -166,43 +158,38 @@
                 </div>
             </div>
         </div>
-    </div>
+    </ng-container>
 </sqx-panel>
 
 <router-outlet></router-outlet>
 
-<div class="modal" *sqxModalView="dueTimeDialog;onRoot:true">
-    <div class="modal-backdrop"></div>
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">{{dueTimeAction}} content item(s)</h4>
+<ng-container *sqxModalView="dueTimeDialog;onRoot:true">
+    <sqx-modal-dialog (close)="cancelStatusChange()">
+        <ng-container title>
+            {{dueTimeAction}} content item(s)
+        </ng-container>
+
+        <ng-container content>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" [(ngModel)]="dueTimeMode" value="Immediately" id="immediately">
+                <label class="form-check-label" for="immediately">
+                    {{dueTimeAction}} content item(s) immediately.
+                </label>
             </div>
 
-            <div class="modal-body">
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" [(ngModel)]="dueTimeMode" value="Immediately" id="immediately">
-                    <label class="form-check-label" for="immediately">
-                        {{dueTimeAction}} content item(s) immediately.
-                    </label>
-                </div>
-
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" [(ngModel)]="dueTimeMode" value="Scheduled" id="scheduled">
-                    <label class="form-check-label" for="scheduled">
-                        {{dueTimeAction}} content item(s) at a later point date and time.
-                    </label>
-                </div>
-
-                <sqx-date-time-editor [disabled]="dueTimeMode === 'Immediately'" mode="DateTime" hideClear="true" [(ngModel)]="dueTime"></sqx-date-time-editor>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" [(ngModel)]="dueTimeMode" value="Scheduled" id="scheduled">
+                <label class="form-check-label" for="scheduled">
+                    {{dueTimeAction}} content item(s) at a later point date and time.
+                </label>
             </div>
 
-            <div class="modal-footer">
-                <div class="clearfix">
-                    <button type="button" class="float-left btn btn-secondary" (click)="cancelStatusChange()">Cancel</button>
-                    <button type="button" class="float-right btn btn-primary" [disabled]="dueTimeMode === 'Scheduled' && !dueTime" (click)="confirmStatusChange()">Confirm</button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+            <sqx-date-time-editor [disabled]="dueTimeMode === 'Immediately'" mode="DateTime" hideClear="true" [(ngModel)]="dueTime"></sqx-date-time-editor>
+        </ng-container>
+
+        <ng-container footer>
+            <button type="button" class="float-left btn btn-secondary" (click)="cancelStatusChange()">Cancel</button>
+            <button type="button" class="float-right btn btn-primary" [disabled]="dueTimeMode === 'Scheduled' && !dueTime" (click)="confirmStatusChange()">Confirm</button>
+        </ng-container>
+    </sqx-modal-dialog>
+</ng-container>

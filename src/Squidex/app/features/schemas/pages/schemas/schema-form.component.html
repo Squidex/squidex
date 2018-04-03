@@ -10,9 +10,7 @@
         </ng-container>
 
         <ng-container content>
-            <ng-container *ngIf="createForm.error | async; let error">
-                <div class="form-alert form-alert-error" [innerHTML]="error"></div>
-            </ng-container>
+            <sqx-form-error [error]="createForm.error | async"></sqx-form-error>
         
             <div class="form-group">
                 <label for="schemaName">Name</label>

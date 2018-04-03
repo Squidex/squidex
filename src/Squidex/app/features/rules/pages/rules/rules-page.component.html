@@ -1,107 +1,97 @@
 <sqx-title message="{app} | Rules" parameter1="app" [value1]="ctx.appName"></sqx-title>
 
 <sqx-panel desiredWidth="54rem">
-    <div class="panel-header">
-        <div class="panel-title-row">
-            <div class="float-right">
-                <button class="btn btn-link btn-secondary" (click)="load(true)" title="Refresh Assets (CTRL + SHIFT + R)">
-                    <i class="icon-reset"></i> Refresh
-                </button>
+    <ng-container title>
+        Rules
+    </ng-container>
 
-                <sqx-shortcut keys="ctrl+shift+r" (trigger)="load(true)"></sqx-shortcut>
-                <sqx-shortcut keys="ctrl+shift+g" (trigger)="buttonNew.click()"></sqx-shortcut>
-                
-                <button class="btn btn-success" #buttonNew (click)="createNew()" title="New Rule (CTRL + M)">
-                    <i class="icon-plus"></i> New
-                </button>
-            </div>
+    <ng-container header>
+        <button class="btn btn-link btn-secondary" (click)="load(true)" title="Refresh Assets (CTRL + SHIFT + R)">
+            <i class="icon-reset"></i> Refresh
+        </button>
 
-            <h3 class="panel-title"><i class="icon-rules"></i> Rules</h3>
+        <sqx-shortcut keys="ctrl+shift+r" (trigger)="load(true)"></sqx-shortcut>
+        <sqx-shortcut keys="ctrl+shift+g" (trigger)="buttonNew.click()"></sqx-shortcut>
+
+        <button class="btn btn-success" #buttonNew (click)="createNew()" title="New Rule (CTRL + M)">
+            <i class="icon-plus"></i> New
+        </button>
+    </ng-container>
+
+    <ng-container content>
+        <div class="table-items-row table-items-row-empty" *ngIf="rules && rules.length === 0">
+            No Rule created yet.
         </div>
 
-        <a class="panel-close" sqxParentLink isLazyLoaded="true">
-            <i class="icon-close"></i>
+        <table class="table table-items table-fixed" *ngIf="rules && rules.length > 0">
+            <tbody>
+                <ng-template ngFor let-rule [ngForOf]="rules">
+                    <tr>
+                        <td class="cell-separator">
+                            <h3>If</h3>
+                        </td>
+                        <td class="cell-auto">
+                            <span class="rule-element rule-element-{{rule.triggerType}}" (click)="editTrigger(rule)">
+                                <span class="rule-element-icon">
+                                    <i class="icon-trigger-{{rule.triggerType}}"></i>
+                                </span>
+                                <span class="rule-element-text">
+                                    {{ruleTriggers[rule.triggerType].name}}
+                                </span>
+                            </span>
+                        </td>
+                        <td class="cell-separator">
+                            <h3>then</h3>
+                        </td>
+                        <td class="cell-auto">
+                            <span class="rule-element rule-element-{{rule.actionType}}" (click)="editAction(rule)">
+                                <span class="rule-element-icon">
+                                    <i class="icon-action-{{rule.actionType}}"></i>
+                                </span>
+                                <span class="rule-element-text">
+                                    {{ruleActions[rule.actionType].name}}
+                                </span>
+                            </span>
+                        </td>
+                        <td class="cell-actions">
+                            <sqx-toggle [ngModel]="rule.isEnabled" (ngModelChange)="toggleRule(rule)"></sqx-toggle>
+                        </td>
+                        <td class="cell-actions">
+                            <button type="button" class="btn btn-link btn-danger"
+                                (sqxConfirmClick)="deleteRule(rule)"
+                                confirmTitle="Delete rule" 
+                                confirmText="Do you really want to delete the rule?">
+                                <i class="icon-bin2"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    <tr class="spacer"></tr>
+                </ng-template>
+            </tbody>
+        </table>
+    </ng-container>
+
+    <ng-container sidebar>
+        <a class="panel-link" routerLink="events" routerLinkActive="active" #linkHistory>
+            <i class="icon-time"></i>
         </a>
-    </div>
 
-    <div class="panel-main">
-        <div class="panel-content panel-content-scroll">
-            <div class="table-items-row table-items-row-empty" *ngIf="rules && rules.length === 0">
-                No Rule created yet.
-            </div>
+        <a class="panel-link" routerLink="help" routerLinkActive="active" #linkHelp>
+            <i class="icon-help"></i>
+        </a>
 
-            <table class="table table-items table-fixed" *ngIf="rules && rules.length > 0">
-                <tbody>
-                    <ng-template ngFor let-rule [ngForOf]="rules">
-                        <tr>
-                            <td class="cell-separator">
-                                <h3>If</h3>
-                            </td>
-                            <td class="cell-auto">
-                                <span class="rule-element rule-element-{{rule.triggerType}}" (click)="editTrigger(rule)">
-                                    <span class="rule-element-icon">
-                                        <i class="icon-trigger-{{rule.triggerType}}"></i>
-                                    </span>
-                                    <span class="rule-element-text">
-                                        {{ruleTriggers[rule.triggerType].name}}
-                                    </span>
-                                </span>
-                            </td>
-                            <td class="cell-separator">
-                                <h3>then</h3>
-                            </td>
-                            <td class="cell-auto">
-                                <span class="rule-element rule-element-{{rule.actionType}}" (click)="editAction(rule)">
-                                    <span class="rule-element-icon">
-                                        <i class="icon-action-{{rule.actionType}}"></i>
-                                    </span>
-                                    <span class="rule-element-text">
-                                        {{ruleActions[rule.actionType].name}}
-                                    </span>
-                                </span>
-                            </td>
-                            <td class="cell-actions">
-                                <sqx-toggle [ngModel]="rule.isEnabled" (ngModelChange)="toggleRule(rule)"></sqx-toggle>
-                            </td>
-                            <td class="cell-actions">
-                                <button type="button" class="btn btn-link btn-danger"
-                                    (sqxConfirmClick)="deleteRule(rule)"
-                                    confirmTitle="Delete rule" 
-                                    confirmText="Do you really want to delete the rule?">
-                                    <i class="icon-bin2"></i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr class="spacer"></tr>
-                    </ng-template>
-                </tbody>
-            </table>
-        </div>
-
-        <div class="panel-sidebar">
-            <a class="panel-link" routerLink="events" routerLinkActive="active" #linkHistory>
-                <i class="icon-time"></i>
-            </a>
-            
-            <a class="panel-link" routerLink="help" routerLinkActive="active" #linkHelp>
-                <i class="icon-help"></i>
-            </a>
-            
-            <sqx-onboarding-tooltip id="help" [for]="linkHelp" position="leftTop" after="180000">
-                Click the help icon to show a context specific help page. Go to <a href="https://docs.squidex.io" target="_blank">https://docs.squidex.io</a> for the full documentation.
-            </sqx-onboarding-tooltip>
-        </div>
-    </div>
+        <sqx-onboarding-tooltip id="help" [for]="linkHelp" position="leftTop" after="180000">
+            Click the help icon to show a context specific help page. Go to <a href="https://docs.squidex.io" target="_blank">https://docs.squidex.io</a> for the full documentation.
+        </sqx-onboarding-tooltip>
+    </ng-container>
 </sqx-panel>
 
-<div class="modal" *sqxModalView="addRuleDialog;onRoot:true;closeAuto:false" @fade>
-    <div class="modal-backdrop"></div>
-    
+<ng-container *sqxModalView="addRuleDialog;onRoot:true;closeAuto:false">
     <sqx-rule-wizard [schemas]="schemas" [rule]="wizardRule" [mode]="wizardMode"
         (updated)="onRuleUpdated($event)"
         (cancelled)="addRuleDialog.hide()"
         (created)="onRuleCreated($event)">
     </sqx-rule-wizard>
-</div>
+</ng-container>
 
 <router-outlet></router-outlet>

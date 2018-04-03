@@ -10,7 +10,6 @@ import { Component, OnInit } from '@angular/core';
 import {
     AppContext,
     DateTime,
-    fadeAnimation,
     ImmutableArray,
     ModalView,
     ruleActions,
@@ -27,9 +26,6 @@ import {
     templateUrl: './rules-page.component.html',
     providers: [
         AppContext
-    ],
-    animations: [
-        fadeAnimation
     ]
 })
 export class RulesPageComponent implements OnInit {

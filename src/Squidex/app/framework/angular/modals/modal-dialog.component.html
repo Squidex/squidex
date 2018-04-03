@@ -3,7 +3,7 @@
 
     <div class="modal-dialog {{large ? 'modal-lg' : ''}}">
         <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-header" *ngIf="showHeader">
                 <h4 class="modal-title">
                     <ng-content select=[title]></ng-content>
                 </h4>

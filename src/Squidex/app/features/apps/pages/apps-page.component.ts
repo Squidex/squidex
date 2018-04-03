@@ -12,7 +12,6 @@ import {
     AppDto,
     AppsState,
     AuthService,
-    fadeAnimation,
     ImmutableArray,
     ModalView,
     OnboardingService
@@ -21,10 +20,7 @@ import {
 @Component({
     selector: 'sqx-apps-page',
     styleUrls: ['./apps-page.component.scss'],
-    templateUrl: './apps-page.component.html',
-    animations: [
-        fadeAnimation
-    ]
+    templateUrl: './apps-page.component.html'
 })
 export class AppsPageComponent implements OnDestroy, OnInit {
     private appsSubscription: Subscription;

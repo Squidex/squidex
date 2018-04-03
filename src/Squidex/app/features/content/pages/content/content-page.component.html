@@ -2,69 +2,62 @@
 
 <form [formGroup]="contentForm" (ngSubmit)="saveAndPublish()">
     <sqx-panel desiredWidth="53rem">
-        <div class="panel-header">
-            <div class="panel-title-row">
-                <div class="float-right" *ngIf="!content || content.status !== 'Archived'">
-                    <span *ngIf="isNewMode">
-                        <button type="button" class="btn btn-secondary" (click)="saveAsDraft()" title="CTRL + S">
-                            Save as Draft
-                        </button>
+        <ng-container title>
+            <ng-container *ngIf="isNewMode">
+                New Content
+            </ng-container>
+            <ng-container *ngIf="!isNewMode && content.status !== 'Archived'">
+                Edit Content
+            </ng-container>
+            <ng-container *ngIf="!isNewMode && content.status === 'Archived'">
+                Show Content
+            </ng-container>
+        </ng-container>
 
-                        <button type="submit" class="btn btn-primary">
-                            Save and Publish
-                        </button>
-                    </span>
-                    <span *ngIf="!isNewMode">
-                        <button type="submit" class="btn btn-primary" title="CTRL + S">
-                            Save
-                        </button>
-                    </span>
-                    
-                    <sqx-shortcut keys="ctrl+s" (trigger)="saveAndPublish()"></sqx-shortcut>
+        <ng-container header>
+            <ng-container *ngIf="isNewMode; else notNew">
+                <button type="button" class="btn btn-secondary" (click)="saveAsDraft()" title="CTRL + S">
+                    Save as Draft
+                </button>
+
+                <button type="submit" class="btn btn-primary">
+                    Save and Publish
+                </button>
+            </ng-container>
+            <ng-template #notNew>
+                <button type="submit" class="btn btn-primary" title="CTRL + S">
+                    Save
+                </button>
+            </ng-template>
+
+            <sqx-shortcut keys="ctrl+s" (trigger)="saveAndPublish()"></sqx-shortcut>
+        </ng-container>
+
+        <ng-container content>
+            <div class="panel-alert panel-alert-danger" *ngIf="contentOld">
+                <div class="float-right">
+                    <a class="force" (click)="showLatest()">View latest</a>
                 </div>
-                
-                <h3 class="panel-title" *ngIf="isNewMode">
-                    New Content
-                </h3>
-                <h3 class="panel-title" *ngIf="!isNewMode && content.status !== 'Archived'">
-                    Edit Content
-                </h3>
-                <h3 class="panel-title" *ngIf="!isNewMode && content.status === 'Archived'">
-                    Show Content
-                </h3>
+                Viewing <strong>{{content.lastModifiedBy | sqxUserNameRef:null}}'s</strong> changes of {{content.lastModified | sqxShortDate}}.
             </div>
 
-            <a class="panel-close" sqxParentLink>
-                <i class="icon-close"></i>
+            <div *ngFor="let field of schema.fields">
+                <sqx-content-field [field]="field" [fieldForm]="contentForm.controls[field.name]" [languages]="languages" [contentFormSubmitted]="contentFormSubmitted"></sqx-content-field>
+            </div>
+        </ng-container>
+
+        <ng-container sidebar>
+            <a class="panel-link" routerLink="history" routerLinkActive="active" #linkHistory *ngIf="!isNewMode">
+                <i class="icon-time"></i>
             </a>
-        </div>
+            <a class="panel-link" routerLink="assets" routerLinkActive="active">
+                <i class="icon-media"></i>
+            </a>
 
-        <div class="panel-main">
-            <div class="panel-content panel-content-scroll">
-                <div class="panel-alert panel-alert-danger" *ngIf="contentOld">
-                    <div class="float-right">
-                        <a class="force" (click)="showLatest()">View latest</a>
-                    </div>
-                    Viewing <strong>{{content.lastModifiedBy | sqxUserNameRef:null}}'s</strong> changes of {{content.lastModified | sqxShortDate}}.
-                </div>
-
-                <div *ngFor="let field of schema.fields">
-                    <sqx-content-field [field]="field" [fieldForm]="contentForm.controls[field.name]" [languages]="languages" [contentFormSubmitted]="contentFormSubmitted"></sqx-content-field>
-                </div>
-            </div>
-            <div class="panel-sidebar">
-                <a class="panel-link" routerLink="history" routerLinkActive="active" #linkHistory *ngIf="!isNewMode">
-                    <i class="icon-time"></i>
-                </a>
-                <a class="panel-link" routerLink="assets" routerLinkActive="active">
-                    <i class="icon-media"></i>
-                </a>
-
-                <sqx-onboarding-tooltip id="history" [for]="linkHistory" position="leftTop" after="120000" *ngIf="!isNewMode">
-                    The sidebar navigation contains useful context specific links. Here you can view the history how this schema has changed over time.
-                </sqx-onboarding-tooltip>
-            </div>
-        </div>
+            <sqx-onboarding-tooltip id="history" [for]="linkHistory" position="leftTop" after="120000" *ngIf="!isNewMode">
+                The sidebar navigation contains useful context specific links. Here you can view the history how this schema has changed over time.
+            </sqx-onboarding-tooltip>
+        </ng-container>
     </sqx-panel>
 </form>
 
