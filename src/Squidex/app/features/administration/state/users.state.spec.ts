@@ -131,7 +131,7 @@ describe('UsersState', () => {
         usersState.lockUser(oldUsers[0]).subscribe();
 
         expect(usersState.snapshot.users.at(0).isLocked).toBeTruthy();
-        expect(usersState.snapshot.selectedUser!.isLocked).toBeTruthy();
+        expect(usersState.snapshot.selectedUser).toBe(usersState.snapshot.users.at(0));
     });
 
     it('should raise notification when locking failed', () => {
@@ -151,7 +151,7 @@ describe('UsersState', () => {
         usersState.unlockUser(oldUsers[1]).subscribe();
 
         expect(usersState.snapshot.users.at(1).isLocked).toBeFalsy();
-        expect(usersState.snapshot.selectedUser!.isLocked).toBeFalsy();
+        expect(usersState.snapshot.selectedUser).toBe(usersState.snapshot.users.at(1));
     });
 
     it('should raise notification when unlocking failed', () => {
@@ -174,8 +174,7 @@ describe('UsersState', () => {
 
         expect(usersState.snapshot.users.at(0).email).toEqual('new@mail.com');
         expect(usersState.snapshot.users.at(0).displayName).toEqual('New');
-        expect(usersState.snapshot.selectedUser!.email).toEqual('new@mail.com');
-        expect(usersState.snapshot.selectedUser!.displayName).toEqual('New');
+        expect(usersState.snapshot.selectedUser).toBe(usersState.snapshot.users.at(0));
     });
 
     it('should not raise notification when updating failed', () => {
