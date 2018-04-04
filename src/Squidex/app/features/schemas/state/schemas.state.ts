@@ -144,14 +144,6 @@ interface Snapshot {
 
 @Injectable()
 export class SchemasState extends State<Snapshot> {
-    private get appName() {
-        return this.appsState.appName;
-    }
-
-    private get user() {
-        return this.authState.user!.token;
-    }
-
     public selectedSchema =
         this.changes.map(s => s.selectedSchema)
             .distinctUntilChanged();
@@ -159,6 +151,10 @@ export class SchemasState extends State<Snapshot> {
     public schemas =
         this.changes.map(s => s.schemas)
             .distinctUntilChanged();
+
+    public get schemaName() {
+        return this.snapshot.selectedSchema!.name;
+    }
 
     constructor(
         private readonly appsState: AppsState,
@@ -338,6 +334,14 @@ export class SchemasState extends State<Snapshot> {
 
             return { ...s, schemas, selectedSchema };
         });
+    }
+
+    private get appName() {
+        return this.appsState.appName;
+    }
+
+    private get user() {
+        return this.authState.user!.token;
     }
 }
 

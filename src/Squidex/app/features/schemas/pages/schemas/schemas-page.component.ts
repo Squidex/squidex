@@ -47,9 +47,9 @@ export class SchemasPageComponent implements OnDestroy, OnInit {
 
     constructor(
         public readonly appsState: AppsState,
-        private readonly schemasState: SchemasState,
+        private readonly messageBus: MessageBus,
         private readonly route: ActivatedRoute,
-        private readonly messageBus: MessageBus
+        private readonly schemasState: SchemasState
     ) {
     }
 

@@ -140,7 +140,17 @@ export class UsersState extends State<Snapshot> {
                     const users = ImmutableArray.of(dtos.items);
                     const usersPager = s.usersPager.setCount(dtos.total);
 
-                    return { ...s, users, usersPager, usersLoading: false };
+                    let selectedUser = s.selectedUser;
+
+                    if (selectedUser) {
+                        const selectedFromResult = dtos.items.find(x => x.id === selectedUser!.id);
+
+                        if (selectedFromResult) {
+                            selectedUser = selectedFromResult;
+                        }
+                    }
+
+                    return { ...s, users, usersPager, selectedUser, usersLoading: false };
                 });
             })
             .notify(this.dialogs);

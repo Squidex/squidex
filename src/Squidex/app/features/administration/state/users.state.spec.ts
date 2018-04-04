@@ -29,7 +29,7 @@ describe('UsersState', () => {
     const newUser = new UserDto('id3', 'mail3@mail.de', 'name3', false);
 
     let authService: IMock<AuthService>;
-    let dialogService: IMock<DialogService>;
+    let dialogs: IMock<DialogService>;
     let usersService: IMock<UsersService>;
     let usersState: UsersState;
 
@@ -39,28 +39,44 @@ describe('UsersState', () => {
         authService.setup(x => x.user)
             .returns(() => <any>{ id: 'id2' });
 
-        dialogService = Mock.ofType<DialogService>();
+        dialogs = Mock.ofType<DialogService>();
 
         usersService = Mock.ofType<UsersService>();
 
         usersService.setup(x => x.getUsers(10, 0, undefined))
             .returns(() => Observable.of(new UsersDto(200, oldUsers)));
 
-        usersState = new UsersState(authService.object, dialogService.object, usersService.object);
+        usersState = new UsersState(authService.object, dialogs.object, usersService.object);
         usersState.loadUsers().subscribe();
     });
 
-    it('should load apps', () => {
+    it('should load users', () => {
         expect(usersState.snapshot.users.values).toEqual(oldUsers);
         expect(usersState.snapshot.usersPager.numberOfItems).toEqual(200);
 
         usersService.verifyAll();
     });
 
+    it('should replace selected user when reloading', () => {
+        usersState.selectUser('id1').subscribe();
+
+        const newUsers = [
+            new UserDto('id1', 'mail1@mail.de_new', 'name1_new', false),
+            new UserDto('id2', 'mail2@mail.de_new', 'name2_new', true)
+        ];
+
+        usersService.setup(x => x.getUsers(10, 0, undefined))
+            .returns(() => Observable.of(new UsersDto(200, newUsers)));
+
+        usersState.loadUsers().subscribe();
+
+        expect(usersState.snapshot.selectedUser).toBe(newUsers[0]);
+    });
+
     it('should raise notification on load when notify is true', () => {
         usersState.loadUsers(true).subscribe();
 
-        dialogService.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
+        dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
     });
 
     it('should not load user when already loaded', () => {
@@ -140,7 +156,7 @@ describe('UsersState', () => {
 
         usersState.lockUser(oldUsers[0]).onErrorResumeNext().subscribe();
 
-        dialogService.verify(x => x.notifyError(It.isAny()), Times.once());
+        dialogs.verify(x => x.notifyError(It.isAny()), Times.once());
     });
 
     it('should unmark user as locked', () => {
@@ -160,7 +176,7 @@ describe('UsersState', () => {
 
         usersState.unlockUser(oldUsers[1]).onErrorResumeNext().subscribe();
 
-        dialogService.verify(x => x.notifyError(It.isAny()), Times.once());
+        dialogs.verify(x => x.notifyError(It.isAny()), Times.once());
     });
 
     it('should update user on update', () => {
@@ -185,7 +201,7 @@ describe('UsersState', () => {
 
         usersState.updateUser(oldUsers[0], request).onErrorResumeNext().subscribe();
 
-        dialogService.verify(x => x.notifyError(It.isAny()), Times.never());
+        dialogs.verify(x => x.notifyError(It.isAny()), Times.never());
     });
 
     it('should add user to state when created', () => {
@@ -208,7 +224,7 @@ describe('UsersState', () => {
 
         usersState.createUser(request).onErrorResumeNext().subscribe();
 
-        dialogService.verify(x => x.notifyError(It.isAny()), Times.never());
+        dialogs.verify(x => x.notifyError(It.isAny()), Times.never());
     });
 
     it('should load next page and prev page when paging', () => {

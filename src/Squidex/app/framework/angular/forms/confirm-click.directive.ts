@@ -50,7 +50,7 @@ export class ConfirmClickDirective implements OnDestroy {
     public clickConfirmed = new DelayEventEmitter();
 
     constructor(
-        private readonly dialogService: DialogService
+        private readonly dialogs: DialogService
     ) {
     }
 
@@ -72,7 +72,7 @@ export class ConfirmClickDirective implements OnDestroy {
             this.isOpen = true;
 
             let subscription =
-                this.dialogService.confirm(this.confirmTitle, this.confirmText)
+                this.dialogs.confirm(this.confirmTitle, this.confirmText)
                     .subscribe(result => {
                         this.isOpen = false;
 

@@ -38,7 +38,7 @@ export class DialogRendererComponent implements OnDestroy, OnInit {
     public position = 'bottomright';
 
     constructor(
-        private readonly dialogService: DialogService
+        private readonly dialogs: DialogService
     ) {
     }
 
@@ -57,7 +57,7 @@ export class DialogRendererComponent implements OnDestroy, OnInit {
             });
 
         this.notificationsSubscription =
-            this.dialogService.notifications.subscribe(notification => {
+            this.dialogs.notifications.subscribe(notification => {
                 this.notifications.push(notification);
 
                 if (notification.displayTime > 0) {
@@ -68,7 +68,7 @@ export class DialogRendererComponent implements OnDestroy, OnInit {
             });
 
         this.dialogsSubscription =
-            this.dialogService.dialogs
+            this.dialogs.dialogs
                 .subscribe(request => {
                     this.cancel();
 
