@@ -10,6 +10,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 
 import {
+    AppPatternDto,
+    AppPatternsService,
     AppsState,
     fadeAnimation,
     FieldDto,
@@ -38,6 +40,8 @@ export class SchemaPageComponent implements OnDestroy, OnInit {
 
     public fieldTypes = fieldTypes;
 
+    public patterns: AppPatternDto[] = [];
+
     public schemaExport: any;
     public schema: SchemaDetailsDto;
 
@@ -53,6 +57,7 @@ export class SchemaPageComponent implements OnDestroy, OnInit {
     constructor(
         public readonly appsState: AppsState,
         public readonly schemasState: SchemasState,
+        private readonly patternsService: AppPatternsService,
         private readonly route: ActivatedRoute,
         private readonly router: Router,
         private readonly messageBus: MessageBus
@@ -64,6 +69,11 @@ export class SchemaPageComponent implements OnDestroy, OnInit {
     }
 
     public ngOnInit() {
+        this.patternsService.getPatterns(this.appsState.appName)
+            .subscribe(dtos => {
+                this.patterns = dtos.patterns;
+            });
+
         this.selectedSchemaSubscription =
             this.schemasState.selectedSchema
                 .subscribe(schema => {

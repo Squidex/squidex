@@ -9,6 +9,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 
 import {
+    AppPatternDto,
     createProperties,
     fadeAnimation,
     FieldDto,
@@ -30,6 +31,9 @@ import { SchemasState, EditFieldForm } from './../../state/schemas.state';
 export class FieldComponent implements OnInit {
     @Input()
     public field: FieldDto;
+
+    @Input()
+    public patters: AppPatternDto;
 
     @Input()
     public schema: SchemaDetailsDto;

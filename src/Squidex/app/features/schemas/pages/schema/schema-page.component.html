@@ -53,7 +53,7 @@
     <ng-container content>
         <div dnd-sortable-container [sortableData]="schema.fields">
             <div *ngFor="let field of schema.fields; let i = index;" dnd-sortable [sortableIndex]="i" (sqxSorted)="sortFields($event)">
-                <sqx-field [field]="field" [schema]="schema"></sqx-field>
+                <sqx-field [field]="field" [schema]="schema" [patterns]="patterns"></sqx-field>
             </div>
     
             <button class="btn btn-success field-button" (click)="addFieldDialog.show()">

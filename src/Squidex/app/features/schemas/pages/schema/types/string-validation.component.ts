@@ -30,14 +30,13 @@ export class StringValidationComponent implements OnDestroy, OnInit {
     public properties: StringFieldPropertiesDto;
 
     @Input()
-    public regexSuggestions: AppPatternDto[] = [];
+    public patterns: AppPatternDto[] = [];
 
     public showDefaultValue: Observable<boolean>;
     public showPatternMessage: boolean;
     public showPatternSuggestions: Observable<boolean>;
     public patternName: string;
-
-    public regexSuggestionsModal = new ModalView(false, false);
+    public patternsModal = new ModalView(false, false);
 
     public ngOnDestroy() {
         this.patternSubscription.unsubscribe();
@@ -92,7 +91,7 @@ export class StringValidationComponent implements OnDestroy, OnInit {
     }
 
     private setPatternName() {
-        const matchingPattern = this.regexSuggestions.find(x => x.pattern === this.editForm.controls['pattern'].value);
+        const matchingPattern = this.patterns.find(x => x.pattern === this.editForm.controls['pattern'].value);
 
         if (matchingPattern) {
             this.patternName = matchingPattern.name;
