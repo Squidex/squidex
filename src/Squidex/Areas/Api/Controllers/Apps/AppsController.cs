@@ -99,7 +99,6 @@ namespace Squidex.Areas.Api.Controllers.Apps
         public async Task<IActionResult> PostApp([FromBody] CreateAppDto request)
         {
             var command = SimpleMapper.Map(request, new CreateApp());
-
             var context = await CommandBus.PublishAsync(command);
 
             var result = context.Result<EntityCreatedResult<Guid>>();

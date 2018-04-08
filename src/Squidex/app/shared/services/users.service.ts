@@ -26,21 +26,20 @@ export class UserDto {
         public readonly id: string,
         public readonly email: string,
         public readonly displayName: string,
-        public readonly pictureUrl: string | null,
         public readonly isLocked: boolean
     ) {
     }
 
     public update(email: string, displayName: string): UserDto {
-        return new UserDto(this.id, email, displayName, this.pictureUrl, this.isLocked);
+        return new UserDto(this.id, email, displayName, this.isLocked);
     }
 
     public lock(): UserDto {
-        return new UserDto(this.id, this.email, this.displayName, this.pictureUrl, true);
+        return new UserDto(this.id, this.email, this.displayName, true);
     }
 
     public unlock(): UserDto {
-        return new UserDto(this.id, this.email, this.displayName, this.pictureUrl, false);
+        return new UserDto(this.id, this.email, this.displayName, false);
     }
 }
 
@@ -62,6 +61,14 @@ export class UpdateUserDto {
     }
 }
 
+export class PublicUserDto {
+    constructor(
+        public readonly id: string,
+        public readonly displayName: string
+    ) {
+    }
+}
+
 @Injectable()
 export class UsersService {
     constructor(
@@ -70,7 +77,7 @@ export class UsersService {
     ) {
     }
 
-    public getUsers(query?: string): Observable<UserDto[]> {
+    public getUsers(query?: string): Observable<PublicUserDto[]> {
         const url = this.apiUrl.buildUrl(`api/users?query=${query || ''}`);
 
         return HTTP.getVersioned<any>(this.http, url)
@@ -80,30 +87,24 @@ export class UsersService {
                     const items: any[] = body;
 
                     return items.map(item => {
-                        return new UserDto(
+                        return new PublicUserDto(
                             item.id,
-                            item.email,
-                            item.displayName,
-                            item.pictureUrl,
-                            item.isLocked);
+                            item.displayName);
                     });
                 })
                 .pretifyError('Failed to load users. Please reload.');
     }
 
-    public getUser(id: string): Observable<UserDto> {
+    public getUser(id: string): Observable<PublicUserDto> {
         const url = this.apiUrl.buildUrl(`api/users/${id}`);
 
         return HTTP.getVersioned<any>(this.http, url)
                 .map(response => {
                     const body = response.payload.body;
 
-                    return new UserDto(
+                    return new PublicUserDto(
                         body.id,
-                        body.email,
-                        body.displayName,
-                        body.pictureUrl,
-                        body.isLocked);
+                        body.displayName);
                 })
                 .pretifyError('Failed to load user. Please reload.');
     }
@@ -131,7 +132,6 @@ export class UserManagementService {
                             item.id,
                             item.email,
                             item.displayName,
-                            item.pictureUrl,
                             item.isLocked);
                     });
 
@@ -151,7 +151,6 @@ export class UserManagementService {
                         body.id,
                         body.email,
                         body.displayName,
-                        body.pictureUrl,
                         body.isLocked);
                 })
                 .pretifyError('Failed to load user. Please reload.');
@@ -164,7 +163,7 @@ export class UserManagementService {
                 .map(response => {
                     const body = response.payload.body;
 
-                    return new UserDto(body.id, dto.email, dto.displayName, body.pictureUrl, false);
+                    return new UserDto(body.id, dto.email, dto.displayName, false);
                 })
                 .pretifyError('Failed to create user. Please reload.');
     }

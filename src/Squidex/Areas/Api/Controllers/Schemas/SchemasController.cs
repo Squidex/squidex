@@ -120,7 +120,6 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         public async Task<IActionResult> PostSchema(string app, [FromBody] CreateSchemaDto request)
         {
             var command = request.ToCommand();
-
             var context = await CommandBus.PublishAsync(command);
 
             var result = context.Result<EntityCreatedResult<Guid>>();

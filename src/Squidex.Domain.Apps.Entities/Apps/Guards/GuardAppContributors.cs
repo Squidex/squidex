@@ -34,20 +34,27 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                 }
                 else
                 {
-                    if (await users.FindByIdAsync(command.ContributorId) == null)
+                    var user = await users.FindByIdOrEmailAsync(command.ContributorId);
+
+                    if (user == null)
                     {
                         error(new ValidationError("Cannot find contributor id.", nameof(command.ContributorId)));
                     }
-                    else if (contributors.TryGetValue(command.ContributorId, out var existing))
+                    else
                     {
-                        if (existing == command.Permission)
+                        command.ContributorId = user.Id;
+
+                        if (contributors.TryGetValue(command.ContributorId, out var existing))
                         {
-                            error(new ValidationError("Contributor has already this permission.", nameof(command.Permission)));
+                            if (existing == command.Permission)
+                            {
+                                error(new ValidationError("Contributor has already this permission.", nameof(command.Permission)));
+                            }
                         }
-                    }
-                    else if (plan.MaxContributors == contributors.Count)
-                    {
-                        error(new ValidationError("You have reached the maximum number of contributors for your plan."));
+                        else if (plan.MaxContributors == contributors.Count)
+                        {
+                            error(new ValidationError("You have reached the maximum number of contributors for your plan."));
+                        }
                     }
                 }
             });

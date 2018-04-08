@@ -52,7 +52,7 @@
                 </div>
             }
 
-            <input type="email" ap class="form-control" asp-for="Email" name="email" id="email" />
+            <input type="email" ap class="form-control" asp-for="Email" id="email" />
         </div>
 
         <div class="form-group">
@@ -65,7 +65,15 @@
                 </div>
             }
 
-            <input type="text" class="form-control" asp-for="DisplayName" name="displayName" id="displayName"/>
+            <input type="text" class="form-control" asp-for="DisplayName" id="displayName"/>
+        </div>
+
+        <div class="form-group">
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" asp-for="IsHidden" id="hidden" />
+
+                <label class="form-check-label" for="hidden">Do not show my profile to other users</label>
+            </div>
         </div>
 
         <button type="submit" class="btn btn-primary">Save</button>

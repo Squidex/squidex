@@ -11,6 +11,7 @@ using NSwag.Annotations;
 using Squidex.Areas.Api.Controllers.Schemas.Models;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
 
 namespace Squidex.Areas.Api.Controllers.Schemas
@@ -50,13 +51,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         [ApiCosts(1)]
         public async Task<IActionResult> PostField(string app, string name, [FromBody] AddFieldDto request)
         {
-            var command = new AddField
-            {
-                Name = request.Name,
-                Partitioning = request.Partitioning,
-                Properties = request.Properties.ToProperties()
-            };
-
+            var command = SimpleMapper.Map(request, new AddField { Properties = request.Properties.ToProperties() });
             var context = await CommandBus.PublishAsync(command);
 
             var result = context.Result<EntityCreatedResult<long>>();

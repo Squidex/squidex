@@ -65,19 +65,24 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// <param name="app">The name of the app.</param>
         /// <param name="request">Contributor object that needs to be added to the app.</param>
         /// <returns>
-        /// 204 => User assigned to app.
+        /// 200 => User assigned to app.
         /// 400 => User is already assigned to the app or not found.
         /// 404 => App not found.
         /// </returns>
         [HttpPost]
         [Route("apps/{app}/contributors/")]
+        [ProducesResponseType(typeof(ContributorAssignedDto), 201)]
         [ProducesResponseType(typeof(ErrorDto), 400)]
         [ApiCosts(1)]
         public async Task<IActionResult> PostContributor(string app, [FromBody] AssignAppContributorDto request)
         {
-            await CommandBus.PublishAsync(SimpleMapper.Map(request, new AssignContributor()));
+            var command = SimpleMapper.Map(request, new AssignContributor());
+            var context = await CommandBus.PublishAsync(command);
 
-            return NoContent();
+            var result = context.Result<EntityCreatedResult<string>>();
+            var response = new ContributorAssignedDto { ContributorId = result.IdOrValue };
+
+            return Ok(response);
         }
 
         /// <summary>
