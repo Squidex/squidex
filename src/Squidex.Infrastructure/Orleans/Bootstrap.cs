@@ -36,7 +36,7 @@ namespace Squidex.Infrastructure.Orleans
 
                     return;
                 }
-                catch (OrleansMessageRejectionException)
+                catch (OrleansException)
                 {
                     if (i == NumTries)
                     {
