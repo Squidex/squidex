@@ -53,8 +53,7 @@ namespace Squidex.Config.Domain
             });
 
             services.AddSingletonAs<OrleansEventNotifier>()
-                .As<IEventNotifier>()
-                .As<IInitializable>();
+                .As<IEventNotifier>();
 
             services.AddSingletonAs<DefaultStreamNameResolver>()
                 .As<IStreamNameResolver>();

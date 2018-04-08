@@ -29,7 +29,6 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         [Fact]
         public void Should_wakeup_manager_with_stream_name()
         {
-            sut.Initialize();
             sut.NotifyEventsStored("my-stream");
 
             A.CallTo(() => manager.ActivateAsync("my-stream"))

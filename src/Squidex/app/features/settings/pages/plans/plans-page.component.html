@@ -32,29 +32,45 @@
 
                 <div class="clearfix">
                     <div class="card plan float-left" *ngFor="let plan of plans.plans">
-                        <div class="card-body plan-header text-center">
+                        <div class="card-header text-center">
                             <h4 class="card-title">{{plan.name}}</h4>
                             <h5 class="plan-price">{{plan.costs}}</h5>
-
+    
                             <small class="text-muted">Per Month</small>
                         </div>
                         <div class="card-body">
-                            <div class="plan-fact">
-                                {{plan.maxApiCalls | sqxKNumber}} API Calls
+                            <div class="plan-fact text-center">
+                                <div>
+                                    <strong>{{plan.maxApiCalls | sqxKNumber}}</strong> API Calls
+                                </div>
+                                <div>
+                                    {{plan.maxAssetSize | sqxFileSize}} Storage
+                                </div>
+                                <div>
+                                    {{plan.maxContributors}} Contributors
+                                </div>
                             </div>
-                            <div class="plan-fact">
-                                {{plan.maxAssetSize | sqxFileSize}} Storage
-                            </div>
-                            <div class="plan-fact">
-                                {{plan.maxContributors}} Contributors
-                            </div>
-                        </div>
-                        <div class="card-body">
+                        
                             <button *ngIf="plan.id === plans.currentPlanId" class="btn btn-block btn-link btn-success plan-selected">
                                 &#10003; Selected
                             </button>
                             
                             <button *ngIf="plan.id !== plans.currentPlanId" class="btn btn-block btn-success" [disabled]="isDisabled || !planOwned" (click)="changePlan(plan.id)">
+                                Change
+                            </button>
+                        </div>
+                        <div class="card-footer" *ngIf="plan.yearlyId">
+                            <div class="text-center">
+                                <h5 class="plan-price">{{plan.yearlyCosts}}</h5>
+
+                                <small class="text-muted">Per Year</small>
+                            </div>
+
+                            <button *ngIf="plan.yearlyId === plans.currentPlanId" class="btn btn-block btn-link btn-success plan-selected">
+                                &#10003; Selected
+                            </button>
+                            
+                            <button *ngIf="plan.yearlyId !== plans.currentPlanId" class="btn btn-block btn-success" [disabled]="isDisabled || !planOwned" (click)="changePlan(plan.yearlyId)">
                                 Change
                             </button>
                         </div>

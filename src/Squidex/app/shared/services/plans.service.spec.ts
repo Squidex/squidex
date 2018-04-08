@@ -62,6 +62,8 @@ describe('PlansService', () => {
                     id: 'free',
                     name: 'Free',
                     costs: '14 €',
+                    yearlyId: 'free_yearly',
+                    yearlyCosts: '12 €',
                     maxApiCalls: 1000,
                     maxAssetSize: 1500,
                     maxContributors: 2500
@@ -70,6 +72,8 @@ describe('PlansService', () => {
                     id: 'prof',
                     name: 'Prof',
                     costs: '18 €',
+                    yearlyId: 'prof_yearly',
+                    yearlyCosts: '16 €',
                     maxApiCalls: 4000,
                     maxAssetSize: 5500,
                     maxContributors: 6500
@@ -87,8 +91,8 @@ describe('PlansService', () => {
                 '456',
                 true,
                 [
-                    new PlanDto('free', 'Free', '14 €', 1000, 1500, 2500),
-                    new PlanDto('prof', 'Prof', '18 €', 4000, 5500, 6500)
+                    new PlanDto('free', 'Free', '14 €', 'free_yearly', '12 €', 1000, 1500, 2500),
+                    new PlanDto('prof', 'Prof', '18 €', 'prof_yearly', '16 €', 4000, 5500, 6500)
                 ],
                 new Version('2')
             ));
