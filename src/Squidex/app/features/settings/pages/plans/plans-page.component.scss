@@ -8,12 +8,10 @@
         margin: .5rem;
     }
 
-    &-header {
-        border-bottom: 1px solid $color-border;
-    }
-
     &-price {
         color: $color-theme-blue;
+        margin-top: 0;
+        margin-bottom: 0;
     }
 
     &-selected {
@@ -21,8 +19,18 @@
     }
 
     &-fact {
-        line-height: 2rem;
+        line-height: 1.8rem;
     }
+
+    .btn {
+        margin-top: 1rem;
+    }
+}
+
+.card-footer,
+.card-header,
+.card-body {
+    padding: 1rem;
 }
 
 .empty {

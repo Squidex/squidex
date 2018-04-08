@@ -15,6 +15,10 @@ namespace Squidex.Domain.Apps.Entities.Apps.Services.Implementations
 
         public string Costs { get; set; }
 
+        public string YearlyCosts { get; set; }
+
+        public string YearlyId { get; set; }
+
         public long MaxApiCalls { get; set; }
 
         public long MaxAssetSize { get; set; }

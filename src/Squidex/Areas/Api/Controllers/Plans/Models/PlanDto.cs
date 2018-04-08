@@ -5,6 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.ComponentModel.DataAnnotations;
+
 namespace Squidex.Areas.Api.Controllers.Plans.Models
 {
     public sealed class PlanDto
@@ -12,17 +14,30 @@ namespace Squidex.Areas.Api.Controllers.Plans.Models
         /// <summary>
         /// The id of the plan.
         /// </summary>
+        [Required]
         public string Id { get; set; }
 
         /// <summary>
         /// The name of the plan.
         /// </summary>
+        [Required]
         public string Name { get; set; }
 
         /// <summary>
         /// The monthly costs of the plan.
         /// </summary>
+        [Required]
         public string Costs { get; set; }
+
+        /// <summary>
+        /// The yearly costs of the plan.
+        /// </summary>
+        public string YearlyCosts { get; set; }
+
+        /// <summary>
+        /// The yearly id of the plan.
+        /// </summary>
+        public string YearlyId { get; set; }
 
         /// <summary>
         /// The maximum number of API calls.
