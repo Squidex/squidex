@@ -11,10 +11,10 @@ namespace Squidex.Areas.Api.Controllers.Users.Models
 {
     public sealed class UserCreatedDto
     {
+        /// <summary>
+        /// The id of the user.
+        /// </summary>
         [Required]
         public string Id { get; set; }
-
-        [Required]
-        public string PictureUrl { get; set; }
     }
 }

@@ -11,7 +11,7 @@ import { Observable, Subscription } from 'rxjs';
 import {
     ApiUrlConfig,
     MathHelper,
-    UserDto,
+    PublicUserDto,
     UsersProviderService
 } from '@app/shared/internal';
 
@@ -92,42 +92,6 @@ export class UserNameRefPipe extends UserAsyncPipe implements PipeTransform {
 }
 
 @Pipe({
-    name: 'sqxUserEmail',
-    pure: false
-})
-export class UserEmailPipe extends UserAsyncPipe implements PipeTransform {
-    constructor(users: UsersProviderService, changeDetector: ChangeDetectorRef) {
-        super(users, changeDetector);
-    }
-
-    public transform(userId: string): string | null {
-        return super.transformInternal(userId, users => users.getUser(userId).map(u => u.email));
-    }
-}
-
-@Pipe({
-    name: 'sqxUserEmailRef',
-    pure: false
-})
-export class UserEmailRefPipe extends UserAsyncPipe implements PipeTransform {
-    constructor(users: UsersProviderService, changeDetector: ChangeDetectorRef) {
-        super(users, changeDetector);
-    }
-
-    public transform(userId: string): string | null {
-        return super.transformInternal(userId, users => {
-            const parts = userId.split(':');
-
-            if (parts[0] === 'subject') {
-                return users.getUser(parts[1]).map(u => u.email);
-            } else {
-                return Observable.of(null);
-            }
-        });
-    }
-}
-
-@Pipe({
     name: 'sqxUserDtoPicture',
     pure: false
 })
@@ -137,7 +101,7 @@ export class UserDtoPicture implements PipeTransform {
     ) {
     }
 
-    public transform(user: UserDto): string | null {
+    public transform(user: PublicUserDto): string | null {
         return this.apiUrl.buildUrl(`api/users/${user.id}/picture`);
     }
 }

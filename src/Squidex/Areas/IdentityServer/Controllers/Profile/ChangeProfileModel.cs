@@ -17,5 +17,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
 
         [Required(ErrorMessage = "DisplayName is required.")]
         public string DisplayName { get; set; }
+
+        public bool IsHidden { get; set; }
     }
 }

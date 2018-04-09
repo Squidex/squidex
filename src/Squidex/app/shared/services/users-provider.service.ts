@@ -8,13 +8,13 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { UserDto, UsersService } from './users.service';
+import { PublicUserDto, UsersService } from './users.service';
 
 import { AuthService } from './auth.service';
 
 @Injectable()
 export class UsersProviderService {
-    private readonly caches: { [id: string]: Observable<UserDto> } = {};
+    private readonly caches: { [id: string]: Observable<PublicUserDto> } = {};
 
     constructor(
         private readonly usersService: UsersService,
@@ -22,14 +22,14 @@ export class UsersProviderService {
     ) {
     }
 
-    public getUser(id: string, me: string | null = 'Me'): Observable<UserDto> {
+    public getUser(id: string, me: string | null = 'Me'): Observable<PublicUserDto> {
         let result = this.caches[id];
 
         if (!result) {
             const request =
                 this.usersService.getUser(id)
                     .catch(error => {
-                        return Observable.of(new UserDto('NOT FOUND', 'NOT FOUND', 'NOT FOUND', null, false));
+                        return Observable.of(new PublicUserDto('Unknown', 'Unknown'));
                     })
                     .publishLast();
 
@@ -41,7 +41,7 @@ export class UsersProviderService {
         return result
             .map(dto => {
                 if (me && this.authService.user && dto.id === this.authService.user.id) {
-                    dto = new UserDto(dto.id, dto.email, me, dto.pictureUrl, dto.isLocked);
+                    dto = new PublicUserDto(dto.id, me);
                 }
                 return dto;
             }).share();

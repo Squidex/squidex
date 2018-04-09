@@ -14,6 +14,7 @@ namespace Squidex.Infrastructure.Orleans
 {
     public sealed class Bootstrap<T> : IStartupTask where T : IBackgroundGrain
     {
+        private const int NumTries = 10;
         private readonly IGrainFactory grainFactory;
 
         public Bootstrap(IGrainFactory grainFactory)
@@ -23,11 +24,26 @@ namespace Squidex.Infrastructure.Orleans
             this.grainFactory = grainFactory;
         }
 
-        public Task Execute(CancellationToken cancellationToken)
+        public async Task Execute(CancellationToken cancellationToken)
         {
-            var grain = grainFactory.GetGrain<T>("Default");
+            for (var i = 1; i <= NumTries; i++)
+            {
+                try
+                {
+                    var grain = grainFactory.GetGrain<T>("Default");
 
-            return grain.ActivateAsync();
+                    await grain.ActivateAsync();
+
+                    return;
+                }
+                catch (OrleansException)
+                {
+                    if (i == NumTries)
+                    {
+                        throw;
+                    }
+                }
+            }
         }
     }
 }

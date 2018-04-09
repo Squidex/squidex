@@ -12,6 +12,7 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.Tasks;
@@ -72,9 +73,16 @@ namespace Squidex.Domain.Users.MongoDb
             return new MongoUser { Email = email, UserName = email };
         }
 
-        public async Task<IUser> FindByIdAsync(string id)
+        public async Task<IUser> FindByIdOrEmailAsync(string id)
         {
-            return await Collection.Find(x => x.Id == id).FirstOrDefaultAsync();
+            if (ObjectId.TryParse(id, out var parsed))
+            {
+                return await Collection.Find(x => x.Id == id).FirstOrDefaultAsync();
+            }
+            else
+            {
+                return await Collection.Find(x => x.NormalizedEmail == id.ToUpperInvariant()).FirstOrDefaultAsync();
+            }
         }
 
         public async Task<IUser> FindByIdAsync(string userId, CancellationToken cancellationToken)

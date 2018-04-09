@@ -55,11 +55,12 @@ namespace Squidex.Areas.Api.Controllers.Plans
         public IActionResult GetPlans(string app)
         {
             var planId = appPlansProvider.GetPlanForApp(App).Id;
+            var plans = appPlansProvider.GetAvailablePlans().Select(x => SimpleMapper.Map(x, new PlanDto())).ToList();
 
             var response = new AppPlansDto
             {
                 CurrentPlanId = planId,
-                Plans = appPlansProvider.GetAvailablePlans().Select(x => SimpleMapper.Map(x, new PlanDto())).ToList(),
+                Plans = plans,
                 PlanOwner = App.Plan?.Owner.Identifier,
                 HasPortal = appPlansBillingManager.HasPortal
             };

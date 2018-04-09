@@ -14,7 +14,8 @@ import {
     AppContributorDto,
     AppContributorsDto,
     AppContributorsService,
-    Version
+    Version,
+    ContributorAssignedDto
 } from './../';
 
 describe('AppContributorsDto', () => {
@@ -122,14 +123,20 @@ describe('AppContributorsService', () => {
 
         const dto = new AppContributorDto('123', 'Owner');
 
-        appContributorsService.postContributor('my-app', dto, version).subscribe();
+        let contributorAssignedDto: ContributorAssignedDto | null = null;
+
+        appContributorsService.postContributor('my-app', dto, version).subscribe(result => {
+            contributorAssignedDto = result.payload;
+        });
 
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/contributors');
 
         expect(req.request.method).toEqual('POST');
         expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
-        req.flush({});
+        req.flush({ contributorId: '123' });
+
+        expect(contributorAssignedDto!.contributorId).toEqual('123');
     }));
 
     it('should make delete request to remove contributor',

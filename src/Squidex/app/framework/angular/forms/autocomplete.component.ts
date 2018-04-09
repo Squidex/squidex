@@ -61,15 +61,18 @@ export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, O
     public ngOnInit() {
         this.subscription =
             this.queryInput.valueChanges
+                .do(query => {
+                    this.callChange(query);
+                })
                 .map(query => <string>query)
                 .map(query => query ? query.trim() : query)
-                .distinctUntilChanged()
-                .debounceTime(200)
                 .do(query => {
                     if (!query) {
                         this.reset();
                     }
                 })
+                .distinctUntilChanged()
+                .debounceTime(200)
                 .filter(query => !!query && !!this.source)
                 .switchMap(query => this.source.find(query)).catch(error => Observable.of([]))
                 .subscribe(items => {

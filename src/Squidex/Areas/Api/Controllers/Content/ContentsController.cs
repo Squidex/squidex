@@ -268,7 +268,6 @@ namespace Squidex.Areas.Api.Controllers.Contents
             await contentQuery.FindSchemaAsync(App, name);
 
             var command = new UpdateContent { ContentId = id, Data = request.ToCleaned() };
-
             var context = await CommandBus.PublishAsync(command);
 
             var result = context.Result<ContentDataChangedResult>();
@@ -301,7 +300,6 @@ namespace Squidex.Areas.Api.Controllers.Contents
             await contentQuery.FindSchemaAsync(App, name);
 
             var command = new PatchContent { ContentId = id, Data = request.ToCleaned() };
-
             var context = await CommandBus.PublishAsync(command);
 
             var result = context.Result<ContentDataChangedResult>();

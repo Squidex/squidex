@@ -9,25 +9,18 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Squidex.Areas.Api.Controllers.Users.Models
 {
-    public sealed class CreateUserDto
+    public sealed class PublicUserDto
     {
         /// <summary>
-        /// The email of the user. Unique value.
+        /// The id of the user.
         /// </summary>
         [Required]
-        [EmailAddress]
-        public string Email { get; set; }
+        public string Id { get; set; }
 
         /// <summary>
         /// The display name (usually first name and last name) of the user.
         /// </summary>
         [Required]
         public string DisplayName { get; set; }
-
-        /// <summary>
-        /// The password of the user.
-        /// </summary>
-        [Required]
-        public string Password { get; set; }
     }
 }

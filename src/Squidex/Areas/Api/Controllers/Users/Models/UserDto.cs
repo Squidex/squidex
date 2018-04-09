@@ -24,12 +24,6 @@ namespace Squidex.Areas.Api.Controllers.Users.Models
         public string Email { get; set; }
 
         /// <summary>
-        /// The url to the profile picture of the user.
-        /// </summary>
-        [Required]
-        public string PictureUrl { get; set; }
-
-        /// <summary>
         /// The display name (usually first name and last name) of the user.
         /// </summary>
         [Required]
