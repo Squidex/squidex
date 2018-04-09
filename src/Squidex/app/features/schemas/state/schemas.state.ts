@@ -165,8 +165,8 @@ export class SchemasState extends State<Snapshot> {
         super({ schemas: ImmutableArray.of() });
     }
 
-    public selectSchema(id: string | null): Observable<SchemaDetailsDto | null> {
-        return this.loadSchema(id)
+    public selectSchema(idOrName: string | null): Observable<SchemaDetailsDto | null> {
+        return this.loadSchema(idOrName)
             .do(schema => {
                 this.next(s => {
                     const schemas = schema ? s.schemas.replaceBy('id', schema) : s.schemas;
@@ -176,20 +176,20 @@ export class SchemasState extends State<Snapshot> {
             });
     }
 
-    private loadSchema(id: string | null) {
-        return !id ?
+    private loadSchema(idOrName: string | null) {
+        return !idOrName ?
             Observable.of(null) :
-            Observable.of(<SchemaDetailsDto>this.snapshot.schemas.find(x => x.id === id && x instanceof SchemaDetailsDto))
+            Observable.of(<SchemaDetailsDto>this.snapshot.schemas.find(x => (x.name === idOrName || x.id === idOrName) && x instanceof SchemaDetailsDto))
                 .switchMap(schema => {
                     if (!schema) {
-                        return this.schemasService.getSchema(this.appName, id).catch(() => Observable.of(null));
+                        return this.schemasService.getSchema(this.appName, idOrName).catch(() => Observable.of(null));
                     } else {
                         return Observable.of(schema);
                     }
                 });
     }
 
-    public load(): Observable<any> {
+    public loadSchemas(): Observable<any> {
         return this.schemasService.getSchemas(this.appName)
             .do(dtos => {
                 return this.next(s => {
