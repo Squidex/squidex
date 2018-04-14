@@ -12,7 +12,8 @@ import {
     ApiUrlConfig,
     AppsState,
     CreateSchemaForm,
-    SchemasState
+    SchemasState,
+    SchemaDto
 } from '@app/shared';
 
 @Component({
@@ -22,7 +23,10 @@ import {
 })
 export class SchemaFormComponent implements OnInit {
     @Output()
-    public completed = new EventEmitter();
+    public created = new EventEmitter<SchemaDto>();
+
+    @Output()
+    public cancelled = new EventEmitter();
 
     @Input()
     public import: any;
@@ -51,8 +55,12 @@ export class SchemaFormComponent implements OnInit {
         return false;
     }
 
-    public complete() {
-        this.completed.emit();
+    public complete(schema: SchemaDto) {
+        this.created.emit(schema);
+    }
+
+    public cancel() {
+        this.cancelled.emit();
     }
 
     public createSchema() {
@@ -64,7 +72,7 @@ export class SchemaFormComponent implements OnInit {
 
             this.schemasState.create(schemaDto)
                 .subscribe(dto => {
-                    this.complete();
+                    this.complete(dto);
                 }, error => {
                     this.createForm.submitFailed(error);
                 });

@@ -21,7 +21,7 @@
     </sqx-asset>
 
     <ng-container *ngIf="state.assets | async; let assets">
-        <sqx-asset class="{{assetClass}}" *ngFor="let asset of assets" [asset]="asset" 
+        <sqx-asset class="{{assetClass}}" *ngFor="let asset of assets; trackBy: trackByAsset" [asset]="asset" 
             [isDisabled]="isDisabled"
             [isSelectable]="selectedIds"
             [isSelected]="isSelected(asset)"

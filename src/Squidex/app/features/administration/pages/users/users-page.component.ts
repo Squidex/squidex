@@ -55,5 +55,9 @@ export class UsersPageComponent implements OnInit {
     public goNext() {
         this.usersState.goNext().subscribe();
     }
+
+    public trackByUser(index: number, user: UserDto) {
+        return user.id;
+    }
 }
 

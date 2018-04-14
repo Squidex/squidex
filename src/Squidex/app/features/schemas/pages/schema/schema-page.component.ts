@@ -136,6 +136,10 @@ export class SchemaPageComponent implements OnDestroy, OnInit {
         this.schemaExport = result;
     }
 
+    public trackByField(index: number, field: FieldDto) {
+        return field.fieldId;
+    }
+
     private back() {
         this.router.navigate(['../'], { relativeTo: this.route });
     }

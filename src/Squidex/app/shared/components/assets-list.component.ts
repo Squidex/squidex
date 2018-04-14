@@ -68,6 +68,10 @@ export class AssetsListComponent {
         this.state.goPrev().subscribe();
     }
 
+    public trackByAsset(index: number, asset: AssetDto) {
+        return asset.id;
+    }
+
     public isSelected(asset: AssetDto) {
         return this.selectedIds && this.selectedIds[asset.id];
     }

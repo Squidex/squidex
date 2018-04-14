@@ -1,6 +1,6 @@
 <sqx-title message="{app} | {schema} | Contents" parameter1="app" parameter2="schema" [value1]="ctx.appName" [value2]="schema?.displayName"></sqx-title>
 
-<sqx-panel [desiredWidth]="isReadOnly ? '40rem' : '60rem'">
+<sqx-panel [desiredWidth]="isReadOnly ? '40rem' : '60rem'" contentClass="grid">
     <ng-container title>
         <ng-container *ngIf="!isReadOnly && !isArchive">
             Contents
@@ -58,93 +58,93 @@
     </ng-container>
 
     <ng-container content>
-        <div class="grid">
-            <div class="grid-header">
-                <table class="table table-items table-fixed" *ngIf="contentItems">
-                    <thead>
-                        <tr>
-                            <th class="cell-select" *ngIf="!isReadOnly">
-                                <input type="checkbox" class="form-control" [ngModel]="isAllSelected" (ngModelChange)="selectAll($event)" />
-                            </th>
-                            <th class="cell-auto" *ngFor="let field of contentFields">
-                                <span class="field">{{field.displayName}}</span>
-                            </th>
-                            <th class="cell-time">
-                                Updated
-                            </th>
-                            <th class="cell-user">
-                                By
-                            </th>
-                            <th class="cell-actions" *ngIf="!isReadOnly">
-                                Actions
-                            </th>
-                        </tr>
-                    </thead>
+        <div class="grid-header">
+            <table class="table table-items table-fixed" *ngIf="contentItems">
+                <thead>
+                    <tr>
+                        <th class="cell-select" *ngIf="!isReadOnly">
+                            <input type="checkbox" class="form-control" [ngModel]="isAllSelected" (ngModelChange)="selectAll($event)" />
+                        </th>
+                        <th class="cell-auto" *ngFor="let field of contentFields">
+                            <span class="field">{{field.displayName}}</span>
+                        </th>
+                        <th class="cell-time">
+                            Updated
+                        </th>
+                        <th class="cell-user">
+                            By
+                        </th>
+                        <th class="cell-actions" *ngIf="!isReadOnly">
+                            Actions
+                        </th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+
+        <div class="selection" *ngIf="selectionCount > 0">
+            {{selectionCount}} items selected:&nbsp;&nbsp;
+
+            <button class="btn btn-secondary" (click)="publishSelected()" *ngIf="canPublish">
+                Publish
+            </button>
+            
+            <button class="btn btn-secondary" (click)="unpublishSelected()" *ngIf="canUnpublish">
+                Unpublish
+            </button>
+            
+            <button class="btn btn-secondary" (click)="archiveSelected()" *ngIf="!isArchive">
+                Archive
+            </button>
+            
+            <button class="btn btn-secondary" (click)="restoreSelected()" *ngIf="isArchive">
+                Restore
+            </button>
+            
+            <button class="btn btn-danger"
+                (sqxConfirmClick)="deleteSelected()"
+                confirmTitle="Delete content" 
+                confirmText="Do you really want to delete the selected content items?">
+                Delete
+            </button>
+        </div>
+
+        <div class="grid-content">
+            <div sqxIgnoreScrollbar>
+                <table class="table table-items table-fixed" *ngIf="contentItems" >
+                    <tbody *ngIf="!isReadOnly">
+                        <ng-template ngFor let-content [ngForOf]="contentItems" [ngForTrackBy]="trackByContent">
+                            <tr [sqxContent]="content" [routerLink]="[content.id]" routerLinkActive="active"
+                                [language]="languageSelected"
+                                [schemaFields]="contentFields"
+                                [schema]="schema"
+                                [selected]="isItemSelected(content)"
+                                (selectedChange)="selectItem(content, $event)"
+                                (unpublishing)="unpublishContent(content)"
+                                (publishing)="publishContent(content)"
+                                (archiving)="archiveContent(content)"
+                                (restoring)="restoreContent(content)"
+                                (deleting)="deleteContent(content)"
+                                (saved)="onContentSaved(content, $event)"></tr>
+                            <tr class="spacer"></tr>
+                        </ng-template>
+                    </tbody>
+
+                    <tbody *ngIf="isReadOnly">
+                        <ng-template ngFor let-content [ngForOf]="contentItems">
+                            <tr [sqxContent]="content" dnd-draggable [dragData]="dropData(content)"
+                                [language]="languageSelected"
+                                [schemaFields]="contentFields"
+                                [schema]="schema" 
+                                isReadOnly="true"></tr>
+                            <tr class="spacer"></tr>
+                        </ng-template>
+                    </tbody>
                 </table>
             </div>
+        </div>
 
-            <div class="selection" *ngIf="selectionCount > 0">
-                {{selectionCount}} items selected:&nbsp;&nbsp;
-
-                <button class="btn btn-secondary" (click)="publishSelected()" *ngIf="canPublish">
-                    Publish
-                </button>
-                
-                <button class="btn btn-secondary" (click)="unpublishSelected()" *ngIf="canUnpublish">
-                    Unpublish
-                </button>
-                
-                <button class="btn btn-secondary" (click)="archiveSelected()" *ngIf="!isArchive">
-                    Archive
-                </button>
-                
-                <button class="btn btn-secondary" (click)="restoreSelected()" *ngIf="isArchive">
-                    Restore
-                </button>
-                
-                <button class="btn btn-danger"
-                    (sqxConfirmClick)="deleteSelected()"
-                    confirmTitle="Delete content" 
-                    confirmText="Do you really want to delete the selected content items?">
-                    Delete
-                </button>
-            </div>
-
-            <div class="grid-content">
-                <div sqxIgnoreScrollbar>
-                    <table class="table table-items table-fixed" *ngIf="contentItems" >
-                        <tbody *ngIf="!isReadOnly">
-                            <ng-template ngFor let-content [ngForOf]="contentItems" [ngForTrackBy]="trackBy">
-                                <tr [sqxContent]="content" [routerLink]="[content.id]" routerLinkActive="active"
-                                    [language]="languageSelected"
-                                    [schemaFields]="contentFields"
-                                    [schema]="schema"
-                                    [selected]="isItemSelected(content)"
-                                    (selectedChange)="selectItem(content, $event)"
-                                    (unpublishing)="unpublishContent(content)"
-                                    (publishing)="publishContent(content)"
-                                    (archiving)="archiveContent(content)"
-                                    (restoring)="restoreContent(content)"
-                                    (deleting)="deleteContent(content)"
-                                    (saved)="onContentSaved(content, $event)"></tr>
-                                <tr class="spacer"></tr>
-                            </ng-template>
-                        </tbody>
-
-                        <tbody *ngIf="isReadOnly">
-                            <ng-template ngFor let-content [ngForOf]="contentItems">
-                                <tr [sqxContent]="content" dnd-draggable [dragData]="dropData(content)"
-                                    [language]="languageSelected"
-                                    [schemaFields]="contentFields"
-                                    [schema]="schema" 
-                                    isReadOnly="true"></tr>
-                                <tr class="spacer"></tr>
-                            </ng-template>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
+        <div class="grid-footer">
             <sqx-pager [pager]="contentsPager"></sqx-pager>
         </div>
     </ng-container>

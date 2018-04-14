@@ -49,7 +49,7 @@
             <div sqxIgnoreScrollbar>
                 <table class="table table-items table-fixed">
                     <tbody>
-                        <ng-template ngFor let-user [ngForOf]="usersState.users | async">
+                        <ng-template ngFor let-user [ngForOf]="usersState.users | async" [ngForTrackBy]="trackByUser">
                             <tr [routerLink]="user.id" routerLinkActive="active">
                                 <td class="cell-user">
                                     <img class="user-picture" [attr.title]="user.name" [attr.src]="user | sqxUserDtoPicture" />
@@ -81,7 +81,9 @@
             </div>
         </div>
 
-        <sqx-pager [pager]="usersState.usersPager | async" (prev)="goPrev()" (next)="goNext()"></sqx-pager>
+        <div class="grid-footer">
+            <sqx-pager [pager]="usersState.usersPager | async" (prev)="goPrev()" (next)="goNext()"></sqx-pager>
+        </div>
     </ng-container>
 </sqx-panel>
 

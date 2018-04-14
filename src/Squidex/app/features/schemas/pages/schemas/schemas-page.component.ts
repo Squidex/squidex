@@ -7,7 +7,7 @@
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 
 import {
@@ -48,6 +48,7 @@ export class SchemasPageComponent implements OnDestroy, OnInit {
         public readonly appsState: AppsState,
         private readonly messageBus: MessageBus,
         private readonly route: ActivatedRoute,
+        private readonly router: Router,
         private readonly schemasState: SchemasState
     ) {
     }
@@ -75,7 +76,13 @@ export class SchemasPageComponent implements OnDestroy, OnInit {
         this.schemasState.loadSchemas().subscribe();
     }
 
-    public createSchema(importing: any) {
+    public onSchemaCreated(schema: SchemaDto) {
+        this.router.navigate([schema.name], { relativeTo: this.route });
+
+        this.addSchemaDialog.hide();
+    }
+
+    public createSchema(importing: any = null) {
         this.import = importing;
 
         this.addSchemaDialog.show();

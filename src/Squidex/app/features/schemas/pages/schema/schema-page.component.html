@@ -51,8 +51,16 @@
     </ng-container>
 
     <ng-container content>
+        <div class="table-items-row table-items-row-empty" *ngIf="schema && schema.fields.length === 0">
+            No field created yet.
+            
+            <button class="btn btn-success ml-2" (click)="addFieldDialog.show()">
+                <i class="icon icon-plus"></i> Add Field
+            </button>
+        </div>
+
         <div dnd-sortable-container [sortableData]="schema.fields">
-            <div *ngFor="let field of schema.fields; let i = index;" dnd-sortable [sortableIndex]="i" (sqxSorted)="sortFields($event)">
+            <div *ngFor="let field of schema.fields; let i = index; trackBy: trackByField" dnd-sortable [sortableIndex]="i" (sqxSorted)="sortFields($event)">
                 <sqx-field [field]="field" [schema]="schema" [patterns]="patterns"></sqx-field>
             </div>
     

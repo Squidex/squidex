@@ -361,7 +361,7 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
         this.ctx.bus.emit(new ContentRemoved(content));
     }
 
-    public trackBy(content: ContentDto): string {
+    public trackByContent(content: ContentDto): string {
         return content.id;
     }
 
