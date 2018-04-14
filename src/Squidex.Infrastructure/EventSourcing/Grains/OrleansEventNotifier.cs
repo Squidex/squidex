@@ -12,7 +12,6 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 {
     public sealed class OrleansEventNotifier : IEventNotifier
     {
-        private readonly IGrainFactory factory;
         private readonly Lazy<IEventConsumerManagerGrain> eventConsumerManagerGrain;
 
         public OrleansEventNotifier(IGrainFactory factory)

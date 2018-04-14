@@ -1,11 +1,11 @@
 <sqx-title message="{app} | Rules" parameter1="app" [value1]="ctx.appName"></sqx-title>
 
-<sqx-panel desiredWidth="54rem">
+<sqx-panel desiredWidth="54rem" showSidebar="true">
     <ng-container title>
         Rules
     </ng-container>
 
-    <ng-container header>
+    <ng-container menu>
         <button class="btn btn-link btn-secondary" (click)="load(true)" title="Refresh Assets (CTRL + SHIFT + R)">
             <i class="icon-reset"></i> Refresh
         </button>
