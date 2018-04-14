@@ -1,7 +1,7 @@
 <div class="assets-container" [class.disabled]="isDisabled">
     <div class="row">
         <div class="col-4 drop-area-container">
-            <div class="drop-area" dnd-droppable (onDropSuccess)="onAssetDropped($event.dragData)" [allowDrop]="canDrop()" (sqxFileDrop)="addFiles($event)" (click)="selectorModal.show()">
+            <div class="drop-area" (sqxFileDrop)="addFiles($event)" (click)="selectorModal.show()">
                 Drop files here to add them.
             </div>
         </div>

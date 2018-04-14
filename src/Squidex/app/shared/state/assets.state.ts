@@ -112,7 +112,7 @@ export class AssetsState extends State<Snapshot> {
     }
 
     public search(query: string): Observable<any> {
-        this.next(s => ({ ...s, assetsPager: new Pager(0), assetsQuery: query }));
+        this.next(s => ({ ...s, assetsPager: new Pager(0, 0, 30), assetsQuery: query }));
 
         return this.loadAssets();
     }

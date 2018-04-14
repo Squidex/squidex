@@ -79,14 +79,6 @@ export class AssetsEditorComponent implements ControlValueAccessor {
         }
     }
 
-    public canDrop() {
-        const component = this;
-
-        return (dragData: any) => {
-            return !component.isDisabled && dragData instanceof AssetDto && !component.oldAssets.find(a => a.id === dragData.id);
-        };
-    }
-
     public onAssetsSelected(assets: AssetDto[]) {
         for (let asset of assets) {
             this.oldAssets = this.oldAssets.push(asset);

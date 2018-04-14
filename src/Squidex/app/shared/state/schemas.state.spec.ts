@@ -163,7 +163,7 @@ describe('SchemasState', () => {
         expectToBeModified(schema_1);
     });
 
-    describe('without selection', () => {
+    describe('with selection', () => {
         beforeEach(() => {
             schemasState.selectSchema(schema.name).subscribe();
         });
