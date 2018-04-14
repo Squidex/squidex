@@ -13,7 +13,7 @@ import {
     CanDeactivateGuard,
     ResolveAppLanguagesGuard,
     ResolveContentGuard,
-    ResolvePublishedSchemaGuard,
+    SchemaMustExistPublishedGuard,
     SqxFrameworkModule,
     SqxSharedModule
 } from '@app/shared';
@@ -41,11 +41,16 @@ const routes: Routes = [
             },
             {
                 path: ':schemaName',
-                component: ContentsPageComponent,
+                canActivate: [SchemaMustExistPublishedGuard],
                 resolve: {
-                    schema: ResolvePublishedSchemaGuard, appLanguages: ResolveAppLanguagesGuard
+                    appLanguages: ResolveAppLanguagesGuard
                 },
                 children: [
+                    {
+                        path: '',
+                        component: ContentsPageComponent,
+                        canDeactivate: [CanDeactivateGuard]
+                    },
                     {
                         path: 'new',
                         component: ContentPageComponent,

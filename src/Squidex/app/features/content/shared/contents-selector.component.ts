@@ -6,7 +6,6 @@
  */
 
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FormControl } from '@angular/forms';
 
 import {
     AppsState,
@@ -42,7 +41,6 @@ export class ContentsSelectorComponent implements OnInit {
     public searchModal = new ModalView();
 
     public contentItems: ImmutableArray<ContentDto>;
-    public contentsFilter = new FormControl();
     public contentsQuery = '';
     public contentsPager = new Pager(0);
 
@@ -81,8 +79,8 @@ export class ContentsSelectorComponent implements OnInit {
             });
     }
 
-    public search() {
-        this.contentsQuery = this.contentsFilter.value;
+    public search(query: string) {
+        this.contentsQuery = query;
         this.contentsPager = new Pager(0);
 
         this.load();

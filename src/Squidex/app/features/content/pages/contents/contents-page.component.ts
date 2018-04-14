@@ -6,15 +6,7 @@
  */
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { FormControl } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
-
-import {
-    ContentCreated,
-    ContentRemoved,
-    ContentStatusChanged,
-    ContentUpdated
-} from './../messages';
 
 import {
     allData,
@@ -27,6 +19,7 @@ import {
     ImmutableArray,
     ModalView,
     Pager,
+    SchemasState,
     SchemaDetailsDto,
     Versioned
 } from '@app/shared';
@@ -40,8 +33,7 @@ import {
     ]
 })
 export class ContentsPageComponent implements OnDestroy, OnInit {
-    private contentCreatedSubscription: Subscription;
-    private contentUpdatedSubscription: Subscription;
+    private selectedSchemaSubscription: Subscription;
 
     public schema: SchemaDetailsDto;
 
@@ -49,7 +41,6 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
 
     public contentItems: ImmutableArray<ContentDto>;
     public contentFields: FieldDto[];
-    public contentsFilter = new FormControl();
     public contentsQuery = '';
     public contentsPager = new Pager(0);
 
@@ -70,58 +61,31 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
     public languageParameter: string;
 
     public isAllSelected = false;
-    public isReadOnly = false;
     public isArchive = false;
 
     constructor(public readonly ctx: AppContext,
-        private readonly contentsService: ContentsService
+        private readonly contentsService: ContentsService,
+        private readonly schemasState: SchemasState
     ) {
     }
 
     public ngOnDestroy() {
-        this.contentCreatedSubscription.unsubscribe();
-        this.contentUpdatedSubscription.unsubscribe();
+        this.selectedSchemaSubscription.unsubscribe();
     }
 
     public ngOnInit() {
-        this.contentCreatedSubscription =
-            this.ctx.bus.of(ContentCreated)
-                .subscribe(message => {
-                    this.contentItems = this.contentItems.pushFront(message.content);
-                    this.contentsPager = this.contentsPager.incrementCount();
-                });
+        this.selectedSchemaSubscription =
+            this.schemasState.selectedSchema
+                .subscribe(schema => {
+                    this.schema = schema!;
 
-        this.contentUpdatedSubscription =
-            this.ctx.bus.of(ContentUpdated)
-                .subscribe(message => {
-                    this.contentItems = this.contentItems.replaceBy('id', message.content, (o, n) => o.update(n.data, n.lastModifiedBy, n.version, n.lastModified));
+                    this.resetContents();
+                    this.load();
                 });
 
         const routeData = allData(this.ctx.route);
 
         this.languages = routeData.appLanguages;
-
-        this.ctx.route.data.map(p => p.isReadOnly)
-            .subscribe(isReadOnly => {
-                this.isReadOnly = isReadOnly;
-            });
-
-        this.ctx.route.params.map(p => p.language)
-            .subscribe(language => {
-                this.languageSelected = this.languages.find(l => l.iso2Code === language) || this.languages.find(l => l.isMaster) || this.languages[0];
-            });
-
-        this.ctx.route.data.map(d => d.schema)
-            .subscribe(schema => {
-                this.schema = schema;
-
-                this.resetContents();
-                this.load();
-            });
-    }
-
-    public dropData(content: ContentDto) {
-        return { content, schemaId: this.schema.id };
     }
 
     public publishContent(content: ContentDto) {
@@ -207,8 +171,6 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
                     content = content.changeStatus(status, dt, this.ctx.userToken, dto.version);
 
                     this.contentItems = this.contentItems.replaceBy('id', content);
-
-                    this.emitContentStatusChanged(content);
                 }
             });
     }
@@ -233,9 +195,6 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
 
     public deleteContentItem(content: ContentDto): Observable<any> {
         return this.contentsService.deleteContent(this.ctx.appName, this.schema.name, content.id, content.version)
-            .do(() => {
-                this.emitContentRemoved(content);
-            })
             .catch(error => {
                 this.ctx.notifyError(error);
 
@@ -247,8 +206,6 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
         content = content.update(update.payload, this.ctx.userToken, update.version);
 
         this.contentItems = this.contentItems.replaceBy('id', content);
-
-        this.emitContentUpdated(content);
     }
 
     public load(showInfo = false) {
@@ -271,7 +228,6 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
     }
 
     public updateArchive(isArchive: boolean) {
-        this.contentsQuery = this.contentsFilter.value;
         this.contentsPager = new Pager(0);
 
         this.isArchive = isArchive;
@@ -281,8 +237,8 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
         this.load();
     }
 
-    public search() {
-        this.contentsQuery = this.contentsFilter.value;
+    public search(query: string) {
+        this.contentsQuery = query;
         this.contentsPager = new Pager(0);
 
         this.load();
@@ -349,18 +305,6 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
         this.languageSelected = language;
     }
 
-    private emitContentStatusChanged(content: ContentDto) {
-        this.ctx.bus.emit(new ContentStatusChanged(content));
-    }
-
-    private emitContentUpdated(content: ContentDto) {
-        this.ctx.bus.emit(new ContentUpdated(content));
-    }
-
-    private emitContentRemoved(content: ContentDto) {
-        this.ctx.bus.emit(new ContentRemoved(content));
-    }
-
     public trackByContent(content: ContentDto): string {
         return content.id;
     }
@@ -368,7 +312,6 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
     private resetContents() {
         this.contentItems = ImmutableArray.empty<ContentDto>();
         this.contentsQuery = '';
-        this.contentsFilter.setValue('');
         this.contentsPager = new Pager(0);
         this.selectedItems = {};
 

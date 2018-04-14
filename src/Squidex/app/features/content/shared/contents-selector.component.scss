@@ -1,34 +1,6 @@
 @import '_vars';
 @import '_mixins';
 
-.content {
-    cursor: pointer;
-}
-
-.icon-plus {
-    font-size: .8rem;
-}
-
-.search-form {
-    display: inline-block;
-}
-
-.form-inline {
-    position: relative;
-}
-
-.form-control-expandable {
-    padding-right: 1.5rem;
-}
-
-.expand-search {
-    @include absolute(8px, 8px, auto, auto);
-    color: $color-border-dark !important;
-    font-size: .9rem;
-    font-weight: normal;
-    cursor: pointer !important;
-}
-
 :host /deep/ .modal-body {
     background: $color-background;
 }

@@ -6,7 +6,9 @@
  */
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
+import { FormBuilder, FormControl } from '@angular/forms';
+
+import { ModalView } from '@app/shared';
 
 @Component({
     selector: 'sqx-search-form',
@@ -15,8 +17,6 @@ import { FormBuilder } from '@angular/forms';
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SearchFormComponent implements OnChanges {
-    private queryValue = '';
-
     @Input()
     public query = '';
 
@@ -32,6 +32,12 @@ export class SearchFormComponent implements OnChanges {
     @Input()
     public canArchive = true;
 
+    @Input()
+    public enableShortcut = false;
+
+    public contentsFilter = new FormControl();
+
+    public searchModal = new ModalView();
     public searchForm =
         this.formBuilder.group({
             odataOrderBy: '',
@@ -44,8 +50,18 @@ export class SearchFormComponent implements OnChanges {
     ) {
     }
 
+    public search() {
+        this.invalidate(this.contentsFilter.value);
+
+        this.queryChanged.emit(this.contentsFilter.value);
+    }
+
     public ngOnChanges() {
-        if (this.query === this.queryValue) {
+        this.invalidate(this.query);
+    }
+
+    private invalidate(query: string) {
+        if (query === this.contentsFilter.value) {
             return;
         }
 
@@ -81,7 +97,7 @@ export class SearchFormComponent implements OnChanges {
             odataOrderBy
         }, { emitEvent: false });
 
-        this.queryValue = this.query;
+        this.contentsFilter.setValue(this.query);
     }
 
     public updateQuery() {
@@ -112,8 +128,9 @@ export class SearchFormComponent implements OnChanges {
         }
 
         if (query !== this.query) {
-            this.queryValue = query;
             this.queryChanged.emit(query);
         }
+
+        this.contentsFilter.setValue(query);
     }
 }

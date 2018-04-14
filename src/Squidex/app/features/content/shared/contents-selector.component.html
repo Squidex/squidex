@@ -4,13 +4,7 @@
     </ng-container>
 
     <ng-container tabs>
-        <form class="form-inline search-form" (ngSubmit)="search()">
-            <input class="form-control form-control-expandable" [formControl]="contentsFilter" placeholder="Search for content" />
-
-            <a class="expand-search" (click)="searchModal.toggle()" #archive>
-                <i class="icon-caret-down"></i>
-            </a>
-        </form>       
+        <sqx-search-form (queryChanged)="search($event)"></sqx-search-form>
         
         <button class="btn btn-link btn-secondary" (click)="load(true)">
             <i class="icon-reset"></i> Refresh
