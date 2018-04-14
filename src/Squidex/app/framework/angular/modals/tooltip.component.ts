@@ -14,7 +14,7 @@ import { fadeAnimation } from './../animations';
 @Component({
     selector: 'sqx-tooltip',
     styleUrls: ['./tooltip.component.scss'],
-    template: './tooltip.component.html',
+    templateUrl: './tooltip.component.html',
     animations: [
         fadeAnimation
     ],
@@ -49,7 +49,6 @@ export class TooltipComponent implements OnDestroy, OnInit {
             this.targetMouseEnterListener =
                 this.renderer.listen(this.target, 'mouseenter', () => {
                     this.modal.show();
-                    // this.changeDetector.detectChanges();
                 });
 
             this.targetMouseLeaveListener =

@@ -7,7 +7,6 @@
 
 import { Component, Input, OnInit } from '@angular/core';
 import { AbstractControl, FormGroup } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
 
 import {
     AppLanguageDto,
@@ -36,12 +35,6 @@ export class ContentFieldComponent implements OnInit {
     public selectedFormControl: AbstractControl;
     public selectedLanguage: AppLanguageDto;
 
-    constructor(
-        private readonly router: Router,
-        private readonly route: ActivatedRoute
-    ) {
-    }
-
     public ngOnInit() {
         const masterLanguage = this.languages[0];
 
@@ -59,10 +52,6 @@ export class ContentFieldComponent implements OnInit {
 
         this.selectedFormControl = this.fieldForm.controls[language.iso2Code];
         this.selectedLanguage = language;
-    }
-
-    public assetPluginClicked() {
-        this.router.navigate(['assets'], { relativeTo: this.route });
     }
 }
 

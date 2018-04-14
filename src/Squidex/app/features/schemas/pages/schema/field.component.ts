@@ -33,7 +33,7 @@ export class FieldComponent implements OnInit {
     public field: FieldDto;
 
     @Input()
-    public patters: AppPatternDto;
+    public patterns: AppPatternDto;
 
     @Input()
     public schema: SchemaDetailsDto;

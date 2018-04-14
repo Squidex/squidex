@@ -1,7 +1,7 @@
 <div class="modal" @fade>
     <div class="modal-backdrop"></div>
 
-    <div class="modal-dialog {{large ? 'modal-lg' : ''}}">
+    <div class="modal-dialog" [class.modal-lg]="large" [class.modal-fh]="fullHeight">
         <div class="modal-content">
             <div class="modal-header" *ngIf="showHeader">
                 <h4 class="modal-title">

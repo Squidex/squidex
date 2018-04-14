@@ -1,4 +1,4 @@
-<div class="grid-footer clearfix" *ngIf="pager && pager.numberOfItems > 0">
+<div class="grid-footer clearfix" *ngIf="pager && pager.numberOfItems > 0 && (!hideWhenButtonsDisabled || pager.canGoPrev || pager.canGoNext)">
     <div class="float-right pagination">
         <span class="pagination-text">{{pager.itemFirst}}-{{pager.itemLast}} of {{pager.numberOfItems}}</span>
 

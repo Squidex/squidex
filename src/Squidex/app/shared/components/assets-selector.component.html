@@ -1,0 +1,24 @@
+<sqx-modal-dialog (close)="complete()" large="true" fullHeight="true">
+    <ng-container title>
+        Select assets
+    </ng-container>
+
+    <ng-container tabs>
+        <form class="form-inline" (ngSubmit)="search()">
+            <input class="form-control" [formControl]="assetsFilter" placeholder="Search for assets" />
+        </form>
+    </ng-container>
+
+    <ng-container content>
+        <sqx-assets-list assetClass="asset-default" size="4"
+            (selected)="onAssetSelected($event)"
+            [selectedIds]="selectedAssets"
+            [state]="state" isDisabled="true">
+        </sqx-assets-list>
+    </ng-container>
+
+    <ng-container footer>
+        <button type="reset" class="float-left btn btn-secondary" (click)="complete()">Cancel</button>
+        <button type="submit" class="float-right btn btn-success" (click)="select()" [disabled]="selectionCount === 0">Link selected assets ({{selectionCount}})</button>
+    </ng-container>
+</sqx-modal-dialog>

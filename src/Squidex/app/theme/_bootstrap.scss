@@ -421,6 +421,15 @@ a {
         @include opacity(.5);
     }
 
+    &-header,
+    &-footer {
+        @include flex-shrink(0);
+    }
+
+    &-body {
+        overflow-y: auto;
+    }
+
     &-header {
         @include border-radius-top(.25rem);
         background: $color-modal-header-background;
@@ -452,15 +461,25 @@ a {
     &-content {
         @include box-shadow(0, 6px, 16px, .4);
         @include border-radiusn(.4rem, .35rem, .35rem, .4rem);
+        max-height: 100%;
+    }
+
+    &-fh {
+        .modal-content {
+            min-height: 100%;
+        }
+    }
+
+    &-lg {
+        @media (min-width: 992px) {
+            max-width: 854px;
+        }
     }
 
     &-dialog {
         & {
+            @include absolute(0, 0, 0, 0);
             z-index: 1100;
-        }
-
-        @media (min-width: 576px) {
-            margin-top: 4.5rem;
         }
     }
 

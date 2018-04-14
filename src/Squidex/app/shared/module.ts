@@ -23,6 +23,10 @@ import {
     AppsService,
     AssetComponent,
     AssetPreviewUrlPipe,
+    AssetsDialogState,
+    AssetsListComponent,
+    AssetsSelectorComponent,
+    AssetsState,
     AssetsService,
     AssetUrlPipe,
     AuthInterceptor,
@@ -75,6 +79,8 @@ import {
         AssetComponent,
         AssetPreviewUrlPipe,
         AssetUrlPipe,
+        AssetsListComponent,
+        AssetsSelectorComponent,
         FileIconPipe,
         GeolocationEditorComponent,
         HelpComponent,
@@ -94,6 +100,8 @@ import {
         AssetComponent,
         AssetPreviewUrlPipe,
         AssetUrlPipe,
+        AssetsListComponent,
+        AssetsSelectorComponent,
         FileIconPipe,
         GeolocationEditorComponent,
         HelpComponent,
@@ -108,6 +116,9 @@ import {
         UserPicturePipe,
         UserPictureRefPipe,
         RichEditorComponent
+    ],
+    providers: [
+        AssetsDialogState
     ]
 })
 export class SqxSharedModule {
@@ -122,6 +133,7 @@ export class SqxSharedModule {
                 AppPatternsService,
                 AppsService,
                 AppsState,
+                AssetsState,
                 AssetsService,
                 AuthService,
                 BackupsService,

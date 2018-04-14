@@ -28,6 +28,9 @@ export class ModalDialogComponent implements AfterViewInit {
     @Input()
     public large = false;
 
+    @Input()
+    public fullHeight = false;
+
     @Output()
     public close = new EventEmitter();
 

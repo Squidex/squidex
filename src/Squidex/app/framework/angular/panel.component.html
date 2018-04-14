@@ -23,7 +23,7 @@
         </div>
 
         <div class="panel-main">
-            <div class="panel-content {{contentClass}} {{showScrollbar ? 'panel-content-scroll' : ''}} {{isBlank ? 'panel-content-blank' : ''}}">
+            <div class="panel-content {{contentClass}}" [class.panel-content-scroll]="showScrollbar" [class.panel-content-blank]="isBlank">
                 <ng-content select=[content]></ng-content>
             </div>
 

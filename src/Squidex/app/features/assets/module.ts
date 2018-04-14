@@ -7,7 +7,6 @@
 
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { DndModule } from 'ng2-dnd';
 
 import { SqxFrameworkModule, SqxSharedModule } from '@app/shared';
 
@@ -26,7 +25,6 @@ const routes: Routes = [
     imports: [
         SqxFrameworkModule,
         SqxSharedModule,
-        DndModule,
         RouterModule.forChild(routes)
     ],
     declarations: [

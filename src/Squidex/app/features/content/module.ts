@@ -51,10 +51,6 @@ const routes: Routes = [
                         canDeactivate: [CanDeactivateGuard],
                         children: [
                             {
-                                path: 'assets',
-                                loadChildren: './../assets/module#SqxFeatureAssetsModule'
-                            },
-                            {
                                 path: 'references/:schemaName/:language',
                                 component: ContentsPageComponent,
                                 data: {
@@ -90,10 +86,6 @@ const routes: Routes = [
                                 resolve: {
                                     schema: ResolvePublishedSchemaGuard
                                 }
-                            },
-                            {
-                                path: 'assets',
-                                loadChildren: './../assets/module#SqxFeatureAssetsModule'
                             }
                         ]
                     }

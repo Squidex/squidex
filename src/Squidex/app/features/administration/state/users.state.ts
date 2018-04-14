@@ -103,7 +103,7 @@ export class UsersState extends State<Snapshot> {
         private readonly dialogs: DialogService,
         private readonly usersService: UsersService
     ) {
-        super({ users: ImmutableArray.empty(), usersPager: new Pager(10) });
+        super({ users: ImmutableArray.empty(), usersPager: new Pager(0) });
     }
 
     public selectUser(id: string | null): Observable<UserDto | null> {
@@ -150,7 +150,7 @@ export class UsersState extends State<Snapshot> {
                         }
                     }
 
-                    return { ...s, users, usersPager, selectedUser, usersLoading: false };
+                    return { ...s, users, usersPager, selectedUser };
                 });
             })
             .notify(this.dialogs);
