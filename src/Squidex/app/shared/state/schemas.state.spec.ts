@@ -8,21 +8,25 @@
 import { Observable } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 
-import { AuthService, DialogService, Versioned, AddFieldDto, CreateSchemaDto, UpdateFieldDto } from '@app/shared';
-
 import { SchemasState } from './schemas.state';
 
 import {
+    AddFieldDto,
     AppsState,
+    AuthService,
     createProperties,
+    CreateSchemaDto,
+    DialogService,
     DateTime,
     FieldDto,
     SchemaDetailsDto,
     SchemaDto,
     SchemasService,
+    UpdateFieldDto,
     UpdateSchemaDto,
     UpdateSchemaScriptsDto,
-    Version
+    Version,
+    Versioned
  } from '@app/shared';
 
 describe('SchemasState', () => {

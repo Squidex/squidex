@@ -11,14 +11,14 @@ import { FormBuilder } from '@angular/forms';
 import {
     AppPatternDto,
     createProperties,
+    EditFieldForm,
     fadeAnimation,
     FieldDto,
     ModalView,
     SchemaDetailsDto,
+    SchemasState,
     UpdateFieldDto
 } from '@app/shared';
-
-import { SchemasState, EditFieldForm } from './../../state/schemas.state';
 
 @Component({
     selector: 'sqx-field',

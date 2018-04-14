@@ -8,9 +8,12 @@
 import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 
-import { fieldTypes, SchemaDetailsDto } from '@app/shared';
-
-import { SchemasState, AddFieldForm } from './../../state/schemas.state';
+import {
+    AddFieldForm,
+    fieldTypes,
+    SchemaDetailsDto,
+    SchemasState
+} from '@app/shared';
 
 @Component({
     selector: 'sqx-field-wizard',

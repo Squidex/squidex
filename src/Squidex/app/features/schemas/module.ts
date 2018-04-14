@@ -40,7 +40,6 @@ import {
     SchemaPageComponent,
     SchemasPageComponent,
     SchemaScriptsFormComponent,
-    SchemasState,
     StringUIComponent,
     StringValidationComponent,
     TagsUIComponent,
@@ -68,8 +67,7 @@ const routes: Routes = [
         RouterModule.forChild(routes)
     ],
     providers: [
-        SchemaMustExistGuard,
-        SchemasState
+        SchemaMustExistGuard
     ],
     declarations: [
         FieldComponent,

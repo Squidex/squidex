@@ -8,9 +8,12 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 
-import { ApiUrlConfig, AppsState } from '@app/shared';
-
-import { CreateForm, SchemasState } from './../../state/schemas.state';
+import {
+    ApiUrlConfig,
+    AppsState,
+    CreateSchemaForm,
+    SchemasState
+} from '@app/shared';
 
 @Component({
     selector: 'sqx-schema-form',
@@ -24,7 +27,7 @@ export class SchemaFormComponent implements OnInit {
     @Input()
     public import: any;
 
-    public createForm: CreateForm;
+    public createForm: CreateSchemaForm;
 
     public showImport = false;
 
@@ -33,7 +36,7 @@ export class SchemaFormComponent implements OnInit {
         public readonly appsState: AppsState,
         private readonly schemasState: SchemasState
     ) {
-        this.createForm = new CreateForm(formBuilder);
+        this.createForm = new CreateSchemaForm(formBuilder);
     }
 
     public ngOnInit() {

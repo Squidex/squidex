@@ -18,14 +18,13 @@ import {
     fieldTypes,
     MessageBus,
     ModalView,
-    SchemaDetailsDto
+    SchemaDetailsDto,
+    SchemasState
 } from '@app/shared';
 
 import {
     SchemaCloning
 } from './../messages';
-
-import { SchemasState } from './../../state/schemas.state';
 
 @Component({
     selector: 'sqx-schema-page',

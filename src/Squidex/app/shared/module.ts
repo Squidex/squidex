@@ -60,7 +60,8 @@ import {
     UserPictureRefPipe,
     UsersProviderService,
     UsersService,
-    RichEditorComponent
+    RichEditorComponent,
+    SchemasState
 } from './declarations';
 
 @NgModule({
@@ -139,6 +140,7 @@ export class SqxSharedModule {
                 ResolveSchemaGuard,
                 RulesService,
                 SchemasService,
+                SchemasState,
                 UIService,
                 UnsetAppGuard,
                 UsagesService,

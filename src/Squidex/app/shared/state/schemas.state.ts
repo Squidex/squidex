@@ -12,32 +12,36 @@ import { Observable } from 'rxjs';
 import '@app/framework/utils/rxjs-extensions';
 
 import {
-    AddFieldDto,
-    AppsState,
-    AuthService,
-    createProperties,
-    CreateSchemaDto,
     DateTime,
     DialogService,
-    FieldDto,
     Form,
     ImmutableArray,
+    State,
+    ValidatorsEx,
+    Version
+} from '@app/framework';
+
+import { AppsState } from './apps.state';
+import { AuthService } from './../services/auth.service';
+
+import {
+    AddFieldDto,
+    createProperties,
+    CreateSchemaDto,
+    FieldDto,
     SchemaDto,
     SchemaDetailsDto,
     SchemasService,
-    State,
     UpdateFieldDto,
     UpdateSchemaScriptsDto,
     UpdateSchemaDto,
-    ValidatorsEx,
-    Version,
     SchemaPropertiesDto,
     FieldPropertiesDto
-} from '@app/shared';
+} from './../services/schemas.service';
 
 const FALLBACK_NAME = 'my-schema';
 
-export class CreateForm extends Form<FormGroup> {
+export class CreateSchemaForm extends Form<FormGroup> {
     public schemaName =
         this.form.controls['name'].valueChanges.map(n => n || FALLBACK_NAME)
             .startWith(FALLBACK_NAME);

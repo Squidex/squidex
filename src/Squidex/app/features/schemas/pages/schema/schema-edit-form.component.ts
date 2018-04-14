@@ -8,8 +8,11 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 
-import { SchemaDetailsDto } from '@app/shared';
-import { SchemasState, EditSchemaForm } from './../../state/schemas.state';
+import {
+    EditSchemaForm,
+    SchemaDetailsDto,
+    SchemasState
+} from '@app/shared';
 
 @Component({
     selector: 'sqx-schema-edit-form',

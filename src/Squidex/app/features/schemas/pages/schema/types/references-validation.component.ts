@@ -8,9 +8,7 @@
 import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 
-import { ReferencesFieldPropertiesDto } from '@app/shared';
-
-import { SchemasState } from './../../../state/schemas.state';
+import { ReferencesFieldPropertiesDto, SchemasState } from '@app/shared';
 
 @Component({
     selector: 'sqx-references-validation',

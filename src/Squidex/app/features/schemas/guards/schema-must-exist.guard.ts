@@ -9,9 +9,7 @@ import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from '@angular/router';
 import { Observable } from 'rxjs';
 
-import { allParams } from '@app/framework';
-
-import { SchemasState } from './../state/schemas.state';
+import { allParams, SchemasState } from '@app/shared';
 
 @Injectable()
 export class SchemaMustExistGuard implements CanActivate {

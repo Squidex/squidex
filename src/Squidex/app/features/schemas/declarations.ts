@@ -38,5 +38,3 @@ export * from './pages/schema/schema-scripts-form.component';
 
 export * from './pages/schemas/schema-form.component';
 export * from './pages/schemas/schemas-page.component';
-
-export * from './state/schemas.state';
