@@ -145,18 +145,7 @@
                 </div>
             </div>
 
-            <div class="grid-footer clearfix" *ngIf="contentsPager.numberOfItems > 0">
-                <div class="float-right pagination">
-                    <span class="pagination-text">{{contentsPager.itemFirst}}-{{contentsPager.itemLast}} of {{contentsPager.numberOfItems}}</span>
-
-                    <button class="btn btn-link btn-secondary pagination-button" [disabled]="!contentsPager.canGoPrev" (click)="goPrev()">
-                        <i class="icon-angle-left"></i>
-                    </button>
-                    <button class="btn btn-link btn-secondary pagination-button" [disabled]="!contentsPager.canGoNext" (click)="goNext()">
-                        <i class="icon-angle-right"></i>
-                    </button>
-                </div>
-            </div>
+            <sqx-pager [pager]="contentsPager"></sqx-pager>
         </div>
     </ng-container>
 </sqx-panel>

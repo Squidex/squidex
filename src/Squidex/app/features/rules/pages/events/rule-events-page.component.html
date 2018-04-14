@@ -90,18 +90,7 @@
             </tbody>
         </table>
 
-        <div class="clearfix" *ngIf="eventsPager.numberOfItems > 0">
-            <div class="float-right pagination">
-                <span class="pagination-text">{{eventsPager.itemFirst}}-{{eventsPager.itemLast}} of {{eventsPager.numberOfItems}}</span>
-
-                <button class="btn btn-link btn-secondary pagination-button" [disabled]="!eventsPager.canGoPrev" (click)="goPrev()">
-                    <i class="icon-angle-left"></i>
-                </button>
-                <button class="btn btn-link btn-secondary pagination-button" [disabled]="!eventsPager.canGoNext" (click)="goNext()">
-                    <i class="icon-angle-right"></i>
-                </button>
-            </div>
-        </div>
+        <sqx-pager [pager]="eventsPager"></sqx-pager>
     </ng-container>
 </sqx-panel>
 
