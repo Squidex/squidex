@@ -42,7 +42,7 @@ $color-apps-border: #65a6ff;
 }
 
 .dropdown-menu {
-    top: 2.65rem;
+    @include absolute(2.65rem, auto, auto, auto);
 }
 
 .icon-plus {
