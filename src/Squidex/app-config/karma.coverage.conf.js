@@ -1,5 +1,7 @@
 ﻿var webpackConfig = require('./webpack.test.coverage');
 
+process.env.CHROME_BIN = require('puppeteer').executablePath()
+
 module.exports = function (config) {
     var _config = {
         /** 
