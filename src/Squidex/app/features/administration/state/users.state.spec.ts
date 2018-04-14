@@ -79,6 +79,12 @@ describe('UsersState', () => {
         dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
     });
 
+    it('should mark as current user when selected user equals to profile', () => {
+        usersState.selectUser('id2').subscribe();
+
+        expect(usersState.snapshot.isCurrentUser).toBeTruthy();
+    });
+
     it('should not load user when already loaded', () => {
         let selectedUser: UserDto;
 
@@ -90,12 +96,6 @@ describe('UsersState', () => {
         expect(usersState.snapshot.selectedUser).toBe(oldUsers[0]);
 
         usersService.verify(x => x.getUser(It.isAnyString()), Times.never());
-    });
-
-    it('should mark as current user when selected user equals to profile', () => {
-        usersState.selectUser('id2').subscribe();
-
-        expect(usersState.snapshot.isCurrentUser).toBeTruthy();
     });
 
     it('should load user when not loaded', () => {
@@ -150,15 +150,6 @@ describe('UsersState', () => {
         expect(usersState.snapshot.selectedUser).toBe(usersState.snapshot.users.at(0));
     });
 
-    it('should raise notification when locking failed', () => {
-        usersService.setup(x => x.lockUser('id1'))
-            .returns(() => Observable.throw({}));
-
-        usersState.lockUser(oldUsers[0]).onErrorResumeNext().subscribe();
-
-        dialogs.verify(x => x.notifyError(It.isAny()), Times.once());
-    });
-
     it('should unmark user as locked', () => {
         usersService.setup(x => x.unlockUser('id2'))
             .returns(() => Observable.of({}));
@@ -168,15 +159,6 @@ describe('UsersState', () => {
 
         expect(usersState.snapshot.users.at(1).isLocked).toBeFalsy();
         expect(usersState.snapshot.selectedUser).toBe(usersState.snapshot.users.at(1));
-    });
-
-    it('should raise notification when unlocking failed', () => {
-        usersService.setup(x => x.unlockUser('id2'))
-            .returns(() => Observable.throw({}));
-
-        usersState.unlockUser(oldUsers[1]).onErrorResumeNext().subscribe();
-
-        dialogs.verify(x => x.notifyError(It.isAny()), Times.once());
     });
 
     it('should update user on update', () => {
@@ -193,17 +175,6 @@ describe('UsersState', () => {
         expect(usersState.snapshot.selectedUser).toBe(usersState.snapshot.users.at(0));
     });
 
-    it('should not raise notification when updating failed', () => {
-        const request = new UpdateUserDto('new@mail.com', 'New');
-
-        usersService.setup(x => x.putUser('id1', request))
-            .returns(() => Observable.throw({}));
-
-        usersState.updateUser(oldUsers[0], request).onErrorResumeNext().subscribe();
-
-        dialogs.verify(x => x.notifyError(It.isAny()), Times.never());
-    });
-
     it('should add user to state when created', () => {
         const request = new CreateUserDto(newUser.email, newUser.displayName, 'password');
 
@@ -214,17 +185,6 @@ describe('UsersState', () => {
 
         expect(usersState.snapshot.users.at(0)).toBe(newUser);
         expect(usersState.snapshot.usersPager.numberOfItems).toBe(201);
-    });
-
-    it('should not raise notification when creating failed', () => {
-        const request = new CreateUserDto(newUser.email, newUser.displayName, 'password');
-
-        usersService.setup(x => x.postUser(request))
-            .returns(() => Observable.throw({}));
-
-        usersState.createUser(request).onErrorResumeNext().subscribe();
-
-        dialogs.verify(x => x.notifyError(It.isAny()), Times.never());
     });
 
     it('should load next page and prev page when paging', () => {
