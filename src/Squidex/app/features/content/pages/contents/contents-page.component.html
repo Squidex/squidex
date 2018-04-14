@@ -116,8 +116,8 @@
                         <ng-template ngFor let-content [ngForOf]="contentItems" [ngForTrackBy]="trackByContent">
                             <tr [sqxContent]="content" [routerLink]="[content.id]" routerLinkActive="active"
                                 [language]="languageSelected"
-                                [schemaFields]="contentFields"
                                 [schema]="schema"
+                                [schemaFields]="contentFields"
                                 [selected]="isItemSelected(content)"
                                 (selectedChange)="selectItem(content, $event)"
                                 (unpublishing)="unpublishContent(content)"

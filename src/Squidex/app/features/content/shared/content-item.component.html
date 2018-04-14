@@ -1,4 +1,4 @@
-<td class="cell-select" *ngIf="!isReadOnly" (click)="shouldStop($event)">
+<td class="cell-select" *ngIf="!isReference" (click)="shouldStop($event)">
     <input type="checkbox" class="form-control"
         [ngModel]="selected" 
         (ngModelChange)="selectedChange.emit($event);"

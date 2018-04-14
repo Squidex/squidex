@@ -13,11 +13,11 @@
                 </button>
             </div>
 
-            <div class="modal-tabs clearfix" #tabsElement [hidden]="!showTabs">
+            <div class="modal-tabs {{tabsClass}} clearfix" #tabsElement [hidden]="!showTabs">
                 <ng-content select=[tabs]></ng-content>
             </div>
 
-            <div class="modal-body">
+            <div class="modal-body {{contentClass}}">
                 <ng-content select=[content]></ng-content>
             </div>
 

@@ -25,6 +25,7 @@ import {
     ContentPageComponent,
     ContentItemComponent,
     ContentsPageComponent,
+    ContentsSelectorComponent,
     ReferencesEditorComponent,
     SchemasPageComponent,
     SearchFormComponent
@@ -48,19 +49,7 @@ const routes: Routes = [
                     {
                         path: 'new',
                         component: ContentPageComponent,
-                        canDeactivate: [CanDeactivateGuard],
-                        children: [
-                            {
-                                path: 'references/:schemaName/:language',
-                                component: ContentsPageComponent,
-                                data: {
-                                    isReadOnly: true
-                                },
-                                resolve: {
-                                    schema: ResolvePublishedSchemaGuard
-                                }
-                            }
-                        ]
+                        canDeactivate: [CanDeactivateGuard]
                     },
                     {
                         path: ':contentId',
@@ -75,16 +64,6 @@ const routes: Routes = [
                                 component: ContentHistoryComponent,
                                 data: {
                                     channel: 'contents.{contentId}'
-                                }
-                            },
-                            {
-                                path: 'references/:schemaName/:language',
-                                component: ContentsPageComponent,
-                                data: {
-                                    isReadOnly: true
-                                },
-                                resolve: {
-                                    schema: ResolvePublishedSchemaGuard
                                 }
                             }
                         ]
@@ -108,6 +87,7 @@ const routes: Routes = [
         ContentItemComponent,
         ContentPageComponent,
         ContentsPageComponent,
+        ContentsSelectorComponent,
         ReferencesEditorComponent,
         SchemasPageComponent,
         SearchFormComponent

@@ -28,12 +28,12 @@
             </div>
 
             <div class="form-group">
-                <button class="btn btn-sm btn-link" (click)="toggleImport()" [class.hidden]="showImport">
+                <a class="btn btn-sm btn-link" (click)="toggleImport()" [class.hidden]="showImport">
                     Import schema
-                </button>
-                <button class="btn btn-sm btn-link" (click)="toggleImport()" [class.hidden]="!showImport">
+                </a>
+                <a class="btn btn-sm btn-link" (click)="toggleImport()" [class.hidden]="!showImport">
                     Hide
-                </button>
+                </a>
         
                 <sqx-json-editor *ngIf="showImport" formControlName="import"></sqx-json-editor>
             </div>
