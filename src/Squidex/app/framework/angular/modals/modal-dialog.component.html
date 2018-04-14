@@ -1,0 +1,31 @@
+<div class="modal" @fade>
+    <div class="modal-backdrop"></div>
+
+    <div class="modal-dialog" [class.modal-lg]="large" [class.modal-fh]="fullHeight">
+        <div class="modal-content">
+            <div class="modal-header" *ngIf="showHeader">
+                <h4 class="modal-title">
+                    <ng-content select=[title]></ng-content>
+                </h4>
+
+                <button type="button" class="close" (click)="close.emit()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-tabs clearfix" #tabsElement [hidden]="!showTabs">
+                <ng-content select=[tabs]></ng-content>
+            </div>
+
+            <div class="modal-body">
+                <ng-content select=[content]></ng-content>
+            </div>
+
+            <div class="modal-footer" [hidden]="!showFooter">
+                <div class="clearfix" #footerElement>
+                    <ng-content select=[footer]></ng-content>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

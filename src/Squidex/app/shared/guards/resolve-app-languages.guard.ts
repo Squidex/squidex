@@ -6,10 +6,10 @@
  */
 
 import { Injectable } from '@angular/core';
-import { ActivatedRouteSnapshot, Resolve, Router, RouterStateSnapshot } from '@angular/router';
+import { ActivatedRouteSnapshot, Resolve, Router } from '@angular/router';
 import { Observable } from 'rxjs';
 
-import { allParams } from 'framework';
+import { allParams } from '@app/framework';
 
 import { AppLanguageDto, AppLanguagesService } from './../services/app-languages.service';
 
@@ -21,14 +21,8 @@ export class ResolveAppLanguagesGuard implements Resolve<AppLanguageDto[] | null
     ) {
     }
 
-    public resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<AppLanguageDto[] | null> {
-        const params = allParams(route);
-
-        const appName = params['appName'];
-
-        if (!appName) {
-            throw 'Route must contain app name.';
-        }
+    public resolve(route: ActivatedRouteSnapshot): Observable<AppLanguageDto[] | null> {
+        const appName = allParams(route)['appName'];
 
         const result =
             this.appLanguagesService.getLanguages(appName).map(d => d.languages)

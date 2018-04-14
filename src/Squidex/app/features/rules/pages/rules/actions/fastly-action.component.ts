@@ -26,11 +26,13 @@ export class FastlyActionComponent implements OnInit {
             serviceId: ['',
                 [
                     Validators.required
-                ]],
+                ]
+            ],
             apiKey: ['',
                 [
                     Validators.required
-                ]]
+                ]
+            ]
         });
 
     constructor(

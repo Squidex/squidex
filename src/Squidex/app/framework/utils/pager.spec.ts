@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Pager } from './../';
+import { Pager } from './pager';
 
 describe('Pager', () => {
     it('should init with default values', () => {

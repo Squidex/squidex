@@ -8,7 +8,7 @@
 import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 
-import { AssetsFieldPropertiesDto } from 'shared';
+import { AssetsFieldPropertiesDto } from '@app/shared';
 
 @Component({
     selector: 'sqx-assets-validation',

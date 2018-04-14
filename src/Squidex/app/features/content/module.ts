@@ -16,7 +16,7 @@ import {
     ResolvePublishedSchemaGuard,
     SqxFrameworkModule,
     SqxSharedModule
-} from 'shared';
+} from '@app/shared';
 
 import {
     AssetsEditorComponent,
@@ -50,10 +50,6 @@ const routes: Routes = [
                         component: ContentPageComponent,
                         canDeactivate: [CanDeactivateGuard],
                         children: [
-                            {
-                                path: 'assets',
-                                loadChildren: './../assets/module#SqxFeatureAssetsModule'
-                            },
                             {
                                 path: 'references/:schemaName/:language',
                                 component: ContentsPageComponent,
@@ -90,10 +86,6 @@ const routes: Routes = [
                                 resolve: {
                                     schema: ResolvePublishedSchemaGuard
                                 }
-                            },
-                            {
-                                path: 'assets',
-                                loadChildren: './../assets/module#SqxFeatureAssetsModule'
                             }
                         ]
                     }

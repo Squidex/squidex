@@ -10,12 +10,9 @@ import { RouterModule, Routes } from '@angular/router';
 import { DndModule } from 'ng2-dnd';
 
 import {
-    HelpComponent,
-    HistoryComponent,
-    ResolveSchemaGuard,
     SqxFrameworkModule,
     SqxSharedModule
-} from 'shared';
+} from '@app/shared';
 
 import {
     FieldComponent,
@@ -25,6 +22,10 @@ import {
     BooleanValidationComponent,
     DateTimeUIComponent,
     DateTimeValidationComponent,
+    FieldFormCommonComponent,
+    FieldFormUIComponent,
+    FieldFormValidationComponent,
+    FieldWizardComponent,
     GeolocationUIComponent,
     GeolocationValidationComponent,
     JsonUIComponent,
@@ -35,6 +36,7 @@ import {
     ReferencesValidationComponent,
     SchemaEditFormComponent,
     SchemaFormComponent,
+    SchemaMustExistGuard,
     SchemaPageComponent,
     SchemasPageComponent,
     SchemaScriptsFormComponent,
@@ -50,30 +52,9 @@ const routes: Routes = [
         component: SchemasPageComponent,
         children: [
             {
-                path: ''
-            },
-            {
                 path: ':schemaName',
                 component: SchemaPageComponent,
-                resolve: {
-                    schema: ResolveSchemaGuard
-                },
-                children: [
-                    {
-                        path: 'history',
-                        component: HistoryComponent,
-                        data: {
-                            channel: 'schemas.{schemaName}'
-                        }
-                    },
-                    {
-                        path: 'help',
-                        component: HelpComponent,
-                        data: {
-                            helpPage: '05-integrated/schemas'
-                        }
-                    }
-                ]
+                canActivate: [SchemaMustExistGuard]
             }]
     }
 ];
@@ -85,6 +66,9 @@ const routes: Routes = [
         DndModule,
         RouterModule.forChild(routes)
     ],
+    providers: [
+        SchemaMustExistGuard
+    ],
     declarations: [
         FieldComponent,
         AssetsUIComponent,
@@ -93,6 +77,10 @@ const routes: Routes = [
         BooleanValidationComponent,
         DateTimeUIComponent,
         DateTimeValidationComponent,
+        FieldFormCommonComponent,
+        FieldFormUIComponent,
+        FieldFormValidationComponent,
+        FieldWizardComponent,
         GeolocationUIComponent,
         GeolocationValidationComponent,
         JsonUIComponent,

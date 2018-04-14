@@ -17,7 +17,7 @@ import {
     HistoryEventDto,
     HistoryService,
     UsersProviderService
-} from './../declarations-base';
+} from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-history',

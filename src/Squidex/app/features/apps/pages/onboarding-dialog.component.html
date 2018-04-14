@@ -1,7 +1,6 @@
-<div class="modal" *sqxModalView="modalView;onRoot:true;closeAuto:false" @fade>
-    <div class="modal-backdrop"></div>
-    <div class="modal-dialog">
-        <div class="modal-content">
+<ng-container *sqxModalView="modalView;onRoot:true;closeAuto:false">
+    <sqx-modal-dialog showHeader="false">
+        <ng-container content>
             <a class="header-right modal-close" (click)="modalView.hide()">Skip Tour</a>
 
             <div class="onboarding-step" *ngIf="step === 0">
@@ -145,6 +144,6 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-</div>
+        </ng-container>
+    </sqx-modal-dialog>
+</ng-container>

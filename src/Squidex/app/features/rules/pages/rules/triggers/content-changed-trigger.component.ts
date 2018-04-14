@@ -11,7 +11,7 @@ import {
     ImmutableArray,
     SchemaDto,
     Types
-} from 'shared';
+} from '@app/shared';
 
 export interface TriggerSchemaForm {
     schema: SchemaDto;

@@ -8,7 +8,7 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
-import { AssetsFieldPropertiesDto } from 'shared';
+import { AssetsFieldPropertiesDto } from '@app/shared';
 
 @Component({
     selector: 'sqx-tags-ui',

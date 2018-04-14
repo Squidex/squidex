@@ -26,8 +26,9 @@ export class SlackActionComponent implements OnInit {
             webhookUrl: ['',
                 [
                     Validators.required
-                ]],
-            text: ['']
+                ]
+            ],
+            text: ''
         });
 
     constructor(

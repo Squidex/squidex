@@ -7,8 +7,6 @@
 
 import { CommonModule } from '@angular/common';
 import { ModuleWithProviders, NgModule } from '@angular/core';
-import { RouterModule } from '@angular/router';
-import { HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import {
@@ -31,6 +29,7 @@ import {
     FileDropDirective,
     FileSizePipe,
     FocusOnInitDirective,
+    FormErrorComponent,
     FromNowPipe,
     FullDateTimePipe,
     IgnoreScrollbarDirective,
@@ -43,20 +42,21 @@ import {
     LocalStoreService,
     LowerCaseInputDirective,
     MessageBus,
+    ModalDialogComponent,
     ModalTargetDirective,
     ModalViewDirective,
     MoneyPipe,
     MonthPipe,
     OnboardingService,
     OnboardingTooltipComponent,
+    PagerComponent,
     PanelContainerDirective,
     PanelComponent,
     ParentLinkDirective,
     PopupLinkDirective,
     ProgressBarComponent,
     ResourceLoaderService,
-    RootViewDirective,
-    RootViewService,
+    RootViewComponent,
     ScrollActiveDirective,
     ShortcutComponent,
     ShortcutService,
@@ -77,10 +77,8 @@ import {
 
 @NgModule({
     imports: [
-        HttpClientModule,
         FormsModule,
         CommonModule,
-        RouterModule,
         ReactiveFormsModule
     ],
     declarations: [
@@ -99,6 +97,7 @@ import {
         FileDropDirective,
         FileSizePipe,
         FocusOnInitDirective,
+        FormErrorComponent,
         FromNowPipe,
         FullDateTimePipe,
         IgnoreScrollbarDirective,
@@ -109,17 +108,19 @@ import {
         KeysPipe,
         KNumberPipe,
         LowerCaseInputDirective,
+        ModalDialogComponent,
         ModalTargetDirective,
         ModalViewDirective,
         MoneyPipe,
         MonthPipe,
         OnboardingTooltipComponent,
+        PagerComponent,
         PanelContainerDirective,
         PanelComponent,
         ParentLinkDirective,
         PopupLinkDirective,
         ProgressBarComponent,
-        RootViewDirective,
+        RootViewComponent,
         ScrollActiveDirective,
         ShortcutComponent,
         ShortDatePipe,
@@ -137,6 +138,7 @@ import {
     ],
     exports: [
         AutocompleteComponent,
+        CommonModule,
         ConfirmClickDirective,
         ControlErrorsComponent,
         CopyDirective,
@@ -151,6 +153,8 @@ import {
         FileDropDirective,
         FileSizePipe,
         FocusOnInitDirective,
+        FormErrorComponent,
+        FormsModule,
         FromNowPipe,
         FullDateTimePipe,
         IgnoreScrollbarDirective,
@@ -161,17 +165,20 @@ import {
         KeysPipe,
         KNumberPipe,
         LowerCaseInputDirective,
+        ModalDialogComponent,
         ModalTargetDirective,
         ModalViewDirective,
         MoneyPipe,
         MonthPipe,
         OnboardingTooltipComponent,
+        PagerComponent,
         PanelContainerDirective,
         PanelComponent,
         ParentLinkDirective,
         PopupLinkDirective,
         ProgressBarComponent,
-        RootViewDirective,
+        ReactiveFormsModule,
+        RootViewComponent,
         ScrollActiveDirective,
         ShortcutComponent,
         ShortDatePipe,
@@ -185,12 +192,7 @@ import {
         TitleComponent,
         ToggleComponent,
         TooltipComponent,
-        UserReportComponent,
-        HttpClientModule,
-        FormsModule,
-        CommonModule,
-        RouterModule,
-        ReactiveFormsModule
+        UserReportComponent
     ]
 })
 export class SqxFrameworkModule {
@@ -206,7 +208,6 @@ export class SqxFrameworkModule {
                 MessageBus,
                 OnboardingService,
                 ResourceLoaderService,
-                RootViewService,
                 ShortcutService,
                 TitleService
             ]

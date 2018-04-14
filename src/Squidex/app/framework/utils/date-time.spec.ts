@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { DateTime } from './../';
+import { DateTime } from './date-time';
 
 describe('DateTime', () => {
     const today = DateTime.today();

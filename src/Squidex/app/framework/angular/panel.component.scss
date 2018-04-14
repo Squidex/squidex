@@ -1,0 +1,9 @@
+@import '_mixins';
+@import '_vars';
+
+.panel-header {
+    &.large {
+        min-height: 8rem;
+        max-height: 8rem;
+    }
+}

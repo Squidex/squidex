@@ -1,0 +1,40 @@
+@import '_vars';
+@import '_mixins';
+
+.file-drop {
+    & {
+        @include transition(border-color .4s ease);
+        border: 2px dashed $color-border;
+        background: transparent;
+        padding: 1rem;
+        text-align: center;
+        margin-bottom: 1rem;
+        margin-right: 0;
+    }
+
+    &.drag {
+        border-color: darken($color-border, 10%);
+        border-style: dashed;
+        cursor: copy;
+    }
+
+    &-button-input {
+        @include hidden;
+    }
+
+    &-button {
+        margin: .5rem 0;
+    }
+
+    &-or {
+        font-size: .8rem;
+    }
+
+    &-info {
+        color: darken($color-border, 30%);
+    }
+}
+
+.btn {
+    cursor: default;
+}

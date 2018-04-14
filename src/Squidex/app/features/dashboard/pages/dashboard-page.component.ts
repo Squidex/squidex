@@ -18,7 +18,7 @@ import {
     HistoryService,
     UsagesService,
     UsersProviderService
-} from 'shared';
+} from '@app/shared';
 
 declare var _urq: any;
 

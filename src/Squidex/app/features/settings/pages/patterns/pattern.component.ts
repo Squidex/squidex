@@ -10,18 +10,14 @@ import { FormBuilder, Validators } from '@angular/forms';
 
 import {
     AppPatternDto,
-    fadeAnimation,
-    ValidatorsEx,
-    UpdatePatternDto
-} from 'shared';
+    UpdatePatternDto,
+    ValidatorsEx
+} from '@app/shared';
 
 @Component({
     selector: 'sqx-pattern',
     styleUrls: ['./pattern.component.scss'],
-    templateUrl: './pattern.component.html',
-    animations: [
-        fadeAnimation
-    ]
+    templateUrl: './pattern.component.html'
 })
 export class PatternComponent implements OnInit {
     @Input()
@@ -39,16 +35,14 @@ export class PatternComponent implements OnInit {
     public editFormSubmitted = false;
     public editForm =
         this.formBuilder.group({
-            name: [
-                '',
+            name: ['',
                 [
                     Validators.required,
                     Validators.maxLength(100),
                     ValidatorsEx.pattern('[A-z0-9]+[A-z0-9\- ]*[A-z0-9]', 'Name can only contain letters, numbers, dashes and spaces.')
                 ]
             ],
-            pattern: [
-                '',
+            pattern: ['',
                 [
                     Validators.required
                 ]

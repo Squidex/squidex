@@ -10,23 +10,20 @@ import { FormBuilder, Validators } from '@angular/forms';
 
 import {
     AddAppLanguageDto,
-    AppContext,
     AppLanguageDto,
     AppLanguagesDto,
     AppLanguagesService,
-    HistoryChannelUpdated,
+    AppsState,
+    DialogService,
     ImmutableArray,
     LanguageDto,
     LanguagesService
-} from 'shared';
+} from '@app/shared';
 
 @Component({
     selector: 'sqx-languages-page',
     styleUrls: ['./languages-page.component.scss'],
-    templateUrl: './languages-page.component.html',
-    providers: [
-        AppContext
-    ]
+    templateUrl: './languages-page.component.html'
 })
 export class LanguagesPageComponent implements OnInit {
     public allLanguages: LanguageDto[] = [];
@@ -36,14 +33,18 @@ export class LanguagesPageComponent implements OnInit {
     public addLanguageForm =
         this.formBuilder.group({
             language: [null,
-                Validators.required
+                [
+                    Validators.required
+                ]
             ]
         });
 
-    constructor(public readonly ctx: AppContext,
+    constructor(
+        public readonly appsState: AppsState,
         private readonly appLanguagesService: AppLanguagesService,
-        private readonly languagesService: LanguagesService,
-        private readonly formBuilder: FormBuilder
+        private readonly dialogs: DialogService,
+        private readonly formBuilder: FormBuilder,
+        private readonly languagesService: LanguagesService
     ) {
     }
 
@@ -53,40 +54,40 @@ export class LanguagesPageComponent implements OnInit {
     }
 
     public load() {
-        this.appLanguagesService.getLanguages(this.ctx.appName)
+        this.appLanguagesService.getLanguages(this.appsState.appName)
             .subscribe(dto => {
                 this.updateLanguages(dto);
             }, error => {
-                this.ctx.notifyError(error);
+                this.dialogs.notifyError(error);
             });
     }
 
     public removeLanguage(language: AppLanguageDto) {
-        this.appLanguagesService.deleteLanguage(this.ctx.appName, language.iso2Code, this.appLanguages.version)
+        this.appLanguagesService.deleteLanguage(this.appsState.appName, language.iso2Code, this.appLanguages.version)
             .subscribe(dto => {
                 this.updateLanguages(this.appLanguages.removeLanguage(language, dto.version));
             }, error => {
-                this.ctx.notifyError(error);
+                this.dialogs.notifyError(error);
             });
     }
 
     public addLanguage() {
         const requestDto = new AddAppLanguageDto(this.addLanguageForm.controls['language'].value.iso2Code);
 
-        this.appLanguagesService.postLanguages(this.ctx.appName, requestDto, this.appLanguages.version)
+        this.appLanguagesService.postLanguages(this.appsState.appName, requestDto, this.appLanguages.version)
             .subscribe(dto => {
                 this.updateLanguages(this.appLanguages.addLanguage(dto.payload, dto.version));
             }, error => {
-                this.ctx.notifyError(error);
+                this.dialogs.notifyError(error);
             });
     }
 
     public updateLanguage(language: AppLanguageDto) {
-        this.appLanguagesService.putLanguage(this.ctx.appName, language.iso2Code, language, this.appLanguages.version)
+        this.appLanguagesService.putLanguage(this.appsState.appName, language.iso2Code, language, this.appLanguages.version)
             .subscribe(dto => {
                 this.updateLanguages(this.appLanguages.updateLanguage(language, dto.version));
             }, error => {
-                this.ctx.notifyError(error);
+                this.dialogs.notifyError(error);
             });
     }
 
@@ -97,7 +98,7 @@ export class LanguagesPageComponent implements OnInit {
 
                 this.updateNewLanguages();
             }, error => {
-                this.ctx.notifyError(error);
+                this.dialogs.notifyError(error);
             });
     }
 
@@ -115,8 +116,6 @@ export class LanguagesPageComponent implements OnInit {
                 }), appLanguages.version);
 
         this.updateNewLanguages();
-
-        this.ctx.bus.emit(new HistoryChannelUpdated());
     }
 
     private updateNewLanguages() {

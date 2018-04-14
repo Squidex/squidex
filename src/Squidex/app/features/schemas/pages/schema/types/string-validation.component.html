@@ -31,14 +31,14 @@
                 autocomplete="off" 
                 autocorrect="off"
                 autocapitalize="off" 
-                (focus)="regexSuggestionsModal.show()" (blur)="regexSuggestionsModal.hide()" />
+                (focus)="patternsModal.show()" (blur)="patternsModal.hide()" />
 
-            <div *ngIf="regexSuggestions.length > 0 && (regexSuggestionsModal.isOpen | async) && (showPatternSuggestions | async)" [sqxModalTarget]="patternInput" class="control-dropdown">
+            <div *ngIf="patterns.length > 0 && (patternsModal.isOpen | async) && (showPatternSuggestions | async)" [sqxModalTarget]="patternInput" class="control-dropdown">
                 <h4>Suggestions</h4>
 
-                <div *ngFor="let suggestion of regexSuggestions" class="control-dropdown-item control-dropdown-item-selectable" (mousedown)="setPattern(suggestion)">
-                    <div class="truncate">{{suggestion.name}}</div>
-                    <div class="truncate text-muted">{{suggestion.pattern}}</div>
+                <div *ngFor="let pattern of pattern" class="control-dropdown-item control-dropdown-item-selectable" (mousedown)="setPattern(suggestion)">
+                    <div class="truncate">{{pattern.name}}</div>
+                    <div class="truncate text-muted">{{pattern.pattern}}</div>
                 </div>
             </div>
         </div>

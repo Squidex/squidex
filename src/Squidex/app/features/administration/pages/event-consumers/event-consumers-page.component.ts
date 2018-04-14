@@ -9,24 +9,17 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
 
 import {
-    AppContext,
-    EventConsumerDto,
-    EventConsumersService,
-    fadeAnimation,
+    DialogService,
     ImmutableArray,
     ModalView
-} from 'shared';
+} from '@app/shared';
+
+import { EventConsumerDto, EventConsumersService } from './../../services/event-consumers.service';
 
 @Component({
     selector: 'sqx-event-consumers-page',
     styleUrls: ['./event-consumers-page.component.scss'],
-    templateUrl: './event-consumers-page.component.html',
-    providers: [
-        AppContext
-    ],
-    animations: [
-        fadeAnimation
-    ]
+    templateUrl: './event-consumers-page.component.html'
 })
 export class EventConsumersPageComponent implements OnDestroy, OnInit {
     private subscription: Subscription;
@@ -35,7 +28,8 @@ export class EventConsumersPageComponent implements OnDestroy, OnInit {
     public eventConsumerError = '';
     public eventConsumers = ImmutableArray.empty<EventConsumerDto>();
 
-    constructor(public readonly ctx: AppContext,
+    constructor(
+        private readonly dialogs: DialogService,
         private readonly eventConsumersService: EventConsumersService
     ) {
     }
@@ -59,11 +53,11 @@ export class EventConsumersPageComponent implements OnDestroy, OnInit {
                 this.eventConsumers = ImmutableArray.of(dtos);
 
                 if (showInfo) {
-                    this.ctx.notifyInfo('Event Consumers reloaded.');
+                    this.dialogs.notifyInfo('Event Consumers reloaded.');
                 }
             }, error => {
                 if (showError) {
-                    this.ctx.notifyError(error);
+                    this.dialogs.notifyError(error);
                 }
             });
     }
@@ -71,27 +65,27 @@ export class EventConsumersPageComponent implements OnDestroy, OnInit {
     public start(consumer: EventConsumerDto) {
         this.eventConsumersService.startEventConsumer(consumer.name)
             .subscribe(() => {
-                this.eventConsumers = this.eventConsumers.replaceBy('name', consumer.start());
+                this.eventConsumers = this.eventConsumers.replaceBy('name', start(consumer));
             }, error => {
-                this.ctx.notifyError(error);
+                this.dialogs.notifyError(error);
             });
     }
 
     public stop(consumer: EventConsumerDto) {
         this.eventConsumersService.stopEventConsumer(consumer.name)
             .subscribe(() => {
-                this.eventConsumers = this.eventConsumers.replaceBy('name', consumer.stop());
+                this.eventConsumers = this.eventConsumers.replaceBy('name', stop(consumer));
             }, error => {
-                this.ctx.notifyError(error);
+                this.dialogs.notifyError(error);
             });
     }
 
     public reset(consumer: EventConsumerDto) {
         this.eventConsumersService.resetEventConsumer(consumer.name)
             .subscribe(() => {
-                this.eventConsumers = this.eventConsumers.replaceBy('name', consumer.reset());
+                this.eventConsumers = this.eventConsumers.replaceBy('name', reset(consumer));
             }, error => {
-                this.ctx.notifyError(error);
+                this.dialogs.notifyError(error);
             });
     }
 
@@ -101,3 +95,16 @@ export class EventConsumersPageComponent implements OnDestroy, OnInit {
     }
 }
 
+
+
+function start(es: EventConsumerDto) {
+    return new EventConsumerDto(es.name, false, false, es.error, es.position);
+}
+
+function stop(es: EventConsumerDto) {
+    return new EventConsumerDto(es.name, true, false, es.error, es.position);
+}
+
+function reset(es: EventConsumerDto) {
+    return new EventConsumerDto(es.name, es.isStopped, true, es.error, es.position);
+}

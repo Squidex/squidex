@@ -7,9 +7,10 @@
 
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { ModuleWithProviders, NgModule } from '@angular/core';
+import { RouterModule } from '@angular/router';
 import { DndModule } from 'ng2-dnd';
 
-import { SqxFrameworkModule } from 'framework';
+import { SqxFrameworkModule } from '@app/framework';
 
 import {
     AppFormComponent,
@@ -18,17 +19,20 @@ import {
     AppLanguagesService,
     AppMustExistGuard,
     AppPatternsService,
-    AppsStoreService,
+    AppsState,
     AppsService,
     AssetComponent,
     AssetPreviewUrlPipe,
+    AssetsDialogState,
+    AssetsListComponent,
+    AssetsSelectorComponent,
+    AssetsState,
     AssetsService,
     AssetUrlPipe,
     AuthInterceptor,
     AuthService,
     BackupsService,
     ContentsService,
-    EventConsumersService,
     FileIconPipe,
     GeolocationEditorComponent,
     GraphQlService,
@@ -38,6 +42,7 @@ import {
     HistoryService,
     LanguageSelectorComponent,
     LanguagesService,
+    LoadAppsGuard,
     MarkdownEditorComponent,
     MustBeAuthenticatedGuard,
     MustBeNotAuthenticatedGuard,
@@ -47,7 +52,6 @@ import {
     ResolvePublishedSchemaGuard,
     ResolveSchemaGuard,
     SchemasService,
-    ResolveUserGuard,
     RulesService,
     UIService,
     UnsetAppGuard,
@@ -58,15 +62,16 @@ import {
     UserIdPicturePipe,
     UserPicturePipe,
     UserPictureRefPipe,
-    UserManagementService,
     UsersProviderService,
     UsersService,
-    RichEditorComponent
+    RichEditorComponent,
+    SchemasState
 } from './declarations';
 
 @NgModule({
     imports: [
         DndModule,
+        RouterModule,
         SqxFrameworkModule
     ],
     declarations: [
@@ -74,6 +79,8 @@ import {
         AssetComponent,
         AssetPreviewUrlPipe,
         AssetUrlPipe,
+        AssetsListComponent,
+        AssetsSelectorComponent,
         FileIconPipe,
         GeolocationEditorComponent,
         HelpComponent,
@@ -93,12 +100,15 @@ import {
         AssetComponent,
         AssetPreviewUrlPipe,
         AssetUrlPipe,
+        AssetsListComponent,
+        AssetsSelectorComponent,
         FileIconPipe,
         GeolocationEditorComponent,
         HelpComponent,
         HistoryComponent,
         LanguageSelectorComponent,
         MarkdownEditorComponent,
+        RouterModule,
         UserDtoPicture,
         UserIdPicturePipe,
         UserNamePipe,
@@ -106,6 +116,9 @@ import {
         UserPicturePipe,
         UserPictureRefPipe,
         RichEditorComponent
+    ],
+    providers: [
+        AssetsDialogState
     ]
 })
 export class SqxSharedModule {
@@ -119,16 +132,17 @@ export class SqxSharedModule {
                 AppMustExistGuard,
                 AppPatternsService,
                 AppsService,
-                AppsStoreService,
+                AppsState,
+                AssetsState,
                 AssetsService,
                 AuthService,
                 BackupsService,
                 ContentsService,
-                EventConsumersService,
                 GraphQlService,
                 HelpService,
                 HistoryService,
                 LanguagesService,
+                LoadAppsGuard,
                 MustBeAuthenticatedGuard,
                 MustBeNotAuthenticatedGuard,
                 PlansService,
@@ -136,13 +150,12 @@ export class SqxSharedModule {
                 ResolveContentGuard,
                 ResolvePublishedSchemaGuard,
                 ResolveSchemaGuard,
-                ResolveUserGuard,
                 RulesService,
                 SchemasService,
+                SchemasState,
                 UIService,
                 UnsetAppGuard,
                 UsagesService,
-                UserManagementService,
                 UsersProviderService,
                 UsersService,
                 {

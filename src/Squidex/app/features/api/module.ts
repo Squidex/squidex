@@ -12,7 +12,7 @@ import { DndModule } from 'ng2-dnd';
 import {
     SqxFrameworkModule,
     SqxSharedModule
-} from 'shared';
+} from '@app/shared';
 
 import {
     ApiAreaComponent,

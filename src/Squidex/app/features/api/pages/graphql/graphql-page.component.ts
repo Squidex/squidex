@@ -16,25 +16,23 @@ const GraphiQL = require('graphiql');
 /* tslint:disable:use-view-encapsulation */
 
 import {
-    AppContext,
+    AppsState,
     GraphQlService,
     LocalStoreService
-} from 'shared';
+} from '@app/shared';
 
 @Component({
     selector: 'sqx-graphql-page',
     styleUrls: ['./graphql-page.component.scss'],
     templateUrl: './graphql-page.component.html',
-    providers: [
-        AppContext
-    ],
     encapsulation: ViewEncapsulation.None
 })
 export class GraphQLPageComponent implements OnInit {
     @ViewChild('graphiQLContainer')
     public graphiQLContainer: ElementRef;
 
-    constructor(public readonly ctx: AppContext,
+    constructor(
+        public readonly appsState: AppsState,
         private readonly graphQlService: GraphQlService,
         private readonly localStoreService: LocalStoreService
     ) {
@@ -56,7 +54,7 @@ export class GraphQLPageComponent implements OnInit {
     }
 
     private request(params: any) {
-        return this.graphQlService.query(this.ctx.appName, params).catch(response => Observable.of(response.error)).toPromise();
+        return this.graphQlService.query(this.appsState.appName, params).catch(response => Observable.of(response.error)).toPromise();
     }
 }
 

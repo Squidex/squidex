@@ -8,7 +8,7 @@
 import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 
-import { ReferencesFieldPropertiesDto, SchemaDto } from 'shared';
+import { ReferencesFieldPropertiesDto, SchemasState } from '@app/shared';
 
 @Component({
     selector: 'sqx-references-validation',
@@ -23,8 +23,10 @@ export class ReferencesValidationComponent implements OnInit {
     @Input()
     public properties: ReferencesFieldPropertiesDto;
 
-    @Input()
-    public schemas: SchemaDto[];
+    constructor(
+        public readonly schemasState: SchemasState
+    ) {
+    }
 
     public ngOnInit() {
         this.editForm.setControl('maxItems',

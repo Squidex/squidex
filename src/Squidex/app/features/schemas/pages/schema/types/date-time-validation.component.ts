@@ -9,7 +9,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
 
-import { DateTimeFieldPropertiesDto, ValidatorsEx } from 'shared';
+import { DateTimeFieldPropertiesDto, ValidatorsEx } from '@app/shared';
 
 @Component({
     selector: 'sqx-date-time-validation',

@@ -10,7 +10,7 @@ import { Injectable } from '@angular/core';
 import { ValidatorFn, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
 
-import 'framework/angular/http-extensions';
+import '@app/framework/angular/http/http-extensions';
 
 import {
     AnalyticsService,
@@ -21,18 +21,37 @@ import {
     ValidatorsEx,
     Version,
     Versioned
-} from 'framework';
+} from '@app/framework';
 
-export const fieldTypes: string[] = [
-    'Assets',
-    'Boolean',
-    'DateTime',
-    'Geolocation',
-    'Json',
-    'Number',
-    'References',
-    'String',
-    'Tags'
+export const fieldTypes = [
+    {
+        type: 'String',
+        description: 'Titles, names, paragraphs.'
+    }, {
+        type: 'Assets',
+        description: 'Images, videos, documents.'
+    }, {
+        type: 'Boolean',
+        description: 'Yes or no, true or false.'
+    }, {
+        type: 'DateTime',
+        description: 'Events date, opening hours.'
+    }, {
+        type: 'Geolocation',
+        description: 'Coordinates: latitude and longitude.'
+    }, {
+        type: 'Json',
+        description: 'Data in JSON format, for developers.'
+    }, {
+        type: 'Number',
+        description: 'ID, order number, rating, quantity.'
+    }, {
+        type: 'References',
+        description: 'Links to other content items.'
+    }, {
+        type: 'Tags',
+        description: 'Special format for tags.'
+    }
 ];
 
 export const fieldInvariant = 'iv';

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ContentDto } from 'shared';
+import { ContentDto } from '@app/shared';
 
 export class ContentCreated {
     constructor(

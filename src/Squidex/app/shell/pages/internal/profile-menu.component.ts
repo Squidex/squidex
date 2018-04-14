@@ -13,7 +13,7 @@ import {
     AuthService,
     fadeAnimation,
     ModalView
-} from 'shared';
+} from '@app/shared';
 
 @Component({
     selector: 'sqx-profile-menu',

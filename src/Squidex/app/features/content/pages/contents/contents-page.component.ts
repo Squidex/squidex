@@ -29,7 +29,7 @@ import {
     Pager,
     SchemaDetailsDto,
     Versioned
-} from 'shared';
+} from '@app/shared';
 
 @Component({
     selector: 'sqx-contents-page',
@@ -361,7 +361,7 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
         this.ctx.bus.emit(new ContentRemoved(content));
     }
 
-    public trackBy(content: ContentDto): string {
+    public trackByContent(content: ContentDto): string {
         return content.id;
     }
 

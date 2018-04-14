@@ -9,13 +9,13 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import 'framework/angular/http-extensions';
+import '@app/framework/angular/http/http-extensions';
 
 import {
     ApiUrlConfig,
     DateTime,
     HTTP
-} from 'framework';
+} from '@app/framework';
 
 export class CallsUsageDto {
     constructor(

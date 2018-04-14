@@ -10,7 +10,7 @@ import { Injectable} from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { AuthService, Profile } from './../services/auth.service';
-import { ApiUrlConfig } from 'framework';
+import { ApiUrlConfig } from '@app/framework';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {

@@ -8,7 +8,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 
-import { ValidatorsEx } from 'shared';
+import { ValidatorsEx } from '@app/shared';
 
 @Component({
     selector: 'sqx-azure-queue-action',
@@ -28,12 +28,14 @@ export class AzureQueueActionComponent implements OnInit {
             connectionString: ['',
                 [
                     Validators.required
-                ]],
+                ]
+            ],
             queue: ['squidex',
                 [
                     Validators.required,
                     ValidatorsEx.pattern('[a-z][a-z0-9]{2,}(\-[a-z0-9]+)*', 'Name must be a valid azure queue name.')
-                ]]
+                ]
+            ]
         });
 
     constructor(

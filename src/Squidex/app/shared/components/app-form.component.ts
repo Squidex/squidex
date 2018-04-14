@@ -8,13 +8,12 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 
-import { ApiUrlConfig, ValidatorsEx } from 'framework';
-
 import {
-    AppDto,
-    AppsStoreService,
-    CreateAppDto
-} from './../declarations-base';
+    ApiUrlConfig,
+    AppsState,
+    CreateAppDto,
+    ValidatorsEx
+} from '@app/shared/internal';
 
 const FALLBACK_NAME = 'my-app';
 
@@ -25,10 +24,7 @@ const FALLBACK_NAME = 'my-app';
 })
 export class AppFormComponent {
     @Output()
-    public created = new EventEmitter<AppDto>();
-
-    @Output()
-    public cancelled = new EventEmitter();
+    public completed = new EventEmitter();
 
     @Input()
     public template = '';
@@ -42,23 +38,22 @@ export class AppFormComponent {
                     Validators.required,
                     Validators.maxLength(40),
                     ValidatorsEx.pattern('[a-z0-9]+(\-[a-z0-9]+)*', 'Name can contain lower case letters (a-z), numbers and dashes (not at the end).')
-                ]]
+                ]
+            ]
         });
 
     public appName =
         this.createForm.controls['name'].valueChanges.map(n => n || FALLBACK_NAME)
             .startWith(FALLBACK_NAME);
 
-    constructor(
-        public readonly apiUrl: ApiUrlConfig,
-        private readonly appsStore: AppsStoreService,
+    constructor(public readonly apiUrl: ApiUrlConfig,
+        private readonly appsStore: AppsState,
         private readonly formBuilder: FormBuilder
     ) {
     }
 
-    public cancel() {
-        this.emitCancelled();
-        this.resetCreateForm();
+    public complete() {
+        this.completed.emit();
     }
 
     public createApp() {
@@ -71,31 +66,16 @@ export class AppFormComponent {
 
             this.appsStore.createApp(request)
                 .subscribe(dto => {
-                    this.resetCreateForm();
-                    this.emitCreated(dto);
+                    this.complete();
                 }, error => {
                     this.enableCreateForm(error.displayMessage);
                 });
         }
     }
 
-    private emitCancelled() {
-        this.cancelled.emit();
-    }
-
-    private emitCreated(app: AppDto) {
-        this.created.emit(app);
-    }
-
     private enableCreateForm(message: string) {
         this.createForm.enable();
         this.createFormSubmitted = false;
         this.createFormError = message;
-    }
-
-    private resetCreateForm() {
-        this.createFormError = '';
-        this.createForm.enable();
-        this.createFormSubmitted = false;
     }
 }

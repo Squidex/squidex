@@ -8,26 +8,25 @@
 import { Component, OnInit } from '@angular/core';
 
 import {
-    AppContext,
     AppPatternDto,
     AppPatternsDto,
     AppPatternsService,
-    HistoryChannelUpdated,
+    AppsState,
+    DialogService,
     UpdatePatternDto
-} from 'shared';
+} from '@app/shared';
 
 @Component({
     selector: 'sqx-patterns-page',
     styleUrls: ['./patterns-page.component.scss'],
-    templateUrl: './patterns-page.component.html',
-    providers: [
-        AppContext
-    ]
+    templateUrl: './patterns-page.component.html'
 })
 export class PatternsPageComponent implements OnInit {
     public appPatterns: AppPatternsDto;
 
-    constructor(public readonly ctx: AppContext,
+    constructor(
+        public readonly appsState: AppsState,
+        private readonly dialogs: DialogService,
         private readonly appPatternsService: AppPatternsService
     ) {
     }
@@ -37,40 +36,40 @@ export class PatternsPageComponent implements OnInit {
     }
 
     public load() {
-        this.appPatternsService.getPatterns(this.ctx.appName).retry(2)
+        this.appPatternsService.getPatterns(this.appsState.appName)
             .subscribe(dtos => {
                 this.updatePatterns(dtos);
             }, error => {
-                this.ctx.notifyError(error);
+                this.dialogs.notifyError(error);
             });
     }
 
     public addPattern(pattern: AppPatternDto) {
         const requestDto = new UpdatePatternDto(pattern.name, pattern.pattern, pattern.message);
 
-        this.appPatternsService.postPattern(this.ctx.appName, requestDto, this.appPatterns.version)
+        this.appPatternsService.postPattern(this.appsState.appName, requestDto, this.appPatterns.version)
             .subscribe(dto => {
                 this.updatePatterns(this.appPatterns.addPattern(dto.payload, dto.version));
             }, error => {
-                this.ctx.notifyError(error);
+                this.dialogs.notifyError(error);
             });
     }
 
     public updatePattern(pattern: AppPatternDto, update: UpdatePatternDto) {
-        this.appPatternsService.putPattern(this.ctx.appName, pattern.patternId, update, this.appPatterns.version)
+        this.appPatternsService.putPattern(this.appsState.appName, pattern.patternId, update, this.appPatterns.version)
             .subscribe(dto => {
                 this.updatePatterns(this.appPatterns.updatePattern(pattern.update(update), dto.version));
             }, error => {
-                this.ctx.notifyError(error);
+                this.dialogs.notifyError(error);
             });
     }
 
     public removePattern(pattern: AppPatternDto) {
-        this.appPatternsService.deletePattern(this.ctx.appName, pattern.patternId, this.appPatterns.version)
+        this.appPatternsService.deletePattern(this.appsState.appName, pattern.patternId, this.appPatterns.version)
             .subscribe(dto => {
                 this.updatePatterns(this.appPatterns.deletePattern(pattern, dto.version));
             }, error => {
-                this.ctx.notifyError(error);
+                this.dialogs.notifyError(error);
             });
     }
 
@@ -81,7 +80,5 @@ export class PatternsPageComponent implements OnInit {
                     return a.name.localeCompare(b.name);
                 }),
                 patterns.version);
-
-        this.ctx.bus.emit(new HistoryChannelUpdated());
     }
 }

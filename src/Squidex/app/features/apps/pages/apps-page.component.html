@@ -1,7 +1,7 @@
 ﻿<sqx-title message="Apps"></sqx-title>
 
 <div class="apps-section">
-    <h1 class="apps-title">Hi {{ctx.user.displayName}}</h1>
+    <h1 class="apps-title">Hi {{authState.user?.displayName}}</h1>
 
     <div class="subtext">
         Welcome to  Squidex.
@@ -49,7 +49,9 @@
 
             <div class="card-text">
                 <div>Start with our ready to use blog.</div>
-                <div>Sample Code: <a href="https://github.com/Squidex/squidex-samples/tree/master/csharp/Sample.Blog" (click)="$event.stopPropagation()" target="_blank">ASP.NET Core</a></div>
+                <div>
+                    Sample Code: <a href="https://github.com/Squidex/squidex-samples/tree/master/csharp/Sample.Blog" (click)="$event.stopPropagation()" target="_blank">C#</a>
+                </div>
             </div>
         </div>
     </div>
@@ -64,34 +66,18 @@
 
             <div class="card-text">
                 <div>Create your profile page.</div>
-                <div>Sample Code: <a href="https://github.com/Squidex/squidex-samples/tree/master/csharp/Sample.Profile" (click)="$event.stopPropagation()" target="_blank">ASP.NET Core</a></div>
+                <div>
+                    Sample Code: <a href="https://github.com/Squidex/squidex-samples/tree/master/csharp/Sample.Profile" (click)="$event.stopPropagation()" target="_blank">C#</a>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<div class="modal" *sqxModalView="addAppDialog;onRoot:true" @fade>
-    <div class="modal-backdrop"></div>
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title" *ngIf="template">Create {{template}} Sample</h4>
-                <h4 class="modal-title" *ngIf="!template">Create App</h4>
-                
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="addAppDialog.hide()">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-
-            <div class="modal-body">
-                <sqx-app-form
-                    [template]="template"
-                    (created)="addAppDialog.hide()"
-                    (cancelled)="addAppDialog.hide()">
-                </sqx-app-form>
-            </div>
-        </div>
-    </div>
-</div>
+<ng-container *sqxModalView="addAppDialog;onRoot:true">
+    <sqx-app-form [template]="appTemplate"
+        (completed)="addAppDialog.hide()">
+    </sqx-app-form>
+</ng-container>
 
 <sqx-onboarding-dialog [modalView]="onboardingModal"></sqx-onboarding-dialog>

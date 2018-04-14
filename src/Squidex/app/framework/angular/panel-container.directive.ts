@@ -5,17 +5,16 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, Directive, ElementRef, HostListener, OnDestroy, Renderer } from '@angular/core';
+import { AfterViewInit, Directive, ElementRef, HostListener, Renderer } from '@angular/core';
 
 import { PanelComponent } from './panel.component';
 
 @Directive({
     selector: '[sqxPanelContainer]'
 })
-export class PanelContainerDirective implements AfterViewInit, OnDestroy {
+export class PanelContainerDirective implements AfterViewInit {
     private readonly panels: PanelComponent[] = [];
     private containerWidth = 0;
-    private isInit = false;
 
     constructor(
         private readonly element: ElementRef,
@@ -26,10 +25,6 @@ export class PanelContainerDirective implements AfterViewInit, OnDestroy {
     @HostListener('window:resize')
     public onResize() {
         this.invalidate(true);
-    }
-
-    public ngOnDestroy() {
-        this.isInit = true;
     }
 
     public ngAfterViewInit() {

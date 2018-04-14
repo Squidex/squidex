@@ -5,7 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { DateTime, Duration } from './../';
+import { DateTime } from './date-time';
+import { Duration } from './duration';
 
 describe('Duration', () => {
     it('should instantiate and provide timestamp as property', () => {

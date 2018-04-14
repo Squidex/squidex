@@ -1,64 +1,56 @@
-<sqx-title message="{app} | Settings" parameter1="app" [value1]="ctx.appName"></sqx-title>
+<sqx-title message="{app} | Settings" parameter1="app" [value1]="appsState.appName"></sqx-title>
 
 <sqx-panel theme="dark" desiredWidth="16rem">
-    <div class="panel-header">
-        <div class="panel-title-row">
-            <h3 class="panel-title">Settings</h3>
-        </div>
-
-        <a class="panel-close" sqxParentLink isLazyLoaded="true">
-            <i class="icon-close"></i>
-        </a>
-    </div>
-
-    <div class="panel-main">
-        <div class="panel-content">
-            <ul class="nav nav-panel nav-dark flex-column">
-                <li class="nav-item" *ngIf="ctx.app.permission === 'Owner'">
-                    <a class="nav-link" routerLink="backups" routerLinkActive="active">
-                        Backups
-                        <i class="icon-angle-right"></i>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" routerLink="clients" routerLinkActive="active">
-                        Clients
-                        <i class="icon-angle-right"></i>
-                    </a>
-                </li>
-                <li class="nav-item" *ngIf="ctx.app.permission === 'Owner'">
-                    <a class="nav-link" routerLink="contributors" routerLinkActive="active">
-                        Contributors
-                        <i class="icon-angle-right"></i>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" routerLink="languages" routerLinkActive="active">
-                        Languages
-                        <i class="icon-angle-right"></i>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" routerLink="patterns" routerLinkActive="active">
-                        Patterns
-                        <i class="icon-angle-right"></i>
-                    </a>
-                </li>
-                <li class="nav-item" *ngIf="ctx.app.permission === 'Owner'">
-                    <a class="nav-link" routerLink="plans" routerLinkActive="active">
-                        Subscription
-                        <i class="icon-angle-right"></i>
-                    </a>
-                </li>
-                <li class="nav-item" *ngIf="ctx.app.permission === 'Owner'">
-                    <a class="nav-link" routerLink="more" routerLinkActive="active">
-                        More
-                        <i class="icon-angle-right"></i>
-                    </a>
-                </li>
-            </ul>
-        </div>
-    </div>
+    <ng-container title>
+        Settings
+    </ng-container>
+    
+    <ng-container content>
+        <ul class="nav nav-panel nav-dark flex-column" *ngIf="appsState.selectedApp | async; let selectedApp">
+            <li class="nav-item" *ngIf="selectedApp.permission === 'Owner'">
+                <a class="nav-link" routerLink="backups" routerLinkActive="active">
+                    Backups
+                    <i class="icon-angle-right"></i>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" routerLink="clients" routerLinkActive="active">
+                    Clients
+                    <i class="icon-angle-right"></i>
+                </a>
+            </li>
+            <li class="nav-item" *ngIf="selectedApp.permission === 'Owner'">
+                <a class="nav-link" routerLink="contributors" routerLinkActive="active">
+                    Contributors
+                    <i class="icon-angle-right"></i>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" routerLink="languages" routerLinkActive="active">
+                    Languages
+                    <i class="icon-angle-right"></i>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" routerLink="patterns" routerLinkActive="active">
+                    Patterns
+                    <i class="icon-angle-right"></i>
+                </a>
+            </li>
+            <li class="nav-item" *ngIf="selectedApp.permission === 'Owner'">
+                <a class="nav-link" routerLink="plans" routerLinkActive="active">
+                    Subscription
+                    <i class="icon-angle-right"></i>
+                </a>
+            </li>
+            <li class="nav-item" *ngIf="selectedApp.permission === 'Owner'">
+                <a class="nav-link" routerLink="more" routerLinkActive="active">
+                    More
+                    <i class="icon-angle-right"></i>
+                </a>
+            </li>
+        </ul>
+    </ng-container>
 </sqx-panel>
 
 <router-outlet></router-outlet>

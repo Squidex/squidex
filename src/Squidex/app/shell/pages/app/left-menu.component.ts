@@ -7,7 +7,7 @@
 
 import { Component } from '@angular/core';
 
-import { AppContext } from 'shared';
+import { AppContext } from '@app/shared';
 
 @Component({
     selector: 'sqx-left-menu',

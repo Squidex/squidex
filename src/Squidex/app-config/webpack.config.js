@@ -2,6 +2,7 @@
                path = require('path'),
   HtmlWebpackPlugin = require('html-webpack-plugin'),
   ExtractTextPlugin = require('extract-text-webpack-plugin'),
+TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin'),
             helpers = require('./helpers');
 
 module.exports = {
@@ -23,6 +24,10 @@ module.exports = {
             helpers.root('app-libs'),
             helpers.root('node_modules')
         ],
+
+        plugins: [
+            new TsconfigPathsPlugin()
+        ]
     },
 
     /*

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Types } from './../';
+import { Types } from './types';
 
 describe('Types', () => {
     it('should make string check', () => {

@@ -26,15 +26,18 @@ export class ElasticSearchActionComponent implements OnInit {
             host: ['',
                 [
                     Validators.required
-                ]],
+                ]
+            ],
             indexName: ['$APP_NAME',
                 [
                     Validators.required
-                ]],
+                ]
+            ],
             indexType: ['$SCHEMA_NAME',
                 [
                     // Validators.required
-                ]],
+                ]
+            ],
             username: '',
             password: ''
         });

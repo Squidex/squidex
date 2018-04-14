@@ -12,7 +12,7 @@ import {
     HelpComponent,
     SqxFrameworkModule,
     SqxSharedModule
-} from 'shared';
+} from '@app/shared';
 
 import {
     AlgoliaActionComponent,

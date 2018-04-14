@@ -10,7 +10,7 @@ import {
     DialogRequest,
     DialogService,
     DialogServiceFactory
-} from './../';
+} from './dialog.service';
 
 describe('DialogService', () => {
     it('should instantiate from factory', () => {

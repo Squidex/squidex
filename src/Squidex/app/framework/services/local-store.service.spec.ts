@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { LocalStoreService, LocalStoreServiceFactory } from './../';
+import { LocalStoreService, LocalStoreServiceFactory } from './local-store.service';
 
 describe('LocalStore', () => {
     it('should instantiate from factory', () => {

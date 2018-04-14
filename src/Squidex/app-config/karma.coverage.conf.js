@@ -65,12 +65,20 @@ module.exports = function (config) {
          */
         singleRun: true,
 
+        customLaunchers: {
+            ChromeCustom: {
+              base: 'ChromeHeadless',
+              // We must disable the Chrome sandbox (Chrome's sandbox needs more permissions than Docker allows by default)
+              flags: ['--no-sandbox']
+            }
+          },
+
         /**
          * Run with chrome because phantom js does not provide all types, e.g. DragEvent
          * 
          * available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
          */
-        browsers: ['PhantomJS']
+        browsers: ['ChromeCustom']
     };
 
     config.set(_config);

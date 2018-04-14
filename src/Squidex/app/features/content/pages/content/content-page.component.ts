@@ -28,7 +28,7 @@ import {
     fieldInvariant,
     SchemaDetailsDto,
     Version
-} from 'shared';
+} from '@app/shared';
 
 @Component({
     selector: 'sqx-content-page',

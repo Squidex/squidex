@@ -26,8 +26,9 @@ export class WebhookActionComponent implements OnInit {
             url: ['',
                 [
                     Validators.required
-                ]],
-            sharedSecret: ['']
+                ]
+            ],
+            sharedSecret: ''
         });
 
     constructor(

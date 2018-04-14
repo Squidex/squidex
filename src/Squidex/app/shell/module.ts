@@ -7,7 +7,7 @@
 
 import { NgModule } from '@angular/core';
 
-import { SqxFrameworkModule, SqxSharedModule } from 'shared';
+import { SqxFrameworkModule, SqxSharedModule } from '@app/shared';
 
 import {
     AppAreaComponent,

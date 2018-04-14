@@ -1,86 +1,78 @@
-<sqx-title message="{app} | Plans | Settings" parameter1="app" [value1]="ctx.appName"></sqx-title>
+<sqx-title message="{app} | Plans | Settings" parameter1="app" [value1]="appsState.appName"></sqx-title>
 
 <sqx-panel desiredWidth="61rem">
-    <div class="panel-header">
-        <div class="panel-title-row">
-            <div class="float-right">
-                <button class="btn btn-link btn-secondary" (click)="load(true)" title="Refresh Plans (CTRL + SHIFT + R)">
-                    <i class="icon-reset"></i> Refresh
-                </button>
+    <ng-container title>
+        Update Plan
+    </ng-container>
 
-                <sqx-shortcut keys="ctrl+shift+r" (trigger)="load(true)"></sqx-shortcut>
+    <ng-container menu>
+        <button class="btn btn-link btn-secondary" (click)="load(true)" title="Refresh Plans (CTRL + SHIFT + R)">
+            <i class="icon-reset"></i> Refresh
+        </button>
+
+        <sqx-shortcut keys="ctrl+shift+r" (trigger)="load(true)"></sqx-shortcut>
+    </ng-container>
+
+    <ng-container content>
+        <ng-container *ngIf="plans">
+            <div class="panel-alert panel-alert-danger" *ngIf="!planOwned">
+                You have not created the subscription. Therefore you cannot change the plan.
             </div>
-            
-            <h3 class="panel-title">Update Plan</h3>
-        </div>
 
-        <a class="panel-close" sqxParentLink>
-            <i class="icon-close"></i>
-        </a>
-    </div>
+            <div class="text-muted text-center empty" *ngIf="plans.plans.length === 0">
+                No plan configured, this app has unlimited usage.
+            </div>
 
-    <div class="panel-main">
-        <div class="panel-content">
-            <div *ngIf="plans">
-                <div class="panel-alert panel-alert-danger" *ngIf="!planOwned">
-                    You have not created the subscription. Therefore you cannot change the plan.
-                </div>
+            <div class="clearfix">
+                <div class="card plan float-left" *ngFor="let plan of plans.plans">
+                    <div class="card-header text-center">
+                        <h4 class="card-title">{{plan.name}}</h4>
+                        <h5 class="plan-price">{{plan.costs}}</h5>
 
-                <div class="text-muted text-center empty" *ngIf="plans.plans.length === 0">
-                    No plan configured, this app has unlimited usage.
-                </div>
-
-                <div class="clearfix">
-                    <div class="card plan float-left" *ngFor="let plan of plans.plans">
-                        <div class="card-header text-center">
-                            <h4 class="card-title">{{plan.name}}</h4>
-                            <h5 class="plan-price">{{plan.costs}}</h5>
-    
-                            <small class="text-muted">Per Month</small>
-                        </div>
-                        <div class="card-body">
-                            <div class="plan-fact text-center">
-                                <div>
-                                    <strong>{{plan.maxApiCalls | sqxKNumber}}</strong> API Calls
-                                </div>
-                                <div>
-                                    {{plan.maxAssetSize | sqxFileSize}} Storage
-                                </div>
-                                <div>
-                                    {{plan.maxContributors}} Contributors
-                                </div>
+                        <small class="text-muted">Per Month</small>
+                    </div>
+                    <div class="card-body">
+                        <div class="plan-fact text-center">
+                            <div>
+                                <strong>{{plan.maxApiCalls | sqxKNumber}}</strong> API Calls
                             </div>
+                            <div>
+                                {{plan.maxAssetSize | sqxFileSize}} Storage
+                            </div>
+                            <div>
+                                {{plan.maxContributors}} Contributors
+                            </div>
+                        </div>
+                    
+                        <button *ngIf="plan.id === plans.currentPlanId" class="btn btn-block btn-link btn-success plan-selected">
+                            &#10003; Selected
+                        </button>
                         
-                            <button *ngIf="plan.id === plans.currentPlanId" class="btn btn-block btn-link btn-success plan-selected">
-                                &#10003; Selected
-                            </button>
-                            
-                            <button *ngIf="plan.id !== plans.currentPlanId" class="btn btn-block btn-success" [disabled]="isDisabled || !planOwned" (click)="changePlan(plan.id)">
-                                Change
-                            </button>
-                        </div>
-                        <div class="card-footer" *ngIf="plan.yearlyId">
-                            <div class="text-center">
-                                <h5 class="plan-price">{{plan.yearlyCosts}}</h5>
+                        <button *ngIf="plan.id !== plans.currentPlanId" class="btn btn-block btn-success" [disabled]="isDisabled || !planOwned" (click)="changePlan(plan.id)">
+                            Change
+                        </button>
+                    </div>
+                    <div class="card-footer" *ngIf="plan.yearlyId">
+                        <div class="text-center">
+                            <h5 class="plan-price">{{plan.yearlyCosts}}</h5>
 
-                                <small class="text-muted">Per Year</small>
-                            </div>
-
-                            <button *ngIf="plan.yearlyId === plans.currentPlanId" class="btn btn-block btn-link btn-success plan-selected">
-                                &#10003; Selected
-                            </button>
-                            
-                            <button *ngIf="plan.yearlyId !== plans.currentPlanId" class="btn btn-block btn-success" [disabled]="isDisabled || !planOwned" (click)="changePlan(plan.yearlyId)">
-                                Change
-                            </button>
+                            <small class="text-muted">Per Year</small>
                         </div>
+
+                        <button *ngIf="plan.yearlyId === plans.currentPlanId" class="btn btn-block btn-link btn-success plan-selected">
+                            &#10003; Selected
+                        </button>
+                        
+                        <button *ngIf="plan.yearlyId !== plans.currentPlanId" class="btn btn-block btn-success" [disabled]="isDisabled || !planOwned" (click)="changePlan(plan.yearlyId)">
+                            Change
+                        </button>
                     </div>
                 </div>
-
-                <div *ngIf="plans.hasPortal" class="billing-portal-link">
-                    Go to <a target="_blank" href="{{portalUrl}}">Billing Portal</a> for payment history and subscription overview.
-                </div>
             </div>
-        </div>
-    </div>
+
+            <div *ngIf="plans.hasPortal" class="billing-portal-link">
+                Go to <a target="_blank" href="{{portalUrl}}">Billing Portal</a> for payment history and subscription overview.
+            </div>
+        </ng-container>
+    </ng-container>
 </sqx-panel>

@@ -6,23 +6,23 @@
  */
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 
 import {
     ApiUrlConfig,
-    AppContext,
     AppPlansDto,
+    AppsState,
+    AuthService,
     ChangePlanDto,
+    DialogService,
     PlansService
-} from 'shared';
+} from '@app/shared';
 
 @Component({
     selector: 'sqx-plans-page',
     styleUrls: ['./plans-page.component.scss'],
-    templateUrl: './plans-page.component.html',
-    providers: [
-        AppContext
-    ]
+    templateUrl: './plans-page.component.html'
 })
 export class PlansPageComponent implements OnDestroy, OnInit {
     private queryParamsSubscription: Subscription;
@@ -35,9 +35,13 @@ export class PlansPageComponent implements OnDestroy, OnInit {
 
     public isDisabled = false;
 
-    constructor(public readonly ctx: AppContext,
+    constructor(
+        public readonly appsState: AppsState,
+        private readonly apiUrl: ApiUrlConfig,
+        private readonly authState: AuthService,
+        private readonly dialogs: DialogService,
         private readonly plansService: PlansService,
-        private readonly apiUrl: ApiUrlConfig
+        private readonly route: ActivatedRoute
     ) {
     }
 
@@ -47,7 +51,7 @@ export class PlansPageComponent implements OnDestroy, OnInit {
 
     public ngOnInit() {
         this.queryParamsSubscription =
-            this.ctx.route.queryParams.subscribe(params => {
+            this.route.queryParams.subscribe(params => {
                 this.overridePlanId = params['planId'];
             });
 
@@ -55,7 +59,7 @@ export class PlansPageComponent implements OnDestroy, OnInit {
     }
 
     public load(showInfo = false) {
-        this.plansService.getPlans(this.ctx.appName)
+        this.plansService.getPlans(this.appsState.appName)
             .subscribe(dto => {
                 if (this.overridePlanId) {
                     this.plans = dto.changePlanId(this.overridePlanId);
@@ -63,30 +67,31 @@ export class PlansPageComponent implements OnDestroy, OnInit {
                     this.plans = dto;
                 }
 
-                this.planOwned = !dto.planOwner || (dto.planOwner === this.ctx.userId);
+                this.planOwned = !dto.planOwner || (dto.planOwner === this.authState.user!.id);
 
                 if (showInfo) {
-                    this.ctx.notifyInfo('Plans reloaded.');
+                    this.dialogs.notifyInfo('Plans reloaded.');
                 }
             }, error => {
-                this.ctx.notifyError(error);
+                this.dialogs.notifyError(error);
             });
     }
 
     public changePlan(planId: string) {
         this.isDisabled = true;
 
-        this.plansService.putPlan(this.ctx.appName, new ChangePlanDto(planId), this.plans.version)
+        this.plansService.putPlan(this.appsState.appName, new ChangePlanDto(planId), this.plans.version)
+            .do(() => {
+                this.isDisabled = false;
+            })
             .subscribe(dto => {
                 if (dto.payload.redirectUri && dto.payload.redirectUri.length > 0) {
                     window.location.href = dto.payload.redirectUri;
                 } else {
                     this.plans = this.plans.changePlanId(planId, dto.version);
-                    this.isDisabled = false;
                 }
             }, error => {
-                this.ctx.notifyError(error);
-                this.isDisabled = false;
+                this.dialogs.notifyError(error);
             });
     }
 }

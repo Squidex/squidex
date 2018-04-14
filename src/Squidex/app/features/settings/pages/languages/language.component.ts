@@ -9,7 +9,7 @@ import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, OnInit } 
 import { FormBuilder } from '@angular/forms';
 import { Subscription } from 'rxjs';
 
-import { AppLanguageDto, fadeAnimation } from 'shared';
+import { AppLanguageDto, fadeAnimation } from '@app/shared';
 
 @Component({
     selector: 'sqx-language',
@@ -45,8 +45,8 @@ export class LanguageComponent implements OnInit, OnChanges, OnDestroy {
     public editFormSubmitted = false;
     public editForm =
         this.formBuilder.group({
-            isMaster: [false, []],
-            isOptional: [false, []]
+            isMaster: false,
+            isOptional: false
         });
 
     constructor(
@@ -77,12 +77,12 @@ export class LanguageComponent implements OnInit, OnChanges, OnDestroy {
         this.resetEditForm();
     }
 
-    public toggleEditing() {
-        this.isEditing = !this.isEditing;
-    }
-
     public addLanguage() {
         this.addFallbackLanguage(this.otherLanguage);
+    }
+
+    public toggleEditing() {
+        this.isEditing = !this.isEditing;
     }
 
     public removeFallbackLanguage(language: AppLanguageDto) {

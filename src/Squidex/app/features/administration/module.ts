@@ -9,16 +9,20 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
 import {
-    ResolveUserGuard,
-    SqxFrameworkModule,
-    SqxSharedModule
-} from 'shared';
+    SqxSharedModule,
+    SqxFrameworkModule
+} from '@app/shared';
 
 import {
     AdministrationAreaComponent,
     EventConsumersPageComponent,
+    EventConsumersService,
+    UnsetUserGuard,
+    UserMustExistGuard,
     UserPageComponent,
-    UsersPageComponent
+    UsersPageComponent,
+    UsersService,
+    UsersState
 } from './declarations';
 
 const routes: Routes = [
@@ -39,14 +43,13 @@ const routes: Routes = [
                         children: [
                             {
                                 path: 'new',
-                                component: UserPageComponent
+                                component: UserPageComponent,
+                                canActivate: [UnsetUserGuard]
                             },
                             {
                                 path: ':userId',
                                 component: UserPageComponent,
-                                resolve: {
-                                    user: ResolveUserGuard
-                                }
+                                canActivate: [UserMustExistGuard]
                             }
                         ]
                     }
@@ -58,8 +61,8 @@ const routes: Routes = [
 
 @NgModule({
     imports: [
-        SqxFrameworkModule,
         SqxSharedModule,
+        SqxFrameworkModule,
         RouterModule.forChild(routes)
     ],
     declarations: [
@@ -67,6 +70,13 @@ const routes: Routes = [
         EventConsumersPageComponent,
         UserPageComponent,
         UsersPageComponent
+    ],
+    providers: [
+        EventConsumersService,
+        UnsetUserGuard,
+        UserMustExistGuard,
+        UsersService,
+        UsersState
     ]
 })
 export class SqxFeatureAdministrationModule { }

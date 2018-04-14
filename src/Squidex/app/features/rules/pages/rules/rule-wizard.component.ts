@@ -11,14 +11,13 @@ import {
     AppContext,
     CreateRuleDto,
     DateTime,
-    fadeAnimation,
     ruleActions,
     ruleTriggers,
     RuleDto,
     RulesService,
     SchemaDto,
     UpdateRuleDto
-} from 'shared';
+} from '@app/shared';
 
 export const MODE_WIZARD = 'Wizard';
 export const MODE_EDIT_TRIGGER = 'EditTrigger';
@@ -30,9 +29,6 @@ export const MODE_EDIT_ACTION  = 'EditAction';
     templateUrl: './rule-wizard.component.html',
     providers: [
         AppContext
-    ],
-    animations: [
-        fadeAnimation
     ]
 })
 export class RuleWizardComponent implements OnInit {

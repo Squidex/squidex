@@ -6,6 +6,10 @@
  */
 
 import { ApplicationRef, NgModule } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { HttpClientModule } from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { DndModule } from 'ng2-dnd';
@@ -56,6 +60,11 @@ export function configUserReport() {
         BrowserModule,
         BrowserAnimationsModule,
         DndModule.forRoot(),
+        HttpClientModule,
+        FormsModule,
+        CommonModule,
+        RouterModule,
+        ReactiveFormsModule,
         SqxFrameworkModule.forRoot(),
         SqxSharedModule.forRoot(),
         SqxShellModule,

@@ -13,12 +13,8 @@ import { PanelContainerDirective } from './panel-container.directive';
 
 @Component({
     selector: 'sqx-panel',
-    template: `
-        <div #panel>
-            <div class="panel panel-{{theme}}" [@slideRight]>
-                <ng-content></ng-content>
-            </div>
-        </div>`,
+    styleUrls: ['./panel.component.scss'],
+    templateUrl: './panel.component.html',
     animations: [
         slideRightAnimation
     ]
@@ -31,6 +27,27 @@ export class PanelComponent implements AfterViewInit, OnDestroy, OnInit {
 
     @Input()
     public desiredWidth = '10rem';
+
+    @Input()
+    public isBlank = false;
+
+    @Input()
+    public isFullSize = false;
+
+    @Input()
+    public showScrollbar = false;
+
+    @Input()
+    public showSecondHeader = false;
+
+    @Input()
+    public showSidebar = false;
+
+    @Input()
+    public showClose = true;
+
+    @Input()
+    public contentClass = '';
 
     @ViewChild('panel')
     public panel: ElementRef;

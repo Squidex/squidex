@@ -5,37 +5,33 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable, OnDestroy } from '@angular/core';
-import { Observable, Subscription } from 'rxjs';
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 
-import { MessageBus } from 'framework';
+import { MessageBus } from '@app/framework';
 
 import {
     AppDto,
-    AppsStoreService,
+    AppsState,
     AuthService,
     DialogService,
     ErrorDto,
-    Notification,
     Profile
-} from './../declarations-base';
+} from '@app/shared/internal';
 
 @Injectable()
-export class AppContext implements OnDestroy {
-    private readonly appSubscription: Subscription;
-    private appField: AppDto;
-
+export class AppContext {
     public get app(): AppDto {
-        return this.appField;
+        return this.appsState.snapshot.selectedApp!;
     }
 
     public get appChanges(): Observable<AppDto | null> {
-        return this.appsStore.selectedApp;
+        return this.appsState.selectedApp;
     }
 
     public get appName(): string {
-        return this.appField ? this.appField.name : '';
+        return this.app.name;
     }
 
     public get userToken(): string {
@@ -53,18 +49,10 @@ export class AppContext implements OnDestroy {
     constructor(
         public readonly dialogs: DialogService,
         public readonly authService: AuthService,
-        public readonly appsStore: AppsStoreService,
+        public readonly appsState: AppsState,
         public readonly route: ActivatedRoute,
         public readonly bus: MessageBus
     ) {
-        this.appSubscription =
-            this.appsStore.selectedApp.take(1).subscribe(app => {
-                this.appField = app!;
-            });
-    }
-
-    public ngOnDestroy() {
-        this.appSubscription.unsubscribe();
     }
 
     public confirmUnsavedChanges(): Observable<boolean> {
@@ -72,14 +60,10 @@ export class AppContext implements OnDestroy {
     }
 
     public notifyInfo(error: string) {
-        this.dialogs.notify(Notification.info(error));
+        this.dialogs.notifyInfo(error);
     }
 
     public notifyError(error: string | ErrorDto) {
-        if (error instanceof ErrorDto) {
-            this.dialogs.notify(Notification.error(error.displayMessage));
-        } else {
-            this.dialogs.notify(Notification.error(error));
-        }
+        this.dialogs.notifyError(error);
     }
 }

@@ -1,80 +1,55 @@
-<sqx-title message="{app} | Schemas" parameter1="app" [value1]="ctx.appName"></sqx-title>
+<sqx-title message="{app} | Schemas" parameter1="app" [value1]="appsState.appName"></sqx-title>
 
-<sqx-panel theme="dark" desiredWidth="30rem">
-    <div class="panel-header">
-        <div class="panel-title-row">
-            <h3 class="panel-title">Schemas</h3>
+<sqx-panel theme="dark" desiredWidth="30rem" showSecondHeader="true">
+    <ng-container title>
+        Schemas
+    </ng-container>
+    
+    <ng-container secondHeader>
+        <sqx-shortcut keys="ctrl+shift+g" (trigger)="addSchemaDialog.show()"></sqx-shortcut>
+        <sqx-shortcut keys="ctrl+shift+f" (trigger)="inputFind.focus()"></sqx-shortcut>
+
+        <button class="btn btn-success subheader-button" (click)="createSchema()" title="New Schema (CTRL + SHIFT + G)">
+            <i class="icon-plus"></i>          
+        </button>
+        
+        <div class="search-form">
+            <input class="form-control form-control-dark" #inputFind [formControl]="schemasFilter" placeholder="Search for schemas..." />
+
+            <i class="icon-search"></i>
         </div>
+    </ng-container>
 
-        <a class="panel-close" sqxParentLink isLazyLoaded="true">
-            <i class="icon-close"></i>
-        </a>
-
-        <div class="panel-header-row">
-            <sqx-shortcut keys="ctrl+shift+g" (trigger)="addSchemaDialog.show()"></sqx-shortcut>
-            <sqx-shortcut keys="ctrl+shift+f" (trigger)="inputFind.focus()"></sqx-shortcut>
-
-            <button class="btn btn-success subheader-button" (click)="createSchema(null)" title="New Schema (CTRL + SHIFT + G)">
-                <i class="icon-plus"></i>          
-            </button>
-            
-            <div class="search-form">
-                <input class="form-control form-control-dark" #inputFind [formControl]="schemasFilter" placeholder="Search for schemas..." />
-
-                <i class="icon-search"></i>
-            </div>
-        </div>
-    </div>
-
-    <div class="panel-main">
-        <div class="panel-content">
-            <ul class="nav nav-panel nav-dark nav-dark-bordered flex-column">
-                <li class="nav-item" *ngFor="let schema of schemasFiltered">
-                    <a class="nav-link" [routerLink]="[schema.name]" routerLinkActive="active">
-                        <div class="row">
-                            <div class="col col-4">
-                                <span class="schema-name">{{schema.displayName}}</span> 
-                            </div>
-                            <div class="col col-4">
-                                <span class="schema-user">
-                                    <i class="icon-user"></i> {{schema.lastModifiedBy | sqxUserNameRef}}
-                                </span>
-                            </div>
-                            <div class="col col-4 schema-modified">
-                                <small class="item-modified">{{schema.lastModified | sqxFromNow}}</small>
-                                
-                                <span class="item-published" [class.unpublished]="!schema.isPublished"></span>
-                            </div>
+    <ng-container content>
+        <ul class="nav nav-panel nav-dark nav-dark-bordered flex-column">
+            <li class="nav-item" *ngFor="let schema of schemasFiltered | async; trackBy: trackBySchema">
+                <a class="nav-link" [routerLink]="[schema.name]" routerLinkActive="active">
+                    <div class="row">
+                        <div class="col col-4">
+                            <span class="schema-name">{{schema.displayName}}</span> 
                         </div>
-                    </a>
-                </li>
-            </ul>
-        </div>
-    </div>
+                        <div class="col col-4">
+                            <span class="schema-user">
+                                <i class="icon-user"></i> {{schema.lastModifiedBy | sqxUserNameRef}}
+                            </span>
+                        </div>
+                        <div class="col col-4 schema-modified">
+                            <small class="item-modified">{{schema.lastModified | sqxFromNow}}</small>
+                            
+                            <span class="item-published" [class.unpublished]="!schema.isPublished"></span>
+                        </div>
+                    </div>
+                </a>
+            </li>
+        </ul>
+    </ng-container>
 </sqx-panel>
 
-<div class="modal" *sqxModalView="addSchemaDialog;onRoot:true" @fade>
-    <div class="modal-backdrop"></div>
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title" *ngIf="import">Clone Schema</h4>
-                <h4 class="modal-title" *ngIf="!import">Create Schema</h4>
-
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="addSchemaDialog.hide()">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-
-            <div class="modal-body">
-                <sqx-schema-form
-                    [import]="import"
-                    (created)="onSchemaCreated($event)" 
-                    (cancelled)="addSchemaDialog.hide()">
-                </sqx-schema-form>
-            </div>
-        </div>
-    </div>
-</div>
+<ng-container *sqxModalView="addSchemaDialog;onRoot:true">
+    <sqx-schema-form [import]="import"
+        (cancelled)="addSchemaDialog.hide()"
+        (created)="onSchemaCreated($event)">
+    </sqx-schema-form>
+</ng-container>
 
 <router-outlet></router-outlet>

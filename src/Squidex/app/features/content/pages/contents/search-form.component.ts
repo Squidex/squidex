@@ -5,13 +5,14 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 
 @Component({
     selector: 'sqx-search-form',
     styleUrls: ['./search-form.component.scss'],
-    templateUrl: './search-form.component.html'
+    templateUrl: './search-form.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SearchFormComponent implements OnChanges {
     private queryValue = '';
