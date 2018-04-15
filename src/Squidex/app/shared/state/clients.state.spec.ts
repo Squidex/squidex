@@ -14,11 +14,11 @@ import {
     AppClientsDto,
     AppClientsService,
     ClientsState,
+    CreateAppClientDto,
     DialogService,
     UpdateAppClientDto,
     Version,
-    Versioned,
-    CreateAppClientDto
+    Versioned
  } from '@app/shared';
 
 describe('ClientsState', () => {
@@ -55,6 +55,7 @@ describe('ClientsState', () => {
 
     it('should load clients', () => {
         expect(clientsState.snapshot.clients.values).toEqual(oldClients);
+        expect(clientsState.snapshot.isLoaded).toBeTruthy();
         expect(clientsState.snapshot.version).toEqual(version);
     });
 

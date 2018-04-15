@@ -14,6 +14,7 @@ import '@app/framework/utils/rxjs-extensions';
 
 import {
     DateTime,
+    DialogService,
     Form,
     ImmutableArray,
     State,
@@ -67,7 +68,8 @@ export class AppsState extends State<Snapshot> {
             .distinctUntilChanged();
 
     constructor(
-        private readonly appsService: AppsService
+        private readonly appsService: AppsService,
+        private readonly dialogs: DialogService
     ) {
         super({ apps: ImmutableArray.empty(), selectedApp: null });
     }
@@ -116,6 +118,7 @@ export class AppsState extends State<Snapshot> {
 
                     return { ...s, apps, selectedApp };
                 });
-            });
+            })
+            .notify(this.dialogs);
     }
 }

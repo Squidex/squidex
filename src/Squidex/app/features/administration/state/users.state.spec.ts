@@ -51,7 +51,7 @@ describe('UsersState', () => {
     });
 
     it('should load users', () => {
-        expect(usersState.snapshot.users.values).toEqual([{ isCurrentUser: false, user: oldUsers[0] }, { isCurrentUser: true, user: oldUsers[1] }]);
+        expect(usersState.snapshot.users.values).toEqual(oldUsers.map(x => u(x)));
         expect(usersState.snapshot.usersPager.numberOfItems).toEqual(200);
 
         usersService.verifyAll();
@@ -76,7 +76,7 @@ describe('UsersState', () => {
 
         usersState.load().subscribe();
 
-        expect(usersState.snapshot.selectedUser).toEqual({ isCurrentUser: false, user: newUsers[0] });
+        expect(usersState.snapshot.selectedUser).toEqual(u(newUsers[0]));
     });
 
     it('should mark as current user when selected user equals to profile', () => {
@@ -87,7 +87,7 @@ describe('UsersState', () => {
         });
 
         expect(selectedUser!).toEqual(oldUsers[1]);
-        expect(usersState.snapshot.selectedUser!).toEqual({ isCurrentUser: true, user: oldUsers[1] });
+        expect(usersState.snapshot.selectedUser).toEqual(u(oldUsers[1]));
     });
 
     it('should not load user when already loaded', () => {
@@ -98,7 +98,7 @@ describe('UsersState', () => {
         });
 
         expect(selectedUser!).toEqual(oldUsers[0]);
-        expect(usersState.snapshot.selectedUser).toEqual({ isCurrentUser: false, user: oldUsers[0] });
+        expect(usersState.snapshot.selectedUser).toEqual(u(oldUsers[0]));
 
         usersService.verify(x => x.getUser(It.isAnyString()), Times.never());
     });
@@ -114,7 +114,7 @@ describe('UsersState', () => {
         });
 
         expect(selectedUser!).toEqual(newUser);
-        expect(usersState.snapshot.selectedUser).toEqual({ isCurrentUser: false, user: newUser });
+        expect(usersState.snapshot.selectedUser).toEqual(u(newUser));
 
         usersService.verify(x => x.getUser('id3'), Times.once());
     });
@@ -166,7 +166,7 @@ describe('UsersState', () => {
         usersState.select('id2').subscribe();
         usersState.unlock(oldUsers[1]).subscribe();
 
-        const user_1 = usersState.snapshot.users.at(0);
+        const user_1 = usersState.snapshot.users.at(1);
 
         expect(user_1.user.isLocked).toBeFalsy();
         expect(user_1).toBe(usersState.snapshot.selectedUser);
@@ -196,7 +196,7 @@ describe('UsersState', () => {
 
         usersState.create(request).subscribe();
 
-        expect(usersState.snapshot.users.at(0).user).toBe(newUser);
+        expect(usersState.snapshot.users.values).toEqual([u(newUser), ...oldUsers.map(x => u(x))]);
         expect(usersState.snapshot.usersPager.numberOfItems).toBe(201);
     });
 
@@ -208,7 +208,7 @@ describe('UsersState', () => {
         usersState.goPrev().subscribe();
 
         usersService.verify(x => x.getUsers(10, 10, undefined), Times.once());
-        usersService.verify(x => x.getUsers(10, 0, undefined), Times.exactly(2));
+        usersService.verify(x => x.getUsers(10, 0,  undefined), Times.exactly(2));
     });
 
     it('should load with query when searching', () => {
@@ -221,4 +221,8 @@ describe('UsersState', () => {
 
         usersService.verify(x => x.getUsers(10, 0, 'my-query'), Times.once());
     });
+
+    function u(user: UserDto) {
+        return { user, isCurrentUser: user.id === 'id2' };
+    }
 });

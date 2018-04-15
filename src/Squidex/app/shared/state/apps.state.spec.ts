@@ -13,7 +13,8 @@ import {
     AppsService,
     AppsState,
     CreateAppDto,
-    DateTime
+    DateTime,
+    DialogService
 } from './../';
 
 describe('AppsState', () => {
@@ -23,19 +24,23 @@ describe('AppsState', () => {
         new AppDto('id1', 'old-name1', 'Owner', now, now, 'Free', 'Plan'),
         new AppDto('id2', 'old-name2', 'Owner', now, now, 'Free', 'Plan')
     ];
+
     const newApp = new AppDto('id3', 'new-name', 'Owner', now, now, 'Free', 'Plan');
 
+    let dialogs: IMock<DialogService>;
     let appsService: IMock<AppsService>;
     let appsState: AppsState;
 
     beforeEach(() => {
+        dialogs = Mock.ofType<DialogService>();
+
         appsService = Mock.ofType<AppsService>();
 
         appsService.setup(x => x.getApps())
             .returns(() => Observable.of(oldApps))
             .verifiable(Times.once());
 
-        appsState = new AppsState(appsService.object);
+        appsState = new AppsState(appsService.object, dialogs.object);
         appsState.load().subscribe();
     });
 

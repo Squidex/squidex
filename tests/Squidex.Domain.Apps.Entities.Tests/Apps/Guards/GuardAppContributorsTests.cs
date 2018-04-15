@@ -83,6 +83,14 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         }
 
         [Fact]
+        public Task CanAssign_should_throw_exception_if_user_is_actor()
+        {
+            var command = new AssignContributor { ContributorId = "3", Permission = (AppContributorPermission)10, Actor = new RefToken("user", "3") };
+
+            return Assert.ThrowsAsync<ValidationException>(() => GuardAppContributors.CanAssign(contributors_0, command, users, appPlan));
+        }
+
+        [Fact]
         public Task CanAssign_should_throw_exception_if_contributor_max_reached()
         {
             A.CallTo(() => appPlan.MaxContributors)

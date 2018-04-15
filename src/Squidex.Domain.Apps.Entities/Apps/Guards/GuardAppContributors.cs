@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Apps;
@@ -44,7 +45,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                     {
                         command.ContributorId = user.Id;
 
-                        if (contributors.TryGetValue(command.ContributorId, out var existing))
+                        if (string.Equals(command.ContributorId, command.Actor.Identifier, StringComparison.OrdinalIgnoreCase))
+                        {
+                            error(new ValidationError("You cannot change your own permission."));
+                        }
+                        else if (contributors.TryGetValue(command.ContributorId, out var existing))
                         {
                             if (existing == command.Permission)
                             {

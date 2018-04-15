@@ -8,7 +8,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { AppsState, DialogService } from '@app/shared';
+import { AppsState } from '@app/shared';
 
 @Component({
     selector: 'sqx-more-page',
@@ -18,7 +18,6 @@ import { AppsState, DialogService } from '@app/shared';
 export class MorePageComponent {
     constructor(
         public readonly appsState: AppsState,
-        private readonly dialogs: DialogService,
         private readonly router: Router
     ) {
     }
@@ -27,8 +26,6 @@ export class MorePageComponent {
         this.appsState.delete(this.appsState.appName)
             .subscribe(() => {
                 this.router.navigate(['/app']);
-            }, error => {
-                this.dialogs.notifyError(error);
             });
     }
 }
