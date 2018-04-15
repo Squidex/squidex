@@ -15,7 +15,7 @@
         <ng-container *ngIf="contributorsState.contributors | async; let contributors">
             <table class="table table-items table-fixed">
                 <tbody>
-                    <ng-template ngFor let-contributorInfo [ngForOf]="contributors">
+                    <ng-template ngFor let-contributorInfo [ngForOf]="contributors" [ngForTrackBy]="trackByContributor">
                         <tr>
                             <td class="cell-user">
                                 <img class="user-picture" [attr.title]="contributorInfo.contributor.contributorId | sqxUserName" [attr.src]="contributorInfo.contributor.contributorId | sqxUserPicture" />

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component, Injectable, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { Observable } from 'rxjs';
 
@@ -19,16 +19,17 @@ import {
     UsersService
 } from '@app/shared';
 
+@Injectable()
 export class UsersDataSource implements AutocompleteSource {
     constructor(
-        private readonly usersService: UsersService,
-        private readonly component: ContributorsPageComponent
+        private readonly contributorsState: ContributorsState,
+        private readonly usersService: UsersService
     ) {
     }
 
     public find(query: string): Observable<any[]> {
         return this.usersService.getUsers(query)
-            .withLatestFrom(this.component.contributorsState.contributors, (users, contributors) => {
+            .withLatestFrom(this.contributorsState.contributors, (users, contributors) => {
                 const results: any[] = [];
 
                 for (let user of users) {
@@ -44,10 +45,12 @@ export class UsersDataSource implements AutocompleteSource {
 @Component({
     selector: 'sqx-contributors-page',
     styleUrls: ['./contributors-page.component.scss'],
-    templateUrl: './contributors-page.component.html'
+    templateUrl: './contributors-page.component.html',
+    providers: [
+        UsersDataSource
+    ]
 })
 export class ContributorsPageComponent implements OnInit {
-    public usersDataSource: UsersDataSource;
     public usersPermissions = [ 'Owner', 'Developer', 'Editor' ];
 
     public assignContributorForm = new AssignContributorForm(this.formBuilder);
@@ -55,10 +58,9 @@ export class ContributorsPageComponent implements OnInit {
     constructor(
         public readonly appsState: AppsState,
         public readonly contributorsState: ContributorsState,
-        private readonly formBuilder: FormBuilder,
-        usersService: UsersService
+        public readonly usersDataSource: UsersDataSource,
+        private readonly formBuilder: FormBuilder
     ) {
-        this.usersDataSource = new UsersDataSource(usersService, this);
     }
 
     public ngOnInit() {
@@ -92,5 +94,9 @@ export class ContributorsPageComponent implements OnInit {
                     this.assignContributorForm.submitFailed(error);
                 });
         }
+    }
+
+    public trackByContributor(index: number, contributor: { contributor: AppContributorDto }) {
+        return contributor.contributor.contributorId;
     }
 }

@@ -37,14 +37,6 @@ export class UsersPageComponent implements OnInit {
         this.usersState.search(this.usersFilter.value).onErrorResumeNext().subscribe();
     }
 
-    public lock(user: UserDto) {
-        this.usersState.lock(user).onErrorResumeNext().subscribe();
-    }
-
-    public unlock(user: UserDto) {
-        this.usersState.unlock(user).onErrorResumeNext().subscribe();
-    }
-
     public goPrev() {
         this.usersState.goPrev().onErrorResumeNext().subscribe();
     }
@@ -53,8 +45,16 @@ export class UsersPageComponent implements OnInit {
         this.usersState.goNext().onErrorResumeNext().subscribe();
     }
 
-    public trackByUser(index: number, user: UserDto) {
-        return user.id;
+    public lock(user: UserDto) {
+        this.usersState.lock(user).onErrorResumeNext().subscribe();
+    }
+
+    public unlock(user: UserDto) {
+        this.usersState.unlock(user).onErrorResumeNext().subscribe();
+    }
+
+    public trackByUser(index: number, user: { user: UserDto }) {
+        return user.user.id;
     }
 }
 
