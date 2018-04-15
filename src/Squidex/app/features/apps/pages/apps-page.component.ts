@@ -27,7 +27,7 @@ export class AppsPageComponent implements OnDestroy, OnInit {
 
     public addAppDialog = new ModalView();
 
-    public apps: ImmutableArray<AppDto>;
+    public apps: ImmutableArray<AppDto> = ImmutableArray.empty();
     public appTemplate = '';
 
     public onboardingModal = new ModalView();

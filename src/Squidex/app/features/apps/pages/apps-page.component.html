@@ -80,4 +80,6 @@
     </sqx-app-form>
 </ng-container>
 
-<sqx-onboarding-dialog [modalView]="onboardingModal"></sqx-onboarding-dialog>
+<ng-container *sqxModalView="onboardingModal;onRoot:true;closeAuto:false">
+    <sqx-onboarding-dialog (close)="onboardingModal.hide()"></sqx-onboarding-dialog>
+</ng-container>
