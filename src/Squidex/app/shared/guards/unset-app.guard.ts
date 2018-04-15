@@ -19,6 +19,6 @@ export class UnsetAppGuard implements CanActivate {
     }
 
     public canActivate(): Observable<boolean> {
-        return this.appsState.selectApp(null).map(a => a === null);
+        return this.appsState.select(null).map(a => a === null);
     }
 }

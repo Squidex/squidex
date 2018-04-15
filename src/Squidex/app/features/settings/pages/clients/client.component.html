@@ -2,7 +2,7 @@
     <div class="row no-gutters">
         <div class="col">
             <div class="client-header">
-                <form *ngIf="isRenaming" class="form-inline" [formGroup]="renameForm" (ngSubmit)="renaming.emit(renameForm.controls.name.value)">
+                <form *ngIf="isRenaming" class="form-inline" [formGroup]="renameForm" (ngSubmit)="rename()">
                     <div class="form-group mr-1">
                         <sqx-control-errors for="name"></sqx-control-errors>
                         
@@ -32,7 +32,7 @@
         </div>
         <div class="col col-auto cell-actions">
             <button type="button" class="btn btn-link btn-danger"
-                (sqxConfirmClick)="revoking.emit()"
+                (sqxConfirmClick)="revoke()"
                 confirmTitle="Revoke client" 
                 confirmText="Do you really want to revoke the client?">
                 <i class="icon-bin2"></i>
@@ -70,7 +70,7 @@
             Permission:
         </div>
         <div class="col">
-            <select class="form-control" [ngModel]="client.permission" (ngModelChange)="updating.emit($event)">
+            <select class="form-control" [ngModel]="client.permission" (ngModelChange)="updatePermission($event)">
                 <option *ngFor="let permission of clientPermissions" [ngValue]="permission">{{permission}}</option>
             </select>
         </div>

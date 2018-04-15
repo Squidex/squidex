@@ -84,7 +84,7 @@ describe('SchemasState', () => {
             .returns(() => Observable.of(schema));
 
         schemasState = new SchemasState(appsState.object, authService.object, dialogs.object, schemasService.object);
-        schemasState.loadSchemas().subscribe();
+        schemasState.load().subscribe();
     });
 
     it('should load schemas', () => {
@@ -94,8 +94,8 @@ describe('SchemasState', () => {
     });
 
     it('should reload schema when already loaded', () => {
-        schemasState.selectSchema('name2').subscribe();
-        schemasState.selectSchema('name2').subscribe();
+        schemasState.select('name2').subscribe();
+        schemasState.select('name2').subscribe();
 
         schemasService.verify(x => x.getSchema(app, 'name2'), Times.exactly(2));
     });
@@ -103,7 +103,7 @@ describe('SchemasState', () => {
     it('should load selected schema when not loaded', () => {
         let selectedSchema: SchemaDetailsDto;
 
-        schemasState.selectSchema('name2').subscribe(x => {
+        schemasState.select('name2').subscribe(x => {
             selectedSchema = x!;
         });
 
@@ -118,7 +118,7 @@ describe('SchemasState', () => {
 
         let selectedSchema: SchemaDetailsDto;
 
-        schemasState.selectSchema('failed').subscribe(x => {
+        schemasState.select('failed').subscribe(x => {
             selectedSchema = x!;
         });
 
@@ -129,7 +129,7 @@ describe('SchemasState', () => {
     it('should return null when unselecting schema', () => {
         let selectedSchema: SchemaDetailsDto;
 
-        schemasState.selectSchema(null).subscribe(x => {
+        schemasState.select(null).subscribe(x => {
             selectedSchema = x!;
         });
 
@@ -165,7 +165,7 @@ describe('SchemasState', () => {
 
     describe('with selection', () => {
         beforeEach(() => {
-            schemasState.selectSchema(schema.name).subscribe();
+            schemasState.select(schema.name).subscribe();
         });
 
         it('should update isPublished property and user info when publishing selected schema', () => {

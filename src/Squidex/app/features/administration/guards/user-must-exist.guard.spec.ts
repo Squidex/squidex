@@ -31,7 +31,7 @@ describe('UserMustExistGuard', () => {
     });
 
     it('should load user and return true when found', () => {
-        usersState.setup(x => x.selectUser('123'))
+        usersState.setup(x => x.select('123'))
             .returns(() => Observable.of(<UserDto>{}));
 
         let result: boolean;
@@ -42,11 +42,11 @@ describe('UserMustExistGuard', () => {
 
         expect(result!).toBeTruthy();
 
-        usersState.verify(x => x.selectUser('123'), Times.once());
+        usersState.verify(x => x.select('123'), Times.once());
     });
 
     it('should load user and return false when not found', () => {
-        usersState.setup(x => x.selectUser('123'))
+        usersState.setup(x => x.select('123'))
             .returns(() => Observable.of(null));
 
         let result: boolean;

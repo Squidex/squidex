@@ -37,15 +37,15 @@ export class UsersPageComponent implements OnInit {
     }
 
     public load(notify = false) {
-        this.usersState.loadUsers(notify).onErrorResumeNext().subscribe();
+        this.usersState.load(notify).onErrorResumeNext().subscribe();
     }
 
     public lock(user: UserDto) {
-        this.usersState.lockUser(user).onErrorResumeNext().subscribe();
+        this.usersState.lock(user).onErrorResumeNext().subscribe();
     }
 
     public unlock(user: UserDto) {
-        this.usersState.unlockUser(user).onErrorResumeNext().subscribe();
+        this.usersState.unlock(user).onErrorResumeNext().subscribe();
     }
 
     public goPrev() {

@@ -53,11 +53,11 @@ describe('AssetsState', () => {
             .returns(() => Observable.of(new AssetsDto(200, oldAssets)));
 
         assetsState = new AssetsState(appsState.object, assetsService.object, dialogs.object);
-        assetsState.loadAssets().subscribe();
+        assetsState.load().subscribe();
     });
 
     it('should load assets', () => {
-        assetsState.loadAssets().subscribe();
+        assetsState.load().subscribe();
 
         expect(assetsState.snapshot.assets.values).toEqual(oldAssets);
         expect(assetsState.snapshot.assetsPager.numberOfItems).toEqual(200);
@@ -66,7 +66,7 @@ describe('AssetsState', () => {
     });
 
     it('should not reload when assets assets already loaded', () => {
-        assetsState.loadAssets(false, true).subscribe();
+        assetsState.load(false, true).subscribe();
 
         expect(assetsState.snapshot.assets.values).toEqual(oldAssets);
         expect(assetsState.snapshot.assetsPager.numberOfItems).toEqual(200);
@@ -75,7 +75,7 @@ describe('AssetsState', () => {
     });
 
     it('should raise notification on load when notify is true', () => {
-        assetsState.loadAssets(true).subscribe();
+        assetsState.load(true).subscribe();
 
         dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
     });
@@ -83,7 +83,7 @@ describe('AssetsState', () => {
     it('should add asset to snapshot', () => {
         const newAsset = new AssetDto('id3', creator, creator, creation, creation, 'name3', 'type3', 3, 3, 'mime3', true, 0, 0, 'url3', version);
 
-        assetsState.addAsset(newAsset);
+        assetsState.add(newAsset);
 
         expect(assetsState.snapshot.assets.values).toEqual([newAsset, ...oldAssets]);
         expect(assetsState.snapshot.assetsPager.numberOfItems).toBe(201);
@@ -91,7 +91,8 @@ describe('AssetsState', () => {
 
     it('should update asset in snapshot', () => {
         const newAsset = new AssetDto('id1', modifier, modifier, modified, modified, 'name3', 'type3', 3, 3, 'mime3', true, 0, 0, 'url3', version);
-        assetsState.updateAsset(newAsset);
+
+        assetsState.update(newAsset);
 
         const asset_1 = assetsState.snapshot.assets.at(0);
 

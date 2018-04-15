@@ -22,7 +22,7 @@ describe('LoadAppsGuard', () => {
     });
 
     it('should load apps', () => {
-        appsState.setup(x => x.loadApps())
+        appsState.setup(x => x.load())
             .returns(() => Observable.of(null));
 
         let result = false;
@@ -33,6 +33,6 @@ describe('LoadAppsGuard', () => {
 
         expect(result).toBeTruthy();
 
-        appsState.verify(x => x.loadApps(), Times.once());
+        appsState.verify(x => x.load(), Times.once());
     });
 });

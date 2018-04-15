@@ -173,7 +173,7 @@ export class SchemasState extends State<Snapshot> {
         super({ schemas: ImmutableArray.of() });
     }
 
-    public selectSchema(idOrName: string | null): Observable<SchemaDetailsDto | null> {
+    public select(idOrName: string | null): Observable<SchemaDetailsDto | null> {
         return this.loadSchema(idOrName)
             .do(schema => {
                 this.next(s => {
@@ -190,7 +190,7 @@ export class SchemasState extends State<Snapshot> {
                 .catch(() => Observable.of(null));
     }
 
-    public loadSchemas(): Observable<any> {
+    public load(): Observable<any> {
         return this.schemasService.getSchemas(this.appName)
             .do(dtos => {
                 return this.next(s => {

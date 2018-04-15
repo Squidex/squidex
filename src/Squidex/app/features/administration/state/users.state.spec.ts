@@ -47,7 +47,7 @@ describe('UsersState', () => {
             .returns(() => Observable.of(new UsersDto(200, oldUsers)));
 
         usersState = new UsersState(authService.object, dialogs.object, usersService.object);
-        usersState.loadUsers().subscribe();
+        usersState.load().subscribe();
     });
 
     it('should load users', () => {
@@ -58,7 +58,7 @@ describe('UsersState', () => {
     });
 
     it('should replace selected user when reloading', () => {
-        usersState.selectUser('id1').subscribe();
+        usersState.select('id1').subscribe();
 
         const newUsers = [
             new UserDto('id1', 'mail1@mail.de_new', 'name1_new', false),
@@ -68,19 +68,19 @@ describe('UsersState', () => {
         usersService.setup(x => x.getUsers(10, 0, undefined))
             .returns(() => Observable.of(new UsersDto(200, newUsers)));
 
-        usersState.loadUsers().subscribe();
+        usersState.load().subscribe();
 
         expect(usersState.snapshot.selectedUser).toBe(newUsers[0]);
     });
 
     it('should raise notification on load when notify is true', () => {
-        usersState.loadUsers(true).subscribe();
+        usersState.load(true).subscribe();
 
         dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
     });
 
     it('should mark as current user when selected user equals to profile', () => {
-        usersState.selectUser('id2').subscribe();
+        usersState.select('id2').subscribe();
 
         expect(usersState.snapshot.isCurrentUser).toBeTruthy();
     });
@@ -88,7 +88,7 @@ describe('UsersState', () => {
     it('should not load user when already loaded', () => {
         let selectedUser: UserDto;
 
-        usersState.selectUser('id1').subscribe(x => {
+        usersState.select('id1').subscribe(x => {
             selectedUser = x!;
         });
 
@@ -104,7 +104,7 @@ describe('UsersState', () => {
 
         let selectedUser: UserDto;
 
-        usersState.selectUser('id3').subscribe(x => {
+        usersState.select('id3').subscribe(x => {
             selectedUser = x!;
         });
 
@@ -115,7 +115,7 @@ describe('UsersState', () => {
     it('should return null when unselecting user', () => {
         let selectedUser: UserDto;
 
-        usersState.selectUser(null).subscribe(x => {
+        usersState.select(null).subscribe(x => {
             selectedUser = x!;
         });
 
@@ -131,7 +131,7 @@ describe('UsersState', () => {
 
         let selectedUser: UserDto;
 
-        usersState.selectUser('unknown').subscribe(x => {
+        usersState.select('unknown').subscribe(x => {
             selectedUser = x!;
         }).unsubscribe();
 
@@ -143,8 +143,8 @@ describe('UsersState', () => {
         usersService.setup(x => x.lockUser('id1'))
             .returns(() => Observable.of({}));
 
-        usersState.selectUser('id1').subscribe();
-        usersState.lockUser(oldUsers[0]).subscribe();
+        usersState.select('id1').subscribe();
+        usersState.lock(oldUsers[0]).subscribe();
 
         expect(usersState.snapshot.users.at(0).isLocked).toBeTruthy();
         expect(usersState.snapshot.selectedUser).toBe(usersState.snapshot.users.at(0));
@@ -154,8 +154,8 @@ describe('UsersState', () => {
         usersService.setup(x => x.unlockUser('id2'))
             .returns(() => Observable.of({}));
 
-        usersState.selectUser('id2').subscribe();
-        usersState.unlockUser(oldUsers[1]).subscribe();
+        usersState.select('id2').subscribe();
+        usersState.unlock(oldUsers[1]).subscribe();
 
         expect(usersState.snapshot.users.at(1).isLocked).toBeFalsy();
         expect(usersState.snapshot.selectedUser).toBe(usersState.snapshot.users.at(1));
@@ -167,8 +167,8 @@ describe('UsersState', () => {
         usersService.setup(x => x.putUser('id1', request))
             .returns(() => Observable.of({}));
 
-        usersState.selectUser('id1').subscribe();
-        usersState.updateUser(oldUsers[0], request).subscribe();
+        usersState.select('id1').subscribe();
+        usersState.update(oldUsers[0], request).subscribe();
 
         expect(usersState.snapshot.users.at(0).email).toEqual('new@mail.com');
         expect(usersState.snapshot.users.at(0).displayName).toEqual('New');
@@ -181,7 +181,7 @@ describe('UsersState', () => {
         usersService.setup(x => x.postUser(request))
             .returns(() => Observable.of(newUser));
 
-        usersState.createUser(request).subscribe();
+        usersState.create(request).subscribe();
 
         expect(usersState.snapshot.users.at(0)).toBe(newUser);
         expect(usersState.snapshot.usersPager.numberOfItems).toBe(201);

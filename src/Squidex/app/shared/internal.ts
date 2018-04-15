@@ -40,6 +40,7 @@ export * from './services/users.service';
 
 export * from './state/apps.state';
 export * from './state/assets.state';
+export * from './state/clients.state';
 export * from './state/schemas.state';
 
 export * from './utils/messages';

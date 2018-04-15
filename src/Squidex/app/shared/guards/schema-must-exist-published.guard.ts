@@ -25,7 +25,7 @@ export class SchemaMustExistPublishedGuard implements CanActivate {
         const schemaName = allParams(route)['schemaName'];
 
         const result =
-            this.schemasState.selectSchema(schemaName)
+            this.schemasState.select(schemaName)
                 .do(dto => {
                     if (!dto || !dto.isPublished) {
                         this.router.navigate(['/404']);

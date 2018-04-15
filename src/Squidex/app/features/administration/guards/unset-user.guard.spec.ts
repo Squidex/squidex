@@ -21,7 +21,7 @@ describe('UnsetUserGuard', () => {
     });
 
     it('should unset user', () => {
-        usersState.setup(x => x.selectUser(null))
+        usersState.setup(x => x.select(null))
             .returns(() => Observable.of(null));
 
         let result: boolean;
@@ -32,6 +32,6 @@ describe('UnsetUserGuard', () => {
 
         expect(result!).toBeTruthy();
 
-        usersState.verify(x => x.selectUser(null), Times.once());
+        usersState.verify(x => x.select(null), Times.once());
     });
 });

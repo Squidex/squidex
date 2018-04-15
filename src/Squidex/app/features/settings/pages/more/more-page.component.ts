@@ -24,7 +24,7 @@ export class MorePageComponent {
     }
 
     public archiveApp() {
-        this.appsState.deleteApp(this.appsState.appName)
+        this.appsState.delete(this.appsState.appName)
             .subscribe(() => {
                 this.router.navigate(['/app']);
             }, error => {

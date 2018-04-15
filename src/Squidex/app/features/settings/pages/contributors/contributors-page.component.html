@@ -21,12 +21,12 @@
 							<span class="user-name table-cell">{{contributor.contributorId | sqxUserName}}</span>
 						</td>
 						<td class="cell-time">
-							<select class="form-control" [ngModel]="contributor.permission" (ngModelChange)="changePermission(contributor, $event)" [disabled]="userId === contributor.contributorId">
+							<select class="form-control" [ngModel]="contributor.permission" (ngModelChange)="changePermission(contributor, $event)" [disabled]="authState.user?.id === contributor.contributorId">
 								<option *ngFor="let permission of usersPermissions" [ngValue]="permission">{{permission}}</option>
 							</select>
 						</td>
 						<td class="cell-actions">
-							<button *ngIf="ctx.userId !== contributor.contributorId" type="button" class="btn btn-link btn-danger" (click)="removeContributor(contributor)">
+							<button *ngIf="authState.user?.id !== contributor.contributorId" type="button" class="btn btn-link btn-danger" (click)="removeContributor(contributor)">
 								<i class="icon-bin2"></i>
 							</button>
 						</td>

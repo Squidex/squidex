@@ -31,7 +31,7 @@ export class AssetsPageComponent implements OnInit {
     }
 
     public load(notify = false) {
-        this.assetsState.loadAssets(notify).onErrorResumeNext().subscribe();
+        this.assetsState.load(notify).onErrorResumeNext().subscribe();
     }
 
     public search() {

@@ -19,6 +19,6 @@ export class LoadAppsGuard implements CanActivate {
     }
 
     public canActivate(): Observable<boolean> {
-        return this.appsState.loadApps().map(a => true);
+        return this.appsState.load().map(a => true);
     }
 }

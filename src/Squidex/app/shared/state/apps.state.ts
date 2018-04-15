@@ -72,7 +72,7 @@ export class AppsState extends State<Snapshot> {
         super({ apps: ImmutableArray.empty(), selectedApp: null });
     }
 
-    public selectApp(name: string | null): Observable<AppDto | null> {
+    public select(name: string | null): Observable<AppDto | null> {
         const observable =
             !name ?
                 Observable.of(null) :
@@ -86,7 +86,7 @@ export class AppsState extends State<Snapshot> {
             });
     }
 
-    public loadApps(): Observable<any> {
+    public load(): Observable<any> {
         return this.appsService.getApps()
             .do(dtos => {
                 this.next(s => {
@@ -95,7 +95,7 @@ export class AppsState extends State<Snapshot> {
             });
     }
 
-    public createApp(request: CreateAppDto, now?: DateTime): Observable<AppDto> {
+    public create(request: CreateAppDto, now?: DateTime): Observable<AppDto> {
         return this.appsService.postApp(request)
             .do(dto => {
                 this.next(s => {
@@ -104,7 +104,7 @@ export class AppsState extends State<Snapshot> {
             });
     }
 
-    public deleteApp(name: string): Observable<any> {
+    public delete(name: string): Observable<any> {
         return this.appsService.deleteApp(name)
             .do(app => {
                 this.next(s => {

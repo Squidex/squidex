@@ -60,7 +60,7 @@ export class AssetsState extends State<Snapshot> {
         super({ assets: ImmutableArray.empty(), assetsPager: new Pager(0, 0, 30), loaded: false });
     }
 
-    public loadAssets(notify = false, noReload = false): Observable<any> {
+    public load(notify = false, noReload = false): Observable<any> {
         if (this.snapshot.loaded && noReload) {
             return Observable.of({});
         }
@@ -81,7 +81,7 @@ export class AssetsState extends State<Snapshot> {
             .notify(this.dialogs);
     }
 
-    public addAsset(asset: AssetDto) {
+    public add(asset: AssetDto) {
         this.next(s => {
             const assets = s.assets.pushFront(asset);
             const assetsPager = s.assetsPager.incrementCount();
@@ -90,7 +90,7 @@ export class AssetsState extends State<Snapshot> {
         });
     }
 
-    public updateAsset(asset: AssetDto) {
+    public update(asset: AssetDto) {
         this.next(s => {
             const assets = s.assets.replaceBy('id', asset);
 
@@ -114,19 +114,19 @@ export class AssetsState extends State<Snapshot> {
     public search(query: string): Observable<any> {
         this.next(s => ({ ...s, assetsPager: new Pager(0, 0, 30), assetsQuery: query }));
 
-        return this.loadAssets();
+        return this.load();
     }
 
     public goNext(): Observable<any> {
         this.next(s => ({ ...s, assetsPager: s.assetsPager.goNext() }));
 
-        return this.loadAssets();
+        return this.load();
     }
 
     public goPrev(): Observable<any> {
         this.next(s => ({ ...s, assetsPager: s.assetsPager.goPrev() }));
 
-        return this.loadAssets();
+        return this.load();
     }
 
     private get appName() {

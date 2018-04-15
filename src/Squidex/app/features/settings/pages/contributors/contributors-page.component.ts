@@ -14,6 +14,7 @@ import {
     AppContributorsDto,
     AppContributorsService,
     AppsState,
+    AuthService,
     AutocompleteSource,
     DialogService,
     PublicUserDto,
@@ -70,6 +71,7 @@ export class ContributorsPageComponent implements OnInit {
 
     constructor(
         public readonly appsState: AppsState,
+        public readonly authState: AuthService,
         private readonly appContributorsService: AppContributorsService,
         private readonly dialogs: DialogService,
         private readonly formBuilder: FormBuilder,

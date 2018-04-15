@@ -31,7 +31,7 @@ describe('SchemaMustExistPublishedGuard', () => {
     });
 
     it('should load schema and return true when found', () => {
-        schemasState.setup(x => x.selectSchema('123'))
+        schemasState.setup(x => x.select('123'))
             .returns(() => Observable.of(<SchemaDetailsDto>{ isPublished: true }));
 
         let result: boolean;
@@ -42,11 +42,11 @@ describe('SchemaMustExistPublishedGuard', () => {
 
         expect(result!).toBeTruthy();
 
-        schemasState.verify(x => x.selectSchema('123'), Times.once());
+        schemasState.verify(x => x.select('123'), Times.once());
     });
 
     it('should load schema and return false when not found', () => {
-        schemasState.setup(x => x.selectSchema('123'))
+        schemasState.setup(x => x.select('123'))
         .returns(() => Observable.of(<SchemaDetailsDto>{ isPublished: false }));
 
         let result: boolean;
@@ -61,7 +61,7 @@ describe('SchemaMustExistPublishedGuard', () => {
     });
 
     it('should load schema and return false when not found', () => {
-        schemasState.setup(x => x.selectSchema('123'))
+        schemasState.setup(x => x.select('123'))
             .returns(() => Observable.of(null));
 
         let result: boolean;

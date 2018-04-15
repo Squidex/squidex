@@ -22,7 +22,7 @@ describe('UnsetAppGuard', () => {
     });
 
     it('should unselect app', () => {
-        appsState.setup(x => x.selectApp(null))
+        appsState.setup(x => x.select(null))
             .returns(() => Observable.of(null));
 
         let result = false;
@@ -33,6 +33,6 @@ describe('UnsetAppGuard', () => {
 
         expect(result).toBeTruthy();
 
-        appsState.verify(x => x.selectApp(null), Times.once());
+        appsState.verify(x => x.select(null), Times.once());
     });
 });

@@ -33,7 +33,7 @@ describe('AppMustExistGuard', () => {
     });
 
     it('should navigate to 404 page if app is not found', () => {
-        appsState.setup(x => x.selectApp('my-app'))
+        appsState.setup(x => x.select('my-app'))
             .returns(() => Observable.of(null));
 
         let result: boolean;
@@ -44,11 +44,11 @@ describe('AppMustExistGuard', () => {
 
         expect(result!).toBeFalsy();
 
-        appsState.verify(x => x.selectApp('my-app'), Times.once());
+        appsState.verify(x => x.select('my-app'), Times.once());
     });
 
     it('should return true if app is found', () => {
-        appsState.setup(x => x.selectApp('my-app'))
+        appsState.setup(x => x.select('my-app'))
             .returns(() => Observable.of(<any>{}));
 
         let result: boolean;

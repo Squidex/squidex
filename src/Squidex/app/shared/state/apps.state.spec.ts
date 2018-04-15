@@ -36,7 +36,7 @@ describe('AppsState', () => {
             .verifiable(Times.once());
 
         appsState = new AppsState(appsService.object);
-        appsState.loadApps().subscribe();
+        appsState.load().subscribe();
     });
 
     it('should load apps', () => {
@@ -52,7 +52,7 @@ describe('AppsState', () => {
             .returns(() => Observable.of(newApp))
             .verifiable(Times.once());
 
-        appsState.createApp(request, now).subscribe();
+        appsState.create(request, now).subscribe();
 
         expect(appsState.snapshot.apps.values).toEqual([newApp, ...oldApps]);
 
@@ -70,11 +70,11 @@ describe('AppsState', () => {
             .returns(() => Observable.of({}))
             .verifiable(Times.once());
 
-        appsState.createApp(request, now).subscribe();
+        appsState.create(request, now).subscribe();
 
         const appsAfterCreate = appsState.snapshot.apps.values;
 
-        appsState.deleteApp(newApp.name).subscribe();
+        appsState.delete(newApp.name).subscribe();
 
         const appsAfterDelete = appsState.snapshot.apps.values;
 
@@ -87,7 +87,7 @@ describe('AppsState', () => {
     it('should select app', () => {
         let selectedApp: AppDto;
 
-        appsState.selectApp(oldApps[0].name).subscribe(x => {
+        appsState.select(oldApps[0].name).subscribe(x => {
             selectedApp = x!;
         }).unsubscribe();
 
@@ -98,7 +98,7 @@ describe('AppsState', () => {
     it('should return null when unselecting app', () => {
         let selectedApp: AppDto;
 
-        appsState.selectApp(null).subscribe(x => {
+        appsState.select(null).subscribe(x => {
             selectedApp = x!;
         }).unsubscribe();
 
@@ -109,7 +109,7 @@ describe('AppsState', () => {
     it('should return null when app to select is not found', () => {
         let selectedApp: AppDto;
 
-        appsState.selectApp('unknown').subscribe(x => {
+        appsState.select('unknown').subscribe(x => {
             selectedApp = x!;
         }).unsubscribe();
 

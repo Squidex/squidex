@@ -106,7 +106,7 @@ export class UsersState extends State<Snapshot> {
         super({ users: ImmutableArray.empty(), usersPager: new Pager(0) });
     }
 
-    public selectUser(id: string | null): Observable<UserDto | null> {
+    public select(id: string | null): Observable<UserDto | null> {
         return this.loadUser(id)
             .do(selectedUser => {
                 const isCurrentUser = id === this.authState.user!.id;
@@ -129,7 +129,7 @@ export class UsersState extends State<Snapshot> {
                 });
     }
 
-    public loadUsers(notify = false): Observable<any> {
+    public load(notify = false): Observable<any> {
         return this.usersService.getUsers(this.snapshot.usersPager.pageSize, this.snapshot.usersPager.skip, this.snapshot.usersQuery)
             .do(dtos => {
                 if (notify) {
@@ -156,7 +156,7 @@ export class UsersState extends State<Snapshot> {
             .notify(this.dialogs);
     }
 
-    public createUser(request: CreateUserDto): Observable<UserDto> {
+    public create(request: CreateUserDto): Observable<UserDto> {
         return this.usersService.postUser(request)
             .do(dto => {
                 this.next(s => {
@@ -168,7 +168,7 @@ export class UsersState extends State<Snapshot> {
             });
     }
 
-    public updateUser(user: UserDto, request: UpdateUserDto): Observable<any> {
+    public update(user: UserDto, request: UpdateUserDto): Observable<any> {
         return this.usersService.putUser(user.id, request)
             .do(() => {
                 this.dialogs.notifyInfo('User saved successsfull');
@@ -177,7 +177,7 @@ export class UsersState extends State<Snapshot> {
             });
     }
 
-    public lockUser(user: UserDto): Observable<any> {
+    public lock(user: UserDto): Observable<any> {
         return this.usersService.lockUser(user.id)
             .do(() => {
                 this.replaceUser(setLocked(user, true));
@@ -185,7 +185,7 @@ export class UsersState extends State<Snapshot> {
             .notify(this.dialogs);
     }
 
-    public unlockUser(user: UserDto): Observable<any> {
+    public unlock(user: UserDto): Observable<any> {
         return this.usersService.unlockUser(user.id)
             .do(() => {
                 this.replaceUser(setLocked(user, false));
@@ -196,19 +196,19 @@ export class UsersState extends State<Snapshot> {
     public search(query: string): Observable<any> {
         this.next(s => ({ ...s, usersPager: new Pager(0), usersQuery: query }));
 
-        return this.loadUsers();
+        return this.load();
     }
 
     public goNext(): Observable<any> {
         this.next(s => ({ ...s, usersPager: s.usersPager.goNext() }));
 
-        return this.loadUsers();
+        return this.load();
     }
 
     public goPrev(): Observable<any> {
         this.next(s => ({ ...s, usersPager: s.usersPager.goPrev() }));
 
-        return this.loadUsers();
+        return this.load();
     }
 
     private replaceUser(user: UserDto) {

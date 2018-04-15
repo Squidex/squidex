@@ -5,16 +5,18 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 
 import {
     AccessTokenDto,
     AppClientDto,
     AppClientsService,
+    AppsState,
+    ClientsState,
     DialogService,
     ModalView,
-    AppsState
+    UpdateAppClientDto
 } from '@app/shared';
 
 const ESCAPE_KEY = 27;
@@ -25,15 +27,6 @@ const ESCAPE_KEY = 27;
     templateUrl: './client.component.html'
 })
 export class ClientComponent {
-    @Output()
-    public renaming = new EventEmitter<string>();
-
-    @Output()
-    public revoking = new EventEmitter();
-
-    @Output()
-    public updating = new EventEmitter<boolean>();
-
     @Input()
     public client: AppClientDto;
 
@@ -60,9 +53,22 @@ export class ClientComponent {
     constructor(
         public readonly appsState: AppsState,
         private readonly appClientsService: AppClientsService,
+        private readonly clientsState: ClientsState,
         private readonly dialogs: DialogService,
         private readonly formBuilder: FormBuilder
     ) {
+    }
+
+    public revoke() {
+        this.clientsState.revoke(this.client).onErrorResumeNext().subscribe();
+    }
+
+    public updatePermission(permission: string) {
+        this.clientsState.update(this.client, new UpdateAppClientDto(undefined, permission)).onErrorResumeNext().subscribe();
+    }
+
+    public rename() {
+        this.clientsState.update(this.client, new UpdateAppClientDto(this.renameForm.controls['name'].value)).onErrorResumeNext().subscribe();
     }
 
     public cancelRename() {

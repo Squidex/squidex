@@ -45,7 +45,7 @@ export class AppFormComponent {
         if (value) {
             const request = new CreateAppDto(value.name, this.template);
 
-            this.appsStore.createApp(request)
+            this.appsStore.create(request)
                 .subscribe(dto => {
                     this.complete();
                 }, error => {

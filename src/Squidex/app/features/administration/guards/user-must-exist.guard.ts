@@ -25,7 +25,7 @@ export class UserMustExistGuard implements CanActivate {
         const userId = allParams(route)['userId'];
 
         const result =
-            this.usersState.selectUser(userId)
+            this.usersState.select(userId)
                 .do(dto => {
                     if (!dto) {
                         this.router.navigate(['/404']);

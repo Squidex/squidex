@@ -41,11 +41,11 @@ export class AssetsListComponent {
     public onAssetLoaded(file: File, asset: AssetDto) {
         this.newFiles = this.newFiles.remove(file);
 
-        this.state.addAsset(asset);
+        this.state.add(asset);
     }
 
     public search() {
-        this.state.loadAssets().onErrorResumeNext().subscribe();
+        this.state.load().onErrorResumeNext().subscribe();
     }
 
     public onAssetDeleting(asset: AssetDto) {
