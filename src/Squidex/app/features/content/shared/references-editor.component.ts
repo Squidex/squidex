@@ -18,7 +18,6 @@ import {
     FieldDto,
     ImmutableArray,
     MathHelper,
-    ModalView,
     SchemaDetailsDto,
     SchemasService,
     Types
@@ -46,7 +45,7 @@ export class ReferencesEditorComponent implements ControlValueAccessor, OnInit {
     @Input()
     public language: AppLanguageDto;
 
-    public selectorModal = new ModalView();
+    public isModalVisibible = false;
 
     public schema: SchemaDetailsDto;
     public schemaFields: FieldDto[];
@@ -103,6 +102,14 @@ export class ReferencesEditorComponent implements ControlValueAccessor, OnInit {
         this.callTouched = fn;
     }
 
+    public showModal() {
+        this.isModalVisibible = true;
+    }
+
+    public hideModal() {
+        this.isModalVisibible = false;
+    }
+
     public onContentsSelected(contents: ContentDto[]) {
         for (let content of contents) {
             this.contentItems = this.contentItems.push(content);
@@ -112,7 +119,7 @@ export class ReferencesEditorComponent implements ControlValueAccessor, OnInit {
             this.updateValue();
         }
 
-        this.selectorModal.hide();
+        this.hideModal();
     }
 
     public onContentRemoving(content: ContentDto) {

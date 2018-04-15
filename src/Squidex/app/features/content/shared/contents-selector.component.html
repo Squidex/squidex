@@ -4,11 +4,13 @@
     </ng-container>
 
     <ng-container tabs>
-        <sqx-search-form (queryChanged)="search($event)"></sqx-search-form>
-        
-        <button class="btn btn-link btn-secondary" (click)="load(true)">
-            <i class="icon-reset"></i> Refresh
-        </button>
+        <div class="text-right">
+            <button class="btn btn-link btn-secondary" (click)="load(true)">
+                <i class="icon-reset"></i> Refresh
+            </button>
+            
+            <sqx-search-form (queryChanged)="search($event)" [canArchive]="false"></sqx-search-form>
+        </div>
     </ng-container>
 
     <ng-container content>

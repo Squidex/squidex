@@ -1,6 +1,6 @@
 <div class="references-container" [class.disabled]="isDisabled">
     <div class="drop-area-container" *ngIf="schema">
-        <div class="drop-area" (click)="selectorModal.show()">
+        <div class="drop-area" (click)="showModal()">
             Click here to link a content.
         </div>
     </div>
@@ -25,7 +25,7 @@
     </table>
 </div>
 
-<ng-container *sqxModalView="selectorModal;onRoot:true;closeAuto:false">
+<ng-container *sqxModalView="isModalVisibible;onRoot:true;closeAuto:false">
     <sqx-contents-selector
         [language]="language"
         [schema]="schema"
