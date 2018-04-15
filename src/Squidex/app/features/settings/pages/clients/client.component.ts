@@ -67,10 +67,6 @@ export class ClientComponent {
         this.clientsState.update(this.client, new UpdateAppClientDto(undefined, permission)).onErrorResumeNext().subscribe();
     }
 
-    public rename() {
-        this.clientsState.update(this.client, new UpdateAppClientDto(this.renameForm.controls['name'].value)).onErrorResumeNext().subscribe();
-    }
-
     public cancelRename() {
         this.isRenaming = false;
     }
@@ -85,6 +81,13 @@ export class ClientComponent {
         if (keyCode === ESCAPE_KEY) {
             this.cancelRename();
         }
+    }
+
+    public rename() {
+        this.clientsState.update(this.client, new UpdateAppClientDto(this.renameForm.controls['name'].value))
+            .subscribe(() => {
+                this.cancelRename();
+            });
     }
 
     public createToken(client: AppClientDto) {
