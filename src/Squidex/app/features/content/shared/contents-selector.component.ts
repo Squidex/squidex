@@ -12,7 +12,6 @@ import {
     ContentDto,
     ContentsService,
     DialogService,
-    FieldDto,
     ImmutableArray,
     ModalView,
     Pager,
@@ -31,9 +30,6 @@ export class ContentsSelectorComponent implements OnInit {
 
     @Input()
     public schema: SchemaDetailsDto;
-
-    @Input()
-    public schemaFields: FieldDto[];
 
     @Output()
     public selected = new EventEmitter<ContentDto[]>();

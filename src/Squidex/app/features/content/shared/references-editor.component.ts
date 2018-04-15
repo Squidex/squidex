@@ -15,7 +15,6 @@ import {
     AppsState,
     ContentDto,
     ContentsService,
-    FieldDto,
     ImmutableArray,
     MathHelper,
     SchemaDetailsDto,
@@ -48,7 +47,6 @@ export class ReferencesEditorComponent implements ControlValueAccessor, OnInit {
     public isModalVisibible = false;
 
     public schema: SchemaDetailsDto;
-    public schemaFields: FieldDto[];
 
     public contentItems = ImmutableArray.empty<ContentDto>();
 
@@ -70,8 +68,6 @@ export class ReferencesEditorComponent implements ControlValueAccessor, OnInit {
         this.schemasService.getSchema(this.appsState.appName, this.schemaId)
             .subscribe(dto => {
                 this.schema = dto;
-
-                this.loadFields();
             }, error => {
                 this.isInvalidSchema = true;
             });
@@ -147,17 +143,5 @@ export class ReferencesEditorComponent implements ControlValueAccessor, OnInit {
 
         this.callTouched();
         this.callChange(ids);
-    }
-
-    private loadFields() {
-        this.schemaFields = this.schema.fields.filter(x => x.properties.isListField);
-
-        if (this.schemaFields.length === 0 && this.schema.fields.length > 0) {
-            this.schemaFields = [this.schema.fields[0]];
-        }
-
-        if (this.schemaFields.length === 0) {
-            this.schemaFields = [<any>{}];
-        }
     }
 }

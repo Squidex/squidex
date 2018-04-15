@@ -21,7 +21,7 @@
                         <th class="cell-select">
                             <input type="checkbox" class="form-control" [ngModel]="isAllSelected" (ngModelChange)="selectAll($event)" />
                         </th>
-                        <th class="cell-auto" *ngFor="let field of schemaFields">
+                        <th class="cell-auto" *ngFor="let field of schema.listFields">
                             <span class="field">{{field.displayName}}</span>
                         </th>
                         <th class="cell-time">
@@ -44,7 +44,6 @@
                                 [selected]="isItemSelected(content)"
                                 (selectedChange)="onContentSelected(content)"
                                 [language]="languageSelected"
-                                [schemaFields]="schemaFields"
                                 [schema]="schema" 
                                 isReadOnly="true"></tr>
                             <tr class="spacer"></tr>

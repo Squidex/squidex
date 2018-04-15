@@ -17,9 +17,101 @@ import {
     JsonFieldPropertiesDto,
     NumberFieldPropertiesDto,
     ReferencesFieldPropertiesDto,
+    SchemaDetailsDto,
+    SchemaPropertiesDto,
     StringFieldPropertiesDto,
     TagsFieldPropertiesDto
 } from './../';
+
+describe('SchemaDetailsDto', () => {
+    it('should return label as display name', () => {
+        const schema = createSchema(new SchemaPropertiesDto('Label'), 1, []);
+
+        expect(schema.displayName).toBe('Label');
+    });
+
+    it('should return name as display name if label is undefined', () => {
+        const schema = createSchema(new SchemaPropertiesDto(undefined), 1, []);
+
+        expect(schema.displayName).toBe('schema1');
+    });
+
+    it('should return name as display name label is empty', () => {
+        const schema = createSchema(new SchemaPropertiesDto(''), 1, []);
+
+        expect(schema.displayName).toBe('schema1');
+    });
+
+    it('should return configured fields as list fields if no schema field are declared', () => {
+        const field1 = createField(new AssetsFieldPropertiesDto(null, null, null, false, true), 1);
+        const field2 = createField(new AssetsFieldPropertiesDto(null, null, null, false, false), 2);
+        const field3 = createField(new AssetsFieldPropertiesDto(null, null, null, false, true), 3);
+
+        const schema = createSchema(new SchemaPropertiesDto(''), 1, [field1, field2, field3]);
+
+        expect(schema.listFields).toEqual([field1, field3]);
+    });
+
+    it('should return first fields as list fields if no schema field is declared', () => {
+        const field1 = createField(new AssetsFieldPropertiesDto(null, null, null, false, false), 1);
+        const field2 = createField(new AssetsFieldPropertiesDto(null, null, null, false, false), 2);
+        const field3 = createField(new AssetsFieldPropertiesDto(null, null, null, false, false), 3);
+
+        const schema = createSchema(new SchemaPropertiesDto(''), 1, [field1, field2, field3]);
+
+        expect(schema.listFields).toEqual([field1]);
+    });
+
+    it('should return empty list fields if fields is empty', () => {
+        const schema = createSchema(new SchemaPropertiesDto(''), 1, []);
+
+        expect(schema.listFields).toEqual([{}]);
+    });
+});
+
+describe('FieldDto', () => {
+    it('should return label as display name', () => {
+        const field = createField(new AssetsFieldPropertiesDto('Label', null, null, true, false), 1);
+
+        expect(field.displayName).toBe('Label');
+    });
+
+    it('should return name as display name if label is null', () => {
+        const field = createField(new AssetsFieldPropertiesDto(null, null, null, true, false), 1);
+
+        expect(field.displayName).toBe('field1');
+    });
+
+    it('should return name as display name label is empty', () => {
+        const field = createField(new AssetsFieldPropertiesDto('', null, null, true, false), 1);
+
+        expect(field.displayName).toBe('field1');
+    });
+
+    it('should return placeholder as display placeholder', () => {
+        const field = createField(new AssetsFieldPropertiesDto(null, null, 'Placeholder', true, false), 1);
+
+        expect(field.displayPlaceholder).toBe('Placeholder');
+    });
+
+    it('should return empty as display placeholder if placeholder is null', () => {
+        const field = createField(new AssetsFieldPropertiesDto(null, null, null, true, false));
+
+        expect(field.displayPlaceholder).toBe('');
+    });
+
+    it('should return localizable if partitioning is language', () => {
+        const field = createField(new AssetsFieldPropertiesDto(null, null, null, true, false), 1, 'language');
+
+        expect(field.isLocalizable).toBeTruthy();
+    });
+
+    it('should not return localizable if partitioning is invarient', () => {
+        const field = createField(new AssetsFieldPropertiesDto(null, null, null, true, false), 1, 'invariant');
+
+        expect(field.isLocalizable).toBeFalsy();
+    });
+});
 
 describe('AssetsField', () => {
     const field = createField(new AssetsFieldPropertiesDto(null, null, null, true, false, 1, 1));
@@ -250,6 +342,10 @@ describe('StringField', () => {
     });
 });
 
-function createField(properties: FieldPropertiesDto) {
-    return new FieldDto(1, 'field1', false, false, false, 'languages', properties);
+function createSchema(properties: SchemaPropertiesDto, index = 1, fields: FieldDto[]) {
+    return new SchemaDetailsDto('id' + index, 'schema' + index, properties, true, null!, null!, null!, null!, null!, fields);
+}
+
+function createField(properties: FieldPropertiesDto, index = 1, partitioning = 'languages') {
+    return new FieldDto(index, 'field' + index, false, false, false, partitioning, properties);
 }

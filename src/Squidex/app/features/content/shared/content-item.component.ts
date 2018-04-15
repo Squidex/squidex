@@ -17,7 +17,7 @@ import {
     FieldDto,
     fieldInvariant,
     ModalView,
-    SchemaDto,
+    SchemaDetailsDto,
     Types,
     Versioned
 } from '@app/shared';
@@ -64,10 +64,7 @@ export class ContentItemComponent implements OnInit, OnChanges {
     public language: AppLanguageDto;
 
     @Input()
-    public schemaFields: FieldDto[];
-
-    @Input()
-    public schema: SchemaDto;
+    public schema: SchemaDetailsDto;
 
     @Input()
     public isReadOnly = false;
@@ -95,7 +92,7 @@ export class ContentItemComponent implements OnInit, OnChanges {
     }
 
     public ngOnInit() {
-        for (let field of this.schemaFields) {
+        for (let field of this.schema.listFields) {
             if (field.properties['inlineEditable']) {
                 this.form.setControl(field.name, new FormControl(undefined, field.createValidators(this.language.isOptional)));
             }
@@ -119,7 +116,7 @@ export class ContentItemComponent implements OnInit, OnChanges {
 
             const request = {};
 
-            for (let field of this.schemaFields) {
+            for (let field of this.schema.listFields) {
                 if (field.properties['inlineEditable']) {
                     const value = this.form.controls[field.name].value;
 
@@ -152,22 +149,20 @@ export class ContentItemComponent implements OnInit, OnChanges {
     private updateValues() {
         this.values = [];
 
-        if (this.schemaFields) {
-            for (let field of this.schemaFields) {
-                const value = this.getRawValue(field);
+        for (let field of this.schema.listFields) {
+            const value = this.getRawValue(field);
 
-                if (Types.isUndefined(value)) {
-                    this.values.push('');
-                } else {
-                    this.values.push(field.formatValue(value));
-                }
+            if (Types.isUndefined(value)) {
+                this.values.push('');
+            } else {
+                this.values.push(field.formatValue(value));
+            }
 
-                if (this.form) {
-                    const formControl = this.form.controls[field.name];
+            if (this.form) {
+                const formControl = this.form.controls[field.name];
 
-                    if (formControl) {
-                        formControl.setValue(value);
-                    }
+                if (formControl) {
+                    formControl.setValue(value);
                 }
             }
         }

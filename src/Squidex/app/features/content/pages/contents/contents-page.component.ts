@@ -15,7 +15,6 @@ import {
     ContentDto,
     ContentsService,
     DateTime,
-    FieldDto,
     ImmutableArray,
     ModalView,
     Pager,
@@ -40,7 +39,6 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
     public searchModal = new ModalView();
 
     public contentItems: ImmutableArray<ContentDto>;
-    public contentFields: FieldDto[];
     public contentsQuery = '';
     public contentsPager = new Pager(0);
 
@@ -316,19 +314,6 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
         this.selectedItems = {};
 
         this.updateSelectionSummary();
-        this.loadFields();
-    }
-
-    private loadFields() {
-        this.contentFields = this.schema.fields.filter(x => x.properties.isListField);
-
-        if (this.contentFields.length === 0 && this.schema.fields.length > 0) {
-            this.contentFields = [this.schema.fields[0]];
-        }
-
-        if (this.contentFields.length === 0) {
-            this.contentFields = [<any>{}];
-        }
     }
 
     public confirmStatusChange() {

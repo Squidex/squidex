@@ -15,7 +15,6 @@
                 <tr [sqxContent]="content" dnd-sortable [sortableIndex]="i" (sqxSorted)="onContentsSorted($event)"
                     [language]="language"
                     [schema]="schema"
-                    [schemaFields]="schemaFields"
                     (deleting)="onContentRemoving(content)"
                     isReadOnly="true" 
                     isReference="true"></tr>
@@ -26,10 +25,7 @@
 </div>
 
 <ng-container *sqxModalView="isModalVisibible;onRoot:true;closeAuto:false">
-    <sqx-contents-selector
-        [language]="language"
-        [schema]="schema"
-        [schemaFields]="schemaFields"
+    <sqx-contents-selector [language]="language" [schema]="schema"
         (selected)="onContentsSelected($event)">
     </sqx-contents-selector>
 </ng-container>

@@ -124,31 +124,11 @@ export class SchemaDto {
             this.created, now || DateTime.now(),
             version);
     }
-
-    public unpublish(user: string, version: Version, now?: DateTime): SchemaDto {
-        return new SchemaDto(
-            this.id,
-            this.name,
-            this.properties,
-            false,
-            this.createdBy, user,
-            this.created, now || DateTime.now(),
-            version);
-    }
-
-    public update(properties: SchemaPropertiesDto, user: string, version: Version, now?: DateTime): SchemaDto {
-        return new SchemaDto(
-            this.id,
-            this.name,
-            properties,
-            this.isPublished,
-            this.createdBy, user,
-            this.created, now || DateTime.now(),
-            version);
-    }
 }
 
 export class SchemaDetailsDto extends SchemaDto {
+    public readonly listFields: FieldDto[];
+
     constructor(id: string, name: string, properties: SchemaPropertiesDto, isPublished: boolean, createdBy: string, lastModifiedBy: string, created: DateTime, lastModified: DateTime, version: Version,
         public readonly fields: FieldDto[],
         public readonly scriptQuery?: string,
@@ -158,142 +138,16 @@ export class SchemaDetailsDto extends SchemaDto {
         public readonly scriptChange?: string
     ) {
         super(id, name, properties, isPublished, createdBy, lastModifiedBy, created, lastModified, version);
-    }
 
-    public publish(user: string, version: Version, now?: DateTime): SchemaDetailsDto {
-        return new SchemaDetailsDto(
-            this.id,
-            this.name,
-            this.properties,
-            true,
-            this.createdBy, user,
-            this.created, now || DateTime.now(),
-            version,
-            this.fields,
-            this.scriptQuery,
-            this.scriptCreate,
-            this.scriptUpdate,
-            this.scriptDelete,
-            this.scriptChange);
-    }
+        this.listFields = this.fields.filter(x => x.properties.isListField);
 
-    public unpublish(user: string, version: Version, now?: DateTime): SchemaDetailsDto {
-        return new SchemaDetailsDto(
-            this.id,
-            this.name,
-            this.properties,
-            false,
-            this.createdBy, user,
-            this.created, now || DateTime.now(),
-            version,
-            this.fields,
-            this.scriptQuery,
-            this.scriptCreate,
-            this.scriptUpdate,
-            this.scriptDelete,
-            this.scriptChange);
-    }
+        if (this.listFields.length === 0 && this.fields.length > 0) {
+            this.listFields = [this.fields[0]];
+        }
 
-    public configureScripts(scripts: UpdateSchemaScriptsDto, user: string, version: Version, now?: DateTime): SchemaDetailsDto {
-        return new SchemaDetailsDto(
-            this.id,
-            this.name,
-            this.properties,
-            this.isPublished,
-            this.createdBy, user,
-            this.created, now || DateTime.now(),
-            version,
-            this.fields,
-            scripts.scriptQuery,
-            scripts.scriptCreate,
-            scripts.scriptUpdate,
-            scripts.scriptDelete,
-            scripts.scriptChange);
-    }
-
-    public update(properties: SchemaPropertiesDto, user: string, version: Version, now?: DateTime): SchemaDetailsDto {
-        return new SchemaDetailsDto(
-            this.id,
-            this.name,
-            properties,
-            this.isPublished,
-            this.createdBy, user,
-            this.created, now || DateTime.now(),
-            version,
-            this.fields,
-            this.scriptQuery,
-            this.scriptCreate,
-            this.scriptUpdate,
-            this.scriptDelete,
-            this.scriptChange);
-    }
-
-    public addField(field: FieldDto, user: string, version: Version, now?: DateTime): SchemaDetailsDto {
-        return new SchemaDetailsDto(
-            this.id,
-            this.name,
-            this.properties,
-            this.isPublished,
-            this.createdBy, user,
-            this.created, now || DateTime.now(),
-            version,
-            [...this.fields, field],
-            this.scriptQuery,
-            this.scriptCreate,
-            this.scriptUpdate,
-            this.scriptDelete,
-            this.scriptChange);
-    }
-
-    public updateField(field: FieldDto, user: string, version: Version, now?: DateTime): SchemaDetailsDto {
-        return new SchemaDetailsDto(
-            this.id,
-            this.name,
-            this.properties,
-            this.isPublished,
-            this.createdBy, user,
-            this.created, now || DateTime.now(),
-            version,
-            this.fields.map(f => f.fieldId === field.fieldId ? field : f),
-            this.scriptQuery,
-            this.scriptCreate,
-            this.scriptUpdate,
-            this.scriptDelete,
-            this.scriptChange);
-    }
-
-    public replaceFields(fields: FieldDto[], user: string, version: Version, now?: DateTime): SchemaDetailsDto {
-        return new SchemaDetailsDto(
-            this.id,
-            this.name,
-            this.properties,
-            this.isPublished,
-            this.createdBy, user,
-            this.created, now || DateTime.now(),
-            version,
-            fields,
-            this.scriptQuery,
-            this.scriptCreate,
-            this.scriptUpdate,
-            this.scriptDelete,
-            this.scriptChange);
-    }
-
-    public removeField(field: FieldDto, user: string, version: Version, now?: DateTime): SchemaDetailsDto {
-        return new SchemaDetailsDto(
-            this.id,
-            this.name,
-            this.properties,
-            this.isPublished,
-            this.createdBy, user,
-            this.created, now || DateTime.now(),
-            version,
-            this.fields.filter(f => f.fieldId !== field.fieldId),
-            this.scriptQuery,
-            this.scriptCreate,
-            this.scriptUpdate,
-            this.scriptDelete,
-            this.scriptChange);
+        if (this.listFields.length === 0) {
+            this.listFields = [<any>{}];
+        }
     }
 }
 
@@ -312,30 +166,6 @@ export class FieldDto {
         public readonly partitioning: string,
         public readonly properties: FieldPropertiesDto
     ) {
-    }
-
-    public lock(): FieldDto {
-        return new FieldDto(this.fieldId, this.name, true, this.isHidden, this.isDisabled, this.partitioning, this.properties);
-    }
-
-    public show(): FieldDto {
-        return new FieldDto(this.fieldId, this.name, this.isLocked, false, this.isDisabled, this.partitioning, this.properties);
-    }
-
-    public hide(): FieldDto {
-        return new FieldDto(this.fieldId, this.name, this.isLocked, true, this.isDisabled, this.partitioning, this.properties);
-    }
-
-    public enable(): FieldDto {
-        return new FieldDto(this.fieldId, this.name, this.isLocked, this.isHidden, false, this.partitioning, this.properties);
-    }
-
-    public disable(): FieldDto {
-        return new FieldDto(this.fieldId, this.name, this.isLocked, this.isHidden, true, this.partitioning, this.properties);
-    }
-
-    public update(properties: FieldPropertiesDto): FieldDto {
-        return new FieldDto(this.fieldId, this.name, this.isLocked, this.isHidden, this.isDisabled, this.partitioning, properties);
     }
 
     public formatValue(value: any): string {

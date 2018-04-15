@@ -5,7 +5,7 @@
         (click)="$event.stopPropagation()" />
 </td>
 
-<td class="cell-auto" *ngFor="let field of schemaFields; let i = index" (click)="shouldStop($event)">
+<td class="cell-auto" *ngFor="let field of schema.listFields; let i = index" (click)="shouldStop($event)">
     <div *ngIf="field.properties.inlineEditable && !isReadOnly" [formGroup]="form" (click)="$event.stopPropagation()">
         <div [ngSwitch]="field.properties.fieldType">
             <div *ngSwitchCase="'Number'">
