@@ -6,7 +6,7 @@
  */
 
 import { AfterViewInit, Component, forwardRef, ElementRef, EventEmitter, OnDestroy, Output, ViewChild } from '@angular/core';
-import { ControlValueAccessor,  NG_VALUE_ACCESSOR, FormBuilder } from '@angular/forms';
+import { ControlValueAccessor,  NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import {
     AssetDto,
@@ -43,12 +43,8 @@ export class RichEditorComponent implements ControlValueAccessor, AfterViewInit,
     @Output()
     public assetPluginClicked = new EventEmitter<any>();
 
-    public assetsForm = this.formBuilder.group({
-        name: ''
-    });
-
-    constructor(private readonly resourceLoader: ResourceLoaderService,
-        private readonly formBuilder: FormBuilder
+    constructor(
+        private readonly resourceLoader: ResourceLoaderService
     ) {
     }
 
