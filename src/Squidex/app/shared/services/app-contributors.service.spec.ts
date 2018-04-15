@@ -18,47 +18,6 @@ import {
     ContributorAssignedDto
 } from './../';
 
-describe('AppContributorsDto', () => {
-    const contributor1 = new AppContributorDto('1', 'Owner');
-    const contributor2 = new AppContributorDto('2', 'Developer');
-    const contributor2_new = new AppContributorDto('2', 'Editor');
-    const version = new Version('1');
-    const newVersion = new Version('2');
-
-    it('should update contributors when adding contributor', () => {
-        const contributors_1 = new AppContributorsDto([contributor1], 4, version);
-        const contributors_2 = contributors_1.addContributor(contributor2, newVersion);
-
-        expect(contributors_2.contributors).toEqual([contributor1, contributor2]);
-        expect(contributors_2.version).toEqual(newVersion);
-    });
-
-    it('should update contributors when removing contributor', () => {
-        const contributors_1 = new AppContributorsDto([contributor1, contributor2], 4, version);
-        const contributors_2 = contributors_1.removeContributor(contributor1, newVersion);
-
-        expect(contributors_2.contributors).toEqual([contributor2]);
-        expect(contributors_2.version).toEqual(newVersion);
-    });
-
-    it('should update contributors when updating contributor', () => {
-        const contributors_1 = new AppContributorsDto([contributor1, contributor2], 4, version);
-        const contributors_2 = contributors_1.updateContributor(contributor2_new, newVersion);
-
-        expect(contributors_2.contributors).toEqual([contributor1, contributor2_new]);
-        expect(contributors_2.version).toEqual(newVersion);
-    });
-});
-
-describe('AppContributorDto', () => {
-    it('should update permission property when changing', () => {
-        const contributor_1 = new AppContributorDto('1', 'Owner');
-        const contributor_2 = contributor_1.changePermission('Editor');
-
-        expect(contributor_2.permission).toBe('Editor');
-    });
-});
-
 describe('AppContributorsService', () => {
     const version = new Version('1');
 
