@@ -8,8 +8,6 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 
-import { AuthService } from '@app/shared';
-
 import { UserDto } from './../../services/users.service';
 import { UsersState } from './../../state/users.state';
 
@@ -23,21 +21,20 @@ export class UsersPageComponent implements OnInit {
     public usersFilter = new FormControl();
 
     constructor(
-        public readonly authState: AuthService,
         public readonly usersState: UsersState
     ) {
     }
 
     public ngOnInit() {
-        this.load();
+        this.usersState.load().onErrorResumeNext().subscribe();
+    }
+
+    public reload() {
+        this.usersState.load(true).onErrorResumeNext().subscribe();
     }
 
     public search() {
         this.usersState.search(this.usersFilter.value).onErrorResumeNext().subscribe();
-    }
-
-    public load(notify = false) {
-        this.usersState.load(notify).onErrorResumeNext().subscribe();
     }
 
     public lock(user: UserDto) {

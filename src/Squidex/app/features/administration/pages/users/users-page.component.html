@@ -6,7 +6,7 @@
     </ng-container>
 
     <ng-container menu>
-        <button class="btn btn-link btn-secondary" (click)="load(true)" title="Refresh Users (CTRL + SHIFT + R)">
+        <button class="btn btn-link btn-secondary" (click)="reload()" title="Refresh Users (CTRL + SHIFT + R)">
             <i class="icon-reset"></i> Refresh
         </button>
 
@@ -49,27 +49,28 @@
             <div sqxIgnoreScrollbar>
                 <table class="table table-items table-fixed">
                     <tbody>
-                        <ng-template ngFor let-user [ngForOf]="usersState.users | async" [ngForTrackBy]="trackByUser">
-                            <tr [routerLink]="user.id" routerLinkActive="active">
+                        <ng-template ngFor let-userInfo [ngForOf]="usersState.users | async" [ngForTrackBy]="trackByUser">
+                            <tr [routerLink]="userInfo.user.id" routerLinkActive="active">
                                 <td class="cell-user">
-                                    <img class="user-picture" [attr.title]="user.name" [attr.src]="user | sqxUserDtoPicture" />
+                                    <img class="user-picture" [attr.title]="userInfo.user.name" [attr.src]="userInfo.user | sqxUserDtoPicture" />
                                 </td>
                                 <td class="cell-auto">
-                                    <span class="user-name table-cell">{{user.displayName}}</span>
+                                    <span class="user-name table-cell">{{userInfo.user.displayName}}</span>
                                 </td>
                                 <td class="cell-auto">
-                                    <span class="user-email table-cell">{{user.email}}</span>
+                                    <span class="user-email table-cell">{{userInfo.user.email}}</span>
                                 </td>
                                 <td class="cell-actions">
-                                    <ng-container *ngIf="user.id !== authState.user?.id">
-                                        <button class="btn btn-link" (click)="lock(user); $event.stopPropagation();" *ngIf="!user.isLocked" title="Lock User">
+                                    <ng-container *ngIf="!userInfo.isCurrentUser">
+                                        <button class="btn btn-link" (click)="lock(user); $event.stopPropagation();" *ngIf="!userInfo.user.isLocked" title="Lock User">
                                             <i class="icon icon-unlocked"></i>
                                         </button>
-                                        <button class="btn btn-link" (click)="unlock(user); $event.stopPropagation();" *ngIf="user.isLocked" title="Unlock User">
+                                        <button class="btn btn-link" (click)="unlock(user); $event.stopPropagation();" *ngIf="userInfo.user.isLocked" title="Unlock User">
                                             <i class="icon icon-lock"></i>
                                         </button>
                                     </ng-container>
-                                    <button *ngIf="user.id === authState.user?.id" class="btn btn-link invisible">
+
+                                    <button *ngIf="userInfo.isCurrentUser" class="btn btn-link invisible">
                                         &nbsp;
                                     </button>
                                 </td>

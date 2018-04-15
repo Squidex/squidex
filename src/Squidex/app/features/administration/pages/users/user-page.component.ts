@@ -20,7 +20,8 @@ import { UserForm, UsersState } from './../../state/users.state';
 })
 export class UserPageComponent implements OnDestroy, OnInit {
     private selectedUserSubscription: Subscription;
-    private user?: UserDto;
+
+    public user?: { user: UserDto, isCurrentUser: boolean };
 
     public userForm = new UserForm(this.formBuilder);
 
@@ -39,9 +40,12 @@ export class UserPageComponent implements OnDestroy, OnInit {
     public ngOnInit() {
         this.selectedUserSubscription =
             this.usersState.selectedUser
-                .subscribe(user => {
-                    this.user = user;
-                    this.userForm.load(user);
+                .subscribe(selectedUser => {
+                    this.user = selectedUser;
+
+                    if (selectedUser) {
+                        this.userForm.load(selectedUser.user);
+                    }
                 });
     }
 
@@ -50,7 +54,7 @@ export class UserPageComponent implements OnDestroy, OnInit {
 
         if (value) {
             if (this.user) {
-                this.usersState.update(this.user, value)
+                this.usersState.update(this.user.user, value)
                     .subscribe(user => {
                         this.userForm.submitCompleted();
                     }, error => {

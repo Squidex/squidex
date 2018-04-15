@@ -51,7 +51,7 @@ describe('UsersState', () => {
     });
 
     it('should load users', () => {
-        expect(usersState.snapshot.users.values).toEqual(oldUsers);
+        expect(usersState.snapshot.users.values.map(x => x.user)).toEqual(oldUsers);
         expect(usersState.snapshot.usersPager.numberOfItems).toEqual(200);
 
         usersService.verifyAll();
@@ -70,7 +70,7 @@ describe('UsersState', () => {
 
         usersState.load().subscribe();
 
-        expect(usersState.snapshot.selectedUser).toBe(newUsers[0]);
+        expect(usersState.snapshot.selectedUser!.user).toBe(newUsers[0]);
     });
 
     it('should raise notification on load when notify is true', () => {
@@ -82,7 +82,7 @@ describe('UsersState', () => {
     it('should mark as current user when selected user equals to profile', () => {
         usersState.select('id2').subscribe();
 
-        expect(usersState.snapshot.isCurrentUser).toBeTruthy();
+        expect(usersState.snapshot.selectedUser!.isCurrentUser).toBeTruthy();
     });
 
     it('should not load user when already loaded', () => {
@@ -93,7 +93,7 @@ describe('UsersState', () => {
         });
 
         expect(selectedUser!).toEqual(oldUsers[0]);
-        expect(usersState.snapshot.selectedUser).toBe(oldUsers[0]);
+        expect(usersState.snapshot.selectedUser!.user).toBe(oldUsers[0]);
 
         usersService.verify(x => x.getUser(It.isAnyString()), Times.never());
     });
@@ -109,7 +109,7 @@ describe('UsersState', () => {
         });
 
         expect(selectedUser!).toEqual(newUser);
-        expect(usersState.snapshot.selectedUser).toBe(newUser);
+        expect(usersState.snapshot.selectedUser!.user).toBe(newUser);
     });
 
     it('should return null when unselecting user', () => {
@@ -146,8 +146,10 @@ describe('UsersState', () => {
         usersState.select('id1').subscribe();
         usersState.lock(oldUsers[0]).subscribe();
 
-        expect(usersState.snapshot.users.at(0).isLocked).toBeTruthy();
-        expect(usersState.snapshot.selectedUser).toBe(usersState.snapshot.users.at(0));
+        const user_1 = usersState.snapshot.users.at(0);
+
+        expect(user_1.user.isLocked).toBeTruthy();
+        expect(user_1).toBe(usersState.snapshot.selectedUser);
     });
 
     it('should unmark user as locked', () => {
@@ -157,8 +159,10 @@ describe('UsersState', () => {
         usersState.select('id2').subscribe();
         usersState.unlock(oldUsers[1]).subscribe();
 
-        expect(usersState.snapshot.users.at(1).isLocked).toBeFalsy();
-        expect(usersState.snapshot.selectedUser).toBe(usersState.snapshot.users.at(1));
+        const user_1 = usersState.snapshot.users.at(0);
+
+        expect(user_1.user.isLocked).toBeFalsy();
+        expect(user_1).toBe(usersState.snapshot.selectedUser);
     });
 
     it('should update user on update', () => {
@@ -170,12 +174,14 @@ describe('UsersState', () => {
         usersState.select('id1').subscribe();
         usersState.update(oldUsers[0], request).subscribe();
 
-        expect(usersState.snapshot.users.at(0).email).toEqual('new@mail.com');
-        expect(usersState.snapshot.users.at(0).displayName).toEqual('New');
-        expect(usersState.snapshot.selectedUser).toBe(usersState.snapshot.users.at(0));
+        const user_1 = usersState.snapshot.users.at(0);
+
+        expect(user_1.user.email).toEqual('new@mail.com');
+        expect(user_1.user.displayName).toEqual('New');
+        expect(user_1).toBe(usersState.snapshot.selectedUser);
     });
 
-    it('should add user to state when created', () => {
+    it('should add user to snapshot when created', () => {
         const request = new CreateUserDto(newUser.email, newUser.displayName, 'password');
 
         usersService.setup(x => x.postUser(request))
@@ -183,7 +189,7 @@ describe('UsersState', () => {
 
         usersState.create(request).subscribe();
 
-        expect(usersState.snapshot.users.at(0)).toBe(newUser);
+        expect(usersState.snapshot.users.at(0).user).toBe(newUser);
         expect(usersState.snapshot.usersPager.numberOfItems).toBe(201);
     });
 

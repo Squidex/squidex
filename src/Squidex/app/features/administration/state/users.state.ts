@@ -70,14 +70,18 @@ export class UserForm extends Form<FormGroup> {
     }
 }
 
-interface Snapshot {
-    isCurrentUser?: boolean;
+interface SnapshotUser {
+    user: UserDto;
 
-    users: ImmutableArray<UserDto>;
+    isCurrentUser: boolean;
+}
+
+interface Snapshot {
+    users: ImmutableArray<SnapshotUser>;
     usersPager: Pager;
     usersQuery?: string;
 
-    selectedUser?: UserDto;
+    selectedUser?: SnapshotUser;
 }
 
 @Injectable()
@@ -94,10 +98,6 @@ export class UsersState extends State<Snapshot> {
         this.changes.map(x => x.selectedUser)
             .distinctUntilChanged();
 
-    public isCurrentUser =
-        this.changes.map(x => x.isCurrentUser)
-            .distinctUntilChanged();
-
     constructor(
         private readonly authState: AuthService,
         private readonly dialogs: DialogService,
@@ -109,21 +109,19 @@ export class UsersState extends State<Snapshot> {
     public select(id: string | null): Observable<UserDto | null> {
         return this.loadUser(id)
             .do(selectedUser => {
-                const isCurrentUser = id === this.authState.user!.id;
-
-                this.next(s => ({ ...s, selectedUser, isCurrentUser }));
-            });
+                this.next(s => ({ ...s, selectedUser }));
+            })
+            .map(x => x && x.user);
     }
 
     private loadUser(id: string | null) {
         return !id ?
             Observable.of(null) :
-            Observable.of(this.snapshot.users.find(x => x.id === id))
+            Observable.of(this.snapshot.users.find(x => x.user.id === id))
                 .switchMap(user => {
                     if (!user) {
-                        return this.usersService.getUser(id).catch(() => Observable.of(null));
+                        return this.usersService.getUser(id).map(x => this.createUser(x)).catch(() => Observable.of(null));
                     } else {
-
                         return Observable.of(user);
                     }
                 });
@@ -137,13 +135,13 @@ export class UsersState extends State<Snapshot> {
                 }
 
                 this.next(s => {
-                    const users = ImmutableArray.of(dtos.items);
+                    const users = ImmutableArray.of(dtos.items.map(x => this.createUser(x)));
                     const usersPager = s.usersPager.setCount(dtos.total);
 
                     let selectedUser = s.selectedUser;
 
                     if (selectedUser) {
-                        const selectedFromResult = dtos.items.find(x => x.id === selectedUser!.id);
+                        const selectedFromResult = users.find(x => x.user.id === selectedUser!.user.id);
 
                         if (selectedFromResult) {
                             selectedUser = selectedFromResult;
@@ -160,7 +158,7 @@ export class UsersState extends State<Snapshot> {
         return this.usersService.postUser(request)
             .do(dto => {
                 this.next(s => {
-                    const users = s.users.pushFront(dto);
+                    const users = s.users.pushFront(this.createUser(dto));
                     const usersPager = s.usersPager.incrementCount();
 
                     return { ...s, users, usersPager };
@@ -171,8 +169,6 @@ export class UsersState extends State<Snapshot> {
     public update(user: UserDto, request: UpdateUserDto): Observable<any> {
         return this.usersService.putUser(user.id, request)
             .do(() => {
-                this.dialogs.notifyInfo('User saved successsfull');
-
                 this.replaceUser(update(user, request));
             });
     }
@@ -211,13 +207,19 @@ export class UsersState extends State<Snapshot> {
         return this.load();
     }
 
-    private replaceUser(user: UserDto) {
+    private replaceUser(userDto: UserDto) {
         return this.next(s => {
+            const user = this.createUser(userDto);
+
             const users = s.users.replaceBy('id', user);
-            const selectedUser = s.selectedUser && s.selectedUser.id === user.id ? user : s.selectedUser;
+            const selectedUser = s.selectedUser && s.selectedUser.user.id === userDto.id ? user : s.selectedUser;
 
             return { ...s, users, selectedUser };
         });
+    }
+
+    private createUser(user: UserDto): SnapshotUser {
+        return user ? { user, isCurrentUser: user.id === this.authState.user!.id } : null!;
     }
 }
 
