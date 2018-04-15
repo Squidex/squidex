@@ -141,11 +141,7 @@ export class UsersState extends State<Snapshot> {
                     let selectedUser = s.selectedUser;
 
                     if (selectedUser) {
-                        const selectedFromResult = users.find(x => x.user.id === selectedUser!.user.id);
-
-                        if (selectedFromResult) {
-                            selectedUser = selectedFromResult;
-                        }
+                        selectedUser = users.find(x => x.user.id === selectedUser!.user.id) || selectedUser;
                     }
 
                     return { ...s, users, usersPager, selectedUser };

@@ -18,7 +18,7 @@ import {
     UpdateUserDto,
     UsersDto,
     UsersService
- } from './../services/users.service';
+} from './../services/users.service';
 
 describe('UsersState', () => {
     const oldUsers = [
@@ -51,10 +51,16 @@ describe('UsersState', () => {
     });
 
     it('should load users', () => {
-        expect(usersState.snapshot.users.values.map(x => x.user)).toEqual(oldUsers);
+        expect(usersState.snapshot.users.values).toEqual([{ isCurrentUser: false, user: oldUsers[0] }, { isCurrentUser: true, user: oldUsers[1] }]);
         expect(usersState.snapshot.usersPager.numberOfItems).toEqual(200);
 
         usersService.verifyAll();
+    });
+
+    it('should raise notification on load when notify is true', () => {
+        usersState.load(true).subscribe();
+
+        dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
     });
 
     it('should replace selected user when reloading', () => {
@@ -70,19 +76,18 @@ describe('UsersState', () => {
 
         usersState.load().subscribe();
 
-        expect(usersState.snapshot.selectedUser!.user).toBe(newUsers[0]);
-    });
-
-    it('should raise notification on load when notify is true', () => {
-        usersState.load(true).subscribe();
-
-        dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
+        expect(usersState.snapshot.selectedUser).toEqual({ isCurrentUser: false, user: newUsers[0] });
     });
 
     it('should mark as current user when selected user equals to profile', () => {
-        usersState.select('id2').subscribe();
+        let selectedUser: UserDto;
 
-        expect(usersState.snapshot.selectedUser!.isCurrentUser).toBeTruthy();
+        usersState.select('id2').subscribe(x => {
+            selectedUser = x!;
+        });
+
+        expect(selectedUser!).toEqual(oldUsers[1]);
+        expect(usersState.snapshot.selectedUser!).toEqual({ isCurrentUser: true, user: oldUsers[1] });
     });
 
     it('should not load user when already loaded', () => {
@@ -93,7 +98,7 @@ describe('UsersState', () => {
         });
 
         expect(selectedUser!).toEqual(oldUsers[0]);
-        expect(usersState.snapshot.selectedUser!.user).toBe(oldUsers[0]);
+        expect(usersState.snapshot.selectedUser).toEqual({ isCurrentUser: false, user: oldUsers[0] });
 
         usersService.verify(x => x.getUser(It.isAnyString()), Times.never());
     });
@@ -109,7 +114,9 @@ describe('UsersState', () => {
         });
 
         expect(selectedUser!).toEqual(newUser);
-        expect(usersState.snapshot.selectedUser!.user).toBe(newUser);
+        expect(usersState.snapshot.selectedUser).toEqual({ isCurrentUser: false, user: newUser });
+
+        usersService.verify(x => x.getUser('id3'), Times.once());
     });
 
     it('should return null when unselecting user', () => {
@@ -201,7 +208,7 @@ describe('UsersState', () => {
         usersState.goPrev().subscribe();
 
         usersService.verify(x => x.getUsers(10, 10, undefined), Times.once());
-        usersService.verify(x => x.getUsers(10,  0, undefined), Times.exactly(2));
+        usersService.verify(x => x.getUsers(10, 0, undefined), Times.exactly(2));
     });
 
     it('should load with query when searching', () => {
