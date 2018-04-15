@@ -210,8 +210,8 @@ export class UsersState extends State<Snapshot> {
     private replaceUser(userDto: UserDto) {
         return this.next(s => {
             const user = this.createUser(userDto);
-
             const users = s.users.replaceBy('id', user);
+
             const selectedUser = s.selectedUser && s.selectedUser.user.id === userDto.id ? user : s.selectedUser;
 
             return { ...s, users, selectedUser };

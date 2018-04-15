@@ -80,7 +80,9 @@ export class PatternsState extends State<Snapshot> {
         return this.appPatternsService.getPatterns(this.appName)
             .do(dtos => {
                 this.next(s => {
-                    return { patterns: ImmutableArray.of(dtos.patterns), isLoaded: true, version: dtos.version };
+                    const patterns = ImmutableArray.of(dtos.patterns).sortByStringAsc(x => x.name);
+
+                    return { ...s, patterns, isLoaded: true, version: dtos.version };
                 });
             })
             .notify(this.dialogs);

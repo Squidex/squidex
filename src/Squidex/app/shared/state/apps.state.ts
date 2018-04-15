@@ -80,9 +80,7 @@ export class AppsState extends State<Snapshot> {
 
         return observable
             .do(selectedApp => {
-                this.next(s => {
-                    return { ...s, selectedApp };
-                });
+                this.next(s => ({ ...s, selectedApp }));
             });
     }
 
@@ -90,7 +88,9 @@ export class AppsState extends State<Snapshot> {
         return this.appsService.getApps()
             .do(dtos => {
                 this.next(s => {
-                    return { ...s, apps: ImmutableArray.of(dtos) };
+                    const apps = ImmutableArray.of(dtos);
+
+                    return { ...s, apps };
                 });
             });
     }
@@ -99,7 +99,9 @@ export class AppsState extends State<Snapshot> {
         return this.appsService.postApp(request)
             .do(dto => {
                 this.next(s => {
-                    return { ...s, apps: s.apps.push(dto).sortByStringAsc(x => x.name) };
+                    const apps = s.apps.push(dto).sortByStringAsc(x => x.name);
+
+                    return { ...s, apps };
                 });
             });
     }
@@ -108,9 +110,11 @@ export class AppsState extends State<Snapshot> {
         return this.appsService.deleteApp(name)
             .do(app => {
                 this.next(s => {
+                    const apps = s.apps.filter(x => x.name !== name);
+
                     const selectedApp = s.selectedApp && s.selectedApp.name === name ? null : s.selectedApp;
 
-                    return { apps: s.apps.filter(x => x.name !== name), selectedApp };
+                    return { ...s, apps, selectedApp };
                 });
             });
     }

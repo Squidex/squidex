@@ -73,7 +73,9 @@ export class ClientsState extends State<Snapshot> {
         return this.appClientsService.getClients(this.appName)
             .do(dtos => {
                 this.next(s => {
-                    return { clients: ImmutableArray.of(dtos.clients), isLoaded: true, version: dtos.version };
+                    const clients = ImmutableArray.of(dtos.clients);
+
+                    return { ...s, clients, isLoaded: true, version: dtos.version };
                 });
             })
             .notify(this.dialogs);
