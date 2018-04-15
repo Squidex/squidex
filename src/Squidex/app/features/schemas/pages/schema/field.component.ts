@@ -73,27 +73,27 @@ export class FieldComponent implements OnInit {
     }
 
     public deleteField() {
-        this.schemasState.deleteField(this.schema, this.field).subscribe();
+        this.schemasState.deleteField(this.schema, this.field).onErrorResumeNext().subscribe();
     }
 
     public enableField() {
-        this.schemasState.enableField(this.schema, this.field).subscribe();
+        this.schemasState.enableField(this.schema, this.field).onErrorResumeNext().subscribe();
     }
 
     public disableField() {
-        this.schemasState.disableField(this.schema, this.field).subscribe();
+        this.schemasState.disableField(this.schema, this.field).onErrorResumeNext().subscribe();
     }
 
     public showField() {
-        this.schemasState.showField(this.schema, this.field).subscribe();
+        this.schemasState.showField(this.schema, this.field).onErrorResumeNext().subscribe();
     }
 
     public hideField() {
-        this.schemasState.hideField(this.schema, this.field).subscribe();
+        this.schemasState.hideField(this.schema, this.field).onErrorResumeNext().subscribe();
     }
 
     public lockField() {
-        this.schemasState.lockField(this.schema, this.field).subscribe();
+        this.schemasState.lockField(this.schema, this.field).onErrorResumeNext().subscribe();
     }
 
     public save() {

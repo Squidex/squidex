@@ -73,7 +73,7 @@ export class SchemasPageComponent implements OnDestroy, OnInit {
                 }
             });
 
-        this.schemasState.loadSchemas().subscribe();
+        this.schemasState.loadSchemas().onErrorResumeNext().subscribe();
     }
 
     public onSchemaCreated(schema: SchemaDto) {

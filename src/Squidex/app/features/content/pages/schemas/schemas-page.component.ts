@@ -39,7 +39,7 @@ export class SchemasPageComponent implements OnInit {
     }
 
     public ngOnInit() {
-        this.schemasState.loadSchemas().subscribe();
+        this.schemasState.loadSchemas().onErrorResumeNext().subscribe();
     }
 
     public trackBySchema(index: number, schema: SchemaDto) {

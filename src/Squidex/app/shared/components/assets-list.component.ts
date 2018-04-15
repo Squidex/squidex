@@ -45,11 +45,11 @@ export class AssetsListComponent {
     }
 
     public search() {
-        this.state.loadAssets().subscribe();
+        this.state.loadAssets().onErrorResumeNext().subscribe();
     }
 
     public onAssetDeleting(asset: AssetDto) {
-        this.state.delete(asset).subscribe();
+        this.state.delete(asset).onErrorResumeNext().subscribe();
     }
 
     public onAssetSelected(asset: AssetDto) {
@@ -61,11 +61,11 @@ export class AssetsListComponent {
     }
 
     public goNext() {
-        this.state.goNext().subscribe();
+        this.state.goNext().onErrorResumeNext().subscribe();
     }
 
     public goPrev() {
-        this.state.goPrev().subscribe();
+        this.state.goPrev().onErrorResumeNext().subscribe();
     }
 
     public trackByAsset(index: number, asset: AssetDto) {

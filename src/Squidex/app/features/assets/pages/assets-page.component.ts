@@ -31,19 +31,19 @@ export class AssetsPageComponent implements OnInit {
     }
 
     public load(notify = false) {
-        this.assetsState.loadAssets(notify).subscribe();
+        this.assetsState.loadAssets(notify).onErrorResumeNext().subscribe();
     }
 
     public search() {
-        this.assetsState.search(this.assetsFilter.value).subscribe();
+        this.assetsState.search(this.assetsFilter.value).onErrorResumeNext().subscribe();
     }
 
     public goNext() {
-        this.assetsState.goNext().subscribe();
+        this.assetsState.goNext().onErrorResumeNext().subscribe();
     }
 
     public goPrev() {
-        this.assetsState.goPrev().subscribe();
+        this.assetsState.goPrev().onErrorResumeNext().subscribe();
     }
 }
 

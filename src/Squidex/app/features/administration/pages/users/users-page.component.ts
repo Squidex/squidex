@@ -33,27 +33,27 @@ export class UsersPageComponent implements OnInit {
     }
 
     public search() {
-        this.usersState.search(this.usersFilter.value).subscribe();
+        this.usersState.search(this.usersFilter.value).onErrorResumeNext().subscribe();
     }
 
     public load(notify = false) {
-        this.usersState.loadUsers(notify).subscribe();
+        this.usersState.loadUsers(notify).onErrorResumeNext().subscribe();
     }
 
     public lock(user: UserDto) {
-        this.usersState.lockUser(user).subscribe();
+        this.usersState.lockUser(user).onErrorResumeNext().subscribe();
     }
 
     public unlock(user: UserDto) {
-        this.usersState.unlockUser(user).subscribe();
+        this.usersState.unlockUser(user).onErrorResumeNext().subscribe();
     }
 
     public goPrev() {
-        this.usersState.goPrev().subscribe();
+        this.usersState.goPrev().onErrorResumeNext().subscribe();
     }
 
     public goNext() {
-        this.usersState.goNext().subscribe();
+        this.usersState.goNext().onErrorResumeNext().subscribe();
     }
 
     public trackByUser(index: number, user: UserDto) {
