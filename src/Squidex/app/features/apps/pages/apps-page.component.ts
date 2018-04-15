@@ -5,14 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { Component, OnInit } from '@angular/core';
 
 import {
-    AppDto,
     AppsState,
     AuthService,
-    ImmutableArray,
     ModalView,
     OnboardingService
 } from '@app/shared';
@@ -22,13 +19,9 @@ import {
     styleUrls: ['./apps-page.component.scss'],
     templateUrl: './apps-page.component.html'
 })
-export class AppsPageComponent implements OnDestroy, OnInit {
-    private appsSubscription: Subscription;
-
+export class AppsPageComponent implements OnInit {
     public addAppDialog = new ModalView();
-
-    public apps: ImmutableArray<AppDto> = ImmutableArray.empty();
-    public appTemplate = '';
+    public addAppTemplate = '';
 
     public onboardingModal = new ModalView();
 
@@ -39,26 +32,18 @@ export class AppsPageComponent implements OnDestroy, OnInit {
     ) {
     }
 
-    public ngOnDestroy() {
-        this.appsSubscription.unsubscribe();
-    }
-
     public ngOnInit() {
-        this.appsSubscription =
-            this.appsState.apps
-                .subscribe(apps => {
-                    if (apps.length === 0 && this.onboardingService.shouldShow('dialog')) {
-                        this.onboardingService.disable('dialog');
-                        this.onboardingModal.show();
-                    }
-
-                    this.apps = apps;
-                });
+        this.appsState.apps.take(1)
+            .subscribe(apps => {
+                if (this.onboardingService.shouldShow('dialog') && apps.length === 0) {
+                    this.onboardingService.disable('dialog');
+                    this.onboardingModal.show();
+                }
+            });
     }
 
     public createNewApp(template: string) {
-        this.appTemplate = template;
-
+        this.addAppTemplate = template;
         this.addAppDialog.show();
     }
 }
