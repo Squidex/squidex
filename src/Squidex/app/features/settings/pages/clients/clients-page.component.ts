@@ -26,7 +26,7 @@ export class ClientsPageComponent implements OnInit {
 
     constructor(
         public readonly appsState: AppsState,
-        private readonly clientsState: ClientsState,
+        public readonly clientsState: ClientsState,
         private readonly formBuilder: FormBuilder
     ) {
     }

@@ -2,20 +2,17 @@
 
 <sqx-panel desiredWidth="60rem">
     <ng-container title>
-        Contributors
+        Patterns
     </ng-container>
 
     <ng-container content>
-        <ng-container *ngIf="appPatterns">
-            <div *ngFor="let pattern of appPatterns.patterns">
-                <sqx-pattern [pattern]="pattern"
-                    (removing)="removePattern(pattern)"
-                    (updating)="updatePattern(pattern, $event)">
-                </sqx-pattern>
+        <ng-container *ngIf="patternsState.patterns | async; let patterns">
+            <div class="table-items-row table-items-row-empty" *ngIf="patterns.length === 0">
+                No pattern created yet.
             </div>
-            <sqx-pattern isNew="true"
-                (updating)="addPattern($event)">
-            </sqx-pattern>
+            
+            <sqx-pattern *ngFor="let pattern of patterns" [pattern]="pattern"></sqx-pattern>
+            <sqx-pattern></sqx-pattern>
         </ng-container>
     </ng-container>
 </sqx-panel>

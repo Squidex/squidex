@@ -47,13 +47,16 @@ import {
     MarkdownEditorComponent,
     MustBeAuthenticatedGuard,
     MustBeNotAuthenticatedGuard,
+    PatternsState,
     PlansService,
     ResolveAppLanguagesGuard,
     ResolveContentGuard,
+    RichEditorComponent,
+    RulesService,
     SchemaMustExistGuard,
     SchemaMustExistPublishedGuard,
     SchemasService,
-    RulesService,
+    SchemasState,
     UIService,
     UnsetAppGuard,
     UsagesService,
@@ -64,9 +67,7 @@ import {
     UserPicturePipe,
     UserPictureRefPipe,
     UsersProviderService,
-    UsersService,
-    RichEditorComponent,
-    SchemasState
+    UsersService
 } from './declarations';
 
 @NgModule({
@@ -147,6 +148,7 @@ export class SqxSharedModule {
                 LoadAppsGuard,
                 MustBeAuthenticatedGuard,
                 MustBeNotAuthenticatedGuard,
+                PatternsState,
                 PlansService,
                 ResolveAppLanguagesGuard,
                 ResolveContentGuard,
