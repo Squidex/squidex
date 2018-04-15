@@ -38,7 +38,7 @@ export class EventConsumersState extends State<Snapshot> {
         return this.eventConsumersService.getEventConsumers()
             .do(dtos => {
                 if (notifyLoad) {
-                    this.dialogs.notifyInfo('Event consumers reloaded.');
+                    this.dialogs.notifyInfo('Event Consumers reloaded.');
                 }
 
                 this.next(s => {

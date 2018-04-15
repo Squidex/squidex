@@ -50,14 +50,14 @@ export class RulesPageComponent implements OnInit {
         this.load();
     }
 
-    public load(showInfo = false) {
+    public load(notifyLoad = false) {
         this.schemasService.getSchemas(this.ctx.appName)
                 .combineLatest(this.rulesService.getRules(this.ctx.appName), (s, w) => { return { rules: w, schemas: s }; })
             .subscribe(dtos => {
                 this.schemas = dtos.schemas;
                 this.rules = ImmutableArray.of(dtos.rules);
 
-                if (showInfo) {
+                if (notifyLoad) {
                     this.ctx.notifyInfo('Rules reloaded.');
                 }
             }, error => {

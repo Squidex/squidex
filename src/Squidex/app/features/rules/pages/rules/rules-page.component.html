@@ -21,6 +21,10 @@
     <ng-container content>
         <div class="table-items-row table-items-row-empty" *ngIf="rules && rules.length === 0">
             No Rule created yet.
+
+            <button class="btn btn-success btn-sm ml-2" (click)="createNew()">
+                <i class="icon icon-plus"></i> Add Rule
+            </button>
         </div>
 
         <table class="table table-items table-fixed" *ngIf="rules && rules.length > 0">

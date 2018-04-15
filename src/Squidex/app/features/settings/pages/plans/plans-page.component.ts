@@ -58,7 +58,7 @@ export class PlansPageComponent implements OnDestroy, OnInit {
         this.load();
     }
 
-    public load(showInfo = false) {
+    public load(notifyLoad = false) {
         this.plansService.getPlans(this.appsState.appName)
             .subscribe(dto => {
                 if (this.overridePlanId) {
@@ -69,7 +69,7 @@ export class PlansPageComponent implements OnDestroy, OnInit {
 
                 this.planOwned = !dto.planOwner || (dto.planOwner === this.authState.user!.id);
 
-                if (showInfo) {
+                if (notifyLoad) {
                     this.dialogs.notifyInfo('Plans reloaded.');
                 }
             }, error => {

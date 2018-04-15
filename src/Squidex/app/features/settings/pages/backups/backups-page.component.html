@@ -19,6 +19,10 @@
         <ng-container *ngIf="backupsState.backups | async; let backups">
             <div class="table-items-row table-items-row-empty" *ngIf="backups.length === 0">
                 No backups created yet.
+
+                <button class="btn btn-success btn-sm ml-2" (click)="start()">
+                    Start Backup
+                </button>
             </div>
             
             <div class="table-items-row" *ngFor="let backup of backups; trackBy: trackByBackup">

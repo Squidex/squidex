@@ -60,14 +60,14 @@ export class AssetsState extends State<Snapshot> {
         super({ assets: ImmutableArray.empty(), assetsPager: new Pager(0, 0, 30), loaded: false });
     }
 
-    public load(notify = false, noReload = false): Observable<any> {
+    public load(notifyLoad = false, noReload = false): Observable<any> {
         if (this.snapshot.loaded && noReload) {
             return Observable.of({});
         }
 
         return this.assetsService.getAssets(this.appName, this.snapshot.assetsPager.pageSize, this.snapshot.assetsPager.skip, this.snapshot.assetsQuery)
             .do(dtos => {
-                if (notify) {
+                if (notifyLoad) {
                     this.dialogs.notifyInfo('Assets reloaded.');
                 }
 

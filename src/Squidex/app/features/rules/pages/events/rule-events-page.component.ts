@@ -38,13 +38,13 @@ export class RuleEventsPageComponent implements OnInit {
         this.load();
     }
 
-    public load(showInfo = false) {
+    public load(notifyLoad = false) {
         this.rulesService.getEvents(this.ctx.appName, this.eventsPager.pageSize, this.eventsPager.skip)
             .subscribe(dtos => {
                 this.eventsItems = ImmutableArray.of(dtos.items);
                 this.eventsPager = this.eventsPager.setCount(dtos.total);
 
-                if (showInfo) {
+                if (notifyLoad) {
                     this.ctx.notifyInfo('Events reloaded.');
                 }
             }, error => {

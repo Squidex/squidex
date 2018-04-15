@@ -60,7 +60,7 @@ export class ContentsSelectorComponent implements OnInit {
         this.load(true);
     }
 
-    private load(showInfo = false) {
+    private load(notifyLod = false) {
         this.contentsService.getContents(this.appsState.appName, this.schema.name, this.contentsPager.pageSize, this.contentsPager.skip, this.contentsQuery, undefined, false)
             .finally(() => {
                 this.selectedItems = {};
@@ -71,7 +71,7 @@ export class ContentsSelectorComponent implements OnInit {
                 this.contentItems = ImmutableArray.of(dtos.items);
                 this.contentsPager = this.contentsPager.setCount(dtos.total);
 
-                if (showInfo) {
+                if (notifyLod) {
                     this.dialogs.notifyInfo('Contents reloaded.');
                 }
             }, error => {
