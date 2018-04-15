@@ -47,8 +47,32 @@ describe('BackupsState', () => {
         backupsState.load().subscribe();
     });
 
-    it('should load clients', () => {
+    it('should load backups', () => {
         expect(backupsState.snapshot.backups.values).toEqual(oldBackups);
+    });
+
+    it('should show notification on load when flag is true', () => {
+        backupsState.load(true, true).subscribe();
+
+        dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
+    });
+
+    it('should show notification on load error when flag is true', () => {
+        backupsService.setup(x => x.getBackups(app))
+            .returns(() => Observable.throw({}));
+
+        backupsState.load(true, true).onErrorResumeNext().subscribe();
+
+        dialogs.verify(x => x.notifyError(It.isAny()), Times.once());
+    });
+
+    it('should not show notification on load error when flag is false', () => {
+        backupsService.setup(x => x.getBackups(app))
+            .returns(() => Observable.throw({}));
+
+        backupsState.load().onErrorResumeNext().subscribe();
+
+        dialogs.verify(x => x.notifyError(It.isAny()), Times.never());
     });
 
     it('should not add backup to snapshot', () => {

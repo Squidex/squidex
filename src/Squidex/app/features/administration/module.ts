@@ -17,6 +17,7 @@ import {
     AdministrationAreaComponent,
     EventConsumersPageComponent,
     EventConsumersService,
+    EventConsumersState,
     UnsetUserGuard,
     UserMustExistGuard,
     UserPageComponent,
@@ -73,6 +74,7 @@ const routes: Routes = [
     ],
     providers: [
         EventConsumersService,
+        EventConsumersState,
         UnsetUserGuard,
         UserMustExistGuard,
         UsersService,

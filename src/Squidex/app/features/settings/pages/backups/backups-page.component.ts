@@ -20,7 +20,7 @@ import {
     templateUrl: './backups-page.component.html'
 })
 export class BackupsPageComponent implements OnInit, OnDestroy {
-    private loadSubscription: Subscription;
+    private timerSubscription: Subscription;
 
     constructor(
         public readonly appsState: AppsState,
@@ -29,21 +29,27 @@ export class BackupsPageComponent implements OnInit, OnDestroy {
     }
 
     public ngOnDestroy() {
-        this.loadSubscription.unsubscribe();
+        this.timerSubscription.unsubscribe();
     }
 
     public ngOnInit() {
-        this.loadSubscription =
-            Observable.timer(0, 2000)
+        this.backupsState.load(false, true).onErrorResumeNext().subscribe();
+
+        this.timerSubscription =
+            Observable.timer(3000, 3000)
                 .switchMap(t => this.backupsState.load().onErrorResumeNext())
                 .subscribe();
     }
 
-    public startBackup() {
+    public reload() {
+        this.backupsState.load(true, true).onErrorResumeNext().subscribe();
+    }
+
+    public start() {
         this.backupsState.start().onErrorResumeNext().subscribe();
     }
 
-    public deleteBackup(backup: BackupDto) {
+    public delete(backup: BackupDto) {
         this.backupsState.delete(backup).onErrorResumeNext().subscribe();
     }
 

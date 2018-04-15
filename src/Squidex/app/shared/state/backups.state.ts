@@ -40,10 +40,25 @@ export class BackupsState extends State<Snapshot> {
         super({ backups: ImmutableArray.empty() });
     }
 
-    public load(): Observable<any> {
+    public load(notifyLoad = false, notifyError = false): Observable<any> {
         return this.backupsService.getBackups(this.appName)
             .do(dtos => {
-                this.next({ backups: ImmutableArray.of(dtos) });
+                if (notifyLoad) {
+                    this.dialogs.notifyInfo('Backups reloaded.');
+                }
+
+                this.next(s => {
+                    const backups = ImmutableArray.of(dtos);
+
+                    return { ...s, backups };
+                });
+            })
+            .catch(error => {
+                if (notifyError) {
+                    this.dialogs.notifyError(error);
+                }
+
+                return Observable.throw(error);
             });
     }
 

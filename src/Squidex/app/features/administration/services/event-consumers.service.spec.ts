@@ -69,7 +69,7 @@ describe('EventConsumersService', () => {
     it('should make put request to start event consumer',
         inject([EventConsumersService, HttpTestingController], (eventConsumersService: EventConsumersService, httpMock: HttpTestingController) => {
 
-        eventConsumersService.startEventConsumer('event-consumer1').subscribe();
+        eventConsumersService.putStart('event-consumer1').subscribe();
 
         const req = httpMock.expectOne('http://service/p/api/event-consumers/event-consumer1/start');
 
@@ -82,7 +82,7 @@ describe('EventConsumersService', () => {
     it('should make put request to stop event consumer',
         inject([EventConsumersService, HttpTestingController], (eventConsumersService: EventConsumersService, httpMock: HttpTestingController) => {
 
-        eventConsumersService.stopEventConsumer('event-consumer1').subscribe();
+        eventConsumersService.putStop('event-consumer1').subscribe();
 
         const req = httpMock.expectOne('http://service/p/api/event-consumers/event-consumer1/stop');
 
@@ -95,7 +95,7 @@ describe('EventConsumersService', () => {
     it('should make put request to reset event consumer',
         inject([EventConsumersService, HttpTestingController], (eventConsumersService: EventConsumersService, httpMock: HttpTestingController) => {
 
-        eventConsumersService.resetEventConsumer('event-consumer1').subscribe();
+        eventConsumersService.putReset('event-consumer1').subscribe();
 
         const req = httpMock.expectOne('http://service/p/api/event-consumers/event-consumer1/reset');
 

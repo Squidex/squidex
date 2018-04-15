@@ -53,21 +53,21 @@ export class EventConsumersService {
                 .pretifyError('Failed to load event consumers. Please reload.');
     }
 
-    public startEventConsumer(name: string): Observable<any> {
+    public putStart(name: string): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/event-consumers/${name}/start`);
 
         return HTTP.putVersioned(this.http, url, {})
                 .pretifyError('Failed to start event consumer. Please reload.');
     }
 
-    public stopEventConsumer(name: string): Observable<any> {
+    public putStop(name: string): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/event-consumers/${name}/stop`);
 
         return HTTP.putVersioned(this.http, url, {})
                 .pretifyError('Failed to stop event consumer. Please reload.');
     }
 
-    public resetEventConsumer(name: string): Observable<any> {
+    public putReset(name: string): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/event-consumers/${name}/reset`);
 
         return HTTP.putVersioned(this.http, url, {})

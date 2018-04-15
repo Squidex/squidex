@@ -57,7 +57,7 @@ describe('UsersState', () => {
         usersService.verifyAll();
     });
 
-    it('should raise notification on load when notify is true', () => {
+    it('should show notification on load when flag is true', () => {
         usersState.load(true).subscribe();
 
         dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
@@ -79,18 +79,7 @@ describe('UsersState', () => {
         expect(usersState.snapshot.selectedUser).toEqual(u(newUsers[0]));
     });
 
-    it('should mark as current user when selected user equals to profile', () => {
-        let selectedUser: UserDto;
-
-        usersState.select('id2').subscribe(x => {
-            selectedUser = x!;
-        });
-
-        expect(selectedUser!).toEqual(oldUsers[1]);
-        expect(usersState.snapshot.selectedUser).toEqual(u(oldUsers[1]));
-    });
-
-    it('should not load user when already loaded', () => {
+    it('should not load user on select when already loaded', () => {
         let selectedUser: UserDto;
 
         usersState.select('id1').subscribe(x => {
@@ -103,7 +92,7 @@ describe('UsersState', () => {
         usersService.verify(x => x.getUser(It.isAnyString()), Times.never());
     });
 
-    it('should load user when not loaded', () => {
+    it('should load user on select when not loaded', () => {
         usersService.setup(x => x.getUser('id3'))
             .returns(() => Observable.of(newUser));
 
@@ -119,7 +108,7 @@ describe('UsersState', () => {
         usersService.verify(x => x.getUser('id3'), Times.once());
     });
 
-    it('should return null when unselecting user', () => {
+    it('should return null on select when unselecting user', () => {
         let selectedUser: UserDto;
 
         usersState.select(null).subscribe(x => {
@@ -132,7 +121,7 @@ describe('UsersState', () => {
         usersService.verify(x => x.getUser(It.isAnyString()), Times.never());
     });
 
-    it('should return null when user to select is not found', () => {
+    it('should return null on select when user is not found', () => {
         usersService.setup(x => x.getUser('unknown'))
             .returns(() => Observable.throw({}));
 

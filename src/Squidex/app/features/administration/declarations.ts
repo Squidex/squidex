@@ -17,4 +17,5 @@ export * from './pages/users/users-page.component';
 export * from './services/event-consumers.service';
 export * from './services/users.service';
 
+export * from './state/event-consumers.state';
 export * from './state/users.state';
