@@ -7,7 +7,11 @@
 
 import { Component, OnInit } from '@angular/core';
 
-import { AppsState, PatternsState } from '@app/shared';
+import {
+    AppPatternDto,
+    AppsState,
+    PatternsState
+} from '@app/shared';
 
 @Component({
     selector: 'sqx-patterns-page',
@@ -23,5 +27,9 @@ export class PatternsPageComponent implements OnInit {
 
     public ngOnInit() {
         this.patternsState.load().onErrorResumeNext().subscribe();
+    }
+
+    public trackByPattern(index: number, pattern: AppPatternDto) {
+        return pattern.id;
     }
 }

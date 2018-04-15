@@ -11,7 +11,7 @@
                 No pattern created yet.
             </div>
             
-            <sqx-pattern *ngFor="let pattern of patterns" [pattern]="pattern"></sqx-pattern>
+            <sqx-pattern *ngFor="let pattern of patterns; trackBy: trackByPattern" [pattern]="pattern"></sqx-pattern>
             <sqx-pattern></sqx-pattern>
         </ng-container>
     </ng-container>

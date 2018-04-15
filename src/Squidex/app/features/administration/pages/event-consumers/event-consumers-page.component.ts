@@ -95,8 +95,6 @@ export class EventConsumersPageComponent implements OnDestroy, OnInit {
     }
 }
 
-
-
 function start(es: EventConsumerDto) {
     return new EventConsumerDto(es.name, false, false, es.error, es.position);
 }
