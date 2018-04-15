@@ -8,21 +8,23 @@
     </div>
 </div>
 
-<div class="apps-section">
-    <div class="empty" *ngIf="apps?.length === 0">
-        <h3 class="empty-headline">You are not collaborating to any app yet</h3>
-    </div>
+<ng-container *ngIf="appsState.apps | async; let apps">
+    <div class="apps-section">
+        <div class="empty" *ngIf="apps.length === 0">
+            <h3 class="empty-headline">You are not collaborating to any app yet</h3>
+        </div>
 
-    <div class="card card-href card-app float-left" *ngFor="let app of appsState.apps | async" [routerLink]="['/app', app.name]">
-        <div class="card-body">
-            <h4 class="card-title">{{app.name}}</h4>
+        <div class="card card-href card-app float-left" *ngFor="let app of apps" [routerLink]="['/app', app.name]">
+            <div class="card-body">
+                <h4 class="card-title">{{app.name}}</h4>
 
-            <div class="card-text">
-                <a [routerLink]="['/app', app.name]">Edit</a>
+                <div class="card-text">
+                    <a [routerLink]="['/app', app.name]">Edit</a>
+                </div>
             </div>
         </div>
     </div>
-</div>
+</ng-container>
 
 <div class="apps-section">
     <div class="card card-template card-href" (click)="createNewApp('')">
