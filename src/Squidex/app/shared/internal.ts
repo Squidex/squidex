@@ -11,8 +11,6 @@ export * from './guards/must-be-authenticated.guard';
 export * from './guards/must-be-not-authenticated.guard';
 export * from './guards/resolve-app-languages.guard';
 export * from './guards/resolve-content.guard';
-export * from './guards/resolve-published-schema.guard';
-export * from './guards/resolve-schema.guard';
 export * from './guards/schema-must-exist-published.guard';
 export * from './guards/schema-must-exist.guard';
 export * from './guards/unset-app.guard';

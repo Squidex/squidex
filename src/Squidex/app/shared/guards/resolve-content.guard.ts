@@ -6,7 +6,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { ActivatedRouteSnapshot, Resolve, Router, RouterStateSnapshot } from '@angular/router';
+import { ActivatedRouteSnapshot, Resolve, Router } from '@angular/router';
 import { Observable } from 'rxjs';
 
 import { allParams } from '@app/framework';
@@ -21,7 +21,7 @@ export class ResolveContentGuard implements Resolve<ContentDto | null> {
     ) {
     }
 
-    public resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<ContentDto | null> {
+    public resolve(route: ActivatedRouteSnapshot): Observable<ContentDto | null> {
         const params = allParams(route);
 
         const appName = params['appName'];
