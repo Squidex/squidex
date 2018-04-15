@@ -56,7 +56,11 @@ export class ContentsSelectorComponent implements OnInit {
         this.load();
     }
 
-    public load(showInfo = false) {
+    public reload() {
+        this.load(true);
+    }
+
+    private load(showInfo = false) {
         this.contentsService.getContents(this.appsState.appName, this.schema.name, this.contentsPager.pageSize, this.contentsPager.skip, this.contentsQuery, undefined, false)
             .finally(() => {
                 this.selectedItems = {};

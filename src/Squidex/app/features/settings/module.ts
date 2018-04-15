@@ -15,6 +15,8 @@ import {
 } from '@app/shared';
 
 import {
+    BackupDownloadUrlPipe,
+    BackupDurationPipe,
     BackupsPageComponent,
     ClientComponent,
     ClientsPageComponent,
@@ -76,6 +78,8 @@ const routes: Routes = [
         RouterModule.forChild(routes)
     ],
     declarations: [
+        BackupDownloadUrlPipe,
+        BackupDurationPipe,
         BackupsPageComponent,
         ClientComponent,
         ClientsPageComponent,

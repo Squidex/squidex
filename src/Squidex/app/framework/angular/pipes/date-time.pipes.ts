@@ -21,6 +21,16 @@ export class ShortDatePipe implements PipeTransform {
 }
 
 @Pipe({
+    name: 'sqxISODate',
+    pure: true
+})
+export class ISODatePipe implements PipeTransform {
+    public transform(value: DateTime): any {
+        return value.toISOString();
+    }
+}
+
+@Pipe({
     name: 'sqxDate',
     pure: true
 })

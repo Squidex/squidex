@@ -14,6 +14,7 @@ import {
     DurationPipe,
     FromNowPipe,
     FullDateTimePipe,
+    ISODatePipe,
     MonthPipe,
     ShortDatePipe,
     ShortTimePipe
@@ -117,6 +118,17 @@ describe('ShortTimePipe', () => {
 
         const actual = pipe.transform(dateTime);
         const expected = '12:13';
+
+        expect(actual).toBe(expected);
+    });
+});
+
+describe('ISODatePipe', () => {
+    it('should format to short time string', () => {
+        const pipe = new ISODatePipe();
+
+        const actual = pipe.transform(dateTime);
+        const expected = dateTime.toISOString();
 
         expect(actual).toBe(expected);
     });

@@ -29,9 +29,7 @@
                     <th class="cell-time">
                         Created
                     </th>
-                    <th class="cell-actions">
-
-                    </th>
+                    <th class="cell-actions"></th>
                 </tr>
             </thead>
 
@@ -39,7 +37,7 @@
                 <ng-template ngFor let-event [ngForOf]="eventsItems">
                     <tr [class.expanded]="selectedEventId === event.id">
                         <td class="cell-label">
-                            <span class="badge badge-pill badge-{{getBadgeClass(event.jobResult)}}">{{event.jobResult}}</span>
+                            <span class="badge badge-pill badge-{{event.jobResult | sqxRuleEventBadgeClass}}">{{event.jobResult}}</span>
                         </td>
                         <td class="cell-40">
                             <span class="truncate">{{event.eventName}}</span>
@@ -64,7 +62,7 @@
                             
                             <div class="row event-stats">
                                 <div class="col-3">
-                                    <span class="badge badge-pill badge-{{getBadgeClass(event.result)}}">{{event.result}}</span>
+                                    <span class="badge badge-pill badge-{{event.result | sqxRuleEventBadgeClass}}">{{event.result}}</span>
                                 </div>
                                 <div class="col-3">
                                     Attempts: {{event.numCalls}}

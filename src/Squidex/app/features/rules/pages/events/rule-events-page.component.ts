@@ -76,17 +76,5 @@ export class RuleEventsPageComponent implements OnInit {
 
         this.load();
     }
-
-    public getBadgeClass(status: string) {
-        if (status === 'Retry') {
-            return 'warning';
-        } else if (status === 'Failed') {
-            return 'danger';
-        } else if (status === 'Pending') {
-            return 'secondary';
-        } else {
-            return status.toLowerCase();
-        }
-    }
 }
 

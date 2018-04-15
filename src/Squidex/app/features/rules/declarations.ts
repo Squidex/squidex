@@ -16,4 +16,5 @@ export * from './pages/rules/triggers/content-changed-trigger.component';
 export * from './pages/rules/rule-wizard.component';
 export * from './pages/rules/rules-page.component';
 
+export * from './pages/events/pipes';
 export * from './pages/events/rule-events-page.component';

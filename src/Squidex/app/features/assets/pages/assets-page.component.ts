@@ -27,11 +27,11 @@ export class AssetsPageComponent implements OnInit {
     }
 
     public ngOnInit() {
-        this.load();
+        this.assetsState.load().onErrorResumeNext().subscribe();
     }
 
-    public load(notify = false) {
-        this.assetsState.load(notify).onErrorResumeNext().subscribe();
+    public reload() {
+        this.assetsState.load(true).onErrorResumeNext().subscribe();
     }
 
     public search() {
