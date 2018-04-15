@@ -65,7 +65,7 @@
 
 <ng-container *sqxModalView="renameDialog;onRoot:true">
     <form [formGroup]="renameForm.form" (ngSubmit)="renameAsset()">
-        <sqx-modal-dialog (close)="cancelRenameAsset()">
+        <sqx-modal-dialog (closed)="cancelRenameAsset()">
             <ng-container title>
                 Rename asset
             </ng-container>

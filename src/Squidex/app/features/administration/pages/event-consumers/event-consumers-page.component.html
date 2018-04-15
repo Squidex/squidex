@@ -61,7 +61,7 @@
     </ng-container>
 </sqx-panel>
 
-<sqx-modal-dialog *sqxModalView="eventConsumerErrorDialog;onRoot:true" (close)="eventConsumerErrorDialog.hide()">
+<sqx-modal-dialog *sqxModalView="eventConsumerErrorDialog;onRoot:true" (closed)="eventConsumerErrorDialog.hide()">
     <ng-container #title>
         Error
     </ng-container>

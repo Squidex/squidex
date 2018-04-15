@@ -38,7 +38,7 @@ export class ModalDialogComponent implements AfterViewInit {
     public contentClass = '';
 
     @Output()
-    public close = new EventEmitter();
+    public closed = new EventEmitter();
 
     @ViewChild('tabsElement')
     public tabsElement: ElementRef;

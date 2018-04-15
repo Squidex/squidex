@@ -112,7 +112,7 @@
 </sqx-panel>
 
 <ng-container *sqxModalView="dueTimeDialog;onRoot:true">
-    <sqx-modal-dialog (close)="cancelStatusChange()">
+    <sqx-modal-dialog (closed)="cancelStatusChange()">
         <ng-container title>
             {{dueTimeAction}} content item(s)
         </ng-container>

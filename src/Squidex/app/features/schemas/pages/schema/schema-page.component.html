@@ -90,7 +90,7 @@
 </ng-container>
 
 <ng-container *sqxModalView="exportSchemaDialog;onRoot:true">
-    <sqx-modal-dialog (close)="exportSchemaDialog.hide()">
+    <sqx-modal-dialog (closed)="exportSchemaDialog.hide()">
         <ng-container title>
             Export Schema
         </ng-container>

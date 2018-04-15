@@ -1,5 +1,5 @@
 <form [formGroup]="createForm.form" (ngSubmit)="createApp()">
-    <sqx-modal-dialog (close)="complete()">
+    <sqx-modal-dialog (closed)="complete()">
         <ng-container title>
             <ng-container *ngIf="template; else noTemplate">
                 Create {{template}} Sample

@@ -1,5 +1,5 @@
 <form [formGroup]="editForm.form" (ngSubmit)="saveSchema()">
-    <sqx-modal-dialog (close)="complete()">
+    <sqx-modal-dialog (closed)="complete()">
         <ng-container title>
             Edit Schema
         </ng-container>
