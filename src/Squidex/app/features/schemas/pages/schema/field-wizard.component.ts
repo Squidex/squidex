@@ -32,12 +32,12 @@ export class FieldWizardComponent {
 
     public fieldTypes = fieldTypes;
 
-    public addFieldForm: AddFieldForm;
+    public addFieldForm = new AddFieldForm(this.formBuilder);
 
-    constructor(formBuilder: FormBuilder,
+    constructor(
+        private readonly formBuilder: FormBuilder,
         private readonly schemasState: SchemasState
     ) {
-        this.addFieldForm = new AddFieldForm(formBuilder);
     }
 
     public complete() {

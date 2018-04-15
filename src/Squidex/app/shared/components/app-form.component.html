@@ -1,4 +1,4 @@
-<form [formGroup]="createForm" (ngSubmit)="createApp()">
+<form [formGroup]="createForm.form" (ngSubmit)="createApp()">
     <sqx-modal-dialog (close)="complete()">
         <ng-container title>
             <ng-container *ngIf="template; else noTemplate">
@@ -11,17 +11,17 @@
         </ng-container>
 
         <ng-container content>
-            <sqx-form-error [error]="createFormError"></sqx-form-error>
+            <sqx-form-error [error]="createForm.error | async"></sqx-form-error>
         
             <div class="form-group">
                 <label for="appName">Name</label>
                 
-                <sqx-control-errors for="name" submitOnly="true" [submitted]="createFormSubmitted"></sqx-control-errors>
+                <sqx-control-errors for="name" submitOnly="true" [submitted]="createForm.submitted | async"></sqx-control-errors>
         
                 <input type="text" class="form-control" id="appName" formControlName="name" autocomplete="off" sqxLowerCaseInput sqxFocusOnInit />
                 
                 <small class="form-text text-muted">
-                    The app name becomes part of the api url,<br /> e.g {{apiUrl.buildUrl("api/content/")}}<b>{{appName | async}}</b>/.
+                    The app name becomes part of the api url,<br /> e.g {{apiUrl.buildUrl("api/content/")}}<b>{{createForm.appName | async}}</b>/.
                 </small>
                     
                 <small class="form-text text-muted">

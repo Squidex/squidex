@@ -31,16 +31,16 @@ export class SchemaFormComponent implements OnInit {
     @Input()
     public import: any;
 
-    public createForm: CreateSchemaForm;
+    public createForm = new CreateSchemaForm(this.formBuilder);
 
     public showImport = false;
 
-    constructor(formBuilder: FormBuilder,
+    constructor(
         public readonly apiUrl: ApiUrlConfig,
         public readonly appsState: AppsState,
+        private readonly formBuilder: FormBuilder,
         private readonly schemasState: SchemasState
     ) {
-        this.createForm = new CreateSchemaForm(formBuilder);
     }
 
     public ngOnInit() {

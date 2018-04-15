@@ -22,14 +22,14 @@ export class UserPageComponent implements OnDestroy, OnInit {
     private selectedUserSubscription: Subscription;
     private user?: UserDto;
 
-    public userForm: UserForm;
+    public userForm = new UserForm(this.formBuilder);
 
-    constructor(formBuilder: FormBuilder,
+    constructor(
         public readonly usersState: UsersState,
+        private readonly formBuilder: FormBuilder,
         private readonly route: ActivatedRoute,
         private readonly router: Router
     ) {
-        this.userForm = new UserForm(formBuilder);
     }
 
     public ngOnDestroy() {

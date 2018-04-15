@@ -28,12 +28,12 @@ export class SchemaScriptsFormComponent implements OnInit {
 
     public selectedField = 'scriptQuery';
 
-    public editForm: EditScriptsForm;
+    public editForm = new EditScriptsForm(this.formBuilder);
 
-    constructor(formBuilder: FormBuilder,
+    constructor(
+        private readonly formBuilder: FormBuilder,
         private readonly schemasState: SchemasState
     ) {
-        this.editForm = new EditScriptsForm(formBuilder);
     }
 
     public ngOnInit() {

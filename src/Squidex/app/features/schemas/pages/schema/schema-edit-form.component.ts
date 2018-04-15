@@ -26,12 +26,12 @@ export class SchemaEditFormComponent implements OnInit {
     @Input()
     public schema: SchemaDetailsDto;
 
-    public editForm: EditSchemaForm;
+    public editForm = new EditSchemaForm(this.formBuilder);
 
-    constructor(formBuilder: FormBuilder,
+    constructor(
+        private readonly formBuilder: FormBuilder,
         private readonly schemasState: SchemasState
     ) {
-        this.editForm = new EditSchemaForm(formBuilder);
     }
 
     public ngOnInit() {
