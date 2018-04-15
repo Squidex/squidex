@@ -31,7 +31,7 @@
         </ng-container>
 
         <ng-container footer>
-            <button type="reset" class="float-left btn btn-secondary" (click)="complete()" [disabled]="createFormSubmitted">Cancel</button>
+            <button type="reset" class="float-left btn btn-secondary" (click)="complete()" [disabled]="createForm.submitted | async">Cancel</button>
             <button type="submit" class="float-right btn btn-success">Create</button>
         </ng-container>
     </sqx-modal-dialog>
