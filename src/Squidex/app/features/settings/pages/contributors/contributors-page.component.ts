@@ -67,7 +67,7 @@ export class ContributorsPageComponent implements OnInit {
         this.contributorsState.load().onErrorResumeNext().subscribe();
     }
 
-    public removeContributor(contributor: AppContributorDto) {
+    public remove(contributor: AppContributorDto) {
         this.contributorsState.revoke(contributor).onErrorResumeNext().subscribe();
     }
 

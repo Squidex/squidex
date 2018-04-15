@@ -29,7 +29,7 @@
                                 </select>
                             </td>
                             <td class="cell-actions">
-                                <button *ngIf="!contributorInfo.isCurrentUser" type="button" class="btn btn-link btn-danger" (click)="removeContributor(contributorInfo.contributor)">
+                                <button *ngIf="!contributorInfo.isCurrentUser" type="button" class="btn btn-link btn-danger" (click)="remove(contributorInfo.contributor)">
                                     <i class="icon-bin2"></i>
                                 </button>
                             </td>
@@ -55,7 +55,7 @@
 						</sqx-autocomplete>
 					</div>
 					<div class="col col-auto pl-1">
-						<button type="submit" class="btn btn-success" [disabled]="assignContributorForm.noUser | async">Add Contributor</button>
+						<button type="submit" class="btn btn-success" [disabled]="assignContributorForm.hasNoUser | async">Add Contributor</button>
 					</div>
                 </div>
             </form>

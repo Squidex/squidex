@@ -29,6 +29,18 @@ import {
     UpdateAppClientDto
 } from './../services/app-clients.service';
 
+export class RenameClientForm extends Form<FormGroup> {
+    constructor(formBuilder: FormBuilder) {
+        super(formBuilder.group({
+            name: ['',
+                [
+                    Validators.required
+                ]
+            ]
+        }));
+    }
+}
+
 export class AttachClientForm extends Form<FormGroup> {
     public hasNoName =
         this.form.controls['name'].valueChanges.startWith('').map(x => !x || x.length === 0);

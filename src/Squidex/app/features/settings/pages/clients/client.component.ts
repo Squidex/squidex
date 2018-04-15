@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input } from '@angular/core';
-import { FormBuilder, Validators } from '@angular/forms';
+import { Component, Input, OnChanges } from '@angular/core';
+import { FormBuilder } from '@angular/forms';
 
 import {
     AccessTokenDto,
@@ -16,6 +16,7 @@ import {
     ClientsState,
     DialogService,
     ModalView,
+    RenameClientForm,
     UpdateAppClientDto
 } from '@app/shared';
 
@@ -26,7 +27,7 @@ const ESCAPE_KEY = 27;
     styleUrls: ['./client.component.scss'],
     templateUrl: './client.component.html'
 })
-export class ClientComponent {
+export class ClientComponent implements OnChanges {
     @Input()
     public client: AppClientDto;
 
@@ -37,18 +38,7 @@ export class ClientComponent {
     public token: AccessTokenDto;
     public tokenDialog = new ModalView();
 
-    public renameForm =
-        this.formBuilder.group({
-            name: ['',
-                [
-                    Validators.required
-                ]
-            ]
-        });
-
-    public get hasNewName() {
-        return this.renameForm.controls['name'].value !== this.client.name;
-    }
+    public renameForm = new RenameClientForm(this.formBuilder);
 
     constructor(
         public readonly appsState: AppsState,
@@ -59,35 +49,43 @@ export class ClientComponent {
     ) {
     }
 
+    public ngOnChanges() {
+        this.renameForm.load(this.client);
+    }
+
     public revoke() {
         this.clientsState.revoke(this.client).onErrorResumeNext().subscribe();
     }
 
-    public updatePermission(permission: string) {
+    public update(permission: string) {
         this.clientsState.update(this.client, new UpdateAppClientDto(undefined, permission)).onErrorResumeNext().subscribe();
     }
 
-    public cancelRename() {
-        this.isRenaming = false;
-    }
-
-    public startRename() {
-        this.renameForm.controls['name'].setValue(this.client.name);
-
-        this.isRenaming = true;
+    public toggleRename() {
+        this.isRenaming = !this.isRenaming;
     }
 
     public onKeyDown(keyCode: number) {
         if (keyCode === ESCAPE_KEY) {
-            this.cancelRename();
+            this.toggleRename();
         }
     }
 
     public rename() {
-        this.clientsState.update(this.client, new UpdateAppClientDto(this.renameForm.controls['name'].value))
-            .subscribe(() => {
-                this.cancelRename();
-            });
+        const value = this.renameForm.submit();
+
+        if (value) {
+            const requestDto = new UpdateAppClientDto(value.name);
+
+            this.clientsState.update(this.client, requestDto)
+                .subscribe(() => {
+                    this.renameForm.submitCompleted();
+
+                    this.toggleRename();
+                }, error => {
+                    this.renameForm.submitFailed(error);
+                });
+        }
     }
 
     public createToken(client: AppClientDto) {

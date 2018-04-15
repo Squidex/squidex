@@ -2,26 +2,26 @@
     <div class="row no-gutters">
         <div class="col">
             <div class="client-header">
-                <form *ngIf="isRenaming" class="form-inline" [formGroup]="renameForm" (ngSubmit)="rename()">
+                <form *ngIf="isRenaming" class="form-inline" [formGroup]="renameForm.form" (ngSubmit)="rename()">
                     <div class="form-group mr-1">
                         <sqx-control-errors for="name"></sqx-control-errors>
                         
                         <input type="text" class="form-control client-name enabled" formControlName="name" maxlength="20" sqxFocusOnInit (keydown)="onKeyDown($event.keyCode)" />
                     </div>
 
-                    <button type="submit" class="btn btn-primary" [disabled]="!renameForm.valid || !hasNewName">Save</button>
+                    <button type="submit" class="btn btn-primary" [disabled]="!renameForm.form.valid || !renameForm.form.dirty">Save</button>
 
-                    <button class="btn btn-link btn-secondary btn-cancel" (click)="cancelRename()">
+                    <button class="btn btn-link btn-secondary btn-cancel" (click)="toggleRename()">
                         <i class="icon-close"></i>
                     </button>
                 </form>
 
                 <ng-container *ngIf="!isRenaming">
                     <h3 class="client-name">
-                        <span (dblclick)="startRename()">{{client.name}}</span> 
+                        <span (dblclick)="toggleRename()">{{client.name}}</span> 
                     </h3>
 
-                    <i class="client-edit icon-pencil" (click)="startRename()"></i>
+                    <i class="client-edit icon-pencil" (click)="toggleRename()"></i>
                 </ng-container>
             </div>
                 
@@ -70,7 +70,7 @@
             Permission:
         </div>
         <div class="col">
-            <select class="form-control" [ngModel]="client.permission" (ngModelChange)="updatePermission($event)">
+            <select class="form-control" [ngModel]="client.permission" (ngModelChange)="update($event)">
                 <option *ngFor="let permission of clientPermissions" [ngValue]="permission">{{permission}}</option>
             </select>
         </div>
