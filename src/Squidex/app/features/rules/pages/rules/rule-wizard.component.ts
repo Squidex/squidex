@@ -5,12 +5,14 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { FormGroup } from '@angular/forms';
 
 import {
     AppContext,
     CreateRuleDto,
     DateTime,
+    Form,
     ruleActions,
     ruleTriggers,
     RuleDto,
@@ -35,17 +37,15 @@ export class RuleWizardComponent implements OnInit {
     public ruleActions = ruleActions;
     public ruleTriggers = ruleTriggers;
 
-    public triggerType: string;
-    public trigger: any = {};
+    public actionForm = new Form<FormGroup>(new FormGroup({}));
     public actionType: string;
     public action: any = {};
+
+    public triggerForm = new Form<FormGroup>(new FormGroup({}));
+    public triggerType: string;
+    public trigger: any = {};
+
     public step = 1;
-
-    @ViewChild('triggerControl')
-    public triggerControl: any;
-
-    @ViewChild('actionControl')
-    public actionControl: any;
 
     @Output()
     public cancelled = new EventEmitter();
@@ -74,17 +74,13 @@ export class RuleWizardComponent implements OnInit {
         if (this.mode === MODE_EDIT_ACTION) {
             this.step = 4;
 
-            this.action = Object.assign({}, this.rule.action);
+            this.action = this.rule.action;
             this.actionType = this.rule.actionType;
-
-            delete this.action.actionType;
         } else if (this.mode === MODE_EDIT_TRIGGER) {
             this.step = 2;
 
-            this.trigger = Object.assign({}, this.rule.trigger);
+            this.trigger = this.rule.trigger;
             this.triggerType = this.rule.triggerType;
-
-            delete this.trigger.triggerType;
         }
     }
 
@@ -98,23 +94,31 @@ export class RuleWizardComponent implements OnInit {
         this.step++;
     }
 
-    public selectTrigger(value: any) {
-        this.trigger = Object.assign({}, value, { triggerType: this.triggerType });
+    public saveTrigger() {
+        const value = this.triggerForm.submit();
 
-        if (this.mode === MODE_WIZARD) {
-            this.step++;
-        } else {
-            this.updateTrigger();
+        if (value) {
+            this.trigger = { ...value, triggerType: this.triggerType };
+
+            if (this.mode === MODE_WIZARD) {
+                this.step++;
+            } else {
+                this.updateTrigger();
+            }
         }
     }
 
-    public selectAction(value: any) {
-        this.action = Object.assign({}, value, { actionType: this.actionType });
+    public saveAction() {
+        const value = this.actionForm.submit();
 
-        if (this.mode === MODE_WIZARD) {
-            this.createRule();
-        } else {
-            this.updateAction();
+        if (value) {
+            this.action = { ...value, actionType: this.actionType };
+
+            if (this.mode === MODE_WIZARD) {
+                this.createRule();
+            } else {
+                this.updateAction();
+            }
         }
     }
 

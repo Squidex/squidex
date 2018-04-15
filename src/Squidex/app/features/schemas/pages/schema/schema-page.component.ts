@@ -108,9 +108,7 @@ export class SchemaPageComponent implements OnDestroy, OnInit {
     private export() {
         const result: any = {
             fields: this.schema.fields.map(field => {
-                const copy: any = Object.assign({}, field);
-
-                delete copy.fieldId;
+                const { fieldId, ...copy } = field;
 
                 for (const key in copy.properties) {
                     if (copy.properties.hasOwnProperty(key)) {

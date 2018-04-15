@@ -2,11 +2,11 @@
 
 <sqx-modal-dialog *sqxModalView="dialogView;onRoot:true" showClose="false">
     <ng-container title>
-        {{dialogRequest.title}}
+        {{dialogRequest?.title}}
     </ng-container>
 
     <ng-container content>
-        {{dialogRequest.text}}
+        {{dialogRequest?.text}}
     </ng-container>
 
     <ng-container footer>
