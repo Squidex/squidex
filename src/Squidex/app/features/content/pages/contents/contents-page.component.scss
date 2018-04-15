@@ -9,22 +9,6 @@
     font-size: .8rem;
 }
 
-.form-inline {
-    position: relative;
-}
-
-.form-control-expandable {
-    padding-right: 1.5rem;
-}
-
-.expand-search {
-    @include absolute(8px, 8px, auto, auto);
-    color: $color-border-dark !important;
-    font-size: .9rem;
-    font-weight: normal;
-    cursor: pointer !important;
-}
-
 .selection {
     background: $color-table-footer;
     border-bottom: 2px solid $color-border;

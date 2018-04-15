@@ -9,7 +9,9 @@ import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from '@angular/router';
 import { Observable } from 'rxjs';
 
-import { allParams, SchemasState } from '@app/shared';
+import { allParams } from '@app/framework';
+
+import { SchemasState } from './../state/schemas.state';
 
 @Injectable()
 export class SchemaMustExistGuard implements CanActivate {
@@ -29,7 +31,7 @@ export class SchemaMustExistGuard implements CanActivate {
                         this.router.navigate(['/404']);
                     }
                 })
-                .map(u => u !== null);
+                .map(s => s !== null);
 
         return result;
     }

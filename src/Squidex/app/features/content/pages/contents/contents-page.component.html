@@ -1,16 +1,14 @@
 <sqx-title message="{app} | {schema} | Contents" parameter1="app" parameter2="schema" [value1]="ctx.appName" [value2]="schema?.displayName"></sqx-title>
 
-<sqx-panel [desiredWidth]="isReadOnly ? '40rem' : '60rem'" contentClass="grid">
+<sqx-panel desiredWidth="*" contentClass="grid">
     <ng-container title>
-        <ng-container *ngIf="!isReadOnly && !isArchive">
-            Contents
-        </ng-container>
-        <ng-container *ngIf="isArchive">
+        <ng-container *ngIf="isArchive; else noArchive">
             Archive
         </ng-container>
-        <ng-container *ngIf="isReadOnly">
-            References
-        </ng-container>
+
+        <ng-template #noArchive>
+            Contents
+        </ng-template>
     </ng-container>
 
     <ng-container menu>
@@ -19,40 +17,14 @@
         </button>
 
         <sqx-shortcut keys="ctrl+shift+r" (trigger)="load(true)"></sqx-shortcut>
-        <sqx-shortcut keys="ctrl+shift+f" (trigger)="inputFind.focus()"></sqx-shortcut>
-        <sqx-shortcut keys="ctrl+shift+g" (trigger)="newButton.click()" *ngIf="!isReadOnly"></sqx-shortcut>
 
-        <form class="form-inline" (ngSubmit)="search()">
-            <input class="form-control form-control-expandable" #inputFind [formControl]="contentsFilter" placeholder="Search for content" />
+        <sqx-search-form (queryChanged)="search($event)" [query]="contentsQuery" enableShortcut="true"></sqx-search-form>
 
-            <a class="expand-search" (click)="searchModal.toggle()" #archive>
-                <i class="icon-caret-down"></i>
-            </a>
-        </form>
-
-        <sqx-onboarding-tooltip id="contentArchive" [for]="archive" position="bottomRight" after="60000">
-            Click this icon to show the advanced search menu and to show the archive!
-        </sqx-onboarding-tooltip>
-
-        <sqx-onboarding-tooltip id="contentFind" [for]="inputFind" position="bottomRight" after="120000">
-            Search for content using full text search over all fields and languages!
-        </sqx-onboarding-tooltip>
-
-        <div class="dropdown-menu" *sqxModalView="searchModal" [sqxModalTarget]="inputFind">
-            <sqx-search-form
-                [canArchive]="!isReadOnly"
-                (queryChanged)="contentsFilter.setValue($event, { emitEvent: false })" 
-                [query]="contentsFilter.value"
-                (archivedChanged)="updateArchive($event)"
-                [archived]="isArchive">
-            </sqx-search-form>
-        </div>
-
-        <ng-container *ngIf="!isReadOnly && languages.length > 1">
+        <ng-container *ngIf="languages.length > 1">
             <sqx-language-selector class="languages-buttons" (selectedLanguageChanged)="selectLanguage($event)" [languages]="languages"></sqx-language-selector>
         </ng-container>
 
-        <button *ngIf="!isReadOnly" class="btn btn-success" #newButton routerLink="new" title="New Content (CTRL + SHIFT + G)">
+        <button class="btn btn-success" #newButton routerLink="new" title="New Content (CTRL + SHIFT + G)">
             <i class="icon-plus"></i> New
         </button>
     </ng-container>
@@ -111,13 +83,13 @@
 
         <div class="grid-content">
             <div sqxIgnoreScrollbar>
-                <table class="table table-items table-fixed" *ngIf="contentItems" >
-                    <tbody *ngIf="!isReadOnly">
+                <table class="table table-items table-fixed" *ngIf="contentItems">
+                    <tbody>
                         <ng-template ngFor let-content [ngForOf]="contentItems" [ngForTrackBy]="trackByContent">
                             <tr [sqxContent]="content" [routerLink]="[content.id]" routerLinkActive="active"
                                 [language]="languageSelected"
-                                [schemaFields]="contentFields"
                                 [schema]="schema"
+                                [schemaFields]="contentFields"
                                 [selected]="isItemSelected(content)"
                                 (selectedChange)="selectItem(content, $event)"
                                 (unpublishing)="unpublishContent(content)"
@@ -126,17 +98,6 @@
                                 (restoring)="restoreContent(content)"
                                 (deleting)="deleteContent(content)"
                                 (saved)="onContentSaved(content, $event)"></tr>
-                            <tr class="spacer"></tr>
-                        </ng-template>
-                    </tbody>
-
-                    <tbody *ngIf="isReadOnly">
-                        <ng-template ngFor let-content [ngForOf]="contentItems">
-                            <tr [sqxContent]="content" dnd-draggable [dragData]="dropData(content)"
-                                [language]="languageSelected"
-                                [schemaFields]="contentFields"
-                                [schema]="schema" 
-                                isReadOnly="true"></tr>
                             <tr class="spacer"></tr>
                         </ng-template>
                     </tbody>
@@ -149,8 +110,6 @@
         </div>
     </ng-container>
 </sqx-panel>
-
-<router-outlet></router-outlet>
 
 <ng-container *sqxModalView="dueTimeDialog;onRoot:true">
     <sqx-modal-dialog (close)="cancelStatusChange()">

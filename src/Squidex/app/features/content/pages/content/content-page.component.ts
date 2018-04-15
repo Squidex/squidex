@@ -10,13 +10,7 @@ import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Observable, Subscription } from 'rxjs';
 
-import {
-    ContentCreated,
-    ContentRemoved,
-    ContentStatusChanged,
-    ContentUpdated,
-    ContentVersionSelected
-} from './../messages';
+import { ContentVersionSelected } from './../messages';
 
 import {
     AppContext,
@@ -27,6 +21,7 @@ import {
     ContentsService,
     fieldInvariant,
     SchemaDetailsDto,
+    SchemasState,
     Version
 } from '@app/shared';
 
@@ -39,10 +34,8 @@ import {
     ]
 })
 export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, OnInit {
-    private contentStatusChangedSubscription: Subscription;
-    private contentDeletedSubscription: Subscription;
-    private contentUpdatedSubscription: Subscription;
     private contentVersionSelectedSubscription: Subscription;
+    private selectedSchemaSubscription: Subscription;
 
     public schema: SchemaDetailsDto;
 
@@ -57,15 +50,14 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
 
     constructor(public readonly ctx: AppContext,
         private readonly contentsService: ContentsService,
-        private readonly router: Router
+        private readonly router: Router,
+        private readonly schemasState: SchemasState
     ) {
     }
 
     public ngOnDestroy() {
         this.contentVersionSelectedSubscription.unsubscribe();
-        this.contentStatusChangedSubscription.unsubscribe();
-        this.contentUpdatedSubscription.unsubscribe();
-        this.contentDeletedSubscription.unsubscribe();
+        this.selectedSchemaSubscription.unsubscribe();
     }
 
     public ngOnInit() {
@@ -75,40 +67,14 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
                     this.loadVersion(message.version);
                 });
 
-        this.contentDeletedSubscription =
-            this.ctx.bus.of(ContentRemoved)
-                .subscribe(message => {
-                    if (this.content && message.content.id === this.content.id) {
-                        this.router.navigate(['../'], { relativeTo: this.ctx.route });
-                    }
+        this.selectedSchemaSubscription =
+            this.schemasState.selectedSchema
+                .subscribe(schema => {
+                    const routeData = allData(this.ctx.route);
+
+                    this.setupLanguages(routeData);
+                    this.setupContentForm(schema!);
                 });
-
-        this.contentUpdatedSubscription =
-            this.ctx.bus.of(ContentUpdated)
-                .subscribe(message => {
-                    if (this.content && message.content.id === this.content.id) {
-                        this.reloadContentForm(message.content);
-                    }
-                });
-
-        this.contentStatusChangedSubscription =
-            this.ctx.bus.of(ContentStatusChanged)
-                .subscribe(message => {
-                    if (this.content && message.content.id === this.content.id) {
-                        this.content =
-                            this.content.changeStatus(
-                                message.content.scheduledTo || message.content.status,
-                                message.content.scheduledAt,
-                                message.content.lastModifiedBy,
-                                message.content.version,
-                                message.content.lastModified);
-                    }
-                });
-
-        const routeData = allData(this.ctx.route);
-
-        this.setupLanguages(routeData);
-        this.setupContentForm(routeData.schema);
 
         this.ctx.route.data.map(d => d.content)
             .subscribe((content: ContentDto) => {
@@ -129,7 +95,6 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
             this.content = this.contentOld;
             this.contentOld = null;
 
-            this.emitContentUpdated(this.content);
             this.reloadContentForm(this.content);
         }
     }
@@ -157,7 +122,6 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
 
                         this.ctx.notifyInfo('Content created successfully.');
 
-                        this.emitContentCreated(this.content);
                         this.back();
                     }, error => {
                         this.ctx.notifyError(error);
@@ -171,7 +135,6 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
 
                         this.ctx.notifyInfo('Content saved successfully.');
 
-                        this.emitContentUpdated(content);
                         this.enableContentForm();
                         this.reloadContentForm(content);
                     }, error => {
@@ -204,16 +167,8 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
         }
     }
 
-    private back() {
-        this.router.navigate(['../'], { relativeTo: this.ctx.route, replaceUrl: true });
-    }
-
-    private emitContentCreated(content: ContentDto) {
-        this.ctx.bus.emit(new ContentCreated(content));
-    }
-
-    private emitContentUpdated(content: ContentDto) {
-        this.ctx.bus.emit(new ContentUpdated(content));
+    public back() {
+        this.router.navigate([this.schema.name], { relativeTo: this.ctx.route.parent!.parent, replaceUrl: true });
     }
 
     private disableContentForm() {

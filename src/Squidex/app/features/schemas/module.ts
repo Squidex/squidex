@@ -10,6 +10,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { DndModule } from 'ng2-dnd';
 
 import {
+    SchemaMustExistGuard,
     SqxFrameworkModule,
     SqxSharedModule
 } from '@app/shared';
@@ -36,7 +37,6 @@ import {
     ReferencesValidationComponent,
     SchemaEditFormComponent,
     SchemaFormComponent,
-    SchemaMustExistGuard,
     SchemaPageComponent,
     SchemasPageComponent,
     SchemaScriptsFormComponent,

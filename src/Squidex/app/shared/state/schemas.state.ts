@@ -156,6 +156,10 @@ export class SchemasState extends State<Snapshot> {
         this.changes.map(s => s.schemas)
             .distinctUntilChanged();
 
+    public publishedSchemas =
+        this.changes.map(s => s.schemas.filter(x => x.isPublished))
+            .distinctUntilChanged();
+
     public get schemaName() {
         return this.snapshot.selectedSchema!.name;
     }
