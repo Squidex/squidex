@@ -97,7 +97,7 @@ export class EventConsumersState extends State<Snapshot> {
 }
 
 const setStopped = (es: EventConsumerDto, isStoped: boolean) =>
-    new EventConsumerDto(es.name, false, false, es.error, es.position);
+    new EventConsumerDto(es.name, isStoped, false, es.error, es.position);
 
 const reset = (es: EventConsumerDto) =>
     new EventConsumerDto(es.name, es.isStopped, true, es.error, es.position);

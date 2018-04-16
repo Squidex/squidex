@@ -11,10 +11,10 @@ import { inject, TestBed } from '@angular/core/testing';
 import {
     AnalyticsService,
     ApiUrlConfig,
-    AppPlansDto,
     ChangePlanDto,
     PlanChangedDto,
     PlanDto,
+    PlansDto,
     PlansService,
     Version
 } from './../';
@@ -42,7 +42,7 @@ describe('PlansService', () => {
     it('should make get request to get app plans',
         inject([PlansService, HttpTestingController], (plansService: PlansService, httpMock: HttpTestingController) => {
 
-        let plans: AppPlansDto | null = null;
+        let plans: PlansDto | null = null;
 
         plansService.getPlans('my-app').subscribe(result => {
             plans = result;
@@ -86,7 +86,7 @@ describe('PlansService', () => {
         });
 
         expect(plans).toEqual(
-            new AppPlansDto(
+            new PlansDto(
                 '123',
                 '456',
                 true,

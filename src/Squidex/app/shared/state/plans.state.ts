@@ -86,12 +86,14 @@ export class PlansState extends State<Snapshot> {
 
                 this.next(s => {
                     const planId = overridePlanId || dto.currentPlanId;
+                    const plans = ImmutableArray.of(dto.plans.map(x => this.createPlan(x, planId)));
 
                     return {
                         ...s,
-                        plans: ImmutableArray.of(dto.plans.map(x => this.createPlan(x, planId))),
+                        plans: plans,
                         isOwner: !dto.planOwner || dto.planOwner === this.userId,
                         isLoaded: true,
+                        version: dto.version,
                         hasPortal: dto.hasPortal
                     };
                 });
@@ -108,7 +110,7 @@ export class PlansState extends State<Snapshot> {
                     this.next(s => {
                         const plans = s.plans.map(x => this.createPlan(x.plan, planId));
 
-                        return { ...s, plans };
+                        return { ...s, plans, isOwner: true, version: dto.version };
                     });
                 }
             })

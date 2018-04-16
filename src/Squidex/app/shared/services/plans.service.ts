@@ -19,7 +19,7 @@ import {
     Versioned
 } from '@app/framework';
 
-export class AppPlansDto {
+export class PlansDto {
     constructor(
         public readonly currentPlanId: string,
         public readonly planOwner: string,
@@ -27,15 +27,6 @@ export class AppPlansDto {
         public readonly plans: PlanDto[],
         public readonly version: Version
     ) {
-    }
-
-    public changePlanId(planId: string, version?: Version): AppPlansDto {
-        return new AppPlansDto(
-            planId,
-            this.planOwner,
-            this.hasPortal,
-            this.plans,
-            version || this.version);
     }
 }
 
@@ -76,7 +67,7 @@ export class PlansService {
     ) {
     }
 
-    public getPlans(appName: string): Observable<AppPlansDto> {
+    public getPlans(appName: string): Observable<PlansDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/plans`);
 
         return HTTP.getVersioned<any>(this.http, url)
@@ -85,7 +76,7 @@ export class PlansService {
 
                     const items: any[] = body.plans;
 
-                    return new AppPlansDto(
+                    return new PlansDto(
                         body.currentPlanId,
                         body.planOwner,
                         body.hasPortal,
