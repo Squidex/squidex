@@ -66,7 +66,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         public Instant LastModified { get; set; }
 
         /// <summary>
-        /// Gets the status of the content.
+        /// The the status of the content.
         /// </summary>
         public Status Status { get; set; }
 

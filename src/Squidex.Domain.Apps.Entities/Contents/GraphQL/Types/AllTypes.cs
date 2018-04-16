@@ -7,6 +7,7 @@
 
 using System;
 using GraphQL.Types;
+using Squidex.Domain.Apps.Core.Contents;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {
@@ -26,6 +27,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
         public static readonly IGraphType Boolean = new BooleanGraphType();
 
+        public static readonly IGraphType StatusType = new EnumerationGraphType<Status>();
+
         public static readonly IGraphType NonNullInt = new NonNullGraphType(new IntGraphType());
 
         public static readonly IGraphType NonNullGuid = new NonNullGraphType(new GuidGraphType());
@@ -37,6 +40,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
         public static readonly IGraphType NonNullString = new NonNullGraphType(new StringGraphType());
 
         public static readonly IGraphType NonNullBoolean = new NonNullGraphType(new BooleanGraphType());
+
+        public static readonly IGraphType NonNullStatusType = new NonNullGraphType(new EnumerationGraphType<Status>());
 
         public static readonly IGraphType ListOfNonNullGuid = new ListGraphType(new NonNullGraphType(new GuidGraphType()));
 
