@@ -8,6 +8,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Areas.Api.Controllers.Assets.Models
@@ -74,6 +75,7 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
                 Id = command.AssetId,
                 FileName = command.File.FileName,
                 FileSize = command.File.FileSize,
+                FileType = command.File.FileName.FileType(),
                 FileVersion = result.Version,
                 MimeType = command.File.MimeType,
                 IsImage = command.ImageInfo != null,
