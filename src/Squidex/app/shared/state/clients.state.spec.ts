@@ -59,7 +59,7 @@ describe('ClientsState', () => {
         expect(clientsState.snapshot.version).toEqual(version);
     });
 
-    it('should add client to snapshot', () => {
+    it('should add client to snapshot when created', () => {
         const newClient = new AppClientDto('id3', 'name3', 'secret3', 'Developer');
 
         const request = new CreateAppClientDto('id3');
@@ -73,7 +73,7 @@ describe('ClientsState', () => {
         expect(clientsState.snapshot.version).toEqual(newVersion);
     });
 
-    it('should update client in snapshot', () => {
+    it('should update properties when updated', () => {
         const request = new UpdateAppClientDto('NewName', 'NewPermission');
 
         clientsService.setup(x => x.putClient(app, oldClients[0].id, request, version))
@@ -88,7 +88,7 @@ describe('ClientsState', () => {
         expect(clientsState.snapshot.version).toEqual(newVersion);
     });
 
-    it('should remove client from snapshot', () => {
+    it('should remove client from snapshot when revoked', () => {
         clientsService.setup(x => x.deleteClient(app, oldClients[0].id, version))
             .returns(() => Observable.of(new Versioned<any>(newVersion, {})));
 

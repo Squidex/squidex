@@ -1,4 +1,4 @@
-<sqx-modal-dialog large="true" fullHeight="true" (closed)="cancel()">
+<sqx-modal-dialog large="true" fullHeight="true" (closed)="complete()">
     <ng-container title>
         <ng-container *ngIf="mode === 'EditTrigger'">
             Edit Trigger
@@ -44,7 +44,7 @@
                     </ng-container>
                     <ng-container *ngSwitchCase="'ContentChanged'">
                         <sqx-content-changed-trigger
-                            [schemas]="schemas"
+                            [schemas]="schemas.values"
                             [trigger]="trigger"
                             [triggerForm]="triggerForm.form"
                             [triggerFormSubmitted]="triggerForm.submitted | async">
@@ -118,17 +118,17 @@
     <ng-container footer>
         <div>
             <ng-container *ngIf="mode === 'Wizard' && step === 2">
-                <button type="reset" class="float-left btn btn-secondary" (click)="cancel()">Cancel</button>
+                <button type="reset" class="float-left btn btn-secondary" (click)="complete()">Cancel</button>
                 <button type="submit" class="float-right btn btn-primary" (click)="saveTrigger()">Next</button>
             </ng-container>
             
             <ng-container *ngIf="mode !== 'Wizard' && step === 2">
-                <button type="reset" class="float-left btn btn-secondary" (click)="cancel()">Cancel</button>
+                <button type="reset" class="float-left btn btn-secondary" (click)="complete()">Cancel</button>
                 <button type="submit" class="float-right btn btn-primary" (click)="saveTrigger()">Save</button>
             </ng-container>
 
             <ng-container *ngIf="step === 4">
-                <button type="reset" class="float-left btn btn-secondary" (click)="cancel()">Cancel</button>
+                <button type="reset" class="float-left btn btn-secondary" (click)="complete()">Cancel</button>
                 <button type="submit" class="float-right btn btn-primary" (click)="saveAction()">Save</button>
             </ng-container>
         </div>

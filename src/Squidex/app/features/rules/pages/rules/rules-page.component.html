@@ -1,4 +1,4 @@
-<sqx-title message="{app} | Rules" parameter1="app" [value1]="ctx.appName"></sqx-title>
+<sqx-title message="{app} | Rules" parameter1="app" [value1]="appsState.appName"></sqx-title>
 
 <sqx-panel desiredWidth="54rem" showSidebar="true">
     <ng-container title>
@@ -6,11 +6,11 @@
     </ng-container>
 
     <ng-container menu>
-        <button class="btn btn-link btn-secondary" (click)="load(true)" title="Refresh Assets (CTRL + SHIFT + R)">
+        <button class="btn btn-link btn-secondary" (click)="reload()" title="Refresh Assets (CTRL + SHIFT + R)">
             <i class="icon-reset"></i> Refresh
         </button>
 
-        <sqx-shortcut keys="ctrl+shift+r" (trigger)="load(true)"></sqx-shortcut>
+        <sqx-shortcut keys="ctrl+shift+r" (trigger)="reload()"></sqx-shortcut>
         <sqx-shortcut keys="ctrl+shift+g" (trigger)="buttonNew.click()"></sqx-shortcut>
 
         <button class="btn btn-success" #buttonNew (click)="createNew()" title="New Rule (CTRL + M)">
@@ -19,60 +19,62 @@
     </ng-container>
 
     <ng-container content>
-        <div class="table-items-row table-items-row-empty" *ngIf="rules && rules.length === 0">
-            No Rule created yet.
+        <ng-container *ngIf="rulesState.rules | async; let rules">
+            <div class="table-items-row table-items-row-empty" *ngIf="rules.length === 0">
+                No Rule created yet.
 
-            <button class="btn btn-success btn-sm ml-2" (click)="createNew()">
-                <i class="icon icon-plus"></i> Add Rule
-            </button>
-        </div>
+                <button class="btn btn-success btn-sm ml-2" (click)="createNew()">
+                    <i class="icon icon-plus"></i> Add Rule
+                </button>
+            </div>
 
-        <table class="table table-items table-fixed" *ngIf="rules && rules.length > 0">
-            <tbody>
-                <ng-template ngFor let-rule [ngForOf]="rules">
-                    <tr>
-                        <td class="cell-separator">
-                            <h3>If</h3>
-                        </td>
-                        <td class="cell-auto">
-                            <span class="rule-element rule-element-{{rule.triggerType}}" (click)="editTrigger(rule)">
-                                <span class="rule-element-icon">
-                                    <i class="icon-trigger-{{rule.triggerType}}"></i>
+            <table class="table table-items table-fixed" *ngIf="rules.length > 0">
+                <tbody>
+                    <ng-template ngFor let-rule [ngForOf]="rules">
+                        <tr>
+                            <td class="cell-separator">
+                                <h3>If</h3>
+                            </td>
+                            <td class="cell-auto">
+                                <span class="rule-element rule-element-{{rule.triggerType}}" (click)="editTrigger(rule)">
+                                    <span class="rule-element-icon">
+                                        <i class="icon-trigger-{{rule.triggerType}}"></i>
+                                    </span>
+                                    <span class="rule-element-text">
+                                        {{ruleTriggers[rule.triggerType].name}}
+                                    </span>
                                 </span>
-                                <span class="rule-element-text">
-                                    {{ruleTriggers[rule.triggerType].name}}
+                            </td>
+                            <td class="cell-separator">
+                                <h3>then</h3>
+                            </td>
+                            <td class="cell-auto">
+                                <span class="rule-element rule-element-{{rule.actionType}}" (click)="editAction(rule)">
+                                    <span class="rule-element-icon">
+                                        <i class="icon-action-{{rule.actionType}}"></i>
+                                    </span>
+                                    <span class="rule-element-text">
+                                        {{ruleActions[rule.actionType].name}}
+                                    </span>
                                 </span>
-                            </span>
-                        </td>
-                        <td class="cell-separator">
-                            <h3>then</h3>
-                        </td>
-                        <td class="cell-auto">
-                            <span class="rule-element rule-element-{{rule.actionType}}" (click)="editAction(rule)">
-                                <span class="rule-element-icon">
-                                    <i class="icon-action-{{rule.actionType}}"></i>
-                                </span>
-                                <span class="rule-element-text">
-                                    {{ruleActions[rule.actionType].name}}
-                                </span>
-                            </span>
-                        </td>
-                        <td class="cell-actions">
-                            <sqx-toggle [ngModel]="rule.isEnabled" (ngModelChange)="toggleRule(rule)"></sqx-toggle>
-                        </td>
-                        <td class="cell-actions">
-                            <button type="button" class="btn btn-link btn-danger"
-                                (sqxConfirmClick)="deleteRule(rule)"
-                                confirmTitle="Delete rule" 
-                                confirmText="Do you really want to delete the rule?">
-                                <i class="icon-bin2"></i>
-                            </button>
-                        </td>
-                    </tr>
-                    <tr class="spacer"></tr>
-                </ng-template>
-            </tbody>
-        </table>
+                            </td>
+                            <td class="cell-actions">
+                                <sqx-toggle [ngModel]="rule.isEnabled" (ngModelChange)="toggle(rule)"></sqx-toggle>
+                            </td>
+                            <td class="cell-actions">
+                                <button type="button" class="btn btn-link btn-danger"
+                                    (sqxConfirmClick)="delete(rule)"
+                                    confirmTitle="Delete rule" 
+                                    confirmText="Do you really want to delete the rule?">
+                                    <i class="icon-bin2"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr class="spacer"></tr>
+                    </ng-template>
+                </tbody>
+            </table>
+        </ng-container>
     </ng-container>
 
     <ng-container sidebar>
@@ -91,10 +93,8 @@
 </sqx-panel>
 
 <ng-container *sqxModalView="addRuleDialog;onRoot:true;closeAuto:false">
-    <sqx-rule-wizard [schemas]="schemas" [rule]="wizardRule" [mode]="wizardMode"
-        (updated)="onRuleUpdated($event)"
-        (cancelled)="addRuleDialog.hide()"
-        (created)="onRuleCreated($event)">
+    <sqx-rule-wizard [schemas]="schemasState.schemas | async" [rule]="wizardRule" [mode]="wizardMode"
+        (completed)="addRuleDialog.hide()">
     </sqx-rule-wizard>
 </ng-container>
 

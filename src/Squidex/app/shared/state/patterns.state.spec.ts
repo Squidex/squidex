@@ -57,7 +57,7 @@ describe('PatternsState', () => {
         expect(patternsState.snapshot.version).toEqual(version);
     });
 
-    it('should add pattern to snapshot', () => {
+    it('should add pattern to snapshot when created', () => {
         const newPattern = new AppPatternDto('id3', 'name3', 'pattern3', '');
 
         const request = new EditAppPatternDto('name3', 'pattern3', '');
@@ -71,7 +71,7 @@ describe('PatternsState', () => {
         expect(patternsState.snapshot.version).toEqual(newVersion);
     });
 
-    it('should update pattern in snapshot', () => {
+    it('should update properties when updated', () => {
         const request = new EditAppPatternDto('a_name2', 'a_pattern2', 'a_message2');
 
         patternsService.setup(x => x.putPattern(app, oldPatterns[1].id, request, version))
@@ -87,7 +87,7 @@ describe('PatternsState', () => {
         expect(patternsState.snapshot.version).toEqual(newVersion);
     });
 
-    it('should remove pattern from snapshot', () => {
+    it('should remove pattern from snapshot when deleted', () => {
         patternsService.setup(x => x.deletePattern(app, oldPatterns[0].id, version))
             .returns(() => Observable.of(new Versioned<any>(newVersion, {})));
 

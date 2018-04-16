@@ -46,47 +46,6 @@ describe('AppsState', () => {
 
     it('should load apps', () => {
         expect(appsState.snapshot.apps.values).toEqual(oldApps);
-
-        appsService.verifyAll();
-    });
-
-    it('should add app to state when created', () => {
-        const request = new CreateAppDto(newApp.name);
-
-        appsService.setup(x => x.postApp(request))
-            .returns(() => Observable.of(newApp))
-            .verifiable(Times.once());
-
-        appsState.create(request, now).subscribe();
-
-        expect(appsState.snapshot.apps.values).toEqual([newApp, ...oldApps]);
-
-        appsService.verifyAll();
-    });
-
-    it('should remove app from state when archived', () => {
-        const request = new CreateAppDto(newApp.name);
-
-        appsService.setup(x => x.postApp(request))
-            .returns(() => Observable.of(newApp))
-            .verifiable(Times.once());
-
-        appsService.setup(x => x.deleteApp(newApp.name))
-            .returns(() => Observable.of({}))
-            .verifiable(Times.once());
-
-        appsState.create(request, now).subscribe();
-
-        const appsAfterCreate = appsState.snapshot.apps.values;
-
-        appsState.delete(newApp.name).subscribe();
-
-        const appsAfterDelete = appsState.snapshot.apps.values;
-
-        expect(appsAfterCreate).toEqual([newApp, ...oldApps]);
-        expect(appsAfterDelete).toEqual(oldApps);
-
-        appsService.verifyAll();
     });
 
     it('should select app', () => {
@@ -100,7 +59,7 @@ describe('AppsState', () => {
         expect(appsState.snapshot.selectedApp).toBe(oldApps[0]);
     });
 
-    it('should return null when unselecting app', () => {
+    it('should return null on select when unselecting user', () => {
         let selectedApp: AppDto;
 
         appsState.select(null).subscribe(x => {
@@ -111,7 +70,7 @@ describe('AppsState', () => {
         expect(appsState.snapshot.selectedApp).toBeNull();
     });
 
-    it('should return null when app to select is not found', () => {
+    it('should return null on select when apps is not found', () => {
         let selectedApp: AppDto;
 
         appsState.select('unknown').subscribe(x => {
@@ -120,5 +79,37 @@ describe('AppsState', () => {
 
         expect(selectedApp!).toBeNull();
         expect(appsState.snapshot.selectedApp).toBeNull();
+    });
+
+    it('should add app to snapshot when created', () => {
+        const request = new CreateAppDto(newApp.name);
+
+        appsService.setup(x => x.postApp(request))
+            .returns(() => Observable.of(newApp));
+
+        appsState.create(request, now).subscribe();
+
+        expect(appsState.snapshot.apps.values).toEqual([newApp, ...oldApps]);
+    });
+
+    it('should remove app from snashot when archived', () => {
+        const request = new CreateAppDto(newApp.name);
+
+        appsService.setup(x => x.postApp(request))
+            .returns(() => Observable.of(newApp));
+
+        appsService.setup(x => x.deleteApp(newApp.name))
+            .returns(() => Observable.of({}));
+
+        appsState.create(request, now).subscribe();
+
+        const appsAfterCreate = appsState.snapshot.apps.values;
+
+        appsState.delete(newApp.name).subscribe();
+
+        const appsAfterDelete = appsState.snapshot.apps.values;
+
+        expect(appsAfterCreate).toEqual([newApp, ...oldApps]);
+        expect(appsAfterDelete).toEqual(oldApps);
     });
 });

@@ -54,7 +54,7 @@ describe('UsersState', () => {
         expect(usersState.snapshot.users.values).toEqual(oldUsers.map(x => u(x)));
         expect(usersState.snapshot.usersPager.numberOfItems).toEqual(200);
 
-        usersService.verifyAll();
+        dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
     });
 
     it('should show notification on load when flag is true', () => {
@@ -79,7 +79,7 @@ describe('UsersState', () => {
         expect(usersState.snapshot.selectedUser).toEqual(u(newUsers[0]));
     });
 
-    it('should not load user on select when already loaded', () => {
+    it('should return user on select and not load when already loaded', () => {
         let selectedUser: UserDto;
 
         usersState.select('id1').subscribe(x => {
@@ -92,7 +92,7 @@ describe('UsersState', () => {
         usersService.verify(x => x.getUser(It.isAnyString()), Times.never());
     });
 
-    it('should load user on select when not loaded', () => {
+    it('should return user on select and load when not loaded', () => {
         usersService.setup(x => x.getUser('id3'))
             .returns(() => Observable.of(newUser));
 
@@ -135,7 +135,7 @@ describe('UsersState', () => {
         expect(usersState.snapshot.selectedUser).toBeNull();
     });
 
-    it('should mark user as locked', () => {
+    it('should mark as locked when locked', () => {
         usersService.setup(x => x.lockUser('id1'))
             .returns(() => Observable.of({}));
 
@@ -148,7 +148,7 @@ describe('UsersState', () => {
         expect(user_1).toBe(usersState.snapshot.selectedUser);
     });
 
-    it('should unmark user as locked', () => {
+    it('should unmark as locked when unlocked', () => {
         usersService.setup(x => x.unlockUser('id2'))
             .returns(() => Observable.of({}));
 
@@ -161,7 +161,7 @@ describe('UsersState', () => {
         expect(user_1).toBe(usersState.snapshot.selectedUser);
     });
 
-    it('should update user on update', () => {
+    it('should update user properties when updated', () => {
         const request = new UpdateUserDto('new@mail.com', 'New');
 
         usersService.setup(x => x.putUser('id1', request))

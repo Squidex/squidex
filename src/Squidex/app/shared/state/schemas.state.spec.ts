@@ -93,14 +93,14 @@ describe('SchemasState', () => {
         schemasService.verifyAll();
     });
 
-    it('should reload schema when already loaded', () => {
+    it('should return schema on select and reload when already loaded', () => {
         schemasState.select('name2').subscribe();
         schemasState.select('name2').subscribe();
 
         schemasService.verify(x => x.getSchema(app, 'name2'), Times.exactly(2));
     });
 
-    it('should load selected schema when not loaded', () => {
+    it('should return schema on select and load when not loaded', () => {
         let selectedSchema: SchemaDetailsDto;
 
         schemasState.select('name2').subscribe(x => {
@@ -112,7 +112,7 @@ describe('SchemasState', () => {
         expect(schemasState.snapshot.selectedSchema).toBe(schemasState.snapshot.schemas.at(1));
     });
 
-    it('should return null when loading failed', () => {
+    it('should return null on select  when loading failed', () => {
         schemasService.setup(x => x.getSchema(app, 'failed'))
             .returns(() => Observable.throw({}));
 
@@ -126,7 +126,7 @@ describe('SchemasState', () => {
         expect(schemasState.snapshot.selectedSchema).toBeNull();
     });
 
-    it('should return null when unselecting schema', () => {
+    it('should return null on select when unselecting schema', () => {
         let selectedSchema: SchemaDetailsDto;
 
         schemasState.select(null).subscribe(x => {
@@ -139,7 +139,7 @@ describe('SchemasState', () => {
         schemasService.verify(x => x.getSchema(app, It.isAnyString()), Times.never());
     });
 
-    it('should update isPublished property and user info when publishing', () => {
+    it('should mark published and update user info when published', () => {
         schemasService.setup(x => x.publishSchema(app, oldSchemas[0].name, version))
             .returns(() => Observable.of(new Versioned<any>(newVersion, {})));
 
@@ -151,7 +151,7 @@ describe('SchemasState', () => {
         expectToBeModified(schema_1);
     });
 
-    it('should update isPublished property and user info when unpublishing', () => {
+    it('should unmark published and update user info when unpublished', () => {
         schemasService.setup(x => x.unpublishSchema(app, oldSchemas[1].name, version))
             .returns(() => Observable.of(new Versioned<any>(newVersion, {})));
 
@@ -168,7 +168,7 @@ describe('SchemasState', () => {
             schemasState.select(schema.name).subscribe();
         });
 
-        it('should update isPublished property and user info when publishing selected schema', () => {
+        it('should unmark published and update user info when published selected schema', () => {
             schemasService.setup(x => x.publishSchema(app, schema.name, version))
                 .returns(() => Observable.of(new Versioned<any>(newVersion, {})));
 
@@ -180,7 +180,7 @@ describe('SchemasState', () => {
             expectToBeModified(schema_1);
         });
 
-        it('should update properties property and user info when updating', () => {
+        it('should update properties and update user info when updated', () => {
             const request = new UpdateSchemaDto('name2_label', 'name2_hints');
 
             schemasService.setup(x => x.putSchema(app, schema.name, It.isAny(), version))
@@ -195,7 +195,7 @@ describe('SchemasState', () => {
             expectToBeModified(schema_1);
         });
 
-        it('should update script properties and user info when updating', () => {
+        it('should update script properties and update user info when scripts configured', () => {
             const request = new UpdateSchemaScriptsDto('query', 'create', 'update', 'delete', 'change');
 
             schemasService.setup(x => x.putSchemaScripts(app, schema.name, It.isAny(), version))
@@ -213,7 +213,7 @@ describe('SchemasState', () => {
             expectToBeModified(schema_1);
         });
 
-        it('should add schema when created', () => {
+        it('should add schema to snapshot when created', () => {
             const request = new CreateSchemaDto('newName');
 
             const result = new SchemaDetailsDto('id4', 'newName', {}, false, modifier, modifier, modified, modified, version, []);
@@ -227,7 +227,7 @@ describe('SchemasState', () => {
             expect(schemasState.snapshot.schemas.at(2)).toBe(result);
         });
 
-        it('should remove schema when deleted', () => {
+        it('should remove schema from snapshot when deleted', () => {
             schemasService.setup(x => x.deleteSchema(app, schema.name, version))
                 .returns(() => Observable.of(new Versioned<any>(newVersion, {})));
 
@@ -237,7 +237,7 @@ describe('SchemasState', () => {
             expect(schemasState.snapshot.selectedSchema).toBeNull();
         });
 
-        it('should update fields property and user info when adding field', () => {
+        it('should add field and update user info when field added', () => {
             const request = new AddFieldDto(field1.name, field1.partitioning, field1.properties);
 
             const newField = new FieldDto(3, '3', false, false, false, 'l', createProperties('String'));
@@ -253,7 +253,7 @@ describe('SchemasState', () => {
             expectToBeModified(schema_1);
         });
 
-        it('should update fields property and user info when removing field', () => {
+        it('should remove field and update user info when field removed', () => {
             schemasService.setup(x => x.deleteField(app, schema.name, field1.fieldId, version))
                 .returns(() => Observable.of(new Versioned<any>(newVersion, {})));
 
@@ -265,7 +265,7 @@ describe('SchemasState', () => {
             expectToBeModified(schema_1);
         });
 
-        it('should update fields property and user info when sorting fields', () => {
+        it('should sort fields and update user info when fields sorted', () => {
             schemasService.setup(x => x.putFieldOrdering(app, schema.name, [field2.fieldId, field1.fieldId], version))
                 .returns(() => Observable.of(new Versioned<any>(newVersion, {})));
 
@@ -277,7 +277,7 @@ describe('SchemasState', () => {
             expectToBeModified(schema_1);
         });
 
-        it('should update fields property and user info when updating field', () => {
+        it('should update field properties and update user info when field updated', () => {
             const request = new UpdateFieldDto(createProperties('String'));
 
             schemasService.setup(x => x.putField(app, schema.name, field1.fieldId, request, version))
@@ -291,7 +291,7 @@ describe('SchemasState', () => {
             expectToBeModified(schema_1);
         });
 
-        it('should update fields property and user info when hiding field', () => {
+        it('should mark field hidden and update user info when field hidden', () => {
             schemasService.setup(x => x.hideField(app, schema.name, field1.fieldId, version))
                 .returns(() => Observable.of(new Versioned<any>(newVersion, {})));
 
@@ -303,7 +303,7 @@ describe('SchemasState', () => {
             expectToBeModified(schema_1);
         });
 
-        it('should update fields property and user info when disabling field', () => {
+        it('should mark field disabled and update user info when field disabled', () => {
             schemasService.setup(x => x.disableField(app, schema.name, field1.fieldId, version))
                 .returns(() => Observable.of(new Versioned<any>(newVersion, {})));
 
@@ -315,7 +315,7 @@ describe('SchemasState', () => {
             expectToBeModified(schema_1);
         });
 
-        it('should update fields property and user info when locking field', () => {
+        it('should mark field locked and update user info when field locked', () => {
             schemasService.setup(x => x.lockField(app, schema.name, field1.fieldId, version))
                 .returns(() => Observable.of(new Versioned<any>(newVersion, {})));
 
@@ -327,7 +327,7 @@ describe('SchemasState', () => {
             expectToBeModified(schema_1);
         });
 
-        it('should update fields property and user info when showing field', () => {
+        it('should unmark field hidden and update user info when field shown', () => {
             schemasService.setup(x => x.showField(app, schema.name, field2.fieldId, version))
                 .returns(() => Observable.of(new Versioned<any>(newVersion, {})));
 
@@ -339,7 +339,7 @@ describe('SchemasState', () => {
             expectToBeModified(schema_1);
         });
 
-        it('should update fields property and user info when enabling field', () => {
+        it('should unmark field disabled and update user info when field enabled', () => {
             schemasService.setup(x => x.enableField(app, schema.name, field2.fieldId, version))
                 .returns(() => Observable.of(new Versioned<any>(newVersion, {})));
 

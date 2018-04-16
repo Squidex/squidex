@@ -63,24 +63,28 @@ describe('AssetsState', () => {
         expect(assetsState.snapshot.assetsPager.numberOfItems).toEqual(200);
 
         assetsService.verify(x => x.getAssets(app, 30, 0, undefined), Times.exactly(2));
+
+        dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
     });
 
-    it('should not reload when assets assets already loaded', () => {
+    it('should not reload when assets already loaded', () => {
         assetsState.load(false, true).subscribe();
 
         expect(assetsState.snapshot.assets.values).toEqual(oldAssets);
         expect(assetsState.snapshot.assetsPager.numberOfItems).toEqual(200);
 
         assetsService.verify(x => x.getAssets(app, 30, 0, undefined), Times.once());
+
+        dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
     });
 
-    it('should raise notification on load when notify is true', () => {
+    it('should show notification on load when flag is true', () => {
         assetsState.load(true).subscribe();
 
         dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
     });
 
-    it('should add asset to snapshot', () => {
+    it('should add asset to snapshot when created', () => {
         const newAsset = new AssetDto('id3', creator, creator, creation, creation, 'name3', 'type3', 3, 3, 'mime3', true, 0, 0, 'url3', version);
 
         assetsState.add(newAsset);
@@ -89,7 +93,7 @@ describe('AssetsState', () => {
         expect(assetsState.snapshot.assetsPager.numberOfItems).toBe(201);
     });
 
-    it('should update asset in snapshot', () => {
+    it('should update properties when updated', () => {
         const newAsset = new AssetDto('id1', modifier, modifier, modified, modified, 'name3', 'type3', 3, 3, 'mime3', true, 0, 0, 'url3', version);
 
         assetsState.update(newAsset);
@@ -97,6 +101,16 @@ describe('AssetsState', () => {
         const asset_1 = assetsState.snapshot.assets.at(0);
 
         expect(asset_1).toBe(newAsset);
+    });
+
+    it('should remove asset from snapshot when deleted', () => {
+        assetsService.setup(x => x.deleteAsset(app, oldAssets[0].id, version))
+            .returns(() => Observable.of(new Versioned<any>(newVersion, {})));
+
+        assetsState.delete(oldAssets[0]).subscribe();
+
+        expect(assetsState.snapshot.assets.values.length).toBe(1);
+        expect(assetsState.snapshot.assetsPager.numberOfItems).toBe(199);
     });
 
     it('should load next page and prev page when paging', () => {
@@ -119,15 +133,5 @@ describe('AssetsState', () => {
         expect(assetsState.snapshot.assetsQuery).toEqual('my-query');
 
         assetsService.verify(x => x.getAssets(app, 30, 0, 'my-query'), Times.once());
-    });
-
-    it('should remove asset when deleted', () => {
-        assetsService.setup(x => x.deleteAsset(app, oldAssets[0].id, version))
-            .returns(() => Observable.of(new Versioned<any>(newVersion, {})));
-
-        assetsState.delete(oldAssets[0]).subscribe();
-
-        expect(assetsState.snapshot.assets.values.length).toBe(1);
-        expect(assetsState.snapshot.assetsPager.numberOfItems).toBe(199);
     });
 });

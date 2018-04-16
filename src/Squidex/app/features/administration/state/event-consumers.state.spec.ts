@@ -37,6 +37,8 @@ describe('EventConsumersState', () => {
 
     it('should load event consumers', () => {
         expect(eventConsumersState.snapshot.eventConsumers.values).toEqual(oldConsumers);
+
+        dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
     });
 
     it('should show notification on load when flag is true', () => {
@@ -63,7 +65,7 @@ describe('EventConsumersState', () => {
         dialogs.verify(x => x.notifyError(It.isAny()), Times.never());
     });
 
-    it('should mark consumer as started', () => {
+    it('should unmark as stopped when started', () => {
         eventConsumersService.setup(x => x.putStart(oldConsumers[1].name))
             .returns(() => Observable.of({}));
 
@@ -74,7 +76,7 @@ describe('EventConsumersState', () => {
         expect(es_1.isStopped).toBeFalsy();
     });
 
-    it('should mark consumer as stopped', () => {
+    it('should mark as stopped when stopped', () => {
         eventConsumersService.setup(x => x.putStop(oldConsumers[0].name))
             .returns(() => Observable.of({}));
 
@@ -85,7 +87,7 @@ describe('EventConsumersState', () => {
         expect(es_1.isStopped).toBeTruthy();
     });
 
-    it('should mark consumer as resetting', () => {
+    it('should mark as resetting when reset', () => {
         eventConsumersService.setup(x => x.putReset(oldConsumers[0].name))
             .returns(() => Observable.of({}));
 

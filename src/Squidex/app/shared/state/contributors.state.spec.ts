@@ -66,7 +66,7 @@ describe('ContributorsState', () => {
         expect(contributorsState.snapshot.version).toEqual(version);
     });
 
-    it('should add contributor to snapshot', () => {
+    it('should add contributor to snapshot when assigned', () => {
         const newContributor = new AppContributorDto('id3', 'Developer');
 
         const request = new AppContributorDto('mail2stehle@gmail.com', 'Developer');
@@ -83,7 +83,7 @@ describe('ContributorsState', () => {
         expect(contributorsState.snapshot.version).toEqual(newVersion);
     });
 
-    it('should update contributor in snapshot', () => {
+    it('should update contributor in snapshot when assigned and already added', () => {
         const newContributor = new AppContributorDto('id2', 'Owner');
 
         const request = new AppContributorDto('mail2stehle@gmail.com', 'Owner');
@@ -100,7 +100,7 @@ describe('ContributorsState', () => {
         expect(contributorsState.snapshot.version).toEqual(newVersion);
     });
 
-    it('should remove contributor from snapshot', () => {
+    it('should remove contributor from snapshot when revoked', () => {
         contributorsService.setup(x => x.deleteContributor(app, oldContributors[0].contributorId, version))
             .returns(() => Observable.of(new Versioned<any>(newVersion, {})));
 

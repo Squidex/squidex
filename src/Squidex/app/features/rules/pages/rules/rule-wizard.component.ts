@@ -9,16 +9,14 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
 import {
-    AppContext,
     CreateRuleDto,
-    DateTime,
     Form,
+    ImmutableArray,
     ruleActions,
     ruleTriggers,
     RuleDto,
-    RulesService,
-    SchemaDto,
-    UpdateRuleDto
+    RulesState,
+    SchemaDto
 } from '@app/shared';
 
 export const MODE_WIZARD = 'Wizard';
@@ -28,10 +26,7 @@ export const MODE_EDIT_ACTION  = 'EditAction';
 @Component({
     selector: 'sqx-rule-wizard',
     styleUrls: ['./rule-wizard.component.scss'],
-    templateUrl: './rule-wizard.component.html',
-    providers: [
-        AppContext
-    ]
+    templateUrl: './rule-wizard.component.html'
 })
 export class RuleWizardComponent implements OnInit {
     public ruleActions = ruleActions;
@@ -48,16 +43,10 @@ export class RuleWizardComponent implements OnInit {
     public step = 1;
 
     @Output()
-    public cancelled = new EventEmitter();
-
-    @Output()
-    public created = new EventEmitter<RuleDto>();
-
-    @Output()
-    public updated = new EventEmitter<RuleDto>();
+    public completed = new EventEmitter();
 
     @Input()
-    public schemas: SchemaDto[];
+    public schemas: ImmutableArray<SchemaDto>;
 
     @Input()
     public rule: RuleDto;
@@ -65,8 +54,8 @@ export class RuleWizardComponent implements OnInit {
     @Input()
     public mode = MODE_WIZARD;
 
-    constructor(public readonly ctx: AppContext,
-        private readonly rulesService: RulesService
+    constructor(
+        private readonly rulesState: RulesState
     ) {
     }
 
@@ -82,6 +71,10 @@ export class RuleWizardComponent implements OnInit {
             this.trigger = this.rule.trigger;
             this.triggerType = this.rule.triggerType;
         }
+    }
+
+    public complete() {
+        this.completed.emit();
     }
 
     public selectTriggerType(type: string) {
@@ -125,40 +118,23 @@ export class RuleWizardComponent implements OnInit {
     private createRule() {
         const requestDto = new CreateRuleDto(this.trigger, this.action);
 
-        this.rulesService.postRule(this.ctx.appName, requestDto, this.ctx.userToken, DateTime.now())
+        this.rulesState.create(requestDto)
             .subscribe(dto => {
-                this.created.emit(dto);
-            }, error => {
-                this.ctx.notifyError(error);
+                this.complete();
             });
     }
 
     private updateTrigger() {
-        const requestDto = new UpdateRuleDto(this.trigger, null);
-
-        this.rulesService.putRule(this.ctx.appName, this.rule.id, requestDto, this.rule.version)
+        this.rulesState.updateTrigger(this.rule, this.trigger)
             .subscribe(dto => {
-                const rule = this.rule.updateTrigger(this.trigger, this.ctx.userToken, dto.version, DateTime.now());
-                this.updated.emit(rule);
-            }, error => {
-                this.ctx.notifyError(error);
+                this.complete();
             });
     }
 
     private updateAction() {
-        const requestDto = new UpdateRuleDto(null, this.action);
-
-        this.rulesService.putRule(this.ctx.appName, this.rule.id, requestDto, this.rule.version)
+        this.rulesState.updateAction(this.rule, this.action)
             .subscribe(dto => {
-                const rule = this.rule.updateAction(this.action, this.ctx.userToken, dto.version, DateTime.now());
-
-                this.updated.emit(rule);
-            }, error => {
-                this.ctx.notifyError(error);
+                this.complete();
             });
-    }
-
-    public cancel() {
-        this.cancelled.emit();
     }
 }
