@@ -84,6 +84,7 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
         const routeData = allData(this.ctx.route);
 
         this.languages = routeData.appLanguages;
+        this.languageSelected = this.languages[0];
     }
 
     public publishContent(content: ContentDto) {
