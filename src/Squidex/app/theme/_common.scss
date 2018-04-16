@@ -144,9 +144,7 @@ body {
             @include flex-box;
         }
 
-        &.drag,
-        &.dnd-drag-over,
-        &.dnd-drag-enter {
+        &.drag {
             border-color: darken($color-border, 10%);
             cursor: copy;
             color: darken($color-border, 40%);

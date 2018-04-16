@@ -40,15 +40,6 @@
     &:hover {
         text-decoration: underline;
     }
-
-    &.drag,
-    &.dnd-drag-over,
-    &.dnd-drag-enter {
-        border-color: darken($color-border, 10%);
-        cursor: copy;
-        color: darken($color-border, 40%);
-        text-decoration: none;
-    }
 }
 
 .table {

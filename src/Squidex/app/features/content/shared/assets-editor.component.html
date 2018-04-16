@@ -1,16 +1,16 @@
 <div class="assets-container" [class.disabled]="isDisabled">
     <div class="row">
-        <div class="col-4 drop-area-container">
+        <div class="drop-area-container">
             <div class="drop-area" (sqxFileDrop)="addFiles($event)" (click)="selectorModal.show()">
                 Drop files here to add them.
             </div>
         </div>
 
-        <sqx-asset class="col-4" *ngFor="let file of newAssets" [initFile]="file" 
+        <sqx-asset *ngFor="let file of newAssets" [initFile]="file" 
             (failed)="onAssetFailed(file)" 
             (loaded)="onAssetLoaded(file, $event)">
         </sqx-asset>
-        <sqx-asset class="col-4" *ngFor="let asset of oldAssets" [asset]="asset" removeMode="true" isDisabled="true"
+        <sqx-asset *ngFor="let asset of oldAssets" [asset]="asset" removeMode="true" isDisabled="true"
             (removing)="onAssetRemoving($event)">
         </sqx-asset>
     </div>
