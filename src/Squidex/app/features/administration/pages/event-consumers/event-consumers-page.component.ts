@@ -10,8 +10,8 @@ import { Observable, Subscription } from 'rxjs';
 
 import { ImmutableArray, ModalView } from '@app/shared';
 
-import { EventConsumerDto } from './../../services/event-consumers.service';
 import { EventConsumersState } from '@appfeatures/administration/declarations';
+import { EventConsumerDto } from './../../services/event-consumers.service';
 
 @Component({
     selector: 'sqx-event-consumers-page',

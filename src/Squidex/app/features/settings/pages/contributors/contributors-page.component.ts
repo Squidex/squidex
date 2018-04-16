@@ -100,7 +100,7 @@ export class ContributorsPageComponent implements OnInit {
         }
     }
 
-    public trackByContributor(index: number, contributor: { contributor: AppContributorDto }) {
-        return contributor.contributor.contributorId;
+    public trackByContributor(index: number, contributorInfo: { contributor: AppContributorDto }) {
+        return contributorInfo.contributor.contributorId;
     }
 }

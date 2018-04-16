@@ -9,8 +9,8 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
 import {
-    SqxSharedModule,
-    SqxFrameworkModule
+    SqxFrameworkModule,
+    SqxSharedModule
 } from '@app/shared';
 
 import {

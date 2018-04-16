@@ -10,8 +10,8 @@ import { FormBuilder } from '@angular/forms';
 
 import {
     AppPatternDto,
-    PatternsState,
-    EditPatternForm
+    EditPatternForm,
+    PatternsState
 } from '@app/shared';
 
 @Component({

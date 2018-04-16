@@ -6,7 +6,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { FormBuilder, Validators, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
 
 import '@app/framework/utils/rxjs-extensions';
@@ -14,18 +14,18 @@ import '@app/framework/utils/rxjs-extensions';
 import {
     AuthService,
     DialogService,
+    Form,
     ImmutableArray,
     Pager,
-    Form,
     State,
     ValidatorsEx
 } from '@app/shared';
 
 import {
     CreateUserDto,
+    UpdateUserDto,
     UserDto,
-    UsersService,
-    UpdateUserDto
+    UsersService
 } from './../services/users.service';
 
 export class UserForm extends Form<FormGroup> {

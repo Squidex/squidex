@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, Component, forwardRef, ElementRef, EventEmitter, OnDestroy, Output, ViewChild } from '@angular/core';
-import { ControlValueAccessor,  NG_VALUE_ACCESSOR } from '@angular/forms';
+import { AfterViewInit, Component, ElementRef, EventEmitter, forwardRef, OnDestroy, Output, ViewChild } from '@angular/core';
+import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import {
     AssetDto,

@@ -6,21 +6,21 @@
  */
 
 import { Injectable } from '@angular/core';
-import { FormBuilder, Validators, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
 
 import '@app/framework/utils/rxjs-extensions';
 
 import {
     DialogService,
+    Form,
     ImmutableArray,
     Pager,
-    Form,
     State
 } from '@app/framework';
 
-import { AppsState } from './apps.state';
 import { AssetDto, AssetsService} from './../services/assets.service';
+import { AppsState } from './apps.state';
 
 export class RenameAssetForm extends Form<FormGroup> {
     constructor(formBuilder: FormBuilder) {

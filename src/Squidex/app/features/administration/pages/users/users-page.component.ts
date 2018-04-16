@@ -53,8 +53,8 @@ export class UsersPageComponent implements OnInit {
         this.usersState.unlock(user).onErrorResumeNext().subscribe();
     }
 
-    public trackByUser(index: number, user: { user: UserDto }) {
-        return user.user.id;
+    public trackByUser(index: number, userInfo: { user: UserDto }) {
+        return userInfo.user.id;
     }
 }
 

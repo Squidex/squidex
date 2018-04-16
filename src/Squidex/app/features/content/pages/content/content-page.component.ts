@@ -13,9 +13,9 @@ import { Observable, Subscription } from 'rxjs';
 import { ContentVersionSelected } from './../messages';
 
 import {
+    allData,
     AppContext,
     AppLanguageDto,
-    allData,
     CanComponentDeactivate,
     ContentDto,
     ContentsService,

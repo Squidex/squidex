@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, Component, forwardRef, ElementRef, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, forwardRef, ViewChild } from '@angular/core';
 import { ControlValueAccessor,  NG_VALUE_ACCESSOR } from '@angular/forms';
 import { Subject } from 'rxjs';
 

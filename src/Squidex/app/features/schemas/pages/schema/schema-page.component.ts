@@ -10,7 +10,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 
 import {
-    AppPatternDto,
     AppsState,
     fadeAnimation,
     FieldDto,

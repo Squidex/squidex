@@ -12,8 +12,8 @@ import {
     ApiUrlConfig,
     AppsState,
     CreateSchemaForm,
-    SchemasState,
-    SchemaDto
+    SchemaDto,
+    SchemasState
 } from '@app/shared';
 
 @Component({

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Directive, forwardRef, ElementRef, HostListener, Renderer } from '@angular/core';
+import { Directive, ElementRef, forwardRef, HostListener, Renderer } from '@angular/core';
 import { ControlValueAccessor,  NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import { Types } from '@app/framework/internal';

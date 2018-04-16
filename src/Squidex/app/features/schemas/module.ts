@@ -16,13 +16,13 @@ import {
 } from '@app/shared';
 
 import {
-    FieldComponent,
     AssetsUIComponent,
     AssetsValidationComponent,
     BooleanUIComponent,
     BooleanValidationComponent,
     DateTimeUIComponent,
     DateTimeValidationComponent,
+    FieldComponent,
     FieldFormCommonComponent,
     FieldFormUIComponent,
     FieldFormValidationComponent,
@@ -38,8 +38,8 @@ import {
     SchemaEditFormComponent,
     SchemaFormComponent,
     SchemaPageComponent,
-    SchemasPageComponent,
     SchemaScriptsFormComponent,
+    SchemasPageComponent,
     StringUIComponent,
     StringValidationComponent,
     TagsUIComponent,

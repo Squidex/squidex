@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component } from '@angular/core';
 import { Location } from '@angular/common';
+import { Component } from '@angular/core';
 
 @Component({
     selector: 'sqx-not-found-page',

@@ -6,22 +6,22 @@
  */
 
 import { Injectable } from '@angular/core';
-import { FormBuilder, Validators, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
 
 import '@app/framework/utils/rxjs-extensions';
 
 import {
     DialogService,
-    ImmutableArray,
     Form,
+    ImmutableArray,
     State,
     Version
 } from '@app/framework';
 
+import { AppContributorDto, AppContributorsService } from './../services/app-contributors.service';
 import { AuthService } from './../services/auth.service';
 import { AppsState } from './apps.state';
-import { AppContributorDto, AppContributorsService } from './../services/app-contributors.service';
 
 export class AssignContributorForm extends Form<FormGroup> {
     public hasNoUser =

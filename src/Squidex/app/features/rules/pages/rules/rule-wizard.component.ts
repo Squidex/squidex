@@ -13,9 +13,9 @@ import {
     Form,
     ImmutableArray,
     ruleActions,
-    ruleTriggers,
     RuleDto,
     RulesState,
+    ruleTriggers,
     SchemaDto
 } from '@app/shared';
 

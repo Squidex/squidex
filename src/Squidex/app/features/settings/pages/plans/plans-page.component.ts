@@ -11,8 +11,8 @@ import { ActivatedRoute } from '@angular/router';
 import {
     ApiUrlConfig,
     AppsState,
-    PlansState,
-    PlanDto
+    PlanDto,
+    PlansState
 } from '@app/shared';
 
 @Component({
@@ -49,8 +49,8 @@ export class PlansPageComponent implements OnInit {
         this.plansState.change(planId).onErrorResumeNext().subscribe();
     }
 
-    public trackByPlan(index: number, plan: PlanDto) {
-        return plan.id;
+    public trackByPlan(index: number, planInfo: { plan: PlanDto }) {
+        return planInfo.plan.id;
     }
 }
 

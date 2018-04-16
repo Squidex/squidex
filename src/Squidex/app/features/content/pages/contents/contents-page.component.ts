@@ -18,8 +18,8 @@ import {
     ImmutableArray,
     ModalView,
     Pager,
-    SchemasState,
     SchemaDetailsDto,
+    SchemasState,
     Versioned
 } from '@app/shared';
 

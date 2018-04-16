@@ -21,22 +21,22 @@ import {
     Version
 } from '@app/framework';
 
-import { AppsState } from './apps.state';
 import { AuthService } from './../services/auth.service';
+import { AppsState } from './apps.state';
 
 import {
     AddFieldDto,
     createProperties,
     CreateSchemaDto,
     FieldDto,
-    SchemaDto,
+    FieldPropertiesDto,
     SchemaDetailsDto,
+    SchemaDto,
+    SchemaPropertiesDto,
     SchemasService,
     UpdateFieldDto,
-    UpdateSchemaScriptsDto,
     UpdateSchemaDto,
-    SchemaPropertiesDto,
-    FieldPropertiesDto
+    UpdateSchemaScriptsDto
 } from './../services/schemas.service';
 
 const FALLBACK_NAME = 'my-schema';

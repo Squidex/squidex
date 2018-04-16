@@ -6,7 +6,7 @@
  */
 
 import { Component, Input, OnInit } from '@angular/core';
-import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { GeolocationFieldPropertiesDto } from '@app/shared';
 

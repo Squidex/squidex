@@ -14,8 +14,8 @@ import {
     AppsState,
     AssetDto,
     AssetsService,
-    ModalView,
     ImmutableArray,
+    ModalView,
     Types
 } from '@app/shared';
 

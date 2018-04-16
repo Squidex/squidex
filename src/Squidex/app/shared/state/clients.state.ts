@@ -6,15 +6,15 @@
  */
 
 import { Injectable } from '@angular/core';
-import { FormBuilder, Validators, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
 
 import '@app/framework/utils/rxjs-extensions';
 
 import {
     DialogService,
-    ImmutableArray,
     Form,
+    ImmutableArray,
     State,
     ValidatorsEx,
     Version

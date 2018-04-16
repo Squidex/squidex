@@ -13,10 +13,10 @@ import {
     ContentsService,
     DialogService,
     ImmutableArray,
+    LanguageDto,
     ModalView,
     Pager,
-    SchemaDetailsDto,
-    LanguageDto
+    SchemaDetailsDto
 } from '@app/shared';
 
 @Component({

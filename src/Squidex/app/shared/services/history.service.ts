@@ -15,8 +15,8 @@ import { UsersProviderService } from './users-provider.service';
 
 import {
     ApiUrlConfig,
-    HTTP,
-    DateTime
+    DateTime,
+    HTTP
 } from '@app/framework';
 
 export class HistoryEventDto {

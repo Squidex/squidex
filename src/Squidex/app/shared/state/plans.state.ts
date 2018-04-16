@@ -17,8 +17,8 @@ import {
     Version
 } from '@app/framework';
 
-import { AppsState } from './apps.state';
 import { AuthService } from './../services/auth.service';
+import { AppsState } from './apps.state';
 
 import {
     ChangePlanDto,

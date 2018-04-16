@@ -6,8 +6,8 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
+import { Observable } from 'rxjs';
 
 import { MessageBus } from '@app/framework';
 

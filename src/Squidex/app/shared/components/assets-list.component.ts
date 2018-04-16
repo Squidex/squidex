@@ -10,8 +10,8 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 import {
-    AssetsState,
     AssetDto,
+    AssetsState,
     ImmutableArray
 } from '@app/shared/internal';
 
