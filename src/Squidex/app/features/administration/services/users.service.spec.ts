@@ -14,8 +14,8 @@ import {
     CreateUserDto,
     UpdateUserDto,
     UserDto,
-    UsersService,
-    UsersDto
+    UsersDto,
+    UsersService
 } from './users.service';
 
 describe('UsersService', () => {

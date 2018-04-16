@@ -14,8 +14,8 @@ import {
     AssetsDto,
     AssetsService,
     AssetsState,
-    DialogService,
     DateTime,
+    DialogService,
     Version,
     Versioned
  } from '@app/shared';

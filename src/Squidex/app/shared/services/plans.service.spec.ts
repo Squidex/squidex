@@ -10,8 +10,8 @@ import { inject, TestBed } from '@angular/core/testing';
 
 import {
     AnalyticsService,
-    AppPlansDto,
     ApiUrlConfig,
+    AppPlansDto,
     ChangePlanDto,
     PlanChangedDto,
     PlanDto,

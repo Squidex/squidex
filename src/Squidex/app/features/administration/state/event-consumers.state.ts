@@ -66,7 +66,7 @@ export class EventConsumersState extends State<Snapshot> {
     public start(es: EventConsumerDto): Observable<any> {
         return this.eventConsumersService.putStart(es.name)
             .do(() => {
-                this.replaceEventConsumer(start(es));
+                this.replaceEventConsumer(setStopped(es, false));
             })
             .notify(this.dialogs);
     }
@@ -74,7 +74,7 @@ export class EventConsumersState extends State<Snapshot> {
     public stop(es: EventConsumerDto): Observable<any> {
         return this.eventConsumersService.putStop(es.name)
             .do(() => {
-                this.replaceEventConsumer(stop(es));
+                this.replaceEventConsumer(setStopped(es, true));
             })
             .notify(this.dialogs);
     }
@@ -96,11 +96,8 @@ export class EventConsumersState extends State<Snapshot> {
     }
 }
 
-const start = (es: EventConsumerDto) =>
+const setStopped = (es: EventConsumerDto, isStoped: boolean) =>
     new EventConsumerDto(es.name, false, false, es.error, es.position);
-
-const stop = (es: EventConsumerDto) =>
-    new EventConsumerDto(es.name, true, false, es.error, es.position);
 
 const reset = (es: EventConsumerDto) =>
     new EventConsumerDto(es.name, es.isStopped, true, es.error, es.position);

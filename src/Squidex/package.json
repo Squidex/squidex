@@ -12,7 +12,8 @@
     "build": "webpack --config app-config/webpack.run.prod.js --display-error-details --bail --display-optimization-bailout",
     "build:nobail": "webpack --config app-config/webpack.run.prod.js --display-error-details",
     "build:copy": "cpx node_modules/oidc-client/dist/oidc-client.min.js wwwroot/scripts/",
-    "build:clean": "rimraf wwwroot/build"
+    "build:clean": "rimraf wwwroot/build",
+    "tslint": "tslint app/**/*.ts"
   },
   "dependencies": {
     "@angular/animations": "5.2.1",

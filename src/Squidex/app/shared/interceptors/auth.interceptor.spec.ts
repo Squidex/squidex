@@ -5,16 +5,16 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { HTTP_INTERCEPTORS, HttpClient, HttpHeaders } from '@angular/common/http';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { HttpClient, HttpHeaders, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { inject, TestBed } from '@angular/core/testing';
 import { Observable } from 'rxjs';
 import { IMock, Mock, Times } from 'typemoq';
 
 import {
     ApiUrlConfig,
-    AuthService,
-    AuthInterceptor
+    AuthInterceptor,
+    AuthService
 } from './../';
 
 describe('AuthInterceptor', () => {

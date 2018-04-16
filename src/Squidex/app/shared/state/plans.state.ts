@@ -38,7 +38,6 @@ interface Snapshot {
 
     isOwner?: boolean;
     isLoaded?: boolean;
-    isDisabled?: boolean;
 
     hasPortal?: boolean;
 
@@ -60,7 +59,7 @@ export class PlansState extends State<Snapshot> {
             .distinctUntilChanged();
 
     public isDisabled =
-        this.changes.map(x => !!x.isDisabled || !x.isOwner)
+        this.changes.map(x => !x.isOwner)
             .distinctUntilChanged();
 
     public hasPortal =
@@ -93,7 +92,6 @@ export class PlansState extends State<Snapshot> {
                         plans: ImmutableArray.of(dto.plans.map(x => this.createPlan(x, planId))),
                         isOwner: !dto.planOwner || dto.planOwner === this.userId,
                         isLoaded: true,
-                        isDisabled: false,
                         hasPortal: dto.hasPortal
                     };
                 });
@@ -102,20 +100,15 @@ export class PlansState extends State<Snapshot> {
     }
 
     public change(planId: string): Observable<any> {
-        this.next(s => ({ ...s, isDisabled: true }));
-
         return this.plansService.putPlan(this.appName, new ChangePlanDto(planId), this.version)
             .do(dto => {
                 if (dto.payload.redirectUri && dto.payload.redirectUri.length > 0) {
                     this.window.location.href = dto.payload.redirectUri;
                 } else {
                     this.next(s => {
-                        return {
-                            ...s,
-                            plans: s.plans.map(x => this.createPlan(x.plan, planId)),
-                            isOwner: true,
-                            isDisabled: false
-                        };
+                        const plans = s.plans.map(x => this.createPlan(x.plan, planId));
+
+                        return { ...s, plans };
                     });
                 }
             })

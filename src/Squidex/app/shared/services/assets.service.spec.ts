@@ -11,9 +11,9 @@ import { inject, TestBed } from '@angular/core/testing';
 import {
     AnalyticsService,
     ApiUrlConfig,
-    AssetsDto,
     AssetDto,
     AssetReplacedDto,
+    AssetsDto,
     AssetsService,
     DateTime,
     UpdateAssetDto,

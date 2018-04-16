@@ -9,16 +9,16 @@ import { Observable } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 
 import {
-    AppsState,
     AppPatternDto,
     AppPatternsDto,
     AppPatternsService,
-    PatternsState,
+    AppsState,
     DialogService,
     EditAppPatternDto,
+    PatternsState,
     Version,
     Versioned
- } from '@app/shared';
+} from '@app/shared';
 
 describe('PatternsState', () => {
     const app = 'my-app';

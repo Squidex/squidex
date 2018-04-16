@@ -9,10 +9,10 @@ import { Observable } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 
 import {
-    AppsState,
     AppContributorDto,
     AppContributorsDto,
     AppContributorsService,
+    AppsState,
     AuthService,
     ContributorsState,
     DialogService,

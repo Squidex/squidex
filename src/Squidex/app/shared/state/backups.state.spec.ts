@@ -11,11 +11,11 @@ import { IMock, It, Mock, Times } from 'typemoq';
 import {
     AppsState,
     BackupDto,
-    BackupsState,
     BackupsService,
+    BackupsState,
     DateTime,
     DialogService
- } from '@app/shared';
+} from '@app/shared';
 
 describe('BackupsState', () => {
     const app = 'my-app';

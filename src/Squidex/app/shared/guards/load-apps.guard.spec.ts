@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { IMock, Mock, Times } from 'typemoq';
 import { Observable } from 'rxjs';
+import { IMock, Mock, Times } from 'typemoq';
 
 import { AppsState } from '@app/shared';
 

@@ -14,8 +14,8 @@ import { UsersState } from './users.state';
 
 import {
     CreateUserDto,
-    UserDto,
     UpdateUserDto,
+    UserDto,
     UsersDto,
     UsersService
 } from './../services/users.service';

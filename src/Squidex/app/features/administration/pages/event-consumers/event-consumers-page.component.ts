@@ -8,7 +8,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
 
-import { ImmutableArray, ModalView } from '@app/shared';
+import { ModalView } from '@app/shared';
 
 import { EventConsumersState } from '@appfeatures/administration/declarations';
 import { EventConsumerDto } from './../../services/event-consumers.service';
@@ -23,7 +23,6 @@ export class EventConsumersPageComponent implements OnDestroy, OnInit {
 
     public eventConsumerErrorDialog = new ModalView();
     public eventConsumerError = '';
-    public eventConsumers = ImmutableArray.empty<EventConsumerDto>();
 
     constructor(
         public readonly eventConsumersState: EventConsumersState

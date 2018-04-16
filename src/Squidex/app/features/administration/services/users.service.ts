@@ -11,7 +11,7 @@ import { Observable } from 'rxjs';
 
 import '@app/framework/angular/http/http-extensions';
 
-import { ApiUrlConfig, HTTP } from '@app/framework';
+import { ApiUrlConfig, HTTP } from '@app/shared';
 
 export class UsersDto {
     constructor(

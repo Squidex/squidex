@@ -6,8 +6,8 @@
  */
 
 import { Router } from '@angular/router';
-import { IMock, Mock, Times } from 'typemoq';
 import { Observable } from 'rxjs';
+import { IMock, Mock, Times } from 'typemoq';
 
 import { AuthService } from '@app/shared';
 

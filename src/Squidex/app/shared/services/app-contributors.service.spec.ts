@@ -14,8 +14,8 @@ import {
     AppContributorDto,
     AppContributorsDto,
     AppContributorsService,
-    Version,
-    ContributorAssignedDto
+    ContributorAssignedDto,
+    Version
 } from './../';
 
 describe('AppContributorsService', () => {

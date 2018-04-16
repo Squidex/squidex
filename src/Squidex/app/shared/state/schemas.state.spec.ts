@@ -16,8 +16,8 @@ import {
     AuthService,
     createProperties,
     CreateSchemaDto,
-    DialogService,
     DateTime,
+    DialogService,
     FieldDto,
     SchemaDetailsDto,
     SchemaDto,
@@ -27,7 +27,7 @@ import {
     UpdateSchemaScriptsDto,
     Version,
     Versioned
- } from '@app/shared';
+} from '@app/shared';
 
 describe('SchemasState', () => {
     const app = 'my-app';

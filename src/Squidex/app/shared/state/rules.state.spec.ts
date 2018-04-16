@@ -13,14 +13,14 @@ import { RulesState } from './rules.state';
 import {
     AppsState,
     AuthService,
-    DialogService,
+    CreateRuleDto,
     DateTime,
+    DialogService,
     RuleDto,
     RulesService,
+    UpdateRuleDto,
     Version,
-    Versioned,
-    CreateRuleDto,
-    UpdateRuleDto
+    Versioned
 } from '@app/shared';
 
 describe('RulesState', () => {

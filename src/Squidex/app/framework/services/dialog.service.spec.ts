@@ -6,10 +6,10 @@
  */
 
 import {
-    Notification,
     DialogRequest,
     DialogService,
-    DialogServiceFactory
+    DialogServiceFactory,
+    Notification
 } from './dialog.service';
 
 describe('DialogService', () => {

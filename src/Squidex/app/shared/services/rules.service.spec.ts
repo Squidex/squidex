@@ -14,12 +14,12 @@ import {
     ApiUrlConfig,
     CreateRuleDto,
     DateTime,
-    UpdateRuleDto,
-    Version,
     RuleDto,
     RuleEventDto,
     RuleEventsDto,
-    RulesService
+    RulesService,
+    UpdateRuleDto,
+    Version
 } from './../';
 
 describe('RuleDto', () => {
