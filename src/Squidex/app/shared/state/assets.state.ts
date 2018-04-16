@@ -39,7 +39,7 @@ interface Snapshot {
     assetsPager: Pager;
     assetsQuery?: string;
 
-    loaded: false;
+    isLoaded?: false;
 }
 
 @Injectable()
@@ -52,16 +52,20 @@ export class AssetsState extends State<Snapshot> {
         this.changes.map(x => x.assetsPager)
             .distinctUntilChanged();
 
+    public isLoaded =
+        this.changes.map(x => !!x.isLoaded)
+            .distinctUntilChanged();
+
     constructor(
         private readonly appsState: AppsState,
         private readonly assetsService: AssetsService,
         private readonly dialogs: DialogService
     ) {
-        super({ assets: ImmutableArray.empty(), assetsPager: new Pager(0, 0, 30), loaded: false });
+        super({ assets: ImmutableArray.empty(), assetsPager: new Pager(0, 0, 30) });
     }
 
     public load(notifyLoad = false, noReload = false): Observable<any> {
-        if (this.snapshot.loaded && noReload) {
+        if (this.snapshot.isLoaded && noReload) {
             return Observable.of({});
         }
 
@@ -75,7 +79,7 @@ export class AssetsState extends State<Snapshot> {
                     const assets = ImmutableArray.of(dtos.items);
                     const assetsPager = s.assetsPager.setCount(dtos.total);
 
-                    return { ...s, assets, assetsPager, loaded: true };
+                    return { ...s, assets, assetsPager, isLoaded: true };
                 });
             })
             .notify(this.dialogs);
@@ -90,14 +94,6 @@ export class AssetsState extends State<Snapshot> {
         });
     }
 
-    public update(asset: AssetDto) {
-        this.next(s => {
-            const assets = s.assets.replaceBy('id', asset);
-
-            return { ...s, assets };
-        });
-    }
-
     public delete(asset: AssetDto): Observable<any> {
         return this.assetsService.deleteAsset(this.appName, asset.id, asset.version)
             .do(dto => {
@@ -109,6 +105,14 @@ export class AssetsState extends State<Snapshot> {
                 });
             })
             .notify(this.dialogs);
+    }
+
+    public update(asset: AssetDto) {
+        this.next(s => {
+            const assets = s.assets.replaceBy('id', asset);
+
+            return { ...s, assets };
+        });
     }
 
     public search(query: string): Observable<any> {

@@ -89,6 +89,7 @@ describe('SchemasState', () => {
 
     it('should load schemas', () => {
         expect(schemasState.snapshot.schemas.values).toEqual(oldSchemas);
+        expect(schemasState.snapshot.isLoaded).toBeTruthy();
 
         schemasService.verifyAll();
     });

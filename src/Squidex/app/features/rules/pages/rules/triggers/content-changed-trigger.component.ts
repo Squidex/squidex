@@ -30,7 +30,7 @@ export interface TriggerSchemaForm {
 })
 export class ContentChangedTriggerComponent implements OnInit {
     @Input()
-    public schemas: SchemaDto[];
+    public schemas: ImmutableArray<SchemaDto>;
 
     @Input()
     public trigger: any;
@@ -79,12 +79,11 @@ export class ContentChangedTriggerComponent implements OnInit {
                 }).filter(s => s !== null).map(s => s!)).sortByStringAsc(s => s.schema.name);
 
         this.schemasToAdd =
-            ImmutableArray.of(
                 this.schemas.filter(schema =>
-                    !triggerSchemas.find(s => s.schemaId === schema.id)))
+                    !triggerSchemas.find(s => s.schemaId === schema.id))
                 .sortByStringAsc(x => x.name);
 
-        this.schemaToAdd = this.schemasToAdd.values[0];
+        this.schemaToAdd = this.schemasToAdd.at(0);
     }
 
     public removeSchema(schemaForm: TriggerSchemaForm) {
@@ -93,7 +92,7 @@ export class ContentChangedTriggerComponent implements OnInit {
         this.updateValue();
 
         this.schemasToAdd = this.schemasToAdd.push(schemaForm.schema).sortByStringAsc(x => x.name);
-        this.schemaToAdd = this.schemasToAdd.values[0];
+        this.schemaToAdd = this.schemasToAdd.at(0);
     }
 
     public addSchema() {
@@ -111,7 +110,7 @@ export class ContentChangedTriggerComponent implements OnInit {
         this.updateValue();
 
         this.schemasToAdd = this.schemasToAdd.remove(this.schemaToAdd).sortByStringAsc(x => x.name);
-        this.schemaToAdd = this.schemasToAdd.values[0];
+        this.schemaToAdd = this.schemasToAdd.at(0);
     }
 
     public toggle(schemaForm: TriggerSchemaForm, property: string) {

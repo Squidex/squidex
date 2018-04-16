@@ -61,6 +61,7 @@ describe('AssetsState', () => {
 
         expect(assetsState.snapshot.assets.values).toEqual(oldAssets);
         expect(assetsState.snapshot.assetsPager.numberOfItems).toEqual(200);
+        expect(assetsState.snapshot.isLoaded).toBeTruthy();
 
         assetsService.verify(x => x.getAssets(app, 30, 0, undefined), Times.exactly(2));
 

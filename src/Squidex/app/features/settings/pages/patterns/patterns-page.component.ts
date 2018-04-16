@@ -29,6 +29,10 @@ export class PatternsPageComponent implements OnInit {
         this.patternsState.load().onErrorResumeNext().subscribe();
     }
 
+    public reload() {
+        this.patternsState.load(true).onErrorResumeNext().subscribe();
+    }
+
     public trackByPattern(index: number, pattern: AppPatternDto) {
         return pattern.id;
     }

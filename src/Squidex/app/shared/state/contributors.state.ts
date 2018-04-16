@@ -45,25 +45,33 @@ interface SnapshotContributor {
 }
 
 interface Snapshot {
-    contributors?: ImmutableArray<SnapshotContributor>;
+    contributors: ImmutableArray<SnapshotContributor>;
 
     isMaxReached?: boolean;
+    isLoaded?: boolean;
 
     maxContributors: number;
 
-    version?: Version;
+    version: Version;
 }
 
 @Injectable()
 export class ContributorsState extends State<Snapshot> {
     public contributors =
-        this.changes.map(x => x.contributors);
+        this.changes.map(x => x.contributors)
+            .distinctUntilChanged();
 
     public isMaxReached =
-        this.changes.map(x => x.isMaxReached);
+        this.changes.map(x => x.isMaxReached)
+            .distinctUntilChanged();
+
+    public isLoaded =
+        this.changes.map(x => !!x.isLoaded)
+            .distinctUntilChanged();
 
     public maxContributors =
-        this.changes.map(x => x.maxContributors);
+        this.changes.map(x => x.maxContributors)
+            .distinctUntilChanged();
 
     constructor(
         private readonly appContributorsService: AppContributorsService,
@@ -71,12 +79,16 @@ export class ContributorsState extends State<Snapshot> {
         private readonly authState: AuthService,
         private readonly dialogs: DialogService
     ) {
-        super({ maxContributors: -1 });
+        super({ contributors: ImmutableArray.empty(), version: new Version(''), maxContributors: -1 });
     }
 
-    public load(): Observable<any> {
+    public load(notifyLoad = false): Observable<any> {
         return this.appContributorsService.getContributors(this.appName)
             .do(dtos => {
+                if (notifyLoad) {
+                    this.dialogs.notifyInfo('Contributors reloaded.');
+                }
+
                 const contributors = ImmutableArray.of(dtos.contributors.map(x => this.createContributor(x)));
 
                 this.replaceContributors(contributors, dtos.version, dtos.maxContributors);
@@ -87,7 +99,7 @@ export class ContributorsState extends State<Snapshot> {
     public revoke(contributor: AppContributorDto): Observable<any> {
         return this.appContributorsService.deleteContributor(this.appName, contributor.contributorId, this.version)
             .do(dto => {
-                const contributors = this.snapshot.contributors!.filter(x => x.contributor.contributorId !== contributor.contributorId);
+                const contributors = this.snapshot.contributors.filter(x => x.contributor.contributorId !== contributor.contributorId);
 
                 this.replaceContributors(contributors, dto.version);
             })
@@ -99,7 +111,7 @@ export class ContributorsState extends State<Snapshot> {
             .do(dto => {
                 const contributor = this.createContributor(new AppContributorDto(dto.payload.contributorId, request.permission));
 
-                let contributors = this.snapshot.contributors!;
+                let contributors = this.snapshot.contributors;
 
                 if (contributors.find(x => x.contributor.contributorId === dto.payload.contributorId)) {
                     contributors = contributors.map(c => c.contributor.contributorId === dto.payload.contributorId ? contributor : c);
@@ -128,7 +140,7 @@ export class ContributorsState extends State<Snapshot> {
     }
 
     private get version() {
-        return this.snapshot.version!;
+        return this.snapshot.version;
     }
 
     private createContributor(contributor: AppContributorDto): SnapshotContributor {

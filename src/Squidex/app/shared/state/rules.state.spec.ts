@@ -67,6 +67,7 @@ describe('RulesState', () => {
 
     it('should load rules', () => {
         expect(rulesState.snapshot.rules.values).toEqual(oldRules);
+        expect(rulesState.snapshot.isLoaded).toBeTruthy();
 
         dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
     });

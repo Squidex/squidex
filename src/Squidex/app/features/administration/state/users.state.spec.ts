@@ -53,6 +53,7 @@ describe('UsersState', () => {
     it('should load users', () => {
         expect(usersState.snapshot.users.values).toEqual(oldUsers.map(x => u(x)));
         expect(usersState.snapshot.usersPager.numberOfItems).toEqual(200);
+        expect(usersState.snapshot.isLoaded).toBeTruthy();
 
         dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
     });

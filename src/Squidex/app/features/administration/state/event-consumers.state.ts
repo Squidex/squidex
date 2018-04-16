@@ -20,12 +20,19 @@ import { EventConsumerDto, EventConsumersService } from './../services/event-con
 
 interface Snapshot {
     eventConsumers: ImmutableArray<EventConsumerDto>;
+
+    isLoaded?: false;
 }
 
 @Injectable()
 export class EventConsumersState extends State<Snapshot> {
     public eventConsumers =
-        this.changes.map(x => x.eventConsumers);
+        this.changes.map(x => x.eventConsumers)
+            .distinctUntilChanged();
+
+    public isLoaded =
+        this.changes.map(x => !!x.isLoaded)
+            .distinctUntilChanged();
 
     constructor(
         private readonly dialogs: DialogService,
@@ -44,7 +51,7 @@ export class EventConsumersState extends State<Snapshot> {
                 this.next(s => {
                     const eventConsumers = ImmutableArray.of(dtos);
 
-                    return { ...s, eventConsumers };
+                    return { ...s, eventConsumers, isLoaded: true };
                 });
             })
             .catch(error => {

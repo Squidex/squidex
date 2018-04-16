@@ -35,6 +35,10 @@ export class ClientsPageComponent implements OnInit {
         this.clientsState.load().onErrorResumeNext().subscribe();
     }
 
+    public reload() {
+        this.clientsState.load(true).onErrorResumeNext().subscribe();
+    }
+
     public attachClient() {
         const value = this.addClientForm.submit();
 

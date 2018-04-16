@@ -37,6 +37,7 @@ describe('EventConsumersState', () => {
 
     it('should load event consumers', () => {
         expect(eventConsumersState.snapshot.eventConsumers.values).toEqual(oldConsumers);
+        expect(eventConsumersState.snapshot.isLoaded).toBeTruthy();
 
         dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
     });

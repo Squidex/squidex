@@ -34,29 +34,38 @@ interface PlanInfo {
 }
 
 interface Snapshot {
-    plans?: ImmutableArray<PlanInfo>;
-
-    version?: Version;
+    plans: ImmutableArray<PlanInfo>;
 
     isOwner?: boolean;
+    isLoaded?: boolean;
     isDisabled?: boolean;
 
     hasPortal?: boolean;
+
+    version: Version;
 }
 
 @Injectable()
 export class PlansState extends State<Snapshot> {
     public plans =
-        this.changes.map(x => x.plans);
+        this.changes.map(x => x.plans)
+            .distinctUntilChanged();
 
     public isOwner =
-        this.changes.map(x => x.isOwner);
+        this.changes.map(x => !!x.isOwner)
+            .distinctUntilChanged();
+
+    public isLoaded =
+        this.changes.map(x => !!x.isLoaded)
+            .distinctUntilChanged();
 
     public isDisabled =
-        this.changes.map(x => x.isDisabled || !x.isOwner);
+        this.changes.map(x => !!x.isDisabled || !x.isOwner)
+            .distinctUntilChanged();
 
     public hasPortal =
-        this.changes.map(x => x.hasPortal);
+        this.changes.map(x => x.hasPortal)
+            .distinctUntilChanged();
 
     public window = window;
 
@@ -66,7 +75,7 @@ export class PlansState extends State<Snapshot> {
         private readonly dialogs: DialogService,
         private readonly plansService: PlansService
     ) {
-        super({});
+        super({ plans: ImmutableArray.empty(), version: new Version('') });
     }
 
     public load(notifyLoad = false, overridePlanId?: string): Observable<any> {
@@ -83,6 +92,7 @@ export class PlansState extends State<Snapshot> {
                         ...s,
                         plans: ImmutableArray.of(dto.plans.map(x => this.createPlan(x, planId))),
                         isOwner: !dto.planOwner || dto.planOwner === this.userId,
+                        isLoaded: true,
                         isDisabled: false,
                         hasPortal: dto.hasPortal
                     };
@@ -102,7 +112,7 @@ export class PlansState extends State<Snapshot> {
                     this.next(s => {
                         return {
                             ...s,
-                            plans: s.plans!.map(x => this.createPlan(x.plan, planId)),
+                            plans: s.plans.map(x => this.createPlan(x.plan, planId)),
                             isOwner: true,
                             isDisabled: false
                         };
@@ -125,7 +135,7 @@ export class PlansState extends State<Snapshot> {
     }
 
     private get version() {
-        return this.snapshot.version!;
+        return this.snapshot.version;
     }
 }
 

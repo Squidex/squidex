@@ -81,6 +81,8 @@ interface Snapshot {
     usersPager: Pager;
     usersQuery?: string;
 
+    isLoaded?: boolean;
+
     selectedUser?: SnapshotUser;
 }
 
@@ -96,6 +98,10 @@ export class UsersState extends State<Snapshot> {
 
     public selectedUser =
         this.changes.map(x => x.selectedUser)
+            .distinctUntilChanged();
+
+    public isLoaded =
+        this.changes.map(x => !!x.isLoaded)
             .distinctUntilChanged();
 
     constructor(
@@ -144,7 +150,7 @@ export class UsersState extends State<Snapshot> {
                         selectedUser = users.find(x => x.user.id === selectedUser!.user.id) || selectedUser;
                     }
 
-                    return { ...s, users, usersPager, selectedUser };
+                    return { ...s, users, usersPager, selectedUser, isLoaded: true };
                 });
             })
             .notify(this.dialogs);

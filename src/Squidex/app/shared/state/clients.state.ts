@@ -58,27 +58,38 @@ export class AttachClientForm extends Form<FormGroup> {
 }
 
 interface Snapshot {
-    clients?: ImmutableArray<AppClientDto>;
+    clients: ImmutableArray<AppClientDto>;
 
-    version?: Version;
+    version: Version;
+
+    isLoaded?: boolean;
 }
 
 @Injectable()
 export class ClientsState extends State<Snapshot> {
     public clients =
-        this.changes.map(x => x.clients);
+        this.changes.map(x => x.clients)
+            .distinctUntilChanged();
+
+    public isLoaded =
+        this.changes.map(x => !!x.isLoaded)
+            .distinctUntilChanged();
 
     constructor(
         private readonly appClientsService: AppClientsService,
         private readonly appsState: AppsState,
         private readonly dialogs: DialogService
     ) {
-        super({});
+        super({ clients: ImmutableArray.empty(), version: new Version('') });
     }
 
-    public load(): Observable<any> {
+    public load(notifyLoad = false): Observable<any> {
         return this.appClientsService.getClients(this.appName)
             .do(dtos => {
+                if (notifyLoad) {
+                    this.dialogs.notifyInfo('Clients reloaded.');
+                }
+
                 this.next(s => {
                     const clients = ImmutableArray.of(dtos.clients);
 
@@ -92,7 +103,7 @@ export class ClientsState extends State<Snapshot> {
         return this.appClientsService.postClient(this.appName, request, this.version)
             .do(dto => {
                 this.next(s => {
-                    const clients = s.clients!.push(dto.payload);
+                    const clients = s.clients.push(dto.payload);
 
                     return { ...s, clients, version: dto.version };
                 });
@@ -104,7 +115,7 @@ export class ClientsState extends State<Snapshot> {
         return this.appClientsService.deleteClient(this.appName, client.id, this.version)
             .do(dto => {
                 this.next(s => {
-                    const clients = s.clients!.filter(c => c.id !== client.id);
+                    const clients = s.clients.filter(c => c.id !== client.id);
 
                     return { ...s, clients, version: dto.version };
                 });
@@ -116,7 +127,7 @@ export class ClientsState extends State<Snapshot> {
         return this.appClientsService.putClient(this.appName, client.id, request, this.version)
             .do(dto => {
                 this.next(s => {
-                    const clients = s.clients!.replaceBy('id', update(client, request));
+                    const clients = s.clients.replaceBy('id', update(client, request));
 
                     return { ...s, clients, version: dto.version };
                 });
@@ -129,7 +140,7 @@ export class ClientsState extends State<Snapshot> {
     }
 
     private get version() {
-        return this.snapshot.version!;
+        return this.snapshot.version;
     }
 }
 

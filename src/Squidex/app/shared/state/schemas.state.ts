@@ -143,21 +143,28 @@ export class AddFieldForm extends Form<FormGroup> {
 
 interface Snapshot {
     schemas: ImmutableArray<SchemaDto>;
+
+    isLoaded?: boolean;
+
     selectedSchema?: SchemaDetailsDto | null;
 }
 
 @Injectable()
 export class SchemasState extends State<Snapshot> {
     public selectedSchema =
-        this.changes.map(s => s.selectedSchema)
+        this.changes.map(x => x.selectedSchema)
             .distinctUntilChanged();
 
     public schemas =
-        this.changes.map(s => s.schemas)
+        this.changes.map(x => x.schemas)
             .distinctUntilChanged();
 
     public publishedSchemas =
-        this.changes.map(s => s.schemas.filter(x => x.isPublished))
+        this.changes.map(x => x.schemas.filter(s => s.isPublished))
+            .distinctUntilChanged();
+
+    public isLoaded =
+        this.changes.map(x => !!x.isLoaded)
             .distinctUntilChanged();
 
     public get schemaName() {
@@ -196,7 +203,7 @@ export class SchemasState extends State<Snapshot> {
                 return this.next(s => {
                     const schemas = ImmutableArray.of(dtos).sortByStringAsc(x => x.displayName);
 
-                    return { ...s, schemas };
+                    return { ...s, schemas, isLoaded: true };
                 });
             })
             .notify(this.dialogs);

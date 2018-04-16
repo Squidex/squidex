@@ -11,6 +11,7 @@ import { Observable, Subscription } from 'rxjs';
 
 import {
     AppPatternDto,
+    ImmutableArray,
     ModalView,
     StringFieldPropertiesDto
 } from '@app/shared';
@@ -30,7 +31,7 @@ export class StringValidationComponent implements OnDestroy, OnInit {
     public properties: StringFieldPropertiesDto;
 
     @Input()
-    public patterns: AppPatternDto[] = [];
+    public patterns: ImmutableArray<AppPatternDto>;
 
     public showDefaultValue: Observable<boolean>;
     public showPatternMessage: boolean;

@@ -11,13 +11,13 @@ import { Subscription } from 'rxjs';
 
 import {
     AppPatternDto,
-    AppPatternsService,
     AppsState,
     fadeAnimation,
     FieldDto,
     fieldTypes,
     MessageBus,
     ModalView,
+    PatternsState,
     SchemaDetailsDto,
     SchemasState
 } from '@app/shared';
@@ -39,8 +39,6 @@ export class SchemaPageComponent implements OnDestroy, OnInit {
 
     public fieldTypes = fieldTypes;
 
-    public patterns: AppPatternDto[] = [];
-
     public schemaExport: any;
     public schema: SchemaDetailsDto;
 
@@ -56,7 +54,7 @@ export class SchemaPageComponent implements OnDestroy, OnInit {
     constructor(
         public readonly appsState: AppsState,
         public readonly schemasState: SchemasState,
-        private readonly patternsService: AppPatternsService,
+        public readonly patternsState: PatternsState,
         private readonly route: ActivatedRoute,
         private readonly router: Router,
         private readonly messageBus: MessageBus
@@ -68,10 +66,7 @@ export class SchemaPageComponent implements OnDestroy, OnInit {
     }
 
     public ngOnInit() {
-        this.patternsService.getPatterns(this.appsState.appName)
-            .subscribe(dtos => {
-                this.patterns = dtos.patterns;
-            });
+        this.patternsState.load().onErrorResumeNext().subscribe();
 
         this.selectedSchemaSubscription =
             this.schemasState.selectedSchema

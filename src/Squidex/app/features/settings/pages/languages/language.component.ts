@@ -89,14 +89,14 @@ export class LanguageComponent implements OnInit, OnChanges, OnDestroy {
         this.fallbackLanguages.splice(this.fallbackLanguages.indexOf(language), 1);
 
         this.otherLanguages = [...this.otherLanguages, language];
-        this.otherLanguage = this.otherLanguages.values[0];
+        this.otherLanguage = this.otherLanguages[0];
     }
 
     public addFallbackLanguage(language: AppLanguageDto) {
         this.fallbackLanguages.push(language);
 
         this.otherLanguages = this.otherLanguages.filter(l => l.iso2Code !== language.iso2Code);
-        this.otherLanguage = this.otherLanguages.values[0];
+        this.otherLanguage = this.otherLanguages[0];
     }
 
     public save() {

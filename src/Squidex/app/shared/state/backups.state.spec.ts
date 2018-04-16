@@ -49,6 +49,9 @@ describe('BackupsState', () => {
 
     it('should load backups', () => {
         expect(backupsState.snapshot.backups.values).toEqual(oldBackups);
+        expect(backupsState.snapshot.isLoaded).toBeTruthy();
+
+        dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
     });
 
     it('should show notification on load when flag is true', () => {

@@ -11,11 +11,11 @@ import { Observable } from 'rxjs';
 import '@app/framework/utils/rxjs-extensions';
 
 import {
+    DateTime,
     DialogService,
     ImmutableArray,
     State,
-    Version,
-    DateTime
+    Version
 } from '@app/framework';
 
 import { AppsState } from './apps.state';
@@ -30,12 +30,19 @@ import {
 
 interface Snapshot {
     rules: ImmutableArray<RuleDto>;
+
+    isLoaded?: boolean;
 }
 
 @Injectable()
 export class RulesState extends State<Snapshot> {
     public rules =
-        this.changes.map(x => x.rules);
+        this.changes.map(x => x.rules)
+            .distinctUntilChanged();
+
+    public isLoaded =
+        this.changes.map(x => !!x.isLoaded)
+            .distinctUntilChanged();
 
     constructor(
         private readonly appsState: AppsState,
@@ -56,7 +63,7 @@ export class RulesState extends State<Snapshot> {
                 this.next(s => {
                     const rules = ImmutableArray.of(dtos);
 
-                    return { ...s, rules };
+                    return { ...s, rules, isLoaded: true };
                 });
             })
             .notify(this.dialogs);
@@ -105,7 +112,7 @@ export class RulesState extends State<Snapshot> {
     public enable(rule: RuleDto, now?: DateTime): Observable<any> {
         return this.rulesService.enableRule(this.appName, rule.id, rule.version)
             .do(dto => {
-                this.replaceRule(enable(rule, this.user, dto.version, now));
+                this.replaceRule(setEnabled(rule, true, this.user, dto.version, now));
             })
             .notify(this.dialogs);
     }
@@ -113,7 +120,7 @@ export class RulesState extends State<Snapshot> {
     public disable(rule: RuleDto, now?: DateTime): Observable<any> {
         return this.rulesService.disableRule(this.appName, rule.id, rule.version)
             .do(dto => {
-                this.replaceRule(disable(rule, this.user, dto.version, now));
+                this.replaceRule(setEnabled(rule, false, this.user, dto.version, now));
             })
             .notify(this.dialogs);
     }
@@ -159,25 +166,13 @@ const updateAction = (rule: RuleDto, action: any, user: string, version: Version
         action,
         action.actionType);
 
-const enable = (rule: RuleDto, user: string, version: Version, now?: DateTime) =>
+const setEnabled = (rule: RuleDto, isEnabled: boolean, user: string, version: Version, now?: DateTime) =>
     new RuleDto(
         rule.id,
         rule.createdBy, user,
         rule.created, now || DateTime.now(),
         version,
-        true,
-        rule.trigger,
-        rule.triggerType,
-        rule.action,
-        rule.actionType);
-
-const disable = (rule: RuleDto, user: string, version: Version, now?: DateTime) =>
-    new RuleDto(
-        rule.id,
-        rule.createdBy, user,
-        rule.created, now || DateTime.now(),
-        version,
-        false,
+        isEnabled,
         rule.trigger,
         rule.triggerType,
         rule.action,

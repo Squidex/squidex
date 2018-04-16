@@ -55,7 +55,7 @@ export class EditPatternForm extends Form<FormGroup> {
 interface Snapshot {
     patterns: ImmutableArray<AppPatternDto>;
 
-    isLoaded: boolean;
+    isLoaded?: boolean;
 
     version: Version;
 }
@@ -63,22 +63,28 @@ interface Snapshot {
 @Injectable()
 export class PatternsState extends State<Snapshot> {
     public patterns =
-        this.changes.map(x => x.patterns);
+        this.changes.map(x => x.patterns)
+            .distinctUntilChanged();
 
     public isLoaded =
-        this.changes.map(x => x.isLoaded);
+        this.changes.map(x => !!x.isLoaded)
+            .distinctUntilChanged();
 
     constructor(
         private readonly appPatternsService: AppPatternsService,
         private readonly appsState: AppsState,
         private readonly dialogs: DialogService
     ) {
-        super({ patterns: ImmutableArray.empty(), version: new Version(''), isLoaded: false });
+        super({ patterns: ImmutableArray.empty(), version: new Version('') });
     }
 
-    public load(): Observable<any> {
+    public load(notifyLoad = false): Observable<any> {
         return this.appPatternsService.getPatterns(this.appName)
             .do(dtos => {
+                if (notifyLoad) {
+                    this.dialogs.notifyInfo('Patterns reloaded.');
+                }
+
                 this.next(s => {
                     const patterns = ImmutableArray.of(dtos.patterns).sortByStringAsc(x => x.name);
 

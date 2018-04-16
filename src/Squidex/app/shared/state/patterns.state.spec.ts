@@ -6,7 +6,7 @@
  */
 
 import { Observable } from 'rxjs';
-import { IMock, Mock } from 'typemoq';
+import { IMock, It, Mock, Times } from 'typemoq';
 
 import {
     AppsState,
@@ -55,6 +55,14 @@ describe('PatternsState', () => {
     it('should load patterns', () => {
         expect(patternsState.snapshot.patterns.values).toEqual(oldPatterns);
         expect(patternsState.snapshot.version).toEqual(version);
+
+        dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
+    });
+
+    it('should show notification on load when flag is true', () => {
+        patternsState.load(true).subscribe();
+
+        dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
     });
 
     it('should add pattern to snapshot when created', () => {

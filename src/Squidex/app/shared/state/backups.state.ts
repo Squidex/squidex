@@ -22,15 +22,23 @@ import { BackupDto, BackupsService } from './../services/backups.service';
 
 interface Snapshot {
     backups: ImmutableArray<BackupDto>;
+
+    isLoaded?: boolean;
 }
 
 @Injectable()
 export class BackupsState extends State<Snapshot> {
     public backups =
-        this.changes.map(x => x.backups);
+        this.changes.map(x => x.backups)
+            .distinctUntilChanged();
 
     public maxBackupsReached =
-        this.changes.map(x => x.backups.length >= 10);
+        this.changes.map(x => x.backups.length >= 10)
+            .distinctUntilChanged();
+
+    public isLoaded =
+        this.changes.map(x => !!x.isLoaded)
+            .distinctUntilChanged();
 
     constructor(
         private readonly appsState: AppsState,
@@ -50,7 +58,7 @@ export class BackupsState extends State<Snapshot> {
                 this.next(s => {
                     const backups = ImmutableArray.of(dtos);
 
-                    return { ...s, backups };
+                    return { ...s, backups, isLoaded: true };
                 });
             })
             .catch(error => {

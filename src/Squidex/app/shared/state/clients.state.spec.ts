@@ -6,7 +6,7 @@
  */
 
 import { Observable } from 'rxjs';
-import { IMock, Mock } from 'typemoq';
+import { IMock, It, Mock, Times } from 'typemoq';
 
 import {
     AppsState,
@@ -54,8 +54,17 @@ describe('ClientsState', () => {
     });
 
     it('should load clients', () => {
-        expect(clientsState.snapshot.clients!.values).toEqual(oldClients);
+        expect(clientsState.snapshot.clients.values).toEqual(oldClients);
         expect(clientsState.snapshot.version).toEqual(version);
+        expect(clientsState.isLoaded).toBeTruthy();
+
+        dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
+    });
+
+    it('should show notification on load when flag is true', () => {
+        clientsState.load(true).subscribe();
+
+        dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
     });
 
     it('should add client to snapshot when created', () => {
@@ -68,7 +77,7 @@ describe('ClientsState', () => {
 
         clientsState.attach(request).subscribe();
 
-        expect(clientsState.snapshot.clients!.values).toEqual([...oldClients, newClient]);
+        expect(clientsState.snapshot.clients.values).toEqual([...oldClients, newClient]);
         expect(clientsState.snapshot.version).toEqual(newVersion);
     });
 
@@ -80,7 +89,7 @@ describe('ClientsState', () => {
 
         clientsState.update(oldClients[0], request).subscribe();
 
-        const client_1 = clientsState.snapshot.clients!.at(0);
+        const client_1 = clientsState.snapshot.clients.at(0);
 
         expect(client_1.name).toBe('NewName');
         expect(client_1.permission).toBe('NewPermission');
@@ -93,7 +102,7 @@ describe('ClientsState', () => {
 
         clientsState.revoke(oldClients[0]).subscribe();
 
-        expect(clientsState.snapshot.clients!.values).toEqual([oldClients[1]]);
+        expect(clientsState.snapshot.clients.values).toEqual([oldClients[1]]);
         expect(clientsState.snapshot.version).toEqual(newVersion);
     });
 });

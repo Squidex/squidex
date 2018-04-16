@@ -14,6 +14,7 @@ import {
     EditFieldForm,
     fadeAnimation,
     FieldDto,
+    ImmutableArray,
     ModalView,
     SchemaDetailsDto,
     SchemasState,
@@ -33,10 +34,10 @@ export class FieldComponent implements OnInit {
     public field: FieldDto;
 
     @Input()
-    public patterns: AppPatternDto;
+    public schema: SchemaDetailsDto;
 
     @Input()
-    public schema: SchemaDetailsDto;
+    public patterns: ImmutableArray<AppPatternDto>;
 
     public dropdown = new ModalView(false, true);
 
