@@ -80,4 +80,8 @@ export class RulesPageComponent implements OnInit {
 
         this.addRuleDialog.show();
     }
+
+    public trackByRule(index: number, rule: RuleDto) {
+        return rule.id;
+    }
 }

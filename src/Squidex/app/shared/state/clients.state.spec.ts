@@ -54,8 +54,7 @@ describe('ClientsState', () => {
     });
 
     it('should load clients', () => {
-        expect(clientsState.snapshot.clients.values).toEqual(oldClients);
-        expect(clientsState.snapshot.isLoaded).toBeTruthy();
+        expect(clientsState.snapshot.clients!.values).toEqual(oldClients);
         expect(clientsState.snapshot.version).toEqual(version);
     });
 
@@ -69,7 +68,7 @@ describe('ClientsState', () => {
 
         clientsState.attach(request).subscribe();
 
-        expect(clientsState.snapshot.clients.values).toEqual([...oldClients, newClient]);
+        expect(clientsState.snapshot.clients!.values).toEqual([...oldClients, newClient]);
         expect(clientsState.snapshot.version).toEqual(newVersion);
     });
 
@@ -81,7 +80,7 @@ describe('ClientsState', () => {
 
         clientsState.update(oldClients[0], request).subscribe();
 
-        const client_1 = clientsState.snapshot.clients.at(0);
+        const client_1 = clientsState.snapshot.clients!.at(0);
 
         expect(client_1.name).toBe('NewName');
         expect(client_1.permission).toBe('NewPermission');
@@ -94,7 +93,7 @@ describe('ClientsState', () => {
 
         clientsState.revoke(oldClients[0]).subscribe();
 
-        expect(clientsState.snapshot.clients.values).toEqual([oldClients[1]]);
+        expect(clientsState.snapshot.clients!.values).toEqual([oldClients[1]]);
         expect(clientsState.snapshot.version).toEqual(newVersion);
     });
 });

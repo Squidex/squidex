@@ -10,26 +10,26 @@
             <div class="table-items-row table-items-row-empty" *ngIf="clients.length === 0">
                 No client created yet.
             </div>
-    
+        
             <sqx-client *ngFor="let client of clients; trackBy: trackByClient" [client]="client"></sqx-client>
-        </ng-container>
 
-        <div class="table-items-footer" *ngIf="clientsState.isLoaded | async">
-            <form [formGroup]="addClientForm.form" (ngSubmit)="attachClient()">
-                <div class="row no-gutters">
-                    <div class="col">
-                        <sqx-control-errors for="name" [submitted]="addClientForm.submitted | async"></sqx-control-errors>
-                            
-                        <input type="text" class="form-control" formControlName="name" maxlength="40" placeholder="Enter client name" autocomplete="off" sqxLowerCaseInput />
+            <div class="table-items-footer">
+                <form [formGroup]="addClientForm.form" (ngSubmit)="attachClient()">
+                    <div class="row no-gutters">
+                        <div class="col">
+                            <sqx-control-errors for="name" [submitted]="addClientForm.submitted | async"></sqx-control-errors>
+                                
+                            <input type="text" class="form-control" formControlName="name" maxlength="40" placeholder="Enter client name" autocomplete="off" sqxLowerCaseInput />
+                        </div>
+                        <div class="col col-auto pl-1">
+                            <button type="submit" class="btn btn-success" [disabled]="addClientForm.hasNoName | async">Add Client</button>
+                        </div>
+                        <div class="col col-auto pl-1">
+                            <button type="reset" class="btn btn-secondary" (click)="cancelAttachClient()">Cancel</button>
+                        </div>
                     </div>
-                    <div class="col col-auto pl-1">
-                        <button type="submit" class="btn btn-success" [disabled]="addClientForm.hasNoName | async">Add Client</button>
-                    </div>
-                    <div class="col col-auto pl-1">
-                        <button type="reset" class="btn btn-secondary" (click)="cancelAttachClient()">Cancel</button>
-                    </div>
-                </div>
-            </form>
-        </div>
+                </form>
+            </div>
+        </ng-container>
     </ng-container>
 </sqx-panel>

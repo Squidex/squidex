@@ -5,18 +5,14 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Subscription } from 'rxjs';
 
 import {
     ApiUrlConfig,
-    AppPlansDto,
     AppsState,
-    AuthService,
-    ChangePlanDto,
-    DialogService,
-    PlansService
+    PlansState,
+    PlanDto
 } from '@app/shared';
 
 @Component({
@@ -24,75 +20,37 @@ import {
     styleUrls: ['./plans-page.component.scss'],
     templateUrl: './plans-page.component.html'
 })
-export class PlansPageComponent implements OnDestroy, OnInit {
-    private queryParamsSubscription: Subscription;
+export class PlansPageComponent implements OnInit {
     private overridePlanId: string;
 
     public portalUrl = this.apiUrl.buildUrl('/portal/');
 
-    public plans: AppPlansDto;
-    public planOwned = false;
-
-    public isDisabled = false;
-
     constructor(
         public readonly appsState: AppsState,
+        public readonly plansState: PlansState,
         private readonly apiUrl: ApiUrlConfig,
-        private readonly authState: AuthService,
-        private readonly dialogs: DialogService,
-        private readonly plansService: PlansService,
         private readonly route: ActivatedRoute
     ) {
     }
 
-    public ngOnDestroy() {
-        this.queryParamsSubscription.unsubscribe();
-    }
-
     public ngOnInit() {
-        this.queryParamsSubscription =
-            this.route.queryParams.subscribe(params => {
-                this.overridePlanId = params['planId'];
-            });
+        this.route.queryParams.subscribe(params => {
+            this.overridePlanId = params['planId'];
+        }).unsubscribe();
 
-        this.load();
+        this.plansState.load(false, this.overridePlanId).onErrorResumeNext().subscribe();
     }
 
-    public load(notifyLoad = false) {
-        this.plansService.getPlans(this.appsState.appName)
-            .subscribe(dto => {
-                if (this.overridePlanId) {
-                    this.plans = dto.changePlanId(this.overridePlanId);
-                } else {
-                    this.plans = dto;
-                }
-
-                this.planOwned = !dto.planOwner || (dto.planOwner === this.authState.user!.id);
-
-                if (notifyLoad) {
-                    this.dialogs.notifyInfo('Plans reloaded.');
-                }
-            }, error => {
-                this.dialogs.notifyError(error);
-            });
+    public reload() {
+        this.plansState.load(true, this.overridePlanId).onErrorResumeNext().subscribe();
     }
 
-    public changePlan(planId: string) {
-        this.isDisabled = true;
+    public change(planId: string) {
+        this.plansState.change(planId).onErrorResumeNext().subscribe();
+    }
 
-        this.plansService.putPlan(this.appsState.appName, new ChangePlanDto(planId), this.plans.version)
-            .do(() => {
-                this.isDisabled = false;
-            })
-            .subscribe(dto => {
-                if (dto.payload.redirectUri && dto.payload.redirectUri.length > 0) {
-                    window.location.href = dto.payload.redirectUri;
-                } else {
-                    this.plans = this.plans.changePlanId(planId, dto.version);
-                }
-            }, error => {
-                this.dialogs.notifyError(error);
-            });
+    public trackByPlan(index: number, plan: PlanDto) {
+        return plan.id;
     }
 }
 

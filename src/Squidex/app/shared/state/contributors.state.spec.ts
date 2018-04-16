@@ -59,8 +59,7 @@ describe('ContributorsState', () => {
     });
 
     it('should load contributors', () => {
-        expect(contributorsState.snapshot.contributors.values).toEqual(oldContributors.map(x => c(x)));
-        expect(contributorsState.snapshot.isLoaded).toBeTruthy();
+        expect(contributorsState.snapshot.contributors!.values).toEqual(oldContributors.map(x => c(x)));
         expect(contributorsState.snapshot.isMaxReached).toBeFalsy();
         expect(contributorsState.snapshot.maxContributors).toBe(3);
         expect(contributorsState.snapshot.version).toEqual(version);
@@ -76,8 +75,7 @@ describe('ContributorsState', () => {
 
         contributorsState.assign(request).subscribe();
 
-        expect(contributorsState.snapshot.contributors.values).toEqual([...oldContributors.map(x => c(x)), c(newContributor)]);
-        expect(contributorsState.snapshot.isLoaded).toBeTruthy();
+        expect(contributorsState.snapshot.contributors!.values).toEqual([...oldContributors.map(x => c(x)), c(newContributor)]);
         expect(contributorsState.snapshot.isMaxReached).toBeTruthy();
         expect(contributorsState.snapshot.maxContributors).toBe(3);
         expect(contributorsState.snapshot.version).toEqual(newVersion);
@@ -93,8 +91,7 @@ describe('ContributorsState', () => {
 
         contributorsState.assign(request).subscribe();
 
-        expect(contributorsState.snapshot.contributors.values).toEqual([c(oldContributors[0]), c(newContributor)]);
-        expect(contributorsState.snapshot.isLoaded).toBeTruthy();
+        expect(contributorsState.snapshot.contributors!.values).toEqual([c(oldContributors[0]), c(newContributor)]);
         expect(contributorsState.snapshot.isMaxReached).toBeFalsy();
         expect(contributorsState.snapshot.maxContributors).toBe(3);
         expect(contributorsState.snapshot.version).toEqual(newVersion);
@@ -106,7 +103,7 @@ describe('ContributorsState', () => {
 
         contributorsState.revoke(oldContributors[0]).subscribe();
 
-        expect(contributorsState.snapshot.contributors.values).toEqual([c(oldContributors[1])]);
+        expect(contributorsState.snapshot.contributors!.values).toEqual([c(oldContributors[1])]);
         expect(contributorsState.snapshot.version).toEqual(newVersion);
     });
 

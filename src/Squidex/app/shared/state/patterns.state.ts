@@ -89,7 +89,7 @@ export class PatternsState extends State<Snapshot> {
     }
 
     public create(request: EditAppPatternDto): Observable<any> {
-        return this.appPatternsService.postPattern(this.appName, request, this.snapshot.version)
+        return this.appPatternsService.postPattern(this.appName, request, this.version)
             .do(dto => {
                 this.next(s => {
                     const patterns = s.patterns.push(dto.payload).sortByStringAsc(x => x.name);
@@ -101,7 +101,7 @@ export class PatternsState extends State<Snapshot> {
     }
 
     public update(pattern: AppPatternDto, request: EditAppPatternDto): Observable<any> {
-        return this.appPatternsService.putPattern(this.appName, pattern.id, request, this.snapshot.version)
+        return this.appPatternsService.putPattern(this.appName, pattern.id, request, this.version)
             .do(dto => {
                 this.next(s => {
                     const patterns = s.patterns.replaceBy('id', update(pattern, request)).sortByStringAsc(x => x.name);
@@ -113,7 +113,7 @@ export class PatternsState extends State<Snapshot> {
     }
 
     public delete(pattern: AppPatternDto): Observable<any> {
-        return this.appPatternsService.deletePattern(this.appName, pattern.id, this.snapshot.version)
+        return this.appPatternsService.deletePattern(this.appName, pattern.id, this.version)
             .do(dto => {
                 this.next(s => {
                     const patterns = s.patterns.filter(c => c.id !== pattern.id);
@@ -126,6 +126,10 @@ export class PatternsState extends State<Snapshot> {
 
     private get appName() {
         return this.appsState.appName;
+    }
+
+    private get version() {
+        return this.snapshot.version;
     }
 }
 

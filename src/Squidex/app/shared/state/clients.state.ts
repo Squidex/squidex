@@ -58,11 +58,9 @@ export class AttachClientForm extends Form<FormGroup> {
 }
 
 interface Snapshot {
-    clients: ImmutableArray<AppClientDto>;
+    clients?: ImmutableArray<AppClientDto>;
 
-    isLoaded: boolean;
-
-    version: Version;
+    version?: Version;
 }
 
 @Injectable()
@@ -70,15 +68,12 @@ export class ClientsState extends State<Snapshot> {
     public clients =
         this.changes.map(x => x.clients);
 
-    public isLoaded =
-        this.changes.map(x => x.isLoaded);
-
     constructor(
         private readonly appClientsService: AppClientsService,
         private readonly appsState: AppsState,
         private readonly dialogs: DialogService
     ) {
-        super({ clients: ImmutableArray.empty(), version: new Version(''), isLoaded: false });
+        super({});
     }
 
     public load(): Observable<any> {
@@ -94,10 +89,10 @@ export class ClientsState extends State<Snapshot> {
     }
 
     public attach(request: CreateAppClientDto): Observable<any> {
-        return this.appClientsService.postClient(this.appName, request, this.snapshot.version)
+        return this.appClientsService.postClient(this.appName, request, this.version)
             .do(dto => {
                 this.next(s => {
-                    const clients = s.clients.push(dto.payload);
+                    const clients = s.clients!.push(dto.payload);
 
                     return { ...s, clients, version: dto.version };
                 });
@@ -106,10 +101,10 @@ export class ClientsState extends State<Snapshot> {
     }
 
     public revoke(client: AppClientDto): Observable<any> {
-        return this.appClientsService.deleteClient(this.appName, client.id, this.snapshot.version)
+        return this.appClientsService.deleteClient(this.appName, client.id, this.version)
             .do(dto => {
                 this.next(s => {
-                    const clients = s.clients.filter(c => c.id !== client.id);
+                    const clients = s.clients!.filter(c => c.id !== client.id);
 
                     return { ...s, clients, version: dto.version };
                 });
@@ -118,10 +113,10 @@ export class ClientsState extends State<Snapshot> {
     }
 
     public update(client: AppClientDto, request: UpdateAppClientDto): Observable<any> {
-        return this.appClientsService.putClient(this.appName, client.id, request, this.snapshot.version)
+        return this.appClientsService.putClient(this.appName, client.id, request, this.version)
             .do(dto => {
                 this.next(s => {
-                    const clients = s.clients.replaceBy('id', update(client, request));
+                    const clients = s.clients!.replaceBy('id', update(client, request));
 
                     return { ...s, clients, version: dto.version };
                 });
@@ -131,6 +126,10 @@ export class ClientsState extends State<Snapshot> {
 
     private get appName() {
         return this.appsState.appName;
+    }
+
+    private get version() {
+        return this.snapshot.version!;
     }
 }
 

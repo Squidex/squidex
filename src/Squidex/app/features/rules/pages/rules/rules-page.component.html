@@ -30,7 +30,7 @@
 
             <table class="table table-items table-fixed" *ngIf="rules.length > 0">
                 <tbody>
-                    <ng-template ngFor let-rule [ngForOf]="rules">
+                    <ng-template ngFor let-rule [ngForOf]="rules" [ngForTrackBy]="trackByRule">
                         <tr>
                             <td class="cell-separator">
                                 <h3>If</h3>

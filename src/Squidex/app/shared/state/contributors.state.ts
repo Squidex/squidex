@@ -45,23 +45,19 @@ interface SnapshotContributor {
 }
 
 interface Snapshot {
-    contributors: ImmutableArray<SnapshotContributor>;
+    contributors?: ImmutableArray<SnapshotContributor>;
 
-    isLoaded: boolean;
-    isMaxReached: boolean;
+    isMaxReached?: boolean;
 
     maxContributors: number;
 
-    version: Version;
+    version?: Version;
 }
 
 @Injectable()
 export class ContributorsState extends State<Snapshot> {
     public contributors =
         this.changes.map(x => x.contributors);
-
-    public isLoaded =
-        this.changes.map(x => x.isLoaded);
 
     public isMaxReached =
         this.changes.map(x => x.isMaxReached);
@@ -75,7 +71,7 @@ export class ContributorsState extends State<Snapshot> {
         private readonly authState: AuthService,
         private readonly dialogs: DialogService
     ) {
-        super({ contributors: ImmutableArray.empty(), version: new Version(''), isLoaded: false, isMaxReached: true, maxContributors: -1 });
+        super({ maxContributors: -1 });
     }
 
     public load(): Observable<any> {
@@ -89,9 +85,9 @@ export class ContributorsState extends State<Snapshot> {
     }
 
     public revoke(contributor: AppContributorDto): Observable<any> {
-        return this.appContributorsService.deleteContributor(this.appName, contributor.contributorId, this.snapshot.version)
+        return this.appContributorsService.deleteContributor(this.appName, contributor.contributorId, this.version)
             .do(dto => {
-                const contributors = this.snapshot.contributors.filter(x => x.contributor.contributorId !== contributor.contributorId);
+                const contributors = this.snapshot.contributors!.filter(x => x.contributor.contributorId !== contributor.contributorId);
 
                 this.replaceContributors(contributors, dto.version);
             })
@@ -99,11 +95,11 @@ export class ContributorsState extends State<Snapshot> {
     }
 
     public assign(request: AppContributorDto): Observable<any> {
-        return this.appContributorsService.postContributor(this.appName, request, this.snapshot.version)
+        return this.appContributorsService.postContributor(this.appName, request, this.version)
             .do(dto => {
                 const contributor = this.createContributor(new AppContributorDto(dto.payload.contributorId, request.permission));
 
-                let contributors = this.snapshot.contributors;
+                let contributors = this.snapshot.contributors!;
 
                 if (contributors.find(x => x.contributor.contributorId === dto.payload.contributorId)) {
                     contributors = contributors.map(c => c.contributor.contributorId === dto.payload.contributorId ? contributor : c);
@@ -129,6 +125,10 @@ export class ContributorsState extends State<Snapshot> {
 
     private get appName() {
         return this.appsState.appName;
+    }
+
+    private get version() {
+        return this.snapshot.version!;
     }
 
     private createContributor(contributor: AppContributorDto): SnapshotContributor {
