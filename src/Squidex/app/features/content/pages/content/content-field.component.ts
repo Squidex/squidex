@@ -11,7 +11,8 @@ import { AbstractControl, FormGroup } from '@angular/forms';
 import {
     AppLanguageDto,
     FieldDto,
-    fieldInvariant
+    fieldInvariant,
+    ImmutableArray
 } from '@app/shared';
 
 @Component({
@@ -30,7 +31,7 @@ export class ContentFieldComponent implements OnInit {
     public language: AppLanguageDto;
 
     @Input()
-    public languages: AppLanguageDto[];
+    public languages: ImmutableArray<AppLanguageDto>;
 
     @Input()
     public contentFormSubmitted: boolean;

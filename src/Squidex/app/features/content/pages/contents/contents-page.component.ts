@@ -9,13 +9,13 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
 
 import {
-    allData,
     AppContext,
     AppLanguageDto,
     ContentDto,
     ContentsService,
     DateTime,
     ImmutableArray,
+    LanguagesState,
     ModalView,
     Pager,
     SchemaDetailsDto,
@@ -33,6 +33,7 @@ import {
 })
 export class ContentsPageComponent implements OnDestroy, OnInit {
     private selectedSchemaSubscription: Subscription;
+    private languagesSubscription: Subscription;
 
     public schema: SchemaDetailsDto;
 
@@ -54,20 +55,22 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
     public canUnpublish = false;
     public canPublish = false;
 
-    public languages: AppLanguageDto[] = [];
-    public languageSelected: AppLanguageDto;
+    public language: AppLanguageDto;
+    public languages: ImmutableArray<AppLanguageDto>;
     public languageParameter: string;
 
     public isAllSelected = false;
     public isArchive = false;
 
     constructor(public readonly ctx: AppContext,
+        private readonly languagesState: LanguagesState,
         private readonly contentsService: ContentsService,
         private readonly schemasState: SchemasState
     ) {
     }
 
     public ngOnDestroy() {
+        this.languagesSubscription.unsubscribe();
         this.selectedSchemaSubscription.unsubscribe();
     }
 
@@ -81,10 +84,12 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
                     this.load();
                 });
 
-        const routeData = allData(this.ctx.route);
-
-        this.languages = routeData.appLanguages;
-        this.languageSelected = this.languages[0];
+        this.languagesSubscription =
+            this.languagesState.languages
+                .subscribe(languages => {
+                    this.languages = languages.map(x => x.language);
+                    this.language = this.languages.at(0);
+                });
     }
 
     public publishContent(content: ContentDto) {
@@ -301,7 +306,7 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
     }
 
     public selectLanguage(language: AppLanguageDto) {
-        this.languageSelected = language;
+        this.language = language;
     }
 
     public trackByContent(content: ContentDto): string {

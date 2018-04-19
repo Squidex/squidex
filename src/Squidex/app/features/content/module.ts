@@ -11,7 +11,7 @@ import { DndModule } from 'ng2-dnd';
 
 import {
     CanDeactivateGuard,
-    ResolveAppLanguagesGuard,
+    LoadLanguagesGuard,
     ResolveContentGuard,
     SchemaMustExistPublishedGuard,
     SqxFrameworkModule,
@@ -35,6 +35,7 @@ const routes: Routes = [
     {
         path: '',
         component: SchemasPageComponent,
+        canActivate: [LoadLanguagesGuard],
         children: [
             {
                 path: ''
@@ -42,9 +43,6 @@ const routes: Routes = [
             {
                 path: ':schemaName',
                 canActivate: [SchemaMustExistPublishedGuard],
-                resolve: {
-                    appLanguages: ResolveAppLanguagesGuard
-                },
                 children: [
                     {
                         path: '',

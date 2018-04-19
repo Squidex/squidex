@@ -20,6 +20,8 @@ import {
     ContentDto,
     ContentsService,
     fieldInvariant,
+    ImmutableArray,
+    LanguagesState,
     SchemaDetailsDto,
     SchemasState,
     Version
@@ -35,6 +37,7 @@ import {
 })
 export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, OnInit {
     private contentVersionSelectedSubscription: Subscription;
+    private languagesSubscription: Subscription;
     private selectedSchemaSubscription: Subscription;
 
     public schema: SchemaDetailsDto;
@@ -46,9 +49,11 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
 
     public isNewMode = true;
 
-    public languages: AppLanguageDto[] = [];
+    public languages: ImmutableArray<AppLanguageDto>;
 
-    constructor(public readonly ctx: AppContext,
+    constructor(
+        public readonly ctx: AppContext,
+        public readonly languagesState: LanguagesState,
         private readonly contentsService: ContentsService,
         private readonly router: Router,
         private readonly schemasState: SchemasState
@@ -57,6 +62,7 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
 
     public ngOnDestroy() {
         this.contentVersionSelectedSubscription.unsubscribe();
+        this.languagesSubscription.unsubscribe();
         this.selectedSchemaSubscription.unsubscribe();
     }
 
@@ -65,6 +71,12 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
             this.ctx.bus.of(ContentVersionSelected)
                 .subscribe(message => {
                     this.loadVersion(message.version);
+                });
+
+        this.languagesSubscription =
+            this.languagesState.languages
+                .subscribe(languages => {
+                    this.languages = languages.map(x => x.language);
                 });
 
         this.selectedSchemaSubscription =
@@ -206,7 +218,7 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
             const fieldForm = new FormGroup({});
 
             if (field.isLocalizable) {
-                for (let language of this.languages) {
+                for (let language of this.languages.values) {
                     fieldForm.setControl(language.iso2Code, new FormControl(undefined, field.createValidators(language.isOptional)));
                 }
             } else {
@@ -233,7 +245,7 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
                 const fieldForm = <FormGroup>this.contentForm.controls[field.name];
 
                 if (field.isLocalizable) {
-                    for (let language of this.languages) {
+                    for (let language of this.languages.values) {
                         fieldForm.controls[language.iso2Code].setValue(fieldValue[language.iso2Code]);
                     }
                 } else {
@@ -251,7 +263,7 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
                     const fieldForm = <FormGroup>this.contentForm.controls[field.name];
 
                     if (field.isLocalizable) {
-                        for (let language of this.languages) {
+                        for (let language of this.languages.values) {
                             fieldForm.controls[language.iso2Code].setValue(defaultValue);
                         }
                     } else {

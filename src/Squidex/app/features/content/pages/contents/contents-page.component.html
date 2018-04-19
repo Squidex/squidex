@@ -87,7 +87,7 @@
                     <tbody>
                         <ng-template ngFor let-content [ngForOf]="contentItems" [ngForTrackBy]="trackByContent">
                             <tr [sqxContent]="content" [routerLink]="[content.id]" routerLinkActive="active"
-                                [language]="languageSelected"
+                                [language]="language"
                                 [schema]="schema"
                                 [selected]="isItemSelected(content)"
                                 (selectedChange)="selectItem(content, $event)"
