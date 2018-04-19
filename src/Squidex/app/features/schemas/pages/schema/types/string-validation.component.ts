@@ -36,6 +36,7 @@ export class StringValidationComponent implements OnDestroy, OnInit {
     public showDefaultValue: Observable<boolean>;
     public showPatternMessage: boolean;
     public showPatternSuggestions: Observable<boolean>;
+
     public patternName: string;
     public patternsModal = new ModalView(false, false);
 
