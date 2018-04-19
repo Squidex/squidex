@@ -15,7 +15,7 @@ import {
     AssignContributorForm,
     AutocompleteSource,
     ContributorsState,
-    PublicUserDto,
+    UserDto,
     UsersService
 } from '@app/shared';
 
@@ -85,7 +85,7 @@ export class ContributorsPageComponent implements OnInit {
         if (value) {
             let user = value.user;
 
-            if (user instanceof PublicUserDto) {
+            if (user instanceof UserDto) {
                 user = user.id;
             }
 

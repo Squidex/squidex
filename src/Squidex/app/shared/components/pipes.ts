@@ -11,7 +11,7 @@ import { Observable, Subscription } from 'rxjs';
 import {
     ApiUrlConfig,
     MathHelper,
-    PublicUserDto,
+    UserDto,
     UsersProviderService
 } from '@app/shared/internal';
 
@@ -101,7 +101,7 @@ export class UserDtoPicture implements PipeTransform {
     ) {
     }
 
-    public transform(user: PublicUserDto): string | null {
+    public transform(user: UserDto): string | null {
         return this.apiUrl.buildUrl(`api/users/${user.id}/picture`);
     }
 }

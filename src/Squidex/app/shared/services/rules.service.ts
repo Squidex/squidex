@@ -65,58 +65,6 @@ export class RuleDto {
         public readonly actionType: string
     ) {
     }
-
-    public updateTrigger(trigger: any, user: string, version: Version, now?: DateTime): RuleDto {
-        return new RuleDto(
-            this.id,
-            this.createdBy, user,
-            this.created, now || DateTime.now(),
-            version,
-            this.isEnabled,
-            trigger,
-            trigger.triggerType,
-            this.action,
-            this.action.actionType);
-    }
-
-    public updateAction(action: any, user: string, version: Version, now?: DateTime): RuleDto {
-        return new RuleDto(
-            this.id,
-            this.createdBy, user,
-            this.created, now || DateTime.now(),
-            version,
-            this.isEnabled,
-            this.trigger,
-            this.trigger.triggerType,
-            action,
-            action.actionType);
-    }
-
-    public enable(user: string, version: Version, now?: DateTime): RuleDto {
-        return new RuleDto(
-            this.id,
-            this.createdBy, user,
-            this.created, now || DateTime.now(),
-            version,
-            true,
-            this.trigger,
-            this.triggerType,
-            this.action,
-            this.actionType);
-    }
-
-    public disable(user: string, version: Version, now?: DateTime): RuleDto {
-        return new RuleDto(
-            this.id,
-            this.createdBy, user,
-            this.created, now || DateTime.now(),
-            version,
-            false,
-            this.trigger,
-            this.triggerType,
-            this.action,
-            this.actionType);
-    }
 }
 
 export class RuleEventDto {
