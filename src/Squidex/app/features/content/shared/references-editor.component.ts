@@ -44,6 +44,9 @@ export class ReferencesEditorComponent implements ControlValueAccessor, OnInit {
     @Input()
     public language: AppLanguageDto;
 
+    @Input()
+    public languages: AppLanguageDto[];
+
     public isModalVisibible = false;
 
     public schema: SchemaDetailsDto;

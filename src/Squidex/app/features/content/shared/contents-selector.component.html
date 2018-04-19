@@ -10,6 +10,10 @@
             </button>
             
             <sqx-search-form (queryChanged)="search($event)" [canArchive]="false"></sqx-search-form>
+
+            <ng-container *ngIf="languages.length > 1">
+                <sqx-language-selector class="languages-buttons" (selectedLanguageChanged)="selectLanguage($event)" [languages]="languages"></sqx-language-selector>
+            </ng-container>
         </div>
     </ng-container>
 
@@ -43,7 +47,7 @@
                             <tr [sqxContent]="content"
                                 [selected]="isItemSelected(content)"
                                 (selectedChange)="onContentSelected(content)"
-                                [language]="languageSelected"
+                                [language]="language"
                                 [schema]="schema" 
                                 isReadOnly="true"></tr>
                             <tr class="spacer"></tr>

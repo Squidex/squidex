@@ -26,7 +26,10 @@ import {
 })
 export class ContentsSelectorComponent implements OnInit {
     @Input()
-    public language: LanguageDto[];
+    public language: LanguageDto;
+
+    @Input()
+    public languages: LanguageDto[];
 
     @Input()
     public schema: SchemaDetailsDto;
@@ -100,6 +103,10 @@ export class ContentsSelectorComponent implements OnInit {
 
     public isItemSelected(content: ContentDto) {
         return this.selectedItems[content.id];
+    }
+
+    public selectLanguage(language: LanguageDto) {
+        this.language = language;
     }
 
     public complete() {

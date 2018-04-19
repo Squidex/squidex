@@ -25,7 +25,10 @@
 </div>
 
 <ng-container *sqxModalView="isModalVisibible;onRoot:true;closeAuto:false">
-    <sqx-contents-selector [language]="language" [schema]="schema"
+    <sqx-contents-selector 
+        [language]="language"
+        [languages]="languages"
+        [schema]="schema"
         (selected)="onContentsSelected($event)">
     </sqx-contents-selector>
 </ng-container>

@@ -27,31 +27,33 @@ export class ContentFieldComponent implements OnInit {
     public fieldForm: FormGroup;
 
     @Input()
+    public language: AppLanguageDto;
+
+    @Input()
     public languages: AppLanguageDto[];
 
     @Input()
     public contentFormSubmitted: boolean;
 
     public selectedFormControl: AbstractControl;
-    public selectedLanguage: AppLanguageDto;
 
     public ngOnInit() {
-        const masterLanguage = this.languages[0];
+        if (!this.language) {
+            this.language = this.languages[0];
+        }
 
         if (this.field.isLocalizable) {
-            this.selectedFormControl = this.fieldForm.controls[masterLanguage.iso2Code];
+            this.selectedFormControl = this.fieldForm.controls[this.language.iso2Code];
         } else {
             this.selectedFormControl = this.fieldForm.controls[fieldInvariant];
         }
-
-        this.selectedLanguage = masterLanguage;
     }
 
     public selectLanguage(language: AppLanguageDto) {
         this.selectedFormControl['_clearChangeFns']();
-
         this.selectedFormControl = this.fieldForm.controls[language.iso2Code];
-        this.selectedLanguage = language;
+
+        this.language = language;
     }
 }
 
