@@ -21,7 +21,7 @@
         <sqx-search-form (queryChanged)="search($event)" [query]="contentsQuery" enableShortcut="true"></sqx-search-form>
 
         <ng-container *ngIf="languages.length > 1">
-            <sqx-language-selector class="languages-buttons" (selectedLanguageChanged)="selectLanguage($event)" [languages]="languages"></sqx-language-selector>
+            <sqx-language-selector class="languages-buttons" (selectedLanguageChanged)="selectLanguage($event)" [languages]="languages.values"></sqx-language-selector>
         </ng-container>
 
         <button class="btn btn-success" #newButton routerLink="new" title="New Content (CTRL + SHIFT + G)">

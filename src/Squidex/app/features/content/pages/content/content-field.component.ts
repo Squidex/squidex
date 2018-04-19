@@ -40,7 +40,7 @@ export class ContentFieldComponent implements OnInit {
 
     public ngOnInit() {
         if (!this.language) {
-            this.language = this.languages[0];
+            this.language = this.languages.at(0);
         }
 
         if (this.field.isLocalizable) {

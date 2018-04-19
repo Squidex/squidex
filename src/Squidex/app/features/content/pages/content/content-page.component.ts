@@ -13,7 +13,6 @@ import { Observable, Subscription } from 'rxjs';
 import { ContentVersionSelected } from './../messages';
 
 import {
-    allData,
     AppContext,
     AppLanguageDto,
     CanComponentDeactivate,
@@ -82,9 +81,6 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
         this.selectedSchemaSubscription =
             this.schemasState.selectedSchema
                 .subscribe(schema => {
-                    const routeData = allData(this.ctx.route);
-
-                    this.setupLanguages(routeData);
                     this.setupContentForm(schema!);
                 });
 
@@ -203,10 +199,6 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
                 }
             }
         }
-    }
-
-    private setupLanguages(routeData: { [name: string]: any; }) {
-        this.languages = routeData.appLanguages;
     }
 
     private setupContentForm(schema: SchemaDetailsDto) {

@@ -7,7 +7,7 @@
 
     <ng-container *ngIf="field.isLocalizable && languages.length > 1">
         <div class="languages-buttons" #buttonLanguages>
-            <sqx-language-selector size="sm" (selectedLanguageChanged)="selectLanguage($event)" [languages]="languages"></sqx-language-selector>
+            <sqx-language-selector size="sm" (selectedLanguageChanged)="selectLanguage($event)" [languages]="languages.values"></sqx-language-selector>
         </div>
 
         <sqx-onboarding-tooltip id="languages" [for]="buttonLanguages" position="topRight" after="120000">
