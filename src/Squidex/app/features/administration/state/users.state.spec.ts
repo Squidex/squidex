@@ -51,7 +51,10 @@ describe('UsersState', () => {
     });
 
     it('should load users', () => {
-        expect(usersState.snapshot.users.values).toEqual(oldUsers.map(x => u(x)));
+        expect(usersState.snapshot.users.values).toEqual([
+            { isCurrentUser: false, user: oldUsers[0] },
+            { isCurrentUser: true,  user: oldUsers[1] }
+        ]);
         expect(usersState.snapshot.usersPager.numberOfItems).toEqual(200);
         expect(usersState.snapshot.isLoaded).toBeTruthy();
 
@@ -77,7 +80,7 @@ describe('UsersState', () => {
 
         usersState.load().subscribe();
 
-        expect(usersState.snapshot.selectedUser).toEqual(u(newUsers[0]));
+        expect(usersState.snapshot.selectedUser).toEqual({ isCurrentUser: false, user: newUsers[0] });
     });
 
     it('should return user on select and not load when already loaded', () => {
@@ -88,7 +91,7 @@ describe('UsersState', () => {
         });
 
         expect(selectedUser!).toEqual(oldUsers[0]);
-        expect(usersState.snapshot.selectedUser).toEqual(u(oldUsers[0]));
+        expect(usersState.snapshot.selectedUser).toEqual({ isCurrentUser: false, user: oldUsers[0] });
 
         usersService.verify(x => x.getUser(It.isAnyString()), Times.never());
     });
@@ -104,7 +107,7 @@ describe('UsersState', () => {
         });
 
         expect(selectedUser!).toEqual(newUser);
-        expect(usersState.snapshot.selectedUser).toEqual(u(newUser));
+        expect(usersState.snapshot.selectedUser).toEqual({ isCurrentUser: false, user: newUser });
 
         usersService.verify(x => x.getUser('id3'), Times.once());
     });
@@ -186,7 +189,11 @@ describe('UsersState', () => {
 
         usersState.create(request).subscribe();
 
-        expect(usersState.snapshot.users.values).toEqual([u(newUser), ...oldUsers.map(x => u(x))]);
+        expect(usersState.snapshot.users.values).toEqual([
+            { isCurrentUser: false, user: newUser },
+            { isCurrentUser: false, user: oldUsers[0] },
+            { isCurrentUser: true,  user: oldUsers[1] }
+        ]);
         expect(usersState.snapshot.usersPager.numberOfItems).toBe(201);
     });
 
@@ -211,8 +218,4 @@ describe('UsersState', () => {
 
         usersService.verify(x => x.getUsers(10, 0, 'my-query'), Times.once());
     });
-
-    function u(user: UserDto) {
-        return { user, isCurrentUser: user.id === 'id2' };
-    }
 });

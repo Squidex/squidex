@@ -134,7 +134,7 @@ export class AssetComponent implements OnInit {
                 }, error => {
                     this.dialogs.notifyError(error);
 
-                    this.renameForm.submitFailed();
+                    this.renameForm.submitFailed(error);
                 });
         }
     }

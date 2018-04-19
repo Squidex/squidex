@@ -209,19 +209,28 @@ export class UsersState extends State<Snapshot> {
         return this.load();
     }
 
-    private replaceUser(userDto: UserDto) {
+    private replaceUser(user: UserDto) {
         return this.next(s => {
-            const user = this.createUser(userDto);
-            const users = s.users.map(u => u.user.id === userDto.id ? user : u);
+            const users = s.users.map(u => u.user.id === user.id ? this.createUser(user, u) : u);
 
-            const selectedUser = s.selectedUser && s.selectedUser.user.id === userDto.id ? user : s.selectedUser;
+            const selectedUser = s.selectedUser && s.selectedUser.user.id === user.id ? users.find(x => x.user.id === user.id) : s.selectedUser;
 
             return { ...s, users, selectedUser };
         });
     }
 
-    private createUser(user: UserDto): SnapshotUser {
-        return user ? { user, isCurrentUser: user.id === this.authState.user!.id } : null!;
+    private get userId() {
+        return this.authState.user!.id;
+    }
+
+    private createUser(user: UserDto, current?: SnapshotUser): SnapshotUser {
+        if (!user) {
+            return null!;
+        } else if (current && current.user === user) {
+            return current;
+        } else {
+            return { user, isCurrentUser: user.id === this.userId };
+        }
     }
 }
 

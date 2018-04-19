@@ -43,6 +43,7 @@ export * from './state/assets.state';
 export * from './state/backups.state';
 export * from './state/clients.state';
 export * from './state/contributors.state';
+export * from './state/languages.state';
 export * from './state/patterns.state';
 export * from './state/plans.state';
 export * from './state/rules.state';

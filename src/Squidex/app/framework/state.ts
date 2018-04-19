@@ -33,7 +33,7 @@ export class Form<T extends AbstractControl> {
     public load(value: any) {
         this.state.next({ submitted: false, error: null });
 
-        this.form.reset(value);
+        this.form.reset(value, { emitEvent: true });
     }
 
     public submit(): any | null {

@@ -52,14 +52,14 @@ export class PatternComponent implements OnInit {
                     .subscribe(() => {
                         this.editForm.submitCompleted();
                     }, error => {
-                        this.editForm.submitFailed();
+                        this.editForm.submitFailed(error);
                     });
             } else {
                 this.patternsState.create(value)
                     .subscribe(() => {
                         this.editForm.submitCompleted({});
                     }, error => {
-                        this.editForm.submitFailed();
+                        this.editForm.submitFailed(error);
                     });
             }
         }

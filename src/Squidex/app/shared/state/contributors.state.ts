@@ -109,19 +109,22 @@ export class ContributorsState extends State<Snapshot> {
     public assign(request: AppContributorDto): Observable<any> {
         return this.appContributorsService.postContributor(this.appName, request, this.version)
             .do(dto => {
-                const contributor = this.createContributor(new AppContributorDto(dto.payload.contributorId, request.permission));
-
-                let contributors = this.snapshot.contributors;
-
-                if (contributors.find(x => x.contributor.contributorId === dto.payload.contributorId)) {
-                    contributors = contributors.map(c => c.contributor.contributorId === dto.payload.contributorId ? contributor : c);
-                } else {
-                    contributors = contributors.push(contributor);
-                }
+                const contributors = this.updateContributors(dto.payload.contributorId, request.permission, dto.version);
 
                 this.replaceContributors(contributors, dto.version);
             })
             .notify(this.dialogs);
+    }
+
+    private updateContributors(id: string, permission: string, version: Version) {
+        const contributor = new AppContributorDto(id, permission);
+        const contributors = this.snapshot.contributors;
+
+        if (contributors.find(x => x.contributor.contributorId === id)) {
+            return contributors.map(x => x.contributor.contributorId === id ? this.createContributor(contributor, x) : x);
+        } else {
+            return contributors.push(this.createContributor(contributor));
+        }
     }
 
     private replaceContributors(contributors: ImmutableArray<SnapshotContributor>, version: Version, maxContributors?: number) {
@@ -139,11 +142,21 @@ export class ContributorsState extends State<Snapshot> {
         return this.appsState.appName;
     }
 
+    private get userId() {
+        return this.authState.user!.id;
+    }
+
     private get version() {
         return this.snapshot.version;
     }
 
-    private createContributor(contributor: AppContributorDto): SnapshotContributor {
-        return { contributor, isCurrentUser: contributor.contributorId === this.authState.user!.id };
+    private createContributor(contributor: AppContributorDto, current?: SnapshotContributor): SnapshotContributor {
+        if (!contributor) {
+            return null!;
+        } else if (current && current.contributor === contributor) {
+            return current;
+        } else {
+            return { contributor, isCurrentUser: contributor.contributorId === this.userId };
+        }
     }
 }
