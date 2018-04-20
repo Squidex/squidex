@@ -75,19 +75,19 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
                 });
 
         this.selectedSchemaSubscription =
-            this.schemasState.selectedSchema.filter(s => !!s)
+            this.schemasState.selectedSchema.filter(s => !!s).map(s => s!)
                 .subscribe(schema => {
-                    this.schema = schema!;
+                    this.schema = schema;
 
                     this.contentForm = new EditContentForm(this.schema, this.languages);
                 });
 
         this.contentSubscription =
-            this.contentsState.selectedContent.filter(c => !!c)
+            this.contentsState.selectedContent.filter(c => !!c).map(c => c!)
                 .subscribe(content => {
-                    this.content = content!;
+                    this.content = content;
 
-                    this.loadContent(content!.data);
+                    this.loadContent(content.data);
                 });
 
         this.contentVersionSelectedSubscription =
@@ -114,20 +114,24 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
     }
 
     private saveContent(publish: boolean) {
+        if (this.content && this.content.status === 'Archived') {
+            return;
+        }
+
         const value = this.contentForm.submit();
 
         if (value) {
-            if (!this.content) {
-                this.contentsState.create(value, publish)
+            if (this.content) {
+                this.contentsState.update(this.content, value)
                     .subscribe(dto => {
-                        this.back();
+                        this.contentForm.submitCompleted();
                     }, error => {
                         this.contentForm.submitFailed(error);
                     });
             } else {
                 this.contentsState.create(value, publish)
                     .subscribe(dto => {
-                        this.contentForm.submitCompleted();
+                        this.back();
                     }, error => {
                         this.contentForm.submitFailed(error);
                     });
@@ -142,7 +146,7 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
     }
 
     private loadContent(data: any) {
-        this.contentForm.load(data);
+        this.contentForm.loadData(data, this.content && this.content.status === 'Archived');
     }
 
     private loadVersion(version: Version) {
@@ -154,8 +158,6 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
                     } else {
                         this.contentVersion = null;
                     }
-
-                    this.dialogs.notifyInfo('Content version loaded successfully.');
 
                     this.loadContent(dto);
                 });

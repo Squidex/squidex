@@ -72,6 +72,16 @@ export class EditContentForm extends Form<FormGroup> {
         this.enableContentForm();
     }
 
+    public loadData(value: any, isArchive: boolean) {
+        super.load(value);
+
+        if (isArchive) {
+            this.form.disable();
+        } else {
+            this.enableContentForm();
+        }
+    }
+
     private enableContentForm() {
         if (this.schema.fields.length === 0) {
             this.form.enable();
@@ -277,7 +287,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
             .do(dto => {
                 this.dialogs.notifyInfo('Contents updated successfully.');
 
-                this.replaceContent(updateData(content, request, this.user, dto.version, now));
+                this.replaceContent(updateData(content, dto.payload, this.user, dto.version, now));
             })
             .notify(this.dialogs);
     }
@@ -287,7 +297,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
             .do(dto => {
                 this.dialogs.notifyInfo('Contents updated successfully.');
 
-                this.replaceContent(updateData(content, request, this.user, dto.version, now));
+                this.replaceContent(updateData(content, dto.payload, this.user, dto.version, now));
             })
             .notify(this.dialogs);
     }

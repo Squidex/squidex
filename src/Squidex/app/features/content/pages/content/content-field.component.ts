@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { AbstractControl, FormGroup } from '@angular/forms';
 
 import {
@@ -18,8 +18,7 @@ import {
 @Component({
     selector: 'sqx-content-field',
     styleUrls: ['./content-field.component.scss'],
-    templateUrl: './content-field.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    templateUrl: './content-field.component.html'
 })
 export class ContentFieldComponent implements OnChanges {
     @Input()
@@ -42,12 +41,15 @@ export class ContentFieldComponent implements OnChanges {
 
     public selectedFormControl: AbstractControl;
 
-    public ngOnChanges() {
+    public ngOnChanges(changes: SimpleChanges) {
         if (this.field.isLocalizable) {
             this.selectedFormControl = this.fieldForm.controls[this.language.iso2Code];
-            this.selectedFormControl['_clearChangeFns']();
         } else {
             this.selectedFormControl = this.fieldForm.controls[fieldInvariant];
+        }
+
+        if (changes['language']) {
+            this.selectedFormControl['_clearChangeFns']();
         }
     }
 }

@@ -68,9 +68,9 @@ export class SchemaPageComponent implements OnDestroy, OnInit {
         this.patternsState.load().onErrorResumeNext().subscribe();
 
         this.selectedSchemaSubscription =
-            this.schemasState.selectedSchema
+            this.schemasState.selectedSchema.filter(s => !!s).map(s => s!)
                 .subscribe(schema => {
-                    this.schema = schema!;
+                    this.schema = schema;
 
                     this.export();
                 });

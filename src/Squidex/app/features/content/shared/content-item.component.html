@@ -81,7 +81,7 @@
     </button>
 </td>
 <td class="cell-actions" *ngIf="patchForm.form.dirty" (click)="shouldStop($event)">
-    <button type="button" class="btn btn-link btn-secondary btn-cancel" (click)="save(); $event.stopPropagation()">
+    <button type="button" class="btn btn-link btn-secondary btn-cancel" (click)="cancel(); $event.stopPropagation()">
         <i class="icon-close"></i>
     </button>
 </td>

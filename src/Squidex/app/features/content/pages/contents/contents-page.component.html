@@ -144,7 +144,7 @@
 
         <ng-container footer>
             <button type="button" class="float-left btn btn-secondary" (click)="cancelStatusChange()">Cancel</button>
-            <button type="button" class="float-right btn btn-primary" autofocus [disabled]="dueTimeMode === 'Scheduled' && !dueTime" (click)="confirmStatusChange()">Confirm</button>
+            <button type="button" class="float-right btn btn-primary" [disabled]="dueTimeMode === 'Scheduled' && !dueTime" (click)="confirmStatusChange()" sqxFocusOnInit>Confirm</button>
         </ng-container>
     </sqx-modal-dialog>
 </ng-container>

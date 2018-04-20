@@ -8,7 +8,11 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
-import { AppPatternDto, FieldDto } from '@app/shared';
+import {
+    AppPatternDto,
+    FieldDto,
+    ImmutableArray
+} from '@app/shared';
 
 @Component({
     selector: 'sqx-field-form-validation',
@@ -24,5 +28,5 @@ export class FieldFormValidationComponent {
     public field: FieldDto;
 
     @Input()
-    public patterns: AppPatternDto[];
+    public patterns: ImmutableArray<AppPatternDto>;
 }

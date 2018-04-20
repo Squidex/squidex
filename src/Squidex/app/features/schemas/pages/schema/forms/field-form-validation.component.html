@@ -3,7 +3,7 @@
         <sqx-number-validation [editForm]="editForm" [properties]="field.properties"></sqx-number-validation>
     </div>
     <div *ngSwitchCase="'String'">
-        <sqx-string-validation [editForm]="editForm" [properties]="field.properties"></sqx-string-validation>
+        <sqx-string-validation [editForm]="editForm" [properties]="field.properties" [patterns]="patterns"></sqx-string-validation>
     </div>
     <div *ngSwitchCase="'Boolean'">
         <sqx-boolean-validation [editForm]="editForm" [properties]="field.properties"></sqx-boolean-validation>

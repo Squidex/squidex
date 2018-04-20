@@ -27,23 +27,27 @@
                 <button type="submit" class="btn btn-primary">
                     Save and Publish
                 </button>
+
+                <sqx-shortcut keys="ctrl+s" (trigger)="saveAndPublish()"></sqx-shortcut>
             </ng-container>
             <ng-template #notNew>
-                <button type="submit" class="btn btn-primary" title="CTRL + S">
-                    Save
-                </button>
-            </ng-template>
+                <ng-container *ngIf="content.status !== 'Archived'">
+                    <button type="submit" class="btn btn-primary" title="CTRL + S">
+                        Save
+                    </button>
 
-            <sqx-shortcut keys="ctrl+s" (trigger)="saveAndPublish()"></sqx-shortcut>
+                    <sqx-shortcut keys="ctrl+s" (trigger)="saveAndPublish()"></sqx-shortcut>
+                </ng-container>
+            </ng-template>
         </ng-container>
 
         <ng-container content>
-            <div class="panel-alert panel-alert-danger" *ngIf="contentVersion">
+            <div class="panel-alert panel-alert-danger" *ngIf="contentVersion; let version">
                 <div class="float-right">
                     <a class="force" (click)="showLatest()">View latest</a>
                 </div>
 
-                Viewing <strong>version {{contentVersion.value</strong>.
+                Viewing <strong>version {{version.value}}</strong>.
             </div>
 
             <div *ngFor="let field of schema.fields">

@@ -57,6 +57,8 @@ export class Form<T extends AbstractControl> {
 
         if (newValue) {
             this.form.reset(newValue);
+        } else {
+            this.form.markAsPristine();
         }
     }
 

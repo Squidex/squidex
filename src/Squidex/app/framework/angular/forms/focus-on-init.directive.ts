@@ -21,10 +21,12 @@ export class FocusOnInitDirective implements AfterViewInit {
     }
 
     public ngAfterViewInit() {
-        this.renderer.invokeElementMethod(this.element.nativeElement, 'focus', []);
+        setTimeout(() => {
+            this.renderer.invokeElementMethod(this.element.nativeElement, 'focus', []);
 
-        if (this.select) {
-            this.renderer.invokeElementMethod(this.element.nativeElement, 'select', []);
-        }
+            if (this.select) {
+                this.renderer.invokeElementMethod(this.element.nativeElement, 'select', []);
+            }
+        }, 100);
     }
 }

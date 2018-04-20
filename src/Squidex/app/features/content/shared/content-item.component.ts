@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 
 import {
     AppLanguageDto,
@@ -78,10 +78,14 @@ export class ContentItemComponent implements OnChanges {
     ) {
     }
 
-    public ngOnChanges() {
-        this.patchForm = new PatchContentForm(this.schema, this.language);
+    public ngOnChanges(changes: SimpleChanges) {
+        if (changes['schema'] || changes['language']) {
+            this.patchForm = new PatchContentForm(this.schema, this.language);
+        }
 
-        this.updateValues();
+        if (changes['content'] || changes['language']) {
+            this.updateValues();
+        }
     }
 
     public shouldStop(event: Event) {
@@ -102,6 +106,12 @@ export class ContentItemComponent implements OnChanges {
                     this.patchForm.submitFailed(error);
                 });
         }
+    }
+
+    public cancel() {
+        this.patchForm.submitCompleted();
+
+        this.updateValues();
     }
 
     private updateValues() {
