@@ -9,11 +9,8 @@ import { Component, OnInit } from '@angular/core';
 
 import {
     AppsState,
-    DialogService,
-    ImmutableArray,
-    Pager,
     RuleEventDto,
-    RulesService
+    RuleEventsState
 } from '@app/shared';
 
 @Component({
@@ -22,59 +19,40 @@ import {
     templateUrl: './rule-events-page.component.html'
 })
 export class RuleEventsPageComponent implements OnInit {
-    public eventsItems = ImmutableArray.empty<RuleEventDto>();
-    public eventsPager = new Pager(0);
-
     public selectedEventId: string | null = null;
 
     constructor(
         public readonly appsState: AppsState,
-        private readonly dialogs: DialogService,
-        private readonly rulesService: RulesService
+        public readonly ruleEventsState: RuleEventsState
     ) {
     }
 
     public ngOnInit() {
-        this.load();
+        this.ruleEventsState.load().onErrorResumeNext().subscribe();
     }
 
-    public load(notifyLoad = false) {
-        this.rulesService.getEvents(this.appsState.appName, this.eventsPager.pageSize, this.eventsPager.skip)
-            .subscribe(dtos => {
-                this.eventsItems = ImmutableArray.of(dtos.items);
-                this.eventsPager = this.eventsPager.setCount(dtos.total);
-
-                if (notifyLoad) {
-                    this.dialogs.notifyInfo('Events reloaded.');
-                }
-            }, error => {
-                this.dialogs.notifyError(error);
-            });
+    public reload() {
+        this.ruleEventsState.load(true).onErrorResumeNext().subscribe();
     }
 
-    public enqueueEvent(event: RuleEventDto) {
-        this.rulesService.enqueueEvent(this.appsState.appName, event.id)
-            .subscribe(() => {
-                this.dialogs.notifyInfo('Events enqueued. Will be resend in a few seconds.');
-            }, error => {
-                this.dialogs.notifyError(error);
-            });
+    public goNext() {
+        this.ruleEventsState.goNext().onErrorResumeNext().subscribe();
+    }
+
+    public goPrev() {
+        this.ruleEventsState.goPrev().onErrorResumeNext().subscribe();
+    }
+
+    public enqueue(event: RuleEventDto) {
+        this.ruleEventsState.enqueue(event).onErrorResumeNext().subscribe();
     }
 
     public selectEvent(id: string) {
         this.selectedEventId = this.selectedEventId !== id ? id : null;
     }
 
-    public goNext() {
-        this.eventsPager = this.eventsPager.goNext();
-
-        this.load();
-    }
-
-    public goPrev() {
-        this.eventsPager = this.eventsPager.goPrev();
-
-        this.load();
+    public trackByRuleEvent(index: number, ruleEvent: RuleEventDto) {
+        return ruleEvent.id;
     }
 }
 

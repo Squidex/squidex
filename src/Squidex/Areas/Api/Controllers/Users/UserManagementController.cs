@@ -24,7 +24,7 @@ namespace Squidex.Areas.Api.Controllers.Users
 {
     [ApiAuthorize]
     [ApiExceptionFilter]
-    [ApiModelValidation]
+    [ApiModelValidation(true)]
     [MustBeAdministrator]
     [SwaggerIgnore]
     public sealed class UserManagementController : ApiController

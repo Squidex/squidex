@@ -121,6 +121,12 @@ export class RuleWizardComponent implements OnInit {
         this.rulesState.create(requestDto)
             .subscribe(dto => {
                 this.complete();
+
+                this.actionForm.submitCompleted();
+                this.triggerForm.submitCompleted();
+            }, error => {
+                this.actionForm.submitFailed(error);
+                this.triggerForm.submitFailed(error);
             });
     }
 
@@ -128,6 +134,10 @@ export class RuleWizardComponent implements OnInit {
         this.rulesState.updateTrigger(this.rule, this.trigger)
             .subscribe(dto => {
                 this.complete();
+
+                this.triggerForm.submitCompleted();
+            }, error => {
+                this.triggerForm.submitFailed(error);
             });
     }
 
@@ -135,6 +145,10 @@ export class RuleWizardComponent implements OnInit {
         this.rulesState.updateAction(this.rule, this.action)
             .subscribe(dto => {
                 this.complete();
+
+                this.actionForm.submitCompleted();
+            }, error => {
+                this.actionForm.submitFailed(error);
             });
     }
 }

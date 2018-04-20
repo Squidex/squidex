@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.IO;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -28,6 +29,7 @@ namespace Squidex
                 {
                     builder.AddConfiguration(hostingContext.Configuration.GetSection("logging"));
                     builder.AddSemanticLog();
+                    builder.AddFilter((category, level) => !category.StartsWith("Orleans.", StringComparison.CurrentCultureIgnoreCase) || level >= LogLevel.Warning);
                 })
                 .ConfigureAppConfiguration((hostContext, builder) =>
                 {

@@ -73,7 +73,7 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
 
                     this.schema = schema!;
 
-                    this.contentsState.load().onErrorResumeNext().subscribe();
+                    this.contentsState.init().onErrorResumeNext().subscribe();
                 });
 
         this.contentsSubscription =
@@ -88,8 +88,6 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
                     this.languages = languages.map(x => x.language);
                     this.language = this.languages.at(0);
                 });
-
-        this.contentsState.load().onErrorResumeNext().subscribe();
     }
 
     public reload() {

@@ -75,7 +75,7 @@ namespace Squidex.Config.Orleans
                     {
                         builder.AddConfiguration(hostingContext.Configuration.GetSection("logging"));
                         builder.AddSemanticLog();
-                        builder.AddFilter("Orleans.Runtime.SiloControl", LogLevel.Warning);
+                        builder.AddFilter((category, level) => !category.StartsWith("Orleans.", StringComparison.CurrentCultureIgnoreCase) || level >= LogLevel.Warning);
                     })
                     .ConfigureApplicationParts(builder =>
                     {

@@ -52,7 +52,7 @@ export class ContentChangedTriggerComponent implements OnInit {
 
     public ngOnInit() {
         this.triggerForm.setControl('schemas',
-            new FormControl(this.trigger.schemas || {}));
+            new FormControl(this.trigger.schemas || []));
 
         this.triggerForm.setControl('handleAll',
             new FormControl(Types.isBoolean(this.trigger.handleAll) ? this.trigger.handleAll : false));

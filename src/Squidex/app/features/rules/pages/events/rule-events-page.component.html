@@ -6,11 +6,11 @@
     </ng-container>
     
     <ng-container menu>
-        <button class="btn btn-link btn-secondary" (click)="load(true)" title="Refresh Events (CTRL + SHIFT + R)">
+        <button class="btn btn-link btn-secondary" (click)="reload()" title="Refresh Events (CTRL + SHIFT + R)">
             <i class="icon-reset"></i> Refresh
         </button>
 
-        <sqx-shortcut keys="ctrl+shift+r" (trigger)="load(true)"></sqx-shortcut>
+        <sqx-shortcut keys="ctrl+shift+r" (trigger)="reload()"></sqx-shortcut>
     </ng-container>
     
     <ng-container content>
@@ -34,7 +34,7 @@
             </thead>
 
             <tbody>
-                <ng-template ngFor let-event [ngForOf]="eventsItems">
+                <ng-template ngFor let-event [ngForOf]="ruleEventsState.ruleEvents | async" [ngForOf]="trackByRuleEvent">
                     <tr [class.expanded]="selectedEventId === event.id">
                         <td class="cell-label">
                             <span class="badge badge-pill badge-{{event.jobResult | sqxRuleEventBadgeClass}}">{{event.jobResult}}</span>
@@ -71,7 +71,7 @@
                                     Next: <ng-container *ngIf="event.nextAttempt">{{event.nextAttempt | sqxFromNow}}</ng-container>
                                 </div>
                                 <div class="col-3 text-right">
-                                    <button class="btn btn-success btn-sm" (click)="enqueueEvent(event)">
+                                    <button class="btn btn-success btn-sm" (click)="enqueue(event)">
                                         Enqueue
                                     </button>
                                 </div>
@@ -88,7 +88,7 @@
             </tbody>
         </table>
 
-        <sqx-pager [pager]="eventsPager"></sqx-pager>
+        <sqx-pager [pager]="ruleEventsState.ruleEventsPager | async"></sqx-pager>
     </ng-container>
 </sqx-panel>
 

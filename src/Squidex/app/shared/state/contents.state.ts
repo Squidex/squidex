@@ -29,10 +29,7 @@ import { fieldInvariant, SchemaDetailsDto, SchemaDto } from './../services/schem
 import { AppsState } from './apps.state';
 import { SchemasState } from './schemas.state';
 
-import {
-    ContentDto,
-    ContentsService
-} from './../services/contents.service';
+import { ContentDto, ContentsService } from './../services/contents.service';
 
 export class EditContentForm extends Form<FormGroup> {
     constructor(
@@ -313,6 +310,12 @@ export abstract class ContentsStateBase extends State<Snapshot> {
 
     public goArchive(isArchive: boolean): Observable<any> {
         this.next(s => ({ ...s, contentsPager: new Pager(0), contentsQuery: undefined, isArchive }));
+
+        return this.load();
+    }
+
+    public init(): Observable<any> {
+        this.next(s => ({ ...s, contentsPager: new Pager(0), contentsQuery: '', isArchive: false, isLoaded: false }));
 
         return this.load();
     }
