@@ -14,49 +14,49 @@
         <label class="col col-3 col-form-label">Editor</label>
 
         <div class="col col-9">
-            <label class="btn btn-radio" [class.active]="editForm.controls.editor.value === 'Input'">
+            <label class="btn btn-radio" [class.active]="editForm.controls['editor'].value === 'Input'">
                 <input type="radio" class="radio-input" formControlName="editor" value="Input" />
 
                 <i class="icon-control-Input"></i>
 
                 <span class="radio-label">Input</span>
             </label>
-            <label class="btn btn-radio" [class.active]="editForm.controls.editor.value === 'Slug'">
+            <label class="btn btn-radio" [class.active]="editForm.controls['editor'].value === 'Slug'">
                 <input type="radio" class="radio-input" formControlName="editor" value="Slug" />
 
                 <i class="icon-control-Slug"></i>
 
                 <span class="radio-label">Slug</span>
             </label>
-            <label class="btn btn-radio" [class.active]="editForm.controls.editor.value === 'TextArea'">
+            <label class="btn btn-radio" [class.active]="editForm.controls['editor'].value === 'TextArea'">
                 <input type="radio" class="radio-input" formControlName="editor" value="TextArea" />
 
                 <i class="icon-control-TextArea"></i>
 
                 <span class="radio-label">TextArea</span>
             </label>
-            <label class="btn btn-radio" [class.active]="editForm.controls.editor.value === 'RichText'">
+            <label class="btn btn-radio" [class.active]="editForm.controls['editor'].value === 'RichText'">
                 <input type="radio" class="radio-input" formControlName="editor" value="RichText" />
 
                 <i class="icon-control-RichText"></i>
 
                 <span class="radio-label">RichText</span>
             </label>
-            <label class="btn btn-radio" [class.active]="editForm.controls.editor.value === 'Markdown'">
+            <label class="btn btn-radio" [class.active]="editForm.controls['editor'].value === 'Markdown'">
                 <input type="radio" class="radio-input" formControlName="editor" value="Markdown" />
 
                 <i class="icon-control-Markdown"></i>
 
                 <span class="radio-label">Markdown</span>
             </label>
-            <label class="btn btn-radio" [class.active]="editForm.controls.editor.value === 'Dropdown'">
+            <label class="btn btn-radio" [class.active]="editForm.controls['editor'].value === 'Dropdown'">
                 <input type="radio" class="radio-input" formControlName="editor" value="Dropdown" />
 
                 <i class="icon-control-Dropdown"></i>
 
                 <span class="radio-label" clas>Dropdown</span>
             </label>
-            <label class="btn btn-radio" [class.active]="editForm.controls.editor.value === 'Radio'">
+            <label class="btn btn-radio" [class.active]="editForm.controls['editor'].value === 'Radio'">
                 <input type="radio" class="radio-input" formControlName="editor" value="Radio" />
 
                 <i class="icon-control-Radio"></i>

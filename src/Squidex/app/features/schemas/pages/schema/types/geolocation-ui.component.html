@@ -3,7 +3,7 @@
         <label class="col col-3 col-form-label">Editor</label>
 
         <div class="col col-9">
-            <label class="btn btn-radio" [class.active]="editForm.controls.editor.value === 'Map'">
+            <label class="btn btn-radio" [class.active]="editForm.controls['editor'].value === 'Map'">
                 <input type="radio" class="radio-input" formControlName="editor" value="Map" />
 
                 <i class="icon-control-Map"></i>
