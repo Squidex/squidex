@@ -16,5 +16,10 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// </summary>
         [Required]
         public string ContributorId { get; set; }
+
+        public static ContributorAssignedDto FromId(string id)
+        {
+            return new ContributorAssignedDto { ContributorId = id };
+        }
     }
 }

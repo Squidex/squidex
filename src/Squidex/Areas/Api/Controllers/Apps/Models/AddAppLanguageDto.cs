@@ -6,7 +6,9 @@
 // ==========================================================================
 
 using System.ComponentModel.DataAnnotations;
+using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models
 {
@@ -17,5 +19,10 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// </summary>
         [Required]
         public Language Language { get; set; }
+
+        public AddLanguage ToCommand()
+        {
+            return SimpleMapper.Map(this, new AddLanguage());
+        }
     }
 }

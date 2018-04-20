@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
@@ -13,7 +12,6 @@ using Squidex.Areas.Api.Controllers.Apps.Models;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Services;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
 
 namespace Squidex.Areas.Api.Controllers.Apps
@@ -50,9 +48,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [ApiCosts(0)]
         public IActionResult GetContributors(string app)
         {
-            var contributors = App.Contributors.Select(x => new ContributorDto { ContributorId = x.Key, Permission = x.Value }).ToArray();
-
-            var response = new ContributorsDto { Contributors = contributors, MaxContributors = appPlansProvider.GetPlanForApp(App).MaxContributors };
+            var response = ContributorsDto.FromApp(App, appPlansProvider);
 
             Response.Headers["ETag"] = App.Version.ToString();
 
@@ -76,11 +72,11 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [ApiCosts(1)]
         public async Task<IActionResult> PostContributor(string app, [FromBody] AssignAppContributorDto request)
         {
-            var command = SimpleMapper.Map(request, new AssignContributor());
+            var command = request.ToCommand();
             var context = await CommandBus.PublishAsync(command);
 
             var result = context.Result<EntityCreatedResult<string>>();
-            var response = new ContributorAssignedDto { ContributorId = result.IdOrValue };
+            var response = ContributorAssignedDto.FromId(result.IdOrValue);
 
             return Ok(response);
         }
