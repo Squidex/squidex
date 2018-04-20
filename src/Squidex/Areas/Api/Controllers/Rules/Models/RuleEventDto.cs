@@ -10,6 +10,7 @@ using System.ComponentModel.DataAnnotations;
 using NodaTime;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Entities.Rules;
+using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Areas.Api.Controllers.Rules.Models
 {
@@ -61,5 +62,15 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
         /// The result of the job.
         /// </summary>
         public RuleJobResult JobResult { get; set; }
+
+        public static RuleEventDto FromRuleEvent(IRuleEventEntity ruleEvent)
+        {
+            var response = new RuleEventDto();
+
+            SimpleMapper.Map(ruleEvent, response);
+            SimpleMapper.Map(ruleEvent.Job, response);
+
+            return response;
+        }
     }
 }
