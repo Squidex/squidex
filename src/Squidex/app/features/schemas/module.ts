@@ -10,6 +10,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { DndModule } from 'ng2-dnd';
 
 import {
+    HelpComponent,
     SchemaMustExistGuard,
     SqxFrameworkModule,
     SqxSharedModule
@@ -54,7 +55,16 @@ const routes: Routes = [
             {
                 path: ':schemaName',
                 component: SchemaPageComponent,
-                canActivate: [SchemaMustExistGuard]
+                canActivate: [SchemaMustExistGuard],
+                children: [
+                    {
+                        path: 'help',
+                        component: HelpComponent,
+                        data: {
+                            helpPage: '05-integrated/schemas'
+                        }
+                    }
+                ]
             }]
     }
 ];
