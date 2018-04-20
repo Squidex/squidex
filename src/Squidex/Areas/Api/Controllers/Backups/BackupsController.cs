@@ -15,7 +15,6 @@ using Orleans;
 using Squidex.Areas.Api.Controllers.Backups.Models;
 using Squidex.Domain.Apps.Entities.Backup;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Tasks;
 using Squidex.Pipeline;
 
@@ -57,7 +56,9 @@ namespace Squidex.Areas.Api.Controllers.Backups
 
             var jobs = await backupGrain.GetStateAsync();
 
-            return Ok(jobs.Value.Select(x => SimpleMapper.Map(x, new BackupJobDto())).ToList());
+            var response = jobs.Value.Select(BackupJobDto.FromBackup).ToList();
+
+            return Ok(response);
         }
 
         /// <summary>

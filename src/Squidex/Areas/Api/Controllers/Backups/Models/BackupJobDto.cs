@@ -7,6 +7,8 @@
 
 using System;
 using NodaTime;
+using Squidex.Domain.Apps.Entities.Backup;
+using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Areas.Api.Controllers.Backups.Models
 {
@@ -41,5 +43,10 @@ namespace Squidex.Areas.Api.Controllers.Backups.Models
         /// Indicates if the job has failed.
         /// </summary>
         public bool IsFailed { get; set; }
+
+        public static BackupJobDto FromBackup(IBackupJob backup)
+        {
+            return SimpleMapper.Map(backup, new BackupJobDto());
+        }
     }
 }
