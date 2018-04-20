@@ -15,7 +15,6 @@ using Squidex.Areas.Api.Controllers.Users.Models;
 using Squidex.Domain.Users;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Security;
 using Squidex.Pipeline;
 using Squidex.Shared.Users;
@@ -52,7 +51,7 @@ namespace Squidex.Areas.Api.Controllers.Users
             var response = new UsersDto
             {
                 Total = taskForCount.Result,
-                Items = taskForItems.Result.Select(Map).ToArray()
+                Items = taskForItems.Result.Select(UserDto.FromUser).ToArray()
             };
 
             return Ok(response);
@@ -70,7 +69,7 @@ namespace Squidex.Areas.Api.Controllers.Users
                 return NotFound();
             }
 
-            var response = Map(entity);
+            var response = UserDto.FromUser(entity);
 
             return Ok(response);
         }
@@ -125,11 +124,6 @@ namespace Squidex.Areas.Api.Controllers.Users
             await userManager.UnlockAsync(id);
 
             return NoContent();
-        }
-
-        private static UserDto Map(IUser user)
-        {
-            return SimpleMapper.Map(user, new UserDto { DisplayName = user.DisplayName() });
         }
 
         private bool IsSelf(string id)

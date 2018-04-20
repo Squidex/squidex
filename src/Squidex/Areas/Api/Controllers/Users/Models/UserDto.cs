@@ -6,6 +6,9 @@
 // ==========================================================================
 
 using System.ComponentModel.DataAnnotations;
+using Squidex.Domain.Users;
+using Squidex.Infrastructure.Reflection;
+using Squidex.Shared.Users;
 
 namespace Squidex.Areas.Api.Controllers.Users.Models
 {
@@ -34,5 +37,10 @@ namespace Squidex.Areas.Api.Controllers.Users.Models
         /// </summary>
         [Required]
         public bool IsLocked { get; set; }
+
+        public static UserDto FromUser(IUser user)
+        {
+            return SimpleMapper.Map(user, new UserDto { DisplayName = user.DisplayName() });
+        }
     }
 }

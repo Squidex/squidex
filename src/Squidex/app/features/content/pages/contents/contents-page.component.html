@@ -42,7 +42,7 @@
             <table class="table table-items table-fixed">
                 <thead>
                     <tr>
-                        <th class="cell-select" *ngIf="!isReadOnly">
+                        <th class="cell-select">
                             <input type="checkbox" class="form-control" [ngModel]="isAllSelected" (ngModelChange)="selectAll($event)" />
                         </th>
                         <th class="cell-auto" *ngFor="let field of schema.listFields">
@@ -54,7 +54,7 @@
                         <th class="cell-user">
                             By
                         </th>
-                        <th class="cell-actions" *ngIf="!isReadOnly">
+                        <th class="cell-actions">
                             Actions
                         </th>
                     </tr>

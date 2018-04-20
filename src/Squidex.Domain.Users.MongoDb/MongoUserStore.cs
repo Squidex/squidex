@@ -73,18 +73,6 @@ namespace Squidex.Domain.Users.MongoDb
             return new MongoUser { Email = email, UserName = email };
         }
 
-        public async Task<IUser> FindByIdOrEmailAsync(string id)
-        {
-            if (ObjectId.TryParse(id, out var parsed))
-            {
-                return await Collection.Find(x => x.Id == id).FirstOrDefaultAsync();
-            }
-            else
-            {
-                return await Collection.Find(x => x.NormalizedEmail == id.ToUpperInvariant()).FirstOrDefaultAsync();
-            }
-        }
-
         public async Task<IUser> FindByIdAsync(string userId, CancellationToken cancellationToken)
         {
             return await Collection.Find(x => x.Id == userId).FirstOrDefaultAsync(cancellationToken);
@@ -395,6 +383,32 @@ namespace Squidex.Domain.Users.MongoDb
             ((MongoUser)user).RemoveToken(loginProvider, name);
 
             return TaskHelper.Done;
+        }
+
+        public async Task<IUser> FindByIdOrEmailAsync(string id)
+        {
+            if (ObjectId.TryParse(id, out var parsed))
+            {
+                return await Collection.Find(x => x.Id == id).FirstOrDefaultAsync();
+            }
+            else
+            {
+                return await Collection.Find(x => x.NormalizedEmail == id.ToUpperInvariant()).FirstOrDefaultAsync();
+            }
+        }
+
+        public Task<List<IUser>> QueryByEmailAsync(string email)
+        {
+            var result = Users;
+
+            if (!string.IsNullOrWhiteSpace(email))
+            {
+                var normalizedEmail = email.ToUpperInvariant();
+
+                result = result.Where(x => x.NormalizedEmail.Contains(normalizedEmail));
+            }
+
+            return Task.FromResult(result.Select(x => x).ToList());
         }
     }
 }
