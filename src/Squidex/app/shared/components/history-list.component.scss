@@ -17,14 +17,14 @@
 
 .event {
     & {
-        color: $color-text-decent;
+        color: $color-history;
         font-size: .9rem;
         font-weight: normal;
         margin-bottom: 1.5rem;
     }
 
     &-message {
-        margin-bottom: .35rem;
+        margin-bottom: .375rem;
     }
 
     &-created {

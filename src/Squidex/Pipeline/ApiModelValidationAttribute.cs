@@ -38,7 +38,10 @@ namespace Squidex.Pipeline
                     }
                 }
 
-                throw new ValidationException("The model is not valid.", errors);
+                if (errors.Count > 0)
+                {
+                    throw new ValidationException("The model is not valid.", errors);
+                }
             }
         }
     }

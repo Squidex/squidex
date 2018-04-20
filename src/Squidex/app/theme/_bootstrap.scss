@@ -95,6 +95,10 @@ a {
     }
 
     &.force {
+        & {
+            color: $color-theme-blue !important;
+        }
+
         &:hover {
             text-decoration: underline !important;
             cursor: pointer;
@@ -431,14 +435,15 @@ a {
     }
 
     &-header {
-        @include border-radius-top(.25rem);
-        background: $color-modal-header-background;
-        font-size: 1rem;
-        font-weight: normal;
-        color: $color-modal-header-foreground;
+        & {
+            @include border-radius-top(.25rem);
+            background: $color-modal-header-background;
+            font-size: 1rem;
+            font-weight: normal;
+            color: $color-modal-header-foreground;
+        }
 
-        h4,
-        h5 {
+        h4 {
             font-size: 1rem;
             font-weight: normal;
         }

@@ -59,6 +59,11 @@
             position: relative;
         }
 
+        &.large {
+            min-height: 8rem;
+            max-height: 8rem;
+        }
+
         .form-inline {
             display: inline-block;
         }

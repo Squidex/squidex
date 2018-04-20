@@ -17,27 +17,15 @@
 
 .event {
     & {
-        color: $color-text-decent;
+        color: $color-history;
         font-size: .9rem;
         font-weight: normal;
         margin-bottom: 1.5rem;
     }
 
     &-created {
+        font-weight: normal;
         font-size: .75rem;
-    }
-
-    &-load {
-        & {
-            font-size: .9rem;
-            font-weight: normal;
-            cursor: pointer;
-            color: $color-theme-blue !important;
-        }
-
-        &:focus,
-        &:hover {
-            text-decoration: underline !important;
-        }
+        margin: .375rem 0;
     }
 }

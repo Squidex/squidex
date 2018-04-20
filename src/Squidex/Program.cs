@@ -12,6 +12,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Orleans;
 using Orleans.Hosting;
+using Squidex.Config;
 using Squidex.Infrastructure.Log.Adapter;
 
 namespace Squidex
@@ -29,7 +30,7 @@ namespace Squidex
                 {
                     builder.AddConfiguration(hostingContext.Configuration.GetSection("logging"));
                     builder.AddSemanticLog();
-                    builder.AddFilter((category, level) => !category.StartsWith("Orleans.", StringComparison.CurrentCultureIgnoreCase) || level >= LogLevel.Warning);
+                    builder.AddOrleansFilter();
                 })
                 .ConfigureAppConfiguration((hostContext, builder) =>
                 {
