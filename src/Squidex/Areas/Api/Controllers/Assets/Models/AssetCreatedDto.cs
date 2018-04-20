@@ -68,7 +68,7 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         /// </summary>
         public long Version { get; set; }
 
-        public static AssetCreatedDto Create(CreateAsset command, EntityCreatedResult<Guid> result)
+        public static AssetCreatedDto FromCommand(CreateAsset command, EntityCreatedResult<Guid> result)
         {
             var response = new AssetCreatedDto
             {
