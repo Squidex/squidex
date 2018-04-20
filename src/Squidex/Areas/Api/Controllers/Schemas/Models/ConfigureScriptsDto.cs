@@ -5,6 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Entities.Schemas.Commands;
+using Squidex.Infrastructure.Reflection;
+
 namespace Squidex.Areas.Api.Controllers.Schemas.Models
 {
     public sealed class ConfigureScriptsDto
@@ -33,5 +36,10 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// The script that is executed when change a content status.
         /// </summary>
         public string ScriptChange { get; set; }
+
+        public ConfigureScripts ToCommand()
+        {
+            return SimpleMapper.Map(this, new ConfigureScripts());
+        }
     }
 }

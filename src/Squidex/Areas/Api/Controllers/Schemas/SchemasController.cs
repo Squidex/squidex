@@ -11,13 +11,10 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using Squidex.Areas.Api.Controllers.Schemas.Models;
-using Squidex.Areas.Api.Controllers.Schemas.Models.Converters;
-using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
 
 namespace Squidex.Areas.Api.Controllers.Schemas
@@ -56,7 +53,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         {
             var schemas = await appProvider.GetSchemasAsync(AppId);
 
-            var response = schemas.Select(s => s.ToModel()).ToList();
+            var response = schemas.Select(SchemaDto.FromSchema).ToList();
 
             return Ok(response);
         }
@@ -93,7 +90,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
                 return NotFound();
             }
 
-            var response = entity.ToDetailsModel();
+            var response = SchemaDetailsDto.FromSchema(entity);
 
             Response.Headers["ETag"] = entity.Version.ToString();
 
@@ -145,9 +142,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         [ApiCosts(1)]
         public async Task<IActionResult> PutSchema(string app, string name, [FromBody] UpdateSchemaDto request)
         {
-            var properties = SimpleMapper.Map(request, new SchemaProperties());
-
-            await CommandBus.PublishAsync(new UpdateSchema { Properties = properties });
+            await CommandBus.PublishAsync(request.ToCommand());
 
             return NoContent();
         }
@@ -169,9 +164,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         [ApiCosts(1)]
         public async Task<IActionResult> PutSchemaScripts(string app, string name, [FromBody] ConfigureScriptsDto request)
         {
-            var command = SimpleMapper.Map(request, new ConfigureScripts());
-
-            await CommandBus.PublishAsync(command);
+            await CommandBus.PublishAsync(request.ToCommand());
 
             return NoContent();
         }

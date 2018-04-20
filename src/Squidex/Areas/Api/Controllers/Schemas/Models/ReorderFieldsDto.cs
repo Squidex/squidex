@@ -7,6 +7,7 @@
 
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Squidex.Domain.Apps.Entities.Schemas.Commands;
 
 namespace Squidex.Areas.Api.Controllers.Schemas.Models
 {
@@ -17,5 +18,10 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// </summary>
         [Required]
         public List<long> FieldIds { get; set; }
+
+        public ReorderFields ToCommand()
+        {
+            return new ReorderFields { FieldIds = FieldIds };
+        }
     }
 }

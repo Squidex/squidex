@@ -6,6 +6,8 @@
 // ==========================================================================
 
 using System.ComponentModel.DataAnnotations;
+using Squidex.Domain.Apps.Entities.Schemas.Commands;
+using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Areas.Api.Controllers.Schemas.Models
 {
@@ -28,5 +30,10 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// </summary>
         [Required]
         public FieldPropertiesDto Properties { get; set; }
+
+        public AddField ToCommand()
+        {
+            return SimpleMapper.Map(this, new AddField { Properties = this.Properties.ToProperties() });
+        }
     }
 }
