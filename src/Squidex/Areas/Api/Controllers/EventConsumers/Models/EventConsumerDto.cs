@@ -5,6 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Reflection;
+
 namespace Squidex.Areas.Api.Controllers.EventConsumers.Models
 {
     public sealed class EventConsumerDto
@@ -18,5 +21,10 @@ namespace Squidex.Areas.Api.Controllers.EventConsumers.Models
         public string Error { get; set; }
 
         public string Position { get; set; }
+
+        public static EventConsumerDto FromEventConsumerInfo(EventConsumerInfo eventConsumerInfo)
+        {
+            return SimpleMapper.Map(eventConsumerInfo, new EventConsumerDto());
+        }
     }
 }

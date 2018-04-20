@@ -8,6 +8,8 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using NodaTime;
+using Squidex.Domain.Apps.Entities.History;
+using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Areas.Api.Controllers.History.Models
 {
@@ -39,5 +41,10 @@ namespace Squidex.Areas.Api.Controllers.History.Models
         /// The version identifier.
         /// </summary>
         public long Version { get; set; }
+
+        public static HistoryEventDto FromHistoryEvent(IHistoryEventEntity x)
+        {
+            return SimpleMapper.Map(x, new HistoryEventDto());
+        }
     }
 }

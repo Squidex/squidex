@@ -239,7 +239,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
             var context = await CommandBus.PublishAsync(command);
 
             var result = context.Result<EntityCreatedResult<NamedContentData>>();
-            var response = ContentDto.Create(command, result);
+            var response = ContentDto.FromCommand(command, result);
 
             return CreatedAtAction(nameof(GetContent), new { id = command.ContentId }, response);
         }

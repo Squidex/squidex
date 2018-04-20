@@ -13,7 +13,6 @@ using Orleans;
 using Squidex.Areas.Api.Controllers.EventConsumers.Models;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing.Grains;
-using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
 
 namespace Squidex.Areas.Api.Controllers.EventConsumers
@@ -39,9 +38,9 @@ namespace Squidex.Areas.Api.Controllers.EventConsumers
         {
             var entities = await eventConsumerManagerGrain.GetConsumersAsync();
 
-            var models = entities.Value.Select(x => SimpleMapper.Map(x, new EventConsumerDto())).ToList();
+            var response = entities.Value.Select(EventConsumerDto.FromEventConsumerInfo).ToList();
 
-            return Ok(models);
+            return Ok(response);
         }
 
         [HttpPut]
