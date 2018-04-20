@@ -12,12 +12,10 @@ import { Observable } from 'rxjs';
 import {
     allParams,
     AppsState,
-    formatHistoryMessage,
     HistoryChannelUpdated,
     HistoryEventDto,
     HistoryService,
-    MessageBus,
-    UsersProviderService
+    MessageBus
 } from '@app/shared/internal';
 
 @Component({
@@ -26,23 +24,7 @@ import {
     templateUrl: './history.component.html'
 })
 export class HistoryComponent {
-    public get channel(): string {
-        let channelPath = this.route.snapshot.data['channel'];
-
-        if (channelPath) {
-            const params = allParams(this.route);
-
-            for (let key in params) {
-                if (params.hasOwnProperty(key)) {
-                    const value = params[key];
-
-                    channelPath = channelPath.replace(`{${key}}`, value);
-                }
-            }
-        }
-
-        return channelPath;
-    }
+    private readonly channel = this.calculateChannel();
 
     public events: Observable<HistoryEventDto[]> =
         Observable.timer(0, 10000).merge(this.messageBus.of(HistoryChannelUpdated).delay(1000))
@@ -50,14 +32,27 @@ export class HistoryComponent {
 
     constructor(
         private readonly appsState: AppsState,
-        private readonly users: UsersProviderService,
         private readonly historyService: HistoryService,
         private readonly messageBus: MessageBus,
         private readonly route: ActivatedRoute
     ) {
     }
 
-    public format(message: string): Observable<string> {
-        return formatHistoryMessage(message, this.users);
+    private calculateChannel(): string {
+        let channel = this.route.snapshot.data['channel'];
+
+        if (channel) {
+            const params = allParams(this.route);
+
+            for (let key in params) {
+                if (params.hasOwnProperty(key)) {
+                    const value = params[key];
+
+                    channel = channel.replace(`{${key}}`, value);
+                }
+            }
+        }
+
+        return channel;
     }
 }

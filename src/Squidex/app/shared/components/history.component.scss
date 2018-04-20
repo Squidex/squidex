@@ -1,25 +1,2 @@
 @import '_vars';
 @import '_mixins';
-
-.event {
-    & {
-        @include flex-box;
-        margin-bottom: 1rem;
-    }
-
-    &-main {
-        @include flex-grow(1);
-    }
-
-    &-left {
-        min-width: 2.8rem;
-        max-width: 2.8rem;
-        margin-top: .25rem;
-    }
-
-    &-created {
-        font-size: .65rem;
-        font-weight: normal;
-        color: $color-text-decent;
-    }
-}

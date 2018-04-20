@@ -12,6 +12,7 @@ export * from './components/assets-selector.component';
 export * from './components/help.component';
 export * from './components/geolocation-editor.component';
 export * from './components/history.component';
+export * from './components/history-list.component';
 export * from './components/language-selector.component';
 export * from './components/markdown-editor.component';
 export * from './components/pipes';

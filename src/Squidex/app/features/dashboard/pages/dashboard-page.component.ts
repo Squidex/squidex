@@ -6,7 +6,7 @@
  */
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Observable, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 
 import {
     AppDto,
@@ -14,11 +14,9 @@ import {
     AuthService,
     DateTime,
     fadeAnimation,
-    formatHistoryMessage,
     HistoryEventDto,
     HistoryService,
-    UsagesService,
-    UsersProviderService
+    UsagesService
 } from '@app/shared';
 
 declare var _urq: any;
@@ -74,7 +72,6 @@ export class DashboardPageComponent implements OnDestroy, OnInit {
         public readonly appsState: AppsState,
         public readonly authState: AuthService,
         private readonly historyService: HistoryService,
-        private readonly users: UsersProviderService,
         private readonly usagesService: UsagesService
     ) {
     }
@@ -176,10 +173,6 @@ export class DashboardPageComponent implements OnDestroy, OnInit {
                         ]
                     };
                 }));
-    }
-
-    public format(message: string): Observable<string> {
-        return formatHistoryMessage(message, this.users);
     }
 
     public showForum() {
