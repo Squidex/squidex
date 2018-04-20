@@ -116,7 +116,9 @@
         </div>
     </div>
 
-    <small class="form-text text-muted" *ngIf="field.properties['hints'] && field.properties['hints'].length > 0">
-        {{field.properties['hints']}}
-    </small>
+    <ng-container *ngIf="field.properties['hints']; let hints">
+        <small class="form-text text-muted" *ngIf="hints.length > 0">
+            {{hints}}
+        </small>
+    </ng-container>
 </div>
