@@ -5,9 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { Version } from '@app/shared';
+
 export class ContentVersionSelected {
     constructor(
-        public readonly version: number
+        public readonly version: Version
     ) {
     }
 }

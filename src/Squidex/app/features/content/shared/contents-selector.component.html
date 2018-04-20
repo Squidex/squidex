@@ -9,17 +9,21 @@
                 <i class="icon-reset"></i> Refresh
             </button>
             
-            <sqx-search-form (queryChanged)="search($event)" [canArchive]="false"></sqx-search-form>
+            <sqx-search-form 
+                [query]="contentsState.contentsQuery | async" 
+                (queryChanged)="search($event)"
+                [canArchive]="false">
+            </sqx-search-form>
 
             <ng-container *ngIf="languages.length > 1">
-                <sqx-language-selector class="languages-buttons" (selectedLanguageChanged)="selectLanguage($event)" [languages]="languages.values"></sqx-language-selector>
+                <sqx-language-selector class="languages-buttons" (selectedLanguageChange)="selectLanguage($event)" [languages]="languages.values"></sqx-language-selector>
             </ng-container>
         </div>
     </ng-container>
 
     <ng-container content>
         <div class="grid-header">
-            <table class="table table-items table-fixed" *ngIf="contentItems">
+            <table class="table table-items table-fixed">
                 <thead>
                     <tr>
                         <th class="cell-select">
@@ -41,12 +45,12 @@
 
         <div class="grid-content">
             <div sqxIgnoreScrollbar>
-                <table class="table table-items table-fixed" *ngIf="contentItems">
+                <table class="table table-items table-fixed">
                     <tbody>
-                        <ng-template ngFor let-content [ngForOf]="contentItems" [ngForTrackBy]="trackByContent">
+                        <ng-template ngFor let-content [ngForOf]="contentsState.contents | async" [ngForTrackBy]="trackByContent">
                             <tr [sqxContent]="content"
                                 [selected]="isItemSelected(content)"
-                                (selectedChange)="onContentSelected(content)"
+                                (selectedChange)="selectContent(content)"
                                 [language]="language"
                                 [schema]="schema" 
                                 isReadOnly="true"></tr>
@@ -58,7 +62,7 @@
         </div>
 
         <div class="grid-footer">
-            <sqx-pager [pager]="contentsPager"></sqx-pager>
+            <sqx-pager [pager]="contentsState.contentsPager | async"></sqx-pager>
         </div>
     </ng-container>
 

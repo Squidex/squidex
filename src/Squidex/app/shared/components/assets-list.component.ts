@@ -32,13 +32,10 @@ export class AssetsListComponent {
     @Input()
     public selectedIds: object;
 
-    @Input()
-    public assetClass = '';
-
     @Output()
     public selected = new EventEmitter<AssetDto>();
 
-    public onAssetLoaded(file: File, asset: AssetDto) {
+    public add(file: File, asset: AssetDto) {
         this.newFiles = this.newFiles.remove(file);
 
         this.state.add(asset);
@@ -48,16 +45,8 @@ export class AssetsListComponent {
         this.state.load().onErrorResumeNext().subscribe();
     }
 
-    public onAssetDeleting(asset: AssetDto) {
+    public delete(asset: AssetDto) {
         this.state.delete(asset).onErrorResumeNext().subscribe();
-    }
-
-    public onAssetSelected(asset: AssetDto) {
-        this.selected.emit(asset);
-    }
-
-    public onAssetFailed(file: File) {
-        this.newFiles = this.newFiles.remove(file);
     }
 
     public goNext() {
@@ -72,8 +61,16 @@ export class AssetsListComponent {
         return asset.id;
     }
 
+    public select(asset: AssetDto) {
+        this.selected.emit(asset);
+    }
+
     public isSelected(asset: AssetDto) {
         return this.selectedIds && this.selectedIds[asset.id];
+    }
+
+    public remove(file: File) {
+        this.newFiles = this.newFiles.remove(file);
     }
 
     public addFiles(files: FileList) {

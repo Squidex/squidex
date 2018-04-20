@@ -65,6 +65,7 @@ export class ReferencesEditorComponent implements ControlValueAccessor, OnInit {
 
     public ngOnInit() {
         if (this.schemaId === MathHelper.EMPTY_GUID) {
+            this.isInvalidSchema = true;
             return;
         }
 
@@ -77,14 +78,18 @@ export class ReferencesEditorComponent implements ControlValueAccessor, OnInit {
     }
 
     public writeValue(value: string[]) {
-        this.contentItems = ImmutableArray.empty<ContentDto>();
-
-        if (Types.isArrayOfString(value) && value.length > 0) {
+        if (Types.isArrayOfString(value) && !Types.isEquals(value, this.contentItems.map(x => x.id).values)) {
             const contentIds: string[] = value;
 
             this.contentsService.getContents(this.appsState.appName, this.schemaId, 10000, 0, undefined, contentIds)
                 .subscribe(dtos => {
                     this.contentItems = ImmutableArray.of(contentIds.map(id => dtos.items.find(c => c.id === id)).filter(r => !!r).map(r => r!));
+
+                    if (this.contentItems.length !== contentIds.length) {
+                        this.updateValue();
+                    }
+                }, () => {
+                    this.contentItems = ImmutableArray.empty<ContentDto>();
                 });
         }
     }
@@ -109,7 +114,7 @@ export class ReferencesEditorComponent implements ControlValueAccessor, OnInit {
         this.isModalVisibible = false;
     }
 
-    public onContentsSelected(contents: ContentDto[]) {
+    public select(contents: ContentDto[]) {
         for (let content of contents) {
             this.contentItems = this.contentItems.push(content);
         }
@@ -121,7 +126,7 @@ export class ReferencesEditorComponent implements ControlValueAccessor, OnInit {
         this.hideModal();
     }
 
-    public onContentRemoving(content: ContentDto) {
+    public remove(content: ContentDto) {
         if (content) {
             this.contentItems = this.contentItems.remove(content);
 
@@ -129,7 +134,7 @@ export class ReferencesEditorComponent implements ControlValueAccessor, OnInit {
         }
     }
 
-    public onContentsSorted(contents: ContentDto[]) {
+    public sort(contents: ContentDto[]) {
         if (contents) {
             this.contentItems = ImmutableArray.of(contents);
 

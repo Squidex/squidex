@@ -67,4 +67,22 @@ export module Types {
 
         return true;
     }
+
+    export function isEquals<T>(lhs: T[], rhs: T[]) {
+        if (!lhs && !rhs) {
+            return true;
+        }
+
+        if (lhs.length !== rhs.length) {
+            return false;
+        }
+
+        for (let i = 0; i < lhs.length; i++) {
+            if (rhs[i] !== lhs[i]) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 }

@@ -6,23 +6,23 @@
 </td>
 
 <td class="cell-auto" *ngFor="let field of schema.listFields; let i = index" (click)="shouldStop($event)">
-    <div *ngIf="field.properties.inlineEditable && !isReadOnly" [formGroup]="form" (click)="$event.stopPropagation()">
+    <div *ngIf="field.properties['inlineEditable'] && !isReadOnly" [formGroup]="patchForm.form" (click)="$event.stopPropagation()">
         <div [ngSwitch]="field.properties.fieldType">
             <div *ngSwitchCase="'Number'">
-                <div [ngSwitch]="field.properties.editor">
+                <div [ngSwitch]="field.properties['editor']">
                     <div *ngSwitchCase="'Input'">
                         <input class="form-control" type="number" [formControlName]="field.name" [placeholder]="field.displayPlaceholder" />
                     </div>
                     <div *ngSwitchCase="'Dropdown'">
                         <select class="form-control" [formControlName]="field.name">
                             <option [ngValue]="null"></option>
-                            <option *ngFor="let value of field.properties.allowedValues" [ngValue]="value">{{value}}</option>
+                            <option *ngFor="let value of field.properties['allowedValues']" [ngValue]="value">{{value}}</option>
                         </select>
                     </div>
                 </div>
             </div>
             <div *ngSwitchCase="'String'">
-                <div [ngSwitch]="field.properties.editor">
+                <div [ngSwitch]="field.properties['editor']">
                     <div *ngSwitchCase="'Input'">
                         <input class="form-control" type="text" [formControlName]="field.name" [placeholder]="field.displayPlaceholder" />
                     </div>
@@ -32,13 +32,13 @@
                     <div *ngSwitchCase="'Dropdown'">
                         <select class="form-control" [formControlName]="field.name">
                             <option [ngValue]="null"></option>
-                            <option *ngFor="let value of field.properties.allowedValues" [ngValue]="value">{{value}}</option>
+                            <option *ngFor="let value of field.properties['allowedValues']" [ngValue]="value">{{value}}</option>
                         </select>
                     </div>
                 </div>
             </div>
             <div *ngSwitchCase="'Boolean'">
-                <div [ngSwitch]="field.properties.editor">
+                <div [ngSwitch]="field.properties['editor']">
                     <div *ngSwitchCase="'Toggle'">
                         <sqx-toggle [formControlName]="field.name"></sqx-toggle>
                     </div>
@@ -51,7 +51,7 @@
             </div>
         </div>
     </div>
-    <div *ngIf="!field.properties.inlineEditable || isReadOnly" class="truncate">
+    <div *ngIf="!field.properties['inlineEditable'] || isReadOnly" class="truncate">
         {{values[i]}}
     </div>
 </td>
@@ -75,22 +75,22 @@
     <small class="item-modified">{{content.lastModified | sqxFromNow}}</small>
 </td>
 
-<td class="cell-user" *ngIf="form.dirty" (click)="shouldStop($event)">
+<td class="cell-user" *ngIf="patchForm.form.dirty" (click)="shouldStop($event)">
     <button type="button" class="btn btn-success" (click)="save(); $event.stopPropagation()">
         <i class="icon-checkmark"></i>
     </button>
 </td>
-<td class="cell-actions" *ngIf="form.dirty" (click)="shouldStop($event)">
+<td class="cell-actions" *ngIf="patchForm.form.dirty" (click)="shouldStop($event)">
     <button type="button" class="btn btn-link btn-secondary btn-cancel" (click)="save(); $event.stopPropagation()">
         <i class="icon-close"></i>
     </button>
 </td>
 
-<td class="cell-user" *ngIf="form.pristine" (click)="shouldStop($event)">
+<td class="cell-user" *ngIf="patchForm.form.pristine" (click)="shouldStop($event)">
     <img class="user-picture" [attr.title]="content.lastModifiedBy | sqxUserNameRef" [attr.src]="content.lastModifiedBy | sqxUserPictureRef" />
 </td>
 
-<td class="cell-actions" *ngIf="!isReadOnly && form.pristine" (click)="shouldStop($event)">
+<td class="cell-actions" *ngIf="!isReadOnly && patchForm.form.pristine" (click)="shouldStop($event)">
     <div class="dropdown dropdown-options" *ngIf="content">
         <button type="button" class="btn btn-link btn-secondary" (click)="dropdown.toggle(); $event.stopPropagation()" [class.active]="dropdown.isOpen | async" #optionsButton>
             <i class="icon-dots"></i>

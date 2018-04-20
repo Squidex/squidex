@@ -1,8 +1,8 @@
-<sqx-title message="{app} | {schema} | Contents" parameter1="app" parameter2="schema" [value1]="ctx.appName" [value2]="schema?.displayName"></sqx-title>
+<sqx-title message="{app} | {schema} | Contents" parameter1="app" parameter2="schema" [value1]="appsState.appName" [value2]="schema.displayName"></sqx-title>
 
 <sqx-panel desiredWidth="*" contentClass="grid">
     <ng-container title>
-        <ng-container *ngIf="isArchive; else noArchive">
+        <ng-container *ngIf="contentsState.isArchive | async; else noArchive">
             Archive
         </ng-container>
 
@@ -12,26 +12,34 @@
     </ng-container>
 
     <ng-container menu>
-        <button class="btn btn-link btn-secondary" (click)="load(true)" title="Refresh Contents (CTRL + SHIFT + R)">
+        <button class="btn btn-link btn-secondary" (click)="reload()" title="Refresh Contents (CTRL + SHIFT + R)">
             <i class="icon-reset"></i> Refresh
         </button>
 
-        <sqx-shortcut keys="ctrl+shift+r" (trigger)="load(true)"></sqx-shortcut>
+        <sqx-shortcut keys="ctrl+shift+r" (trigger)="reload()"></sqx-shortcut>
 
-        <sqx-search-form (queryChanged)="search($event)" [query]="contentsQuery" enableShortcut="true"></sqx-search-form>
+        <sqx-search-form 
+            (queryChanged)="search($event)" 
+            [query]="contentsState.contentsQuery | async" 
+            (archivedChanged)="goArchive($event)"
+            [archived]="contentsState.isArchive | async"
+            enableShortcut="true">
+        </sqx-search-form>
 
         <ng-container *ngIf="languages.length > 1">
-            <sqx-language-selector class="languages-buttons" (selectedLanguageChanged)="selectLanguage($event)" [languages]="languages.values"></sqx-language-selector>
+            <sqx-language-selector class="languages-buttons" (selectedLanguageChange)="selectLanguage($event)" [languages]="languages.values"></sqx-language-selector>
         </ng-container>
 
         <button class="btn btn-success" #newButton routerLink="new" title="New Content (CTRL + SHIFT + G)">
             <i class="icon-plus"></i> New
         </button>
+        
+        <sqx-shortcut keys="ctrl+shift+g" (trigger)="newButton.click()"></sqx-shortcut>
     </ng-container>
 
     <ng-container content>
         <div class="grid-header">
-            <table class="table table-items table-fixed" *ngIf="contentItems">
+            <table class="table table-items table-fixed">
                 <thead>
                     <tr>
                         <th class="cell-select" *ngIf="!isReadOnly">
@@ -65,11 +73,11 @@
                 Unpublish
             </button>
             
-            <button class="btn btn-secondary" (click)="archiveSelected()" *ngIf="!isArchive">
+            <button class="btn btn-secondary" (click)="archiveSelected()" *ngIf="(contentsState.isArchive | async) === false">
                 Archive
             </button>
             
-            <button class="btn btn-secondary" (click)="restoreSelected()" *ngIf="isArchive">
+            <button class="btn btn-secondary" (click)="restoreSelected()" *ngIf="contentsState.isArchive | async">
                 Restore
             </button>
             
@@ -83,20 +91,20 @@
 
         <div class="grid-content">
             <div sqxIgnoreScrollbar>
-                <table class="table table-items table-fixed" *ngIf="contentItems">
+                <table class="table table-items table-fixed">
                     <tbody>
-                        <ng-template ngFor let-content [ngForOf]="contentItems" [ngForTrackBy]="trackByContent">
+                        <ng-template ngFor let-content [ngForOf]="contentsState.contents | async" [ngForTrackBy]="trackByContent">
                             <tr [sqxContent]="content" [routerLink]="[content.id]" routerLinkActive="active"
                                 [language]="language"
                                 [schema]="schema"
                                 [selected]="isItemSelected(content)"
                                 (selectedChange)="selectItem(content, $event)"
-                                (unpublishing)="unpublishContent(content)"
-                                (publishing)="publishContent(content)"
-                                (archiving)="archiveContent(content)"
-                                (restoring)="restoreContent(content)"
-                                (deleting)="deleteContent(content)"
-                                (saved)="onContentSaved(content, $event)"></tr>
+                                (unpublishing)="unpublish(content)"
+                                (publishing)="publish(content)"
+                                (archiving)="archive(content)"
+                                (restoring)="restore(content)"
+                                (deleting)="delete(content)">
+                            </tr>
                             <tr class="spacer"></tr>
                         </ng-template>
                     </tbody>
@@ -105,7 +113,7 @@
         </div>
 
         <div class="grid-footer">
-            <sqx-pager [pager]="contentsPager"></sqx-pager>
+            <sqx-pager [pager]="contentsState.contentsPager | async"></sqx-pager>
         </div>
     </ng-container>
 </sqx-panel>
@@ -136,7 +144,7 @@
 
         <ng-container footer>
             <button type="button" class="float-left btn btn-secondary" (click)="cancelStatusChange()">Cancel</button>
-            <button type="button" class="float-right btn btn-primary" [disabled]="dueTimeMode === 'Scheduled' && !dueTime" (click)="confirmStatusChange()">Confirm</button>
+            <button type="button" class="float-right btn btn-primary" autofocus [disabled]="dueTimeMode === 'Scheduled' && !dueTime" (click)="confirmStatusChange()">Confirm</button>
         </ng-container>
     </sqx-modal-dialog>
 </ng-container>

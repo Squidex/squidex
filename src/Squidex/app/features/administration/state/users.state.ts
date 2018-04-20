@@ -134,7 +134,10 @@ export class UsersState extends State<Snapshot> {
     }
 
     public load(notifyLoad = false): Observable<any> {
-        return this.usersService.getUsers(this.snapshot.usersPager.pageSize, this.snapshot.usersPager.skip, this.snapshot.usersQuery)
+        return this.usersService.getUsers(
+                this.snapshot.usersPager.pageSize,
+                this.snapshot.usersPager.skip,
+                this.snapshot.usersQuery)
             .do(dtos => {
                 if (notifyLoad) {
                     this.dialogs.notifyInfo('Users reloaded.');

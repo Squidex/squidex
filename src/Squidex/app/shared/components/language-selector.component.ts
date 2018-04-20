@@ -32,7 +32,7 @@ export class LanguageSelectorComponent implements OnChanges, OnInit {
     public selectedLanguage: Language;
 
     @Output()
-    public selectedLanguageChanged = new EventEmitter<Language>();
+    public selectedLanguageChange = new EventEmitter<Language>();
 
     public get isSmallMode(): boolean {
         return this.languages && this.languages.length > 0 && this.languages.length <= 3;
@@ -62,6 +62,6 @@ export class LanguageSelectorComponent implements OnChanges, OnInit {
 
     public selectLanguage(language: Language) {
         this.selectedLanguage = language;
-        this.selectedLanguageChanged.emit(language);
+        this.selectedLanguageChange.emit(language);
     }
 }

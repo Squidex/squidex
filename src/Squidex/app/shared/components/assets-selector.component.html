@@ -10,8 +10,8 @@
     </ng-container>
 
     <ng-container content>
-        <sqx-assets-list assetClass="asset-default" size="4"
-            (selected)="onAssetSelected($event)"
+        <sqx-assets-list
+            (selected)="selectAsset($event)"
             [selectedIds]="selectedAssets"
             [state]="state" isDisabled="true">
         </sqx-assets-list>

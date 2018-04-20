@@ -15,18 +15,18 @@
 </div>
 
 <div class="row">
-    <sqx-asset class="{{assetClass}}" *ngFor="let file of newFiles" [initFile]="file" 
-        (failed)="onAssetFailed(file)" 
-        (loaded)="onAssetLoaded(file, $event)">
+    <sqx-asset *ngFor="let file of newFiles" [initFile]="file" 
+        (failed)="remove(file)" 
+        (loaded)="add(file, $event)">
     </sqx-asset>
 
     <ng-container *ngIf="state.assets | async; let assets">
-        <sqx-asset class="{{assetClass}}" *ngFor="let asset of assets; trackBy: trackByAsset" [asset]="asset" 
+        <sqx-asset *ngFor="let asset of assets; trackBy: trackByAsset" [asset]="asset" 
             [isDisabled]="isDisabled"
             [isSelectable]="selectedIds"
             [isSelected]="isSelected(asset)"
-            (selected)="onAssetSelected($event)"
-            (deleting)="onAssetDeleting($event)">
+            (selected)="select($event)"
+            (deleting)="delete($event)">
         </sqx-asset>
     </ng-container>
 </div>

@@ -8,7 +8,8 @@
 import { Component, OnInit } from '@angular/core';
 
 import {
-    AppContext,
+    AppsState,
+    DialogService,
     ImmutableArray,
     Pager,
     RuleEventDto,
@@ -18,10 +19,7 @@ import {
 @Component({
     selector: 'sqx-rule-events-page',
     styleUrls: ['./rule-events-page.component.scss'],
-    templateUrl: './rule-events-page.component.html',
-    providers: [
-        AppContext
-    ]
+    templateUrl: './rule-events-page.component.html'
 })
 export class RuleEventsPageComponent implements OnInit {
     public eventsItems = ImmutableArray.empty<RuleEventDto>();
@@ -29,7 +27,9 @@ export class RuleEventsPageComponent implements OnInit {
 
     public selectedEventId: string | null = null;
 
-    constructor(public readonly ctx: AppContext,
+    constructor(
+        public readonly appsState: AppsState,
+        private readonly dialogs: DialogService,
         private readonly rulesService: RulesService
     ) {
     }
@@ -39,25 +39,25 @@ export class RuleEventsPageComponent implements OnInit {
     }
 
     public load(notifyLoad = false) {
-        this.rulesService.getEvents(this.ctx.appName, this.eventsPager.pageSize, this.eventsPager.skip)
+        this.rulesService.getEvents(this.appsState.appName, this.eventsPager.pageSize, this.eventsPager.skip)
             .subscribe(dtos => {
                 this.eventsItems = ImmutableArray.of(dtos.items);
                 this.eventsPager = this.eventsPager.setCount(dtos.total);
 
                 if (notifyLoad) {
-                    this.ctx.notifyInfo('Events reloaded.');
+                    this.dialogs.notifyInfo('Events reloaded.');
                 }
             }, error => {
-                this.ctx.notifyError(error);
+                this.dialogs.notifyError(error);
             });
     }
 
     public enqueueEvent(event: RuleEventDto) {
-        this.rulesService.enqueueEvent(this.ctx.appName, event.id)
+        this.rulesService.enqueueEvent(this.appsState.appName, event.id)
             .subscribe(() => {
-                this.ctx.notifyInfo('Events enqueued. Will be resend in a few seconds.');
+                this.dialogs.notifyInfo('Events enqueued. Will be resend in a few seconds.');
             }, error => {
-                this.ctx.notifyError(error);
+                this.dialogs.notifyError(error);
             });
     }
 

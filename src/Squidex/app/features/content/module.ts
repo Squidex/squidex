@@ -11,11 +11,12 @@ import { DndModule } from 'ng2-dnd';
 
 import {
     CanDeactivateGuard,
+    ContentMustExistGuard,
     LoadLanguagesGuard,
-    ResolveContentGuard,
     SchemaMustExistPublishedGuard,
     SqxFrameworkModule,
-    SqxSharedModule
+    SqxSharedModule,
+    UnsetContentGuard
 } from '@app/shared';
 
 import {
@@ -52,15 +53,14 @@ const routes: Routes = [
                     {
                         path: 'new',
                         component: ContentPageComponent,
+                        canActivate: [UnsetContentGuard],
                         canDeactivate: [CanDeactivateGuard]
                     },
                     {
                         path: ':contentId',
                         component: ContentPageComponent,
+                        canActivate: [ContentMustExistGuard],
                         canDeactivate: [CanDeactivateGuard],
-                        resolve: {
-                            content: ResolveContentGuard
-                        },
                         children: [
                              {
                                 path: 'history',

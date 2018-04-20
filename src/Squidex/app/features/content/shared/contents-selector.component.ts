@@ -8,21 +8,20 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 
 import {
-    AppsState,
     ContentDto,
-    ContentsService,
-    DialogService,
-    ImmutableArray,
     LanguageDto,
+    ManualContentsState,
     ModalView,
-    Pager,
     SchemaDetailsDto
 } from '@app/shared';
 
 @Component({
     selector: 'sqx-contents-selector',
     styleUrls: ['./contents-selector.component.scss'],
-    templateUrl: './contents-selector.component.html'
+    templateUrl: './contents-selector.component.html',
+    providers: [
+        ManualContentsState
+    ]
 })
 export class ContentsSelectorComponent implements OnInit {
     @Input()
@@ -39,74 +38,40 @@ export class ContentsSelectorComponent implements OnInit {
 
     public searchModal = new ModalView();
 
-    public contentItems: ImmutableArray<ContentDto>;
-    public contentsQuery = '';
-    public contentsPager = new Pager(0);
-
     public selectedItems:  { [id: string]: ContentDto; } = {};
     public selectionCount = 0;
 
     public isAllSelected = false;
 
     constructor(
-        private readonly appsState: AppsState,
-        private readonly contentsService: ContentsService,
-        private readonly dialogs: DialogService
+        public readonly contentsState: ManualContentsState
     ) {
     }
 
     public ngOnInit() {
-        this.load();
+        this.contentsState.schema = this.schema;
+
+        this.contentsState.load().onErrorResumeNext().subscribe();
     }
 
     public reload() {
-        this.load(true);
-    }
-
-    private load(notifyLod = false) {
-        this.contentsService.getContents(this.appsState.appName, this.schema.name, this.contentsPager.pageSize, this.contentsPager.skip, this.contentsQuery, undefined, false)
-            .finally(() => {
-                this.selectedItems = {};
-
-                this.updateSelectionSummary();
-            })
-            .subscribe(dtos => {
-                this.contentItems = ImmutableArray.of(dtos.items);
-                this.contentsPager = this.contentsPager.setCount(dtos.total);
-
-                if (notifyLod) {
-                    this.dialogs.notifyInfo('Contents reloaded.');
-                }
-            }, error => {
-                this.dialogs.notifyError(error);
-            });
+        this.contentsState.load(true).onErrorResumeNext().subscribe();
     }
 
     public search(query: string) {
-        this.contentsQuery = query;
-        this.contentsPager = new Pager(0);
-
-        this.load();
+        this.contentsState.search(query).onErrorResumeNext().subscribe();
     }
 
     public goNext() {
-        this.contentsPager = this.contentsPager.goNext();
-
-        this.load();
+        this.contentsState.goNext().onErrorResumeNext().subscribe();
     }
 
     public goPrev() {
-        this.contentsPager = this.contentsPager.goPrev();
-
-        this.load();
+        this.contentsState.goPrev().onErrorResumeNext().subscribe();
     }
 
     public isItemSelected(content: ContentDto) {
         return this.selectedItems[content.id];
-    }
-
-    public selectLanguage(language: LanguageDto) {
-        this.language = language;
     }
 
     public complete() {
@@ -117,11 +82,15 @@ export class ContentsSelectorComponent implements OnInit {
         this.selected.emit(Object.values(this.selectedItems));
     }
 
+    public selectLanguage(language: LanguageDto) {
+        this.language = language;
+    }
+
     public selectAll(isSelected: boolean) {
         this.selectedItems = {};
 
         if (isSelected) {
-            for (let content of this.contentItems.values) {
+            for (let content of this.contentsState.snapshot.contents.values) {
                 this.selectedItems[content.id] = content;
             }
         }
@@ -129,7 +98,7 @@ export class ContentsSelectorComponent implements OnInit {
         this.updateSelectionSummary();
     }
 
-    public onContentSelected(content: ContentDto) {
+    public selectContent(content: ContentDto) {
         if (this.selectedItems[content.id]) {
             delete this.selectedItems[content.id];
         } else {
@@ -142,7 +111,7 @@ export class ContentsSelectorComponent implements OnInit {
     private updateSelectionSummary() {
         this.selectionCount = Object.keys(this.selectedItems).length;
 
-        this.isAllSelected = this.selectionCount === this.contentItems.length;
+        this.isAllSelected = this.selectionCount === this.contentsState.snapshot.contents.length;
     }
 
     public trackByContent(content: ContentDto): string {

@@ -1,25 +1,25 @@
-<sqx-title message="{app} | {schema} | Content" parameter1="app" parameter2="schema" [value1]="ctx.appName" [value2]="schema?.displayName"></sqx-title>
+<sqx-title message="{app} | {schema} | Content" parameter1="app" parameter2="schema" [value1]="appsState.appName" [value2]="schema.displayName"></sqx-title>
 
-<form [formGroup]="contentForm" (ngSubmit)="saveAndPublish()">
-    <sqx-panel desiredWidth="*" showSidebar="true">
+<form [formGroup]="contentForm.form" (ngSubmit)="saveAndPublish()">
+    <sqx-panel desiredWidth="*" [showSidebar]="content">
         <ng-container title>
             <a class="btn btn-link" (click)="back()">
                 <i class="icon-angle-left"></i>
             </a>
 
-            <ng-container *ngIf="isNewMode">
+            <ng-container *ngIf="!content">
                 New Content
             </ng-container>
-            <ng-container *ngIf="!isNewMode && content.status !== 'Archived'">
+            <ng-container *ngIf="content && content.status !== 'Archived'">
                 Edit Content
             </ng-container>
-            <ng-container *ngIf="!isNewMode && content.status === 'Archived'">
+            <ng-container *ngIf="content && content.status === 'Archived'">
                 Show Content
             </ng-container>
         </ng-container>
 
         <ng-container menu>
-            <ng-container *ngIf="isNewMode; else notNew">
+            <ng-container *ngIf="!content; else notNew">
                 <button type="button" class="btn btn-secondary" (click)="saveAsDraft()" title="CTRL + S">
                     Save as Draft
                 </button>
@@ -38,24 +38,31 @@
         </ng-container>
 
         <ng-container content>
-            <div class="panel-alert panel-alert-danger" *ngIf="contentOld">
+            <div class="panel-alert panel-alert-danger" *ngIf="contentVersion">
                 <div class="float-right">
                     <a class="force" (click)="showLatest()">View latest</a>
                 </div>
-                Viewing <strong>{{content.lastModifiedBy | sqxUserNameRef:null}}'s</strong> changes of {{content.lastModified | sqxShortDate}}.
+
+                Viewing <strong>version {{contentVersion.value</strong>.
             </div>
 
             <div *ngFor="let field of schema.fields">
-                <sqx-content-field [field]="field" [fieldForm]="contentForm.controls[field.name]" [languages]="languages" [contentFormSubmitted]="contentFormSubmitted"></sqx-content-field>
+                <sqx-content-field 
+                    [field]="field"
+                    [fieldForm]="contentForm.form.controls[field.name]" 
+                    [(language)]="language"
+                    [languages]="languages"
+                    [contentFormSubmitted]="contentForm.submitted | async">
+                </sqx-content-field>
             </div>
         </ng-container>
 
         <ng-container sidebar>
-            <a class="panel-link" routerLink="history" routerLinkActive="active" #linkHistory *ngIf="!isNewMode">
+            <a class="panel-link" routerLink="history" routerLinkActive="active" #linkHistory>
                 <i class="icon-time"></i>
             </a>
 
-            <sqx-onboarding-tooltip id="history" [for]="linkHistory" position="leftTop" after="120000" *ngIf="!isNewMode">
+            <sqx-onboarding-tooltip id="history" [for]="linkHistory" position="leftTop" after="120000">
                 The sidebar navigation contains useful context specific links. Here you can view the history how this schema has changed over time.
             </sqx-onboarding-tooltip>
         </ng-container>

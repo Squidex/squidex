@@ -69,23 +69,25 @@ export class SearchFormComponent implements OnChanges {
         let odataFilter = '';
         let odataSearch = '';
 
-        const parts = this.query.split('&');
+        if (this.query) {
+            const parts = this.query.split('&');
 
-        if (parts.length === 1 && parts[0][0] !== '$') {
-            odataSearch = parts[0];
-        } else {
-            for (let part of parts) {
-                const kvp = part.split('=');
+            if (parts.length === 1 && parts[0][0] !== '$') {
+                odataSearch = parts[0];
+            } else {
+                for (let part of parts) {
+                    const kvp = part.split('=');
 
-                if (kvp.length === 2) {
-                    const key = kvp[0].toLowerCase();
+                    if (kvp.length === 2) {
+                        const key = kvp[0].toLowerCase();
 
-                    if (key === '$filter') {
-                        odataFilter = kvp[1];
-                    } else if (key === '$orderby') {
-                        odataOrderBy = kvp[1];
-                    } else if (key === '$search') {
-                        odataSearch = kvp[1];
+                        if (key === '$filter') {
+                            odataFilter = kvp[1];
+                        } else if (key === '$orderby') {
+                            odataOrderBy = kvp[1];
+                        } else if (key === '$search') {
+                            odataSearch = kvp[1];
+                        }
                     }
                 }
             }

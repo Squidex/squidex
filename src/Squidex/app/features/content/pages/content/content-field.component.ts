@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
 import { AbstractControl, FormGroup } from '@angular/forms';
 
 import {
@@ -18,9 +18,10 @@ import {
 @Component({
     selector: 'sqx-content-field',
     styleUrls: ['./content-field.component.scss'],
-    templateUrl: './content-field.component.html'
+    templateUrl: './content-field.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ContentFieldComponent implements OnInit {
+export class ContentFieldComponent implements OnChanges {
     @Input()
     public field: FieldDto;
 
@@ -30,6 +31,9 @@ export class ContentFieldComponent implements OnInit {
     @Input()
     public language: AppLanguageDto;
 
+    @Output()
+    public languageChange = new EventEmitter<AppLanguageDto>();
+
     @Input()
     public languages: ImmutableArray<AppLanguageDto>;
 
@@ -38,23 +42,13 @@ export class ContentFieldComponent implements OnInit {
 
     public selectedFormControl: AbstractControl;
 
-    public ngOnInit() {
-        if (!this.language) {
-            this.language = this.languages.at(0);
-        }
-
+    public ngOnChanges() {
         if (this.field.isLocalizable) {
             this.selectedFormControl = this.fieldForm.controls[this.language.iso2Code];
+            this.selectedFormControl['_clearChangeFns']();
         } else {
             this.selectedFormControl = this.fieldForm.controls[fieldInvariant];
         }
-    }
-
-    public selectLanguage(language: AppLanguageDto) {
-        this.selectedFormControl['_clearChangeFns']();
-        this.selectedFormControl = this.fieldForm.controls[language.iso2Code];
-
-        this.language = language;
     }
 }
 

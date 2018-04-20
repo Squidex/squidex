@@ -5,7 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-export * from './components/app-context';
 export * from './components/app-form.component';
 export * from './components/asset.component';
 export * from './components/assets-list.component';

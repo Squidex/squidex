@@ -6,21 +6,22 @@
  */
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, Subscription } from 'rxjs';
 
 import { ContentVersionSelected } from './../messages';
 
 import {
-    AppContext,
     AppLanguageDto,
+    AppsState,
     CanComponentDeactivate,
     ContentDto,
-    ContentsService,
-    fieldInvariant,
+    ContentsState,
+    DialogService,
+    EditContentForm,
     ImmutableArray,
     LanguagesState,
+    MessageBus,
     SchemaDetailsDto,
     SchemasState,
     Version
@@ -29,81 +30,78 @@ import {
 @Component({
     selector: 'sqx-content-page',
     styleUrls: ['./content-page.component.scss'],
-    templateUrl: './content-page.component.html',
-    providers: [
-        AppContext
-    ]
+    templateUrl: './content-page.component.html'
 })
 export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, OnInit {
-    private contentVersionSelectedSubscription: Subscription;
     private languagesSubscription: Subscription;
+    private contentSubscription: Subscription;
+    private contentVersionSelectedSubscription: Subscription;
     private selectedSchemaSubscription: Subscription;
 
     public schema: SchemaDetailsDto;
 
     public content: ContentDto;
-    public contentOld: ContentDto | null;
-    public contentFormSubmitted = false;
-    public contentForm: FormGroup;
+    public contentVersion: Version | null;
+    public contentForm: EditContentForm;
 
-    public isNewMode = true;
-
+    public language: AppLanguageDto;
     public languages: ImmutableArray<AppLanguageDto>;
 
     constructor(
-        public readonly ctx: AppContext,
-        public readonly languagesState: LanguagesState,
-        private readonly contentsService: ContentsService,
+        public readonly appsState: AppsState,
+        private readonly contentsState: ContentsState,
+        private readonly dialogs: DialogService,
+        private readonly languagesState: LanguagesState,
+        private readonly messageBus: MessageBus,
+        private readonly route: ActivatedRoute,
         private readonly router: Router,
         private readonly schemasState: SchemasState
     ) {
     }
 
     public ngOnDestroy() {
-        this.contentVersionSelectedSubscription.unsubscribe();
         this.languagesSubscription.unsubscribe();
+        this.contentSubscription.unsubscribe();
+        this.contentVersionSelectedSubscription.unsubscribe();
         this.selectedSchemaSubscription.unsubscribe();
     }
 
     public ngOnInit() {
-        this.contentVersionSelectedSubscription =
-            this.ctx.bus.of(ContentVersionSelected)
-                .subscribe(message => {
-                    this.loadVersion(message.version);
-                });
-
         this.languagesSubscription =
             this.languagesState.languages
                 .subscribe(languages => {
                     this.languages = languages.map(x => x.language);
+                    this.language = this.languages.at(0);
                 });
 
         this.selectedSchemaSubscription =
-            this.schemasState.selectedSchema
+            this.schemasState.selectedSchema.filter(s => !!s)
                 .subscribe(schema => {
-                    this.setupContentForm(schema!);
+                    this.schema = schema!;
+
+                    this.contentForm = new EditContentForm(this.schema, this.languages);
                 });
 
-        this.ctx.route.data.map(d => d.content)
-            .subscribe((content: ContentDto) => {
-                this.reloadContentForm(content);
-            });
+        this.contentSubscription =
+            this.contentsState.selectedContent.filter(c => !!c)
+                .subscribe(content => {
+                    this.content = content!;
+
+                    this.loadContent(content!.data);
+                });
+
+        this.contentVersionSelectedSubscription =
+            this.messageBus.of(ContentVersionSelected)
+                .subscribe(message => {
+                    this.loadVersion(message.version);
+                });
     }
 
     public canDeactivate(): Observable<boolean> {
-        if (!this.contentForm.dirty || this.isNewMode) {
+        if (!this.contentForm.form.dirty || !this.content) {
             return Observable.of(true);
         } else {
-            return this.ctx.confirmUnsavedChanges();
-        }
-    }
-
-    public showLatest() {
-        if (this.contentOld) {
-            this.content = this.contentOld;
-            this.contentOld = null;
-
-            this.reloadContentForm(this.content);
+            return this.dialogs.confirmUnsavedChanges();
         }
     }
 
@@ -116,153 +114,59 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
     }
 
     private saveContent(publish: boolean) {
-        this.contentFormSubmitted = true;
+        const value = this.contentForm.submit();
 
-        if (this.contentForm.valid) {
-            this.disableContentForm();
-
-            const requestDto = this.contentForm.value;
-
-            if (this.isNewMode) {
-                this.contentsService.postContent(this.ctx.appName, this.schema.name, requestDto, publish)
+        if (value) {
+            if (!this.content) {
+                this.contentsState.create(value, publish)
                     .subscribe(dto => {
-                        this.content = dto;
-
-                        this.ctx.notifyInfo('Content created successfully.');
-
                         this.back();
                     }, error => {
-                        this.ctx.notifyError(error);
-
-                        this.enableContentForm();
+                        this.contentForm.submitFailed(error);
                     });
             } else {
-                this.contentsService.putContent(this.ctx.appName, this.schema.name, this.content.id, requestDto, this.content.version)
+                this.contentsState.create(value, publish)
                     .subscribe(dto => {
-                        const content = this.content.update(dto.payload, this.ctx.userToken, dto.version);
-
-                        this.ctx.notifyInfo('Content saved successfully.');
-
-                        this.enableContentForm();
-                        this.reloadContentForm(content);
+                        this.contentForm.submitCompleted();
                     }, error => {
-                        this.ctx.notifyError(error);
-
-                        this.enableContentForm();
+                        this.contentForm.submitFailed(error);
                     });
             }
         } else {
-            this.ctx.notifyError('Content element not valid, please check the field with the red bar on the left in all languages (if localizable).');
-        }
-    }
-
-    private loadVersion(version: number) {
-        if (!this.isNewMode && this.content) {
-           this.contentsService.getVersionData(this.ctx.appName, this.schema.name, this.content.id, new Version(version.toString()))
-                .subscribe(dto => {
-                    if (this.content.version.value !== version.toString()) {
-                        this.contentOld = this.content;
-                    } else {
-                        this.contentOld = null;
-                    }
-
-                    this.ctx.notifyInfo('Content version loaded successfully.');
-
-                    this.reloadContentForm(this.content.setData(dto));
-                }, error => {
-                    this.ctx.notifyError(error);
-                });
+            this.dialogs.notifyError('Content element not valid, please check the field with the red bar on the left in all languages (if localizable).');
         }
     }
 
     public back() {
-        this.router.navigate([this.schema.name], { relativeTo: this.ctx.route.parent!.parent, replaceUrl: true });
+        this.router.navigate([this.schema.name], { relativeTo: this.route.parent!.parent, replaceUrl: true });
     }
 
-    private disableContentForm() {
-        this.contentForm.disable();
+    private loadContent(data: any) {
+        this.contentForm.load(data);
     }
 
-    private enableContentForm() {
-        this.contentForm.markAsPristine();
-
-        if (this.schema.fields.length === 0) {
-            this.contentForm.enable();
-        } else {
-            for (const field of this.schema.fields) {
-                const fieldForm = <FormGroup>this.contentForm.controls[field.name];
-
-                if (field.isDisabled) {
-                    fieldForm.disable();
-                } else {
-                    fieldForm.enable();
-                }
-            }
-        }
-    }
-
-    private setupContentForm(schema: SchemaDetailsDto) {
-        this.schema = schema;
-
-        const controls: { [key: string]: AbstractControl } = {};
-
-        for (const field of schema.fields) {
-            const fieldForm = new FormGroup({});
-
-            if (field.isLocalizable) {
-                for (let language of this.languages.values) {
-                    fieldForm.setControl(language.iso2Code, new FormControl(undefined, field.createValidators(language.isOptional)));
-                }
-            } else {
-                fieldForm.setControl(fieldInvariant, new FormControl(undefined, field.createValidators(false)));
-            }
-
-            controls[field.name] = fieldForm;
-        }
-
-        this.contentForm = new FormGroup(controls);
-
-        this.enableContentForm();
-    }
-
-    private reloadContentForm(content: ContentDto) {
-        this.content = content;
-        this.contentForm.markAsPristine();
-
-        this.isNewMode = !this.content;
-
-        if (!this.isNewMode) {
-            for (const field of this.schema.fields) {
-                const fieldValue = this.content.data[field.name] || {};
-                const fieldForm = <FormGroup>this.contentForm.controls[field.name];
-
-                if (field.isLocalizable) {
-                    for (let language of this.languages.values) {
-                        fieldForm.controls[language.iso2Code].setValue(fieldValue[language.iso2Code]);
-                    }
-                } else {
-                    fieldForm.controls[fieldInvariant].setValue(fieldValue[fieldInvariant] === undefined ? null : fieldValue[fieldInvariant]);
-                }
-            }
-            if (this.content.status === 'Archived') {
-                this.contentForm.disable();
-            }
-        } else {
-            for (const field of this.schema.fields) {
-                const defaultValue = field.defaultValue();
-
-                if (defaultValue) {
-                    const fieldForm = <FormGroup>this.contentForm.controls[field.name];
-
-                    if (field.isLocalizable) {
-                        for (let language of this.languages.values) {
-                            fieldForm.controls[language.iso2Code].setValue(defaultValue);
-                        }
+    private loadVersion(version: Version) {
+        if (this.content) {
+            this.contentsState.loadVersion(this.content, version)
+                .subscribe(dto => {
+                    if (this.content.version.value !== version.toString()) {
+                        this.contentVersion = version;
                     } else {
-                        fieldForm.controls[fieldInvariant].setValue(defaultValue);
+                        this.contentVersion = null;
                     }
-                }
-            }
+
+                    this.dialogs.notifyInfo('Content version loaded successfully.');
+
+                    this.loadContent(dto);
+                });
+        }
+    }
+
+    public showLatest() {
+        if (this.contentVersion) {
+            this.contentVersion = null;
+
+            this.loadContent(this.content.data);
         }
     }
 }

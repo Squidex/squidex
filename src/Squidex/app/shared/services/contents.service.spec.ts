@@ -18,58 +18,6 @@ import {
     Version
 } from './../';
 
-describe('ContentDto', () => {
-    const creation = DateTime.today();
-    const creator = 'not-me';
-    const modified = DateTime.now();
-    const modifier = 'me';
-    const dueTime = DateTime.now().addDays(1);
-    const version = new Version('1');
-    const newVersion = new Version('2');
-
-    it('should update data property and user info when updating', () => {
-        const content_1 = new ContentDto('1', 'Published', creator, creator, creation, creation, null, null, null, { data: 1 }, version);
-        const content_2 = content_1.update({ data: 2 }, modifier, newVersion, modified);
-
-        expect(content_2.data).toEqual({ data: 2 });
-        expect(content_2.lastModified).toEqual(modified);
-        expect(content_2.lastModifiedBy).toEqual(modifier);
-        expect(content_2.version).toEqual(newVersion);
-    });
-
-    it('should update status property and user info when changing status', () => {
-        const content_1 = new ContentDto('1', 'Draft', creator, creator, creation, creation, null, null, null, { data: 1 }, version);
-        const content_2 = content_1.changeStatus('Published', null, modifier, newVersion, modified);
-
-        expect(content_2.status).toEqual('Published');
-        expect(content_2.lastModified).toEqual(modified);
-        expect(content_2.lastModifiedBy).toEqual(modifier);
-        expect(content_2.version).toEqual(newVersion);
-    });
-
-    it('should update schedules property and user info when changing status with due time', () => {
-        const content_1 = new ContentDto('1', 'Draft', creator, creator, creation, creation, null, null, null, { data: 1 }, version);
-        const content_2 = content_1.changeStatus('Published', dueTime, modifier, newVersion, modified);
-
-        expect(content_2.status).toEqual('Draft');
-        expect(content_2.lastModified).toEqual(modified);
-        expect(content_2.lastModifiedBy).toEqual(modifier);
-        expect(content_2.scheduledAt).toEqual(dueTime);
-        expect(content_2.scheduledBy).toEqual(modifier);
-        expect(content_2.scheduledTo).toEqual('Published');
-        expect(content_2.version).toEqual(newVersion);
-    });
-
-    it('should update data property when setting data', () => {
-        const newData = {};
-
-        const content_1 = new ContentDto('1', 'Published', creator, creator, creation, creation, null, null, null, { data: 1 }, version);
-        const content_2 = content_1.setData(newData);
-
-        expect(content_2.data).toBe(newData);
-    });
-});
-
 describe('ContentsService', () => {
     const version = new Version('1');
 
