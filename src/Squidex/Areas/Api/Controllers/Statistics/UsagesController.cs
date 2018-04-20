@@ -64,7 +64,9 @@ namespace Squidex.Areas.Api.Controllers.Statistics
 
             var plan = appPlanProvider.GetPlanForApp(App);
 
-            return Ok(new CurrentCallsDto { Count = count, MaxAllowed = plan.MaxApiCalls });
+            var response = new CurrentCallsDto { Count = count, MaxAllowed = plan.MaxApiCalls };
+
+            return Ok(response);
         }
 
         /// <summary>
@@ -91,14 +93,9 @@ namespace Squidex.Areas.Api.Controllers.Statistics
 
             var entities = await usageTracker.QueryAsync(App.Id.ToString(), fromDate.Date, toDate.Date);
 
-            var models = entities.Select(x =>
-            {
-                var averageMs = x.TotalCount == 0 ? 0 : x.TotalElapsedMs / x.TotalCount;
+            var response = entities.Select(CallsUsageDto.FromUsage);
 
-                return new CallsUsageDto { Date = x.Date, Count = x.TotalCount, AverageMs = averageMs };
-            }).ToList();
-
-            return Ok(models);
+            return Ok(response);
         }
 
         /// <summary>
@@ -119,7 +116,9 @@ namespace Squidex.Areas.Api.Controllers.Statistics
 
             var plan = appPlanProvider.GetPlanForApp(App);
 
-            return Ok(new CurrentStorageDto { Size = size, MaxAllowed = plan.MaxAssetSize });
+            var response = new CurrentStorageDto { Size = size, MaxAllowed = plan.MaxAssetSize };
+
+            return Ok(response);
         }
 
         /// <summary>
@@ -146,7 +145,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics
 
             var entities = await assetStatsRepository.QueryAsync(App.Id, fromDate.Date, toDate.Date);
 
-            var models = entities.Select(x => new StorageUsageDto { Date = x.Date, Count = x.TotalCount, Size = x.TotalSize }).ToList();
+            var models = entities.Select(StorageUsageDto.FromStats).ToList();
 
             return Ok(models);
         }

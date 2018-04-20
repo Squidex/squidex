@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using Squidex.Domain.Apps.Entities.Assets;
 
 namespace Squidex.Areas.Api.Controllers.Statistics.Models
 {
@@ -25,5 +26,10 @@ namespace Squidex.Areas.Api.Controllers.Statistics.Models
         /// The size in bytes.
         /// </summary>
         public long Size { get; set; }
+
+        public static StorageUsageDto FromStats(IAssetStatsEntity stats)
+        {
+            return new StorageUsageDto { Date = stats.Date, Count = stats.TotalCount, Size = stats.TotalSize };
+        }
     }
 }
