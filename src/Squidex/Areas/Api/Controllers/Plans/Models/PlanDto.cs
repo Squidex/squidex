@@ -5,6 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Entities.Apps.Services;
+using Squidex.Infrastructure.Reflection;
 using System.ComponentModel.DataAnnotations;
 
 namespace Squidex.Areas.Api.Controllers.Plans.Models
@@ -53,5 +55,10 @@ namespace Squidex.Areas.Api.Controllers.Plans.Models
         /// The maximum number of contributors.
         /// </summary>
         public int MaxContributors { get; set; }
+
+        public static PlanDto FromPlan(IAppLimitsPlan plan)
+        {
+            return SimpleMapper.Map(plan, new PlanDto());
+        }
     }
 }

@@ -5,15 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using Squidex.Areas.Api.Controllers.Plans.Models;
-using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Services;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
 
 namespace Squidex.Areas.Api.Controllers.Plans
@@ -54,16 +51,9 @@ namespace Squidex.Areas.Api.Controllers.Plans
         [ApiCosts(0)]
         public IActionResult GetPlans(string app)
         {
-            var planId = appPlansProvider.GetPlanForApp(App).Id;
-            var plans = appPlansProvider.GetAvailablePlans().Select(x => SimpleMapper.Map(x, new PlanDto())).ToList();
+            var hasPortal = appPlansBillingManager.HasPortal;
 
-            var response = new AppPlansDto
-            {
-                CurrentPlanId = planId,
-                Plans = plans,
-                PlanOwner = App.Plan?.Owner.Identifier,
-                HasPortal = appPlansBillingManager.HasPortal
-            };
+            var response = AppPlansDto.FromApp(App, appPlansProvider, hasPortal);
 
             Response.Headers["ETag"] = App.Version.ToString();
 
@@ -89,8 +79,9 @@ namespace Squidex.Areas.Api.Controllers.Plans
         [ApiCosts(0)]
         public async Task<IActionResult> ChangePlanAsync(string app, [FromBody] ChangePlanDto request)
         {
-            var redirectUri = (string)null;
-            var context = await CommandBus.PublishAsync(SimpleMapper.Map(request, new ChangePlan()));
+            var context = await CommandBus.PublishAsync(request.ToCommand());
+
+            string redirectUri = null;
 
             if (context.Result<object>() is RedirectToCheckoutResult result)
             {
