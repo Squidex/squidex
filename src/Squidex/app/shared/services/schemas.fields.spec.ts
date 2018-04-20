@@ -65,7 +65,7 @@ describe('SchemaDetailsDto', () => {
     it('should return empty list fields if fields is empty', () => {
         const schema = createSchema(new SchemaPropertiesDto(''), 1, []);
 
-        expect(schema.listFields).toEqual([{}]);
+        expect(schema.listFields).toEqual([{ properties: {} }]);
     });
 });
 
@@ -181,7 +181,7 @@ describe('BooleanField', () => {
     });
 
     it('should return default value for default properties', () => {
-        Object.assign(field.properties, { defaultValue : true });
+        Object.assign(field.properties, { defaultValue: true });
 
         expect(field.defaultValue()).toBeTruthy();
     });

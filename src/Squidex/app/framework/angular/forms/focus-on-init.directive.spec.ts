@@ -10,7 +10,7 @@ import { ElementRef, Renderer } from '@angular/core';
 import { FocusOnInitDirective } from './focus-on-init.directive';
 
 describe('FocusOnInitDirective', () => {
-    it('should call focus on element when init', () => {
+    it('should call focus on element when init', (cb) => {
         const calledMethods: string[] = [];
         const calledElements: any[] = [];
 
@@ -29,7 +29,11 @@ describe('FocusOnInitDirective', () => {
         directive.select = true;
         directive.ngAfterViewInit();
 
-        expect(calledMethods).toEqual(['focus', 'select']);
-        expect(calledElements).toEqual([element.nativeElement, element.nativeElement]);
+        setTimeout(() => {
+            expect(calledMethods).toEqual(['focus', 'select']);
+            expect(calledElements).toEqual([element.nativeElement, element.nativeElement]);
+
+            cb();
+        }, 200);
     });
 });
