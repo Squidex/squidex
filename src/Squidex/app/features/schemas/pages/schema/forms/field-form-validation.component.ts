@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
 import {
@@ -17,8 +17,7 @@ import {
 @Component({
     selector: 'sqx-field-form-validation',
     styleUrls: ['field-form-validation.component.scss'],
-    templateUrl: 'field-form-validation.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    templateUrl: 'field-form-validation.component.html'
 })
 export class FieldFormValidationComponent {
     @Input()

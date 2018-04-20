@@ -60,7 +60,7 @@
         </div>
 
         <div dnd-sortable-container [sortableData]="schema.fields">
-            <div *ngFor="let field of schema.fields; let i = index; trackBy: trackByField" dnd-sortable [sortableIndex]="i" (sqxSorted)="sortFields($event)">
+            <div *ngFor="let field of schema.fields; let i = index;" dnd-sortable [sortableIndex]="i" (sqxSorted)="sortFields($event)">
                 <sqx-field [field]="field" [schema]="schema" [patterns]="patternsState.patterns | async"></sqx-field>
             </div>
     

@@ -2,7 +2,7 @@
     <div class="table-items-row-summary">        
         <div class="row">
             <div class="col col-2">
-                <span class="language-code" [class.language-optional]="language.isOptional" [class.language-master]="language.isMaster">{{language.iso2Code}}</span>
+                <span class="language-code" [class.language-optional]="language.isOptional" [class.language-master]="language.isMaster"></span>
             </div>
             <div class="col col-6">
                 <span class="language-name table-cell" [class.language-optional]="language.isOptional" [class.language-master]="language.isMaster">{{language.englishName}}</span>
@@ -71,8 +71,8 @@
                 <div class="form-group row" *ngIf="!language.isMaster">
                     <div class="col offset-3 col-9">
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="isMaster" formControlName="isMaster" />
-                            <label class="form-check-label" for="isMaster">
+                            <input class="form-check-input" type="checkbox" id="{{language.iso2Code}}_isMaster" formControlName="isMaster" />
+                            <label class="form-check-label" for="{{language.iso2Code}}_isMaster">
                                 Is Master
                             </label>
                         </div>
@@ -86,8 +86,8 @@
                 <div class="form-group row" *ngIf="!language.isMaster">
                     <div class="col offset-3 col-9" *ngIf="!isMaster">
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="isOptional" formControlName="isOptional" />
-                            <label class="form-check-label" for="isOptional">
+                            <input class="form-check-input" type="checkbox" id="{{language.iso2Code}}_isOptional" formControlName="isOptional" />
+                            <label class="form-check-label" for="{{language.iso2Code}}_isOptional">
                                 Is Optional
                             </label> 
                         </div>

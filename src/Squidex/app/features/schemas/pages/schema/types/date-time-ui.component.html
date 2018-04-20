@@ -1,9 +1,9 @@
 <div [formGroup]="editForm">
     <div class="form-group row">
-        <label class="col col-3 col-form-label" for="fieldPlaceholder">Placeholder</label>
+        <label class="col col-3 col-form-label" for="{{field.fieldId}}_fieldPlaceholder">Placeholder</label>
 
         <div class="col col-6">
-            <input type="text" class="form-control" id="fieldPlaceholder" maxlength="100" formControlName="placeholder" />
+            <input type="text" class="form-control" id="{{field.fieldId}}_fieldPlaceholder" maxlength="100" formControlName="placeholder" />
 
             <small class="form-text text-muted">
                 Define the placeholder for the input control.

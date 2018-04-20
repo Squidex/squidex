@@ -11,6 +11,7 @@ import { Observable, Subscription } from 'rxjs';
 
 import {
     AppPatternDto,
+    FieldDto,
     ImmutableArray,
     ModalView,
     StringFieldPropertiesDto
@@ -26,6 +27,9 @@ export class StringValidationComponent implements OnDestroy, OnInit {
 
     @Input()
     public editForm: FormGroup;
+
+    @Input()
+    public field: FieldDto;
 
     @Input()
     public properties: StringFieldPropertiesDto;
