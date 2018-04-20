@@ -5,9 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.ComponentModel.DataAnnotations;
 using Squidex.Domain.Apps.Entities.Apps.Services;
 using Squidex.Infrastructure.Reflection;
-using System.ComponentModel.DataAnnotations;
 
 namespace Squidex.Areas.Api.Controllers.Plans.Models
 {

@@ -5,11 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Domain.Apps.Entities.Apps.Services;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Entities.Apps.Services;
 
 namespace Squidex.Areas.Api.Controllers.Plans.Models
 {
