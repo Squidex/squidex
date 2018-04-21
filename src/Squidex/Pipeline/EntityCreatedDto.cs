@@ -25,7 +25,7 @@ namespace Squidex.Pipeline
 
         public static EntityCreatedDto FromResult<T>(EntityCreatedResult<T> result)
         {
-            return new EntityCreatedDto { Id = result.ToString(), Version = result.Version };
+            return new EntityCreatedDto { Id = result.IdOrValue?.ToString(), Version = result.Version };
         }
     }
 }
