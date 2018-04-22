@@ -142,6 +142,7 @@ export class AddFieldForm extends Form<FormGroup> {
 }
 
 interface Snapshot {
+    schemasApp?: string;
     schemas: ImmutableArray<SchemaDto>;
 
     isLoaded?: boolean;
@@ -198,12 +199,16 @@ export class SchemasState extends State<Snapshot> {
     }
 
     public load(): Observable<any> {
+        if (this.snapshot.schemasApp !== this.appName) {
+            this.next({ schemas: ImmutableArray.of() });
+        }
+
         return this.schemasService.getSchemas(this.appName)
             .do(dtos => {
                 return this.next(s => {
                     const schemas = ImmutableArray.of(dtos).sortByStringAsc(x => x.displayName);
 
-                    return { ...s, schemas, isLoaded: true };
+                    return { ...s, schemas, schemasApp: this.appName, isLoaded: true };
                 });
             })
             .notify(this.dialogs);
