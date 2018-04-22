@@ -34,16 +34,16 @@ export class EventConsumersPageComponent implements OnDestroy, OnInit {
     }
 
     public ngOnInit() {
-        this.eventConsumersState.load(false, true).onErrorResumeNext().subscribe();
+        this.eventConsumersState.load().onErrorResumeNext().subscribe();
 
         this.timerSubscription =
             Observable.timer(2000, 2000)
-                .switchMap(x => this.eventConsumersState.load().onErrorResumeNext())
+                .switchMap(x => this.eventConsumersState.reloadSilently().onErrorResumeNext())
                 .subscribe();
     }
 
     public reload() {
-        this.eventConsumersState.load(true, true).onErrorResumeNext().subscribe();
+        this.eventConsumersState.reload().onErrorResumeNext().subscribe();
     }
 
     public start(es: EventConsumerDto) {

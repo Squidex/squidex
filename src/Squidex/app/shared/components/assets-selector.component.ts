@@ -39,9 +39,13 @@ export class AssetsSelectorComponent implements OnInit {
     }
 
     public ngOnInit() {
-        this.state.load(false, true).onErrorResumeNext().subscribe();
+        this.state.load().onErrorResumeNext().subscribe();
 
         this.assetsFilter.setValue(this.state.snapshot.assetsQuery);
+    }
+
+    public reload() {
+        this.state.load(true).onErrorResumeNext().subscribe();
     }
 
     public search() {
