@@ -68,18 +68,7 @@ describe('AssetsState', () => {
         dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
     });
 
-    it('should not reload when assets already loaded', () => {
-        assetsState.load(false, true).subscribe();
-
-        expect(assetsState.snapshot.assets.values).toEqual(oldAssets);
-        expect(assetsState.snapshot.assetsPager.numberOfItems).toEqual(200);
-
-        assetsService.verify(x => x.getAssets(app, 30, 0, undefined), Times.once());
-
-        dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
-    });
-
-    it('should show notification on load when flag is true', () => {
+    it('should show notification on load when reload is true', () => {
         assetsState.load(true).subscribe();
 
         dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());

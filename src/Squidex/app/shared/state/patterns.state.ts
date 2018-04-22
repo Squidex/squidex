@@ -78,10 +78,14 @@ export class PatternsState extends State<Snapshot> {
         super({ patterns: ImmutableArray.empty(), version: new Version('') });
     }
 
-    public load(notifyLoad = false): Observable<any> {
+    public load(isReload = false): Observable<any> {
+        if (!isReload) {
+            this.resetState();
+        }
+
         return this.appPatternsService.getPatterns(this.appName)
             .do(dtos => {
-                if (notifyLoad) {
+                if (isReload) {
                     this.dialogs.notifyInfo('Patterns reloaded.');
                 }
 

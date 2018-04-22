@@ -108,14 +108,18 @@ export class LanguagesState extends State<Snapshot> {
         });
     }
 
-    public load(notifyLoad = false): Observable<any> {
+    public load(isReload = false): Observable<any> {
+        if (!isReload) {
+            this.resetState();
+        }
+
         return Observable.forkJoin(
                 this.languagesService.getLanguages(),
                 this.appLanguagesService.getLanguages(this.appName),
                 (allLanguages, languages) => ({ allLanguages, languages })
             )
             .do(dtos => {
-                if (notifyLoad) {
+                if (isReload) {
                     this.dialogs.notifyInfo('Languages reloaded.');
                 }
 

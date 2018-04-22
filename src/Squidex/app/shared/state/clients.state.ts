@@ -83,10 +83,14 @@ export class ClientsState extends State<Snapshot> {
         super({ clients: ImmutableArray.empty(), version: new Version('') });
     }
 
-    public load(notifyLoad = false): Observable<any> {
+    public load(isReload = false): Observable<any> {
+        if (!isReload) {
+            this.resetState();
+        }
+
         return this.appClientsService.getClients(this.appName)
             .do(dtos => {
-                if (notifyLoad) {
+                if (isReload) {
                     this.dialogs.notifyInfo('Clients reloaded.');
                 }
 

@@ -82,10 +82,14 @@ export class ContributorsState extends State<Snapshot> {
         super({ contributors: ImmutableArray.empty(), version: new Version(''), maxContributors: -1 });
     }
 
-    public load(notifyLoad = false): Observable<any> {
+    public load(isReload = false): Observable<any> {
+        if (!isReload) {
+            this.resetState();
+        }
+
         return this.appContributorsService.getContributors(this.appName)
             .do(dtos => {
-                if (notifyLoad) {
+                if (isReload) {
                     this.dialogs.notifyInfo('Contributors reloaded.');
                 }
 

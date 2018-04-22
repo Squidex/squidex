@@ -50,12 +50,20 @@ export class RuleEventsState extends State<Snapshot> {
         super({ ruleEvents: ImmutableArray.of(), ruleEventsPager: new Pager(0) });
     }
 
-    public load(notifyLoad = false): Observable<any> {
+    public load(isReload = false): Observable<any> {
+        if (!isReload) {
+            this.resetState();
+        }
+
+        return this.loadInternal(isReload);
+    }
+
+    private loadInternal(isReload = false): Observable<any> {
         return this.rulesService.getEvents(this.appName,
                 this.snapshot.ruleEventsPager.pageSize,
                 this.snapshot.ruleEventsPager.skip)
             .do(dtos => {
-                if (notifyLoad) {
+                if (isReload) {
                     this.dialogs.notifyInfo('RuleEvents reloaded.');
                 }
 
@@ -80,13 +88,13 @@ export class RuleEventsState extends State<Snapshot> {
     public goNext(): Observable<any> {
         this.next(s => ({ ...s, ruleEventsPager: s.ruleEventsPager.goNext() }));
 
-        return this.load();
+        return this.loadInternal();
     }
 
     public goPrev(): Observable<any> {
         this.next(s => ({ ...s, ruleEventsPager: s.ruleEventsPager.goPrev() }));
 
-        return this.load();
+        return this.loadInternal();
     }
 
     private get appName() {

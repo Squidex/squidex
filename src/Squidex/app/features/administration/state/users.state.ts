@@ -133,13 +133,21 @@ export class UsersState extends State<Snapshot> {
                 });
     }
 
-    public load(notifyLoad = false): Observable<any> {
+    public load(isReload = false): Observable<any> {
+        if (!isReload) {
+            this.resetState();
+        }
+
+        return this.loadInternal(isReload);
+    }
+
+    private loadInternal(isReload = false): Observable<any> {
         return this.usersService.getUsers(
                 this.snapshot.usersPager.pageSize,
                 this.snapshot.usersPager.skip,
                 this.snapshot.usersQuery)
             .do(dtos => {
-                if (notifyLoad) {
+                if (isReload) {
                     this.dialogs.notifyInfo('Users reloaded.');
                 }
 
@@ -197,19 +205,19 @@ export class UsersState extends State<Snapshot> {
     public search(query: string): Observable<any> {
         this.next(s => ({ ...s, usersPager: new Pager(0), usersQuery: query }));
 
-        return this.load();
+        return this.loadInternal();
     }
 
     public goNext(): Observable<any> {
         this.next(s => ({ ...s, usersPager: s.usersPager.goNext() }));
 
-        return this.load();
+        return this.loadInternal();
     }
 
     public goPrev(): Observable<any> {
         this.next(s => ({ ...s, usersPager: s.usersPager.goPrev() }));
 
-        return this.load();
+        return this.loadInternal();
     }
 
     private replaceUser(user: UserDto) {

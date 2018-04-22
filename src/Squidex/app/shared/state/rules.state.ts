@@ -53,10 +53,14 @@ export class RulesState extends State<Snapshot> {
         super({ rules: ImmutableArray.empty() });
     }
 
-    public load(notifyLoad = false): Observable<any> {
+    public load(isReload = false): Observable<any> {
+        if (!isReload) {
+            this.resetState();
+        }
+
         return this.rulesService.getRules(this.appName)
             .do(dtos => {
-                if (notifyLoad) {
+                if (isReload) {
                     this.dialogs.notifyInfo('Rules reloaded.');
                 }
 

@@ -54,13 +54,13 @@ describe('BackupsState', () => {
         dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
     });
 
-    it('should show notification on load when flag is true', () => {
+    it('should show notification on load when reload is true', () => {
         backupsState.load(true, true).subscribe();
 
         dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
     });
 
-    it('should show notification on load error when flag is true', () => {
+    it('should show notification on load error when silent is true', () => {
         backupsService.setup(x => x.getBackups(app))
             .returns(() => Observable.throw({}));
 

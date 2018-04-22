@@ -42,13 +42,13 @@ describe('EventConsumersState', () => {
         dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
     });
 
-    it('should show notification on load when flag is true', () => {
+    it('should show notification on load when reload is true', () => {
         eventConsumersState.load(true, true).subscribe();
 
         dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
     });
 
-    it('should show notification on load error when flag is true', () => {
+    it('should show notification on load error when silent is true', () => {
         eventConsumersService.setup(x => x.getEventConsumers())
             .returns(() => Observable.throw({}));
 

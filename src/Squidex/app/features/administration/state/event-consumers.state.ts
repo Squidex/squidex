@@ -41,10 +41,14 @@ export class EventConsumersState extends State<Snapshot> {
         super({ eventConsumers: ImmutableArray.empty() });
     }
 
-    public load(notifyLoad = false, notifyError = false): Observable<any> {
+    public load(isReload = false, silent = false): Observable<any> {
+        if (!isReload) {
+            this.resetState();
+        }
+
         return this.eventConsumersService.getEventConsumers()
             .do(dtos => {
-                if (notifyLoad) {
+                if (isReload) {
                     this.dialogs.notifyInfo('Event Consumers reloaded.');
                 }
 
@@ -55,7 +59,7 @@ export class EventConsumersState extends State<Snapshot> {
                 });
             })
             .catch(error => {
-                if (notifyError) {
+                if (silent) {
                     this.dialogs.notifyError(error);
                 }
 

@@ -64,14 +64,18 @@ export class AssetsState extends State<Snapshot> {
         super({ assets: ImmutableArray.empty(), assetsPager: new Pager(0, 0, 30) });
     }
 
-    public load(notifyLoad = false, noReload = false): Observable<any> {
-        if (this.snapshot.isLoaded && noReload) {
-            return Observable.of({});
+    public load(isReload = false): Observable<any> {
+        if (!isReload) {
+            this.resetState();
         }
 
+        return this.loadInternal(isReload);
+    }
+
+    private loadInternal(isReload = false): Observable<any> {
         return this.assetsService.getAssets(this.appName, this.snapshot.assetsPager.pageSize, this.snapshot.assetsPager.skip, this.snapshot.assetsQuery)
             .do(dtos => {
-                if (notifyLoad) {
+                if (isReload) {
                     this.dialogs.notifyInfo('Assets reloaded.');
                 }
 
@@ -118,19 +122,19 @@ export class AssetsState extends State<Snapshot> {
     public search(query: string): Observable<any> {
         this.next(s => ({ ...s, assetsPager: new Pager(0, 0, 30), assetsQuery: query }));
 
-        return this.load();
+        return this.loadInternal();
     }
 
     public goNext(): Observable<any> {
         this.next(s => ({ ...s, assetsPager: s.assetsPager.goNext() }));
 
-        return this.load();
+        return this.loadInternal();
     }
 
     public goPrev(): Observable<any> {
         this.next(s => ({ ...s, assetsPager: s.assetsPager.goPrev() }));
 
-        return this.load();
+        return this.loadInternal();
     }
 
     private get appName() {

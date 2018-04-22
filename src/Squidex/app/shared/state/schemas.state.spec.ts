@@ -94,6 +94,12 @@ describe('SchemasState', () => {
         schemasService.verifyAll();
     });
 
+    it('should show notification on load when reload is true', () => {
+        schemasState.load(true).subscribe();
+
+        dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
+    });
+
     it('should return schema on select and reload when already loaded', () => {
         schemasState.select('name2').subscribe();
         schemasState.select('name2').subscribe();

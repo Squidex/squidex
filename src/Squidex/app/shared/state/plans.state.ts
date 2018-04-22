@@ -77,10 +77,14 @@ export class PlansState extends State<Snapshot> {
         super({ plans: ImmutableArray.empty(), version: new Version('') });
     }
 
-    public load(notifyLoad = false, overridePlanId?: string): Observable<any> {
+    public load(isReload = false, overridePlanId?: string): Observable<any> {
+        if (!isReload) {
+            this.resetState();
+        }
+
         return this.plansService.getPlans(this.appName)
             .do(dto => {
-                if (notifyLoad) {
+                if (isReload) {
                     this.dialogs.notifyInfo('Plans reloaded.');
                 }
 

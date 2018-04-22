@@ -48,10 +48,14 @@ export class BackupsState extends State<Snapshot> {
         super({ backups: ImmutableArray.empty() });
     }
 
-    public load(notifyLoad = false, notifyError = false): Observable<any> {
+    public load(isReload = false, silent = false): Observable<any> {
+        if (!isReload) {
+            this.resetState();
+        }
+
         return this.backupsService.getBackups(this.appName)
             .do(dtos => {
-                if (notifyLoad) {
+                if (isReload) {
                     this.dialogs.notifyInfo('Backups reloaded.');
                 }
 
@@ -62,7 +66,7 @@ export class BackupsState extends State<Snapshot> {
                 });
             })
             .catch(error => {
-                if (notifyError) {
+                if (silent) {
                     this.dialogs.notifyError(error);
                 }
 

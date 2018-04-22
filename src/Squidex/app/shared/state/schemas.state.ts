@@ -198,13 +198,17 @@ export class SchemasState extends State<Snapshot> {
                 .catch(() => Observable.of(null));
     }
 
-    public load(): Observable<any> {
-        if (this.snapshot.schemasApp !== this.appName) {
-            this.next({ schemas: ImmutableArray.of() });
+    public load(isReload = false): Observable<any> {
+        if (!isReload) {
+            this.resetState();
         }
 
         return this.schemasService.getSchemas(this.appName)
             .do(dtos => {
+                if (isReload) {
+                    this.dialogs.notifyInfo('Schemas reloaded.');
+                }
+
                 return this.next(s => {
                     const schemas = ImmutableArray.of(dtos).sortByStringAsc(x => x.displayName);
 

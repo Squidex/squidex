@@ -204,14 +204,22 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                 });
     }
 
-    public load(notifyLoad = false): Observable<any> {
+    public load(isReload = false): Observable<any> {
+        if (!isReload) {
+            this.resetState();
+        }
+
+        return this.loadInternal(isReload);
+    }
+
+    private loadInternal(isReload = false): Observable<any> {
         return this.contentsService.getContents(this.appName, this.schemaName,
                 this.snapshot.contentsPager.pageSize,
                 this.snapshot.contentsPager.skip,
                 this.snapshot.contentsQuery, undefined,
                 this.snapshot.isArchive)
             .do(dtos => {
-                if (notifyLoad) {
+                if (isReload) {
                     this.dialogs.notifyInfo('Contents reloaded.');
                 }
 
@@ -259,7 +267,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
 
                 return Observable.of(error);
             })
-            .switchMap(() => this.load());
+            .switchMap(() => this.loadInternal());
     }
 
     public delete(contents: ContentDto[]): Observable<any> {
@@ -276,7 +284,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
 
                 return Observable.of(error);
             })
-            .switchMap(() => this.load());
+            .switchMap(() => this.loadInternal());
     }
 
     public update(content: ContentDto, request: any, now?: DateTime): Observable<any> {
@@ -311,31 +319,31 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     public goArchive(isArchive: boolean): Observable<any> {
         this.next(s => ({ ...s, contentsPager: new Pager(0), contentsQuery: undefined, isArchive }));
 
-        return this.load();
+        return this.loadInternal();
     }
 
     public init(): Observable<any> {
         this.next(s => ({ ...s, contentsPager: new Pager(0), contentsQuery: '', isArchive: false, isLoaded: false }));
 
-        return this.load();
+        return this.loadInternal();
     }
 
     public search(query: string): Observable<any> {
         this.next(s => ({ ...s, contentsPager: new Pager(0), contentsQuery: query }));
 
-        return this.load();
+        return this.loadInternal();
     }
 
     public goNext(): Observable<any> {
         this.next(s => ({ ...s, contentsPager: s.contentsPager.goNext() }));
 
-        return this.load();
+        return this.loadInternal();
     }
 
     public goPrev(): Observable<any> {
         this.next(s => ({ ...s, contentsPager: s.contentsPager.goPrev() }));
 
-        return this.load();
+        return this.loadInternal();
     }
 
     public loadVersion(content: ContentDto, version: Version): Observable<Versioned<any>> {
