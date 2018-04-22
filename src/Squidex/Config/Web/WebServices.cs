@@ -20,6 +20,7 @@ namespace Squidex.Config.Web
             services.AddSingletonAs<AppApiFilter>();
             services.AddSingletonAs<ApiCostsFilter>();
 
+            services.AddResponseCaching();
             services.AddMvc().AddMySerializers();
             services.AddCors();
             services.AddRouting();
