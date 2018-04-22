@@ -42,17 +42,17 @@ describe('EventConsumersState', () => {
         dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
     });
 
-    it('should show notification on reload', () => {
-        eventConsumersState.reload().subscribe();
+    it('should show notification on load when flag is true', () => {
+        eventConsumersState.load(true, true).subscribe();
 
         dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
     });
 
-    it('should show notification on load error', () => {
+    it('should show notification on load error when flag is true', () => {
         eventConsumersService.setup(x => x.getEventConsumers())
             .returns(() => Observable.throw({}));
 
-        eventConsumersState.load().onErrorResumeNext().subscribe();
+        eventConsumersState.load(true, true).onErrorResumeNext().subscribe();
 
         dialogs.verify(x => x.notifyError(It.isAny()), Times.once());
     });
@@ -61,7 +61,7 @@ describe('EventConsumersState', () => {
         eventConsumersService.setup(x => x.getEventConsumers())
             .returns(() => Observable.throw({}));
 
-        eventConsumersState.reloadSilently().onErrorResumeNext().subscribe();
+        eventConsumersState.load().onErrorResumeNext().subscribe();
 
         dialogs.verify(x => x.notifyError(It.isAny()), Times.never());
     });

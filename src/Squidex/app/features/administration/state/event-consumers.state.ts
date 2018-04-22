@@ -41,19 +41,7 @@ export class EventConsumersState extends State<Snapshot> {
         super({ eventConsumers: ImmutableArray.empty() });
     }
 
-    public load() {
-        return this.loadInternal(true);
-    }
-
-    public reload() {
-        return this.loadInternal(true, true);
-    }
-
-    public reloadSilently() {
-        return this.loadInternal(false, false);
-    }
-
-    public loadInternal(notifyLoad = false, notifyError = false): Observable<any> {
+    public load(notifyLoad = false, notifyError = false): Observable<any> {
         return this.eventConsumersService.getEventConsumers()
             .do(dtos => {
                 if (notifyLoad) {
