@@ -14,12 +14,12 @@ namespace Squidex.Infrastructure.Commands
     {
         public static string Format(IGrainCallContext context)
         {
-            if (context.Method == null)
+            if (context.InterfaceMethod == null)
             {
                 return "Unknown";
             }
 
-            if (string.Equals(context.Method.Name, nameof(IDomainObjectGrain.ExecuteAsync), StringComparison.CurrentCultureIgnoreCase) &&
+            if (string.Equals(context.InterfaceMethod.Name, nameof(IDomainObjectGrain.ExecuteAsync), StringComparison.CurrentCultureIgnoreCase) &&
                 context.Arguments?.Length == 1 &&
                 context.Arguments[0] != null)
             {
@@ -30,7 +30,7 @@ namespace Squidex.Infrastructure.Commands
                 return $"{nameof(IDomainObjectGrain.ExecuteAsync)}({argumentName})";
             }
 
-            return context.Method.Name;
+            return context.InterfaceMethod.Name;
         }
     }
 }
