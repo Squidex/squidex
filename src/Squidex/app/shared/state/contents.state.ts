@@ -250,7 +250,8 @@ export abstract class ContentsStateBase extends State<Snapshot> {
 
                     return { ...s, contents, contentsPager };
                 });
-            });
+            })
+            .notify(this.dialogs);
     }
 
     public changeStatus(contents: ContentDto[], action: string, dueTime: string | null): Observable<any> {
