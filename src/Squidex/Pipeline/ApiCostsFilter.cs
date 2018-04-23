@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Squidex.Domain.Apps.Entities.Apps.Services;
+using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.UsageTracking;
 
 namespace Squidex.Pipeline
@@ -47,14 +48,17 @@ namespace Squidex.Pipeline
 
             if (appFeature?.App != null && FilterDefinition.Weight > 0)
             {
-                var plan = appPlanProvider.GetPlanForApp(appFeature.App);
-
-                var usage = await usageTracker.GetMonthlyCallsAsync(appFeature.App.Id.ToString(), DateTime.Today);
-
-                if (plan.MaxApiCalls >= 0 && usage > plan.MaxApiCalls * 1.1)
+                using (Profile.Key("CheckUsage"))
                 {
-                    context.Result = new StatusCodeResult(429);
-                    return;
+                    var plan = appPlanProvider.GetPlanForApp(appFeature.App);
+
+                    var usage = await usageTracker.GetMonthlyCallsAsync(appFeature.App.Id.ToString(), DateTime.Today);
+
+                    if (plan.MaxApiCalls >= 0 && usage > plan.MaxApiCalls * 1.1)
+                    {
+                        context.Result = new StatusCodeResult(429);
+                        return;
+                    }
                 }
 
                 var stopWatch = Stopwatch.StartNew();

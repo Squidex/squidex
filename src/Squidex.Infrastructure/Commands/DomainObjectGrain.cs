@@ -162,7 +162,8 @@ namespace Squidex.Infrastructure.Commands
 
                 throw new DomainObjectNotFoundException(id.ToString(), GetType());
             }
-            else if (!isUpdate && Version >= 0)
+
+            if (!isUpdate && Version >= 0)
             {
                 throw new DomainException("Object has already been created.");
             }

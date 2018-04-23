@@ -75,7 +75,7 @@ namespace Squidex.Config.Orleans
                     {
                         builder.AddConfiguration(hostingContext.Configuration.GetSection("logging"));
                         builder.AddSemanticLog();
-                        builder.AddOrleansFilter();
+                        builder.AddFilter();
                     })
                     .ConfigureApplicationParts(builder =>
                     {

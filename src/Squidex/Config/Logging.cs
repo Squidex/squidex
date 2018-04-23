@@ -12,7 +12,7 @@ namespace Squidex.Config
 {
     public static class Logging
     {
-        public static void AddOrleansFilter(this ILoggingBuilder builder)
+        public static void AddFilter(this ILoggingBuilder builder)
         {
             builder.AddFilter((category, level) =>
             {
@@ -24,6 +24,11 @@ namespace Squidex.Config
                 if (category.StartsWith("Runtime.", StringComparison.OrdinalIgnoreCase))
                 {
                     return level >= LogLevel.Warning;
+                }
+
+                if (category.StartsWith("Microsoft.AspNetCore.", StringComparison.OrdinalIgnoreCase))
+                {
+                    return level > LogLevel.Information;
                 }
 
                 return level >= LogLevel.Information;

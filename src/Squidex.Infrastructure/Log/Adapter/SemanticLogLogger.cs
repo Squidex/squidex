@@ -86,14 +86,5 @@ namespace Squidex.Infrastructure.Log.Adapter
         {
             return NoopDisposable.Instance;
         }
-
-        private class NoopDisposable : IDisposable
-        {
-            public static readonly NoopDisposable Instance = new NoopDisposable();
-
-            public void Dispose()
-            {
-            }
-        }
     }
 }

@@ -13,13 +13,15 @@ using Squidex.Infrastructure.Log;
 
 namespace Squidex.Pipeline
 {
-    public sealed class LogPerformanceMiddleware : ActionFilterAttribute
+    public sealed class RequestLogPerformanceMiddleware : ActionFilterAttribute
     {
+        private readonly RequestLogProfilerSessionProvider requestSession;
         private readonly RequestDelegate next;
         private readonly ISemanticLog log;
 
-        public LogPerformanceMiddleware(RequestDelegate next, ISemanticLog log)
+        public RequestLogPerformanceMiddleware(RequestLogProfilerSessionProvider requestSession, RequestDelegate next, ISemanticLog log)
         {
+            this.requestSession = requestSession;
             this.next = next;
             this.log = log;
         }
@@ -28,11 +30,25 @@ namespace Squidex.Pipeline
         {
             var stopWatch = Stopwatch.StartNew();
 
-            await next(context);
+            var session = new ProfilerSession();
 
-            stopWatch.Stop();
+            try
+            {
+                requestSession.Start(context, session);
 
-            log.LogInformation(w => w.WriteProperty("elapsedRequestMs", stopWatch.ElapsedMilliseconds));
+                await next(context);
+            }
+            finally
+            {
+                stopWatch.Stop();
+
+                log.LogInformation(w =>
+                {
+                    session.Write(w);
+
+                    w.WriteProperty("elapsedRequestMs", stopWatch.ElapsedMilliseconds);
+                });
+            }
         }
     }
 }

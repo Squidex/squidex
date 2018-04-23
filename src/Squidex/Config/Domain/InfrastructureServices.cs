@@ -8,6 +8,7 @@
 using System;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
 using Squidex.Infrastructure;
@@ -25,6 +26,9 @@ namespace Squidex.Config.Domain
                 .As<IClock>();
 
             services.AddSingletonAs<BackgroundUsageTracker>()
+                .AsSelf();
+
+            services.AddSingletonAs(c => new CachingUsageTracker(c.GetRequiredService<BackgroundUsageTracker>(), c.GetRequiredService<IMemoryCache>()))
                 .As<IUsageTracker>();
 
             services.AddSingletonAs<HttpContextAccessor>()
