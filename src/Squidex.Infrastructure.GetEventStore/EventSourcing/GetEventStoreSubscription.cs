@@ -30,12 +30,13 @@ namespace Squidex.Infrastructure.EventSourcing
             Guard.NotNull(subscriber, nameof(subscriber));
 
             this.connection = connection;
+
             this.position = projectionClient.ParsePositionOrNull(position);
-            this.subscriber = subscriber;
 
             var streamName = projectionClient.CreateProjectionAsync(streamFilter).Result;
 
-            subscription = SubscribeToStream(streamName);
+            this.subscriber = subscriber;
+            this.subscription = SubscribeToStream(streamName);
         }
 
         public Task StopAsync()
