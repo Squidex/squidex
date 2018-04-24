@@ -12,7 +12,7 @@
                     <tr [sqxContent]="content" dnd-sortable [sortableIndex]="i" (sqxSorted)="sort($event)"
                         [language]="language"
                         [schema]="schema"
-                        (removing)="remove(content)"
+                        (deleting)="remove(content)"
                         isReadOnly="true" 
                         isReference="true"></tr>
                     <tr class="spacer"></tr>

@@ -62,7 +62,7 @@
         </div>
 
         <div class="grid-footer">
-            <sqx-pager [pager]="contentsState.contentsPager | async"></sqx-pager>
+            <sqx-pager [pager]="contentsState.contentsPager | async" (prev)="goPrev()" (next)="goNext()"></sqx-pager>
         </div>
     </ng-container>
 
