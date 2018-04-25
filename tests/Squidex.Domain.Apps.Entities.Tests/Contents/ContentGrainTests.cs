@@ -25,6 +25,7 @@ using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.Log;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents
@@ -107,7 +108,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             patched = patch.MergeInto(data);
 
-            sut = new ContentGrain(Store, appProvider, A.Dummy<IAssetRepository>(), scriptEngine, A.Dummy<IContentRepository>());
+            sut = new ContentGrain(Store, A.Dummy<ISemanticLog>(), appProvider, A.Dummy<IAssetRepository>(), scriptEngine, A.Dummy<IContentRepository>());
             sut.OnActivateAsync(Id).Wait();
         }
 

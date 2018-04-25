@@ -11,6 +11,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.TestHelpers;
@@ -60,7 +61,7 @@ namespace Squidex.Infrastructure.Commands
         public sealed class MyDomainObject : DomainObjectGrain<MyDomainState>
         {
             public MyDomainObject(IStore<Guid> store)
-               : base(store)
+               : base(store, A.Dummy<ISemanticLog>())
             {
             }
 

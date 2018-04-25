@@ -16,6 +16,7 @@ using Squidex.Domain.Apps.Entities.Assets.State;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Tasks;
 using Xunit;
 
@@ -42,7 +43,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             file = new AssetFile("my-image.png", "image/png", 1024, () => stream);
 
-            asset = new AssetGrain(Store);
+            asset = new AssetGrain(Store, A.Dummy<ISemanticLog>());
             asset.OnActivateAsync(Id).Wait();
 
             A.CallTo(() => grainFactory.GetGrain<IAssetGrain>(Id, null))

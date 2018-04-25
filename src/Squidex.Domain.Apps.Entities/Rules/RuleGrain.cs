@@ -15,6 +15,7 @@ using Squidex.Domain.Apps.Events.Rules;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
@@ -25,8 +26,8 @@ namespace Squidex.Domain.Apps.Entities.Rules
     {
         private readonly IAppProvider appProvider;
 
-        public RuleGrain(IStore<Guid> store, IAppProvider appProvider)
-            : base(store)
+        public RuleGrain(IStore<Guid> store, ISemanticLog log, IAppProvider appProvider)
+            : base(store, log)
         {
             Guard.NotNull(appProvider, nameof(appProvider));
 

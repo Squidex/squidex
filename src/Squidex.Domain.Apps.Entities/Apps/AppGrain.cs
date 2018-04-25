@@ -18,6 +18,7 @@ using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
@@ -36,11 +37,12 @@ namespace Squidex.Domain.Apps.Entities.Apps
         public AppGrain(
             InitialPatterns initialPatterns,
             IStore<Guid> store,
+            ISemanticLog log,
             IAppProvider appProvider,
             IAppPlansProvider appPlansProvider,
             IAppPlanBillingManager appPlansBillingManager,
             IUserResolver userResolver)
-            : base(store)
+            : base(store, log)
         {
             Guard.NotNull(initialPatterns, nameof(initialPatterns));
             Guard.NotNull(appProvider, nameof(appProvider));

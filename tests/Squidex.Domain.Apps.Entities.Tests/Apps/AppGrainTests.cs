@@ -17,6 +17,7 @@ using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.Log;
 using Squidex.Shared.Users;
 using Xunit;
 
@@ -61,7 +62,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 { patternId2, new AppPattern("Numbers", "[0-9]*") }
             };
 
-            sut = new AppGrain(initialPatterns, Store, appProvider, appPlansProvider, appPlansBillingManager, userResolver);
+            sut = new AppGrain(initialPatterns, Store, A.Dummy<ISemanticLog>(), appProvider, appPlansProvider, appPlansBillingManager, userResolver);
             sut.OnActivateAsync(Id).Wait();
         }
 

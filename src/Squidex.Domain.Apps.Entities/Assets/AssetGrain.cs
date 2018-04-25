@@ -15,6 +15,7 @@ using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
@@ -23,8 +24,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
 {
     public class AssetGrain : SquidexDomainObjectGrain<AssetState>, IAssetGrain
     {
-        public AssetGrain(IStore<Guid> store)
-            : base(store)
+        public AssetGrain(IStore<Guid> store, ISemanticLog log)
+            : base(store, log)
         {
         }
 
