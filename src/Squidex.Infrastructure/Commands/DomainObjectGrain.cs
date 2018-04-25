@@ -59,8 +59,8 @@ namespace Squidex.Infrastructure.Commands
         {
             using (log.MeasureInformation(w => w
                 .WriteProperty("action", "ActivateDomainObject")
-                .WriteProperty("doType", GetType().Name)
-                .WriteProperty("doKey", key.ToString())))
+                .WriteProperty("domainObjectType", GetType().Name)
+                .WriteProperty("domainObjectKey", key.ToString())))
             {
                 id = key;
 
