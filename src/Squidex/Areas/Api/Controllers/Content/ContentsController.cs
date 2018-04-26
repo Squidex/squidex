@@ -32,14 +32,17 @@ namespace Squidex.Areas.Api.Controllers.Contents
     public sealed class ContentsController : ApiController
     {
         private readonly IContentQueryService contentQuery;
+        private readonly IContentVersionLoader contentVersionLoader;
         private readonly IGraphQLService graphQl;
 
         public ContentsController(ICommandBus commandBus,
             IContentQueryService contentQuery,
+            IContentVersionLoader contentVersionLoader,
             IGraphQLService graphQl)
             : base(commandBus)
         {
             this.contentQuery = contentQuery;
+            this.contentVersionLoader = contentVersionLoader;
 
             this.graphQl = graphQl;
         }
@@ -195,7 +198,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(1)]
         public async Task<IActionResult> GetContentVersion(string app, string name, Guid id, int version)
         {
-            var content = await contentQuery.FindContentAsync(App, name, User, id, version);
+            var content = await contentVersionLoader.LoadAsync(id, version);
 
             var response = SimpleMapper.Map(content.Content, new ContentDto());
 

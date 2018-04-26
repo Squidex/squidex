@@ -517,7 +517,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   }}
                 }}";
 
-            A.CallTo(() => contentQuery.FindContentAsync(app, schema.Id.ToString(), user, contentId, EtagVersion.Any))
+            A.CallTo(() => contentQuery.FindContentAsync(app, schema.Id.ToString(), user, contentId))
                 .Returns((schema, content));
 
             var result = await sut.QueryAsync(app, user, new GraphQLQuery { Query = query });
@@ -610,7 +610,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             var refContents = new List<IContentEntity> { contentRef };
 
-            A.CallTo(() => contentQuery.FindContentAsync(app, schema.Id.ToString(), user, contentId, EtagVersion.Any))
+            A.CallTo(() => contentQuery.FindContentAsync(app, schema.Id.ToString(), user, contentId))
                 .Returns((schema, content));
 
             A.CallTo(() => contentQuery.QueryAsync(app, schema.Id.ToString(), user, false, A<HashSet<Guid>>.That.Matches(x => x.Contains(contentRefId))))
@@ -670,7 +670,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             var refAssets = new List<IAssetEntity> { assetRef };
 
-            A.CallTo(() => contentQuery.FindContentAsync(app, schema.Id.ToString(), user, contentId, EtagVersion.Any))
+            A.CallTo(() => contentQuery.FindContentAsync(app, schema.Id.ToString(), user, contentId))
                 .Returns((schema, content));
 
             A.CallTo(() => assetRepository.QueryAsync(app.Id, A<HashSet<Guid>>.That.Matches(x => x.Contains(assetRefId))))
@@ -729,7 +729,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                   }}
                 }}";
 
-            A.CallTo(() => contentQuery.FindContentAsync(app, schema.Id.ToString(), user, contentId, EtagVersion.Any))
+            A.CallTo(() => contentQuery.FindContentAsync(app, schema.Id.ToString(), user, contentId))
                 .Returns((schema, content));
 
             var result = await sut.QueryAsync(app, user, new GraphQLQuery { Query = query });

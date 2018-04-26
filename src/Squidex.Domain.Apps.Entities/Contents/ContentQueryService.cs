@@ -48,7 +48,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             this.modelBuilder = modelBuilder;
         }
 
-        public async Task<(ISchemaEntity Schema, IContentEntity Content)> FindContentAsync(IAppEntity app, string schemaIdOrName, ClaimsPrincipal user, Guid id, long version = -1)
+        public async Task<(ISchemaEntity Schema, IContentEntity Content)> FindContentAsync(IAppEntity app, string schemaIdOrName, ClaimsPrincipal user, Guid id)
         {
             Guard.NotNull(app, nameof(app));
             Guard.NotNull(user, nameof(user));
@@ -58,10 +58,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var schema = await FindSchemaAsync(app, schemaIdOrName);
 
-            var content =
-                version > EtagVersion.Empty ?
-                await contentRepository.FindContentAsync(app, schema, id, version) :
-                await contentRepository.FindContentAsync(app, schema, id);
+            var content = await contentRepository.FindContentAsync(app, schema, id);
 
             if (content == null || (content.Status != Status.Published && !isFrontendClient))
             {
