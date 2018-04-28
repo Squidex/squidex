@@ -9,9 +9,8 @@ using System;
 using System.Linq;
 using Squidex.Infrastructure;
 using Squidex.Shared.Identity;
-using Squidex.Shared.Users;
 
-namespace Squidex.Domain.Users
+namespace Squidex.Shared.Users
 {
     public static class UserExtensions
     {

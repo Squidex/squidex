@@ -6,6 +6,12 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
+using System.Security.Claims;
+using System.Threading.Tasks;
+using FakeItEasy;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NodaTime;
@@ -15,6 +21,8 @@ using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Shared.Identity;
+using Squidex.Shared.Users;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.HandleRules
@@ -22,11 +30,24 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
     public class RuleEventFormatterTests
     {
         private readonly JsonSerializer serializer = JsonSerializer.CreateDefault();
+        private readonly MemoryCache memoryCache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
+        private readonly IUserResolver userResolver = A.Fake<IUserResolver>();
+        private readonly IUser user = A.Fake<IUser>();
+        private readonly IRuleUrlGenerator urlGenerator = A.Fake<IRuleUrlGenerator>();
+        private readonly NamedId<Guid> appId = new NamedId<Guid>(Guid.NewGuid(), "my-app");
+        private readonly NamedId<Guid> schemaId = new NamedId<Guid>(Guid.NewGuid(), "my-schema");
+        private readonly Guid contentId = Guid.NewGuid();
         private readonly RuleEventFormatter sut;
 
         public RuleEventFormatterTests()
         {
-            sut = new RuleEventFormatter(serializer);
+            A.CallTo(() => user.Email)
+                .Returns("me@email.com");
+
+            A.CallTo(() => user.Claims)
+                .Returns(new List<Claim> { new Claim(SquidexClaimTypes.SquidexDisplayName, "me") });
+
+            sut = new RuleEventFormatter(serializer, urlGenerator, memoryCache, userResolver);
         }
 
         [Fact]
@@ -40,12 +61,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public void Should_create_route_data()
         {
-            var appId = Guid.NewGuid();
-
-            var @event = new ContentCreated
-            {
-                AppId = new NamedId<Guid>(appId, "my-app")
-            };
+            var @event = new ContentCreated { AppId = appId };
 
             var result = sut.ToRouteData(AsEnvelope(@event));
 
@@ -55,12 +71,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public void Should_create_route_data_from_event()
         {
-            var appId = Guid.NewGuid();
-
-            var @event = new ContentCreated
-            {
-                AppId = new NamedId<Guid>(appId, "my-app")
-            };
+            var @event = new ContentCreated { AppId = appId };
 
             var result = sut.ToRouteData(AsEnvelope(@event), "MyEventName");
 
@@ -70,31 +81,21 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public void Should_replace_app_information_from_event()
         {
-            var appId = Guid.NewGuid();
-
-            var @event = new ContentCreated
-            {
-                AppId = new NamedId<Guid>(appId, "my-app")
-            };
+            var @event = new ContentCreated { AppId = appId };
 
             var result = sut.FormatString("Name $APP_NAME has id $APP_ID", AsEnvelope(@event));
 
-            Assert.Equal($"Name my-app has id {appId}", result);
+            Assert.Equal($"Name my-app has id {appId.Id}", result);
         }
 
         [Fact]
         public void Should_replace_schema_information_from_event()
         {
-            var schemaId = Guid.NewGuid();
-
-            var @event = new ContentCreated
-            {
-                SchemaId = new NamedId<Guid>(schemaId, "my-schema")
-            };
+            var @event = new ContentCreated { SchemaId = schemaId };
 
             var result = sut.FormatString("Name $SCHEMA_NAME has id $SCHEMA_ID", AsEnvelope(@event));
 
-            Assert.Equal($"Name my-schema has id {schemaId}", result);
+            Assert.Equal($"Name my-schema has id {schemaId.Id}", result);
         }
 
         [Fact]
@@ -102,11 +103,75 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
             var now = DateTime.UtcNow;
 
-            var envelope = Envelope.Create(new ContentCreated()).To<AppEvent>().SetTimestamp(Instant.FromDateTimeUtc(now));
+            var envelope = AsEnvelope(new ContentCreated()).SetTimestamp(Instant.FromDateTimeUtc(now));
 
             var result = sut.FormatString("Date: $TIMESTAMP_DATE, Full: $TIMESTAMP_DATETIME", envelope);
 
             Assert.Equal($"Date: {now:yyyy-MM-dd}, Full: {now:yyyy-MM-dd-hh-mm-ss}", result);
+        }
+
+        [Fact]
+        public void Should_format_email_and_display_name_from_user()
+        {
+            A.CallTo(() => userResolver.FindByIdOrEmailAsync("123"))
+                .Returns(user);
+
+            var @event = new ContentCreated { Actor = new RefToken("subject", "123") };
+
+            var result = sut.FormatString("From $USER_NAME ($USER_EMAIL)", AsEnvelope(@event));
+
+            Assert.Equal($"From me (me@email.com)", result);
+        }
+
+        [Fact]
+        public void Should_return_undefined_if_user_is_not_found()
+        {
+            A.CallTo(() => userResolver.FindByIdOrEmailAsync("123"))
+                .Returns(Task.FromResult<IUser>(null));
+
+            var @event = new ContentCreated { Actor = new RefToken("subject", "123") };
+
+            var result = sut.FormatString("From $USER_NAME ($USER_EMAIL)", AsEnvelope(@event));
+
+            Assert.Equal($"From UNDEFINED (UNDEFINED)", result);
+        }
+
+        [Fact]
+        public void Should_return_undefined_if_user_failed_to_resolve()
+        {
+            A.CallTo(() => userResolver.FindByIdOrEmailAsync("123"))
+                .Throws(new InvalidOperationException());
+
+            var @event = new ContentCreated { Actor = new RefToken("subject", "123") };
+
+            var result = sut.FormatString("From $USER_NAME ($USER_EMAIL)", AsEnvelope(@event));
+
+            Assert.Equal($"From UNDEFINED (UNDEFINED)", result);
+        }
+
+        [Fact]
+        public void Should_format_email_and_display_name_from_client()
+        {
+            var @event = new ContentCreated { Actor = new RefToken("client", "android") };
+
+            var result = sut.FormatString("From $USER_NAME ($USER_EMAIL)", AsEnvelope(@event));
+
+            Assert.Equal($"From client:android (client:android)", result);
+        }
+
+        [Fact]
+        public void Should_replacecontent_url_from_event()
+        {
+            var url = "http://content";
+
+            A.CallTo(() => urlGenerator.GenerateContentUIUrl(appId, schemaId, contentId))
+                .Returns(url);
+
+            var @event = new ContentCreated { AppId = appId, ContentId = contentId, SchemaId = schemaId };
+
+            var result = sut.FormatString("Go to $CONTENT_URL", AsEnvelope(@event));
+
+            Assert.Equal($"Go to {url}", result);
         }
 
         [Fact]
@@ -301,7 +366,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         }
 
         [Fact]
-        public void Should_format_content_action_for_created_when_found()
+        public void Should_format_content_actions_when_found()
         {
             Assert.Equal("created", sut.FormatString("$CONTENT_ACTION", AsEnvelope(new ContentCreated())));
             Assert.Equal("updated", sut.FormatString("$CONTENT_ACTION", AsEnvelope(new ContentUpdated())));

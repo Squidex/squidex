@@ -13,6 +13,7 @@ using Migrate_01;
 using Migrate_01.Migrations;
 using Orleans;
 using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps;
@@ -42,11 +43,12 @@ namespace Squidex.Config.Domain
         {
             var exposeSourceUrl = config.GetOptionalValue("assetStore:exposeSourceUrl", true);
 
-            services.AddSingletonAs(c => new GraphQLUrlGenerator(
+            services.AddSingletonAs(c => new UrlGenerator(
                     c.GetRequiredService<IOptions<MyUrlsOptions>>(),
                     c.GetRequiredService<IAssetStore>(),
                     exposeSourceUrl))
-                .As<IGraphQLUrlGenerator>();
+                .As<IGraphQLUrlGenerator>()
+                .As<IRuleUrlGenerator>();
 
             services.AddSingletonAs<CachingGraphQLService>()
                 .As<IGraphQLService>();

@@ -42,7 +42,7 @@ const routes: Routes = [
                 path: 'help',
                 component: HelpComponent,
                 data: {
-                    helpPage: '06-integrated/rules'
+                    helpPage: '05-integrated/rules'
                 }
             }
         ]
