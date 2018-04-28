@@ -125,6 +125,44 @@ namespace Squidex.Infrastructure.Log
             Assert.Equal(expected, output);
         }
 
+        [Fact]
+        public void Should_log_additional_values()
+        {
+            var exception = new InvalidOperationException();
+
+            var logger = sut.CreateLogger("my-category");
+
+            logger.LogDebug("My numbers are {number1} and {Number2}", 123, 456);
+
+            var expected =
+                MakeTestCall(w => w
+                    .WriteProperty("logLevel", "Debug")
+                    .WriteProperty("message", "My numbers are 123 and 456")
+                    .WriteProperty("number1", "123")
+                    .WriteProperty("number2", "456")
+                    .WriteProperty("category", "my-category"));
+
+            Assert.Equal(expected, output);
+        }
+
+        [Fact]
+        public void Should_not_log_numbers()
+        {
+            var exception = new InvalidOperationException();
+
+            var logger = sut.CreateLogger("my-category");
+
+            logger.LogDebug("My numbers are {0} and {1}", 123, 456);
+
+            var expected =
+                MakeTestCall(w => w
+                    .WriteProperty("logLevel", "Debug")
+                    .WriteProperty("message", "My numbers are 123 and 456")
+                    .WriteProperty("category", "my-category"));
+
+            Assert.Equal(expected, output);
+        }
+
         [Theory]
         [InlineData(LogLevel.None, "Debug")]
         [InlineData(LogLevel.Debug, "Debug")]
