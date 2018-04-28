@@ -14,7 +14,7 @@ using Xunit;
 
 namespace Squidex.Infrastructure.UsageTracking
 {
-    public sealed class ThreadingUsageTrackerTests
+    public class ThreadingUsageTrackerTests
     {
         private readonly MemoryCache cache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
         private readonly IUsageTracker inner = A.Fake<IUsageTracker>();

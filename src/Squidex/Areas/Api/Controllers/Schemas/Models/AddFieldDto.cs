@@ -33,7 +33,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
 
         public AddField ToCommand()
         {
-            return SimpleMapper.Map(this, new AddField { Properties = this.Properties.ToProperties() });
+            return SimpleMapper.Map(this, new AddField { Properties = Properties.ToProperties() });
         }
     }
 }

@@ -7,12 +7,11 @@
 
 using System;
 using System.Threading.Tasks;
-using Squidex.Domain.Apps.Entities.Schemas;
 
 namespace Squidex.Domain.Apps.Entities.Contents
 {
     public interface IContentVersionLoader
     {
-        Task<(ISchemaEntity Schema, IContentEntity Content)> LoadAsync(Guid id, int version);
+        Task<IContentEntity> LoadAsync(Guid id, long version);
     }
 }

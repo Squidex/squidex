@@ -316,6 +316,29 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         }
 
         [Fact]
+        public void Should_not_include_invalid_field_types()
+        {
+            var input =
+                new NamedContentData()
+                    .AddField("field1",
+                        new ContentFieldData()
+                            .AddValue("iv", "INVALID"))
+                    .AddField("field2",
+                        new ContentFieldData()
+                            .AddValue("iv", 2));
+
+            var actual = input.ToApiModel(schema, languagesConfig, checkTypeCompatibility: true);
+
+            var expected =
+                new NamedContentData()
+                    .AddField("field2",
+                        new ContentFieldData()
+                            .AddValue("iv", 2));
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
         public void Should_return_original_when_no_language_preferences_defined()
         {
             var data =
