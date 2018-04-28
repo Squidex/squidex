@@ -69,7 +69,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             if (content == null)
             {
-                content = (await contentQuery.FindContentAsync(app, schemaId.ToString(), user, id)).Content;
+                content = await contentQuery.FindContentAsync(app, schemaId.ToString(), user, id);
 
                 if (content != null)
                 {
@@ -96,12 +96,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var result = await contentQuery.QueryAsync(app, schemaIdOrName, user, false, query);
 
-            foreach (var content in result.Contents)
+            foreach (var content in result)
             {
                 cachedContents[content.Id] = content;
             }
 
-            return result.Contents;
+            return result;
         }
 
         public async Task<IReadOnlyList<IAssetEntity>> GetReferencedAssetsAsync(ICollection<Guid> ids)
@@ -133,7 +133,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             {
                 var result = await contentQuery.QueryAsync(app, schemaId.ToString(), user, false, notLoadedContents);
 
-                foreach (var content in result.Contents)
+                foreach (var content in result)
                 {
                     cachedContents[content.Id] = content;
                 }

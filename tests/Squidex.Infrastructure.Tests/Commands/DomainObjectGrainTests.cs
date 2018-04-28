@@ -19,7 +19,7 @@ using Xunit;
 
 namespace Squidex.Infrastructure.Commands
 {
-    public sealed class DomainObjectGrainTests
+    public class DomainObjectGrainTests
     {
         private readonly IStore<Guid> store = A.Fake<IStore<Guid>>();
         private readonly IPersistence<MyDomainState> persistence = A.Fake<IPersistence<MyDomainState>>();

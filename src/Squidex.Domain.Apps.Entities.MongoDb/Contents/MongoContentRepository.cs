@@ -26,12 +26,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
     public partial class MongoContentRepository : MongoRepositoryBase<MongoContentEntity>, IContentRepository
     {
         private readonly IAppProvider appProvider;
-        private readonly IMongoCollection<MongoContentEntity> archiveCollection;
-
-        protected IMongoCollection<MongoContentEntity> ArchiveCollection
-        {
-            get { return archiveCollection; }
-        }
 
         public MongoContentRepository(IMongoDatabase database, IAppProvider appProvider)
             : base(database)
@@ -39,8 +33,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             Guard.NotNull(appProvider, nameof(appProvider));
 
             this.appProvider = appProvider;
-
-            archiveCollection = database.GetCollection<MongoContentEntity>("States_Contents_Archive");
         }
 
         protected override string CollectionName()
@@ -51,15 +43,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         protected override async Task SetupCollectionAsync(IMongoCollection<MongoContentEntity> collection)
         {
             await collection.Indexes.TryDropOneAsync("si_1_st_1_dl_1_dt_text");
-
-            await archiveCollection.Indexes.CreateOneAsync(
-                Index
-                    .Ascending(x => x.ScheduledTo));
-
-            await archiveCollection.Indexes.CreateOneAsync(
-                Index
-                    .Ascending(x => x.Id)
-                    .Ascending(x => x.Version));
 
             await collection.Indexes.CreateOneAsync(
                 Index
@@ -150,17 +133,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             return ids.Except(contentEntities.Select(x => Guid.Parse(x["id"].AsString))).ToList();
         }
 
-        public async Task<IContentEntity> FindContentAsync(IAppEntity app, ISchemaEntity schema, Guid id, long version)
-        {
-            var contentEntity =
-                await ArchiveCollection.Find(x => x.Id == id && x.Version >= version).SortBy(x => x.Version)
-                    .FirstOrDefaultAsync();
-
-            contentEntity?.ParseData(schema.SchemaDef);
-
-            return contentEntity;
-        }
-
         public async Task<IContentEntity> FindContentAsync(IAppEntity app, ISchemaEntity schema, Guid id)
         {
             var contentEntity =
@@ -181,11 +153,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                 });
         }
 
-        public override async Task ClearAsync()
+        public Task DeleteArchiveAsync()
         {
-            await Database.DropCollectionAsync("States_Contents_Archive");
-
-            await base.ClearAsync();
+            return Database.DropCollectionAsync("States_Contents_Archive");
         }
     }
 }

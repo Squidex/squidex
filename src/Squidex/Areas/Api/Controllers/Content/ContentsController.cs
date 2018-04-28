@@ -15,7 +15,6 @@ using NodaTime.Text;
 using NSwag.Annotations;
 using Squidex.Areas.Api.Controllers.Contents.Models;
 using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Domain.Apps.Core.ConvertContent;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL;
@@ -119,18 +118,8 @@ namespace Squidex.Areas.Api.Controllers.Contents
 
             var response = new ContentsDto
             {
-                Total = result.Contents.Total,
-                Items = result.Contents.Take(200).Select(item =>
-                {
-                    var itemModel = SimpleMapper.Map(item, new ContentDto());
-
-                    if (item.Data != null)
-                    {
-                        itemModel.Data = item.Data.ToApiModel(result.Schema.SchemaDef, App.LanguagesConfig, !isFrontendClient);
-                    }
-
-                    return itemModel;
-                }).ToArray()
+                Total = result.Total,
+                Items = result.Take(200).Select(item => SimpleMapper.Map(item, new ContentDto { Data = item.Data })).ToArray()
             };
 
             Response.Headers["Surrogate-Key"] = string.Join(" ", response.Items.Select(x => x.Id));
@@ -157,19 +146,12 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(1)]
         public async Task<IActionResult> GetContent(string app, string name, Guid id)
         {
-            var (schema, entity) = await contentQuery.FindContentAsync(App, name, User, id);
+            var content = await contentQuery.FindContentAsync(App, name, User, id);
 
-            var response = SimpleMapper.Map(entity, new ContentDto());
+            var response = SimpleMapper.Map(content, new ContentDto { Data = content.Data });
 
-            if (entity.Data != null)
-            {
-                var isFrontendClient = User.IsFrontendClient();
-
-                response.Data = entity.Data.ToApiModel(schema.SchemaDef, App.LanguagesConfig, !isFrontendClient);
-            }
-
-            Response.Headers["ETag"] = entity.Version.ToString();
-            Response.Headers["Surrogate-Key"] = entity.Id.ToString();
+            Response.Headers["ETag"] = content.Version.ToString();
+            Response.Headers["Surrogate-Key"] = content.Id.ToString();
 
             return Ok(response);
         }
@@ -197,16 +179,10 @@ namespace Squidex.Areas.Api.Controllers.Contents
         {
             var content = await contentQuery.FindContentAsync(App, name, User, id, version);
 
-            var response = SimpleMapper.Map(content.Content, new ContentDto());
+            var response = SimpleMapper.Map(content, new ContentDto { Data = content.Data });
 
-            if (content.Content.Data != null)
-            {
-                var isFrontendClient = User.IsFrontendClient();
-
-                response.Data = content.Content.Data.ToApiModel(content.Schema.SchemaDef, App.LanguagesConfig, !isFrontendClient);
-            }
-
-            Response.Headers["ETag"] = version.ToString();
+            Response.Headers["ETag"] = content.Version.ToString();
+            Response.Headers["Surrogate-Key"] = content.Id.ToString();
 
             return Ok(response.Data);
         }
@@ -232,7 +208,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(1)]
         public async Task<IActionResult> PostContent(string app, string name, [FromBody] NamedContentData request, [FromQuery] bool publish = false)
         {
-            await contentQuery.FindSchemaAsync(App, name);
+            await contentQuery.ThrowIfSchemaNotExistsAsync(App, name);
 
             var command = new CreateContent { ContentId = Guid.NewGuid(), Data = request.ToCleaned(), Publish = publish };
 
@@ -265,7 +241,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(1)]
         public async Task<IActionResult> PutContent(string app, string name, Guid id, [FromBody] NamedContentData request)
         {
-            await contentQuery.FindSchemaAsync(App, name);
+            await contentQuery.ThrowIfSchemaNotExistsAsync(App, name);
 
             var command = new UpdateContent { ContentId = id, Data = request.ToCleaned() };
             var context = await CommandBus.PublishAsync(command);
@@ -297,7 +273,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(1)]
         public async Task<IActionResult> PatchContent(string app, string name, Guid id, [FromBody] NamedContentData request)
         {
-            await contentQuery.FindSchemaAsync(App, name);
+            await contentQuery.ThrowIfSchemaNotExistsAsync(App, name);
 
             var command = new PatchContent { ContentId = id, Data = request.ToCleaned() };
             var context = await CommandBus.PublishAsync(command);
@@ -329,7 +305,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(1)]
         public async Task<IActionResult> PublishContent(string app, string name, Guid id, string dueTime = null)
         {
-            await contentQuery.FindSchemaAsync(App, name);
+            await contentQuery.ThrowIfSchemaNotExistsAsync(App, name);
 
             var command = CreateCommand(id, Status.Published, dueTime);
 
@@ -359,7 +335,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(1)]
         public async Task<IActionResult> UnpublishContent(string app, string name, Guid id, string dueTime = null)
         {
-            await contentQuery.FindSchemaAsync(App, name);
+            await contentQuery.ThrowIfSchemaNotExistsAsync(App, name);
 
             var command = CreateCommand(id, Status.Draft, dueTime);
 
@@ -389,7 +365,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(1)]
         public async Task<IActionResult> ArchiveContent(string app, string name, Guid id, string dueTime = null)
         {
-            await contentQuery.FindSchemaAsync(App, name);
+            await contentQuery.ThrowIfSchemaNotExistsAsync(App, name);
 
             var command = CreateCommand(id, Status.Archived, dueTime);
 
@@ -419,7 +395,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(1)]
         public async Task<IActionResult> RestoreContent(string app, string name, Guid id, string dueTime = null)
         {
-            await contentQuery.FindSchemaAsync(App, name);
+            await contentQuery.ThrowIfSchemaNotExistsAsync(App, name);
 
             var command = CreateCommand(id, Status.Draft, dueTime);
 
@@ -447,7 +423,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(1)]
         public async Task<IActionResult> DeleteContent(string app, string name, Guid id)
         {
-            await contentQuery.FindSchemaAsync(App, name);
+            await contentQuery.ThrowIfSchemaNotExistsAsync(App, name);
 
             var command = new DeleteContent { ContentId = id };
 

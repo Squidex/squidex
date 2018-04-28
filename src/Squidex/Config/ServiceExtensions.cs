@@ -33,7 +33,7 @@ namespace Squidex.Config
             {
                 if (typeof(TInterface) != typeof(T))
                 {
-                    this.services.AddSingleton(typeof(TInterface), c =>
+                    services.AddSingleton(typeof(TInterface), c =>
                     {
                         return c.GetRequiredService<T>();
                     });

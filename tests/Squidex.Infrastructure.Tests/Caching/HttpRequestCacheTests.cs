@@ -13,7 +13,7 @@ using Xunit;
 
 namespace Squidex.Infrastructure.Caching
 {
-    public sealed class HttpRequestCacheTests
+    public class HttpRequestCacheTests
     {
         private readonly IHttpContextAccessor httpContextAccessor = A.Fake<IHttpContextAccessor>();
         private readonly IRequestCache sut;

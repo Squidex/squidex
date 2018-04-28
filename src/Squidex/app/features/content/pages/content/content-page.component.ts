@@ -153,7 +153,7 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
         if (this.content) {
             this.contentsState.loadVersion(this.content, version)
                 .subscribe(dto => {
-                    if (this.content.version.value !== version.toString()) {
+                    if (this.content.version.value !== version.value) {
                         this.contentVersion = version;
                     } else {
                         this.contentVersion = null;

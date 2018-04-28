@@ -15,7 +15,7 @@ namespace Migrate_01
 {
     public sealed class MigrationPath : IMigrationPath
     {
-        private const int CurrentVersion = 7;
+        private const int CurrentVersion = 8;
         private readonly IServiceProvider serviceProvider;
 
         public MigrationPath(IServiceProvider serviceProvider)
@@ -55,6 +55,8 @@ namespace Migrate_01
             {
                 migrations.Add(serviceProvider.GetRequiredService<AddPatterns>());
             }
+
+            migrations.Add(serviceProvider.GetRequiredService<DeleteArchiveCollection>());
 
             return (CurrentVersion, migrations);
         }

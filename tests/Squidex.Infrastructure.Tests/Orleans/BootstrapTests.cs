@@ -17,7 +17,7 @@ using Xunit;
 
 namespace Squidex.Infrastructure.Orleans
 {
-    public sealed class BootstrapTests
+    public class BootstrapTests
     {
         private readonly IBackgroundGrain grain = A.Fake<IBackgroundGrain>();
         private readonly Bootstrap<IBackgroundGrain> sut;

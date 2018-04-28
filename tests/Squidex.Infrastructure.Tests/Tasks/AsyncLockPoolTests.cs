@@ -12,7 +12,7 @@ using Xunit;
 
 namespace Squidex.Infrastructure.Tasks
 {
-    public sealed class AsyncLockPoolTests
+    public class AsyncLockPoolTests
     {
         [Fact]
         public async Task Should_lock()

@@ -88,8 +88,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
 
             document.DocumentId = $"{key}_{newVersion}";
-
-            await ArchiveCollection.ReplaceOneAsync(x => x.DocumentId == document.DocumentId, document, Upsert);
         }
 
         private async Task<ISchemaEntity> GetSchemaAsync(Guid appId, Guid schemaId)
