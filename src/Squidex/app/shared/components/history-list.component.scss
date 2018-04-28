@@ -1,0 +1,33 @@
+@import '_vars';
+@import '_mixins';
+
+:host /deep/ {
+    .user-ref {
+        color: $color-title;
+    }
+
+    .marker-ref {
+        color: $color-title;
+    }
+}
+
+.user-picture {
+    margin-top: .25rem;
+}
+
+.event {
+    & {
+        color: $color-history;
+        font-size: .9rem;
+        font-weight: normal;
+        margin-bottom: 1.5rem;
+    }
+
+    &-message {
+        margin-bottom: .375rem;
+    }
+
+    &-created {
+        font-size: .75rem;
+    }
+}

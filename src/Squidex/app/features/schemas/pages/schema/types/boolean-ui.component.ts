@@ -8,7 +8,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 
-import { BooleanFieldPropertiesDto } from 'shared';
+import { BooleanFieldPropertiesDto, FieldDto } from '@app/shared';
 
 @Component({
     selector: 'sqx-boolean-ui',
@@ -18,6 +18,9 @@ import { BooleanFieldPropertiesDto } from 'shared';
 export class BooleanUIComponent implements OnInit {
     @Input()
     public editForm: FormGroup;
+
+    @Input()
+    public field: FieldDto;
 
     @Input()
     public properties: BooleanFieldPropertiesDto;

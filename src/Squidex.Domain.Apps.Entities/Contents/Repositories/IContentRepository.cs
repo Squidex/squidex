@@ -27,8 +27,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Repositories
 
         Task<IContentEntity> FindContentAsync(IAppEntity app, ISchemaEntity schema, Guid id);
 
-        Task<IContentEntity> FindContentAsync(IAppEntity app, ISchemaEntity schema, Guid id, long version);
-
         Task QueryScheduledWithoutDataAsync(Instant now, Func<IContentEntity, Task> callback);
     }
 }

@@ -1,26 +1,36 @@
 <div class="references-container" [class.disabled]="isDisabled">
-    <div class="drop-area-container" *ngIf="schema && !isDisabled">
-        <div class="drop-area" dnd-droppable (onDropSuccess)="onContentDropped($event.dragData.content)" [allowDrop]="canDrop()" [routerLink]="['references', schemaId, languageCode]">
-            Drop content here to add a reference.
+    <ng-container *ngIf="schema">
+        <div class="drop-area-container">
+            <div class="drop-area" (click)="showModal()">
+                Click here to link a content.
+            </div>
         </div>
-    </div>
+        
+        <table class="table table-items table-fixed" [class.disabled]="isDisabled" *ngIf="schema && contentItems && contentItems.length > 0">
+            <tbody dnd-sortable-container [sortableData]="contentItems.mutableValues">
+                <ng-template ngFor let-content let-i="index" [ngForOf]="contentItems">
+                    <tr [sqxContent]="content" dnd-sortable [sortableIndex]="i" (sqxSorted)="sort($event)"
+                        [language]="language"
+                        [schema]="schema"
+                        (deleting)="remove(content)"
+                        isReadOnly="true" 
+                        isReference="true"></tr>
+                    <tr class="spacer"></tr>
+                </ng-template>
+            </tbody>
+        </table>
+    </ng-container>
 
     <div class="invalid" *ngIf="isInvalidSchema">
         Schema not found or not configured yet.
     </div>
-
-    <table class="table table-items table-fixed" [class.disabled]="isDisabled" *ngIf="contentItems && contentItems.length > 0">
-        <tbody dnd-sortable-container [sortableData]="contentItems.mutableValues">
-            <ng-template ngFor let-content let-i="index" [ngForOf]="contentItems">
-                <tr [sqxContent]="content" dnd-sortable [sortableIndex]="i" (sqxSorted)="onContentsSorted($event)"
-                    [language]="language"
-                    [schemaFields]="contentFields"
-                    [schema]="schema"
-                    (deleting)="onContentRemoving(content)"
-                    isReadOnly="true" 
-                    isReference="true"></tr>
-                <tr class="spacer"></tr>
-            </ng-template>
-        </tbody>
-    </table>
 </div>
+
+<ng-container *sqxModalView="isModalVisibible;onRoot:true;closeAuto:false">
+    <sqx-contents-selector 
+        [language]="language"
+        [languages]="languages"
+        [schema]="schema"
+        (selected)="select($event)">
+    </sqx-contents-selector>
+</ng-container>

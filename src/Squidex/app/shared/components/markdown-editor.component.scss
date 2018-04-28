@@ -7,10 +7,6 @@ $background: #fff;
     height: 30rem;
 }
 
-.drop-area {
-    @include absolute(80px, 30px, 66px, 30px);
-}
-
 .fullscreen {
     @include fixed(0, 0, 0, 0);
     border: 0;

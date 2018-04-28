@@ -1,0 +1,62 @@
+<form [formGroup]="addFieldForm.form" (ngSubmit)="addField(false)">
+    <sqx-modal-dialog (closed)="complete()" large="true">
+        <ng-container title>
+            Create Field
+        </ng-container>
+
+        <ng-container content>
+            <sqx-form-error [error]="addFieldForm.error | async"></sqx-form-error>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-4 type" *ngFor="let fieldType of fieldTypes">
+                        <label>
+                            <input type="radio" class="radio-input" formControlName="type" value="{{fieldType.type}}" />
+                        
+                            <div class="row no-gutters">
+                                <div class="col col-auto">
+                                    <div class="type-icon" [class.active]="addFieldForm.form.controls['type'].value === fieldType.type">
+                                        <i class="icon-type-{{fieldType.type}}"></i>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="type-title">{{fieldType.type}}</div>
+                                    <div class="type-text text-muted">{{fieldType.description}}</div>
+                                </div>
+                            </div>
+
+                        </label>
+                    </div>
+                </div>
+            </div>
+                
+            <div class="form-group">
+                <sqx-control-errors for="name" submitOnly="true" [submitted]="addFieldForm.submitted | async"></sqx-control-errors>
+
+                <input type="text" class="form-control" formControlName="name" maxlength="40" #nameInput placeholder="Enter field name" sqxFocusOnInit />
+            </div>
+
+            <div class="form-group">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="isLocalizable" formControlName="isLocalizable" />
+                    <label class="form-check-label" for="isLocalizable">
+                        Localizable
+                    </label>
+                </div>
+
+                <small class="form-text text-muted">
+                    You can the field as localizable. It means that is dependent on the language, for example a city name.
+                </small>
+            </div>
+        </ng-container>
+
+        <ng-container footer>
+            <button type="reset" class="float-left btn btn-secondary" (click)="complete()">Cancel</button>
+
+            <div class="float-right">
+                <button class="btn btn-success" (click)="addField(false)">Create and close</button>
+                <button class="btn btn-success" (click)="addField(true)">Create and new field</button>
+            </div>
+        </ng-container>
+    </sqx-modal-dialog>
+</form>

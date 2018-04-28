@@ -8,7 +8,9 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using NodaTime;
+using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Areas.Api.Controllers.Assets.Models
 {
@@ -88,5 +90,10 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         /// The version of the asset.
         /// </summary>
         public long Version { get; set; }
+
+        public static AssetDto FromAsset(IAssetEntity asset)
+        {
+            return SimpleMapper.Map(asset, new AssetDto { FileType = asset.FileName.FileType() });
+        }
     }
 }

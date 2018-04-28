@@ -6,19 +6,19 @@
  */
 
 import { Injectable } from '@angular/core';
-import { ActivatedRouteSnapshot, CanActivate, RouterStateSnapshot } from '@angular/router';
+import { CanActivate } from '@angular/router';
 import { Observable } from 'rxjs';
 
-import { AppsStoreService } from './../services/apps-store.service';
+import { AppsState } from './../state/apps.state';
 
 @Injectable()
 export class UnsetAppGuard implements CanActivate {
     constructor(
-        private readonly appsStore: AppsStoreService
+        private readonly appsState: AppsState
     ) {
     }
 
-    public canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> {
-        return this.appsStore.selectApp(null).map(a => !a);
+    public canActivate(): Observable<boolean> {
+        return this.appsState.select(null).map(a => a === null);
     }
 }

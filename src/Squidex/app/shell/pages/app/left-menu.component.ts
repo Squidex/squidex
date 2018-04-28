@@ -7,18 +7,15 @@
 
 import { Component } from '@angular/core';
 
-import { AppContext } from 'shared';
+import { AppsState } from '@app/shared';
 
 @Component({
     selector: 'sqx-left-menu',
     styleUrls: ['./left-menu.component.scss'],
-    templateUrl: './left-menu.component.html',
-    providers: [
-        AppContext
-    ]
+    templateUrl: './left-menu.component.html'
 })
 export class LeftMenuComponent {
-    constructor(public readonly ctx: AppContext
+    constructor(public readonly appsState: AppsState
     ) {
     }
 }

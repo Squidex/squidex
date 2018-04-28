@@ -13,6 +13,7 @@ using Migrate_01;
 using Migrate_01.Migrations;
 using Orleans;
 using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps;
@@ -42,11 +43,12 @@ namespace Squidex.Config.Domain
         {
             var exposeSourceUrl = config.GetOptionalValue("assetStore:exposeSourceUrl", true);
 
-            services.AddSingletonAs(c => new GraphQLUrlGenerator(
+            services.AddSingletonAs(c => new UrlGenerator(
                     c.GetRequiredService<IOptions<MyUrlsOptions>>(),
                     c.GetRequiredService<IAssetStore>(),
                     exposeSourceUrl))
-                .As<IGraphQLUrlGenerator>();
+                .As<IGraphQLUrlGenerator>()
+                .As<IRuleUrlGenerator>();
 
             services.AddSingletonAs<CachingGraphQLService>()
                 .As<IGraphQLService>();
@@ -59,6 +61,9 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<ContentQueryService>()
                 .As<IContentQueryService>();
+
+            services.AddSingletonAs<ContentVersionLoader>()
+                .As<IContentVersionLoader>();
 
             services.AddSingletonAs<AppHistoryEventsCreator>()
                 .As<IHistoryEventsCreator>();
@@ -158,13 +163,16 @@ namespace Squidex.Config.Domain
             services.AddTransientAs<MigrationPath>()
                 .As<IMigrationPath>();
 
+            services.AddTransientAs<AddPatterns>()
+                .As<IMigration>();
+
             services.AddTransientAs<ConvertEventStore>()
                 .As<IMigration>();
 
             services.AddTransientAs<ConvertEventStoreAppId>()
                 .As<IMigration>();
 
-            services.AddTransientAs<AddPatterns>()
+            services.AddTransientAs<DeleteArchiveCollection>()
                 .As<IMigration>();
 
             services.AddTransientAs<RebuildContents>()

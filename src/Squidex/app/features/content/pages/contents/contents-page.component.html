@@ -1,208 +1,150 @@
-<sqx-title message="{app} | {schema} | Contents" parameter1="app" parameter2="schema" [value1]="ctx.appName" [value2]="schema?.displayName"></sqx-title>
+<sqx-title message="{app} | {schema} | Contents" parameter1="app" parameter2="schema" [value1]="appsState.appName" [value2]="schema.displayName"></sqx-title>
 
-<sqx-panel [desiredWidth]="isReadOnly ? '40rem' : '60rem'">
-    <div class="panel-header">
-        <div class="panel-title-row">
-            <div class="float-right">
-                <button class="btn btn-link btn-secondary" (click)="load(true)" title="Refresh Contents (CTRL + SHIFT + R)">
-                    <i class="icon-reset"></i> Refresh
-                </button>
+<sqx-panel desiredWidth="*" contentClass="grid">
+    <ng-container title>
+        <ng-container *ngIf="contentsState.isArchive | async; else noArchive">
+            Archive
+        </ng-container>
 
-                <sqx-shortcut keys="ctrl+shift+r" (trigger)="load(true)"></sqx-shortcut>
-                <sqx-shortcut keys="ctrl+shift+f" (trigger)="inputFind.focus()"></sqx-shortcut>
-                <sqx-shortcut keys="ctrl+shift+g" (trigger)="newButton.click()" *ngIf="!isReadOnly"></sqx-shortcut>
+        <ng-template #noArchive>
+            Contents
+        </ng-template>
+    </ng-container>
 
-                <form class="form-inline" (ngSubmit)="search()">
-                    <input class="form-control form-control-expandable" #inputFind [formControl]="contentsFilter" placeholder="Search for content" />
+    <ng-container menu>
+        <button class="btn btn-link btn-secondary" (click)="reload()" title="Refresh Contents (CTRL + SHIFT + R)">
+            <i class="icon-reset"></i> Refresh
+        </button>
 
-                    <a class="expand-search" (click)="searchModal.toggle()" #archive>
-                        <i class="icon-caret-down"></i>
-                    </a>
-                </form>
+        <sqx-shortcut keys="ctrl+shift+r" (trigger)="reload()"></sqx-shortcut>
 
-                <sqx-onboarding-tooltip id="contentArchive" [for]="archive" position="bottomRight" after="60000">
-                    Click this icon to show the advanced search menu and to show the archive!
-                </sqx-onboarding-tooltip>
+        <sqx-search-form 
+            (queryChanged)="search($event)" 
+            [query]="contentsState.contentsQuery | async" 
+            (archivedChanged)="goArchive($event)"
+            [archived]="contentsState.isArchive | async"
+            enableShortcut="true">
+        </sqx-search-form>
 
-                <sqx-onboarding-tooltip id="contentFind" [for]="inputFind" position="bottomRight" after="120000">
-                    Search for content using full text search over all fields and languages!
-                </sqx-onboarding-tooltip>
-                
-                <div class="dropdown-menu" *sqxModalView="searchModal" [sqxModalTarget]="inputFind">
-                    <sqx-search-form
-                        [canArchive]="!isReadOnly"
-                        (queryChanged)="contentsFilter.setValue($event, { emitEvent: false })" 
-                        [query]="contentsFilter.value"
-                        (archivedChanged)="updateArchive($event)"
-                        [archived]="isArchive">
-                    </sqx-search-form>
-                </div>
-                
-                <span *ngIf="!isReadOnly && languages.length > 1">
-                    <sqx-language-selector class="languages-buttons" (selectedLanguageChanged)="selectLanguage($event)" [languages]="languages"></sqx-language-selector>
-                </span>
+        <ng-container *ngIf="languages.length > 1">
+            <sqx-language-selector class="languages-buttons" (selectedLanguageChange)="selectLanguage($event)" [languages]="languages.values"></sqx-language-selector>
+        </ng-container>
 
-                <button *ngIf="!isReadOnly" class="btn btn-success" #newButton routerLink="new" title="New Content (CTRL + SHIFT + G)">
-                    <i class="icon-plus"></i> New
-                </button>
-            </div>
+        <button class="btn btn-success" #newButton routerLink="new" title="New Content (CTRL + SHIFT + G)">
+            <i class="icon-plus"></i> New
+        </button>
+        
+        <sqx-shortcut keys="ctrl+shift+g" (trigger)="newButton.click()"></sqx-shortcut>
+    </ng-container>
 
-            <h3 class="panel-title" *ngIf="!isReadOnly && !isArchive">
-                Contents
-            </h3>
-            
-            <h3 class="panel-title" *ngIf="isArchive">
-                Archive
-            </h3>
-
-            <h3 class="panel-title" *ngIf="isReadOnly">
-                References
-            </h3>
+    <ng-container content>
+        <div class="grid-header">
+            <table class="table table-items table-fixed">
+                <thead>
+                    <tr>
+                        <th class="cell-select">
+                            <input type="checkbox" class="form-control" [ngModel]="isAllSelected" (ngModelChange)="selectAll($event)" />
+                        </th>
+                        <th class="cell-auto" *ngFor="let field of schema.listFields">
+                            <span class="field">{{field.displayName}}</span>
+                        </th>
+                        <th class="cell-time">
+                            Updated
+                        </th>
+                        <th class="cell-user">
+                            By
+                        </th>
+                        <th class="cell-actions">
+                            Actions
+                        </th>
+                    </tr>
+                </thead>
+            </table>
         </div>
 
-        <a class="panel-close" sqxParentLink>
-            <i class="icon-close"></i>
-        </a>
-    </div>
+        <div class="selection" *ngIf="selectionCount > 0">
+            {{selectionCount}} items selected:&nbsp;&nbsp;
 
-    <div class="panel-main">
-        <div class="panel-content grid">
-            <div class="grid-header">
-                <table class="table table-items table-fixed" *ngIf="contentItems">
-                    <thead>
-                        <tr>
-                            <th class="cell-select" *ngIf="!isReadOnly">
-                                <input type="checkbox" class="form-control" [ngModel]="isAllSelected" (ngModelChange)="selectAll($event)" />
-                            </th>
-                            <th class="cell-auto" *ngFor="let field of contentFields">
-                                <span class="field">{{field.displayName}}</span>
-                            </th>
-                            <th class="cell-time">
-                                Updated
-                            </th>
-                            <th class="cell-user">
-                                By
-                            </th>
-                            <th class="cell-actions" *ngIf="!isReadOnly">
-                                Actions
-                            </th>
-                        </tr>
-                    </thead>
+            <button class="btn btn-secondary" (click)="publishSelected()" *ngIf="canPublish">
+                Publish
+            </button>
+            
+            <button class="btn btn-secondary" (click)="unpublishSelected()" *ngIf="canUnpublish">
+                Unpublish
+            </button>
+            
+            <button class="btn btn-secondary" (click)="archiveSelected()" *ngIf="(contentsState.isArchive | async) === false">
+                Archive
+            </button>
+            
+            <button class="btn btn-secondary" (click)="restoreSelected()" *ngIf="contentsState.isArchive | async">
+                Restore
+            </button>
+            
+            <button class="btn btn-danger"
+                (sqxConfirmClick)="deleteSelected()"
+                confirmTitle="Delete content" 
+                confirmText="Do you really want to delete the selected content items?">
+                Delete
+            </button>
+        </div>
+
+        <div class="grid-content">
+            <div sqxIgnoreScrollbar>
+                <table class="table table-items table-fixed">
+                    <tbody>
+                        <ng-template ngFor let-content [ngForOf]="contentsState.contents | async" [ngForTrackBy]="trackByContent">
+                            <tr [sqxContent]="content" [routerLink]="[content.id]" routerLinkActive="active"
+                                [language]="language"
+                                [schema]="schema"
+                                [selected]="isItemSelected(content)"
+                                (selectedChange)="selectItem(content, $event)"
+                                (unpublishing)="unpublish(content)"
+                                (publishing)="publish(content)"
+                                (archiving)="archive(content)"
+                                (restoring)="restore(content)"
+                                (deleting)="delete(content)">
+                            </tr>
+                            <tr class="spacer"></tr>
+                        </ng-template>
+                    </tbody>
                 </table>
             </div>
-
-            <div class="selection" *ngIf="selectionCount > 0">
-                {{selectionCount}} items selected:&nbsp;&nbsp;
-
-                <button class="btn btn-secondary" (click)="publishSelected()" *ngIf="canPublish">
-                    Publish
-                </button>
-                
-                <button class="btn btn-secondary" (click)="unpublishSelected()" *ngIf="canUnpublish">
-                    Unpublish
-                </button>
-                
-                <button class="btn btn-secondary" (click)="archiveSelected()" *ngIf="!isArchive">
-                    Archive
-                </button>
-                
-                <button class="btn btn-secondary" (click)="restoreSelected()" *ngIf="isArchive">
-                    Restore
-                </button>
-                
-                <button class="btn btn-danger"
-                    (sqxConfirmClick)="deleteSelected()"
-                    confirmTitle="Delete content" 
-                    confirmText="Do you really want to delete the selected content items?">
-                    Delete
-                </button>
-            </div>
-
-            <div class="grid-content">
-                <div sqxIgnoreScrollbar>
-                    <table class="table table-items table-fixed" *ngIf="contentItems" >
-                        <tbody *ngIf="!isReadOnly">
-                            <ng-template ngFor let-content [ngForOf]="contentItems" [ngForTrackBy]="trackBy">
-                                <tr [sqxContent]="content" [routerLink]="[content.id]" routerLinkActive="active"
-                                    [language]="languageSelected"
-                                    [schemaFields]="contentFields"
-                                    [schema]="schema"
-                                    [selected]="isItemSelected(content)"
-                                    (selectedChange)="selectItem(content, $event)"
-                                    (unpublishing)="unpublishContent(content)"
-                                    (publishing)="publishContent(content)"
-                                    (archiving)="archiveContent(content)"
-                                    (restoring)="restoreContent(content)"
-                                    (deleting)="deleteContent(content)"
-                                    (saved)="onContentSaved(content, $event)"></tr>
-                                <tr class="spacer"></tr>
-                            </ng-template>
-                        </tbody>
-
-                        <tbody *ngIf="isReadOnly">
-                            <ng-template ngFor let-content [ngForOf]="contentItems">
-                                <tr [sqxContent]="content" dnd-draggable [dragData]="dropData(content)"
-                                    [language]="languageSelected"
-                                    [schemaFields]="contentFields"
-                                    [schema]="schema" 
-                                    isReadOnly="true"></tr>
-                                <tr class="spacer"></tr>
-                            </ng-template>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div class="grid-footer clearfix" *ngIf="contentsPager.numberOfItems > 0">
-                <div class="float-right pagination">
-                    <span class="pagination-text">{{contentsPager.itemFirst}}-{{contentsPager.itemLast}} of {{contentsPager.numberOfItems}}</span>
-
-                    <button class="btn btn-link btn-secondary pagination-button" [disabled]="!contentsPager.canGoPrev" (click)="goPrev()">
-                        <i class="icon-angle-left"></i>
-                    </button>
-                    <button class="btn btn-link btn-secondary pagination-button" [disabled]="!contentsPager.canGoNext" (click)="goNext()">
-                        <i class="icon-angle-right"></i>
-                    </button>
-                </div>
-            </div>
         </div>
-    </div>
+
+        <div class="grid-footer">
+            <sqx-pager [pager]="contentsState.contentsPager | async" (prev)="goPrev()" (next)="goNext()"></sqx-pager>
+        </div>
+    </ng-container>
 </sqx-panel>
 
-<router-outlet></router-outlet>
+<ng-container *sqxModalView="dueTimeDialog;onRoot:true">
+    <sqx-modal-dialog (closed)="cancelStatusChange()">
+        <ng-container title>
+            {{dueTimeAction}} content item(s)
+        </ng-container>
 
-<div class="modal" *sqxModalView="dueTimeDialog;onRoot:true">
-    <div class="modal-backdrop"></div>
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">{{dueTimeAction}} content item(s)</h4>
+        <ng-container content>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" [(ngModel)]="dueTimeMode" value="Immediately" id="immediately">
+                <label class="form-check-label" for="immediately">
+                    {{dueTimeAction}} content item(s) immediately.
+                </label>
             </div>
 
-            <div class="modal-body">
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" [(ngModel)]="dueTimeMode" value="Immediately" id="immediately">
-                    <label class="form-check-label" for="immediately">
-                        {{dueTimeAction}} content item(s) immediately.
-                    </label>
-                </div>
-
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" [(ngModel)]="dueTimeMode" value="Scheduled" id="scheduled">
-                    <label class="form-check-label" for="scheduled">
-                        {{dueTimeAction}} content item(s) at a later point date and time.
-                    </label>
-                </div>
-
-                <sqx-date-time-editor [disabled]="dueTimeMode === 'Immediately'" mode="DateTime" hideClear="true" [(ngModel)]="dueTime"></sqx-date-time-editor>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" [(ngModel)]="dueTimeMode" value="Scheduled" id="scheduled">
+                <label class="form-check-label" for="scheduled">
+                    {{dueTimeAction}} content item(s) at a later point date and time.
+                </label>
             </div>
 
-            <div class="modal-footer">
-                <div class="clearfix">
-                    <button type="button" class="float-left btn btn-secondary" (click)="cancelStatusChange()">Cancel</button>
-                    <button type="button" class="float-right btn btn-primary" [disabled]="dueTimeMode === 'Scheduled' && !dueTime" (click)="confirmStatusChange()">Confirm</button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+            <sqx-date-time-editor [disabled]="dueTimeMode === 'Immediately'" mode="DateTime" hideClear="true" [(ngModel)]="dueTime"></sqx-date-time-editor>
+        </ng-container>
+
+        <ng-container footer>
+            <button type="button" class="float-left btn btn-secondary" (click)="cancelStatusChange()">Cancel</button>
+            <button type="button" class="float-right btn btn-primary" [disabled]="dueTimeMode === 'Scheduled' && !dueTime" (click)="confirmStatusChange()" sqxFocusOnInit>Confirm</button>
+        </ng-container>
+    </sqx-modal-dialog>
+</ng-container>

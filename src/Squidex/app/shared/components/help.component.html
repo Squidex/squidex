@@ -1,17 +1,9 @@
-<sqx-panel desiredWidth="16rem">
-    <div class="panel-header">
-        <div class="panel-title-row">
-            <h3 class="panel-title">Help</h3>
-        </div>
+<sqx-panel desiredWidth="16rem" isBlank="true">
+    <ng-container title>
+        Help
+    </ng-container>
 
-        <a class="panel-close" sqxParentLink>
-            <i class="icon-close"></i>
-        </a>
-    </div>
-
-    <div class="panel-main">
-        <div class="panel-content panel-content-blank">
-            <p *ngFor="let section of helpSections | async" [innerHTML]="section"></p>            
-        </div>
-    </div>
+    <ng-container content>
+        <p *ngFor="let section of helpSections | async" [innerHTML]="section"></p>
+    </ng-container>
 </sqx-panel>

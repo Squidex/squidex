@@ -8,6 +8,7 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using FakeItEasy;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.Assets.State;
 using Squidex.Domain.Apps.Entities.TestHelpers;
@@ -15,6 +16,7 @@ using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.Log;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Assets
@@ -33,7 +35,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public AssetGrainTests()
         {
-            sut = new AssetGrain(Store);
+            sut = new AssetGrain(Store, A.Dummy<ISemanticLog>());
             sut.OnActivateAsync(Id).Wait();
         }
 

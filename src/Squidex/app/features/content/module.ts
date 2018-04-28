@@ -11,21 +11,23 @@ import { DndModule } from 'ng2-dnd';
 
 import {
     CanDeactivateGuard,
-    ResolveAppLanguagesGuard,
-    ResolveContentGuard,
-    ResolvePublishedSchemaGuard,
+    ContentMustExistGuard,
+    LoadLanguagesGuard,
+    SchemaMustExistPublishedGuard,
     SqxFrameworkModule,
-    SqxSharedModule
-} from 'shared';
+    SqxSharedModule,
+    UnsetContentGuard
+} from '@app/shared';
 
 import {
     AssetsEditorComponent,
     ContentFieldComponent,
     ContentHistoryComponent,
-    ContentPageComponent,
     ContentItemComponent,
-    ContentStatusComponent,
+    ContentPageComponent,
     ContentsPageComponent,
+    ContentsSelectorComponent,
+    ContentStatusComponent,
     ReferencesEditorComponent,
     SchemasPageComponent,
     SearchFormComponent
@@ -35,45 +37,31 @@ const routes: Routes = [
     {
         path: '',
         component: SchemasPageComponent,
+        canActivate: [LoadLanguagesGuard],
         children: [
             {
                 path: ''
             },
             {
                 path: ':schemaName',
-                component: ContentsPageComponent,
-                resolve: {
-                    schema: ResolvePublishedSchemaGuard, appLanguages: ResolveAppLanguagesGuard
-                },
+                canActivate: [SchemaMustExistPublishedGuard],
                 children: [
+                    {
+                        path: '',
+                        component: ContentsPageComponent,
+                        canDeactivate: [CanDeactivateGuard]
+                    },
                     {
                         path: 'new',
                         component: ContentPageComponent,
-                        canDeactivate: [CanDeactivateGuard],
-                        children: [
-                            {
-                                path: 'assets',
-                                loadChildren: './../assets/module#SqxFeatureAssetsModule'
-                            },
-                            {
-                                path: 'references/:schemaName/:language',
-                                component: ContentsPageComponent,
-                                data: {
-                                    isReadOnly: true
-                                },
-                                resolve: {
-                                    schema: ResolvePublishedSchemaGuard
-                                }
-                            }
-                        ]
+                        canActivate: [UnsetContentGuard],
+                        canDeactivate: [CanDeactivateGuard]
                     },
                     {
                         path: ':contentId',
                         component: ContentPageComponent,
+                        canActivate: [ContentMustExistGuard],
                         canDeactivate: [CanDeactivateGuard],
-                        resolve: {
-                            content: ResolveContentGuard
-                        },
                         children: [
                              {
                                 path: 'history',
@@ -81,20 +69,6 @@ const routes: Routes = [
                                 data: {
                                     channel: 'contents.{contentId}'
                                 }
-                            },
-                            {
-                                path: 'references/:schemaName/:language',
-                                component: ContentsPageComponent,
-                                data: {
-                                    isReadOnly: true
-                                },
-                                resolve: {
-                                    schema: ResolvePublishedSchemaGuard
-                                }
-                            },
-                            {
-                                path: 'assets',
-                                loadChildren: './../assets/module#SqxFeatureAssetsModule'
                             }
                         ]
                     }
@@ -118,6 +92,7 @@ const routes: Routes = [
         ContentPageComponent,
         ContentStatusComponent,
         ContentsPageComponent,
+        ContentsSelectorComponent,
         ReferencesEditorComponent,
         SchemasPageComponent,
         SearchFormComponent

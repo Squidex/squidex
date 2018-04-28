@@ -1,89 +1,72 @@
 <sqx-title message="Event Consumers"></sqx-title>
 
 <sqx-panel theme="light" desiredWidth="50rem">
-    <div class="panel-header">
-        <div class="panel-title-row">
-            <div class="float-right">
-                <button class="btn btn-link btn-secondary" (click)="load(true)" title="Refresh Event Consumers (CTRL + SHIFT + R)">
-                    <i class="icon-reset"></i> Refresh
-                </button>
+    <ng-container title>
+        Consumers
+    </ng-container>
 
-                <sqx-shortcut keys="ctrl+shift+r" (trigger)="load(true)"></sqx-shortcut>
-            </div>
+    <ng-container menu>
+        <button class="btn btn-link btn-secondary" (click)="reload()" title="Refresh event consumers (CTRL + SHIFT + R)">
+            <i class="icon-reset"></i> Refresh
+        </button>
 
-            <h3 class="panel-title">Event Consumers</h3>
-        </div>
+        <sqx-shortcut keys="ctrl+shift+r" (trigger)="reload()"></sqx-shortcut>
+    </ng-container>
 
-        <a class="panel-close" sqxParentLink isLazyLoaded="true">
-            <i class="icon-close"></i>
-        </a>
-    </div>
+    <ng-container content>
+        <table class="table table-items table-fixed">
+            <thead>
+                <tr>
+                    <th class="cell-auto">
+                        Name
+                    </th>
+                    <th class="cell-auto-right">
+                        Position
+                    </th>
+                    <th class="cell-actions-lg">
+                        Actions
+                    </th>
+                </tr>
+            </thead>
 
-    <div class="panel-main">
-        <div class="panel-content panel-content-scroll">
-            <table class="table table-items table-fixed">
-                <thead>
-                    <tr>
-                        <th class="cell-auto">
-                            Name
-                        </th>
-                        <th class="cell-auto-right">
-                            Position
-                        </th>
-                        <th class="cell-actions-lg">
-                            Actions
-                        </th>
+            <tbody>
+                <ng-template ngFor let-eventConsumer [ngForOf]="eventConsumersState.eventConsumers | async" [ngForTrackBy]="trackByEventConsumer">
+                    <tr [class.faulted]="eventConsumer.error && eventConsumer.error.length > 0">
+                        <td class="auto-auto">
+                            <span class="truncate">
+                                <i class="faulted-icon icon icon-bug" (click)="showError(eventConsumer)" [class.hidden]="!eventConsumer.error || eventConsumer.error.length === 0"></i>
+
+                                {{eventConsumer.name}}
+                            </span>
+                        </td>
+                        <td class="cell-auto-right">
+                            <span>{{eventConsumer.position}}</span>
+                        </td>
+                        <td class="cell-actions-lg">
+                            <button class="btn btn-link" (click)="reset(eventConsumer)" *ngIf="!eventConsumer.isResetting" title="Reset Event Consumer">
+                                <i class="icon icon-reset"></i>
+                            </button>
+                            <button class="btn btn-link" (click)="start(eventConsumer)" *ngIf="eventConsumer.isStopped" title="Start Event Consumer">
+                                <i class="icon icon-play"></i>
+                            </button>
+                            <button class="btn btn-link" (click)="stop(eventConsumer)" *ngIf="!eventConsumer.isStopped" title="Stop Event Consumer">
+                                <i class="icon icon-pause"></i>
+                            </button>
+                        </td>
                     </tr>
-                </thead>
-
-                <tbody>
-                    <ng-template ngFor let-eventConsumer [ngForOf]="eventConsumers">
-                        <tr [class.faulted]="eventConsumer.error && eventConsumer.error.length > 0">
-                            <td class="auto-auto">
-                                <span class="truncate">
-                                    <i class="faulted-icon icon icon-bug" (click)="showError(eventConsumer)" [class.hidden]="!eventConsumer.error || eventConsumer.error.length === 0"></i>
-
-                                    {{eventConsumer.name}}
-                                </span>
-                            </td>
-                            <td class="cell-auto-right">
-                                <span>{{eventConsumer.position}}</span>
-                            </td>
-                            <td class="cell-actions-lg">
-                                <button class="btn btn-link" (click)="reset(eventConsumer)" *ngIf="!eventConsumer.isResetting" title="Reset Event Consumer">
-                                    <i class="icon icon-reset"></i>
-                                </button>
-                                <button class="btn btn-link" (click)="start(eventConsumer)" *ngIf="eventConsumer.isStopped" title="Start Event Consumer">
-                                    <i class="icon icon-play"></i>
-                                </button>
-                                <button class="btn btn-link" (click)="stop(eventConsumer)" *ngIf="!eventConsumer.isStopped" title="Stop Event Consumer">
-                                    <i class="icon icon-pause"></i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr class="spacer"></tr>
-                    </ng-template>
-                </tbody>
-            </table>
-        </div>
-    </div>
+                    <tr class="spacer"></tr>
+                </ng-template>
+            </tbody>
+        </table>
+    </ng-container>
 </sqx-panel>
 
-<div class="modal" *sqxModalView="eventConsumerErrorDialog;onRoot:true" @fade>
-    <div class="modal-backdrop"></div>
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">Error</h4>
+<sqx-modal-dialog *sqxModalView="eventConsumerErrorDialog;onRoot:true" (closed)="eventConsumerErrorDialog.hide()">
+    <ng-container #title>
+        Error
+    </ng-container>
 
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="eventConsumerErrorDialog.hide()">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-
-            <div class="modal-body">
-                <textarea readonly class="form-control error-message">{{eventConsumerError}}</textarea>
-            </div>
-        </div>
-    </div>
-</div>
+    <ng-container #content>
+        <textarea readonly class="form-control error-message">{{eventConsumerError}}</textarea>
+    </ng-container>
+</sqx-modal-dialog>

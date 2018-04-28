@@ -11,27 +11,23 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Orleans.CodeGeneration;
 using Orleans.Serialization;
+using Squidex.Infrastructure.Log;
 
 namespace Squidex.Infrastructure.Orleans
 {
     public struct J<T>
     {
-        private readonly T value;
-
-        public T Value
-        {
-            get { return value; }
-        }
+        public T Value { get; }
 
         [JsonConstructor]
         public J(T value)
         {
-            this.value = value;
+            Value = value;
         }
 
         public static implicit operator T(J<T> value)
         {
-            return value.value;
+            return value.Value;
         }
 
         public static implicit operator J<T>(T d)
@@ -41,7 +37,7 @@ namespace Squidex.Infrastructure.Orleans
 
         public override string ToString()
         {
-            return value?.ToString() ?? string.Empty;
+            return Value?.ToString() ?? string.Empty;
         }
 
         public static Task<J<T>> AsTask(T value)
@@ -58,32 +54,38 @@ namespace Squidex.Infrastructure.Orleans
         [SerializerMethod]
         public static void Serialize(object input, ISerializationContext context, Type expected)
         {
-            var stream = new MemoryStream();
-
-            using (var writer = new JsonTextWriter(new StreamWriter(stream)))
+            using (Profile.Method(nameof(J)))
             {
-                J.Serializer.Serialize(writer, input);
+                var stream = new MemoryStream();
 
-                writer.Flush();
+                using (var writer = new JsonTextWriter(new StreamWriter(stream)))
+                {
+                    J.Serializer.Serialize(writer, input);
+
+                    writer.Flush();
+                }
+
+                var outBytes = stream.ToArray();
+
+                context.StreamWriter.Write(outBytes.Length);
+                context.StreamWriter.Write(outBytes);
             }
-
-            var outBytes = stream.ToArray();
-
-            context.StreamWriter.Write(outBytes.Length);
-            context.StreamWriter.Write(outBytes);
         }
 
         [DeserializerMethod]
         public static object Deserialize(Type expected, IDeserializationContext context)
         {
-            var outLength = context.StreamReader.ReadInt();
-            var outBytes = context.StreamReader.ReadBytes(outLength);
-
-            var stream = new MemoryStream(outBytes);
-
-            using (var reader = new JsonTextReader(new StreamReader(stream)))
+            using (Profile.Method(nameof(J)))
             {
-                return J.Serializer.Deserialize(reader, expected);
+                var outLength = context.StreamReader.ReadInt();
+                var outBytes = context.StreamReader.ReadBytes(outLength);
+
+                var stream = new MemoryStream(outBytes);
+
+                using (var reader = new JsonTextReader(new StreamReader(stream)))
+                {
+                    return J.Serializer.Deserialize(reader, expected);
+                }
             }
         }
     }

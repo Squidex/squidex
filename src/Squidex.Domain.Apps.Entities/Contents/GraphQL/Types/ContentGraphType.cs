@@ -72,6 +72,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
             AddField(new FieldType
             {
+                Name = "status",
+                ResolvedType = AllTypes.NonNullStatusType,
+                Resolver = Resolve(x => x.Status),
+                Description = $"The the status of the {schemaName} content."
+            });
+
+            AddField(new FieldType
+            {
                 Name = "url",
                 ResolvedType = AllTypes.NonNullString,
                 Resolver = model.ResolveContentUrl(schema),

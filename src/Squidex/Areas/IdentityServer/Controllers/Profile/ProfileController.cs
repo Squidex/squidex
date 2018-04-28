@@ -83,7 +83,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
         [Route("/account/profile/update/")]
         public Task<IActionResult> UpdateProfile(ChangeProfileModel model)
         {
-            return MakeChangeAsync(user => userManager.UpdateAsync(user, model.Email, model.DisplayName),
+            return MakeChangeAsync(user => userManager.UpdateAsync(user, model.Email, model.DisplayName, model.IsHidden),
                 "Account updated successfully.");
         }
 
@@ -195,6 +195,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
                 ExternalLogins = user.Logins,
                 ExternalProviders = externalProviders,
                 DisplayName = user.DisplayName(),
+                IsHidden = user.IsHidden(),
                 HasPassword = await userManager.HasPasswordAsync(user),
                 HasPasswordAuth = identityOptions.Value.AllowPasswordAuth,
                 SuccessMessage = successMessage

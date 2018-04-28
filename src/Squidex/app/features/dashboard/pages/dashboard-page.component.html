@@ -1,134 +1,126 @@
-<sqx-title message="{app} | Dashboard" parameter1="app" [value1]="(app | async).name"></sqx-title>
+<ng-container *ngIf="app | async; let app">
+    <sqx-title message="{app} | Dashboard" parameter1="app" [value1]="app.name"></sqx-title>
 
-<div class="dashboard" @fade>
-    <div class="dashboard-inner">
-    
-    <div>
-        <h1 class="dashboard-title">Hi {{ctx.user.displayName}}</h1>
+    <div class="dashboard" @fade>
+        <div class="dashboard-inner">
+            <div>
+                <h1 class="dashboard-title">Hi {{authState.user?.displayName}}</h1>
 
-        <div class="subtext">
-            Welcome to <span class="app-name">{{(app | async).name}}</span> dashboard.
-        </div>
-    </div>
-
-    <div class="clearfix">
-        <a class="card card-href" [routerLink]="['schemas', { showDialog: true }]" *ngIf="ctx.app.permission !== 'Editor'">
-            <div class="card-body">
-                <div class="card-image">
-                    <img src="/images/dashboard-schema.png" />
-                </div>
-
-                <h4 class="card-title">New Schema</h4>
-
-                <div class="card-text">
-                    A schema defines the structure of your content element.
+                <div class="subtext">
+                    Welcome to <span class="app-name">{{app.name}}</span> dashboard.
                 </div>
             </div>
-        </a>
 
-        <a class="card card-href" href="/api/docs" target="_blank">
-            <div class="card-body">
-                <div class="card-image">
-                    <img src="/images/dashboard-api.png" />
-                </div>
-
-                <h4 class="card-title">API Documentation</h4>
-
-                <div class="card-text">
-                    Swagger compatible documentation for app management.
-                </div>
-            </div>
-        </a>
-
-        <a class="card card-href" (click)="showForum()">
-            <div class="card-body">
-                <div class="card-image">
-                    <img src="/images/dashboard-feedback.png" />
-                </div>
-
-                <h4 class="card-title">Feedback</h4>
-
-                <div class="card-text">
-                    Provide feedback and request features to help us to improve Squidex.
-                </div>
-            </div>
-        </a>
-
-        <a class="card card-href" href="https://github.com/squidex/squidex" target="_blank">
-            <div class="card-body">
-                <div class="card-image">
-                    <img src="/images/dashboard-github.png" />
-                </div>
-
-                <h4 class="card-title">Github</h4>
-
-                <div class="card-text">
-                    Get the source code from Github and report bugs or ask for support.
-                </div>
-            </div>
-        </a>
-
-        <div class="card card-lg">
-            <div class="card-body">
-                <chart type="bar" [data]="chartCallsCount" [options]="chartOptions"></chart>
-            </div>
-        </div>
-
-        <div class="card card-lg">
-            <div class="card-body">
-                <chart type="bar" [data]="chartCallsPerformance" [options]="chartOptions"></chart>
-            </div>
-        </div>
-
-        <div class="card card">
-            <div class="card-body">
-                <div class="aggregation" *ngIf="callsCurrent >= 0">
-                    <div class="aggregation-label">API calls this month</div>
-                    <div class="aggregation-value">{{callsCurrent | sqxKNumber}}</div>
-                    <div class="aggregation-label" *ngIf="callsMax > 0">Monthly limit: {{callsMax | sqxKNumber}}</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="card card-lg">
-            <div class="card-body">
-                <chart type="line" [data]="chartStorageCount" [options]="chartOptions"></chart>
-            </div>
-        </div>
-
-        <div class="card card">
-            <div class="card-body">
-                <div class="aggregation" *ngIf="assetsCurrent >= 0">
-                    <div class="aggregation-label">Asset size today</div>
-                    <div class="aggregation-value">{{assetsCurrent | sqxFileSize}}</div>
-                    <div class="aggregation-label" *ngIf="assetsMax > 0">Total limit: {{assetsMax | sqxFileSize}}</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="card card-lg">
-            <div class="card-body">
-                <chart type="line" [data]="chartStorageSize" [options]="chartOptions"></chart>
-            </div>
-        </div>
-
-        <div class="card card-lg">
-            <div class="card-header">
-                History
-            </div>
-            <div class="card-body card-history card-body-scroll">
-                <div *ngFor="let event of history" class="event">
-                    <div class="event-left">
-                        <img class="user-picture" [attr.title]="event.actor | sqxUserNameRef:null" [attr.src]="event.actor | sqxUserPictureRef" />
-                    </div>
-                    <div class="event-main">
-                        <div class="event-message">
-                            <span class="event-actor user-ref">{{event.actor | sqxUserNameRef:null}}</span> <span [innerHTML]="format(event.message) | async"></span>
+            <div class="clearfix">
+                <a class="card card-href" [routerLink]="['schemas', { showDialog: true }]" *ngIf="app.permission !== 'Editor'">
+                    <div class="card-body">
+                        <div class="card-image">
+                            <img src="/images/dashboard-schema.png" />
                         </div>
-                        <div class="event-created">{{event.created | sqxFromNow}}</div>
+
+                        <h4 class="card-title">New Schema</h4>
+
+                        <div class="card-text">
+                            A schema defines the structure of your content element.
+                        </div>
                     </div>
-                </div>            
+                </a>
+
+                <a class="card card-href" href="/api/docs" target="_blank">
+                    <div class="card-body">
+                        <div class="card-image">
+                            <img src="/images/dashboard-api.png" />
+                        </div>
+
+                        <h4 class="card-title">API Documentation</h4>
+
+                        <div class="card-text">
+                            Swagger compatible documentation for app management.
+                        </div>
+                    </div>
+                </a>
+
+                <a class="card card-href" (click)="showForum()">
+                    <div class="card-body">
+                        <div class="card-image">
+                            <img src="/images/dashboard-feedback.png" />
+                        </div>
+
+                        <h4 class="card-title">Feedback</h4>
+
+                        <div class="card-text">
+                            Provide feedback and request features to help us to improve Squidex.
+                        </div>
+                    </div>
+                </a>
+
+                <a class="card card-href" href="https://github.com/squidex/squidex" target="_blank">
+                    <div class="card-body">
+                        <div class="card-image">
+                            <img src="/images/dashboard-github.png" />
+                        </div>
+
+                        <h4 class="card-title">Github</h4>
+
+                        <div class="card-text">
+                            Get the source code from Github and report bugs or ask for support.
+                        </div>
+                    </div>
+                </a>
+
+                <div class="card card-lg">
+                    <div class="card-body">
+                        <chart type="bar" [data]="chartCallsCount" [options]="chartOptions"></chart>
+                    </div>
+                </div>
+
+                <div class="card card-lg">
+                    <div class="card-body">
+                        <chart type="bar" [data]="chartCallsPerformance" [options]="chartOptions"></chart>
+                    </div>
+                </div>
+
+                <div class="card card">
+                    <div class="card-body">
+                        <div class="aggregation" *ngIf="callsCurrent >= 0">
+                            <div class="aggregation-label">API calls this month</div>
+                            <div class="aggregation-value">{{callsCurrent | sqxKNumber}}</div>
+                            <div class="aggregation-label" *ngIf="callsMax > 0">Monthly limit: {{callsMax | sqxKNumber}}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card card-lg">
+                    <div class="card-body">
+                        <chart type="line" [data]="chartStorageCount" [options]="chartOptions"></chart>
+                    </div>
+                </div>
+
+                <div class="card card">
+                    <div class="card-body">
+                        <div class="aggregation" *ngIf="assetsCurrent >= 0">
+                            <div class="aggregation-label">Asset size today</div>
+                            <div class="aggregation-value">{{assetsCurrent | sqxFileSize}}</div>
+                            <div class="aggregation-label" *ngIf="assetsMax > 0">Total limit: {{assetsMax | sqxFileSize}}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card card-lg">
+                    <div class="card-body">
+                        <chart type="line" [data]="chartStorageSize" [options]="chartOptions"></chart>
+                    </div>
+                </div>
+
+                <div class="card card-lg">
+                    <div class="card-header">
+                        History
+                    </div>
+                    <div class="card-body card-history card-body-scroll">
+                        <sqx-history-list [events]="history"></sqx-history-list>            
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-</div> 
+</ng-container>

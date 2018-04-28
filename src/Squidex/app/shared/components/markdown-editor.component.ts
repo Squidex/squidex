@@ -5,16 +5,15 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, Component, ElementRef, EventEmitter, forwardRef, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, forwardRef, ViewChild } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import {
     AssetDto,
-    AssetDragged,
-    MessageBus,
+    ModalView,
     ResourceLoaderService,
     Types
-} from './../declarations-base';
+} from '@app/shared/internal';
 
 declare var SimpleMDE: any;
 
@@ -28,13 +27,14 @@ export const SQX_MARKDOWN_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     templateUrl: './markdown-editor.component.html',
     providers: [SQX_MARKDOWN_EDITOR_CONTROL_VALUE_ACCESSOR]
 })
-export class MarkdownEditorComponent implements ControlValueAccessor, AfterViewInit, OnDestroy, OnInit {
+export class MarkdownEditorComponent implements ControlValueAccessor, AfterViewInit {
     private callChange = (v: any) => { /* NOOP */ };
     private callTouched = () => { /* NOOP */ };
     private simplemde: any;
     private value: string;
     private isDisabled = false;
-    private assetDraggedSubscription: any;
+
+    public selectorModal = new ModalView();
 
     @ViewChild('editor')
     public editor: ElementRef;
@@ -45,35 +45,12 @@ export class MarkdownEditorComponent implements ControlValueAccessor, AfterViewI
     @ViewChild('inner')
     public inner: ElementRef;
 
-    @Output()
-    public assetPluginClicked = new EventEmitter<any>();
-
     public isFullscreen = false;
 
-    public draggedOver = false;
-
     constructor(
-        private readonly resourceLoader: ResourceLoaderService,
-        private readonly messageBus: MessageBus
+        private readonly resourceLoader: ResourceLoaderService
     ) {
         this.resourceLoader.loadStyle('https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css');
-    }
-
-    public ngOnDestroy() {
-        this.assetDraggedSubscription.unsubscribe();
-    }
-
-    public ngOnInit() {
-        this.assetDraggedSubscription =
-            this.messageBus.of(AssetDragged).subscribe(message => {
-                if (message.assetDto.isImage) {
-                    if (message.dragEvent === AssetDragged.DRAG_START) {
-                        this.draggedOver = true;
-                    } else {
-                        this.draggedOver = false;
-                    }
-                }
-            });
     }
 
     public writeValue(value: string) {
@@ -100,9 +77,11 @@ export class MarkdownEditorComponent implements ControlValueAccessor, AfterViewI
         this.callTouched = fn;
     }
 
-    public ngAfterViewInit() {
-        const self = this;
+    private showSelector = () => {
+        this.selectorModal.show();
+    }
 
+    public ngAfterViewInit() {
         this.resourceLoader.loadScript('https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js').then(() => {
             this.simplemde = new SimpleMDE({
                 toolbar: [
@@ -176,15 +155,14 @@ export class MarkdownEditorComponent implements ControlValueAccessor, AfterViewI
                     '|',
                     {
                         name: 'assets',
-                        action: () => {
-                            self.assetPluginClicked.emit();
-                        },
+                        action: this.showSelector,
                         className: 'icon-assets icon-bold',
                         title: 'Insert Assets'
                     }
                 ],
                 element: this.editor.nativeElement
             });
+
             this.simplemde.value(this.value || '');
             this.simplemde.codemirror.setOption('readOnly', this.isDisabled);
 
@@ -214,15 +192,17 @@ export class MarkdownEditorComponent implements ControlValueAccessor, AfterViewI
         });
     }
 
-    public onItemDropped(event: any) {
-        const content = event.dragData;
+    public onAssetsSelected(assets: AssetDto[]) {
+        let content = '';
 
-        if (content instanceof AssetDto) {
-            const img = `![${content.fileName}](${content.url} '${content.fileName}')`;
-
-            this.simplemde.codemirror.replaceSelection(img);
+        for (let asset of assets) {
+            content += `![${asset.fileName}](${asset.url} '${asset.fileName}')`;
         }
 
-        this.draggedOver = false;
+        if (content.length > 0) {
+            this.simplemde.codemirror.replaceSelection(content);
+        }
+
+        this.selectorModal.hide();
     }
 }

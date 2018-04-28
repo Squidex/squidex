@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.ComponentModel.DataAnnotations;
+using Squidex.Domain.Apps.Entities.Schemas.Commands;
 
 namespace Squidex.Areas.Api.Controllers.Schemas.Models
 {
@@ -16,5 +17,10 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// </summary>
         [Required]
         public FieldPropertiesDto Properties { get; set; }
+
+        public UpdateField ToCommand(long id)
+        {
+            return new UpdateField { FieldId = id, Properties = Properties?.ToProperties() };
+        }
     }
 }

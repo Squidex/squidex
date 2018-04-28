@@ -1,127 +1,136 @@
-<div class="modal-dialog modal-lg">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h4 class="modal-title" *ngIf="mode === 'EditTrigger'">
-                Edit Trigger
-            </h4>
-            <h4 class="modal-title" *ngIf="mode === 'EditAction'">
-                Edit Action
-            </h4>
-            <h4 class="modal-title" *ngIf="mode === 'Wizard' && step === 1">
-                Step 1 of 4: Select Trigger
-            </h4>
-            <h4 class="modal-title" *ngIf="mode === 'Wizard' && step === 2">
-                Step 2 of 4: Configure Trigger
-            </h4>
-            <h4 class="modal-title" *ngIf="mode === 'Wizard' && step === 3">
-                Step 3 of 4: Select Action
-            </h4>
-            <h4 class="modal-title" *ngIf="mode === 'Wizard' && step === 4">
-                Step 4 of 4: Configure Action
-            </h4>
-            
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="cancel()">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
+<sqx-modal-dialog large="true" fullHeight="true" (closed)="complete()">
+    <ng-container title>
+        <ng-container *ngIf="mode === 'EditTrigger'">
+            Edit Trigger
+        </ng-container>
+        <ng-container *ngIf="mode === 'EditAction'">
+            Edit Action
+        </ng-container>
+        <ng-container *ngIf="mode === 'Wizard' && step === 1">
+            Step 1 of 4: Select Trigger
+        </ng-container>
+        <ng-container *ngIf="mode === 'Wizard' && step === 2">
+            Step 2 of 4: Configure Trigger
+        </ng-container>
+        <ng-container *ngIf="mode === 'Wizard' && step === 3">
+            Step 3 of 4: Select Action
+        </ng-container>
+        <ng-container *ngIf="mode === 'Wizard' && step === 4">
+            Step 4 of 4: Configure Action
+        </ng-container>
+    </ng-container>
 
-        <div class="modal-body">
-            <div *ngIf="step === 1">        
-                <span *ngFor="let trigger of ruleTriggers | sqxKeys" class="rule-element rule-element-{{trigger}}" (click)="selectTriggerType(trigger)">
-                    <span class="rule-element-icon">
-                        <i class="icon-trigger-{{trigger}}"></i>
-                    </span>
-                    <span class="rule-element-text">
-                        {{ruleTriggers[trigger].name}}
-                    </span>
+    <ng-container content>
+        <ng-container *ngIf="step === 1">        
+            <span *ngFor="let trigger of ruleTriggers | sqxKeys" class="rule-element rule-element-{{trigger}}" (click)="selectTriggerType(trigger)">
+                <span class="rule-element-icon">
+                    <i class="icon-trigger-{{trigger}}"></i>
                 </span>
-            </div>
-            
-            <div *ngIf="step === 2 && schemas" class="modal-form">       
-                <div [ngSwitch]="triggerType">
-                    <div *ngSwitchCase="'AssetChanged'">
-                        <sqx-asset-changed-trigger #triggerControl
-                            [trigger]="trigger" 
-                            (triggerChanged)="selectTrigger($event)">
+                <span class="rule-element-text">
+                    {{ruleTriggers[trigger].name}}
+                </span>
+            </span>
+        </ng-container>
+        
+        <ng-container *ngIf="step === 2 && schemas">
+            <form [formGroup]="triggerForm.form" (submit)="saveTrigger()">  
+                <ng-container [ngSwitch]="triggerType">
+                    <ng-container *ngSwitchCase="'AssetChanged'">
+                        <sqx-asset-changed-trigger
+                            [trigger]="trigger"
+                            [triggerForm]="triggerForm.form"
+                            [triggerFormSubmitted]="triggerForm.submitted | async">
                         </sqx-asset-changed-trigger>
-                    </div>
-                    <div *ngSwitchCase="'ContentChanged'">
-                        <sqx-content-changed-trigger #triggerControl
-                            [schemas]="schemas" 
-                            [trigger]="trigger" 
-                            (triggerChanged)="selectTrigger($event)">
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'ContentChanged'">
+                        <sqx-content-changed-trigger
+                            [schemas]="schemas"
+                            [trigger]="trigger"
+                            [triggerForm]="triggerForm.form"
+                            [triggerFormSubmitted]="triggerForm.submitted | async">
                         </sqx-content-changed-trigger>
-                    </div>
-                </div>
-            </div>
-        
-            <div *ngIf="step === 3">        
-                <span *ngFor="let action of ruleActions | sqxKeys" class="rule-element rule-element-{{action}}" (click)="selectActionType(action)">
-                    <span class="rule-element-icon">
-                        <i class="icon-action-{{action}}"></i>
-                    </span>
-                    <span class="rule-element-text">
-                        {{ruleActions[action].name}}
-                    </span>
+                    </ng-container>
+                </ng-container>
+            </form>
+        </ng-container>
+    
+        <ng-container *ngIf="step === 3">        
+            <span *ngFor="let action of ruleActions | sqxKeys" class="rule-element rule-element-{{action}}" (click)="selectActionType(action)">
+                <span class="rule-element-icon">
+                    <i class="icon-action-{{action}}"></i>
                 </span>
-            </div>
-        
-            <div *ngIf="step === 4" class="modal-form">
-                <div [ngSwitch]="actionType">
-                    <div *ngSwitchCase="'Algolia'">
-                        <sqx-algolia-action #actionControl
-                            [action]="action" 
-                            (actionChanged)="selectAction($event)">
+                <span class="rule-element-text">
+                    {{ruleActions[action].name}}
+                </span>
+            </span>
+        </ng-container>
+    
+        <ng-container *ngIf="step === 4">
+            <form [formGroup]="actionForm.form" (submit)="saveAction()">
+                <ng-container [ngSwitch]="actionType">
+                    <ng-container *ngSwitchCase="'Algolia'">
+                        <sqx-algolia-action
+                            [action]="action"
+                            [actionForm]="actionForm.form"
+                            [actionFormSubmitted]="actionForm.submitted | async">
                         </sqx-algolia-action>
-                    </div>
-                    <div *ngSwitchCase="'AzureQueue'">
-                        <sqx-azure-queue-action #actionControl
-                            [action]="action" 
-                            (actionChanged)="selectAction($event)">
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'AzureQueue'">
+                        <sqx-azure-queue-action
+                            [action]="action"
+                            [actionForm]="actionForm.form"
+                            [actionFormSubmitted]="actionForm.submitted | async">
                         </sqx-azure-queue-action>
-                    </div>
-                    <div *ngSwitchCase="'ElasticSearch'">
-                        <sqx-elastic-search-action #actionControl
-                            [action]="action" 
-                            (actionChanged)="selectAction($event)">
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'ElasticSearch'">
+                        <sqx-elastic-search-action
+                            [action]="action"
+                            [actionForm]="actionForm.form"
+                            [actionFormSubmitted]="actionForm.submitted | async">
                         </sqx-elastic-search-action>
-                    </div>
-                    <div *ngSwitchCase="'Fastly'">
-                        <sqx-fastly-action #actionControl
-                            [action]="action" 
-                            (actionChanged)="selectAction($event)">
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'Fastly'">
+                        <sqx-fastly-action
+                            [action]="action"
+                            [actionForm]="actionForm.form"
+                            [actionFormSubmitted]="actionForm.submitted | async">
                         </sqx-fastly-action>
-                    </div>
-                    <div *ngSwitchCase="'Slack'">
-                        <sqx-slack-action #actionControl
-                            [action]="action" 
-                            (actionChanged)="selectAction($event)">
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'Slack'">
+                        <sqx-slack-action
+                            [action]="action"
+                            [actionForm]="actionForm.form"
+                            [actionFormSubmitted]="actionForm.submitted | async">
                         </sqx-slack-action>
-                    </div>
-                    <div *ngSwitchCase="'Webhook'">
-                        <sqx-webhook-action #actionControl
-                            [action]="action" 
-                            (actionChanged)="selectAction($event)">
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'Webhook'">
+                        <sqx-webhook-action        
+                            [action]="action"
+                            [actionForm]="actionForm.form"
+                            [actionFormSubmitted]="actionForm.submitted | async">
                         </sqx-webhook-action>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="modal-footer" *ngIf="step === 2 || step === 4">
-            <div class="clearfix" *ngIf="mode === 'Wizard' && step === 2">
-                <button type="reset" class="float-left btn btn-secondary" (click)="cancel()">Cancel</button>
-                <button type="submit" class="float-right btn btn-primary" (click)="triggerControl.save()">Next</button>
-            </div>
-            
-            <div class="clearfix" *ngIf="mode !== 'Wizard' && step === 2">
-                <button type="reset" class="float-left btn btn-secondary" (click)="cancel()">Cancel</button>
-                <button type="submit" class="float-right btn btn-primary" (click)="triggerControl.save()">Save</button>
-            </div>
+                    </ng-container>
+                </ng-container>
+            </form>
+        </ng-container>
+    </ng-container>
 
-            <div class="clearfix" *ngIf="step === 4">
-                <button type="reset" class="float-left btn btn-secondary" (click)="cancel()">Cancel</button>
-                <button type="submit" class="float-right btn btn-primary" (click)="actionControl.save()">Save</button>
-            </div>
+    <ng-container footer>
+        <div>
+            <ng-container *ngIf="mode === 'Wizard' && step === 2">
+                <button type="reset" class="float-left btn btn-secondary" (click)="complete()">Cancel</button>
+                <button type="submit" class="float-right btn btn-primary" (click)="saveTrigger()">Next</button>
+            </ng-container>
+            
+            <ng-container *ngIf="mode !== 'Wizard' && step === 2">
+                <button type="reset" class="float-left btn btn-secondary" (click)="complete()">Cancel</button>
+                <button type="submit" class="float-right btn btn-primary" (click)="saveTrigger()">Save</button>
+            </ng-container>
+
+            <ng-container *ngIf="step === 4">
+                <button type="reset" class="float-left btn btn-secondary" (click)="complete()">Cancel</button>
+                <button type="submit" class="float-right btn btn-primary" (click)="saveAction()">Save</button>
+            </ng-container>
         </div>
-    </div>
-</div>
+    </ng-container>
+</sqx-modal-dialog>

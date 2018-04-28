@@ -11,6 +11,9 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Entities.Apps.Services;
+using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models
 {
@@ -58,5 +61,17 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// Gets the next plan name.
         /// </summary>
         public string PlanUpgrade { get; set; }
+
+        public static AppDto FromApp(IAppEntity app, string subject, IAppPlansProvider plans)
+        {
+            var response = SimpleMapper.Map(app, new AppDto());
+
+            response.Permission = app.Contributors[subject];
+
+            response.PlanName = plans.GetPlanForApp(app)?.Name;
+            response.PlanUpgrade = plans.GetPlanUpgradeForApp(app)?.Name;
+
+            return response;
+        }
     }
 }

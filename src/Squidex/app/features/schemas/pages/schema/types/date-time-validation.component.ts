@@ -9,7 +9,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
 
-import { DateTimeFieldPropertiesDto, ValidatorsEx } from 'shared';
+import { DateTimeFieldPropertiesDto, FieldDto, ValidatorsEx } from '@app/shared';
 
 @Component({
     selector: 'sqx-date-time-validation',
@@ -19,6 +19,9 @@ import { DateTimeFieldPropertiesDto, ValidatorsEx } from 'shared';
 export class DateTimeValidationComponent implements OnInit {
     @Input()
     public editForm: FormGroup;
+
+    @Input()
+    public field: FieldDto;
 
     @Input()
     public properties: DateTimeFieldPropertiesDto;

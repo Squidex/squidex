@@ -7,14 +7,14 @@
             <div class="col col-6">
                 <span class="language-name table-cell" [class.language-optional]="language.isOptional" [class.language-master]="language.isMaster">{{language.englishName}}</span>
             </div>
-            <div class="col col-4">
+            <div class="col col-options">
                 <div class="float-right">
-                    <button type="button" class="btn btn-secondary table-items-edit-button" [class.active]="isEditing" (click)="toggleEditing()" *ngIf="!language.isMaster || allLanguages.length > 1">
+                    <button type="button" class="btn btn-secondary table-items-edit-button" [class.active]="isEditing" (click)="toggleEditing()" *ngIf="!language.isMaster">
                         <i class="icon-settings"></i>
                     </button>
 
                     <button type="button" class="btn btn-link btn-danger" [class.invisible]="language.isMaster"
-                        (sqxConfirmClick)="removing.emit(language)"
+                        (sqxConfirmClick)="remove()"
                         confirmTitle="Remove language" 
                         confirmText="Do you really want to remove the language?">
                         <i class="icon-bin2"></i>
@@ -25,37 +25,45 @@
     </div>
 
     <div class="table-items-row-details" *ngIf="isEditing">
-        <form [formGroup]="editForm" (ngSubmit)="save()">
+        <form [formGroup]="editForm.form" (ngSubmit)="save()">
             <div class="table-items-row-details-tabs clearfix">
                 <div class="float-right">
-                    <button type="reset" class="btn btn-link" (click)="cancel()">Cancel</button>
+                    <button type="reset" class="btn btn-link" (click)="toggleEditing()">Cancel</button>
                     <button type="submit" class="btn btn-primary">Save</button>
                 </div>
             </div>
 
             <div class="table-items-row-details-tab">
-                <div class="form-group row" *ngIf="allLanguages.length > 1">
+                <div class="form-group row">
                     <label class="col col-3 col-form-label fallback-label">Fallback</label>
 
                     <div class="col col-9">
-                        <div class="fallback-languages" dnd-sortable-container [sortableData]="fallbackLanguages" *ngIf="fallbackLanguages.length > 0">
+                        <div class="fallback-languages" dnd-sortable-container [sortableData]="fallbackLanguages.mutableValues" *ngIf="fallbackLanguages.length > 0">
                             <div class="fallback-language" *ngFor="let language of fallbackLanguages; let i = index" dnd-sortable [sortableIndex]="i">
-                                {{language.englishName}}
-
-                                <button type="button" class="btn btn-link btn-secondary btn-sm float-right" (click)="removeFallbackLanguage(language)">
-                                    <i class="icon-close"></i>
-                                </button>
+                                <div class="row no-gutter">
+                                    <div class="col">
+                                        {{language.englishName}}
+                                    </div>
+                                    <div class="col col-auto">
+                                        <button type="button" class="btn btn-link btn-secondary btn-sm" (click)="removeFallbackLanguage(language)">
+                                            <i class="icon-close"></i>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        <form class="form-inline fallback-form" (ngSubmit)="addLanguage()" *ngIf="otherLanguages.length > 0">
-                            <div class="form-group mr-1">
-                                <select class="form-control fallback-select" [(ngModel)]="otherLanguage" name="otherLanguage">
-                                    <option *ngFor="let otherLanguage of otherLanguages" [ngValue]="otherLanguage">{{otherLanguage.englishName}}</option>
-                                </select>
+                        <form class="form fallback-form" (ngSubmit)="addFallbackLanguage()" *ngIf="otherLanguage">
+                            <div class="row no-gutters">
+                                <div class="col">
+                                    <select class="form-control fallback-select" [(ngModel)]="otherLanguage" name="otherLanguage">
+                                        <option *ngFor="let otherLanguage of fallbackLanguagesNew; trackBy: trackByLanguage" [ngValue]="otherLanguage">{{otherLanguage.englishName}}</option>
+                                    </select>
+                                </div>
+                                <div class="col col-auto pl-1">
+                                    <button type="submit" class="btn btn-success">Add Language</button>
+                                </div>
                             </div>
-
-                            <button type="submit" class="btn btn-success">Add Language</button>
                         </form>
                     </div>
                 </div>
@@ -63,9 +71,9 @@
                 <div class="form-group row" *ngIf="!language.isMaster">
                     <div class="col offset-3 col-9">
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="isMaster" formControlName="isMaster" />
-                            <label class="form-check-label" for="isMaster">
-                                    Is Master
+                            <input class="form-check-input" type="checkbox" id="{{language.iso2Code}}_isMaster" formControlName="isMaster" />
+                            <label class="form-check-label" for="{{language.iso2Code}}_isMaster">
+                                Is Master
                             </label>
                         </div>
     
@@ -78,8 +86,8 @@
                 <div class="form-group row" *ngIf="!language.isMaster">
                     <div class="col offset-3 col-9" *ngIf="!isMaster">
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" is="isOptional" formControlName="isOptional" />
-                            <label class="form-check-label" for="isOptional">
+                            <input class="form-check-input" type="checkbox" id="{{language.iso2Code}}_isOptional" formControlName="isOptional" />
+                            <label class="form-check-label" for="{{language.iso2Code}}_isOptional">
                                 Is Optional
                             </label> 
                         </div>

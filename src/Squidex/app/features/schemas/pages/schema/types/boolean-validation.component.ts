@@ -9,7 +9,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
 
-import { BooleanFieldPropertiesDto } from 'shared';
+import { BooleanFieldPropertiesDto, FieldDto } from '@app/shared';
 
 @Component({
     selector: 'sqx-boolean-validation',
@@ -19,6 +19,9 @@ import { BooleanFieldPropertiesDto } from 'shared';
 export class BooleanValidationComponent implements OnInit {
     @Input()
     public editForm: FormGroup;
+
+    @Input()
+    public field: FieldDto;
 
     @Input()
     public properties: BooleanFieldPropertiesDto;

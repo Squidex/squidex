@@ -19,6 +19,7 @@ import {
 
 import {
     AppMustExistGuard,
+    LoadAppsGuard,
     MustBeAuthenticatedGuard,
     MustBeNotAuthenticatedGuard,
     UnsetAppGuard
@@ -33,7 +34,7 @@ export const routes: Routes = [
     {
         path: 'app',
         component: InternalAreaComponent,
-        canActivate: [MustBeAuthenticatedGuard],
+        canActivate: [MustBeAuthenticatedGuard, LoadAppsGuard],
         children: [
             {
                 path: '',

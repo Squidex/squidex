@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
         private JsonValueConverter(JToken value)
         {
-            this.Value = value;
+            Value = value;
         }
 
         public static object ConvertValue(Field field, JToken json)

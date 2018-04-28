@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { StringHelper } from './../';
+import { StringHelper } from './string-helper';
 
 describe('StringHelper', () => {
     it('should return empty text if value is null or undefined', () => {

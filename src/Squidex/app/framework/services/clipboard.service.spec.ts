@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ClipboardService, ClipboardServiceFactory } from './../';
+import { ClipboardService, ClipboardServiceFactory } from './clipboard.service';
 
 describe('ShortcutService', () => {
     it('should instantiate from factory', () => {

@@ -15,4 +15,5 @@ export * from './pages/schemas/schemas-page.component';
 export * from './shared/assets-editor.component';
 export * from './shared/content-item.component';
 export * from './shared/content-status.component';
+export * from './shared/contents-selector.component';
 export * from './shared/references-editor.component';

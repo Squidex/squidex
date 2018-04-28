@@ -6,6 +6,9 @@
 // ==========================================================================
 
 using System.ComponentModel.DataAnnotations;
+using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Entities.Schemas.Commands;
+using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Areas.Api.Controllers.Schemas.Models
 {
@@ -22,5 +25,12 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// </summary>
         [StringLength(1000)]
         public string Hints { get; set; }
+
+        public UpdateSchema ToCommand()
+        {
+            var properties = SimpleMapper.Map(this, new SchemaProperties());
+
+            return new UpdateSchema { Properties = properties };
+        }
     }
 }

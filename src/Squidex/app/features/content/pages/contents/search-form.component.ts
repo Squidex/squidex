@@ -5,17 +5,18 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
+import { FormBuilder, FormControl } from '@angular/forms';
+
+import { ModalView } from '@app/shared';
 
 @Component({
     selector: 'sqx-search-form',
     styleUrls: ['./search-form.component.scss'],
-    templateUrl: './search-form.component.html'
+    templateUrl: './search-form.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SearchFormComponent implements OnChanges {
-    private queryValue = '';
-
     @Input()
     public query = '';
 
@@ -31,6 +32,12 @@ export class SearchFormComponent implements OnChanges {
     @Input()
     public canArchive = true;
 
+    @Input()
+    public enableShortcut = false;
+
+    public contentsFilter = new FormControl();
+
+    public searchModal = new ModalView();
     public searchForm =
         this.formBuilder.group({
             odataOrderBy: '',
@@ -43,8 +50,18 @@ export class SearchFormComponent implements OnChanges {
     ) {
     }
 
+    public search() {
+        this.invalidate(this.contentsFilter.value);
+
+        this.queryChanged.emit(this.contentsFilter.value);
+    }
+
     public ngOnChanges() {
-        if (this.query === this.queryValue) {
+        this.invalidate(this.query);
+    }
+
+    private invalidate(query: string) {
+        if (query === this.contentsFilter.value) {
             return;
         }
 
@@ -52,23 +69,25 @@ export class SearchFormComponent implements OnChanges {
         let odataFilter = '';
         let odataSearch = '';
 
-        const parts = this.query.split('&');
+        if (this.query) {
+            const parts = this.query.split('&');
 
-        if (parts.length === 1 && parts[0][0] !== '$') {
-            odataSearch = parts[0];
-        } else {
-            for (let part of parts) {
-                const kvp = part.split('=');
+            if (parts.length === 1 && parts[0][0] !== '$') {
+                odataSearch = parts[0];
+            } else {
+                for (let part of parts) {
+                    const kvp = part.split('=');
 
-                if (kvp.length === 2) {
-                    const key = kvp[0].toLowerCase();
+                    if (kvp.length === 2) {
+                        const key = kvp[0].toLowerCase();
 
-                    if (key === '$filter') {
-                        odataFilter = kvp[1];
-                    } else if (key === '$orderby') {
-                        odataOrderBy = kvp[1];
-                    } else if (key === '$search') {
-                        odataSearch = kvp[1];
+                        if (key === '$filter') {
+                            odataFilter = kvp[1];
+                        } else if (key === '$orderby') {
+                            odataOrderBy = kvp[1];
+                        } else if (key === '$search') {
+                            odataSearch = kvp[1];
+                        }
                     }
                 }
             }
@@ -80,7 +99,7 @@ export class SearchFormComponent implements OnChanges {
             odataOrderBy
         }, { emitEvent: false });
 
-        this.queryValue = this.query;
+        this.contentsFilter.setValue(this.query);
     }
 
     public updateQuery() {
@@ -111,8 +130,9 @@ export class SearchFormComponent implements OnChanges {
         }
 
         if (query !== this.query) {
-            this.queryValue = query;
             this.queryChanged.emit(query);
         }
+
+        this.contentsFilter.setValue(query);
     }
 }

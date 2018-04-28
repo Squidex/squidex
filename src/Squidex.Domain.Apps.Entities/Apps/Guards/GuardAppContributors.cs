@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Apps;
@@ -34,20 +35,31 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                 }
                 else
                 {
-                    if (await users.FindByIdAsync(command.ContributorId) == null)
+                    var user = await users.FindByIdOrEmailAsync(command.ContributorId);
+
+                    if (user == null)
                     {
                         error(new ValidationError("Cannot find contributor id.", nameof(command.ContributorId)));
                     }
-                    else if (contributors.TryGetValue(command.ContributorId, out var existing))
+                    else
                     {
-                        if (existing == command.Permission)
+                        command.ContributorId = user.Id;
+
+                        if (string.Equals(command.ContributorId, command.Actor?.Identifier, StringComparison.OrdinalIgnoreCase))
                         {
-                            error(new ValidationError("Contributor has already this permission.", nameof(command.Permission)));
+                            error(new ValidationError("You cannot change your own permission."));
                         }
-                    }
-                    else if (plan.MaxContributors == contributors.Count)
-                    {
-                        error(new ValidationError("You have reached the maximum number of contributors for your plan."));
+                        else if (contributors.TryGetValue(command.ContributorId, out var existing))
+                        {
+                            if (existing == command.Permission)
+                            {
+                                error(new ValidationError("Contributor has already this permission.", nameof(command.Permission)));
+                            }
+                        }
+                        else if (plan.MaxContributors == contributors.Count)
+                        {
+                            error(new ValidationError("You have reached the maximum number of contributors for your plan."));
+                        }
                     }
                 }
             });

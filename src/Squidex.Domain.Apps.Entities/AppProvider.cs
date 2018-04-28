@@ -17,6 +17,8 @@ using Squidex.Domain.Apps.Entities.Rules.Repositories;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Repositories;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Caching;
+using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Orleans;
 
 namespace Squidex.Domain.Apps.Entities
@@ -26,128 +28,180 @@ namespace Squidex.Domain.Apps.Entities
         private readonly IGrainFactory grainFactory;
         private readonly IAppRepository appRepository;
         private readonly IRuleRepository ruleRepository;
+        private readonly IRequestCache requestCache;
         private readonly ISchemaRepository schemaRepository;
 
         public AppProvider(
             IGrainFactory grainFactory,
             IAppRepository appRepository,
             ISchemaRepository schemaRepository,
-            IRuleRepository ruleRepository)
+            IRuleRepository ruleRepository,
+            IRequestCache requestCache)
         {
             Guard.NotNull(grainFactory, nameof(grainFactory));
             Guard.NotNull(appRepository, nameof(appRepository));
             Guard.NotNull(schemaRepository, nameof(schemaRepository));
+            Guard.NotNull(requestCache, nameof(requestCache));
             Guard.NotNull(ruleRepository, nameof(ruleRepository));
 
             this.grainFactory = grainFactory;
             this.appRepository = appRepository;
             this.schemaRepository = schemaRepository;
+            this.requestCache = requestCache;
             this.ruleRepository = ruleRepository;
         }
 
-        public async Task<(IAppEntity, ISchemaEntity)> GetAppWithSchemaAsync(Guid appId, Guid id)
+        public Task<(IAppEntity, ISchemaEntity)> GetAppWithSchemaAsync(Guid appId, Guid id)
         {
-            var app = await grainFactory.GetGrain<IAppGrain>(appId).GetStateAsync();
-
-            if (!IsExisting(app))
+            return requestCache.GetOrCreateAsync($"GetAppWithSchemaAsync({appId}, {id})", async () =>
             {
-                return (null, null);
-            }
+                using (Profile.Method<AppProvider>())
+                {
+                    var app = await grainFactory.GetGrain<IAppGrain>(appId).GetStateAsync();
 
-            var schema = await grainFactory.GetGrain<ISchemaGrain>(id).GetStateAsync();
+                    if (!IsExisting(app))
+                    {
+                        return (null, null);
+                    }
 
-            if (!IsExisting(schema, false))
+                    var schema = await grainFactory.GetGrain<ISchemaGrain>(id).GetStateAsync();
+
+                    if (!IsExisting(schema, false))
+                    {
+                        return (null, null);
+                    }
+
+                    return (app.Value, schema.Value);
+                }
+            });
+        }
+
+        public Task<IAppEntity> GetAppAsync(string appName)
+        {
+            return requestCache.GetOrCreateAsync($"GetAppAsync({appName})", async () =>
             {
-                return (null, null);
-            }
+                using (Profile.Method<AppProvider>())
+                {
+                    var appId = await GetAppIdAsync(appName);
 
-            return (app.Value, schema.Value);
+                    if (appId == Guid.Empty)
+                    {
+                        return null;
+                    }
+
+                    var app = await grainFactory.GetGrain<IAppGrain>(appId).GetStateAsync();
+
+                    if (!IsExisting(app))
+                    {
+                        return null;
+                    }
+
+                    return app.Value;
+                }
+            });
         }
 
-        public async Task<IAppEntity> GetAppAsync(string appName)
+        public Task<ISchemaEntity> GetSchemaAsync(Guid appId, string name)
         {
-            var appId = await GetAppIdAsync(appName);
-
-            if (appId == Guid.Empty)
+            return requestCache.GetOrCreateAsync($"GetSchemaAsync({appId}, {name})", async () =>
             {
-                return null;
-            }
+                using (Profile.Method<AppProvider>())
+                {
+                    var schemaId = await GetSchemaIdAsync(appId, name);
 
-            var app = await grainFactory.GetGrain<IAppGrain>(appId).GetStateAsync();
+                    if (schemaId == Guid.Empty)
+                    {
+                        return null;
+                    }
 
-            if (!IsExisting(app))
+                    return await GetSchemaAsync(appId, schemaId, false);
+                }
+            });
+        }
+
+        public Task<ISchemaEntity> GetSchemaAsync(Guid appId, Guid id, bool allowDeleted = false)
+        {
+            return requestCache.GetOrCreateAsync($"GetSchemaAsync({appId}, {id}, {allowDeleted})", async () =>
             {
-                return null;
-            }
+                using (Profile.Method<AppProvider>())
+                {
+                    var schema = await grainFactory.GetGrain<ISchemaGrain>(id).GetStateAsync();
 
-            return app.Value;
+                    if (!IsExisting(schema, allowDeleted) || schema.Value.AppId.Id != appId)
+                    {
+                        return null;
+                    }
+
+                    return schema.Value;
+                }
+            });
         }
 
-        public async Task<ISchemaEntity> GetSchemaAsync(Guid appId, string name)
+        public Task<List<ISchemaEntity>> GetSchemasAsync(Guid appId)
         {
-            var schemaId = await GetSchemaIdAsync(appId, name);
-
-            if (schemaId == Guid.Empty)
+            return requestCache.GetOrCreateAsync($"GetSchemasAsync({appId})", async () =>
             {
-                return null;
-            }
+                using (Profile.Method<AppProvider>())
+                {
+                    var ids = await schemaRepository.QuerySchemaIdsAsync(appId);
 
-            return await GetSchemaAsync(appId, schemaId, false);
+                    var schemas =
+                        await Task.WhenAll(
+                            ids.Select(id => grainFactory.GetGrain<ISchemaGrain>(id).GetStateAsync()));
+
+                    return schemas.Where(s => IsFound(s.Value)).Select(s => s.Value).ToList();
+                }
+            });
         }
 
-        public async Task<ISchemaEntity> GetSchemaAsync(Guid appId, Guid id, bool allowDeleted = false)
+        public Task<List<IRuleEntity>> GetRulesAsync(Guid appId)
         {
-            var schema = await grainFactory.GetGrain<ISchemaGrain>(id).GetStateAsync();
-
-            if (!IsExisting(schema, allowDeleted) || schema.Value.AppId.Id != appId)
+            return requestCache.GetOrCreateAsync($"GetRulesAsync({appId})", async () =>
             {
-                return null;
+                using (Profile.Method<AppProvider>())
+                {
+                    var ids = await ruleRepository.QueryRuleIdsAsync(appId);
+
+                    var rules =
+                        await Task.WhenAll(
+                            ids.Select(id => grainFactory.GetGrain<IRuleGrain>(id).GetStateAsync()));
+
+                    return rules.Where(r => IsFound(r.Value)).Select(r => r.Value).ToList();
+                }
+            });
+        }
+
+        public Task<List<IAppEntity>> GetUserApps(string userId)
+        {
+            return requestCache.GetOrCreateAsync($"GetUserApps({userId})", async () =>
+            {
+                using (Profile.Method<AppProvider>())
+                {
+                    var ids = await appRepository.QueryUserAppIdsAsync(userId);
+
+                    var apps =
+                        await Task.WhenAll(
+                            ids.Select(id => grainFactory.GetGrain<IAppGrain>(id).GetStateAsync()));
+
+                    return apps.Where(a => IsFound(a.Value)).Select(a => a.Value).ToList();
+                }
+            });
+        }
+
+        private async Task<Guid> GetAppIdAsync(string name)
+        {
+            using (Profile.Method<AppProvider>())
+            {
+                return await appRepository.FindAppIdByNameAsync(name);
             }
-
-            return schema.Value;
-        }
-
-        public async Task<List<ISchemaEntity>> GetSchemasAsync(Guid appId)
-        {
-            var ids = await schemaRepository.QuerySchemaIdsAsync(appId);
-
-            var schemas =
-                await Task.WhenAll(
-                    ids.Select(id => grainFactory.GetGrain<ISchemaGrain>(id).GetStateAsync()));
-
-            return schemas.Where(s => IsFound(s.Value)).Select(s => s.Value).ToList();
-        }
-
-        public async Task<List<IRuleEntity>> GetRulesAsync(Guid appId)
-        {
-            var ids = await ruleRepository.QueryRuleIdsAsync(appId);
-
-            var rules =
-                await Task.WhenAll(
-                    ids.Select(id => grainFactory.GetGrain<IRuleGrain>(id).GetStateAsync()));
-
-            return rules.Where(r => IsFound(r.Value)).Select(r => r.Value).ToList();
-        }
-
-        public async Task<List<IAppEntity>> GetUserApps(string userId)
-        {
-            var ids = await appRepository.QueryUserAppIdsAsync(userId);
-
-            var apps =
-                await Task.WhenAll(
-                    ids.Select(id => grainFactory.GetGrain<IAppGrain>(id).GetStateAsync()));
-
-            return apps.Where(a => IsFound(a.Value)).Select(a => a.Value).ToList();
-        }
-
-        private Task<Guid> GetAppIdAsync(string name)
-        {
-            return appRepository.FindAppIdByNameAsync(name);
         }
 
         private async Task<Guid> GetSchemaIdAsync(Guid appId, string name)
         {
-            return await schemaRepository.FindSchemaIdAsync(appId, name);
+            using (Profile.Method<AppProvider>())
+            {
+                return await schemaRepository.FindSchemaIdAsync(appId, name);
+            }
         }
 
         private static bool IsFound(IEntityWithVersion entity)
@@ -155,14 +209,14 @@ namespace Squidex.Domain.Apps.Entities
             return entity.Version > EtagVersion.Empty;
         }
 
-        private static bool IsExisting(J<ISchemaEntity> schema, bool allowDeleted)
-        {
-            return IsFound(schema.Value) && (!schema.Value.IsDeleted || allowDeleted);
-        }
-
         private static bool IsExisting(J<IAppEntity> app)
         {
             return IsFound(app.Value) && !app.Value.IsArchived;
+        }
+
+        private static bool IsExisting(J<ISchemaEntity> schema, bool allowDeleted)
+        {
+            return IsFound(schema.Value) && (!schema.Value.IsDeleted || allowDeleted);
         }
     }
 }

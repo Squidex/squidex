@@ -6,52 +6,33 @@
  */
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { FormControl } from '@angular/forms';
-import { Observable, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 
 import {
-    ContentCreated,
-    ContentRemoved,
-    ContentStatusChanged,
-    ContentUpdated
-} from './../messages';
-
-import {
-    allData,
-    AppContext,
     AppLanguageDto,
+    AppsState,
     ContentDto,
-    ContentsService,
-    DateTime,
-    FieldDto,
+    ContentsState,
     ImmutableArray,
+    LanguagesState,
     ModalView,
-    Pager,
     SchemaDetailsDto,
-    Versioned
-} from 'shared';
+    SchemasState
+} from '@app/shared';
 
 @Component({
     selector: 'sqx-contents-page',
     styleUrls: ['./contents-page.component.scss'],
-    templateUrl: './contents-page.component.html',
-    providers: [
-        AppContext
-    ]
+    templateUrl: './contents-page.component.html'
 })
 export class ContentsPageComponent implements OnDestroy, OnInit {
-    private contentCreatedSubscription: Subscription;
-    private contentUpdatedSubscription: Subscription;
+    private contentsSubscription: Subscription;
+    private languagesSubscription: Subscription;
+    private selectedSchemaSubscription: Subscription;
 
     public schema: SchemaDetailsDto;
 
     public searchModal = new ModalView();
-
-    public contentItems: ImmutableArray<ContentDto>;
-    public contentFields: FieldDto[];
-    public contentsFilter = new FormControl();
-    public contentsQuery = '';
-    public contentsPager = new Pager(0);
 
     public dueTimeDialog = new ModalView();
     public dueTime: string | null = '';
@@ -65,243 +46,143 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
     public canUnpublish = false;
     public canPublish = false;
 
-    public languages: AppLanguageDto[] = [];
-    public languageSelected: AppLanguageDto;
-    public languageParameter: string;
+    public language: AppLanguageDto;
+    public languages: ImmutableArray<AppLanguageDto>;
 
     public isAllSelected = false;
-    public isReadOnly = false;
-    public isArchive = false;
 
-    constructor(public readonly ctx: AppContext,
-        private readonly contentsService: ContentsService
+    constructor(
+        public readonly appsState: AppsState,
+        public readonly contentsState: ContentsState,
+        private readonly languagesState: LanguagesState,
+        private readonly schemasState: SchemasState
     ) {
     }
 
     public ngOnDestroy() {
-        this.contentCreatedSubscription.unsubscribe();
-        this.contentUpdatedSubscription.unsubscribe();
+        this.contentsSubscription.unsubscribe();
+        this.languagesSubscription.unsubscribe();
+        this.selectedSchemaSubscription.unsubscribe();
     }
 
     public ngOnInit() {
-        this.contentCreatedSubscription =
-            this.ctx.bus.of(ContentCreated)
-                .subscribe(message => {
-                    this.contentItems = this.contentItems.pushFront(message.content);
-                    this.contentsPager = this.contentsPager.incrementCount();
+        this.selectedSchemaSubscription =
+            this.schemasState.selectedSchema
+                .subscribe(schema => {
+                    this.resetSelection();
+
+                    this.schema = schema!;
+
+                    this.contentsState.init().onErrorResumeNext().subscribe();
                 });
 
-        this.contentUpdatedSubscription =
-            this.ctx.bus.of(ContentUpdated)
-                .subscribe(message => {
-                    this.contentItems = this.contentItems.replaceBy('id', message.content);
+        this.contentsSubscription =
+            this.contentsState.contents
+                .subscribe(() => {
+                    this.updateSelectionSummary();
                 });
 
-        const routeData = allData(this.ctx.route);
-
-        this.languages = routeData.appLanguages;
-
-        this.ctx.route.data.map(p => p.isReadOnly)
-            .subscribe(isReadOnly => {
-                this.isReadOnly = isReadOnly;
-            });
-
-        this.ctx.route.params.map(p => p.language)
-            .subscribe(language => {
-                this.languageSelected = this.languages.find(l => l.iso2Code === language) || this.languages.find(l => l.isMaster) || this.languages[0];
-            });
-
-        this.ctx.route.data.map(d => d.schema)
-            .subscribe(schema => {
-                this.schema = schema;
-
-                this.resetContents();
-                this.load();
-            });
+        this.languagesSubscription =
+            this.languagesState.languages
+                .subscribe(languages => {
+                    this.languages = languages.map(x => x.language);
+                    this.language = this.languages.at(0);
+                });
     }
 
-    public dropData(content: ContentDto) {
-        return { content, schemaId: this.schema.id };
+    public reload() {
+        this.contentsState.load(true).onErrorResumeNext().subscribe();
     }
 
-    public publishContent(content: ContentDto) {
-        this.changeContentItems([content], 'Publish', 'Published', false);
+    public publish(content: ContentDto) {
+        this.changeContentItems([content], 'Publish', false);
     }
 
     public publishSelected(scheduled: boolean) {
-        const contents = this.contentItems.filter(c => c.status !== 'Published' && this.selectedItems[c.id]).values;
-
-        this.changeContentItems(contents, 'Publish', 'Published', false);
+        this.changeContentItems(this.select(c => c.status !== 'Published'), 'Publish', false);
     }
 
-    public unpublishContent(content: ContentDto) {
-        this.changeContentItems([content], 'Unpublish', 'Draft', false);
+    public unpublish(content: ContentDto) {
+        this.changeContentItems([content], 'Unpublish', false);
     }
 
     public unpublishSelected(scheduled: boolean) {
-        const contents = this.contentItems.filter(c => c.status === 'Published' && this.selectedItems[c.id]).values;
-
-        this.changeContentItems(contents, 'Unpublish', 'Draft', false);
+        this.changeContentItems(this.select(c => c.status === 'Published'), 'Unpublish', false);
     }
 
-    public archiveContent(content: ContentDto) {
-        this.changeContentItems([content], 'Archive', 'Archived', true);
+    public archive(content: ContentDto) {
+        this.changeContentItems([content], 'Archive', true);
     }
 
     public archiveSelected(scheduled: boolean) {
-        const contents = this.contentItems.filter(c => this.selectedItems[c.id]).values;
-
-        this.changeContentItems(contents, 'Archive', 'Archived', true);
+        this.changeContentItems(this.select(), 'Archive', true);
     }
 
-    public restoreContent(content: ContentDto) {
-        this.changeContentItems([content], 'Restore', 'Draft', true);
+    public restore(content: ContentDto) {
+        this.changeContentItems([content], 'Restore', true);
     }
 
     public restoreSelected(scheduled: boolean) {
-        const contents = this.contentItems.filter(c => this.selectedItems[c.id]).values;
-
-        this.changeContentItems(contents, 'Restore', 'Draft', true);
+        this.changeContentItems(this.select(), 'Restore', true);
     }
 
-    private changeContentItems(contents: ContentDto[], action: string, status: string, reload: boolean) {
+    private changeContentItems(contents: ContentDto[], action: string, reload: boolean) {
         if (contents.length === 0) {
             return;
         }
 
         this.dueTimeFunction = () => {
-            if (this.dueTime) {
-                reload = false;
-            }
-            Observable.forkJoin(
-                contents
-                    .map(c => this.changeContentItem(c, action, status, this.dueTime, reload)))
-                .finally(() => {
-                    if (reload) {
-                        this.load();
-                    } else {
-                        this.updateSelectionSummary();
-                    }
-                })
-                .subscribe();
+            this.resetSelection();
+
+            this.contentsState.changeStatus(contents, action, this.dueTime).onErrorResumeNext().subscribe();
         };
 
         this.dueTimeAction = action;
         this.dueTimeDialog.show();
     }
 
-    private changeContentItem(content: ContentDto, action: string, status: string, dueTime: string | null, reload: boolean): Observable<any> {
-        return this.contentsService.changeContentStatus(this.ctx.appName, this.schema.name, content.id, action, dueTime, content.version)
-            .catch(error => {
-                this.ctx.notifyError(error);
+    public deleteSelected() {
+        this.resetSelection();
 
-                return Observable.throw(error);
-            })
-            .do(dto => {
-                if (!reload) {
-                    const dt =
-                        dueTime ?
-                            DateTime.parseISO_UTC(dueTime) :
-                            null;
-
-                    content = content.changeStatus(status, dt, this.ctx.userToken, dto.version);
-
-                    this.contentItems = this.contentItems.replaceBy('id', content);
-
-                    this.emitContentStatusChanged(content);
-                }
-            });
+        this.contentsState.delete(this.select()).onErrorResumeNext().subscribe();
     }
 
-    public deleteSelected(content: ContentDto) {
-        Observable.forkJoin(
-            this.contentItems.values.filter(c => this.selectedItems[c.id])
-                .map(c => this.deleteContentItem(c)))
-            .finally(() => {
-                this.load();
-            })
-            .subscribe();
+    public delete(content: ContentDto) {
+        this.resetSelection();
+
+        this.contentsState.delete([content]).onErrorResumeNext().subscribe();
     }
 
-    public deleteContent(content: ContentDto) {
-        this.deleteContentItem(content)
-            .finally(() => {
-                this.load();
-            })
-            .subscribe();
-    }
+    public goArchive(isArchive: boolean) {
+        this.resetSelection();
 
-    public deleteContentItem(content: ContentDto): Observable<any> {
-        return this.contentsService.deleteContent(this.ctx.appName, this.schema.name, content.id, content.version)
-            .do(() => {
-                this.emitContentRemoved(content);
-            })
-            .catch(error => {
-                this.ctx.notifyError(error);
-
-                return Observable.throw(error);
-            });
-    }
-
-    public onContentSaved(content: ContentDto, update: Versioned<any>) {
-        content = content.update(update.payload, this.ctx.userToken, update.version);
-
-        this.contentItems = this.contentItems.replaceBy('id', content);
-
-        this.emitContentUpdated(content);
-    }
-
-    public load(showInfo = false) {
-        this.contentsService.getContents(this.ctx.appName, this.schema.name, this.contentsPager.pageSize, this.contentsPager.skip, this.contentsQuery, undefined, this.isArchive)
-            .finally(() => {
-                this.selectedItems = {};
-
-                this.updateSelectionSummary();
-            })
-            .subscribe(dtos => {
-                this.contentItems = ImmutableArray.of(dtos.items);
-                this.contentsPager = this.contentsPager.setCount(dtos.total);
-
-                if (showInfo) {
-                    this.ctx.notifyInfo('Contents reloaded.');
-                }
-            }, error => {
-                this.ctx.notifyError(error);
-            });
-    }
-
-    public updateArchive(isArchive: boolean) {
-        this.contentsQuery = this.contentsFilter.value;
-        this.contentsPager = new Pager(0);
-
-        this.isArchive = isArchive;
-
-        this.searchModal.hide();
-
-        this.load();
-    }
-
-    public search() {
-        this.contentsQuery = this.contentsFilter.value;
-        this.contentsPager = new Pager(0);
-
-        this.load();
-    }
-
-    public goNext() {
-        this.contentsPager = this.contentsPager.goNext();
-
-        this.load();
+        this.contentsState.goArchive(isArchive).onErrorResumeNext().subscribe();
     }
 
     public goPrev() {
-        this.contentsPager = this.contentsPager.goPrev();
+        this.resetSelection();
 
-        this.load();
+        this.contentsState.goPrev().onErrorResumeNext().subscribe();
+    }
+
+    public goNext() {
+        this.resetSelection();
+
+        this.contentsState.goNext().onErrorResumeNext().subscribe();
+    }
+
+    public search(query: string) {
+        this.resetSelection();
+
+        this.contentsState.search(query).onErrorResumeNext().subscribe();
     }
 
     public isItemSelected(content: ContentDto): boolean {
         return !!this.selectedItems[content.id];
+    }
+
+    public selectLanguage(language: AppLanguageDto) {
+        this.language = language;
     }
 
     public selectItem(content: ContentDto, isSelected: boolean) {
@@ -314,84 +195,20 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
         this.selectedItems = {};
 
         if (isSelected) {
-            for (let c of this.contentItems.values) {
-                this.selectedItems[c.id] = true;
+            for (let content of this.contentsState.snapshot.contents.values) {
+                this.selectedItems[content.id] = true;
             }
         }
 
         this.updateSelectionSummary();
-    }
-
-    private updateSelectionSummary() {
-        this.isAllSelected = this.contentItems.length > 0;
-        this.selectionCount = 0;
-        this.canPublish = true;
-        this.canUnpublish = true;
-
-        for (let c of this.contentItems.values) {
-            if (this.selectedItems[c.id]) {
-                this.selectionCount++;
-
-                if (c.status !== 'Published') {
-                    this.canUnpublish = false;
-                }
-
-                if (c.status === 'Published') {
-                    this.canPublish = false;
-                }
-            } else {
-                this.isAllSelected = false;
-            }
-        }
-    }
-
-    public selectLanguage(language: AppLanguageDto) {
-        this.languageSelected = language;
-    }
-
-    private emitContentStatusChanged(content: ContentDto) {
-        this.ctx.bus.emit(new ContentStatusChanged(content));
-    }
-
-    private emitContentUpdated(content: ContentDto) {
-        this.ctx.bus.emit(new ContentUpdated(content));
-    }
-
-    private emitContentRemoved(content: ContentDto) {
-        this.ctx.bus.emit(new ContentRemoved(content));
-    }
-
-    public trackBy(content: ContentDto): string {
-        return content.id;
-    }
-
-    private resetContents() {
-        this.contentItems = ImmutableArray.empty<ContentDto>();
-        this.contentsQuery = '';
-        this.contentsFilter.setValue('');
-        this.contentsPager = new Pager(0);
-        this.selectedItems = {};
-
-        this.updateSelectionSummary();
-        this.loadFields();
-    }
-
-    private loadFields() {
-        this.contentFields = this.schema.fields.filter(x => x.properties.isListField);
-
-        if (this.contentFields.length === 0 && this.schema.fields.length > 0) {
-            this.contentFields = [this.schema.fields[0]];
-        }
-
-        if (this.contentFields.length === 0) {
-            this.contentFields = [<any>{}];
-        }
     }
 
     public confirmStatusChange() {
         this.dueTimeFunction!();
-
-        this.cancelStatusChange();
+        this.dueTimeFunction = null;
+        this.dueTimeMode = 'Immediately';
+        this.dueTimeDialog.hide();
+        this.dueTime = null;
     }
 
     public cancelStatusChange() {
@@ -399,6 +216,45 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
         this.dueTimeDialog.hide();
         this.dueTimeFunction = null;
         this.dueTime = null;
+    }
+
+    public trackByContent(content: ContentDto): string {
+        return content.id;
+    }
+
+    private select(predicate?: (content: ContentDto) => boolean) {
+        return this.contentsState.snapshot.contents.values.filter(c => this.selectedItems[c.id] && (!predicate || predicate(c)));
+    }
+
+    private resetSelection() {
+        this.selectedItems = {};
+
+        this.updateSelectionSummary();
+    }
+
+    private updateSelectionSummary() {
+        this.isAllSelected = this.contentsState.snapshot.contents.length > 0;
+
+        this.selectionCount = 0;
+
+        this.canPublish = true;
+        this.canUnpublish = true;
+
+        for (let content of this.contentsState.snapshot.contents.values) {
+            if (this.selectedItems[content.id]) {
+                this.selectionCount++;
+
+                if (content.status !== 'Published') {
+                    this.canUnpublish = false;
+                }
+
+                if (content.status === 'Published') {
+                    this.canPublish = false;
+                }
+            } else {
+                this.isAllSelected = false;
+            }
+        }
     }
 }
 

@@ -5,23 +5,21 @@
     pointer-events: none;
 }
 
-.references {
-    &-container {
-        & {
-            background: $color-background;
-            overflow-x: hidden;
-            overflow-y: scroll;
-            padding: 1rem;
-        }
-    }
-}
-
 .invalid {
     padding: 2rem;
     font-size: 1.2rem;
     font-weight: normal;
     text-align: center;
     color: darken($color-border, 30%);
+}
+
+.references-container {
+    background: $color-background;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: 1rem;
+    min-height: 6rem;
+    max-height: 20rem;
 }
 
 .drop-area {
@@ -32,7 +30,7 @@
         font-size: 1.2rem;
         font-weight: normal;
         text-align: center;
-        padding: 2rem;
+        padding: 1rem;
         cursor: pointer;
         color: darken($color-border, 30%);
     }
@@ -40,24 +38,9 @@
     &:hover {
         text-decoration: underline;
     }
-
-    &.drag,
-    &.dnd-drag-over,
-    &.dnd-drag-enter {
-        border-color: darken($color-border, 10%);
-        cursor: copy;
-        color: darken($color-border, 40%);
-        text-decoration: none;
-    }
 }
 
 .table {
-    & {
-        margin-bottom: -.25rem;
-        margin-top: 1rem;
-    }
-
-    &.disabled {
-        margin-top: 0;
-    }
+    margin-bottom: -.25rem;
+    margin-top: 1rem;
 }

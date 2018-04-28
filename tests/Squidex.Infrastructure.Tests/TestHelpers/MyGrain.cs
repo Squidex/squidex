@@ -7,7 +7,9 @@
 
 using System;
 using System.Threading.Tasks;
+using FakeItEasy;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.States;
 
 namespace Squidex.Infrastructure.TestHelpers
@@ -15,7 +17,7 @@ namespace Squidex.Infrastructure.TestHelpers
     public class MyGrain : DomainObjectGrain<MyDomainState>
     {
         public MyGrain(IStore<Guid> store)
-            : base(store)
+            : base(store, A.Dummy<ISemanticLog>())
         {
         }
 

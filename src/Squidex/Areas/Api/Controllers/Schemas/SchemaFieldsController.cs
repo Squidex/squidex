@@ -50,17 +50,10 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         [ApiCosts(1)]
         public async Task<IActionResult> PostField(string app, string name, [FromBody] AddFieldDto request)
         {
-            var command = new AddField
-            {
-                Name = request.Name,
-                Partitioning = request.Partitioning,
-                Properties = request.Properties.ToProperties()
-            };
-
-            var context = await CommandBus.PublishAsync(command);
+            var context = await CommandBus.PublishAsync(request.ToCommand());
 
             var result = context.Result<EntityCreatedResult<long>>();
-            var response = new EntityCreatedDto { Id = result.IdOrValue.ToString(), Version = result.Version };
+            var response = EntityCreatedDto.FromResult(result);
 
             return StatusCode(201, response);
         }
@@ -80,11 +73,9 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         [Route("apps/{app}/schemas/{name}/fields/ordering/")]
         [ProducesResponseType(typeof(ErrorDto), 400)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PutFieldOrdering(string app, string name, [FromBody] ReorderFields request)
+        public async Task<IActionResult> PutFieldOrdering(string app, string name, [FromBody] ReorderFieldsDto request)
         {
-            var command = new ReorderFields { FieldIds = request.FieldIds };
-
-            await CommandBus.PublishAsync(command);
+            await CommandBus.PublishAsync(request.ToCommand());
 
             return NoContent();
         }
@@ -108,9 +99,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         [ApiCosts(1)]
         public async Task<IActionResult> PutField(string app, string name, long id, [FromBody] UpdateFieldDto request)
         {
-            var command = new UpdateField { FieldId = id, Properties = request.Properties.ToProperties() };
-
-            await CommandBus.PublishAsync(command);
+            await CommandBus.PublishAsync(request.ToCommand(id));
 
             return NoContent();
         }
@@ -135,9 +124,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         [ApiCosts(1)]
         public async Task<IActionResult> LockField(string app, string name, long id)
         {
-            var command = new LockField { FieldId = id };
-
-            await CommandBus.PublishAsync(command);
+            await CommandBus.PublishAsync(new LockField { FieldId = id });
 
             return NoContent();
         }
@@ -162,9 +149,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         [ApiCosts(1)]
         public async Task<IActionResult> HideField(string app, string name, long id)
         {
-            var command = new HideField { FieldId = id };
-
-            await CommandBus.PublishAsync(command);
+            await CommandBus.PublishAsync(new HideField { FieldId = id });
 
             return NoContent();
         }
@@ -189,9 +174,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         [ApiCosts(1)]
         public async Task<IActionResult> ShowField(string app, string name, long id)
         {
-            var command = new ShowField { FieldId = id };
-
-            await CommandBus.PublishAsync(command);
+            await CommandBus.PublishAsync(new ShowField { FieldId = id });
 
             return NoContent();
         }
@@ -217,9 +200,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         [ApiCosts(1)]
         public async Task<IActionResult> EnableField(string app, string name, long id)
         {
-            var command = new EnableField { FieldId = id };
-
-            await CommandBus.PublishAsync(command);
+            await CommandBus.PublishAsync(new EnableField { FieldId = id });
 
             return NoContent();
         }
@@ -245,9 +226,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         [ApiCosts(1)]
         public async Task<IActionResult> DisableField(string app, string name, long id)
         {
-            var command = new DisableField { FieldId = id };
-
-            await CommandBus.PublishAsync(command);
+            await CommandBus.PublishAsync(new DisableField { FieldId = id });
 
             return NoContent();
         }
@@ -268,9 +247,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         [ApiCosts(1)]
         public async Task<IActionResult> DeleteField(string app, string name, long id)
         {
-            var command = new DeleteField { FieldId = id };
-
-            await CommandBus.PublishAsync(command);
+            await CommandBus.PublishAsync(new DeleteField { FieldId = id });
 
             return NoContent();
         }

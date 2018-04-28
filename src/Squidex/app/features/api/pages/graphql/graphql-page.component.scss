@@ -4,11 +4,13 @@
 @import '~graphiql/graphiql';
 
 .graphiql-container {
-    @include absolute(0, 0, 0, 0);
-}
+    & {
+        @include absolute(0, 0, 0, 0);
+    }
 
-.graphiql-container > * {
-    box-sizing: content-box;
+    & * {
+        box-sizing: content-box;
+    }
 
     // sass-lint:disable class-name-format
     & .editorWrap {

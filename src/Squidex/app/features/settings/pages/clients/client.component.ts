@@ -5,41 +5,29 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { FormBuilder, Validators } from '@angular/forms';
+import { Component, Input, OnChanges } from '@angular/core';
+import { FormBuilder } from '@angular/forms';
 
 import {
     AccessTokenDto,
-    AppContext,
     AppClientDto,
     AppClientsService,
-    fadeAnimation,
-    ModalView
-} from 'shared';
+    AppsState,
+    ClientsState,
+    DialogService,
+    ModalView,
+    RenameClientForm,
+    UpdateAppClientDto
+} from '@app/shared';
 
 const ESCAPE_KEY = 27;
 
 @Component({
     selector: 'sqx-client',
     styleUrls: ['./client.component.scss'],
-    templateUrl: './client.component.html',
-    providers: [
-        AppContext
-    ],
-    animations: [
-        fadeAnimation
-    ]
+    templateUrl: './client.component.html'
 })
-export class ClientComponent {
-    @Output()
-    public renaming = new EventEmitter<string>();
-
-    @Output()
-    public revoking = new EventEmitter();
-
-    @Output()
-    public updating = new EventEmitter<boolean>();
-
+export class ClientComponent implements OnChanges {
     @Input()
     public client: AppClientDto;
 
@@ -50,46 +38,63 @@ export class ClientComponent {
     public token: AccessTokenDto;
     public tokenDialog = new ModalView();
 
-    public renameForm =
-        this.formBuilder.group({
-            name: ['',
-                Validators.required
-            ]
-        });
+    public renameForm = new RenameClientForm(this.formBuilder);
 
-    public get hasNewName() {
-        return this.renameForm.controls['name'].value !== this.client.name;
-    }
-
-    constructor(public readonly ctx: AppContext,
+    constructor(
+        public readonly appsState: AppsState,
         private readonly appClientsService: AppClientsService,
+        private readonly clientsState: ClientsState,
+        private readonly dialogs: DialogService,
         private readonly formBuilder: FormBuilder
     ) {
     }
 
-    public cancelRename() {
-        this.isRenaming = false;
+    public ngOnChanges() {
+        this.renameForm.load(this.client);
     }
 
-    public startRename() {
-        this.renameForm.controls['name'].setValue(this.client.name);
+    public revoke() {
+        this.clientsState.revoke(this.client).onErrorResumeNext().subscribe();
+    }
 
-        this.isRenaming = true;
+    public update(permission: string) {
+        this.clientsState.update(this.client, new UpdateAppClientDto(undefined, permission)).onErrorResumeNext().subscribe();
+    }
+
+    public toggleRename() {
+        this.isRenaming = !this.isRenaming;
     }
 
     public onKeyDown(keyCode: number) {
         if (keyCode === ESCAPE_KEY) {
-            this.cancelRename();
+            this.toggleRename();
+        }
+    }
+
+    public rename() {
+        const value = this.renameForm.submit();
+
+        if (value) {
+            const requestDto = new UpdateAppClientDto(value.name);
+
+            this.clientsState.update(this.client, requestDto)
+                .subscribe(() => {
+                    this.renameForm.submitCompleted();
+
+                    this.toggleRename();
+                }, error => {
+                    this.renameForm.submitFailed(error);
+                });
         }
     }
 
     public createToken(client: AppClientDto) {
-        this.appClientsService.createToken(this.ctx.appName, client)
+        this.appClientsService.createToken(this.appsState.appName, client)
             .subscribe(dto => {
                 this.token = dto;
                 this.tokenDialog.show();
             }, error => {
-                this.ctx.notifyError(error);
+                this.dialogs.notifyError(error);
             });
     }
 }

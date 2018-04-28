@@ -5,12 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { HttpEvent, HttpInterceptor, HttpHandler, HttpRequest, HttpErrorResponse } from '@angular/common/http';
+import { HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
 import { Injectable} from '@angular/core';
 import { Observable } from 'rxjs';
 
+import { ApiUrlConfig } from '@app/framework';
+
 import { AuthService, Profile } from './../services/auth.service';
-import { ApiUrlConfig } from 'framework';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {

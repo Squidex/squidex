@@ -84,7 +84,7 @@
       "allow-declarations"
     ],
     "ordered-imports": [
-      false
+      true
     ],
     "pipe-naming": [
       true,

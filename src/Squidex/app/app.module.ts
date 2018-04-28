@@ -5,9 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { CommonModule } from '@angular/common';
+import { HttpClientModule } from '@angular/common/http';
 import { ApplicationRef, NgModule } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { RouterModule } from '@angular/router';
 import { DndModule } from 'ng2-dnd';
 
 import { AppComponent } from './app.component';
@@ -56,6 +60,11 @@ export function configUserReport() {
         BrowserModule,
         BrowserAnimationsModule,
         DndModule.forRoot(),
+        HttpClientModule,
+        FormsModule,
+        CommonModule,
+        RouterModule,
+        ReactiveFormsModule,
         SqxFrameworkModule.forRoot(),
         SqxSharedModule.forRoot(),
         SqxShellModule,

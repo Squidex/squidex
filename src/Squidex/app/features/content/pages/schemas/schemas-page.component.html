@@ -1,35 +1,27 @@
-<sqx-title message="{app} | Schemas" parameter1="app" [value1]="ctx.appName"></sqx-title>
+<sqx-title message="{app} | Schemas" parameter1="app" [value1]="appsState.appName"></sqx-title>
 
-<sqx-panel theme="dark" desiredWidth="16rem">
-    <div class="panel-header">
-        <div class="panel-title-row">
-            <h3 class="panel-title">Schemas</h3>
+<sqx-panel theme="dark" desiredWidth="16rem" showSecondHeader="true">
+    <ng-container title>
+        Schemas
+    </ng-container>
+
+    <ng-container secondHeader>
+        <sqx-shortcut keys="ctrl+shift+f" (trigger)="inputFind.focus()"></sqx-shortcut>
+
+        <div class="search-form">
+            <input class="form-control form-control-dark" #inputFind [formControl]="schemasFilter" placeholder="Search for schemas" />
+
+            <i class="icon-search"></i>
         </div>
+    </ng-container>
 
-        <a class="panel-close" sqxParentLink isLazyLoaded="true">
-            <i class="icon-close"></i>
-        </a>
-
-        <div class="panel-header-row">
-            <sqx-shortcut keys="ctrl+shift+f" (trigger)="inputFind.focus()"></sqx-shortcut>
-
-            <div class="search-form">
-                <input class="form-control form-control-dark" #inputFind [formControl]="schemasFilter" placeholder="Search for schemas" />
-
-                <i class="icon-search"></i>
-            </div>
-        </div>
-    </div>
-
-    <div class="panel-main">
-        <div class="panel-content">
-            <ul class="nav nav-panel nav-dark nav-dark-bordered flex-column">
-                <li class="nav-item" *ngFor="let schema of schemasFiltered | async">
-                    <a class="nav-link" [routerLink]="schema.name" routerLinkActive="active">{{schema.displayName}} <i class="icon-angle-right"></i></a>
-                </li>
-            </ul>
-        </div>
-    </div>
+    <ng-container content>
+        <ul class="nav nav-panel nav-dark nav-dark-bordered flex-column">
+            <li class="nav-item" *ngFor="let schema of schemasFiltered | async; trackBy: trackBySchema">
+                <a class="nav-link" [routerLink]="schema.name" routerLinkActive="active">{{schema.displayName}} <i class="icon-angle-right"></i></a>
+            </li>
+        </ul>
+    </ng-container>
 </sqx-panel>
 
 <router-outlet></router-outlet>

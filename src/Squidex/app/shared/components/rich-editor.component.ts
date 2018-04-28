@@ -5,16 +5,15 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, Component, forwardRef, ElementRef, EventEmitter, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
-import { ControlValueAccessor,  NG_VALUE_ACCESSOR, FormBuilder } from '@angular/forms';
+import { AfterViewInit, Component, ElementRef, EventEmitter, forwardRef, OnDestroy, Output, ViewChild } from '@angular/core';
+import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import {
     AssetDto,
-    AssetDragged,
-    MessageBus,
+    ModalView,
     ResourceLoaderService,
     Types
-} from './../declarations-base';
+} from '@app/shared/internal';
 
 declare var tinymce: any;
 
@@ -28,14 +27,15 @@ export const SQX_RICH_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     templateUrl: './rich-editor.component.html',
     providers: [SQX_RICH_EDITOR_CONTROL_VALUE_ACCESSOR]
 })
-export class RichEditorComponent implements ControlValueAccessor, AfterViewInit, OnInit, OnDestroy {
+export class RichEditorComponent implements ControlValueAccessor, AfterViewInit, OnDestroy {
     private callChange = (v: any) => { /* NOOP */ };
     private callTouched = () => { /* NOOP */ };
     private tinyEditor: any;
     private tinyInitTimer: any;
     private value: string;
     private isDisabled = false;
-    private assetDraggedSubscription: any;
+
+    public selectorModal = new ModalView();
 
     @ViewChild('editor')
     public editor: ElementRef;
@@ -43,15 +43,8 @@ export class RichEditorComponent implements ControlValueAccessor, AfterViewInit,
     @Output()
     public assetPluginClicked = new EventEmitter<any>();
 
-    public draggedOver = false;
-
-    public assetsForm = this.formBuilder.group({
-        name: ['']
-    });
-
-    constructor(private readonly resourceLoader: ResourceLoaderService,
-        private readonly formBuilder: FormBuilder,
-        private readonly messageBus: MessageBus
+    constructor(
+        private readonly resourceLoader: ResourceLoaderService
     ) {
     }
 
@@ -59,21 +52,6 @@ export class RichEditorComponent implements ControlValueAccessor, AfterViewInit,
         clearTimeout(this.tinyInitTimer);
 
         tinymce.remove(this.editor);
-
-        this.assetDraggedSubscription.unsubscribe();
-    }
-
-    public ngOnInit() {
-        this.assetDraggedSubscription =
-            this.messageBus.of(AssetDragged).subscribe(message => {
-                if (message.assetDto.isImage) {
-                    if (message.dragEvent === AssetDragged.DRAG_START) {
-                        this.draggedOver = true;
-                    } else {
-                        this.draggedOver = false;
-                    }
-                }
-            });
     }
 
     public ngAfterViewInit() {
@@ -84,28 +62,30 @@ export class RichEditorComponent implements ControlValueAccessor, AfterViewInit,
         });
     }
 
+    private showSelector = () => {
+        this.selectorModal.show();
+    }
+
     private getEditorOptions() {
         const self = this;
 
         return {
             convert_fonts_to_spans: true,
             convert_urls: false,
-            plugins: 'code image media link',
+            plugins: 'code image media link lists advlist',
             removed_menuitems: 'newdocument',
             resize: true,
             theme: 'modern',
-            toolbar: 'undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media | assets',
+            toolbar: 'undo redo | styleselect | bold italic | alignleft aligncenter | bullist numlist outdent indent | link image media | assets',
             setup: (editor: any) => {
                 self.tinyEditor = editor;
                 self.tinyEditor.setMode(this.isDisabled ? 'readonly' : 'design');
 
                 self.tinyEditor.addButton('assets', {
-                    text: '',
+                    onclick: this.showSelector,
                     icon: 'assets',
-                    tooltip: 'Insert Assets',
-                    onclick: (event: any) => {
-                        self.assetPluginClicked.emit();
-                    }
+                    text: '',
+                    tooltip: 'Insert Assets'
                 });
 
                 self.tinyEditor.on('change', () => {
@@ -156,15 +136,17 @@ export class RichEditorComponent implements ControlValueAccessor, AfterViewInit,
         this.callTouched = fn;
     }
 
-    public onItemDropped(event: any) {
-        const content = event.dragData;
+    public onAssetsSelected(assets: AssetDto[]) {
+        let content = '';
 
-        if (content instanceof AssetDto) {
-            const img = `<img src="${content.url}" alt="${content.fileName}" />`;
-
-            this.tinyEditor.execCommand('mceInsertContent', false, img);
+        for (let asset of assets) {
+            content += `<img src="${asset.url}" alt="${asset.fileName}" />`;
         }
 
-        this.draggedOver = false;
+        if (content.length > 0) {
+            this.tinyEditor.execCommand('mceInsertContent', false, content);
+        }
+
+        this.selectorModal.hide();
     }
 }

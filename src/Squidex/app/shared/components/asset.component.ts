@@ -6,37 +6,31 @@
  */
 
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FormBuilder, Validators } from '@angular/forms';
-
-import { AppContext } from './app-context';
+import { FormBuilder } from '@angular/forms';
 
 import {
+    AppsState,
     AssetDto,
     AssetsService,
-    AssetDragged,
+    AuthService,
     DateTime,
+    DialogService,
     fadeAnimation,
     ModalView,
+    RenameAssetForm,
     UpdateAssetDto,
-    Version,
-    Versioned,
-    MessageBus
-} from './../declarations-base';
+    Versioned
+} from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-asset',
     styleUrls: ['./asset.component.scss'],
     templateUrl: './asset.component.html',
-    providers: [
-        AppContext
-    ],
     animations: [
         fadeAnimation
     ]
 })
 export class AssetComponent implements OnInit {
-    private assetVersion: Version;
-
     @Input()
     public initFile: File;
 
@@ -44,13 +38,22 @@ export class AssetComponent implements OnInit {
     public asset: AssetDto;
 
     @Input()
-    public closeMode = false;
+    public removeMode = false;
+
+    @Input()
+    public isDisabled = false;
+
+    @Input()
+    public isSelected = false;
+
+    @Input()
+    public isSelectable = false;
 
     @Output()
     public loaded = new EventEmitter<AssetDto>();
 
     @Output()
-    public closing = new EventEmitter<AssetDto>();
+    public removing = new EventEmitter<AssetDto>();
 
     @Output()
     public updated = new EventEmitter<AssetDto>();
@@ -59,27 +62,22 @@ export class AssetComponent implements OnInit {
     public deleting = new EventEmitter<AssetDto>();
 
     @Output()
-    public clicked = new EventEmitter<AssetDto>();
+    public selected = new EventEmitter<AssetDto>();
 
     @Output()
     public failed = new EventEmitter();
 
     public renameDialog = new ModalView();
-    public renameFormSubmitted = false;
-    public renameForm =
-        this.formBuilder.group({
-            name: ['',
-                [
-                    Validators.required
-                ]]
-        });
+    public renameForm = new RenameAssetForm(this.formBuilder);
 
     public progress = 0;
 
-    constructor(public readonly ctx: AppContext,
-        private readonly formBuilder: FormBuilder,
+    constructor(
+        private readonly appsState: AppsState,
         private readonly assetsService: AssetsService,
-        private readonly messageBus: MessageBus
+        private readonly authState: AuthService,
+        private readonly dialogs: DialogService,
+        private readonly formBuilder: FormBuilder
     ) {
     }
 
@@ -87,7 +85,7 @@ export class AssetComponent implements OnInit {
         const initFile = this.initFile;
 
         if (initFile) {
-            this.assetsService.uploadFile(this.ctx.appName, initFile, this.ctx.userToken, DateTime.now())
+            this.assetsService.uploadFile(this.appsState.appName, initFile, this.authState.user!.token, DateTime.now())
                 .subscribe(dto => {
                     if (dto instanceof AssetDto) {
                         this.emitLoaded(dto);
@@ -95,7 +93,7 @@ export class AssetComponent implements OnInit {
                         this.progress = dto;
                     }
                 }, error => {
-                    this.ctx.notifyError(error);
+                    this.dialogs.notifyError(error);
 
                     this.emitFailed(error);
                 });
@@ -106,15 +104,15 @@ export class AssetComponent implements OnInit {
 
     public updateFile(files: FileList) {
         if (files.length === 1) {
-            this.assetsService.replaceFile(this.ctx.appName, this.asset.id, files[0], this.assetVersion)
+            this.assetsService.replaceFile(this.appsState.appName, this.asset.id, files[0], this.asset.version)
                 .subscribe(dto => {
                     if (dto instanceof Versioned) {
-                        this.updateAsset(this.asset.update(dto.payload, this.ctx.userToken, dto.version), true);
+                        this.updateAsset(this.asset.update(dto.payload, this.authState.user!.token, dto.version), true);
                     } else {
                         this.setProgress(dto);
                     }
                 }, error => {
-                    this.ctx.notifyError(error);
+                    this.dialogs.notifyError(error);
 
                     this.setProgress();
                 });
@@ -122,27 +120,28 @@ export class AssetComponent implements OnInit {
     }
 
     public renameAsset() {
-        this.renameFormSubmitted = true;
+        const value = this.renameForm.submit();
 
-        if (this.renameForm.valid) {
-            this.renameForm.disable();
+        if (value) {
+            const requestDto = new UpdateAssetDto(value.name);
 
-            const requestDto = new UpdateAssetDto(this.renameForm.controls['name'].value);
-
-            this.assetsService.putAsset(this.ctx.appName, this.asset.id, requestDto, this.assetVersion)
+            this.assetsService.putAsset(this.appsState.appName, this.asset.id, requestDto, this.asset.version)
                 .subscribe(dto => {
-                    this.updateAsset(this.asset.rename(requestDto.fileName, this.ctx.userToken, dto.version), true);
-                    this.resetRenameForm();
-                }, error => {
-                    this.ctx.notifyError(error);
+                    this.updateAsset(this.asset.rename(requestDto.fileName, this.authState.user!.token, dto.version), true);
 
-                    this.enableRenameForm();
+                    this.renameForm.submitCompleted();
+                    this.renameDialog.hide();
+                }, error => {
+                    this.dialogs.notifyError(error);
+
+                    this.renameForm.submitFailed(error);
                 });
         }
     }
 
     public cancelRenameAsset() {
-        this.resetRenameForm();
+        this.renameForm.submitCompleted();
+        this.renameDialog.hide();
     }
 
     private setProgress(progress = 0) {
@@ -161,34 +160,15 @@ export class AssetComponent implements OnInit {
         this.updated.emit(asset);
     }
 
-    private enableRenameForm() {
-        this.renameForm.enable();
-    }
-
-    private resetRenameForm() {
-        this.renameForm.enable();
-        this.renameForm.controls['name'].setValue(this.asset.fileName);
-        this.renameFormSubmitted = false;
-        this.renameDialog.hide();
-    }
-
     private updateAsset(asset: AssetDto, emitEvent: boolean) {
+        this.renameForm.load({ name: asset.fileName });
         this.asset = asset;
-        this.assetVersion = asset.version;
         this.progress = 0;
 
         if (emitEvent) {
             this.emitUpdated(asset);
         }
 
-        this.resetRenameForm();
-    }
-
-    public onAssetDragStart(event: any) {
-        this.messageBus.emit(new AssetDragged(event.dragData, AssetDragged.DRAG_START, this));
-    }
-
-    public onAssetDragEnd(event: any) {
-        this.messageBus.emit(new AssetDragged(event.dragData, AssetDragged.DRAG_END, this));
+        this.cancelRenameAsset();
     }
 }

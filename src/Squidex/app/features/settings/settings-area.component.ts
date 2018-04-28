@@ -7,18 +7,16 @@
 
 import { Component } from '@angular/core';
 
-import { AppContext } from 'shared';
+import { AppsState } from '@app/shared';
 
 @Component({
     selector: 'sqx-settings-area',
     styleUrls: ['./settings-area.component.scss'],
-    templateUrl: './settings-area.component.html',
-    providers: [
-        AppContext
-    ]
+    templateUrl: './settings-area.component.html'
 })
 export class SettingsAreaComponent {
-    constructor(public readonly ctx: AppContext
+    constructor(
+        public readonly appsState: AppsState
     ) {
     }
 }

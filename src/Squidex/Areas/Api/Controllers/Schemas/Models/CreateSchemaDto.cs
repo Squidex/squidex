@@ -7,6 +7,9 @@
 
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Entities.Schemas.Commands;
+using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Areas.Api.Controllers.Schemas.Models
 {
@@ -33,5 +36,34 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// Set it to true to autopublish the schema.
         /// </summary>
         public bool Publish { get; set; }
+
+        public CreateSchema ToCommand()
+        {
+            var command = new CreateSchema();
+
+            SimpleMapper.Map(this, command);
+
+            if (Properties != null)
+            {
+                command.Properties = new SchemaProperties();
+
+                SimpleMapper.Map(Properties, command.Properties);
+            }
+
+            if (Fields != null)
+            {
+                command.Fields = new List<CreateSchemaField>();
+
+                foreach (var fieldDto in Fields)
+                {
+                    var fieldProperties = fieldDto?.Properties.ToProperties();
+                    var fieldInstance = SimpleMapper.Map(fieldDto, new CreateSchemaField { Properties = fieldProperties });
+
+                    command.Fields.Add(fieldInstance);
+                }
+            }
+
+            return command;
+        }
     }
 }

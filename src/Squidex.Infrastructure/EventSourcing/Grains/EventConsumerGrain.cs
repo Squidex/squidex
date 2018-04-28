@@ -63,7 +63,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
         public Task<Immutable<EventConsumerInfo>> GetStateAsync()
         {
-            return Task.FromResult(state.ToInfo(this.eventConsumer.Name).AsImmutable());
+            return Task.FromResult(state.ToInfo(eventConsumer.Name).AsImmutable());
         }
 
         public Task OnEventAsync(Immutable<IEventSubscription> subscription, Immutable<StoredEvent> storedEvent)

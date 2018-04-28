@@ -5,18 +5,21 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FormBuilder, Validators } from '@angular/forms';
+import { Component, Input, OnInit } from '@angular/core';
+import { FormBuilder } from '@angular/forms';
 
 import {
     AppPatternDto,
     createProperties,
+    EditFieldForm,
     fadeAnimation,
     FieldDto,
-    FieldPropertiesDto,
+    ImmutableArray,
     ModalView,
-    SchemaDto
-} from 'shared';
+    SchemaDetailsDto,
+    SchemasState,
+    UpdateFieldDto
+} from '@app/shared';
 
 @Component({
     selector: 'sqx-field',
@@ -31,63 +34,31 @@ export class FieldComponent implements OnInit {
     public field: FieldDto;
 
     @Input()
-    public schemas: SchemaDto[];
+    public schema: SchemaDetailsDto;
 
     @Input()
-    public regexSuggestions: AppPatternDto[] = [];
-
-    @Output()
-    public locking = new EventEmitter();
-
-    @Output()
-    public hiding = new EventEmitter();
-
-    @Output()
-    public showing = new EventEmitter();
-
-    @Output()
-    public saving = new EventEmitter<FieldPropertiesDto>();
-
-    @Output()
-    public enabling = new EventEmitter();
-
-    @Output()
-    public disabling = new EventEmitter();
-
-    @Output()
-    public deleting = new EventEmitter();
+    public patterns: ImmutableArray<AppPatternDto>;
 
     public dropdown = new ModalView(false, true);
 
     public isEditing = false;
     public selectedTab = 0;
 
-    public get displayName() {
-        return this.field.properties.label && this.field.properties.label.length > 0 ? this.field.properties.label : this.field.name;
-    }
-
-    public editFormSubmitted = false;
-    public editForm =
-        this.formBuilder.group({
-            label: ['',
-                [
-                    Validators.maxLength(100)
-                ]],
-            hints: ['',
-                [
-                    Validators.maxLength(100)
-                ]],
-            isRequired: [false],
-            isListField: [false]
-        });
+    public editForm: EditFieldForm;
 
     constructor(
-        private readonly formBuilder: FormBuilder
+        private readonly formBuilder: FormBuilder,
+        private readonly schemasState: SchemasState
     ) {
     }
 
     public ngOnInit() {
-        this.resetEditForm();
+        this.editForm = new EditFieldForm(this.formBuilder);
+        this.editForm.load(this.field.properties);
+
+        if (this.field.isLocked) {
+            this.editForm.form.disable();
+        }
     }
 
     public toggleEditing() {
@@ -99,32 +70,46 @@ export class FieldComponent implements OnInit {
     }
 
     public cancel() {
-        this.resetEditForm();
+        this.editForm.load(this.field);
+    }
+
+    public deleteField() {
+        this.schemasState.deleteField(this.schema, this.field).onErrorResumeNext().subscribe();
+    }
+
+    public enableField() {
+        this.schemasState.enableField(this.schema, this.field).onErrorResumeNext().subscribe();
+    }
+
+    public disableField() {
+        this.schemasState.disableField(this.schema, this.field).onErrorResumeNext().subscribe();
+    }
+
+    public showField() {
+        this.schemasState.showField(this.schema, this.field).onErrorResumeNext().subscribe();
+    }
+
+    public hideField() {
+        this.schemasState.hideField(this.schema, this.field).onErrorResumeNext().subscribe();
+    }
+
+    public lockField() {
+        this.schemasState.lockField(this.schema, this.field).onErrorResumeNext().subscribe();
     }
 
     public save() {
-        this.editFormSubmitted = true;
+        const value = this.editForm.submit();
 
-        if (this.editForm.valid) {
-            const properties = createProperties(this.field.properties['fieldType'], this.editForm.value);
+        if (value) {
+            const properties = createProperties(this.field.properties['fieldType'], value);
 
-            this.emitSaving(properties);
+            this.schemasState.updateField(this.schema, this.field, new UpdateFieldDto(properties))
+                .subscribe(() => {
+                    this.editForm.submitCompleted();
+                }, error => {
+                    this.editForm.submitFailed(error);
+                });
         }
-    }
-
-    private emitSaving(properties: FieldPropertiesDto) {
-        this.saving.emit(properties);
-    }
-
-    private resetEditForm() {
-        this.editFormSubmitted = false;
-        this.editForm.reset(this.field.properties);
-
-        if (this.field.isLocked) {
-            this.editForm.disable();
-        }
-
-        this.isEditing = false;
     }
 }
 

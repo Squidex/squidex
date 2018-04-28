@@ -5,125 +5,69 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, Validators } from '@angular/forms';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { FormBuilder } from '@angular/forms';
+import { Subscription } from 'rxjs';
 
 import {
-    AddAppLanguageDto,
-    AppContext,
+    AddLanguageForm,
     AppLanguageDto,
-    AppLanguagesDto,
-    AppLanguagesService,
-    HistoryChannelUpdated,
-    ImmutableArray,
-    LanguageDto,
-    LanguagesService
-} from 'shared';
+    AppsState,
+    LanguagesState
+} from '@app/shared';
 
 @Component({
     selector: 'sqx-languages-page',
     styleUrls: ['./languages-page.component.scss'],
-    templateUrl: './languages-page.component.html',
-    providers: [
-        AppContext
-    ]
+    templateUrl: './languages-page.component.html'
 })
-export class LanguagesPageComponent implements OnInit {
-    public allLanguages: LanguageDto[] = [];
-    public newLanguages: LanguageDto[] = [];
-    public appLanguages: AppLanguagesDto;
+export class LanguagesPageComponent implements OnDestroy, OnInit {
+    private newLanguagesSubscription: Subscription;
 
-    public addLanguageForm =
-        this.formBuilder.group({
-            language: [null,
-                Validators.required
-            ]
-        });
+    public addLanguageForm = new AddLanguageForm(this.formBuilder);
 
-    constructor(public readonly ctx: AppContext,
-        private readonly appLanguagesService: AppLanguagesService,
-        private readonly languagesService: LanguagesService,
+    constructor(
+        public readonly appsState: AppsState,
+        public readonly languagesState: LanguagesState,
         private readonly formBuilder: FormBuilder
     ) {
     }
 
+    public ngOnDestroy() {
+        this.newLanguagesSubscription.unsubscribe();
+    }
+
     public ngOnInit() {
-        this.loadAllLanguages();
-        this.load();
+        this.newLanguagesSubscription =
+            this.languagesState.newLanguages
+                .subscribe(languages => {
+                    if (languages.length > 0) {
+                        this.addLanguageForm.load({ language: languages.at(0) });
+                    }
+                });
+
+        this.languagesState.load().onErrorResumeNext().subscribe();
     }
 
-    public load() {
-        this.appLanguagesService.getLanguages(this.ctx.appName)
-            .subscribe(dto => {
-                this.updateLanguages(dto);
-            }, error => {
-                this.ctx.notifyError(error);
-            });
-    }
-
-    public removeLanguage(language: AppLanguageDto) {
-        this.appLanguagesService.deleteLanguage(this.ctx.appName, language.iso2Code, this.appLanguages.version)
-            .subscribe(dto => {
-                this.updateLanguages(this.appLanguages.removeLanguage(language, dto.version));
-            }, error => {
-                this.ctx.notifyError(error);
-            });
+    public reload() {
+        this.languagesState.load(true).onErrorResumeNext().subscribe();
     }
 
     public addLanguage() {
-        const requestDto = new AddAppLanguageDto(this.addLanguageForm.controls['language'].value.iso2Code);
+        const value = this.addLanguageForm.submit();
 
-        this.appLanguagesService.postLanguages(this.ctx.appName, requestDto, this.appLanguages.version)
-            .subscribe(dto => {
-                this.updateLanguages(this.appLanguages.addLanguage(dto.payload, dto.version));
-            }, error => {
-                this.ctx.notifyError(error);
-            });
-    }
-
-    public updateLanguage(language: AppLanguageDto) {
-        this.appLanguagesService.putLanguage(this.ctx.appName, language.iso2Code, language, this.appLanguages.version)
-            .subscribe(dto => {
-                this.updateLanguages(this.appLanguages.updateLanguage(language, dto.version));
-            }, error => {
-                this.ctx.notifyError(error);
-            });
-    }
-
-    private loadAllLanguages() {
-        this.languagesService.getLanguages()
-            .subscribe(languages => {
-                this.allLanguages = ImmutableArray.of(languages).sortByStringAsc(l => l.englishName).values;
-
-                this.updateNewLanguages();
-            }, error => {
-                this.ctx.notifyError(error);
-            });
-    }
-
-    private updateLanguages(appLanguages: AppLanguagesDto, masterId?: string) {
-        this.addLanguageForm.reset();
-
-        this.appLanguages =
-            new AppLanguagesDto(
-                appLanguages.languages.sort((a, b) => {
-                    if (a.isMaster === b.isMaster) {
-                        return a.iso2Code.localeCompare(b.iso2Code);
-                    } else {
-                        return (a.isMaster ? 0 : 1) - (b.isMaster ? 0 : 1);
-                    }
-                }), appLanguages.version);
-
-        this.updateNewLanguages();
-
-        this.ctx.bus.emit(new HistoryChannelUpdated());
-    }
-
-    private updateNewLanguages() {
-        if (this.appLanguages) {
-            this.newLanguages = this.allLanguages.filter(x => !this.appLanguages.languages.find(l => l.iso2Code === x.iso2Code));
-            this.addLanguageForm.controls['language'].setValue(this.newLanguages[0]);
+        if (value) {
+            this.languagesState.add(value.language)
+                .subscribe(() => {
+                    this.addLanguageForm.submitCompleted();
+                }, error => {
+                    this.addLanguageForm.submitFailed(error);
+                });
         }
+    }
+
+    public trackByLanguage(index: number, language: { language: AppLanguageDto }) {
+        return language.language;
     }
 }
 

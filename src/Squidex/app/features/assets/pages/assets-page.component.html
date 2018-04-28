@@ -1,70 +1,24 @@
-<sqx-title message="{app} | Assets" parameter1="app" [value1]="ctx.appName"></sqx-title>
+<sqx-title message="{app} | Assets" parameter1="app" [value1]="appsState.appName"></sqx-title>
 
-<sqx-panel desiredWidth="60rem">
-    <div class="panel-header">
-        <div class="panel-title-row">
-            <div class="float-right">
-                <button class="btn btn-link btn-secondary" (click)="load(true)" title="Refresh Assets (CTRL + SHIFT + R)">
-                    <i class="icon-reset"></i> Refresh
-                </button>
+<sqx-panel desiredWidth="*">
+    <ng-container title>
+        Assets
+    </ng-container>
+    
+    <ng-container menu>
+        <button class="btn btn-link btn-secondary" (click)="reload()" title="Refresh Assets (CTRL + SHIFT + R)">
+            <i class="icon-reset"></i> Refresh
+        </button>
 
-                <sqx-shortcut keys="ctrl+shift+r" (trigger)="load(true)"></sqx-shortcut>
-                <sqx-shortcut keys="ctrl+shift+f" (trigger)="inputFind.focus()"></sqx-shortcut>
+        <sqx-shortcut keys="ctrl+shift+r" (trigger)="reload()"></sqx-shortcut>
+        <sqx-shortcut keys="ctrl+shift+f" (trigger)="inputFind.focus()"></sqx-shortcut>
 
-                <form class="form-inline" (ngSubmit)="search()">
-                    <input class="form-control" #inputFind [formControl]="assetsFilter" placeholder="Search for assets" />
-                </form>
-            </div>
+        <form class="form-inline" (ngSubmit)="search()">
+            <input class="form-control" #inputFind [formControl]="assetsFilter" placeholder="Search for assets" />
+        </form>
+    </ng-container>
 
-            <h3 class="panel-title">Assets</h3>
-        </div>
-
-        <a class="panel-close" sqxParentLink isLazyLoaded="true">
-            <i class="icon-close"></i>
-        </a>
-    </div>
-
-    <div class="panel-main">
-        <div class="panel-content panel-content-scroll">
-            <div class="file-drop" (sqxFileDrop)="addFiles($event)">
-                <h3 class="file-drop-header">Drop files here to upload</h3>
-
-                <div class="file-drop-or">or</div>
-
-                <div class="file-drop-button">
-                    <span class="btn btn-success" (click)="fileInput.click()">
-                        <span>Select File(s)</span>
-
-                        <input class="file-drop-button-input" type="file" (change)="addFiles($event.target.files)" #fileInput multiple />
-                    </span>
-                </div>
-
-                <div class="file-drop-info">Drop file on existing item to replace the asset with a newer version.</div>
-            </div>
-            
-            <div class="row">
-                <sqx-asset class="col-3" *ngFor="let file of newFiles" [initFile]="file" 
-                    (failed)="onAssetFailed(file)" 
-                    (loaded)="onAssetLoaded(file, $event)">
-                </sqx-asset>
-                <sqx-asset class="col-3" *ngFor="let asset of assetsItems" [asset]="asset"
-                    (deleting)="onAssetDeleting($event)"
-                    (updated)="onAssetUpdated($event)">
-                </sqx-asset>
-            </div>
-
-            <div class="clearfix" *ngIf="assetsPager.numberOfItems > 0">
-                <div class="float-right pagination">
-                    <span class="pagination-text">{{assetsPager.itemFirst}}-{{assetsPager.itemLast}} of {{assetsPager.numberOfItems}}</span>
-
-                    <button class="btn btn-link btn-secondary pagination-button" [disabled]="!assetsPager.canGoPrev" (click)="goPrev()">
-                        <i class="icon-angle-left"></i>
-                    </button>
-                    <button class="btn btn-link btn-secondary pagination-button" [disabled]="!assetsPager.canGoNext" (click)="goNext()">
-                        <i class="icon-angle-right"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
+    <ng-container content>
+        <sqx-assets-list [state]="assetsState"></sqx-assets-list>
+    </ng-container>
 </sqx-panel>

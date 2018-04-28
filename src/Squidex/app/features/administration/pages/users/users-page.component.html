@@ -1,107 +1,91 @@
 <sqx-title message="User Management"></sqx-title>
 
-<sqx-panel desiredWidth="50rem">
-    <div class="panel-header">
-        <div class="panel-title-row">
-            <div class="float-right">
-                <button class="btn btn-link btn-secondary" (click)="load(true)" title="Refresh Users (CTRL + SHIFT + R)">
-                    <i class="icon-reset"></i> Refresh
-                </button>
+<sqx-panel desiredWidth="50rem" contentClass="grid">
+    <ng-container title>
+        Users
+    </ng-container>
 
-                <sqx-shortcut keys="ctrl+shift+r" (trigger)="load(true)"></sqx-shortcut>
-                <sqx-shortcut keys="ctrl+shift+f" (trigger)="inputFind.focus()"></sqx-shortcut>
-                <sqx-shortcut keys="ctrl+shift+g" (trigger)="buttonNew.click()"></sqx-shortcut>
+    <ng-container menu>
+        <button class="btn btn-link btn-secondary" (click)="reload()" title="Refresh Users (CTRL + SHIFT + R)">
+            <i class="icon-reset"></i> Refresh
+        </button>
 
-                <form class="form-inline" (ngSubmit)="search()">
-                    <input class="form-control" #inputFind [formControl]="usersFilter" placeholder="Search for user" />
-                </form>
+        <sqx-shortcut keys="ctrl+shift+r" (trigger)="reload()"></sqx-shortcut>
+        <sqx-shortcut keys="ctrl+shift+f" (trigger)="inputFind.focus()"></sqx-shortcut>
+        <sqx-shortcut keys="ctrl+shift+n" (trigger)="buttonNew.click()"></sqx-shortcut>
 
-                <button class="btn btn-success" #buttonNew routerLink="new" title="New User (CTRL + M)">
-                    <i class="icon-plus"></i> New
-                </button>
-            </div>
-            
-            <h3 class="panel-title">Users</h3>
+        <form class="form-inline" (ngSubmit)="search()">
+            <input class="form-control" #inputFind [formControl]="usersFilter" placeholder="Search for user" />
+        </form>
+
+        <button class="btn btn-success" #buttonNew routerLink="new" title="New User (CTRL + N)">
+            <i class="icon-plus"></i> New
+        </button>
+    </ng-container>
+
+    <ng-container content>
+        <div class="grid-header">
+            <table class="table table-items table-fixed">
+                <thead>
+                    <tr>
+                        <th class="cell-user">
+                            &nbsp;
+                        </th>
+                        <th class="cell-auto">
+                            Name
+                        </th>
+                        <th class="cell-auto">
+                            Email
+                        </th>
+                        <th class="cell-actions">
+                            Actions
+                        </th>
+                    </tr>
+                </thead>
+            </table>
         </div>
-
-        <a class="panel-close" sqxParentLink isLazyLoaded="true">
-            <i class="icon-close"></i>
-        </a>
-    </div>
-
-    <div class="panel-main">
-        <div class="panel-content grid">
-            <div class="grid-header">
+        
+        <div class="grid-content">
+            <div sqxIgnoreScrollbar>
                 <table class="table table-items table-fixed">
-                    <thead>
-                        <tr>
-                            <th class="cell-user">
-                                &nbsp;
-                            </th>
-                            <th class="cell-auto">
-                                Name
-                            </th>
-                            <th class="cell-auto">
-                                Email
-                            </th>
-                            <th class="cell-actions">
-                                Actions
-                            </th>
-                        </tr>
-                    </thead>
+                    <tbody>
+                        <ng-template ngFor let-userInfo [ngForOf]="usersState.users | async" [ngForTrackBy]="trackByUser">
+                            <tr [routerLink]="userInfo.user.id" routerLinkActive="active">
+                                <td class="cell-user">
+                                    <img class="user-picture" [attr.title]="userInfo.user.name" [attr.src]="userInfo.user | sqxUserDtoPicture" />
+                                </td>
+                                <td class="cell-auto">
+                                    <span class="user-name table-cell">{{userInfo.user.displayName}}</span>
+                                </td>
+                                <td class="cell-auto">
+                                    <span class="user-email table-cell">{{userInfo.user.email}}</span>
+                                </td>
+                                <td class="cell-actions">
+                                    <ng-container *ngIf="!userInfo.isCurrentUser">
+                                        <button class="btn btn-link" (click)="lock(userInfo.user); $event.stopPropagation();" *ngIf="!userInfo.user.isLocked" title="Lock User">
+                                            <i class="icon icon-unlocked"></i>
+                                        </button>
+                                        <button class="btn btn-link" (click)="unlock(userInfo.user); $event.stopPropagation();" *ngIf="userInfo.user.isLocked" title="Unlock User">
+                                            <i class="icon icon-lock"></i>
+                                        </button>
+                                    </ng-container>
+
+                                    <button *ngIf="userInfo.isCurrentUser" class="btn btn-link invisible">
+                                        &nbsp;
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr class="spacer"></tr>
+                        </ng-template>
+                    </tbody>
                 </table>
             </div>
-            
-            <div class="grid-content">
-                <div sqxIgnoreScrollbar>
-                    <table class="table table-items table-fixed">
-                        <tbody>
-                            <ng-template ngFor let-user [ngForOf]="usersItems">
-                                <tr [routerLink]="user.id" routerLinkActive="active">
-                                    <td class="cell-user">
-                                        <img class="user-picture" [attr.title]="user.name" [attr.src]="user | sqxUserDtoPicture" />
-                                    </td>
-                                    <td class="cell-auto">
-                                        <span class="user-name table-cell">{{user.displayName}}</span>
-                                    </td>
-                                    <td class="cell-auto">
-                                        <span class="user-email table-cell">{{user.email}}</span>
-                                    </td>
-                                    <td class="cell-actions">
-                                        <span *ngIf="user.id !== ctx.userId">
-                                            <button class="btn btn-link" (click)="lock(user); $event.stopPropagation();" *ngIf="!user.isLocked" title="Lock User">
-                                                <i class="icon icon-unlocked"></i>
-                                            </button>
-                                            <button class="btn btn-link" (click)="unlock(user); $event.stopPropagation();" *ngIf="user.isLocked" title="Unlock User">
-                                                <i class="icon icon-lock"></i>
-                                            </button>
-                                        </span>
-                                        <button *ngIf="user.id === ctx.userId" class="btn btn-link invisible">
-                                            &nbsp;
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr class="spacer"></tr>
-                            </ng-template>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div class="grid-footer clearfix" *ngIf="usersPager.numberOfItems > 0">
-                <div class="float-right pagination">
-                    <span class="pagination-text">{{usersPager.itemFirst}}-{{usersPager.itemLast}} of {{usersPager.numberOfItems}}</span>
-
-                    <button class="btn btn-link btn-secondary pagination-button" [disabled]="!usersPager.canGoPrev" (click)="goPrev()">
-                        <i class="icon-angle-left"></i>
-                    </button>
-                    <button class="btn btn-link btn-secondary pagination-button" [disabled]="!usersPager.canGoNext" (click)="goNext()">
-                        <i class="icon-angle-right"></i>
-                    </button>
-                </div>
-            </div>
         </div>
-    </div>
+
+        <div class="grid-footer">
+            <sqx-pager [pager]="usersState.usersPager | async" (prev)="goPrev()" (next)="goNext()"></sqx-pager>
+        </div>
+    </ng-container>
 </sqx-panel>
 
 <router-outlet></router-outlet>

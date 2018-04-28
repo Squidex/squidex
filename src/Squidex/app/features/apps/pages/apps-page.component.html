@@ -1,28 +1,30 @@
 ﻿<sqx-title message="Apps"></sqx-title>
 
 <div class="apps-section">
-    <h1 class="apps-title">Hi {{ctx.user.displayName}}</h1>
+    <h1 class="apps-title">Hi {{authState.user?.displayName}}</h1>
 
     <div class="subtext">
         Welcome to  Squidex.
     </div>
 </div>
 
-<div class="apps-section">
-    <div class="empty" *ngIf="apps?.length === 0">
-        <h3 class="empty-headline">You are not collaborating to any app yet</h3>
-    </div>
+<ng-container *ngIf="appsState.apps | async; let apps">
+    <div class="apps-section">
+        <div class="empty" *ngIf="apps.length === 0">
+            <h3 class="empty-headline">You are not collaborating to any app yet</h3>
+        </div>
 
-    <div class="card card-href card-app float-left" *ngFor="let app of apps" [routerLink]="['/app', app.name]">
-        <div class="card-body">
-            <h4 class="card-title">{{app.name}}</h4>
+        <div class="card card-href card-app float-left" *ngFor="let app of apps" [routerLink]="['/app', app.name]">
+            <div class="card-body">
+                <h4 class="card-title">{{app.name}}</h4>
 
-            <div class="card-text">
-                <a [routerLink]="['/app', app.name]">Edit</a>
+                <div class="card-text">
+                    <a [routerLink]="['/app', app.name]">Edit</a>
+                </div>
             </div>
         </div>
     </div>
-</div>
+</ng-container>
 
 <div class="apps-section">
     <div class="card card-template card-href" (click)="createNewApp('')">
@@ -49,7 +51,9 @@
 
             <div class="card-text">
                 <div>Start with our ready to use blog.</div>
-                <div>Sample Code: <a href="https://github.com/Squidex/squidex-samples/tree/master/csharp/Sample.Blog" (click)="$event.stopPropagation()" target="_blank">ASP.NET Core</a></div>
+                <div>
+                    Sample Code: <a href="https://github.com/Squidex/squidex-samples/tree/master/csharp/Sample.Blog" (click)="$event.stopPropagation()" target="_blank">C#</a>
+                </div>
             </div>
         </div>
     </div>
@@ -64,34 +68,20 @@
 
             <div class="card-text">
                 <div>Create your profile page.</div>
-                <div>Sample Code: <a href="https://github.com/Squidex/squidex-samples/tree/master/csharp/Sample.Profile" (click)="$event.stopPropagation()" target="_blank">ASP.NET Core</a></div>
+                <div>
+                    Sample Code: <a href="https://github.com/Squidex/squidex-samples/tree/master/csharp/Sample.Profile" (click)="$event.stopPropagation()" target="_blank">C#</a>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<div class="modal" *sqxModalView="addAppDialog;onRoot:true" @fade>
-    <div class="modal-backdrop"></div>
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title" *ngIf="template">Create {{template}} Sample</h4>
-                <h4 class="modal-title" *ngIf="!template">Create App</h4>
-                
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="addAppDialog.hide()">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
+<ng-container *sqxModalView="addAppDialog;onRoot:true">
+    <sqx-app-form [template]="addAppTemplate"
+        (completed)="addAppDialog.hide()">
+    </sqx-app-form>
+</ng-container>
 
-            <div class="modal-body">
-                <sqx-app-form
-                    [template]="template"
-                    (created)="addAppDialog.hide()"
-                    (cancelled)="addAppDialog.hide()">
-                </sqx-app-form>
-            </div>
-        </div>
-    </div>
-</div>
-
-<sqx-onboarding-dialog [modalView]="onboardingModal"></sqx-onboarding-dialog>
+<ng-container *sqxModalView="onboardingModal;onRoot:true;closeAuto:false">
+    <sqx-onboarding-dialog (closed)="onboardingModal.hide()"></sqx-onboarding-dialog>
+</ng-container>

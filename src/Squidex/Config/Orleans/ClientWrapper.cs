@@ -17,20 +17,15 @@ namespace Squidex.Config.Orleans
 {
     public sealed class ClientWrapper : DisposableObjectBase, IInitializable, IDisposable
     {
-        private readonly IClusterClient client;
-
-        public IClusterClient Client
-        {
-            get { return client; }
-        }
+        public IClusterClient Client { get; }
 
         public ClientWrapper()
         {
-            client = new ClientBuilder()
+            Client = new ClientBuilder()
                 .UseDashboard()
                 .UseStaticClustering(options =>
                 {
-                    options.Gateways.Add(new IPEndPoint(IPAddress.Loopback, 40000).ToGatewayUri());
+                    options.Gateways.Add(new IPEndPoint(ConfigUtilities.SiloAddress, 40000).ToGatewayUri());
                 })
                 .Configure<ClusterOptions>(options =>
                 {
@@ -46,14 +41,14 @@ namespace Squidex.Config.Orleans
 
         public void Initialize()
         {
-            client.Connect().Wait();
+            Client.Connect().Wait();
         }
 
         protected override void DisposeObject(bool disposing)
         {
             if (disposing)
             {
-                client.Close().Wait();
+                Client.Close().Wait();
             }
         }
     }

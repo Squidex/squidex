@@ -50,7 +50,10 @@
 }
 
 :host {
+    width: $asset-height;
     padding-bottom: 1rem;
+    padding-left: 8px;
+    padding-right: 8px;
 }
 
 .drop-overlay {
@@ -73,10 +76,8 @@
         height: $asset-height;
     }
 
-    &.drag {
-        .drop-overlay {
-            @include opacity(1);
-        }
+    &.selectable {
+        cursor: pointer;
     }
 
     &-body {
@@ -129,19 +130,12 @@
         @include absolute(auto, auto, .5rem, .5rem);
     }
 
-    &-delete {
-        @include asset-link;
+    &-menu {
         @include absolute(.5rem, 1rem, auto, auto);
-    }
 
-    &-edit {
-        @include asset-link;
-        @include absolute(.5rem, 4rem, auto, auto);
-    }
-
-    &-download {
-        @include asset-link;
-        @include absolute(.5rem, 2.5rem, auto, auto);
+        a {
+            @include asset-link;
+        }
     }
 
     &-type {

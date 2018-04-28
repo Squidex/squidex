@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.Tasks;
@@ -19,6 +20,7 @@ namespace Squidex.Infrastructure.Commands
     {
         private readonly List<Envelope<IEvent>> uncomittedEvents = new List<Envelope<IEvent>>();
         private readonly IStore<Guid> store;
+        private readonly ISemanticLog log;
         private Guid id;
         private T snapshot = new T { Version = EtagVersion.Empty };
         private IPersistence<T> persistence;
@@ -43,20 +45,29 @@ namespace Squidex.Infrastructure.Commands
             get { return snapshot; }
         }
 
-        protected DomainObjectGrain(IStore<Guid> store)
+        protected DomainObjectGrain(IStore<Guid> store, ISemanticLog log)
         {
             Guard.NotNull(store, nameof(store));
+            Guard.NotNull(log, nameof(log));
 
             this.store = store;
+
+            this.log = log;
         }
 
-        public override Task OnActivateAsync(Guid key)
+        public override async Task OnActivateAsync(Guid key)
         {
-            id = key;
+            using (log.MeasureInformation(w => w
+                .WriteProperty("action", "ActivateDomainObject")
+                .WriteProperty("domainObjectType", GetType().Name)
+                .WriteProperty("domainObjectKey", key.ToString())))
+            {
+                id = key;
 
-            persistence = store.WithSnapshotsAndEventSourcing<T, Guid>(GetType(), id, ApplySnapshot, ApplyEvent);
+                persistence = store.WithSnapshotsAndEventSourcing<T, Guid>(GetType(), id, ApplySnapshot, ApplyEvent);
 
-            return persistence.ReadAsync();
+                await persistence.ReadAsync();
+            }
         }
 
         public void RaiseEvent(IEvent @event)
@@ -162,7 +173,8 @@ namespace Squidex.Infrastructure.Commands
 
                 throw new DomainObjectNotFoundException(id.ToString(), GetType());
             }
-            else if (!isUpdate && Version >= 0)
+
+            if (!isUpdate && Version >= 0)
             {
                 throw new DomainException("Object has already been created.");
             }

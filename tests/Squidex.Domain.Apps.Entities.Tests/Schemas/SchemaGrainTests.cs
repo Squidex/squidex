@@ -17,6 +17,7 @@ using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.Log;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Schemas
@@ -41,7 +42,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             fieldId = new NamedId<long>(1, fieldName);
 
-            sut = new SchemaGrain(Store, appProvider, registry);
+            sut = new SchemaGrain(Store, A.Dummy<ISemanticLog>(), appProvider, registry);
             sut.OnActivateAsync(Id).Wait();
         }
 

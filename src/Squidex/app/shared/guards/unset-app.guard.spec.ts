@@ -5,35 +5,34 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { IMock, Mock, Times } from 'typemoq';
 import { Observable } from 'rxjs';
+import { IMock, Mock, Times } from 'typemoq';
 
-import { AppsStoreService } from 'shared';
+import { AppsState } from '@app/shared';
 
 import { UnsetAppGuard } from './unset-app.guard';
 
 describe('UnsetAppGuard', () => {
-    let appStoreService: IMock<AppsStoreService>;
+    let appsState: IMock<AppsState>;
+    let appGuard: UnsetAppGuard;
 
     beforeEach(() => {
-        appStoreService = Mock.ofType(AppsStoreService);
+        appsState = Mock.ofType<AppsState>();
+        appGuard = new UnsetAppGuard(appsState.object);
     });
 
     it('should unselect app', () => {
-        appStoreService.setup(x => x.selectApp(null))
-            .returns(() => Observable.of(false));
-
-        const guard = new UnsetAppGuard(appStoreService.object);
+        appsState.setup(x => x.select(null))
+            .returns(() => Observable.of(null));
 
         let result = false;
 
-        guard.canActivate(<any>{}, <any>{})
-            .subscribe(value => {
-                result = value;
-            });
+        appGuard.canActivate().subscribe(value => {
+            result = value;
+        });
 
         expect(result).toBeTruthy();
 
-        appStoreService.verify(x => x.selectApp(null), Times.once());
+        appsState.verify(x => x.select(null), Times.once());
     });
 });

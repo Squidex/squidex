@@ -14,9 +14,11 @@ import {
     HistoryComponent,
     SqxFrameworkModule,
     SqxSharedModule
-} from 'shared';
+} from '@app/shared';
 
 import {
+    BackupDownloadUrlPipe,
+    BackupDurationPipe,
     BackupsPageComponent,
     ClientComponent,
     ClientsPageComponent,
@@ -39,16 +41,54 @@ const routes: Routes = [
                 path: ''
             },
             {
-                path: 'plans',
-                component: PlansPageComponent
-            },
-            {
                 path: 'more',
                 component: MorePageComponent
             },
             {
                 path: 'backups',
-                component: BackupsPageComponent
+                component: BackupsPageComponent,
+                children: [
+                    {
+                        path: 'help',
+                        component: HelpComponent,
+                        data: {
+                            helpPage: '05-integrated/backups'
+                        }
+                    }
+                ]
+            },
+            {
+                path: 'plans',
+                component: PlansPageComponent,
+                children: [
+                    {
+                        path: 'history',
+                        component: HistoryComponent,
+                        data: {
+                            channel: 'settings.plans'
+                        }
+                    }
+                ]
+            },
+            {
+                path: 'patterns',
+                component: PatternsPageComponent,
+                children: [
+                    {
+                        path: 'history',
+                        component: HistoryComponent,
+                        data: {
+                            channel: 'settings.patterns'
+                        }
+                    },
+                    {
+                        path: 'help',
+                        component: HelpComponent,
+                        data: {
+                            helpPage: '05-integrated/patterns'
+                        }
+                    }
+                ]
             },
             {
                 path: 'clients',
@@ -109,26 +149,6 @@ const routes: Routes = [
                         }
                     }
                 ]
-            },
-            {
-                path: 'patterns',
-                component: PatternsPageComponent,
-                children: [
-                    {
-                        path: 'history',
-                        component: HistoryComponent,
-                        data: {
-                            channel: 'settings.patterns'
-                        }
-                    },
-                    {
-                        path: 'help',
-                        component: HelpComponent,
-                        data: {
-                            helpPage: '05-integrated/patterns'
-                        }
-                    }
-                ]
             }
         ]
     }
@@ -142,6 +162,8 @@ const routes: Routes = [
         RouterModule.forChild(routes)
     ],
     declarations: [
+        BackupDownloadUrlPipe,
+        BackupDurationPipe,
         BackupsPageComponent,
         ClientComponent,
         ClientsPageComponent,

@@ -1,34 +1,33 @@
-<div class="sidebar">
-    <ul class="nav flex-column">
-        <li class="nav-item" *ngIf="ctx.app.permission !== 'Editor'">
-            <a class="nav-link" routerLink="schemas" routerLinkActive="active">
-                <i class="nav-icon icon-schemas"></i> <div class="nav-text">Schemas</div>
-            </a>
-        </li>
-        <li class="nav-item" *ngIf="ctx.app">
-            <a class="nav-link" routerLink="content" routerLinkActive="active">
-                <i class="nav-icon icon-contents"></i> <div class="nav-text">Content</div>
-            </a>
-        </li>
-        <li class="nav-item" *ngIf="ctx.app">
-            <a class="nav-link" routerLink="assets" routerLinkActive="active">
-                <i class="nav-icon icon-assets"></i> <div class="nav-text">Assets</div> 
-            </a>
-        </li>
-        <li class="nav-item" *ngIf="ctx.app.permission !== 'Editor'">
-            <a class="nav-link" routerLink="rules" routerLinkActive="active">
-                <i class="nav-icon icon-rules"></i> <div class="nav-text">Rules</div>
-            </a>
-        </li>
-        <li class="nav-item" *ngIf="ctx.app.permission !== 'Editor'">
-            <a class="nav-link" routerLink="settings" routerLinkActive="active">
-                <i class="nav-icon icon-settings"></i> <div class="nav-text">Settings</div>
-            </a>
-        </li>
-        <li class="nav-item" *ngIf="ctx.app.permission !== 'Editor'">
-            <a class="nav-link" routerLink="api" routerLinkActive="active">
-                <i class="nav-icon icon-api"></i> <div class="nav-text">API</div>
-            </a>
-        </li>
-    </ul>
-</div>
+
+<ul class="nav flex-column" *ngIf="appsState.snapshot.selectedApp; let app">
+    <li class="nav-item" *ngIf="app.permission !== 'Editor'">
+        <a class="nav-link" routerLink="schemas" routerLinkActive="active">
+            <i class="nav-icon icon-schemas"></i> <div class="nav-text">Schemas</div>
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" routerLink="content" routerLinkActive="active">
+            <i class="nav-icon icon-contents"></i> <div class="nav-text">Content</div>
+        </a>
+    </li>
+    <li class="nav-item" *ngIf="app">
+        <a class="nav-link" routerLink="assets" routerLinkActive="active">
+            <i class="nav-icon icon-assets"></i> <div class="nav-text">Assets</div> 
+        </a>
+    </li>
+    <li class="nav-item" *ngIf="app.permission !== 'Editor'">
+        <a class="nav-link" routerLink="rules" routerLinkActive="active">
+            <i class="nav-icon icon-rules"></i> <div class="nav-text">Rules</div>
+        </a>
+    </li>
+    <li class="nav-item" *ngIf="app.permission !== 'Editor'">
+        <a class="nav-link" routerLink="settings" routerLinkActive="active">
+            <i class="nav-icon icon-settings"></i> <div class="nav-text">Settings</div>
+        </a>
+    </li>
+    <li class="nav-item" *ngIf="app.permission !== 'Editor'">
+        <a class="nav-link" routerLink="api" routerLinkActive="active">
+            <i class="nav-icon icon-api"></i> <div class="nav-text">API</div>
+        </a>
+    </li>
+</ul>

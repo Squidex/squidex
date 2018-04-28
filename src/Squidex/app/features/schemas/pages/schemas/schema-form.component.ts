@@ -6,34 +6,24 @@
  */
 
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FormBuilder, Validators } from '@angular/forms';
+import { FormBuilder } from '@angular/forms';
 
 import {
     ApiUrlConfig,
-    AppContext,
-    DateTime,
-    fadeAnimation,
-    SchemaDetailsDto,
-    SchemasService,
-    ValidatorsEx
-} from 'shared';
-
-const FALLBACK_NAME = 'my-schema';
+    AppsState,
+    CreateSchemaForm,
+    SchemaDto,
+    SchemasState
+} from '@app/shared';
 
 @Component({
     selector: 'sqx-schema-form',
     styleUrls: ['./schema-form.component.scss'],
-    templateUrl: './schema-form.component.html',
-    providers: [
-        AppContext
-    ],
-    animations: [
-        fadeAnimation
-    ]
+    templateUrl: './schema-form.component.html'
 })
 export class SchemaFormComponent implements OnInit {
     @Output()
-    public created = new EventEmitter<SchemaDetailsDto>();
+    public created = new EventEmitter<SchemaDto>();
 
     @Output()
     public cancelled = new EventEmitter();
@@ -41,35 +31,20 @@ export class SchemaFormComponent implements OnInit {
     @Input()
     public import: any;
 
+    public createForm = new CreateSchemaForm(this.formBuilder);
+
     public showImport = false;
-
-    public createFormError = '';
-    public createFormSubmitted = false;
-    public createForm =
-        this.formBuilder.group({
-            name: ['',
-                [
-                    Validators.required,
-                    Validators.maxLength(40),
-                    ValidatorsEx.pattern('[a-z0-9]+(\-[a-z0-9]+)*', 'Name can contain lower case letters (a-z), numbers and dashes only (not at the end).')
-                ]],
-            import: [{}]
-        });
-
-    public schemaName =
-        this.createForm.controls['name'].valueChanges.map(n => n || FALLBACK_NAME)
-            .startWith(FALLBACK_NAME);
 
     constructor(
         public readonly apiUrl: ApiUrlConfig,
-        public readonly ctx: AppContext,
-        private readonly schemas: SchemasService,
-        private readonly formBuilder: FormBuilder
+        public readonly appsState: AppsState,
+        private readonly formBuilder: FormBuilder,
+        private readonly schemasState: SchemasState
     ) {
     }
 
     public ngOnInit() {
-        this.createForm.controls['import'].setValue(this.import || {});
+        this.createForm.load({ import: this.import });
 
         this.showImport = !!this.import;
     }
@@ -80,46 +55,26 @@ export class SchemaFormComponent implements OnInit {
         return false;
     }
 
-    public cancel() {
-        this.emitCancelled();
-        this.resetCreateForm();
-    }
-
-    public createSchema() {
-        this.createFormSubmitted = true;
-
-        if (this.createForm.valid) {
-            this.createForm.disable();
-
-            const schemaName = this.createForm.controls['name'].value;
-            const schemaDto = Object.assign(this.createForm.controls['import'].value || {}, { name: schemaName });
-
-            this.schemas.postSchema(this.ctx.appName, schemaDto, this.ctx.userToken, DateTime.now())
-                .subscribe(dto => {
-                    this.emitCreated(dto);
-                    this.resetCreateForm();
-                }, error => {
-                    this.enableCreateForm(error.displayMessage);
-                });
-        }
-    }
-
-    private emitCancelled() {
-        this.cancelled.emit();
-    }
-
-    private emitCreated(schema: SchemaDetailsDto) {
+    public complete(schema: SchemaDto) {
         this.created.emit(schema);
     }
 
-    private enableCreateForm(message: string) {
-        this.createForm.enable();
-        this.createFormError = message;
+    public cancel() {
+        this.cancelled.emit();
     }
 
-    private resetCreateForm() {
-        this.createFormError = '';
-        this.createForm.reset();
-        this.createFormSubmitted = false;
+    public createSchema() {
+        const value = this.createForm.submit();
+
+        if (value) {
+            const schemaDto = Object.assign(value.import || {}, { name: value.name });
+
+            this.schemasState.create(schemaDto)
+                .subscribe(dto => {
+                    this.complete(dto);
+                }, error => {
+                    this.createForm.submitFailed(error);
+                });
+        }
     }
 }

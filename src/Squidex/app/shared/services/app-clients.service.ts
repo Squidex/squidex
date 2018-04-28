@@ -9,7 +9,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import 'framework/angular/http-extensions';
+import '@app/framework/angular/http/http-extensions';
 
 import {
     AnalyticsService,
@@ -17,25 +17,13 @@ import {
     HTTP,
     Version,
     Versioned
-} from 'framework';
+} from '@app/framework';
 
 export class AppClientsDto {
     constructor(
         public readonly clients: AppClientDto[],
         public readonly version: Version
     ) {
-    }
-
-    public addClient(client: AppClientDto, version: Version) {
-        return new AppClientsDto([...this.clients, client], version);
-    }
-
-    public updateClient(client: AppClientDto, version: Version) {
-        return new AppClientsDto(this.clients.map(c => c.id === client.id ? client : c), version);
-    }
-
-    public removeClient(client: AppClientDto, version: Version) {
-        return new AppClientsDto(this.clients.filter(c => c.id !== client.id), version);
     }
 }
 
@@ -46,14 +34,6 @@ export class AppClientDto {
         public readonly secret: string,
         public readonly permission: string
     ) {
-    }
-
-    public rename(name: string): AppClientDto {
-        return new AppClientDto(this.id, name, this.secret, this.permission);
-    }
-
-    public update(permission: string): AppClientDto {
-        return new AppClientDto(this.id, this.name, this.secret, permission);
     }
 }
 
@@ -132,7 +112,7 @@ export class AppClientsService {
                 .pretifyError('Failed to add client. Please reload.');
     }
 
-    public updateClient(appName: string, id: string, dto: UpdateAppClientDto, version: Version): Observable<Versioned<any>> {
+    public putClient(appName: string, id: string, dto: UpdateAppClientDto, version: Version): Observable<Versioned<any>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/clients/${id}`);
 
         return HTTP.putVersioned(this.http, url, dto, version)

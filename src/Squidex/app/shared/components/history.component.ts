@@ -6,57 +6,53 @@
  */
 
 import { Component } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
-
-import { AppContext } from './app-context';
 
 import {
     allParams,
-    formatHistoryMessage,
+    AppsState,
     HistoryChannelUpdated,
     HistoryEventDto,
     HistoryService,
-    UsersProviderService
-} from './../declarations-base';
+    MessageBus
+} from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-history',
     styleUrls: ['./history.component.scss'],
-    templateUrl: './history.component.html',
-    providers: [
-        AppContext
-    ]
+    templateUrl: './history.component.html'
 })
 export class HistoryComponent {
-    public get channel(): string {
-        let channelPath = this.ctx.route.snapshot.data['channel'];
+    private readonly channel = this.calculateChannel();
 
-        if (channelPath) {
-            const params = allParams(this.ctx.route);
+    public events: Observable<HistoryEventDto[]> =
+        Observable.timer(0, 10000).merge(this.messageBus.of(HistoryChannelUpdated).delay(1000))
+            .switchMap(app => this.historyService.getHistory(this.appsState.appName, this.channel));
+
+    constructor(
+        private readonly appsState: AppsState,
+        private readonly historyService: HistoryService,
+        private readonly messageBus: MessageBus,
+        private readonly route: ActivatedRoute
+    ) {
+    }
+
+    private calculateChannel(): string {
+        let channel = this.route.snapshot.data['channel'];
+
+        if (channel) {
+            const params = allParams(this.route);
 
             for (let key in params) {
                 if (params.hasOwnProperty(key)) {
                     const value = params[key];
 
-                    channelPath = channelPath.replace(`{${key}}`, value);
+                    channel = channel.replace(`{${key}}`, value);
                 }
             }
         }
 
-        return channelPath;
-    }
-
-    public events: Observable<HistoryEventDto[]> =
-        Observable.timer(0, 10000).merge(this.ctx.bus.of(HistoryChannelUpdated).delay(1000))
-            .switchMap(app => this.historyService.getHistory(this.ctx.appName, this.channel));
-
-    constructor(public readonly ctx: AppContext,
-        private readonly users: UsersProviderService,
-        private readonly historyService: HistoryService
-    ) {
-    }
-
-    public format(message: string): Observable<string> {
-        return formatHistoryMessage(message, this.users);
+        return channel;
     }
 }

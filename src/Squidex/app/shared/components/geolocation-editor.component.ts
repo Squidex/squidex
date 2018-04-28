@@ -8,12 +8,12 @@
 import { AfterViewInit, Component, ElementRef, forwardRef, ViewChild } from '@angular/core';
 import { ControlValueAccessor, FormBuilder, NG_VALUE_ACCESSOR } from '@angular/forms';
 
-import { Types } from './../../framework/utils/types';
-
-import { ResourceLoaderService } from './../../framework/services/resource-loader.service';
-import { ValidatorsEx } from './../../framework/angular/validators';
-
-import { UIService } from './../services/ui.service';
+import {
+    ResourceLoaderService,
+    Types,
+    UIService,
+    ValidatorsEx
+} from '@app/shared/internal';
 
 declare var L: any;
 declare var google: any;

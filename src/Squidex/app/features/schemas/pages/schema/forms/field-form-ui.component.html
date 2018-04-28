@@ -1,0 +1,29 @@
+<div [ngSwitch]="field.properties.fieldType">
+    <div *ngSwitchCase="'Number'">
+        <sqx-number-ui [editForm]="editForm" [field]="field" [properties]="field.properties"></sqx-number-ui>
+    </div>
+    <div *ngSwitchCase="'String'">
+        <sqx-string-ui [editForm]="editForm" [field]="field" [properties]="field.properties"></sqx-string-ui>
+    </div>
+    <div *ngSwitchCase="'Boolean'">
+        <sqx-boolean-ui [editForm]="editForm" [field]="field" [properties]="field.properties"></sqx-boolean-ui>
+    </div>
+    <div *ngSwitchCase="'DateTime'">
+        <sqx-date-time-ui [editForm]="editForm" [field]="field" [properties]="field.properties"></sqx-date-time-ui>
+    </div>
+    <div *ngSwitchCase="'Geolocation'">
+        <sqx-geolocation-ui [editForm]="editForm" [field]="field" [properties]="field.properties"></sqx-geolocation-ui>
+    </div>
+    <div *ngSwitchCase="'Json'">
+        <sqx-json-ui [editForm]="editForm" [field]="field" [properties]="field.properties"></sqx-json-ui>
+    </div>
+    <div *ngSwitchCase="'Assets'">
+        <sqx-assets-ui [editForm]="editForm" [field]="field" [properties]="field.properties"></sqx-assets-ui>
+    </div>
+    <div *ngSwitchCase="'References'">
+        <sqx-references-ui [editForm]="editForm" [field]="field" [properties]="field.properties"></sqx-references-ui>
+    </div>
+    <div *ngSwitchCase="'Tags'">
+        <sqx-tags-ui [editForm]="editForm" [field]="field" [properties]="field.properties"></sqx-tags-ui>
+    </div>
+</div>

@@ -17,6 +17,7 @@ using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.Log;
 using Squidex.Shared.Users;
 using Xunit;
 
@@ -27,6 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
         private readonly IAppPlansProvider appPlansProvider = A.Fake<IAppPlansProvider>();
         private readonly IAppPlanBillingManager appPlansBillingManager = A.Fake<IAppPlanBillingManager>();
+        private readonly IUser user = A.Fake<IUser>();
         private readonly IUserResolver userResolver = A.Fake<IUserResolver>();
         private readonly string contributorId = Guid.NewGuid().ToString();
         private readonly string clientId = "client";
@@ -46,10 +48,13 @@ namespace Squidex.Domain.Apps.Entities.Apps
         public AppGrainTests()
         {
             A.CallTo(() => appProvider.GetAppAsync(AppName))
-             .Returns((IAppEntity)null);
+                .Returns((IAppEntity)null);
 
-            A.CallTo(() => userResolver.FindByIdAsync(contributorId))
-                .Returns(A.Fake<IUser>());
+            A.CallTo(() => user.Id)
+                .Returns(contributorId);
+
+            A.CallTo(() => userResolver.FindByIdOrEmailAsync(contributorId))
+                .Returns(user);
 
             initialPatterns = new InitialPatterns
             {
@@ -57,7 +62,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 { patternId2, new AppPattern("Numbers", "[0-9]*") }
             };
 
-            sut = new AppGrain(initialPatterns, Store, appProvider, appPlansProvider, appPlansBillingManager, userResolver);
+            sut = new AppGrain(initialPatterns, Store, A.Dummy<ISemanticLog>(), appProvider, appPlansProvider, appPlansBillingManager, userResolver);
             sut.OnActivateAsync(Id).Wait();
         }
 
@@ -163,7 +168,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             var result = await sut.ExecuteAsync(CreateCommand(command));
 
-            result.ShouldBeEquivalent(new EntitySavedResult(5));
+            result.ShouldBeEquivalent(EntityCreatedResult.Create(contributorId, 5));
 
             Assert.Equal(AppContributorPermission.Editor, sut.Snapshot.Contributors[contributorId]);
 

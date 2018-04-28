@@ -1,82 +1,102 @@
-<sqx-title message="{app} | Backups | Settings" parameter1="app" [value1]="ctx.appName"></sqx-title>
+<sqx-title message="{app} | Backups | Settings" parameter1="app" [value1]="appsState.appName"></sqx-title>
 
-<sqx-panel desiredWidth="50rem">
-    <div class="panel-header">
-        <div class="panel-title-row">
-            <div class="float-right">
-                <button class="btn btn-success" [disabled]="backups.length === 10" (click)="startBackup()">
-                    Start Backup
-                </button>
-            </div>
+<sqx-panel desiredWidth="50rem" [showSidebar]="true">
+    <ng-container title>
+        Backups
+    </ng-container>
 
-            <h3 class="panel-title">Backups</h3>
-        </div>
+    <ng-container menu>
+        <button class="btn btn-link btn-secondary" (click)="reload()" title="Refresh backups (CTRL + SHIFT + R)">
+            <i class="icon-reset"></i> Refresh
+        </button>
 
-        <a class="panel-close" sqxParentLink>
-            <i class="icon-close"></i>
-        </a>
-    </div>
+        <sqx-shortcut keys="ctrl+shift+r" (trigger)="reload()"></sqx-shortcut>
 
-    <div class="panel-main">
-        <div class="panel-content">
-            <div class="panel-alert panel-alert-danger" *ngIf="backups.length >= 10">
+        <button class="btn btn-success" [disabled]="backupsState.maxBackupsReached | async" (click)="start()">
+            Start Backup
+        </button>
+    </ng-container>
+
+    <ng-container content>
+        <ng-container *ngIf="backupsState.isLoaded | async">
+            <div class="panel-alert panel-alert-danger" *ngIf="backupsState.maxBackupsReached | async">
                 Your have reached the maximum number of backups: 10.
             </div>
-            
-            <div class="table-items-row" *ngFor="let backup of backups; trackBy: trackBy">
-                <div class="row no-gutter">
-                    <div class="col col-auto">
-                        <div *ngIf="!backup.stopped" class="backup-status backup-status-pending spin">
-                            <i class="icon-hour-glass"></i>
-                        </div>
-                        <div *ngIf="backup.stopped && backup.isFailed" class="backup-status backup-status-failed">
-                            <i class="icon-exclamation"></i>
-                        </div>
-                        <div *ngIf="backup.stopped && !backup.isFailed" class="backup-status backup-status-success">
-                            <i class="icon-checkmark"></i>
-                        </div>
-                    </div>
-                    <div class="col col-auto">
-                        <div>
-                            Started:
-                        </div>
-                        <div>
-                            Duration:
-                        </div>
-                    </div>
-                    <div class="col col-auto">
-                        <div>
-                            {{backup.started.toISOString()}}
-                        </div>
-                        <div *ngIf="backup.stopped">
-                            {{getDuration(backup) | sqxDuration}}
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div>
-                            <span title="Archived events">
-                                Events: <strong class="backup-progress">{{backup.handledEvents | sqxKNumber}}</strong>
-                            </span>, 
-                            <span title="Archived assets">
-                                Assets: <strong class="backup-progress">{{backup.handledAssets | sqxKNumber}}</strong> 
-                            </span>
-                        </div>
-                        <div *ngIf="backup.stopped && !backup.isFailed">
-                            Download:
 
-                            <a href="{{getDownloadUrl(backup)}}" target="_blank">
-                                Ready
-                            </a>
+            <ng-container *ngIf="backupsState.backups | async; let backups">
+                <div class="table-items-row table-items-row-empty" *ngIf="backups.length === 0">
+                    No backups created yet.
+
+                    <button class="btn btn-success btn-sm ml-2" (click)="start()">
+                        Start Backup
+                    </button>
+                </div>
+                
+                <div class="table-items-row" *ngFor="let backup of backups; trackBy: trackByBackup">
+                    <div class="row no-gutter">
+                        <div class="col col-auto">
+                            <div *ngIf="!backup.stopped" class="backup-status backup-status-pending spin">
+                                <i class="icon-hour-glass"></i>
+                            </div>
+                            <div *ngIf="backup.stopped && backup.isFailed" class="backup-status backup-status-failed">
+                                <i class="icon-exclamation"></i>
+                            </div>
+                            <div *ngIf="backup.stopped && !backup.isFailed" class="backup-status backup-status-success">
+                                <i class="icon-checkmark"></i>
+                            </div>
                         </div>
-                    </div>
-                    <div class="col col-auto">
-                        <button type="button" class="btn btn-link btn-danger" (sqxConfirmClick)="deleteBackup(backup)" confirmTitle="Delete backup"
-                            confirmText="Do you really want to delete the backup?">
-                            <i class="icon-bin2"></i>
-                        </button>
+                        <div class="col col-auto">
+                            <div>
+                                Started:
+                            </div>
+                            <div>
+                                Duration:
+                            </div>
+                        </div>
+                        <div class="col col-auto">
+                            <div>
+                                {{backup.started | sqxISODate}}
+                            </div>
+                            <div *ngIf="backup.stopped">
+                                {{backup | sqxBackupDuration}}
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div>
+                                <span title="Archived events">
+                                    Events: <strong class="backup-progress">{{backup.handledEvents | sqxKNumber}}</strong>
+                                </span>, 
+                                <span title="Archived assets">
+                                    Assets: <strong class="backup-progress">{{backup.handledAssets | sqxKNumber}}</strong> 
+                                </span>
+                            </div>
+                            <div *ngIf="backup.stopped && !backup.isFailed">
+                                Download:
+
+                                <a href="{{backup | sqxBackupDownloadUrl}}" target="_blank">
+                                    Ready
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col col-auto">
+                            <button type="button" class="btn btn-link btn-danger" 
+                                (sqxConfirmClick)="delete(backup)" 
+                                confirmTitle="Delete backup"
+                                confirmText="Do you really want to delete the backup?">
+                                <i class="icon-bin2"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
+            </ng-container>
+        </ng-container>
+    </ng-container>
+
+    <ng-container sidebar>
+        <a class="panel-link" routerLink="help" routerLinkActive="active">
+            <i class="icon-help"></i>
+        </a>
+    </ng-container>
 </sqx-panel>
+
+<router-outlet></router-outlet>

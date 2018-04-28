@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { MessageBus, MessageBusFactory } from './../';
+import { MessageBus, MessageBusFactory } from './message-bus.service';
 
 class Event1 { }
 class Event2 { }

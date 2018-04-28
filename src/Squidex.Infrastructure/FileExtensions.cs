@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Globalization;
 using System.IO;
 
 namespace Squidex.Infrastructure
@@ -62,7 +63,7 @@ namespace Squidex.Infrastructure
                 u = Extensions.Length - 1;
             }
 
-            return $"{Math.Round(d, 1)} {Extensions[u]}";
+            return $"{Math.Round(d, 1).ToString(CultureInfo.InvariantCulture)} {Extensions[u]}";
         }
     }
 }

@@ -41,7 +41,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.Billing
             Name = "Basic",
             MaxApiCalls = 150000,
             MaxAssetSize = 1024 * 1024 * 2,
-            MaxContributors = 5
+            MaxContributors = 5,
+            YearlyCosts = "100€",
+            YearlyId = "basic_yearly"
         };
 
         private static readonly ConfigAppLimitsPlan[] Plans = { BasicPlan, FreePlan };
@@ -72,6 +74,16 @@ namespace Squidex.Domain.Apps.Entities.Apps.Billing
             var sut = new ConfigAppPlansProvider(Plans);
 
             var plan = sut.GetPlanForApp(CreateApp("basic"));
+
+            plan.ShouldBeEquivalentTo(BasicPlan);
+        }
+
+        [Fact]
+        public void Should_return_fitting_yearly_app_plan()
+        {
+            var sut = new ConfigAppPlansProvider(Plans);
+
+            var plan = sut.GetPlanForApp(CreateApp("basic_yearly"));
 
             plan.ShouldBeEquivalentTo(BasicPlan);
         }

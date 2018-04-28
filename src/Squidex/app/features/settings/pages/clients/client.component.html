@@ -2,27 +2,27 @@
     <div class="row no-gutters">
         <div class="col">
             <div class="client-header">
-                <form *ngIf="isRenaming" class="form-inline" [formGroup]="renameForm" (ngSubmit)="renaming.emit(renameForm.controls.name.value)">
+                <form *ngIf="isRenaming" class="form-inline" [formGroup]="renameForm.form" (ngSubmit)="rename()">
                     <div class="form-group mr-1">
                         <sqx-control-errors for="name"></sqx-control-errors>
                         
                         <input type="text" class="form-control client-name enabled" formControlName="name" maxlength="20" sqxFocusOnInit (keydown)="onKeyDown($event.keyCode)" />
                     </div>
 
-                    <button type="submit" class="btn btn-primary" [disabled]="!renameForm.valid || !hasNewName">Save</button>
+                    <button type="submit" class="btn btn-primary" [disabled]="!renameForm.form.valid || !renameForm.form.dirty">Save</button>
 
-                    <button class="btn btn-link btn-secondary btn-cancel" (click)="cancelRename()">
+                    <button class="btn btn-link btn-secondary btn-cancel" (click)="toggleRename()">
                         <i class="icon-close"></i>
                     </button>
                 </form>
 
-                <span *ngIf="!isRenaming">
+                <ng-container *ngIf="!isRenaming">
                     <h3 class="client-name">
-                        <span (dblclick)="startRename()">{{client.name}}</span> 
+                        <span (dblclick)="toggleRename()">{{client.name}}</span> 
                     </h3>
 
-                    <i class="client-edit icon-pencil" (click)="startRename()"></i>
-                </span>
+                    <i class="client-edit icon-pencil" (click)="toggleRename()"></i>
+                </ng-container>
             </div>
                 
             <div class="client-expires">Access tokens expire after 30 days</div>
@@ -32,7 +32,7 @@
         </div>
         <div class="col col-auto cell-actions">
             <button type="button" class="btn btn-link btn-danger"
-                (sqxConfirmClick)="revoking.emit()"
+                (sqxConfirmClick)="revoke()"
                 confirmTitle="Revoke client" 
                 confirmText="Do you really want to revoke the client?">
                 <i class="icon-bin2"></i>
@@ -44,7 +44,7 @@
             Client Id:
         </div>
         <div class="col">
-            <input readonly class="form-control" value="{{ctx.appName}}:{{client.id}}" #inputName />
+            <input readonly class="form-control" value="{{appsState.appName}}:{{client.id}}" #inputName />
         </div>
         <div class="col col-auto cell-actions">
             <button type="button" class="btn btn-primary btn-link" [sqxCopy]="inputName">
@@ -70,7 +70,7 @@
             Permission:
         </div>
         <div class="col">
-            <select class="form-control" [ngModel]="client.permission" (ngModelChange)="updating.emit($event)">
+            <select class="form-control" [ngModel]="client.permission" (ngModelChange)="update($event)">
                 <option *ngFor="let permission of clientPermissions" [ngValue]="permission">{{permission}}</option>
             </select>
         </div>
@@ -79,21 +79,12 @@
     </div>
 </div>
 
-<div class="modal" *sqxModalView="tokenDialog;onRoot:true" @fade>
-    <div class="modal-backdrop"></div>
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">Access Token</h4>
+<sqx-modal-dialog *sqxModalView="tokenDialog;onRoot:true" (closed)="tokenDialog.hide()">
+    <ng-container title>
+        Access token
+    </ng-container>
 
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="tokenDialog.hide()">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-
-            <div class="modal-body">
-                <textarea readonly class="form-control access-token">{{token.tokenType}} {{token.accessToken}}</textarea>
-            </div>
-        </div>
-    </div>
-</div>
+    <ng-container content>
+        <textarea readonly class="form-control access-token">{{token.tokenType}} {{token.accessToken}}</textarea>
+    </ng-container>
+</sqx-modal-dialog>

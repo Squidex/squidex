@@ -9,9 +9,9 @@
 import { Directive, EventEmitter, Output } from '@angular/core';
 
 import {
+    DragDropSortableService,
     SortableComponent,
-    SortableContainer,
-    DragDropSortableService
+    SortableContainer
 } from 'ng2-dnd';
 
 @Directive({

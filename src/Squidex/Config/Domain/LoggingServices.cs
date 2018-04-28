@@ -59,6 +59,10 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<SemanticLog>()
                 .As<ISemanticLog>();
+
+            services.AddSingletonAs<RequestLogProfilerSessionProvider>()
+                .As<ILogProfilerSessionProvider>()
+                .AsSelf();
         }
     }
 }

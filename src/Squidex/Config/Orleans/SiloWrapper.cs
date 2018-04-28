@@ -75,7 +75,7 @@ namespace Squidex.Config.Orleans
                     {
                         builder.AddConfiguration(hostingContext.Configuration.GetSection("logging"));
                         builder.AddSemanticLog();
-                        builder.AddFilter("Orleans.Runtime.SiloControl", LogLevel.Warning);
+                        builder.AddFilter();
                     })
                     .ConfigureApplicationParts(builder =>
                     {
@@ -104,7 +104,7 @@ namespace Squidex.Config.Orleans
                 {
                     ["MongoDB"] = () =>
                     {
-                        hostBuilder.ConfigureEndpoints(Dns.GetHostName(), 11111, 40000, listenOnAnyHostAddress: true);
+                        hostBuilder.ConfigureEndpoints(ConfigUtilities.SiloAddress, 11111, 40000, true);
 
                         var mongoConfiguration = config.GetRequiredValue("store:mongoDb:configuration");
                         var mongoDatabaseName = config.GetRequiredValue("store:mongoDb:database");

@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using Squidex.Infrastructure.UsageTracking;
 
 namespace Squidex.Areas.Api.Controllers.Statistics.Models
 {
@@ -25,5 +26,12 @@ namespace Squidex.Areas.Api.Controllers.Statistics.Models
         /// The average duration in milliseconds.
         /// </summary>
         public long AverageMs { get; set; }
+
+        public static CallsUsageDto FromUsage(StoredUsage usage)
+        {
+            var averageMs = usage.TotalCount == 0 ? 0 : usage.TotalElapsedMs / usage.TotalCount;
+
+            return new CallsUsageDto { Date = usage.Date, Count = usage.TotalCount, AverageMs = averageMs };
+        }
     }
 }

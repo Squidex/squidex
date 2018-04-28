@@ -1,39 +1,31 @@
 @import '_vars';
 @import '_mixins';
 
+:host /deep/ {
+    .user-ref {
+        color: $color-title;
+    }
+
+    .marker-ref {
+        color: $color-title;
+    }
+}
+
+.user-picture {
+    margin-top: .25rem;
+}
+
 .event {
     & {
-        @include flex-box;
-        margin-bottom: 1rem;
-    }
-
-    &-main {
-        @include flex-grow(1);
-    }
-
-    &-load {
-        & {
-            font-size: .9rem;
-            font-weight: normal;
-            cursor: pointer;
-            color: $color-theme-blue !important;
-        }
-
-        &:focus,
-        &:hover {
-            text-decoration: underline !important;
-        }
-    }
-
-    &-left {
-        min-width: 2.8rem;
-        max-width: 2.8rem;
-        margin-top: .25rem;
+        color: $color-history;
+        font-size: .9rem;
+        font-weight: normal;
+        margin-bottom: 1.5rem;
     }
 
     &-created {
-        font-size: .65rem;
         font-weight: normal;
-        color: $color-text-decent;
+        font-size: .75rem;
+        margin: .375rem 0;
     }
 }

@@ -1,0 +1,10 @@
+@import '_vars';
+@import '_mixins';
+
+:host /deep/ .modal-body {
+    background: $color-background;
+}
+
+:host /deep/ .modal-tabs {
+    background: $color-dark-foreground;
+}

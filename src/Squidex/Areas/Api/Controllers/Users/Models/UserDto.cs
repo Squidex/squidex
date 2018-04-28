@@ -6,6 +6,9 @@
 // ==========================================================================
 
 using System.ComponentModel.DataAnnotations;
+using Squidex.Domain.Users;
+using Squidex.Infrastructure.Reflection;
+using Squidex.Shared.Users;
 
 namespace Squidex.Areas.Api.Controllers.Users.Models
 {
@@ -24,12 +27,6 @@ namespace Squidex.Areas.Api.Controllers.Users.Models
         public string Email { get; set; }
 
         /// <summary>
-        /// The url to the profile picture of the user.
-        /// </summary>
-        [Required]
-        public string PictureUrl { get; set; }
-
-        /// <summary>
         /// The display name (usually first name and last name) of the user.
         /// </summary>
         [Required]
@@ -40,5 +37,10 @@ namespace Squidex.Areas.Api.Controllers.Users.Models
         /// </summary>
         [Required]
         public bool IsLocked { get; set; }
+
+        public static UserDto FromUser(IUser user)
+        {
+            return SimpleMapper.Map(user, new UserDto { DisplayName = user.DisplayName() });
+        }
     }
 }

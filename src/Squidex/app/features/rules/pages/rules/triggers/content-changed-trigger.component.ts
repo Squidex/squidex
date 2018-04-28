@@ -5,13 +5,14 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
+import { FormControl, FormGroup } from '@angular/forms';
 
 import {
     ImmutableArray,
     SchemaDto,
     Types
-} from 'shared';
+} from '@app/shared';
 
 export interface TriggerSchemaForm {
     schema: SchemaDto;
@@ -29,15 +30,16 @@ export interface TriggerSchemaForm {
 })
 export class ContentChangedTriggerComponent implements OnInit {
     @Input()
-    public schemas: SchemaDto[];
+    public schemas: ImmutableArray<SchemaDto>;
 
     @Input()
     public trigger: any;
 
-    @Output()
-    public triggerChanged = new EventEmitter<object>();
+    @Input()
+    public triggerForm: FormGroup;
 
-    public handleAll = false;
+    @Input()
+    public triggerFormSubmitted = false;
 
     public triggerSchemas: ImmutableArray<TriggerSchemaForm>;
 
@@ -49,9 +51,13 @@ export class ContentChangedTriggerComponent implements OnInit {
     }
 
     public ngOnInit() {
-        const triggerSchemas: any[] = (this.trigger.schemas = this.trigger.schemas || []);
+        this.triggerForm.setControl('schemas',
+            new FormControl(this.trigger.schemas || []));
 
-        this.handleAll = Types.isBoolean(this.trigger.handleAll) ? this.trigger.handleAll : false;
+        this.triggerForm.setControl('handleAll',
+            new FormControl(Types.isBoolean(this.trigger.handleAll) ? this.trigger.handleAll : false));
+
+        const triggerSchemas: any[] = (this.trigger.schemas = this.trigger.schemas || []);
 
         this.triggerSchemas =
             ImmutableArray.of(
@@ -73,34 +79,20 @@ export class ContentChangedTriggerComponent implements OnInit {
                 }).filter(s => s !== null).map(s => s!)).sortByStringAsc(s => s.schema.name);
 
         this.schemasToAdd =
-            ImmutableArray.of(
                 this.schemas.filter(schema =>
-                    !triggerSchemas.find(s => s.schemaId === schema.id)))
+                    !triggerSchemas.find(s => s.schemaId === schema.id))
                 .sortByStringAsc(x => x.name);
 
-        this.schemaToAdd = this.schemasToAdd.values[0];
-    }
-
-    public save() {
-        const schemas =
-            this.triggerSchemas.values.map(s => {
-                return {
-                    schemaId: s.schema.id,
-                    sendCreate: s.sendCreate,
-                    sendUpdate: s.sendUpdate,
-                    sendDelete: s.sendDelete,
-                    sendPublish: s.sendPublish
-                };
-            });
-
-        this.triggerChanged.emit({ schemas, handleAll: this.handleAll });
+        this.schemaToAdd = this.schemasToAdd.at(0);
     }
 
     public removeSchema(schemaForm: TriggerSchemaForm) {
         this.triggerSchemas = this.triggerSchemas.remove(schemaForm);
 
+        this.updateValue();
+
         this.schemasToAdd = this.schemasToAdd.push(schemaForm.schema).sortByStringAsc(x => x.name);
-        this.schemaToAdd = this.schemasToAdd.values[0];
+        this.schemaToAdd = this.schemasToAdd.at(0);
     }
 
     public addSchema() {
@@ -115,20 +107,41 @@ export class ContentChangedTriggerComponent implements OnInit {
                     sendPublish: false
                 })).sortByStringAsc(x => x.schema.name);
 
+        this.updateValue();
+
         this.schemasToAdd = this.schemasToAdd.remove(this.schemaToAdd).sortByStringAsc(x => x.name);
-        this.schemaToAdd = this.schemasToAdd.values[0];
+        this.schemaToAdd = this.schemasToAdd.at(0);
     }
 
     public toggle(schemaForm: TriggerSchemaForm, property: string) {
         const newSchema = this.updateSendAll(Object.assign({}, schemaForm, { [property]: !schemaForm[property] }));
 
         this.triggerSchemas = this.triggerSchemas.replace(schemaForm, newSchema);
+
+        this.updateValue();
     }
 
     public toggleAll(schemaForm: TriggerSchemaForm) {
         const newSchema = this.updateAll(<any>{ schema: schemaForm.schema }, !schemaForm.sendAll);
 
         this.triggerSchemas = this.triggerSchemas.replace(schemaForm, newSchema);
+
+        this.updateValue();
+    }
+
+    private updateValue() {
+        const schemas =
+            this.triggerSchemas.values.map(s => {
+                return {
+                    schemaId: s.schema.id,
+                    sendCreate: s.sendCreate,
+                    sendUpdate: s.sendUpdate,
+                    sendDelete: s.sendDelete,
+                    sendPublish: s.sendPublish
+                };
+            });
+
+        this.triggerForm.controls['schemas'].setValue(schemas);
     }
 
     private updateAll(schemaForm: TriggerSchemaForm, value: boolean): TriggerSchemaForm {
@@ -137,6 +150,7 @@ export class ContentChangedTriggerComponent implements OnInit {
         schemaForm.sendUpdate = value;
         schemaForm.sendDelete = value;
         schemaForm.sendPublish = value;
+
         return schemaForm;
     }
 

@@ -5,78 +5,55 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
 
 import {
-    ApiUrlConfig,
-    AppContext,
+    AppsState,
     BackupDto,
-    BackupsService,
-    Duration,
-    ImmutableArray
-} from 'shared';
+    BackupsState
+} from '@app/shared';
 
 @Component({
     selector: 'sqx-backups-page',
     styleUrls: ['./backups-page.component.scss'],
-    templateUrl: './backups-page.component.html',
-    providers: [
-        AppContext
-    ]
+    templateUrl: './backups-page.component.html'
 })
 export class BackupsPageComponent implements OnInit, OnDestroy {
-    private loadSubscription: Subscription;
-
-    public backups = ImmutableArray.empty<BackupDto>();
+    private timerSubscription: Subscription;
 
     constructor(
-        public readonly ctx: AppContext,
-        private readonly apiUrl: ApiUrlConfig,
-        private readonly backupsService: BackupsService
+        public readonly appsState: AppsState,
+        public readonly backupsState: BackupsState
     ) {
     }
 
     public ngOnDestroy() {
-        this.loadSubscription.unsubscribe();
+        this.timerSubscription.unsubscribe();
     }
 
     public ngOnInit() {
-        this.loadSubscription =
-            Observable.timer(0, 2000)
-                .switchMap(t => this.backupsService.getBackups(this.ctx.appName))
-                .subscribe(dtos => {
-                    this.backups = ImmutableArray.of(dtos);
-                });
+        this.backupsState.load(false, true).onErrorResumeNext().subscribe();
+
+        this.timerSubscription =
+            Observable.timer(3000, 3000)
+                .switchMap(t => this.backupsState.load().onErrorResumeNext())
+                .subscribe();
     }
 
-    public startBackup() {
-        this.backupsService.postBackup(this.ctx.appName)
-            .subscribe(() => {
-                this.ctx.notifyInfo('Backup started, it can take several minutes to complete.');
-            }, error => {
-                this.ctx.notifyError(error);
-            });
+    public reload() {
+        this.backupsState.load(true, true).onErrorResumeNext().subscribe();
     }
 
-    public deleteBackup(backup: BackupDto) {
-        this.backupsService.deleteBackup(this.ctx.appName, backup.id)
-            .subscribe(() => {
-                this.ctx.notifyInfo('Backup is about to be deleted.');
-            }, error => {
-                this.ctx.notifyError(error);
-            });
+    public start() {
+        this.backupsState.start().onErrorResumeNext().subscribe();
     }
 
-    public getDownloadUrl(backup: BackupDto) {
-        return this.apiUrl.buildUrl(`api/apps/${this.ctx.appName}/backups/${backup.id}`);
+    public delete(backup: BackupDto) {
+        this.backupsState.delete(backup).onErrorResumeNext().subscribe();
     }
 
-    public getDuration(backup: BackupDto) {
-        return Duration.create(backup.started, backup.stopped!);
-    }
-
-    public trackBy(index: number, item: BackupDto) {
+    public trackByBackup(index: number, item: BackupDto) {
         return item.id;
     }
 }

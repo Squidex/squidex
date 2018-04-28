@@ -16,7 +16,7 @@ import {
     HTTP,
     Version,
     Versioned
-} from 'framework';
+} from '@app/framework';
 
 export class AssetsDto {
     constructor(

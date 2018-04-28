@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.ComponentModel.DataAnnotations;
+using Squidex.Domain.Apps.Entities.Rules.Commands;
 
 namespace Squidex.Areas.Api.Controllers.Rules.Models
 {
@@ -22,5 +23,22 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
         /// </summary>
         [Required]
         public RuleActionDto Action { get; set; }
+
+        public CreateRule ToCommand()
+        {
+            var command = new CreateRule();
+
+            if (Action != null)
+            {
+                command.Action = Action.ToAction();
+            }
+
+            if (Trigger != null)
+            {
+                command.Trigger = Trigger.ToTrigger();
+            }
+
+            return command;
+        }
     }
 }

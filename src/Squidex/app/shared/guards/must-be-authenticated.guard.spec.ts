@@ -5,50 +5,52 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { IMock, Mock } from 'typemoq';
+import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
+import { IMock, Mock, Times } from 'typemoq';
 
-import { AuthService } from 'shared';
+import { AuthService } from '@app/shared';
 
 import { MustBeAuthenticatedGuard } from './must-be-authenticated.guard';
-import { RouterMockup } from './router-mockup';
 
 describe('MustBeAuthenticatedGuard', () => {
+    let router: IMock<Router>;
+
     let authService: IMock<AuthService>;
+    let authGuard: MustBeAuthenticatedGuard;
 
     beforeEach(() => {
-        authService = Mock.ofType(AuthService);
+        router = Mock.ofType<Router>();
+
+        authService = Mock.ofType<AuthService>();
+        authGuard = new MustBeAuthenticatedGuard(authService.object, router.object);
     });
 
-    it('should navigate to default page if not authenticated', (done) => {
+    it('should navigate to default page if not authenticated', () => {
         authService.setup(x => x.userChanges)
             .returns(() => Observable.of(null));
-        const router = new RouterMockup();
 
-        const guard = new MustBeAuthenticatedGuard(authService.object, <any>router);
+        let result: boolean;
 
-        guard.canActivate(<any>{}, <any>{})
-            .subscribe(result => {
-                expect(result).toBeFalsy();
-                expect(router.lastNavigation).toEqual(['']);
+        authGuard.canActivate().subscribe(x => {
+            result = x;
+        });
 
-                done();
-            });
+        expect(result!).toBeFalsy();
+
+        router.verify(x => x.navigate(['']), Times.once());
     });
 
-    it('should return true if authenticated', (done) => {
+    it('should return true if authenticated', () => {
         authService.setup(x => x.userChanges)
             .returns(() => Observable.of(<any>{}));
-        const router = new RouterMockup();
 
-        const guard = new MustBeAuthenticatedGuard(authService.object, <any>router);
+        let result: boolean;
 
-        guard.canActivate(<any>{}, <any>{})
-            .subscribe(result => {
-                expect(result).toBeTruthy();
-                expect(router.lastNavigation).toBeUndefined();
+        authGuard.canActivate().subscribe(x => {
+            result = x;
+        });
 
-                done();
-            });
+        expect(result!).toBeTruthy();
     });
 });

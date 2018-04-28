@@ -1,38 +1,36 @@
-<sqx-title message="{app} | Rules" parameter1="app" [value1]="ctx.appName"></sqx-title>
+<sqx-title message="{app} | Rules" parameter1="app" [value1]="appsState.appName"></sqx-title>
 
-<sqx-panel desiredWidth="54rem">
-    <div class="panel-header">
-        <div class="panel-title-row">
-            <div class="float-right">
-                <button class="btn btn-link btn-secondary" (click)="load(true)" title="Refresh Assets (CTRL + SHIFT + R)">
-                    <i class="icon-reset"></i> Refresh
-                </button>
+<sqx-panel desiredWidth="54rem" showSidebar="true">
+    <ng-container title>
+        Rules
+    </ng-container>
 
-                <sqx-shortcut keys="ctrl+shift+r" (trigger)="load(true)"></sqx-shortcut>
-                <sqx-shortcut keys="ctrl+shift+g" (trigger)="buttonNew.click()"></sqx-shortcut>
-                
-                <button class="btn btn-success" #buttonNew (click)="createNew()" title="New Rule (CTRL + M)">
-                    <i class="icon-plus"></i> New
-                </button>
-            </div>
+    <ng-container menu>
+        <button class="btn btn-link btn-secondary" (click)="reload()" title="Refresh Assets (CTRL + SHIFT + R)">
+            <i class="icon-reset"></i> Refresh
+        </button>
 
-            <h3 class="panel-title">Rules</h3>
-        </div>
+        <sqx-shortcut keys="ctrl+shift+r" (trigger)="reload()"></sqx-shortcut>
+        <sqx-shortcut keys="ctrl+shift+g" (trigger)="buttonNew.click()"></sqx-shortcut>
 
-        <a class="panel-close" sqxParentLink isLazyLoaded="true">
-            <i class="icon-close"></i>
-        </a>
-    </div>
+        <button class="btn btn-success" #buttonNew (click)="createNew()" title="New Rule (CTRL + M)">
+            <i class="icon-plus"></i> New
+        </button>
+    </ng-container>
 
-    <div class="panel-main">
-        <div class="panel-content panel-content-scroll">
-            <div class="table-items-row table-items-row-empty" *ngIf="rules && rules.length === 0">
+    <ng-container content>
+        <ng-container *ngIf="rulesState.rules | async; let rules">
+            <div class="table-items-row table-items-row-empty" *ngIf="rules.length === 0">
                 No Rule created yet.
+
+                <button class="btn btn-success btn-sm ml-2" (click)="createNew()">
+                    <i class="icon icon-plus"></i> Add Rule
+                </button>
             </div>
 
-            <table class="table table-items table-fixed" *ngIf="rules && rules.length > 0">
+            <table class="table table-items table-fixed" *ngIf="rules.length > 0">
                 <tbody>
-                    <ng-template ngFor let-rule [ngForOf]="rules">
+                    <ng-template ngFor let-rule [ngForOf]="rules" [ngForTrackBy]="trackByRule">
                         <tr>
                             <td class="cell-separator">
                                 <h3>If</h3>
@@ -61,11 +59,11 @@
                                 </span>
                             </td>
                             <td class="cell-actions">
-                                <sqx-toggle [ngModel]="rule.isEnabled" (ngModelChange)="toggleRule(rule)"></sqx-toggle>
+                                <sqx-toggle [ngModel]="rule.isEnabled" (ngModelChange)="toggle(rule)"></sqx-toggle>
                             </td>
                             <td class="cell-actions">
                                 <button type="button" class="btn btn-link btn-danger"
-                                    (sqxConfirmClick)="deleteRule(rule)"
+                                    (sqxConfirmClick)="delete(rule)"
                                     confirmTitle="Delete rule" 
                                     confirmText="Do you really want to delete the rule?">
                                     <i class="icon-bin2"></i>
@@ -76,32 +74,28 @@
                     </ng-template>
                 </tbody>
             </table>
-        </div>
+        </ng-container>
+    </ng-container>
 
-        <div class="panel-sidebar">
-            <a class="panel-link" routerLink="events" routerLinkActive="active" #linkHistory>
-                <i class="icon-time"></i>
-            </a>
-            
-            <a class="panel-link" routerLink="help" routerLinkActive="active" #linkHelp>
-                <i class="icon-help"></i>
-            </a>
-            
-            <sqx-onboarding-tooltip id="help" [for]="linkHelp" position="leftTop" after="180000">
-                Click the help icon to show a context specific help page. Go to <a href="https://docs.squidex.io" target="_blank">https://docs.squidex.io</a> for the full documentation.
-            </sqx-onboarding-tooltip>
-        </div>
-    </div>
+    <ng-container sidebar>
+        <a class="panel-link" routerLink="events" routerLinkActive="active" #linkHistory>
+            <i class="icon-time"></i>
+        </a>
+
+        <a class="panel-link" routerLink="help" routerLinkActive="active" #linkHelp>
+            <i class="icon-help"></i>
+        </a>
+
+        <sqx-onboarding-tooltip id="help" [for]="linkHelp" position="leftTop" after="180000">
+            Click the help icon to show a context specific help page. Go to <a href="https://docs.squidex.io" target="_blank">https://docs.squidex.io</a> for the full documentation.
+        </sqx-onboarding-tooltip>
+    </ng-container>
 </sqx-panel>
 
-<div class="modal" *sqxModalView="addRuleDialog;onRoot:true;closeAuto:false" @fade>
-    <div class="modal-backdrop"></div>
-    
-    <sqx-rule-wizard [schemas]="schemas" [rule]="wizardRule" [mode]="wizardMode"
-        (updated)="onRuleUpdated($event)"
-        (cancelled)="addRuleDialog.hide()"
-        (created)="onRuleCreated($event)">
+<ng-container *sqxModalView="addRuleDialog;onRoot:true;closeAuto:false">
+    <sqx-rule-wizard [schemas]="schemasState.schemas | async" [rule]="wizardRule" [mode]="wizardMode"
+        (completed)="addRuleDialog.hide()">
     </sqx-rule-wizard>
-</div>
+</ng-container>
 
 <router-outlet></router-outlet>

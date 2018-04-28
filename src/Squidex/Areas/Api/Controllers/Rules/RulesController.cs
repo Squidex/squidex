@@ -12,12 +12,10 @@ using Microsoft.AspNetCore.Mvc;
 using NodaTime;
 using NSwag.Annotations;
 using Squidex.Areas.Api.Controllers.Rules.Models;
-using Squidex.Areas.Api.Controllers.Rules.Models.Converters;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.Rules.Repositories;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
 
 namespace Squidex.Areas.Api.Controllers.Rules
@@ -58,9 +56,9 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [ApiCosts(1)]
         public async Task<IActionResult> GetRules(string app)
         {
-            var rules = await appProvider.GetRulesAsync(AppId);
+            var entities = await appProvider.GetRulesAsync(AppId);
 
-            var response = rules.Select(r => r.ToModel());
+            var response = entities.Select(RuleDto.FromRule);
 
             return Ok(response);
         }
@@ -82,12 +80,10 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [ApiCosts(1)]
         public async Task<IActionResult> PostRule(string app, [FromBody] CreateRuleDto request)
         {
-            var command = request.ToCommand();
-
-            var context = await CommandBus.PublishAsync(command);
+            var context = await CommandBus.PublishAsync(request.ToCommand());
 
             var result = context.Result<EntityCreatedResult<Guid>>();
-            var response = new EntityCreatedDto { Id = result.IdOrValue.ToString(), Version = result.Version };
+            var response = EntityCreatedDto.FromResult(result);
 
             return CreatedAtAction(nameof(GetRules), new { app }, response);
         }
@@ -112,9 +108,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [ApiCosts(1)]
         public async Task<IActionResult> PutRule(string app, Guid id, [FromBody] UpdateRuleDto request)
         {
-            var command = request.ToCommand(id);
-
-            await CommandBus.PublishAsync(command);
+            await CommandBus.PublishAsync(request.ToCommand(id));
 
             return NoContent();
         }
@@ -199,19 +193,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
 
             await Task.WhenAll(taskForItems, taskForCount);
 
-            var response = new RuleEventsDto
-            {
-                Total = taskForCount.Result,
-                Items = taskForItems.Result.Select(x =>
-                {
-                    var itemModel = new RuleEventDto();
-
-                    SimpleMapper.Map(x, itemModel);
-                    SimpleMapper.Map(x.Job, itemModel);
-
-                    return itemModel;
-                }).ToArray()
-            };
+            var response = RuleEventsDto.FromRuleEvents(taskForItems.Result, taskForCount.Result);
 
             return Ok(response);
         }

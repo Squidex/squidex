@@ -11,20 +11,23 @@ import { DndModule } from 'ng2-dnd';
 
 import {
     HelpComponent,
-    HistoryComponent,
-    ResolveSchemaGuard,
+    SchemaMustExistGuard,
     SqxFrameworkModule,
     SqxSharedModule
-} from 'shared';
+} from '@app/shared';
 
 import {
-    FieldComponent,
     AssetsUIComponent,
     AssetsValidationComponent,
     BooleanUIComponent,
     BooleanValidationComponent,
     DateTimeUIComponent,
     DateTimeValidationComponent,
+    FieldComponent,
+    FieldFormCommonComponent,
+    FieldFormUIComponent,
+    FieldFormValidationComponent,
+    FieldWizardComponent,
     GeolocationUIComponent,
     GeolocationValidationComponent,
     JsonUIComponent,
@@ -36,8 +39,8 @@ import {
     SchemaEditFormComponent,
     SchemaFormComponent,
     SchemaPageComponent,
-    SchemasPageComponent,
     SchemaScriptsFormComponent,
+    SchemasPageComponent,
     StringUIComponent,
     StringValidationComponent,
     TagsUIComponent,
@@ -50,22 +53,10 @@ const routes: Routes = [
         component: SchemasPageComponent,
         children: [
             {
-                path: ''
-            },
-            {
                 path: ':schemaName',
                 component: SchemaPageComponent,
-                resolve: {
-                    schema: ResolveSchemaGuard
-                },
+                canActivate: [SchemaMustExistGuard],
                 children: [
-                    {
-                        path: 'history',
-                        component: HistoryComponent,
-                        data: {
-                            channel: 'schemas.{schemaName}'
-                        }
-                    },
                     {
                         path: 'help',
                         component: HelpComponent,
@@ -85,6 +76,9 @@ const routes: Routes = [
         DndModule,
         RouterModule.forChild(routes)
     ],
+    providers: [
+        SchemaMustExistGuard
+    ],
     declarations: [
         FieldComponent,
         AssetsUIComponent,
@@ -93,6 +87,10 @@ const routes: Routes = [
         BooleanValidationComponent,
         DateTimeUIComponent,
         DateTimeValidationComponent,
+        FieldFormCommonComponent,
+        FieldFormUIComponent,
+        FieldFormValidationComponent,
+        FieldWizardComponent,
         GeolocationUIComponent,
         GeolocationValidationComponent,
         JsonUIComponent,

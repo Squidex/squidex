@@ -5,65 +5,45 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { Observable } from 'rxjs';
 
 import {
-    AppContext,
+    AppsState,
     SchemaDto,
-    SchemasService
-} from 'shared';
+    SchemasState
+} from '@app/shared';
 
 @Component({
     selector: 'sqx-schemas-page',
     styleUrls: ['./schemas-page.component.scss'],
-    templateUrl: './schemas-page.component.html',
-    providers: [
-        AppContext
-    ]
+    templateUrl: './schemas-page.component.html'
 })
-export class SchemasPageComponent {
+export class SchemasPageComponent implements OnInit {
     public schemasFilter = new FormControl();
     public schemasFiltered =
-        this.schemasFilter.valueChanges
-            .startWith(null)
-            .distinctUntilChanged()
-            .debounceTime(300)
-            .combineLatest(this.loadSchemas(),
-                (query, schemas) => {
-                    this.schemasFilter.setValue(query);
-
-                    schemas = schemas.filter(t => t.isPublished);
-
+        this.schemasState.publishedSchemas
+            .combineLatest(this.schemasFilter.valueChanges.startWith(''),
+                (schemas, query) => {
                     if (query && query.length > 0) {
-                        schemas = schemas.filter(t => t.name.indexOf(query) >= 0);
+                        return schemas.filter(t => t.name.indexOf(query) >= 0);
+                    } else {
+                        return schemas;
                     }
-
-                    return schemas;
-            }).map(schemas => {
-                return schemas.sort((a, b) => {
-                    if (a.name < b.name) {
-                        return -1;
-                    }
-                    if (a.name > b.name) {
-                        return 1;
-                    }
-                    return 0;
                 });
-            });
 
-    constructor(public readonly ctx: AppContext,
-        private readonly schemasService: SchemasService
+    constructor(
+        public readonly appsState: AppsState,
+        private readonly schemasState: SchemasState
     ) {
     }
 
-    private loadSchemas(): Observable<SchemaDto[]> {
-        return this.schemasService.getSchemas(this.ctx.appName)
-            .catch(error => {
-                this.ctx.notifyError(error);
-                return [];
-            });
+    public ngOnInit() {
+        this.schemasState.load().onErrorResumeNext().subscribe();
+    }
+
+    public trackBySchema(index: number, schema: SchemaDto) {
+        return schema.id;
     }
 }
 

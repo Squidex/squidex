@@ -1,9 +1,13 @@
 ﻿<main>
-    <router-outlet (activate)="isLoaded = true">
-        <div class="loading" *ngIf="!isLoaded">
-            <img src="/images/loader.gif" />
+    <sqx-root-view>
+        <sqx-dialog-renderer>
+            <router-outlet (activate)="isLoaded = true">
+                <div class="loading" *ngIf="!isLoaded">
+                    <img src="/images/loader.gif" />
 
-            <div>Loading Squidex</div>
-        </div>
-    </router-outlet>
+                    <div>Loading Squidex</div>
+                </div>
+            </router-outlet>
+        </sqx-dialog-renderer>
+    </sqx-root-view>
 </main>

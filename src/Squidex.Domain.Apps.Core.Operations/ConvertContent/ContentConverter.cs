@@ -13,6 +13,7 @@ using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Core.ValidateContent;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
 
@@ -106,7 +107,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
             return result;
         }
 
-        public static NamedContentData ToApiModel(this NamedContentData content, Schema schema, LanguagesConfig languagesConfig, bool excludeHidden = true)
+        public static NamedContentData ToApiModel(this NamedContentData content, Schema schema, LanguagesConfig languagesConfig, bool excludeHidden = true, bool checkTypeCompatibility = false)
         {
             Guard.NotNull(schema, nameof(schema));
             Guard.NotNull(languagesConfig, nameof(languagesConfig));
@@ -121,6 +122,32 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
                 if (!schema.FieldsByName.TryGetValue(fieldValue.Key, out var field) || (excludeHidden && field.IsHidden))
                 {
                     continue;
+                }
+
+                if (checkTypeCompatibility)
+                {
+                    var isValid = true;
+
+                    foreach (var value in fieldValue.Value.Values)
+                    {
+                        try
+                        {
+                            if (!value.IsNull())
+                            {
+                                JsonValueConverter.ConvertValue(field, value);
+                            }
+                        }
+                        catch
+                        {
+                            isValid = false;
+                            break;
+                        }
+                    }
+
+                    if (!isValid)
+                    {
+                        continue;
+                    }
                 }
 
                 var fieldResult = new ContentFieldData();

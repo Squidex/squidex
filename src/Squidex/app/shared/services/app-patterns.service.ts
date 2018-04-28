@@ -9,14 +9,14 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import 'framework/angular/http-extensions';
+import '@app/framework/angular/http/http-extensions';
 
 import {
     ApiUrlConfig,
     HTTP,
     Version,
     Versioned
-} from 'framework';
+} from '@app/framework';
 
 export class AppPatternsDto {
     constructor(
@@ -24,39 +24,19 @@ export class AppPatternsDto {
         public readonly version: Version
     ) {
     }
-
-    public addPattern(pattern: AppPatternDto, version: Version) {
-        return new AppPatternsDto([...this.patterns, pattern],  version);
-    }
-
-    public updatePattern(pattern: AppPatternDto, version: Version) {
-        return new AppPatternsDto(this.patterns.map(p => p.patternId === pattern.patternId ? pattern : p), version);
-    }
-
-    public deletePattern(pattern: AppPatternDto, version: Version) {
-        return new AppPatternsDto(this.patterns.filter(c => c.patternId !== pattern.patternId), version);
-    }
 }
 
 export class AppPatternDto {
     constructor(
-        public readonly patternId: string,
+        public readonly id: string,
         public readonly name: string,
         public readonly pattern: string,
         public readonly message: string
     ) {
     }
-
-    public update(update: UpdatePatternDto) {
-        return new AppPatternDto(
-            this.patternId,
-            update.name,
-            update.pattern,
-            update.message);
-    }
 }
 
-export class UpdatePatternDto {
+export class EditAppPatternDto {
     constructor(
         public readonly name: string,
         public readonly pattern: string,
@@ -96,7 +76,7 @@ export class AppPatternsService {
             .pretifyError('Failed to add pattern. Please reload.');
     }
 
-    public postPattern(appName: string, dto: UpdatePatternDto, version: Version): Observable<Versioned<AppPatternDto>> {
+    public postPattern(appName: string, dto: EditAppPatternDto, version: Version): Observable<Versioned<AppPatternDto>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/patterns`);
 
         return HTTP.postVersioned<any>(this.http, url, dto, version)
@@ -114,7 +94,7 @@ export class AppPatternsService {
             .pretifyError('Failed to add pattern. Please reload.');
     }
 
-    public putPattern(appName: string, id: string, dto: UpdatePatternDto, version: Version): Observable<Versioned<any>> {
+    public putPattern(appName: string, id: string, dto: EditAppPatternDto, version: Version): Observable<Versioned<any>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/patterns/${id}`);
 
         return HTTP.putVersioned(this.http, url, dto, version)

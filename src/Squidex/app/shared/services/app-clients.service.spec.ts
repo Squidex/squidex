@@ -20,54 +20,6 @@ import {
     Version
 } from './../';
 
-describe('AppClientsDto', () => {
-    const client1 = new AppClientDto('1', '1', '1', 'Editor');
-    const client2 = new AppClientDto('2', '2', '1', 'Editor');
-    const client2_new = new AppClientDto('2', '2 New', '1 New', 'Editor');
-    const version = new Version('1');
-    const newVersion = new Version('2');
-
-    it('should update clients when adding client', () => {
-        const clients_1 = new AppClientsDto([client1], version);
-        const clients_2 = clients_1.addClient(client2, newVersion);
-
-        expect(clients_2.clients).toEqual([client1, client2]);
-        expect(clients_2.version).toEqual(newVersion);
-    });
-
-    it('should update clients when removing client', () => {
-        const clients_1 = new AppClientsDto([client1, client2], version);
-        const clients_2 = clients_1.removeClient(client1, newVersion);
-
-        expect(clients_2.clients).toEqual([client2]);
-        expect(clients_2.version).toEqual(newVersion);
-    });
-
-    it('should update clients when updating client', () => {
-        const clients_1 = new AppClientsDto([client1, client2], version);
-        const clients_2 = clients_1.updateClient(client2_new, newVersion);
-
-        expect(clients_2.clients).toEqual([client1, client2_new]);
-        expect(clients_2.version).toEqual(newVersion);
-    });
-});
-
-describe('AppClientDto', () => {
-    it('should update name property when renaming', () => {
-        const client_1 = new AppClientDto('1', 'old-name', 'secret', 'Editor');
-        const client_2 = client_1.rename('new-name');
-
-        expect(client_2.name).toBe('new-name');
-    });
-
-    it('should update isReader property when changing', () => {
-        const client_1 = new AppClientDto('1', 'old-name', 'secret', 'Editor');
-        const client_2 = client_1.update('Developer');
-
-        expect(client_2.permission).toEqual('Developer');
-    });
-});
-
 describe('AppClientsService', () => {
     const version = new Version('1');
 
@@ -155,7 +107,7 @@ describe('AppClientsService', () => {
 
         const dto = new UpdateAppClientDto('Client 1 New');
 
-        appClientsService.updateClient('my-app', 'client1', dto, version).subscribe();
+        appClientsService.putClient('my-app', 'client1', dto, version).subscribe();
 
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/clients/client1');
 

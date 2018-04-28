@@ -1,36 +1,47 @@
-<form [formGroup]="createForm" (ngSubmit)="createSchema()">
-    <div *ngIf="createFormError">
-        <div class="form-alert form-alert-error" [innerHTML]="createFormError"></div>
-    </div>
+<form [formGroup]="createForm.form" (ngSubmit)="createSchema()">     
+    <sqx-modal-dialog (closed)="cancel()" [large]="false">
+        <ng-container title>
+            <ng-container *ngIf="import; else noImport">
+                Clone Schema
+            </ng-container>
+            <ng-template #noImport>
+                Create Schema
+            </ng-template>
+        </ng-container>
 
-	<div class="form-group">
-		<label for="schemaName">Name</label>
+        <ng-container content>
+            <sqx-form-error [error]="createForm.error | async"></sqx-form-error>
         
-        <sqx-control-errors for="name" submitOnly="true" [submitted]="createFormSubmitted"></sqx-control-errors>
-
-		<input type="text" class="form-control" id="schemaName" formControlName="name" autocomplete="off" sqxLowerCaseInput sqxFocusOnInit />
+            <div class="form-group">
+                <label for="schemaName">Name</label>
+                
+                <sqx-control-errors for="name" submitOnly="true" [submitted]="createForm.submitted | async"></sqx-control-errors>
         
-        <small class="form-text text-muted">
-            The schema name becomes part of the api url,<br /> e.g {{apiUrl.buildUrl("api/content/")}}{{ctx.appName}}/<b>{{schemaName | async}}</b>/.
-        </small>
-        <small class="form-text text-muted">
-            It must contain lower case letters (a-z), numbers and dashes only, and cannot be longer than 40 characters. The name cannot be changed later.
-        </small>
-	</div>
+                <input type="text" class="form-control" id="schemaName" formControlName="name" autocomplete="off" sqxLowerCaseInput sqxFocusOnInit />
+                
+                <small class="form-text text-muted">
+                    The schema name becomes part of the api url,<br /> e.g {{apiUrl.buildUrl("api/content/")}}{{appsState.appName}}/<b>{{createForm.schemaName | async}}</b>/.
+                </small>
+                <small class="form-text text-muted">
+                    It must contain lower case letters (a-z), numbers and dashes only, and cannot be longer than 40 characters. The name cannot be changed later.
+                </small>
+            </div>
 
-    <div class="form-group clearfix">
-        <button type="reset" class="float-left btn btn-secondary" (click)="cancel()">Cancel</button>
-        <button type="submit" class="float-right btn btn-success">Create</button>
-    </div>
+            <div class="form-group">
+                <a class="btn btn-sm btn-link" (click)="toggleImport()" [class.hidden]="showImport">
+                    Import schema
+                </a>
+                <a class="btn btn-sm btn-link" (click)="toggleImport()" [class.hidden]="!showImport">
+                    Hide
+                </a>
+        
+                <sqx-json-editor *ngIf="showImport" formControlName="import"></sqx-json-editor>
+            </div>
+        </ng-container>
 
-    <div>
-        <button class="btn btn-sm btn-link" (click)="toggleImport()" [class.hidden]="showImport">
-            Import schema
-        </button>
-        <button class="btn btn-sm btn-link" (click)="toggleImport()" [class.hidden]="!showImport">
-            Hide
-        </button>
-
-        <sqx-json-editor *ngIf="showImport" formControlName="import"></sqx-json-editor>
-    </div>
+        <ng-container footer>
+            <button type="reset" class="float-left btn btn-secondary" (click)="cancel()">Cancel</button>
+            <button type="submit" class="float-right btn btn-success">Create</button>
+        </ng-container>
+    </sqx-modal-dialog>
 </form>

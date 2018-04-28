@@ -21,7 +21,6 @@ using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
 
 namespace Squidex.Areas.Api.Controllers.Assets
@@ -93,11 +92,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
                     await assetRepository.QueryAsync(App.Id, idsList) :
                     await assetRepository.QueryAsync(App.Id, Request.QueryString.ToString());
 
-            var response = new AssetsDto
-            {
-                Total = assets.Total,
-                Items = assets.Select(x => SimpleMapper.Map(x, new AssetDto { FileType = x.FileName.FileType() })).ToArray()
-            };
+            var response = AssetsDto.FromAssets(assets);
 
             Response.Headers["Surrogate-Key"] = string.Join(" ", response.Items.Select(x => x.Id));
 
@@ -127,7 +122,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
                 return NotFound();
             }
 
-            var response = SimpleMapper.Map(entity, new AssetDto { FileType = entity.FileName.FileType() });
+            var response = AssetDto.FromAsset(entity);
 
             Response.Headers["ETag"] = entity.Version.ToString();
             Response.Headers["Surrogate-Key"] = entity.Id.ToString();
@@ -161,7 +156,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
             var context = await CommandBus.PublishAsync(command);
 
             var result = context.Result<EntityCreatedResult<Guid>>();
-            var response = AssetCreatedDto.Create(command, result);
+            var response = AssetCreatedDto.FromCommand(command, result);
 
             return StatusCode(201, response);
         }
@@ -217,9 +212,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [ApiCosts(1)]
         public async Task<IActionResult> PutAsset(string app, Guid id, [FromBody] AssetUpdateDto request)
         {
-            var command = SimpleMapper.Map(request, new RenameAsset { AssetId = id });
-
-            await CommandBus.PublishAsync(command);
+            await CommandBus.PublishAsync(request.ToCommand(id));
 
             return NoContent();
         }

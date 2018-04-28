@@ -1,39 +1,43 @@
 <div class="table-items-row" [class.invalid]="fieldForm.invalid">
     <label>
-        {{field.displayName}} <span class="fieldRequired" [class.hidden]="!field.properties.isRequired">*</span>
+        {{field.displayName}} <span class="field-required" [class.hidden]="!field.properties.isRequired">*</span>
     </label> 
     
     <span class="field-disabled" *ngIf="field.isDisabled">Disabled</span>
 
-    <div *ngIf="field.isLocalizable && languages.length > 1">
+    <ng-container *ngIf="field.isLocalizable && languages.length > 1">
         <div class="languages-buttons" #buttonLanguages>
-            <sqx-language-selector size="sm" (selectedLanguageChanged)="selectLanguage($event)" [languages]="languages"></sqx-language-selector>
+            <sqx-language-selector size="sm"
+                [selectedLanguage]="language"
+                (selectedLanguageChange)="languageChange.emit($event)"
+                [languages]="languages.values">
+            </sqx-language-selector>
         </div>
 
         <sqx-onboarding-tooltip id="languages" [for]="buttonLanguages" position="topRight" after="120000">
             Please remember to check all languages when you see validation errors.
         </sqx-onboarding-tooltip>
-    </div>
+    </ng-container>
 
     <sqx-control-errors [for]="selectedFormControl" [fieldName]="field.displayName" [submitted]="contentFormSubmitted"></sqx-control-errors>
 
     <div [ngSwitch]="field.properties.fieldType">
         <div *ngSwitchCase="'Number'">
-            <div [ngSwitch]="field.properties.editor">
+            <div [ngSwitch]="field.properties['editor']">
                 <div *ngSwitchCase="'Input'">
                     <input class="form-control" type="number" [formControl]="selectedFormControl" [placeholder]="field.displayPlaceholder" />
                 </div>
                 <div *ngSwitchCase="'Stars'">
-                    <sqx-stars [formControl]="selectedFormControl" [maximumStars]="field.properties.maxValue"></sqx-stars>
+                    <sqx-stars [formControl]="selectedFormControl" [maximumStars]="field.properties['maxValue']"></sqx-stars>
                 </div>
                 <div *ngSwitchCase="'Dropdown'">
                     <select class="form-control" [formControl]="selectedFormControl">
                         <option [ngValue]="null"></option>
-                        <option *ngFor="let value of field.properties.allowedValues" [ngValue]="value">{{value}}</option>
+                        <option *ngFor="let value of field.properties['allowedValues']" [ngValue]="value">{{value}}</option>
                     </select>
                 </div>
                 <div *ngSwitchCase="'Radio'">
-                    <div class="form-check form-check-inline" *ngFor="let value of field.properties.allowedValues">
+                    <div class="form-check form-check-inline" *ngFor="let value of field.properties['allowedValues']">
                         <input class="form-check-input" type="radio" [value]="value" [formControl]="selectedFormControl" />
                         <label class="form-check-label">
                             {{value}}
@@ -43,7 +47,7 @@
             </div>
         </div>
         <div *ngSwitchCase="'String'">
-            <div [ngSwitch]="field.properties.editor">
+            <div [ngSwitch]="field.properties['editor']">
                 <div *ngSwitchCase="'Input'">
                     <input class="form-control" type="text" [formControl]="selectedFormControl" [placeholder]="field.displayPlaceholder" />
                 </div>
@@ -51,22 +55,22 @@
                     <input class="form-control" type="text" [formControl]="selectedFormControl" [placeholder]="field.displayPlaceholder" sqxSlugifyInput />
                 </div>
                 <div *ngSwitchCase="'TextArea'">
-                    <textarea class="form-control"  [id]="selectedFormName"[formControl]="selectedFormControl" rows="5" [placeholder]="field.displayPlaceholder"></textarea>
+                    <textarea class="form-control" [formControl]="selectedFormControl" rows="5" [placeholder]="field.displayPlaceholder"></textarea>
                 </div>
                 <div *ngSwitchCase="'RichText'">
-                    <sqx-rich-editor [formControl]="selectedFormControl" (assetPluginClicked)="assetPluginClicked()"></sqx-rich-editor>
+                    <sqx-rich-editor [formControl]="selectedFormControl"></sqx-rich-editor>
                 </div>
                 <div *ngSwitchCase="'Markdown'">
-                    <sqx-markdown-editor [formControl]="selectedFormControl" (assetPluginClicked)="assetPluginClicked()"></sqx-markdown-editor>
+                    <sqx-markdown-editor [formControl]="selectedFormControl"></sqx-markdown-editor>
                 </div>
                 <div *ngSwitchCase="'Dropdown'">
                     <select class="form-control" [formControl]="selectedFormControl">
                         <option [ngValue]="null"></option>
-                        <option *ngFor="let value of field.properties.allowedValues" [ngValue]="value">{{value}}</option>
+                        <option *ngFor="let value of field.properties['allowedValues']" [ngValue]="value">{{value}}</option>
                     </select>
                 </div>
                 <div *ngSwitchCase="'Radio'">
-                    <div class="form-check form-check-inline" *ngFor="let value of field.properties.allowedValues">
+                    <div class="form-check form-check-inline" *ngFor="let value of field.properties['allowedValues']">
                         <input class="form-check-input" type="radio" value="{{value}}" [formControl]="selectedFormControl" />
                         <label class="form-check-label">
                                 {{value}}
@@ -76,7 +80,7 @@
             </div>
         </div>
         <div *ngSwitchCase="'Boolean'">
-            <div [ngSwitch]="field.properties.editor">
+            <div [ngSwitch]="field.properties['editor']">
                 <div *ngSwitchCase="'Toggle'">
                     <sqx-toggle [formControl]="selectedFormControl"></sqx-toggle>
                 </div>
@@ -88,7 +92,7 @@
             </div>
         </div>
         <div *ngSwitchCase="'DateTime'">
-            <sqx-date-time-editor enforceTime="true" [mode]="field.properties.editor" [formControl]="selectedFormControl"></sqx-date-time-editor>
+            <sqx-date-time-editor enforceTime="true" [mode]="field.properties['editor']" [formControl]="selectedFormControl"></sqx-date-time-editor>
         </div>
         <div *ngSwitchCase="'Geolocation'">
             <sqx-geolocation-editor [formControl]="selectedFormControl"></sqx-geolocation-editor>
@@ -103,11 +107,18 @@
             <sqx-tag-editor [formControl]="selectedFormControl"></sqx-tag-editor>
         </div>
         <div *ngSwitchCase="'References'">
-            <sqx-references-editor [formControl]="selectedFormControl" [language]="selectedLanguage" [schemaId]="field.properties.schemaId"></sqx-references-editor>
+            <sqx-references-editor
+                [formControl]="selectedFormControl" 
+                [language]="language"
+                [languages]="languages"
+                [schemaId]="field.properties['schemaId']">
+            </sqx-references-editor>
         </div>
     </div>
 
-    <small class="form-text text-muted" *ngIf="field.properties.hints && field.properties.hints.length > 0">
-        {{field.properties.hints}}
-    </small>
+    <ng-container *ngIf="field.properties['hints']; let hints">
+        <small class="form-text text-muted" *ngIf="hints.length > 0">
+            {{hints}}
+        </small>
+    </ng-container>
 </div>

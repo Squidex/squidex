@@ -5,12 +5,15 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Squidex.Shared.Users
 {
     public interface IUserResolver
     {
-        Task<IUser> FindByIdAsync(string id);
+        Task<IUser> FindByIdOrEmailAsync(string idOrEmail);
+
+        Task<List<IUser>> QueryByEmailAsync(string email);
     }
 }

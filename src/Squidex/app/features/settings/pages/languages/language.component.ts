@@ -5,11 +5,17 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, OnInit } from '@angular/core';
+import { Component, Input, OnChanges } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
-import { Subscription } from 'rxjs';
 
-import { AppLanguageDto, fadeAnimation } from 'shared';
+import {
+    AppLanguageDto,
+    EditLanguageForm,
+    fadeAnimation,
+    ImmutableArray,
+    LanguagesState,
+    UpdateAppLanguageDto
+} from '@app/shared';
 
 @Component({
     selector: 'sqx-language',
@@ -19,127 +25,79 @@ import { AppLanguageDto, fadeAnimation } from 'shared';
         fadeAnimation
     ]
 })
-export class LanguageComponent implements OnInit, OnChanges, OnDestroy {
-    private isMasterSubscription: Subscription;
-
+export class LanguageComponent implements OnChanges {
     @Input()
     public language: AppLanguageDto;
 
     @Input()
-    public allLanguages: AppLanguageDto[];
+    public fallbackLanguages: ImmutableArray<AppLanguageDto>;
 
-    @Output()
-    public removing = new EventEmitter<AppLanguageDto>();
+    @Input()
+    public fallbackLanguagesNew: ImmutableArray<AppLanguageDto>;
 
-    @Output()
-    public saving = new EventEmitter<AppLanguageDto>();
-
-    public otherLanguages: AppLanguageDto[];
     public otherLanguage: AppLanguageDto;
 
-    public fallbackLanguages: AppLanguageDto[] = [];
-
     public isEditing = false;
-    public isMaster = false;
 
-    public editFormSubmitted = false;
-    public editForm =
-        this.formBuilder.group({
-            isMaster: [false, []],
-            isOptional: [false, []]
-        });
+    public editForm = new EditLanguageForm(this.formBuilder);
 
     constructor(
-        private readonly formBuilder: FormBuilder
+        private readonly formBuilder: FormBuilder,
+        private readonly languagesState: LanguagesState
     ) {
     }
 
-    public ngOnDestroy() {
-        this.isMasterSubscription.unsubscribe();
-    }
-
-    public ngOnInit() {
-        this.isMasterSubscription =
-            this.editForm.controls['isMaster'].valueChanges
-                .subscribe(v => {
-                    this.isMaster = v;
-                    this.editForm.controls['isOptional'].setValue(false);
-                });
-
-        this.resetEditForm();
-    }
-
     public ngOnChanges() {
-        this.resetEditForm();
-    }
-
-    public cancel() {
-        this.resetEditForm();
+        this.resetForm();
     }
 
     public toggleEditing() {
         this.isEditing = !this.isEditing;
     }
 
-    public addLanguage() {
-        this.addFallbackLanguage(this.otherLanguage);
-    }
-
-    public removeFallbackLanguage(language: AppLanguageDto) {
-        this.fallbackLanguages.splice(this.fallbackLanguages.indexOf(language), 1);
-
-        this.otherLanguages = [...this.otherLanguages, language];
-        this.otherLanguage = this.otherLanguages.values[0];
-    }
-
-    public addFallbackLanguage(language: AppLanguageDto) {
-        this.fallbackLanguages.push(language);
-
-        this.otherLanguages = this.otherLanguages.filter(l => l.iso2Code !== language.iso2Code);
-        this.otherLanguage = this.otherLanguages.values[0];
+    public remove() {
+        this.languagesState.remove(this.language).onErrorResumeNext().subscribe();
     }
 
     public save() {
-        this.editFormSubmitted = true;
+        const value = this.editForm.submit();
 
-        if (this.editForm.valid) {
-            const newLanguage =
-                new AppLanguageDto(
-                    this.language.iso2Code,
-                    this.language.englishName,
-                    this.editForm.controls['isMaster'].value,
-                    this.editForm.controls['isOptional'].value,
-                    this.fallbackLanguages.map(l => l.iso2Code));
+        if (value) {
+            const request = new UpdateAppLanguageDto(value.isMaster, value.isOptional, this.fallbackLanguages.map(x => x.iso2Code).values);
 
-            this.emitSaving(newLanguage);
+            this.languagesState.update(this.language, request)
+                .subscribe(() => {
+                    this.editForm.submitCompleted();
+
+                    this.toggleEditing();
+                }, error => {
+                    this.editForm.submitFailed(error);
+                });
         }
     }
 
-    private emitSaving(language: AppLanguageDto) {
-        this.saving.emit(language);
+    public removeFallbackLanguage(language: AppLanguageDto) {
+        this.fallbackLanguages = this.fallbackLanguages.remove(language);
+        this.fallbackLanguagesNew = this.fallbackLanguagesNew.push(language).sortByStringAsc(x => x.iso2Code);
+
+        this.otherLanguage = this.fallbackLanguagesNew.at(0);
     }
 
-    private resetEditForm() {
-        this.editFormSubmitted = false;
-        this.editForm.reset(this.language);
+    public addFallbackLanguage() {
+        this.fallbackLanguages = this.fallbackLanguages.push(this.otherLanguage);
+        this.fallbackLanguagesNew = this.fallbackLanguagesNew.remove(this.otherLanguage);
 
-        this.isEditing = false;
+        this.otherLanguage = this.fallbackLanguagesNew.at(0);
+    }
 
-        if (this.language && this.allLanguages) {
-            this.otherLanguages =
-                this.allLanguages.filter(l =>
-                    this.language.iso2Code !== l.iso2Code &&
-                    this.language.fallback.indexOf(l.iso2Code) < 0);
-            this.otherLanguage = this.otherLanguages[0];
-        }
+    private resetForm() {
+        this.otherLanguage = this.fallbackLanguagesNew.at(0);
 
-        if (this.language) {
-            this.isMaster = this.language.isMaster;
+        this.editForm.load(this.language);
+    }
 
-            this.fallbackLanguages =
-                this.allLanguages.filter(l =>
-                    this.language.fallback.indexOf(l.iso2Code) >= 0);
-        }
+    public trackByLanguage(index: number, language: AppLanguageDto) {
+        return language.iso2Code;
     }
 }
 

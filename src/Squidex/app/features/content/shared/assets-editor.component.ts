@@ -7,18 +7,17 @@
 
 // tslint:disable:prefer-for-of
 
-import { Component, forwardRef, OnDestroy, OnInit } from '@angular/core';
+import { Component, forwardRef } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { Subscription } from 'rxjs';
 
 import {
-    AppContext,
+    AppsState,
     AssetDto,
     AssetsService,
-    AssetUpdated,
     ImmutableArray,
+    ModalView,
     Types
-} from 'shared';
+} from '@app/shared';
 
 export const SQX_ASSETS_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => AssetsEditorComponent), multi: true
@@ -29,48 +28,39 @@ export const SQX_ASSETS_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     styleUrls: ['./assets-editor.component.scss'],
     templateUrl: './assets-editor.component.html',
     providers: [
-        AppContext,
         SQX_ASSETS_EDITOR_CONTROL_VALUE_ACCESSOR
     ]
 })
-export class AssetsEditorComponent implements ControlValueAccessor, OnDestroy, OnInit {
-    private assetUpdatedSubscription: Subscription;
+export class AssetsEditorComponent implements ControlValueAccessor {
     private callChange = (v: any) => { /* NOOP */ };
     private callTouched = () => { /* NOOP */ };
+
+    public selectorModal = new ModalView();
 
     public newAssets = ImmutableArray.empty<File>();
     public oldAssets = ImmutableArray.empty<AssetDto>();
 
     public isDisabled = false;
 
-    constructor(public readonly ctx: AppContext,
+    constructor(
+        private readonly appsState: AppsState,
         private readonly assetsService: AssetsService
     ) {
     }
 
-    public ngOnDestroy() {
-        this.assetUpdatedSubscription.unsubscribe();
-    }
-
-    public ngOnInit() {
-        this.assetUpdatedSubscription =
-            this.ctx.bus.of(AssetUpdated)
-                .subscribe(event => {
-                    if (event.sender !== this) {
-                        this.oldAssets = this.oldAssets.replaceBy('id', event.assetDto);
-                    }
-                });
-    }
-
     public writeValue(value: string[]) {
-        this.oldAssets = ImmutableArray.empty<AssetDto>();
-
-        if (Types.isArrayOfString(value) && value.length > 0) {
+        if (Types.isArrayOfString(value) && !Types.isEquals(value, this.oldAssets.map(x => x.id).values)) {
             const assetIds: string[] = value;
 
-            this.assetsService.getAssets(this.ctx.appName, 0, 0, undefined, value)
+            this.assetsService.getAssets(this.appsState.appName, 0, 0, undefined, value)
                 .subscribe(dtos => {
                     this.oldAssets = ImmutableArray.of(assetIds.map(id => dtos.items.find(x => x.id === id)).filter(a => !!a).map(a => a!));
+
+                    if (this.oldAssets.length !== assetIds.length) {
+                        this.updateValue();
+                    }
+                }, () => {
+                    this.oldAssets = ImmutableArray.empty<AssetDto>();
                 });
         }
     }
@@ -93,20 +83,16 @@ export class AssetsEditorComponent implements ControlValueAccessor, OnDestroy, O
         }
     }
 
-    public canDrop() {
-        const component = this;
+    public onAssetsSelected(assets: AssetDto[]) {
+        for (let asset of assets) {
+            this.oldAssets = this.oldAssets.push(asset);
+        }
 
-        return (dragData: any) => {
-            return !component.isDisabled && dragData instanceof AssetDto && !component.oldAssets.find(a => a.id === dragData.id);
-        };
-    }
-
-    public onAssetDropped(asset: AssetDto) {
-        if (asset) {
-            this.oldAssets = this.oldAssets.pushFront(asset);
-
+        if (assets.length > 0) {
             this.updateValue();
         }
+
+        this.selectorModal.hide();
     }
 
     public onAssetRemoving(asset: AssetDto) {
@@ -122,10 +108,6 @@ export class AssetsEditorComponent implements ControlValueAccessor, OnDestroy, O
         this.oldAssets = this.oldAssets.pushFront(asset);
 
         this.updateValue();
-    }
-
-    public onAssetUpdated(asset: AssetDto) {
-        this.ctx.bus.emit(new AssetUpdated(asset, this));
     }
 
     public onAssetFailed(file: File) {

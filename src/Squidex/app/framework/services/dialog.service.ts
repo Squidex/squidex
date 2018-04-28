@@ -8,6 +8,8 @@
 import { Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 
+import { ErrorDto } from './../utils/error';
+
 export const DialogServiceFactory = () => {
     return new DialogService();
 };
@@ -59,6 +61,20 @@ export class DialogService {
 
     public get notifications(): Observable<Notification> {
         return this.notificationsStream$;
+    }
+
+    public notifyError(error: string | ErrorDto) {
+        if (error instanceof ErrorDto) {
+            this.notify(Notification.error(error.displayMessage));
+        } else {
+            this.notify(Notification.error(error));
+        }
+
+        return Observable.throw(error);
+    }
+
+    public notifyInfo(text: string) {
+        this.notificationsStream$.next(Notification.info(text));
     }
 
     public notify(notification: Notification) {

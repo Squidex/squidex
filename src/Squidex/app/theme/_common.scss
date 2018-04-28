@@ -15,16 +15,6 @@ body {
     }
 }
 
-// User ref for history panel. Must be placed here, because element is created dynamically.
-.user-ref {
-    color: $color-theme-blue-dark;
-}
-
-// Marker ref for history panel. Must be placed here, because element is created dynamically.
-.marker-ref {
-    font-weight: bolder;
-}
-
 // Common style for user email.
 .user-email {
     font-style: italic;
@@ -144,9 +134,7 @@ body {
             @include flex-box;
         }
 
-        &.drag,
-        &.dnd-drag-over,
-        &.dnd-drag-enter {
+        &.drag {
             border-color: darken($color-border, 10%);
             cursor: copy;
             color: darken($color-border, 40%);

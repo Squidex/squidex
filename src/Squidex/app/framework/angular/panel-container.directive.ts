@@ -5,31 +5,25 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, Directive, ElementRef, HostListener, OnDestroy, Renderer } from '@angular/core';
+import { AfterViewInit, Directive, ElementRef, HostListener } from '@angular/core';
 
 import { PanelComponent } from './panel.component';
 
 @Directive({
     selector: '[sqxPanelContainer]'
 })
-export class PanelContainerDirective implements AfterViewInit, OnDestroy {
+export class PanelContainerDirective implements AfterViewInit {
     private readonly panels: PanelComponent[] = [];
     private containerWidth = 0;
-    private isInit = false;
 
     constructor(
-        private readonly element: ElementRef,
-        private readonly renderer: Renderer
+        private readonly element: ElementRef
     ) {
     }
 
     @HostListener('window:resize')
     public onResize() {
         this.invalidate(true);
-    }
-
-    public ngOnDestroy() {
-        this.isInit = true;
     }
 
     public ngAfterViewInit() {
@@ -53,28 +47,38 @@ export class PanelContainerDirective implements AfterViewInit, OnDestroy {
             this.containerWidth = this.element.nativeElement.getBoundingClientRect().width;
         }
 
-        let currentPosition = 0;
-        let currentLayer = this.panels.length * 10;
+        const panels = this.panels;
 
-        const last = this.panels[this.panels.length - 1];
+        let currentSize = 0;
+        let panelsWidthSpread = 0;
 
-        for (let panel of this.panels) {
-            const panelRoot = panel.panel.nativeElement;
+        for (let panel of panels) {
+            if (panel.desiredWidth !== '*') {
+                const layoutWidth = panel.desiredWidth;
 
-            let layoutWidth = '';
+                panel.measure(layoutWidth);
 
-            if (panel.desiredWidth === '*' && panel === last) {
-                layoutWidth = (this.containerWidth - currentPosition) + 'px';
+                currentSize += panel.renderWidth;
             } else {
-                layoutWidth = panel.desiredWidth;
+                panelsWidthSpread++;
             }
+        }
 
-            this.renderer.setElementStyle(panelRoot, 'top', '0px');
-            this.renderer.setElementStyle(panelRoot, 'left', currentPosition + 'px');
-            this.renderer.setElementStyle(panelRoot, 'width', layoutWidth);
-            this.renderer.setElementStyle(panelRoot, 'bottom', '0px');
-            this.renderer.setElementStyle(panelRoot, 'position', 'absolute');
-            this.renderer.setElementStyle(panelRoot, 'z-index', currentLayer.toString());
+        for (let panel of panels) {
+            if (panel.desiredWidth === '*') {
+                const layoutWidth = (this.containerWidth - currentSize) / panelsWidthSpread;
+
+                panel.measure(layoutWidth + 'px');
+
+                currentSize += panel.renderWidth;
+            }
+        }
+
+        let currentPosition = 0;
+        let currentLayer = panels.length * 10;
+
+        for (let panel of panels) {
+            panel.arrange(currentPosition + 'px', currentLayer.toString());
 
             currentPosition += panel.renderWidth;
             currentLayer -= 10;

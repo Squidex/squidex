@@ -11,6 +11,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.TestHelpers;
@@ -18,7 +19,7 @@ using Xunit;
 
 namespace Squidex.Infrastructure.Commands
 {
-    public sealed class DomainObjectGrainTests
+    public class DomainObjectGrainTests
     {
         private readonly IStore<Guid> store = A.Fake<IStore<Guid>>();
         private readonly IPersistence<MyDomainState> persistence = A.Fake<IPersistence<MyDomainState>>();
@@ -60,7 +61,7 @@ namespace Squidex.Infrastructure.Commands
         public sealed class MyDomainObject : DomainObjectGrain<MyDomainState>
         {
             public MyDomainObject(IStore<Guid> store)
-               : base(store)
+               : base(store, A.Dummy<ISemanticLog>())
             {
             }
 

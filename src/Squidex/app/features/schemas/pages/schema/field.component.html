@@ -5,7 +5,7 @@
                 <span class="field-name">
                     <i class="field-icon icon-type-{{field.properties.fieldType}}"></i> 
 
-                    <span [class.field-hidden]="field.isHidden" [attr.title]="field.isHidden ? 'Hidden Field' : 'Visible Field'">{{displayName}}</span>
+                    <span [class.field-hidden]="field.isHidden" [attr.title]="field.isHidden ? 'Hidden Field' : 'Visible Field'">{{field.displayName}}</span>
                     <span class="field-partitioning" *ngIf="field.isLocalizable">localizable</span>
                 </span>
             </div>
@@ -27,26 +27,26 @@
                             <i class="icon-dots"></i>
                         </button>
                         <div class="dropdown-menu" *sqxModalView="dropdown" [sqxModalTarget]="optionsButton" @fade>
-                            <a class="dropdown-item" (click)="enabling.emit()" *ngIf="field.isDisabled" [class.disabled]="field.isLocked">
+                            <a class="dropdown-item" (click)="enableField()" *ngIf="field.isDisabled" [class.disabled]="field.isLocked">
                                 Enable
                             </a>
-                            <a class="dropdown-item" (click)="disabling.emit()" *ngIf="!field.isDisabled" [class.disabled]="field.isLocked">
+                            <a class="dropdown-item" (click)="disableField()" *ngIf="!field.isDisabled" [class.disabled]="field.isLocked">
                                 Disable
                             </a>
-                            <a class="dropdown-item" (click)="hiding.emit()" *ngIf="!field.isHidden" [class.disabled]="field.isLocked">
+                            <a class="dropdown-item" (click)="hideField()" *ngIf="!field.isHidden" [class.disabled]="field.isLocked">
                                 Hide
                             </a>
-                            <a class="dropdown-item" (click)="showing.emit()" *ngIf="field.isHidden" [class.disabled]="field.isLocked">
+                            <a class="dropdown-item" (click)="showField()" *ngIf="field.isHidden" [class.disabled]="field.isLocked">
                                 Show
                             </a>                           
                             <a class="dropdown-item" *ngIf="!field.isLocked" 
-                                (sqxConfirmClick)="locking.emit()"
+                                (sqxConfirmClick)="lockField()"
                                 confirmTitle="Lock field" 
                                 confirmText="Do you really want to lock the field? Lock fields cannot be deleted or changed.">
                                 Lock
                             </a>
                             <a class="dropdown-item dropdown-item-delete" [class.disabled]="field.isLocked"
-                                (sqxConfirmClick)="deleting.emit()"
+                                (sqxConfirmClick)="deleteField()"
                                 confirmTitle="Delete field" 
                                 confirmText="Do you really want to delete the field?">
                                 Delete
@@ -59,7 +59,7 @@
     </div>
 
     <div class="table-items-row-details" *ngIf="isEditing">
-        <form [formGroup]="editForm" (ngSubmit)="save()" [attr.disabled]="field.isLocked">
+        <form [formGroup]="editForm.form" (ngSubmit)="save()">
             <div class="table-items-row-details-tabs clearfix">
                 <ul class="nav nav-tabs2">
                     <li class="nav-item">
@@ -80,124 +80,15 @@
             </div>
 
             <div class="table-items-row-details-tab" [class.hidden]="selectedTab !== 0">
-                <div class="form-group row">
-                    <label class="col col-3 col-form-label" for="fieldName">Name</label>
-
-                    <div class="col col-6">
-                        <input type="text" class="form-control" id="fieldName" readonly [ngModel]="field.name" [ngModelOptions]="{standalone: true}" />
-                        
-                        <small class="form-text text-muted">
-                            The name of the field in the API response.
-                        </small>
-                    </div>                        
-                </div>
-
-                <div class="form-group row">
-                    <label class="col col-3 col-form-label" for="fieldLabel">Label</label>
-
-                    <div class="col col-6">
-                        <sqx-control-errors for="label" [submitted]="editFormSubmitted"></sqx-control-errors>
-
-                        <input type="text" class="form-control" id="fieldLabel" maxlength="100" formControlName="label" />
-
-                        <small class="form-text text-muted">
-                            Define the display name for the field for documentation and user interfaces.
-                        </small>
-                    </div>
-                </div>
-
-                <div class="form-group row">
-                    <label class="col col-3 col-form-label" for="fieldHints">Hints</label>
-
-                    <div class="col col-6">
-                        <sqx-control-errors for="hints" [submitted]="editFormSubmitted"></sqx-control-errors>
-
-                        <input type="text" class="form-control" id="fieldHints" maxlength="100" formControlName="hints" />
-
-                        <small class="form-text text-muted">
-                            Define some hints for the user and editor for the field for documentation and user interfaces.
-                        </small>
-                    </div>
-                </div>
-
-                <div class="form-group row">
-                    <div class="col col-9 offset-3">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="fieldListfield" formControlName="isListField" /> 
-                            <label class="form-check-label" for="fieldListfield">
-                                List Field
-                            </label>
-                        </div>
-
-                        <small class="form-text text-muted">
-                            List fields are shown as a column in the content list. If no list field is defined, the first field is shown by default.
-                        </small>
-                    </div>
-                </div>
+                <sqx-field-form-common [editForm]="editForm.form" [editFormSubmitted]="editForm.submitted | async" [field]="field"></sqx-field-form-common>
             </div>
 
             <div class="table-items-row-details-tab" [class.hidden]="selectedTab !== 1">
-                <div [ngSwitch]="field.properties.fieldType">
-                    <div *ngSwitchCase="'Number'">
-                        <sqx-number-validation [editForm]="editForm" [properties]="field.properties"></sqx-number-validation>
-                    </div>
-                    <div *ngSwitchCase="'String'">
-                        <sqx-string-validation [editForm]="editForm" [properties]="field.properties" [regexSuggestions]="regexSuggestions"></sqx-string-validation>
-                    </div>
-                    <div *ngSwitchCase="'Boolean'">
-                        <sqx-boolean-validation [editForm]="editForm" [properties]="field.properties"></sqx-boolean-validation>
-                    </div>
-                    <div *ngSwitchCase="'DateTime'">
-                        <sqx-date-time-validation [editForm]="editForm" [properties]="field.properties"></sqx-date-time-validation>
-                    </div>
-                    <div *ngSwitchCase="'Geolocation'">
-                        <sqx-geolocation-validation [editForm]="editForm" [properties]="field.properties"></sqx-geolocation-validation>
-                    </div>
-                    <div *ngSwitchCase="'Json'">
-                        <sqx-json-validation [editForm]="editForm" [properties]="field.properties"></sqx-json-validation>
-                    </div>
-                    <div *ngSwitchCase="'Assets'">
-                        <sqx-assets-validation [editForm]="editForm" [properties]="field.properties"></sqx-assets-validation>
-                    </div>
-                    <div *ngSwitchCase="'References'">
-                        <sqx-references-validation [editForm]="editForm" [properties]="field.properties" [schemas]="schemas"></sqx-references-validation>
-                    </div>
-                    <div *ngSwitchCase="'Tags'">
-                        <sqx-tags-validation [editForm]="editForm" [properties]="field.properties"></sqx-tags-validation>
-                    </div>
-                </div>
+                <sqx-field-form-validation [patterns]="patterns" [editForm]="editForm.form" [field]="field"></sqx-field-form-validation>
             </div>
 
             <div class="table-items-row-details-tab" [class.hidden]="selectedTab !== 2">
-                <div [ngSwitch]="field.properties.fieldType">
-                    <div *ngSwitchCase="'Number'">
-                        <sqx-number-ui [editForm]="editForm" [properties]="field.properties"></sqx-number-ui>
-                    </div>
-                    <div *ngSwitchCase="'String'">
-                        <sqx-string-ui [editForm]="editForm" [properties]="field.properties"></sqx-string-ui>
-                    </div>
-                    <div *ngSwitchCase="'Boolean'">
-                        <sqx-boolean-ui [editForm]="editForm" [properties]="field.properties"></sqx-boolean-ui>
-                    </div>
-                    <div *ngSwitchCase="'DateTime'">
-                        <sqx-date-time-ui [editForm]="editForm" [properties]="field.properties"></sqx-date-time-ui>
-                    </div>
-                    <div *ngSwitchCase="'Geolocation'">
-                        <sqx-geolocation-ui [editForm]="editForm" [properties]="field.properties"></sqx-geolocation-ui>
-                    </div>
-                    <div *ngSwitchCase="'Json'">
-                        <sqx-json-ui [editForm]="editForm" [properties]="field.properties"></sqx-json-ui>
-                    </div>
-                    <div *ngSwitchCase="'Assets'">
-                        <sqx-assets-ui [editForm]="editForm" [properties]="field.properties"></sqx-assets-ui>
-                    </div>
-                    <div *ngSwitchCase="'References'">
-                        <sqx-references-ui [editForm]="editForm" [properties]="field.properties"></sqx-references-ui>
-                    </div>
-                    <div *ngSwitchCase="'Tags'">
-                        <sqx-tags-ui [editForm]="editForm" [properties]="field.properties"></sqx-tags-ui>
-                    </div>
-                </div>
+                <sqx-field-form-ui [editForm]="editForm.form" [field]="field"></sqx-field-form-ui>
             </div>
         </form> 
     </div>

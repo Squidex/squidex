@@ -5,66 +5,45 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { Component, OnInit } from '@angular/core';
 
 import {
-    AppContext,
-    AppDto,
-    AppsStoreService,
-    fadeAnimation,
+    AppsState,
+    AuthService,
     ModalView,
     OnboardingService
-} from 'shared';
+} from '@app/shared';
 
 @Component({
     selector: 'sqx-apps-page',
     styleUrls: ['./apps-page.component.scss'],
-    templateUrl: './apps-page.component.html',
-    providers: [
-        AppContext
-    ],
-    animations: [
-        fadeAnimation
-    ]
+    templateUrl: './apps-page.component.html'
 })
-export class AppsPageComponent implements OnDestroy, OnInit {
-    private appsSubscription: Subscription;
-
+export class AppsPageComponent implements OnInit {
     public addAppDialog = new ModalView();
-    public apps: AppDto[];
-
-    public template = '';
+    public addAppTemplate = '';
 
     public onboardingModal = new ModalView();
 
     constructor(
-        public readonly ctx: AppContext,
-        private readonly appsStore: AppsStoreService,
+        public readonly appsState: AppsState,
+        public readonly authState: AuthService,
         private readonly onboardingService: OnboardingService
     ) {
     }
 
-    public ngOnDestroy() {
-        this.appsSubscription.unsubscribe();
-    }
-
     public ngOnInit() {
-        this.appsSubscription =
-            this.appsStore.apps
-                .subscribe(apps => {
-                    if (apps.length === 0 && this.onboardingService.shouldShow('dialog')) {
-                        this.onboardingService.disable('dialog');
-                        this.onboardingModal.show();
-                    }
-
-                    this.apps = apps;
-                });
+        this.appsState.apps.take(1)
+            .subscribe(apps => {
+                if (this.onboardingService.shouldShow('dialog') && apps.length === 0) {
+                    this.onboardingService.disable('dialog');
+                    this.onboardingModal.show();
+                }
+            });
     }
 
     public createNewApp(template: string) {
-        this.template = template;
-
+        this.addAppTemplate = template;
         this.addAppDialog.show();
     }
 }

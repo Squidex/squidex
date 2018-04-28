@@ -16,6 +16,10 @@
     margin-top: .25rem;
 }
 
+.btn-success {
+    margin: 0;
+}
+
 .btn-export {
     margin-right: 1rem;
 }
@@ -36,9 +40,24 @@
     color: $color-border-dark;
 }
 
-.form-check {
-    margin-top: .4rem;
-    margin-bottom: -.2rem;
+.field-button {
+    & {
+        @include circle(5.25rem);
+        @include box-shadow(0, 8px, 16px, .3);
+        @include absolute(auto, 2rem, 1rem, auto);
+    }
+
+    &-icon {
+        font-weight: bold;
+    }
+
+    &-text {
+        font-size: .9rem;
+    }
+}
+
+.panel-content-scroll {
+    padding-bottom: 7rem;
 }
 
 .dnd-sortable-drag {

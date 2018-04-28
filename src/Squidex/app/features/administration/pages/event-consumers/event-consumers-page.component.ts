@@ -8,91 +8,58 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
 
-import {
-    AppContext,
-    EventConsumerDto,
-    EventConsumersService,
-    fadeAnimation,
-    ImmutableArray,
-    ModalView
-} from 'shared';
+import { ModalView } from '@app/shared';
+
+import { EventConsumerDto } from './../../services/event-consumers.service';
+import { EventConsumersState } from './../../state/event-consumers.state';
 
 @Component({
     selector: 'sqx-event-consumers-page',
     styleUrls: ['./event-consumers-page.component.scss'],
-    templateUrl: './event-consumers-page.component.html',
-    providers: [
-        AppContext
-    ],
-    animations: [
-        fadeAnimation
-    ]
+    templateUrl: './event-consumers-page.component.html'
 })
 export class EventConsumersPageComponent implements OnDestroy, OnInit {
-    private subscription: Subscription;
+    private timerSubscription: Subscription;
 
     public eventConsumerErrorDialog = new ModalView();
     public eventConsumerError = '';
-    public eventConsumers = ImmutableArray.empty<EventConsumerDto>();
 
-    constructor(public readonly ctx: AppContext,
-        private readonly eventConsumersService: EventConsumersService
+    constructor(
+        public readonly eventConsumersState: EventConsumersState
     ) {
     }
 
     public ngOnDestroy() {
-        this.subscription.unsubscribe();
+        this.timerSubscription.unsubscribe();
     }
 
     public ngOnInit() {
-        this.load(false, true);
+        this.eventConsumersState.load(false, true).onErrorResumeNext().subscribe();
 
-        this.subscription =
-            Observable.timer(4000, 4000).subscribe(() => {
-                this.load();
-            });
+        this.timerSubscription =
+            Observable.timer(2000, 2000)
+                .switchMap(x => this.eventConsumersState.load().onErrorResumeNext())
+                .subscribe();
     }
 
-    public load(showInfo = false, showError = false) {
-        this.eventConsumersService.getEventConsumers()
-            .subscribe(dtos => {
-                this.eventConsumers = ImmutableArray.of(dtos);
-
-                if (showInfo) {
-                    this.ctx.notifyInfo('Event Consumers reloaded.');
-                }
-            }, error => {
-                if (showError) {
-                    this.ctx.notifyError(error);
-                }
-            });
+    public reload() {
+        this.eventConsumersState.load(true, true).onErrorResumeNext().subscribe();
     }
 
-    public start(consumer: EventConsumerDto) {
-        this.eventConsumersService.startEventConsumer(consumer.name)
-            .subscribe(() => {
-                this.eventConsumers = this.eventConsumers.replaceBy('name', consumer.start());
-            }, error => {
-                this.ctx.notifyError(error);
-            });
+    public start(es: EventConsumerDto) {
+        this.eventConsumersState.start(es).onErrorResumeNext().subscribe();
     }
 
-    public stop(consumer: EventConsumerDto) {
-        this.eventConsumersService.stopEventConsumer(consumer.name)
-            .subscribe(() => {
-                this.eventConsumers = this.eventConsumers.replaceBy('name', consumer.stop());
-            }, error => {
-                this.ctx.notifyError(error);
-            });
+    public stop(es: EventConsumerDto) {
+        this.eventConsumersState.stop(es).onErrorResumeNext().subscribe();
     }
 
-    public reset(consumer: EventConsumerDto) {
-        this.eventConsumersService.resetEventConsumer(consumer.name)
-            .subscribe(() => {
-                this.eventConsumers = this.eventConsumers.replaceBy('name', consumer.reset());
-            }, error => {
-                this.ctx.notifyError(error);
-            });
+    public reset(es: EventConsumerDto) {
+        this.eventConsumersState.reset(es).onErrorResumeNext().subscribe();
+    }
+
+    public trackByEventConsumer(index: number, es: EventConsumerDto) {
+        return es.name;
     }
 
     public showError(eventConsumer: EventConsumerDto) {
@@ -100,4 +67,3 @@ export class EventConsumersPageComponent implements OnDestroy, OnInit {
         this.eventConsumerErrorDialog.show();
     }
 }
-

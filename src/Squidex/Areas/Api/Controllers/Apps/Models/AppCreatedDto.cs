@@ -5,10 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Domain.Apps.Entities.Apps.Services;
+using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models
 {
@@ -21,15 +24,15 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         public string Id { get; set; }
 
         /// <summary>
-        /// The new version of the entity.
-        /// </summary>
-        public long Version { get; set; }
-
-        /// <summary>
         /// The permission level of the user.
         /// </summary>
         [JsonConverter(typeof(StringEnumConverter))]
         public AppContributorPermission Permission { get; set; }
+
+        /// <summary>
+        /// The new version of the entity.
+        /// </summary>
+        public long Version { get; set; }
 
         /// <summary>
         /// Gets the current plan name.
@@ -40,5 +43,17 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// Gets the next plan name.
         /// </summary>
         public string PlanUpgrade { get; set; }
+
+        public static AppCreatedDto FromResult(EntityCreatedResult<Guid> result, IAppPlansProvider apps)
+        {
+            var response = new AppCreatedDto { Id = result.IdOrValue.ToString(), Version = result.Version };
+
+            response.Permission = AppContributorPermission.Owner;
+
+            response.PlanName = apps.GetPlan(null)?.Name;
+            response.PlanUpgrade = apps.GetPlanUpgrade(null)?.Name;
+
+            return response;
+        }
     }
 }

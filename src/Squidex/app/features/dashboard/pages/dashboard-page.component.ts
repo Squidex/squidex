@@ -6,19 +6,18 @@
  */
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Observable, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 
 import {
-    AppContext,
     AppDto,
+    AppsState,
+    AuthService,
     DateTime,
     fadeAnimation,
-    formatHistoryMessage,
     HistoryEventDto,
     HistoryService,
-    UsagesService,
-    UsersProviderService
-} from 'shared';
+    UsagesService
+} from '@app/shared';
 
 declare var _urq: any;
 
@@ -26,9 +25,6 @@ declare var _urq: any;
     selector: 'sqx-dashboard-page',
     styleUrls: ['./dashboard-page.component.scss'],
     templateUrl: './dashboard-page.component.html',
-    providers: [
-        AppContext
-    ],
     animations: [
         fadeAnimation
     ]
@@ -43,7 +39,7 @@ export class DashboardPageComponent implements OnDestroy, OnInit {
     public chartCallsCount: any;
     public chartCallsPerformance: any;
 
-    public app = this.ctx.appChanges.filter(x => !!x).map(x => <AppDto>x);
+    public app = this.appsState.selectedApp.filter(x => !!x).map(x => <AppDto>x);
 
     public chartOptions = {
         responsive: true,
@@ -72,9 +68,10 @@ export class DashboardPageComponent implements OnDestroy, OnInit {
     public callsCurrent = 0;
     public callsMax = 0;
 
-    constructor(public readonly ctx: AppContext,
+    constructor(
+        public readonly appsState: AppsState,
+        public readonly authState: AuthService,
         private readonly historyService: HistoryService,
-        private readonly users: UsersProviderService,
         private readonly usagesService: UsagesService
     ) {
     }
@@ -176,10 +173,6 @@ export class DashboardPageComponent implements OnDestroy, OnInit {
                         ]
                     };
                 }));
-    }
-
-    public format(message: string): Observable<string> {
-        return formatHistoryMessage(message, this.users);
     }
 
     public showForum() {

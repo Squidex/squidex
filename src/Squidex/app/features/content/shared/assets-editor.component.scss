@@ -24,10 +24,12 @@
         @include border-radius;
         border: 2px dashed $color-border;
         height: $asset-height;
+        width: $asset-height;
         font-size: 1.2rem;
         font-weight: normal;
         text-align: center;
-        padding: 3rem 2rem;
+        padding: 3.5rem 2rem;
+        cursor: pointer;
         color: darken($color-border, 30%);
     }
 
@@ -39,9 +41,7 @@
         padding-bottom: 1rem;
     }
 
-    &.drag,
-    &.dnd-drag-over,
-    &.dnd-drag-enter {
+    &.drag {
         border-color: darken($color-border, 10%);
         cursor: copy;
         color: darken($color-border, 40%);

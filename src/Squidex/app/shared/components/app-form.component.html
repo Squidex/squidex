@@ -1,26 +1,38 @@
-<form [formGroup]="createForm" (ngSubmit)="createApp()">
-    <div *ngIf="createFormError">
-        <div class="form-alert form-alert-error" [innerHTML]="createFormError"></div>
-    </div>
+<form [formGroup]="createForm.form" (ngSubmit)="createApp()">
+    <sqx-modal-dialog (closed)="complete()">
+        <ng-container title>
+            <ng-container *ngIf="template; else noTemplate">
+                Create {{template}} Sample
+            </ng-container>
 
-	<div class="form-group">
-		<label for="appName">Name</label>
+            <ng-template #noTemplate>
+                Create App
+            </ng-template>
+        </ng-container>
+
+        <ng-container content>
+            <sqx-form-error [error]="createForm.error | async"></sqx-form-error>
         
-        <sqx-control-errors for="name" submitOnly="true" [submitted]="createFormSubmitted"></sqx-control-errors>
-
-		<input type="text" class="form-control" id="appName" formControlName="name" autocomplete="off" sqxLowerCaseInput sqxFocusOnInit />
+            <div class="form-group">
+                <label for="appName">Name</label>
+                
+                <sqx-control-errors for="name" submitOnly="true" [submitted]="createForm.submitted | async"></sqx-control-errors>
         
-        <small class="form-text text-muted">
-            The app name becomes part of the api url,<br /> e.g {{apiUrl.buildUrl("api/content/")}}<b>{{appName | async}}</b>/.
-        </small>
-          
-        <small class="form-text text-muted">
-            It must contain lower case letters (a-z), numbers and dashes only, and cannot be longer than 40 characters. The name cannot be changed later.
-        </small>
-	</div>
+                <input type="text" class="form-control" id="appName" formControlName="name" autocomplete="off" sqxLowerCaseInput sqxFocusOnInit />
+                
+                <small class="form-text text-muted">
+                    The app name becomes part of the api url,<br /> e.g {{apiUrl.buildUrl("api/content/")}}<b>{{createForm.appName | async}}</b>/.
+                </small>
+                    
+                <small class="form-text text-muted">
+                    It must contain lower case letters (a-z), numbers and dashes only, and cannot be longer than 40 characters. The name cannot be changed later.
+                </small>
+            </div>
+        </ng-container>
 
-    <div class="form-group clearfix">
-        <button type="reset" class="float-left btn btn-secondary" (click)="cancel()" [disabled]="createFormSubmitted">Cancel</button>
-        <button type="submit" class="float-right btn btn-success">Create</button>
-    </div>
+        <ng-container footer>
+            <button type="reset" class="float-left btn btn-secondary" (click)="complete()" [disabled]="createForm.submitted | async">Cancel</button>
+            <button type="submit" class="float-right btn btn-success">Create</button>
+        </ng-container>
+    </sqx-modal-dialog>
 </form>

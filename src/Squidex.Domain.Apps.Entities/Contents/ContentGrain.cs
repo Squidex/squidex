@@ -19,6 +19,7 @@ using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
 
@@ -33,11 +34,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public ContentGrain(
             IStore<Guid> store,
+            ISemanticLog log,
             IAppProvider appProvider,
             IAssetRepository assetRepository,
             IScriptEngine scriptEngine,
             IContentRepository contentRepository)
-            : base(store)
+            : base(store, log)
         {
             Guard.NotNull(appProvider, nameof(appProvider));
             Guard.NotNull(scriptEngine, nameof(scriptEngine));

@@ -5,69 +5,60 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { IMock, Mock } from 'typemoq';
+import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
+import { IMock, Mock, Times } from 'typemoq';
 
-import { AppsStoreService } from 'shared';
+import { AppsState } from '@app/shared';
 
 import { AppMustExistGuard } from './app-must-exist.guard';
-import { RouterMockup } from './router-mockup';
 
 describe('AppMustExistGuard', () => {
-    let appsStore: IMock<AppsStoreService>;
+    const route: any = {
+        params: {
+            appName: 'my-app'
+        }
+    };
+
+    let router: IMock<Router>;
+
+    let appsState: IMock<AppsState>;
+    let appGuard: AppMustExistGuard;
 
     beforeEach(() => {
-        appsStore = Mock.ofType(AppsStoreService);
+        router = Mock.ofType<Router>();
+
+        appsState = Mock.ofType<AppsState>();
+        appGuard = new AppMustExistGuard(appsState.object, router.object);
     });
 
-    it('should navigate to 404 page if app is not found', (done) => {
-        appsStore.setup(x => x.selectApp('my-app'))
-            .returns(() => Observable.of(false));
-        const router = new RouterMockup();
-        const route = <any> { params: { appName: 'my-app' } };
+    it('should navigate to 404 page if app is not found', () => {
+        appsState.setup(x => x.select('my-app'))
+            .returns(() => Observable.of(null));
 
-        const guard = new AppMustExistGuard(appsStore.object, <any>router);
+        let result: boolean;
 
-        guard.canActivate(route, <any>{})
-            .subscribe(result => {
-                expect(result).toBeFalsy();
-                expect(router.lastNavigation).toEqual(['/404']);
+        appGuard.canActivate(route).subscribe(x => {
+            result = x;
+        });
 
-                done();
-            });
+        expect(result!).toBeFalsy();
+
+        appsState.verify(x => x.select('my-app'), Times.once());
     });
 
-    it('should navigate to 404 page if app loading fails', (done) => {
-        appsStore.setup(x => x.selectApp('my-app'))
-            .returns(() => Observable.throw('error'));
-        const router = new RouterMockup();
-        const route = <any> { params: { appName: 'my-app' } };
+    it('should return true if app is found', () => {
+        appsState.setup(x => x.select('my-app'))
+            .returns(() => Observable.of(<any>{}));
 
-        const guard = new AppMustExistGuard(appsStore.object, <any>router);
+        let result: boolean;
 
-        guard.canActivate(route, <any>{})
-            .subscribe(result => {
-                expect(result).toBeFalsy();
-                expect(router.lastNavigation).toEqual(['/404']);
+        appGuard.canActivate(route).subscribe(x => {
+            result = x;
+        });
 
-                done();
-            });
-    });
+        expect(result!).toBeTruthy();
 
-    it('should return true if app is found', (done) => {
-        appsStore.setup(x => x.selectApp('my-app'))
-            .returns(() => Observable.of(true));
-        const router = new RouterMockup();
-        const route = <any> { params: { appName: 'my-app' } };
-
-        const guard = new AppMustExistGuard(appsStore.object, <any>router);
-
-        guard.canActivate(route, <any>{})
-            .subscribe(result => {
-                expect(result).toBeTruthy();
-                expect(router.lastNavigation).toBeUndefined();
-
-                done();
-            });
+        // router.verify(x => x.navigate(['/404']), Times.once());
     });
 });

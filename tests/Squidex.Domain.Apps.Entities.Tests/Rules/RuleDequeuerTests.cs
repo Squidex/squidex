@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
     public class RuleDequeuerTests
     {
         private readonly IClock clock = A.Fake<IClock>();
-        private readonly ISemanticLog log = A.Fake<ISemanticLog>();
+        private readonly ISemanticLog log = A.Dummy<ISemanticLog>();
         private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
         private readonly IRuleEventRepository ruleEventRepository = A.Fake<IRuleEventRepository>();
         private readonly Instant now = SystemClock.Instance.GetCurrentInstant();

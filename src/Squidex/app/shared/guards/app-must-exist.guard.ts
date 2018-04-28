@@ -6,34 +6,29 @@
  */
 
 import { Injectable } from '@angular/core';
-import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from '@angular/router';
+import { ActivatedRouteSnapshot, CanActivate, Router } from '@angular/router';
 import { Observable } from 'rxjs';
 
-import { AppsStoreService } from './../services/apps-store.service';
+import { AppsState } from './../state/apps.state';
 
 @Injectable()
 export class AppMustExistGuard implements CanActivate {
     constructor(
-        private readonly appsStore: AppsStoreService,
+        private readonly appsState: AppsState,
         private readonly router: Router
     ) {
     }
 
-    public canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> {
+    public canActivate(route: ActivatedRouteSnapshot): Observable<boolean> {
         const appName = route.params['appName'];
 
         const result =
-            this.appsStore.selectApp(appName)
+            this.appsState.select(appName)
                 .do(dto => {
                     if (!dto) {
                         this.router.navigate(['/404']);
                     }
-                })
-                .catch(error => {
-                    this.router.navigate(['/404']);
-
-                    return Observable.of(false);
-                });
+                }).map(a => !!a);
 
         return result;
     }

@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 
 namespace Squidex.Infrastructure.Log.Adapter
@@ -70,6 +71,22 @@ namespace Squidex.Infrastructure.Log.Adapter
                     });
                 }
 
+                if (state is IReadOnlyList<KeyValuePair<string, object>> parameters)
+                {
+                    foreach (var kvp in parameters)
+                    {
+                        if (kvp.Value != null)
+                        {
+                            var key = kvp.Key.Trim('{', '}', ' ');
+
+                            if (key.Length > 2 && !string.Equals(key, "originalFormat", StringComparison.OrdinalIgnoreCase))
+                            {
+                                writer.WriteProperty(key.ToCamelCase(), kvp.Value.ToString());
+                            }
+                        }
+                    }
+                }
+
                 if (exception != null)
                 {
                     writer.WriteException(exception);
@@ -85,15 +102,6 @@ namespace Squidex.Infrastructure.Log.Adapter
         public IDisposable BeginScope<TState>(TState state)
         {
             return NoopDisposable.Instance;
-        }
-
-        private class NoopDisposable : IDisposable
-        {
-            public static readonly NoopDisposable Instance = new NoopDisposable();
-
-            public void Dispose()
-            {
-            }
         }
     }
 }

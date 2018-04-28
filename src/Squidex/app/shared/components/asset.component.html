@@ -1,7 +1,4 @@
-<div class="card" (sqxFileDrop)="updateFile($event)" dnd-draggable [dragEnabled]="!!asset" 
-     [dragData]="asset"
-     (onDragStart)="onAssetDragStart($event)"
-     (onDragEnd)="onAssetDragEnd($event)">
+<div class="card" [class.selectable]="isSelectable" [class.border-primary]="isSelected" (click)="selected.emit(asset)" (sqxFileDrop)="updateFile($event)">
     <div class="card-body">
         <div class="file-preview" *ngIf="asset && progress == 0" @fade>
             <span class="file-type" *ngIf="asset.fileType">
@@ -18,19 +15,21 @@
             <div class="file-overlay">
                 <div class="file-overlay-background"></div>
                 
-                <a class="file-edit" (click)="renameDialog.show()">
-                    <i class="icon-pencil"></i>
-                </a>
-                <a class="file-download" [attr.href]="asset | sqxAssetUrl" target="_blank">
-                    <i class="icon-download"></i>
-                </a>
-
-                <a class="file-delete" (click)="deleting.emit(asset)" *ngIf="!closeMode">
-                    <i class="icon-delete"></i>
-                </a>
-                <a class="file-delete" (click)="closing.emit(asset)" *ngIf="closeMode">
-                    <i class="icon-close"></i>
-                </a>
+                <div class="file-menu">
+                    <a class="file-edit" *ngIf="!isDisabled" (click)="renameDialog.show()">
+                        <i class="icon-pencil"></i>
+                    </a>
+                    <a class="file-download" [attr.href]="asset | sqxAssetUrl" target="_blank" (click)="$event.stopPropagation()">
+                        <i class="icon-download"></i>
+                    </a>
+    
+                    <a class="file-delete" (click)="deleting.emit(asset); $event.stopPropagation()" *ngIf="!isDisabled && !removeMode">
+                        <i class="icon-delete"></i>
+                    </a>
+                    <a class="file-delete" (click)="removing.emit(asset); $event.stopPropagation()" *ngIf="removeMode">
+                        <i class="icon-close"></i>
+                    </a>
+                </div>
 
                 <span class="file-overlay-type" *ngIf="asset.fileType">
                     {{asset.fileType}}
@@ -44,12 +43,12 @@
             </div>
         </div>
     </div>
-    <div class="card-footer" dnd-draggable-handle *ngIf="asset && progress == 0">
+    <div class="card-footer" *ngIf="asset && progress == 0">
         <div class="file-name" [attr.title]="asset.fileName">
             {{asset.fileName}}
         </div>
         <div class="file-info">
-            <span *ngIf="asset.pixelWidth">{{asset.pixelWidth}}x{{asset.pixelHeight}}px, </span> {{asset.fileSize | sqxFileSize}}
+            <ng-container *ngIf="asset.pixelWidth">{{asset.pixelWidth}}x{{asset.pixelHeight}}px, </ng-container> {{asset.fileSize | sqxFileSize}}
         </div>
     </div>
 
@@ -64,34 +63,27 @@
     </div>
 </div>
 
-<div class="modal" *sqxModalView="renameDialog;onRoot:true" @fade>
-    <div class="modal-backdrop"></div>
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">Rename asset</h4>
+<ng-container *sqxModalView="renameDialog;onRoot:true">
+    <form [formGroup]="renameForm.form" (ngSubmit)="renameAsset()">
+        <sqx-modal-dialog (closed)="cancelRenameAsset()">
+            <ng-container title>
+                Rename asset
+            </ng-container>
 
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="cancelRenameAsset()">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
+            <ng-container content>
+                <div class="form-group">
+                    <label for="assetName">Name</label>
+                    
+                    <sqx-control-errors for="name" [submitted]="renameForm.submitted | async"></sqx-control-errors>
 
-            <div class="modal-body">
-                <form [formGroup]="renameForm" (ngSubmit)="renameAsset()">
-                    <div class="form-group">
-                        <label for="assetName">Name</label>
-                        
-                        <sqx-control-errors for="name" [submitted]="renameFormSubmitted"></sqx-control-errors>
+                    <input type="text" class="form-control" id="assetName" formControlName="name" autocomplete="off" sqxFocusOnInit />
+                </div>
+            </ng-container>
 
-                        <input type="text" class="form-control" id="assetName" formControlName="name" autocomplete="off" sqxFocusOnInit />
-                    </div>
-
-                    <div class="form-group clearfix">
-                        <button type="reset" class="float-left btn btn-secondary" (click)="cancelRenameAsset()">Cancel</button>
-                        <button type="submit" class="float-right btn btn-success">Rename</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
+            <ng-container footer>
+                <button type="reset" class="float-left btn btn-secondary" (click)="cancelRenameAsset()">Cancel</button>
+                <button type="submit" class="float-right btn btn-success">Rename</button>
+            </ng-container>
+        </sqx-modal-dialog>
+    </form>
+</ng-container>

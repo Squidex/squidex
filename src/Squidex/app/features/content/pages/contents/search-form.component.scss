@@ -1,6 +1,18 @@
 @import '_vars';
 @import '_mixins';
 
+.search-form {
+    display: inline-block;
+}
+
+.form-inline {
+    position: relative;
+}
+
+.form-control-expandable {
+    padding-right: 1.5rem;
+}
+
 .form-horizontal {
     padding: 1rem 1.5rem;
     min-width: 25rem;
@@ -12,6 +24,14 @@
     font-size: 1rem;
     font-weight: normal;
     text-align: right;
+}
+
+.expand-search {
+    @include absolute(8px, 8px, auto, auto);
+    color: $color-border-dark !important;
+    font-size: .9rem;
+    font-weight: normal;
+    cursor: pointer !important;
 }
 
 .link {

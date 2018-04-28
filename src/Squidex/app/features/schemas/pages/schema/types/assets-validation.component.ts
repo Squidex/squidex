@@ -5,20 +5,22 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 
-import { AssetsFieldPropertiesDto } from 'shared';
+import { AssetsFieldPropertiesDto, FieldDto } from '@app/shared';
 
 @Component({
     selector: 'sqx-assets-validation',
     styleUrls: ['assets-validation.component.scss'],
-    templateUrl: 'assets-validation.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    templateUrl: 'assets-validation.component.html'
 })
 export class AssetsValidationComponent implements OnInit {
     @Input()
     public editForm: FormGroup;
+
+    @Input()
+    public field: FieldDto;
 
     @Input()
     public properties: AssetsFieldPropertiesDto;

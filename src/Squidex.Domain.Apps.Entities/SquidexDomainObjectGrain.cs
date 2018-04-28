@@ -9,14 +9,15 @@ using System;
 using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities
 {
     public abstract class SquidexDomainObjectGrain<T> : DomainObjectGrain<T> where T : IDomainState, new()
     {
-        protected SquidexDomainObjectGrain(IStore<Guid> store)
-            : base(store)
+        protected SquidexDomainObjectGrain(IStore<Guid> store, ISemanticLog log)
+            : base(store, log)
         {
         }
 

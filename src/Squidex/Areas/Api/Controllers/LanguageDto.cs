@@ -6,6 +6,8 @@
 // ==========================================================================
 
 using System.ComponentModel.DataAnnotations;
+using Squidex.Infrastructure;
+using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Areas.Api.Controllers
 {
@@ -22,5 +24,10 @@ namespace Squidex.Areas.Api.Controllers
         /// </summary>
         [Required]
         public string EnglishName { get; set; }
+
+        public static LanguageDto FromLanguage(Language language)
+        {
+            return SimpleMapper.Map(language, new LanguageDto());
+        }
     }
 }

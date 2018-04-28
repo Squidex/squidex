@@ -1,80 +1,84 @@
-<h3 class="rule-title">Trigger rule when an events for a schemas happens</h3>
+<h3 class="wizard-title">Trigger rule when an events for a schemas happens</h3>
 
-<table class="table table-middle table-sm table-fixed table-borderless" *ngIf="!handleAll">
-    <colgroup>
-        <col style="width: 100%" />
-        <col style="width: 40px" />
-        <col style="width: 40px" />
-        <col style="width: 40px" />
-        <col style="width: 40px" />
-        <col style="width: 40px" />
-        <col style="width: 40px" />
-    </colgroup>
+<ng-container *ngIf="!triggerForm.controls.handleAll.value">
+    <table class="table table-middle table-sm table-fixed table-borderless">
+        <colgroup>
+            <col style="width: 100%" />
+            <col style="width: 40px" />
+            <col style="width: 40px" />
+            <col style="width: 40px" />
+            <col style="width: 40px" />
+            <col style="width: 40px" />
+            <col style="width: 40px" />
+        </colgroup>
 
-    <tr>
-        <th>
-            Schema
-        </th>
-        <th class="text-center">
-            <div class="rotated-label">All</div>
-        </th>
-        <th class="text-center">
-            <div class="rotated-label">Created</div>
-        </th>
-        <th class="text-center">
-            <div class="rotated-label">Updated</div>
-        </th>
-        <th class="text-center">
-            <div class="rotated-label">Deleted</div>
-        </th>
-        <th class="text-center">
-            <div class="rotated-label">Published</div>
-        </th>
-        <th></th>
-    </tr>
+        <tr>
+            <th>
+                Schema
+            </th>
+            <th class="text-center">
+                <div class="rotated-label">All</div>
+            </th>
+            <th class="text-center">
+                <div class="rotated-label">Created</div>
+            </th>
+            <th class="text-center">
+                <div class="rotated-label">Updated</div>
+            </th>
+            <th class="text-center">
+                <div class="rotated-label">Deleted</div>
+            </th>
+            <th class="text-center">
+                <div class="rotated-label">Published</div>
+            </th>
+            <th></th>
+        </tr>
 
-    <tr *ngFor="let schema of triggerSchemas">
-        <td>
-            <span class="truncate">{{schema.schema.displayName}}</span>
-        </td>
-        <td class="text-center" title="Created">
-            <input type="checkbox" [ngModel]="schema.sendAll" (ngModelChange)="toggleAll(schema)" />
-        </td>
-        <td class="text-center" title="Created">
-            <input type="checkbox" [ngModel]="schema.sendCreate" (ngModelChange)="toggle(schema, 'sendCreate')" />
-        </td>
-        <td class="text-center" title="Updated">
-            <input type="checkbox" [ngModel]="schema.sendUpdate" (ngModelChange)="toggle(schema, 'sendUpdate')" />
-        </td>
-        <td class="text-center" title="Deleted">
-            <input type="checkbox" [ngModel]="schema.sendDelete" (ngModelChange)="toggle(schema, 'sendDelete')" />
-        </td>
-        <td class="text-center" title="Published">
-            <input type="checkbox" [ngModel]="schema.sendPublish" (ngModelChange)="toggle(schema, 'sendPublish')" />
-        </td>
-        <td class="text-center">
-            <button type="button" class="btn btn-link btn-secondary" (click)="removeSchema(schema)">
-                <i class="icon-close"></i>
-            </button>
-        </td>
-    </tr>
-</table>
+        <tr *ngFor="let schema of triggerSchemas">
+            <td>
+                <span class="truncate">{{schema.schema.displayName}}</span>
+            </td>
+            <td class="text-center" title="Created">
+                <input type="checkbox" [ngModel]="schema.sendAll" (ngModelChange)="toggleAll(schema)" />
+            </td>
+            <td class="text-center" title="Created">
+                <input type="checkbox" [ngModel]="schema.sendCreate" (ngModelChange)="toggle(schema, 'sendCreate')" />
+            </td>
+            <td class="text-center" title="Updated">
+                <input type="checkbox" [ngModel]="schema.sendUpdate" (ngModelChange)="toggle(schema, 'sendUpdate')" />
+            </td>
+            <td class="text-center" title="Deleted">
+                <input type="checkbox" [ngModel]="schema.sendDelete" (ngModelChange)="toggle(schema, 'sendDelete')" />
+            </td>
+            <td class="text-center" title="Published">
+                <input type="checkbox" [ngModel]="schema.sendPublish" (ngModelChange)="toggle(schema, 'sendPublish')" />
+            </td>
+            <td class="text-center">
+                <button type="button" class="btn btn-link btn-secondary" (click)="removeSchema(schema)">
+                    <i class="icon-close"></i>
+                </button>
+            </td>
+        </tr>
+    </table>
 
-<div class="section" *ngIf="!handleAll && schemasToAdd.length > 0">
-    <form class="form-inline" (ngSubmit)="addSchema()">
-        <div class="form-group mr-1">
-            <select class="form-control schemas-control" [(ngModel)]="schemaToAdd" name="schema">
-                <option *ngFor="let schema of schemasToAdd" [ngValue]="schema">{{schema.displayName}}</option>
-            </select>
-        </div>
+    <div class="section" *ngIf="schemasToAdd.length > 0">
+        <form class="form-inline" (ngSubmit)="addSchema()">
+            <div class="form-group mr-1">
+                <select class="form-control schemas-control" [(ngModel)]="schemaToAdd" name="schema">
+                    <option *ngFor="let schema of schemasToAdd" [ngValue]="schema">{{schema.displayName}}</option>
+                </select>
+            </div>
 
-        <button type="submit" class="btn btn-success" [disabled]="!hasSchema">Add Schema</button>
-    </form>
-</div>
+            <button type="submit" class="btn btn-success" [disabled]="!hasSchema">Add Schema</button>
+        </form>
+    </div>
+</ng-container>
 
-<div class="form-check">
-    <input class="form-check-input" type="checkbox" [(ngModel)]="handleAll" id="handleAll" />
-    <label class="form-check-label" for="handleAll">
-        Trigger on all content events
-    </label>
+<div class="form-group" [formGroup]="triggerForm">
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="handleAll" formControlName="handleAll" />
+        <label class="form-check-label" for="handleAll">
+            Trigger on all content events
+        </label>
+    </div>
 </div>

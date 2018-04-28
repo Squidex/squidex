@@ -9,7 +9,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
 
-import { NumberFieldPropertiesDto } from 'shared';
+import { FieldDto, NumberFieldPropertiesDto } from '@app/shared';
 
 @Component({
     selector: 'sqx-number-validation',
@@ -19,6 +19,9 @@ import { NumberFieldPropertiesDto } from 'shared';
 export class NumberValidationComponent implements OnInit {
     @Input()
     public editForm: FormGroup;
+
+    @Input()
+    public field: FieldDto;
 
     @Input()
     public properties: NumberFieldPropertiesDto;

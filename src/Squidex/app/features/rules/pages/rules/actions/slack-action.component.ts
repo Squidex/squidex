@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FormBuilder, Validators } from '@angular/forms';
+import { Component, Input, OnInit } from '@angular/core';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 @Component({
     selector: 'sqx-slack-action',
@@ -17,39 +17,21 @@ export class SlackActionComponent implements OnInit {
     @Input()
     public action: any;
 
-    @Output()
-    public actionChanged = new EventEmitter<object>();
+    @Input()
+    public actionForm: FormGroup;
 
+    @Input()
     public actionFormSubmitted = false;
-    public actionForm =
-        this.formBuilder.group({
-            webhookUrl: ['',
-                [
-                    Validators.required
-                ]],
-            text: ['']
-        });
-
-    constructor(
-        private readonly formBuilder: FormBuilder
-    ) {
-    }
 
     public ngOnInit() {
-        this.action = Object.assign({}, { webhookUrl: '', text: '' }, this.action || {});
+        this.actionForm.setControl('webhookUrl',
+            new FormControl(this.action.webhookUrl || '', [
+                Validators.required
+            ]));
 
-        this.actionFormSubmitted = false;
-        this.actionForm.reset();
-        this.actionForm.setValue(this.action);
-    }
-
-    public save() {
-        this.actionFormSubmitted = true;
-
-        if (this.actionForm.valid) {
-            const action = this.actionForm.value;
-
-            this.actionChanged.emit(action);
-        }
+        this.actionForm.setControl('text',
+            new FormControl(this.action.text || '', [
+                Validators.required
+            ]));
     }
 }

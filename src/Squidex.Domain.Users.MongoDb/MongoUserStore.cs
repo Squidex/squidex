@@ -12,6 +12,7 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.Tasks;
@@ -70,11 +71,6 @@ namespace Squidex.Domain.Users.MongoDb
         public IUser Create(string email)
         {
             return new MongoUser { Email = email, UserName = email };
-        }
-
-        public async Task<IUser> FindByIdAsync(string id)
-        {
-            return await Collection.Find(x => x.Id == id).FirstOrDefaultAsync();
         }
 
         public async Task<IUser> FindByIdAsync(string userId, CancellationToken cancellationToken)
@@ -387,6 +383,32 @@ namespace Squidex.Domain.Users.MongoDb
             ((MongoUser)user).RemoveToken(loginProvider, name);
 
             return TaskHelper.Done;
+        }
+
+        public async Task<IUser> FindByIdOrEmailAsync(string id)
+        {
+            if (ObjectId.TryParse(id, out var parsed))
+            {
+                return await Collection.Find(x => x.Id == id).FirstOrDefaultAsync();
+            }
+            else
+            {
+                return await Collection.Find(x => x.NormalizedEmail == id.ToUpperInvariant()).FirstOrDefaultAsync();
+            }
+        }
+
+        public Task<List<IUser>> QueryByEmailAsync(string email)
+        {
+            var result = Users;
+
+            if (!string.IsNullOrWhiteSpace(email))
+            {
+                var normalizedEmail = email.ToUpperInvariant();
+
+                result = result.Where(x => x.NormalizedEmail.Contains(normalizedEmail));
+            }
+
+            return Task.FromResult(result.Select(x => x).ToList());
         }
     }
 }

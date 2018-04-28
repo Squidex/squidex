@@ -9,7 +9,7 @@ import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 
-import { StringFieldPropertiesDto } from 'shared';
+import { FieldDto, StringFieldPropertiesDto } from '@app/shared';
 
 @Component({
     selector: 'sqx-string-ui',
@@ -22,6 +22,9 @@ export class StringUIComponent implements OnDestroy, OnInit {
 
     @Input()
     public editForm: FormGroup;
+
+    @Input()
+    public field: FieldDto;
 
     @Input()
     public properties: StringFieldPropertiesDto;

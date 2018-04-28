@@ -1,0 +1,34 @@
+<div class="file-drop" (sqxFileDrop)="addFiles($event)" *ngIf="!isDisabled">
+    <h3 class="file-drop-header">Drop files here to upload</h3>
+
+    <div class="file-drop-or">or</div>
+
+    <div class="file-drop-button">
+        <span class="btn btn-success" (click)="fileInput.click()">
+            <span>Select File(s)</span>
+
+            <input class="file-drop-button-input" type="file" (change)="addFiles($event.target.files)" #fileInput multiple />
+        </span>
+    </div>
+
+    <div class="file-drop-info">Drop file on existing item to replace the asset with a newer version.</div>
+</div>
+
+<div class="row">
+    <sqx-asset *ngFor="let file of newFiles" [initFile]="file" 
+        (failed)="remove(file)" 
+        (loaded)="add(file, $event)">
+    </sqx-asset>
+
+    <ng-container *ngIf="state.assets | async; let assets">
+        <sqx-asset *ngFor="let asset of assets; trackBy: trackByAsset" [asset]="asset" 
+            [isDisabled]="isDisabled"
+            [isSelectable]="selectedIds"
+            [isSelected]="isSelected(asset)"
+            (selected)="select($event)"
+            (deleting)="delete($event)">
+        </sqx-asset>
+    </ng-container>
+</div>
+
+<sqx-pager [hideWhenButtonsDisabled]="true" [pager]="state.assetsPager | async" (prev)="goPrev()" (next)="goNext()"></sqx-pager>

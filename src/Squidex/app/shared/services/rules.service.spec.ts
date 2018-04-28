@@ -14,68 +14,13 @@ import {
     ApiUrlConfig,
     CreateRuleDto,
     DateTime,
-    UpdateRuleDto,
-    Version,
     RuleDto,
     RuleEventDto,
     RuleEventsDto,
-    RulesService
+    RulesService,
+    UpdateRuleDto,
+    Version
 } from './../';
-
-describe('RuleDto', () => {
-    const creation = DateTime.today();
-    const creator = 'not-me';
-    const modified = DateTime.now();
-    const modifier = 'me';
-    const version = new Version('1');
-    const newVersion = new Version('2');
-
-    it('should update trigger', () => {
-        const trigger = { param2: 2, triggerType: 'NewType' };
-
-        const rule_1 = new RuleDto('id1', creator, creator, creation, creation, version, true, {}, 'contentChanged', {}, 'webhook');
-        const rule_2 = rule_1.updateTrigger(trigger, modifier, newVersion, modified);
-
-        expect(rule_2.trigger).toEqual(trigger);
-        expect(rule_2.triggerType).toEqual(trigger.triggerType);
-        expect(rule_2.lastModified).toEqual(modified);
-        expect(rule_2.lastModifiedBy).toEqual(modifier);
-        expect(rule_2.version).toEqual(newVersion);
-    });
-
-    it('should update action', () => {
-        const action = { param2: 2, actionType: 'NewType' };
-
-        const rule_1 = new RuleDto('id1', creator, creator, creation, creation, version, true, {}, 'contentChanged', {}, 'webhook');
-        const rule_2 = rule_1.updateAction(action, modifier, newVersion, modified);
-
-        expect(rule_2.action).toEqual(action);
-        expect(rule_2.actionType).toEqual(action.actionType);
-        expect(rule_2.lastModified).toEqual(modified);
-        expect(rule_2.lastModifiedBy).toEqual(modifier);
-        expect(rule_2.version).toEqual(newVersion);
-    });
-
-    it('should enable', () => {
-        const rule_1 = new RuleDto('id1', creator, creator, creation, creation, version, true, {}, 'contentChanged', {}, 'webhook');
-        const rule_2 = rule_1.enable(modifier, newVersion, modified);
-
-        expect(rule_2.isEnabled).toBeTruthy();
-        expect(rule_2.lastModified).toEqual(modified);
-        expect(rule_2.lastModifiedBy).toEqual(modifier);
-        expect(rule_2.version).toEqual(newVersion);
-    });
-
-    it('should disable', () => {
-        const rule_1 = new RuleDto('id1', creator, creator, creation, creation, version, true, {}, 'contentChanged', {}, 'webhook');
-        const rule_2 = rule_1.disable(modifier, newVersion, modified);
-
-        expect(rule_2.isEnabled).toBeFalsy();
-        expect(rule_2.lastModified).toEqual(modified);
-        expect(rule_2.lastModifiedBy).toEqual(modifier);
-        expect(rule_2.version).toEqual(newVersion);
-    });
-});
 
 describe('RulesService', () => {
     const now = DateTime.now();

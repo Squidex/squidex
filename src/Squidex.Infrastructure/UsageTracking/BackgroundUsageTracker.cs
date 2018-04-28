@@ -110,6 +110,8 @@ namespace Squidex.Infrastructure.UsageTracking
 
         public async Task<long> GetMonthlyCallsAsync(string key, DateTime date)
         {
+            Guard.NotNull(key, nameof(key));
+
             ThrowIfDisposed();
 
             var dateFrom = new DateTime(date.Year, date.Month, 1);

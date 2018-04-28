@@ -5,13 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 
-import {
-    fadeAnimation,
-    ModalView,
-    slideAnimation
-} from 'framework';
+import { fadeAnimation, slideAnimation } from '@app/framework';
 
 @Component({
     selector: 'sqx-onboarding-dialog',
@@ -24,8 +20,12 @@ import {
 export class OnboardingDialogComponent {
     public step = 0;
 
-    @Input()
-    public modalView = new ModalView();
+    @Output()
+    public closed = new EventEmitter();
+
+    public close() {
+        this.closed.emit();
+    }
 
     public next() {
         this.step = this.step + 1;

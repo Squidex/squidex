@@ -5,93 +5,62 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FormBuilder, Validators } from '@angular/forms';
+import { Component, Input, OnInit } from '@angular/core';
+import { FormBuilder } from '@angular/forms';
 
 import {
     AppPatternDto,
-    fadeAnimation,
-    ValidatorsEx,
-    UpdatePatternDto
-} from 'shared';
+    EditPatternForm,
+    PatternsState
+} from '@app/shared';
 
 @Component({
     selector: 'sqx-pattern',
     styleUrls: ['./pattern.component.scss'],
-    templateUrl: './pattern.component.html',
-    animations: [
-        fadeAnimation
-    ]
+    templateUrl: './pattern.component.html'
 })
 export class PatternComponent implements OnInit {
     @Input()
-    public isNew = false;
-
-    @Input()
     public pattern: AppPatternDto;
 
-    @Output()
-    public removing = new EventEmitter<any>();
-
-    @Output()
-    public updating = new EventEmitter<UpdatePatternDto>();
-
-    public editFormSubmitted = false;
-    public editForm =
-        this.formBuilder.group({
-            name: [
-                '',
-                [
-                    Validators.required,
-                    Validators.maxLength(100),
-                    ValidatorsEx.pattern('[A-z0-9]+[A-z0-9\- ]*[A-z0-9]', 'Name can only contain letters, numbers, dashes and spaces.')
-                ]
-            ],
-            pattern: [
-                '',
-                [
-                    Validators.required
-                ]
-            ],
-            message: [
-                '',
-                [
-                    Validators.maxLength(1000)
-                ]
-            ]
-        });
+    public editForm = new EditPatternForm(this.formBuilder);
 
     constructor(
+        private readonly patternsState: PatternsState,
         private readonly formBuilder: FormBuilder
     ) {
     }
 
     public ngOnInit() {
-        const pattern = this.pattern;
-
-        if (pattern) {
-            this.editForm.setValue({ name: pattern.name, pattern: pattern.pattern, message: pattern.message || '' });
-        }
+        this.editForm.load(this.pattern);
     }
 
     public cancel() {
-        this.editFormSubmitted = false;
-        this.editForm.reset();
+        this.editForm.submitCompleted(this.pattern);
+    }
+
+    public delete() {
+        this.patternsState.delete(this.pattern).onErrorResumeNext().subscribe();
     }
 
     public save() {
-        this.editFormSubmitted = true;
+        const value = this.editForm.submit();
 
-        if (this.editForm.valid) {
-            const requestDto = new UpdatePatternDto(
-                this.editForm.controls['name'].value,
-                this.editForm.controls['pattern'].value,
-                this.editForm.controls['message'].value);
-
-            this.updating.emit(requestDto);
-
-            if (!this.pattern) {
-                this.cancel();
+        if (value) {
+            if (this.pattern) {
+                this.patternsState.update(this.pattern, value)
+                    .subscribe(() => {
+                        this.editForm.submitCompleted();
+                    }, error => {
+                        this.editForm.submitFailed(error);
+                    });
+            } else {
+                this.patternsState.create(value)
+                    .subscribe(() => {
+                        this.editForm.submitCompleted({});
+                    }, error => {
+                        this.editForm.submitFailed(error);
+                    });
             }
         }
     }

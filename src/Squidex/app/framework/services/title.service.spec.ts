@@ -9,7 +9,7 @@ import {
     TitlesConfig,
     TitleService,
     TitleServiceFactory
-} from './../';
+} from './title.service';
 
 describe('TitleService', () => {
     beforeEach(() => {

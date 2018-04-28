@@ -1,9 +1,9 @@
 <div [formGroup]="editForm">
     <div class="form-group row">
-        <label class="col col-3 col-form-label" for="fieldPlaceholder">Placeholder</label>
+        <label class="col col-3 col-form-label" for="{{field.fieldId}}_fieldPlaceholder">Placeholder</label>
 
         <div class="col col-6">
-            <input type="text" class="form-control" id="fieldPlaceholder" maxlength="100" formControlName="placeholder" />
+            <input type="text" class="form-control" id="{{field.fieldId}}_fieldPlaceholder" maxlength="100" formControlName="placeholder" />
 
             <small class="form-text text-muted">
                 Define the placeholder for the input control.
@@ -14,28 +14,28 @@
         <label class="col col-3 col-form-label">Editor</label>
 
         <div class="col col-9">
-            <label class="btn btn-radio" [class.active]="editForm.controls.editor.value === 'Input'">
+            <label class="btn btn-radio" [class.active]="editForm.controls['editor'].value === 'Input'">
                 <input type="radio" class="radio-input" formControlName="editor" value="Input" />
 
                 <i class="icon-control-Input"></i>
 
                 <span class="radio-label">Input</span>
             </label>
-            <label class="btn btn-radio" [class.active]="editForm.controls.editor.value === 'Dropdown'">
+            <label class="btn btn-radio" [class.active]="editForm.controls['editor'].value === 'Dropdown'">
                 <input type="radio" class="radio-input" formControlName="editor" value="Dropdown" />
 
                 <i class="icon-control-Dropdown"></i>
 
                 <span class="radio-label" clas>Dropdown</span>
             </label>
-            <label class="btn btn-radio" [class.active]="editForm.controls.editor.value === 'Radio'">
+            <label class="btn btn-radio" [class.active]="editForm.controls['editor'].value === 'Radio'">
                 <input type="radio" class="radio-input" formControlName="editor" value="Radio" />
 
                 <i class="icon-control-Radio"></i>
 
                 <span class="radio-label">Radio</span>
             </label>
-            <label class="btn btn-radio" [class.active]="editForm.controls.editor.value === 'Stars'">
+            <label class="btn btn-radio" [class.active]="editForm.controls['editor'].value === 'Stars'">
                 <input type="radio" class="radio-input" formControlName="editor" value="Stars" />
 
                 <i class="icon-control-Stars"></i>
@@ -54,8 +54,8 @@
     <div class="form-group row" [class.hidden]="hideInlineEditable | async">
         <div class="col col-9 offset-3">
             <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="fieldInlineEditable" formControlName="inlineEditable" />
-                <label class="form-check-label" for="fieldInlineEditable">
+                <input class="form-check-input" type="checkbox" id="{{field.fieldId}}_fieldInlineEditable" formControlName="inlineEditable" />
+                <label class="form-check-label" for="{{field.fieldId}}_fieldInlineEditable">
                     Inline Editable
                 </label>
             </div>

@@ -1,0 +1,24 @@
+<ng-content></ng-content>
+
+<sqx-modal-dialog *sqxModalView="dialogView;onRoot:true" showClose="false" (closed)="cancel()">
+    <ng-container title>
+        {{dialogRequest?.title}}
+    </ng-container>
+
+    <ng-container content>
+        {{dialogRequest?.text}}
+    </ng-container>
+
+    <ng-container footer>
+        <button type="button" class="float-left btn btn-secondary" (click)="cancel()">No</button>
+        <button type="button" class="float-right btn btn-danger" (click)="confirm()" sqxFocusOnInit>Yes</button>
+    </ng-container>
+</sqx-modal-dialog>
+
+<div class="notification-container notification-container-{{position}}">
+    <div class="alert alert-dismissible alert-{{notification.messageType}}" *ngFor="let notification of notifications" (click)="close(notification)" @fade>
+        <button type="button" class="close" data-dismiss="alert" (closed)="close(notification)">&times;</button>
+
+        <span [innerHTML]="notification.message"></span>
+    </div>
+</div>

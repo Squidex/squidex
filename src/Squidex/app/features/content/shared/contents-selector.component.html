@@ -1,0 +1,73 @@
+<sqx-modal-dialog (closed)="complete()" large="true" fullHeight="true" contentClass="grid">
+    <ng-container title>
+        Select contents
+    </ng-container>
+
+    <ng-container tabs>
+        <div class="text-right">
+            <button class="btn btn-link btn-secondary" (click)="reload()">
+                <i class="icon-reset"></i> Refresh
+            </button>
+            
+            <sqx-search-form 
+                [query]="contentsState.contentsQuery | async" 
+                (queryChanged)="search($event)"
+                [canArchive]="false">
+            </sqx-search-form>
+
+            <ng-container *ngIf="languages.length > 1">
+                <sqx-language-selector class="languages-buttons" (selectedLanguageChange)="selectLanguage($event)" [languages]="languages.values"></sqx-language-selector>
+            </ng-container>
+        </div>
+    </ng-container>
+
+    <ng-container content>
+        <div class="grid-header">
+            <table class="table table-items table-fixed">
+                <thead>
+                    <tr>
+                        <th class="cell-select">
+                            <input type="checkbox" class="form-control" [ngModel]="isAllSelected" (ngModelChange)="selectAll($event)" />
+                        </th>
+                        <th class="cell-auto" *ngFor="let field of schema.listFields">
+                            <span class="field">{{field.displayName}}</span>
+                        </th>
+                        <th class="cell-time">
+                            Updated
+                        </th>
+                        <th class="cell-user">
+                            By
+                        </th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+
+        <div class="grid-content">
+            <div sqxIgnoreScrollbar>
+                <table class="table table-items table-fixed">
+                    <tbody>
+                        <ng-template ngFor let-content [ngForOf]="contentsState.contents | async" [ngForTrackBy]="trackByContent">
+                            <tr [sqxContent]="content"
+                                [selected]="isItemSelected(content)"
+                                (selectedChange)="selectContent(content)"
+                                [language]="language"
+                                [schema]="schema" 
+                                isReadOnly="true"></tr>
+                            <tr class="spacer"></tr>
+                        </ng-template>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="grid-footer">
+            <sqx-pager [pager]="contentsState.contentsPager | async" (prev)="goPrev()" (next)="goNext()"></sqx-pager>
+        </div>
+    </ng-container>
+
+    <ng-container footer>
+        <button type="reset" class="float-left btn btn-secondary" (click)="complete()">Cancel</button>
+        <button type="submit" class="float-right btn btn-success" (click)="select()" [disabled]="selectionCount === 0">Link selected contents ({{selectionCount}})</button>
+    </ng-container>
+</sqx-modal-dialog>

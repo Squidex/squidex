@@ -9,7 +9,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import 'framework/angular/http-extensions';
+import '@app/framework/angular/http/http-extensions';
 
 import {
     AnalyticsService,
@@ -17,7 +17,7 @@ import {
     HTTP,
     Version,
     Versioned
-} from 'framework';
+} from '@app/framework';
 
 export class AppContributorsDto {
     constructor(
@@ -25,24 +25,6 @@ export class AppContributorsDto {
         public readonly maxContributors: number,
         public readonly version: Version
     ) {
-    }
-
-    public addContributor(contributor: AppContributorDto, version: Version) {
-        return new AppContributorsDto([...this.contributors, contributor], this.maxContributors, version);
-    }
-
-    public updateContributor(contributor: AppContributorDto, version: Version) {
-        return new AppContributorsDto(
-            this.contributors.map(c => c.contributorId === contributor.contributorId ? contributor : c),
-            this.maxContributors,
-            version);
-    }
-
-    public removeContributor(contributor: AppContributorDto, version: Version) {
-        return new AppContributorsDto(
-            this.contributors.filter(c => c.contributorId !== contributor.contributorId),
-            this.maxContributors,
-            version);
     }
 }
 
@@ -52,9 +34,12 @@ export class AppContributorDto {
         public readonly permission: string
     ) {
     }
+}
 
-    public changePermission(permission: string): AppContributorDto {
-        return new AppContributorDto(this.contributorId, permission);
+export class ContributorAssignedDto {
+    constructor(
+        public readonly contributorId: string
+    ) {
     }
 }
 
@@ -87,10 +72,17 @@ export class AppContributorsService {
                 .pretifyError('Failed to load contributors. Please reload.');
     }
 
-    public postContributor(appName: string, dto: AppContributorDto, version: Version): Observable<Versioned<any>> {
+    public postContributor(appName: string, dto: AppContributorDto, version: Version): Observable<Versioned<ContributorAssignedDto>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/contributors`);
 
         return HTTP.postVersioned(this.http, url, dto, version)
+                .map(response => {
+                    const body: any = response.payload.body;
+
+                    const result = new ContributorAssignedDto(body.contributorId);
+
+                    return new Versioned(response.version, result);
+                })
                 .do(() => {
                     this.analytics.trackEvent('Contributor', 'Configured', appName);
                 })

@@ -5,12 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.IO;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Orleans;
 using Orleans.Hosting;
+using Squidex.Config;
 using Squidex.Infrastructure.Log.Adapter;
 
 namespace Squidex
@@ -28,6 +30,7 @@ namespace Squidex
                 {
                     builder.AddConfiguration(hostingContext.Configuration.GetSection("logging"));
                     builder.AddSemanticLog();
+                    builder.AddFilter();
                 })
                 .ConfigureAppConfiguration((hostContext, builder) =>
                 {

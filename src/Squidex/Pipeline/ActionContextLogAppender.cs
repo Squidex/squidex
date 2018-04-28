@@ -6,32 +6,28 @@
 // ==========================================================================
 
 using System;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Squidex.Infrastructure.Log;
 
 namespace Squidex.Pipeline
 {
-    public class ActionContextLogAppender : ILogAppender
+    public sealed class ActionContextLogAppender : ILogAppender
     {
         private readonly IActionContextAccessor actionContextAccessor;
+        private readonly IHttpContextAccessor httpContextAccessor;
 
-        public ActionContextLogAppender(IActionContextAccessor actionContextAccessor)
+        public ActionContextLogAppender(IActionContextAccessor actionContextAccessor, IHttpContextAccessor httpContextAccessor)
         {
             this.actionContextAccessor = actionContextAccessor;
+            this.httpContextAccessor = httpContextAccessor;
         }
 
         public void Append(IObjectWriter writer)
         {
-            var actionContext = actionContextAccessor.ActionContext;
+            var httpContext = httpContextAccessor.HttpContext;
 
-            if (actionContext == null)
-            {
-                return;
-            }
-
-            var httpContext = actionContext.HttpContext;
-
-            if (string.IsNullOrEmpty(httpContext.Request.Method))
+            if (string.IsNullOrEmpty(httpContext?.Request?.Method))
             {
                 return;
             }
@@ -47,17 +43,25 @@ namespace Squidex.Pipeline
                 httpContext.Items[nameof(requestId)] = requestId = Guid.NewGuid();
             }
 
-            writer.WriteObject("web", w => w
-                .WriteProperty("requestId", requestId.ToString())
-                .WriteProperty("requestPath", httpContext.Request.Path)
-                .WriteProperty("requestMethod", httpContext.Request.Method)
-                .WriteObject("routeValues", r =>
+            writer.WriteObject("web", w =>
+            {
+                w.WriteProperty("requestId", requestId.ToString());
+                w.WriteProperty("requestPath", httpContext.Request.Path);
+                w.WriteProperty("requestMethod", httpContext.Request.Method);
+
+                var actionContext = actionContextAccessor.ActionContext;
+
+                if (actionContext != null)
                 {
-                    foreach (var kvp in actionContext.ActionDescriptor.RouteValues)
+                    w.WriteObject("routeValues", r =>
                     {
-                        r.WriteProperty(kvp.Key, kvp.Value);
-                    }
-                }));
+                        foreach (var kvp in actionContext.ActionDescriptor.RouteValues)
+                        {
+                            r.WriteProperty(kvp.Key, kvp.Value);
+                        }
+                    });
+                }
+            });
         }
     }
 }

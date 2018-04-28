@@ -10,10 +10,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using Squidex.Areas.Api.Controllers.Apps.Models;
-using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
 
 namespace Squidex.Areas.Api.Controllers.Apps
@@ -50,7 +48,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [ApiCosts(0)]
         public IActionResult GetClients(string app)
         {
-            var response = App.Clients.Select(x => SimpleMapper.Map(x.Value, new ClientDto { Id = x.Key })).ToList();
+            var response = App.Clients.Select(ClientDto.FromKvp).ToList();
 
             Response.Headers["ETag"] = App.Version.ToString();
 
@@ -76,11 +74,11 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [ApiCosts(1)]
         public async Task<IActionResult> PostClient(string app, [FromBody] CreateAppClientDto request)
         {
-            var command = SimpleMapper.Map(request, new AttachClient());
+            var command = request.ToCommand();
 
             await CommandBus.PublishAsync(command);
 
-            var response = SimpleMapper.Map(command, new ClientDto { Name = command.Id, Permission = AppClientPermission.Editor });
+            var response = ClientDto.FromCommand(command);
 
             return CreatedAtAction(nameof(GetClients), new { app }, response);
         }
@@ -104,7 +102,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [ApiCosts(1)]
         public async Task<IActionResult> PutClient(string app, string clientId, [FromBody] UpdateAppClientDto request)
         {
-            await CommandBus.PublishAsync(SimpleMapper.Map(request, new UpdateClient { Id = clientId }));
+            await CommandBus.PublishAsync(request.ToCommand(clientId));
 
             return NoContent();
         }

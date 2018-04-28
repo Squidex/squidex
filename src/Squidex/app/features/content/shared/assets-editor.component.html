@@ -1,18 +1,21 @@
 <div class="assets-container" [class.disabled]="isDisabled">
     <div class="row">
-        <div class="col-4 drop-area-container">
-            <div class="drop-area" dnd-droppable (onDropSuccess)="onAssetDropped($event.dragData)" [allowDrop]="canDrop()" (sqxFileDrop)="addFiles($event)" routerLink="assets">
-                Drop files or assets here to add them.
+        <div class="drop-area-container">
+            <div class="drop-area" (sqxFileDrop)="addFiles($event)" (click)="selectorModal.show()">
+                Drop files here to add them.
             </div>
         </div>
 
-        <sqx-asset class="col-4" *ngFor="let file of newAssets" [initFile]="file" 
+        <sqx-asset *ngFor="let file of newAssets" [initFile]="file" 
             (failed)="onAssetFailed(file)" 
             (loaded)="onAssetLoaded(file, $event)">
         </sqx-asset>
-        <sqx-asset class="col-4" *ngFor="let asset of oldAssets" [asset]="asset" [closeMode]="true"
-            (closing)="onAssetRemoving($event)"
-            (updated)="onAssetUpdated($event)">
+        <sqx-asset *ngFor="let asset of oldAssets" [asset]="asset" removeMode="true" isDisabled="true"
+            (removing)="onAssetRemoving($event)">
         </sqx-asset>
     </div>
 </div>
+
+<ng-container *sqxModalView="selectorModal;onRoot:true;closeAuto:false">
+    <sqx-assets-selector (selected)="onAssetsSelected($event)"></sqx-assets-selector>
+</ng-container>

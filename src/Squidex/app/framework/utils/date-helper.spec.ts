@@ -7,7 +7,7 @@
 
 import * as moment from 'moment';
 
-import { DateHelper } from './../';
+import { DateHelper } from './date-helper';
 
 describe('DateHelper', () => {
     it('should call config method of moment object', () => {

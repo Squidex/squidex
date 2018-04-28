@@ -6,11 +6,11 @@
  */
 
 import {
-    Notification,
     DialogRequest,
     DialogService,
-    DialogServiceFactory
-} from './../';
+    DialogServiceFactory,
+    Notification
+} from './dialog.service';
 
 describe('DialogService', () => {
     it('should instantiate from factory', () => {

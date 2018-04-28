@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using Microsoft.OData;
 using Microsoft.OData.UriParser;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.ConvertContent;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents.Edm;
@@ -27,113 +28,130 @@ namespace Squidex.Domain.Apps.Entities.Contents
     public sealed class ContentQueryService : IContentQueryService
     {
         private readonly IContentRepository contentRepository;
+        private readonly IContentVersionLoader contentVersionLoader;
         private readonly IAppProvider appProvider;
         private readonly IScriptEngine scriptEngine;
         private readonly EdmModelBuilder modelBuilder;
 
         public ContentQueryService(
             IContentRepository contentRepository,
+            IContentVersionLoader contentVersionLoader,
             IAppProvider appProvider,
             IScriptEngine scriptEngine,
             EdmModelBuilder modelBuilder)
         {
             Guard.NotNull(contentRepository, nameof(contentRepository));
+            Guard.NotNull(contentVersionLoader, nameof(contentVersionLoader));
             Guard.NotNull(scriptEngine, nameof(scriptEngine));
             Guard.NotNull(modelBuilder, nameof(modelBuilder));
             Guard.NotNull(appProvider, nameof(appProvider));
 
             this.contentRepository = contentRepository;
+            this.contentVersionLoader = contentVersionLoader;
             this.appProvider = appProvider;
             this.scriptEngine = scriptEngine;
             this.modelBuilder = modelBuilder;
         }
 
-        public async Task<(ISchemaEntity Schema, IContentEntity Content)> FindContentAsync(IAppEntity app, string schemaIdOrName, ClaimsPrincipal user, Guid id, long version = -1)
+        public Task ThrowIfSchemaNotExistsAsync(IAppEntity app, string schemaIdOrName)
+        {
+            return GetSchemaAsync(app, schemaIdOrName);
+        }
+
+        public async Task<IContentEntity> FindContentAsync(IAppEntity app, string schemaIdOrName, ClaimsPrincipal user, Guid id, long version = -1)
         {
             Guard.NotNull(app, nameof(app));
             Guard.NotNull(user, nameof(user));
+            Guard.NotEmpty(id, nameof(id));
             Guard.NotNullOrEmpty(schemaIdOrName, nameof(schemaIdOrName));
 
-            var isFrontendClient = user.IsInClient("squidex-frontend");
+            var schema = await GetSchemaAsync(app, schemaIdOrName);
 
-            var schema = await FindSchemaAsync(app, schemaIdOrName);
+            var isFrontendClient = IsFrontendClient(user);
+            var isVersioned = version > EtagVersion.Empty;
 
             var content =
-                version > EtagVersion.Empty ?
-                await contentRepository.FindContentAsync(app, schema, id, version) :
-                await contentRepository.FindContentAsync(app, schema, id);
+                isVersioned ?
+                await FindContentByVersionAsync(id, version) :
+                await FindContentAsync(app, id, schema);
 
-            if (content == null || (content.Status != Status.Published && !isFrontendClient))
+            if (content == null || (content.Status != Status.Published && !isFrontendClient) || content.SchemaId.Id != schema.Id)
             {
                 throw new DomainObjectNotFoundException(id.ToString(), typeof(ISchemaEntity));
             }
 
-            content = TransformContent(user, schema, Enumerable.Repeat(content, 1)).FirstOrDefault();
+            content = TransformContent(app, schema, user, Enumerable.Repeat(content, 1), isVersioned, isFrontendClient).FirstOrDefault();
 
-            return (schema, content);
+            return content;
         }
 
-        public async Task<(ISchemaEntity Schema, IResultList<IContentEntity> Contents)> QueryAsync(IAppEntity app, string schemaIdOrName, ClaimsPrincipal user, bool archived, string query)
+        public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, string schemaIdOrName, ClaimsPrincipal user, bool archived, string query)
         {
             Guard.NotNull(app, nameof(app));
             Guard.NotNull(user, nameof(user));
             Guard.NotNullOrEmpty(schemaIdOrName, nameof(schemaIdOrName));
 
-            var schema = await FindSchemaAsync(app, schemaIdOrName);
+            var schema = await GetSchemaAsync(app, schemaIdOrName);
+
+            var isFrontendClient = IsFrontendClient(user);
 
             var parsedQuery = ParseQuery(app, query, schema);
-            var parsedStatus = ParseStatus(user, archived);
+            var parsedStatus = ParseStatus(isFrontendClient, archived);
 
             var contents = await contentRepository.QueryAsync(app, schema, parsedStatus.ToArray(), parsedQuery);
 
-            return TransformContents(user, schema, contents);
+            return TransformContents(app, schema, user, contents, false, isFrontendClient);
         }
 
-        public async Task<(ISchemaEntity Schema, IResultList<IContentEntity> Contents)> QueryAsync(IAppEntity app, string schemaIdOrName, ClaimsPrincipal user, bool archived, HashSet<Guid> ids)
+        public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, string schemaIdOrName, ClaimsPrincipal user, bool archived, HashSet<Guid> ids)
         {
             Guard.NotNull(ids, nameof(ids));
             Guard.NotNull(app, nameof(app));
             Guard.NotNull(user, nameof(user));
             Guard.NotNullOrEmpty(schemaIdOrName, nameof(schemaIdOrName));
 
-            var schema = await FindSchemaAsync(app, schemaIdOrName);
+            var schema = await GetSchemaAsync(app, schemaIdOrName);
 
-            var parsedStatus = ParseStatus(user, archived);
+            var isFrontendClient = IsFrontendClient(user);
+
+            var parsedStatus = ParseStatus(isFrontendClient, archived);
 
             var contents = await contentRepository.QueryAsync(app, schema, parsedStatus.ToArray(), ids);
 
-            return TransformContents(user, schema, contents);
+            return TransformContents(app, schema, user, contents, false, isFrontendClient);
         }
 
-        private (ISchemaEntity Schema, IResultList<IContentEntity> Contents) TransformContents(ClaimsPrincipal user, ISchemaEntity schema, IResultList<IContentEntity> contents)
+        private IResultList<IContentEntity> TransformContents(IAppEntity app, ISchemaEntity schema, ClaimsPrincipal user,
+            IResultList<IContentEntity> contents,
+            bool isTypeChecking,
+            bool isFrontendClient)
         {
-            var transformed = TransformContent(user, schema, contents);
+            var transformed = TransformContent(app, schema, user, contents, isTypeChecking, isFrontendClient);
 
-            return (schema, ResultList.Create(transformed, contents.Total));
+            return ResultList.Create(transformed, contents.Total);
         }
 
-        private IEnumerable<IContentEntity> TransformContent(ClaimsPrincipal user, ISchemaEntity schema, IEnumerable<IContentEntity> contents)
+        private IEnumerable<IContentEntity> TransformContent(IAppEntity app, ISchemaEntity schema, ClaimsPrincipal user,
+            IEnumerable<IContentEntity> contents,
+            bool isTypeChecking,
+            bool isFrontendClient)
         {
             var scriptText = schema.ScriptQuery;
 
-            if (!string.IsNullOrWhiteSpace(scriptText))
-            {
-                foreach (var content in contents)
-                {
-                    var contentData = scriptEngine.Transform(new ScriptContext { User = user, Data = content.Data, ContentId = content.Id }, scriptText);
-                    var contentResult = SimpleMapper.Map(content, new ContentEntity());
+            var isScripting = !string.IsNullOrWhiteSpace(scriptText);
 
-                    contentResult.Data = contentData;
-
-                    yield return contentResult;
-                }
-            }
-            else
+            foreach (var content in contents)
             {
-                foreach (var content in contents)
+                var result = SimpleMapper.Map(content, new ContentEntity());
+
+                if (!isFrontendClient && isScripting)
                 {
-                    yield return content;
+                    result.Data = scriptEngine.Transform(new ScriptContext { User = user, Data = content.Data, ContentId = content.Id }, scriptText);
                 }
+
+                result.Data = result.Data.ToApiModel(schema.SchemaDef, app.LanguagesConfig, isFrontendClient, isTypeChecking);
+
+                yield return result;
             }
         }
 
@@ -151,7 +169,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             }
         }
 
-        public async Task<ISchemaEntity> FindSchemaAsync(IAppEntity app, string schemaIdOrName)
+        public async Task<ISchemaEntity> GetSchemaAsync(IAppEntity app, string schemaIdOrName)
         {
             Guard.NotNull(app, nameof(app));
 
@@ -175,11 +193,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return schema;
         }
 
-        private static List<Status> ParseStatus(ClaimsPrincipal user, bool archived)
+        private static List<Status> ParseStatus(bool isFrontendClient, bool archived)
         {
             var status = new List<Status>();
 
-            if (user.IsInClient("squidex-frontend"))
+            if (isFrontendClient)
             {
                 if (archived)
                 {
@@ -197,6 +215,21 @@ namespace Squidex.Domain.Apps.Entities.Contents
             }
 
             return status;
+        }
+
+        private Task<IContentEntity> FindContentByVersionAsync(Guid id, long version)
+        {
+            return contentVersionLoader.LoadAsync(id, version);
+        }
+
+        private Task<IContentEntity> FindContentAsync(IAppEntity app, Guid id, ISchemaEntity schema)
+        {
+            return contentRepository.FindContentAsync(app, schema, id);
+        }
+
+        private static bool IsFrontendClient(ClaimsPrincipal user)
+        {
+            return user.IsInClient("squidex-frontend");
         }
     }
 }

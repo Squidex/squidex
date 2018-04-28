@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
+import { Component, Input, OnInit } from '@angular/core';
+import { FormControl, FormGroup } from '@angular/forms';
 
 @Component({
     selector: 'sqx-asset-changed-trigger',
@@ -17,43 +17,23 @@ export class AssetChangedTriggerComponent implements OnInit {
     @Input()
     public trigger: any;
 
-    @Output()
-    public triggerChanged = new EventEmitter<object>();
+    @Input()
+    public triggerForm: FormGroup;
 
+    @Input()
     public triggerFormSubmitted = false;
-    public triggerForm =
-        this.formBuilder.group({
-            sendCreate: false,
-            sendUpdate: false,
-            sendRename: false,
-            sendDelete: false
-        });
-
-    constructor(
-        private readonly formBuilder: FormBuilder
-    ) {
-    }
 
     public ngOnInit() {
-        this.trigger = Object.assign({}, {
-            sendCreate: false,
-            sendUpdate: false,
-            sendRename: false,
-            sendDelete: false
-        }, this.trigger || {});
+        this.triggerForm.setControl('sendCreate',
+            new FormControl(this.trigger.sendCreate || false));
 
-        this.triggerFormSubmitted = false;
-        this.triggerForm.reset();
-        this.triggerForm.setValue(this.trigger);
-    }
+        this.triggerForm.setControl('sendUpdate',
+            new FormControl(this.trigger.sendUpdate || false));
 
-    public save() {
-        this.triggerFormSubmitted = true;
+        this.triggerForm.setControl('sendRename',
+            new FormControl(this.trigger.sendRename || false));
 
-        if (this.triggerForm.valid) {
-            const trigger = this.triggerForm.value;
-
-            this.triggerChanged.emit(trigger);
-        }
+        this.triggerForm.setControl('sendDelete',
+            new FormControl(this.trigger.sendDelete || false));
     }
 }
