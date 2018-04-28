@@ -124,7 +124,9 @@
         }
 
         a {
-            color: $color-dark-foreground;
+            & {
+                color: $color-dark-foreground !important;
+            }
 
             &,
             &:hover {

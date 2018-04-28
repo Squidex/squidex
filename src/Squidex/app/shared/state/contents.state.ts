@@ -348,7 +348,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     }
 
     public loadVersion(content: ContentDto, version: Version): Observable<Versioned<any>> {
-        return this.contentsService.getVersionData(this.appName, this.schemaName, content.id, new Version(version.toString()))
+        return this.contentsService.getVersionData(this.appName, this.schemaName, content.id, version)
             .notify(this.dialogs);
     }
 

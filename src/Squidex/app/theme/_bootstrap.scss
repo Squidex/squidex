@@ -56,7 +56,7 @@
     }
 
     .alert-link {
-        color: $color-dark-foreground;
+        color: $color-dark-foreground !important;
         font-size: inherit;
         font-weight: normal;
         text-decoration: underline;

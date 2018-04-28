@@ -60,6 +60,9 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<ContentQueryService>()
                 .As<IContentQueryService>();
 
+            services.AddSingletonAs<ContentVersionLoader>()
+                .As<IContentVersionLoader>();
+
             services.AddSingletonAs<AppHistoryEventsCreator>()
                 .As<IHistoryEventsCreator>();
 
