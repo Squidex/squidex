@@ -4,6 +4,7 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Squidex.Domain.Apps.Core.Model\Squidex.Domain.Apps.Core.Model.csproj" />
+    <ProjectReference Include="..\..\src\Squidex.Domain.Apps.Entities.MongoDb\Squidex.Domain.Apps.Entities.MongoDb.csproj" />
     <ProjectReference Include="..\..\src\Squidex.Domain.Apps.Entities\Squidex.Domain.Apps.Entities.csproj" />
     <ProjectReference Include="..\..\src\Squidex.Domain.Apps.Events\Squidex.Domain.Apps.Events.csproj" />
     <ProjectReference Include="..\..\src\Squidex.Infrastructure.MongoDb\Squidex.Infrastructure.MongoDb.csproj" />

@@ -38,6 +38,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 if (content.Version < version)
                 {
                     content = content.Apply(e);
+                    content.Version++;
                 }
             });
 

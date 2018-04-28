@@ -10,7 +10,7 @@ using Squidex.Infrastructure.Migrations;
 
 namespace Migrate_01
 {
-    public class RebuildAssets : IMigration
+    public sealed class RebuildAssets : IMigration
     {
         private readonly Rebuilder rebuilder;
 

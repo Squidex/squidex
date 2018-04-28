@@ -147,25 +147,37 @@ namespace Squidex.Domain.Apps.Entities.Contents
         }
 
         [Fact]
-        public async Task Should_return_contents_with_ids_from_repository_and_transform()
+        public async Task Should_return_contents_with_ids_from_repository()
         {
             await TestManyIdRequest(true, false, new HashSet<Guid> { Guid.NewGuid() }, Status.Draft, Status.Published);
         }
 
         [Fact]
-        public async Task Should_return_non_archived_contents_from_repository_and_transform()
+        public async Task Should_return_contents_with_ids_from_repository_and_transform_as_non_frontend()
+        {
+            await TestManyIdRequest(false, false, new HashSet<Guid> { Guid.NewGuid() }, Status.Published);
+        }
+
+        [Fact]
+        public async Task Should_return_non_archived_contents_from_repository()
         {
             await TestManyRequest(true, false, Status.Draft, Status.Published);
         }
 
         [Fact]
-        public async Task Should_return_archived_contents_from_repository_and_transform()
+        public async Task Should_return_non_archived_contents_from_repository_and_transform_as_non_frontend()
+        {
+            await TestManyRequest(false, false, Status.Published);
+        }
+
+        [Fact]
+        public async Task Should_return_archived_contents_from_repository()
         {
             await TestManyRequest(true, true, Status.Archived);
         }
 
         [Fact]
-        public async Task Should_return_draft_contents_from_repository_and_transform()
+        public async Task Should_return_draft_contents_from_repository()
         {
             await TestManyRequest(false, false, Status.Published);
         }
@@ -189,6 +201,17 @@ namespace Squidex.Domain.Apps.Entities.Contents
             Assert.Equal(content.Id, result[0].Id);
 
             Assert.Equal(123, result.Total);
+
+            if (!isFrontend)
+            {
+                A.CallTo(() => scriptEngine.Transform(A<ScriptContext>.Ignored, A<string>.Ignored))
+                    .MustHaveHappened(Repeated.Exactly.Times(result.Count));
+            }
+            else
+            {
+                A.CallTo(() => scriptEngine.Transform(A<ScriptContext>.Ignored, A<string>.Ignored))
+                    .MustNotHaveHappened();
+            }
         }
 
         private async Task TestManyIdRequest(bool isFrontend, bool archive, HashSet<Guid> ids, params Status[] status)
@@ -204,6 +227,17 @@ namespace Squidex.Domain.Apps.Entities.Contents
             Assert.Equal(content.Id, result[0].Id);
 
             Assert.Equal(123, result.Total);
+
+            if (!isFrontend)
+            {
+                A.CallTo(() => scriptEngine.Transform(A<ScriptContext>.Ignored, A<string>.Ignored))
+                    .MustHaveHappened(Repeated.Exactly.Times(result.Count));
+            }
+            else
+            {
+                A.CallTo(() => scriptEngine.Transform(A<ScriptContext>.Ignored, A<string>.Ignored))
+                    .MustNotHaveHappened();
+            }
         }
 
         private void SetupClaims(bool isFrontend)

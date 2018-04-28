@@ -161,13 +161,16 @@ namespace Squidex.Config.Domain
             services.AddTransientAs<MigrationPath>()
                 .As<IMigrationPath>();
 
+            services.AddTransientAs<AddPatterns>()
+                .As<IMigration>();
+
             services.AddTransientAs<ConvertEventStore>()
                 .As<IMigration>();
 
             services.AddTransientAs<ConvertEventStoreAppId>()
                 .As<IMigration>();
 
-            services.AddTransientAs<AddPatterns>()
+            services.AddTransientAs<DeleteArchiveCollection>()
                 .As<IMigration>();
 
             services.AddTransientAs<RebuildContents>()

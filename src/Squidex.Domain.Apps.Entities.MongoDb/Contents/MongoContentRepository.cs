@@ -152,5 +152,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                     callback(c);
                 });
         }
+
+        public Task DeleteArchiveAsync()
+        {
+            return Database.DropCollectionAsync("States_Contents_Archive");
+        }
     }
 }
