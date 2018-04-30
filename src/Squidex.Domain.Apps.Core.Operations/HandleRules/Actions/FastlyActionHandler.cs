@@ -19,9 +19,10 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
 {
     public sealed class FastlyJob
     {
-        public string Key { get; set; }
         public string FastlyApiKey { get; set; }
         public string FastlyServiceID { get; set; }
+
+        public string Key { get; set; }
     }
 
     public sealed class FastlyActionHandler : RuleActionHandler<FastlyAction, FastlyJob>
@@ -33,14 +34,14 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
         {
             if (@event.Headers.Contains(CommonHeaders.AggregateId))
             {
-                var ruleData = new FastlyJob
+                var ruleJob = new FastlyJob
                 {
                     Key = @event.Headers.AggregateId().ToString(),
                     FastlyApiKey = action.ApiKey,
                     FastlyServiceID = action.ServiceId
                 };
 
-                return Task.FromResult((Description, ruleData));
+                return Task.FromResult((Description, ruleJob));
             }
 
             return Task.FromResult((DescriptionIgnore, new FastlyJob()));
