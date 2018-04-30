@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using Newtonsoft.Json.Linq;
 using NodaTime;
 
 namespace Squidex.Domain.Apps.Core.Rules
@@ -28,6 +29,6 @@ namespace Squidex.Domain.Apps.Core.Rules
 
         public Instant Expires { get; set; }
 
-        public RuleJobData ActionData { get; set; }
+        public JObject ActionData { get; set; }
     }
 }

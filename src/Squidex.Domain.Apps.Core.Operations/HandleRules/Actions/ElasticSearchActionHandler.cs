@@ -10,17 +10,37 @@ using System.Threading.Tasks;
 using Elasticsearch.Net;
 using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Actions;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 
+#pragma warning disable SA1649 // File name must match first type name
+
 namespace Squidex.Domain.Apps.Core.HandleRules.Actions
 {
-    public sealed class ElasticSearchActionHandler : RuleActionHandler<ElasticSearchAction>
+    public sealed class ElasticSearchJob
     {
+        public string Host { get; set; }
+
+        public string Username { get; set; }
+        public string Password { get; set; }
+
+        public string ContentId { get; set; }
+
+        public string IndexName { get; set; }
+        public string IndexType { get; set; }
+
+        public string Operation { get; set; }
+
+        public JObject Content { get; set; }
+    }
+
+    public sealed class ElasticSearchActionHandler : RuleActionHandler<ElasticSearchAction, ElasticSearchJob>
+    {
+        private const string DescriptionIgnore = "Ignore";
+
         private readonly ClientPool<(Uri Host, string Username, string Password), ElasticLowLevelClient> clients;
         private readonly RuleEventFormatter formatter;
 
@@ -43,23 +63,26 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
             });
         }
 
-        protected override (string Description, RuleJobData Data) CreateJob(Envelope<AppEvent> @event, string eventName, ElasticSearchAction action)
+        protected override async Task<(string Description, ElasticSearchJob Data)> CreateJobAsync(Envelope<AppEvent> @event, string eventName, ElasticSearchAction action)
         {
-            var ruleDescription = string.Empty;
-            var ruleData = new RuleJobData
-            {
-                ["Host"] = action.Host,
-                ["Username"] = action.Username,
-                ["Password"] = action.Password
-            };
-
             if (@event.Payload is ContentEvent contentEvent)
             {
-                ruleData["ContentId"] = contentEvent.ContentId.ToString();
-                ruleData["IndexName"] = formatter.FormatString(action.IndexName, @event);
-                ruleData["IndexType"] = formatter.FormatString(action.IndexType, @event);
+                var contentId = contentEvent.ContentId.ToString();
+
+                var ruleDescription = string.Empty;
+                var ruleJob = new ElasticSearchJob
+                {
+                    Host = action.Host.ToString(),
+                    Username = action.Username,
+                    Password = action.Password,
+                    ContentId = contentId,
+                    IndexName = await formatter.FormatStringAsync(action.IndexName, @event),
+                    IndexType = await formatter.FormatStringAsync(action.IndexType, @event),
+                };
 
                 var timestamp = @event.Headers.Timestamp().ToString();
+
+                var actor = @event.Payload.Actor.ToString();
 
                 switch (@event.Payload)
                 {
@@ -67,13 +90,13 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
                         {
                             ruleDescription = $"Add entry to ES index: {action.IndexName}";
 
-                            ruleData["Operation"] = "Create";
-                            ruleData["Content"] = new JObject(
-                                new JProperty("id", contentEvent.ContentId),
+                            ruleJob.Operation = "Create";
+                            ruleJob.Content = new JObject(
+                                new JProperty("id", contentId),
                                 new JProperty("created", timestamp),
-                                new JProperty("createdBy", created.Actor.ToString()),
+                                new JProperty("createdBy", actor),
                                 new JProperty("lastModified", timestamp),
-                                new JProperty("lastModifiedBy", created.Actor.ToString()),
+                                new JProperty("lastModifiedBy", actor),
                                 new JProperty("status", Status.Draft.ToString()),
                                 new JProperty("data", formatter.ToRouteData(created.Data)));
                             break;
@@ -83,10 +106,10 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
                         {
                             ruleDescription = $"Update entry in ES index: {action.IndexName}";
 
-                            ruleData["Operation"] = "Update";
-                            ruleData["Content"] = new JObject(
+                            ruleJob.Operation = "Update";
+                            ruleJob.Content = new JObject(
                                 new JProperty("lastModified", timestamp),
-                                new JProperty("lastModifiedBy", updated.Actor.ToString()),
+                                new JProperty("lastModifiedBy", actor),
                                 new JProperty("data", formatter.ToRouteData(updated.Data)));
                             break;
                         }
@@ -95,10 +118,10 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
                         {
                             ruleDescription = $"Update entry in ES index: {action.IndexName}";
 
-                            ruleData["Operation"] = "Update";
-                            ruleData["Content"] = new JObject(
+                            ruleJob.Operation = "Update";
+                            ruleJob.Content = new JObject(
                                 new JProperty("lastModified", timestamp),
-                                new JProperty("lastModifiedBy", statusChanged.Actor.ToString()),
+                                new JProperty("lastModifiedBy", actor),
                                 new JProperty("status", statusChanged.Status.ToString()));
                             break;
                         }
@@ -107,62 +130,49 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
                         {
                             ruleDescription = $"Delete entry from ES index: {action.IndexName}";
 
-                            ruleData["Operation"] = "Delete";
-                            ruleData["Content"] = new JObject();
+                            ruleJob.Operation = "Delete";
                             break;
                         }
                 }
             }
 
-            return (ruleDescription, ruleData);
+            return (DescriptionIgnore, new ElasticSearchJob());
         }
 
-        public override async Task<(string Dump, Exception Exception)> ExecuteJobAsync(RuleJobData job)
+        protected override async Task<(string Dump, Exception Exception)> ExecuteJobAsync(ElasticSearchJob job)
         {
-            if (!job.TryGetValue("Operation", out var operationToken))
+            if (string.IsNullOrWhiteSpace(job.Operation))
             {
                 return (null, new InvalidOperationException("The action cannot handle this event."));
             }
 
-            var host = new Uri(job["Host"].Value<string>(), UriKind.Absolute);
-
-            var username = job["Username"].Value<string>();
-            var password = job["Password"].Value<string>();
-
-            var client = clients.GetClient((host, username, password));
-
-            var indexName = job["IndexName"].Value<string>();
-            var indexType = job["IndexType"].Value<string>();
-
-            var operation = operationToken.Value<string>();
-            var content = job["Content"].Value<JObject>();
-            var contentId = job["ContentId"].Value<string>();
+            var client = clients.GetClient((new Uri(job.Host, UriKind.Absolute), job.Username, job.Password));
 
             try
             {
-                switch (operation)
+                switch (job.Operation)
                 {
                     case "Create":
                         {
-                            var doc = content.ToString();
+                            var doc = job.Content.ToString();
 
-                            var response = await client.IndexAsync<StringResponse>(indexName, indexType, contentId, doc);
+                            var response = await client.IndexAsync<StringResponse>(job.IndexName, job.IndexType, job.ContentId, doc);
 
                             return (response.Body, response.OriginalException);
                         }
 
                     case "Update":
                         {
-                            var doc = new JObject(new JProperty("doc", content)).ToString();
+                            var doc = new JObject(new JProperty("doc", job.Content)).ToString();
 
-                            var response = await client.UpdateAsync<StringResponse>(indexName, indexType, contentId, doc);
+                            var response = await client.UpdateAsync<StringResponse>(job.IndexName, job.IndexType, job.ContentId, doc);
 
                             return (response.Body, response.OriginalException);
                         }
 
                     case "Delete":
                         {
-                            var response = await client.DeleteAsync<StringResponse>(indexName, indexType, contentId);
+                            var response = await client.DeleteAsync<StringResponse>(job.IndexName, job.IndexType, job.ContentId);
 
                             return (response.Body, response.OriginalException);
                         }

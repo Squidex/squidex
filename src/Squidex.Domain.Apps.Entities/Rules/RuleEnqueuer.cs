@@ -57,7 +57,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
                 foreach (var ruleEntity in rules)
                 {
-                    var job = ruleService.CreateJob(ruleEntity.RuleDef, @event);
+                    var job = await ruleService.CreateJobAsync(ruleEntity.RuleDef, @event);
 
                     if (job != null)
                     {

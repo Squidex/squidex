@@ -79,88 +79,88 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         }
 
         [Fact]
-        public void Should_replace_app_information_from_event()
+        public async Task Should_replace_app_information_from_event()
         {
             var @event = new ContentCreated { AppId = appId };
 
-            var result = sut.FormatString("Name $APP_NAME has id $APP_ID", AsEnvelope(@event));
+            var result = await sut.FormatStringAsync("Name $APP_NAME has id $APP_ID", AsEnvelope(@event));
 
             Assert.Equal($"Name my-app has id {appId.Id}", result);
         }
 
         [Fact]
-        public void Should_replace_schema_information_from_event()
+        public async Task Should_replace_schema_information_from_event()
         {
             var @event = new ContentCreated { SchemaId = schemaId };
 
-            var result = sut.FormatString("Name $SCHEMA_NAME has id $SCHEMA_ID", AsEnvelope(@event));
+            var result = await sut.FormatStringAsync("Name $SCHEMA_NAME has id $SCHEMA_ID", AsEnvelope(@event));
 
             Assert.Equal($"Name my-schema has id {schemaId.Id}", result);
         }
 
         [Fact]
-        public void Should_replace_timestamp_information_from_event()
+        public async Task Should_replace_timestamp_information_from_event()
         {
             var now = DateTime.UtcNow;
 
             var envelope = AsEnvelope(new ContentCreated()).SetTimestamp(Instant.FromDateTimeUtc(now));
 
-            var result = sut.FormatString("Date: $TIMESTAMP_DATE, Full: $TIMESTAMP_DATETIME", envelope);
+            var result = await sut.FormatStringAsync("Date: $TIMESTAMP_DATE, Full: $TIMESTAMP_DATETIME", envelope);
 
             Assert.Equal($"Date: {now:yyyy-MM-dd}, Full: {now:yyyy-MM-dd-hh-mm-ss}", result);
         }
 
         [Fact]
-        public void Should_format_email_and_display_name_from_user()
+        public async Task Should_format_email_and_display_name_from_user()
         {
             A.CallTo(() => userResolver.FindByIdOrEmailAsync("123"))
                 .Returns(user);
 
             var @event = new ContentCreated { Actor = new RefToken("subject", "123") };
 
-            var result = sut.FormatString("From $USER_NAME ($USER_EMAIL)", AsEnvelope(@event));
+            var result = await sut.FormatStringAsync("From $USER_NAME ($USER_EMAIL)", AsEnvelope(@event));
 
             Assert.Equal($"From me (me@email.com)", result);
         }
 
         [Fact]
-        public void Should_return_undefined_if_user_is_not_found()
+        public async Task Should_return_undefined_if_user_is_not_found()
         {
             A.CallTo(() => userResolver.FindByIdOrEmailAsync("123"))
                 .Returns(Task.FromResult<IUser>(null));
 
             var @event = new ContentCreated { Actor = new RefToken("subject", "123") };
 
-            var result = sut.FormatString("From $USER_NAME ($USER_EMAIL)", AsEnvelope(@event));
+            var result = await sut.FormatStringAsync("From $USER_NAME ($USER_EMAIL)", AsEnvelope(@event));
 
             Assert.Equal($"From UNDEFINED (UNDEFINED)", result);
         }
 
         [Fact]
-        public void Should_return_undefined_if_user_failed_to_resolve()
+        public async Task Should_return_undefined_if_user_failed_to_resolve()
         {
             A.CallTo(() => userResolver.FindByIdOrEmailAsync("123"))
                 .Throws(new InvalidOperationException());
 
             var @event = new ContentCreated { Actor = new RefToken("subject", "123") };
 
-            var result = sut.FormatString("From $USER_NAME ($USER_EMAIL)", AsEnvelope(@event));
+            var result = await sut.FormatStringAsync("From $USER_NAME ($USER_EMAIL)", AsEnvelope(@event));
 
             Assert.Equal($"From UNDEFINED (UNDEFINED)", result);
         }
 
         [Fact]
-        public void Should_format_email_and_display_name_from_client()
+        public async Task Should_format_email_and_display_name_from_client()
         {
             var @event = new ContentCreated { Actor = new RefToken("client", "android") };
 
-            var result = sut.FormatString("From $USER_NAME ($USER_EMAIL)", AsEnvelope(@event));
+            var result = await sut.FormatStringAsync("From $USER_NAME ($USER_EMAIL)", AsEnvelope(@event));
 
             Assert.Equal($"From client:android (client:android)", result);
         }
 
         [Fact]
-        public void Should_replacecontent_url_from_event()
+        public async Task Should_replace_content_url_from_event()
         {
             var url = "http://content";
 
@@ -169,13 +169,13 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
             var @event = new ContentCreated { AppId = appId, ContentId = contentId, SchemaId = schemaId };
 
-            var result = sut.FormatString("Go to $CONTENT_URL", AsEnvelope(@event));
+            var result = await sut.FormatStringAsync("Go to $CONTENT_URL", AsEnvelope(@event));
 
             Assert.Equal($"Go to {url}", result);
         }
 
         [Fact]
-        public void Should_return_undefined_when_field_not_found()
+        public async Task Should_return_undefined_when_field_not_found()
         {
             var @event = new ContentCreated
             {
@@ -186,13 +186,13 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                                 .AddValue("iv", "Berlin"))
             };
 
-            var result = sut.FormatString("$CONTENT_DATA.country.iv", AsEnvelope(@event));
+            var result = await sut.FormatStringAsync("$CONTENT_DATA.country.iv", AsEnvelope(@event));
 
             Assert.Equal("UNDEFINED", result);
         }
 
         [Fact]
-        public void Should_return_undefined_when_partition_not_found()
+        public async Task Should_return_undefined_when_partition_not_found()
         {
             var @event = new ContentCreated
             {
@@ -203,13 +203,13 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                                 .AddValue("iv", "Berlin"))
             };
 
-            var result = sut.FormatString("$CONTENT_DATA.city.de", AsEnvelope(@event));
+            var result = await sut.FormatStringAsync("$CONTENT_DATA.city.de", AsEnvelope(@event));
 
             Assert.Equal("UNDEFINED", result);
         }
 
         [Fact]
-        public void Should_return_undefined_when_array_item_not_found()
+        public async Task Should_return_undefined_when_array_item_not_found()
         {
             var @event = new ContentCreated
             {
@@ -220,13 +220,13 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                                 .AddValue("iv", new JArray()))
             };
 
-            var result = sut.FormatString("$CONTENT_DATA.city.de.10", AsEnvelope(@event));
+            var result = await sut.FormatStringAsync("$CONTENT_DATA.city.de.10", AsEnvelope(@event));
 
             Assert.Equal("UNDEFINED", result);
         }
 
         [Fact]
-        public void Should_return_undefined_when_property_not_found()
+        public async Task Should_return_undefined_when_property_not_found()
         {
             var @event = new ContentCreated
             {
@@ -238,13 +238,13 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                                     new JProperty("name", "Berlin"))))
             };
 
-            var result = sut.FormatString("$CONTENT_DATA.city.de.Name", AsEnvelope(@event));
+            var result = await sut.FormatStringAsync("$CONTENT_DATA.city.de.Name", AsEnvelope(@event));
 
             Assert.Equal("UNDEFINED", result);
         }
 
         [Fact]
-        public void Should_return_plain_value_when_found()
+        public async Task Should_return_plain_value_when_found()
         {
             var @event = new ContentCreated
             {
@@ -255,13 +255,13 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                                 .AddValue("iv", "Berlin"))
             };
 
-            var result = sut.FormatString("$CONTENT_DATA.city.iv", AsEnvelope(@event));
+            var result = await sut.FormatStringAsync("$CONTENT_DATA.city.iv", AsEnvelope(@event));
 
             Assert.Equal("Berlin", result);
         }
 
         [Fact]
-        public void Should_return_plain_value_when_found_from_update_event()
+        public async Task Should_return_plain_value_when_found_from_update_event()
         {
             var @event = new ContentUpdated
             {
@@ -272,13 +272,13 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                                 .AddValue("iv", "Berlin"))
             };
 
-            var result = sut.FormatString("$CONTENT_DATA.city.iv", AsEnvelope(@event));
+            var result = await sut.FormatStringAsync("$CONTENT_DATA.city.iv", AsEnvelope(@event));
 
             Assert.Equal("Berlin", result);
         }
 
         [Fact]
-        public void Should_return_undefined_when_null()
+        public async Task Should_return_undefined_when_null()
         {
             var @event = new ContentCreated
             {
@@ -289,13 +289,13 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                                 .AddValue("iv", JValue.CreateNull()))
             };
 
-            var result = sut.FormatString("$CONTENT_DATA.city.iv", AsEnvelope(@event));
+            var result = await sut.FormatStringAsync("$CONTENT_DATA.city.iv", AsEnvelope(@event));
 
             Assert.Equal("UNDEFINED", result);
         }
 
         [Fact]
-        public void Should_return_undefined_when_undefined()
+        public async Task Should_return_undefined_when_undefined()
         {
             var @event = new ContentCreated
             {
@@ -306,13 +306,13 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                                 .AddValue("iv", JValue.CreateUndefined()))
             };
 
-            var result = sut.FormatString("$CONTENT_DATA.city.iv", AsEnvelope(@event));
+            var result = await sut.FormatStringAsync("$CONTENT_DATA.city.iv", AsEnvelope(@event));
 
             Assert.Equal("UNDEFINED", result);
         }
 
         [Fact]
-        public void Should_return_string_when_object()
+        public async Task Should_return_string_when_object()
         {
             var @event = new ContentCreated
             {
@@ -324,13 +324,13 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                                     new JProperty("name", "Berlin"))))
             };
 
-            var result = sut.FormatString("$CONTENT_DATA.city.iv", AsEnvelope(@event));
+            var result = await sut.FormatStringAsync("$CONTENT_DATA.city.iv", AsEnvelope(@event));
 
             Assert.Equal(JObject.FromObject(new { name = "Berlin" }).ToString(Formatting.Indented), result);
         }
 
         [Fact]
-        public void Should_return_plain_value_from_array_when_found()
+        public async Task Should_return_plain_value_from_array_when_found()
         {
             var @event = new ContentCreated
             {
@@ -342,13 +342,13 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                                     "Berlin")))
             };
 
-            var result = sut.FormatString("$CONTENT_DATA.city.iv.0", AsEnvelope(@event));
+            var result = await sut.FormatStringAsync("$CONTENT_DATA.city.iv.0", AsEnvelope(@event));
 
             Assert.Equal("Berlin", result);
         }
 
         [Fact]
-        public void Should_return_plain_value_from_object_when_found()
+        public async Task Should_return_plain_value_from_object_when_found()
         {
             var @event = new ContentCreated
             {
@@ -360,19 +360,19 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                                     new JProperty("name", "Berlin"))))
             };
 
-            var result = sut.FormatString("$CONTENT_DATA.city.iv.name", AsEnvelope(@event));
+            var result = await sut.FormatStringAsync("$CONTENT_DATA.city.iv.name", AsEnvelope(@event));
 
             Assert.Equal("Berlin", result);
         }
 
         [Fact]
-        public void Should_format_content_actions_when_found()
+        public async Task Should_format_content_actions_when_found()
         {
-            Assert.Equal("created", sut.FormatString("$CONTENT_ACTION", AsEnvelope(new ContentCreated())));
-            Assert.Equal("updated", sut.FormatString("$CONTENT_ACTION", AsEnvelope(new ContentUpdated())));
-            Assert.Equal("deleted", sut.FormatString("$CONTENT_ACTION", AsEnvelope(new ContentDeleted())));
+            Assert.Equal("created", await sut.FormatStringAsync("$CONTENT_ACTION", AsEnvelope(new ContentCreated())));
+            Assert.Equal("updated", await sut.FormatStringAsync("$CONTENT_ACTION", AsEnvelope(new ContentUpdated())));
+            Assert.Equal("deleted", await sut.FormatStringAsync("$CONTENT_ACTION", AsEnvelope(new ContentDeleted())));
 
-            Assert.Equal("set to archived", sut.FormatString("$CONTENT_ACTION", AsEnvelope(new ContentStatusChanged { Status = Status.Archived })));
+            Assert.Equal("set to archived", await sut.FormatStringAsync("$CONTENT_ACTION", AsEnvelope(new ContentStatusChanged { Status = Status.Archived })));
         }
 
         private static Envelope<AppEvent> AsEnvelope<T>(T @event) where T : AppEvent

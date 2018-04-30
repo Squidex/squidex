@@ -7,26 +7,36 @@
 
 using System;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Core.HandleRules
 {
-    public abstract class RuleActionHandler<T> : IRuleActionHandler where T : RuleAction
+    public abstract class RuleActionHandler<TAction, TData> : IRuleActionHandler where TAction : RuleAction
     {
         Type IRuleActionHandler.ActionType
         {
-            get { return typeof(T); }
+            get { return typeof(TAction); }
         }
 
-        (string Description, RuleJobData Data) IRuleActionHandler.CreateJob(Envelope<AppEvent> @event, string eventName, RuleAction action)
+        async Task<(string Description, JObject Data)> IRuleActionHandler.CreateJobAsync(Envelope<AppEvent> @event, string eventName, RuleAction action)
         {
-            return CreateJob(@event, eventName, (T)action);
+            var (description, data) = await CreateJobAsync(@event, eventName, (TAction)action);
+
+            return (description, JObject.FromObject(data));
         }
 
-        protected abstract (string Description, RuleJobData Data) CreateJob(Envelope<AppEvent> @event, string eventName, T action);
+        async Task<(string Dump, Exception Exception)> IRuleActionHandler.ExecuteJobAsync(JObject data)
+        {
+            var typedData = data.ToObject<TData>();
 
-        public abstract Task<(string Dump, Exception Exception)> ExecuteJobAsync(RuleJobData job);
+            return await ExecuteJobAsync(typedData);
+        }
+
+        protected abstract Task<(string Description, TData Data)> CreateJobAsync(Envelope<AppEvent> @event, string eventName, TAction action);
+
+        protected abstract Task<(string Dump, Exception Exception)> ExecuteJobAsync(TData job);
     }
 }

@@ -11,17 +11,32 @@ using Algolia.Search;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Actions;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 
+#pragma warning disable SA1649 // File name must match first type name
+
 namespace Squidex.Domain.Apps.Core.HandleRules.Actions
 {
-    public sealed class AlgoliaActionHandler : RuleActionHandler<AlgoliaAction>
+    public sealed class AlgoliaJob
     {
+        public string AppId { get; set; }
+        public string ApiKey { get; set; }
+
+        public string ContentId { get; set; }
+
+        public string IndexName { get; set; }
+
+        public JObject Content { get; set; }
+    }
+
+    public sealed class AlgoliaActionHandler : RuleActionHandler<AlgoliaAction, AlgoliaJob>
+    {
+        private const string DescriptionIgnore = "Ignore";
+
         private readonly ClientPool<(string AppId, string ApiKey, string IndexName), Index> clients;
         private readonly RuleEventFormatter formatter;
 
@@ -39,20 +54,20 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
             });
         }
 
-        protected override (string Description, RuleJobData Data) CreateJob(Envelope<AppEvent> @event, string eventName, AlgoliaAction action)
+        protected override async Task<(string Description, AlgoliaJob Data)> CreateJobAsync(Envelope<AppEvent> @event, string eventName, AlgoliaAction action)
         {
-            var ruleDescription = string.Empty;
-            var ruleData = new RuleJobData
-            {
-                ["AppId"] = action.AppId,
-                ["ApiKey"] = action.ApiKey
-            };
-
             if (@event.Payload is ContentEvent contentEvent)
             {
-                ruleData["ContentId"] = contentEvent.ContentId.ToString();
-                ruleData["Operation"] = "Upsert";
-                ruleData["IndexName"] = formatter.FormatString(action.IndexName, @event);
+                var contentId = contentEvent.ContentId.ToString();
+
+                var ruleDescription = string.Empty;
+                var ruleJob = new AlgoliaJob
+                {
+                    AppId = action.AppId,
+                    ApiKey = action.ApiKey,
+                    ContentId = contentId,
+                    IndexName = await formatter.FormatStringAsync(action.IndexName, @event)
+                };
 
                 var timestamp = @event.Headers.Timestamp().ToString();
 
@@ -62,8 +77,9 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
                     {
                         ruleDescription = $"Add entry to Algolia index: {action.IndexName}";
 
-                        ruleData["Content"] = new JObject(
-                            new JProperty("id", contentEvent.ContentId),
+                        ruleJob.Content = new JObject(
+                            new JProperty("objectID", contentId),
+                            new JProperty("id", contentId),
                             new JProperty("created", timestamp),
                             new JProperty("createdBy", created.Actor.ToString()),
                             new JProperty("lastModified", timestamp),
@@ -77,7 +93,8 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
                     {
                         ruleDescription = $"Update entry in Algolia index: {action.IndexName}";
 
-                        ruleData["Content"] = new JObject(
+                        ruleJob.Content = new JObject(
+                            new JProperty("objectID", contentId),
                             new JProperty("lastModified", timestamp),
                             new JProperty("lastModifiedBy", updated.Actor.ToString()),
                             new JProperty("data", formatter.ToRouteData(updated.Data)));
@@ -88,7 +105,8 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
                     {
                         ruleDescription = $"Update entry in Algolia index: {action.IndexName}";
 
-                        ruleData["Content"] = new JObject(
+                        ruleJob.Content = new JObject(
+                            new JProperty("objectID", contentId),
                             new JProperty("lastModified", timestamp),
                             new JProperty("lastModifiedBy", statusChanged.Actor.ToString()),
                             new JProperty("status", statusChanged.Status.ToString()));
@@ -99,55 +117,38 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
                     {
                         ruleDescription = $"Delete entry from Algolia index: {action.IndexName}";
 
-                        ruleData["Content"] = new JObject();
-                        ruleData["Operation"] = "Delete";
                         break;
                     }
                 }
+
+                return (ruleDescription, ruleJob);
             }
 
-            return (ruleDescription, ruleData);
+            return (DescriptionIgnore, new AlgoliaJob());
         }
 
-        public override async Task<(string Dump, Exception Exception)> ExecuteJobAsync(RuleJobData job)
+        protected override async Task<(string Dump, Exception Exception)> ExecuteJobAsync(AlgoliaJob job)
         {
-            if (!job.TryGetValue("Operation", out var operationToken))
+            if (string.IsNullOrWhiteSpace(job.AppId))
             {
                 return (null, new InvalidOperationException("The action cannot handle this event."));
             }
 
-            var appId = job["AppId"].Value<string>();
-            var apiKey = job["ApiKey"].Value<string>();
-            var indexName = job["IndexName"].Value<string>();
-
-            var index = clients.GetClient((appId, apiKey, indexName));
-
-            var operation = operationToken.Value<string>();
-            var content = job["Content"].Value<JObject>();
-            var contentId = job["ContentId"].Value<string>();
+            var index = clients.GetClient((job.AppId, job.ApiKey, job.IndexName));
 
             try
             {
-                switch (operation)
+                if (job.Content != null)
                 {
-                    case "Upsert":
-                    {
-                        content["objectID"] = contentId;
+                    var response = await index.PartialUpdateObjectAsync(job.Content);
 
-                        var response = await index.PartialUpdateObjectAsync(content);
+                    return (response.ToString(Formatting.Indented), null);
+                }
+                else
+                {
+                    var response = await index.DeleteObjectAsync(job.ContentId);
 
-                        return (response.ToString(Formatting.Indented), null);
-                    }
-
-                    case "Delete":
-                    {
-                        var response = await index.DeleteObjectAsync(contentId);
-
-                        return (response.ToString(Formatting.Indented), null);
-                    }
-
-                    default:
-                        return (null, null);
+                    return (response.ToString(Formatting.Indented), null);
                 }
             }
             catch (AlgoliaException ex)

@@ -9,6 +9,7 @@ using System;
 using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -67,7 +68,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                 new JProperty("timestamp", @event.Headers.Timestamp().ToString()));
         }
 
-        public virtual string FormatString(string text, Envelope<AppEvent> @event)
+        public async virtual Task<string> FormatStringAsync(string text, Envelope<AppEvent> @event)
         {
             var sb = new StringBuilder(text);
 
@@ -96,7 +97,8 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                 sb.Replace(ContentUrlPlaceholder, urlGenerator.GenerateContentUIUrl(@event.Payload.AppId, contentEvent.SchemaId, contentEvent.ContentId));
             }
 
-            FormatUserInfo(@event, sb);
+            await FormatUserInfoAsync(@event, sb);
+
             FormatContentAction(@event, sb);
 
             var result = sb.ToString();
@@ -114,7 +116,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             return result;
         }
 
-        private void FormatUserInfo(Envelope<AppEvent> @event, StringBuilder sb)
+        private async Task FormatUserInfoAsync(Envelope<AppEvent> @event, StringBuilder sb)
         {
             var text = sb.ToString();
 
@@ -131,7 +133,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                 }
                 else
                 {
-                    var user = FindUser(actor);
+                    var user = await FindUserAsync(actor);
 
                     if (user != null)
                     {
@@ -222,17 +224,17 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             });
         }
 
-        private IUser FindUser(RefToken actor)
+        private Task<IUser> FindUserAsync(RefToken actor)
         {
             var key = $"RuleEventFormatter_Users_${actor.Identifier}";
 
-            return memoryCache.GetOrCreate(key, x =>
+            return memoryCache.GetOrCreateAsync(key, async x =>
             {
                 x.AbsoluteExpirationRelativeToNow = UserCacheDuration;
 
                 try
                 {
-                    return userResolver.FindByIdOrEmailAsync(actor.Identifier).Result;
+                    return await userResolver.FindByIdOrEmailAsync(actor.Identifier);
                 }
                 catch
                 {
