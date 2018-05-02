@@ -56,7 +56,7 @@ namespace Squidex.Config.Orleans
                 J.Serializer = SerializationServices.DefaultJsonSerializer;
 
                 var hostBuilder = new SiloHostBuilder()
-                    .UseDashboard(options => options.HostSelf = true)
+                    .UseDashboard(options => options.HostSelf = false)
                     .AddStartupTask<Bootstrap<IContentSchedulerGrain>>()
                     .AddStartupTask<Bootstrap<IEventConsumerManagerGrain>>()
                     .AddStartupTask<Bootstrap<IRuleDequeuerGrain>>()

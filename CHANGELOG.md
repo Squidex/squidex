@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.4.1 - 2018-05-02
+
+### Bugfixes
+
+* **Orleans**: Remove orleans dashboard from 8080.
+
 ## v1.4.0 - 2018-05-02
 
 ### Features
