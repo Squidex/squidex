@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.DataProtection.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Migrate_01.Migrations;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
@@ -107,6 +108,12 @@ namespace Squidex.Config.Domain
                         .As<ISnapshotStore<ContentState, Guid>>()
                         .As<IEventConsumer>()
                         .As<IInitializable>();
+
+                    services.AddTransientAs(c => new DeleteArchiveCollectionSetup(mongoContentDatabase))
+                        .As<IMigration>();
+
+                    services.AddTransientAs<ConvertOldSnapshotStores>()
+                        .As<IMigration>();
                 }
             });
 

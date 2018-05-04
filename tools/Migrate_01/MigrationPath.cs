@@ -15,7 +15,7 @@ namespace Migrate_01
 {
     public sealed class MigrationPath : IMigrationPath
     {
-        private const int CurrentVersion = 9;
+        private const int CurrentVersion = 10;
         private readonly IServiceProvider serviceProvider;
 
         public MigrationPath(IServiceProvider serviceProvider)
@@ -31,6 +31,17 @@ namespace Migrate_01
             }
 
             var migrations = new List<IMigration>();
+
+            // Version 10: Delete old archive fields
+            if (version < 10)
+            {
+                var migration = serviceProvider.GetService<DeleteArchiveCollectionSetup>();
+
+                if (migration != null)
+                {
+                    migrations.Add(migration);
+                }
+            }
 
             // Version 6: Convert Event store. Must always be executed first.
             if (version < 6)
@@ -53,7 +64,13 @@ namespace Migrate_01
             // Version 9: Grain Indexes
             if (version < 9)
             {
-                migrations.Add(serviceProvider.GetRequiredService<ConvertOldSnapshotStores>());
+                var migration = serviceProvider.GetService<ConvertOldSnapshotStores>();
+
+                if (migration != null)
+                {
+                    migrations.Add(migration);
+                }
+
                 migrations.Add(serviceProvider.GetRequiredService<PopulateGrainIndexes>());
             }
 
@@ -66,7 +83,7 @@ namespace Migrate_01
             // Version 8: Introduce Archive collection.
             if (version < 8)
             {
-                migrations.Add(serviceProvider.GetRequiredService<DeleteArchiveCollection>());
+                migrations.Add(serviceProvider.GetRequiredService<DeleteArchiveCollectionSetup>());
             }
 
             return (CurrentVersion, migrations);
