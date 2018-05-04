@@ -11,7 +11,7 @@ namespace Squidex.Infrastructure.States
 {
     public sealed class DefaultStreamNameResolver : IStreamNameResolver
     {
-        private static readonly string[] Suffixes = { "Grain", "DomainObject" };
+        private static readonly string[] Suffixes = { "Grain", "DomainObject", "State" };
 
         public string GetStreamName(Type aggregateType, string id)
         {

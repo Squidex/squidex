@@ -7,6 +7,7 @@
 
 using FakeItEasy;
 using Orleans;
+using Squidex.Infrastructure.Orleans;
 using Xunit;
 
 namespace Squidex.Infrastructure.EventSourcing.Grains
@@ -20,7 +21,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         {
             var factory = A.Fake<IGrainFactory>();
 
-            A.CallTo(() => factory.GetGrain<IEventConsumerManagerGrain>("Default", null))
+            A.CallTo(() => factory.GetGrain<IEventConsumerManagerGrain>(SingleGrain.Id, null))
                 .Returns(manager);
 
             sut = new OrleansEventNotifier(factory);

@@ -5,7 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Linq;
 using System.Threading.Tasks;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using Newtonsoft.Json;
 using Squidex.Infrastructure.MongoDb;
@@ -26,7 +28,11 @@ namespace Squidex.Infrastructure.States
 
         protected override string CollectionName()
         {
-            return $"States_{typeof(T).Name}";
+            var attribute = typeof(T).GetCustomAttributes(true).OfType<CollectionNameAttribute>().FirstOrDefault();
+
+            var name = attribute?.Name ?? typeof(T).Name;
+
+            return $"States_{name}";
         }
 
         public async Task<(T Value, long Version)> ReadAsync(TKey key)
@@ -46,6 +52,11 @@ namespace Squidex.Infrastructure.States
         public Task WriteAsync(TKey key, T value, long oldVersion, long newVersion)
         {
             return Collection.UpsertVersionedAsync(key, oldVersion, newVersion, u => u.Set(x => x.Doc, value));
+        }
+
+        public Task ReadAllAsync(System.Func<T, long, Task> callback)
+        {
+            return Collection.Find(new BsonDocument()).ForEachAsync(x => callback(x.Doc, x.Version));
         }
     }
 }

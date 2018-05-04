@@ -15,7 +15,7 @@ namespace Migrate_01
 {
     public sealed class MigrationPath : IMigrationPath
     {
-        private const int CurrentVersion = 8;
+        private const int CurrentVersion = 9;
         private readonly IServiceProvider serviceProvider;
 
         public MigrationPath(IServiceProvider serviceProvider)
@@ -50,13 +50,24 @@ namespace Migrate_01
                 migrations.Add(serviceProvider.GetRequiredService<RebuildSnapshots>());
             }
 
+            // Version 9: Grain Indexes
+            if (version < 9)
+            {
+                migrations.Add(serviceProvider.GetRequiredService<ConvertOldSnapshotStores>());
+                migrations.Add(serviceProvider.GetRequiredService<PopulateGrainIndexes>());
+            }
+
             // Version 1: Introduce App patterns.
             if (version <= 1)
             {
                 migrations.Add(serviceProvider.GetRequiredService<AddPatterns>());
             }
 
-            migrations.Add(serviceProvider.GetRequiredService<DeleteArchiveCollection>());
+            // Version 8: Introduce Archive collection.
+            if (version < 8)
+            {
+                migrations.Add(serviceProvider.GetRequiredService<DeleteArchiveCollection>());
+            }
 
             return (CurrentVersion, migrations);
         }

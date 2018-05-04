@@ -12,11 +12,12 @@ using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Apps.State
 {
-    public class AppState : DomainObjectState<AppState>,
-        IAppEntity
+    [CollectionName("Apps")]
+    public class AppState : DomainObjectState<AppState>, IAppEntity
     {
         [JsonProperty]
         public string Name { get; set; }

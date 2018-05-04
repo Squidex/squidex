@@ -11,11 +11,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Orleans;
 using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Domain.Apps.Entities.Apps.Repositories;
 using Squidex.Domain.Apps.Entities.Rules;
-using Squidex.Domain.Apps.Entities.Rules.Repositories;
 using Squidex.Domain.Apps.Entities.Schemas;
-using Squidex.Domain.Apps.Entities.Schemas.Repositories;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.Log;
@@ -26,29 +23,15 @@ namespace Squidex.Domain.Apps.Entities
     public sealed class AppProvider : IAppProvider
     {
         private readonly IGrainFactory grainFactory;
-        private readonly IAppRepository appRepository;
-        private readonly IRuleRepository ruleRepository;
         private readonly IRequestCache requestCache;
-        private readonly ISchemaRepository schemaRepository;
 
-        public AppProvider(
-            IGrainFactory grainFactory,
-            IAppRepository appRepository,
-            ISchemaRepository schemaRepository,
-            IRuleRepository ruleRepository,
-            IRequestCache requestCache)
+        public AppProvider(IGrainFactory grainFactory, IRequestCache requestCache)
         {
             Guard.NotNull(grainFactory, nameof(grainFactory));
-            Guard.NotNull(appRepository, nameof(appRepository));
-            Guard.NotNull(schemaRepository, nameof(schemaRepository));
             Guard.NotNull(requestCache, nameof(requestCache));
-            Guard.NotNull(ruleRepository, nameof(ruleRepository));
 
             this.grainFactory = grainFactory;
-            this.appRepository = appRepository;
-            this.schemaRepository = schemaRepository;
             this.requestCache = requestCache;
-            this.ruleRepository = ruleRepository;
         }
 
         public Task<(IAppEntity, ISchemaEntity)> GetAppWithSchemaAsync(Guid appId, Guid id)
@@ -143,7 +126,7 @@ namespace Squidex.Domain.Apps.Entities
             {
                 using (Profile.Method<AppProvider>())
                 {
-                    var ids = await schemaRepository.QuerySchemaIdsAsync(appId);
+                    var ids = await grainFactory.GetGrain<ISchemasByAppIndex>(appId).GetSchemaIdsAsync();
 
                     var schemas =
                         await Task.WhenAll(
@@ -160,7 +143,7 @@ namespace Squidex.Domain.Apps.Entities
             {
                 using (Profile.Method<AppProvider>())
                 {
-                    var ids = await ruleRepository.QueryRuleIdsAsync(appId);
+                    var ids = await grainFactory.GetGrain<IRulesByAppIndex>(appId).GetRuleIdsAsync();
 
                     var rules =
                         await Task.WhenAll(
@@ -177,7 +160,7 @@ namespace Squidex.Domain.Apps.Entities
             {
                 using (Profile.Method<AppProvider>())
                 {
-                    var ids = await appRepository.QueryUserAppIdsAsync(userId);
+                    var ids = await grainFactory.GetGrain<IAppsByUserIndex>(userId).GetAppIdsAsync();
 
                     var apps =
                         await Task.WhenAll(
@@ -192,7 +175,7 @@ namespace Squidex.Domain.Apps.Entities
         {
             using (Profile.Method<AppProvider>())
             {
-                return await appRepository.FindAppIdByNameAsync(name);
+                return await grainFactory.GetGrain<IAppsByNameIndex>(SingleGrain.Id).GetAppIdAsync(name);
             }
         }
 
@@ -200,7 +183,7 @@ namespace Squidex.Domain.Apps.Entities
         {
             using (Profile.Method<AppProvider>())
             {
-                return await schemaRepository.FindSchemaIdAsync(appId, name);
+                return await grainFactory.GetGrain<ISchemasByAppIndex>(appId).GetSchemaIdAsync(name);
             }
         }
 

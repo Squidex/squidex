@@ -20,6 +20,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 {
     public partial class MongoContentRepository : ISnapshotStore<ContentState, Guid>
     {
+        Task ISnapshotStore<ContentState, Guid>.ReadAllAsync(Func<ContentState, long, Task> callback)
+        {
+            throw new NotSupportedException();
+        }
+
         public async Task<(ContentState Value, long Version)> ReadAsync(Guid key)
         {
             var contentEntity =

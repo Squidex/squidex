@@ -1,23 +1,25 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using Orleans;
 
-namespace Squidex.Infrastructure.States
+namespace Squidex.Domain.Apps.Entities.Rules
 {
-    public interface ISnapshotStore<T, TKey>
+    public interface IRulesByAppIndex : IGrainWithGuidKey
     {
-        Task WriteAsync(TKey key, T value, long oldVersion, long newVersion);
+        Task AddRuleAsync(Guid ruleId);
 
-        Task<(T Value, long Version)> ReadAsync(TKey key);
+        Task RemoveRuleAsync(Guid ruleId);
 
-        Task ClearAsync();
+        Task RebuildAsync(HashSet<Guid> rules);
 
-        Task ReadAllAsync(Func<T, long, Task> callback);
+        Task<List<Guid>> GetRuleIdsAsync();
     }
 }

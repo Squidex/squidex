@@ -1,22 +1,25 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Orleans;
 
-namespace Squidex.Domain.Apps.Entities.Apps.Repositories
+namespace Squidex.Domain.Apps.Entities.Apps
 {
-    public interface IAppRepository
+    public interface IAppsByUserIndex : IGrainWithStringKey
     {
-        Task<Guid> FindAppIdByNameAsync(string name);
+        Task AddAppAsync(Guid appId);
 
-        Task<IReadOnlyList<Guid>> QueryAppIdsAsync();
+        Task RemoveAppAsync(Guid appId);
 
-        Task<IReadOnlyList<Guid>> QueryUserAppIdsAsync(string userId);
+        Task RebuildAsync(HashSet<Guid> apps);
+
+        Task<List<Guid>> GetAppIdsAsync();
     }
 }

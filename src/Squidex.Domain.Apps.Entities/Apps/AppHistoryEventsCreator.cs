@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             : base(typeNameRegistry)
         {
             AddEventMessage<AppContributorAssigned>(
-                "assigned {user:[Contributor]} as [Permission]");
+                "assigned {user:[Contributor]} as {[Permission]}");
 
             AddEventMessage<AppContributorRemoved>(
                 "removed {user:[Contributor]} from app");
@@ -48,6 +48,15 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             AddEventMessage<AppMasterLanguageSet>(
                 "changed master language to {[Language]}");
+
+            AddEventMessage<AppPatternAdded>(
+                "added pattern {[Name]}");
+
+            AddEventMessage<AppPatternDeleted>(
+                "deleted pattern {[Name]}");
+
+            AddEventMessage<AppPatternUpdated>(
+                "updated pattern {[Name]}");
         }
 
         protected Task<HistoryEventToStore> On(AppContributorRemoved @event)
@@ -129,6 +138,33 @@ namespace Squidex.Domain.Apps.Entities.Apps
             return Task.FromResult(
                 ForEvent(@event, channel)
                     .AddParameter("Language", @event.Language));
+        }
+
+        protected Task<HistoryEventToStore> On(AppPatternAdded @event)
+        {
+            const string channel = "settings.patterns";
+
+            return Task.FromResult(
+                ForEvent(@event, channel)
+                    .AddParameter("Name", @event.Name));
+        }
+
+        protected Task<HistoryEventToStore> On(AppPatternUpdated @event)
+        {
+            const string channel = "settings.patterns";
+
+            return Task.FromResult(
+                ForEvent(@event, channel)
+                    .AddParameter("Name", @event.Name));
+        }
+
+        protected Task<HistoryEventToStore> On(AppPatternDeleted @event)
+        {
+            const string channel = "settings.patterns";
+
+            return Task.FromResult(
+                ForEvent(@event, channel)
+                    .AddParameter("Name", @event.Name));
         }
 
         protected override Task<HistoryEventToStore> CreateEventCoreAsync(Envelope<IEvent> @event)
