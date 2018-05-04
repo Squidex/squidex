@@ -22,6 +22,6 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         Task<Guid> GetAppIdAsync(string name);
 
-        Task<List<Guid>> GetAppIdAsync();
+        Task<List<Guid>> GetAppIdsAsync();
     }
 }

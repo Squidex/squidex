@@ -28,7 +28,7 @@ namespace Migrate_01.Migrations
 
         public async Task UpdateAsync()
         {
-            var ids = await grainFactory.GetGrain<IAppsByNameIndex>(SingleGrain.Id).GetAppIdAsync();
+            var ids = await grainFactory.GetGrain<IAppsByNameIndex>(SingleGrain.Id).GetAppIdsAsync();
 
             foreach (var id in ids)
             {

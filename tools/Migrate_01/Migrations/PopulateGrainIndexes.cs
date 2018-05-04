@@ -111,7 +111,7 @@ namespace Migrate_01.Migrations
             {
                 if (!schema.IsDeleted)
                 {
-                    schemasByApp.GetOrAddNew(schema.AppId.Id).Add(schema.Name, schema.Id);
+                    schemasByApp.GetOrAddNew(schema.AppId.Id)[schema.Name] = schema.Id;
                 }
 
                 return TaskHelper.Done;

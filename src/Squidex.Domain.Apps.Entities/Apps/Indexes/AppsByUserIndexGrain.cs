@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         private State state = new State();
 
         [CollectionName("Index_AppsByUser")]
-        private sealed class State
+        public sealed class State
         {
             public HashSet<Guid> Apps { get; set; } = new HashSet<Guid>();
         }

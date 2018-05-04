@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         private State state = new State();
 
         [CollectionName("Index_AppsByName")]
-        private sealed class State
+        public sealed class State
         {
             public Dictionary<string, Guid> Apps { get; set; } = new Dictionary<string, Guid>();
         }
@@ -72,7 +72,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             return Task.FromResult(appId);
         }
 
-        public Task<List<Guid>> GetAppIdAsync()
+        public Task<List<Guid>> GetAppIdsAsync()
         {
             return Task.FromResult(state.Apps.Values.ToList());
         }

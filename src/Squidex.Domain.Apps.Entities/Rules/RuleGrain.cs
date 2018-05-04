@@ -130,7 +130,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
         public Task<J<IRuleEntity>> GetStateAsync()
         {
-            return Task.FromResult(new J<IRuleEntity>(Snapshot));
+            return J.AsTask<IRuleEntity>(Snapshot);
         }
     }
 }

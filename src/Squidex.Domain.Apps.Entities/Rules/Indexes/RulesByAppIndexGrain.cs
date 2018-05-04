@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
         private State state = new State();
 
         [CollectionName("Index_RulesByApp")]
-        private sealed class State
+        public sealed class State
         {
             public HashSet<Guid> Rules { get; set; } = new HashSet<Guid>();
         }

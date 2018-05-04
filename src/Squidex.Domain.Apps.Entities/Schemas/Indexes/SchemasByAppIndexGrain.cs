@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         private State state = new State();
 
         [CollectionName("Index_SchemasByApp")]
-        private sealed class State
+        public sealed class State
         {
             public Dictionary<string, Guid> Schemas { get; set; } = new Dictionary<string, Guid>();
         }
