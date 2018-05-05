@@ -9,6 +9,7 @@ import { AbstractControl } from '@angular/forms';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 import { ErrorDto } from './utils/error';
+import { Types } from './utils/types';
 
 export interface FormState {
     submitted: boolean;
@@ -69,7 +70,7 @@ export class Form<T extends AbstractControl> {
     }
 
     private getError(error?: string | ErrorDto) {
-        if (error instanceof ErrorDto) {
+        if (Types.is(error, ErrorDto)) {
             return error.displayMessage;
         } else {
             return error;
@@ -100,7 +101,7 @@ export class State<T extends {}> {
     }
 
     public next(update: ((v: T) => T) | object) {
-        if (update instanceof Function) {
+        if (Types.isFunction(update)) {
             this.state.next(update(this.state.value));
         } else {
             this.state.next(Object.assign({}, this.snapshot, update));

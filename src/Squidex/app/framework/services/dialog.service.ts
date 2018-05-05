@@ -9,6 +9,7 @@ import { Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 
 import { ErrorDto } from './../utils/error';
+import { Types } from './../utils/types';
 
 export const DialogServiceFactory = () => {
     return new DialogService();
@@ -64,7 +65,7 @@ export class DialogService {
     }
 
     public notifyError(error: string | ErrorDto) {
-        if (error instanceof ErrorDto) {
+        if (Types.is(error, ErrorDto)) {
             this.notify(Notification.error(error.displayMessage));
         } else {
             this.notify(Notification.error(error));

@@ -8,7 +8,7 @@
 import { Directive, EmbeddedViewRef, Input, OnChanges, OnDestroy, Renderer2, SimpleChanges, TemplateRef, ViewContainerRef } from '@angular/core';
 import { Subscription } from 'rxjs';
 
-import { ModalView } from '@app/framework/internal';
+import { ModalView, Types } from '@app/framework/internal';
 
 import { RootViewComponent } from './root-view.component';
 
@@ -40,7 +40,7 @@ export class ModalViewDirective implements OnChanges, OnDestroy {
     public ngOnDestroy() {
         this.stopListening();
 
-        if (this.modalView instanceof ModalView) {
+        if (Types.is(this.modalView, ModalView)) {
             this.modalView.hide();
         }
     }
@@ -55,7 +55,7 @@ export class ModalViewDirective implements OnChanges, OnDestroy {
             this.subscription = null;
         }
 
-        if (this.modalView instanceof ModalView) {
+        if (Types.is(this.modalView, ModalView)) {
             this.subscription =
                 this.modalView.isOpen.subscribe(isOpen => {
                     this.update(isOpen);

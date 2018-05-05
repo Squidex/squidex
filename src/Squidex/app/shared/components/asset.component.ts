@@ -18,6 +18,7 @@ import {
     fadeAnimation,
     ModalView,
     RenameAssetForm,
+    Types,
     UpdateAssetDto,
     Versioned
 } from '@app/shared/internal';
@@ -87,7 +88,7 @@ export class AssetComponent implements OnInit {
         if (initFile) {
             this.assetsService.uploadFile(this.appsState.appName, initFile, this.authState.user!.token, DateTime.now())
                 .subscribe(dto => {
-                    if (dto instanceof AssetDto) {
+                    if (Types.is(dto, AssetDto)) {
                         this.emitLoaded(dto);
                     } else {
                         this.progress = dto;
@@ -106,7 +107,7 @@ export class AssetComponent implements OnInit {
         if (files.length === 1) {
             this.assetsService.replaceFile(this.appsState.appName, this.asset.id, files[0], this.asset.version)
                 .subscribe(dto => {
-                    if (dto instanceof Versioned) {
+                    if (Types.is(dto, Versioned)) {
                         this.updateAsset(this.asset.update(dto.payload, this.authState.user!.token, dto.version), true);
                     } else {
                         this.setProgress(dto);

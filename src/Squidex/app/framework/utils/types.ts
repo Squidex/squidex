@@ -46,6 +46,10 @@ export module Types {
         return value instanceof Date;
     }
 
+    export function is<TClass>(x: any, c: new (...args: any[]) => TClass): x is TClass {
+        return x instanceof c;
+    }
+
     export function isArrayOfNumber(value: any): value is Array<number> {
         return isArrayOf(value, v => isNumber(v));
     }

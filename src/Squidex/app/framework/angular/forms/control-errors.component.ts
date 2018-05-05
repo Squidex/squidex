@@ -9,7 +9,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Host, Input, OnC
 import { AbstractControl, FormGroupDirective } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 
-import { fadeAnimation } from '@app/framework/internal';
+import { fadeAnimation, Types } from '@app/framework/internal';
 
 const DEFAULT_ERRORS: { [key: string]: string } = {
     required: '{field} is required.',
@@ -71,7 +71,7 @@ export class ControlErrorsComponent implements OnChanges, OnDestroy {
         if (this.fieldName) {
             this.displayFieldName = this.fieldName;
         } else if (this.for) {
-            if (typeof this.for === 'string') {
+            if (Types.isString(this.for)) {
                 this.displayFieldName = this.for.substr(0, 1).toUpperCase() + this.for.substr(1);
             } else {
                 this.displayFieldName = 'field';
@@ -80,7 +80,7 @@ export class ControlErrorsComponent implements OnChanges, OnDestroy {
 
         let control: AbstractControl | null = null;
 
-        if (typeof this.for === 'string') {
+        if (Types.isString(this.for)) {
             control = this.formGroupDirective.form.controls[this.for];
         } else {
             control = this.for;

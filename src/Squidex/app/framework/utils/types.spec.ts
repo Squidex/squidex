@@ -89,4 +89,17 @@ describe('Types', () => {
 
         expect(Types.isFunction([])).toBeFalsy();
     });
+
+    it('should make type check', () => {
+        expect(Types.is(new MyClass(1), MyClass)).toBeTruthy();
+
+        expect(Types.is(1, MyClass)).toBeFalsy();
+    });
 });
+
+class MyClass {
+    constructor(
+        public readonly value: number
+    ) {
+    }
+}

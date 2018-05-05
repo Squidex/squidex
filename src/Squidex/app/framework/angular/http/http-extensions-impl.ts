@@ -9,7 +9,7 @@ import { HttpClient, HttpErrorResponse, HttpHeaders, HttpResponse } from '@angul
 import { Observable } from 'rxjs';
 
 import { ErrorDto } from './../../utils/error';
-
+import { Types} from './../../utils/types';
 import { Version, Versioned } from './../../utils/version';
 
 export module HTTP {
@@ -64,9 +64,9 @@ export function pretifyError(message: string): Observable<any> {
     return this.catch((response: HttpErrorResponse) => {
         let result: ErrorDto | null = null;
 
-        if (!(response.error instanceof Error)) {
+        if (!Types.is(response.error, Error)) {
             try {
-                const errorDto = typeof response.error === 'object' ? response.error : JSON.parse(response.error);
+                const errorDto = Types.isObject(response.error) ? response.error : JSON.parse(response.error);
 
                 if (response.status === 412) {
                     result = new ErrorDto(response.status, 'Failed to make the update. Another user has made a change. Please reload.');

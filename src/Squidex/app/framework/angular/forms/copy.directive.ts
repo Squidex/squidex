@@ -40,7 +40,7 @@ export class CopyDirective {
 
         element.focus();
 
-        if (element instanceof HTMLInputElement) {
+        if (Types.is(element, HTMLInputElement)) {
             element.setSelectionRange(0, element.value.length);
         }
 
@@ -56,7 +56,7 @@ export class CopyDirective {
             currentFocus.focus();
         }
 
-        if (element instanceof HTMLInputElement) {
+        if (Types.is(element, HTMLInputElement)) {
             element.setSelectionRange(prevSelectionStart!, prevSelectionEnd!);
         }
     }

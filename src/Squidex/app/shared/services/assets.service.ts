@@ -14,6 +14,7 @@ import {
     ApiUrlConfig,
     DateTime,
     HTTP,
+    Types,
     Version,
     Versioned
 } from '@app/framework';
@@ -176,7 +177,7 @@ export class AssetsService {
                         const percentDone = event.total ? Math.round(100 * event.loaded / event.total) : 0;
 
                         return percentDone;
-                    } else if (event instanceof HttpResponse) {
+                    } else if (Types.is(event, HttpResponse)) {
                         const response: any = event.body;
                         const assetUrl = this.apiUrl.buildUrl(`api/assets/${response.id}`);
 
@@ -256,7 +257,7 @@ export class AssetsService {
                         const percentDone = event.total ? Math.round(100 * event.loaded / event.total) : 0;
 
                         return percentDone;
-                    } else if (event instanceof HttpResponse) {
+                    } else if (Types.is(event, HttpResponse)) {
                         const response: any = event.body;
 
                         const replaced =  new AssetReplacedDto(

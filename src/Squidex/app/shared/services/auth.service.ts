@@ -15,7 +15,7 @@ import {
     WebStorageStateStore
 } from 'oidc-client';
 
-import { ApiUrlConfig } from '@app/framework';
+import { ApiUrlConfig, Types } from '@app/framework';
 
 export class Profile {
     public get id(): string {
@@ -163,7 +163,7 @@ export class AuthService {
 
         return observable.timeout(2000)
             .retryWhen(errors => errors
-                .mergeMap(e => e instanceof TimeoutError ? Observable.of(e) : Observable.throw(e))
+                .mergeMap(e => Types.is(e, TimeoutError) ? Observable.of(e) : Observable.throw(e))
                 .delay(500)
                 .take(5)
                 .concat(Observable.throw(new Error('Retry limit exceeded.'))));

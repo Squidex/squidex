@@ -9,6 +9,7 @@ import { Injectable } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 
 import { AnalyticsIdConfig } from '../configurations';
+import { Types } from './../utils/types';
 import { ResourceLoaderService } from './resource-loader.service';
 
 // tslint:disable:only-arrow-functions
@@ -31,7 +32,7 @@ export class AnalyticsService {
         if (analyticsId && router && resourceLoader && window.location.hostname !== 'localhost') {
             this.gtag('config', analyticsId.value);
 
-            router.events.filter(e => e instanceof NavigationEnd)
+            router.events.filter(e => Types.is(e, NavigationEnd))
                 .subscribe(() => {
                     this.gtag('config', analyticsId.value, { page_path: window.location.pathname });
                 });
