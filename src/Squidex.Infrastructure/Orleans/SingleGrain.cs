@@ -1,18 +1,14 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-
-namespace Squidex.Domain.Apps.Entities.Rules.Repositories
+namespace Squidex.Infrastructure.Orleans
 {
-    public interface IRuleRepository
+    public static class SingleGrain
     {
-        Task<IReadOnlyList<Guid>> QueryRuleIdsAsync(Guid appId);
+        public const string Id = "Default";
     }
 }

@@ -5,18 +5,18 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using NodaTime;
-using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Infrastructure;
+using System;
 
-namespace Squidex.Domain.Apps.Entities.Contents
+namespace Squidex.Infrastructure.States
 {
-    public interface IContentScheduleItem
+    [AttributeUsage(AttributeTargets.Class)]
+    public sealed class CollectionNameAttribute : Attribute
     {
-        Status ScheduledTo { get; }
+        public string Name { get; }
 
-        Instant ScheduledAt { get; }
-
-        RefToken ScheduledBy { get; }
+        public CollectionNameAttribute(string name)
+        {
+            Name = name;
+        }
     }
 }

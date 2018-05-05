@@ -11,8 +11,6 @@ using NodaTime;
 using Squidex.Domain.Apps.Entities.History;
 using Squidex.Infrastructure;
 
-#pragma warning disable RECS0029 // Warns about property or indexer setters and event adders or removers that do not use the value parameter
-
 namespace Squidex.Domain.Apps.Entities.MongoDb.History
 {
     internal sealed class ParsedHistoryEvent : IHistoryEventEntity
@@ -23,29 +21,26 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.History
         public Guid Id
         {
             get { return inner.Id; }
-            set { }
-        }
-
-        public Instant Created
-        {
-            get { return inner.Created; }
-            set { }
-        }
-
-        public Instant LastModified
-        {
-            get { return inner.LastModified; }
-            set { }
-        }
-
-        public RefToken Actor
-        {
-            get { return inner.Actor; }
         }
 
         public Guid EventId
         {
             get { return inner.Id; }
+        }
+
+        public Instant Created
+        {
+            get { return inner.Created; }
+        }
+
+        public Instant LastModified
+        {
+            get { return inner.LastModified; }
+        }
+
+        public RefToken Actor
+        {
+            get { return inner.Actor; }
         }
 
         public long Version

@@ -10,8 +10,8 @@ using System.Threading.Tasks;
 using Orleans;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
-using Squidex.Domain.Apps.Entities.Apps.Repositories;
 using Squidex.Infrastructure.Migrations;
+using Squidex.Infrastructure.Orleans;
 
 namespace Migrate_01.Migrations
 {
@@ -19,18 +19,16 @@ namespace Migrate_01.Migrations
     {
         private readonly InitialPatterns initialPatterns;
         private readonly IGrainFactory grainFactory;
-        private readonly IAppRepository appRepository;
 
-        public AddPatterns(InitialPatterns initialPatterns, IAppRepository appRepository, IGrainFactory grainFactory)
+        public AddPatterns(InitialPatterns initialPatterns, IGrainFactory grainFactory)
         {
             this.initialPatterns = initialPatterns;
-            this.appRepository = appRepository;
             this.grainFactory = grainFactory;
         }
 
         public async Task UpdateAsync()
         {
-            var ids = await appRepository.QueryAppIdsAsync();
+            var ids = await grainFactory.GetGrain<IAppsByNameIndex>(SingleGrain.Id).GetAppIdsAsync();
 
             foreach (var id in ids)
             {

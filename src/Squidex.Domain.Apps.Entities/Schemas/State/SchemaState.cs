@@ -15,11 +15,12 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.State
 {
-    public class SchemaState : DomainObjectState<SchemaState>,
-        ISchemaEntity
+    [CollectionName("Schemas")]
+    public class SchemaState : DomainObjectState<SchemaState>, ISchemaEntity
     {
         [JsonProperty]
         public NamedId<Guid> AppId { get; set; }

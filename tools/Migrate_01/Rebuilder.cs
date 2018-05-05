@@ -15,6 +15,7 @@ using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.State;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Assets.State;
+using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.State;
 using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Domain.Apps.Entities.Rules.State;
@@ -138,22 +139,13 @@ namespace Migrate_01
             {
                 var @event = ParseKnownEvent(storedEvent);
 
-                if (@event.Payload is ContentEvent contentEvent)
+                if (@event.Payload is ContentEvent contentEvent && handledIds.Add(contentEvent.ContentId))
                 {
                     try
                     {
-                        var (content, version) = await snapshotContentStore.ReadAsync(contentEvent.ContentId);
+                        var content = grainFactory.GetGrain<IContentGrain>(contentEvent.ContentId);
 
-                        if (content == null)
-                        {
-                            version = EtagVersion.Empty;
-
-                            content = new ContentState();
-                        }
-
-                        content = content.Apply(@event);
-
-                        await snapshotContentStore.WriteAsync(contentEvent.ContentId, content, version, version + 1);
+                        await content.WriteSnapshotAsync();
                     }
                     catch (DomainObjectNotFoundException)
                     {

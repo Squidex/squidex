@@ -79,7 +79,7 @@ namespace Squidex.Pipeline.Swagger
 
         public static SwaggerSecurityScheme CreateOAuthSchema(MyUrlsOptions urlOptions)
         {
-            var tokenUrl = urlOptions.BuildUrl($"{Constants.IdentityServerPrefix}/connect/token");
+            var tokenUrl = urlOptions.BuildUrl($"{Constants.IdentityServerPrefix}/connect/token", false);
 
             var securityDocs = LoadDocs("security");
             var securityText = securityDocs.Replace("<TOKEN_URL>", tokenUrl);

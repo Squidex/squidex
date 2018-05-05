@@ -7,6 +7,7 @@
 
 using System;
 using Orleans;
+using Squidex.Infrastructure.Orleans;
 
 namespace Squidex.Infrastructure.EventSourcing.Grains
 {
@@ -20,7 +21,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
             eventConsumerManagerGrain = new Lazy<IEventConsumerManagerGrain>(() =>
             {
-                return factory.GetGrain<IEventConsumerManagerGrain>("Default");
+                return factory.GetGrain<IEventConsumerManagerGrain>(SingleGrain.Id);
             });
         }
 

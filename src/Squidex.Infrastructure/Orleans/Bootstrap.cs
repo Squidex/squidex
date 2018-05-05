@@ -30,7 +30,7 @@ namespace Squidex.Infrastructure.Orleans
             {
                 try
                 {
-                    var grain = grainFactory.GetGrain<T>("Default");
+                    var grain = grainFactory.GetGrain<T>(SingleGrain.Id);
 
                     await grain.ActivateAsync();
 

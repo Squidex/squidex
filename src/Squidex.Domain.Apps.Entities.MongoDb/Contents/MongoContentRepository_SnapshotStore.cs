@@ -20,6 +20,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 {
     public partial class MongoContentRepository : ISnapshotStore<ContentState, Guid>
     {
+        Task ISnapshotStore<ContentState, Guid>.ReadAllAsync(Func<ContentState, long, Task> callback)
+        {
+            throw new NotSupportedException();
+        }
+
         public async Task<(ContentState Value, long Version)> ReadAsync(Guid key)
         {
             var contentEntity =
@@ -49,14 +54,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
             var idData = value.Data?.ToIdModel(schema.SchemaDef, true);
 
-            var id = key.ToString();
-
             var document = SimpleMapper.Map(value, new MongoContentEntity
             {
                 AppIdId = value.AppId.Id,
                 SchemaIdId = value.SchemaId.Id,
                 IsDeleted = value.IsDeleted,
-                DocumentId = key.ToString(),
                 DataText = idData?.ToFullText(),
                 DataByIds = idData,
                 ReferencedIds = idData?.ToReferencedIds(schema.SchemaDef),
@@ -66,14 +68,14 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
             try
             {
-                await Collection.ReplaceOneAsync(x => x.DocumentId == id && x.Version == oldVersion, document, Upsert);
+                await Collection.ReplaceOneAsync(x => x.Id == key && x.Version == oldVersion, document, Upsert);
             }
             catch (MongoWriteException ex)
             {
                 if (ex.WriteError.Category == ServerErrorCategory.DuplicateKey)
                 {
                     var existingVersion =
-                        await Collection.Find(x => x.DocumentId == id).Only(x => x.DocumentId, x => x.Version)
+                        await Collection.Find(x => x.Id == key).Only(x => x.Id, x => x.Version)
                             .FirstOrDefaultAsync();
 
                     if (existingVersion != null)
@@ -86,8 +88,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                     throw;
                 }
             }
-
-            document.DocumentId = $"{key}_{newVersion}";
         }
 
         private async Task<ISchemaEntity> GetSchemaAsync(Guid appId, Guid schemaId)

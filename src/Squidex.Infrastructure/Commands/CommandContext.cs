@@ -45,9 +45,11 @@ namespace Squidex.Infrastructure.Commands
             this.commandBus = commandBus;
         }
 
-        public void Complete(object resultValue = null)
+        public CommandContext Complete(object resultValue = null)
         {
             result = Tuple.Create(resultValue);
+
+            return this;
         }
 
         public T Result<T>()

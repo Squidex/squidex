@@ -38,7 +38,7 @@ FROM microsoft/aspnetcore:2.0.3-jessie
 # Default AspNetCore directory
 WORKDIR /app
 
-# Copy from nuild stage
+# Copy from build stage
 COPY --from=builder /out/ .
 
 EXPOSE 80

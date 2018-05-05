@@ -17,9 +17,7 @@ using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Entities.Assets.State
 {
-    public class AssetState : DomainObjectState<AssetState>,
-        IAssetEntity,
-        IAssetInfo
+    public class AssetState : DomainObjectState<AssetState>, IAssetEntity, IAssetInfo
     {
         [JsonProperty]
         public NamedId<Guid> AppId { get; set; }

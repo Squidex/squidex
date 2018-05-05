@@ -11,6 +11,7 @@ using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Infrastructure.States
 {
+    [BsonIgnoreExtraElements]
     public sealed class MongoState<T, TKey> : IVersionedEntity<TKey>
     {
         [BsonId]

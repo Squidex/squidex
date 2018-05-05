@@ -275,7 +275,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         public Task<J<List<IBackupJob>>> GetStateAsync()
         {
-            return Task.FromResult(new J<List<IBackupJob>>(state.Jobs.OfType<IBackupJob>().ToList()));
+            return J.AsTask(state.Jobs.OfType<IBackupJob>().ToList());
         }
 
         private bool IsRunning()
