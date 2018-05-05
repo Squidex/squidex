@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+
+    <script src="editor-sdk.js"></script>
+    <script src="https://cdn.ckeditor.com/ckeditor5/10.0.0/classic/ckeditor.js"></script>
+
+    <style>
+        .ck-editor__editable {
+            min-height: 250px;
+        }
+    </style>
+</head>
+
+<body>
+    <textarea name="content" id="editor"></textarea>
+
+    <script>
+        var element = document.getElementById('editor');
+
+        ClassicEditor
+            .create(element)
+            .catch(error => {
+                console.error(error);
+            })
+            .then(editor => {
+                var field = new SquidexFormField();
+
+                field.onValueChanged(function (value) {
+                    if (value) {
+                        editor.setData(value);
+                    }
+                });
+
+                field.onDisabled(function (disabled) {
+                    editor.set('isReadOnly', disabled);
+                });
+
+                editor.model.document.on('change', function () {
+                    var data = editor.getData();
+
+                    field.valueChanged(data);
+                });
+
+                editor.ui.focusTracker.on('change:isFocused', function (event, name, isFocused) {
+                    if (!isFocused) {
+                        field.touched();
+                    }
+                });
+            });
+    </script>
+</body>
+
+</html>
