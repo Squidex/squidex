@@ -7,7 +7,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Orleans;
 using Squidex.Domain.Apps.Entities.Apps;
@@ -71,36 +70,32 @@ namespace Migrate_01.Migrations
                 return TaskHelper.Done;
             });
 
-            var tasks =
-                appsByUser.Select(x =>
-                    grainFactory.GetGrain<IAppsByUserIndex>(x.Key).RebuildAsync(x.Value))
-                .Union(new[]
-                {
-                    grainFactory.GetGrain<IAppsByNameIndex>(SingleGrain.Id).RebuildAsync(appsByName)
-                });
+            await grainFactory.GetGrain<IAppsByNameIndex>(SingleGrain.Id).RebuildAsync(appsByName);
 
-            await Task.WhenAll(tasks);
+            foreach (var kvp in appsByUser)
+            {
+                await grainFactory.GetGrain<IAppsByUserIndex>(kvp.Key).RebuildAsync(kvp.Value);
+            }
         }
 
         private async Task RebuildRuleIndexes()
         {
-            var schemasByApp = new Dictionary<Guid, HashSet<Guid>>();
+            var rulesByApp = new Dictionary<Guid, HashSet<Guid>>();
 
             await statesForRules.ReadAllAsync((schema, version) =>
             {
                 if (!schema.IsDeleted)
                 {
-                    schemasByApp.GetOrAddNew(schema.AppId.Id).Add(schema.Id);
+                    rulesByApp.GetOrAddNew(schema.AppId.Id).Add(schema.Id);
                 }
 
                 return TaskHelper.Done;
             });
 
-            var tasks =
-                schemasByApp.Select(x =>
-                    grainFactory.GetGrain<IRulesByAppIndex>(x.Key).RebuildAsync(x.Value));
-
-            await Task.WhenAll(tasks);
+            foreach (var kvp in rulesByApp)
+            {
+                await grainFactory.GetGrain<IRulesByAppIndex>(kvp.Key).RebuildAsync(kvp.Value);
+            }
         }
 
         private async Task RebuildSchemaIndexes()
@@ -117,11 +112,10 @@ namespace Migrate_01.Migrations
                 return TaskHelper.Done;
             });
 
-            var tasks =
-                schemasByApp.Select(x =>
-                    grainFactory.GetGrain<ISchemasByAppIndex>(x.Key).RebuildAsync(x.Value));
-
-            await Task.WhenAll(tasks);
+            foreach (var kvp in schemasByApp)
+            {
+                await grainFactory.GetGrain<ISchemasByAppIndex>(kvp.Key).RebuildAsync(kvp.Value);
+            }
         }
     }
 }

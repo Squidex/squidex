@@ -43,11 +43,6 @@ export class StringUIComponent implements OnDestroy, OnInit {
                 Validators.required
             ]));
 
-        this.editForm.setControl('placeholder',
-            new FormControl(this.properties.placeholder, [
-                Validators.maxLength(100)
-            ]));
-
         this.editForm.setControl('allowedValues',
             new FormControl(this.properties.allowedValues));
 

@@ -1,5 +1,16 @@
 <div [formGroup]="editForm">
     <div class="form-group row">
+        <label class="col col-3 col-form-label" for="{{field.fieldId}}_editorUrl">Editor Url</label>
+
+        <div class="col col-6">
+            <input type="text" class="form-control" id="{{field.fieldId}}_editorUrl" formControlName="editorUrl" />
+
+            <small class="form-text text-muted">
+                Url to your plugin if you use a custom editor.
+            </small>
+        </div>
+    </div>
+    <div class="form-group row">
         <label class="col col-3 col-form-label">Editor</label>
 
         <div class="col col-9">

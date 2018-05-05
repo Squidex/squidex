@@ -43,9 +43,9 @@ describe('SchemaDetailsDto', () => {
     });
 
     it('should return configured fields as list fields if no schema field are declared', () => {
-        const field1 = createField(new AssetsFieldPropertiesDto(null, null, null, false, true), 1);
-        const field2 = createField(new AssetsFieldPropertiesDto(null, null, null, false, false), 2);
-        const field3 = createField(new AssetsFieldPropertiesDto(null, null, null, false, true), 3);
+        const field1 = createField(new AssetsFieldPropertiesDto(null, null, null, null, false, true), 1);
+        const field2 = createField(new AssetsFieldPropertiesDto(null, null, null, null, false, false), 2);
+        const field3 = createField(new AssetsFieldPropertiesDto(null, null, null, null, false, true), 3);
 
         const schema = createSchema(new SchemaPropertiesDto(''), 1, [field1, field2, field3]);
 
@@ -53,9 +53,9 @@ describe('SchemaDetailsDto', () => {
     });
 
     it('should return first fields as list fields if no schema field is declared', () => {
-        const field1 = createField(new AssetsFieldPropertiesDto(null, null, null, false, false), 1);
-        const field2 = createField(new AssetsFieldPropertiesDto(null, null, null, false, false), 2);
-        const field3 = createField(new AssetsFieldPropertiesDto(null, null, null, false, false), 3);
+        const field1 = createField(new AssetsFieldPropertiesDto(null, null, null, null, false, false), 1);
+        const field2 = createField(new AssetsFieldPropertiesDto(null, null, null, null, false, false), 2);
+        const field3 = createField(new AssetsFieldPropertiesDto(null, null, null, null, false, false), 3);
 
         const schema = createSchema(new SchemaPropertiesDto(''), 1, [field1, field2, field3]);
 
@@ -71,50 +71,50 @@ describe('SchemaDetailsDto', () => {
 
 describe('FieldDto', () => {
     it('should return label as display name', () => {
-        const field = createField(new AssetsFieldPropertiesDto('Label', null, null, true, false), 1);
+        const field = createField(new AssetsFieldPropertiesDto('Label', null, null, null, true, false), 1);
 
         expect(field.displayName).toBe('Label');
     });
 
     it('should return name as display name if label is null', () => {
-        const field = createField(new AssetsFieldPropertiesDto(null, null, null, true, false), 1);
+        const field = createField(new AssetsFieldPropertiesDto(null, null, null, null, true, false), 1);
 
         expect(field.displayName).toBe('field1');
     });
 
     it('should return name as display name label is empty', () => {
-        const field = createField(new AssetsFieldPropertiesDto('', null, null, true, false), 1);
+        const field = createField(new AssetsFieldPropertiesDto('', null, null, null, true, false), 1);
 
         expect(field.displayName).toBe('field1');
     });
 
     it('should return placeholder as display placeholder', () => {
-        const field = createField(new AssetsFieldPropertiesDto(null, null, 'Placeholder', true, false), 1);
+        const field = createField(new AssetsFieldPropertiesDto(null, null, 'Placeholder', null, true, false), 1);
 
         expect(field.displayPlaceholder).toBe('Placeholder');
     });
 
     it('should return empty as display placeholder if placeholder is null', () => {
-        const field = createField(new AssetsFieldPropertiesDto(null, null, null, true, false));
+        const field = createField(new AssetsFieldPropertiesDto(null, null, null, null, true, false));
 
         expect(field.displayPlaceholder).toBe('');
     });
 
     it('should return localizable if partitioning is language', () => {
-        const field = createField(new AssetsFieldPropertiesDto(null, null, null, true, false), 1, 'language');
+        const field = createField(new AssetsFieldPropertiesDto(null, null, null, null, true, false), 1, 'language');
 
         expect(field.isLocalizable).toBeTruthy();
     });
 
     it('should not return localizable if partitioning is invarient', () => {
-        const field = createField(new AssetsFieldPropertiesDto(null, null, null, true, false), 1, 'invariant');
+        const field = createField(new AssetsFieldPropertiesDto(null, null, null, null, true, false), 1, 'invariant');
 
         expect(field.isLocalizable).toBeFalsy();
     });
 });
 
 describe('AssetsField', () => {
-    const field = createField(new AssetsFieldPropertiesDto(null, null, null, true, false, 1, 1));
+    const field = createField(new AssetsFieldPropertiesDto(null, null, null, null, true, false, 1, 1));
 
     it('should create validators', () => {
         expect(field.createValidators(false).length).toBe(3);
@@ -138,7 +138,7 @@ describe('AssetsField', () => {
 });
 
 describe('TagsField', () => {
-    const field = createField(new TagsFieldPropertiesDto(null, null, null, true, false, 1, 1));
+    const field = createField(new TagsFieldPropertiesDto(null, null, null, null, true, false, 1, 1));
 
     it('should create validators', () => {
         expect(field.createValidators(false).length).toBe(3);
@@ -162,7 +162,7 @@ describe('TagsField', () => {
 });
 
 describe('BooleanField', () => {
-    const field = createField(new BooleanFieldPropertiesDto(null, null, null, true, false, false, 'Checkbox'));
+    const field = createField(new BooleanFieldPropertiesDto(null, null, null, null, true, false, false, 'Checkbox'));
 
     it('should create validators', () => {
         expect(field.createValidators(false).length).toBe(1);
@@ -189,7 +189,7 @@ describe('BooleanField', () => {
 
 describe('DateTimeField', () => {
     const now = DateTime.parseISO_UTC('2017-10-12T16:30:10Z');
-    const field = createField(new DateTimeFieldPropertiesDto(null, null, null, true, false, 'Date'));
+    const field = createField(new DateTimeFieldPropertiesDto(null, null, null, null, true, false, 'Date'));
 
     it('should create validators', () => {
         expect(field.createValidators(false).length).toBe(1);
@@ -204,13 +204,13 @@ describe('DateTimeField', () => {
     });
 
     it('should format to date', () => {
-        const dateField = createField(new DateTimeFieldPropertiesDto(null, null, null, true, false, 'Date'));
+        const dateField = createField(new DateTimeFieldPropertiesDto(null, null, null, null, true, false, 'Date'));
 
         expect(dateField.formatValue('2017-12-12T16:00:00Z')).toBe('2017-12-12');
     });
 
     it('should format to date time', () => {
-        const dateTimeField = createField(new DateTimeFieldPropertiesDto(null, null, null, true, false, 'DateTime'));
+        const dateTimeField = createField(new DateTimeFieldPropertiesDto(null, null, null, null, true, false, 'DateTime'));
 
         expect(dateTimeField.formatValue('2017-12-12T16:00:00Z')).toBe('2017-12-12 16:00:00');
     });
@@ -235,7 +235,7 @@ describe('DateTimeField', () => {
 });
 
 describe('GeolocationField', () => {
-    const field = createField(new GeolocationFieldPropertiesDto(null, null, null, true, false, 'Default'));
+    const field = createField(new GeolocationFieldPropertiesDto(null, null, null, null, true, false, 'Default'));
 
     it('should create validators', () => {
         expect(field.createValidators(false).length).toBe(1);
@@ -255,7 +255,7 @@ describe('GeolocationField', () => {
 });
 
 describe('JsonField', () => {
-    const field = createField(new JsonFieldPropertiesDto(null, null, null, true, false));
+    const field = createField(new JsonFieldPropertiesDto(null, null, null, null, true, false));
 
     it('should create validators', () => {
         expect(field.createValidators(false).length).toBe(1);
@@ -275,7 +275,7 @@ describe('JsonField', () => {
 });
 
 describe('NumberField', () => {
-    const field = createField(new NumberFieldPropertiesDto(null, null, null, true, false, false, 'Input', undefined, 3, 1, [1, 2, 3]));
+    const field = createField(new NumberFieldPropertiesDto(null, null, null, null, true, false, false, 'Input', undefined, 3, 1, [1, 2, 3]));
 
     it('should create validators', () => {
         expect(field.createValidators(false).length).toBe(4);
@@ -297,7 +297,7 @@ describe('NumberField', () => {
 });
 
 describe('ReferencesField', () => {
-    const field = createField(new ReferencesFieldPropertiesDto(null, null, null, true, false, 1, 1));
+    const field = createField(new ReferencesFieldPropertiesDto(null, null, null, null, true, false, 1, 1));
 
     it('should create validators', () => {
         expect(field.createValidators(false).length).toBe(3);
@@ -321,7 +321,7 @@ describe('ReferencesField', () => {
 });
 
 describe('StringField', () => {
-    const field = createField(new StringFieldPropertiesDto(null, null, null, true, false, false, 'Input', undefined, 'pattern', undefined, 3, 1, ['1', '2']));
+    const field = createField(new StringFieldPropertiesDto(null, null, null, null, true, false, false, 'Input', undefined, 'pattern', undefined, 3, 1, ['1', '2']));
 
     it('should create validators', () => {
         expect(field.createValidators(false).length).toBe(5);

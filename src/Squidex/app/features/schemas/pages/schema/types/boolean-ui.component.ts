@@ -31,11 +31,6 @@ export class BooleanUIComponent implements OnInit {
                 Validators.required
             ]));
 
-        this.editForm.setControl('placeholder',
-            new FormControl(this.properties.placeholder, [
-                Validators.maxLength(100)
-            ]));
-
         this.editForm.setControl('inlineEditable',
             new FormControl(this.properties.inlineEditable));
     }

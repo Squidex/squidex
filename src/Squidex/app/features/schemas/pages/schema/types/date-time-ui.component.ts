@@ -35,10 +35,5 @@ export class DateTimeUIComponent implements OnInit {
             new FormControl(this.properties.editor, [
                 Validators.required
             ]));
-
-        this.editForm.setControl('placeholder',
-            new FormControl(this.properties.placeholder, [
-                Validators.maxLength(100)
-            ]));
     }
 }

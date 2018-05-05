@@ -85,6 +85,12 @@ export class EditFieldForm extends Form<FormGroup> {
                     Validators.maxLength(1000)
                 ]
             ],
+            placeholder: ['',
+                [
+                    Validators.maxLength(1000)
+                ]
+            ],
+            editorUrl: null,
             isRequired: false,
             isListField: false
         }));

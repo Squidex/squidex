@@ -61,31 +61,31 @@ export function createProperties(fieldType: string, values: Object | null = null
 
     switch (fieldType) {
         case 'Number':
-            properties = new NumberFieldPropertiesDto(null, null, null, false, false, false, 'Input');
+            properties = new NumberFieldPropertiesDto(null, null, null, null, false, false, false, 'Input');
             break;
         case 'String':
-            properties = new StringFieldPropertiesDto(null, null, null, false, false, false, 'Input');
+            properties = new StringFieldPropertiesDto(null, null, null, null, false, false, false, 'Input');
             break;
         case 'Boolean':
-            properties = new BooleanFieldPropertiesDto(null, null, null, false, false, false, 'Checkbox');
+            properties = new BooleanFieldPropertiesDto(null, null, null, null, false, false, false, 'Checkbox');
             break;
         case 'DateTime':
-            properties = new DateTimeFieldPropertiesDto(null, null, null, false, false, 'DateTime');
+            properties = new DateTimeFieldPropertiesDto(null, null, null, null, false, false, 'DateTime');
             break;
         case 'Geolocation':
-            properties = new GeolocationFieldPropertiesDto(null, null, null, false, false, 'Map');
+            properties = new GeolocationFieldPropertiesDto(null, null, null, null, false, false, 'Map');
             break;
         case 'Json':
-            properties = new JsonFieldPropertiesDto(null, null, null, false, false);
+            properties = new JsonFieldPropertiesDto(null, null, null, null, false, false);
             break;
         case 'References':
-            properties = new ReferencesFieldPropertiesDto(null, null, null, false, false);
+            properties = new ReferencesFieldPropertiesDto(null, null, null, null, false, false);
             break;
         case 'Assets':
-            properties = new AssetsFieldPropertiesDto(null, null, null, false, false);
+            properties = new AssetsFieldPropertiesDto(null, null, null, null, false, false);
             break;
         case 'Tags':
-            properties = new TagsFieldPropertiesDto(null, null, null, false, false);
+            properties = new TagsFieldPropertiesDto(null, null, null, null, false, false);
             break;
         default:
             throw 'Invalid properties type';
@@ -176,6 +176,7 @@ export abstract class FieldPropertiesDto {
         public readonly label: string | null,
         public readonly hints: string | null,
         public readonly placeholder: string | null,
+        public readonly editorUrl: string | null,
         public readonly isRequired: boolean,
         public readonly isListField: boolean
     ) {
@@ -191,7 +192,7 @@ export abstract class FieldPropertiesDto {
 }
 
 export class StringFieldPropertiesDto extends FieldPropertiesDto {
-    constructor(label: string | null, hints: string | null, placeholder: string | null,
+    constructor(label: string | null, hints: string | null, placeholder: string | null, editorUrl: string | null,
         isRequired: boolean,
         isListField: boolean,
         public readonly inlineEditable: boolean,
@@ -203,7 +204,7 @@ export class StringFieldPropertiesDto extends FieldPropertiesDto {
         public readonly maxLength?: number,
         public readonly allowedValues?: string[]
     ) {
-        super('String', label, hints, placeholder, isRequired, isListField);
+        super('String', label, hints, placeholder, editorUrl, isRequired, isListField);
     }
 
     public formatValue(value: any): string {
@@ -252,7 +253,7 @@ export class StringFieldPropertiesDto extends FieldPropertiesDto {
 }
 
 export class NumberFieldPropertiesDto extends FieldPropertiesDto {
-    constructor(label: string | null, hints: string | null, placeholder: string | null,
+    constructor(label: string | null, hints: string | null, placeholder: string | null, editorUrl: string | null,
         isRequired: boolean,
         isListField: boolean,
         public readonly inlineEditable: boolean,
@@ -262,7 +263,7 @@ export class NumberFieldPropertiesDto extends FieldPropertiesDto {
         public readonly minValue?: number,
         public readonly allowedValues?: number[]
     ) {
-        super('Number', label, hints, placeholder, isRequired, isListField);
+        super('Number', label, hints, placeholder, editorUrl, isRequired, isListField);
     }
 
     public formatValue(value: any): string {
@@ -307,7 +308,7 @@ export class NumberFieldPropertiesDto extends FieldPropertiesDto {
 }
 
 export class DateTimeFieldPropertiesDto extends FieldPropertiesDto {
-    constructor(label: string | null, hints: string | null, placeholder: string | null,
+    constructor(label: string | null, hints: string | null, placeholder: string | null, editorUrl: string | null,
         isRequired: boolean,
         isListField: boolean,
         public readonly editor: string,
@@ -316,7 +317,7 @@ export class DateTimeFieldPropertiesDto extends FieldPropertiesDto {
         public readonly minValue?: string,
         public readonly calculatedDefaultValue?: string
     ) {
-        super('DateTime', label, hints, placeholder, isRequired, isListField);
+        super('DateTime', label, hints, placeholder, editorUrl, isRequired, isListField);
     }
 
     public formatValue(value: any): string {
@@ -361,14 +362,14 @@ export class DateTimeFieldPropertiesDto extends FieldPropertiesDto {
 }
 
 export class BooleanFieldPropertiesDto extends FieldPropertiesDto {
-    constructor(label: string | null, hints: string | null, placeholder: string | null,
+    constructor(label: string | null, hints: string | null, placeholder: string | null, editorUrl: string | null,
         isRequired: boolean,
         isListField: boolean,
         public readonly inlineEditable: boolean,
         public readonly editor: string,
         public readonly defaultValue?: boolean
     ) {
-        super('Boolean', label, hints, placeholder, isRequired, isListField);
+        super('Boolean', label, hints, placeholder, editorUrl, isRequired, isListField);
     }
 
     public formatValue(value: any): string {
@@ -395,12 +396,12 @@ export class BooleanFieldPropertiesDto extends FieldPropertiesDto {
 }
 
 export class GeolocationFieldPropertiesDto extends FieldPropertiesDto {
-    constructor(label: string | null, hints: string | null, placeholder: string | null,
+    constructor(label: string | null, hints: string | null, placeholder: string | null, editorUrl: string | null,
         isRequired: boolean,
         isListField: boolean,
         public readonly editor: string
     ) {
-        super('Geolocation', label, hints, placeholder, isRequired, isListField);
+        super('Geolocation', label, hints, placeholder, editorUrl, isRequired, isListField);
     }
 
     public formatValue(value: any): string {
@@ -423,14 +424,14 @@ export class GeolocationFieldPropertiesDto extends FieldPropertiesDto {
 }
 
 export class ReferencesFieldPropertiesDto extends FieldPropertiesDto {
-    constructor(label: string | null, hints: string | null, placeholder: string | null,
+    constructor(label: string | null, hints: string | null, placeholder: string | null, editorUrl: string | null,
         isRequired: boolean,
         isListField: boolean,
         public readonly minItems?: number,
         public readonly maxItems?: number,
         public readonly schemaId?: string
     ) {
-        super('References', label, hints, placeholder, isRequired, isListField);
+        super('References', label, hints, placeholder, editorUrl, isRequired, isListField);
     }
 
     public formatValue(value: any): string {
@@ -465,7 +466,7 @@ export class ReferencesFieldPropertiesDto extends FieldPropertiesDto {
 }
 
 export class AssetsFieldPropertiesDto extends FieldPropertiesDto {
-    constructor(label: string | null, hints: string | null, placeholder: string | null,
+    constructor(label: string | null, hints: string | null, placeholder: string | null, editorUrl: string | null,
         isRequired: boolean,
         isListField: boolean,
         public readonly minItems?: number,
@@ -481,7 +482,7 @@ export class AssetsFieldPropertiesDto extends FieldPropertiesDto {
         public readonly aspectWidth?: number,
         public readonly aspectHeight?: number
     ) {
-        super('Assets', label, hints, placeholder, isRequired, isListField);
+        super('Assets', label, hints, placeholder, editorUrl, isRequired, isListField);
     }
 
     public formatValue(value: any): string {
@@ -516,13 +517,13 @@ export class AssetsFieldPropertiesDto extends FieldPropertiesDto {
 }
 
 export class TagsFieldPropertiesDto extends FieldPropertiesDto {
-    constructor(label: string | null, hints: string | null, placeholder: string | null,
+    constructor(label: string | null, hints: string | null, placeholder: string | null, editorUrl: string | null,
         isRequired: boolean,
         isListField: boolean,
         public readonly minItems?: number,
         public readonly maxItems?: number
     ) {
-        super('Tags', label, hints, placeholder, isRequired, isListField);
+        super('Tags', label, hints, placeholder, editorUrl, isRequired, isListField);
     }
 
     public formatValue(value: any): string {
@@ -557,11 +558,11 @@ export class TagsFieldPropertiesDto extends FieldPropertiesDto {
 }
 
 export class JsonFieldPropertiesDto extends FieldPropertiesDto {
-    constructor(label: string | null, hints: string | null, placeholder: string | null,
+    constructor(label: string | null, hints: string | null, placeholder: string | null, editorUrl: string | null,
         isRequired: boolean,
         isListField: boolean
     ) {
-        super('Json', label, hints, placeholder, isRequired, isListField);
+        super('Json', label, hints, placeholder, editorUrl, isRequired, isListField);
     }
 
     public formatValue(value: any): string {

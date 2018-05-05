@@ -14,6 +14,7 @@ export * from './angular/forms/dropdown.component';
 export * from './angular/forms/file-drop.directive';
 export * from './angular/forms/focus-on-init.directive';
 export * from './angular/forms/form-error.component';
+export * from './angular/forms/iframe-editor.component';
 export * from './angular/forms/indeterminate-value.directive';
 export * from './angular/forms/jscript-editor.component';
 export * from './angular/forms/json-editor.component';
