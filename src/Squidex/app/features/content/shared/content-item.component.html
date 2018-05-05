@@ -27,7 +27,7 @@
                         <input class="form-control" type="text" [formControlName]="field.name" [placeholder]="field.displayPlaceholder" />
                     </div>
                     <div *ngSwitchCase="'Slug'">
-                        <input class="form-control" type="text" [formControlName]="field.name" [placeholder]="field.displayPlaceholder" sqxSlugifyInput />
+                        <input class="form-control" type="text" [formControlName]="field.name" [placeholder]="field.displayPlaceholder" sqxTransformInput="Slugify" />
                     </div>
                     <div *ngSwitchCase="'Dropdown'">
                         <select class="form-control" [formControlName]="field.name">

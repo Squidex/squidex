@@ -5,9 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, forwardRef, Input, OnDestroy, OnInit, Renderer, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, forwardRef, Input, OnDestroy, OnInit, Renderer2, ViewChild } from '@angular/core';
 import { ControlValueAccessor,  NG_VALUE_ACCESSOR } from '@angular/forms';
 import { DomSanitizer } from '@angular/platform-browser';
+
+import { Types } from '@app/framework/internal';
 
 export const SQX_IFRAME_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => IFrameEditorComponent), multi: true
@@ -38,7 +40,7 @@ export class IFrameEditorComponent implements ControlValueAccessor, AfterViewIni
 
     constructor(
         private readonly sanitizer: DomSanitizer,
-        private readonly renderer: Renderer
+        private readonly renderer: Renderer2
     ) {
     }
 
@@ -52,14 +54,14 @@ export class IFrameEditorComponent implements ControlValueAccessor, AfterViewIni
 
     public ngOnInit(): void {
         this.windowMessageListener =
-            this.renderer.listenGlobal('window', 'message', (event: MessageEvent) => {
+            this.renderer.listen('window', 'message', (event: MessageEvent) => {
                 if (event.source === this.plugin.contentWindow) {
                     const { type } = event.data;
 
                     if (type === 'started') {
                         this.isInitialized = true;
 
-                        if (this.plugin.contentWindow) {
+                        if (this.plugin.contentWindow && Types.isFunction(this.plugin.contentWindow.postMessage)) {
                             this.plugin.contentWindow.postMessage({ type: 'disabled', disabled: this.isDisabled }, '*');
                             this.plugin.contentWindow.postMessage({ type: 'valueChanged', value: this.value }, '*');
                         }
@@ -93,7 +95,7 @@ export class IFrameEditorComponent implements ControlValueAccessor, AfterViewIni
         this.value = value;
         this.valueJson = JSON.stringify(value);
 
-        if (this.isInitialized && this.plugin.contentWindow) {
+        if (this.isInitialized && this.plugin.contentWindow && Types.isFunction(this.plugin.contentWindow.postMessage)) {
             this.plugin.contentWindow.postMessage({ type: 'valueChanged', value: this.value }, '*');
         }
     }
@@ -101,7 +103,7 @@ export class IFrameEditorComponent implements ControlValueAccessor, AfterViewIni
     public setDisabledState(isDisabled: boolean): void {
         this.isDisabled = isDisabled;
 
-        if (this.isInitialized && this.plugin.contentWindow) {
+        if (this.isInitialized && this.plugin.contentWindow && Types.isFunction(this.plugin.contentWindow.postMessage)) {
             this.plugin.contentWindow.postMessage({ type: 'disabled', disabled: this.isDisabled }, '*');
         }
     }

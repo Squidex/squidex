@@ -58,7 +58,7 @@
                             <input class="form-control" type="text" [formControl]="selectedFormControl" [placeholder]="field.displayPlaceholder" />
                         </ng-container>
                         <ng-container *ngSwitchCase="'Slug'">
-                            <input class="form-control" type="text" [formControl]="selectedFormControl" [placeholder]="field.displayPlaceholder" sqxSlugifyInput />
+                            <input class="form-control" type="text" [formControl]="selectedFormControl" [placeholder]="field.displayPlaceholder" sqxTransformInput="Slugify" />
                         </ng-container>
                         <ng-container *ngSwitchCase="'TextArea'">
                             <textarea class="form-control" [formControl]="selectedFormControl" rows="5" [placeholder]="field.displayPlaceholder"></textarea>

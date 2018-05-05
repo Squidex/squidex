@@ -42,7 +42,6 @@ import {
     KeysPipe,
     KNumberPipe,
     LocalStoreService,
-    LowerCaseInputDirective,
     MessageBus,
     ModalDialogComponent,
     ModalTargetDirective,
@@ -65,7 +64,6 @@ import {
     ShortDatePipe,
     ShortTimePipe,
     SliderComponent,
-    SlugifyInputDirective,
     SortedDirective,
     StarsComponent,
     TagEditorComponent,
@@ -74,6 +72,7 @@ import {
     TitleService,
     ToggleComponent,
     TooltipComponent,
+    TransformInputDirective,
     UserReportComponent
 } from './declarations';
 
@@ -111,7 +110,6 @@ import {
         JsonEditorComponent,
         KeysPipe,
         KNumberPipe,
-        LowerCaseInputDirective,
         ModalDialogComponent,
         ModalTargetDirective,
         ModalViewDirective,
@@ -130,7 +128,6 @@ import {
         ShortDatePipe,
         ShortTimePipe,
         SliderComponent,
-        SlugifyInputDirective,
         SortedDirective,
         StarsComponent,
         TagEditorComponent,
@@ -138,6 +135,7 @@ import {
         TitleComponent,
         ToggleComponent,
         TooltipComponent,
+        TransformInputDirective,
         UserReportComponent
     ],
     exports: [
@@ -170,7 +168,6 @@ import {
         JsonEditorComponent,
         KeysPipe,
         KNumberPipe,
-        LowerCaseInputDirective,
         ModalDialogComponent,
         ModalTargetDirective,
         ModalViewDirective,
@@ -190,7 +187,6 @@ import {
         ShortDatePipe,
         ShortTimePipe,
         SliderComponent,
-        SlugifyInputDirective,
         SortedDirective,
         StarsComponent,
         TagEditorComponent,
@@ -198,6 +194,7 @@ import {
         TitleComponent,
         ToggleComponent,
         TooltipComponent,
+        TransformInputDirective,
         UserReportComponent
     ]
 })

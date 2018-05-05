@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, Input, OnDestroy, OnInit, Renderer } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnDestroy, OnInit, Renderer2 } from '@angular/core';
 
 import { ModalView } from './../../utils/modal-view';
 
@@ -30,7 +30,7 @@ export class TooltipComponent implements OnDestroy, OnInit {
     public modal = new ModalView(false, false);
 
     constructor(
-        private readonly renderer: Renderer
+        private readonly renderer: Renderer2
     ) {
     }
 

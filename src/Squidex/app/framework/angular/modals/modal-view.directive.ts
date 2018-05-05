@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Directive, EmbeddedViewRef, Input, OnChanges, OnDestroy, Renderer, SimpleChanges, TemplateRef, ViewContainerRef } from '@angular/core';
+import { Directive, EmbeddedViewRef, Input, OnChanges, OnDestroy, Renderer2, SimpleChanges, TemplateRef, ViewContainerRef } from '@angular/core';
 import { Subscription } from 'rxjs';
 
 import { ModalView } from '@app/framework/internal';
@@ -31,7 +31,7 @@ export class ModalViewDirective implements OnChanges, OnDestroy {
 
     constructor(
         private readonly templateRef: TemplateRef<any>,
-        private readonly renderer: Renderer,
+        private readonly renderer: Renderer2,
         private readonly viewContainer: ViewContainerRef,
         private readonly rootView: RootViewComponent
     ) {
@@ -78,7 +78,7 @@ export class ModalViewDirective implements OnChanges, OnDestroy {
             }
 
             if (this.renderedView.rootNodes[0].style) {
-                this.renderer.setElementStyle(this.renderedView.rootNodes[0], 'display', 'block');
+                this.renderer.setStyle(this.renderedView.rootNodes[0], 'display', 'block');
             }
 
             setTimeout(() => {
@@ -103,7 +103,7 @@ export class ModalViewDirective implements OnChanges, OnDestroy {
         }
 
         this.documentClickListener =
-            this.renderer.listenGlobal('document', 'click', (event: MouseEvent) => {
+            this.renderer.listen('document', 'click', (event: MouseEvent) => {
                 if (!event.target || this.renderedView === null) {
                     return;
                 }

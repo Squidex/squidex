@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Directive, ElementRef, HostListener, Input, OnDestroy, OnInit, Renderer } from '@angular/core';
+import { Directive, ElementRef, HostListener, Input, OnDestroy, OnInit, Renderer2 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 
@@ -23,7 +23,7 @@ export class ParentLinkDirective implements OnDestroy, OnInit {
         private readonly router: Router,
         private readonly route: ActivatedRoute,
         private readonly element: ElementRef,
-        private readonly renderer: Renderer
+        private readonly renderer: Renderer2
     ) {
     }
 
@@ -40,7 +40,7 @@ export class ParentLinkDirective implements OnDestroy, OnInit {
                     this.router.createUrlTree(['.'], { relativeTo: this.route.parent!.parent }).toString() :
                     this.router.createUrlTree(['.'], { relativeTo: this.route.parent }).toString();
 
-                this.renderer.setElementAttribute(this.element.nativeElement, 'href', this.url);
+                this.renderer.setProperty(this.element.nativeElement, 'href', this.url);
             });
     }
 

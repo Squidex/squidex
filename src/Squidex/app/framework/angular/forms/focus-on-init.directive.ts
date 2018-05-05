@@ -5,7 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, Directive, ElementRef, Input, Renderer } from '@angular/core';
+import { AfterViewInit, Directive, ElementRef, Input } from '@angular/core';
+
+import { Types } from '@app/framework/internal';
 
 @Directive({
     selector: '[sqxFocusOnInit]'
@@ -15,17 +17,20 @@ export class FocusOnInitDirective implements AfterViewInit {
     public select: boolean;
 
     constructor(
-        private readonly element: ElementRef,
-        private readonly renderer: Renderer
+        private readonly element: ElementRef
     ) {
     }
 
     public ngAfterViewInit() {
         setTimeout(() => {
-            this.renderer.invokeElementMethod(this.element.nativeElement, 'focus', []);
+            if (Types.isFunction(this.element.nativeElement.focus)) {
+                this.element.nativeElement.focus();
+            }
 
             if (this.select) {
-                this.renderer.invokeElementMethod(this.element.nativeElement, 'select', []);
+                if (Types.isFunction(this.element.nativeElement.select)) {
+                    this.element.nativeElement.select();
+                }
             }
         }, 100);
     }

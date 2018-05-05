@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit, Renderer, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit, Renderer2, ViewChild } from '@angular/core';
 
 import { slideRightAnimation } from './animations';
 
@@ -59,7 +59,7 @@ export class PanelComponent implements AfterViewInit, OnDestroy, OnInit {
 
     constructor(
         private readonly container: PanelContainerDirective,
-        private readonly renderer: Renderer
+        private readonly renderer: Renderer2
     ) {
     }
 
@@ -79,17 +79,17 @@ export class PanelComponent implements AfterViewInit, OnDestroy, OnInit {
         if (this.styleWidth !== size) {
             this.styleWidth = size;
 
-            this.renderer.setElementStyle(this.panel.nativeElement, 'width', size);
+            this.renderer.setStyle(this.panel.nativeElement, 'width', size);
 
             this.renderWidth = this.panel.nativeElement.getBoundingClientRect().width;
         }
     }
 
     public arrange(left: any, layer: any) {
-        this.renderer.setElementStyle(this.panel.nativeElement, 'top', '0px');
-        this.renderer.setElementStyle(this.panel.nativeElement, 'left', left);
-        this.renderer.setElementStyle(this.panel.nativeElement, 'bottom', '0px');
-        this.renderer.setElementStyle(this.panel.nativeElement, 'position', 'absolute');
-        this.renderer.setElementStyle(this.panel.nativeElement, 'z-index', layer);
+        this.renderer.setStyle(this.panel.nativeElement, 'top', '0px');
+        this.renderer.setStyle(this.panel.nativeElement, 'left', left);
+        this.renderer.setStyle(this.panel.nativeElement, 'bottom', '0px');
+        this.renderer.setStyle(this.panel.nativeElement, 'position', 'absolute');
+        this.renderer.setStyle(this.panel.nativeElement, 'z-index', layer);
     }
 }

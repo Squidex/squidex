@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, Directive, ElementRef, HostListener } from '@angular/core';
+import { AfterViewInit, Directive, ElementRef, HostListener, Renderer2 } from '@angular/core';
 
 import { PanelComponent } from './panel.component';
 
@@ -17,7 +17,8 @@ export class PanelContainerDirective implements AfterViewInit {
     private containerWidth = 0;
 
     constructor(
-        private readonly element: ElementRef
+        private readonly element: ElementRef,
+        private readonly renderer: Renderer2
     ) {
     }
 
@@ -84,12 +85,8 @@ export class PanelContainerDirective implements AfterViewInit {
             currentLayer -= 10;
         }
 
-        const diff = currentPosition - this.containerWidth;
+        const diff = Math.max(0, currentPosition - this.containerWidth);
 
-        if (diff > 0) {
-            this.element.nativeElement.scrollLeft = diff;
-        } else {
-            this.element.nativeElement.scrollLeft = 0;
-        }
+        this.renderer.setProperty(this.element.nativeElement, 'scrollLeft', diff);
     }
 }

@@ -18,13 +18,12 @@ export * from './angular/forms/iframe-editor.component';
 export * from './angular/forms/indeterminate-value.directive';
 export * from './angular/forms/jscript-editor.component';
 export * from './angular/forms/json-editor.component';
-export * from './angular/forms/lowercase-input.directive';
 export * from './angular/forms/progress-bar.component';
 export * from './angular/forms/slider.component';
-export * from './angular/forms/slugify-input.directive';
 export * from './angular/forms/stars.component';
 export * from './angular/forms/tag-editor.component';
 export * from './angular/forms/toggle.component';
+export * from './angular/forms/transform-input.directive';
 export * from './angular/forms/validators';
 
 export * from './angular/http/http-extensions-impl';
