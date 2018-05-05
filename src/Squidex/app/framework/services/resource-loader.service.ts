@@ -5,11 +5,16 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable } from '@angular/core';
+import { Injectable, Renderer2, RendererFactory2 } from '@angular/core';
 
 @Injectable()
 export class ResourceLoaderService {
-    private cache: { [path: string]: Promise<any> } = {};
+    private readonly cache: { [path: string]: Promise<any> } = {};
+    private readonly renderer: Renderer2;
+
+    constructor(rendererFactory: RendererFactory2) {
+        this.renderer = rendererFactory.createRenderer(null, null);
+    }
 
     public loadStyle(url: string): Promise<any> {
         const key = url.toUpperCase();
@@ -18,18 +23,13 @@ export class ResourceLoaderService {
 
         if (!result) {
             result = new Promise((resolve, reject) => {
-                const style = document.createElement('link');
-                style.rel  = 'stylesheet';
-                style.href = url;
-                style.type = 'text/css';
+                const style = this.renderer.createElement('link');
 
-                style.onload = () => {
-                    resolve();
-                };
-
-                const head = document.getElementsByTagName('head')[0];
-
-                head.appendChild(style);
+                this.renderer.listen(style, 'load', () => resolve());
+                this.renderer.setProperty(style, 'rel', 'stylesheet');
+                this.renderer.setProperty(style, 'href', url);
+                this.renderer.setProperty(style, 'type', 'text/css');
+                this.renderer.appendChild(document.head, style);
             });
 
             this.cache[key] = result;
@@ -45,19 +45,12 @@ export class ResourceLoaderService {
 
         if (!result) {
             result = new Promise((resolve, reject) => {
-                const script = document.createElement('script');
-                script.src = url;
-                script.async = true;
+                const script = this.renderer.createElement('script');
 
-                script.onload = () => {
-                    resolve();
-                };
-
-                const node = document.getElementsByTagName('script')[0];
-
-                if (node.parentNode) {
-                    node.parentNode.insertBefore(script, node);
-                }
+                this.renderer.listen(script, 'load', () => resolve());
+                this.renderer.setProperty(script, 'src', url);
+                this.renderer.setProperty(script, 'async', true);
+                this.renderer.appendChild(document.body, script);
             });
 
             this.cache[key] = result;

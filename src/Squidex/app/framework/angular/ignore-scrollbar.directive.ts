@@ -30,7 +30,7 @@ export class IgnoreScrollbarDirective implements OnDestroy, OnInit, AfterViewIni
 
     public ngOnInit() {
         if (!this.parent) {
-            this.parent = this.element.nativeElement.parentElement;
+            this.parent = this.renderer.parentNode(this.element.nativeElement);
         }
 
         this.resizeListener =

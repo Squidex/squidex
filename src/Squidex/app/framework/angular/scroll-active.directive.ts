@@ -38,14 +38,12 @@ export class ScrollActiveDirective implements AfterViewInit, OnChanges {
     }
 
     private scrollInView(parent: HTMLElement, target: HTMLElement) {
-        if (!parent.getBoundingClientRect || !target.getBoundingClientRect || !document.body) {
-            return;
-        }
-
         const parentRect = parent.getBoundingClientRect();
         const targetRect = target.getBoundingClientRect();
 
-        const offset = (targetRect.top + document.body.scrollTop) - (parentRect.top + document.body.scrollTop);
+        const body = document.body;
+
+        const offset = (targetRect.top + body.scrollTop) - (parentRect.top + body.scrollTop);
 
         const scroll = parent.scrollTop;
 

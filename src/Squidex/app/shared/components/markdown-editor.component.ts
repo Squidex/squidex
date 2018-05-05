@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, Component, ElementRef, forwardRef, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, forwardRef, Renderer2, ViewChild } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import {
@@ -48,6 +48,7 @@ export class MarkdownEditorComponent implements ControlValueAccessor, AfterViewI
     public isFullscreen = false;
 
     constructor(
+        private readonly renderer: Renderer2,
         private readonly resourceLoader: ResourceLoaderService
     ) {
         this.resourceLoader.loadStyle('https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css');
@@ -179,11 +180,13 @@ export class MarkdownEditorComponent implements ControlValueAccessor, AfterViewI
             this.simplemde.codemirror.on('refresh', () => {
                 this.isFullscreen = this.simplemde.isFullscreenActive();
 
+                let target = this.container.nativeElement;
+
                 if (this.isFullscreen) {
-                    document.body.appendChild(this.inner.nativeElement);
-                } else {
-                    this.container.nativeElement.appendChild(this.inner.nativeElement);
+                    target = document.body;
                 }
+
+                this.renderer.appendChild(target, this.inner.nativeElement);
             });
 
             this.simplemde.codemirror.on('blur', () => {

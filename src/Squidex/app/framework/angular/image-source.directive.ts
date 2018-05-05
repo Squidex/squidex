@@ -43,7 +43,7 @@ export class ImageSourceDirective implements OnChanges, OnDestroy, OnInit, After
 
     public ngOnInit() {
         if (!this.parent) {
-            this.parent = this.element.nativeElement.parentElement;
+            this.parent = this.renderer.parentNode(this.element.nativeElement);
         }
 
         this.parentResizeListener =

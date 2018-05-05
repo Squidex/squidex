@@ -97,7 +97,7 @@ export class OnboardingTooltipComponent implements OnDestroy, OnInit {
         } if (this.for === underCursor) {
             return true;
         } else {
-            return this.isSameOrParent(underCursor.parentElement);
+            return this.isSameOrParent(this.renderer.parentNode(underCursor));
         }
     }
 
