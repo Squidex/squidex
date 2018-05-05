@@ -89,18 +89,18 @@ export class DateTimeEditorComponent implements ControlValueAccessor, OnDestroy,
             });
     }
 
-    public writeValue(value: string) {
-        if (!Types.isString(value) || value.length === 0) {
-            this.timeValue = null;
-            this.dateValue = null;
-        } else {
-            const parsed = moment.parseZone(value);
+    public writeValue(obj: any) {
+        if (Types.isString(obj) && obj.length > 0) {
+            const parsed = moment.parseZone(obj);
 
             this.dateValue = moment(parsed);
 
             if (this.showTime) {
                 this.timeValue = moment(parsed);
             }
+        } else {
+            this.timeValue = null;
+            this.dateValue = null;
         }
 
         this.updateControls();

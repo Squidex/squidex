@@ -38,13 +38,13 @@ export class IndeterminateValueDirective implements ControlValueAccessor {
         this.callTouched();
     }
 
-    public writeValue(value: boolean | number | undefined) {
-        if (!Types.isBoolean(value)) {
+    public writeValue(obj: any) {
+        if (!Types.isBoolean(obj)) {
             this.renderer.setProperty(this.element.nativeElement, 'indeterminate', true);
             this.renderer.setProperty(this.element.nativeElement, 'checked', false);
         } else {
             this.renderer.setProperty(this.element.nativeElement, 'indeterminate', false);
-            this.renderer.setProperty(this.element.nativeElement, 'checked', value);
+            this.renderer.setProperty(this.element.nativeElement, 'checked', obj);
         }
     }
 

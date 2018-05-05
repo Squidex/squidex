@@ -6,6 +6,14 @@
  */
 
 export module Types {
+    export function hash(value: any): string {
+        try {
+            return JSON.stringify(value);
+        } catch (e) {
+            return '';
+        }
+    }
+
     export function isString(value: any): value is string {
         return typeof value === 'string' || value instanceof String;
     }
@@ -70,6 +78,10 @@ export module Types {
         }
 
         return true;
+    }
+
+    export function jsJsonEquals<T>(lhs: T, rhs: T) {
+        return hash(lhs) === hash(rhs);
     }
 
     export function isEquals<T>(lhs: T[], rhs: T[]) {

@@ -27,7 +27,6 @@ export class IFrameEditorComponent implements ControlValueAccessor, AfterViewIni
     private callChange = (v: any) => { /* NOOP */ };
     private callTouched = () => { /* NOOP */ };
     private value: any;
-    private valueJson: string;
     private isDisabled = false;
     private isInitialized = false;
     private plugin: HTMLIFrameElement;
@@ -72,10 +71,7 @@ export class IFrameEditorComponent implements ControlValueAccessor, AfterViewIni
                     } else if (type === 'valueChanged') {
                         const { value } = event.data;
 
-                        const valueJson = JSON.stringify(value);
-
-                        if (this.valueJson !== valueJson) {
-                            this.valueJson = valueJson;
+                        if (!Types.jsJsonEquals(this.value, value)) {
                             this.value = value;
 
                             this.callChange(value);
@@ -91,9 +87,8 @@ export class IFrameEditorComponent implements ControlValueAccessor, AfterViewIni
         return this.sanitizer.bypassSecurityTrustResourceUrl(this.url);
     }
 
-    public writeValue(value: any) {
-        this.value = value;
-        this.valueJson = JSON.stringify(value);
+    public writeValue(obj: any) {
+        this.value = obj;
 
         if (this.isInitialized && this.plugin.contentWindow && Types.isFunction(this.plugin.contentWindow.postMessage)) {
             this.plugin.contentWindow.postMessage({ type: 'valueChanged', value: this.value }, '*');

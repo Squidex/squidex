@@ -11,8 +11,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import {
     AssetDto,
     ModalView,
-    ResourceLoaderService,
-    Types
+    ResourceLoaderService
 } from '@app/shared/internal';
 
 declare var SimpleMDE: any;
@@ -54,8 +53,8 @@ export class MarkdownEditorComponent implements ControlValueAccessor, AfterViewI
         this.resourceLoader.loadStyle('https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css');
     }
 
-    public writeValue(value: string) {
-        this.value = Types.isString(value) ? value : '';
+    public writeValue(obj: any) {
+        this.value = obj + '';
 
         if (this.simplemde) {
             this.simplemde.value(this.value);

@@ -70,8 +70,8 @@ export class TransformInputDirective implements ControlValueAccessor {
         this.callTouched();
     }
 
-    public writeValue(value: string) {
-        const normalizedValue = this.transformValue(value);
+    public writeValue(obj: any) {
+        const normalizedValue = this.transformValue(obj + '');
 
         this.renderer.setProperty(this.element.nativeElement, 'value', normalizedValue);
     }

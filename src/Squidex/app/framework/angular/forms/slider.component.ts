@@ -49,8 +49,8 @@ export class SliderComponent implements ControlValueAccessor {
 
     constructor(private readonly renderer: Renderer2) { }
 
-    public writeValue(value: number) {
-        this.lastValue = this.value = Types.isNumber(value) ? value : 0;
+    public writeValue(obj: any) {
+        this.lastValue = this.value = Types.isNumber(obj) ? obj : 0;
 
         this.updateThumbPosition();
     }
