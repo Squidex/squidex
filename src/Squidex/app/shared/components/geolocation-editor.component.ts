@@ -76,9 +76,9 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
     ) {
     }
 
-    public writeValue(value: Geolocation) {
-        if (Types.isObject(value) && Types.isNumber(value.latitude) && Types.isNumber(value.longitude)) {
-            this.value = value;
+    public writeValue(obj: any) {
+        if (Types.isObject(obj) && Types.isNumber(obj.latitude) && Types.isNumber(obj.longitude)) {
+            this.value = obj;
         } else {
             this.value = null;
         }

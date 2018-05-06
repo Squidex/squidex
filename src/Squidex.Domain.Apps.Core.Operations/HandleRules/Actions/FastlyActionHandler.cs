@@ -6,45 +6,55 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
-using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Actions;
 using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Http;
 
+#pragma warning disable SA1649 // File name must match first type name
+
 namespace Squidex.Domain.Apps.Core.HandleRules.Actions
 {
-    public sealed class FastlyActionHandler : RuleActionHandler<FastlyAction>
+    public sealed class FastlyJob
     {
-        protected override (string Description, RuleJobData Data) CreateJob(Envelope<AppEvent> @event, string eventName, FastlyAction action)
-        {
-            var ruleDescription = "Purge key in fastly";
-            var ruleData = new RuleJobData
-            {
-                ["FastlyApiKey"] = action.ApiKey,
-                ["FastlyServiceID"] = action.ServiceId
-            };
+        public string FastlyApiKey { get; set; }
+        public string FastlyServiceID { get; set; }
 
+        public string Key { get; set; }
+    }
+
+    public sealed class FastlyActionHandler : RuleActionHandler<FastlyAction, FastlyJob>
+    {
+        private const string Description = "Purge key in fastly";
+        private const string DescriptionIgnore = "Ignore";
+
+        protected override Task<(string Description, FastlyJob Data)> CreateJobAsync(Envelope<AppEvent> @event, string eventName, FastlyAction action)
+        {
             if (@event.Headers.Contains(CommonHeaders.AggregateId))
             {
-                ruleData["Key"] = @event.Headers.AggregateId().ToString();
+                var ruleJob = new FastlyJob
+                {
+                    Key = @event.Headers.AggregateId().ToString(),
+                    FastlyApiKey = action.ApiKey,
+                    FastlyServiceID = action.ServiceId
+                };
+
+                return Task.FromResult((Description, ruleJob));
             }
 
-            return (ruleDescription, ruleData);
+            return Task.FromResult((DescriptionIgnore, new FastlyJob()));
         }
 
-        public override async Task<(string Dump, Exception Exception)> ExecuteJobAsync(RuleJobData job)
+        protected override async Task<(string Dump, Exception Exception)> ExecuteJobAsync(FastlyJob job)
         {
-            if (!job.TryGetValue("Key", out var keyToken))
+            if (string.IsNullOrWhiteSpace(job.Key))
             {
                 return (null, new InvalidOperationException("The action cannot handle this event."));
             }
 
-            var requestMsg = BuildRequest(job, keyToken.Value<string>());
+            var requestMsg = BuildRequest(job);
 
             HttpResponseMessage response = null;
 
@@ -59,29 +69,18 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
             }
             catch (Exception ex)
             {
-                if (requestMsg != null)
-                {
-                    var requestDump = DumpFormatter.BuildDump(requestMsg, response, null, ex.ToString(), TimeSpan.Zero, false);
+                var requestDump = DumpFormatter.BuildDump(requestMsg, response, null, ex.ToString(), TimeSpan.Zero, false);
 
-                    return (requestDump, ex);
-                }
-                else
-                {
-                    var requestDump = ex.ToString();
-
-                    return (requestDump, ex);
-                }
+                return (requestDump, ex);
             }
         }
 
-        private static HttpRequestMessage BuildRequest(Dictionary<string, JToken> job, string key)
+        private static HttpRequestMessage BuildRequest(FastlyJob job)
         {
-            var serviceId = job["FastlyServiceID"].Value<string>();
-
-            var requestUrl = $"https://api.fastly.com/service/{serviceId}/purge/{key}";
+            var requestUrl = $"https://api.fastly.com/service/{job.FastlyServiceID}/purge/{job.Key}";
             var request = new HttpRequestMessage(HttpMethod.Post, requestUrl);
 
-            request.Headers.Add("Fastly-Key", job["FastlyApiKey"].Value<string>());
+            request.Headers.Add("Fastly-Key", job.FastlyApiKey);
 
             return request;
         }

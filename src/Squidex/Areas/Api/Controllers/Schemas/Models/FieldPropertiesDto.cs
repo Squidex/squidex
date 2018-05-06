@@ -47,6 +47,11 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         public bool IsListField { get; set; }
 
         /// <summary>
+        /// Optional url to the editor.
+        /// </summary>
+        public string EditorUrl { get; set; }
+
+        /// <summary>
         /// Gets the partitioning of the language, e.g. invariant or language.
         /// </summary>
         public string Partitioning { get; set; }

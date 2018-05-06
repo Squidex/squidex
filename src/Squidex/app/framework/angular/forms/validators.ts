@@ -18,7 +18,7 @@ export module ValidatorsEx {
         let regeExp: RegExp;
         let regexStr: string;
 
-        if (typeof regex === 'string') {
+        if (Types.isString(regex)) {
             regexStr = `^${regex}$`;
             regeExp = new RegExp(regexStr);
         } else {

@@ -13,6 +13,7 @@ using Orleans;
 using Squidex.Areas.Api.Controllers.EventConsumers.Models;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing.Grains;
+using Squidex.Infrastructure.Orleans;
 using Squidex.Pipeline;
 
 namespace Squidex.Areas.Api.Controllers.EventConsumers
@@ -28,7 +29,7 @@ namespace Squidex.Areas.Api.Controllers.EventConsumers
         public EventConsumersController(ICommandBus commandBus, IGrainFactory grainFactory)
             : base(commandBus)
         {
-            eventConsumerManagerGrain = grainFactory.GetGrain<IEventConsumerManagerGrain>("Default");
+            eventConsumerManagerGrain = grainFactory.GetGrain<IEventConsumerManagerGrain>(SingleGrain.Id);
         }
 
         [HttpGet]

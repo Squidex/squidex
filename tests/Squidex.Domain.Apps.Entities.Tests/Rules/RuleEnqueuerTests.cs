@@ -80,14 +80,14 @@ namespace Squidex.Domain.Apps.Entities.Rules
             A.CallTo(() => appProvider.GetRulesAsync(appId.Id))
                 .Returns(new List<IRuleEntity> { ruleEntity1, ruleEntity2, ruleEntity3 });
 
-            A.CallTo(() => ruleService.CreateJob(rule1, @event))
+            A.CallTo(() => ruleService.CreateJobAsync(rule1, @event))
                 .Returns(job1);
 
-            A.CallTo(() => ruleService.CreateJob(rule2, @event))
+            A.CallTo(() => ruleService.CreateJobAsync(rule2, @event))
                 .Returns(job2);
 
-            A.CallTo(() => ruleService.CreateJob(rule3, @event))
-                .Returns(null);
+            A.CallTo(() => ruleService.CreateJobAsync(rule3, @event))
+                .Returns(Task.FromResult<RuleJob>(null));
 
             await sut.On(@event);
 

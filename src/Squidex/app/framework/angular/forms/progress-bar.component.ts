@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, ElementRef, Input, OnChanges, OnInit, Renderer, SimpleChanges } from '@angular/core';
+import { Component, ElementRef, Input, OnChanges, OnInit, Renderer2, SimpleChanges } from '@angular/core';
 
 const ProgressBar = require('progressbar.js');
 
@@ -36,7 +36,7 @@ export class ProgressBarComponent implements OnChanges, OnInit {
 
     constructor(
         private readonly element: ElementRef,
-        private readonly renderer: Renderer
+        private readonly renderer: Renderer2
     ) {
     }
 
@@ -48,7 +48,7 @@ export class ProgressBarComponent implements OnChanges, OnInit {
             strokeWidth: this.strokeWidth
         };
 
-        this.renderer.setElementStyle(this.element.nativeElement, 'display', 'block');
+        this.renderer.setStyle(this.element.nativeElement, 'display', 'block');
 
         if (this.mode === 'Circle') {
             this.progressBar = new ProgressBar.Circle(this.element.nativeElement, options);

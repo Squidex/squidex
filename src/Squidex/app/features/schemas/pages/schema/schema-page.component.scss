@@ -44,7 +44,7 @@
     & {
         @include circle(5.25rem);
         @include box-shadow(0, 8px, 16px, .3);
-        @include absolute(auto, 2rem, 1rem, auto);
+        @include absolute(auto, 5rem, 1rem, auto);
     }
 
     &-icon {

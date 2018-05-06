@@ -11,15 +11,34 @@ using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Queue;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Actions;
 using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 
+#pragma warning disable SA1649 // File name must match first type name
+
 namespace Squidex.Domain.Apps.Core.HandleRules.Actions
 {
-    public sealed class AzureQueueActionHandler : RuleActionHandler<AzureQueueAction>
+    public sealed class AzureQueueJob
+    {
+        public string QueueConnectionString { get; set; }
+        public string QueueName { get; set; }
+
+        public string MessageBodyV2 { get; set; }
+
+        public JObject MessageBody { get; set; }
+
+        public string Body
+        {
+            get
+            {
+                return MessageBodyV2 ?? MessageBody.ToString(Formatting.Indented);
+            }
+        }
+    }
+
+    public sealed class AzureQueueActionHandler : RuleActionHandler<AzureQueueAction, AzureQueueJob>
     {
         private readonly ClientPool<(string ConnectionString, string QueueName), CloudQueue> clients;
         private readonly RuleEventFormatter formatter;
@@ -41,31 +60,28 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
             });
         }
 
-        protected override (string Description, RuleJobData Data) CreateJob(Envelope<AppEvent> @event, string eventName, AzureQueueAction action)
+        protected override async Task<(string Description, AzureQueueJob Data)> CreateJobAsync(Envelope<AppEvent> @event, string eventName, AzureQueueAction action)
         {
-            var body = formatter.ToRouteData(@event, eventName);
+            var body = formatter.ToRouteData(@event, eventName).ToString(Formatting.Indented);
 
-            var ruleDescription = $"Send event to azure queue '{action.Queue}'";
-            var ruleData = new RuleJobData
+            var queueName = await formatter.FormatStringAsync(action.Queue, @event);
+
+            var ruleDescription = $"Send AzureQueueJob to azure queue '{action.Queue}'";
+            var ruleJob = new AzureQueueJob
             {
-                ["QueueConnectionString"] = action.ConnectionString,
-                ["QueueName"] = action.Queue,
-                ["MessageBody"] = body
+                QueueConnectionString = action.ConnectionString,
+                QueueName = queueName,
+                MessageBodyV2 = body,
             };
 
-            return (ruleDescription, ruleData);
+            return (ruleDescription, ruleJob);
         }
 
-        public override async Task<(string Dump, Exception Exception)> ExecuteJobAsync(RuleJobData job)
+        protected override async Task<(string Dump, Exception Exception)> ExecuteJobAsync(AzureQueueJob job)
         {
-            var queueConnectionString = job["QueueConnectionString"].Value<string>();
-            var queueName = job["QueueName"].Value<string>();
+            var queue = clients.GetClient((job.QueueConnectionString, job.QueueName));
 
-            var queue = clients.GetClient((queueConnectionString, queueName));
-
-            var messageBody = job["MessageBody"].ToString(Formatting.Indented);
-
-            await queue.AddMessageAsync(new CloudQueueMessage(messageBody));
+            await queue.AddMessageAsync(new CloudQueueMessage(job.Body));
 
             return ("Completed", null);
         }

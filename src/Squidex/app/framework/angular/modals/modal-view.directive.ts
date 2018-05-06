@@ -5,10 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Directive, EmbeddedViewRef, Input, OnChanges, OnDestroy, Renderer, SimpleChanges, TemplateRef, ViewContainerRef } from '@angular/core';
+import { Directive, EmbeddedViewRef, Input, OnChanges, OnDestroy, Renderer2, SimpleChanges, TemplateRef, ViewContainerRef } from '@angular/core';
 import { Subscription } from 'rxjs';
 
-import { ModalView } from '@app/framework/internal';
+import { ModalView, Types } from '@app/framework/internal';
 
 import { RootViewComponent } from './root-view.component';
 
@@ -31,7 +31,7 @@ export class ModalViewDirective implements OnChanges, OnDestroy {
 
     constructor(
         private readonly templateRef: TemplateRef<any>,
-        private readonly renderer: Renderer,
+        private readonly renderer: Renderer2,
         private readonly viewContainer: ViewContainerRef,
         private readonly rootView: RootViewComponent
     ) {
@@ -40,7 +40,7 @@ export class ModalViewDirective implements OnChanges, OnDestroy {
     public ngOnDestroy() {
         this.stopListening();
 
-        if (this.modalView instanceof ModalView) {
+        if (Types.is(this.modalView, ModalView)) {
             this.modalView.hide();
         }
     }
@@ -55,7 +55,7 @@ export class ModalViewDirective implements OnChanges, OnDestroy {
             this.subscription = null;
         }
 
-        if (this.modalView instanceof ModalView) {
+        if (Types.is(this.modalView, ModalView)) {
             this.subscription =
                 this.modalView.isOpen.subscribe(isOpen => {
                     this.update(isOpen);
@@ -78,7 +78,7 @@ export class ModalViewDirective implements OnChanges, OnDestroy {
             }
 
             if (this.renderedView.rootNodes[0].style) {
-                this.renderer.setElementStyle(this.renderedView.rootNodes[0], 'display', 'block');
+                this.renderer.setStyle(this.renderedView.rootNodes[0], 'display', 'block');
             }
 
             setTimeout(() => {
@@ -103,7 +103,7 @@ export class ModalViewDirective implements OnChanges, OnDestroy {
         }
 
         this.documentClickListener =
-            this.renderer.listenGlobal('document', 'click', (event: MouseEvent) => {
+            this.renderer.listen('document', 'click', (event: MouseEvent) => {
                 if (!event.target || this.renderedView === null) {
                     return;
                 }

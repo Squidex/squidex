@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using Microsoft.Extensions.Caching.Memory;
-using Squidex.Infrastructure;
 
 namespace Squidex.Infrastructure
 {

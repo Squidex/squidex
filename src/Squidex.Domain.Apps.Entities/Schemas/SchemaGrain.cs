@@ -305,7 +305,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
         public Task<J<ISchemaEntity>> GetStateAsync()
         {
-            return Task.FromResult(new J<ISchemaEntity>(Snapshot));
+            return J.AsTask<ISchemaEntity>(Snapshot);
         }
     }
 }

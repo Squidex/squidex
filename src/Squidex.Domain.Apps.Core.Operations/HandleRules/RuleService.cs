@@ -11,6 +11,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Events;
@@ -46,7 +47,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             this.clock = clock;
         }
 
-        public virtual RuleJob CreateJob(Rule rule, Envelope<IEvent> @event)
+        public virtual async Task<RuleJob> CreateJobAsync(Rule rule, Envelope<IEvent> @event)
         {
             Guard.NotNull(rule, nameof(rule));
             Guard.NotNull(@event, nameof(@event));
@@ -80,7 +81,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             var now = clock.GetCurrentInstant();
 
             var actionName = typeNameRegistry.GetName(actionType);
-            var actionData = actionHandler.CreateJob(appEventEnvelope, eventName, rule.Action);
+            var actionData = await actionHandler.CreateJobAsync(appEventEnvelope, eventName, rule.Action);
 
             var eventTime =
                 @event.Headers.Contains(CommonHeaders.Timestamp) ?
@@ -113,7 +114,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             return job;
         }
 
-        public virtual async Task<(string Dump, RuleResult Result, TimeSpan Elapsed)> InvokeAsync(string actionName, RuleJobData job)
+        public virtual async Task<(string Dump, RuleResult Result, TimeSpan Elapsed)> InvokeAsync(string actionName, JObject job)
         {
             try
             {

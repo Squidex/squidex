@@ -104,14 +104,14 @@ export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, O
         return true;
     }
 
-    public writeValue(value: any) {
-        if (!value) {
+    public writeValue(obj: any) {
+        if (!obj) {
             this.resetForm();
         } else {
-            const item = this.items.find(i => i === value);
+            const item = this.items.find(i => i === obj);
 
             if (item) {
-                this.queryInput.setValue(value.title || '');
+                this.queryInput.setValue(obj.title || '');
             }
         }
 

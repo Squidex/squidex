@@ -12,7 +12,8 @@ import {
     AddFieldForm,
     fieldTypes,
     SchemaDetailsDto,
-    SchemasState
+    SchemasState,
+    Types
 } from '@app/shared';
 
 @Component({
@@ -53,7 +54,9 @@ export class FieldWizardComponent {
                     this.addFieldForm.submitCompleted({ type: fieldTypes[0].type });
 
                     if (next) {
-                        this.nameInput.nativeElement.focus();
+                        if (Types.isFunction(this.nameInput.nativeElement.focus)) {
+                            this.nameInput.nativeElement.focus();
+                        }
                     } else {
                         this.complete();
                     }

@@ -6,23 +6,41 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Actions;
 using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Http;
 
+#pragma warning disable SA1649 // File name must match first type name
+
 namespace Squidex.Domain.Apps.Core.HandleRules.Actions
 {
-    public sealed class SlackActionHandler : RuleActionHandler<SlackAction>
+    public sealed class SlackJob
     {
+        public string RequestUrl { get; set; }
+        public string RequestBodyV2 { get; set; }
+
+        public JObject RequestBody { get; set; }
+
+        public string Body
+        {
+            get
+            {
+                return RequestBodyV2 ?? RequestBody.ToString(Formatting.Indented);
+            }
+        }
+    }
+
+    public sealed class SlackActionHandler : RuleActionHandler<SlackAction, SlackJob>
+    {
+        private const string Description = "Send message to slack";
+
         private readonly RuleEventFormatter formatter;
 
         public SlackActionHandler(RuleEventFormatter formatter)
@@ -32,61 +50,51 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
             this.formatter = formatter;
         }
 
-        protected override (string Description, RuleJobData Data) CreateJob(Envelope<AppEvent> @event, string eventName, SlackAction action)
+        protected override async Task<(string Description, SlackJob Data)> CreateJobAsync(Envelope<AppEvent> @event, string eventName, SlackAction action)
         {
-            var body = CreatePayload(@event, action.Text);
+            var body = await CreatePayloadAsync(@event, action.Text);
 
-            var ruleDescription = "Send message to slack";
-            var ruleData = new RuleJobData
+            var ruleJob = new SlackJob
             {
-                ["RequestUrl"] = action.WebhookUrl,
-                ["RequestBody"] = body
+                RequestUrl = action.WebhookUrl.ToString(),
+                RequestBodyV2 = body.ToString(Formatting.Indented),
             };
 
-            return (ruleDescription, ruleData);
+            return (Description, ruleJob);
         }
 
-        private JObject CreatePayload(Envelope<AppEvent> @event, string text)
+        private async Task<JObject> CreatePayloadAsync(Envelope<AppEvent> @event, string text)
         {
-            return new JObject(new JProperty("text", formatter.FormatString(text, @event)));
+            return new JObject(new JProperty("text", await formatter.FormatStringAsync(text, @event)));
         }
 
-        public override async Task<(string Dump, Exception Exception)> ExecuteJobAsync(RuleJobData job)
+        protected override async Task<(string Dump, Exception Exception)> ExecuteJobAsync(SlackJob job)
         {
-            var requestBody = job["RequestBody"].ToString(Formatting.Indented);
-            var requestMsg = BuildRequest(job, requestBody);
+            var requestBody = job.Body;
+            var requestMessage = BuildRequest(job, requestBody);
 
             HttpResponseMessage response = null;
 
             try
             {
-                response = await HttpClientPool.GetHttpClient().SendAsync(requestMsg);
+                response = await HttpClientPool.GetHttpClient().SendAsync(requestMessage);
 
                 var responseString = await response.Content.ReadAsStringAsync();
-                var requestDump = DumpFormatter.BuildDump(requestMsg, response, requestBody, responseString, TimeSpan.Zero, false);
+                var requestDump = DumpFormatter.BuildDump(requestMessage, response, requestBody, responseString, TimeSpan.Zero, false);
 
                 return (requestDump, null);
             }
             catch (Exception ex)
             {
-                if (requestMsg != null)
-                {
-                    var requestDump = DumpFormatter.BuildDump(requestMsg, response, requestBody, ex.ToString(), TimeSpan.Zero, false);
+                var requestDump = DumpFormatter.BuildDump(requestMessage, response, requestBody, ex.ToString(), TimeSpan.Zero, false);
 
-                    return (requestDump, ex);
-                }
-                else
-                {
-                    throw;
-                }
+                return (requestDump, ex);
             }
         }
 
-        private static HttpRequestMessage BuildRequest(Dictionary<string, JToken> job, string requestBody)
+        private static HttpRequestMessage BuildRequest(SlackJob job, string requestBody)
         {
-            var requestUrl = job["RequestUrl"].Value<string>();
-
-            var request = new HttpRequestMessage(HttpMethod.Post, requestUrl)
+            var request = new HttpRequestMessage(HttpMethod.Post, job.RequestUrl)
             {
                 Content = new StringContent(requestBody, Encoding.UTF8, "application/json")
             };

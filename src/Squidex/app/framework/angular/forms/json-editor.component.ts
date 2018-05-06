@@ -40,17 +40,17 @@ export class JsonEditorComponent implements ControlValueAccessor, AfterViewInit 
     ) {
     }
 
-    public writeValue(value: any) {
-        this.value = value;
+    public writeValue(obj: any) {
+        this.value = obj;
 
         try {
-            this.valueString = JSON.stringify(value);
+            this.valueString = JSON.stringify(obj);
         } catch (e) {
             this.valueString = '';
         }
 
         if (this.aceEditor) {
-            this.setValue(value);
+            this.setValue(obj);
         }
     }
 

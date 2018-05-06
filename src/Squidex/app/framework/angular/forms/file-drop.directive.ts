@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Directive, ElementRef, EventEmitter, HostListener, Output, Renderer } from '@angular/core';
+import { Directive, ElementRef, EventEmitter, HostListener, Output, Renderer2 } from '@angular/core';
 
 @Directive({
     selector: '[sqxFileDrop]'
@@ -18,7 +18,7 @@ export class FileDropDirective {
 
     constructor(
         private readonly element: ElementRef,
-        private readonly renderer: Renderer
+        private readonly renderer: Renderer2
     ) {
     }
 
@@ -71,7 +71,7 @@ export class FileDropDirective {
         this.dragCounter++;
 
         if (this.dragCounter === 1) {
-            this.renderer.setElementClass(this.element.nativeElement, 'drag', true);
+            this.renderer.addClass(this.element.nativeElement, 'drag');
         }
     }
 
@@ -79,7 +79,7 @@ export class FileDropDirective {
         this.dragCounter = number || this.dragCounter - 1;
 
         if (this.dragCounter === 0) {
-            this.renderer.setElementClass(this.element.nativeElement, 'drag', false);
+            this.renderer.removeClass(this.element.nativeElement, 'drag');
         }
     }
 

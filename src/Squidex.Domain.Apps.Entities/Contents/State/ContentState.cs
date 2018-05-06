@@ -18,8 +18,7 @@ using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Entities.Contents.State
 {
-    public class ContentState : DomainObjectState<ContentState>,
-        IContentEntity
+    public class ContentState : DomainObjectState<ContentState>, IContentEntity
     {
         [JsonProperty]
         public NamedId<Guid> AppId { get; set; }

@@ -77,20 +77,24 @@ export class ReferencesEditorComponent implements ControlValueAccessor, OnInit {
             });
     }
 
-    public writeValue(value: string[]) {
-        if (Types.isArrayOfString(value) && !Types.isEquals(value, this.contentItems.map(x => x.id).values)) {
-            const contentIds: string[] = value;
+    public writeValue(obj: any) {
+        if (Types.isArrayOfString(obj)) {
+            if (!Types.isEquals(obj, this.contentItems.map(x => x.id).values)) {
+                const contentIds: string[] = obj;
 
-            this.contentsService.getContents(this.appsState.appName, this.schemaId, 10000, 0, undefined, contentIds)
-                .subscribe(dtos => {
-                    this.contentItems = ImmutableArray.of(contentIds.map(id => dtos.items.find(c => c.id === id)).filter(r => !!r).map(r => r!));
+                this.contentsService.getContents(this.appsState.appName, this.schemaId, 10000, 0, undefined, contentIds)
+                    .subscribe(dtos => {
+                        this.contentItems = ImmutableArray.of(contentIds.map(id => dtos.items.find(c => c.id === id)).filter(r => !!r).map(r => r!));
 
-                    if (this.contentItems.length !== contentIds.length) {
-                        this.updateValue();
-                    }
-                }, () => {
-                    this.contentItems = ImmutableArray.empty<ContentDto>();
-                });
+                        if (this.contentItems.length !== contentIds.length) {
+                            this.updateValue();
+                        }
+                    }, () => {
+                        this.contentItems = ImmutableArray.empty();
+                    });
+            }
+        } else {
+            this.contentItems = ImmutableArray.empty();
         }
     }
 

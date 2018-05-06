@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Threading.Tasks;
 
 namespace Squidex.Infrastructure.States
@@ -16,5 +17,7 @@ namespace Squidex.Infrastructure.States
         Task<(T Value, long Version)> ReadAsync(TKey key);
 
         Task ClearAsync();
+
+        Task ReadAllAsync(Func<T, long, Task> callback);
     }
 }

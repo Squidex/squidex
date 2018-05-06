@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Directive, ElementRef, forwardRef, HostListener, Renderer } from '@angular/core';
+import { Directive, ElementRef, forwardRef, HostListener, Renderer2 } from '@angular/core';
 import { ControlValueAccessor,  NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import { Types } from '@app/framework/internal';
@@ -23,8 +23,8 @@ export class IndeterminateValueDirective implements ControlValueAccessor {
     private callTouched = () => { /* NOOP */ };
 
     constructor(
-        private readonly renderer: Renderer,
-        private readonly element: ElementRef
+        private readonly element: ElementRef,
+        private readonly renderer: Renderer2
     ) {
     }
 
@@ -38,18 +38,18 @@ export class IndeterminateValueDirective implements ControlValueAccessor {
         this.callTouched();
     }
 
-    public writeValue(value: boolean | number | undefined) {
-        if (!Types.isBoolean(value)) {
-            this.renderer.setElementProperty(this.element.nativeElement, 'indeterminate', true);
-            this.renderer.setElementProperty(this.element.nativeElement, 'checked', false);
+    public writeValue(obj: any) {
+        if (!Types.isBoolean(obj)) {
+            this.renderer.setProperty(this.element.nativeElement, 'indeterminate', true);
+            this.renderer.setProperty(this.element.nativeElement, 'checked', false);
         } else {
-            this.renderer.setElementProperty(this.element.nativeElement, 'indeterminate', false);
-            this.renderer.setElementProperty(this.element.nativeElement, 'checked', value);
+            this.renderer.setProperty(this.element.nativeElement, 'indeterminate', false);
+            this.renderer.setProperty(this.element.nativeElement, 'checked', obj);
         }
     }
 
     public setDisabledState(isDisabled: boolean): void {
-        this.renderer.setElementProperty(this.element.nativeElement, 'disabled', isDisabled);
+        this.renderer.setProperty(this.element.nativeElement, 'disabled', isDisabled);
     }
 
     public registerOnChange(fn: any) {

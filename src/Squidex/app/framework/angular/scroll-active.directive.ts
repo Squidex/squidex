@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, Directive, ElementRef, Input, OnChanges } from '@angular/core';
+import { AfterViewInit, Directive, ElementRef, Input, OnChanges, Renderer2 } from '@angular/core';
 
 @Directive({
     selector: '[sqxScrollActive]'
@@ -18,7 +18,8 @@ export class ScrollActiveDirective implements AfterViewInit, OnChanges {
     public container: HTMLElement;
 
     constructor(
-        private readonly element: ElementRef
+        private readonly element: ElementRef,
+        private readonly renderer: Renderer2
     ) {
     }
 
@@ -37,25 +38,23 @@ export class ScrollActiveDirective implements AfterViewInit, OnChanges {
     }
 
     private scrollInView(parent: HTMLElement, target: HTMLElement) {
-        if (!parent.getBoundingClientRect) {
-            return;
-        }
-
         const parentRect = parent.getBoundingClientRect();
         const targetRect = target.getBoundingClientRect();
 
-        const offset = (targetRect.top + document.body.scrollTop) - (parentRect.top + document.body.scrollTop);
+        const body = document.body;
+
+        const offset = (targetRect.top + body.scrollTop) - (parentRect.top + body.scrollTop);
 
         const scroll = parent.scrollTop;
 
         if (offset < 0) {
-            parent.scrollTop = scroll + offset;
+            this.renderer.setProperty(parent, 'scrollTop', scroll + offset);
         } else {
             const targetHeight = targetRect.height;
             const parentHeight = parentRect.height;
 
             if ((offset + targetHeight) > parentHeight) {
-                parent.scrollTop = scroll + offset - parentHeight + targetHeight;
+                this.renderer.setProperty(parent, 'scrollTop', scroll + offset - parentHeight + targetHeight);
             }
         }
     }

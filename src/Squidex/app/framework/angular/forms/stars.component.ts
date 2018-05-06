@@ -51,13 +51,8 @@ export class StarsComponent implements ControlValueAccessor {
 
     public value: number | null = 1;
 
-    public writeValue(value: number | null | undefined) {
-        if (Types.isNumber(value)) {
-            this.value = this.stars = value || 0;
-        } else {
-            this.value = null;
-            this.stars = 0;
-        }
+    public writeValue(obj: any) {
+        this.value = this.stars = Types.isNumber(obj) ? obj : 0;
     }
 
     public setDisabledState(isDisabled: boolean): void {

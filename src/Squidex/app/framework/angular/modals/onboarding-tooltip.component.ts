@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input, OnDestroy, OnInit, Renderer } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, Renderer2 } from '@angular/core';
 
 import {
     fadeAnimation,
@@ -43,7 +43,7 @@ export class OnboardingTooltipComponent implements OnDestroy, OnInit {
 
     constructor(
         private readonly onboardingService: OnboardingService,
-        private readonly renderer: Renderer
+        private readonly renderer: Renderer2
     ) {
     }
 
@@ -97,7 +97,7 @@ export class OnboardingTooltipComponent implements OnDestroy, OnInit {
         } if (this.for === underCursor) {
             return true;
         } else {
-            return this.isSameOrParent(underCursor.parentElement);
+            return this.isSameOrParent(this.renderer.parentNode(underCursor));
         }
     }
 

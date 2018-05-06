@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, Directive, ElementRef, Input, OnDestroy, OnInit, Renderer } from '@angular/core';
+import { AfterViewInit, Directive, ElementRef, Input, OnDestroy, OnInit, Renderer2 } from '@angular/core';
 
 const POSITION_TOPLEFT = 'topLeft';
 const POSITION_TOPRIGHT = 'topRight';
@@ -39,7 +39,7 @@ export class ModalTargetDirective implements AfterViewInit, OnDestroy, OnInit {
     public autoPosition = true;
 
     constructor(
-        private readonly renderer: Renderer,
+        private readonly renderer: Renderer2,
         private readonly element: ElementRef
     ) {
     }
@@ -80,8 +80,8 @@ export class ModalTargetDirective implements AfterViewInit, OnDestroy, OnInit {
     public ngAfterViewInit() {
         const modalRef = this.element.nativeElement;
 
-        this.renderer.setElementStyle(modalRef, 'position', 'fixed');
-        this.renderer.setElementStyle(modalRef, 'z-index', '1000000');
+        this.renderer.setStyle(modalRef, 'position', 'fixed');
+        this.renderer.setStyle(modalRef, 'z-index', '1000000');
 
         this.updatePosition();
     }
@@ -197,14 +197,14 @@ export class ModalTargetDirective implements AfterViewInit, OnDestroy, OnInit {
             const w = targetRect.width + 2 * this.offset;
             const h = targetRect.height + 2 * this.offset;
 
-            this.renderer.setElementStyle(modalRef, 'width', `${w}px`);
-            this.renderer.setElementStyle(modalRef, 'height', `${h}px`);
+            this.renderer.setStyle(modalRef, 'width', `${w}px`);
+            this.renderer.setStyle(modalRef, 'height', `${h}px`);
         }
 
-        this.renderer.setElementStyle(modalRef, 'top', `${t}px`);
-        this.renderer.setElementStyle(modalRef, 'left', `${l}px`);
-        this.renderer.setElementStyle(modalRef, 'right', 'auto');
-        this.renderer.setElementStyle(modalRef, 'bottom', 'auto');
-        this.renderer.setElementStyle(modalRef, 'margin', '0');
+        this.renderer.setStyle(modalRef, 'top', `${t}px`);
+        this.renderer.setStyle(modalRef, 'left', `${l}px`);
+        this.renderer.setStyle(modalRef, 'right', 'auto');
+        this.renderer.setStyle(modalRef, 'bottom', 'auto');
+        this.renderer.setStyle(modalRef, 'margin', '0');
     }
 }

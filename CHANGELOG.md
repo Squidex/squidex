@@ -1,10 +1,27 @@
 # Changelog
 
+## v1.4.1 - 2018-05-02
+
+### Bugfixes
+
+* **Orleans**: Remove orleans dashboard from 8080.
+
+## v1.4.0 - 2018-05-02
+
+### Features
+
+* **UI**: Big refactorings and UI improvements.
+* **Actions**: New log formatter with placeholder for user infos.
+* **Actions**: Azure Queue action.
+* **Actions**: Algolia action.
+* **Actions**: Fastly action.
+* **Backup**: Backup all your data to an archive.
+
 ## v1.3.0 - 2018-02-17
 
 ### Features
 
-* **Actions**: ElasticSearch action
+* **Actions**: ElasticSearch action.
 
 ### Refactorings
 

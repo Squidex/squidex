@@ -48,20 +48,24 @@ export class AssetsEditorComponent implements ControlValueAccessor {
     ) {
     }
 
-    public writeValue(value: string[]) {
-        if (Types.isArrayOfString(value) && !Types.isEquals(value, this.oldAssets.map(x => x.id).values)) {
-            const assetIds: string[] = value;
+    public writeValue(obj: any) {
+        if (Types.isArrayOfString(obj)) {
+            if (!Types.isEquals(obj, this.oldAssets.map(x => x.id).values)) {
+                const assetIds: string[] = obj;
 
-            this.assetsService.getAssets(this.appsState.appName, 0, 0, undefined, value)
-                .subscribe(dtos => {
-                    this.oldAssets = ImmutableArray.of(assetIds.map(id => dtos.items.find(x => x.id === id)).filter(a => !!a).map(a => a!));
+                this.assetsService.getAssets(this.appsState.appName, 0, 0, undefined, obj)
+                    .subscribe(dtos => {
+                        this.oldAssets = ImmutableArray.of(assetIds.map(id => dtos.items.find(x => x.id === id)).filter(a => !!a).map(a => a!));
 
-                    if (this.oldAssets.length !== assetIds.length) {
-                        this.updateValue();
-                    }
-                }, () => {
-                    this.oldAssets = ImmutableArray.empty<AssetDto>();
-                });
+                        if (this.oldAssets.length !== assetIds.length) {
+                            this.updateValue();
+                        }
+                    }, () => {
+                        this.oldAssets = ImmutableArray.empty();
+                    });
+            }
+        } else {
+            this.oldAssets = ImmutableArray.empty();
         }
     }
 

@@ -11,8 +11,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import {
     AssetDto,
     ModalView,
-    ResourceLoaderService,
-    Types
+    ResourceLoaderService
 } from '@app/shared/internal';
 
 declare var tinymce: any;
@@ -112,8 +111,8 @@ export class RichEditorComponent implements ControlValueAccessor, AfterViewInit,
         };
     }
 
-    public writeValue(value: string) {
-        this.value = Types.isString(value) ? value : '';
+    public writeValue(obj: any) {
+        this.value = obj + '';
 
         if (this.tinyEditor) {
             this.tinyEditor.setContent(this.value);

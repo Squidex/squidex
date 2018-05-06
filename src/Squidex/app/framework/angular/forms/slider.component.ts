@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, ElementRef, forwardRef, Input, Renderer, ViewChild } from '@angular/core';
+import { Component, ElementRef, forwardRef, Input, Renderer2, ViewChild } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import { Types } from '@app/framework/internal';
@@ -47,10 +47,10 @@ export class SliderComponent implements ControlValueAccessor {
     @Input()
     public step = 1;
 
-    constructor(private readonly renderer: Renderer) { }
+    constructor(private readonly renderer: Renderer2) { }
 
-    public writeValue(value: number) {
-        this.lastValue = this.value = Types.isNumber(value) ? value : 0;
+    public writeValue(obj: any) {
+        this.lastValue = this.value = Types.isNumber(obj) ? obj : 0;
 
         this.updateThumbPosition();
     }
@@ -87,16 +87,16 @@ export class SliderComponent implements ControlValueAccessor {
         this.centerStartOffset = event.offsetX - this.thumb.nativeElement.clientWidth * 0.5;
 
         this.windowMouseMoveListener =
-            this.renderer.listenGlobal('window', 'mousemove', (e: MouseEvent) => {
+            this.renderer.listen('window', 'mousemove', (e: MouseEvent) => {
                 this.onMouseMove(e);
             });
 
         this.windowMouseUpListener =
-            this.renderer.listenGlobal('window', 'mouseup', () => {
+            this.renderer.listen('window', 'mouseup', () => {
                 this.onMouseUp();
             });
 
-        this.renderer.setElementClass(this.thumb.nativeElement, 'focused', true);
+        this.renderer.addClass(this.thumb.nativeElement, 'focused');
 
         this.isDragging = true;
 
@@ -123,7 +123,7 @@ export class SliderComponent implements ControlValueAccessor {
 
         setTimeout(() => {
             this.releaseMouseHandlers();
-            this.renderer.setElementClass(this.thumb.nativeElement, 'focused', false);
+            this.renderer.removeClass(this.thumb.nativeElement, 'focused');
         }, 10);
 
         this.centerStartOffset = 0;
@@ -168,7 +168,7 @@ export class SliderComponent implements ControlValueAccessor {
     private updateThumbPosition() {
         const relativeValue = Math.min(1, Math.max(0, (this.value - this.min) / (this.max - this.min)));
 
-        this.renderer.setElementStyle(this.thumb.nativeElement, 'left', relativeValue * 100 + '%');
+        this.renderer.setStyle(this.thumb.nativeElement, 'left', relativeValue * 100 + '%');
     }
 
     private releaseMouseHandlers() {

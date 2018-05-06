@@ -17,6 +17,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 {
     public sealed partial class MongoAssetRepository : ISnapshotStore<AssetState, Guid>
     {
+        Task ISnapshotStore<AssetState, Guid>.ReadAllAsync(Func<AssetState, long, Task> callback)
+        {
+            throw new NotSupportedException();
+        }
+
         public async Task<(AssetState Value, long Version)> ReadAsync(Guid key)
         {
             var existing =

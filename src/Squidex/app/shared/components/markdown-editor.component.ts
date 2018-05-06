@@ -5,14 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, Component, ElementRef, forwardRef, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, forwardRef, Renderer2, ViewChild } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import {
     AssetDto,
     ModalView,
-    ResourceLoaderService,
-    Types
+    ResourceLoaderService
 } from '@app/shared/internal';
 
 declare var SimpleMDE: any;
@@ -48,13 +47,14 @@ export class MarkdownEditorComponent implements ControlValueAccessor, AfterViewI
     public isFullscreen = false;
 
     constructor(
+        private readonly renderer: Renderer2,
         private readonly resourceLoader: ResourceLoaderService
     ) {
         this.resourceLoader.loadStyle('https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css');
     }
 
-    public writeValue(value: string) {
-        this.value = Types.isString(value) ? value : '';
+    public writeValue(obj: any) {
+        this.value = obj + '';
 
         if (this.simplemde) {
             this.simplemde.value(this.value);
@@ -179,11 +179,13 @@ export class MarkdownEditorComponent implements ControlValueAccessor, AfterViewI
             this.simplemde.codemirror.on('refresh', () => {
                 this.isFullscreen = this.simplemde.isFullscreenActive();
 
+                let target = this.container.nativeElement;
+
                 if (this.isFullscreen) {
-                    document.body.appendChild(this.inner.nativeElement);
-                } else {
-                    this.container.nativeElement.appendChild(this.inner.nativeElement);
+                    target = document.body;
                 }
+
+                this.renderer.appendChild(target, this.inner.nativeElement);
             });
 
             this.simplemde.codemirror.on('blur', () => {

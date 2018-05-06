@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, Directive, ElementRef, OnDestroy, OnInit, Renderer } from '@angular/core';
+import { AfterViewInit, Directive, ElementRef, OnDestroy, OnInit, Renderer2 } from '@angular/core';
 
 @Directive({
     selector: '[sqxIgnoreScrollbar]'
@@ -18,7 +18,7 @@ export class IgnoreScrollbarDirective implements OnDestroy, OnInit, AfterViewIni
 
     constructor(
         private readonly element: ElementRef,
-        private readonly renderer: Renderer
+        private readonly renderer: Renderer2
     ) {
     }
 
@@ -30,7 +30,7 @@ export class IgnoreScrollbarDirective implements OnDestroy, OnInit, AfterViewIni
 
     public ngOnInit() {
         if (!this.parent) {
-            this.parent = this.element.nativeElement.parentElement;
+            this.parent = this.renderer.parentNode(this.element.nativeElement);
         }
 
         this.resizeListener =
@@ -61,7 +61,7 @@ export class IgnoreScrollbarDirective implements OnDestroy, OnInit, AfterViewIni
         if (scrollbarWidth !== this.scollbarWidth) {
             this.scollbarWidth = scrollbarWidth;
 
-            this.renderer.setElementStyle(this.element.nativeElement, 'marginRight', `-${scrollbarWidth}px`);
+            this.renderer.setStyle(this.element.nativeElement, 'marginRight', `-${scrollbarWidth}px`);
         }
     }
 }

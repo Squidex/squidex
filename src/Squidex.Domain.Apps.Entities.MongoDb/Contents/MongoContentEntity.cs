@@ -25,11 +25,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         [BsonId]
         [BsonRequired]
-        [BsonElement]
-        public string DocumentId { get; set; }
-
-        [BsonRequired]
-        [BsonElement("id")]
         [BsonRepresentation(BsonType.String)]
         public Guid Id { get; set; }
 

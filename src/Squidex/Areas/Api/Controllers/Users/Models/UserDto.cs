@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.ComponentModel.DataAnnotations;
-using Squidex.Domain.Users;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Shared.Users;
 

@@ -8,6 +8,13 @@
 import { Types } from './types';
 
 describe('Types', () => {
+    it('should calculate hash string', () => {
+        expect(Types.hash(null)).toBe('null');
+        expect(Types.hash(undefined)).toBe(undefined);
+
+        expect(Types.hash(new RegExp('.*'))).toEqual('{}');
+    });
+
     it('should make string check', () => {
         expect(Types.isString('')).toBeTruthy();
         expect(Types.isString('string')).toBeTruthy();
@@ -89,4 +96,23 @@ describe('Types', () => {
 
         expect(Types.isFunction([])).toBeFalsy();
     });
+
+    it('should make type check', () => {
+        expect(Types.is(new MyClass(1), MyClass)).toBeTruthy();
+
+        expect(Types.is(1, MyClass)).toBeFalsy();
+    });
+
+    it('should make json equals check', () => {
+        expect(Types.jsJsonEquals({ a: 1, b: 2 }, { a: 1, b: 2 })).toBeTruthy();
+
+        expect(Types.jsJsonEquals({ a: 1, b: 2 }, { b: 2, a: 1 })).toBeFalsy();
+    });
 });
+
+class MyClass {
+    constructor(
+        public readonly value: number
+    ) {
+    }
+}

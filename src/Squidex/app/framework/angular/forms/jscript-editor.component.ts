@@ -9,7 +9,7 @@ import { AfterViewInit, Component, ElementRef, forwardRef, ViewChild } from '@an
 import { ControlValueAccessor,  NG_VALUE_ACCESSOR } from '@angular/forms';
 import { Subject } from 'rxjs';
 
-import { ResourceLoaderService, Types } from '@app/framework/internal';
+import { ResourceLoaderService } from '@app/framework/internal';
 
 declare var ace: any;
 
@@ -39,8 +39,8 @@ export class JscriptEditorComponent implements ControlValueAccessor, AfterViewIn
     ) {
     }
 
-    public writeValue(value: string) {
-        this.value = Types.isString(value) ? value : '';
+    public writeValue(obj: any) {
+        this.value = obj + '';
 
         if (this.aceEditor) {
             this.setValue(this.value);

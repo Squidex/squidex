@@ -341,7 +341,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         public Task<J<IAppEntity>> GetStateAsync()
         {
-            return Task.FromResult(new J<IAppEntity>(Snapshot));
+            return J.AsTask<IAppEntity>(Snapshot);
         }
     }
 }

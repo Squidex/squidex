@@ -88,11 +88,11 @@ export class TagEditorComponent implements ControlValueAccessor {
 
     public addInput = new FormControl();
 
-    public writeValue(value: any[]) {
+    public writeValue(obj: any) {
         this.resetForm();
 
-        if (this.converter && Types.isArrayOf(value, v => this.converter.isValidValue(v))) {
-            this.items = value;
+        if (this.converter && Types.isArrayOf(obj, v => this.converter.isValidValue(v))) {
+            this.items = obj;
         } else {
             this.items = [];
         }

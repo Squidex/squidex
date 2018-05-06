@@ -142,7 +142,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public Task<J<IAssetEntity>> GetStateAsync()
         {
-            return Task.FromResult(new J<IAssetEntity>(Snapshot));
+            return J.AsTask<IAssetEntity>(Snapshot);
         }
     }
 }

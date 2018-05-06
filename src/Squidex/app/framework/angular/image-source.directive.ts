@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, Directive, ElementRef, HostListener, Input, OnChanges, OnDestroy, OnInit, Renderer } from '@angular/core';
+import { AfterViewInit, Directive, ElementRef, HostListener, Input, OnChanges, OnDestroy, OnInit, Renderer2 } from '@angular/core';
 
 import { MathHelper } from './../utils/math-helper';
 
@@ -31,7 +31,7 @@ export class ImageSourceDirective implements OnChanges, OnDestroy, OnInit, After
 
     constructor(
         private readonly element: ElementRef,
-        private readonly renderer: Renderer
+        private readonly renderer: Renderer2
     ) {
     }
 
@@ -43,7 +43,7 @@ export class ImageSourceDirective implements OnChanges, OnDestroy, OnInit, After
 
     public ngOnInit() {
         if (!this.parent) {
-            this.parent = this.element.nativeElement.parentElement;
+            this.parent = this.renderer.parentNode(this.element.nativeElement);
         }
 
         this.parentResizeListener =
@@ -65,12 +65,12 @@ export class ImageSourceDirective implements OnChanges, OnDestroy, OnInit, After
 
     @HostListener('load')
     public onLoad() {
-        this.renderer.setElementStyle(this.element.nativeElement, 'visibility', 'visible');
+        this.renderer.setStyle(this.element.nativeElement, 'visibility', 'visible');
     }
 
     @HostListener('error')
     public onError() {
-        this.renderer.setElementStyle(this.element.nativeElement, 'visibility', 'hidden');
+        this.renderer.setStyle(this.element.nativeElement, 'visibility', 'hidden');
 
         this.retryLoadingImage();
     }
@@ -78,9 +78,9 @@ export class ImageSourceDirective implements OnChanges, OnDestroy, OnInit, After
     private resize(parent: any) {
         this.size = this.parent.getBoundingClientRect();
 
-        this.renderer.setElementStyle(this.element.nativeElement, 'display', 'inline-block');
-        this.renderer.setElementStyle(this.element.nativeElement, 'width', this.size.width + 'px');
-        this.renderer.setElementStyle(this.element.nativeElement, 'height', this.size.height + 'px');
+        this.renderer.setStyle(this.element.nativeElement, 'display', 'inline-block');
+        this.renderer.setStyle(this.element.nativeElement, 'width', this.size.width + 'px');
+        this.renderer.setStyle(this.element.nativeElement, 'height', this.size.height + 'px');
 
         this.setImageSource();
     }
@@ -100,7 +100,7 @@ export class ImageSourceDirective implements OnChanges, OnDestroy, OnInit, After
                 source += `&q=${this.loadQuery}`;
             }
 
-            this.renderer.setElementAttribute(this.element.nativeElement, 'src', source);
+            this.renderer.setProperty(this.element.nativeElement, 'src', source);
         }
     }
 

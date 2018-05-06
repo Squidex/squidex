@@ -17,6 +17,7 @@ import {
     Form,
     ImmutableArray,
     State,
+    Types,
     ValidatorsEx,
     Version
 } from '@app/framework';
@@ -85,6 +86,12 @@ export class EditFieldForm extends Form<FormGroup> {
                     Validators.maxLength(1000)
                 ]
             ],
+            placeholder: ['',
+                [
+                    Validators.maxLength(1000)
+                ]
+            ],
+            editorUrl: null,
             isRequired: false,
             isListField: false
         }));
@@ -364,7 +371,7 @@ export class SchemasState extends State<Snapshot> {
 }
 
 const setPublished = (schema: SchemaDto | SchemaDetailsDto, publish: boolean, user: string, version: Version, now?: DateTime) => {
-    if (schema instanceof SchemaDetailsDto) {
+    if (Types.is(schema, SchemaDetailsDto)) {
         return new SchemaDetailsDto(
             schema.id,
             schema.name,

@@ -5,33 +5,51 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ElementRef, Renderer } from '@angular/core';
+import { ElementRef } from '@angular/core';
 
 import { FocusOnInitDirective } from './focus-on-init.directive';
 
 describe('FocusOnInitDirective', () => {
-    it('should call focus on element when init', (cb) => {
-        const calledMethods: string[] = [];
-        const calledElements: any[] = [];
+    let isFocusCalled = false;
+    let isSelectCalled = false;
 
-        const renderer = {
-            invokeElementMethod: (elem: any, method: any) => {
-                calledElements.push(elem);
-                calledMethods.push(method);
+    const element: ElementRef = {
+        nativeElement: {
+            focus: () => {
+                isFocusCalled = true;
+            },
+            select: () => {
+                isSelectCalled = true;
             }
-        };
+        }
+    };
 
-        const element: ElementRef = {
-            nativeElement: {}
-        };
+    beforeEach(() => {
+        isFocusCalled = false;
+        isSelectCalled = false;
+    });
 
-        const directive = new FocusOnInitDirective(element, renderer as Renderer);
+    it('should call focus on element when init', (cb) => {
+        const directive = new FocusOnInitDirective(element);
+        directive.select = false;
+        directive.ngAfterViewInit();
+
+        setTimeout(() => {
+            expect(isFocusCalled).toBeTruthy();
+            expect(isSelectCalled).toBeFalsy();
+
+            cb();
+        }, 200);
+    });
+
+    it('should call select on element when init', (cb) => {
+        const directive = new FocusOnInitDirective(element);
         directive.select = true;
         directive.ngAfterViewInit();
 
         setTimeout(() => {
-            expect(calledMethods).toEqual(['focus', 'select']);
-            expect(calledElements).toEqual([element.nativeElement, element.nativeElement]);
+            expect(isFocusCalled).toBeTruthy();
+            expect(isSelectCalled).toBeTruthy();
 
             cb();
         }, 200);
