@@ -11,6 +11,10 @@ namespace Squidex.Domain.Users
 {
     public sealed class NoopUserEvents : IUserEvents
     {
+        public void OnConsentGiven(IUser user)
+        {
+        }
+
         public void OnUserRegistered(IUser user)
         {
         }

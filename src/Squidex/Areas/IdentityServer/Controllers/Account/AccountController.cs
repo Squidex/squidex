@@ -123,6 +123,8 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
 
             await userManager.UpdateAsync(user);
 
+            userEvents.OnConsentGiven(user);
+
             return RedirectToReturnUrl(returnUrl);
         }
 
