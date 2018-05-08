@@ -130,7 +130,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                 await Collection.Find(x => x.SchemaIdId == schemaId && ids.Contains(x.Id) && x.IsDeleted == false).Only(x => x.Id)
                     .ToListAsync();
 
-            return ids.Except(contentEntities.Select(x => Guid.Parse(x["id"].AsString))).ToList();
+            return ids.Except(contentEntities.Select(x => Guid.Parse(x["_id"].AsString))).ToList();
         }
 
         public async Task<IContentEntity> FindContentAsync(IAppEntity app, ISchemaEntity schema, Guid id)

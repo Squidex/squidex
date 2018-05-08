@@ -12,5 +12,7 @@ namespace Squidex.Domain.Users
     public interface IUserEvents
     {
         void OnUserRegistered(IUser user);
+
+        void OnConsentGiven(IUser user);
     }
 }

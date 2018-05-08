@@ -20,7 +20,6 @@ using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Json;
-using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Config.Domain
 {
@@ -74,16 +73,14 @@ namespace Squidex.Config.Domain
             ConfigureJson(DefaultJsonSettings, TypeNameHandling.Auto);
 
             DefaultJsonSerializer = JsonSerializer.Create(DefaultJsonSettings);
-
-            BsonJsonConvention.Register(DefaultJsonSerializer);
         }
 
         public static IServiceCollection AddMySerializers(this IServiceCollection services)
         {
-            services.AddSingletonAs(t => FieldRegistry);
-            services.AddSingletonAs(t => DefaultJsonSettings);
-            services.AddSingletonAs(t => DefaultJsonSerializer);
-            services.AddSingletonAs(t => TypeNameRegistry);
+            services.AddSingleton(FieldRegistry);
+            services.AddSingleton(DefaultJsonSettings);
+            services.AddSingleton(DefaultJsonSerializer);
+            services.AddSingleton(TypeNameRegistry);
 
             return services;
         }

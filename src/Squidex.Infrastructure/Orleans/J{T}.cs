@@ -8,6 +8,7 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Orleans.CodeGeneration;
 using Orleans.Serialization;
@@ -17,6 +18,8 @@ namespace Squidex.Infrastructure.Orleans
 {
     public struct J<T>
     {
+        private static readonly JsonSerializer DefaultSerializer = JsonSerializer.CreateDefault();
+
         public T Value { get; }
 
         [JsonConstructor]
@@ -56,11 +59,13 @@ namespace Squidex.Infrastructure.Orleans
         {
             using (Profile.Method(nameof(J)))
             {
+                var jsonSerializer = GetSerializer(context);
+
                 var stream = new MemoryStream();
 
                 using (var writer = new JsonTextWriter(new StreamWriter(stream)))
                 {
-                    J.Serializer.Serialize(writer, input);
+                    jsonSerializer.Serialize(writer, input);
 
                     writer.Flush();
                 }
@@ -77,6 +82,8 @@ namespace Squidex.Infrastructure.Orleans
         {
             using (Profile.Method(nameof(J)))
             {
+                var jsonSerializer = GetSerializer(context);
+
                 var outLength = context.StreamReader.ReadInt();
                 var outBytes = context.StreamReader.ReadBytes(outLength);
 
@@ -84,8 +91,20 @@ namespace Squidex.Infrastructure.Orleans
 
                 using (var reader = new JsonTextReader(new StreamReader(stream)))
                 {
-                    return J.Serializer.Deserialize(reader, expected);
+                    return jsonSerializer.Deserialize(reader, expected);
                 }
+            }
+        }
+
+        private static JsonSerializer GetSerializer(ISerializerContext context)
+        {
+            try
+            {
+                return context?.ServiceProvider?.GetService<JsonSerializer>() ?? DefaultSerializer;
+            }
+            catch
+            {
+                return DefaultSerializer;
             }
         }
     }
