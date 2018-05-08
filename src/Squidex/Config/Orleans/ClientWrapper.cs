@@ -10,6 +10,7 @@ using System.Net;
 using Orleans;
 using Orleans.Configuration;
 using Orleans.Runtime;
+using Squidex.Config.Domain;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Infrastructure;
 
@@ -30,6 +31,10 @@ namespace Squidex.Config.Orleans
                 .Configure<ClusterOptions>(options =>
                 {
                     options.ClusterId = "squidex";
+                })
+                .ConfigureServices((context, services) =>
+                {
+                    services.AddMySerializers();
                 })
                 .ConfigureApplicationParts(builder =>
                 {

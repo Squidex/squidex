@@ -53,8 +53,6 @@ namespace Squidex.Config.Orleans
 
             silo = new Lazy<ISiloHost>(() =>
             {
-                J.Serializer = SerializationServices.DefaultJsonSerializer;
-
                 var hostBuilder = new SiloHostBuilder()
                     .UseDashboard(options => options.HostSelf = false)
                     .AddStartupTask<Bootstrap<IContentSchedulerGrain>>()
