@@ -11,7 +11,8 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import {
     AssetDto,
     ModalView,
-    ResourceLoaderService
+    ResourceLoaderService,
+    Types
 } from '@app/shared/internal';
 
 declare var tinymce: any;
