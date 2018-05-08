@@ -18,6 +18,8 @@ namespace Squidex.Infrastructure.Orleans
 {
     public struct J<T>
     {
+        private static readonly JsonSerializer DefaultSerializer = JsonSerializer.CreateDefault();
+
         public T Value { get; }
 
         [JsonConstructor]
@@ -57,7 +59,7 @@ namespace Squidex.Infrastructure.Orleans
         {
             using (Profile.Method(nameof(J)))
             {
-                var jsonSerializer = context.ServiceProvider.GetRequiredService<JsonSerializer>();
+                var jsonSerializer = GetSerializer(context);
 
                 var stream = new MemoryStream();
 
@@ -80,7 +82,7 @@ namespace Squidex.Infrastructure.Orleans
         {
             using (Profile.Method(nameof(J)))
             {
-                var jsonSerializer = context.ServiceProvider.GetRequiredService<JsonSerializer>();
+                var jsonSerializer = GetSerializer(context);
 
                 var outLength = context.StreamReader.ReadInt();
                 var outBytes = context.StreamReader.ReadBytes(outLength);
@@ -91,6 +93,18 @@ namespace Squidex.Infrastructure.Orleans
                 {
                     return jsonSerializer.Deserialize(reader, expected);
                 }
+            }
+        }
+
+        private static JsonSerializer GetSerializer(ISerializerContext context)
+        {
+            try
+            {
+                return context?.ServiceProvider?.GetService<JsonSerializer>() ?? DefaultSerializer;
+            }
+            catch
+            {
+                return DefaultSerializer;
             }
         }
     }
