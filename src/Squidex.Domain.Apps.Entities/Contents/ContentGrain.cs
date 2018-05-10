@@ -102,10 +102,6 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                         if (Snapshot.IsPending && Snapshot.Status == Status.Published && c.Status == Status.Published)
                         {
-                            var ctx = await CreateContext(Snapshot.AppId.Id, Snapshot.SchemaId.Id, () => "Failed to update content.");
-
-                            await ctx.ExecuteScriptAndTransformAsync(x => x.ScriptUpdate, "Update", c, Snapshot.DataDraft, Snapshot.Data);
-
                             ConfirmChanges(c);
                         }
                         else
@@ -170,14 +166,14 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     await ctx.ValidateAsync(c.Data);
                 }
 
+                newData = await ctx.ExecuteScriptAndTransformAsync(x => x.ScriptUpdate, "Update", c, newData, Snapshot.Data);
+
                 if (isProposal)
                 {
                     ProposeUpdate(c, newData);
                 }
                 else
                 {
-                    newData = await ctx.ExecuteScriptAndTransformAsync(x => x.ScriptUpdate, "Update", c, newData, Snapshot.Data);
-
                     Update(c, newData);
                 }
             }

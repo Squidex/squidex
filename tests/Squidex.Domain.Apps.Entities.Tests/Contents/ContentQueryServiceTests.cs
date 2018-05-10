@@ -99,7 +99,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             A.CallTo(() => appProvider.GetSchemaAsync(appId, schemaId, false))
                 .Returns(schema);
-            A.CallTo(() => contentRepository.FindContentAsync(app, schema, null, contentId))
+            A.CallTo(() => contentRepository.FindContentAsync(app, schema, A<Status[]>.Ignored, contentId))
                 .Returns(content);
 
             A.CallTo(() => schema.ScriptQuery)
