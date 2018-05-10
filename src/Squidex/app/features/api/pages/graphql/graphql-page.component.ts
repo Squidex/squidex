@@ -13,8 +13,6 @@ import * as ReactDOM from 'react-dom';
 
 const GraphiQL = require('graphiql');
 
-/* tslint:disable:use-view-encapsulation */
-
 import { AppsState, GraphQlService } from '@app/shared';
 
 @Component({
