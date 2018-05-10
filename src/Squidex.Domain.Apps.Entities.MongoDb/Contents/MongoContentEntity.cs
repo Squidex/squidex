@@ -53,12 +53,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         [BsonRepresentation(BsonType.String)]
         public Status Status { get; set; }
 
-        [BsonIgnoreIfDefault]
+        [BsonIgnoreIfNull]
         [BsonElement("do")]
         [BsonJson]
         public IdContentData DataByIds { get; set; }
 
-        [BsonIgnoreIfDefault]
+        [BsonIgnoreIfNull]
         [BsonElement("dd")]
         [BsonJson]
         public IdContentData DataDraftByIds { get; set; }
