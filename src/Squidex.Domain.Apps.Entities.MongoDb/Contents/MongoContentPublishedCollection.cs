@@ -49,6 +49,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
             content.DataText = content.DataByIds.ToFullText();
             content.DataDraftByIds = null;
+            content.ScheduleJob = null;
+            content.ScheduledAt = null;
 
             return Collection.ReplaceOneAsync(x => x.Id == content.Id, content, new UpdateOptions { IsUpsert = true });
         }
