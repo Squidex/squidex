@@ -8,6 +8,10 @@
 using System;
 using System.Threading.Tasks;
 using MongoDB.Driver;
+using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Entities.Contents;
+using Squidex.Domain.Apps.Entities.Schemas;
+using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 {
@@ -28,6 +32,17 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                     .Ascending(x => x.Id));
 
             await base.SetupCollectionAsync(collection);
+        }
+
+        public async Task<IContentEntity> FindContentAsync(IAppEntity app, ISchemaEntity schema, Guid id)
+        {
+            var contentEntity =
+                await Collection.Find(x => x.IndexedSchemaId == schema.Id && x.Id == id).Not(x => x.DataText)
+                    .FirstOrDefaultAsync();
+
+            contentEntity?.ParseData(schema.SchemaDef);
+
+            return contentEntity;
         }
 
         public Task UpsertAsync(MongoContentEntity content)

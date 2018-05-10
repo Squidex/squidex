@@ -108,17 +108,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             return ResultList.Create<IContentEntity>(contentItems.Result, contentCount.Result);
         }
 
-        public async Task<IContentEntity> FindContentAsync(IAppEntity app, ISchemaEntity schema, Guid id)
-        {
-            var contentEntity =
-                await Collection.Find(x => x.IndexedSchemaId == schema.Id && x.Id == id && x.IsDeleted != true).Not(x => x.DataText)
-                    .FirstOrDefaultAsync();
-
-            contentEntity?.ParseData(schema.SchemaDef);
-
-            return contentEntity;
-        }
-
         public Task CleanupAsync(Guid id)
         {
             return Collection.UpdateManyAsync(

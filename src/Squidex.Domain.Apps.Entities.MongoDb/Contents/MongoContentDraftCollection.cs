@@ -11,6 +11,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 using NodaTime;
+using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.State;
 using Squidex.Domain.Apps.Entities.Schemas;
@@ -65,6 +66,17 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                 {
                     callback(c);
                 });
+        }
+
+        public async Task<IContentEntity> FindContentAsync(IAppEntity app, ISchemaEntity schema, Guid id)
+        {
+            var contentEntity =
+                await Collection.Find(x => x.IndexedSchemaId == schema.Id && x.Id == id && x.IsDeleted != true).Not(x => x.DataText)
+                    .FirstOrDefaultAsync();
+
+            contentEntity?.ParseData(schema.SchemaDef);
+
+            return contentEntity;
         }
 
         public async Task<(ContentState Value, long Version)> ReadAsync(Guid key, Func<Guid, Guid, Task<ISchemaEntity>> getSchema)
