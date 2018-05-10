@@ -33,14 +33,14 @@ export class ScheduleDto {
     constructor(
         public readonly status: string,
         public readonly scheduledBy: string,
-        public readonly when: DateTime
+        public readonly dueTime: DateTime
     ) {
     }
 }
 
 export class ContentDto {
     constructor(
-        public  readonly id: string,
+        public readonly id: string,
         public readonly status: string,
         public readonly createdBy: string,
         public readonly lastModifiedBy: string,
@@ -115,7 +115,7 @@ export class ContentsService {
                                 ? new ScheduleDto(
                                     item.scheduleJob.status,
                                     item.scheduleJob.scheduledBy,
-                                    DateTime.parseISO_UTC(item.scheduleJob.when))
+                                    DateTime.parseISO_UTC(item.scheduleJob.dueTime))
                                 : null,
                             item.isPending === true,
                             item.data,
@@ -144,7 +144,7 @@ export class ContentsService {
                             ? new ScheduleDto(
                                 body.scheduleJob.status,
                                 body.scheduleJob.scheduledBy,
-                                DateTime.parseISO_UTC(body.scheduleJob.when))
+                                DateTime.parseISO_UTC(body.scheduleJob.dueTimes))
                             : null,
                         body.isPending === true,
                         body.data,
