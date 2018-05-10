@@ -40,8 +40,8 @@ export class ContentDto {
         public readonly scheduledBy: string | null,
         public readonly scheduledAt: DateTime | null,
         public readonly isPending: boolean,
-        public readonly data: any,
-        public readonly dataDraft: any,
+        public readonly data: object | any,
+        public readonly dataDraft: object,
         public readonly version: Version
     ) {
     }
@@ -106,7 +106,7 @@ export class ContentsService {
                             item.scheduledTo || null,
                             item.scheduledBy || null,
                             item.scheduledAt ? DateTime.parseISO_UTC(item.scheduledAt) : null,
-                            item.isPending,
+                            item.isPending === true,
                             item.data,
                             item.dataDraft,
                             new Version(item.version.toString()));
@@ -132,7 +132,7 @@ export class ContentsService {
                         body.scheduledTo || null,
                         body.scheduledBy || null,
                         body.scheduledAt || null ? DateTime.parseISO_UTC(body.scheduledAt) : null,
-                        body.isPending,
+                        body.isPending === true,
                         body.data,
                         body.dataDraft,
                         response.version);

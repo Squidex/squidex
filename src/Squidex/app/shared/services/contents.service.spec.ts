@@ -172,6 +172,7 @@ describe('ContentsService', () => {
             scheduledTo: 'Draft',
             scheduledBy: 'Scheduler1',
             scheduledAt: '2018-12-12T10:10',
+            isPending: true,
             data: {},
             dataDraft: {}
         }, {
@@ -231,7 +232,7 @@ describe('ContentsService', () => {
                 null,
                 null,
                 true,
-                undefined,
+                null,
                 {},
                 new Version('2')));
     }));
