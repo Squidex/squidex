@@ -65,8 +65,10 @@ describe('ContentsService', () => {
                     scheduledTo: 'Draft',
                     scheduledBy: 'Scheduler1',
                     scheduledAt: '2018-12-12T10:10',
+                    isPending: true,
                     version: 11,
-                    data: {}
+                    data: {},
+                    dataDraft: {}
                 },
                 {
                     id: 'id2',
@@ -76,7 +78,8 @@ describe('ContentsService', () => {
                     lastModified: '2017-10-12T10:10',
                     lastModifiedBy: 'LastModifiedBy2',
                     version: 22,
-                    data: {}
+                    data: {},
+                    dataDraft: {}
                 }
             ]
         });
@@ -89,8 +92,9 @@ describe('ContentsService', () => {
                     'Draft',
                     'Scheduler1',
                     DateTime.parseISO_UTC('2018-12-12T10:10'),
+                    true,
                     {},
-                    undefined,
+                    {},
                     new Version('11')),
                 new ContentDto('id2', 'Published', 'Created2', 'LastModifiedBy2',
                     DateTime.parseISO_UTC('2016-10-12T10:10'),
@@ -98,8 +102,9 @@ describe('ContentsService', () => {
                     null,
                     null,
                     null,
+                    false,
                     {},
-                    undefined,
+                    {},
                     new Version('22'))
         ]));
     }));
@@ -167,7 +172,8 @@ describe('ContentsService', () => {
             scheduledTo: 'Draft',
             scheduledBy: 'Scheduler1',
             scheduledAt: '2018-12-12T10:10',
-            data: {}
+            data: {},
+            dataDraft: {}
         }, {
             headers: {
                 etag: '2'
@@ -181,8 +187,9 @@ describe('ContentsService', () => {
                 'Draft',
                 'Scheduler1',
                 DateTime.parseISO_UTC('2018-12-12T10:10'),
+                true,
                 {},
-                undefined,
+                {},
                 new Version('2')));
     }));
 
@@ -223,8 +230,9 @@ describe('ContentsService', () => {
                 null,
                 null,
                 null,
-                {},
+                true,
                 undefined,
+                {},
                 new Version('2')));
     }));
 
@@ -256,7 +264,7 @@ describe('ContentsService', () => {
 
         contentsService.putContent('my-app', 'my-schema', 'content1', dto, true, version).subscribe();
 
-        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema/content1?asProposal=true');
+        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema/content1?asDraft=true');
 
         expect(req.request.method).toEqual('PUT');
         expect(req.request.headers.get('If-Match')).toBe(version.value);

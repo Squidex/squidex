@@ -94,17 +94,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
             A.CallTo(() => schema.ScriptUpdate).Returns("<update-script>");
             A.CallTo(() => schema.ScriptDelete).Returns("<delete-script>");
 
-            A.CallTo(() => scriptEngine.ExecuteAndTransform(A<ScriptContext>.That.Matches(x => ReferenceEquals(x.Data, data)), A<string>.Ignored))
-                .Returns(data);
-
-            A.CallTo(() => scriptEngine.ExecuteAndTransform(A<ScriptContext>.That.Matches(x => ReferenceEquals(x.Data, invalidData)), A<string>.Ignored))
-                .Returns(invalidData);
-
-            A.CallTo(() => scriptEngine.ExecuteAndTransform(A<ScriptContext>.That.Matches(x => ReferenceEquals(x.Data, patch)), A<string>.Ignored))
-                .Returns(patch);
-
-            A.CallTo(() => scriptEngine.ExecuteAndTransform(A<ScriptContext>.That.Matches(x => ReferenceEquals(x.Data, otherData)), A<string>.Ignored))
-                .Returns(otherData);
+            A.CallTo(() => scriptEngine.ExecuteAndTransform(A<ScriptContext>.Ignored, A<string>.Ignored))
+                .ReturnsLazily(x => x.GetArgument<ScriptContext>(0).Data);
 
             patched = patch.MergeInto(data);
 
@@ -191,6 +182,27 @@ namespace Squidex.Domain.Apps.Entities.Contents
         }
 
         [Fact]
+        public async Task Update_should_create_proposal_events_and_update_state()
+        {
+            var command = new UpdateContent { Data = otherData, AsDraft = true };
+
+            await ExecuteCreateAsync();
+            await ExecutePublishAsync();
+
+            var result = await sut.ExecuteAsync(CreateContentCommand(command));
+
+            result.ShouldBeEquivalent(new ContentDataChangedResult(otherData, 2));
+
+            LastEvents
+                .ShouldHaveSameEvents(
+                    CreateContentEvent(new ContentUpdateProposed { Data = otherData })
+                );
+
+            A.CallTo(() => scriptEngine.ExecuteAndTransform(A<ScriptContext>.Ignored, "<update-script>"))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
         public async Task Update_should_not_create_event_for_same_data()
         {
             var command = new UpdateContent { Data = data };
@@ -207,7 +219,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 );
 
             A.CallTo(() => scriptEngine.ExecuteAndTransform(A<ScriptContext>.Ignored, "<update-script>"))
-                .MustHaveHappened();
+                .MustNotHaveHappened();
         }
 
         [Fact]
@@ -229,7 +241,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var result = await sut.ExecuteAsync(CreateContentCommand(command));
 
-            result.ShouldBeEquivalent(new ContentDataChangedResult(otherData, 1));
+            result.ShouldBeEquivalent(new ContentDataChangedResult(patched, 1));
 
             LastEvents
                 .ShouldHaveSameEvents(
@@ -238,6 +250,27 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             A.CallTo(() => scriptEngine.ExecuteAndTransform(A<ScriptContext>.Ignored, "<update-script>"))
                 .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Patch_should_create_proposal_events_and_update_state()
+        {
+            var command = new PatchContent { Data = patch, AsDraft = true };
+
+            await ExecuteCreateAsync();
+            await ExecutePublishAsync();
+
+            var result = await sut.ExecuteAsync(CreateContentCommand(command));
+
+            result.ShouldBeEquivalent(new ContentDataChangedResult(otherData, 2));
+
+            LastEvents
+                .ShouldHaveSameEvents(
+                    CreateContentEvent(new ContentUpdateProposed { Data = patched })
+                );
+
+            A.CallTo(() => scriptEngine.ExecuteAndTransform(A<ScriptContext>.Ignored, "<update-script>"))
+                .MustNotHaveHappened();
         }
 
         [Fact]
@@ -257,7 +290,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 );
 
             A.CallTo(() => scriptEngine.ExecuteAndTransform(A<ScriptContext>.Ignored, "<update-script>"))
-                .MustHaveHappened();
+                .MustNotHaveHappened();
         }
 
         [Fact]
@@ -343,6 +376,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
         private Task ExecuteDeleteAsync()
         {
             return sut.ExecuteAsync(CreateContentCommand(new DeleteContent()));
+        }
+
+        private Task ExecutePublishAsync()
+        {
+            return sut.ExecuteAsync(CreateContentCommand(new ChangeContentStatus { Status = Status.Published }));
         }
 
         protected T CreateContentEvent<T>(T @event) where T : ContentEvent

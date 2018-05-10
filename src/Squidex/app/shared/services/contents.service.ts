@@ -29,8 +29,6 @@ export class ContentsDto {
 }
 
 export class ContentDto {
-    public displayData: any;
-
     constructor(
         public readonly id: string,
         public readonly status: string,
@@ -41,11 +39,11 @@ export class ContentDto {
         public readonly scheduledTo: string | null,
         public readonly scheduledBy: string | null,
         public readonly scheduledAt: DateTime | null,
+        public readonly isPending: boolean,
         public readonly data: any,
-        public readonly pendingData: any,
+        public readonly dataDraft: any,
         public readonly version: Version
     ) {
-        this.displayData = pendingData || data;
     }
 }
 
@@ -108,8 +106,9 @@ export class ContentsService {
                             item.scheduledTo || null,
                             item.scheduledBy || null,
                             item.scheduledAt ? DateTime.parseISO_UTC(item.scheduledAt) : null,
+                            item.isPending,
                             item.data,
-                            item.pendingData,
+                            item.dataDraft,
                             new Version(item.version.toString()));
                     }));
                 })
@@ -133,8 +132,9 @@ export class ContentsService {
                         body.scheduledTo || null,
                         body.scheduledBy || null,
                         body.scheduledAt || null ? DateTime.parseISO_UTC(body.scheduledAt) : null,
+                        body.isPending,
                         body.data,
-                        body.pendingData,
+                        body.dataDraft,
                         response.version);
                 })
                 .pretifyError('Failed to load content. Please reload.');
@@ -167,8 +167,9 @@ export class ContentsService {
                         null,
                         null,
                         null,
+                        true,
+                        null,
                         body.data,
-                        body.pendingData,
                         response.version);
                 })
                 .do(content => {
@@ -177,8 +178,8 @@ export class ContentsService {
                 .pretifyError('Failed to create content. Please reload.');
     }
 
-    public putContent(appName: string, schemaName: string, id: string, dto: any, asProposal: boolean, version: Version): Observable<Versioned<any>> {
-        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}?asProposal=${asProposal}`);
+    public putContent(appName: string, schemaName: string, id: string, dto: any, asDraft: boolean, version: Version): Observable<Versioned<any>> {
+        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}?asDraft=${asDraft}`);
 
         return HTTP.putVersioned(this.http, url, dto, version)
                 .map(response => {

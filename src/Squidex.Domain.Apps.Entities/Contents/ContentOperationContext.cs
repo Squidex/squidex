@@ -69,6 +69,13 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return data.ValidateAsync(ctx, schemaEntity.SchemaDef, appEntity.PartitionResolver(), message);
         }
 
+        public Task ValidatePartialAsync(NamedContentData data)
+        {
+            var ctx = CreateValidationContext();
+
+            return data.ValidatePartialAsync(ctx, schemaEntity.SchemaDef, appEntity.PartitionResolver(), message);
+        }
+
         public Task<NamedContentData> ExecuteScriptAndTransformAsync(Func<ISchemaEntity, string> script, object operation, ContentCommand command, NamedContentData data, NamedContentData oldData = null)
         {
             var ctx = CreateScriptContext(operation, command, data, oldData);

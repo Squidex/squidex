@@ -30,9 +30,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.OData
 {
     public class ODataQueryTests
     {
+        private static readonly IBsonSerializerRegistry Registry = BsonSerializer.SerializerRegistry;
+        private static readonly IBsonSerializer<MongoContentEntity> Serializer = BsonSerializer.SerializerRegistry.GetSerializer<MongoContentEntity>();
         private readonly Schema schemaDef;
-        private readonly IBsonSerializerRegistry registry = BsonSerializer.SerializerRegistry;
-        private readonly IBsonSerializer<MongoContentEntity> serializer = BsonSerializer.SerializerRegistry.GetSerializer<MongoContentEntity>();
         private readonly IEdmModel edmModel;
         private readonly LanguagesConfig languagesConfig = LanguagesConfig.Build(Language.EN, Language.DE);
 
@@ -417,10 +417,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.OData
             A.CallTo(() => cursor.Sort(A<SortDefinition<MongoContentEntity>>.Ignored))
                 .Invokes((SortDefinition<MongoContentEntity> sortDefinition) =>
                 {
-                    i = sortDefinition.Render(serializer, registry).ToString();
+                    i = sortDefinition.Render(Serializer, Registry).ToString();
                 });
 
-            cursor.ContentSort(parser, FindExtensions.CreatePropertyCalculator(schemaDef));
+            cursor.ContentSort(parser, FindExtensions.CreatePropertyCalculator(schemaDef, false));
 
             return i;
         }
@@ -430,8 +430,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.OData
             var parser = edmModel.ParseQuery(value);
 
             var query =
-                parser.BuildFilter<MongoContentEntity>(FindExtensions.CreatePropertyCalculator(schemaDef))
-                    .Filter.Render(serializer, registry).ToString();
+                parser.BuildFilter<MongoContentEntity>(FindExtensions.CreatePropertyCalculator(schemaDef, false))
+                    .Filter.Render(Serializer, Registry).ToString();
 
             return query;
         }

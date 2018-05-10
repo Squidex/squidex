@@ -23,8 +23,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
         IUpdateableEntityWithLastModifiedBy
     {
         [BsonRequired]
-        [BsonElement]
-        public Guid AppIdId { get; set; }
+        [BsonElement("AppIdId")]
+        public Guid IndexedAppId { get; set; }
 
         [BsonRequired]
         [BsonElement]

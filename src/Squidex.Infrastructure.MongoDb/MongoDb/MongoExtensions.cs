@@ -74,6 +74,27 @@ namespace Squidex.Infrastructure.MongoDb
             return find.Project<BsonDocument>(Builders<TDocument>.Projection.Include(include1).Include(include2).Include(include3));
         }
 
+        public static IFindFluent<TDocument, TDocument> Not<TDocument>(this IFindFluent<TDocument, TDocument> find,
+            Expression<Func<TDocument, object>> exclude)
+        {
+            return find.Project<TDocument>(Builders<TDocument>.Projection.Exclude(exclude));
+        }
+
+        public static IFindFluent<TDocument, TDocument> Not<TDocument>(this IFindFluent<TDocument, TDocument> find,
+            Expression<Func<TDocument, object>> exclude1,
+            Expression<Func<TDocument, object>> exclude2)
+        {
+            return find.Project<TDocument>(Builders<TDocument>.Projection.Exclude(exclude1).Exclude(exclude2));
+        }
+
+        public static IFindFluent<TDocument, TDocument> Not<TDocument>(this IFindFluent<TDocument, TDocument> find,
+            Expression<Func<TDocument, object>> exclude1,
+            Expression<Func<TDocument, object>> exclude2,
+            Expression<Func<TDocument, object>> exclude3)
+        {
+            return find.Project<TDocument>(Builders<TDocument>.Projection.Exclude(exclude1).Exclude(exclude2).Exclude(exclude3));
+        }
+
         public static async Task UpsertVersionedAsync<T, TKey>(this IMongoCollection<T> collection, TKey key, long oldVersion, long newVersion, Func<UpdateDefinition<T>, UpdateDefinition<T>> updater) where T : IVersionedEntity<TKey>
         {
             try

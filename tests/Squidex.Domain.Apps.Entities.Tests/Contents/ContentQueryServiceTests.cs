@@ -99,7 +99,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             A.CallTo(() => appProvider.GetSchemaAsync(appId, schemaId, false))
                 .Returns(schema);
-            A.CallTo(() => contentRepository.FindContentAsync(app, schema, contentId))
+            A.CallTo(() => contentRepository.FindContentAsync(app, schema, null, contentId))
                 .Returns(content);
 
             A.CallTo(() => schema.ScriptQuery)
@@ -140,7 +140,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             A.CallTo(() => appProvider.GetSchemaAsync(appId, schemaId, false))
                 .Returns(schema);
 
-            A.CallTo(() => contentRepository.FindContentAsync(app, schema, contentId))
+            A.CallTo(() => contentRepository.FindContentAsync(app, schema, new[] { Status.Published }, contentId))
                 .Returns((IContentEntity)null);
 
             await Assert.ThrowsAsync<DomainObjectNotFoundException>(async () => await sut.FindContentAsync(app, schemaId.ToString(), user, contentId));

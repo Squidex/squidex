@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.State
         public NamedContentData Data { get; set; }
 
         [JsonProperty]
-        public NamedContentData PendingData { get; set; }
+        public NamedContentData DataDraft { get; set; }
 
         [JsonProperty]
         public Status Status { get; set; }
@@ -45,28 +45,43 @@ namespace Squidex.Domain.Apps.Entities.Contents.State
         public RefToken ScheduledBy { get; set; }
 
         [JsonProperty]
+        public bool IsPending { get; set; }
+
+        [JsonProperty]
         public bool IsDeleted { get; set; }
 
         protected void On(ContentCreated @event)
         {
             SimpleMapper.Map(@event, this);
-        }
 
-        protected void On(ContentUpdateProposed @event)
-        {
-            PendingData = @event.Data;
-        }
-
-        protected void On(ContentChangesDiscarded @event)
-        {
-            PendingData = null;
+            DataDraft = @event.Data;
         }
 
         protected void On(ContentUpdated @event)
         {
-            PendingData = null;
-
             Data = @event.Data;
+            DataDraft = @event.Data;
+        }
+
+        protected void On(ContentUpdateProposed @event)
+        {
+            DataDraft = @event.Data;
+
+            IsPending = true;
+        }
+
+        protected void On(ContentChangesDiscarded @event)
+        {
+            DataDraft = Data;
+
+            IsPending = false;
+        }
+
+        protected void On(ContentChangesConfirmed @event)
+        {
+            Data = DataDraft;
+
+            IsPending = false;
         }
 
         protected void On(ContentStatusScheduled @event)
@@ -83,6 +98,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.State
             ScheduledAt = null;
             ScheduledBy = null;
             ScheduledTo = null;
+
+            if (@event.Status == Status.Published)
+            {
+                Data = DataDraft;
+
+                IsPending = false;
+            }
         }
 
         protected void On(ContentDeleted @event)

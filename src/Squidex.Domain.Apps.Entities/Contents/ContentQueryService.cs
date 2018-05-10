@@ -70,10 +70,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
             var isFrontendClient = IsFrontendClient(user);
             var isVersioned = version > EtagVersion.Empty;
 
+            var parsedStatus = isFrontendClient ? new[] { Status.Published } : null;
+
             var content =
                 isVersioned ?
                 await FindContentByVersionAsync(id, version) :
-                await FindContentAsync(app, id, schema);
+                await FindContentAsync(app, id, parsedStatus, schema);
 
             if (content == null || (content.Status != Status.Published && !isFrontendClient) || content.SchemaId.Id != schema.Id)
             {
@@ -144,12 +146,17 @@ namespace Squidex.Domain.Apps.Entities.Contents
             {
                 var result = SimpleMapper.Map(content, new ContentEntity());
 
-                if (!isFrontendClient && isScripting)
+                if (result.Data != null)
                 {
-                    result.Data = scriptEngine.Transform(new ScriptContext { User = user, Data = content.Data, ContentId = content.Id }, scriptText);
+                    if (!isFrontendClient && isScripting)
+                    {
+                        result.Data = scriptEngine.Transform(new ScriptContext { User = user, Data = content.Data, ContentId = content.Id }, scriptText);
+                    }
+
+                    result.Data = result.Data.ToApiModel(schema.SchemaDef, app.LanguagesConfig, isFrontendClient, isTypeChecking);
                 }
 
-                result.Data = result.Data.ToApiModel(schema.SchemaDef, app.LanguagesConfig, isFrontendClient, isTypeChecking);
+                result.DataDraft = result.DataDraft.ToApiModel(schema.SchemaDef, app.LanguagesConfig, isFrontendClient, isTypeChecking);
 
                 yield return result;
             }
@@ -222,9 +229,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return contentVersionLoader.LoadAsync(id, version);
         }
 
-        private Task<IContentEntity> FindContentAsync(IAppEntity app, Guid id, ISchemaEntity schema)
+        private Task<IContentEntity> FindContentAsync(IAppEntity app, Guid id, Status[] status, ISchemaEntity schema)
         {
-            return contentRepository.FindContentAsync(app, schema, id);
+            return contentRepository.FindContentAsync(app, schema, status, id);
         }
 
         private static bool IsFrontendClient(ClaimsPrincipal user)

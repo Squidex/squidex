@@ -119,7 +119,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
             var response = new ContentsDto
             {
                 Total = result.Total,
-                Items = result.Take(200).Select(item => SimpleMapper.Map(item, new ContentDto { Data = item.Data })).ToArray()
+                Items = result.Take(200).Select(item => SimpleMapper.Map(item, new ContentDto { Data = item.Data, DataDraft = item.DataDraft })).ToArray()
             };
 
             Response.Headers["Surrogate-Key"] = string.Join(" ", response.Items.Select(x => x.Id));
@@ -148,10 +148,10 @@ namespace Squidex.Areas.Api.Controllers.Contents
         {
             var content = await contentQuery.FindContentAsync(App, name, User, id);
 
-            var response = SimpleMapper.Map(content, new ContentDto { Data = content.Data });
+            var response = SimpleMapper.Map(content, new ContentDto { Data = content.Data, DataDraft = content.DataDraft });
 
-            Response.Headers["ETag"] = entity.Version.ToString();
-            Response.Headers["Surrogate-Key"] = entity.Id.ToString();
+            Response.Headers["ETag"] = content.Version.ToString();
+            Response.Headers["Surrogate-Key"] = content.Id.ToString();
 
             return Ok(response);
         }
@@ -177,9 +177,9 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(1)]
         public async Task<IActionResult> GetContentVersion(string app, string name, Guid id, int version)
         {
-            var (schema, entity) = await contentQuery.FindContentAsync(App, name, User, id, version);
-			
-            var response = SimpleMapper.Map(content, new ContentDto { Data = content.Data });
+            var content = await contentQuery.FindContentAsync(App, name, User, id, version);
+
+            var response = SimpleMapper.Map(content, new ContentDto { Data = content.Data, DataDraft = content.DataDraft });
 
             Response.Headers["ETag"] = content.Version.ToString();
             Response.Headers["Surrogate-Key"] = content.Id.ToString();
@@ -227,7 +227,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// <param name="name">The name of the schema.</param>
         /// <param name="id">The id of the content item to update.</param>
         /// <param name="request">The full data for the content item.</param>
-        /// <param name="asProposal">Indicates whether the update is a proposal.</param>
+        /// <param name="asDraft">Indicates whether the update is a proposal.</param>
         /// <returns>
         /// 200 => Content updated.
         /// 404 => Content, schema or app not found.
@@ -240,11 +240,11 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [HttpPut]
         [Route("content/{app}/{name}/{id}/")]
         [ApiCosts(1)]
-        public async Task<IActionResult> PutContent(string app, string name, Guid id, [FromBody] NamedContentData request, [FromQuery] bool asProposal = false)
+        public async Task<IActionResult> PutContent(string app, string name, Guid id, [FromBody] NamedContentData request, [FromQuery] bool asDraft = false)
         {
             await contentQuery.ThrowIfSchemaNotExistsAsync(App, name);
 
-            var command = new UpdateContent { ContentId = id, Data = request.ToCleaned(), AsProposal = asProposal };
+            var command = new UpdateContent { ContentId = id, Data = request.ToCleaned(), AsDraft = asDraft };
             var context = await CommandBus.PublishAsync(command);
 
             var result = context.Result<ContentDataChangedResult>();
@@ -260,7 +260,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// <param name="name">The name of the schema.</param>
         /// <param name="id">The id of the content item to patch.</param>
         /// <param name="request">The patch for the content item.</param>
-        /// <param name="asProposal">Indicates whether the patch is a proposal.</param>
+        /// <param name="asDraft">Indicates whether the patch is a proposal.</param>
         /// <returns>
         /// 200 => Content patched.
         /// 404 => Content, schema or app not found.
@@ -273,11 +273,11 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [HttpPatch]
         [Route("content/{app}/{name}/{id}/")]
         [ApiCosts(1)]
-        public async Task<IActionResult> PatchContent(string app, string name, Guid id, [FromBody] NamedContentData request, [FromQuery] bool asProposal = false)
+        public async Task<IActionResult> PatchContent(string app, string name, Guid id, [FromBody] NamedContentData request, [FromQuery] bool asDraft = false)
         {
             await contentQuery.ThrowIfSchemaNotExistsAsync(App, name);
 
-            var command = new PatchContent { ContentId = id, Data = request.ToCleaned(), AsProposal = asProposal };
+            var command = new PatchContent { ContentId = id, Data = request.ToCleaned(), AsDraft = asDraft };
             var context = await CommandBus.PublishAsync(command);
 
             var result = context.Result<ContentDataChangedResult>();
@@ -426,7 +426,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(1)]
         public async Task<IActionResult> DiscardChanges(string app, string name, Guid id)
         {
-            await contentQuery.FindSchemaAsync(App, name);
+            await contentQuery.ThrowIfSchemaNotExistsAsync(App, name);
 
             var command = new DiscardChanges { ContentId = id };
 

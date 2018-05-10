@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Repositories
 
         Task<IReadOnlyList<Guid>> QueryNotFoundAsync(Guid appId, Guid schemaId, IList<Guid> ids);
 
-        Task<IContentEntity> FindContentAsync(IAppEntity app, ISchemaEntity schema, Guid id);
+        Task<IContentEntity> FindContentAsync(IAppEntity app, ISchemaEntity schema, Status[] status, Guid id);
 
         Task QueryScheduledWithoutDataAsync(Instant now, Func<IContentEntity, Task> callback);
     }

@@ -5,9 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Contents.Commands
+using Squidex.Infrastructure.EventSourcing;
+
+namespace Squidex.Domain.Apps.Events.Contents
 {
-    public sealed class UpdateContent : ContentDataCommand
+    [EventType(nameof(ContentChangesConfirmed))]
+    public sealed class ContentChangesConfirmed : ContentEvent
     {
     }
 }

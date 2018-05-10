@@ -43,7 +43,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
                     if (value.Length < 1000)
                     {
-                        stringBuilder.Append(" ");
+                        if (stringBuilder.Length > 0)
+                        {
+                            stringBuilder.Append(" ");
+                        }
+
                         stringBuilder.Append(text);
                     }
                 }

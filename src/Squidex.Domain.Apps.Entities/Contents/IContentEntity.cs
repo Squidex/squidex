@@ -33,6 +33,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         NamedContentData Data { get; }
 
-        NamedContentData PendingData { get; }
+        NamedContentData DataDraft { get; }
+
+        bool IsPending { get; }
     }
 }

@@ -28,22 +28,22 @@
                         </button>
                         <div class="dropdown-menu" *sqxModalView="dropdown" [sqxModalTarget]="optionsButton" @fade>
                             <a class="dropdown-item" (click)="enableField()" *ngIf="field.isDisabled" [class.disabled]="field.isLocked">
-                                Enable
+                                Enable in UI
                             </a>
                             <a class="dropdown-item" (click)="disableField()" *ngIf="!field.isDisabled" [class.disabled]="field.isLocked">
-                                Disable
+                                Disable in UI
                             </a>
                             <a class="dropdown-item" (click)="hideField()" *ngIf="!field.isHidden" [class.disabled]="field.isLocked">
-                                Hide
+                                Hide in API
                             </a>
                             <a class="dropdown-item" (click)="showField()" *ngIf="field.isHidden" [class.disabled]="field.isLocked">
-                                Show
+                                Show in API
                             </a>                           
                             <a class="dropdown-item" *ngIf="!field.isLocked" 
                                 (sqxConfirmClick)="lockField()"
                                 confirmTitle="Lock field" 
                                 confirmText="Do you really want to lock the field? Lock fields cannot be deleted or changed.">
-                                Lock
+                                Lock and prevent changes
                             </a>
                             <a class="dropdown-item dropdown-item-delete" [class.disabled]="field.isLocked"
                                 (sqxConfirmClick)="deleteField()"

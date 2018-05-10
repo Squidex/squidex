@@ -5,9 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, ChangeDetectionStrategy, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 
-import { DateTime } from 'shared';
+import { DateTime } from '@app/shared';
 
 @Component({
     selector: 'sqx-content-status',
@@ -26,13 +26,13 @@ export class ContentStatusComponent {
     public scheduledAt?: DateTime;
 
     @Input()
-    public hasPendingChanges: any;
+    public isPending: any;
 
     @Input()
     public showLabel = false;
 
     public get displayStatus() {
-        return !!this.hasPendingChanges ? 'Pending' : this.status;
+        return !!this.isPending ? 'Pending' : this.status;
     }
 }
 

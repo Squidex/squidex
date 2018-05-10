@@ -87,7 +87,7 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
                 .subscribe(content => {
                     this.content = content;
 
-                    this.loadContent(content.data);
+                    this.loadContent(content.dataDraft);
                 });
 
         this.contentVersionSelectedSubscription =
@@ -106,14 +106,18 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
     }
 
     public saveAndPublish() {
-        this.saveContent(true);
+        this.saveContent(true, false);
     }
 
-    public saveAsDraft() {
-        this.saveContent(false);
+    public saveAsProposal() {
+        this.saveContent(false, true);
     }
 
-    private saveContent(publish: boolean) {
+    public save() {
+        this.saveContent(false, false);
+    }
+
+    private saveContent(publish: boolean, asProposal: boolean) {
         if (this.content && this.content.status === 'Archived') {
             return;
         }
@@ -122,12 +126,21 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
 
         if (value) {
             if (this.content) {
-                this.contentsState.update(this.content, value)
-                    .subscribe(dto => {
-                        this.contentForm.submitCompleted();
-                    }, error => {
-                        this.contentForm.submitFailed(error);
-                    });
+                if (asProposal) {
+                    this.contentsState.proposeUpdate(this.content, value)
+                        .subscribe(dto => {
+                            this.contentForm.submitCompleted();
+                        }, error => {
+                            this.contentForm.submitFailed(error);
+                        });
+                } else {
+                    this.contentsState.update(this.content, value)
+                        .subscribe(dto => {
+                            this.contentForm.submitCompleted();
+                        }, error => {
+                            this.contentForm.submitFailed(error);
+                        });
+                }
             } else {
                 this.contentsState.create(value, publish)
                     .subscribe(dto => {
@@ -168,7 +181,7 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
         if (this.contentVersion) {
             this.contentVersion = null;
 
-            this.loadContent(this.content.data);
+            this.loadContent(this.content.dataDraft);
         }
     }
 }

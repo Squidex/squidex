@@ -289,7 +289,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     }
 
     public update(content: ContentDto, request: any, now?: DateTime): Observable<any> {
-        return this.contentsService.putContent(this.appName, this.schemaName, content.id, request, content.version)
+        return this.contentsService.putContent(this.appName, this.schemaName, content.id, request, false, content.version)
             .do(dto => {
                 this.dialogs.notifyInfo('Contents updated successfully.');
 
@@ -298,10 +298,30 @@ export abstract class ContentsStateBase extends State<Snapshot> {
             .notify(this.dialogs);
     }
 
+    public proposeUpdate(content: ContentDto, request: any, now?: DateTime): Observable<any> {
+        return this.contentsService.putContent(this.appName, this.schemaName, content.id, request, true, content.version)
+            .do(dto => {
+                this.dialogs.notifyInfo('Content updated successfully.');
+
+                this.replaceContent(updateDataDraft(content, dto.payload, this.user, dto.version, now));
+            })
+            .notify(this.dialogs);
+    }
+
+    public revertProposal(content: ContentDto, now?: DateTime): Observable<any> {
+        return this.contentsService.discardChanges(this.appName, this.schemaName, content.id, content.version)
+            .do(dto => {
+                this.dialogs.notifyInfo('Content updated successfully.');
+
+                this.replaceContent(revertDataDraft(content, this.user, dto.version, now));
+            })
+            .notify(this.dialogs);
+    }
+
     public patch(content: ContentDto, request: any, now?: DateTime): Observable<any> {
         return this.contentsService.patchContent(this.appName, this.schemaName, content.id, request, content.version)
             .do(dto => {
-                this.dialogs.notifyInfo('Contents updated successfully.');
+                this.dialogs.notifyInfo('Content updated successfully.');
 
                 this.replaceContent(updateData(content, dto.payload, this.user, dto.version, now));
             })
@@ -400,5 +420,35 @@ const updateData = (content: ContentDto, data: any, user: string, version: Versi
         content.scheduledTo,
         content.scheduledBy,
         content.scheduledAt,
+        content.isPending,
         data,
+        data,
+        version);
+
+const updateDataDraft = (content: ContentDto, data: any, user: string, version: Version, now?: DateTime) =>
+    new ContentDto(
+        content.id,
+        content.status,
+        content.createdBy, user,
+        content.created, now || DateTime.now(),
+        content.scheduledTo,
+        content.scheduledBy,
+        content.scheduledAt,
+        true,
+        content.data,
+        data,
+        version);
+
+const revertDataDraft = (content: ContentDto, user: string, version: Version, now?: DateTime) =>
+    new ContentDto(
+        content.id,
+        content.status,
+        content.createdBy, user,
+        content.created, now || DateTime.now(),
+        content.scheduledTo,
+        content.scheduledBy,
+        content.scheduledAt,
+        false,
+        content.data,
+        content.data,
         version);

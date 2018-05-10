@@ -20,18 +20,31 @@
 
         <ng-container menu>
             <ng-container *ngIf="!content; else notNew">
-                <button type="button" class="btn btn-secondary" (click)="saveAsDraft()" title="CTRL + S">
+                <button type="button" class="btn btn-secondary" (click)="save()">
                     Save as Draft
                 </button>
 
-                <button type="submit" class="btn btn-primary">
+                <button type="submit" class="btn btn-primary" title="CTRL + S">
                     Save and Publish
                 </button>
 
                 <sqx-shortcut keys="ctrl+s" (trigger)="saveAndPublish()"></sqx-shortcut>
             </ng-container>
             <ng-template #notNew>
+                <span class="btn btn btn-outline-secondary">
+                    <sqx-content-status 
+                        [status]="content.status"
+                        [scheduledTo]="content.scheduledTo"
+                        [scheduledAt]="content.scheduledAt"
+                        [isPending]="content.isPending">
+                    </sqx-content-status>
+                </span>        
+
                 <ng-container *ngIf="content.status !== 'Archived'">
+                    <button type="button" class="btn btn-secondary" (click)="saveAsProposal()">
+                        Save as Proposal
+                    </button>
+                    
                     <button type="submit" class="btn btn-primary" title="CTRL + S">
                         Save
                     </button>

@@ -43,7 +43,12 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         /// <summary>
         /// The pending changes of the content item.
         /// </summary>
-        public object PendingData { get; set; }
+        public object DataDraft { get; set; }
+
+        /// <summary>
+        /// Indicates if the draft data is pending.
+        /// </summary>
+        public bool IsPending { get; set; }
 
         /// <summary>
         /// The scheduled status.
