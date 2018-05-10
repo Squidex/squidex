@@ -37,6 +37,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             AddEventMessage<ContentUpdateProposed>(
                 "proposed update for {[Schema]} content.");
 
+            AddEventMessage<ContentSchedulingCancelled>(
+                "failed to schedule status change for {[Schema]} content.");
+
             AddEventMessage<ContentStatusChanged>(
                 "changed status of {[Schema]} content to {[Status]}.");
 

@@ -7,7 +7,6 @@
 
 using System;
 using Newtonsoft.Json;
-using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Contents;
@@ -36,13 +35,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.State
         public Status Status { get; set; }
 
         [JsonProperty]
-        public Status? ScheduledTo { get; set; }
-
-        [JsonProperty]
-        public Instant? ScheduledAt { get; set; }
-
-        [JsonProperty]
-        public RefToken ScheduledBy { get; set; }
+        public ScheduleJob ScheduleJob { get; set; }
 
         [JsonProperty]
         public bool IsPending { get; set; }
@@ -81,18 +74,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.State
             IsPending = false;
         }
 
-        protected void On(ContentStatusScheduled @event)
-        {
-            ScheduledAt = @event.DueTime;
-            ScheduledBy = @event.Actor;
-            ScheduledTo = @event.Status;
-        }
-
         protected void On(ContentChangesPublished @event)
         {
-            ScheduledAt = null;
-            ScheduledBy = null;
-            ScheduledTo = null;
+            ScheduleJob = null;
 
             Data = DataDraft;
 
@@ -101,9 +85,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.State
 
         protected void On(ContentStatusChanged @event)
         {
-            ScheduledAt = null;
-            ScheduledBy = null;
-            ScheduledTo = null;
+            ScheduleJob = null;
 
             Status = @event.Status;
 
@@ -111,6 +93,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.State
             {
                 Data = DataDraft;
             }
+        }
+
+        protected void On(ContentSchedulingCancelled @event)
+        {
+            ScheduleJob = null;
+        }
+
+        protected void On(ContentStatusScheduled @event)
+        {
+            ScheduleJob = new ScheduleJob(Guid.NewGuid(), @event.Status, @event.Actor, @event.DueTime);
         }
 
         protected void On(ContentDeleted @event)

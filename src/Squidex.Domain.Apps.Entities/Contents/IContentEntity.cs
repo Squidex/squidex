@@ -7,7 +7,6 @@
 // ==========================================================================
 
 using System;
-using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
 
@@ -25,11 +24,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         Status Status { get; }
 
-        Status? ScheduledTo { get; }
-
-        Instant? ScheduledAt { get; }
-
-        RefToken ScheduledBy { get; }
+        ScheduleJob ScheduleJob { get; }
 
         NamedContentData Data { get; }
 

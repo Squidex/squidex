@@ -98,25 +98,39 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 case ChangeContentStatus changeContentStatus:
                     return UpdateAsync(changeContentStatus, async c =>
                     {
-                        GuardContent.CanChangeContentStatus(Snapshot.IsPending, Snapshot.Status, c);
+                        try
+                        {
+                            GuardContent.CanChangeContentStatus(Snapshot.IsPending, Snapshot.Status, c);
 
-                        if (c.DueTime.HasValue)
-                        {
-                            ScheduleStatus(c);
-                        }
-                        else
-                        {
-                            if (Snapshot.IsPending && Snapshot.Status == Status.Published && c.Status == Status.Published)
+                            if (c.DueTime.HasValue)
                             {
-                                ConfirmChanges(c);
+                                ScheduleStatus(c);
                             }
                             else
                             {
-                                var ctx = await CreateContext(Snapshot.AppId.Id, Snapshot.SchemaId.Id, () => "Failed to change content.");
+                                if (Snapshot.IsPending && Snapshot.Status == Status.Published && c.Status == Status.Published)
+                                {
+                                    ConfirmChanges(c);
+                                }
+                                else
+                                {
+                                    var ctx = await CreateContext(Snapshot.AppId.Id, Snapshot.SchemaId.Id, () => "Failed to change content.");
 
-                                await ctx.ExecuteScriptAsync(x => x.ScriptChange, c.Status, c, Snapshot.Data);
+                                    await ctx.ExecuteScriptAsync(x => x.ScriptChange, c.Status, c, Snapshot.Data);
 
-                                ChangeStatus(c);
+                                    ChangeStatus(c);
+                                }
+                            }
+                        }
+                        catch (Exception)
+                        {
+                            if (c.JobId.HasValue && Snapshot?.ScheduleJob.Id == c.JobId)
+                            {
+                                CancelScheduling(c);
+                            }
+                            else
+                            {
+                                throw;
                             }
                         }
                     });
@@ -218,6 +232,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
         public void ProposeUpdate(ContentCommand command, NamedContentData data)
         {
             RaiseEvent(SimpleMapper.Map(command, new ContentUpdateProposed { Data = data }));
+        }
+
+        public void CancelScheduling(ChangeContentStatus command)
+        {
+            RaiseEvent(SimpleMapper.Map(command, new ContentSchedulingCancelled()));
         }
 
         public void ScheduleStatus(ChangeContentStatus command)

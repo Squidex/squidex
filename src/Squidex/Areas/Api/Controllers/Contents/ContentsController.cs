@@ -119,7 +119,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
             var response = new ContentsDto
             {
                 Total = result.Total,
-                Items = result.Take(200).Select(item => SimpleMapper.Map(item, new ContentDto { Data = item.Data, DataDraft = item.DataDraft })).ToArray()
+                Items = result.Take(200).Select(ContentDto.FromContent).ToArray()
             };
 
             Response.Headers["Surrogate-Key"] = string.Join(" ", response.Items.Select(x => x.Id));
@@ -148,7 +148,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         {
             var content = await contentQuery.FindContentAsync(App, name, User, id);
 
-            var response = SimpleMapper.Map(content, new ContentDto { Data = content.Data, DataDraft = content.DataDraft });
+            var response = ContentDto.FromContent(content);
 
             Response.Headers["ETag"] = content.Version.ToString();
             Response.Headers["Surrogate-Key"] = content.Id.ToString();
@@ -179,7 +179,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         {
             var content = await contentQuery.FindContentAsync(App, name, User, id, version);
 
-            var response = SimpleMapper.Map(content, new ContentDto { Data = content.Data, DataDraft = content.DataDraft });
+            var response = ContentDto.FromContent(content);
 
             Response.Headers["ETag"] = content.Version.ToString();
             Response.Headers["Surrogate-Key"] = content.Id.ToString();

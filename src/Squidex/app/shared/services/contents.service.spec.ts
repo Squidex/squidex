@@ -15,6 +15,7 @@ import {
     ContentsDto,
     ContentsService,
     DateTime,
+    ScheduleDto,
     Version
 } from './../';
 
@@ -62,9 +63,11 @@ describe('ContentsService', () => {
                     createdBy: 'Created1',
                     lastModified: '2017-12-12T10:10',
                     lastModifiedBy: 'LastModifiedBy1',
-                    scheduledTo: 'Draft',
-                    scheduledBy: 'Scheduler1',
-                    scheduledAt: '2018-12-12T10:10',
+                    scheduleJob: {
+                        status: 'Draft',
+                        scheduledBy: 'Scheduler1',
+                        when: '2018-12-12T10:10'
+                    },
                     isPending: true,
                     version: 11,
                     data: {},
@@ -89,9 +92,7 @@ describe('ContentsService', () => {
                 new ContentDto('id1', 'Published', 'Created1', 'LastModifiedBy1',
                     DateTime.parseISO_UTC('2016-12-12T10:10'),
                     DateTime.parseISO_UTC('2017-12-12T10:10'),
-                    'Draft',
-                    'Scheduler1',
-                    DateTime.parseISO_UTC('2018-12-12T10:10'),
+                    new ScheduleDto('Draft', 'Scheduler1', DateTime.parseISO_UTC('2018-12-12T10:10')),
                     true,
                     {},
                     {},
@@ -99,8 +100,6 @@ describe('ContentsService', () => {
                 new ContentDto('id2', 'Published', 'Created2', 'LastModifiedBy2',
                     DateTime.parseISO_UTC('2016-10-12T10:10'),
                     DateTime.parseISO_UTC('2017-10-12T10:10'),
-                    null,
-                    null,
                     null,
                     false,
                     {},
@@ -169,9 +168,11 @@ describe('ContentsService', () => {
             createdBy: 'Created1',
             lastModified: '2017-12-12T10:10',
             lastModifiedBy: 'LastModifiedBy1',
-            scheduledTo: 'Draft',
-            scheduledBy: 'Scheduler1',
-            scheduledAt: '2018-12-12T10:10',
+            scheduleJob: {
+                status: 'Draft',
+                scheduledBy: 'Scheduler1',
+                when: '2018-12-12T10:10'
+            },
             isPending: true,
             data: {},
             dataDraft: {}
@@ -185,9 +186,7 @@ describe('ContentsService', () => {
             new ContentDto('id1', 'Published', 'Created1', 'LastModifiedBy1',
                 DateTime.parseISO_UTC('2016-12-12T10:10'),
                 DateTime.parseISO_UTC('2017-12-12T10:10'),
-                'Draft',
-                'Scheduler1',
-                DateTime.parseISO_UTC('2018-12-12T10:10'),
+                new ScheduleDto('Draft', 'Scheduler1', DateTime.parseISO_UTC('2018-12-12T10:10')),
                 true,
                 {},
                 {},
@@ -228,8 +227,6 @@ describe('ContentsService', () => {
             new ContentDto('id1', 'Published', 'Created1', 'LastModifiedBy1',
                 DateTime.parseISO_UTC('2016-12-12T10:10'),
                 DateTime.parseISO_UTC('2017-12-12T10:10'),
-                null,
-                null,
                 null,
                 true,
                 null,

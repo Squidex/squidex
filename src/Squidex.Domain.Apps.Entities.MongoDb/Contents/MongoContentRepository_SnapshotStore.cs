@@ -43,6 +43,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                 IndexedAppId = value.AppId.Id,
                 IndexedSchemaId = value.SchemaId.Id,
                 ReferencedIds = idData.ToReferencedIds(schema.SchemaDef),
+                ScheduledAt = value.ScheduleJob?.DueTime,
                 Version = newVersion
             });
 

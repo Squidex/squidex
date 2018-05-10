@@ -58,8 +58,8 @@
 <td class="cell-time" (click)="shouldStop($event)">
     <sqx-content-status 
         [status]="content.status"
-        [scheduledTo]="content.scheduledTo"
-        [scheduledAt]="content.scheduledAt"
+        [scheduledTo]="content.scheduleJob?.status"
+        [scheduledAt]="content.scheduleJob?.dueTime"
         [isPending]="content.isPending">
     </sqx-content-status>
     

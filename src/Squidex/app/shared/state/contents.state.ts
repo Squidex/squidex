@@ -29,7 +29,7 @@ import { fieldInvariant, SchemaDetailsDto, SchemaDto } from './../services/schem
 import { AppsState } from './apps.state';
 import { SchemasState } from './schemas.state';
 
-import { ContentDto, ContentsService } from './../services/contents.service';
+import { ContentDto, ContentsService, ScheduleDto } from './../services/contents.service';
 
 export class EditContentForm extends Form<FormGroup> {
     constructor(
@@ -446,8 +446,6 @@ const changeStatus = (content: ContentDto, status: string, user: string, version
         content.createdBy, user,
         content.created, now || DateTime.now(),
         null,
-        null,
-        null,
         content.isPending,
         content.data,
         content.dataDraft,
@@ -459,9 +457,7 @@ const changeScheduleStatus = (content: ContentDto, status: string, dueTime: stri
         content.status,
         content.createdBy, user,
         content.created, now || DateTime.now(),
-        status,
-        user,
-        DateTime.parseISO_UTC(dueTime),
+        new ScheduleDto(status, user, DateTime.parseISO_UTC(dueTime)),
         content.isPending,
         content.data,
         content.dataDraft,
@@ -473,9 +469,7 @@ const updateData = (content: ContentDto, data: any, user: string, version: Versi
         content.status,
         content.createdBy, user,
         content.created, now || DateTime.now(),
-        content.scheduledTo,
-        content.scheduledBy,
-        content.scheduledAt,
+        content.scheduleJob,
         content.isPending,
         data,
         data,
@@ -487,9 +481,7 @@ const updateDataDraft = (content: ContentDto, data: any, user: string, version: 
         content.status,
         content.createdBy, user,
         content.created, now || DateTime.now(),
-        content.scheduledTo,
-        content.scheduledBy,
-        content.scheduledAt,
+        content.scheduleJob,
         true,
         content.data,
         data,
@@ -501,9 +493,7 @@ const confirmChanges = (content: ContentDto, user: string, version: Version, now
         content.status,
         content.createdBy, user,
         content.created, now || DateTime.now(),
-        content.scheduledTo,
-        content.scheduledBy,
-        content.scheduledAt,
+        null,
         false,
         content.dataDraft,
         content.dataDraft,
@@ -515,9 +505,7 @@ const discardChanges = (content: ContentDto, user: string, version: Version, now
         content.status,
         content.createdBy, user,
         content.created, now || DateTime.now(),
-        content.scheduledTo,
-        content.scheduledBy,
-        content.scheduledAt,
+        content.scheduleJob,
         false,
         content.data,
         content.data,

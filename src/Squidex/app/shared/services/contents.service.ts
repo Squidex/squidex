@@ -28,17 +28,25 @@ export class ContentsDto {
     }
 }
 
+
+export class ScheduleDto {
+    constructor(
+        public readonly status: string,
+        public readonly scheduledBy: string,
+        public readonly when: DateTime
+    ) {
+    }
+}
+
 export class ContentDto {
     constructor(
-        public readonly id: string,
+        public  readonly id: string,
         public readonly status: string,
         public readonly createdBy: string,
         public readonly lastModifiedBy: string,
         public readonly created: DateTime,
         public readonly lastModified: DateTime,
-        public readonly scheduledTo: string | null,
-        public readonly scheduledBy: string | null,
-        public readonly scheduledAt: DateTime | null,
+        public readonly scheduleJob: ScheduleDto | null,
         public readonly isPending: boolean,
         public readonly data: object | any,
         public readonly dataDraft: object,
@@ -103,9 +111,12 @@ export class ContentsService {
                             item.lastModifiedBy,
                             DateTime.parseISO_UTC(item.created),
                             DateTime.parseISO_UTC(item.lastModified),
-                            item.scheduledTo || null,
-                            item.scheduledBy || null,
-                            item.scheduledAt ? DateTime.parseISO_UTC(item.scheduledAt) : null,
+                            item.scheduleJob
+                                ? new ScheduleDto(
+                                    item.scheduleJob.status,
+                                    item.scheduleJob.scheduledBy,
+                                    DateTime.parseISO_UTC(item.scheduleJob.when))
+                                : null,
                             item.isPending === true,
                             item.data,
                             item.dataDraft,
@@ -129,9 +140,12 @@ export class ContentsService {
                         body.lastModifiedBy,
                         DateTime.parseISO_UTC(body.created),
                         DateTime.parseISO_UTC(body.lastModified),
-                        body.scheduledTo || null,
-                        body.scheduledBy || null,
-                        body.scheduledAt || null ? DateTime.parseISO_UTC(body.scheduledAt) : null,
+                        body.scheduleJob
+                            ? new ScheduleDto(
+                                body.scheduleJob.status,
+                                body.scheduleJob.scheduledBy,
+                                DateTime.parseISO_UTC(body.scheduleJob.when))
+                            : null,
                         body.isPending === true,
                         body.data,
                         body.dataDraft,
@@ -164,8 +178,6 @@ export class ContentsService {
                         body.lastModifiedBy,
                         DateTime.parseISO_UTC(body.created),
                         DateTime.parseISO_UTC(body.lastModified),
-                        null,
-                        null,
                         null,
                         true,
                         null,

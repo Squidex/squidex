@@ -357,8 +357,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
             result.ShouldBeEquivalent(new EntitySavedResult(1));
 
             Assert.Equal(Status.Draft, sut.Snapshot.Status);
-            Assert.Equal(Status.Published, sut.Snapshot.ScheduledTo);
-            Assert.Equal(dueTime, sut.Snapshot.ScheduledAt);
+            Assert.Equal(Status.Published, sut.Snapshot.ScheduleJob.Status);
+            Assert.Equal(dueTime, sut.Snapshot.ScheduleJob.DueTime);
 
             LastEvents
                 .ShouldHaveSameEvents(
@@ -367,6 +367,28 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             A.CallTo(() => scriptEngine.Execute(A<ScriptContext>.Ignored, "<change-script>"))
                 .MustNotHaveHappened();
+        }
+
+        [Fact]
+        public async Task ChangeStatus_should_refresh_properties_and_revert_scheduling_when_invoked_by_scheduler()
+        {
+            var dueTime = Instant.MaxValue;
+
+            await ExecuteCreateAsync();
+            await ExecuteScheduledAsync();
+
+            var command = new ChangeContentStatus { Status = Status.Draft, JobId = sut.Snapshot.ScheduleJob.Id };
+
+            var result = await sut.ExecuteAsync(CreateContentCommand(command));
+
+            result.ShouldBeEquivalent(new EntitySavedResult(2));
+
+            Assert.Null(sut.Snapshot.ScheduleJob);
+
+            LastEvents
+                .ShouldHaveSameEvents(
+                    CreateContentEvent(new ContentSchedulingCancelled())
+                );
         }
 
         [Fact]
@@ -425,6 +447,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
         private Task ExecuteProposeUpdateAsync()
         {
             return sut.ExecuteAsync(CreateContentCommand(new UpdateContent { Data = otherData, AsDraft = true }));
+        }
+
+        private Task ExecuteScheduledAsync()
+        {
+            return sut.ExecuteAsync(CreateContentCommand(new ChangeContentStatus { Status = Status.Published, DueTime = Instant.MaxValue }));
         }
 
         private Task ExecuteDeleteAsync()

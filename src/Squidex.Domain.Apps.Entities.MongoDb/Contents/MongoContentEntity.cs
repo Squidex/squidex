@@ -63,6 +63,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         [BsonJson]
         public IdContentData DataDraftByIds { get; set; }
 
+        [BsonIgnoreIfNull]
+        [BsonElement("sj")]
+        [BsonJson]
+        public ScheduleJob ScheduleJob { get; set; }
+
         [BsonIgnoreIfDefault]
         [BsonElement("dt")]
         public string DataText { get; set; }
@@ -76,16 +81,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         public NamedId<Guid> SchemaId { get; set; }
 
         [BsonIgnoreIfNull]
-        [BsonElement("st")]
-        public Status? ScheduledTo { get; set; }
-
-        [BsonIgnoreIfNull]
         [BsonElement("sa")]
         public Instant? ScheduledAt { get; set; }
-
-        [BsonIgnoreIfNull]
-        [BsonElement("sb")]
-        public RefToken ScheduledBy { get; set; }
 
         [BsonRequired]
         [BsonElement("ct")]

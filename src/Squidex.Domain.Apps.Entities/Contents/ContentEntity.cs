@@ -30,11 +30,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public Status Status { get; set; }
 
-        public Status? ScheduledTo { get; set; }
-
-        public Instant? ScheduledAt { get; set; }
-
-        public RefToken ScheduledBy { get; set; }
+        public ScheduleJob ScheduleJob { get; set; }
 
         public RefToken CreatedBy { get; set; }
 

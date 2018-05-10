@@ -72,9 +72,14 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 {
                     try
                     {
-                        var command = new ChangeContentStatus { ContentId = content.Id, Status = content.ScheduledTo.Value, Actor = content.ScheduledBy };
+                        var job = content.ScheduleJob;
 
-                        await commandBus.Value.PublishAsync(command);
+                        if (job != null)
+                        {
+                            var command = new ChangeContentStatus { ContentId = content.Id, Status = job.Status, Actor = job.ScheduledBy, JobId = job.Id };
+
+                            await commandBus.Value.PublishAsync(command);
+                        }
                     }
                     catch (Exception ex)
                     {
