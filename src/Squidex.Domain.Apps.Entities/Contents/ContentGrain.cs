@@ -100,20 +100,24 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     {
                         GuardContent.CanChangeContentStatus(Snapshot.IsPending, Snapshot.Status, c);
 
-                        if (Snapshot.IsPending && Snapshot.Status == Status.Published && c.Status == Status.Published)
+                        if (c.DueTime.HasValue)
                         {
-                            ConfirmChanges(c);
+                            ScheduleStatus(c);
                         }
                         else
                         {
-                            if (!c.DueTime.HasValue)
+                            if (Snapshot.IsPending && Snapshot.Status == Status.Published && c.Status == Status.Published)
+                            {
+                                ConfirmChanges(c);
+                            }
+                            else
                             {
                                 var ctx = await CreateContext(Snapshot.AppId.Id, Snapshot.SchemaId.Id, () => "Failed to change content.");
 
                                 await ctx.ExecuteScriptAsync(x => x.ScriptChange, c.Status, c, Snapshot.Data);
-                            }
 
-                            ChangeStatus(c);
+                                ChangeStatus(c);
+                            }
                         }
                     });
 
@@ -216,16 +220,14 @@ namespace Squidex.Domain.Apps.Entities.Contents
             RaiseEvent(SimpleMapper.Map(command, new ContentUpdateProposed { Data = data }));
         }
 
+        public void ScheduleStatus(ChangeContentStatus command)
+        {
+            RaiseEvent(SimpleMapper.Map(command, new ContentStatusScheduled { DueTime = command.DueTime.Value }));
+        }
+
         public void ChangeStatus(ChangeContentStatus command)
         {
-            if (command.DueTime.HasValue)
-            {
-                RaiseEvent(SimpleMapper.Map(command, new ContentStatusScheduled { DueTime = command.DueTime.Value }));
-            }
-            else
-            {
-                RaiseEvent(SimpleMapper.Map(command, new ContentStatusChanged()));
-            }
+            RaiseEvent(SimpleMapper.Map(command, new ContentStatusChanged()));
         }
 
         private void RaiseEvent(SchemaEvent @event)

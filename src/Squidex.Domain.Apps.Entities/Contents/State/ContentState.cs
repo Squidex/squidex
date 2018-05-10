@@ -81,13 +81,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.State
             IsPending = false;
         }
 
-        protected void On(ContentChangesPublished @event)
-        {
-            Data = DataDraft;
-
-            IsPending = false;
-        }
-
         protected void On(ContentStatusScheduled @event)
         {
             ScheduledAt = @event.DueTime;
@@ -95,13 +88,24 @@ namespace Squidex.Domain.Apps.Entities.Contents.State
             ScheduledTo = @event.Status;
         }
 
-        protected void On(ContentStatusChanged @event)
+        protected void On(ContentChangesPublished @event)
         {
-            Status = @event.Status;
-
             ScheduledAt = null;
             ScheduledBy = null;
             ScheduledTo = null;
+
+            Data = DataDraft;
+
+            IsPending = false;
+        }
+
+        protected void On(ContentStatusChanged @event)
+        {
+            ScheduledAt = null;
+            ScheduledBy = null;
+            ScheduledTo = null;
+
+            Status = @event.Status;
 
             if (@event.Status == Status.Published)
             {

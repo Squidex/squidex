@@ -174,10 +174,6 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
         this.contentForm.loadData(data, this.content && this.content.status === 'Archived');
     }
 
-    public publishChanges() {
-        this.contentsState.publishChanges(this.content).onErrorResumeNext().subscribe();
-    }
-
     public discardChanges() {
         this.contentsState.discardChanges(this.content).onErrorResumeNext().subscribe();
     }
@@ -203,6 +199,12 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
             .subscribe(() => {
                 this.back();
             });
+    }
+
+    public publishChanges() {
+        this.dueTimeSelector.selectDueTime('Publish')
+            .switchMap(d => this.contentsState.publishChanges(this.content, d)).onErrorResumeNext()
+            .subscribe();
     }
 
     private changeContentItems(action: string, status: string) {

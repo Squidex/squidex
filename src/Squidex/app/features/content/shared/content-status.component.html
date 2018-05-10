@@ -11,7 +11,7 @@
         <i class="icon-clock"></i>
     </span>
 
-    <sqx-tooltip [target]="statusIcon">Will be set to '{{scheduledTo}}' at {{scheduledAt | sqxFullDateTime}}</sqx-tooltip>
+    <sqx-tooltip position="topRight" [target]="statusIcon">Will be set to '{{scheduledTo}}' at {{scheduledAt | sqxFullDateTime}}</sqx-tooltip>
 </span>
 
 <span class="content-status-label" *ngIf="showLabel">{{displayStatus}}</span>

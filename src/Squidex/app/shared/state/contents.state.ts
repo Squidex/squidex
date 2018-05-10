@@ -288,12 +288,30 @@ export abstract class ContentsStateBase extends State<Snapshot> {
             .switchMap(() => this.loadInternal());
     }
 
+    public publishChanges(content: ContentDto, dueTime: string | null, now?: DateTime): Observable<any> {
+        return this.contentsService.changeContentStatus(this.appName, this.schemaName, content.id, 'Publish', dueTime, content.version)
+            .do(dto => {
+                this.dialogs.notifyInfo('Content updated successfully.');
+
+                if (dueTime) {
+                    this.replaceContent(changeScheduleStatus(content, 'Published', dueTime, this.user, dto.version, now));
+                } else {
+                    this.replaceContent(confirmChanges(content, this.user, dto.version, now));
+                }
+            })
+            .notify(this.dialogs);
+    }
+
     public changeStatus(content: ContentDto, action: string, status: string, dueTime: string | null, now?: DateTime): Observable<any> {
         return this.contentsService.changeContentStatus(this.appName, this.schemaName, content.id, action, dueTime, content.version)
             .do(dto => {
                 this.dialogs.notifyInfo('Content updated successfully.');
 
-                this.replaceContent(changeStatus(content, status, dueTime, this.user, dto.version, now));
+                if (dueTime) {
+                    this.replaceContent(changeScheduleStatus(content, status, dueTime, this.user, dto.version, now));
+                } else {
+                    this.replaceContent(changeStatus(content, status, this.user, dto.version, now));
+                }
             })
             .notify(this.dialogs);
     }
@@ -314,16 +332,6 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                 this.dialogs.notifyInfo('Content updated successfully.');
 
                 this.replaceContent(updateDataDraft(content, dto.payload, this.user, dto.version, now));
-            })
-            .notify(this.dialogs);
-    }
-
-    public publishChanges(content: ContentDto, now?: DateTime): Observable<any> {
-        return this.contentsService.changeContentStatus(this.appName, this.schemaName, content.id, 'Publish', null, content.version)
-            .do(dto => {
-                this.dialogs.notifyInfo('Content updated successfully.');
-
-                this.replaceContent(confirmChanges(content, this.user, dto.version, now));
             })
             .notify(this.dialogs);
     }
@@ -431,15 +439,29 @@ export class ManualContentsState extends ContentsStateBase {
     }
 }
 
-const changeStatus = (content: ContentDto, status: string, dueTime: string | null, user: string, version: Version, now?: DateTime) =>
+const changeStatus = (content: ContentDto, status: string, user: string, version: Version, now?: DateTime) =>
     new ContentDto(
         content.id,
-        dueTime ? content.status : status,
+        status,
         content.createdBy, user,
         content.created, now || DateTime.now(),
-        dueTime ? status : null,
-        dueTime ? user : null,
-        dueTime ? DateTime.parseISO_UTC(dueTime) : null,
+        null,
+        null,
+        null,
+        content.isPending,
+        content.data,
+        content.dataDraft,
+        version);
+
+const changeScheduleStatus = (content: ContentDto, status: string, dueTime: string, user: string, version: Version, now?: DateTime) =>
+    new ContentDto(
+        content.id,
+        content.status,
+        content.createdBy, user,
+        content.created, now || DateTime.now(),
+        status,
+        user,
+        DateTime.parseISO_UTC(dueTime),
         content.isPending,
         content.data,
         content.dataDraft,

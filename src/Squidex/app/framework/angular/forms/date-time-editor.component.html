@@ -7,10 +7,10 @@
             <input type="text" class="form-control" [formControl]="timeControl" (blur)="touched()" />
         </div>
         <div class="form-group" *ngIf="showTime">
-            <button class="btn btn-secondary" (click)="writeNow()">Now</button>
+            <button class="btn btn-secondary" [disabled]="isDisabled" (click)="writeNow()">Now</button>
         </div>
         <div class="form-group" *ngIf="!showTime">
-            <button class="btn btn-secondary" (click)="writeNow()">Today</button>
+            <button class="btn btn-secondary" [disabled]="isDisabled" (click)="writeNow()">Today</button>
         </div>
         <div class="form-group" [class.hidden]="!hasValue" *ngIf="!hideClear">
             <button class="btn btn-link clear" [disabled]="isDisabled" (click)="reset()">Clear</button>
