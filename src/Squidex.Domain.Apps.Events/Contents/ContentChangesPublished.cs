@@ -9,8 +9,8 @@ using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Events.Contents
 {
-    [EventType(nameof(ContentChangesConfirmed))]
-    public sealed class ContentChangesConfirmed : ContentEvent
+    [EventType(nameof(ContentChangesPublished))]
+    public sealed class ContentChangesPublished : ContentEvent
     {
     }
 }

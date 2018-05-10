@@ -39,12 +39,18 @@
                             <a class="dropdown-item" (click)="showField()" *ngIf="field.isHidden" [class.disabled]="field.isLocked">
                                 Show in API
                             </a>                           
+                            
+                            <div class="dropdown-divider"></div>
+                            
                             <a class="dropdown-item" *ngIf="!field.isLocked" 
                                 (sqxConfirmClick)="lockField()"
                                 confirmTitle="Lock field" 
                                 confirmText="Do you really want to lock the field? Lock fields cannot be deleted or changed.">
                                 Lock and prevent changes
                             </a>
+                            
+                            <div class="dropdown-divider"></div>
+
                             <a class="dropdown-item dropdown-item-delete" [class.disabled]="field.isLocked"
                                 (sqxConfirmClick)="deleteField()"
                                 confirmTitle="Delete field" 

@@ -99,6 +99,9 @@
             <a class="dropdown-item" (click)="restoring.emit(); $event.stopPropagation()" *ngIf="content.status === 'Archived'">
                 Restore
             </a>
+            
+            <div class="dropdown-divider"></div>
+
             <a class="dropdown-item dropdown-item-delete"
                 (sqxConfirmClick)="deleting.emit()"
                 confirmTitle="Delete content" 

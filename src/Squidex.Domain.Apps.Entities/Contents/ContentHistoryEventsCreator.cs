@@ -31,6 +31,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             AddEventMessage<ContentChangesDiscarded>(
                 "discarded pending changes of {[Schema]} content.");
 
+            AddEventMessage<ContentChangesPublished>(
+                "published changes of {[Schema]} content.");
+
             AddEventMessage<ContentUpdateProposed>(
                 "proposed update for {[Schema]} content.");
 

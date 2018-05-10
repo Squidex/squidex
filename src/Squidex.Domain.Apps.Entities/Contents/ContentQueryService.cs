@@ -70,7 +70,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             var isFrontendClient = IsFrontendClient(user);
             var isVersioned = version > EtagVersion.Empty;
 
-            var parsedStatus = isFrontendClient ? new[] { Status.Published } : null;
+            var parsedStatus = isFrontendClient ? null : new[] { Status.Published };
 
             var content =
                 isVersioned ?
@@ -156,7 +156,10 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     result.Data = result.Data.ToApiModel(schema.SchemaDef, app.LanguagesConfig, isFrontendClient, isTypeChecking);
                 }
 
-                result.DataDraft = result.DataDraft.ToApiModel(schema.SchemaDef, app.LanguagesConfig, isFrontendClient, isTypeChecking);
+                if (result.DataDraft != null)
+                {
+                    result.DataDraft = result.DataDraft.ToApiModel(schema.SchemaDef, app.LanguagesConfig, isFrontendClient, isTypeChecking);
+                }
 
                 yield return result;
             }

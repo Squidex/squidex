@@ -59,8 +59,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.State
 
         protected void On(ContentUpdated @event)
         {
-            Data = @event.Data;
             DataDraft = @event.Data;
+
+            if (Data != null)
+            {
+                Data = @event.Data;
+            }
         }
 
         protected void On(ContentUpdateProposed @event)
@@ -77,7 +81,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.State
             IsPending = false;
         }
 
-        protected void On(ContentChangesConfirmed @event)
+        protected void On(ContentChangesPublished @event)
         {
             Data = DataDraft;
 
@@ -102,8 +106,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.State
             if (@event.Status == Status.Published)
             {
                 Data = DataDraft;
-
-                IsPending = false;
             }
         }
 

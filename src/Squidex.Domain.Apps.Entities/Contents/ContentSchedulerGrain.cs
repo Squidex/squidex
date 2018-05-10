@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using NodaTime;
 using Orleans;
@@ -23,6 +24,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         private readonly Lazy<IContentRepository> contentRepository;
         private readonly Lazy<ICommandBus> commandBus;
         private readonly IClock clock;
+        private TaskScheduler scheduler;
 
         public ContentSchedulerGrain(
             Lazy<IContentRepository> contentRepository,
@@ -40,6 +42,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public override Task OnActivateAsync()
         {
+            scheduler = TaskScheduler.Current;
+
             DelayDeactivation(TimeSpan.FromDays(1));
 
             RegisterOrUpdateReminder("Default", TimeSpan.Zero, TimeSpan.FromMinutes(10));
@@ -59,15 +63,23 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             return contentRepository.Value.QueryScheduledWithoutDataAsync(now, content =>
             {
-                var command = new ChangeContentStatus { ContentId = content.Id, Status = content.ScheduledTo.Value, Actor = content.ScheduledBy };
+                return Dispatch(() =>
+                {
+                    var command = new ChangeContentStatus { ContentId = content.Id, Status = content.ScheduledTo.Value, Actor = content.ScheduledBy };
 
-                return commandBus.Value.PublishAsync(command);
+                    return commandBus.Value.PublishAsync(command);
+                });
             });
         }
 
         public Task ReceiveReminder(string reminderName, TickStatus status)
         {
             return TaskHelper.Done;
+        }
+
+        private Task Dispatch(Func<Task> task)
+        {
+            return Task<Task>.Factory.StartNew(() => task(), CancellationToken.None, TaskCreationOptions.None, scheduler ?? TaskScheduler.Default).Unwrap();
         }
     }
 }

@@ -16,4 +16,5 @@ export * from './shared/assets-editor.component';
 export * from './shared/content-item.component';
 export * from './shared/content-status.component';
 export * from './shared/contents-selector.component';
+export * from './shared/due-time-selector.component';
 export * from './shared/references-editor.component';

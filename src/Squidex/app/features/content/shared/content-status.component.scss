@@ -22,6 +22,10 @@
         color: $color-dark-black;
     }
 
+    &-label {
+        color: $color-text;
+    }
+
     &-tooltip {
         @include border-radius;
         background: $color-tooltip;

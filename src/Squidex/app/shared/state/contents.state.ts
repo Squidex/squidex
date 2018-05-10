@@ -254,7 +254,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
             .notify(this.dialogs);
     }
 
-    public changeStatus(contents: ContentDto[], action: string, dueTime: string | null): Observable<any> {
+    public changeManyStatus(contents: ContentDto[], action: string, dueTime: string | null): Observable<any> {
         return Observable.forkJoin(
             contents.map(c =>
                 this.contentsService.changeContentStatus(this.appName, this.schemaName, c.id, action, dueTime, c.version)
@@ -271,7 +271,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
             .switchMap(() => this.loadInternal());
     }
 
-    public delete(contents: ContentDto[]): Observable<any> {
+    public deleteMany(contents: ContentDto[]): Observable<any> {
         return Observable.forkJoin(
                 contents.map(c =>
                     this.contentsService.deleteContent(this.appName, this.schemaName, c.id, c.version)
@@ -288,10 +288,20 @@ export abstract class ContentsStateBase extends State<Snapshot> {
             .switchMap(() => this.loadInternal());
     }
 
+    public changeStatus(content: ContentDto, action: string, status: string, dueTime: string | null, now?: DateTime): Observable<any> {
+        return this.contentsService.changeContentStatus(this.appName, this.schemaName, content.id, action, dueTime, content.version)
+            .do(dto => {
+                this.dialogs.notifyInfo('Content updated successfully.');
+
+                this.replaceContent(changeStatus(content, status, dueTime, this.user, dto.version, now));
+            })
+            .notify(this.dialogs);
+    }
+
     public update(content: ContentDto, request: any, now?: DateTime): Observable<any> {
         return this.contentsService.putContent(this.appName, this.schemaName, content.id, request, false, content.version)
             .do(dto => {
-                this.dialogs.notifyInfo('Contents updated successfully.');
+                this.dialogs.notifyInfo('Content updated successfully.');
 
                 this.replaceContent(updateData(content, dto.payload, this.user, dto.version, now));
             })
@@ -308,12 +318,22 @@ export abstract class ContentsStateBase extends State<Snapshot> {
             .notify(this.dialogs);
     }
 
-    public revertProposal(content: ContentDto, now?: DateTime): Observable<any> {
+    public publishChanges(content: ContentDto, now?: DateTime): Observable<any> {
+        return this.contentsService.changeContentStatus(this.appName, this.schemaName, content.id, 'Publish', null, content.version)
+            .do(dto => {
+                this.dialogs.notifyInfo('Content updated successfully.');
+
+                this.replaceContent(confirmChanges(content, this.user, dto.version, now));
+            })
+            .notify(this.dialogs);
+    }
+
+    public discardChanges(content: ContentDto, now?: DateTime): Observable<any> {
         return this.contentsService.discardChanges(this.appName, this.schemaName, content.id, content.version)
             .do(dto => {
                 this.dialogs.notifyInfo('Content updated successfully.');
 
-                this.replaceContent(revertDataDraft(content, this.user, dto.version, now));
+                this.replaceContent(discardChanges(content, this.user, dto.version, now));
             })
             .notify(this.dialogs);
     }
@@ -411,6 +431,20 @@ export class ManualContentsState extends ContentsStateBase {
     }
 }
 
+const changeStatus = (content: ContentDto, status: string, dueTime: string | null, user: string, version: Version, now?: DateTime) =>
+    new ContentDto(
+        content.id,
+        dueTime ? content.status : status,
+        content.createdBy, user,
+        content.created, now || DateTime.now(),
+        dueTime ? status : null,
+        dueTime ? user : null,
+        dueTime ? DateTime.parseISO_UTC(dueTime) : null,
+        content.isPending,
+        content.data,
+        content.dataDraft,
+        version);
+
 const updateData = (content: ContentDto, data: any, user: string, version: Version, now?: DateTime) =>
     new ContentDto(
         content.id,
@@ -439,7 +473,21 @@ const updateDataDraft = (content: ContentDto, data: any, user: string, version: 
         data,
         version);
 
-const revertDataDraft = (content: ContentDto, user: string, version: Version, now?: DateTime) =>
+const confirmChanges = (content: ContentDto, user: string, version: Version, now?: DateTime) =>
+    new ContentDto(
+        content.id,
+        content.status,
+        content.createdBy, user,
+        content.created, now || DateTime.now(),
+        content.scheduledTo,
+        content.scheduledBy,
+        content.scheduledAt,
+        false,
+        content.dataDraft,
+        content.dataDraft,
+        version);
+
+const discardChanges = (content: ContentDto, user: string, version: Version, now?: DateTime) =>
     new ContentDto(
         content.id,
         content.status,

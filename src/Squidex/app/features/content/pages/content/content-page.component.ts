@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, Subscription } from 'rxjs';
 
@@ -19,18 +19,25 @@ import {
     ContentsState,
     DialogService,
     EditContentForm,
+    fadeAnimation,
     ImmutableArray,
     LanguagesState,
     MessageBus,
+    ModalView,
     SchemaDetailsDto,
     SchemasState,
     Version
 } from '@app/shared';
 
+import { DueTimeSelectorComponent } from './../../shared/due-time-selector.component';
+
 @Component({
     selector: 'sqx-content-page',
     styleUrls: ['./content-page.component.scss'],
-    templateUrl: './content-page.component.html'
+    templateUrl: './content-page.component.html',
+    animations: [
+        fadeAnimation
+    ]
 })
 export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, OnInit {
     private languagesSubscription: Subscription;
@@ -44,8 +51,13 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
     public contentVersion: Version | null;
     public contentForm: EditContentForm;
 
+    public dropdown = new ModalView(false, true);
+
     public language: AppLanguageDto;
     public languages: ImmutableArray<AppLanguageDto>;
+
+    @ViewChild('dueTimeSelector')
+    public dueTimeSelector: DueTimeSelectorComponent;
 
     constructor(
         public readonly appsState: AppsState,
@@ -160,6 +172,43 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
 
     private loadContent(data: any) {
         this.contentForm.loadData(data, this.content && this.content.status === 'Archived');
+    }
+
+    public publishChanges() {
+        this.contentsState.publishChanges(this.content).onErrorResumeNext().subscribe();
+    }
+
+    public discardChanges() {
+        this.contentsState.discardChanges(this.content).onErrorResumeNext().subscribe();
+    }
+
+    public publish() {
+        this.changeContentItems('Publish', 'Published');
+    }
+
+    public unpublish() {
+        this.changeContentItems('Unpublish', 'Draft');
+    }
+
+    public archive() {
+        this.changeContentItems('Archive', 'Archived');
+    }
+
+    public restore() {
+        this.changeContentItems('Restore', 'Draft');
+    }
+
+    public delete() {
+        this.contentsState.deleteMany([this.content]).onErrorResumeNext()
+            .subscribe(() => {
+                this.back();
+            });
+    }
+
+    private changeContentItems(action: string, status: string) {
+        this.dueTimeSelector.selectDueTime(action)
+            .switchMap(d => this.contentsState.changeStatus(this.content, action, status, d)).onErrorResumeNext()
+            .subscribe();
     }
 
     private loadVersion(version: Version) {

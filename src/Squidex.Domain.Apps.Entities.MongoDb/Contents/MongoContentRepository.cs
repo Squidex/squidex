@@ -77,7 +77,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
             else
             {
-                return contentsPublished.FindContentAsync(app, schema, id);
+                return contentsDraft.FindContentAsync(app, schema, id);
             }
         }
 

@@ -197,7 +197,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public void ConfirmChanges(ChangeContentStatus command)
         {
-            RaiseEvent(SimpleMapper.Map(command, new ContentChangesConfirmed()));
+            RaiseEvent(SimpleMapper.Map(command, new ContentChangesPublished()));
         }
 
         public void DiscardChanges(DiscardChanges command)
