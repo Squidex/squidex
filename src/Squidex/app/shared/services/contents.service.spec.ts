@@ -66,7 +66,7 @@ describe('ContentsService', () => {
                     scheduleJob: {
                         status: 'Draft',
                         scheduledBy: 'Scheduler1',
-                        when: '2018-12-12T10:10'
+                        dueTime: '2018-12-12T10:10'
                     },
                     isPending: true,
                     version: 11,
@@ -171,7 +171,7 @@ describe('ContentsService', () => {
             scheduleJob: {
                 status: 'Draft',
                 scheduledBy: 'Scheduler1',
-                when: '2018-12-12T10:10'
+                dueTime: '2018-12-12T10:10'
             },
             isPending: true,
             data: {},

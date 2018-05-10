@@ -144,7 +144,7 @@ export class ContentsService {
                             ? new ScheduleDto(
                                 body.scheduleJob.status,
                                 body.scheduleJob.scheduledBy,
-                                DateTime.parseISO_UTC(body.scheduleJob.dueTimes))
+                                DateTime.parseISO_UTC(body.scheduleJob.dueTime))
                             : null,
                         body.isPending === true,
                         body.data,
