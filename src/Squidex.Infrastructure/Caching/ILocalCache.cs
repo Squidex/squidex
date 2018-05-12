@@ -5,10 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
+
 namespace Squidex.Infrastructure.Caching
 {
-    public interface IRequestCache
+    public interface ILocalCache
     {
+        IDisposable StartContext();
+
         void Add(object key, object value);
 
         void Remove(object key);

@@ -172,9 +172,6 @@ namespace Squidex.Config.Domain
             services.AddTransientAs<ConvertEventStoreAppId>()
                 .As<IMigration>();
 
-            services.AddTransientAs<DeleteArchiveCollectionSetup>()
-                .As<IMigration>();
-
             services.AddTransientAs<PopulateGrainIndexes>()
                 .As<IMigration>();
 

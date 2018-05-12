@@ -32,8 +32,8 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs(c => new CachingUsageTracker(c.GetRequiredService<BackgroundUsageTracker>(), c.GetRequiredService<IMemoryCache>()))
                 .As<IUsageTracker>();
 
-            services.AddSingletonAs<HttpRequestCache>()
-                .As<IRequestCache>();
+            services.AddSingletonAs<AsyncLocalCache>()
+                .As<ILocalCache>();
 
             services.AddSingletonAs<HttpContextAccessor>()
                 .As<IHttpContextAccessor>();

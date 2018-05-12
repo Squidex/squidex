@@ -12,7 +12,7 @@ namespace Squidex.Infrastructure.Caching
 {
     public static class RequestCacheExtensions
     {
-        public static async Task<T> GetOrCreateAsync<T>(this IRequestCache cache, object key, Func<Task<T>> task)
+        public static async Task<T> GetOrCreateAsync<T>(this ILocalCache cache, object key, Func<Task<T>> task)
         {
             if (cache.TryGetValue(key, out var value) && value is T typedValue)
             {
@@ -26,7 +26,7 @@ namespace Squidex.Infrastructure.Caching
             return typedValue;
         }
 
-        public static T GetOrCreate<T>(this IRequestCache cache, object key, Func<T> task)
+        public static T GetOrCreate<T>(this ILocalCache cache, object key, Func<T> task)
         {
             if (cache.TryGetValue(key, out var value) && value is T typedValue)
             {

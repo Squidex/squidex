@@ -13,8 +13,6 @@ namespace Squidex.Infrastructure.Commands
 {
     public interface IDomainObjectGrain : IGrainWithGuidKey
     {
-        Task WriteSnapshotAsync();
-
         Task<J<object>> ExecuteAsync(J<IAggregateCommand> command);
     }
 }

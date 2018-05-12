@@ -55,6 +55,7 @@ namespace Squidex.Config.Orleans
             {
                 var hostBuilder = new SiloHostBuilder()
                     .UseDashboard(options => options.HostSelf = false)
+                    .AddIncomingGrainCallFilter<LocalCacheFilter>()
                     .AddStartupTask<Bootstrap<IContentSchedulerGrain>>()
                     .AddStartupTask<Bootstrap<IEventConsumerManagerGrain>>()
                     .AddStartupTask<Bootstrap<IRuleDequeuerGrain>>()

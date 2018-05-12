@@ -24,6 +24,15 @@ namespace Squidex.Config.Web
             services.AddSingletonAs<ApiCostsFilter>()
                 .AsSelf();
 
+            services.AddSingletonAs<EnforceHttpsMiddleware>()
+                .AsSelf();
+
+            services.AddSingletonAs<LocalCacheMiddleware>()
+                .AsSelf();
+
+            services.AddSingletonAs<RequestLogPerformanceMiddleware>()
+                .AsSelf();
+
             services.AddMvc().AddMySerializers();
             services.AddCors();
             services.AddRouting();

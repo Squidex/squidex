@@ -18,5 +18,7 @@ namespace Squidex.Infrastructure.States
         IPersistence<TState> WithSnapshots<TState>(Type owner, TKey key, Func<TState, Task> applySnapshot);
 
         IPersistence<TState> WithSnapshotsAndEventSourcing<TState>(Type owner, TKey key, Func<TState, Task> applySnapshot, Func<Envelope<IEvent>, Task> applyEvent);
+
+        Task ClearSnapshotsAsync<TState>();
     }
 }

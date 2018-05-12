@@ -9,7 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Orleans;
+using System.Threading.Tasks.Dataflow;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.State;
@@ -21,11 +21,9 @@ using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Domain.Apps.Entities.Rules.State;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.State;
-using Squidex.Domain.Apps.Events;
-using Squidex.Domain.Apps.Events.Assets;
-using Squidex.Domain.Apps.Events.Contents;
-using Squidex.Domain.Apps.Events.Rules;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Caching;
+using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.States;
 
@@ -34,137 +32,107 @@ namespace Migrate_01
     public sealed class Rebuilder
     {
         private readonly FieldRegistry fieldRegistry;
+        private readonly ILocalCache localCache;
+        private readonly IStore<Guid> store;
         private readonly IEventStore eventStore;
-        private readonly IEventDataFormatter eventDataFormatter;
-        private readonly ISnapshotStore<AppState, Guid> snapshotAppStore;
-        private readonly ISnapshotStore<AssetState, Guid> snapshotAssetStore;
-        private readonly ISnapshotStore<ContentState, Guid> snapshotContentStore;
-        private readonly ISnapshotStore<RuleState, Guid> snapshotRuleStore;
-        private readonly ISnapshotStore<SchemaState, Guid> snapshotSchemaStore;
-        private readonly IGrainFactory grainFactory;
 
         public Rebuilder(
             FieldRegistry fieldRegistry,
-            IEventDataFormatter eventDataFormatter,
-            IEventStore eventStore,
-            ISnapshotStore<AppState, Guid> snapshotAppStore,
-            ISnapshotStore<ContentState, Guid> snapshotContentStore,
-            ISnapshotStore<AssetState, Guid> snapshotAssetStore,
-            ISnapshotStore<RuleState, Guid> snapshotRuleStore,
-            ISnapshotStore<SchemaState, Guid> snapshotSchemaStore,
-            IGrainFactory grainFactory)
+            ILocalCache localCache,
+            IStore<Guid> store,
+            IEventStore eventStore)
         {
             this.fieldRegistry = fieldRegistry;
-            this.eventDataFormatter = eventDataFormatter;
             this.eventStore = eventStore;
-            this.snapshotAppStore = snapshotAppStore;
-            this.snapshotAssetStore = snapshotAssetStore;
-            this.snapshotContentStore = snapshotContentStore;
-            this.snapshotRuleStore = snapshotRuleStore;
-            this.snapshotSchemaStore = snapshotSchemaStore;
-            this.grainFactory = grainFactory;
+            this.localCache = localCache;
+            this.store = store;
+        }
+
+        public async Task RebuildAppsAsync()
+        {
+            await store.ClearSnapshotsAsync<AppState>();
+
+            await RebuildManyAsync("^app\\-", id => RebuildAsync<AppState, AppGrain>(id, (e, s) => s.Apply(e)));
+        }
+
+        public async Task RebuildSchemasAsync()
+        {
+            await store.ClearSnapshotsAsync<SchemaState>();
+
+            await RebuildManyAsync("^schema\\-", id => RebuildAsync<SchemaState, SchemaGrain>(id, (e, s) => s.Apply(e, fieldRegistry)));
+        }
+
+        public async Task RebuildRulesAsync()
+        {
+            await store.ClearSnapshotsAsync<RuleState>();
+
+            await RebuildManyAsync("^rule\\-", id => RebuildAsync<RuleState, RuleGrain>(id, (e, s) => s.Apply(e)));
         }
 
         public async Task RebuildAssetsAsync()
         {
-            await snapshotAssetStore.ClearAsync();
+            await store.ClearSnapshotsAsync<AssetState>();
 
-            const string filter = "^asset\\-";
-
-            var handledIds = new HashSet<Guid>();
-
-            await eventStore.QueryAsync(async storedEvent =>
-            {
-                var @event = ParseKnownEvent(storedEvent);
-
-                if (@event != null)
-                {
-                    if (@event.Payload is AssetEvent assetEvent && handledIds.Add(assetEvent.AssetId))
-                    {
-                        var asset = grainFactory.GetGrain<IAssetGrain>(assetEvent.AssetId);
-
-                        await asset.WriteSnapshotAsync();
-                    }
-                }
-            }, filter, ct: CancellationToken.None);
-        }
-
-        public async Task RebuildConfigAsync()
-        {
-            await snapshotAppStore.ClearAsync();
-            await snapshotRuleStore.ClearAsync();
-            await snapshotSchemaStore.ClearAsync();
-
-            const string filter = "^((app\\-)|(schema\\-)|(rule\\-))";
-
-            var handledIds = new HashSet<Guid>();
-
-            await eventStore.QueryAsync(async storedEvent =>
-            {
-                var @event = ParseKnownEvent(storedEvent);
-
-                if (@event != null)
-                {
-                    if (@event.Payload is SchemaEvent schemaEvent && handledIds.Add(schemaEvent.SchemaId.Id))
-                    {
-                        var schema = grainFactory.GetGrain<ISchemaGrain>(schemaEvent.SchemaId.Id);
-
-                        await schema.WriteSnapshotAsync();
-                    }
-                    else if (@event.Payload is RuleEvent ruleEvent && handledIds.Add(ruleEvent.RuleId))
-                    {
-                        var rule = grainFactory.GetGrain<IRuleGrain>(ruleEvent.RuleId);
-
-                        await rule.WriteSnapshotAsync();
-                    }
-                    else if (@event.Payload is AppEvent appEvent && handledIds.Add(appEvent.AppId.Id))
-                    {
-                        var app = grainFactory.GetGrain<IAppGrain>(appEvent.AppId.Id);
-
-                        await app.WriteSnapshotAsync();
-                    }
-                }
-            }, filter, ct: CancellationToken.None);
+            await RebuildManyAsync("^asset\\-", id => RebuildAsync<AssetState, AssetGrain>(id, (e, s) => s.Apply(e)));
         }
 
         public async Task RebuildContentAsync()
         {
-            await snapshotContentStore.ClearAsync();
-
-            const string filter = "^((content\\-))";
-
-            var handledIds = new HashSet<Guid>();
-
-            await eventStore.QueryAsync(async storedEvent =>
+            using (localCache.StartContext())
             {
-                var @event = ParseKnownEvent(storedEvent);
+                await store.ClearSnapshotsAsync<ContentState>();
 
-                if (@event.Payload is ContentEvent contentEvent && handledIds.Add(contentEvent.ContentId))
+                await RebuildManyAsync("^content\\-", async id =>
                 {
                     try
                     {
-                        var content = grainFactory.GetGrain<IContentGrain>(contentEvent.ContentId);
-
-                        await content.WriteSnapshotAsync();
+                        await RebuildAsync<ContentState, ContentGrain>(id, (e, s) => s.Apply(e));
                     }
                     catch (DomainObjectNotFoundException)
                     {
-                        // Schema has been deleted.
+                        return;
                     }
-                }
-            }, filter, ct: CancellationToken.None);
+                });
+            }
         }
 
-        private Envelope<IEvent> ParseKnownEvent(StoredEvent storedEvent)
+        private async Task RebuildManyAsync(string filter, Func<Guid, Task> action)
         {
-            try
+            var handledIds = new HashSet<Guid>();
+
+            var worker = new ActionBlock<Guid>(action, new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = 32 });
+
+            await eventStore.QueryAsync(async storedEvent =>
             {
-                return eventDataFormatter.Parse(storedEvent.Data);
-            }
-            catch (TypeNameNotFoundException)
+                var id = Guid.Parse(storedEvent.Data.Metadata.Value<string>(CommonHeaders.AggregateId));
+
+                if (handledIds.Add(id))
+                {
+                    await worker.SendAsync(id);
+                }
+            }, filter, ct: CancellationToken.None);
+
+            worker.Complete();
+
+            await worker.Completion;
+        }
+
+        private async Task RebuildAsync<TState, TGrain>(Guid key, Func<Envelope<IEvent>, TState, TState> func) where TState : IDomainState, new()
+        {
+            var state = new TState
             {
-                return null;
-            }
+                Version = EtagVersion.Empty
+            };
+
+            var persistence = store.WithSnapshotsAndEventSourcing<TState, Guid>(typeof(TGrain), key, s => state = s, e =>
+            {
+                state = func(e, state);
+
+                state.Version++;
+            });
+
+            await persistence.ReadAsync();
+            await persistence.WriteSnapshotAsync(state);
         }
     }
 }

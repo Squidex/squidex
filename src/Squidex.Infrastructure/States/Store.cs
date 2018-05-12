@@ -57,5 +57,12 @@ namespace Squidex.Infrastructure.States
 
             return new Persistence<TState, TKey>(key, owner, eventStore, eventDataFormatter, snapshotStore, streamNameResolver, mode, applySnapshot, applyEvent);
         }
+
+        public Task ClearSnapshotsAsync<TState>()
+        {
+            var snapshotStore = (ISnapshotStore<TState, TKey>)services.GetService(typeof(ISnapshotStore<TState, TKey>));
+
+            return snapshotStore.ClearAsync();
+        }
     }
 }

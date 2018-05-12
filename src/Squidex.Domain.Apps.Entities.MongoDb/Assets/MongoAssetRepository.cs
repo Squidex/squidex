@@ -84,7 +84,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 
         public async Task<IResultList<IAssetEntity>> QueryAsync(Guid appId, HashSet<Guid> ids)
         {
-            var find = Collection.Find(Filter.In(x => x.Id, ids)).SortByDescending(x => x.LastModified);
+            var find = Collection.Find(x => ids.Contains(x.Id)).SortByDescending(x => x.LastModified);
 
             var assetItems = find.ToListAsync();
             var assetCount = find.CountAsync();

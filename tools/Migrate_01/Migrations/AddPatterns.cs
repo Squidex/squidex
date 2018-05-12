@@ -53,8 +53,6 @@ namespace Migrate_01.Migrations
 
                         await app.ExecuteAsync(command);
                     }
-
-                    await app.WriteSnapshotAsync();
                 }
             }
         }
