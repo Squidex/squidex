@@ -112,10 +112,10 @@ namespace Squidex.Config.Domain
                         .As<IEventConsumer>()
                         .As<IInitializable>();
 
-                    services.AddTransientAs(c => new DeleteArchiveCollectionSetup(mongoContentDatabase))
+                    services.AddTransientAs<ConvertOldSnapshotStores>()
                         .As<IMigration>();
 
-                    services.AddTransientAs<ConvertOldSnapshotStores>()
+                    services.AddTransientAs(c => new DeleteContentCollections(mongoContentDatabase))
                         .As<IMigration>();
                 }
             });

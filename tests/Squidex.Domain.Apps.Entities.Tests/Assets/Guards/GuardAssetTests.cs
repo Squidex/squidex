@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
         }
 
         [Fact]
-        public void CanRename_not_should_throw_exception_if_name_are_different()
+        public void CanRename_should_not_throw_exception_if_name_are_different()
         {
             var command = new RenameAsset { FileName = "new-name" };
 

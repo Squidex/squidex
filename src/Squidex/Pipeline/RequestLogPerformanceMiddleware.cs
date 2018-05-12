@@ -8,25 +8,23 @@
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.Filters;
 using Squidex.Infrastructure.Log;
 
 namespace Squidex.Pipeline
 {
-    public sealed class RequestLogPerformanceMiddleware : ActionFilterAttribute
+    public sealed class RequestLogPerformanceMiddleware : IMiddleware
     {
         private readonly RequestLogProfilerSessionProvider requestSession;
-        private readonly RequestDelegate next;
         private readonly ISemanticLog log;
 
-        public RequestLogPerformanceMiddleware(RequestLogProfilerSessionProvider requestSession, RequestDelegate next, ISemanticLog log)
+        public RequestLogPerformanceMiddleware(RequestLogProfilerSessionProvider requestSession, ISemanticLog log)
         {
             this.requestSession = requestSession;
-            this.next = next;
+
             this.log = log;
         }
 
-        public async Task Invoke(HttpContext context)
+        public async Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
             var stopWatch = Stopwatch.StartNew();
 

@@ -27,6 +27,8 @@ import {
     ContentPageComponent,
     ContentsPageComponent,
     ContentsSelectorComponent,
+    ContentStatusComponent,
+    DueTimeSelectorComponent,
     ReferencesEditorComponent,
     SchemasPageComponent,
     SearchFormComponent
@@ -89,8 +91,10 @@ const routes: Routes = [
         ContentHistoryComponent,
         ContentItemComponent,
         ContentPageComponent,
+        ContentStatusComponent,
         ContentsPageComponent,
         ContentsSelectorComponent,
+        DueTimeSelectorComponent,
         ReferencesEditorComponent,
         SchemasPageComponent,
         SearchFormComponent

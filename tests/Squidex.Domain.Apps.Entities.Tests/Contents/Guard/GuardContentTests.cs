@@ -71,7 +71,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         {
             var command = new ChangeContentStatus { Status = (Status)10 };
 
-            Assert.Throws<ValidationException>(() => GuardContent.CanChangeContentStatus(Status.Archived, command));
+            Assert.Throws<ValidationException>(() => GuardContent.CanChangeContentStatus(false, Status.Archived, command));
         }
 
         [Fact]
@@ -79,7 +79,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         {
             var command = new ChangeContentStatus { Status = Status.Published };
 
-            Assert.Throws<ValidationException>(() => GuardContent.CanChangeContentStatus(Status.Archived, command));
+            Assert.Throws<ValidationException>(() => GuardContent.CanChangeContentStatus(false, Status.Archived, command));
         }
 
         [Fact]
@@ -87,15 +87,47 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         {
             var command = new ChangeContentStatus { Status = Status.Published, DueTime = dueTimeInPast };
 
-            Assert.Throws<ValidationException>(() => GuardContent.CanChangeContentStatus(Status.Draft, command));
+            Assert.Throws<ValidationException>(() => GuardContent.CanChangeContentStatus(false, Status.Draft, command));
         }
 
         [Fact]
-        public void CanChangeContentStatus_not_should_throw_exception_if_status_flow_valid()
+        public void CanChangeContentStatus_should_throw_exception_if_publishing_without_pending_changes()
         {
             var command = new ChangeContentStatus { Status = Status.Published };
 
-            GuardContent.CanChangeContentStatus(Status.Draft, command);
+            Assert.Throws<ValidationException>(() => GuardContent.CanChangeContentStatus(false, Status.Published, command));
+        }
+
+        [Fact]
+        public void CanChangeContentStatus_should_not_throw_exception_if_publishing_with_pending_changes()
+        {
+            var command = new ChangeContentStatus { Status = Status.Published };
+
+            GuardContent.CanChangeContentStatus(true, Status.Published, command);
+        }
+
+        [Fact]
+        public void CanChangeContentStatus_should_not_throw_exception_if_status_flow_valid()
+        {
+            var command = new ChangeContentStatus { Status = Status.Published };
+
+            GuardContent.CanChangeContentStatus(false, Status.Draft, command);
+        }
+
+        [Fact]
+        public void CanDiscardChanges_should_throw_exception_if_pending()
+        {
+            var command = new DiscardChanges();
+
+            Assert.Throws<ValidationException>(() => GuardContent.CanDiscardChanges(false, command));
+        }
+
+        [Fact]
+        public void CanDiscardChanges_should_not_throw_exception_if_pending()
+        {
+            var command = new DiscardChanges();
+
+            GuardContent.CanDiscardChanges(true, command);
         }
 
         [Fact]

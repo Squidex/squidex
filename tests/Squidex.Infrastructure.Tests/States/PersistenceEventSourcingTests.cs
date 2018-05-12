@@ -10,8 +10,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FakeItEasy;
-using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Options;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.TestHelpers;
 using Xunit;
@@ -23,8 +21,6 @@ namespace Squidex.Infrastructure.States
         private readonly string key = Guid.NewGuid().ToString();
         private readonly IEventDataFormatter eventDataFormatter = A.Fake<IEventDataFormatter>();
         private readonly IEventStore eventStore = A.Fake<IEventStore>();
-        private readonly IMemoryCache cache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
-        private readonly IPubSub pubSub = new InMemoryPubSub(true);
         private readonly IServiceProvider services = A.Fake<IServiceProvider>();
         private readonly ISnapshotStore<object, string> snapshotStore = A.Fake<ISnapshotStore<object, string>>();
         private readonly IStreamNameResolver streamNameResolver = A.Fake<IStreamNameResolver>();

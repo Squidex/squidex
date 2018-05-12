@@ -110,6 +110,16 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
         }
 
         [Fact]
+        public void Should_empty_list_from_non_references_field()
+        {
+            var sut = new StringField(1, "my-string", Partitioning.Invariant);
+
+            var result = sut.ExtractReferences("invalid").ToArray();
+
+            Assert.Empty(result);
+        }
+
+        [Fact]
         public void Should_return_null_from_assets_field_when_removing_references_from_null_array()
         {
             var sut = new AssetsField(1, "my-asset", Partitioning.Invariant);

@@ -27,6 +27,9 @@ export class TooltipComponent implements OnDestroy, OnInit {
     @Input()
     public target: any;
 
+    @Input()
+    public position = 'topLeft';
+
     public modal = new ModalView(false, false);
 
     constructor(

@@ -24,44 +24,29 @@ namespace Squidex.Domain.Apps.Entities.Contents
 {
     public sealed class ContentOperationContext
     {
-        private ContentCommand command;
         private IContentRepository contentRepository;
-        private IContentEntity content;
         private IAssetRepository assetRepository;
         private IScriptEngine scriptEngine;
         private ISchemaEntity schemaEntity;
         private IAppEntity appEntity;
-        private Guid appId;
         private Func<string> message;
 
         public static async Task<ContentOperationContext> CreateAsync(
-            ContentCommand command,
-            IContentEntity content,
-            IContentRepository contentRepository,
+            Guid appId,
+            Guid schemaId,
             IAppProvider appProvider,
             IAssetRepository assetRepository,
+            IContentRepository contentRepository,
             IScriptEngine scriptEngine,
             Func<string> message)
         {
-            var a = content.AppId;
-            var s = content.SchemaId;
-
-            if (command is CreateContent createContent)
-            {
-                a = a ?? createContent.AppId;
-                s = s ?? createContent.SchemaId;
-            }
-
-            var (appEntity, schemaEntity) = await appProvider.GetAppWithSchemaAsync(a.Id, s.Id);
+            var (appEntity, schemaEntity) = await appProvider.GetAppWithSchemaAsync(appId, schemaId);
 
             var context = new ContentOperationContext
             {
                 appEntity = appEntity,
-                appId = a.Id,
                 assetRepository = assetRepository,
                 contentRepository = contentRepository,
-                content = content,
-                command = command,
                 message = message,
                 schemaEntity = schemaEntity,
                 scriptEngine = scriptEngine
@@ -70,64 +55,48 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return context;
         }
 
-        public Task EnrichAsync()
+        public Task EnrichAsync(NamedContentData data)
         {
-            if (command is ContentDataCommand dataCommand)
-            {
-                dataCommand.Data.Enrich(schemaEntity.SchemaDef, appEntity.PartitionResolver());
-            }
+            data.Enrich(schemaEntity.SchemaDef, appEntity.PartitionResolver());
 
             return TaskHelper.Done;
         }
 
-        public Task ValidateAsync()
+        public Task ValidateAsync(NamedContentData data)
         {
-            if (command is ContentDataCommand dataCommand)
-            {
-                var ctx = CreateValidationContext();
+            var ctx = CreateValidationContext();
 
-                return dataCommand.Data.ValidateAsync(ctx, schemaEntity.SchemaDef, appEntity.PartitionResolver(), message);
-            }
-
-            return TaskHelper.Done;
+            return data.ValidateAsync(ctx, schemaEntity.SchemaDef, appEntity.PartitionResolver(), message);
         }
 
-        public Task ValidatePartialAsync()
+        public Task ValidatePartialAsync(NamedContentData data)
         {
-            if (command is ContentDataCommand dataCommand)
-            {
-                var ctx = CreateValidationContext();
+            var ctx = CreateValidationContext();
 
-                return dataCommand.Data.ValidatePartialAsync(ctx, schemaEntity.SchemaDef, appEntity.PartitionResolver(), message);
-            }
-
-            return TaskHelper.Done;
+            return data.ValidatePartialAsync(ctx, schemaEntity.SchemaDef, appEntity.PartitionResolver(), message);
         }
 
-        public Task ExecuteScriptAndTransformAsync(Func<ISchemaEntity, string> script, object operation)
+        public Task<NamedContentData> ExecuteScriptAndTransformAsync(Func<ISchemaEntity, string> script, object operation, ContentCommand command, NamedContentData data, NamedContentData oldData = null)
         {
-            if (command is ContentDataCommand dataCommand)
-            {
-                var ctx = CreateScriptContext(operation, dataCommand.Data);
+            var ctx = CreateScriptContext(operation, command, data, oldData);
 
-                dataCommand.Data = scriptEngine.ExecuteAndTransform(ctx, script(schemaEntity));
-            }
+            var result = scriptEngine.ExecuteAndTransform(ctx, script(schemaEntity));
 
-            return TaskHelper.Done;
+            return Task.FromResult(result);
         }
 
-        public Task ExecuteScriptAsync(Func<ISchemaEntity, string> script, object operation)
+        public Task ExecuteScriptAsync(Func<ISchemaEntity, string> script, object operation, ContentCommand command, NamedContentData data, NamedContentData oldData = null)
         {
-            var ctx = CreateScriptContext(operation, content.Data);
+            var ctx = CreateScriptContext(operation, command, data, oldData);
 
             scriptEngine.Execute(ctx, script(schemaEntity));
 
             return TaskHelper.Done;
         }
 
-        private ScriptContext CreateScriptContext(object operation, NamedContentData data = null)
+        private ScriptContext CreateScriptContext(object operation, ContentCommand command, NamedContentData data, NamedContentData oldData)
         {
-            return new ScriptContext { ContentId = command.ContentId, OldData = content.Data, Data = data, User = command.User, Operation = operation.ToString() };
+            return new ScriptContext { ContentId = command.ContentId, OldData = oldData, Data = data, User = command.User, Operation = operation.ToString() };
         }
 
         private ValidationContext CreateValidationContext()
@@ -145,12 +114,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         private async Task<IReadOnlyList<IAssetInfo>> QueryAssetsAsync(IEnumerable<Guid> assetIds)
         {
-            return await assetRepository.QueryAsync(appId, new HashSet<Guid>(assetIds));
+            return await assetRepository.QueryAsync(appEntity.Id, new HashSet<Guid>(assetIds));
         }
 
         private async Task<IReadOnlyList<Guid>> QueryContentsAsync(Guid schemaId, IEnumerable<Guid> contentIds)
         {
-            return await contentRepository.QueryNotFoundAsync(appId, schemaId, contentIds.ToList());
+            return await contentRepository.QueryNotFoundAsync(appEntity.Id, schemaId, contentIds.ToList());
         }
     }
 }

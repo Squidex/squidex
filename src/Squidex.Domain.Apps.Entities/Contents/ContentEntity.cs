@@ -30,17 +30,17 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public Status Status { get; set; }
 
-        public Status? ScheduledTo { get; set; }
-
-        public Instant? ScheduledAt { get; set; }
-
-        public RefToken ScheduledBy { get; set; }
+        public ScheduleJob ScheduleJob { get; set; }
 
         public RefToken CreatedBy { get; set; }
 
         public RefToken LastModifiedBy { get; set; }
 
         public NamedContentData Data { get; set; }
+
+        public NamedContentData DataDraft { get; set; }
+
+        public bool IsPending { get; set; }
 
         public static ContentEntity Create(CreateContent command, EntityCreatedResult<NamedContentData> result)
         {

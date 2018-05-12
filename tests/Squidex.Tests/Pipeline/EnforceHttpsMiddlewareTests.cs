@@ -17,6 +17,8 @@ namespace Squidex.Pipeline
     public class EnforceHttpsMiddlewareTests
     {
         private readonly RequestDelegate next;
+        private readonly MyUrlsOptions options = new MyUrlsOptions();
+        private readonly EnforceHttpsMiddleware sut;
         private bool isNextCalled;
 
         public EnforceHttpsMiddlewareTests()
@@ -27,6 +29,8 @@ namespace Squidex.Pipeline
 
                 return TaskHelper.Done;
             };
+
+            sut = new EnforceHttpsMiddleware(Options.Create(options));
         }
 
         [Fact]
@@ -34,9 +38,9 @@ namespace Squidex.Pipeline
         {
             var httpContext = CreateHttpContext();
 
-            var sut = new EnforceHttpsMiddleware(next, Options.Create(new MyUrlsOptions { EnforceHTTPS = true }));
+            options.EnforceHTTPS = true;
 
-            await sut.Invoke(httpContext);
+            await sut.InvokeAsync(httpContext, next);
 
             Assert.False(isNextCalled);
             Assert.Equal("https://squidex.local/path?query=1", httpContext.Response.Headers["Location"]);
@@ -47,9 +51,9 @@ namespace Squidex.Pipeline
         {
             var httpContext = CreateHttpContext("https");
 
-            var sut = new EnforceHttpsMiddleware(next, Options.Create(new MyUrlsOptions { EnforceHTTPS = true }));
+            options.EnforceHTTPS = true;
 
-            await sut.Invoke(httpContext);
+            await sut.InvokeAsync(httpContext, next);
 
             Assert.True(isNextCalled);
             Assert.Null((string)httpContext.Response.Headers["Location"]);
@@ -60,9 +64,9 @@ namespace Squidex.Pipeline
         {
             var httpContext = CreateHttpContext("http");
 
-            var sut = new EnforceHttpsMiddleware(next, Options.Create(new MyUrlsOptions { EnforceHTTPS = false }));
+            options.EnforceHTTPS = false;
 
-            await sut.Invoke(httpContext);
+            await sut.InvokeAsync(httpContext, next);
 
             Assert.True(isNextCalled);
             Assert.Null((string)httpContext.Response.Headers["Location"]);

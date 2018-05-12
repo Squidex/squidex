@@ -15,6 +15,7 @@ import {
     ContentsDto,
     ContentsService,
     DateTime,
+    ScheduleDto,
     Version
 } from './../';
 
@@ -62,11 +63,15 @@ describe('ContentsService', () => {
                     createdBy: 'Created1',
                     lastModified: '2017-12-12T10:10',
                     lastModifiedBy: 'LastModifiedBy1',
-                    scheduledTo: 'Draft',
-                    scheduledBy: 'Scheduler1',
-                    scheduledAt: '2018-12-12T10:10',
+                    scheduleJob: {
+                        status: 'Draft',
+                        scheduledBy: 'Scheduler1',
+                        dueTime: '2018-12-12T10:10'
+                    },
+                    isPending: true,
                     version: 11,
-                    data: {}
+                    data: {},
+                    dataDraft: {}
                 },
                 {
                     id: 'id2',
@@ -76,7 +81,8 @@ describe('ContentsService', () => {
                     lastModified: '2017-10-12T10:10',
                     lastModifiedBy: 'LastModifiedBy2',
                     version: 22,
-                    data: {}
+                    data: {},
+                    dataDraft: {}
                 }
             ]
         });
@@ -86,17 +92,17 @@ describe('ContentsService', () => {
                 new ContentDto('id1', 'Published', 'Created1', 'LastModifiedBy1',
                     DateTime.parseISO_UTC('2016-12-12T10:10'),
                     DateTime.parseISO_UTC('2017-12-12T10:10'),
-                    'Draft',
-                    'Scheduler1',
-                    DateTime.parseISO_UTC('2018-12-12T10:10'),
+                    new ScheduleDto('Draft', 'Scheduler1', DateTime.parseISO_UTC('2018-12-12T10:10')),
+                    true,
+                    {},
                     {},
                     new Version('11')),
                 new ContentDto('id2', 'Published', 'Created2', 'LastModifiedBy2',
                     DateTime.parseISO_UTC('2016-10-12T10:10'),
                     DateTime.parseISO_UTC('2017-10-12T10:10'),
                     null,
-                    null,
-                    null,
+                    false,
+                    {},
                     {},
                     new Version('22'))
         ]));
@@ -162,10 +168,14 @@ describe('ContentsService', () => {
             createdBy: 'Created1',
             lastModified: '2017-12-12T10:10',
             lastModifiedBy: 'LastModifiedBy1',
-            scheduledTo: 'Draft',
-            scheduledBy: 'Scheduler1',
-            scheduledAt: '2018-12-12T10:10',
-            data: {}
+            scheduleJob: {
+                status: 'Draft',
+                scheduledBy: 'Scheduler1',
+                dueTime: '2018-12-12T10:10'
+            },
+            isPending: true,
+            data: {},
+            dataDraft: {}
         }, {
             headers: {
                 etag: '2'
@@ -176,9 +186,9 @@ describe('ContentsService', () => {
             new ContentDto('id1', 'Published', 'Created1', 'LastModifiedBy1',
                 DateTime.parseISO_UTC('2016-12-12T10:10'),
                 DateTime.parseISO_UTC('2017-12-12T10:10'),
-                'Draft',
-                'Scheduler1',
-                DateTime.parseISO_UTC('2018-12-12T10:10'),
+                new ScheduleDto('Draft', 'Scheduler1', DateTime.parseISO_UTC('2018-12-12T10:10')),
+                true,
+                {},
                 {},
                 new Version('2')));
     }));
@@ -218,7 +228,7 @@ describe('ContentsService', () => {
                 DateTime.parseISO_UTC('2016-12-12T10:10'),
                 DateTime.parseISO_UTC('2017-12-12T10:10'),
                 null,
-                null,
+                true,
                 null,
                 {},
                 new Version('2')));
@@ -250,9 +260,9 @@ describe('ContentsService', () => {
 
         const dto = {};
 
-        contentsService.putContent('my-app', 'my-schema', 'content1', dto, version).subscribe();
+        contentsService.putContent('my-app', 'my-schema', 'content1', dto, true, version).subscribe();
 
-        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema/content1');
+        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema/content1?asDraft=true');
 
         expect(req.request.method).toEqual('PUT');
         expect(req.request.headers.get('If-Match')).toBe(version.value);

@@ -27,12 +27,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors
             typeof(MongoContentEntity).GetProperties()
                 .ToDictionary(x => x.Name, x => x.GetCustomAttribute<BsonElementAttribute>()?.ElementName ?? x.Name, StringComparer.OrdinalIgnoreCase);
 
-        static FindExtensions()
-        {
-            PropertyMap["Data"] = "do";
-        }
-
-        public static PropertyCalculator CreatePropertyCalculator(Schema schema)
+        public static PropertyCalculator CreatePropertyCalculator(Schema schema, bool useDraft)
         {
             return propertyNames =>
             {
@@ -50,7 +45,21 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors
 
                 if (propertyNames.Length > 0)
                 {
-                    propertyNames[0] = PropertyMap[propertyNames[0]];
+                    if (propertyNames[0].Equals("Data", StringComparison.CurrentCultureIgnoreCase))
+                    {
+                        if (useDraft)
+                        {
+                            propertyNames[0] = "dd";
+                        }
+                        else
+                        {
+                            propertyNames[0] = "do";
+                        }
+                    }
+                    else
+                    {
+                        propertyNames[0] = PropertyMap[propertyNames[0]];
+                    }
                 }
 
                 var propertyName = string.Join(".", propertyNames);
@@ -80,10 +89,14 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors
         {
             var filters = new List<FilterDefinition<MongoContentEntity>>
             {
-                Filter.Eq(x => x.SchemaIdId, schemaId),
-                Filter.In(x => x.Status, status),
-                Filter.Eq(x => x.IsDeleted, false)
+                Filter.Eq(x => x.IndexedSchemaId, schemaId),
             };
+
+            if (status != null)
+            {
+                filters.Add(Filter.Ne(x => x.IsDeleted, true));
+                filters.Add(Filter.In(x => x.Status, status));
+            }
 
             var filter = query.BuildFilter<MongoContentEntity>(propertyCalculator);
 

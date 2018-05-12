@@ -20,18 +20,70 @@
 
         <ng-container menu>
             <ng-container *ngIf="!content; else notNew">
-                <button type="button" class="btn btn-secondary" (click)="saveAsDraft()" title="CTRL + S">
+                <button type="button" class="btn btn-secondary" (click)="save()">
                     Save as Draft
                 </button>
 
-                <button type="submit" class="btn btn-primary">
+                <button type="submit" class="btn btn-primary" title="CTRL + S">
                     Save and Publish
                 </button>
 
                 <sqx-shortcut keys="ctrl+s" (trigger)="saveAndPublish()"></sqx-shortcut>
             </ng-container>
             <ng-template #notNew>
+                <div class="dropdown dropdown-options" *ngIf="content">
+                    <button type="button" class="btn btn-outline-secondary" (click)="dropdown.toggle()" [class.active]="dropdown.isOpen | async" #optionsButton>
+                        <sqx-content-status 
+                            [status]="content.status"
+                            [scheduledTo]="content.scheduleJob?.status"
+                            [scheduledAt]="content.scheduleJob?.dueTime"
+                            [isPending]="content.isPending"
+                            showLabel="true">
+                        </sqx-content-status>
+                    </button>
+
+                    <div class="dropdown-menu" *sqxModalView="dropdown" [sqxModalTarget]="optionsButton" @fade>
+                        <ng-container *ngIf="content.isPending">
+                            <a class="dropdown-item" (click)="discardChanges()">
+                                Discard changes
+                            </a>
+
+                            <div class="dropdown-divider"></div>
+                            
+                            <a class="dropdown-item" (click)="publishChanges()">
+                                Publish changes
+                            </a>
+                        </ng-container>
+
+                        <a class="dropdown-item" (click)="publish()" *ngIf="content.status === 'Draft'">
+                            Publish
+                        </a>
+                        <a class="dropdown-item" (click)="unpublish()" *ngIf="content.status === 'Published'">
+                            Unpublish
+                        </a>
+                        <a class="dropdown-item" (click)="archive()" *ngIf="content.status !== 'Archived'">
+                            Archive
+                        </a>
+                        <a class="dropdown-item" (click)="restore()" *ngIf="content.status === 'Archived'">
+                            Restore
+                        </a>
+
+                        <div class="dropdown-divider"></div>
+
+                        <a class="dropdown-item dropdown-item-delete"
+                            (sqxConfirmClick)="delete()"
+                            confirmTitle="Delete content" 
+                            confirmText="Do you really want to delete the content?">
+                            Delete
+                        </a>
+                    </div>
+                </div>        
+
                 <ng-container *ngIf="content.status !== 'Archived'">
+                    <button type="button" class="btn btn-secondary" (click)="saveAsProposal()" *ngIf="content.status === 'Published'">
+                        Save as Draft
+                    </button>
+                    
                     <button type="submit" class="btn btn-primary" title="CTRL + S">
                         Save
                     </button>
@@ -74,3 +126,5 @@
 </form>
 
 <router-outlet></router-outlet>
+
+<sqx-due-time-selector #dueTimeSelector></sqx-due-time-selector>

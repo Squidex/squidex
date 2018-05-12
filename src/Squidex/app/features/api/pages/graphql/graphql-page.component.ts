@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, ElementRef, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import * as React from 'react';
@@ -13,19 +13,12 @@ import * as ReactDOM from 'react-dom';
 
 const GraphiQL = require('graphiql');
 
-/* tslint:disable:use-view-encapsulation */
-
-import {
-    AppsState,
-    GraphQlService,
-    LocalStoreService
-} from '@app/shared';
+import { AppsState, GraphQlService } from '@app/shared';
 
 @Component({
     selector: 'sqx-graphql-page',
     styleUrls: ['./graphql-page.component.scss'],
-    templateUrl: './graphql-page.component.html',
-    encapsulation: ViewEncapsulation.None
+    templateUrl: './graphql-page.component.html'
 })
 export class GraphQLPageComponent implements OnInit {
     @ViewChild('graphiQLContainer')
@@ -33,8 +26,7 @@ export class GraphQLPageComponent implements OnInit {
 
     constructor(
         public readonly appsState: AppsState,
-        private readonly graphQlService: GraphQlService,
-        private readonly localStoreService: LocalStoreService
+        private readonly graphQlService: GraphQlService
     ) {
     }
 
@@ -43,11 +35,7 @@ export class GraphQLPageComponent implements OnInit {
             React.createElement(GraphiQL, {
                 fetcher: (params: any) => {
                     return this.request(params);
-                },
-                onEditQuery: (query: string) => {
-                    this.localStoreService.set('graphiQlQuery', query);
-                },
-                query: this.localStoreService.get('graphiQlQuery')
+                }
             }),
             this.graphiQLContainer.nativeElement
         );

@@ -6,9 +6,11 @@
 // ==========================================================================
 
 using System;
+using System.Security.Claims;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Security;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.Scripting
@@ -199,6 +201,42 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 data.number2 = { 'iv': 10 };
 
                 replace(data);");
+
+            Assert.Equal(expected, result);
+        }
+
+        [Fact]
+        public void Should_transform_content_with_old_content()
+        {
+            var content =
+                new NamedContentData()
+                    .AddField("number0",
+                        new ContentFieldData()
+                            .AddValue("iv", 3.0));
+
+            var oldContent =
+                new NamedContentData()
+                    .AddField("number0",
+                        new ContentFieldData()
+                            .AddValue("iv", 5.0));
+
+            var expected =
+                new NamedContentData()
+                    .AddField("number0",
+                        new ContentFieldData()
+                            .AddValue("iv", 13.0));
+
+            var userIdentity = new ClaimsIdentity();
+            var userPrincipal = new ClaimsPrincipal(userIdentity);
+
+            userIdentity.AddClaim(new Claim(OpenIdClaims.ClientId, "2"));
+
+            var context = new ScriptContext { Data = content, OldData = oldContent, User = userPrincipal };
+
+            var result = scriptEngine.ExecuteAndTransform(context, @"
+                ctx.data.number0.iv = ctx.data.number0.iv + ctx.oldData.number0.iv * parseInt(ctx.user.id, 10);
+
+                replace(ctx.data);");
 
             Assert.Equal(expected, result);
         }

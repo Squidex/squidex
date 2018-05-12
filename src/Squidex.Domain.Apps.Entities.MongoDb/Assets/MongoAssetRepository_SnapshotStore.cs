@@ -41,7 +41,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             var entity = SimpleMapper.Map(value, new MongoAssetEntity());
 
             entity.Version = newVersion;
-            entity.AppIdId = value.AppId.Id;
+            entity.IndexedAppId = value.AppId.Id;
 
             await Collection.ReplaceOneAsync(x => x.Id == key && x.Version == oldVersion, entity, Upsert);
         }

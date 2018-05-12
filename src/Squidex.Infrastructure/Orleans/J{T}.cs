@@ -18,8 +18,6 @@ namespace Squidex.Infrastructure.Orleans
 {
     public struct J<T>
     {
-        private static readonly JsonSerializer DefaultSerializer = JsonSerializer.CreateDefault();
-
         public T Value { get; }
 
         [JsonConstructor]
@@ -100,11 +98,11 @@ namespace Squidex.Infrastructure.Orleans
         {
             try
             {
-                return context?.ServiceProvider?.GetService<JsonSerializer>() ?? DefaultSerializer;
+                return context?.ServiceProvider?.GetService<JsonSerializer>() ?? J.DefaultSerializer;
             }
             catch
             {
-                return DefaultSerializer;
+                return J.DefaultSerializer;
             }
         }
     }

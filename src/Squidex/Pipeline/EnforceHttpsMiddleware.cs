@@ -13,18 +13,16 @@ using Squidex.Config;
 
 namespace Squidex.Pipeline
 {
-    public sealed class EnforceHttpsMiddleware
+    public sealed class EnforceHttpsMiddleware : IMiddleware
     {
-        private readonly RequestDelegate next;
         private readonly IOptions<MyUrlsOptions> urls;
 
-        public EnforceHttpsMiddleware(RequestDelegate next, IOptions<MyUrlsOptions> urls)
+        public EnforceHttpsMiddleware(IOptions<MyUrlsOptions> urls)
         {
-            this.next = next;
             this.urls = urls;
         }
 
-        public async Task Invoke(HttpContext context)
+        public async Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
             if (!urls.Value.EnforceHTTPS)
             {

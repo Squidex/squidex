@@ -15,7 +15,7 @@ namespace Migrate_01
 {
     public sealed class MigrationPath : IMigrationPath
     {
-        private const int CurrentVersion = 10;
+        private const int CurrentVersion = 11;
         private readonly IServiceProvider serviceProvider;
 
         public MigrationPath(IServiceProvider serviceProvider)
@@ -32,36 +32,25 @@ namespace Migrate_01
 
             var migrations = new List<IMigration>();
 
-            // Version 10: Delete old archive fields
-            if (version < 10)
-            {
-                var migration = serviceProvider.GetService<DeleteArchiveCollectionSetup>();
-
-                if (migration != null)
-                {
-                    migrations.Add(migration);
-                }
-            }
-
-            // Version 6: Convert Event store. Must always be executed first.
+            // Version 06: Convert Event store. Must always be executed first.
             if (version < 6)
             {
                 migrations.Add(serviceProvider.GetRequiredService<ConvertEventStore>());
             }
 
-            // Version 7: Introduces AppId for backups.
+            // Version 07: Introduces AppId for backups.
             else if (version < 7)
             {
                 migrations.Add(serviceProvider.GetRequiredService<ConvertEventStoreAppId>());
             }
 
-            // Version 5: Fixes the broken command architecture and requires a rebuild of all snapshots.
+            // Version 05: Fixes the broken command architecture and requires a rebuild of all snapshots.
             if (version < 5)
             {
                 migrations.Add(serviceProvider.GetRequiredService<RebuildSnapshots>());
             }
 
-            // Version 9: Grain Indexes
+            // Version 09: Grain indexes.
             if (version < 9)
             {
                 var migration = serviceProvider.GetService<ConvertOldSnapshotStores>();
@@ -74,16 +63,23 @@ namespace Migrate_01
                 migrations.Add(serviceProvider.GetRequiredService<PopulateGrainIndexes>());
             }
 
-            // Version 1: Introduce App patterns.
-            if (version <= 1)
+            // Version 11: Introduce content drafts.
+            if (version < 11)
             {
-                migrations.Add(serviceProvider.GetRequiredService<AddPatterns>());
+                var migration = serviceProvider.GetService<DeleteContentCollections>();
+
+                if (migration != null)
+                {
+                    migrations.Add(migration);
+                }
+
+                migrations.Add(serviceProvider.GetRequiredService<RebuildContents>());
             }
 
-            // Version 8: Introduce Archive collection.
-            if (version < 8)
+            // Version 01: Introduce app patterns.
+            if (version < 1)
             {
-                migrations.Add(serviceProvider.GetRequiredService<DeleteArchiveCollectionSetup>());
+                migrations.Add(serviceProvider.GetRequiredService<AddPatterns>());
             }
 
             return (CurrentVersion, migrations);

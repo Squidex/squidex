@@ -1,0 +1,38 @@
+@import '_vars';
+@import '_mixins';
+
+.content-status {
+    & {
+        vertical-align: middle;
+    }
+
+    &-published {
+        color: $color-theme-green;
+    }
+
+    &-draft {
+        color: $color-text-decent;
+    }
+
+    &-archived {
+        color: $color-theme-error;
+    }
+
+    &-pending {
+        color: $color-dark-black;
+    }
+
+    &-label {
+        color: $color-text;
+    }
+
+    &-tooltip {
+        @include border-radius;
+        background: $color-tooltip;
+        border: 0;
+        font-size: .9rem;
+        font-weight: normal;
+        color: $color-dark-foreground;
+        padding: .75rem;
+    }
+}

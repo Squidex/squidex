@@ -27,6 +27,10 @@ namespace Squidex.Domain.Apps.Entities.Contents
 {
     public sealed class ContentQueryService : IContentQueryService
     {
+        private static readonly Status[] StatusAll = { Status.Archived, Status.Draft, Status.Published };
+        private static readonly Status[] StatusArchived = { Status.Archived };
+        private static readonly Status[] StatusPublished = { Status.Published };
+        private static readonly Status[] StatusDraftOrPublished = { Status.Draft, Status.Published };
         private readonly IContentRepository contentRepository;
         private readonly IContentVersionLoader contentVersionLoader;
         private readonly IAppProvider appProvider;
@@ -67,22 +71,22 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var schema = await GetSchemaAsync(app, schemaIdOrName);
 
-            var isFrontendClient = IsFrontendClient(user);
             var isVersioned = version > EtagVersion.Empty;
+            var isFrontend = IsFrontendClient(user);
+
+            var parsedStatus = isFrontend ? StatusAll : StatusPublished;
 
             var content =
                 isVersioned ?
                 await FindContentByVersionAsync(id, version) :
-                await FindContentAsync(app, id, schema);
+                await FindContentAsync(app, id, parsedStatus, schema);
 
-            if (content == null || (content.Status != Status.Published && !isFrontendClient) || content.SchemaId.Id != schema.Id)
+            if (content == null || (content.Status != Status.Published && !isFrontend) || content.SchemaId.Id != schema.Id)
             {
                 throw new DomainObjectNotFoundException(id.ToString(), typeof(ISchemaEntity));
             }
 
-            content = TransformContent(app, schema, user, Enumerable.Repeat(content, 1), isVersioned, isFrontendClient).FirstOrDefault();
-
-            return content;
+            return TransformContent(app, schema, user, content, isFrontend, isVersioned);
         }
 
         public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, string schemaIdOrName, ClaimsPrincipal user, bool archived, string query)
@@ -93,14 +97,14 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var schema = await GetSchemaAsync(app, schemaIdOrName);
 
-            var isFrontendClient = IsFrontendClient(user);
+            var isFrontend = IsFrontendClient(user);
 
             var parsedQuery = ParseQuery(app, query, schema);
-            var parsedStatus = ParseStatus(isFrontendClient, archived);
+            var parsedStatus = ParseStatus(isFrontend, archived);
 
-            var contents = await contentRepository.QueryAsync(app, schema, parsedStatus.ToArray(), parsedQuery);
+            var contents = await contentRepository.QueryAsync(app, schema, parsedStatus, parsedQuery);
 
-            return TransformContents(app, schema, user, contents, false, isFrontendClient);
+            return TransformContents(app, schema, user, contents, false, isFrontend);
         }
 
         public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, string schemaIdOrName, ClaimsPrincipal user, bool archived, HashSet<Guid> ids)
@@ -112,13 +116,21 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var schema = await GetSchemaAsync(app, schemaIdOrName);
 
-            var isFrontendClient = IsFrontendClient(user);
+            var isFrontend = IsFrontendClient(user);
 
-            var parsedStatus = ParseStatus(isFrontendClient, archived);
+            var parsedStatus = ParseStatus(isFrontend, archived);
 
-            var contents = await contentRepository.QueryAsync(app, schema, parsedStatus.ToArray(), ids);
+            var contents = await contentRepository.QueryAsync(app, schema, parsedStatus, ids);
 
-            return TransformContents(app, schema, user, contents, false, isFrontendClient);
+            return TransformContents(app, schema, user, contents, false, isFrontend);
+        }
+
+        private IContentEntity TransformContent(IAppEntity app, ISchemaEntity schema, ClaimsPrincipal user,
+            IContentEntity content,
+            bool isFrontend,
+            bool isVersioned)
+        {
+            return TransformContents(app, schema, user, Enumerable.Repeat(content, 1), isVersioned, isFrontend).FirstOrDefault();
         }
 
         private IResultList<IContentEntity> TransformContents(IAppEntity app, ISchemaEntity schema, ClaimsPrincipal user,
@@ -126,12 +138,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
             bool isTypeChecking,
             bool isFrontendClient)
         {
-            var transformed = TransformContent(app, schema, user, contents, isTypeChecking, isFrontendClient);
+            var transformed = TransformContents(app, schema, user, (IEnumerable<IContentEntity>)contents, isTypeChecking, isFrontendClient);
 
             return ResultList.Create(transformed, contents.Total);
         }
 
-        private IEnumerable<IContentEntity> TransformContent(IAppEntity app, ISchemaEntity schema, ClaimsPrincipal user,
+        private IEnumerable<IContentEntity> TransformContents(IAppEntity app, ISchemaEntity schema, ClaimsPrincipal user,
             IEnumerable<IContentEntity> contents,
             bool isTypeChecking,
             bool isFrontendClient)
@@ -144,12 +156,20 @@ namespace Squidex.Domain.Apps.Entities.Contents
             {
                 var result = SimpleMapper.Map(content, new ContentEntity());
 
-                if (!isFrontendClient && isScripting)
+                if (result.Data != null)
                 {
-                    result.Data = scriptEngine.Transform(new ScriptContext { User = user, Data = content.Data, ContentId = content.Id }, scriptText);
+                    if (!isFrontendClient && isScripting)
+                    {
+                        result.Data = scriptEngine.Transform(new ScriptContext { User = user, Data = content.Data, ContentId = content.Id }, scriptText);
+                    }
+
+                    result.Data = result.Data.ToApiModel(schema.SchemaDef, app.LanguagesConfig, isFrontendClient, isTypeChecking);
                 }
 
-                result.Data = result.Data.ToApiModel(schema.SchemaDef, app.LanguagesConfig, isFrontendClient, isTypeChecking);
+                if (result.DataDraft != null)
+                {
+                    result.DataDraft = result.DataDraft.ToApiModel(schema.SchemaDef, app.LanguagesConfig, isFrontendClient, isTypeChecking);
+                }
 
                 yield return result;
             }
@@ -193,28 +213,19 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return schema;
         }
 
-        private static List<Status> ParseStatus(bool isFrontendClient, bool archived)
+        private static Status[] ParseStatus(bool isFrontendClient, bool archived)
         {
-            var status = new List<Status>();
-
             if (isFrontendClient)
             {
                 if (archived)
                 {
-                    status.Add(Status.Archived);
+                    return StatusArchived;
                 }
-                else
-                {
-                    status.Add(Status.Draft);
-                    status.Add(Status.Published);
-                }
-            }
-            else
-            {
-                status.Add(Status.Published);
+
+                return StatusDraftOrPublished;
             }
 
-            return status;
+            return StatusPublished;
         }
 
         private Task<IContentEntity> FindContentByVersionAsync(Guid id, long version)
@@ -222,9 +233,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return contentVersionLoader.LoadAsync(id, version);
         }
 
-        private Task<IContentEntity> FindContentAsync(IAppEntity app, Guid id, ISchemaEntity schema)
+        private Task<IContentEntity> FindContentAsync(IAppEntity app, Guid id, Status[] status, ISchemaEntity schema)
         {
-            return contentRepository.FindContentAsync(app, schema, id);
+            return contentRepository.FindContentAsync(app, schema, status, id);
         }
 
         private static bool IsFrontendClient(ClaimsPrincipal user)

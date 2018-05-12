@@ -27,6 +27,8 @@ namespace Squidex.Pipeline.CommandMiddlewares
         {
             if (httpContextAccessor.HttpContext == null)
             {
+                await next();
+
                 return;
             }
 

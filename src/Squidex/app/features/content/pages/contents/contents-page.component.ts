@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Subscription } from 'rxjs';
 
 import {
@@ -19,6 +19,8 @@ import {
     SchemaDetailsDto,
     SchemasState
 } from '@app/shared';
+
+import { DueTimeSelectorComponent } from './../../shared/due-time-selector.component';
 
 @Component({
     selector: 'sqx-contents-page',
@@ -34,12 +36,6 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
 
     public searchModal = new ModalView();
 
-    public dueTimeDialog = new ModalView();
-    public dueTime: string | null = '';
-    public dueTimeFunction: Function | null;
-    public dueTimeAction: string | null = '';
-    public dueTimeMode = 'Immediately';
-
     public selectedItems:  { [id: string]: boolean; } = {};
     public selectionCount = 0;
 
@@ -50,6 +46,9 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
     public languages: ImmutableArray<AppLanguageDto>;
 
     public isAllSelected = false;
+
+    @ViewChild('dueTimeSelector')
+    public dueTimeSelector: DueTimeSelectorComponent;
 
     constructor(
         public readonly appsState: AppsState,
@@ -99,7 +98,7 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
     }
 
     public publishSelected(scheduled: boolean) {
-        this.changeContentItems(this.s(c => c.status !== 'Published'), 'Publish', false);
+        this.changeContentItems(this.select(c => c.status !== 'Published'), 'Publish', false);
     }
 
     public unpublish(content: ContentDto) {
@@ -107,7 +106,7 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
     }
 
     public unpublishSelected(scheduled: boolean) {
-        this.changeContentItems(this.s(c => c.status === 'Published'), 'Unpublish', false);
+        this.changeContentItems(this.select(c => c.status === 'Published'), 'Unpublish', false);
     }
 
     public archive(content: ContentDto) {
@@ -115,7 +114,7 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
     }
 
     public archiveSelected(scheduled: boolean) {
-        this.changeContentItems(this.s(), 'Archive', true);
+        this.changeContentItems(this.select(), 'Archive', true);
     }
 
     public restore(content: ContentDto) {
@@ -123,7 +122,7 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
     }
 
     public restoreSelected(scheduled: boolean) {
-        this.changeContentItems(this.s(), 'Restore', true);
+        this.changeContentItems(this.select(), 'Restore', true);
     }
 
     private changeContentItems(contents: ContentDto[], action: string, reload: boolean) {
@@ -131,26 +130,24 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
             return;
         }
 
-        this.dueTimeFunction = () => {
-            this.resetSelection();
-
-            this.contentsState.changeStatus(contents, action, this.dueTime).onErrorResumeNext().subscribe();
-        };
-
-        this.dueTimeAction = action;
-        this.dueTimeDialog.show();
+        this.dueTimeSelector.selectDueTime(action)
+            .do(() => {
+                this.resetSelection();
+            })
+            .switchMap(d => this.contentsState.changeManyStatus(contents, action, d)).onErrorResumeNext()
+            .subscribe();
     }
 
     public deleteSelected() {
         this.resetSelection();
 
-        this.contentsState.delete(this.s()).onErrorResumeNext().subscribe();
+        this.contentsState.deleteMany(this.select()).onErrorResumeNext().subscribe();
     }
 
     public delete(content: ContentDto) {
         this.resetSelection();
 
-        this.contentsState.delete([content]).onErrorResumeNext().subscribe();
+        this.contentsState.deleteMany([content]).onErrorResumeNext().subscribe();
     }
 
     public goArchive(isArchive: boolean) {
@@ -203,26 +200,11 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
         this.updateSelectionSummary();
     }
 
-    public confirmStatusChange() {
-        this.dueTimeFunction!();
-        this.dueTimeFunction = null;
-        this.dueTimeMode = 'Immediately';
-        this.dueTimeDialog.hide();
-        this.dueTime = null;
-    }
-
-    public cancelStatusChange() {
-        this.dueTimeMode = 'Immediately';
-        this.dueTimeDialog.hide();
-        this.dueTimeFunction = null;
-        this.dueTime = null;
-    }
-
     public trackByContent(content: ContentDto): string {
         return content.id;
     }
 
-    private s(predicate?: (content: ContentDto) => boolean) {
+    private select(predicate?: (content: ContentDto) => boolean) {
         return this.contentsState.snapshot.contents.values.filter(c => this.selectedItems[c.id] && (!predicate || predicate(c)));
     }
 

@@ -53,13 +53,31 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
             });
         }
 
-        public static void CanChangeContentStatus(Status status, ChangeContentStatus command)
+        public static void CanDiscardChanges(bool isPending, DiscardChanges command)
+        {
+            Guard.NotNull(command, nameof(command));
+
+            Validate.It(() => "Cannot discard pending changes.", error =>
+            {
+                if (!isPending)
+                {
+                    error(new ValidationError("The content has no pending changes."));
+                }
+            });
+        }
+
+        public static void CanChangeContentStatus(bool isPending, Status status, ChangeContentStatus command)
         {
             Guard.NotNull(command, nameof(command));
 
             Validate.It(() => "Cannot change status.", error =>
             {
-                if (!StatusFlow.Exists(command.Status) || !StatusFlow.CanChange(status, command.Status))
+                var isAllowedPendingUpdate =
+                    status == command.Status &&
+                    status == Status.Published &&
+                    isPending;
+
+                if (!StatusFlow.Exists(command.Status) || (!StatusFlow.CanChange(status, command.Status) && !isAllowedPendingUpdate))
                 {
                     error(new ValidationError($"Content cannot be changed from status {status} to {command.Status}.", nameof(command.Status)));
                 }

@@ -23,20 +23,20 @@ namespace Squidex.Domain.Apps.Entities
     public sealed class AppProvider : IAppProvider
     {
         private readonly IGrainFactory grainFactory;
-        private readonly IRequestCache requestCache;
+        private readonly ILocalCache localCache;
 
-        public AppProvider(IGrainFactory grainFactory, IRequestCache requestCache)
+        public AppProvider(IGrainFactory grainFactory, ILocalCache localCache)
         {
             Guard.NotNull(grainFactory, nameof(grainFactory));
-            Guard.NotNull(requestCache, nameof(requestCache));
+            Guard.NotNull(localCache, nameof(localCache));
 
             this.grainFactory = grainFactory;
-            this.requestCache = requestCache;
+            this.localCache = localCache;
         }
 
         public Task<(IAppEntity, ISchemaEntity)> GetAppWithSchemaAsync(Guid appId, Guid id)
         {
-            return requestCache.GetOrCreateAsync($"GetAppWithSchemaAsync({appId}, {id})", async () =>
+            return localCache.GetOrCreateAsync($"GetAppWithSchemaAsync({appId}, {id})", async () =>
             {
                 using (Profile.Method<AppProvider>())
                 {
@@ -61,7 +61,7 @@ namespace Squidex.Domain.Apps.Entities
 
         public Task<IAppEntity> GetAppAsync(string appName)
         {
-            return requestCache.GetOrCreateAsync($"GetAppAsync({appName})", async () =>
+            return localCache.GetOrCreateAsync($"GetAppAsync({appName})", async () =>
             {
                 using (Profile.Method<AppProvider>())
                 {
@@ -86,7 +86,7 @@ namespace Squidex.Domain.Apps.Entities
 
         public Task<ISchemaEntity> GetSchemaAsync(Guid appId, string name)
         {
-            return requestCache.GetOrCreateAsync($"GetSchemaAsync({appId}, {name})", async () =>
+            return localCache.GetOrCreateAsync($"GetSchemaAsync({appId}, {name})", async () =>
             {
                 using (Profile.Method<AppProvider>())
                 {
@@ -104,7 +104,7 @@ namespace Squidex.Domain.Apps.Entities
 
         public Task<ISchemaEntity> GetSchemaAsync(Guid appId, Guid id, bool allowDeleted = false)
         {
-            return requestCache.GetOrCreateAsync($"GetSchemaAsync({appId}, {id}, {allowDeleted})", async () =>
+            return localCache.GetOrCreateAsync($"GetSchemaAsync({appId}, {id}, {allowDeleted})", async () =>
             {
                 using (Profile.Method<AppProvider>())
                 {
@@ -122,7 +122,7 @@ namespace Squidex.Domain.Apps.Entities
 
         public Task<List<ISchemaEntity>> GetSchemasAsync(Guid appId)
         {
-            return requestCache.GetOrCreateAsync($"GetSchemasAsync({appId})", async () =>
+            return localCache.GetOrCreateAsync($"GetSchemasAsync({appId})", async () =>
             {
                 using (Profile.Method<AppProvider>())
                 {
@@ -139,7 +139,7 @@ namespace Squidex.Domain.Apps.Entities
 
         public Task<List<IRuleEntity>> GetRulesAsync(Guid appId)
         {
-            return requestCache.GetOrCreateAsync($"GetRulesAsync({appId})", async () =>
+            return localCache.GetOrCreateAsync($"GetRulesAsync({appId})", async () =>
             {
                 using (Profile.Method<AppProvider>())
                 {
@@ -156,7 +156,7 @@ namespace Squidex.Domain.Apps.Entities
 
         public Task<List<IAppEntity>> GetUserApps(string userId)
         {
-            return requestCache.GetOrCreateAsync($"GetUserApps({userId})", async () =>
+            return localCache.GetOrCreateAsync($"GetUserApps({userId})", async () =>
             {
                 using (Profile.Method<AppProvider>())
                 {

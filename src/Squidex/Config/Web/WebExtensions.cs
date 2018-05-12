@@ -13,6 +13,13 @@ namespace Squidex.Config.Web
 {
     public static class WebExtensions
     {
+        public static IApplicationBuilder UseMyLocalCache(this IApplicationBuilder app)
+        {
+            app.UseMiddleware<LocalCacheMiddleware>();
+
+            return app;
+        }
+
         public static IApplicationBuilder UseMyTracking(this IApplicationBuilder app)
         {
             app.UseMiddleware<RequestLogPerformanceMiddleware>();

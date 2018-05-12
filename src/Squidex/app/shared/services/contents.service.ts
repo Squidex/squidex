@@ -28,6 +28,16 @@ export class ContentsDto {
     }
 }
 
+
+export class ScheduleDto {
+    constructor(
+        public readonly status: string,
+        public readonly scheduledBy: string,
+        public readonly dueTime: DateTime
+    ) {
+    }
+}
+
 export class ContentDto {
     constructor(
         public readonly id: string,
@@ -36,10 +46,10 @@ export class ContentDto {
         public readonly lastModifiedBy: string,
         public readonly created: DateTime,
         public readonly lastModified: DateTime,
-        public readonly scheduledTo: string | null,
-        public readonly scheduledBy: string | null,
-        public readonly scheduledAt: DateTime | null,
-        public readonly data: any,
+        public readonly scheduleJob: ScheduleDto | null,
+        public readonly isPending: boolean,
+        public readonly data: object | any,
+        public readonly dataDraft: object,
         public readonly version: Version
     ) {
     }
@@ -101,10 +111,15 @@ export class ContentsService {
                             item.lastModifiedBy,
                             DateTime.parseISO_UTC(item.created),
                             DateTime.parseISO_UTC(item.lastModified),
-                            item.scheduledTo || null,
-                            item.scheduledBy || null,
-                            item.scheduledAt ? DateTime.parseISO_UTC(item.scheduledAt) : null,
+                            item.scheduleJob
+                                ? new ScheduleDto(
+                                    item.scheduleJob.status,
+                                    item.scheduleJob.scheduledBy,
+                                    DateTime.parseISO_UTC(item.scheduleJob.dueTime))
+                                : null,
+                            item.isPending === true,
                             item.data,
+                            item.dataDraft,
                             new Version(item.version.toString()));
                     }));
                 })
@@ -125,10 +140,15 @@ export class ContentsService {
                         body.lastModifiedBy,
                         DateTime.parseISO_UTC(body.created),
                         DateTime.parseISO_UTC(body.lastModified),
-                        body.scheduledTo || null,
-                        body.scheduledBy || null,
-                        body.scheduledAt || null ? DateTime.parseISO_UTC(body.scheduledAt) : null,
+                        body.scheduleJob
+                            ? new ScheduleDto(
+                                body.scheduleJob.status,
+                                body.scheduleJob.scheduledBy,
+                                DateTime.parseISO_UTC(body.scheduleJob.dueTime))
+                            : null,
+                        body.isPending === true,
                         body.data,
+                        body.dataDraft,
                         response.version);
                 })
                 .pretifyError('Failed to load content. Please reload.');
@@ -159,7 +179,7 @@ export class ContentsService {
                         DateTime.parseISO_UTC(body.created),
                         DateTime.parseISO_UTC(body.lastModified),
                         null,
-                        null,
+                        true,
                         null,
                         body.data,
                         response.version);
@@ -170,8 +190,8 @@ export class ContentsService {
                 .pretifyError('Failed to create content. Please reload.');
     }
 
-    public putContent(appName: string, schemaName: string, id: string, dto: any, version: Version): Observable<Versioned<any>> {
-        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}`);
+    public putContent(appName: string, schemaName: string, id: string, dto: any, asDraft: boolean, version: Version): Observable<Versioned<any>> {
+        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}?asDraft=${asDraft}`);
 
         return HTTP.putVersioned(this.http, url, dto, version)
                 .map(response => {
@@ -198,6 +218,16 @@ export class ContentsService {
                     this.analytics.trackEvent('Content', 'Updated', appName);
                 })
                 .pretifyError('Failed to update content. Please reload.');
+    }
+
+    public discardChanges(appName: string, schemaName: string, id: string, version: Version): Observable<Versioned<any>> {
+        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}/discard`);
+
+        return HTTP.putVersioned(this.http, url, version)
+                .do(() => {
+                    this.analytics.trackEvent('Content', 'Discarded', appName);
+                })
+                .pretifyError('Failed to discard changes. Please reload.');
     }
 
     public deleteContent(appName: string, schemaName: string, id: string, version: Version): Observable<Versioned<any>> {

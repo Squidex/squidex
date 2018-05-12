@@ -20,6 +20,8 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Xunit;
 
+#pragma warning disable SA1401 // Fields must be private
+
 namespace Squidex.Domain.Apps.Core.Operations.HandleRules.Triggers
 {
     public class ContentChangedTriggerTests
@@ -28,28 +30,22 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules.Triggers
         private static readonly NamedId<Guid> SchemaMatch = new NamedId<Guid>(Guid.NewGuid(), "my-schema1");
         private static readonly NamedId<Guid> SchemaNonMatch = new NamedId<Guid>(Guid.NewGuid(), "my-schema2");
 
-        public static IEnumerable<object[]> TestData
+        public static IEnumerable<object[]> TestData = new[]
         {
-            get
-            {
-                return new[]
-                {
-                    new object[] { 0, 1, 1, 1, 1, new RuleCreated() },
-                    new object[] { 0, 1, 1, 1, 1, new ContentCreated { SchemaId = SchemaNonMatch } },
-                    new object[] { 1, 1, 0, 0, 0, new ContentCreated { SchemaId = SchemaMatch } },
-                    new object[] { 0, 0, 0, 0, 0, new ContentCreated { SchemaId = SchemaMatch } },
-                    new object[] { 1, 0, 1, 0, 0, new ContentUpdated { SchemaId = SchemaMatch } },
-                    new object[] { 0, 0, 0, 0, 0, new ContentUpdated { SchemaId = SchemaMatch } },
-                    new object[] { 1, 0, 0, 1, 0, new ContentDeleted { SchemaId = SchemaMatch } },
-                    new object[] { 0, 0, 0, 0, 0, new ContentDeleted { SchemaId = SchemaMatch } },
-                    new object[] { 1, 0, 0, 0, 1, new ContentStatusChanged { SchemaId = SchemaMatch, Status = Status.Published } },
-                    new object[] { 0, 0, 0, 0, 0, new ContentStatusChanged { SchemaId = SchemaMatch, Status = Status.Published } },
-                    new object[] { 0, 1, 1, 1, 1, new ContentStatusChanged { SchemaId = SchemaMatch, Status = Status.Archived } },
-                    new object[] { 0, 1, 1, 1, 1, new ContentStatusChanged { SchemaId = SchemaMatch, Status = Status.Draft } },
-                    new object[] { 0, 1, 1, 1, 1, new SchemaCreated { SchemaId = SchemaNonMatch } }
-                };
-            }
-        }
+            new object[] { 0, 1, 1, 1, 1, new RuleCreated() },
+            new object[] { 0, 1, 1, 1, 1, new ContentCreated { SchemaId = SchemaNonMatch } },
+            new object[] { 1, 1, 0, 0, 0, new ContentCreated { SchemaId = SchemaMatch } },
+            new object[] { 0, 0, 0, 0, 0, new ContentCreated { SchemaId = SchemaMatch } },
+            new object[] { 1, 0, 1, 0, 0, new ContentUpdated { SchemaId = SchemaMatch } },
+            new object[] { 0, 0, 0, 0, 0, new ContentUpdated { SchemaId = SchemaMatch } },
+            new object[] { 1, 0, 0, 1, 0, new ContentDeleted { SchemaId = SchemaMatch } },
+            new object[] { 0, 0, 0, 0, 0, new ContentDeleted { SchemaId = SchemaMatch } },
+            new object[] { 1, 0, 0, 0, 1, new ContentStatusChanged { SchemaId = SchemaMatch, Status = Status.Published } },
+            new object[] { 0, 0, 0, 0, 0, new ContentStatusChanged { SchemaId = SchemaMatch, Status = Status.Published } },
+            new object[] { 0, 1, 1, 1, 1, new ContentStatusChanged { SchemaId = SchemaMatch, Status = Status.Archived } },
+            new object[] { 0, 1, 1, 1, 1, new ContentStatusChanged { SchemaId = SchemaMatch, Status = Status.Draft } },
+            new object[] { 0, 1, 1, 1, 1, new SchemaCreated { SchemaId = SchemaNonMatch } }
+        };
 
         [Fact]
         public void Should_return_false_when_trigger_contains_no_schemas()

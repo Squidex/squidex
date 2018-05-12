@@ -8,8 +8,6 @@
 using System;
 using System.Threading.Tasks;
 using FakeItEasy;
-using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Options;
 using Squidex.Infrastructure.EventSourcing;
 using Xunit;
 
@@ -22,8 +20,6 @@ namespace Squidex.Infrastructure.States
         private readonly string key = Guid.NewGuid().ToString();
         private readonly IEventDataFormatter eventDataFormatter = A.Fake<IEventDataFormatter>();
         private readonly IEventStore eventStore = A.Fake<IEventStore>();
-        private readonly IMemoryCache cache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
-        private readonly IPubSub pubSub = new InMemoryPubSub(true);
         private readonly IServiceProvider services = A.Fake<IServiceProvider>();
         private readonly ISnapshotStore<int, string> snapshotStore = A.Fake<ISnapshotStore<int, string>>();
         private readonly IStreamNameResolver streamNameResolver = A.Fake<IStreamNameResolver>();
@@ -35,6 +31,15 @@ namespace Squidex.Infrastructure.States
                 .Returns(snapshotStore);
 
             sut = new Store<string>(eventStore, eventDataFormatter, services, streamNameResolver);
+        }
+
+        [Fact]
+        public async Task Should_call_snapshot_store_on_clear()
+        {
+            await sut.ClearSnapshotsAsync<int>();
+
+            A.CallTo(() => snapshotStore.ClearAsync())
+                .MustHaveHappened();
         }
 
         [Fact]

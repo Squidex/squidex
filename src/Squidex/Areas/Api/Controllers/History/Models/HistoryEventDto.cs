@@ -28,6 +28,12 @@ namespace Squidex.Areas.Api.Controllers.History.Models
         public string Actor { get; set; }
 
         /// <summary>
+        /// The type of the event.
+        /// </summary>
+        [Required]
+        public string EventType { get; set; }
+
+        /// <summary>
         /// Gets a unique id for the event.
         /// </summary>
         public Guid EventId { get; set; }

@@ -1,18 +1,16 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschraenkt)
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.Caching
+using Squidex.Infrastructure.EventSourcing;
+
+namespace Squidex.Domain.Apps.Events.Contents
 {
-    public interface IRequestCache
+    [EventType(nameof(ContentChangesDiscarded))]
+    public sealed class ContentChangesDiscarded : ContentEvent
     {
-        void Add(object key, object value);
-
-        void Remove(object key);
-
-        bool TryGetValue(object key, out object value);
     }
 }

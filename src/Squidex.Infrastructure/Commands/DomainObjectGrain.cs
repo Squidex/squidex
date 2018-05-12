@@ -105,13 +105,6 @@ namespace Squidex.Infrastructure.Commands
         {
         }
 
-        public Task WriteSnapshotAsync()
-        {
-            snapshot.Version = persistence.Version;
-
-            return persistence.WriteSnapshotAsync(snapshot);
-        }
-
         protected Task<object> CreateReturnAsync<TCommand>(TCommand command, Func<TCommand, Task<object>> handler) where TCommand : class, IAggregateCommand
         {
             return InvokeAsync(command, handler, false);

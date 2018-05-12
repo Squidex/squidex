@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using NodaTime;
 using Orleans;
@@ -14,6 +15,7 @@ using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.Contents
@@ -23,23 +25,30 @@ namespace Squidex.Domain.Apps.Entities.Contents
         private readonly Lazy<IContentRepository> contentRepository;
         private readonly Lazy<ICommandBus> commandBus;
         private readonly IClock clock;
+        private readonly ISemanticLog log;
+        private TaskScheduler scheduler;
 
         public ContentSchedulerGrain(
             Lazy<IContentRepository> contentRepository,
             Lazy<ICommandBus> commandBus,
-            IClock clock)
+            IClock clock,
+            ISemanticLog log)
         {
             Guard.NotNull(contentRepository, nameof(contentRepository));
             Guard.NotNull(commandBus, nameof(commandBus));
             Guard.NotNull(clock, nameof(clock));
+            Guard.NotNull(log, nameof(log));
 
             this.contentRepository = contentRepository;
             this.commandBus = commandBus;
             this.clock = clock;
+            this.log = log;
         }
 
         public override Task OnActivateAsync()
         {
+            scheduler = TaskScheduler.Current;
+
             DelayDeactivation(TimeSpan.FromDays(1));
 
             RegisterOrUpdateReminder("Default", TimeSpan.Zero, TimeSpan.FromMinutes(10));
@@ -59,15 +68,38 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             return contentRepository.Value.QueryScheduledWithoutDataAsync(now, content =>
             {
-                var command = new ChangeContentStatus { ContentId = content.Id, Status = content.ScheduledTo.Value, Actor = content.ScheduledBy };
+                return Dispatch(async () =>
+                {
+                    try
+                    {
+                        var job = content.ScheduleJob;
 
-                return commandBus.Value.PublishAsync(command);
+                        if (job != null)
+                        {
+                            var command = new ChangeContentStatus { ContentId = content.Id, Status = job.Status, Actor = job.ScheduledBy, JobId = job.Id };
+
+                            await commandBus.Value.PublishAsync(command);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        log.LogError(ex, w => w
+                            .WriteProperty("action", "ChangeStatusScheduled")
+                            .WriteProperty("status", "Failed")
+                            .WriteProperty("contentId", content.Id.ToString()));
+                    }
+                });
             });
         }
 
         public Task ReceiveReminder(string reminderName, TickStatus status)
         {
             return TaskHelper.Done;
+        }
+
+        private Task Dispatch(Func<Task> task)
+        {
+            return Task<Task>.Factory.StartNew(() => task(), CancellationToken.None, TaskCreationOptions.None, scheduler ?? TaskScheduler.Default).Unwrap();
         }
     }
 }

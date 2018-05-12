@@ -83,6 +83,9 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<InMemoryCommandBus>()
                 .As<ICommandBus>();
 
+            services.AddSingletonAs<ReadonlyCommandMiddleware>()
+                .As<ICommandMiddleware>();
+
             services.AddSingletonAs<ETagCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
@@ -170,9 +173,6 @@ namespace Squidex.Config.Domain
                 .As<IMigration>();
 
             services.AddTransientAs<ConvertEventStoreAppId>()
-                .As<IMigration>();
-
-            services.AddTransientAs<DeleteArchiveCollectionSetup>()
                 .As<IMigration>();
 
             services.AddTransientAs<PopulateGrainIndexes>()

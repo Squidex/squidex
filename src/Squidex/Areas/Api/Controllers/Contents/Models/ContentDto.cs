@@ -9,9 +9,11 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Areas.Api.Controllers.Contents.Models
 {
@@ -41,19 +43,19 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         public object Data { get; set; }
 
         /// <summary>
+        /// The pending changes of the content item.
+        /// </summary>
+        public object DataDraft { get; set; }
+
+        /// <summary>
+        /// Indicates if the draft data is pending.
+        /// </summary>
+        public bool IsPending { get; set; }
+
+        /// <summary>
         /// The scheduled status.
         /// </summary>
-        public Status? ScheduledTo { get; set; }
-
-        /// <summary>
-        /// The scheduled date.
-        /// </summary>
-        public Instant? ScheduledAt { get; set; }
-
-        /// <summary>
-        /// The user that has scheduled the content.
-        /// </summary>
-        public RefToken ScheduledBy { get; set; }
+        public ScheduleJobDto ScheduleJob { get; set; }
 
         /// <summary>
         /// The date and time when the content item has been created.
@@ -90,6 +92,21 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
                 LastModifiedBy = command.Actor,
                 Status = command.Publish ? Status.Published : Status.Draft
             };
+
+            return response;
+        }
+
+        public static ContentDto FromContent(IContentEntity content)
+        {
+            var response = SimpleMapper.Map(content, new ContentDto());
+
+            response.Data = content.Data;
+            response.DataDraft = content.DataDraft;
+
+            if (content.ScheduleJob != null)
+            {
+                response.ScheduleJob = SimpleMapper.Map(content.ScheduleJob, new ScheduleJobDto());
+            }
 
             return response;
         }
