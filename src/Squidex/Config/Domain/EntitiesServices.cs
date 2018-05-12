@@ -83,6 +83,9 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<InMemoryCommandBus>()
                 .As<ICommandBus>();
 
+            services.AddSingletonAs<ReadonlyCommandMiddleware>()
+                .As<ICommandMiddleware>();
+
             services.AddSingletonAs<ETagCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
