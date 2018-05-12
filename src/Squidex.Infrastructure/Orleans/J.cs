@@ -5,12 +5,15 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Newtonsoft.Json;
 using System.Threading.Tasks;
 
 namespace Squidex.Infrastructure.Orleans
 {
     public static class J
     {
+        internal static readonly JsonSerializer DefaultSerializer = JsonSerializer.CreateDefault();
+
         public static J<T> AsJ<T>(this T value)
         {
             return new J<T>(value);
