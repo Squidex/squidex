@@ -14,13 +14,10 @@ namespace Squidex.Pipeline
 {
     public sealed class RequestLogPerformanceMiddleware : IMiddleware
     {
-        private readonly RequestLogProfilerSessionProvider requestSession;
         private readonly ISemanticLog log;
 
-        public RequestLogPerformanceMiddleware(RequestLogProfilerSessionProvider requestSession, ISemanticLog log)
+        public RequestLogPerformanceMiddleware(ISemanticLog log)
         {
-            this.requestSession = requestSession;
-
             this.log = log;
         }
 
@@ -28,24 +25,23 @@ namespace Squidex.Pipeline
         {
             var stopWatch = Stopwatch.StartNew();
 
-            var session = new ProfilerSession();
-
-            try
+            using (Profiler.StartSession())
             {
-                requestSession.Start(context, session);
-
-                await next(context);
-            }
-            finally
-            {
-                stopWatch.Stop();
-
-                log.LogInformation(w =>
+                try
                 {
-                    session.Write(w);
+                    await next(context);
+                }
+                finally
+                {
+                    stopWatch.Stop();
 
-                    w.WriteProperty("elapsedRequestMs", stopWatch.ElapsedMilliseconds);
-                });
+                    log.LogInformation(w =>
+                    {
+                        Profiler.Session?.Write(w);
+
+                        w.WriteProperty("elapsedRequestMs", stopWatch.ElapsedMilliseconds);
+                    });
+                }
             }
         }
     }

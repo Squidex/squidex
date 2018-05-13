@@ -55,7 +55,7 @@ namespace Squidex.Infrastructure.Orleans
         [SerializerMethod]
         public static void Serialize(object input, ISerializationContext context, Type expected)
         {
-            using (Profile.Method(nameof(J)))
+            using (Profiler.TraceMethod(nameof(J)))
             {
                 var jsonSerializer = GetSerializer(context);
 
@@ -78,7 +78,7 @@ namespace Squidex.Infrastructure.Orleans
         [DeserializerMethod]
         public static object Deserialize(Type expected, IDeserializationContext context)
         {
-            using (Profile.Method(nameof(J)))
+            using (Profiler.TraceMethod(nameof(J)))
             {
                 var jsonSerializer = GetSerializer(context);
 

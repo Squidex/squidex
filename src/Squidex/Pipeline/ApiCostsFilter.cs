@@ -48,7 +48,7 @@ namespace Squidex.Pipeline
 
             if (appFeature?.App != null && FilterDefinition.Weight > 0)
             {
-                using (Profile.Key("CheckUsage"))
+                using (Profiler.Trace("CheckUsage"))
                 {
                     var plan = appPlanProvider.GetPlanForApp(appFeature.App);
 

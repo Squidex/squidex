@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Threading.Tasks;
 using Orleans;
 using Squidex.Infrastructure.Caching;
@@ -24,7 +25,14 @@ namespace Squidex.Infrastructure.Orleans
 
         public async Task Invoke(IIncomingGrainCallContext context)
         {
-            using (localCache.StartContext())
+            if (!context.Grain.GetType().Namespace.StartsWith("Orleans", StringComparison.OrdinalIgnoreCase))
+            {
+                using (localCache.StartContext())
+                {
+                    await context.Invoke();
+                }
+            }
+            else
             {
                 await context.Invoke();
             }

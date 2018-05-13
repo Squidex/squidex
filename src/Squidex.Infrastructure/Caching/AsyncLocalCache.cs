@@ -8,37 +8,23 @@
 using System;
 using System.Collections.Concurrent;
 using System.Threading;
+using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.Caching
 {
     public sealed class AsyncLocalCache : ILocalCache
     {
-        private static readonly AsyncLocal<ConcurrentDictionary<object, object>> Cache = new AsyncLocal<ConcurrentDictionary<object, object>>();
-        private static readonly AsyncLocalCleaner Cleaner;
-
-        private sealed class AsyncLocalCleaner : IDisposable
-        {
-            private readonly AsyncLocal<ConcurrentDictionary<object, object>> cache;
-
-            public AsyncLocalCleaner(AsyncLocal<ConcurrentDictionary<object, object>> cache)
-            {
-                this.cache = cache;
-            }
-
-            public void Dispose()
-            {
-                cache.Value = null;
-            }
-        }
+        private static readonly AsyncLocal<ConcurrentDictionary<object, object>> LocalCache = new AsyncLocal<ConcurrentDictionary<object, object>>();
+        private static readonly AsyncLocalCleaner<ConcurrentDictionary<object, object>> Cleaner;
 
         static AsyncLocalCache()
         {
-            Cleaner = new AsyncLocalCleaner(Cache);
+            Cleaner = new AsyncLocalCleaner<ConcurrentDictionary<object, object>>(LocalCache);
         }
 
         public IDisposable StartContext()
         {
-            Cache.Value = new ConcurrentDictionary<object, object>();
+            LocalCache.Value = new ConcurrentDictionary<object, object>();
 
             return Cleaner;
         }
@@ -47,7 +33,7 @@ namespace Squidex.Infrastructure.Caching
         {
             var cacheKey = GetCacheKey(key);
 
-            var cache = Cache.Value;
+            var cache = LocalCache.Value;
 
             if (cache != null)
             {
@@ -59,7 +45,7 @@ namespace Squidex.Infrastructure.Caching
         {
             var cacheKey = GetCacheKey(key);
 
-            var cache = Cache.Value;
+            var cache = LocalCache.Value;
 
             if (cache != null)
             {
@@ -71,7 +57,7 @@ namespace Squidex.Infrastructure.Caching
         {
             var cacheKey = GetCacheKey(key);
 
-            var cache = Cache.Value;
+            var cache = LocalCache.Value;
 
             if (cache != null)
             {

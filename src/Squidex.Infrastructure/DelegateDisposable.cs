@@ -5,10 +5,24 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.Log
+using System;
+
+namespace Squidex.Infrastructure
 {
-    public interface ILogProfilerSessionProvider
+    public sealed class DelegateDisposable : IDisposable
     {
-        ProfilerSession GetSession();
+        private readonly Action action;
+
+        public DelegateDisposable(Action action)
+        {
+            Guard.NotNull(action, nameof(action));
+
+            this.action = action;
+        }
+
+        public void Dispose()
+        {
+            action();
+        }
     }
 }

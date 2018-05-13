@@ -38,7 +38,7 @@ namespace Squidex.Domain.Apps.Entities
         {
             return localCache.GetOrCreateAsync($"GetAppWithSchemaAsync({appId}, {id})", async () =>
             {
-                using (Profile.Method<AppProvider>())
+                using (Profiler.TraceMethod<AppProvider>())
                 {
                     var app = await grainFactory.GetGrain<IAppGrain>(appId).GetStateAsync();
 
@@ -63,7 +63,7 @@ namespace Squidex.Domain.Apps.Entities
         {
             return localCache.GetOrCreateAsync($"GetAppAsync({appName})", async () =>
             {
-                using (Profile.Method<AppProvider>())
+                using (Profiler.TraceMethod<AppProvider>())
                 {
                     var appId = await GetAppIdAsync(appName);
 
@@ -88,7 +88,7 @@ namespace Squidex.Domain.Apps.Entities
         {
             return localCache.GetOrCreateAsync($"GetSchemaAsync({appId}, {name})", async () =>
             {
-                using (Profile.Method<AppProvider>())
+                using (Profiler.TraceMethod<AppProvider>())
                 {
                     var schemaId = await GetSchemaIdAsync(appId, name);
 
@@ -106,7 +106,7 @@ namespace Squidex.Domain.Apps.Entities
         {
             return localCache.GetOrCreateAsync($"GetSchemaAsync({appId}, {id}, {allowDeleted})", async () =>
             {
-                using (Profile.Method<AppProvider>())
+                using (Profiler.TraceMethod<AppProvider>())
                 {
                     var schema = await grainFactory.GetGrain<ISchemaGrain>(id).GetStateAsync();
 
@@ -124,7 +124,7 @@ namespace Squidex.Domain.Apps.Entities
         {
             return localCache.GetOrCreateAsync($"GetSchemasAsync({appId})", async () =>
             {
-                using (Profile.Method<AppProvider>())
+                using (Profiler.TraceMethod<AppProvider>())
                 {
                     var ids = await grainFactory.GetGrain<ISchemasByAppIndex>(appId).GetSchemaIdsAsync();
 
@@ -141,7 +141,7 @@ namespace Squidex.Domain.Apps.Entities
         {
             return localCache.GetOrCreateAsync($"GetRulesAsync({appId})", async () =>
             {
-                using (Profile.Method<AppProvider>())
+                using (Profiler.TraceMethod<AppProvider>())
                 {
                     var ids = await grainFactory.GetGrain<IRulesByAppIndex>(appId).GetRuleIdsAsync();
 
@@ -158,7 +158,7 @@ namespace Squidex.Domain.Apps.Entities
         {
             return localCache.GetOrCreateAsync($"GetUserApps({userId})", async () =>
             {
-                using (Profile.Method<AppProvider>())
+                using (Profiler.TraceMethod<AppProvider>())
                 {
                     var ids = await grainFactory.GetGrain<IAppsByUserIndex>(userId).GetAppIdsAsync();
 
@@ -173,7 +173,7 @@ namespace Squidex.Domain.Apps.Entities
 
         private async Task<Guid> GetAppIdAsync(string name)
         {
-            using (Profile.Method<AppProvider>())
+            using (Profiler.TraceMethod<AppProvider>())
             {
                 return await grainFactory.GetGrain<IAppsByNameIndex>(SingleGrain.Id).GetAppIdAsync(name);
             }
@@ -181,7 +181,7 @@ namespace Squidex.Domain.Apps.Entities
 
         private async Task<Guid> GetSchemaIdAsync(Guid appId, string name)
         {
-            using (Profile.Method<AppProvider>())
+            using (Profiler.TraceMethod<AppProvider>())
             {
                 return await grainFactory.GetGrain<ISchemasByAppIndex>(appId).GetSchemaIdAsync(name);
             }
