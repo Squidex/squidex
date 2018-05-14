@@ -29,6 +29,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas.State
         public string Name { get; set; }
 
         [JsonProperty]
+        public string Category { get; set; }
+
+        [JsonProperty]
         public int TotalFields { get; set; } = 0;
 
         [JsonProperty]
@@ -124,6 +127,11 @@ namespace Squidex.Domain.Apps.Entities.Schemas.State
             SchemaDef = SchemaDef.AddField(field);
 
             TotalFields++;
+        }
+
+        protected void On(SchemaCategoryChanged @event, FieldRegistry registry)
+        {
+            Category = @event.Name;
         }
 
         protected void On(SchemaPublished @event, FieldRegistry registry)

@@ -21,6 +21,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
         string Name { get; }
 
+        string Category { get; }
+
         bool IsPublished { get; }
 
         bool IsDeleted { get; }

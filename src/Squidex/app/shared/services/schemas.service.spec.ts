@@ -21,6 +21,7 @@ import {
     SchemaPropertiesDto,
     SchemasService,
     UpdateFieldDto,
+    UpdateSchemaCategoryDto,
     UpdateSchemaDto,
     UpdateSchemaScriptsDto,
     Version
@@ -70,6 +71,7 @@ describe('SchemasService', () => {
             {
                 id: 'id1',
                 name: 'name1',
+                category: 'category1',
                 properties: {
                     label: 'label1',
                     hints: 'hints1'
@@ -85,6 +87,7 @@ describe('SchemasService', () => {
             {
                 id: 'id2',
                 name: 'name2',
+                category: 'category2',
                 properties: {
                     label: 'label2',
                     hints: 'hints2'
@@ -100,11 +103,11 @@ describe('SchemasService', () => {
         ]);
 
         expect(schemas).toEqual([
-            new SchemaDto('id1', 'name1', new SchemaPropertiesDto('label1', 'hints1'), true, 'Created1', 'LastModifiedBy1',
+            new SchemaDto('id1', 'name1', 'category1', new SchemaPropertiesDto('label1', 'hints1'), true, 'Created1', 'LastModifiedBy1',
                 DateTime.parseISO_UTC('2016-12-12T10:10'),
                 DateTime.parseISO_UTC('2017-12-12T10:10'),
                 new Version('11')),
-            new SchemaDto('id2', 'name2', new SchemaPropertiesDto('label2', 'hints2'), true, 'Created2', 'LastModifiedBy2',
+            new SchemaDto('id2', 'name2', 'category2', new SchemaPropertiesDto('label2', 'hints2'), true, 'Created2', 'LastModifiedBy2',
                 DateTime.parseISO_UTC('2016-10-12T10:10'),
                 DateTime.parseISO_UTC('2017-10-12T10:10'),
                 new Version('22'))
@@ -128,6 +131,7 @@ describe('SchemasService', () => {
         req.flush({
             id: 'id1',
             name: 'name1',
+            category: 'category1',
             isPublished: true,
             created: '2016-12-12T10:10',
             createdBy: 'Created1',
@@ -250,7 +254,7 @@ describe('SchemasService', () => {
         });
 
         expect(schema).toEqual(
-            new SchemaDetailsDto('id1', 'name1', new SchemaPropertiesDto('label1', 'hints1'), true, 'Created1', 'LastModifiedBy1',
+            new SchemaDetailsDto('id1', 'name1', 'category1', new SchemaPropertiesDto('label1', 'hints1'), true, 'Created1', 'LastModifiedBy1',
                 DateTime.parseISO_UTC('2016-12-12T10:10'),
                 DateTime.parseISO_UTC('2017-12-12T10:10'),
                 new Version('2'),
@@ -297,7 +301,7 @@ describe('SchemasService', () => {
         });
 
         expect(schema).toEqual(
-            new SchemaDetailsDto('1', dto.name, new SchemaPropertiesDto(), false, user, user, now, now, new Version('2'), []));
+            new SchemaDetailsDto('1', dto.name, '', new SchemaPropertiesDto(), false, user, user, now, now, new Version('2'), []));
     }));
 
     it('should make post request to add field',
@@ -342,9 +346,24 @@ describe('SchemasService', () => {
 
         const dto = new UpdateSchemaScriptsDto();
 
-        schemasService.putSchemaScripts('my-app', 'my-schema', dto, version).subscribe();
+        schemasService.putScripts('my-app', 'my-schema', dto, version).subscribe();
 
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/scripts');
+
+        expect(req.request.method).toEqual('PUT');
+        expect(req.request.headers.get('If-Match')).toBe(version.value);
+
+        req.flush({});
+    }));
+
+    it('should make put request to update category',
+        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
+
+        const dto = new UpdateSchemaCategoryDto();
+
+        schemasService.putCategory('my-app', 'my-schema', dto, version).subscribe();
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/category');
 
         expect(req.request.method).toEqual('PUT');
         expect(req.request.headers.get('If-Match')).toBe(version.value);
