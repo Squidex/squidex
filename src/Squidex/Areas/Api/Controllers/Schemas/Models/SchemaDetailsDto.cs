@@ -31,6 +31,11 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         public string Name { get; set; }
 
         /// <summary>
+        /// The name of the category.
+        /// </summary>
+        public string Category { get; set; }
+
+        /// <summary>
         /// Indicates if the schema is published.
         /// </summary>
         public bool IsPublished { get; set; }

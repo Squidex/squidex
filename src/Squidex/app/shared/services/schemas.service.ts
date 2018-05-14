@@ -603,7 +603,7 @@ export class UpdateSchemaDto {
 
 export class UpdateSchemaCategoryDto {
     constructor(
-        public readonly category?: string
+        public readonly name?: string
     ) {
     }
 }

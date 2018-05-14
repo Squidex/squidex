@@ -21,27 +21,16 @@
     </ng-container>
 
     <ng-container content>
-        <ul class="nav nav-panel nav-dark nav-dark-bordered flex-column">
-            <li class="nav-item" *ngFor="let schema of schemasFiltered | async; trackBy: trackBySchema">
-                <a class="nav-link" [routerLink]="[schema.name]" routerLinkActive="active">
-                    <div class="row">
-                        <div class="col col-4">
-                            <span class="schema-name">{{schema.displayName}}</span> 
-                        </div>
-                        <div class="col col-4">
-                            <span class="schema-user">
-                                <i class="icon-user"></i> {{schema.lastModifiedBy | sqxUserNameRef}}
-                            </span>
-                        </div>
-                        <div class="col col-4 schema-modified">
-                            <small class="item-modified">{{schema.lastModified | sqxFromNow}}</small>
-                            
-                            <span class="item-published" [class.unpublished]="!schema.isPublished"></span>
-                        </div>
-                    </div>
-                </a>
-            </li>
-        </ul>
+        <sqx-schema-category *ngFor="let category of schemasState.categories | async; trackBy: trackByCategory"
+            [name]="category"
+            [schemas]="schemasState.schemas | async"
+            [schemasFilter]="schemasFilter.valueChanges | async"
+            (removing)="removeCategory(category)">
+        </sqx-schema-category>
+
+        <form [formGroup]="addCategoryForm.form" (submit)="addCategory()">
+            <input class="form-control form-control-dark new-category-input" formControlName="name" placeholder="Create new category..." />
+        </form>
     </ng-container>
 </sqx-panel>
 

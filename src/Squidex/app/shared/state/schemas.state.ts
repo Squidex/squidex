@@ -43,6 +43,14 @@ import {
 
 const FALLBACK_NAME = 'my-schema';
 
+export class CreateCategoryForm extends Form<FormGroup> {
+    constructor(formBuilder: FormBuilder) {
+        super(formBuilder.group({
+            name: ['']
+        }));
+    }
+}
+
 export class CreateSchemaForm extends Form<FormGroup> {
     public schemaName =
         this.form.controls['name'].valueChanges.map(n => n || FALLBACK_NAME)
@@ -150,6 +158,8 @@ export class AddFieldForm extends Form<FormGroup> {
 }
 
 interface Snapshot {
+    categories: { [name: string]: boolean };
+
     schemasApp?: string;
     schemas: ImmutableArray<SchemaDto>;
 
@@ -162,6 +172,10 @@ interface Snapshot {
 export class SchemasState extends State<Snapshot> {
     public selectedSchema =
         this.changes.map(x => x.selectedSchema)
+            .distinctUntilChanged();
+
+    public categories =
+        this.changes.map(x => ImmutableArray.of(Object.keys(x.categories)).sortByStringAsc(s => s))
             .distinctUntilChanged();
 
     public schemas =
@@ -186,7 +200,7 @@ export class SchemasState extends State<Snapshot> {
         private readonly dialogs: DialogService,
         private readonly schemasService: SchemasService
     ) {
-        super({ schemas: ImmutableArray.of() });
+        super({ schemas: ImmutableArray.empty(), categories: {} });
     }
 
     public select(idOrName: string | null): Observable<SchemaDetailsDto | null> {
@@ -220,7 +234,9 @@ export class SchemasState extends State<Snapshot> {
                 return this.next(s => {
                     const schemas = ImmutableArray.of(dtos).sortByStringAsc(x => x.displayName);
 
-                    return { ...s, schemas, schemasApp: this.appName, isLoaded: true };
+                    const categories = buildCategories(s.categories, schemas);
+
+                    return { ...s, schemas, schemasApp: this.appName, isLoaded: true, categories };
                 });
             })
             .notify(this.dialogs);
@@ -248,6 +264,22 @@ export class SchemasState extends State<Snapshot> {
                 });
             })
             .notify(this.dialogs);
+    }
+
+    public addCategory(name: string) {
+        this.next(s => {
+            const categories = addCategory(s.categories, name);
+
+            return { ...s, categories: categories };
+        });
+    }
+
+    public removeCategory(name: string) {
+        this.next(s => {
+            const categories = removeCategory(s.categories, name);
+
+            return { ...s, categories: categories };
+        });
     }
 
     public addField(schema: SchemaDetailsDto, request: AddFieldDto, now?: DateTime): Observable<FieldDto> {
@@ -366,7 +398,9 @@ export class SchemasState extends State<Snapshot> {
             const schemas = s.schemas.replaceBy('id', schema).sortByStringAsc(x => x.displayName);
             const selectedSchema = s.selectedSchema && s.selectedSchema.id === schema.id ? schema : s.selectedSchema;
 
-            return { ...s, schemas, selectedSchema };
+            const categories = buildCategories(s.categories, schemas);
+
+            return { ...s, schemas, selectedSchema, categories };
         });
     }
 
@@ -377,6 +411,37 @@ export class SchemasState extends State<Snapshot> {
     private get user() {
         return this.authState.user!.token;
     }
+}
+
+function buildCategories(categories: { [name: string]: boolean }, schemas: ImmutableArray<SchemaDto>) {
+    categories = { ...categories };
+
+    for (let category in categories) {
+        if (!categories[category]) {
+            delete categories[category];
+        }
+    }
+    for (let schema of schemas.values) {
+        categories[schema.category || ''] = false;
+    }
+
+    return categories;
+}
+
+function addCategory(categories: { [name: string]: boolean }, category: string) {
+    categories = { ...categories };
+
+    categories[category] = true;
+
+    return categories;
+}
+
+function removeCategory(categories: { [name: string]: boolean }, category: string) {
+    categories = { ...categories };
+
+    delete categories[category];
+
+    return categories;
 }
 
 const setPublished = (schema: SchemaDto | SchemaDetailsDto, publish: boolean, user: string, version: Version, now?: DateTime) => {

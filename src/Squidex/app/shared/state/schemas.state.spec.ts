@@ -174,7 +174,7 @@ describe('SchemasState', () => {
     it('should change category and update user info when category changed', () => {
         const category = 'my-new-category';
 
-        schemasService.setup(x => x.putCategory(app, oldSchemas[0].name, It.is<UpdateSchemaCategoryDto>(i => i.category === category), version))
+        schemasService.setup(x => x.putCategory(app, oldSchemas[0].name, It.is<UpdateSchemaCategoryDto>(i => i.name === category), version))
             .returns(() => Observable.of(new Versioned<any>(newVersion, {})));
 
         schemasState.changeCategory(oldSchemas[0], category, modified).subscribe();
@@ -206,7 +206,7 @@ describe('SchemasState', () => {
         it('should change category and update user info when category of selected schema changed', () => {
             const category = 'my-new-category';
 
-            schemasService.setup(x => x.putCategory(app, oldSchemas[0].name, It.is<UpdateSchemaCategoryDto>(i => i.category === category), version))
+            schemasService.setup(x => x.putCategory(app, oldSchemas[0].name, It.is<UpdateSchemaCategoryDto>(i => i.name === category), version))
                 .returns(() => Observable.of(new Versioned<any>(newVersion, {})));
 
             schemasState.changeCategory(oldSchemas[0], category, modified).subscribe();

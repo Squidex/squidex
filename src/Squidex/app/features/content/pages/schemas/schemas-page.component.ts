@@ -8,11 +8,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 
-import {
-    AppsState,
-    SchemaDto,
-    SchemasState
-} from '@app/shared';
+import { AppsState, SchemasState } from '@app/shared';
 
 @Component({
     selector: 'sqx-schemas-page',
@@ -21,20 +17,10 @@ import {
 })
 export class SchemasPageComponent implements OnInit {
     public schemasFilter = new FormControl();
-    public schemasFiltered =
-        this.schemasState.publishedSchemas
-            .combineLatest(this.schemasFilter.valueChanges.startWith(''),
-                (schemas, query) => {
-                    if (query && query.length > 0) {
-                        return schemas.filter(t => t.name.indexOf(query) >= 0);
-                    } else {
-                        return schemas;
-                    }
-                });
 
     constructor(
         public readonly appsState: AppsState,
-        private readonly schemasState: SchemasState
+        public readonly schemasState: SchemasState
     ) {
     }
 
@@ -42,8 +28,8 @@ export class SchemasPageComponent implements OnInit {
         this.schemasState.load().onErrorResumeNext().subscribe();
     }
 
-    public trackBySchema(index: number, schema: SchemaDto) {
-        return schema.id;
+    public trackByCategory(index: number, category: string) {
+        return category;
     }
 }
 
