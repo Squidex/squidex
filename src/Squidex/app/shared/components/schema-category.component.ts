@@ -78,7 +78,7 @@ export class SchemaCategoryComponent implements OnInit, OnChanges {
 
         if (changes['name']) {
             if (!this.name || this.name.length === 0) {
-                this.displayName = 'All Schemas';
+                this.displayName = 'Schemas';
             } else {
                 this.displayName = this.name;
             }
