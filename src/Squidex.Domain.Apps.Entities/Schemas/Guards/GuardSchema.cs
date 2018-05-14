@@ -119,6 +119,11 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             Guard.NotNull(command, nameof(command));
         }
 
+        public static void CanChangeCategory(Schema schema, ChangeCategory command)
+        {
+            Guard.NotNull(command, nameof(command));
+        }
+
         public static void CanDelete(Schema schema, DeleteSchema command)
         {
             Guard.NotNull(command, nameof(command));

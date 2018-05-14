@@ -187,6 +187,14 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         }
 
         [Fact]
+        public void CanChangeCategory_should_not_throw_exception()
+        {
+            var command = new ChangeCategory();
+
+            GuardSchema.CanChangeCategory(schema_0, command);
+        }
+
+        [Fact]
         public void CanDelete_should_not_throw_exception()
         {
             var command = new DeleteSchema();

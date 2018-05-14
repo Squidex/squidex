@@ -212,6 +212,25 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         }
 
         [Fact]
+        public async Task ChangeCategory_should_create_events_and_update_state()
+        {
+            var command = new ChangeCategory { Name = "my-category" };
+
+            await ExecuteCreateAsync();
+
+            var result = await sut.ExecuteAsync(CreateCommand(command));
+
+            result.ShouldBeEquivalent(new EntitySavedResult(1));
+
+            Assert.Equal(command.Name, sut.Snapshot.Category);
+
+            LastEvents
+                .ShouldHaveSameEvents(
+                    CreateEvent(new SchemaCategoryChanged { Name = command.Name })
+                );
+        }
+
+        [Fact]
         public async Task Delete_should_create_events_and_update_state()
         {
             var command = new DeleteSchema();

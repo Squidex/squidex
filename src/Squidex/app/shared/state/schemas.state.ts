@@ -36,6 +36,7 @@ import {
     SchemaPropertiesDto,
     SchemasService,
     UpdateFieldDto,
+    UpdateSchemaCategoryDto,
     UpdateSchemaDto,
     UpdateSchemaScriptsDto
 } from './../services/schemas.service';
@@ -272,6 +273,14 @@ export class SchemasState extends State<Snapshot> {
             .notify(this.dialogs);
     }
 
+    public changeCategory(schema: SchemaDto, name: string, now?: DateTime): Observable<any> {
+        return this.schemasService.putCategory(this.appName, schema.name, new UpdateSchemaCategoryDto(name), schema.version)
+            .do(dto => {
+                this.replaceSchema(changeCategory(schema, name, this.user, dto.version, now));
+            })
+            .notify(this.dialogs);
+    }
+
     public enableField(schema: SchemaDetailsDto, field: FieldDto, now?: DateTime): Observable<any> {
         return this.schemasService.enableField(this.appName, schema.name, field.fieldId, schema.version)
             .do(dto => {
@@ -337,7 +346,7 @@ export class SchemasState extends State<Snapshot> {
     }
 
     public configureScripts(schema: SchemaDetailsDto, request: UpdateSchemaScriptsDto, now?: DateTime): Observable<any> {
-        return this.schemasService.putSchemaScripts(this.appName, schema.name, request, schema.version)
+        return this.schemasService.putScripts(this.appName, schema.name, request, schema.version)
             .do(dto => {
                 this.replaceSchema(configureScripts(schema, request, this.user, dto.version, now));
             })
@@ -375,6 +384,7 @@ const setPublished = (schema: SchemaDto | SchemaDetailsDto, publish: boolean, us
         return new SchemaDetailsDto(
             schema.id,
             schema.name,
+            schema.category,
             schema.properties,
             publish,
             schema.createdBy, user,
@@ -390,8 +400,39 @@ const setPublished = (schema: SchemaDto | SchemaDetailsDto, publish: boolean, us
         return new SchemaDto(
             schema.id,
             schema.name,
+            schema.category,
             schema.properties,
             publish,
+            schema.createdBy, user,
+            schema.created, now || DateTime.now(),
+            version);
+    }
+};
+
+const changeCategory = (schema: SchemaDto | SchemaDetailsDto, category: string, user: string, version: Version, now?: DateTime) => {
+    if (Types.is(schema, SchemaDetailsDto)) {
+        return new SchemaDetailsDto(
+            schema.id,
+            schema.name,
+            category,
+            schema.properties,
+            schema.isPublished,
+            schema.createdBy, user,
+            schema.created, now || DateTime.now(),
+            version,
+            schema.fields,
+            schema.scriptQuery,
+            schema.scriptCreate,
+            schema.scriptUpdate,
+            schema.scriptDelete,
+            schema.scriptChange);
+    } else {
+        return new SchemaDto(
+            schema.id,
+            schema.name,
+            category,
+            schema.properties,
+            schema.isPublished,
             schema.createdBy, user,
             schema.created, now || DateTime.now(),
             version);
@@ -402,6 +443,7 @@ const configureScripts = (schema: SchemaDetailsDto, scripts: UpdateSchemaScripts
     new SchemaDetailsDto(
         schema.id,
         schema.name,
+        schema.category,
         schema.properties,
         schema.isPublished,
         schema.createdBy, user,
@@ -418,6 +460,7 @@ const updateProperties = (schema: SchemaDetailsDto, properties: SchemaProperties
     new SchemaDetailsDto(
         schema.id,
         schema.name,
+        schema.category,
         properties,
         schema.isPublished,
         schema.createdBy, user,
@@ -434,6 +477,7 @@ const addField = (schema: SchemaDetailsDto, field: FieldDto, user: string, versi
     new SchemaDetailsDto(
         schema.id,
         schema.name,
+        schema.category,
         schema.properties,
         schema.isPublished,
         schema.createdBy, user,
@@ -450,6 +494,7 @@ const updateField = (schema: SchemaDetailsDto, field: FieldDto, user: string, ve
     new SchemaDetailsDto(
         schema.id,
         schema.name,
+        schema.category,
         schema.properties,
         schema.isPublished,
         schema.createdBy, user,
@@ -466,6 +511,7 @@ const replaceFields = (schema: SchemaDetailsDto, fields: FieldDto[], user: strin
     new SchemaDetailsDto(
         schema.id,
         schema.name,
+        schema.category,
         schema.properties,
         schema.isPublished,
         schema.createdBy, user,
@@ -482,6 +528,7 @@ const removeField = (schema: SchemaDetailsDto, field: FieldDto, user: string, ve
     new SchemaDetailsDto(
         schema.id,
         schema.name,
+        schema.category,
         schema.properties,
         schema.isPublished,
         schema.createdBy, user,

@@ -161,6 +161,14 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                         ConfigureScripts(c);
                     });
 
+                case ChangeCategory changeCategory:
+                    return UpdateAsync(changeCategory, c =>
+                    {
+                        GuardSchema.CanChangeCategory(Snapshot.SchemaDef, c);
+
+                        ChangeCategory(c);
+                    });
+
                 case DeleteSchema deleteSchema:
                     return UpdateAsync(deleteSchema, c =>
                     {
@@ -251,6 +259,11 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         public void ConfigureScripts(ConfigureScripts command)
         {
             RaiseEvent(SimpleMapper.Map(command, new ScriptsConfigured()));
+        }
+
+        public void ChangeCategory(ChangeCategory command)
+        {
+            RaiseEvent(SimpleMapper.Map(command, new SchemaCategoryChanged()));
         }
 
         public void Delete(DeleteSchema command)

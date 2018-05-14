@@ -104,6 +104,7 @@ export class SchemaDto {
     constructor(
         public readonly id: string,
         public readonly name: string,
+        public readonly category: string,
         public readonly properties: SchemaPropertiesDto,
         public readonly isPublished: boolean,
         public readonly createdBy: string,
@@ -118,7 +119,7 @@ export class SchemaDto {
 export class SchemaDetailsDto extends SchemaDto {
     public readonly listFields: FieldDto[];
 
-    constructor(id: string, name: string, properties: SchemaPropertiesDto, isPublished: boolean, createdBy: string, lastModifiedBy: string, created: DateTime, lastModified: DateTime, version: Version,
+    constructor(id: string, name: string, category: string, properties: SchemaPropertiesDto, isPublished: boolean, createdBy: string, lastModifiedBy: string, created: DateTime, lastModified: DateTime, version: Version,
         public readonly fields: FieldDto[],
         public readonly scriptQuery?: string,
         public readonly scriptCreate?: string,
@@ -126,7 +127,7 @@ export class SchemaDetailsDto extends SchemaDto {
         public readonly scriptDelete?: string,
         public readonly scriptChange?: string
     ) {
-        super(id, name, properties, isPublished, createdBy, lastModifiedBy, created, lastModified, version);
+        super(id, name, category, properties, isPublished, createdBy, lastModifiedBy, created, lastModified, version);
 
         this.listFields = this.fields.filter(x => x.properties.isListField);
 
@@ -600,6 +601,13 @@ export class UpdateSchemaDto {
     }
 }
 
+export class UpdateSchemaCategoryDto {
+    constructor(
+        public readonly category?: string
+    ) {
+    }
+}
+
 export class AddFieldDto {
     constructor(
         public readonly name: string,
@@ -659,7 +667,9 @@ export class SchemasService {
 
                     return new SchemaDto(
                         item.id,
-                        item.name, properties,
+                        item.name,
+                        item.category,
+                        properties,
                         item.isPublished,
                         item.createdBy,
                         item.lastModifiedBy,
@@ -698,7 +708,9 @@ export class SchemasService {
 
                 return new SchemaDetailsDto(
                     body.id,
-                    body.name, properties,
+                    body.name,
+                    body.category,
+                    properties,
                     body.isPublished,
                     body.createdBy,
                     body.lastModifiedBy,
@@ -727,6 +739,7 @@ export class SchemasService {
                 return new SchemaDetailsDto(
                     body.id,
                     dto.name,
+                    '',
                     dto.properties || new SchemaPropertiesDto(),
                     false,
                     user,
@@ -781,7 +794,7 @@ export class SchemasService {
             .pretifyError('Failed to delete schema. Please reload.');
     }
 
-    public putSchemaScripts(appName: string, schemaName: string, dto: UpdateSchemaScriptsDto, version: Version): Observable<Versioned<any>> {
+    public putScripts(appName: string, schemaName: string, dto: UpdateSchemaScriptsDto, version: Version): Observable<Versioned<any>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/scripts`);
 
         return HTTP.putVersioned(this.http, url, dto, version)
@@ -829,6 +842,16 @@ export class SchemasService {
                 this.analytics.trackEvent('Schema', 'Unpublished', appName);
             })
             .pretifyError('Failed to unpublish schema. Please reload.');
+    }
+
+    public putCategory(appName: string, schemaName: string, dto: UpdateSchemaCategoryDto, version: Version): Observable<Versioned<any>> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/category`);
+
+        return HTTP.putVersioned(this.http, url, dto, version)
+            .do(() => {
+                this.analytics.trackEvent('Schema', 'CategoryChanged', appName);
+            })
+            .pretifyError('Failed to change category. Please reload.');
     }
 
     public putField(appName: string, schemaName: string, fieldId: number, dto: UpdateFieldDto, version: Version): Observable<Versioned<any>> {

@@ -23,6 +23,7 @@ import {
     SchemaDto,
     SchemasService,
     UpdateFieldDto,
+    UpdateSchemaCategoryDto,
     UpdateSchemaDto,
     UpdateSchemaScriptsDto,
     Version,
@@ -39,15 +40,15 @@ describe('SchemasState', () => {
     const newVersion = new Version('2');
 
     const oldSchemas = [
-        new SchemaDto('id1', 'name1', {}, false, creator, creator, creation, creation, version),
-        new SchemaDto('id2', 'name2', {}, true , creator, creator, creation, creation, version)
+        new SchemaDto('id1', 'name1', 'category1', {}, false, creator, creator, creation, creation, version),
+        new SchemaDto('id2', 'name2', 'category2', {}, true , creator, creator, creation, creation, version)
     ];
 
     const field1 = new FieldDto(1, '1', false, false, false, 'l', createProperties('String'));
     const field2 = new FieldDto(2, '2', true,  true,  true,  'l', createProperties('Number'));
 
     const schema =
-        new SchemaDetailsDto('id2', 'name2', {}, true,
+        new SchemaDetailsDto('id2', 'name2', 'category2', {}, true,
             creator, creator,
             creation, creation,
             version,
@@ -170,12 +171,26 @@ describe('SchemasState', () => {
         expectToBeModified(schema_1);
     });
 
+    it('should change category and update user info when category changed', () => {
+        const category = 'my-new-category';
+
+        schemasService.setup(x => x.putCategory(app, oldSchemas[0].name, It.is<UpdateSchemaCategoryDto>(i => i.category === category), version))
+            .returns(() => Observable.of(new Versioned<any>(newVersion, {})));
+
+        schemasState.changeCategory(oldSchemas[0], category, modified).subscribe();
+
+        const schema_1 = schemasState.snapshot.schemas.at(0);
+
+        expect(schema_1.category).toEqual(category);
+        expectToBeModified(schema_1);
+    });
+
     describe('with selection', () => {
         beforeEach(() => {
             schemasState.select(schema.name).subscribe();
         });
 
-        it('should unmark published and update user info when published selected schema', () => {
+        it('should nmark published and update user info when published selected schema', () => {
             schemasService.setup(x => x.publishSchema(app, schema.name, version))
                 .returns(() => Observable.of(new Versioned<any>(newVersion, {})));
 
@@ -184,6 +199,21 @@ describe('SchemasState', () => {
             const schema_1 = <SchemaDetailsDto>schemasState.snapshot.schemas.at(1);
 
             expect(schema_1.isPublished).toBeTruthy();
+            expectToBeModified(schema_1);
+        });
+
+
+        it('should change category and update user info when category of selected schema changed', () => {
+            const category = 'my-new-category';
+
+            schemasService.setup(x => x.putCategory(app, oldSchemas[0].name, It.is<UpdateSchemaCategoryDto>(i => i.category === category), version))
+                .returns(() => Observable.of(new Versioned<any>(newVersion, {})));
+
+            schemasState.changeCategory(oldSchemas[0], category, modified).subscribe();
+
+            const schema_1 = schemasState.snapshot.schemas.at(0);
+
+            expect(schema_1.category).toEqual(category);
             expectToBeModified(schema_1);
         });
 
@@ -205,7 +235,7 @@ describe('SchemasState', () => {
         it('should update script properties and update user info when scripts configured', () => {
             const request = new UpdateSchemaScriptsDto('query', 'create', 'update', 'delete', 'change');
 
-            schemasService.setup(x => x.putSchemaScripts(app, schema.name, It.isAny(), version))
+            schemasService.setup(x => x.putScripts(app, schema.name, It.isAny(), version))
                 .returns(() => Observable.of(new Versioned<any>(newVersion, {})));
 
             schemasState.configureScripts(schema, request, modified).subscribe();
@@ -223,7 +253,7 @@ describe('SchemasState', () => {
         it('should add schema to snapshot when created', () => {
             const request = new CreateSchemaDto('newName');
 
-            const result = new SchemaDetailsDto('id4', 'newName', {}, false, modifier, modifier, modified, modified, version, []);
+            const result = new SchemaDetailsDto('id4', 'newName', '', {}, false, modifier, modifier, modified, modified, version, []);
 
             schemasService.setup(x => x.postSchema(app, request, modifier, modified))
                 .returns(() => Observable.of(result));
