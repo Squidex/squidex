@@ -16,11 +16,12 @@
     </ng-container>
 
     <ng-container content>
-        <ul class="nav nav-panel nav-dark nav-dark-bordered flex-column">
-            <li class="nav-item" *ngFor="let schema of schemasFiltered | async; trackBy: trackBySchema">
-                <a class="nav-link" [routerLink]="schema.name" routerLinkActive="active">{{schema.displayName}} <i class="icon-angle-right"></i></a>
-            </li>
-        </ul>
+        <sqx-schema-category *ngFor="let category of schemasState.categories | async; trackBy: trackByCategory"
+            [name]="category"
+            [schemas]="schemasState.schemas | async"
+            [schemasFilter]="schemasFilter.valueChanges | async"
+            [isReadonly]="true">
+        </sqx-schema-category>
     </ng-container>
 </sqx-panel>
 

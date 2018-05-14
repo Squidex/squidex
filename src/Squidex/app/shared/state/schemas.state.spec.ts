@@ -91,6 +91,18 @@ describe('SchemasState', () => {
     it('should load schemas', () => {
         expect(schemasState.snapshot.schemas.values).toEqual(oldSchemas);
         expect(schemasState.snapshot.isLoaded).toBeTruthy();
+        expect(schemasState.snapshot.categories).toEqual({ 'category1': false, 'category2': false });
+
+        schemasService.verifyAll();
+    });
+
+    it('should not remove custom category when loading schemas', () => {
+        schemasState.addCategory('category3');
+        schemasState.load(true).subscribe();
+
+        expect(schemasState.snapshot.schemas.values).toEqual(oldSchemas);
+        expect(schemasState.snapshot.isLoaded).toBeTruthy();
+        expect(schemasState.snapshot.categories).toEqual({ 'category1': false, 'category2': false, 'category3': true });
 
         schemasService.verifyAll();
     });
@@ -99,6 +111,18 @@ describe('SchemasState', () => {
         schemasState.load(true).subscribe();
 
         dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
+    });
+
+    it('should add category', () => {
+        schemasState.addCategory('category3');
+
+        expect(schemasState.snapshot.categories).toEqual({ 'category1': false, 'category2': false, 'category3': true });
+    });
+
+    it('should remove category', () => {
+        schemasState.removeCategory('category1');
+
+        expect(schemasState.snapshot.categories).toEqual({ 'category2': false });
     });
 
     it('should return schema on select and reload when already loaded', () => {
@@ -174,7 +198,7 @@ describe('SchemasState', () => {
     it('should change category and update user info when category changed', () => {
         const category = 'my-new-category';
 
-        schemasService.setup(x => x.putCategory(app, oldSchemas[0].name, It.is<UpdateSchemaCategoryDto>(i => i.category === category), version))
+        schemasService.setup(x => x.putCategory(app, oldSchemas[0].name, It.is<UpdateSchemaCategoryDto>(i => i.name === category), version))
             .returns(() => Observable.of(new Versioned<any>(newVersion, {})));
 
         schemasState.changeCategory(oldSchemas[0], category, modified).subscribe();
@@ -206,7 +230,7 @@ describe('SchemasState', () => {
         it('should change category and update user info when category of selected schema changed', () => {
             const category = 'my-new-category';
 
-            schemasService.setup(x => x.putCategory(app, oldSchemas[0].name, It.is<UpdateSchemaCategoryDto>(i => i.category === category), version))
+            schemasService.setup(x => x.putCategory(app, oldSchemas[0].name, It.is<UpdateSchemaCategoryDto>(i => i.name === category), version))
                 .returns(() => Observable.of(new Versioned<any>(newVersion, {})));
 
             schemasState.changeCategory(oldSchemas[0], category, modified).subscribe();

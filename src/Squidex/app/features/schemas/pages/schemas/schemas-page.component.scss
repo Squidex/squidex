@@ -15,35 +15,16 @@ $button-size: calc(2.5rem - 2px);
     line-height: 2.5rem;
 }
 
-.nav-link {
-    padding-top: .75rem;
-    padding-bottom: .75rem;
-}
-
-.schema {
-    &-name {
-        @include truncate;
-        color: $color-dark-foreground;
-    }
-
-    &-modified {
-        text-align: right;
-        width: auto;
-        white-space: nowrap;
+.new-category-input {
+    & {
+        margin-top: 1rem;
+        background: 0;
+        border-width: 0;
+        border-bottom-width: 1px;
         padding-left: 0;
     }
 
-    &-user {
-        @include border-radius(1px);
-        @include truncate;
-        display: inline-block;
-        background: $color-dark2-control;
-        padding: .1rem .25rem;
-        font-size: .8rem;
-        font-weight: normal;
-        margin-left: 10px;
-        margin-bottom: 2px;
-        max-width: 100%;
-        vertical-align: middle;
+    &:focus {
+        @include box-shadow-none;
     }
 }

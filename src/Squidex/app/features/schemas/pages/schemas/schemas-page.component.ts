@@ -6,12 +6,13 @@
  */
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { FormBuilder, FormControl } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 
 import {
     AppsState,
+    CreateCategoryForm,
     MessageBus,
     ModalView,
     SchemaDto,
@@ -29,27 +30,19 @@ export class SchemasPageComponent implements OnDestroy, OnInit {
     private schemaCloningSubscription: Subscription;
 
     public addSchemaDialog = new ModalView();
+    public addCategoryForm = new CreateCategoryForm(this.formBuilder);
 
     public schemasFilter = new FormControl();
-    public schemasFiltered =
-        this.schemasState.schemas
-            .combineLatest(this.schemasFilter.valueChanges.startWith(''),
-                (schemas, query) => {
-                    if (query && query.length > 0) {
-                        return schemas.filter(t => t.name.indexOf(query) >= 0);
-                    } else {
-                        return schemas;
-                    }
-                });
 
     public import: any;
 
     constructor(
         public readonly appsState: AppsState,
+        public readonly schemasState: SchemasState,
+        private readonly formBuilder: FormBuilder,
         private readonly messageBus: MessageBus,
         private readonly route: ActivatedRoute,
-        private readonly router: Router,
-        private readonly schemasState: SchemasState
+        private readonly router: Router
     ) {
     }
 
@@ -76,6 +69,22 @@ export class SchemasPageComponent implements OnDestroy, OnInit {
         this.schemasState.load().onErrorResumeNext().subscribe();
     }
 
+    public removeCategory(name: string) {
+        this.schemasState.removeCategory(name);
+    }
+
+    public addCategory() {
+        const value = this.addCategoryForm.submit();
+
+        if (value) {
+            try {
+               this.schemasState.addCategory(value.name);
+            } finally {
+                this.addCategoryForm.submitCompleted({});
+            }
+        }
+    }
+
     public onSchemaCreated(schema: SchemaDto) {
         this.router.navigate([schema.name], { relativeTo: this.route });
 
@@ -88,8 +97,8 @@ export class SchemasPageComponent implements OnDestroy, OnInit {
         this.addSchemaDialog.show();
     }
 
-    public trackBySchema(index: number, schema: SchemaDto) {
-        return schema.id;
+    public trackByCategory(index: number, category: string) {
+        return category;
     }
 }
 
