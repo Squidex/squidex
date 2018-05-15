@@ -38,8 +38,8 @@ namespace Squidex.Infrastructure.Assets.ImageSharp
                     resizeMode = ResizeMode.Max;
                 }
 
-                var w = width ?? int.MaxValue;
-                var h = height ?? int.MaxValue;
+                var w = width ?? 0;
+                var h = height ?? 0;
 
                 using (var sourceImage = Image.Load(source, out var format))
                 {

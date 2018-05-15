@@ -46,7 +46,6 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// <summary>
         /// Get the asset content.
         /// </summary>
-        /// <param name="app">The name of the app.</param>
         /// <param name="id">The id of the asset.</param>
         /// <param name="version">The optional version of the asset.</param>
         /// <param name="width">The target width of the asset, if it is an image.</param>
@@ -60,7 +59,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [Route("assets/{id}/")]
         [ProducesResponseType(200)]
         [ApiCosts(0.5)]
-        public async Task<IActionResult> GetAssetContent(string app, Guid id, [FromQuery] int version = -1, [FromQuery] int? width = null, [FromQuery] int? height = null, [FromQuery] string mode = null)
+        public async Task<IActionResult> GetAssetContent(Guid id, [FromQuery] int version = -1, [FromQuery] int? width = null, [FromQuery] int? height = null, [FromQuery] string mode = null)
         {
             var entity = await assetRepository.FindAssetAsync(id);
 
