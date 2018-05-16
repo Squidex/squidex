@@ -24,6 +24,10 @@
     margin-right: 1rem;
 }
 
+.schemas {
+    padding-bottom: 7rem;
+}
+
 .schema {
     &-edit {
         color: $color-border-dark;
@@ -44,7 +48,7 @@
     & {
         @include circle(5.25rem);
         @include box-shadow(0, 8px, 16px, .3);
-        @include absolute(auto, 5rem, 1rem, auto);
+        @include absolute(auto, 6rem, 1rem, auto);
     }
 
     &-icon {
@@ -54,10 +58,6 @@
     &-text {
         font-size: .9rem;
     }
-}
-
-.panel-content-scroll {
-    padding-bottom: 7rem;
 }
 
 .dnd-sortable-drag {
