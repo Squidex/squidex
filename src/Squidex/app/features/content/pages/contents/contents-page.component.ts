@@ -93,6 +93,14 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
         this.contentsState.load(true).onErrorResumeNext().subscribe();
     }
 
+    public deleteSelected() {
+        this.contentsState.deleteMany(this.select()).onErrorResumeNext().subscribe();
+    }
+
+    public delete(content: ContentDto) {
+        this.contentsState.deleteMany([content]).onErrorResumeNext().subscribe();
+    }
+
     public publish(content: ContentDto) {
         this.changeContentItems([content], 'Publish', false);
     }
@@ -136,18 +144,6 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
             })
             .switchMap(d => this.contentsState.changeManyStatus(contents, action, d)).onErrorResumeNext()
             .subscribe();
-    }
-
-    public deleteSelected() {
-        this.resetSelection();
-
-        this.contentsState.deleteMany(this.select()).onErrorResumeNext().subscribe();
-    }
-
-    public delete(content: ContentDto) {
-        this.resetSelection();
-
-        this.contentsState.deleteMany([content]).onErrorResumeNext().subscribe();
     }
 
     public goArchive(isArchive: boolean) {
