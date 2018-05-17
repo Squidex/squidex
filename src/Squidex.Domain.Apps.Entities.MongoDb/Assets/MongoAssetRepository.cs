@@ -15,6 +15,7 @@ using Squidex.Domain.Apps.Entities.Assets.Edm;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Domain.Apps.Entities.MongoDb.Assets.Visitors;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
@@ -43,64 +44,73 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 
         public async Task<IResultList<IAssetEntity>> QueryAsync(Guid appId, string query = null)
         {
-            try
+            using (Profiler.TraceMethod<MongoAssetRepository>("QueryAsyncByQuery"))
             {
-                var odataQuery = EdmAssetModel.Edm.ParseQuery(query);
-
-                var filter = FindExtensions.BuildQuery(odataQuery, appId);
-
-                var contentCount = Collection.Find(filter).CountAsync();
-                var contentItems =
-                    Collection.Find(filter)
-                        .AssetTake(odataQuery)
-                        .AssetSkip(odataQuery)
-                        .AssetSort(odataQuery)
-                        .ToListAsync();
-
-                await Task.WhenAll(contentItems, contentCount);
-
-                return ResultList.Create<IAssetEntity>(contentItems.Result, contentCount.Result);
-            }
-            catch (NotSupportedException)
-            {
-                throw new ValidationException("This odata operation is not supported.");
-            }
-            catch (NotImplementedException)
-            {
-                throw new ValidationException("This odata operation is not supported.");
-            }
-            catch (MongoQueryException ex)
-            {
-                if (ex.Message.Contains("17406"))
+                try
                 {
-                    throw new DomainException("Result set is too large to be retrieved. Use $top parameter to reduce the number of items.");
+                    var odataQuery = EdmAssetModel.Edm.ParseQuery(query);
+
+                    var filter = FindExtensions.BuildQuery(odataQuery, appId);
+
+                    var contentCount = Collection.Find(filter).CountAsync();
+                    var contentItems =
+                        Collection.Find(filter)
+                            .AssetTake(odataQuery)
+                            .AssetSkip(odataQuery)
+                            .AssetSort(odataQuery)
+                            .ToListAsync();
+
+                    await Task.WhenAll(contentItems, contentCount);
+
+                    return ResultList.Create<IAssetEntity>(contentItems.Result, contentCount.Result);
                 }
-                else
+                catch (NotSupportedException)
                 {
-                    throw;
+                    throw new ValidationException("This odata operation is not supported.");
+                }
+                catch (NotImplementedException)
+                {
+                    throw new ValidationException("This odata operation is not supported.");
+                }
+                catch (MongoQueryException ex)
+                {
+                    if (ex.Message.Contains("17406"))
+                    {
+                        throw new DomainException("Result set is too large to be retrieved. Use $top parameter to reduce the number of items.");
+                    }
+                    else
+                    {
+                        throw;
+                    }
                 }
             }
         }
 
         public async Task<IResultList<IAssetEntity>> QueryAsync(Guid appId, HashSet<Guid> ids)
         {
-            var find = Collection.Find(x => ids.Contains(x.Id)).SortByDescending(x => x.LastModified);
+            using (Profiler.TraceMethod<MongoAssetRepository>("QueryAsyncByIds"))
+            {
+                var find = Collection.Find(x => ids.Contains(x.Id)).SortByDescending(x => x.LastModified);
 
-            var assetItems = find.ToListAsync();
-            var assetCount = find.CountAsync();
+                var assetItems = find.ToListAsync();
+                var assetCount = find.CountAsync();
 
-            await Task.WhenAll(assetItems, assetCount);
+                await Task.WhenAll(assetItems, assetCount);
 
-            return ResultList.Create(assetItems.Result.OfType<IAssetEntity>().ToList(), assetCount.Result);
+                return ResultList.Create(assetItems.Result.OfType<IAssetEntity>().ToList(), assetCount.Result);
+            }
         }
 
         public async Task<IAssetEntity> FindAssetAsync(Guid id)
         {
-            var assetEntity =
-                await Collection.Find(x => x.Id == id)
-                    .FirstOrDefaultAsync();
+            using (Profiler.TraceMethod<MongoAssetRepository>())
+            {
+                var assetEntity =
+                    await Collection.Find(x => x.Id == id)
+                        .FirstOrDefaultAsync();
 
-            return assetEntity;
+                return assetEntity;
+            }
         }
     }
 }

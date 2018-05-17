@@ -12,6 +12,7 @@ using Squidex.Domain.Apps.Core.ConvertContent;
 using Squidex.Domain.Apps.Entities.Contents.State;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
 
@@ -19,43 +20,49 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 {
     public partial class MongoContentRepository : ISnapshotStore<ContentState, Guid>
     {
-        public Task<(ContentState Value, long Version)> ReadAsync(Guid key)
+        public async Task<(ContentState Value, long Version)> ReadAsync(Guid key)
         {
-            return contentsDraft.ReadAsync(key, GetSchemaAsync);
+            using (Profiler.TraceMethod<MongoContentRepository>())
+            {
+                return await contentsDraft.ReadAsync(key, GetSchemaAsync);
+            }
         }
 
         public async Task WriteAsync(Guid key, ContentState value, long oldVersion, long newVersion)
         {
-            if (value.SchemaId.Id == Guid.Empty)
+            using (Profiler.TraceMethod<MongoContentRepository>())
             {
-                return;
-            }
+                if (value.SchemaId.Id == Guid.Empty)
+                {
+                    return;
+                }
 
-            var schema = await GetSchemaAsync(value.AppId.Id, value.SchemaId.Id);
+                var schema = await GetSchemaAsync(value.AppId.Id, value.SchemaId.Id);
 
-            var idData = value.Data.ToIdModel(schema.SchemaDef, true);
+                var idData = value.Data.ToIdModel(schema.SchemaDef, true);
 
-            var content = SimpleMapper.Map(value, new MongoContentEntity
-            {
-                DataByIds = idData,
-                DataDraftByIds = value.DataDraft?.ToIdModel(schema.SchemaDef, true),
-                IsDeleted = value.IsDeleted,
-                IndexedAppId = value.AppId.Id,
-                IndexedSchemaId = value.SchemaId.Id,
-                ReferencedIds = idData.ToReferencedIds(schema.SchemaDef),
-                ScheduledAt = value.ScheduleJob?.DueTime,
-                Version = newVersion
-            });
+                var content = SimpleMapper.Map(value, new MongoContentEntity
+                {
+                    DataByIds = idData,
+                    DataDraftByIds = value.DataDraft?.ToIdModel(schema.SchemaDef, true),
+                    IsDeleted = value.IsDeleted,
+                    IndexedAppId = value.AppId.Id,
+                    IndexedSchemaId = value.SchemaId.Id,
+                    ReferencedIds = idData.ToReferencedIds(schema.SchemaDef),
+                    ScheduledAt = value.ScheduleJob?.DueTime,
+                    Version = newVersion
+                });
 
-            await contentsDraft.UpsertAsync(content, oldVersion);
+                await contentsDraft.UpsertAsync(content, oldVersion);
 
-            if (value.Status == Status.Published && !value.IsDeleted)
-            {
-                await contentsPublished.UpsertAsync(content);
-            }
-            else
-            {
-                await contentsPublished.RemoveAsync(content.Id);
+                if (value.Status == Status.Published && !value.IsDeleted)
+                {
+                    await contentsPublished.UpsertAsync(content);
+                }
+                else
+                {
+                    await contentsPublished.RemoveAsync(content.Id);
+                }
             }
         }
 

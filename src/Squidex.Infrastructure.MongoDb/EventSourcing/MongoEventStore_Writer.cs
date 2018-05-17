@@ -11,6 +11,7 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using Squidex.Infrastructure.Log;
 
 namespace Squidex.Infrastructure.EventSourcing
 {
@@ -26,57 +27,60 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public async Task AppendAsync(Guid commitId, string streamName, long expectedVersion, ICollection<EventData> events)
         {
-            Guard.GreaterEquals(expectedVersion, EtagVersion.Any, nameof(expectedVersion));
-            Guard.NotNullOrEmpty(streamName, nameof(streamName));
-            Guard.NotNull(events, nameof(events));
-
-            if (events.Count == 0)
+            using (Profiler.TraceMethod<MongoEventStore>())
             {
-                return;
-            }
+                Guard.GreaterEquals(expectedVersion, EtagVersion.Any, nameof(expectedVersion));
+                Guard.NotNullOrEmpty(streamName, nameof(streamName));
+                Guard.NotNull(events, nameof(events));
 
-            var currentVersion = await GetEventStreamOffset(streamName);
-
-            if (expectedVersion != EtagVersion.Any && expectedVersion != currentVersion)
-            {
-                throw new WrongEventVersionException(currentVersion, expectedVersion);
-            }
-
-            var commit = BuildCommit(commitId, streamName, expectedVersion >= -1 ? expectedVersion : currentVersion, events);
-
-            for (var attempt = 0; attempt < MaxWriteAttempts; attempt++)
-            {
-                try
+                if (events.Count == 0)
                 {
-                    await Collection.InsertOneAsync(commit);
-
-                    notifier.NotifyEventsStored(streamName);
-
                     return;
                 }
-                catch (MongoWriteException ex)
+
+                var currentVersion = await GetEventStreamOffset(streamName);
+
+                if (expectedVersion != EtagVersion.Any && expectedVersion != currentVersion)
                 {
-                    if (ex.WriteError?.Category == ServerErrorCategory.DuplicateKey)
+                    throw new WrongEventVersionException(currentVersion, expectedVersion);
+                }
+
+                var commit = BuildCommit(commitId, streamName, expectedVersion >= -1 ? expectedVersion : currentVersion, events);
+
+                for (var attempt = 0; attempt < MaxWriteAttempts; attempt++)
+                {
+                    try
                     {
-                        currentVersion = await GetEventStreamOffset(streamName);
+                        await Collection.InsertOneAsync(commit);
 
-                        if (expectedVersion != EtagVersion.Any)
-                        {
-                            throw new WrongEventVersionException(currentVersion, expectedVersion);
-                        }
+                        notifier.NotifyEventsStored(streamName);
 
-                        if (attempt < MaxWriteAttempts)
+                        return;
+                    }
+                    catch (MongoWriteException ex)
+                    {
+                        if (ex.WriteError?.Category == ServerErrorCategory.DuplicateKey)
                         {
-                            expectedVersion = currentVersion;
+                            currentVersion = await GetEventStreamOffset(streamName);
+
+                            if (expectedVersion != EtagVersion.Any)
+                            {
+                                throw new WrongEventVersionException(currentVersion, expectedVersion);
+                            }
+
+                            if (attempt < MaxWriteAttempts)
+                            {
+                                expectedVersion = currentVersion;
+                            }
+                            else
+                            {
+                                throw new TimeoutException("Could not acquire a free slot for the commit within the provided time.");
+                            }
                         }
                         else
                         {
-                            throw new TimeoutException("Could not acquire a free slot for the commit within the provided time.");
+                            throw;
                         }
-                    }
-                    else
-                    {
-                        throw;
                     }
                 }
             }

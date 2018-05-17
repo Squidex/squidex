@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Newtonsoft.Json;
+using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Infrastructure.States
@@ -37,26 +38,35 @@ namespace Squidex.Infrastructure.States
 
         public async Task<(T Value, long Version)> ReadAsync(TKey key)
         {
-            var existing =
-                await Collection.Find(x => x.Id.Equals(key))
-                    .FirstOrDefaultAsync();
-
-            if (existing != null)
+            using (Profiler.TraceMethod<MongoSnapshotStore<T, TKey>>())
             {
-                return (existing.Doc, existing.Version);
+                var existing =
+                    await Collection.Find(x => x.Id.Equals(key))
+                        .FirstOrDefaultAsync();
+
+                if (existing != null)
+                {
+                    return (existing.Doc, existing.Version);
+                }
+
+                return (default(T), EtagVersion.NotFound);
             }
-
-            return (default(T), EtagVersion.NotFound);
         }
 
-        public Task WriteAsync(TKey key, T value, long oldVersion, long newVersion)
+        public async Task WriteAsync(TKey key, T value, long oldVersion, long newVersion)
         {
-            return Collection.UpsertVersionedAsync(key, oldVersion, newVersion, u => u.Set(x => x.Doc, value));
+            using (Profiler.TraceMethod<MongoSnapshotStore<T, TKey>>())
+            {
+                await Collection.UpsertVersionedAsync(key, oldVersion, newVersion, u => u.Set(x => x.Doc, value));
+            }
         }
 
-        public Task ReadAllAsync(System.Func<T, long, Task> callback)
+        public async Task ReadAllAsync(System.Func<T, long, Task> callback)
         {
-            return Collection.Find(new BsonDocument()).ForEachAsync(x => callback(x.Doc, x.Version));
+            using (Profiler.TraceMethod<MongoSnapshotStore<T, TKey>>())
+            {
+                return Collection.Find(new BsonDocument()).ForEachAsync(x => callback(x.Doc, x.Version));
+            }
         }
     }
 }

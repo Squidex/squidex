@@ -17,6 +17,7 @@ using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Log;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 {
@@ -45,50 +46,65 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             contentsPublished.Initialize();
         }
 
-        public Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, Status[] status, ODataUriParser odataQuery)
+        public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, Status[] status, ODataUriParser odataQuery)
         {
-            if (RequiresPublished(status))
+            using (Profiler.TraceMethod<MongoContentRepository>("QueryAsyncByQuery"))
             {
-                return contentsPublished.QueryAsync(app, schema, odataQuery);
-            }
-            else
-            {
-                return contentsDraft.QueryAsync(app, schema, odataQuery, status, true);
+                if (RequiresPublished(status))
+                {
+                    return await contentsPublished.QueryAsync(app, schema, odataQuery);
+                }
+                else
+                {
+                    return await contentsDraft.QueryAsync(app, schema, odataQuery, status, true);
+                }
             }
         }
 
-        public Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, Status[] status, HashSet<Guid> ids)
+        public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, Status[] status, HashSet<Guid> ids)
         {
-            if (RequiresPublished(status))
+            using (Profiler.TraceMethod<MongoContentRepository>("QueryAsyncByIds"))
             {
-                return contentsPublished.QueryAsync(app, schema, ids);
-            }
-            else
-            {
-                return contentsDraft.QueryAsync(app, schema, ids, status);
-            }
-        }
-
-        public Task<IContentEntity> FindContentAsync(IAppEntity app, ISchemaEntity schema, Status[] status, Guid id)
-        {
-            if (RequiresPublished(status))
-            {
-                return contentsPublished.FindContentAsync(app, schema, id);
-            }
-            else
-            {
-                return contentsDraft.FindContentAsync(app, schema, id);
+                if (RequiresPublished(status))
+                {
+                    return await contentsPublished.QueryAsync(app, schema, ids);
+                }
+                else
+                {
+                    return await contentsDraft.QueryAsync(app, schema, ids, status);
+                }
             }
         }
 
-        public Task<IReadOnlyList<Guid>> QueryNotFoundAsync(Guid appId, Guid schemaId, IList<Guid> ids)
+        public async Task<IContentEntity> FindContentAsync(IAppEntity app, ISchemaEntity schema, Status[] status, Guid id)
         {
-            return contentsDraft.QueryNotFoundAsync(appId, schemaId, ids);
+            using (Profiler.TraceMethod<MongoContentRepository>())
+            {
+                if (RequiresPublished(status))
+                {
+                    return await contentsPublished.FindContentAsync(app, schema, id);
+                }
+                else
+                {
+                    return await contentsDraft.FindContentAsync(app, schema, id);
+                }
+            }
         }
 
-        public Task QueryScheduledWithoutDataAsync(Instant now, Func<IContentEntity, Task> callback)
+        public async Task<IReadOnlyList<Guid>> QueryNotFoundAsync(Guid appId, Guid schemaId, IList<Guid> ids)
         {
-            return contentsDraft.QueryScheduledWithoutDataAsync(now, callback);
+            using (Profiler.TraceMethod<MongoContentRepository>())
+            {
+                await contentsDraft.QueryNotFoundAsync(appId, schemaId, ids);
+            }
+        }
+
+        public async Task QueryScheduledWithoutDataAsync(Instant now, Func<IContentEntity, Task> callback)
+        {
+            using (Profiler.TraceMethod<MongoContentRepository>())
+            {
+                await contentsDraft.QueryScheduledWithoutDataAsync(now, callback);
+            }
         }
 
         public Task ClearAsync()

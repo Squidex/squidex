@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Contents.State;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Contents
@@ -31,25 +32,28 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public async Task<IContentEntity> LoadAsync(Guid id, long version)
         {
-            var content = new ContentState();
-
-            var persistence = store.WithEventSourcing<ContentGrain, Guid>(id, e =>
+            using (Profiler.TraceMethod<ContentVersionLoader>())
             {
-                if (content.Version < version)
+                var content = new ContentState();
+
+                var persistence = store.WithEventSourcing<ContentGrain, Guid>(id, e =>
                 {
-                    content = content.Apply(e);
-                    content.Version++;
+                    if (content.Version < version)
+                    {
+                        content = content.Apply(e);
+                        content.Version++;
+                    }
+                });
+
+                await persistence.ReadAsync();
+
+                if (content.Version != version)
+                {
+                    throw new DomainObjectNotFoundException(id.ToString(), typeof(IContentEntity));
                 }
-            });
 
-            await persistence.ReadAsync();
-
-            if (content.Version != version)
-            {
-                throw new DomainObjectNotFoundException(id.ToString(), typeof(IContentEntity));
+                return content;
             }
-
-            return content;
         }
     }
 }

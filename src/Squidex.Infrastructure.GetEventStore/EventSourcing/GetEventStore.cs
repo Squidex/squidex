@@ -11,6 +11,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using EventStore.ClientAPI;
+using Squidex.Infrastructure.Log;
 
 namespace Squidex.Infrastructure.EventSourcing
 {
@@ -59,20 +60,26 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public async Task QueryAsync(Func<StoredEvent, Task> callback, string property, object value, string position = null, CancellationToken ct = default(CancellationToken))
         {
-            var streamName = await projectionClient.CreateProjectionAsync(property, value);
+            using (Profiler.TraceMethod<GetEventStore>())
+            {
+                var streamName = await projectionClient.CreateProjectionAsync(property, value);
 
-            var sliceStart = projectionClient.ParsePosition(position);
+                var sliceStart = projectionClient.ParsePosition(position);
 
-            await QueryAsync(callback, streamName, sliceStart, ct);
+                await QueryAsync(callback, streamName, sliceStart, ct);
+            }
         }
 
         public async Task QueryAsync(Func<StoredEvent, Task> callback, string streamFilter = null, string position = null, CancellationToken ct = default(CancellationToken))
         {
-            var streamName = await projectionClient.CreateProjectionAsync(streamFilter);
+            using (Profiler.TraceMethod<GetEventStore>())
+            {
+                var streamName = await projectionClient.CreateProjectionAsync(streamFilter);
 
-            var sliceStart = projectionClient.ParsePosition(position);
+                var sliceStart = projectionClient.ParsePosition(position);
 
-            await QueryAsync(callback, streamName, sliceStart, ct);
+                await QueryAsync(callback, streamName, sliceStart, ct);
+            }
         }
 
         private Task QueryAsync(Func<StoredEvent, Task> callback, string streamName, long sliceStart, CancellationToken ct)
@@ -82,30 +89,33 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public async Task<IReadOnlyList<StoredEvent>> QueryAsync(string streamName, long streamPosition = 0)
         {
-            var result = new List<StoredEvent>();
-
-            var sliceStart = streamPosition;
-
-            StreamEventsSlice currentSlice;
-            do
+            using (Profiler.TraceMethod<GetEventStore>())
             {
-                currentSlice = await connection.ReadStreamEventsForwardAsync(streamName, sliceStart, ReadPageSize, false);
+                var result = new List<StoredEvent>();
 
-                if (currentSlice.Status == SliceReadStatus.Success)
+                var sliceStart = streamPosition;
+
+                StreamEventsSlice currentSlice;
+                do
                 {
-                    sliceStart = currentSlice.NextEventNumber;
+                    currentSlice = await connection.ReadStreamEventsForwardAsync(streamName, sliceStart, ReadPageSize, false);
 
-                    foreach (var resolved in currentSlice.Events)
+                    if (currentSlice.Status == SliceReadStatus.Success)
                     {
-                        var storedEvent = Formatter.Read(resolved);
+                        sliceStart = currentSlice.NextEventNumber;
 
-                        result.Add(storedEvent);
+                        foreach (var resolved in currentSlice.Events)
+                        {
+                            var storedEvent = Formatter.Read(resolved);
+
+                            result.Add(storedEvent);
+                        }
                     }
                 }
-            }
-            while (!currentSlice.IsEndOfStream);
+                while (!currentSlice.IsEndOfStream);
 
-            return result;
+                return result;
+            }
         }
 
         public Task AppendAsync(Guid commitId, string streamName, ICollection<EventData> events)
@@ -122,30 +132,33 @@ namespace Squidex.Infrastructure.EventSourcing
 
         private async Task AppendEventsInternalAsync(string streamName, long expectedVersion, ICollection<EventData> events)
         {
-            Guard.NotNullOrEmpty(streamName, nameof(streamName));
-            Guard.NotNull(events, nameof(events));
-
-            if (events.Count == 0)
+            using (Profiler.TraceMethod<GetEventStore>(nameof(AppendAsync)))
             {
-                return;
-            }
+                Guard.NotNullOrEmpty(streamName, nameof(streamName));
+                Guard.NotNull(events, nameof(events));
 
-            var eventsToSave = events.Select(Formatter.Write).ToList();
-
-            if (eventsToSave.Count < WritePageSize)
-            {
-                await connection.AppendToStreamAsync(GetStreamName(streamName), expectedVersion, eventsToSave);
-            }
-            else
-            {
-                using (var transaction = await connection.StartTransactionAsync(GetStreamName(streamName), expectedVersion))
+                if (events.Count == 0)
                 {
-                    for (var p = 0; p < eventsToSave.Count; p += WritePageSize)
-                    {
-                        await transaction.WriteAsync(eventsToSave.Skip(p).Take(WritePageSize));
-                    }
+                    return;
+                }
 
-                    await transaction.CommitAsync();
+                var eventsToSave = events.Select(Formatter.Write).ToList();
+
+                if (eventsToSave.Count < WritePageSize)
+                {
+                    await connection.AppendToStreamAsync(GetStreamName(streamName), expectedVersion, eventsToSave);
+                }
+                else
+                {
+                    using (var transaction = await connection.StartTransactionAsync(GetStreamName(streamName), expectedVersion))
+                    {
+                        for (var p = 0; p < eventsToSave.Count; p += WritePageSize)
+                        {
+                            await transaction.WriteAsync(eventsToSave.Skip(p).Take(WritePageSize));
+                        }
+
+                        await transaction.CommitAsync();
+                    }
                 }
             }
         }
