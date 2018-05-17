@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System;
-using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -144,19 +143,18 @@ namespace Squidex.Config.Orleans
 
         public void Initialize()
         {
-            var startTime = Stopwatch.GetTimestamp();
+            var watch = ValueStopwatch.StartNew();
             try
             {
                 silo.Value.StartAsync().Wait();
             }
             finally
             {
-                var endTime = Stopwatch.GetTimestamp();
-                var elapsed = endTime - startTime;
+                var elapsedMs = watch.Stop();
 
                 log.LogInformation(w => w
                     .WriteProperty("message", "Silo started")
-                    .WriteProperty("elapsedMs", elapsed));
+                    .WriteProperty("elapsedMs", elapsedMs));
             }
         }
 

@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System;
-using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using Squidex.Infrastructure.Tasks;
@@ -56,14 +55,13 @@ namespace Squidex.Infrastructure.Log
                 return NoopDisposable.Instance;
             }
 
-            var startTime = Stopwatch.GetTimestamp();
+            var watch = ValueStopwatch.StartNew();
 
             return new DelegateDisposable(() =>
             {
-                var endTime = Stopwatch.GetTimestamp();
-                var elapsed = endTime - startTime;
+                var elapsedMs = watch.Stop();
 
-                session.Measured(key, elapsed);
+                session.Measured(key, elapsedMs);
             });
         }
     }

@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using FakeItEasy;
 using Orleans.Serialization;
 using Xunit;
@@ -48,28 +49,29 @@ namespace Squidex.Infrastructure.Orleans
         {
             var value = new J<List<int>>(new List<int> { 1, 2, 3 });
 
-            var writtenLength = 0;
-            var writtenBuffer = (byte[])null;
+            var buffer = new MemoryStream();
 
             var writer = A.Fake<IBinaryTokenStreamWriter>();
             var writerContext = new SerializationContext(null) { StreamWriter = writer };
 
-            A.CallTo(() => writer.Write(A<int>.Ignored))
-                .Invokes(new Action<int>(x => writtenLength = x));
-
-            A.CallTo(() => writer.Write(A<byte[]>.Ignored))
-                .Invokes(new Action<byte[]>(x => writtenBuffer = x));
+            A.CallTo(() => writer.Write(A<byte[]>.Ignored, A<int>.Ignored, A<int>.Ignored))
+                .Invokes(new Action<byte[], int, int>(buffer.Write));
+            A.CallTo(() => writer.CurrentOffset)
+                .ReturnsLazily(x => (int)buffer.Position);
 
             J<object>.Serialize(value, writerContext, value.GetType());
+
+            buffer.Position = 0;
 
             var reader = A.Fake<IBinaryTokenStreamReader>();
             var readerContext = new DeserializationContext(null) { StreamReader = reader };
 
-            A.CallTo(() => reader.ReadInt())
-                .Returns(writtenLength);
-
-            A.CallTo(() => reader.ReadBytes(writtenLength))
-                .Returns(writtenBuffer);
+            A.CallTo(() => reader.ReadByteArray(A<byte[]>.Ignored, A<int>.Ignored, A<int>.Ignored))
+                .Invokes(new Action<byte[], int, int>((b, o, l) => buffer.Read(b, o, l)));
+            A.CallTo(() => reader.CurrentPosition)
+                .ReturnsLazily(x => (int)buffer.Position);
+            A.CallTo(() => reader.Length)
+                .ReturnsLazily(x => (int)buffer.Length);
 
             var copy = (J<List<int>>)J<object>.Deserialize(value.GetType(), readerContext);
 

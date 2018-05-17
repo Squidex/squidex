@@ -59,7 +59,7 @@ namespace Squidex.Infrastructure.Orleans
             {
                 var jsonSerializer = GetSerializer(context);
 
-                var stream = new MemoryStream();
+                var stream = new StreamWriterWrapper(context.StreamWriter);
 
                 using (var writer = new JsonTextWriter(new StreamWriter(stream)))
                 {
@@ -67,11 +67,6 @@ namespace Squidex.Infrastructure.Orleans
 
                     writer.Flush();
                 }
-
-                var outBytes = stream.ToArray();
-
-                context.StreamWriter.Write(outBytes.Length);
-                context.StreamWriter.Write(outBytes);
             }
         }
 
@@ -82,10 +77,7 @@ namespace Squidex.Infrastructure.Orleans
             {
                 var jsonSerializer = GetSerializer(context);
 
-                var outLength = context.StreamReader.ReadInt();
-                var outBytes = context.StreamReader.ReadBytes(outLength);
-
-                var stream = new MemoryStream(outBytes);
+                var stream = new StreamReaderWrapper(context.StreamReader);
 
                 using (var reader = new JsonTextReader(new StreamReader(stream)))
                 {

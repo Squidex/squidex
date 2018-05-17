@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System;
-using System.Diagnostics;
 
 namespace Squidex.Infrastructure.Log
 {
@@ -94,18 +93,17 @@ namespace Squidex.Infrastructure.Log
 
         private static IDisposable Measure(this ISemanticLog log, SemanticLogLevel logLevel, Action<IObjectWriter> objectWriter)
         {
-            var startTime = Stopwatch.GetTimestamp();
+            var watch = ValueStopwatch.StartNew();
 
             return new DelegateDisposable(() =>
             {
-                var endTime = Stopwatch.GetTimestamp();
-                var elapsed = endTime - startTime;
+                var elapsedMs = watch.Stop();
 
                 log.Log(logLevel, writer =>
                 {
                     objectWriter?.Invoke(writer);
 
-                    writer.WriteProperty("elapsedMs", elapsed);
+                    writer.WriteProperty("elapsedMs", elapsedMs);
                 });
             });
         }

@@ -5,9 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
 
 namespace Squidex.Pipeline
@@ -23,7 +23,7 @@ namespace Squidex.Pipeline
 
         public async Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
-            var startTime = Stopwatch.GetTimestamp();
+            var watch = ValueStopwatch.StartNew();
 
             using (Profiler.StartSession())
             {
@@ -33,14 +33,13 @@ namespace Squidex.Pipeline
                 }
                 finally
                 {
-                    var endTime = Stopwatch.GetTimestamp();
-                    var elapsed = endTime - startTime;
+                    var elapsedMs = watch.Stop();
 
                     log.LogInformation(w =>
                     {
                         Profiler.Session?.Write(w);
 
-                        w.WriteProperty("elapsedRequestMs", elapsed);
+                        w.WriteProperty("elapsedRequestMs", elapsedMs);
                     });
                 }
             }
