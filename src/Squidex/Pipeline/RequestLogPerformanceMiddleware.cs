@@ -23,7 +23,7 @@ namespace Squidex.Pipeline
 
         public async Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
-            var stopWatch = Stopwatch.StartNew();
+            var startTime = Stopwatch.GetTimestamp();
 
             using (Profiler.StartSession())
             {
@@ -33,13 +33,14 @@ namespace Squidex.Pipeline
                 }
                 finally
                 {
-                    stopWatch.Stop();
+                    var endTime = Stopwatch.GetTimestamp();
+                    var elapsed = endTime - startTime;
 
                     log.LogInformation(w =>
                     {
                         Profiler.Session?.Write(w);
 
-                        w.WriteProperty("elapsedRequestMs", stopWatch.ElapsedMilliseconds);
+                        w.WriteProperty("elapsedRequestMs", elapsed);
                     });
                 }
             }

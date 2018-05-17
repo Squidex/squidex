@@ -143,19 +143,19 @@ namespace Squidex.Config.Orleans
 
         public void Initialize()
         {
-            var watch = Stopwatch.StartNew();
+            var startTime = Stopwatch.GetTimestamp();
             try
             {
                 silo.Value.StartAsync().Wait();
             }
             finally
             {
-                watch.Stop();
+                var endTime = Stopwatch.GetTimestamp();
+                var elapsed = endTime - startTime;
 
                 log.LogInformation(w => w
                     .WriteProperty("message", "Silo started")
-                    .WriteProperty("elapsed", watch.Elapsed)
-                    .WriteProperty("elapsedMs", watch.ElapsedMilliseconds));
+                    .WriteProperty("elapsedMs", elapsed));
             }
         }
 

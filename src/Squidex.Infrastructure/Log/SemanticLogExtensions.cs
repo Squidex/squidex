@@ -94,17 +94,18 @@ namespace Squidex.Infrastructure.Log
 
         private static IDisposable Measure(this ISemanticLog log, SemanticLogLevel logLevel, Action<IObjectWriter> objectWriter)
         {
-            var watch = Stopwatch.StartNew();
+            var startTime = Stopwatch.GetTimestamp();
 
             return new DelegateDisposable(() =>
             {
-                watch.Stop();
+                var endTime = Stopwatch.GetTimestamp();
+                var elapsed = endTime - startTime;
 
                 log.Log(logLevel, writer =>
                 {
                     objectWriter?.Invoke(writer);
 
-                    writer.WriteProperty("elapsedMs", watch.ElapsedMilliseconds);
+                    writer.WriteProperty("elapsedMs", elapsed);
                 });
             });
         }

@@ -56,13 +56,14 @@ namespace Squidex.Infrastructure.Log
                 return NoopDisposable.Instance;
             }
 
-            var watch = Stopwatch.StartNew();
+            var startTime = Stopwatch.GetTimestamp();
 
             return new DelegateDisposable(() =>
             {
-                watch.Stop();
+                var endTime = Stopwatch.GetTimestamp();
+                var elapsed = endTime - startTime;
 
-                session.Measured(key, watch.ElapsedMilliseconds);
+                session.Measured(key, elapsed);
             });
         }
     }

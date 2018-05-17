@@ -61,7 +61,7 @@ namespace Squidex.Pipeline
                     }
                 }
 
-                var stopWatch = Stopwatch.StartNew();
+                var startTime = Stopwatch.GetTimestamp();
 
                 try
                 {
@@ -69,9 +69,10 @@ namespace Squidex.Pipeline
                 }
                 finally
                 {
-                    stopWatch.Stop();
+                    var endTime = Stopwatch.GetTimestamp();
+                    var elapsed = endTime - startTime;
 
-                    await usageTracker.TrackAsync(appFeature.App.Id.ToString(), FilterDefinition.Weight, stopWatch.ElapsedMilliseconds);
+                    await usageTracker.TrackAsync(appFeature.App.Id.ToString(), FilterDefinition.Weight, elapsed);
                 }
             }
             else
