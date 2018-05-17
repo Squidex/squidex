@@ -14,7 +14,7 @@ namespace Squidex.Infrastructure
         private const long TicksPerMillisecond = 10000;
         private const long TicksPerSecond = TicksPerMillisecond * 1000;
 
-        private static double tickFrequency;
+        private static readonly double TickFrequency;
 
         private readonly long startTime;
 
@@ -22,7 +22,7 @@ namespace Squidex.Infrastructure
         {
             if (Stopwatch.IsHighResolution)
             {
-                tickFrequency = (double)TicksPerSecond / Stopwatch.Frequency;
+                TickFrequency = (double)TicksPerSecond / Stopwatch.Frequency;
             }
         }
 
@@ -47,7 +47,7 @@ namespace Squidex.Infrastructure
 
             if (Stopwatch.IsHighResolution)
             {
-                elapsed = unchecked((long)(elapsed * tickFrequency));
+                elapsed = unchecked((long)(elapsed * TickFrequency));
             }
 
             return elapsed / TicksPerMillisecond;
