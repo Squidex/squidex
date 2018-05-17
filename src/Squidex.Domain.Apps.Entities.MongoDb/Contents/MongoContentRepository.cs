@@ -95,7 +95,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
             using (Profiler.TraceMethod<MongoContentRepository>())
             {
-                await contentsDraft.QueryNotFoundAsync(appId, schemaId, ids);
+                return await contentsDraft.QueryNotFoundAsync(appId, schemaId, ids);
             }
         }
 
