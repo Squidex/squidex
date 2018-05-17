@@ -47,14 +47,14 @@ namespace Squidex.Domain.Apps.Entities
                         return (null, null);
                     }
 
-                    var schema = await grainFactory.GetGrain<ISchemaGrain>(id).GetStateAsync();
+                    var schema = await GetSchemaAsync(appId, id, false);
 
-                    if (!IsExisting(schema, false))
+                    if (schema == null)
                     {
                         return (null, null);
                     }
 
-                    return (app.Value, schema.Value);
+                    return (app.Value, schema);
                 }
             });
         }

@@ -31,6 +31,7 @@ namespace Squidex.Config.Orleans
                 .Configure<ClusterOptions>(options =>
                 {
                     options.ClusterId = "squidex";
+                    options.ServiceId = "squidex";
                 })
                 .ConfigureServices((context, services) =>
                 {
