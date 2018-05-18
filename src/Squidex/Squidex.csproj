@@ -75,8 +75,8 @@
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="2.0.1" />
     <PackageReference Include="Microsoft.Data.Edm" Version="5.8.3" />
     <PackageReference Include="Microsoft.OData.Core" Version="7.4.4" />
-    <PackageReference Include="Microsoft.Orleans.Client" Version="2.0.0" />
-    <PackageReference Include="Microsoft.Orleans.Server " Version="2.0.0-rc2" />
+    <PackageReference Include="Microsoft.Orleans.Client" Version="2.0.0-ci.20180515.5" />
+    <PackageReference Include="Microsoft.Orleans.OrleansRuntime" Version="2.0.3-ci.20180511.2" />
     <PackageReference Include="Microsoft.VisualStudio.Web.BrowserLink" Version="2.0.2" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.0.3" />
     <PackageReference Include="MongoDB.Driver" Version="2.5.1" />
