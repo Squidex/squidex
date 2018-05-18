@@ -32,9 +32,16 @@ namespace Squidex.Areas.IdentityServer.Config
         public static IServiceProvider UseMyAdminRole(this IServiceProvider services)
         {
             var roleManager = services.GetRequiredService<RoleManager<IRole>>();
-            var roleFactory = services.GetRequiredService<IRoleFactory>();
 
-            roleManager.CreateAsync(roleFactory.Create(SquidexRoles.Administrator)).Wait();
+            Task.Run(async () =>
+            {
+                if (!await roleManager.RoleExistsAsync(SquidexRoles.Administrator))
+                {
+                    var role = services.GetRequiredService<IRoleFactory>().Create(SquidexRoles.Administrator);
+
+                    await roleManager.CreateAsync(role);
+                }
+            }).Wait();
 
             return services;
         }
