@@ -70,6 +70,7 @@ export class FieldComponent implements OnInit {
     }
 
     public cancel() {
+        this.isEditing = false;
         this.editForm.load(this.field);
     }
 
