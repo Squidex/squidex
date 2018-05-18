@@ -5,6 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Squidex.Infrastructure;
@@ -14,6 +16,7 @@ namespace Squidex.Pipeline
 {
     public sealed class RequestLogPerformanceMiddleware : IMiddleware
     {
+        private const int LongOperationsMs = 1000;
         private readonly ISemanticLog log;
 
         public RequestLogPerformanceMiddleware(ISemanticLog log)

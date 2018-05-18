@@ -3,7 +3,7 @@
   <PropertyGroup>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <MvcRazorCompileOnPublish>true</MvcRazorCompileOnPublish>
-    <NoWarn>$(NoWarn);CS1591;1591;1573;1572</NoWarn>
+    <NoWarn>$(NoWarn);CS1591;1591;1573;1572;NU1605</NoWarn>
     <PackageId>Squidex</PackageId>
     <PreserveCompilationContext>true</PreserveCompilationContext>
     <TargetFramework>netcoreapp2.0</TargetFramework>
@@ -76,7 +76,9 @@
     <PackageReference Include="Microsoft.Data.Edm" Version="5.8.3" />
     <PackageReference Include="Microsoft.OData.Core" Version="7.4.4" />
     <PackageReference Include="Microsoft.Orleans.Client" Version="2.0.0-ci.20180515.5" />
-    <PackageReference Include="Microsoft.Orleans.OrleansRuntime" Version="2.0.3-ci.20180511.2" />
+    <PackageReference Include="Microsoft.Orleans.Core" Version="2.0.0-ci.20180515.5" />
+    <PackageReference Include="Microsoft.Orleans.Core.Abstractions" Version="2.0.0-ci.20180515.5" />
+    <PackageReference Include="Microsoft.Orleans.OrleansRuntime" Version="2.0.0-ci.20180515.5" />
     <PackageReference Include="Microsoft.VisualStudio.Web.BrowserLink" Version="2.0.2" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.0.3" />
     <PackageReference Include="MongoDB.Driver" Version="2.5.1" />
@@ -112,5 +114,4 @@
   <ItemGroup>
     <PackageReference Update="Microsoft.Orleans.Server" Version="2.0.0" />
   </ItemGroup>
-
 </Project>
