@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -66,8 +67,8 @@ namespace Squidex.Config.Orleans
                     })
                     .Configure<ClusterOptions>(options =>
                     {
-                        options.ClusterId = "squidex";
-                        options.ServiceId = "squidex";
+                        options.ClusterId = Constants.OrleansClusterId;
+                        options.ServiceId = Constants.OrleansClusterId;
                     })
                     .ConfigureLogging((hostingContext, builder) =>
                     {
@@ -102,7 +103,7 @@ namespace Squidex.Config.Orleans
                 {
                     ["MongoDB"] = () =>
                     {
-                        hostBuilder.ConfigureEndpoints(ConfigUtilities.SiloAddress, 11111, 40000, true);
+                        hostBuilder.ConfigureEndpoints(Dns.GetHostName(), 11111, 40000, listenOnAnyHostAddress: true);
 
                         var mongoConfiguration = config.GetRequiredValue("store:mongoDb:configuration");
                         var mongoDatabaseName = config.GetRequiredValue("store:mongoDb:database");
@@ -116,7 +117,7 @@ namespace Squidex.Config.Orleans
                     },
                     ["Development"] = () =>
                     {
-                        hostBuilder.UseLocalhostClustering(gatewayPort: 40000, clusterId: "squidex");
+                        hostBuilder.UseLocalhostClustering(gatewayPort: 40000, serviceId: Constants.OrleansClusterId, clusterId: Constants.OrleansClusterId);
                         hostBuilder.Configure<ClusterMembershipOptions>(options => options.ExpectedClusterSize = 1);
                     }
                 });

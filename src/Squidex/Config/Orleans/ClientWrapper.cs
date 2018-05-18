@@ -24,14 +24,11 @@ namespace Squidex.Config.Orleans
         {
             Client = new ClientBuilder()
                 .UseDashboard()
-                .UseStaticClustering(options =>
-                {
-                    options.Gateways.Add(new IPEndPoint(ConfigUtilities.SiloAddress, 40000).ToGatewayUri());
-                })
+                .UseLocalhostClustering(40000)
                 .Configure<ClusterOptions>(options =>
                 {
-                    options.ClusterId = "squidex";
-                    options.ServiceId = "squidex";
+                    options.ClusterId = Constants.OrleansClusterId;
+                    options.ServiceId = Constants.OrleansClusterId;
                 })
                 .ConfigureServices((context, services) =>
                 {
