@@ -55,7 +55,7 @@ export class BackupsState extends State<Snapshot> {
 
         return this.backupsService.getBackups(this.appName)
             .do(dtos => {
-                if (isReload) {
+                if (isReload && !silent) {
                     this.dialogs.notifyInfo('Backups reloaded.');
                 }
 

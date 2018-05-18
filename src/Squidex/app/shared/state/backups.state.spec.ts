@@ -55,7 +55,7 @@ describe('BackupsState', () => {
     });
 
     it('should show notification on load when reload is true', () => {
-        backupsState.load(true, true).subscribe();
+        backupsState.load(true, false).subscribe();
 
         dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
     });

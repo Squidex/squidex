@@ -37,12 +37,12 @@ export class BackupsPageComponent implements OnInit, OnDestroy {
 
         this.timerSubscription =
             Observable.timer(3000, 3000)
-                .switchMap(t => this.backupsState.load().onErrorResumeNext())
+                .switchMap(t => this.backupsState.load(true, true).onErrorResumeNext())
                 .subscribe();
     }
 
     public reload() {
-        this.backupsState.load(true, true).onErrorResumeNext().subscribe();
+        this.backupsState.load(true, false).onErrorResumeNext().subscribe();
     }
 
     public start() {

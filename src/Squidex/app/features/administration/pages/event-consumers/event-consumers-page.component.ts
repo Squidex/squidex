@@ -38,12 +38,12 @@ export class EventConsumersPageComponent implements OnDestroy, OnInit {
 
         this.timerSubscription =
             Observable.timer(2000, 2000)
-                .switchMap(x => this.eventConsumersState.load().onErrorResumeNext())
+                .switchMap(x => this.eventConsumersState.load(true, true).onErrorResumeNext())
                 .subscribe();
     }
 
     public reload() {
-        this.eventConsumersState.load(true, true).onErrorResumeNext().subscribe();
+        this.eventConsumersState.load(true, false).onErrorResumeNext().subscribe();
     }
 
     public start(es: EventConsumerDto) {

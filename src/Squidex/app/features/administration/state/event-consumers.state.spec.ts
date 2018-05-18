@@ -43,7 +43,7 @@ describe('EventConsumersState', () => {
     });
 
     it('should show notification on load when reload is true', () => {
-        eventConsumersState.load(true, true).subscribe();
+        eventConsumersState.load(true).subscribe();
 
         dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
     });
