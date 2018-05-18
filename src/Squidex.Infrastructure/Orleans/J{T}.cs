@@ -11,11 +11,13 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Orleans.CodeGeneration;
+using Orleans.Concurrency;
 using Orleans.Serialization;
 using Squidex.Infrastructure.Log;
 
 namespace Squidex.Infrastructure.Orleans
 {
+    [Immutable]
     public struct J<T>
     {
         public T Value { get; }
