@@ -9,7 +9,6 @@ using System;
 using Orleans;
 using Orleans.Configuration;
 using Squidex.Config.Domain;
-using Squidex.Domain.Apps.Entities;
 using Squidex.Infrastructure;
 
 namespace Squidex.Config.Orleans
@@ -25,8 +24,7 @@ namespace Squidex.Config.Orleans
                 .UseLocalhostClustering(40000)
                 .Configure<ClusterOptions>(options =>
                 {
-                    options.ClusterId = Constants.OrleansClusterId;
-                    options.ServiceId = Constants.OrleansClusterId;
+                    options.Configure();
                 })
                 .ConfigureServices((context, services) =>
                 {
@@ -34,8 +32,7 @@ namespace Squidex.Config.Orleans
                 })
                 .ConfigureApplicationParts(builder =>
                 {
-                    builder.AddApplicationPart(SquidexEntities.Assembly);
-                    builder.AddApplicationPart(SquidexInfrastructure.Assembly);
+                    builder.AddMyParts();
                 })
                 .Build();
         }

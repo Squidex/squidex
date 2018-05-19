@@ -15,7 +15,6 @@ using Orleans;
 using Orleans.Configuration;
 using Orleans.Hosting;
 using Squidex.Config.Domain;
-using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Infrastructure;
@@ -27,7 +26,7 @@ using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Config.Orleans
 {
-    public class SiloWrapper : DisposableObjectBase, IInitializable, IDisposable
+    public sealed class SiloWrapper : DisposableObjectBase, IInitializable, IDisposable
     {
         private readonly Lazy<ISiloHost> silo;
         private readonly ISemanticLog log;
@@ -67,19 +66,17 @@ namespace Squidex.Config.Orleans
                     })
                     .Configure<ClusterOptions>(options =>
                     {
-                        options.ClusterId = Constants.OrleansClusterId;
-                        options.ServiceId = Constants.OrleansClusterId;
+                        options.Configure();
+                    })
+                    .ConfigureApplicationParts(builder =>
+                    {
+                        builder.AddMyParts();
                     })
                     .ConfigureLogging((hostingContext, builder) =>
                     {
                         builder.AddConfiguration(hostingContext.Configuration.GetSection("logging"));
                         builder.AddSemanticLog();
                         builder.AddFilter();
-                    })
-                    .ConfigureApplicationParts(builder =>
-                    {
-                        builder.AddApplicationPart(SquidexEntities.Assembly);
-                        builder.AddApplicationPart(SquidexInfrastructure.Assembly);
                     })
                     .ConfigureServices((context, services) =>
                     {
