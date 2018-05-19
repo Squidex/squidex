@@ -2,7 +2,7 @@
     <sqx-shortcut keys="ctrl+shift+f" (trigger)="inputFind.focus()"></sqx-shortcut>
 </ng-container>
 
-<form class="form-inline search-form" (ngSubmit)="search()">
+<form [class]="formClass" (ngSubmit)="search()">
     <input class="form-control form-control-expandable" #inputFind [formControl]="contentsFilter" placeholder="Search for content" />
 
     <a class="expand-search" (click)="searchModal.toggle()" #archive>

@@ -4,13 +4,16 @@
 
         <div class="panel-header" [class.large]="showSecondHeader" *ngIf="!isFullSize">
             <div class="panel-title-row">
-                <div class="float-right">
-                    <ng-content select=[menu]></ng-content>
+                <div class="row">
+                    <div class="col col-auto">
+                        <h3 class="panel-title">
+                            <ng-content select=[title]></ng-content>
+                        </h3>
+                    </div>
+                    <div class="col text-right">
+                        <ng-content select=[menu]></ng-content>
+                    </div>
                 </div>
-
-                <h3 class="panel-title">
-                    <ng-content select=[title]></ng-content>
-                </h3>
             </div>
 
             <a class="panel-close" sqxParentLink [isLazyLoaded]="isLazyLoaded" *ngIf="showClose">

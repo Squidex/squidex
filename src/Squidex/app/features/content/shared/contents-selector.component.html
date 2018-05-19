@@ -4,20 +4,23 @@
     </ng-container>
 
     <ng-container tabs>
-        <div class="text-right">
-            <button class="btn btn-link btn-secondary" (click)="reload()">
-                <i class="icon-reset"></i> Refresh
-            </button>
-            
-            <sqx-search-form 
-                [query]="contentsState.contentsQuery | async" 
-                (queryChanged)="search($event)"
-                [canArchive]="false">
-            </sqx-search-form>
-
-            <ng-container *ngIf="languages.length > 1">
-                <sqx-language-selector class="languages-buttons" (selectedLanguageChange)="selectLanguage($event)" [languages]="languages.values"></sqx-language-selector>
-            </ng-container>
+        <div class="row no-gutters">
+            <div class="col col-auto offset-lg-4">
+                <button class="btn btn-link btn-secondary" (click)="reload()">
+                    <i class="icon-reset"></i> Refresh
+                </button>
+            </div>
+            <div class="col pl-1">
+                <sqx-search-form formClass="form"
+                    [query]="contentsState.contentsQuery | async" 
+                    (queryChanged)="search($event)"
+                    [canArchive]="false">
+                </sqx-search-form>
+    
+                <ng-container *ngIf="languages.length > 1">
+                    <sqx-language-selector class="languages-buttons" (selectedLanguageChange)="selectLanguage($event)" [languages]="languages.values"></sqx-language-selector>
+                </ng-container>
+            </div>
         </div>
     </ng-container>
 

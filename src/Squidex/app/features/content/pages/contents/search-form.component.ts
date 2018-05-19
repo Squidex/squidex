@@ -35,6 +35,9 @@ export class SearchFormComponent implements OnChanges {
     @Input()
     public enableShortcut = false;
 
+    @Input()
+    public formClass = 'form-inline search-form';
+
     public contentsFilter = new FormControl();
 
     public searchModal = new ModalView();

@@ -1,6 +1,10 @@
 @import '_vars';
 @import '_mixins';
 
+:host /deep/ .search-form {
+    display: block;
+}
+
 .content {
     cursor: pointer;
 }
