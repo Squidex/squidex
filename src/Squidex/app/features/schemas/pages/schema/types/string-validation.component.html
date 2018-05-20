@@ -36,7 +36,7 @@
             <div *ngIf="patterns.length > 0 && (patternsModal.isOpen | async) && (showPatternSuggestions | async)" [sqxModalTarget]="patternInput" class="control-dropdown">
                 <h4>Suggestions</h4>
 
-                <div *ngFor="let pattern of pattern" class="control-dropdown-item control-dropdown-item-selectable" (mousedown)="setPattern(pattern)">
+                <div *ngFor="let pattern of patterns" class="control-dropdown-item control-dropdown-item-selectable" (mousedown)="setPattern(pattern)">
                     <div class="truncate">{{pattern.name}}</div>
                     <div class="truncate text-muted">{{pattern.pattern}}</div>
                 </div>
