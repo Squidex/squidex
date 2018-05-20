@@ -9,6 +9,7 @@
 
 # Build results
 **/bin/
+**/build/
 **/obj/
 **/publish/
 
@@ -21,4 +22,7 @@
 # Scripts (should be copied from node_modules on build)
 **/wwwroot/scripts/**/*.*
 
+**/src/Squidex/Assets/*.*
+
 **/src/Squidex/appsettings.Development.json
+**/src/Squidex/Properties/launchSettings.json

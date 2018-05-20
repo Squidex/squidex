@@ -7,8 +7,8 @@
 .vscode
 
 # Build results
-build/
 bin/
+build/
 obj/
 publish/
 
@@ -21,6 +21,7 @@ node_modules/
 # Scripts (should be copied from node_modules on build)
 **/wwwroot/scripts/**/*.*
 
-/src/Squidex/appsettings.Development.json
 /src/Squidex/Assets
+
+/src/Squidex/appsettings.Development.json
 /src/Squidex/Properties/launchSettings.json
