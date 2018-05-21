@@ -42,17 +42,17 @@ namespace Squidex.Domain.Apps.Entities.Contents
             IScriptEngine scriptEngine,
             EdmModelBuilder modelBuilder)
         {
+            Guard.NotNull(appProvider, nameof(appProvider));
             Guard.NotNull(contentRepository, nameof(contentRepository));
             Guard.NotNull(contentVersionLoader, nameof(contentVersionLoader));
-            Guard.NotNull(scriptEngine, nameof(scriptEngine));
             Guard.NotNull(modelBuilder, nameof(modelBuilder));
-            Guard.NotNull(appProvider, nameof(appProvider));
+            Guard.NotNull(scriptEngine, nameof(scriptEngine));
 
+            this.appProvider = appProvider;
             this.contentRepository = contentRepository;
             this.contentVersionLoader = contentVersionLoader;
-            this.appProvider = appProvider;
-            this.scriptEngine = scriptEngine;
             this.modelBuilder = modelBuilder;
+            this.scriptEngine = scriptEngine;
         }
 
         public Task ThrowIfSchemaNotExistsAsync(QueryContext context)
@@ -186,7 +186,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
             if (!context.IsFrontendClient)
             {
                 yield return FieldConverters.ResolveFallbackLanguages(context.App.LanguagesConfig);
-                yield return FieldConverters.FilterLanguages(context.App.LanguagesConfig, context.Languages);
+
+                if (context.Languages?.Any() == true)
+                {
+                    yield return FieldConverters.FilterLanguages(context.App.LanguagesConfig, context.Languages);
+                }
             }
         }
 
