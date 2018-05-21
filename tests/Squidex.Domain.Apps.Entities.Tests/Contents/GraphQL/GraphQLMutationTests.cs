@@ -69,7 +69,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 new JObject(
                     new JProperty("data", inputContent));
 
-            var result = await sut.QueryAsync(app, user, new GraphQLQuery { Query = query, Variables = variables });
+            var result = await sut.QueryAsync(context, new GraphQLQuery { Query = query, Variables = variables });
 
             var expected = new
             {
@@ -158,7 +158,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 new JObject(
                     new JProperty("data", inputContent));
 
-            var result = await sut.QueryAsync(app, user, new GraphQLQuery { Query = query, Variables = variables });
+            var result = await sut.QueryAsync(context, new GraphQLQuery { Query = query, Variables = variables });
 
             var expected = new
             {
@@ -247,7 +247,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 new JObject(
                     new JProperty("data", inputContent));
 
-            var result = await sut.QueryAsync(app, user, new GraphQLQuery { Query = query, Variables = variables });
+            var result = await sut.QueryAsync(context, new GraphQLQuery { Query = query, Variables = variables });
 
             var expected = new
             {
@@ -310,7 +310,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             commandContext.Complete(new EntitySavedResult(13));
 
-            var result = await sut.QueryAsync(app, user, new GraphQLQuery { Query = query });
+            var result = await sut.QueryAsync(context, new GraphQLQuery { Query = query });
 
             var expected = new
             {
@@ -345,7 +345,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             commandContext.Complete(new EntitySavedResult(13));
 
-            var result = await sut.QueryAsync(app, user, new GraphQLQuery { Query = query });
+            var result = await sut.QueryAsync(context, new GraphQLQuery { Query = query });
 
             var expected = new
             {
@@ -380,7 +380,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             commandContext.Complete(new EntitySavedResult(13));
 
-            var result = await sut.QueryAsync(app, user, new GraphQLQuery { Query = query });
+            var result = await sut.QueryAsync(context, new GraphQLQuery { Query = query });
 
             var expected = new
             {
@@ -415,7 +415,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             commandContext.Complete(new EntitySavedResult(13));
 
-            var result = await sut.QueryAsync(app, user, new GraphQLQuery { Query = query });
+            var result = await sut.QueryAsync(context, new GraphQLQuery { Query = query });
 
             var expected = new
             {
@@ -450,7 +450,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             commandContext.Complete(new EntitySavedResult(13));
 
-            var result = await sut.QueryAsync(app, user, new GraphQLQuery { Query = query });
+            var result = await sut.QueryAsync(context, new GraphQLQuery { Query = query });
 
             var expected = new
             {

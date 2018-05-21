@@ -8,7 +8,6 @@
 using System;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Domain.Apps.Core.ConvertContent;
 using Squidex.Domain.Apps.Entities.Contents.State;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
@@ -39,12 +38,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
                 var schema = await GetSchemaAsync(value.AppId.Id, value.SchemaId.Id);
 
-                var idData = value.Data.ToIdModel(schema.SchemaDef, true);
+                var idData = value.Data.ToMongoModel(schema.SchemaDef);
 
                 var content = SimpleMapper.Map(value, new MongoContentEntity
                 {
                     DataByIds = idData,
-                    DataDraftByIds = value.DataDraft?.ToIdModel(schema.SchemaDef, true),
+                    DataDraftByIds = value.DataDraft?.ToMongoModel(schema.SchemaDef),
                     IsDeleted = value.IsDeleted,
                     IndexedAppId = value.AppId.Id,
                     IndexedSchemaId = value.SchemaId.Id,

@@ -17,6 +17,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
     public static class ReferencesCleaner
     {
         private static readonly List<Guid> EmptyIds = new List<Guid>();
+
         public static JToken CleanReferences(this Field field, JToken value, ISet<Guid> oldReferences)
         {
             if ((field is AssetsField || field is ReferencesField) && !value.IsNull())

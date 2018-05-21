@@ -47,6 +47,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         private readonly ClaimsPrincipal user;
         private readonly ClaimsIdentity identity = new ClaimsIdentity();
         private readonly EdmModelBuilder modelBuilder = A.Fake<EdmModelBuilder>();
+        private readonly QueryContext context;
         private readonly ContentQueryService sut;
 
         public ContentQueryServiceTests()
@@ -64,6 +65,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             A.CallTo(() => schema.SchemaDef).Returns(new Schema("my-schema"));
 
+            context = QueryContext.Create(app, user);
+
             sut = new ContentQueryService(contentRepository, contentVersionLoader, appProvider, scriptEngine, modelBuilder);
         }
 
@@ -73,7 +76,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             A.CallTo(() => appProvider.GetSchemaAsync(appId, schemaId, false))
                 .Returns(schema);
 
-            var result = await sut.GetSchemaAsync(app, schemaId.ToString());
+            var result = await sut.GetSchemaAsync(context.WithSchemaId(schemaId));
 
             Assert.Equal(schema, result);
         }
@@ -84,7 +87,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             A.CallTo(() => appProvider.GetSchemaAsync(appId, "my-schema"))
                 .Returns(schema);
 
-            var result = await sut.GetSchemaAsync(app, "my-schema");
+            var result = await sut.GetSchemaAsync(context.WithSchemaName("my-schema"));
 
             Assert.Equal(schema, result);
         }
@@ -95,7 +98,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             A.CallTo(() => appProvider.GetSchemaAsync(appId, "my-schema"))
                 .Returns((ISchemaEntity)null);
 
-            await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.GetSchemaAsync(app, "my-schema"));
+            await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.GetSchemaAsync(context.WithSchemaName("my-schema")));
         }
 
         [Fact]
@@ -104,7 +107,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             A.CallTo(() => appProvider.GetSchemaAsync(appId, "my-schema"))
                 .Returns((ISchemaEntity)null);
 
-            await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.ThrowIfSchemaNotExistsAsync(app, "my-schema"));
+            await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.ThrowIfSchemaNotExistsAsync(context.WithSchemaName("my-schema")));
         }
 
         public static IEnumerable<object[]> SingleRequestData = new[]
@@ -130,7 +133,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             A.CallTo(() => scriptEngine.Transform(A<ScriptContext>.That.Matches(x => x.User == user && x.ContentId == contentId && ReferenceEquals(x.Data, contentData)), "<query-script>"))
                 .Returns(contentTransformed);
 
-            var result = await sut.FindContentAsync(app, schemaId.ToString(), user, contentId);
+            var result = await sut.FindContentAsync(context.WithSchemaId(schemaId), contentId);
 
             Assert.Equal(contentTransformed, result.Data);
             Assert.Equal(content.Id, result.Id);
@@ -150,7 +153,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             A.CallTo(() => scriptEngine.Transform(A<ScriptContext>.That.Matches(x => x.User == user && x.ContentId == contentId && ReferenceEquals(x.Data, contentData)), "<query-script>"))
                 .Returns(contentTransformed);
 
-            var result = await sut.FindContentAsync(app, schemaId.ToString(), user, contentId, 10);
+            var result = await sut.FindContentAsync(context.WithSchemaId(schemaId), contentId, 10);
 
             Assert.Equal(contentTransformed, result.Data);
             Assert.Equal(content.Id, result.Id);
@@ -165,7 +168,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             A.CallTo(() => contentRepository.FindContentAsync(app, schema, new[] { Status.Published }, contentId))
                 .Returns((IContentEntity)null);
 
-            await Assert.ThrowsAsync<DomainObjectNotFoundException>(async () => await sut.FindContentAsync(app, schemaId.ToString(), user, contentId));
+            await Assert.ThrowsAsync<DomainObjectNotFoundException>(async () => await sut.FindContentAsync(context.WithSchemaId(schemaId), contentId));
         }
 
         public static IEnumerable<object[]> ManyRequestData = new[]
@@ -189,7 +192,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             A.CallTo(() => contentRepository.QueryAsync(app, schema, A<Status[]>.That.IsSameSequenceAs(status), A<ODataUriParser>.Ignored))
                 .Returns(ResultList.Create(Enumerable.Repeat(content, count), total));
 
-            var result = await sut.QueryAsync(app, schemaId.ToString(), user, archive, string.Empty);
+            var result = await sut.QueryAsync(context.WithSchemaId(schemaId).WithArchived(archive), string.Empty);
 
             Assert.Equal(contentData, result[0].Data);
             Assert.Equal(content.Id, result[0].Id);
@@ -217,7 +220,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             A.CallTo(() => modelBuilder.BuildEdmModel(schema, app))
                 .Throws(new ODataException());
 
-            return Assert.ThrowsAsync<ValidationException>(() => sut.QueryAsync(app, schemaId.ToString(), user, false, "query"));
+            return Assert.ThrowsAsync<ValidationException>(() => sut.QueryAsync(context.WithSchemaId(schemaId), "query"));
         }
 
         public static IEnumerable<object[]> ManyIdRequestData = new[]
@@ -243,7 +246,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             A.CallTo(() => contentRepository.QueryAsync(app, schema, A<Status[]>.That.IsSameSequenceAs(status), ids))
                 .Returns(ResultList.Create(Enumerable.Repeat(content, count), total));
 
-            var result = await sut.QueryAsync(app, schemaId.ToString(), user, archive, ids);
+            var result = await sut.QueryAsync(context.WithSchemaId(schemaId).WithArchived(archive), ids);
 
             Assert.Equal(contentData, result[0].Data);
             Assert.Equal(content.Id, result[0].Id);
