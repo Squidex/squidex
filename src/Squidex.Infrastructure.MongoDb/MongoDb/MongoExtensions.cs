@@ -161,19 +161,24 @@ namespace Squidex.Infrastructure.MongoDb
 
         public static async Task ForEachPipelineAsync<TDocument>(this IAsyncCursor<TDocument> source, Func<TDocument, Task> processor, CancellationToken cancellationToken = default(CancellationToken))
         {
-            var actionBlock =
-                new ActionBlock<TDocument>(processor,
-                    new ExecutionDataflowBlockOptions
-                    {
-                        MaxDegreeOfParallelism = 1,
-                        MaxMessagesPerTask = 1,
-                        BoundedCapacity = 100
-                    });
-
             using (var selfToken = new CancellationTokenSource())
             {
                 using (var combined = CancellationTokenSource.CreateLinkedTokenSource(selfToken.Token, cancellationToken))
                 {
+                    var actionBlock =
+                        new ActionBlock<TDocument>(async x =>
+                            {
+                                if (!combined.IsCancellationRequested)
+                                {
+                                    await processor(x);
+                                }
+                            },
+                            new ExecutionDataflowBlockOptions
+                            {
+                                MaxDegreeOfParallelism = 1,
+                                MaxMessagesPerTask = 1,
+                                BoundedCapacity = 100
+                            });
                     try
                     {
                         await source.ForEachAsync(async i =>

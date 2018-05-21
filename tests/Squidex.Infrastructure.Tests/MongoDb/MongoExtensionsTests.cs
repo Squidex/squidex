@@ -151,6 +151,7 @@ namespace Squidex.Infrastructure.MongoDb
                     }
 
                     result.Add(x);
+
                     return TaskHelper.Done;
                 }, cts.Token);
             });
