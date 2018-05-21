@@ -26,9 +26,14 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             return data.GetReferencedIds(schema).ToList();
         }
 
-        public static NamedContentData ToData(this IdContentData idData, Schema schema, List<Guid> deletedIds)
+        public static NamedContentData FromMongoModel(this IdContentData result, Schema schema, List<Guid> deletedIds)
         {
-            return idData.ToCleanedReferences(schema, new HashSet<Guid>(deletedIds)).ToNameModel(schema, true);
+            return result.ToNameModel(schema, FieldConverters.DecodeJson(), FieldReferencesConverter.CleanReferences(deletedIds));
+        }
+
+        public static IdContentData ToMongoModel(this NamedContentData result, Schema schema)
+        {
+            return result.ToIdModel(schema, FieldConverters.EncodeJson());
         }
 
         public static string ToFullText<T>(this ContentData<T> data)

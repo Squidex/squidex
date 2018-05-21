@@ -11,6 +11,7 @@ using System.Linq;
 using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.ConvertContent;
 using Squidex.Domain.Apps.Core.ExtractReferenceIds;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
@@ -68,7 +69,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
                         new ContentFieldData()
                             .AddValue("iv", new JArray(id1.ToString(), id2.ToString())));
 
-            var actual = input.ToCleanedReferences(schema, new HashSet<Guid>(new[] { id2 }));
+            var actual = input.Convert(schema, FieldReferencesConverter.CleanReferences(new[] { id2 }));
 
             var cleanedValue = (JArray)actual[5]["iv"];
 

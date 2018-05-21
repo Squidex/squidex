@@ -126,11 +126,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         public void ParseData(Schema schema)
         {
-            data = DataByIds.ToData(schema, ReferencedIdsDeleted);
+            data = DataByIds.FromMongoModel(schema, ReferencedIdsDeleted);
 
             if (DataDraftByIds != null)
             {
-                dataDraft = DataDraftByIds.ToData(schema, ReferencedIdsDeleted);
+                dataDraft = DataDraftByIds.FromMongoModel(schema, ReferencedIdsDeleted);
             }
         }
     }

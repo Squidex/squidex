@@ -9,6 +9,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.ConvertContent;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Infrastructure;
@@ -96,12 +97,20 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
             return response;
         }
 
-        public static ContentDto FromContent(IContentEntity content)
+        public static ContentDto FromContent(IContentEntity content, QueryContext context)
         {
             var response = SimpleMapper.Map(content, new ContentDto());
 
-            response.Data = content.Data;
-            response.DataDraft = content.DataDraft;
+            if (context.Flatten)
+            {
+                response.Data = content.Data?.ToFlatten();
+                response.DataDraft = content.DataDraft?.ToFlatten();
+            }
+            else
+            {
+                response.Data = content.Data;
+                response.DataDraft = content.DataDraft;
+            }
 
             if (content.ScheduleJob != null)
             {

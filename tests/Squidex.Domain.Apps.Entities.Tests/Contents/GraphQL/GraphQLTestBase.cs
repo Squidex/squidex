@@ -45,6 +45,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         protected readonly IMemoryCache cache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
         protected readonly IAppProvider appProvider = A.Fake<IAppProvider>();
         protected readonly IAppEntity app = A.Dummy<IAppEntity>();
+        protected readonly QueryContext context;
         protected readonly ClaimsPrincipal user = new ClaimsPrincipal();
         protected readonly IGraphQLService sut;
 
@@ -76,6 +77,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             A.CallTo(() => app.Id).Returns(appId);
             A.CallTo(() => app.Name).Returns(appName);
             A.CallTo(() => app.LanguagesConfig).Returns(LanguagesConfig.Build(Language.DE));
+
+            context = QueryContext.Create(app, user);
 
             A.CallTo(() => schema.Id).Returns(schemaId);
             A.CallTo(() => schema.Name).Returns(schemaDef.Name);

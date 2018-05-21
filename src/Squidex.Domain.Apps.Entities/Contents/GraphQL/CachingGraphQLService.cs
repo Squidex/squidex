@@ -7,7 +7,6 @@
 
 using System;
 using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
 using Squidex.Domain.Apps.Entities.Apps;
@@ -47,9 +46,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             this.urlGenerator = urlGenerator;
         }
 
-        public async Task<(object Data, object[] Errors)> QueryAsync(IAppEntity app, ClaimsPrincipal user, GraphQLQuery query)
+        public async Task<(object Data, object[] Errors)> QueryAsync(QueryContext context, GraphQLQuery query)
         {
-            Guard.NotNull(app, nameof(app));
+            Guard.NotNull(context, nameof(context));
             Guard.NotNull(query, nameof(query));
 
             if (string.IsNullOrWhiteSpace(query.Query))
@@ -57,9 +56,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 return (new object(), new object[0]);
             }
 
-            var modelContext = await GetModelAsync(app);
+            var modelContext = await GetModelAsync(context.App);
 
-            var ctx = new GraphQLExecutionContext(app, assetRepository, commandBus, contentQuery, user, urlGenerator);
+            var ctx = new GraphQLExecutionContext(context, assetRepository, commandBus, contentQuery, urlGenerator);
 
             return await modelContext.ExecuteAsync(ctx, query);
         }
