@@ -179,6 +179,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 yield return FieldConverters.ExcludeChangedTypes();
             }
 
+            yield return FieldConverters.DecodeJson();
             yield return FieldConverters.ResolveInvariant(context.App.LanguagesConfig);
             yield return FieldConverters.ResolveLanguages(context.App.LanguagesConfig);
 
