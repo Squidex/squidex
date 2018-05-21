@@ -10,7 +10,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    public abstract class Field : Cloneable<Field>
+    public abstract class Field : Cloneable<Field>, IField
     {
         private readonly long fieldId;
         private readonly Partitioning partitioning;

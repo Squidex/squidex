@@ -97,9 +97,9 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             return new JValue(v);
         }
 
-        private static NumberField Field(NumberFieldProperties properties)
+        private static Field<NumberFieldProperties> Field(NumberFieldProperties properties)
         {
-            return new NumberField(1, "my-number", Partitioning.Invariant, properties);
+            return Fields.Number(1, "my-number", Partitioning.Invariant, properties);
         }
     }
 }

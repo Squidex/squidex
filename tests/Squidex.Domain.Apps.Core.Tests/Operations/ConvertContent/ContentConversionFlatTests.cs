@@ -27,12 +27,12 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         {
             schema =
                 new Schema("my-schema")
-                    .AddField(new NumberField(1, "field1", Partitioning.Language))
-                    .AddField(new NumberField(2, "field2", Partitioning.Invariant))
-                    .AddField(new NumberField(3, "field3", Partitioning.Invariant))
-                    .AddField(new AssetsField(5, "assets1", Partitioning.Invariant))
-                    .AddField(new AssetsField(6, "assets2", Partitioning.Invariant))
-                    .AddField(new JsonField(4, "json", Partitioning.Language))
+                    .AddNumber(1, "field1", Partitioning.Language)
+                    .AddNumber(2, "field2", Partitioning.Invariant)
+                    .AddNumber(3, "field3", Partitioning.Invariant)
+                    .AddAssets(5, "assets1", Partitioning.Invariant)
+                    .AddAssets(6, "assets2", Partitioning.Invariant)
+                    .AddJson(4, "json", Partitioning.Language)
                     .HideField(3);
         }
 

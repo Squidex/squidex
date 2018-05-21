@@ -53,26 +53,26 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         {
             schemaDef =
                 new Schema("my-schema")
-                    .AddField(new JsonField(1, "my-json", Partitioning.Invariant,
-                        new JsonFieldProperties()))
-                    .AddField(new StringField(2, "my-string", Partitioning.Language,
-                        new StringFieldProperties()))
-                    .AddField(new NumberField(3, "my-number", Partitioning.Invariant,
-                        new NumberFieldProperties()))
-                    .AddField(new AssetsField(4, "my-assets", Partitioning.Invariant,
-                        new AssetsFieldProperties()))
-                    .AddField(new BooleanField(5, "my-boolean", Partitioning.Invariant,
-                        new BooleanFieldProperties()))
-                    .AddField(new DateTimeField(6, "my-datetime", Partitioning.Invariant,
-                        new DateTimeFieldProperties()))
-                    .AddField(new ReferencesField(7, "my-references", Partitioning.Invariant,
-                        new ReferencesFieldProperties { SchemaId = schemaId }))
-                    .AddField(new ReferencesField(9, "my-invalid", Partitioning.Invariant,
-                        new ReferencesFieldProperties { SchemaId = Guid.NewGuid() }))
-                    .AddField(new GeolocationField(10, "my-geolocation", Partitioning.Invariant,
-                        new GeolocationFieldProperties()))
-                    .AddField(new TagsField(11, "my-tags", Partitioning.Invariant,
-                        new TagsFieldProperties()));
+                    .AddJson(1, "my-json", Partitioning.Invariant,
+                        new JsonFieldProperties())
+                    .AddString(2, "my-string", Partitioning.Language,
+                        new StringFieldProperties())
+                    .AddNumber(3, "my-number", Partitioning.Invariant,
+                        new NumberFieldProperties())
+                    .AddAssets(4, "my-assets", Partitioning.Invariant,
+                        new AssetsFieldProperties())
+                    .AddBoolean(5, "my-boolean", Partitioning.Invariant,
+                        new BooleanFieldProperties())
+                    .AddDateTime(6, "my-datetime", Partitioning.Invariant,
+                        new DateTimeFieldProperties())
+                    .AddReferences(7, "my-references", Partitioning.Invariant,
+                        new ReferencesFieldProperties { SchemaId = schemaId })
+                    .AddReferences(9, "my-invalid", Partitioning.Invariant,
+                        new ReferencesFieldProperties { SchemaId = Guid.NewGuid() })
+                    .AddGeolocation(10, "my-geolocation", Partitioning.Invariant,
+                        new GeolocationFieldProperties())
+                    .AddTags(11, "my-tags", Partitioning.Invariant,
+                        new TagsFieldProperties());
 
             A.CallTo(() => app.Id).Returns(appId);
             A.CallTo(() => app.Name).Returns(appName);

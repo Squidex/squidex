@@ -19,9 +19,9 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
     public class FieldConvertersTests
     {
         private readonly LanguagesConfig languagesConfig = LanguagesConfig.Build(Language.EN, Language.DE);
-        private readonly StringField stringLanguageField = new StringField(1, "1", Partitioning.Language);
-        private readonly StringField stringInvariantField = new StringField(1, "1", Partitioning.Invariant);
-        private readonly NumberField numberField = new NumberField(1, "1", Partitioning.Invariant);
+        private readonly Field<StringFieldProperties> stringLanguageField = Fields.String(1, "1", Partitioning.Language);
+        private readonly Field<StringFieldProperties> stringInvariantField = Fields.String(1, "1", Partitioning.Invariant);
+        private readonly Field<NumberFieldProperties> numberField = Fields.Number(1, "1", Partitioning.Invariant);
 
         [Fact]
         public void Should_encode_json_values()
@@ -31,7 +31,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                     .AddValue("en", null)
                     .AddValue("de", JToken.FromObject(new { Value = 1 }));
 
-            var result = FieldConverters.EncodeJson()(source, new JsonField(1, "1", Partitioning.Invariant));
+            var result = FieldConverters.EncodeJson()(source, Fields.Json(1, "1", Partitioning.Invariant));
 
             Assert.Null(result["en"]);
             Assert.True(result["de"].Type == JTokenType.String);
@@ -57,7 +57,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                     .AddValue("en", null)
                     .AddValue("de", "e30=");
 
-            var result = FieldConverters.DecodeJson()(source, new JsonField(1, "1", Partitioning.Invariant));
+            var result = FieldConverters.DecodeJson()(source, Fields.Json(1, "1", Partitioning.Invariant));
 
             Assert.Null(result["en"]);
             Assert.True(result["de"] is JObject);

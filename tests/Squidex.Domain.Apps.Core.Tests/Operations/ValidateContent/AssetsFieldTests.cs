@@ -268,9 +268,9 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             return ids == null ? JValue.CreateNull() : (JToken)new JArray(ids.OfType<object>().ToArray());
         }
 
-        private static AssetsField Field(AssetsFieldProperties properties)
+        private static Field<AssetsFieldProperties> Field(AssetsFieldProperties properties)
         {
-            return new AssetsField(1, "my-assets", Partitioning.Invariant, properties);
+            return Fields.Assets(1, "my-assets", Partitioning.Invariant, properties);
         }
     }
 }

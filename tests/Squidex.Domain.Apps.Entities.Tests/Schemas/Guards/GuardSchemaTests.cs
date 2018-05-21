@@ -29,8 +29,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             schema_0 =
                 new Schema("my-schema")
-                    .AddField(new StringField(1, "field1", Partitioning.Invariant))
-                    .AddField(new StringField(2, "field2", Partitioning.Invariant));
+                    .AddString(1, "field1", Partitioning.Invariant)
+                    .AddString(2, "field2", Partitioning.Invariant);
 
             A.CallTo(() => appProvider.GetSchemaAsync(A<Guid>.Ignored, "new-schema"))
                 .Returns(Task.FromResult<ISchemaEntity>(null));

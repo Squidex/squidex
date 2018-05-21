@@ -18,16 +18,16 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
     {
         private static readonly List<Guid> EmptyIds = new List<Guid>();
 
-        public static JToken CleanReferences(this Field field, JToken value, ISet<Guid> oldReferences)
+        public static JToken CleanReferences(this IField field, JToken value, ISet<Guid> oldReferences)
         {
-            if ((field is AssetsField || field is ReferencesField) && !value.IsNull())
+            if ((field is IField<AssetsFieldProperties> || field is IField<ReferencesFieldProperties>) && !value.IsNull())
             {
                 switch (field)
                 {
-                    case AssetsField assetsField:
+                    case IField<AssetsFieldProperties> assetsField:
                         return Visit(assetsField, value, oldReferences);
 
-                    case ReferencesField referencesField:
+                    case IField<ReferencesFieldProperties> referencesField:
                         return Visit(referencesField, value, oldReferences);
                 }
             }
@@ -35,7 +35,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
             return value;
         }
 
-        private static JToken Visit(AssetsField field, JToken value, IEnumerable<Guid> oldReferences)
+        private static JToken Visit(IField<AssetsFieldProperties> field, JToken value, IEnumerable<Guid> oldReferences)
         {
             var oldIds = GetIds(value);
             var newIds = oldIds.Except(oldReferences).ToList();
@@ -43,7 +43,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
             return oldIds.Count != newIds.Count ? JToken.FromObject(newIds) : value;
         }
 
-        private static JToken Visit(ReferencesField field, JToken value, ICollection<Guid> oldReferences)
+        private static JToken Visit(IField<ReferencesFieldProperties> field, JToken value, ICollection<Guid> oldReferences)
         {
             if (oldReferences.Contains(field.Properties.SchemaId))
             {

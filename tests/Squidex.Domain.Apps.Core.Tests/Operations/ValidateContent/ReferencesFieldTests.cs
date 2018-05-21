@@ -124,9 +124,9 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             return ids == null ? JValue.CreateNull() : (JToken)new JArray(ids.OfType<object>().ToArray());
         }
 
-        private static ReferencesField Field(ReferencesFieldProperties properties)
+        private static Field<ReferencesFieldProperties> Field(ReferencesFieldProperties properties)
         {
-            return new ReferencesField(1, "my-refs", Partitioning.Invariant, properties);
+            return Fields.References(1, "my-refs", Partitioning.Invariant, properties);
         }
     }
 }

@@ -112,9 +112,9 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             return v;
         }
 
-        private static GeolocationField Field(GeolocationFieldProperties properties)
+        private static Field<GeolocationFieldProperties> Field(GeolocationFieldProperties properties)
         {
-            return new GeolocationField(1, "my-geolocation", Partitioning.Invariant, properties);
+            return Fields.Geolocation(1, "my-geolocation", Partitioning.Invariant, properties);
         }
     }
 }

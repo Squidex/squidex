@@ -23,22 +23,22 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             Value = value;
         }
 
-        public static object ConvertValue(Field field, JToken json)
+        public static object ConvertValue(IField field, JToken json)
         {
             return field.Accept(new JsonValueConverter(json));
         }
 
-        public object Visit(AssetsField field)
+        public object Visit(IField<AssetsFieldProperties> field)
         {
             return Value.ToObject<List<Guid>>();
         }
 
-        public object Visit(BooleanField field)
+        public object Visit(IField<BooleanFieldProperties> field)
         {
             return (bool?)Value;
         }
 
-        public object Visit(DateTimeField field)
+        public object Visit(IField<DateTimeFieldProperties> field)
         {
             if (Value.Type == JTokenType.String)
             {
@@ -55,7 +55,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             throw new InvalidCastException("Invalid json type, expected string.");
         }
 
-        public object Visit(GeolocationField field)
+        public object Visit(IField<GeolocationFieldProperties> field)
         {
             var geolocation = (JObject)Value;
 
@@ -84,27 +84,27 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             return Value;
         }
 
-        public object Visit(JsonField field)
+        public object Visit(IField<JsonFieldProperties> field)
         {
             return Value;
         }
 
-        public object Visit(NumberField field)
+        public object Visit(IField<NumberFieldProperties> field)
         {
             return (double?)Value;
         }
 
-        public object Visit(ReferencesField field)
+        public object Visit(IField<ReferencesFieldProperties> field)
         {
             return Value.ToObject<List<Guid>>();
         }
 
-        public object Visit(StringField field)
+        public object Visit(IField<StringFieldProperties> field)
         {
             return Value.ToString();
         }
 
-        public object Visit(TagsField field)
+        public object Visit(IField<TagsFieldProperties> field)
         {
             return Value.ToObject<List<string>>();
         }

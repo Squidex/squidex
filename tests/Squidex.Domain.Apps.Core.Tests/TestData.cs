@@ -61,38 +61,38 @@ namespace Squidex.Domain.Apps.Core
             schema = schema.Publish();
             schema = schema.Update(new SchemaProperties { Hints = "The User" });
 
-            schema = schema.AddField(new JsonField(1, "my-json", inv,
-                new JsonFieldProperties()));
+            schema = schema.AddJson(1, "my-json", inv,
+                new JsonFieldProperties());
 
-            schema = schema.AddField(new AssetsField(2, "my-assets", inv,
-                new AssetsFieldProperties()));
+            schema = schema.AddAssets(2, "my-assets", inv,
+                new AssetsFieldProperties());
 
-            schema = schema.AddField(new StringField(3, "my-string1", inv,
-                new StringFieldProperties { Label = "My String1", IsRequired = true, AllowedValues = ImmutableList.Create("a", "b") }));
+            schema = schema.AddString(3, "my-string1", inv,
+                new StringFieldProperties { Label = "My String1", IsRequired = true, AllowedValues = ImmutableList.Create("a", "b") });
 
-            schema = schema.AddField(new StringField(4, "my-string2", inv,
-                new StringFieldProperties { Hints = "My String1" }));
+            schema = schema.AddString(4, "my-string2", inv,
+                new StringFieldProperties { Hints = "My String1" });
 
-            schema = schema.AddField(new NumberField(5, "my-number", inv,
-                new NumberFieldProperties { MinValue = 1, MaxValue = 10 }));
+            schema = schema.AddNumber(5, "my-number", inv,
+                new NumberFieldProperties { MinValue = 1, MaxValue = 10 });
 
-            schema = schema.AddField(new BooleanField(6, "my-boolean", inv,
-                new BooleanFieldProperties()));
+            schema = schema.AddBoolean(6, "my-boolean", inv,
+                new BooleanFieldProperties());
 
-            schema = schema.AddField(new DateTimeField(7, "my-datetime", inv,
-                new DateTimeFieldProperties { Editor = DateTimeFieldEditor.DateTime }));
+            schema = schema.AddDateTime(7, "my-datetime", inv,
+                new DateTimeFieldProperties { Editor = DateTimeFieldEditor.DateTime });
 
-            schema = schema.AddField(new DateTimeField(8, "my-date", inv,
-                new DateTimeFieldProperties { Editor = DateTimeFieldEditor.Date }));
+            schema = schema.AddDateTime(8, "my-date", inv,
+                new DateTimeFieldProperties { Editor = DateTimeFieldEditor.Date });
 
-            schema = schema.AddField(new GeolocationField(9, "my-geolocation", inv,
-                new GeolocationFieldProperties()));
+            schema = schema.AddGeolocation(9, "my-geolocation", inv,
+                new GeolocationFieldProperties());
 
-            schema = schema.AddField(new ReferencesField(10, "my-references", inv,
-                new ReferencesFieldProperties()));
+            schema = schema.AddReferences(10, "my-references", inv,
+                new ReferencesFieldProperties());
 
-            schema = schema.AddField(new TagsField(11, "my-tags", Partitioning.Language,
-                new TagsFieldProperties()));
+            schema = schema.AddTags(11, "my-tags", Partitioning.Language,
+                new TagsFieldProperties());
 
             schema = schema.HideField(7);
             schema = schema.LockField(8);

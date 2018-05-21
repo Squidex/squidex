@@ -23,6 +23,11 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
                 return default(T);
             }
 
+            public override T Accept<T>(IFieldVisitor<T> visitor, IField field)
+            {
+                return default(T);
+            }
+
             public override Field CreateField(long id, string name, Partitioning partitioning)
             {
                 return null;
@@ -36,41 +41,22 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
         }
 
         [Theory]
-        [InlineData(
-            typeof(AssetsFieldProperties),
-            typeof(AssetsField))]
-        [InlineData(
-            typeof(BooleanFieldProperties),
-            typeof(BooleanField))]
-        [InlineData(
-            typeof(DateTimeFieldProperties),
-            typeof(DateTimeField))]
-        [InlineData(
-            typeof(GeolocationFieldProperties),
-            typeof(GeolocationField))]
-        [InlineData(
-            typeof(JsonFieldProperties),
-            typeof(JsonField))]
-        [InlineData(
-            typeof(NumberFieldProperties),
-            typeof(NumberField))]
-        [InlineData(
-            typeof(ReferencesFieldProperties),
-            typeof(ReferencesField))]
-        [InlineData(
-            typeof(StringFieldProperties),
-            typeof(StringField))]
-        [InlineData(
-            typeof(TagsFieldProperties),
-            typeof(TagsField))]
-        public void Should_create_field_by_properties(Type propertyType, Type fieldType)
+        [InlineData(typeof(AssetsFieldProperties))]
+        [InlineData(typeof(BooleanFieldProperties))]
+        [InlineData(typeof(DateTimeFieldProperties))]
+        [InlineData(typeof(GeolocationFieldProperties))]
+        [InlineData(typeof(JsonFieldProperties))]
+        [InlineData(typeof(NumberFieldProperties))]
+        [InlineData(typeof(ReferencesFieldProperties))]
+        [InlineData(typeof(StringFieldProperties))]
+        [InlineData(typeof(TagsFieldProperties))]
+        public void Should_create_field_by_properties(Type propertyType)
         {
             var properties = (FieldProperties)Activator.CreateInstance(propertyType);
 
             var field = sut.CreateField(1, "name", Partitioning.Invariant, properties);
 
             Assert.Equal(properties, field.RawProperties);
-            Assert.Equal(fieldType, field.GetType());
         }
     }
 }
