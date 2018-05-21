@@ -33,12 +33,12 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             return validator.ValidateAsync(value, (context ?? ValidContext).Optional(true), errors.Add);
         }
 
-        public static Task ValidateAsync(this Field field, JToken value, IList<string> errors, ValidationContext context = null)
+        public static Task ValidateAsync(this IField field, JToken value, IList<string> errors, ValidationContext context = null)
         {
             return field.ValidateAsync(value, context ?? ValidContext, errors.Add);
         }
 
-        public static Task ValidateOptionalAsync(this Field field, JToken value, IList<string> errors, ValidationContext context = null)
+        public static Task ValidateOptionalAsync(this IField field, JToken value, IList<string> errors, ValidationContext context = null)
         {
             return field.ValidateAsync(value, (context ?? ValidContext).Optional(true), errors.Add);
         }

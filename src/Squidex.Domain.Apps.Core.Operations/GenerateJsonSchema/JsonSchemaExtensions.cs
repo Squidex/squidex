@@ -47,7 +47,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
             return jsonSchema;
         }
 
-        public static JsonProperty CreateProperty(Field field)
+        public static JsonProperty CreateProperty(IField field)
         {
             var jsonProperty = new JsonProperty { IsRequired = field.RawProperties.IsRequired, Type = JsonObjectType.Object };
 

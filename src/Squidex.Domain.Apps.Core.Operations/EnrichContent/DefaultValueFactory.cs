@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Core.EnrichContent
             this.now = now;
         }
 
-        public static JToken CreateDefaultValue(Field field, Instant now)
+        public static JToken CreateDefaultValue(IField field, Instant now)
         {
             Guard.NotNull(field, nameof(field));
 

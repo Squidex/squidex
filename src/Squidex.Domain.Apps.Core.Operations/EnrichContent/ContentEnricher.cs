@@ -50,7 +50,7 @@ namespace Squidex.Domain.Apps.Core.EnrichContent
             }
         }
 
-        private static void Enrich(Field field, ContentFieldData fieldData, IFieldPartitionItem partitionItem)
+        private static void Enrich(IField field, ContentFieldData fieldData, IFieldPartitionItem partitionItem)
         {
             Guard.NotNull(fieldData, nameof(fieldData));
 
