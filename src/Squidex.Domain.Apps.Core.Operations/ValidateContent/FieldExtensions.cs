@@ -17,7 +17,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 {
     public static class FieldExtensions
     {
-        public static void AddError(this ConcurrentBag<ValidationError> errors, string message, Field field, IFieldPartitionItem partitionItem = null)
+        public static void AddError(this ConcurrentBag<ValidationError> errors, string message, IField field, IFieldPartitionItem partitionItem = null)
         {
             AddError(errors, message, !string.IsNullOrWhiteSpace(field.RawProperties.Label) ? field.RawProperties.Label : field.Name, field.Name, partitionItem);
         }
@@ -37,7 +37,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             errors.Add(new ValidationError(message.Replace("<FIELD>", displayName), fieldName));
         }
 
-        public static async Task ValidateAsync(this Field field, JToken value, ValidationContext context, Action<string> addError)
+        public static async Task ValidateAsync(this IField field, JToken value, ValidationContext context, Action<string> addError)
         {
             try
             {

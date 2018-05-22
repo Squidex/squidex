@@ -11,7 +11,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    public abstract class Field<T> : Field where T : FieldProperties, new()
+    public sealed class Field<T> : Field, IField<T> where T : FieldProperties, new()
     {
         private T properties;
 
@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
             get { return properties; }
         }
 
-        protected Field(long id, string name, Partitioning partitioning, T properties)
+        public Field(long id, string name, Partitioning partitioning, T properties)
             : base(id, name, partitioning)
         {
             Guard.NotNull(properties, nameof(properties));
@@ -56,6 +56,11 @@ namespace Squidex.Domain.Apps.Core.Schemas
             }
 
             return typedProperties;
+        }
+
+        public override TResult Accept<TResult>(IFieldVisitor<TResult> visitor)
+        {
+            return RawProperties.Accept(visitor, this);
         }
     }
 }

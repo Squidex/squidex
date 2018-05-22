@@ -62,7 +62,7 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
         {
             var schema_1 = schema_0.AddField(CreateField(1));
 
-            Assert.Throws<ArgumentException>(() => schema_1.AddField(new NumberField(2, "my-field-1", Partitioning.Invariant)));
+            Assert.Throws<ArgumentException>(() => schema_1.AddNumber(2, "my-field-1", Partitioning.Invariant));
         }
 
         [Fact]
@@ -70,7 +70,7 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
         {
             var schema_1 = schema_0.AddField(CreateField(1));
 
-            Assert.Throws<ArgumentException>(() => schema_1.AddField(new NumberField(1, "my-field-2", Partitioning.Invariant)));
+            Assert.Throws<ArgumentException>(() => schema_1.AddNumber(1, "my-field-2", Partitioning.Invariant));
         }
 
         [Fact]
@@ -287,9 +287,9 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
             schemaTarget.ShouldBeEquivalentTo(schemaSource);
         }
 
-        private static NumberField CreateField(int id)
+        private static Field<NumberFieldProperties> CreateField(int id)
         {
-            return new NumberField(id, $"my-field-{id}", Partitioning.Invariant);
+            return Fields.Number(id, $"my-field-{id}", Partitioning.Invariant);
         }
     }
 }

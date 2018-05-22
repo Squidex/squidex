@@ -15,21 +15,21 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 {
     public static class ReferencesExtractor
     {
-        public static IEnumerable<Guid> ExtractReferences(this Field field, JToken value)
+        public static IEnumerable<Guid> ExtractReferences(this IField field, JToken value)
         {
             switch (field)
             {
-                case AssetsField assetsField:
+                case IField<AssetsFieldProperties> assetsField:
                     return Visit(assetsField, value);
 
-                case ReferencesField referencesField:
+                case IField<ReferencesFieldProperties> referencesField:
                     return Visit(referencesField, value);
             }
 
             return Enumerable.Empty<Guid>();
         }
 
-        public static IEnumerable<Guid> Visit(AssetsField field, JToken value)
+        public static IEnumerable<Guid> Visit(IField<AssetsFieldProperties> field, JToken value)
         {
             IEnumerable<Guid> result;
             try
@@ -44,7 +44,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
             return result ?? Enumerable.Empty<Guid>();
         }
 
-        private static IEnumerable<Guid> Visit(ReferencesField field, JToken value)
+        private static IEnumerable<Guid> Visit(IField<ReferencesFieldProperties> field, JToken value)
         {
             IEnumerable<Guid> result;
             try

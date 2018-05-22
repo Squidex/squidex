@@ -21,7 +21,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
             this.schemaResolver = schemaResolver;
         }
 
-        public JsonProperty Visit(AssetsField field)
+        public JsonProperty Visit(IField<AssetsFieldProperties> field)
         {
             return CreateProperty(field, jsonProperty =>
             {
@@ -32,7 +32,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
             });
         }
 
-        public JsonProperty Visit(BooleanField field)
+        public JsonProperty Visit(IField<BooleanFieldProperties> field)
         {
             return CreateProperty(field, jsonProperty =>
             {
@@ -40,7 +40,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
             });
         }
 
-        public JsonProperty Visit(DateTimeField field)
+        public JsonProperty Visit(IField<DateTimeFieldProperties> field)
         {
             return CreateProperty(field, jsonProperty =>
             {
@@ -49,7 +49,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
             });
         }
 
-        public JsonProperty Visit(GeolocationField field)
+        public JsonProperty Visit(IField<GeolocationFieldProperties> field)
         {
             return CreateProperty(field, jsonProperty =>
             {
@@ -81,7 +81,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
             });
         }
 
-        public JsonProperty Visit(JsonField field)
+        public JsonProperty Visit(IField<JsonFieldProperties> field)
         {
             return CreateProperty(field, jsonProperty =>
             {
@@ -89,7 +89,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
             });
         }
 
-        public JsonProperty Visit(NumberField field)
+        public JsonProperty Visit(IField<NumberFieldProperties> field)
         {
             return CreateProperty(field, jsonProperty =>
             {
@@ -107,7 +107,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
             });
         }
 
-        public JsonProperty Visit(ReferencesField field)
+        public JsonProperty Visit(IField<ReferencesFieldProperties> field)
         {
             return CreateProperty(field, jsonProperty =>
             {
@@ -118,7 +118,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
             });
         }
 
-        public JsonProperty Visit(StringField field)
+        public JsonProperty Visit(IField<StringFieldProperties> field)
         {
             return CreateProperty(field, jsonProperty =>
             {
@@ -139,7 +139,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
             });
         }
 
-        public JsonProperty Visit(TagsField field)
+        public JsonProperty Visit(IField<TagsFieldProperties> field)
         {
             return CreateProperty(field, jsonProperty =>
             {
@@ -150,7 +150,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
             });
         }
 
-        private static JsonProperty CreateProperty(Field field, Action<JsonProperty> updater)
+        private static JsonProperty CreateProperty(IField field, Action<JsonProperty> updater)
         {
             var property = new JsonProperty { IsRequired = field.RawProperties.IsRequired };
 

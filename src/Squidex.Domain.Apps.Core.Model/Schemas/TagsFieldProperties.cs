@@ -9,7 +9,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    [TypeName(nameof(TagsField))]
+    [TypeName("TagsField")]
     public sealed class TagsFieldProperties : FieldProperties
     {
         public int? MinItems { get; set; }
@@ -21,9 +21,14 @@ namespace Squidex.Domain.Apps.Core.Schemas
             return visitor.Visit(this);
         }
 
+        public override T Accept<T>(IFieldVisitor<T> visitor, IField field)
+        {
+            return visitor.Visit((IField<TagsFieldProperties>)field);
+        }
+
         public override Field CreateField(long id, string name, Partitioning partitioning)
         {
-            return new TagsField(id, name, partitioning, this);
+            return new Field<TagsFieldProperties>(id, name, partitioning, this);
         }
     }
 }

@@ -26,7 +26,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 {
     public sealed class GraphQLModel : IGraphModel
     {
-        private readonly Dictionary<Type, Func<Field, (IGraphType ResolveType, IFieldResolver Resolver)>> fieldInfos;
+        private readonly Dictionary<Type, Func<IField, (IGraphType ResolveType, IFieldResolver Resolver)>> fieldInfos;
         private readonly Dictionary<Type, IGraphType> inputFieldInfos;
         private readonly Dictionary<ISchemaEntity, ContentGraphType> contentTypes = new Dictionary<ISchemaEntity, ContentGraphType>();
         private readonly Dictionary<ISchemaEntity, ContentDataGraphType> contentDataTypes = new Dictionary<ISchemaEntity, ContentDataGraphType>();
@@ -53,75 +53,75 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             inputFieldInfos = new Dictionary<Type, IGraphType>
             {
                 {
-                    typeof(StringField),
+                    typeof(StringFieldProperties),
                     AllTypes.String
                 },
                 {
-                    typeof(BooleanField),
+                    typeof(BooleanFieldProperties),
                     AllTypes.Boolean
                 },
                 {
-                    typeof(NumberField),
+                    typeof(NumberFieldProperties),
                     AllTypes.Boolean
                 },
                 {
-                    typeof(DateTimeField),
+                    typeof(DateTimeFieldProperties),
                     AllTypes.Date
                 },
                 {
-                    typeof(GeolocationField),
+                    typeof(GeolocationFieldProperties),
                     AllTypes.GeolocationInput
                 },
                 {
-                    typeof(TagsField),
+                    typeof(TagsFieldProperties),
                     AllTypes.ListOfNonNullString
                 },
                 {
-                    typeof(AssetsField),
+                    typeof(AssetsFieldProperties),
                     AllTypes.ListOfNonNullGuid
                 },
                 {
-                    typeof(ReferencesField),
+                    typeof(ReferencesFieldProperties),
                     AllTypes.ListOfNonNullGuid
                 }
             };
 
-            fieldInfos = new Dictionary<Type, Func<Field, (IGraphType ResolveType, IFieldResolver Resolver)>>
+            fieldInfos = new Dictionary<Type, Func<IField, (IGraphType ResolveType, IFieldResolver Resolver)>>
             {
                 {
-                    typeof(StringField),
+                    typeof(StringFieldProperties),
                     field => ResolveDefault(AllTypes.NoopString)
                 },
                 {
-                    typeof(BooleanField),
+                    typeof(BooleanFieldProperties),
                     field => ResolveDefault(AllTypes.NoopBoolean)
                 },
                 {
-                    typeof(NumberField),
+                    typeof(NumberFieldProperties),
                     field => ResolveDefault(AllTypes.NoopFloat)
                 },
                 {
-                    typeof(DateTimeField),
+                    typeof(DateTimeFieldProperties),
                     field => ResolveDefault(AllTypes.NoopDate)
                 },
                 {
-                    typeof(JsonField),
+                    typeof(JsonFieldProperties),
                     field => ResolveDefault(AllTypes.NoopJson)
                 },
                 {
-                    typeof(GeolocationField),
+                    typeof(GeolocationFieldProperties),
                     field => ResolveDefault(AllTypes.NoopGeolocation)
                 },
                 {
-                    typeof(TagsField),
+                    typeof(TagsFieldProperties),
                     field => ResolveDefault(AllTypes.NoopTags)
                 },
                 {
-                    typeof(AssetsField),
+                    typeof(AssetsFieldProperties),
                     field => ResolveAssets(assetListType)
                 },
                 {
-                    typeof(ReferencesField),
+                    typeof(ReferencesFieldProperties),
                     field => ResolveReferences(field)
                 }
             };
@@ -210,9 +210,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             return (assetListType, resolver);
         }
 
-        private ValueTuple<IGraphType, IFieldResolver> ResolveReferences(Field field)
+        private ValueTuple<IGraphType, IFieldResolver> ResolveReferences(IField field)
         {
-            var schemaId = ((ReferencesField)field).Properties.SchemaId;
+            var schemaId = ((ReferencesFieldProperties)field.RawProperties).SchemaId;
 
             var contentType = GetContentType(schemaId);
 
@@ -260,9 +260,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             return assetType;
         }
 
-        public (IGraphType ResolveType, IFieldResolver Resolver) GetGraphType(Field field)
+        public (IGraphType ResolveType, IFieldResolver Resolver) GetGraphType(IField field)
         {
-            return fieldInfos[field.GetType()](field);
+            return fieldInfos[field.RawProperties.GetType()](field);
         }
 
         public IComplexGraphType GetContentDataType(Guid schemaId)
@@ -289,9 +289,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             return contentTypes.GetOrAdd(schema, s => new ContentGraphType());
         }
 
-        public IGraphType GetInputGraphType(Field field)
+        public IGraphType GetInputGraphType(IField field)
         {
-            return inputFieldInfos.GetOrAddDefault(field.GetType());
+            return inputFieldInfos.GetOrAddDefault(field.RawProperties.GetType());
         }
     }
 }

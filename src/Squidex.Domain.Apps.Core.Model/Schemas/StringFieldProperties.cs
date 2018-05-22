@@ -10,7 +10,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    [TypeName(nameof(StringField))]
+    [TypeName("StringField")]
     public sealed class StringFieldProperties : FieldProperties
     {
         public ImmutableList<string> AllowedValues { get; set; }
@@ -34,9 +34,14 @@ namespace Squidex.Domain.Apps.Core.Schemas
             return visitor.Visit(this);
         }
 
+        public override T Accept<T>(IFieldVisitor<T> visitor, IField field)
+        {
+            return visitor.Visit((IField<StringFieldProperties>)field);
+        }
+
         public override Field CreateField(long id, string name, Partitioning partitioning)
         {
-            return new StringField(id, name, partitioning, this);
+            return new Field<StringFieldProperties>(id, name, partitioning, this);
         }
     }
 }

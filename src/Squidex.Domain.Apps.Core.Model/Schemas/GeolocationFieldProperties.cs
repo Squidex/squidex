@@ -9,7 +9,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    [TypeName(nameof(GeolocationField))]
+    [TypeName("GeolocationField")]
     public sealed class GeolocationFieldProperties : FieldProperties
     {
         public GeolocationFieldEditor Editor { get; set; }
@@ -19,9 +19,14 @@ namespace Squidex.Domain.Apps.Core.Schemas
             return visitor.Visit(this);
         }
 
+        public override T Accept<T>(IFieldVisitor<T> visitor, IField field)
+        {
+            return visitor.Visit((IField<GeolocationFieldProperties>)field);
+        }
+
         public override Field CreateField(long id, string name, Partitioning partitioning)
         {
-            return new GeolocationField(id, name, partitioning, this);
+            return new Field<GeolocationFieldProperties>(id, name, partitioning, this);
         }
     }
 }

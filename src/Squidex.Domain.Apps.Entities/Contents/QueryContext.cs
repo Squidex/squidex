@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Security.Claims;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Security;
 
 namespace Squidex.Domain.Apps.Entities.Contents

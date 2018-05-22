@@ -52,9 +52,9 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             return v;
         }
 
-        private static JsonField Field(JsonFieldProperties properties)
+        private static Field<JsonFieldProperties> Field(JsonFieldProperties properties)
         {
-            return new JsonField(1, "my-json", Partitioning.Invariant, properties);
+            return Fields.Json(1, "my-json", Partitioning.Invariant, properties);
         }
     }
 }

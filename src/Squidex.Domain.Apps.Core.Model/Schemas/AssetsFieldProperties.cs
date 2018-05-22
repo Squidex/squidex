@@ -10,7 +10,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    [TypeName(nameof(AssetsField))]
+    [TypeName("AssetsField")]
     public sealed class AssetsFieldProperties : FieldProperties
     {
         public bool MustBeImage { get; set; }
@@ -42,9 +42,14 @@ namespace Squidex.Domain.Apps.Core.Schemas
             return visitor.Visit(this);
         }
 
+        public override T Accept<T>(IFieldVisitor<T> visitor, IField field)
+        {
+            return visitor.Visit((IField<AssetsFieldProperties>)field);
+        }
+
         public override Field CreateField(long id, string name, Partitioning partitioning)
         {
-            return new AssetsField(id, name, partitioning, this);
+            return new Field<AssetsFieldProperties>(id, name, partitioning, this);
         }
     }
 }

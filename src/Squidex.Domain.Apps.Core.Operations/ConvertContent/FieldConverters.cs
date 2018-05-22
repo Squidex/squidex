@@ -208,7 +208,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
         {
             return (data, field) =>
             {
-                if (field is JsonField)
+                if (field is IField<JsonFieldProperties>)
                 {
                     var result = new ContentFieldData();
 
@@ -237,7 +237,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
         {
             return (data, field) =>
             {
-                if (field is JsonField)
+                if (field is IField<JsonFieldProperties>)
                 {
                     var result = new ContentFieldData();
 

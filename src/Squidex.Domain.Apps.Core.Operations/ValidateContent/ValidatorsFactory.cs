@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
         {
         }
 
-        public static IEnumerable<IValidator> CreateValidators(Field field)
+        public static IEnumerable<IValidator> CreateValidators(IField field)
         {
             Guard.NotNull(field, nameof(field));
 
