@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Schemas
@@ -24,25 +25,22 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
             this.typeNameRegistry = typeNameRegistry;
 
-            RegisterField<AssetsFieldProperties>();
-            RegisterField<BooleanFieldProperties>();
-            RegisterField<DateTimeFieldProperties>();
-            RegisterField<GeolocationFieldProperties>();
-            RegisterField<JsonFieldProperties>();
-            RegisterField<NumberFieldProperties>();
-            RegisterField<ReferencesFieldProperties>();
-            RegisterField<StringFieldProperties>();
-            RegisterField<TagsFieldProperties>();
+            var types = typeof(FieldRegistry).Assembly.GetTypes().Where(x => x.BaseType == typeof(FieldProperties));
+
+            foreach (var type in types)
+            {
+                RegisterField(type);
+            }
 
             typeNameRegistry.MapObsolete(typeof(ReferencesFieldProperties), "DateTime");
             typeNameRegistry.MapObsolete(typeof(DateTimeFieldProperties), "References");
         }
 
-        private void RegisterField<T>()
+        private void RegisterField(Type type)
         {
-            typeNameRegistry.Map(typeof(T));
+            typeNameRegistry.Map(type);
 
-            fieldsByPropertyType[typeof(T)] = (id, name, partitioning, properties) => properties.CreateField(id, name, partitioning);
+            fieldsByPropertyType[type] = (id, name, partitioning, properties) => properties.CreateField(id, name, partitioning);
         }
 
         public Field CreateField(long id, string name, Partitioning partitioning, FieldProperties properties)
