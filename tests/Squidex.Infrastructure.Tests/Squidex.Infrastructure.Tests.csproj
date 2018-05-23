@@ -8,6 +8,7 @@
     <ProjectReference Include="..\..\src\Squidex.Infrastructure.Azure\Squidex.Infrastructure.Azure.csproj" />
     <ProjectReference Include="..\..\src\Squidex.Infrastructure.GoogleCloud\Squidex.Infrastructure.GoogleCloud.csproj" />
     <ProjectReference Include="..\..\src\Squidex.Infrastructure.MongoDb\Squidex.Infrastructure.MongoDb.csproj" />
+    <ProjectReference Include="..\..\src\Squidex.Infrastructure.MongoGridFs\Squidex.Infrastructure.MongoGridFs.csproj" />
     <ProjectReference Include="..\..\src\Squidex.Infrastructure\Squidex.Infrastructure.csproj" />
   </ItemGroup>
   <ItemGroup>

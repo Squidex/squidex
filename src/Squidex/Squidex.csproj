@@ -44,6 +44,7 @@
     <ProjectReference Include="..\Squidex.Infrastructure.Azure\Squidex.Infrastructure.Azure.csproj" />
     <ProjectReference Include="..\Squidex.Infrastructure.GetEventStore\Squidex.Infrastructure.GetEventStore.csproj" />
     <ProjectReference Include="..\Squidex.Infrastructure.GoogleCloud\Squidex.Infrastructure.GoogleCloud.csproj" />
+    <ProjectReference Include="..\Squidex.Infrastructure.MongoGridFs\Squidex.Infrastructure.MongoGridFs.csproj" />
     <ProjectReference Include="..\Squidex.Infrastructure.RabbitMq\Squidex.Infrastructure.RabbitMq.csproj" />
     <ProjectReference Include="..\Squidex.Infrastructure\Squidex.Infrastructure.csproj" />
     <ProjectReference Include="..\Squidex.Infrastructure.MongoDb\Squidex.Infrastructure.MongoDb.csproj" />
@@ -76,6 +77,7 @@
     <PackageReference Include="Microsoft.Orleans.Core.Abstractions" Version="2.0.0-ci.20180515.5" />
     <PackageReference Include="Microsoft.Orleans.OrleansRuntime" Version="2.0.0-ci.20180515.5" />
     <PackageReference Include="MongoDB.Driver" Version="2.5.1" />
+	<PackageReference Include="MongoDB.Driver.GridFS" Version="2.5.1" />
     <PackageReference Include="NJsonSchema" Version="9.10.35" />
     <PackageReference Include="NodaTime.Serialization.JsonNet" Version="2.0.0" />
     <PackageReference Include="NSwag.AspNetCore" Version="11.15.4" />
