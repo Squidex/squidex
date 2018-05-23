@@ -141,16 +141,13 @@ namespace Squidex.Infrastructure.Assets
         {
             try
             {
-                var filter =
-                    Builders<GridFSFileInfo>.Filter.And(
-                        Builders<GridFSFileInfo>.Filter.Eq(x => x.Filename, file.Name)
-                    );
-                using (var cursor = await bucket.FindAsync(filter))
+                file.Delete();
+                using (var cursor = await bucket.FindAsync(Builders<GridFSFileInfo>.Filter.And(
+                    Builders<GridFSFileInfo>.Filter.Eq(x => x.Filename, file.Name)
+                )))
                 {
                     await cursor.ForEachAsync(fileInfo => bucket.DeleteAsync(fileInfo.Id));
                 }
-
-                file.Delete();
             }
             catch (FileNotFoundException ex)
             {
