@@ -19,7 +19,7 @@ namespace Squidex.Infrastructure.Assets
     public class MongoGridFsAssetStoreTests : AssetStoreTests<MongoGridFsAssetStore>
     {
         private readonly string testFolder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-        private readonly IGridFSBucket bucket = A.Fake<IGridFSBucket>();
+        private readonly IGridFSBucket<string> bucket = A.Fake<IGridFSBucket<string>>();
 
         public override MongoGridFsAssetStore CreateStore()
         {
@@ -48,9 +48,10 @@ namespace Squidex.Infrastructure.Assets
         public override Task Should_throw_exception_if_asset_to_download_is_not_found()
         {
             var id = Id();
+            var filename = $"{id}_1_suffix";
 
             A.CallTo(() =>
-                    bucket.DownloadToStreamByNameAsync($"{id}_1_suffix", A<MemoryStream>.Ignored, null,
+                    bucket.DownloadToStreamAsync(filename, A<MemoryStream>.Ignored, null,
                         A<CancellationToken>.Ignored))
                 .Throws<AssetNotFoundException>();
 
@@ -64,6 +65,7 @@ namespace Squidex.Infrastructure.Assets
         public async Task Should_try_to_download_asset_if_is_not_found_locally()
         {
             var id = Id();
+            var filename = $"{id}_1_suffix";
             using (var stream = new MemoryStream())
             {
                 ((IInitializable)Sut).Initialize();
@@ -71,7 +73,7 @@ namespace Squidex.Infrastructure.Assets
                 await Sut.DownloadAsync(id, 1, "suffix", stream);
 
                 A.CallTo(() =>
-                        bucket.DownloadToStreamByNameAsync($"{id}_1_suffix", stream,
+                        bucket.DownloadToStreamAsync(filename, stream,
                             A<GridFSDownloadByNameOptions>.Ignored,
                             A<CancellationToken>.Ignored))
                     .MustHaveHappened();
@@ -82,7 +84,8 @@ namespace Squidex.Infrastructure.Assets
         public async Task Should_try_to_upload_asset_and_save_locally()
         {
             var id = Id();
-            var file = new FileInfo(testFolder + Path.DirectorySeparatorChar + $"{id}_1_suffix");
+            var filename = $"{id}_1_suffix";
+            var file = new FileInfo(testFolder + Path.DirectorySeparatorChar + filename);
             using (var stream = new MemoryStream(new byte[] { 0x1, 0x2, 0x3, 0x4 }))
             {
                 ((IInitializable)Sut).Initialize();
@@ -90,7 +93,7 @@ namespace Squidex.Infrastructure.Assets
                 await Sut.UploadAsync(id, 1, "suffix", stream);
 
                 A.CallTo(() =>
-                        bucket.UploadFromStreamAsync($"{id}_1_suffix", stream, A<GridFSUploadOptions>.Ignored,
+                        bucket.UploadFromStreamAsync(filename, filename, stream, A<GridFSUploadOptions>.Ignored,
                             A<CancellationToken>.Ignored))
                     .MustHaveHappened();
 

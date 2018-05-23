@@ -19,10 +19,10 @@ namespace Squidex.Infrastructure.Assets
     public class MongoGridFsAssetStore : IAssetStore, IInitializable
     {
         private readonly string path;
-        private readonly IGridFSBucket bucket;
+        private readonly IGridFSBucket<string> bucket;
         private readonly DirectoryInfo directory;
 
-        public MongoGridFsAssetStore(IGridFSBucket bucket, string path)
+        public MongoGridFsAssetStore(IGridFSBucket<string> bucket, string path)
         {
             Guard.NotNull(bucket, nameof(bucket));
             Guard.NotNullOrEmpty(path, nameof(path));
@@ -73,13 +73,13 @@ namespace Squidex.Infrastructure.Assets
             {
                 var file = GetFile(name);
 
+                file.CopyTo(GetPath(id, version, suffix));
+
                 using (var stream = new MemoryStream())
                 {
-                    await bucket.DownloadToStreamByNameAsync(file.Name, stream, cancellationToken: ct);
-                    await bucket.UploadFromStreamAsync(file.Name, stream, cancellationToken: ct);
+                    await bucket.DownloadToStreamAsync(file.Name, stream, cancellationToken: ct);
+                    await bucket.UploadFromStreamAsync(file.Name, file.Name, stream, cancellationToken: ct);
                 }
-
-                file.CopyTo(GetPath(id, version, suffix));
             }
             catch (FileNotFoundException ex)
             {
@@ -109,7 +109,7 @@ namespace Squidex.Infrastructure.Assets
                 {
                     // file not found locally
                     // read from GridFS
-                    await bucket.DownloadToStreamByNameAsync(file.Name, stream, cancellationToken: ct);
+                    await bucket.DownloadToStreamAsync(file.Name, stream, cancellationToken: ct);
 
                     // add to local assets
                     using (var fileStream = file.OpenWrite())
@@ -142,12 +142,7 @@ namespace Squidex.Infrastructure.Assets
             try
             {
                 file.Delete();
-                using (var cursor = await bucket.FindAsync(Builders<GridFSFileInfo>.Filter.And(
-                    Builders<GridFSFileInfo>.Filter.Eq(x => x.Filename, file.Name)
-                )))
-                {
-                    await cursor.ForEachAsync(fileInfo => bucket.DeleteAsync(fileInfo.Id));
-                }
+                await bucket.DeleteAsync(file.Name);
             }
             catch (FileNotFoundException ex)
             {
@@ -166,7 +161,7 @@ namespace Squidex.Infrastructure.Assets
             try
             {
                 // upload file to GridFS first
-                await bucket.UploadFromStreamAsync(file.Name, stream, cancellationToken: ct);
+                await bucket.UploadFromStreamAsync(file.Name, file.Name, stream, cancellationToken: ct);
 
                 // create file locally
                 // even if this stage will fail, file will be recreated on the next Download call
