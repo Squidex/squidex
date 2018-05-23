@@ -28,9 +28,19 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             return field.Accept(new JsonValueConverter(json));
         }
 
+        public object Visit(IArrayField field)
+        {
+            return Value.ToObject<List<JObject>>();
+        }
+
         public object Visit(IField<AssetsFieldProperties> field)
         {
             return Value.ToObject<List<Guid>>();
+        }
+
+        internal static object ConvertValue(IField field, object value)
+        {
+            throw new NotImplementedException();
         }
 
         public object Visit(IField<BooleanFieldProperties> field)

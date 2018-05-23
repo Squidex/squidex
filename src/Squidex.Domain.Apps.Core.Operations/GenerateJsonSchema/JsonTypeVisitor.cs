@@ -21,6 +21,30 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
             this.schemaResolver = schemaResolver;
         }
 
+        public JsonProperty Visit(IArrayField field)
+        {
+            return CreateProperty(field, jsonProperty =>
+            {
+                var itemSchema = new JsonSchema4
+                {
+                    Type = JsonObjectType.Object
+                };
+
+                foreach (var child in field.Fields)
+                {
+                    var childProperty = field.Accept(this);
+
+                    childProperty.Description = child.RawProperties.Hints;
+                    childProperty.IsRequired = child.RawProperties.IsRequired;
+
+                    itemSchema.Properties.Add(child.Name, childProperty);
+                }
+
+                jsonProperty.Type = JsonObjectType.Object;
+                jsonProperty.Item = itemSchema;
+            });
+        }
+
         public JsonProperty Visit(IField<AssetsFieldProperties> field)
         {
             return CreateProperty(field, jsonProperty =>
