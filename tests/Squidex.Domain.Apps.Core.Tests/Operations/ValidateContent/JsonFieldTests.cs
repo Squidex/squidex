@@ -44,7 +44,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             await sut.ValidateAsync(CreateValue(JValue.CreateNull()), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> is required." });
+                new[] { "Field is required." });
         }
 
         private static JValue CreateValue(JValue v)

@@ -38,11 +38,6 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             return Value.ToObject<List<Guid>>();
         }
 
-        internal static object ConvertValue(IField field, object value)
-        {
-            throw new NotImplementedException();
-        }
-
         public object Visit(IField<BooleanFieldProperties> field)
         {
             return (bool?)Value;

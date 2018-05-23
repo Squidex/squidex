@@ -23,9 +23,9 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
             this.properties = properties;
         }
 
-        public async Task ValidateAsync(object value, ValidationContext context, Action<string> addError)
+        public async Task ValidateAsync(object value, ValidationContext context, ErrorFormatter addError)
         {
-            if (value is ICollection<Guid> assetIds)
+            if (value is ICollection<Guid> assetIds && assetIds.Count > 0)
             {
                 var assets = await context.GetAssetInfosAsync(assetIds);
                 var i = 0;
@@ -38,7 +38,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
                     void Error(string message)
                     {
-                        addError($"<FIELD> has invalid asset #{i}: {message}");
+                        addError($"[{i}]", message);
                     }
 
                     if (asset == null)

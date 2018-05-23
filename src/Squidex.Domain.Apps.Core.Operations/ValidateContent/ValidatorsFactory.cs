@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json.Linq;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.ValidateContent.Validators;
@@ -34,15 +35,24 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
         {
             if (field.Properties.IsRequired || field.Properties.MinItems.HasValue || field.Properties.MaxItems.HasValue)
             {
-                yield return new CollectionValidator<Guid>(field.Properties.IsRequired, field.Properties.MinItems, field.Properties.MaxItems);
+                yield return new CollectionValidator(field.Properties.IsRequired, field.Properties.MinItems, field.Properties.MaxItems);
             }
+
+            var fieldsValidators = new Dictionary<string, (bool IsOptional, IValidator Validator)>();
+
+            foreach (var kvp in field.FieldsByName)
+            {
+                fieldsValidators[kvp.Key] = (false, new FieldValidator(kvp.Value.Accept(this), kvp.Value));
+            }
+
+            yield return new CollectionItemValidator(new ObjectValidator<JToken>(fieldsValidators, false, "field", JValue.CreateNull()));
         }
 
         public IEnumerable<IValidator> Visit(IField<AssetsFieldProperties> field)
         {
             if (field.Properties.IsRequired || field.Properties.MinItems.HasValue || field.Properties.MaxItems.HasValue)
             {
-                yield return new CollectionValidator<Guid>(field.Properties.IsRequired, field.Properties.MinItems, field.Properties.MaxItems);
+                yield return new CollectionValidator(field.Properties.IsRequired, field.Properties.MinItems, field.Properties.MaxItems);
             }
 
             yield return new AssetsValidator(field.Properties);
@@ -107,7 +117,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
         {
             if (field.Properties.IsRequired || field.Properties.MinItems.HasValue || field.Properties.MaxItems.HasValue)
             {
-                yield return new CollectionValidator<Guid>(field.Properties.IsRequired, field.Properties.MinItems, field.Properties.MaxItems);
+                yield return new CollectionValidator(field.Properties.IsRequired, field.Properties.MinItems, field.Properties.MaxItems);
             }
 
             if (field.Properties.SchemaId != Guid.Empty)
@@ -143,10 +153,10 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
         {
             if (field.Properties.IsRequired || field.Properties.MinItems.HasValue || field.Properties.MaxItems.HasValue)
             {
-                yield return new CollectionValidator<string>(field.Properties.IsRequired, field.Properties.MinItems, field.Properties.MaxItems);
+                yield return new CollectionValidator(field.Properties.IsRequired, field.Properties.MinItems, field.Properties.MaxItems);
             }
 
-            yield return new CollectionItemValidator<string>(new RequiredStringValidator());
+            yield return new CollectionItemValidator(new RequiredStringValidator());
         }
     }
 }

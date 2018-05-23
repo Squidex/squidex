@@ -5,14 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 {
-    public sealed class CollectionItemValidator<T> : IValidator
+    public sealed class CollectionItemValidator : IValidator
     {
         private readonly IValidator[] itemValidators;
 
@@ -24,10 +24,11 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
             this.itemValidators = itemValidators;
         }
 
-        public async Task ValidateAsync(object value, ValidationContext context, Action<string> addError)
+        public async Task ValidateAsync(object value, ValidationContext context, ErrorFormatter addError)
         {
-            if (value is ICollection<T> items)
+            if (value is ICollection items && items.Count > 0)
             {
+                var innerTasks = new List<Task>();
                 var innerContext = context.Optional(false);
 
                 var index = 1;
@@ -36,11 +37,13 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
                 {
                     foreach (var itemValidator in itemValidators)
                     {
-                        await itemValidator.ValidateAsync(item, innerContext, e => addError(e.Replace("<FIELD>", $"<FIELD> item #{index}")));
+                        innerTasks.Add(itemValidator.ValidateAsync(item, innerContext, Formatter.Combine($"[{index}]", addError)));
                     }
 
                     index++;
                 }
+
+                await Task.WhenAll(innerTasks);
             }
         }
     }

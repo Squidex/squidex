@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
@@ -25,7 +24,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
             this.field = field;
         }
 
-        public async Task ValidateAsync(object value, ValidationContext context, Action<string> addError)
+        public async Task ValidateAsync(object value, ValidationContext context, ErrorFormatter addError)
         {
             try
             {
@@ -43,7 +42,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
             }
             catch
             {
-                addError("<FIELD> is not a valid value.");
+                addError(null, "Not a valid value.");
             }
         }
     }

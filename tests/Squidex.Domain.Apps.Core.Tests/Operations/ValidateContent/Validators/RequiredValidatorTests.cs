@@ -55,7 +55,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
             await sut.ValidateAsync(null, errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> is required." });
+                new[] { "Field is required." });
         }
     }
 }

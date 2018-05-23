@@ -58,7 +58,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             await sut.ValidateAsync(CreateValue(null), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> is required." });
+                new[] { "Field is required." });
         }
 
         [Fact]
@@ -69,7 +69,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             await sut.ValidateAsync(CreateValue(), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> is required." });
+                new[] { "Field is required." });
         }
 
         [Fact]
@@ -80,7 +80,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             await sut.ValidateAsync("invalid", errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> is not a valid value." });
+                new[] { "Not a valid value." });
         }
 
         [Fact]
@@ -91,7 +91,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             await sut.ValidateAsync(CreateValue(Guid.NewGuid(), Guid.NewGuid()), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> must have at least 3 item(s)." });
+                new[] { "Must have at least 3 item(s)." });
         }
 
         [Fact]
@@ -102,7 +102,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             await sut.ValidateAsync(CreateValue(Guid.NewGuid(), Guid.NewGuid()), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> must have not more than 1 item(s)." });
+                new[] { "Must have not more than 1 item(s)." });
         }
 
         private static JToken CreateValue(params Guid[] ids)

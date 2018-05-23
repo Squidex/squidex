@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
                     Type = JsonObjectType.Object
                 };
 
-                foreach (var child in field.Fields)
+                foreach (var child in field.FieldsByName.Values)
                 {
                     var childProperty = field.Accept(this);
 

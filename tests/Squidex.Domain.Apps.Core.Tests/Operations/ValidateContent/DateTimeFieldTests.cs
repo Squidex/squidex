@@ -46,7 +46,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             await sut.ValidateAsync(CreateValue(null), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> is required." });
+                new[] { "Field is required." });
         }
 
         [Fact]
@@ -57,7 +57,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             await sut.ValidateAsync(CreateValue(FutureDays(0)), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { $"<FIELD> must be greater or equals than '{FutureDays(10)}'." });
+                new[] { $"Must be greater or equals than '{FutureDays(10)}'." });
         }
 
         [Fact]
@@ -68,7 +68,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             await sut.ValidateAsync(CreateValue(FutureDays(20)), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { $"<FIELD> must be less or equals than '{FutureDays(10)}'." });
+                new[] { $"Must be less or equals than '{FutureDays(10)}'." });
         }
 
         [Fact]
@@ -79,7 +79,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             await sut.ValidateAsync(CreateValue("Invalid"), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> is not a valid value." });
+                new[] { "Not a valid value." });
         }
 
         [Fact]
@@ -90,7 +90,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             await sut.ValidateAsync(CreateValue(123), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> is not a valid value." });
+                new[] { "Not a valid value." });
         }
 
         private static Instant FutureDays(int days)
