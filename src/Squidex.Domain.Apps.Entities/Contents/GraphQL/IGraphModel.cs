@@ -20,12 +20,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
         IFieldPartitioning ResolvePartition(Partitioning key);
 
-        IComplexGraphType GetAssetType();
-
-        IComplexGraphType GetContentType(Guid schemaId);
-
-        IComplexGraphType GetContentDataType(Guid schemaId);
-
         IFieldResolver ResolveAssetUrl();
 
         IFieldResolver ResolveAssetSourceUrl();
@@ -33,6 +27,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         IFieldResolver ResolveAssetThumbnailUrl();
 
         IFieldResolver ResolveContentUrl(ISchemaEntity schema);
+
+        IGraphType GetAssetType();
+
+        IGraphType GetContentType(Guid schemaId);
+
+        IGraphType GetContentDataType(Guid schemaId);
 
         IGraphType GetInputGraphType(IField field);
 

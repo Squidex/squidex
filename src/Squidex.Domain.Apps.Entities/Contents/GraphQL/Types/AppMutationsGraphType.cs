@@ -50,7 +50,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             Description = "The app mutations.";
         }
 
-        private void AddContentCreate(NamedId<Guid> schemaId, string schemaType, string schemaName, ContentDataGraphInputType inputType, IComplexGraphType contentDataType, IComplexGraphType contentType)
+        private void AddContentCreate(NamedId<Guid> schemaId, string schemaType, string schemaName, ContentDataGraphInputType inputType, IGraphType contentDataType, IGraphType contentType)
         {
             AddField(new FieldType
             {
@@ -98,7 +98,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             });
         }
 
-        private void AddContentUpdate(string schemaType, string schemaName, ContentDataGraphInputType inputType, IComplexGraphType resultType)
+        private void AddContentUpdate(string schemaType, string schemaName, ContentDataGraphInputType inputType, IGraphType resultType)
         {
             AddField(new FieldType
             {
@@ -144,7 +144,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             });
         }
 
-        private void AddContentPatch(string schemaType, string schemaName, ContentDataGraphInputType inputType, IComplexGraphType resultType)
+        private void AddContentPatch(string schemaType, string schemaName, ContentDataGraphInputType inputType, IGraphType resultType)
         {
             AddField(new FieldType
             {

@@ -73,7 +73,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             });
         }
 
-        private void AddAssetsQueries(IComplexGraphType assetType)
+        private void AddAssetsQueries(IGraphType assetType)
         {
             AddField(new FieldType
             {
@@ -104,7 +104,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             });
         }
 
-        private void AddContentQueries(Guid schemaId, string schemaType, string schemaName, IComplexGraphType contentType)
+        private void AddContentQueries(Guid schemaId, string schemaType, string schemaName, IGraphType contentType)
         {
             AddField(new FieldType
             {

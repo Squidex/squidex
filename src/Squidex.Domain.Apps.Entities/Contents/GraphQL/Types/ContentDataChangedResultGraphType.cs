@@ -13,7 +13,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {
     public sealed class ContentDataChangedResultGraphType : ObjectGraphType<ContentDataChangedResult>
     {
-        public ContentDataChangedResultGraphType(string schemaType, string schemaName, IComplexGraphType contentDataType)
+        public ContentDataChangedResultGraphType(string schemaType, string schemaName, IGraphType contentDataType)
         {
             Name = $"{schemaName}DataChangedResultDto";
 
