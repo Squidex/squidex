@@ -36,6 +36,8 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
                     var partitionItemProperty = field.Accept(jsonTypeVisitor);
 
                     partitionItemProperty.Description = partitionItem.Name;
+                    partitionItemProperty.IsRequired = field.RawProperties.IsRequired && !partitionItem.IsOptional;
+
                     partitionObject.Properties.Add(partitionItem.Key, partitionItemProperty);
                 }
 
@@ -53,16 +55,11 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 
             if (!string.IsNullOrWhiteSpace(field.RawProperties.Hints))
             {
-                jsonProperty.Description = field.RawProperties.Hints;
+                jsonProperty.Description = $"{field.Name} ({field.RawProperties.Hints})";
             }
             else
             {
                 jsonProperty.Description = field.Name;
-            }
-
-            if (!string.IsNullOrWhiteSpace(field.RawProperties.Hints))
-            {
-                jsonProperty.Description += $" ({field.RawProperties.Hints}).";
             }
 
             return jsonProperty;
