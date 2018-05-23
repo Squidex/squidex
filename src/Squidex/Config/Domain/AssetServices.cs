@@ -58,7 +58,7 @@ namespace Squidex.Config.Domain
                         {
                             var mongoClient = Singletons<IMongoClient>.GetOrAdd(connectionString, s => new MongoClient(s));
                             var mongoDatabase = mongoClient.GetDatabase(mongoDatabaseName);
-                            var gridFsbucket = new GridFSBucket(mongoDatabase, new GridFSBucketOptions()
+                            var gridFsbucket = new GridFSBucket<string>(mongoDatabase, new GridFSBucketOptions()
                             {
                                 BucketName = mongoGridFsBucketName,
                                 ChunkSizeBytes = 255 * 1024
