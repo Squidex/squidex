@@ -4,6 +4,7 @@
 *.vs
 *.log
 
+.idea
 .vscode
 
 # Build results
