@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 using NJsonSchema;
 using Squidex.Domain.Apps.Core.Schemas;
 
@@ -30,14 +31,14 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
                     Type = JsonObjectType.Object
                 };
 
-                foreach (var child in field.FieldsByName.Values)
+                foreach (var nestedField in field.Fields.Where(x => !x.IsHidden))
                 {
                     var childProperty = field.Accept(this);
 
-                    childProperty.Description = child.RawProperties.Hints;
-                    childProperty.IsRequired = child.RawProperties.IsRequired;
+                    childProperty.Description = nestedField.RawProperties.Hints;
+                    childProperty.IsRequired = nestedField.RawProperties.IsRequired;
 
-                    itemSchema.Properties.Add(child.Name, childProperty);
+                    itemSchema.Properties.Add(nestedField.Name, childProperty);
                 }
 
                 jsonProperty.Type = JsonObjectType.Object;

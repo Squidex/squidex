@@ -12,8 +12,8 @@ using System.Threading.Tasks;
 using GraphQL;
 using GraphQL.Resolvers;
 using GraphQL.Types;
+using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core;
-using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Assets;
@@ -35,6 +35,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         private readonly PartitionResolver partitionResolver;
         private readonly IAppEntity app;
         private readonly IGraphType assetType;
+        private readonly IGraphType assetListType;
         private readonly GraphQLSchema graphQLSchema;
 
         public bool CanGenerateAssetSourceUrl { get; private set; }
@@ -48,8 +49,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             CanGenerateAssetSourceUrl = urlGenerator.CanGenerateAssetSourceUrl;
 
             assetType = new AssetGraphType(this);
+            assetListType = new ListGraphType(new NonNullGraphType(assetType));
+
             schemasById = schemas.ToDictionary(x => x.Id);
-            schemaTypes = new QueryGraphTypeVisitor(GetContentType, new ListGraphType(new NonNullGraphType(assetType)));
 
             graphQLSchema = BuildSchema(this);
 
@@ -78,7 +80,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
         private static (IGraphType ResolveType, IFieldResolver Resolver) ResolveDefault(IGraphType type)
         {
-            return (type, new FuncFieldResolver<ContentFieldData, object>(c => c.Source.GetOrDefault(c.FieldName)));
+            return (type, new FuncFieldResolver<IReadOnlyDictionary<string, JToken>, object>(c => c.Source.GetOrDefault(c.FieldName)));
         }
 
         public IFieldResolver ResolveAssetUrl()
@@ -134,9 +136,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             return partitionResolver(key);
         }
 
-        public (IGraphType ResolveType, IFieldResolver Resolver) GetGraphType(IField field)
+        public (IGraphType ResolveType, IFieldResolver Resolver) GetGraphType(ISchemaEntity schema, IField field)
         {
-            return field.Accept(schemaTypes);
+            return field.Accept(new QueryGraphTypeVisitor(schema, GetContentType, this, assetListType));
         }
 
         public IGraphType GetInputGraphType(IField field)

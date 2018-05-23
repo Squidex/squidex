@@ -27,7 +27,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
             this.maxLength = maxLength;
         }
 
-        public Task ValidateAsync(object value, ValidationContext context, ErrorFormatter addError)
+        public Task ValidateAsync(object value, ValidationContext context, AddError addError)
         {
             if (value is string stringValue && !string.IsNullOrEmpty(stringValue))
             {

@@ -16,16 +16,18 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
         private readonly bool isPartial;
         private readonly string fieldType;
         private readonly TValue fieldDefault;
+        private readonly CombineFields combiner;
 
-        public ObjectValidator(IDictionary<string, (bool IsOptional, IValidator Validator)> schema, bool isPartial, string fieldType, TValue fieldDefault)
+        public ObjectValidator(IDictionary<string, (bool IsOptional, IValidator Validator)> schema, bool isPartial, string fieldType, TValue fieldDefault, CombineFields combiner)
         {
             this.schema = schema;
+            this.combiner = combiner;
             this.fieldDefault = fieldDefault;
             this.fieldType = fieldType;
             this.isPartial = isPartial;
         }
 
-        public async Task ValidateAsync(object value, ValidationContext context, ErrorFormatter addError)
+        public async Task ValidateAsync(object value, ValidationContext context, AddError addError)
         {
             if (value is IReadOnlyDictionary<string, TValue> values)
             {
@@ -35,7 +37,9 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
                     if (!schema.ContainsKey(name))
                     {
-                        Formatter.Combine(name, addError)(null, $"Not a known {fieldType}.");
+                        var fieldFormatter = combiner?.Invoke(name, addError) ?? Formatter.Combine(name, addError);
+
+                        fieldFormatter(null, $"Not a known {fieldType}.");
                     }
                 }
 
@@ -58,7 +62,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
                     var (isOptional, validator) = field.Value;
 
                     var fieldContext = context.Optional(isOptional);
-                    var fieldFormatter = Formatter.Combine(name, addError);
+                    var fieldFormatter = combiner(name, addError);
 
                     tasks.Add(validator.ValidateAsync(fieldValue, fieldContext, fieldFormatter));
                 }

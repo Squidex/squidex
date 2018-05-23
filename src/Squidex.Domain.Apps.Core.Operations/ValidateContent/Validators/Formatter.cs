@@ -5,21 +5,40 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
+
 namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 {
     public static class Formatter
     {
-        public static ErrorFormatter Combine(string field, ErrorFormatter formatter)
+        private static readonly string IV = InvariantPartitioning.Instance.Master.Key;
+
+        public static AddError Combine(string field, AddError formatter)
         {
-            return (innerField, message) =>
+            return (f, m) =>
             {
-                if (!string.IsNullOrWhiteSpace(innerField))
+                if (!string.IsNullOrWhiteSpace(f))
                 {
-                    formatter($"{field}.{innerField}", message);
+                    formatter($"{field}.{f}", m);
                 }
                 else
                 {
-                    formatter(field, message);
+                    formatter(field, m);
+                }
+            };
+        }
+
+        public static AddError CombineForLanguage(string field, AddError formatter)
+        {
+            return (f, m) =>
+            {
+                if (!string.IsNullOrWhiteSpace(f) && !string.Equals(f, IV, StringComparison.OrdinalIgnoreCase))
+                {
+                    formatter($"{field}.{f}", m);
+                }
+                else
+                {
+                    formatter(field, m);
                 }
             };
         }

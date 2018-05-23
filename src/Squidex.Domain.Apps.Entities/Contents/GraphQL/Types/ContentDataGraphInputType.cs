@@ -5,9 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Resolvers;
 using GraphQL.Types;
+using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
@@ -56,7 +58,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
                     fieldGraphType.Description = $"The input structure of the {fieldName} of a {schemaName} content type.";
 
-                    var fieldResolver = new FuncFieldResolver<NamedContentData, ContentFieldData>(c => c.Source.GetOrDefault(field.Name));
+                    var fieldResolver = new FuncFieldResolver<NamedContentData, IReadOnlyDictionary<string, JToken>>(c =>
+                    {
+                        return c.Source.GetOrDefault(field.Name);
+                    });
 
                     AddField(new FieldType
                     {

@@ -20,6 +20,11 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Converters
         {
         }
 
+        public FieldPropertiesDto Visit(ArrayFieldProperties properties)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public static FieldPropertiesDto Create(FieldProperties properties)
         {
             return properties.Accept(Instance);

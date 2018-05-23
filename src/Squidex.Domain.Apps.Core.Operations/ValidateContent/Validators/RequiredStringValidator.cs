@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
             this.validateEmptyStrings = validateEmptyStrings;
         }
 
-        public Task ValidateAsync(object value, ValidationContext context, ErrorFormatter addError)
+        public Task ValidateAsync(object value, ValidationContext context, AddError addError)
         {
             if (context.IsOptional || (value != null && !(value is string)))
             {

@@ -5,9 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Resolvers;
 using GraphQL.Types;
+using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
@@ -25,15 +27,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
             foreach (var field in schema.SchemaDef.Fields.Where(x => !x.IsHidden))
             {
-                var fieldInfo = model.GetGraphType(field);
+                var fieldInfo = model.GetGraphType(schema, field);
 
                 if (fieldInfo.ResolveType != null)
                 {
-                    var fieldName = field.RawProperties.Label.WithFallback(field.Name);
+                    var fieldType = field.TypeName();
+                    var fieldName = field.DisplayName();
 
                     var fieldGraphType = new ObjectGraphType
                     {
-                        Name = $"{schemaType}Data{field.Name.ToPascalCase()}Dto"
+                        Name = $"{schemaType}Data{fieldType}Dto"
                     };
 
                     var partition = model.ResolvePartition(field.Partitioning);
@@ -49,9 +52,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                         });
                     }
 
-                    fieldGraphType.Description = $"The structure of the {fieldName} of a {schemaName} content type.";
+                    fieldGraphType.Description = $"The structure of the {fieldName} field of a {schemaName} content type.";
 
-                    var fieldResolver = new FuncFieldResolver<NamedContentData, ContentFieldData>(c => c.Source.GetOrDefault(field.Name));
+                    var fieldResolver = new FuncFieldResolver<NamedContentData, IReadOnlyDictionary<string, JToken>>(c =>
+                    {
+                        return c.Source.GetOrDefault(field.Name);
+                    });
 
                     AddField(new FieldType
                     {

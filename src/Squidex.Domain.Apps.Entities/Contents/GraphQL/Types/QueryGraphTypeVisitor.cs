@@ -6,23 +6,34 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using GraphQL.Resolvers;
 using GraphQL.Types;
-using Squidex.Domain.Apps.Core.Contents;
+using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {
     public sealed class QueryGraphTypeVisitor : IFieldVisitor<(IGraphType ResolveType, IFieldResolver Resolver)>
     {
+        private readonly ISchemaEntity schema;
         private readonly Func<Guid, IGraphType> schemaResolver;
+        private readonly IGraphModel model;
         private readonly IGraphType assetListType;
 
-        public QueryGraphTypeVisitor(Func<Guid, IGraphType> schemaResolver, IGraphType assetListType)
+        public QueryGraphTypeVisitor(ISchemaEntity schema, Func<Guid, IGraphType> schemaResolver, IGraphModel model, IGraphType assetListType)
         {
+            this.model = model;
             this.assetListType = assetListType;
+            this.schema = schema;
             this.schemaResolver = schemaResolver;
+        }
+
+        public (IGraphType ResolveType, IFieldResolver Resolver) Visit(IArrayField field)
+        {
+            return ResolveNested(field);
         }
 
         public (IGraphType ResolveType, IFieldResolver Resolver) Visit(IField<AssetsFieldProperties> field)
@@ -72,12 +83,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
         private static (IGraphType ResolveType, IFieldResolver Resolver) ResolveDefault(IGraphType type)
         {
-            return (type, new FuncFieldResolver<ContentFieldData, object>(c => c.Source.GetOrDefault(c.FieldName)));
+            return (type, new FuncFieldResolver<IReadOnlyDictionary<string, JToken>, object>(c => c.Source.GetOrDefault(c.FieldName)));
         }
 
         private static ValueTuple<IGraphType, IFieldResolver> ResolveAssets(IGraphType assetListType)
         {
-            var resolver = new FuncFieldResolver<ContentFieldData, object>(c =>
+            var resolver = new FuncFieldResolver<IReadOnlyDictionary<string, JToken>, object>(c =>
             {
                 var context = (GraphQLExecutionContext)c.UserContext;
                 var contentIds = c.Source.GetOrDefault(c.FieldName);
@@ -86,6 +97,18 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             });
 
             return (assetListType, resolver);
+        }
+
+        private ValueTuple<IGraphType, IFieldResolver> ResolveNested(IArrayField field)
+        {
+            var resolver = new FuncFieldResolver<IReadOnlyDictionary<string, JToken>, object>(c =>
+            {
+                return c.Source.GetOrDefault(c.FieldName);
+            });
+
+            var schemaFieldType = new ListGraphType(new NonNullGraphType(new NestedObjectGraphType(model, schema, field)));
+
+            return (schemaFieldType, resolver);
         }
 
         private ValueTuple<IGraphType, IFieldResolver> ResolveReferences(IField field)
@@ -99,7 +122,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 return (null, null);
             }
 
-            var resolver = new FuncFieldResolver<ContentFieldData, object>(c =>
+            var resolver = new FuncFieldResolver<IReadOnlyDictionary<string, JToken>, object>(c =>
             {
                 var context = (GraphQLExecutionContext)c.UserContext;
                 var contentIds = c.Source.GetOrDefault(c.FieldName);

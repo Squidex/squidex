@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
             this.schemaId = schemaId;
         }
 
-        public async Task ValidateAsync(object value, ValidationContext context, ErrorFormatter addError)
+        public async Task ValidateAsync(object value, ValidationContext context, AddError addError)
         {
             if (value is ICollection<Guid> contentIds)
             {

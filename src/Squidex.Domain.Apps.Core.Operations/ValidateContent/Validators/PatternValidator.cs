@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
             regex = new Regex("^" + pattern + "$", RegexOptions.None, Timeout);
         }
 
-        public Task ValidateAsync(object value, ValidationContext context, ErrorFormatter addError)
+        public Task ValidateAsync(object value, ValidationContext context, AddError addError)
         {
             if (value is string stringValue)
             {

@@ -24,7 +24,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
             this.field = field;
         }
 
-        public async Task ValidateAsync(object value, ValidationContext context, ErrorFormatter addError)
+        public async Task ValidateAsync(object value, ValidationContext context, AddError addError)
         {
             try
             {

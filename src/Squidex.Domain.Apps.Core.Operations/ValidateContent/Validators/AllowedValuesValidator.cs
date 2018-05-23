@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
             this.allowedValues = allowedValues;
         }
 
-        public Task ValidateAsync(object value, ValidationContext context, ErrorFormatter addError)
+        public Task ValidateAsync(object value, ValidationContext context, AddError addError)
         {
             if (value == null)
             {

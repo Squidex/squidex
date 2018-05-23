@@ -24,7 +24,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
             this.itemValidators = itemValidators;
         }
 
-        public async Task ValidateAsync(object value, ValidationContext context, ErrorFormatter addError)
+        public async Task ValidateAsync(object value, ValidationContext context, AddError addError)
         {
             if (value is ICollection items && items.Count > 0)
             {
@@ -35,9 +35,11 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
                 foreach (var item in items)
                 {
+                    var itemFormatter = Formatter.Combine($"[{index}]", addError);
+
                     foreach (var itemValidator in itemValidators)
                     {
-                        innerTasks.Add(itemValidator.ValidateAsync(item, innerContext, Formatter.Combine($"[{index}]", addError)));
+                        innerTasks.Add(itemValidator.ValidateAsync(item, innerContext, itemFormatter));
                     }
 
                     index++;

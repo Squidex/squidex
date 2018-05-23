@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                 CreateFormatter(errors));
         }
 
-        private static ErrorFormatter CreateFormatter(IList<string> errors)
+        private static AddError CreateFormatter(IList<string> errors)
         {
             return (field, message) =>
             {

@@ -12,7 +12,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 {
     public class RequiredValidator : IValidator
     {
-        public Task ValidateAsync(object value, ValidationContext context, ErrorFormatter addError)
+        public Task ValidateAsync(object value, ValidationContext context, AddError addError)
         {
             if (value == null && !context.IsOptional)
             {

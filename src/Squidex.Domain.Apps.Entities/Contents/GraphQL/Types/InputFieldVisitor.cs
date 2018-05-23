@@ -18,6 +18,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
         {
         }
 
+        public IGraphType Visit(IArrayField field)
+        {
+            return AllTypes.NoopJson;
+        }
+
         public IGraphType Visit(IField<AssetsFieldProperties> field)
         {
             return AllTypes.ListOfNonNullGuid;

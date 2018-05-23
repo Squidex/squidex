@@ -9,10 +9,12 @@ using System.Threading.Tasks;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 {
-    public delegate void ErrorFormatter(string field, string message);
+    public delegate void AddError(string field, string message);
+
+    public delegate AddError CombineFields(string field, AddError formatter);
 
     public interface IValidator
     {
-        Task ValidateAsync(object value, ValidationContext context, ErrorFormatter addError);
+        Task ValidateAsync(object value, ValidationContext context, AddError addError);
     }
 }

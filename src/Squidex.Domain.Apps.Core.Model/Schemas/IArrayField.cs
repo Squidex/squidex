@@ -11,6 +11,8 @@ namespace Squidex.Domain.Apps.Core.Schemas
 {
     public interface IArrayField : IField<ArrayFieldProperties>
     {
+        IReadOnlyList<Field> Fields { get; }
+
         IReadOnlyDictionary<long, Field> FieldsById { get; }
 
         IReadOnlyDictionary<string, Field> FieldsByName { get; }

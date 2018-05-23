@@ -74,7 +74,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
                 fieldsValidators[field.Key] = (!field.Value.RawProperties.IsRequired, CreateFieldValidator(field.Value, isPartial));
             }
 
-            return new ObjectValidator<ContentFieldData>(fieldsValidators, isPartial, "field", DefaultFieldData);
+            return new ObjectValidator<ContentFieldData>(fieldsValidators, isPartial, "field", DefaultFieldData, Formatter.CombineForLanguage);
         }
 
         private IValidator CreateFieldValidator(Field field, bool isPartial)
@@ -89,9 +89,11 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
                 fieldsValidators[partition.Key] = (partition.IsOptional, fieldValidator);
             }
 
-            var type = field.Partitioning.Equals(Partitioning.Language) ? "language" : "invariant value";
+            var isLanguage = field.Partitioning.Equals(Partitioning.Language);
 
-            return new ObjectValidator<JToken>(fieldsValidators, isPartial, type, DefaultValue);
+            var type = isLanguage ? "language" : "invariant value";
+
+            return new ObjectValidator<JToken>(fieldsValidators, isPartial, type, DefaultValue, Formatter.Combine);
         }
     }
 }

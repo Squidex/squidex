@@ -58,7 +58,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("my-field.iv: Must be less or equals than '100'.", "my-field.iv")
+                    new ValidationError("my-field: Must be less or equals than '100'.", "my-field")
                 });
         }
 
@@ -117,7 +117,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("my-field.iv: Field is required.", "my-field.iv")
+                    new ValidationError("my-field: Field is required.", "my-field")
                 });
         }
 
@@ -220,7 +220,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("my-field.iv: Must be less or equals than '100'.", "my-field.iv")
+                    new ValidationError("my-field: Must be less or equals than '100'.", "my-field")
                 });
         }
 

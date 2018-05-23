@@ -40,12 +40,12 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
             var fieldsValidators = new Dictionary<string, (bool IsOptional, IValidator Validator)>();
 
-            foreach (var kvp in field.FieldsByName)
+            foreach (var nestedField in field.Fields)
             {
-                fieldsValidators[kvp.Key] = (false, new FieldValidator(kvp.Value.Accept(this), kvp.Value));
+                fieldsValidators[nestedField.Name] = (false, new FieldValidator(nestedField.Accept(this), nestedField));
             }
 
-            yield return new CollectionItemValidator(new ObjectValidator<JToken>(fieldsValidators, false, "field", JValue.CreateNull()));
+            yield return new CollectionItemValidator(new ObjectValidator<JToken>(fieldsValidators, false, "field", JValue.CreateNull(), Formatter.Combine));
         }
 
         public IEnumerable<IValidator> Visit(IField<AssetsFieldProperties> field)
