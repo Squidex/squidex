@@ -6,10 +6,14 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Castle.Components.DictionaryAdapter;
 using FakeItEasy;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
 using Xunit;
@@ -59,6 +63,12 @@ namespace Squidex.Infrastructure.Assets
 
             return Assert.ThrowsAsync<AssetNotFoundException>(() =>
                 Sut.DownloadAsync(id, 1, "suffix", new MemoryStream()));
+        }
+
+        [Fact(Skip = "GridFSDownloadStream and GridFSUploadStream are not mockable")]
+        public override Task Should_commit_temporary_file()
+        {
+            return Task.CompletedTask;
         }
 
         [Fact]

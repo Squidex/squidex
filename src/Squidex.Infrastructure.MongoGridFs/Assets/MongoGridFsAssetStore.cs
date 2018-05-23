@@ -12,6 +12,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Driver;
+using MongoDB.Driver.Core.Bindings;
 using MongoDB.Driver.GridFS;
 
 namespace Squidex.Infrastructure.Assets
@@ -21,6 +22,7 @@ namespace Squidex.Infrastructure.Assets
         private readonly string path;
         private readonly IGridFSBucket<string> bucket;
         private readonly DirectoryInfo directory;
+        private static int chunkSize = 4096;
 
         public MongoGridFsAssetStore(IGridFSBucket<string> bucket, string path)
         {
@@ -75,10 +77,18 @@ namespace Squidex.Infrastructure.Assets
 
                 file.CopyTo(GetPath(id, version, suffix));
 
-                using (var stream = new MemoryStream())
+                using (var readStream = await bucket.OpenDownloadStreamAsync(file.Name, cancellationToken: ct))
                 {
-                    await bucket.DownloadToStreamAsync(file.Name, stream, cancellationToken: ct);
-                    await bucket.UploadFromStreamAsync(file.Name, file.Name, stream, cancellationToken: ct);
+                    using (var writeStream = await bucket.OpenUploadStreamAsync(file.Name, file.Name,
+                        new GridFSUploadOptions() { ChunkSizeBytes = chunkSize }, ct))
+                    {
+                        var buffer = new byte[chunkSize];
+                        int bytesRead;
+                        while ((bytesRead = await readStream.ReadAsync(buffer, 0, buffer.Length, ct)) > 0)
+                        {
+                            await writeStream.WriteAsync(buffer, 0, bytesRead, ct);
+                        }
+                    }
                 }
             }
             catch (FileNotFoundException ex)

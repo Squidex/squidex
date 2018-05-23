@@ -64,7 +64,7 @@ namespace Squidex.Infrastructure.Assets
         }
 
         [Fact]
-        public async Task Should_commit_temporary_file()
+        public virtual async Task Should_commit_temporary_file()
         {
             ((IInitializable)Sut).Initialize();
 
