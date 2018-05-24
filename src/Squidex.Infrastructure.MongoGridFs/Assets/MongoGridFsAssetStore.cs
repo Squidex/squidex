@@ -19,10 +19,12 @@ namespace Squidex.Infrastructure.Assets
 {
     public class MongoGridFsAssetStore : IAssetStore, IInitializable
     {
+        public const int ChunkSizeBytes = 255 * 1024;
+        private const int BufferSize = 81920;
+
         private readonly string path;
         private readonly IGridFSBucket<string> bucket;
         private readonly DirectoryInfo directory;
-        private static int chunkSize = 4096;
 
         public MongoGridFsAssetStore(IGridFSBucket<string> bucket, string path)
         {
@@ -74,20 +76,23 @@ namespace Squidex.Infrastructure.Assets
             try
             {
                 var file = GetFile(name);
+                var toFile = GetFile(id, version, suffix);
 
-                file.CopyTo(GetPath(id, version, suffix));
+                file.CopyTo(toFile.FullName);
 
                 using (var readStream = await bucket.OpenDownloadStreamAsync(file.Name, cancellationToken: ct))
                 {
-                    using (var writeStream = await bucket.OpenUploadStreamAsync(file.Name, file.Name,
-                        new GridFSUploadOptions() { ChunkSizeBytes = chunkSize }, ct))
+                    using (var writeStream =
+                        await bucket.OpenUploadStreamAsync(toFile.Name, toFile.Name, cancellationToken: ct))
                     {
-                        var buffer = new byte[chunkSize];
+                        var buffer = new byte[ChunkSizeBytes];
                         int bytesRead;
                         while ((bytesRead = await readStream.ReadAsync(buffer, 0, buffer.Length, ct)) > 0)
                         {
                             await writeStream.WriteAsync(buffer, 0, bytesRead, ct);
                         }
+
+                        await writeStream.CloseAsync(ct);
                     }
                 }
             }
@@ -112,19 +117,25 @@ namespace Squidex.Infrastructure.Assets
                 {
                     using (var fileStream = file.OpenRead())
                     {
-                        await fileStream.CopyToAsync(stream);
+                        await fileStream.CopyToAsync(stream, BufferSize, ct);
                     }
                 }
                 else
                 {
                     // file not found locally
                     // read from GridFS
-                    await bucket.DownloadToStreamAsync(file.Name, stream, cancellationToken: ct);
-
-                    // add to local assets
-                    using (var fileStream = file.OpenWrite())
+                    using (var readStream = await bucket.OpenDownloadStreamAsync(file.Name, cancellationToken: ct))
                     {
-                        await stream.CopyToAsync(fileStream);
+                        using (var fileStream = file.OpenWrite())
+                        {
+                            var buffer = new byte[BufferSize];
+                            int bytesRead;
+                            while ((bytesRead = await readStream.ReadAsync(buffer, 0, buffer.Length, ct)) > 0)
+                            {
+                                await fileStream.WriteAsync(buffer, 0, bytesRead, ct);
+                                await stream.WriteAsync(buffer, 0, bytesRead, ct);
+                            }
+                        }
                     }
                 }
             }
@@ -135,11 +146,11 @@ namespace Squidex.Infrastructure.Assets
         }
 
         public Task UploadAsync(string name, Stream stream, CancellationToken ct = default(CancellationToken))
-            => UploadFileCoreAsync(GetFile(name), stream);
+            => UploadFileCoreAsync(GetFile(name), stream, ct);
 
         public Task UploadAsync(string id, long version, string suffix, Stream stream,
             CancellationToken ct = default(CancellationToken))
-            => UploadFileCoreAsync(GetFile(id, version, suffix), stream);
+            => UploadFileCoreAsync(GetFile(id, version, suffix), stream, ct);
 
         public Task DeleteAsync(string name)
             => DeleteCoreAsync(GetFile(name));
@@ -147,12 +158,12 @@ namespace Squidex.Infrastructure.Assets
         public Task DeleteAsync(string id, long version, string suffix)
             => DeleteCoreAsync(GetFile(id, version, suffix));
 
-        private async Task DeleteCoreAsync(FileInfo file)
+        private async Task DeleteCoreAsync(FileInfo file, CancellationToken ct = default(CancellationToken))
         {
             try
             {
                 file.Delete();
-                await bucket.DeleteAsync(file.Name);
+                await bucket.DeleteAsync(file.Name, ct);
             }
             catch (FileNotFoundException ex)
             {
@@ -173,11 +184,14 @@ namespace Squidex.Infrastructure.Assets
                 // upload file to GridFS first
                 await bucket.UploadFromStreamAsync(file.Name, file.Name, stream, cancellationToken: ct);
 
+                // reset stream position
+                stream.Position = 0;
+
                 // create file locally
                 // even if this stage will fail, file will be recreated on the next Download call
                 using (var fileStream = file.OpenWrite())
                 {
-                    await stream.CopyToAsync(fileStream);
+                    await stream.CopyToAsync(fileStream, BufferSize, ct);
                 }
             }
             catch (IOException ex)

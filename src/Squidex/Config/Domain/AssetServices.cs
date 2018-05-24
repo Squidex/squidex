@@ -61,7 +61,7 @@ namespace Squidex.Config.Domain
                             var gridFsbucket = new GridFSBucket<string>(mongoDatabase, new GridFSBucketOptions()
                             {
                                 BucketName = mongoGridFsBucketName,
-                                ChunkSizeBytes = 255 * 1024
+                                ChunkSizeBytes = MongoGridFsAssetStore.ChunkSizeBytes
                                 // Defaults to 255KB, provisionary set here to avoid future changes in default values
                             });
 
