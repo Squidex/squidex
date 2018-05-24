@@ -146,7 +146,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             }
         }
 
-        private static Field GetFieldOrThrow(Schema schema, long fieldId)
+        private static IRootField GetFieldOrThrow(Schema schema, long fieldId)
         {
             if (!schema.FieldsById.TryGetValue(fieldId, out var field))
             {

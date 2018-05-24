@@ -11,7 +11,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    public sealed class Field<T> : Field, IField<T> where T : FieldProperties, new()
+    public class NestedField<T> : NestedField, IField<T> where T : FieldProperties, new()
     {
         private T properties;
 
@@ -25,25 +25,29 @@ namespace Squidex.Domain.Apps.Core.Schemas
             get { return properties; }
         }
 
-        public Field(long id, string name, Partitioning partitioning, T properties)
-            : base(id, name, partitioning)
+        public NestedField(long id, string name, T properties)
+            : base(id, name)
         {
             Guard.NotNull(properties, nameof(properties));
 
-            this.properties = properties;
-            this.properties.Freeze();
+            SetProperties(properties);
         }
 
         [Pure]
-        public override Field Update(FieldProperties newProperties)
+        public override NestedField Update(FieldProperties newProperties)
         {
             var typedProperties = ValidateProperties(newProperties);
 
-            return Clone<Field<T>>(clone =>
+            return Clone<NestedField<T>>(clone =>
             {
-                clone.properties = typedProperties;
-                clone.properties.Freeze();
+                clone.SetProperties(typedProperties);
             });
+        }
+
+        private void SetProperties(T newProperties)
+        {
+            properties = newProperties;
+            properties.Freeze();
         }
 
         private T ValidateProperties(FieldProperties newProperties)
@@ -60,7 +64,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public override TResult Accept<TResult>(IFieldVisitor<TResult> visitor)
         {
-            return RawProperties.Accept(visitor, this);
+            return properties.Accept(visitor, this);
         }
     }
 }

@@ -77,7 +77,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             return new ObjectValidator<ContentFieldData>(fieldsValidators, isPartial, "field", DefaultFieldData, Formatter.CombineForLanguage);
         }
 
-        private IValidator CreateFieldValidator(Field field, bool isPartial)
+        private IValidator CreateFieldValidator(IRootField field, bool isPartial)
         {
             var partitioning = partitionResolver(field.Partitioning);
 

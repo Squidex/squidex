@@ -103,7 +103,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             return v is Instant ? new JValue(v.ToString()) : new JValue(v);
         }
 
-        private static Field<DateTimeFieldProperties> Field(DateTimeFieldProperties properties)
+        private static RootField<DateTimeFieldProperties> Field(DateTimeFieldProperties properties)
         {
             return Fields.DateTime(1, "my-datetime", Partitioning.Invariant, properties);
         }

@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             var command = new HideField { FieldId = 1 };
 
-            var schema_1 = schema_0.HideField(1);
+            var schema_1 = schema_0.UpdateField(1, f => f.Hide());
 
             Assert.Throws<DomainException>(() => GuardSchemaField.CanHide(schema_1, command));
         }
@@ -60,7 +60,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             var command = new DisableField { FieldId = 1 };
 
-            var schema_1 = schema_0.DisableField(1);
+            var schema_1 = schema_0.UpdateField(1, f => f.Disable());
 
             Assert.Throws<DomainException>(() => GuardSchemaField.CanDisable(schema_1, command));
         }
@@ -102,7 +102,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             var command = new ShowField { FieldId = 1 };
 
-            var schema_1 = schema_0.HideField(1);
+            var schema_1 = schema_0.UpdateField(1, f => f.Hide()); ;
 
             GuardSchemaField.CanShow(schema_1, command);
         }
@@ -128,7 +128,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             var command = new EnableField { FieldId = 1 };
 
-            var schema_1 = schema_0.DisableField(1);
+            var schema_1 = schema_0.UpdateField(1, f => f.Disable());
 
             GuardSchemaField.CanEnable(schema_1, command);
         }
@@ -138,7 +138,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             var command = new LockField { FieldId = 1 };
 
-            var schema_1 = schema_0.LockField(1);
+            var schema_1 = schema_0.UpdateField(1, f => f.Lock());
 
             Assert.Throws<DomainException>(() => GuardSchemaField.CanLock(schema_1, command));
         }
@@ -172,7 +172,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             var command = new DeleteField { FieldId = 1 };
 
-            var schema_1 = schema_0.LockField(1);
+            var schema_1 = schema_0.UpdateField(1, f => f.Lock());
 
             Assert.Throws<DomainException>(() => GuardSchemaField.CanDelete(schema_1, command));
         }
@@ -190,7 +190,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             var command = new UpdateField { FieldId = 1, Properties = new StringFieldProperties() };
 
-            var schema_1 = schema_0.LockField(1);
+            var schema_1 = schema_0.UpdateField(1, f => f.Lock());
 
             Assert.Throws<DomainException>(() => GuardSchemaField.CanUpdate(schema_1, command));
         }

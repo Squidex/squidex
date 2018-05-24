@@ -94,9 +94,9 @@ namespace Squidex.Domain.Apps.Core
             schema = schema.AddTags(11, "my-tags", Partitioning.Language,
                 new TagsFieldProperties());
 
-            schema = schema.HideField(7);
-            schema = schema.LockField(8);
-            schema = schema.DisableField(9);
+            schema = schema.UpdateField(7, f => f.Hide());
+            schema = schema.UpdateField(8, f => f.Lock());
+            schema = schema.UpdateField(9, f => f.Disable());
 
             return schema;
         }

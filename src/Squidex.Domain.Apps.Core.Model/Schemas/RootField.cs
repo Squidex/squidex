@@ -10,11 +10,11 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    public abstract class Field : Cloneable<Field>, IField
+    public abstract class RootField : Cloneable<RootField>, IRootField
     {
         private readonly long fieldId;
-        private readonly Partitioning partitioning;
         private readonly string fieldName;
+        private readonly Partitioning partitioning;
         private bool isDisabled;
         private bool isHidden;
         private bool isLocked;
@@ -51,11 +51,11 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public abstract FieldProperties RawProperties { get; }
 
-        protected Field(long id, string name, Partitioning partitioning)
+        protected RootField(long id, string name, Partitioning partitioning)
         {
             Guard.NotNullOrEmpty(name, nameof(name));
-            Guard.NotNull(partitioning, nameof(partitioning));
             Guard.GreaterThan(id, 0, nameof(id));
+            Guard.NotNull(partitioning, nameof(partitioning));
 
             fieldId = id;
             fieldName = name;
@@ -64,16 +64,16 @@ namespace Squidex.Domain.Apps.Core.Schemas
         }
 
         [Pure]
-        public Field Lock()
+        public RootField Lock()
         {
-            return Clone<Field>(clone =>
+            return Clone(clone =>
             {
                 clone.isLocked = true;
             });
         }
 
         [Pure]
-        public Field Hide()
+        public RootField Hide()
         {
             return Clone(clone =>
             {
@@ -82,7 +82,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         }
 
         [Pure]
-        public Field Show()
+        public RootField Show()
         {
             return Clone(clone =>
             {
@@ -91,7 +91,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         }
 
         [Pure]
-        public Field Disable()
+        public RootField Disable()
         {
             return Clone(clone =>
             {
@@ -100,7 +100,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         }
 
         [Pure]
-        public Field Enable()
+        public RootField Enable()
         {
             return Clone(clone =>
             {
@@ -108,8 +108,8 @@ namespace Squidex.Domain.Apps.Core.Schemas
             });
         }
 
-        public abstract Field Update(FieldProperties newProperties);
-
         public abstract T Accept<T>(IFieldVisitor<T> visitor);
+
+        public abstract RootField Update(FieldProperties newProperties);
     }
 }

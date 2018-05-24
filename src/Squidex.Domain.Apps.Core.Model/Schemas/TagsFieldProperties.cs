@@ -26,9 +26,14 @@ namespace Squidex.Domain.Apps.Core.Schemas
             return visitor.Visit((IField<TagsFieldProperties>)field);
         }
 
-        public override Field CreateField(long id, string name, Partitioning partitioning)
+        public override RootField CreateRootField(long id, string name, Partitioning partitioning)
         {
-            return new Field<TagsFieldProperties>(id, name, partitioning, this);
+            return Fields.Tags(id, name, partitioning, this);
+        }
+
+        public override NestedField CreateNestedField(long id, string name)
+        {
+            return Fields.Tags(id, name, this);
         }
     }
 }

@@ -24,7 +24,7 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
                 .Select(x => new object[] { x })
                 .ToList();
 
-        private readonly Field<NumberFieldProperties> field_0 = Fields.Number(1, "my-field", Partitioning.Invariant);
+        private readonly RootField<NumberFieldProperties> field_0 = Fields.Number(1, "my-field", Partitioning.Invariant);
 
         [Fact]
         public void Should_instantiate_field()

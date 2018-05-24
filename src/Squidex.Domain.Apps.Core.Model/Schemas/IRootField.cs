@@ -5,16 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    public interface IArrayField : IField<ArrayFieldProperties>
+    public interface IRootField : IField
     {
-        IReadOnlyList<INestedField> Fields { get; }
+        bool IsLocked { get; }
 
-        IReadOnlyDictionary<long, INestedField> FieldsById { get; }
-
-        IReadOnlyDictionary<string, INestedField> FieldsByName { get; }
+        Partitioning Partitioning { get; }
     }
 }

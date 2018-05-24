@@ -14,10 +14,8 @@ namespace Squidex.Domain.Apps.Core.Schemas
 {
     public sealed class FieldRegistry
     {
-        private delegate Field FactoryFunction(long id, string name, Partitioning partitioning, FieldProperties properties);
-
         private readonly TypeNameRegistry typeNameRegistry;
-        private readonly Dictionary<Type, FactoryFunction> fieldsByPropertyType = new Dictionary<Type, FactoryFunction>();
+        private readonly HashSet<Type> supportedFields = new HashSet<Type>();
 
         public FieldRegistry(TypeNameRegistry typeNameRegistry)
         {
@@ -38,23 +36,34 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         private void RegisterField(Type type)
         {
-            typeNameRegistry.Map(type);
-
-            fieldsByPropertyType[type] = (id, name, partitioning, properties) => properties.CreateField(id, name, partitioning);
+            if (supportedFields.Add(type))
+            {
+                typeNameRegistry.Map(type);
+            }
         }
 
-        public Field CreateField(long id, string name, Partitioning partitioning, FieldProperties properties)
+        public RootField CreateRootField(long id, string name, Partitioning partitioning, FieldProperties properties)
+        {
+            CheckProperties(properties);
+
+            return properties.CreateRootField(id, name, partitioning);
+        }
+
+        public NestedField CreateNestedField(long id, string name, Partitioning partitioning, FieldProperties properties)
+        {
+            CheckProperties(properties);
+
+            return properties.CreateNestedField(id, name);
+        }
+
+        private void CheckProperties(FieldProperties properties)
         {
             Guard.NotNull(properties, nameof(properties));
 
-            var factory = fieldsByPropertyType.GetOrDefault(properties.GetType());
-
-            if (factory == null)
+            if (!supportedFields.Contains(properties.GetType()))
             {
                 throw new InvalidOperationException($"The field property '{properties.GetType()}' is not supported.");
             }
-
-            return factory(id, name, partitioning, properties);
         }
     }
 }

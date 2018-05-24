@@ -108,7 +108,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             return new JValue(v);
         }
 
-        private static Field<StringFieldProperties> Field(StringFieldProperties properties)
+        private static RootField<StringFieldProperties> Field(StringFieldProperties properties)
         {
             return Fields.String(1, "my-string", Partitioning.Invariant, properties);
         }

@@ -88,7 +88,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.State
                             Partitioning.Language :
                             Partitioning.Invariant;
 
-                    var field = registry.CreateField(TotalFields, eventField.Name, partitioning, eventField.Properties);
+                    var field = registry.CreateRootField(TotalFields, eventField.Name, partitioning, eventField.Properties);
 
                     if (eventField.IsHidden)
                     {
@@ -121,7 +121,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.State
                     Partitioning.Language :
                     Partitioning.Invariant;
 
-            var field = registry.CreateField(@event.FieldId.Id, @event.Name, partitioning, @event.Properties);
+            var field = registry.CreateRootField(@event.FieldId.Id, @event.Name, partitioning, @event.Properties);
 
             SchemaDef = SchemaDef.DeleteField(@event.FieldId.Id);
             SchemaDef = SchemaDef.AddField(field);
@@ -156,32 +156,32 @@ namespace Squidex.Domain.Apps.Entities.Schemas.State
 
         protected void On(FieldUpdated @event, FieldRegistry registry)
         {
-            SchemaDef = SchemaDef.UpdateField(@event.FieldId.Id, @event.Properties);
+            SchemaDef = SchemaDef.UpdateField(@event.FieldId.Id, f => f.Update(@event.Properties));
         }
 
         protected void On(FieldLocked @event, FieldRegistry registry)
         {
-            SchemaDef = SchemaDef.LockField(@event.FieldId.Id);
+            SchemaDef = SchemaDef.UpdateField(@event.FieldId.Id, f => f.Lock());
         }
 
         protected void On(FieldDisabled @event, FieldRegistry registry)
         {
-            SchemaDef = SchemaDef.DisableField(@event.FieldId.Id);
+            SchemaDef = SchemaDef.UpdateField(@event.FieldId.Id, f => f.Disable());
         }
 
         protected void On(FieldEnabled @event, FieldRegistry registry)
         {
-            SchemaDef = SchemaDef.EnableField(@event.FieldId.Id);
+            SchemaDef = SchemaDef.UpdateField(@event.FieldId.Id, f => f.Enable());
         }
 
         protected void On(FieldHidden @event, FieldRegistry registry)
         {
-            SchemaDef = SchemaDef.HideField(@event.FieldId.Id);
+            SchemaDef = SchemaDef.UpdateField(@event.FieldId.Id, f => f.Hide());
         }
 
         protected void On(FieldShown @event, FieldRegistry registry)
         {
-            SchemaDef = SchemaDef.ShowField(@event.FieldId.Id);
+            SchemaDef = SchemaDef.UpdateField(@event.FieldId.Id, f => f.Show());
         }
 
         protected void On(FieldDeleted @event, FieldRegistry registry)

@@ -11,7 +11,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.ConvertContent
 {
-    public delegate ContentFieldData FieldConverter(ContentFieldData data, Field field);
+    public delegate ContentFieldData FieldConverter(ContentFieldData data, IRootField field);
 
     public static class ContentConverter
     {
@@ -111,7 +111,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
             return result;
         }
 
-        private static ContentFieldData Convert(ContentFieldData fieldData, Field field, FieldConverter[] converters)
+        private static ContentFieldData Convert(ContentFieldData fieldData, IRootField field, FieldConverter[] converters)
         {
             if (converters != null)
             {

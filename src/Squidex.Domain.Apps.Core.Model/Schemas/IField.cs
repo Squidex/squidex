@@ -17,8 +17,6 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         bool IsHidden { get; }
 
-        bool IsLocked { get; }
-
         FieldProperties RawProperties { get; }
 
         T Accept<T>(IFieldVisitor<T> visitor);

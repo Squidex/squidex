@@ -25,3 +25,4 @@ node_modules/
 
 /src/Squidex/appsettings.Development.json
 /src/Squidex/Properties/launchSettings.json
+/global.json

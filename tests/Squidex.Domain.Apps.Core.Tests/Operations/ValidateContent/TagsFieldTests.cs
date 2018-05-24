@@ -110,7 +110,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             return ids == null ? JValue.CreateNull() : (JToken)new JArray(ids.OfType<object>().ToArray());
         }
 
-        private static Field<TagsFieldProperties> Field(TagsFieldProperties properties)
+        private static RootField<TagsFieldProperties> Field(TagsFieldProperties properties)
         {
             return Fields.Tags(1, "my-tags", Partitioning.Invariant, properties);
         }

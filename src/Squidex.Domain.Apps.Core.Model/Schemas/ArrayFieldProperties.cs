@@ -19,17 +19,22 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public override T Accept<T>(IFieldPropertiesVisitor<T> visitor)
         {
-            throw new NotImplementedException();
+            return visitor.Visit(this);
         }
 
         public override T Accept<T>(IFieldVisitor<T> visitor, IField field)
         {
-            throw new NotImplementedException();
+            return visitor.Visit((IField<AssetsFieldProperties>)field);
         }
 
-        public override Field CreateField(long id, string name, Partitioning partitioning)
+        public override RootField CreateRootField(long id, string name, Partitioning partitioning)
         {
-            throw new NotImplementedException();
+            return Fields.Array(id, name, partitioning, this);
+        }
+
+        public override NestedField CreateNestedField(long id, string name)
+        {
+            throw new NotSupportedException();
         }
     }
 }

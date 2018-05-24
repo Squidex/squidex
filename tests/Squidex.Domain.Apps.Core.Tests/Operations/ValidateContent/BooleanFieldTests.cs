@@ -73,7 +73,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             return new JValue(v);
         }
 
-        private static Field<BooleanFieldProperties> Field(BooleanFieldProperties properties)
+        private static RootField<BooleanFieldProperties> Field(BooleanFieldProperties properties)
         {
             return Fields.Boolean(1, "my-boolean", Partitioning.Invariant, properties);
         }

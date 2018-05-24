@@ -28,9 +28,14 @@ namespace Squidex.Domain.Apps.Core.Schemas
             return visitor.Visit((IField<BooleanFieldProperties>)field);
         }
 
-        public override Field CreateField(long id, string name, Partitioning partitioning)
+        public override RootField CreateRootField(long id, string name, Partitioning partitioning)
         {
-            return new Field<BooleanFieldProperties>(id, name, partitioning, this);
+            return Fields.Boolean(id, name, partitioning, this);
+        }
+
+        public override NestedField CreateNestedField(long id, string name)
+        {
+            return Fields.Boolean(id, name, this);
         }
     }
 }

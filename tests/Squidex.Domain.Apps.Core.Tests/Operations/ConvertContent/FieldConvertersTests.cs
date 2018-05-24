@@ -19,9 +19,9 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
     public class FieldConvertersTests
     {
         private readonly LanguagesConfig languagesConfig = LanguagesConfig.Build(Language.EN, Language.DE);
-        private readonly Field<StringFieldProperties> stringLanguageField = Fields.String(1, "1", Partitioning.Language);
-        private readonly Field<StringFieldProperties> stringInvariantField = Fields.String(1, "1", Partitioning.Invariant);
-        private readonly Field<NumberFieldProperties> numberField = Fields.Number(1, "1", Partitioning.Invariant);
+        private readonly RootField<StringFieldProperties> stringLanguageField = Fields.String(1, "1", Partitioning.Language);
+        private readonly RootField<StringFieldProperties> stringInvariantField = Fields.String(1, "1", Partitioning.Invariant);
+        private readonly RootField<NumberFieldProperties> numberField = Fields.Number(1, "1", Partitioning.Invariant);
 
         [Fact]
         public void Should_encode_json_values()
