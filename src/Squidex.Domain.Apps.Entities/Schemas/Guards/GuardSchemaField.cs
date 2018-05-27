@@ -68,7 +68,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                 }
             });
 
-            var field = GetFieldOrThrow(schema, command.FieldId);
+            var field = GetFieldOrThrow(schema, command.FieldId, command.ParentFieldId);
 
             if (field.IsLocked)
             {
@@ -80,7 +80,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            var field = GetFieldOrThrow(schema, command.FieldId);
+            var field = GetFieldOrThrow(schema, command.FieldId, command.ParentFieldId);
 
             if (field.IsLocked)
             {
@@ -92,7 +92,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            var field = GetFieldOrThrow(schema, command.FieldId);
+            var field = GetFieldOrThrow(schema, command.FieldId, command.ParentFieldId);
 
             if (field.IsHidden)
             {
@@ -104,7 +104,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            var field = GetFieldOrThrow(schema, command.FieldId);
+            var field = GetFieldOrThrow(schema, command.FieldId, command.ParentFieldId);
 
             if (!field.IsHidden)
             {
@@ -116,7 +116,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            var field = GetFieldOrThrow(schema, command.FieldId);
+            var field = GetFieldOrThrow(schema, command.FieldId, command.ParentFieldId);
 
             if (field.IsDisabled)
             {
@@ -126,7 +126,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
         public static void CanEnable(Schema schema, EnableField command)
         {
-            var field = GetFieldOrThrow(schema, command.FieldId);
+            var field = GetFieldOrThrow(schema, command.FieldId, command.ParentFieldId);
 
             if (!field.IsDisabled)
             {
@@ -138,7 +138,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            var field = GetFieldOrThrow(schema, command.FieldId);
+            var field = GetFieldOrThrow(schema, command.FieldId, null);
 
             if (field.IsLocked)
             {
@@ -146,8 +146,23 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             }
         }
 
-        private static IRootField GetFieldOrThrow(Schema schema, long fieldId)
+        private static IField GetFieldOrThrow(Schema schema, long fieldId, long? parentId)
         {
+            if (parentId.HasValue)
+            {
+                if (!schema.FieldsById.TryGetValue(parentId.Value, out var rootField) || !(rootField is ArrayField arrayField))
+                {
+                    throw new DomainObjectNotFoundException(parentId.ToString(), "Fields", typeof(Schema));
+                }
+
+                if (!arrayField.FieldsById.TryGetValue(fieldId, out var nestedField))
+                {
+                    throw new DomainObjectNotFoundException(fieldId.ToString(), $"Fields[{parentId}].Fields", typeof(Schema));
+                }
+
+                return nestedField;
+            }
+
             if (!schema.FieldsById.TryGetValue(fieldId, out var field))
             {
                 throw new DomainObjectNotFoundException(fieldId.ToString(), "Fields", typeof(Schema));

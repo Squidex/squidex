@@ -49,7 +49,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
             return properties.CreateRootField(id, name, partitioning);
         }
 
-        public NestedField CreateNestedField(long id, string name, Partitioning partitioning, FieldProperties properties)
+        public NestedField CreateNestedField(long id, string name, FieldProperties properties)
         {
             CheckProperties(properties);
 

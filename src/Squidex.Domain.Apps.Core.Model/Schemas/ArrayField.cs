@@ -11,7 +11,7 @@ using System.Diagnostics.Contracts;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    public sealed class ArrayField : RootField<ArrayFieldProperties>
+    public sealed class ArrayField : RootField<ArrayFieldProperties>, IArrayField
     {
         private FieldCollection<NestedField> fields = FieldCollection<NestedField>.Empty;
 

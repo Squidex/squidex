@@ -11,10 +11,10 @@ namespace Squidex.Domain.Apps.Core.Schemas
 {
     public interface IArrayField : IField<ArrayFieldProperties>
     {
-        IReadOnlyList<INestedField> Fields { get; }
+        IReadOnlyList<NestedField> Fields { get; }
 
-        IReadOnlyDictionary<long, INestedField> FieldsById { get; }
+        IReadOnlyDictionary<long, NestedField> FieldsById { get; }
 
-        IReadOnlyDictionary<string, INestedField> FieldsByName { get; }
+        IReadOnlyDictionary<string, NestedField> FieldsByName { get; }
     }
 }

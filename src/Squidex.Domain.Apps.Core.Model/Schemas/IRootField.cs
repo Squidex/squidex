@@ -9,8 +9,6 @@ namespace Squidex.Domain.Apps.Core.Schemas
 {
     public interface IRootField : IField
     {
-        bool IsLocked { get; }
-
         Partitioning Partitioning { get; }
     }
 }

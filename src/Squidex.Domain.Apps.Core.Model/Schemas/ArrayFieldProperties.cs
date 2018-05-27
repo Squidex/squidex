@@ -24,7 +24,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public override T Accept<T>(IFieldVisitor<T> visitor, IField field)
         {
-            return visitor.Visit((IField<AssetsFieldProperties>)field);
+            return visitor.Visit((IArrayField)field);
         }
 
         public override RootField CreateRootField(long id, string name, Partitioning partitioning)

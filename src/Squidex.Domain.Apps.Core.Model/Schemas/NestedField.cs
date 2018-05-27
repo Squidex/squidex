@@ -37,6 +37,11 @@ namespace Squidex.Domain.Apps.Core.Schemas
             get { return isDisabled; }
         }
 
+        public bool IsLocked
+        {
+            get { return false; }
+        }
+
         public abstract FieldProperties RawProperties { get; }
 
         protected NestedField(long id, string name)

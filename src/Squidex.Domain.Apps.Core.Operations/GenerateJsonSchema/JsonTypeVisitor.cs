@@ -33,7 +33,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 
                 foreach (var nestedField in field.Fields.Where(x => !x.IsHidden))
                 {
-                    var childProperty = field.Accept(this);
+                    var childProperty = nestedField.Accept(this);
 
                     childProperty.Description = nestedField.RawProperties.Hints;
                     childProperty.IsRequired = nestedField.RawProperties.IsRequired;

@@ -5,13 +5,30 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
+
 namespace Squidex.Domain.Apps.Core.Schemas
 {
     public static class Fields
     {
-        public static RootField<ArrayFieldProperties> Array(long id, string name, Partitioning partitioning, ArrayFieldProperties properties = null)
+        public static RootField<ArrayFieldProperties> Array(long id, string name, Partitioning partitioning, params NestedField[] fields)
         {
-            return new RootField<ArrayFieldProperties>(id, name, partitioning, properties ?? new ArrayFieldProperties());
+            var result = new ArrayField(id, name, partitioning, new ArrayFieldProperties());
+
+            if (fields != null)
+            {
+                foreach (var field in fields)
+                {
+                    result = result.AddField(field);
+                }
+            }
+
+            return result;
+        }
+
+        public static ArrayField Array(long id, string name, Partitioning partitioning, ArrayFieldProperties properties = null)
+        {
+            return new ArrayField(id, name, partitioning, properties ?? new ArrayFieldProperties());
         }
 
         public static RootField<AssetsFieldProperties> Assets(long id, string name, Partitioning partitioning, AssetsFieldProperties properties = null)
@@ -104,6 +121,18 @@ namespace Squidex.Domain.Apps.Core.Schemas
             return new NestedField<TagsFieldProperties>(id, name, properties ?? new TagsFieldProperties());
         }
 
+        public static Schema AddArray(this Schema schema, long id, string name, Partitioning partitioning, Func<ArrayField, ArrayField> handler, ArrayFieldProperties properties = null)
+        {
+            var field = Array(id, name, partitioning, properties);
+
+            if (handler != null)
+            {
+                field = handler(field);
+            }
+
+            return schema.AddField(field);
+        }
+
         public static Schema AddAssets(this Schema schema, long id, string name, Partitioning partitioning, AssetsFieldProperties properties = null)
         {
             return schema.AddField(Assets(id, name, partitioning, properties));
@@ -147,6 +176,51 @@ namespace Squidex.Domain.Apps.Core.Schemas
         public static Schema AddTags(this Schema schema, long id, string name, Partitioning partitioning, TagsFieldProperties properties = null)
         {
             return schema.AddField(Tags(id, name, partitioning, properties));
+        }
+
+        public static ArrayField AddAssets(this ArrayField field, long id, string name, AssetsFieldProperties properties = null)
+        {
+            return field.AddField(Assets(id, name, properties));
+        }
+
+        public static ArrayField AddBoolean(this ArrayField field, long id, string name, BooleanFieldProperties properties = null)
+        {
+            return field.AddField(Boolean(id, name, properties));
+        }
+
+        public static ArrayField AddDateTime(this ArrayField field, long id, string name, DateTimeFieldProperties properties = null)
+        {
+            return field.AddField(DateTime(id, name, properties));
+        }
+
+        public static ArrayField AddGeolocation(this ArrayField field, long id, string name, GeolocationFieldProperties properties = null)
+        {
+            return field.AddField(Geolocation(id, name, properties));
+        }
+
+        public static ArrayField AddJson(this ArrayField field, long id, string name, JsonFieldProperties properties = null)
+        {
+            return field.AddField(Json(id, name, properties));
+        }
+
+        public static ArrayField AddNumber(this ArrayField field, long id, string name, NumberFieldProperties properties = null)
+        {
+            return field.AddField(Number(id, name, properties));
+        }
+
+        public static ArrayField AddReferences(this ArrayField field, long id, string name, ReferencesFieldProperties properties = null)
+        {
+            return field.AddField(References(id, name, properties));
+        }
+
+        public static ArrayField AddString(this ArrayField field, long id, string name, StringFieldProperties properties = null)
+        {
+            return field.AddField(String(id, name, properties));
+        }
+
+        public static ArrayField AddTags(this ArrayField field, long id, string name, TagsFieldProperties properties = null)
+        {
+            return field.AddField(Tags(id, name, properties));
         }
     }
 }

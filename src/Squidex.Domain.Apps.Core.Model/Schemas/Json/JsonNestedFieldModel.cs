@@ -1,22 +1,29 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Core.Schemas;
+using Newtonsoft.Json;
 
-namespace Squidex.Domain.Apps.Entities.Schemas.Commands
+namespace Squidex.Domain.Apps.Core.Schemas.Json
 {
-    public sealed class AddField : SchemaCommand
+    public sealed class JsonNestedFieldModel
     {
-        public long? ParentFieldId { get; set; }
+        [JsonProperty]
+        public long Id { get; set; }
 
+        [JsonProperty]
         public string Name { get; set; }
 
-        public string Partitioning { get; set; }
+        [JsonProperty]
+        public bool IsHidden { get; set; }
 
+        [JsonProperty]
+        public bool IsDisabled { get; set; }
+
+        [JsonProperty]
         public FieldProperties Properties { get; set; }
     }
 }
