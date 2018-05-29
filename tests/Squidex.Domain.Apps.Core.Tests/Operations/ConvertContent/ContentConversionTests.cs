@@ -30,10 +30,10 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         }
 
         [Fact]
-        public void Should_convert_to_id_model()
+        public void Should_convert_name_to_id()
         {
             var input =
-               new NamedContentData()
+                new NamedContentData()
                     .AddField("field1",
                         new ContentFieldData()
                             .AddValue("en", "EN"))
@@ -44,7 +44,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                         new ContentFieldData()
                             .AddValue("iv", 2));
 
-            var actual = input.ToIdModel(schema, (data, field) => field.Name == "field2" ? null : data);
+            var actual = input.ConvertName2Id(schema, (data, field) => field.Name == "field2" ? null : data);
 
             var expected =
                 new IdContentData()
@@ -56,47 +56,21 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         }
 
         [Fact]
-        public void Should_convert_id_model()
+        public void Should_convert_name_to_name()
         {
             var input =
-               new IdContentData()
-                    .AddField(1,
+                new NamedContentData()
+                    .AddField("field1",
                         new ContentFieldData()
                             .AddValue("en", "EN"))
-                    .AddField(2,
+                    .AddField("field2",
                         new ContentFieldData()
                             .AddValue("iv", 1))
-                    .AddField(99,
+                    .AddField("invalid",
                         new ContentFieldData()
                             .AddValue("iv", 2));
 
-            var actual = input.Convert(schema, (data, field) => field.Name == "field2" ? null : data);
-
-            var expected =
-                new IdContentData()
-                    .AddField(1,
-                        new ContentFieldData()
-                            .AddValue("en", "EN"));
-
-            Assert.Equal(expected, actual);
-        }
-
-        [Fact]
-        public void Should_convert_to_name_model()
-        {
-            var input =
-               new IdContentData()
-                    .AddField(1,
-                        new ContentFieldData()
-                            .AddValue("en", "EN"))
-                    .AddField(2,
-                        new ContentFieldData()
-                            .AddValue("iv", 1))
-                    .AddField(99,
-                        new ContentFieldData()
-                            .AddValue("iv", 2));
-
-            var actual = input.ToNameModel(schema, (data, field) => field.Name == "field2" ? null : data);
+            var actual = input.ConvertName2Name(schema, (data, field) => field.Name == "field2" ? null : data);
 
             var expected =
                 new NamedContentData()
@@ -108,21 +82,47 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         }
 
         [Fact]
-        public void Should_convert_name_model()
+        public void Should_convert_id_to_id()
         {
             var input =
-               new NamedContentData()
-                    .AddField("field1",
+                new IdContentData()
+                    .AddField(1,
                         new ContentFieldData()
                             .AddValue("en", "EN"))
-                    .AddField("field2",
+                    .AddField(2,
                         new ContentFieldData()
                             .AddValue("iv", 1))
-                    .AddField("invalid",
+                    .AddField(99,
                         new ContentFieldData()
                             .AddValue("iv", 2));
 
-            var actual = input.Convert(schema, (data, field) => field.Name == "field2" ? null : data);
+            var actual = input.ConvertId2Id(schema, (data, field) => field.Name == "field2" ? null : data);
+
+            var expected =
+                new IdContentData()
+                    .AddField(1,
+                        new ContentFieldData()
+                            .AddValue("en", "EN"));
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void Should_convert_id_to_name()
+        {
+            var input =
+                new IdContentData()
+                    .AddField(1,
+                        new ContentFieldData()
+                            .AddValue("en", "EN"))
+                    .AddField(2,
+                        new ContentFieldData()
+                            .AddValue("iv", 1))
+                    .AddField(99,
+                        new ContentFieldData()
+                            .AddValue("iv", 2));
+
+            var actual = input.ConvertId2Name(schema, (data, field) => field.Name == "field2" ? null : data);
 
             var expected =
                 new NamedContentData()

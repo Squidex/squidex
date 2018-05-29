@@ -7,53 +7,51 @@
 
 using System;
 using System.Collections.Generic;
-using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.ConvertContent
 {
-    public delegate ContentFieldData FieldConverter(ContentFieldData data, IRootField field);
-
-    public delegate JToken ValueConverter(JToken value, IRootField field);
-
     public static class ContentConverter
     {
-        public static NamedContentData ToNameModel(this IdContentData content, Schema schema, params FieldConverter[] converters)
+        private static readonly Func<IRootField, string> KeyNameResolver = f => f.Name;
+        private static readonly Func<IRootField, long> KeyIdResolver = f => f.Id;
+
+        public static NamedContentData ConvertId2Name(this IdContentData content, Schema schema, params FieldConverter[] converters)
         {
             Guard.NotNull(schema, nameof(schema));
 
             var result = new NamedContentData(content.Count);
 
-            return ConvertInternal(content, result, schema.FieldsById, x => x.Name, converters);
+            return ConvertInternal(content, result, schema.FieldsById, KeyNameResolver, converters);
         }
 
-        public static IdContentData ToIdModel(this NamedContentData content, Schema schema, params FieldConverter[] converters)
+        public static IdContentData ConvertId2Id(this IdContentData content, Schema schema, params FieldConverter[] converters)
         {
             Guard.NotNull(schema, nameof(schema));
 
             var result = new IdContentData(content.Count);
 
-            return ConvertInternal(content, result, schema.FieldsByName, x => x.Id, converters);
+            return ConvertInternal(content, result, schema.FieldsById, KeyIdResolver, converters);
         }
 
-        public static IdContentData Convert(this IdContentData content, Schema schema, params FieldConverter[] converters)
-        {
-            Guard.NotNull(schema, nameof(schema));
-
-            var result = new IdContentData(content.Count);
-
-            return ConvertInternal(content, result, schema.FieldsById, x => x.Id, converters);
-        }
-
-        public static NamedContentData Convert(this NamedContentData content, Schema schema, params FieldConverter[] converters)
+        public static NamedContentData ConvertName2Name(this NamedContentData content, Schema schema, params FieldConverter[] converters)
         {
             Guard.NotNull(schema, nameof(schema));
 
             var result = new NamedContentData(content.Count);
 
-            return ConvertInternal(content, result, schema.FieldsByName, x => x.Name, converters);
+            return ConvertInternal(content, result, schema.FieldsByName, KeyNameResolver, converters);
+        }
+
+        public static IdContentData ConvertName2Id(this NamedContentData content, Schema schema, params FieldConverter[] converters)
+        {
+            Guard.NotNull(schema, nameof(schema));
+
+            var result = new IdContentData(content.Count);
+
+            return ConvertInternal(content, result, schema.FieldsByName, KeyIdResolver, converters);
         }
 
         private static TDict2 ConvertInternal<TKey1, TKey2, TDict1, TDict2>(
@@ -71,24 +69,24 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
                     continue;
                 }
 
-                var fieldValue = fieldKvp.Value;
+                var newvalue = fieldKvp.Value;
 
                 if (converters != null)
                 {
                     foreach (var converter in converters)
                     {
-                        fieldValue = converter(fieldValue, field);
+                        newvalue = converter(newvalue, field);
 
-                        if (fieldValue == null)
+                        if (newvalue == null)
                         {
                             break;
                         }
                     }
                 }
 
-                if (fieldValue != null)
+                if (newvalue != null)
                 {
-                    target.Add(targetKey(field), fieldValue);
+                    target.Add(targetKey(field), newvalue);
                 }
             }
 

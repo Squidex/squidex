@@ -9,12 +9,8 @@ using Newtonsoft.Json.Linq;
 
 namespace Squidex.Domain.Apps.Core.ConvertContent
 {
-    public sealed class Value
+    public static class Value
     {
         public static readonly JToken Unset = JValue.CreateUndefined();
-
-        private Value()
-        {
-        }
     }
 }

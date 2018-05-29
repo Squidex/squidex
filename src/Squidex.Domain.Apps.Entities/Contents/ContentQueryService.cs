@@ -154,12 +154,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
                             result.Data = scriptEngine.Transform(new ScriptContext { User = context.User, Data = content.Data, ContentId = content.Id }, scriptText);
                         }
 
-                        result.Data = result.Data.Convert(schema.SchemaDef, converters);
+                        result.Data = result.Data.ConvertName2Name(schema.SchemaDef, converters);
                     }
 
                     if (result.DataDraft != null)
                     {
-                        result.DataDraft = result.DataDraft.Convert(schema.SchemaDef, converters);
+                        result.DataDraft = result.DataDraft.ConvertName2Name(schema.SchemaDef, converters);
                     }
 
                     yield return result;
@@ -172,11 +172,13 @@ namespace Squidex.Domain.Apps.Entities.Contents
             if (!context.IsFrontendClient)
             {
                 yield return FieldConverters.ExcludeHidden();
+                yield return FieldConverters.ForNestedName2Name(ValueConverters.ExcludeHidden());
             }
 
             if (checkType)
             {
                 yield return FieldConverters.ExcludeChangedTypes();
+                yield return FieldConverters.ForNestedName2Name(ValueConverters.ExcludeChangedTypes());
             }
 
             yield return FieldConverters.ResolveInvariant(context.App.LanguagesConfig);

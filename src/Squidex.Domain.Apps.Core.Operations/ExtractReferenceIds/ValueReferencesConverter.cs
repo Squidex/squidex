@@ -12,7 +12,7 @@ using Squidex.Infrastructure.Json;
 
 namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 {
-    public static class FieldReferencesConverter
+    public static class ValueReferencesConverter
     {
         public static ValueConverter CleanReferences(IEnumerable<Guid> deletedReferencedIds)
         {

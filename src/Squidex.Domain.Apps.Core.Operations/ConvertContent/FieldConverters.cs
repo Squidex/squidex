@@ -20,8 +20,17 @@ using Squidex.Infrastructure.Json;
 
 namespace Squidex.Domain.Apps.Core.ConvertContent
 {
+    public delegate ContentFieldData FieldConverter(ContentFieldData data, IRootField field);
+
     public static class FieldConverters
     {
+        private static readonly Func<IField, string> KeyNameResolver = f => f.Name;
+        private static readonly Func<IField, string> KeyIdResolver = f => f.Id.ToString();
+        private static readonly Func<IArrayField, string, IField> FieldByIdResolver =
+            (f, k) => long.TryParse(k, out var id) ? f.FieldsById.GetOrDefault(id) : null;
+        private static readonly Func<IArrayField, string, IField> FieldByNameResolver =
+            (f, k) => f.FieldsByName.GetOrDefault(k);
+
         public static FieldConverter ExcludeHidden()
         {
             return (data, field) =>
@@ -195,7 +204,30 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
             };
         }
 
-        private static FieldConverter ForNested(params ValueConverter[] converters)
+        public static FieldConverter ForNestedName2Name(params ValueConverter[] converters)
+        {
+            return ForNested(FieldByNameResolver, KeyNameResolver, converters);
+        }
+
+        public static FieldConverter ForNestedName2Id(params ValueConverter[] converters)
+        {
+            return ForNested(FieldByNameResolver, KeyIdResolver, converters);
+        }
+
+        public static FieldConverter ForNestedId2Name(params ValueConverter[] converters)
+        {
+            return ForNested(FieldByIdResolver, KeyNameResolver, converters);
+        }
+
+        public static FieldConverter ForNestedId2Id(params ValueConverter[] converters)
+        {
+            return ForNested(FieldByIdResolver, KeyIdResolver, converters);
+        }
+
+        private static FieldConverter ForNested(
+            Func<IArrayField, string, IField> fieldResolver,
+            Func<IField, string> keyResolver,
+            params ValueConverter[] converters)
         {
             return (data, field) =>
             {
@@ -213,33 +245,38 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 
                                     foreach (var kvp in item)
                                     {
-                                        if (!arrayField.FieldsByName.TryGetValue(kvp.Key, out var nestedField))
+                                        var nestedField = fieldResolver(arrayField, kvp.Key);
+
+                                        if (nestedField == null)
                                         {
                                             continue;
                                         }
 
                                         var newValue = kvp.Value;
 
+                                        var isUnset = false;
+
                                         if (converters != null)
                                         {
                                             foreach (var converter in converters)
                                             {
-                                                newValue = converter(newValue, field);
+                                                newValue = converter(newValue, nestedField);
 
                                                 if (ReferenceEquals(newValue, Value.Unset))
                                                 {
+                                                    isUnset = true;
                                                     break;
                                                 }
                                             }
                                         }
 
-                                        if (!ReferenceEquals(newValue, Value.Unset))
+                                        if (!isUnset)
                                         {
-                                            result.Add(field.Id.ToString(), newValue);
+                                            result.Add(keyResolver(nestedField), newValue);
                                         }
                                     }
 
-                                    jArray[i] = item;
+                                    jArray[i] = result;
                                 }
                             }
                         }
@@ -262,6 +299,8 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
                     {
                         var newValue = partition.Value;
 
+                        var isUnset = false;
+
                         if (converters != null)
                         {
                             foreach (var converter in converters)
@@ -270,19 +309,20 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 
                                 if (ReferenceEquals(newValue, Value.Unset))
                                 {
+                                    isUnset = true;
                                     break;
                                 }
                             }
                         }
 
-                        if (result != null || !ReferenceEquals(newValue, partition.Value))
+                        if (result != null || isUnset || !ReferenceEquals(newValue, partition.Value))
                         {
                             if (result == null)
                             {
                                 result = new ContentFieldData();
                             }
 
-                            if (!ReferenceEquals(newValue, Value.Unset))
+                            if (!isUnset)
                             {
                                 result.Add(partition.Key, newValue);
                             }

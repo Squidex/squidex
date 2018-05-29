@@ -19,69 +19,150 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
     public class FieldConvertersTests
     {
         private readonly LanguagesConfig languagesConfig = LanguagesConfig.Build(Language.EN, Language.DE);
+        private readonly RootField<NumberFieldProperties> numberField = Fields.Number(1, "1", Partitioning.Invariant);
         private readonly RootField<StringFieldProperties> stringLanguageField = Fields.String(1, "1", Partitioning.Language);
         private readonly RootField<StringFieldProperties> stringInvariantField = Fields.String(1, "1", Partitioning.Invariant);
         private readonly RootField<JsonFieldProperties> jsonField = Fields.Json(1, "1", Partitioning.Invariant);
-        private readonly RootField<NumberFieldProperties> numberField = Fields.Number(1, "1", Partitioning.Invariant);
+        private readonly RootField<ArrayFieldProperties> arrayField = Fields.Array(1, "1", Partitioning.Invariant,
+            Fields.Number(1, "field1"),
+            Fields.Number(2, "field2").Hide());
 
         [Fact]
-        public void Should_encode_json_value()
+        public void Should_return_same_object_for_value_conversion_if_nothing_converted()
         {
-            var source = JToken.FromObject(new { Value = 1 });
+            var input =
+                new ContentFieldData()
+                    .AddValue("iv", new JObject());
 
-            var result = ValueConverters.EncodeJson()(source, jsonField);
+            var actual = FieldConverters.ForValues()(input, stringInvariantField);
 
-            Assert.True(result.Type == JTokenType.String);
+            Assert.Same(input, actual);
         }
 
         [Fact]
-        public void Should_return_same_value_if_encoding_null_value()
+        public void Should_filter_for_value_conversion()
         {
-            var source = JValue.CreateNull();
+            var input =
+                new ContentFieldData()
+                    .AddValue("iv", new JObject());
 
-            var result = ValueConverters.EncodeJson()(source, jsonField);
+            var actual = FieldConverters.ForValues((f, i) => Value.Unset)(input, stringInvariantField);
 
-            Assert.Same(source, result);
+            var expected = new ContentFieldData();
+
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
-        public void Should_return_same_value_if_encoding_non_json_field()
+        public void Should_convert_for_value_conversion()
         {
-            var source = (JToken)"NO-JSON";
+            var input =
+                new ContentFieldData()
+                    .AddValue("iv", new JObject());
 
-            var result = ValueConverters.EncodeJson()(source, stringLanguageField);
+            var actual = FieldConverters.ForValues(ValueConverters.EncodeJson())(input, jsonField);
 
-            Assert.Same(source, result);
+            var expected =
+                new ContentFieldData()
+                    .AddValue("iv", "e30=");
+
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
-        public void Should_decode_json_values()
+        public void Should_convert_name_to_id()
         {
-            var source = "e30=";
+            var input =
+                new ContentFieldData()
+                    .AddValue("iv",
+                        new JArray(
+                            new JObject(
+                                new JProperty("field1", 100),
+                                new JProperty("field2", 200),
+                                new JProperty("invalid", 300))));
 
-            var result = ValueConverters.DecodeJson()(source, jsonField);
+            var actual = FieldConverters.ForNestedName2Id(ValueConverters.ExcludeHidden())(input, arrayField);
 
-            Assert.True(result is JObject);
+            var expected =
+               new ContentFieldData()
+                    .AddValue("iv",
+                        new JArray(
+                            new JObject(
+                                new JProperty("1", 100))));
+
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
-        public void Should_return_same_value_if_decoding_null_value()
+        public void Should_convert_name_to_name()
         {
-            var source = JValue.CreateNull();
+            var input =
+                new ContentFieldData()
+                    .AddValue("iv",
+                        new JArray(
+                            new JObject(
+                                new JProperty("field1", 100),
+                                new JProperty("field2", 200),
+                                new JProperty("invalid", 300))));
 
-            var result = ValueConverters.DecodeJson()(source, jsonField);
+            var actual = FieldConverters.ForNestedName2Name(ValueConverters.ExcludeHidden())(input, arrayField);
 
-            Assert.Same(source, result);
+            var expected =
+                new ContentFieldData()
+                    .AddValue("iv",
+                        new JArray(
+                            new JObject(
+                                new JProperty("field1", 100))));
+
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
-        public void Should_return_same_value_if_decoding_non_json_field()
+        public void Should_convert_id_to_id()
         {
-            var source = JValue.CreateNull();
+            var input =
+               new ContentFieldData()
+                    .AddValue("iv",
+                        new JArray(
+                            new JObject(
+                                new JProperty("1", 100),
+                                new JProperty("2", 200),
+                                new JProperty("99", 300))));
 
-            var result = ValueConverters.EncodeJson()(source, stringLanguageField);
+            var actual = FieldConverters.ForNestedId2Id(ValueConverters.ExcludeHidden())(input, arrayField);
 
-            Assert.Same(source, result);
+            var expected =
+               new ContentFieldData()
+                    .AddValue("iv",
+                        new JArray(
+                            new JObject(
+                                new JProperty("1", 100))));
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void Should_convert_id_to_name()
+        {
+            var input =
+               new ContentFieldData()
+                    .AddValue("iv",
+                        new JArray(
+                            new JObject(
+                                new JProperty("1", 100),
+                                new JProperty("2", 200),
+                                new JProperty("99", 300))));
+
+            var actual = FieldConverters.ForNestedId2Name(ValueConverters.ExcludeHidden())(input, arrayField);
+
+            var expected =
+               new ContentFieldData()
+                    .AddValue("iv",
+                        new JArray(
+                            new JObject(
+                                new JProperty("field1", 100))));
+
+            Assert.Equal(expected, actual);
         }
 
         [Fact]

@@ -14,6 +14,8 @@ using Squidex.Infrastructure.Json;
 
 namespace Squidex.Domain.Apps.Core.ConvertContent
 {
+    public delegate JToken ValueConverter(JToken value, IField field);
+
     public static class ValueConverters
     {
         public static ValueConverter DecodeJson()
@@ -50,7 +52,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
         {
             return (value, field) =>
             {
-                return field.IsHidden ? null : value;
+                return field.IsHidden ? Value.Unset : value;
             };
         }
 
@@ -58,16 +60,18 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
         {
             return (value, field) =>
             {
+                if (value.IsNull())
+                {
+                    return value;
+                }
+
                 try
                 {
-                    if (!value.IsNull())
-                    {
-                        JsonValueConverter.ConvertValue(field, value);
-                    }
+                    JsonValueConverter.ConvertValue(field, value);
                 }
                 catch
                 {
-                    return null;
+                    return Value.Unset;
                 }
 
                 return value;

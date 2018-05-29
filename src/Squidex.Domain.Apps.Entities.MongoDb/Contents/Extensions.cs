@@ -28,12 +28,22 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         public static NamedContentData FromMongoModel(this IdContentData result, Schema schema, List<Guid> deletedIds)
         {
-            return result.ToNameModel(schema, FieldConverters.DecodeJson(), FieldReferencesConverter.CleanReferences(deletedIds));
+            return result.ConvertId2Name(schema,
+                FieldConverters.ForValues(
+                    ValueConverters.DecodeJson(),
+                    ValueReferencesConverter.CleanReferences(deletedIds)),
+                FieldConverters.ForNestedId2Name(
+                    ValueConverters.DecodeJson(),
+                    ValueReferencesConverter.CleanReferences(deletedIds)));
         }
 
         public static IdContentData ToMongoModel(this NamedContentData result, Schema schema)
         {
-            return result.ToIdModel(schema, FieldConverters.EncodeJson());
+            return result.ConvertName2Id(schema,
+                FieldConverters.ForValues(
+                    ValueConverters.EncodeJson()),
+                FieldConverters.ForNestedId2Name(
+                    ValueConverters.EncodeJson()));
         }
 
         public static string ToFullText<T>(this ContentData<T> data)

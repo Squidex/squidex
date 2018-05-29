@@ -69,9 +69,9 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
                         new ContentFieldData()
                             .AddValue("iv", new JArray(id1.ToString(), id2.ToString())));
 
-            var converter = FieldConverters.ForValues(FieldReferencesConverter.CleanReferences(new[] { id2 }));
+            var converter = FieldConverters.ForValues(ValueReferencesConverter.CleanReferences(new[] { id2 }));
 
-            var actual = input.Convert(schema, converter);
+            var actual = input.ConvertId2Id(schema, converter);
 
             var cleanedValue = (JArray)actual[5]["iv"];
 

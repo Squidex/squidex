@@ -89,7 +89,7 @@ namespace Squidex.Domain.Apps.Core
                 .AddTags(112, "root-tags", Partitioning.Language,
                     new TagsFieldProperties())
                 .Update(new SchemaProperties { Hints = "The User" })
-                .UpdateField(107, f => f.Hide())
+                .UpdateField(104, f => f.Hide())
                 .UpdateField(108, f => f.Lock())
                 .UpdateField(109, f => f.Disable());
 
