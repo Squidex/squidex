@@ -69,7 +69,9 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
                         new ContentFieldData()
                             .AddValue("iv", new JArray(id1.ToString(), id2.ToString())));
 
-            var actual = input.Convert(schema, FieldReferencesConverter.CleanReferences(new[] { id2 }));
+            var converter = FieldConverters.ForValues(FieldReferencesConverter.CleanReferences(new[] { id2 }));
+
+            var actual = input.Convert(schema, converter);
 
             var cleanedValue = (JArray)actual[5]["iv"];
 
@@ -91,7 +93,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
         }
 
         [Fact]
-        public void Should_empty_list_from_assets_field_for_referenced_ids_when_null()
+        public void Should_return_empty_list_from_assets_field_for_referenced_ids_when_null()
         {
             var sut = Fields.Assets(1, "my-asset", Partitioning.Invariant);
 
@@ -101,7 +103,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
         }
 
         [Fact]
-        public void Should_empty_list_from_assets_field_for_referenced_ids_when_other_type()
+        public void Should_return_empty_list_from_assets_field_for_referenced_ids_when_other_type()
         {
             var sut = Fields.Assets(1, "my-asset", Partitioning.Invariant);
 
@@ -111,7 +113,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
         }
 
         [Fact]
-        public void Should_empty_list_from_non_references_field()
+        public void Should_return_empty_list_from_non_references_field()
         {
             var sut = Fields.String(1, "my-string", Partitioning.Invariant);
 

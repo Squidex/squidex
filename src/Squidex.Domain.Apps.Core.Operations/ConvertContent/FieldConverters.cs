@@ -8,7 +8,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
@@ -35,27 +34,21 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
         {
             return (data, field) =>
             {
-                var isValid = true;
-
                 foreach (var value in data.Values)
                 {
+                    if (value.IsNull())
+                    {
+                        continue;
+                    }
+
                     try
                     {
-                        if (!value.IsNull())
-                        {
-                            JsonValueConverter.ConvertValue(field, value);
-                        }
+                        JsonValueConverter.ConvertValue(field, value);
                     }
                     catch
                     {
-                        isValid = false;
-                        break;
+                        return null;
                     }
-                }
-
-                if (!isValid)
-                {
-                    return null;
                 }
 
                 return data;
@@ -173,12 +166,10 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
                 return (data, field) => data;
             }
 
-            var languageCodes =
-                new HashSet<string>(
-                        languages.Select(x => x.Iso2Code).Where(x => languagesConfig.Contains(x)),
-                    StringComparer.OrdinalIgnoreCase);
+            var languageCodes = languages.Select(x => x.Iso2Code).Where(x => languagesConfig.Contains(x));
+            var languageSet = new HashSet<string>(languageCodes, StringComparer.OrdinalIgnoreCase);
 
-            if (languageCodes.Count == 0)
+            if (languageSet.Count == 0)
             {
                 return (data, field) => data;
             }
@@ -189,7 +180,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
                 {
                     var result = new ContentFieldData();
 
-                    foreach (var languageCode in languageCodes)
+                    foreach (var languageCode in languageSet)
                     {
                         if (data.TryGetValue(languageCode, out var value))
                         {
@@ -204,58 +195,101 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
             };
         }
 
-        public static FieldConverter DecodeJson()
+        private static FieldConverter ForNested(params ValueConverter[] converters)
         {
             return (data, field) =>
             {
-                if (field is IField<JsonFieldProperties>)
+                if (field is IArrayField arrayField)
                 {
-                    var result = new ContentFieldData();
-
-                    foreach (var partitionValue in data)
+                    foreach (var partition in data)
                     {
-                        if (partitionValue.Value.IsNull())
+                        if (partition.Value is JArray jArray)
                         {
-                            result[partitionValue.Key] = null;
-                        }
-                        else
-                        {
-                            var value = Encoding.UTF8.GetString(Convert.FromBase64String(partitionValue.Value.ToString()));
+                            for (var i = 0; i < jArray.Count; i++)
+                            {
+                                if (jArray[i] is JObject item)
+                                {
+                                    var result = new JObject();
 
-                            result[partitionValue.Key] = JToken.Parse(value);
+                                    foreach (var kvp in item)
+                                    {
+                                        if (!arrayField.FieldsByName.TryGetValue(kvp.Key, out var nestedField))
+                                        {
+                                            continue;
+                                        }
+
+                                        var newValue = kvp.Value;
+
+                                        if (converters != null)
+                                        {
+                                            foreach (var converter in converters)
+                                            {
+                                                newValue = converter(newValue, field);
+
+                                                if (ReferenceEquals(newValue, Value.Unset))
+                                                {
+                                                    break;
+                                                }
+                                            }
+                                        }
+
+                                        if (!ReferenceEquals(newValue, Value.Unset))
+                                        {
+                                            result.Add(field.Id.ToString(), newValue);
+                                        }
+                                    }
+
+                                    jArray[i] = item;
+                                }
+                            }
                         }
                     }
-
-                    return result;
                 }
 
                 return data;
             };
         }
 
-        public static FieldConverter EncodeJson()
+        public static FieldConverter ForValues(params ValueConverter[] converters)
         {
             return (data, field) =>
             {
-                if (field is IField<JsonFieldProperties>)
+                if (!(field is IArrayField))
                 {
-                    var result = new ContentFieldData();
+                    ContentFieldData result = null;
 
-                    foreach (var partitionValue in data)
+                    foreach (var partition in data)
                     {
-                        if (partitionValue.Value.IsNull())
-                        {
-                            result[partitionValue.Key] = null;
-                        }
-                        else
-                        {
-                            var value = Convert.ToBase64String(Encoding.UTF8.GetBytes(partitionValue.Value.ToString()));
+                        var newValue = partition.Value;
 
-                            result[partitionValue.Key] = value;
+                        if (converters != null)
+                        {
+                            foreach (var converter in converters)
+                            {
+                                newValue = converter(newValue, field);
+
+                                if (ReferenceEquals(newValue, Value.Unset))
+                                {
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (result != null || !ReferenceEquals(newValue, partition.Value))
+                        {
+                            if (result == null)
+                            {
+                                result = new ContentFieldData();
+                            }
+
+                            if (!ReferenceEquals(newValue, Value.Unset))
+                            {
+                                result.Add(partition.Key, newValue);
+                            }
                         }
                     }
 
-                    return result;
+                    return result ?? data;
                 }
 
                 return data;

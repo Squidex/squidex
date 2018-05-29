@@ -160,7 +160,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 return null;
             }
 
-            return schema != null ? contentDataTypes.GetOrAdd(schema, s => new ContentDataGraphType()) : null;
+            return schema != null ? contentDataTypes.GetOrAddNew(schema) : null;
         }
 
         public IGraphType GetContentType(Guid schemaId)

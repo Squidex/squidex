@@ -21,30 +21,35 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         private readonly LanguagesConfig languagesConfig = LanguagesConfig.Build(Language.EN, Language.DE);
         private readonly RootField<StringFieldProperties> stringLanguageField = Fields.String(1, "1", Partitioning.Language);
         private readonly RootField<StringFieldProperties> stringInvariantField = Fields.String(1, "1", Partitioning.Invariant);
+        private readonly RootField<JsonFieldProperties> jsonField = Fields.Json(1, "1", Partitioning.Invariant);
         private readonly RootField<NumberFieldProperties> numberField = Fields.Number(1, "1", Partitioning.Invariant);
 
         [Fact]
-        public void Should_encode_json_values()
+        public void Should_encode_json_value()
         {
-            var source =
-                new ContentFieldData()
-                    .AddValue("en", null)
-                    .AddValue("de", JToken.FromObject(new { Value = 1 }));
+            var source = JToken.FromObject(new { Value = 1 });
 
-            var result = FieldConverters.EncodeJson()(source, Fields.Json(1, "1", Partitioning.Invariant));
+            var result = ValueConverters.EncodeJson()(source, jsonField);
 
-            Assert.Null(result["en"]);
-            Assert.True(result["de"].Type == JTokenType.String);
+            Assert.True(result.Type == JTokenType.String);
         }
 
         [Fact]
-        public void Should_return_same_values_if_encoding_non_json_field()
+        public void Should_return_same_value_if_encoding_null_value()
         {
-            var source =
-                new ContentFieldData()
-                    .AddValue("en", null);
+            var source = JValue.CreateNull();
 
-            var result = FieldConverters.EncodeJson()(source, stringLanguageField);
+            var result = ValueConverters.EncodeJson()(source, jsonField);
+
+            Assert.Same(source, result);
+        }
+
+        [Fact]
+        public void Should_return_same_value_if_encoding_non_json_field()
+        {
+            var source = (JToken)"NO-JSON";
+
+            var result = ValueConverters.EncodeJson()(source, stringLanguageField);
 
             Assert.Same(source, result);
         }
@@ -52,15 +57,31 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         [Fact]
         public void Should_decode_json_values()
         {
-            var source =
-                new ContentFieldData()
-                    .AddValue("en", null)
-                    .AddValue("de", "e30=");
+            var source = "e30=";
 
-            var result = FieldConverters.DecodeJson()(source, Fields.Json(1, "1", Partitioning.Invariant));
+            var result = ValueConverters.DecodeJson()(source, jsonField);
 
-            Assert.Null(result["en"]);
-            Assert.True(result["de"] is JObject);
+            Assert.True(result is JObject);
+        }
+
+        [Fact]
+        public void Should_return_same_value_if_decoding_null_value()
+        {
+            var source = JValue.CreateNull();
+
+            var result = ValueConverters.DecodeJson()(source, jsonField);
+
+            Assert.Same(source, result);
+        }
+
+        [Fact]
+        public void Should_return_same_value_if_decoding_non_json_field()
+        {
+            var source = JValue.CreateNull();
+
+            var result = ValueConverters.EncodeJson()(source, stringLanguageField);
+
+            Assert.Same(source, result);
         }
 
         [Fact]
@@ -77,7 +98,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         }
 
         [Fact]
-        public void Should_return_null_values_if_all_value_is_invalid()
+        public void Should_return_null_values_any_value_is_invalid()
         {
             var source =
                 new ContentFieldData()
@@ -87,18 +108,6 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
             var result = FieldConverters.ExcludeChangedTypes()(source, numberField);
 
             Assert.Null(result);
-        }
-
-        [Fact]
-        public void Should_return_same_values_if_decoding_non_json_field()
-        {
-            var source =
-                new ContentFieldData()
-                    .AddValue("en", null);
-
-            var result = FieldConverters.DecodeJson()(source, stringLanguageField);
-
-            Assert.Same(source, result);
         }
 
         [Fact]
