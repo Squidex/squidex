@@ -33,12 +33,12 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
             {
                 if (minLength.HasValue && stringValue.Length < minLength.Value)
                 {
-                    addError(null, $"Must have more than '{minLength}' characters.");
+                    addError(context.Path, $"Must have more than '{minLength}' characters.");
                 }
 
                 if (maxLength.HasValue && stringValue.Length > maxLength.Value)
                 {
-                    addError(null, $"Must have less than '{maxLength}' characters.");
+                    addError(context.Path, $"Must have less than '{maxLength}' characters.");
                 }
             }
 

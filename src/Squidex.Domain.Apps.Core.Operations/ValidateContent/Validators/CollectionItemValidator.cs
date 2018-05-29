@@ -29,17 +29,15 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
             if (value is ICollection items && items.Count > 0)
             {
                 var innerTasks = new List<Task>();
-                var innerContext = context.Optional(false);
-
                 var index = 1;
 
                 foreach (var item in items)
                 {
-                    var itemFormatter = Formatter.Combine($"[{index}]", addError);
+                    var innerContext = context.Nested($"[{index}]");
 
                     foreach (var itemValidator in itemValidators)
                     {
-                        innerTasks.Add(itemValidator.ValidateAsync(item, innerContext, itemFormatter));
+                        innerTasks.Add(itemValidator.ValidateAsync(item, innerContext, addError));
                     }
 
                     index++;

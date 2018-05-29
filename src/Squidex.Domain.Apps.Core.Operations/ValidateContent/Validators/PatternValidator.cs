@@ -37,17 +37,17 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
                         {
                             if (string.IsNullOrWhiteSpace(errorMessage))
                             {
-                                addError(null, "Not valid.");
+                                addError(context.Path, "Not valid.");
                             }
                             else
                             {
-                                addError(null, errorMessage);
+                                addError(context.Path, errorMessage);
                             }
                         }
                     }
                     catch
                     {
-                        addError(null, "Regex is too slow.");
+                        addError(context.Path, "Regex is too slow.");
                     }
                 }
             }

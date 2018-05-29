@@ -32,11 +32,9 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_not_add_error_if_references_are_valid()
         {
-            var referenceId = Guid.NewGuid();
-
             var sut = Field(new ReferencesFieldProperties());
 
-            await sut.ValidateAsync(CreateValue(referenceId), errors, ValidationTestExtensions.ValidContext);
+            await sut.ValidateAsync(CreateValue(Guid.NewGuid()), errors, ValidationTestExtensions.ValidContext);
 
             Assert.Empty(errors);
         }

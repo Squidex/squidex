@@ -16,24 +16,24 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 {
-    public class TagsFieldTests
+    public class ArrayFieldTests
     {
         private readonly List<string> errors = new List<string>();
 
         [Fact]
         public void Should_instantiate_field()
         {
-            var sut = Field(new TagsFieldProperties());
+            var sut = Field(new ArrayFieldProperties());
 
-            Assert.Equal("my-tags", sut.Name);
+            Assert.Equal("my-array", sut.Name);
         }
 
         [Fact]
         public async Task Should_not_add_error_if_tags_are_valid()
         {
-            var sut = Field(new TagsFieldProperties());
+            var sut = Field(new ArrayFieldProperties());
 
-            await sut.ValidateAsync(CreateValue("tag"), errors, ValidationTestExtensions.ValidContext);
+            await sut.ValidateAsync(CreateValue(new JObject()), errors, ValidationTestExtensions.ValidContext);
 
             Assert.Empty(errors);
         }
@@ -41,7 +41,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_not_add_error_if_tags_are_null_and_valid()
         {
-            var sut = Field(new TagsFieldProperties());
+            var sut = Field(new ArrayFieldProperties());
 
             await sut.ValidateAsync(CreateValue(null), errors);
 
@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_add_errors_if_tags_are_required_and_null()
         {
-            var sut = Field(new TagsFieldProperties { IsRequired = true });
+            var sut = Field(new ArrayFieldProperties { IsRequired = true });
 
             await sut.ValidateAsync(CreateValue(null), errors);
 
@@ -62,7 +62,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_add_errors_if_tags_are_required_and_empty()
         {
-            var sut = Field(new TagsFieldProperties { IsRequired = true });
+            var sut = Field(new ArrayFieldProperties { IsRequired = true });
 
             await sut.ValidateAsync(CreateValue(), errors);
 
@@ -73,7 +73,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_add_errors_if_value_is_not_valid()
         {
-            var sut = Field(new TagsFieldProperties());
+            var sut = Field(new ArrayFieldProperties());
 
             await sut.ValidateAsync("invalid", errors);
 
@@ -84,9 +84,9 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_add_errors_if_value_has_not_enough_items()
         {
-            var sut = Field(new TagsFieldProperties { MinItems = 3 });
+            var sut = Field(new ArrayFieldProperties { MinItems = 3 });
 
-            await sut.ValidateAsync(CreateValue("tag-1", "tag-2"), errors);
+            await sut.ValidateAsync(CreateValue(new JObject(), new JObject()), errors);
 
             errors.ShouldBeEquivalentTo(
                 new[] { "Must have at least 3 item(s)." });
@@ -95,22 +95,22 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_add_errors_if_value_has_too_much_items()
         {
-            var sut = Field(new TagsFieldProperties { MaxItems = 1 });
+            var sut = Field(new ArrayFieldProperties { MaxItems = 1 });
 
-            await sut.ValidateAsync(CreateValue("tag-1", "tag-2"), errors);
+            await sut.ValidateAsync(CreateValue(new JObject(), new JObject()), errors);
 
             errors.ShouldBeEquivalentTo(
                 new[] { "Must have not more than 1 item(s)." });
         }
 
-        private static JToken CreateValue(params string[] ids)
+        private static JToken CreateValue(params JObject[] ids)
         {
             return ids == null ? JValue.CreateNull() : (JToken)new JArray(ids.OfType<object>().ToArray());
         }
 
-        private static RootField<TagsFieldProperties> Field(TagsFieldProperties properties)
+        private static RootField<ArrayFieldProperties> Field(ArrayFieldProperties properties)
         {
-            return Fields.Tags(1, "my-tags", Partitioning.Invariant, properties);
+            return Fields.Array(1, "my-array", Partitioning.Invariant, properties);
         }
     }
 }

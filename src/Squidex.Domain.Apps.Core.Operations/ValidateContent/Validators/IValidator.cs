@@ -5,13 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 {
-    public delegate void AddError(string field, string message);
-
-    public delegate AddError CombineFields(string field, AddError formatter);
+    public delegate void AddError(IEnumerable<string> path, string message);
 
     public interface IValidator
     {

@@ -5,8 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Contents;
@@ -42,9 +45,11 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             this.partitionResolver = partitionResolver;
         }
 
-        private void AddError(string field, string message)
+        private void AddError(IEnumerable<string> path, string message)
         {
-            errors.Add(new ValidationError($"{field}: {message}", field));
+            var pathString = path.ToPathString();
+
+            errors.Add(new ValidationError($"{pathString}: {message}", pathString));
         }
 
         public Task ValidatePartialAsync(NamedContentData data)
@@ -74,14 +79,14 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
                 fieldsValidators[field.Key] = (!field.Value.RawProperties.IsRequired, CreateFieldValidator(field.Value, isPartial));
             }
 
-            return new ObjectValidator<ContentFieldData>(fieldsValidators, isPartial, "field", DefaultFieldData, Formatter.CombineForLanguage);
+            return new ObjectValidator<ContentFieldData>(fieldsValidators, isPartial, "field", DefaultFieldData);
         }
 
         private IValidator CreateFieldValidator(IRootField field, bool isPartial)
         {
             var partitioning = partitionResolver(field.Partitioning);
 
-            var fieldValidator = new FieldValidator(ValidatorsFactory.CreateValidators(field), field);
+            var fieldValidator = new FieldValidator(ValidatorsFactory.CreateValidators(field).ToArray(), field);
             var fieldsValidators = new Dictionary<string, (bool IsOptional, IValidator Validator)>();
 
             foreach (var partition in partitioning)
@@ -93,7 +98,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
             var type = isLanguage ? "language" : "invariant value";
 
-            return new ObjectValidator<JToken>(fieldsValidators, isPartial, type, DefaultValue, Formatter.Combine);
+            return new ObjectValidator<JToken>(fieldsValidators, isPartial, type, DefaultValue);
         }
     }
 }

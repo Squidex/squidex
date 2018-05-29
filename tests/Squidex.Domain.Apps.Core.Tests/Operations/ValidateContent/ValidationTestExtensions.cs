@@ -39,14 +39,14 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
         public static Task ValidateAsync(this IField field, JToken value, IList<string> errors, ValidationContext context = null)
         {
-            return new FieldValidator(ValidatorsFactory.CreateValidators(field), field).ValidateAsync(value,
+            return new FieldValidator(ValidatorsFactory.CreateValidators(field).ToArray(), field).ValidateAsync(value,
                 CreateContext(context),
                 CreateFormatter(errors));
         }
 
         public static Task ValidateOptionalAsync(this IField field, JToken value, IList<string> errors, ValidationContext context = null)
         {
-            return new FieldValidator(ValidatorsFactory.CreateValidators(field), field).ValidateAsync(value,
+            return new FieldValidator(ValidatorsFactory.CreateValidators(field).ToArray(), field).ValidateAsync(value,
                 CreateContext(context).Optional(true),
                 CreateFormatter(errors));
         }
@@ -55,13 +55,13 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             return (field, message) =>
             {
-                if (field == null)
+                if (field == null || !field.Any())
                 {
                     errors.Add(message);
                 }
                 else
                 {
-                    errors.Add($"{field}: {message}");
+                    errors.Add($"{field.ToPathString()}: {message}");
                 }
             };
         }

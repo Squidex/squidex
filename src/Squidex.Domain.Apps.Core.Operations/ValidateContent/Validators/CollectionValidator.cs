@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
             {
                 if (isRequired && !context.IsOptional)
                 {
-                    addError(null, "Field is required.");
+                    addError(context.Path, "Field is required.");
                 }
 
                 return TaskHelper.Done;
@@ -38,12 +38,12 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
             if (minItems.HasValue && items.Count < minItems.Value)
             {
-                addError(null, $"Must have at least {minItems} item(s).");
+                addError(context.Path, $"Must have at least {minItems} item(s).");
             }
 
             if (maxItems.HasValue && items.Count > maxItems.Value)
             {
-                addError(null, $"Must have not more than {maxItems} item(s).");
+                addError(context.Path, $"Must have not more than {maxItems} item(s).");
             }
 
             return TaskHelper.Done;

@@ -15,10 +15,10 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 {
     public sealed class FieldValidator : IValidator
     {
-        private readonly IEnumerable<IValidator> validators;
+        private readonly IValidator[] validators;
         private readonly IField field;
 
-        public FieldValidator(IEnumerable<IValidator> validators, IField field)
+        public FieldValidator(IValidator[] validators, IField field)
         {
             this.validators = validators;
             this.field = field;
@@ -35,14 +35,18 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
                     typedValue = jToken.IsNull() ? null : JsonValueConverter.ConvertValue(field, jToken);
                 }
 
+                var tasks = new List<Task>();
+
                 foreach (var validator in ValidatorsFactory.CreateValidators(field))
                 {
-                    await validator.ValidateAsync(typedValue, context, addError);
+                    tasks.Add(validator.ValidateAsync(typedValue, context, addError));
                 }
+
+                await Task.WhenAll(tasks);
             }
             catch
             {
-                addError(null, "Not a valid value.");
+                addError(context.Path, "Not a valid value.");
             }
         }
     }

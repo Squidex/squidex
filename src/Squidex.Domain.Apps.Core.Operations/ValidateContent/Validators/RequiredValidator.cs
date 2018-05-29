@@ -16,7 +16,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
         {
             if (value == null && !context.IsOptional)
             {
-                addError(null, "Field is required.");
+                addError(context.Path, "Field is required.");
             }
 
             return TaskHelper.Done;

@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
                 foreach (var invalidId in invalidIds)
                 {
-                    addError(null, $"Contains invalid reference '{invalidId}'.");
+                    addError(context.Path, $"Contains invalid reference '{invalidId}'.");
                 }
             }
         }

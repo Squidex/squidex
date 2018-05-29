@@ -16,12 +16,10 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
         private readonly bool isPartial;
         private readonly string fieldType;
         private readonly TValue fieldDefault;
-        private readonly CombineFields combiner;
 
-        public ObjectValidator(IDictionary<string, (bool IsOptional, IValidator Validator)> schema, bool isPartial, string fieldType, TValue fieldDefault, CombineFields combiner)
+        public ObjectValidator(IDictionary<string, (bool IsOptional, IValidator Validator)> schema, bool isPartial, string fieldType, TValue fieldDefault)
         {
             this.schema = schema;
-            this.combiner = combiner;
             this.fieldDefault = fieldDefault;
             this.fieldType = fieldType;
             this.isPartial = isPartial;
@@ -29,7 +27,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
         public async Task ValidateAsync(object value, ValidationContext context, AddError addError)
         {
-            if (value is IReadOnlyDictionary<string, TValue> values)
+            if (value is IDictionary<string, TValue> values)
             {
                 foreach (var fieldData in values)
                 {
@@ -37,9 +35,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
                     if (!schema.ContainsKey(name))
                     {
-                        var fieldFormatter = combiner?.Invoke(name, addError) ?? Formatter.Combine(name, addError);
-
-                        fieldFormatter(null, $"Not a known {fieldType}.");
+                        addError(context.Path.Enqueue(name), $"Not a known {fieldType}.");
                     }
                 }
 
@@ -60,11 +56,9 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
                     }
 
                     var (isOptional, validator) = field.Value;
+                    var fieldContext = context.Nested(name).Optional(isOptional);
 
-                    var fieldContext = context.Optional(isOptional);
-                    var fieldFormatter = combiner(name, addError);
-
-                    tasks.Add(validator.ValidateAsync(fieldValue, fieldContext, fieldFormatter));
+                    tasks.Add(validator.ValidateAsync(fieldValue, fieldContext, addError));
                 }
 
                 await Task.WhenAll(tasks);

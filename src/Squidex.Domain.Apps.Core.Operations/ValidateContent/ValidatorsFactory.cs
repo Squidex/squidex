@@ -38,14 +38,14 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
                 yield return new CollectionValidator(field.Properties.IsRequired, field.Properties.MinItems, field.Properties.MaxItems);
             }
 
-            var fieldsValidators = new Dictionary<string, (bool IsOptional, IValidator Validator)>();
+            var nestedSchema = new Dictionary<string, (bool IsOptional, IValidator Validator)>();
 
             foreach (var nestedField in field.Fields)
             {
-                fieldsValidators[nestedField.Name] = (false, new FieldValidator(nestedField.Accept(this), nestedField));
+                nestedSchema[nestedField.Name] = (false, new FieldValidator(nestedField.Accept(this).ToArray(), nestedField));
             }
 
-            yield return new CollectionItemValidator(new ObjectValidator<JToken>(fieldsValidators, false, "field", JValue.CreateNull(), Formatter.Combine));
+            yield return new CollectionItemValidator(new ObjectValidator<JToken>(nestedSchema, false, "field", JValue.CreateNull()));
         }
 
         public IEnumerable<IValidator> Visit(IField<AssetsFieldProperties> field)

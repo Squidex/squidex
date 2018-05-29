@@ -8,6 +8,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -79,8 +80,8 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("my-field.es: Not a known invariant value.", "my-field.es"),
-                    new ValidationError("my-field.it: Not a known invariant value.", "my-field.it")
+                    new ValidationError("my-field(es): Not a known invariant value.", "my-field(es)"),
+                    new ValidationError("my-field(it): Not a known invariant value.", "my-field(it)")
                 });
         }
 
@@ -98,8 +99,8 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("my-field.de: Field is required.", "my-field.de"),
-                    new ValidationError("my-field.en: Field is required.", "my-field.en")
+                    new ValidationError("my-field(de): Field is required.", "my-field(de)"),
+                    new ValidationError("my-field(en): Field is required.", "my-field(en)")
                 });
         }
 
@@ -138,7 +139,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("my-field.xx: Not a known language.", "my-field.xx")
+                    new ValidationError("my-field(xx): Not a known language.", "my-field(xx)")
                 });
         }
 
@@ -181,8 +182,8 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("my-field.es: Not a known language.", "my-field.es"),
-                    new ValidationError("my-field.it: Not a known language.", "my-field.it")
+                    new ValidationError("my-field(es): Not a known language.", "my-field(es)"),
+                    new ValidationError("my-field(it): Not a known language.", "my-field(it)")
                 });
         }
 
@@ -241,8 +242,8 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("my-field.es: Not a known invariant value.", "my-field.es"),
-                    new ValidationError("my-field.it: Not a known invariant value.", "my-field.it")
+                    new ValidationError("my-field(es): Not a known invariant value.", "my-field(es)"),
+                    new ValidationError("my-field(it): Not a known invariant value.", "my-field(it)")
                 });
         }
 
@@ -291,7 +292,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("my-field.xx: Not a known language.", "my-field.xx")
+                    new ValidationError("my-field(xx): Not a known language.", "my-field(xx)")
                 });
         }
 
@@ -312,8 +313,34 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             errors.ShouldBeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("my-field.es: Not a known language.", "my-field.es"),
-                    new ValidationError("my-field.it: Not a known language.", "my-field.it")
+                    new ValidationError("my-field(es): Not a known language.", "my-field(es)"),
+                    new ValidationError("my-field(it): Not a known language.", "my-field(it)")
+                });
+        }
+
+        [Fact]
+        public async Task Should_add_error_if_array_field_has_required_nested_field()
+        {
+            schema =
+                schema.AddArray(1, "my-field", Partitioning.Invariant, f => f.
+                    AddNumber(1, "my-nested", new NumberFieldProperties { IsRequired = true }));
+
+            var data =
+                new NamedContentData()
+                    .AddField("my-field",
+                        new ContentFieldData()
+                            .AddValue("iv", new JArray(
+                                new JObject(),
+                                new JObject(new JProperty("my-nested", 1)),
+                                new JObject())));
+
+            await data.ValidatePartialAsync(context, schema, languagesConfig.ToResolver(), errors);
+
+            errors.ShouldBeEquivalentTo(
+                new List<ValidationError>
+                {
+                    new ValidationError("my-field[1].my-nested: Field is required.", "my-field[1].my-nested"),
+                    new ValidationError("my-field[3].my-nested: Field is required.", "my-field[3].my-nested"),
                 });
         }
     }

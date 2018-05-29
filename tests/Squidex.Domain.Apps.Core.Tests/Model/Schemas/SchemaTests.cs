@@ -88,7 +88,7 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
         [Fact]
         public void Should_return_same_schema_if_field_to_hide_does_not_exist()
         {
-            var schema_1 = schema_0.UpdateField(1, f => f.Hide()); ;
+            var schema_1 = schema_0.UpdateField(1, f => f.Hide());
 
             Assert.Same(schema_0, schema_1);
         }

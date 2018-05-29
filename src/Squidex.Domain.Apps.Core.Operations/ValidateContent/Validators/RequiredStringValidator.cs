@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
             if (valueAsString == null || (validateEmptyStrings && string.IsNullOrWhiteSpace(valueAsString)))
             {
-                addError(null, "Field is required.");
+                addError(context.Path, "Field is required.");
             }
 
             return TaskHelper.Done;

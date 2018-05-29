@@ -63,7 +63,7 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
         [Fact]
         public void Should_return_same_parent_if_field_to_hide_does_not_exist()
         {
-            var parent_1 = parent_0.UpdateField(1, f => f.Hide()); ;
+            var parent_1 = parent_0.UpdateField(1, f => f.Hide());
 
             Assert.Same(parent_0, parent_1);
         }
