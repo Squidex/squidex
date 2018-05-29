@@ -87,9 +87,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas.State
 
                     var field = registry.CreateRootField(TotalFields, eventField.Name, partitioning, eventField.Properties);
 
-                    if (field is ArrayField arrayField && eventField.Children?.Count > 0)
+                    if (field is ArrayField arrayField && eventField.Nested?.Count > 0)
                     {
-                        foreach (var nestedEventField in eventField.Children)
+                        foreach (var nestedEventField in eventField.Nested)
                         {
                             TotalFields++;
 

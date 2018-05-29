@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            return Validate.It(() => "Cannot create schema.", async error =>
+            return Validate.It(() => "Cannot create schema.", (System.Func<System.Action<ValidationError>, Task>)(async (System.Action<ValidationError> error) =>
             {
                 if (!command.Name.IsSlug())
                 {
@@ -32,12 +32,14 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                     error(new ValidationError($"A schema with name '{command.Name}' already exists", nameof(command.Name)));
                 }
 
-                if (command.Fields != null && command.Fields.Any())
+                if (command.Fields?.Count > 0)
                 {
                     var index = 0;
 
                     foreach (var field in command.Fields)
                     {
+                        index++;
+
                         var prefix = $"Fields.{index}";
 
                         if (!field.Partitioning.IsValidPartitioning())
@@ -54,12 +56,57 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                         {
                             error(new ValidationError("Properties is required.", $"{prefix}.{nameof(field.Properties)}"));
                         }
-
-                        var propertyErrors = FieldPropertiesValidator.Validate(field.Properties);
-
-                        foreach (var propertyError in propertyErrors)
+                        else
                         {
-                            error(propertyError);
+                            var errors = FieldPropertiesValidator.Validate(field.Properties);
+
+                            foreach (var e in errors)
+                            {
+                                error(e.WithPrefix(prefix));
+                            }
+                        }
+
+                        if (field.Nested?.Count > 0)
+                        {
+                            if (!(field.Properties is ArrayFieldProperties))
+                            {
+                                error(new ValidationError("Only array fields can have nested fields.", $"{prefix}.{nameof(field.Partitioning)}"));
+                            }
+                            else
+                            {
+                                var nestedIndex = 0;
+
+                                foreach (var nestedField in field.Nested)
+                                {
+                                    nestedIndex++;
+
+                                    var nestedPrefix = $"Fields.{index}.Nested.{nestedIndex}";
+
+                                    if (!nestedField.Name.IsPropertyName())
+                                    {
+                                        error(new ValidationError("Name must be a valid property name.", $"{prefix}.{nameof(nestedField.Name)}"));
+                                    }
+
+                                    if (nestedField.Properties == null)
+                                    {
+                                        error(new ValidationError("Properties is required.", $"{prefix}.{nameof(nestedField.Properties)}"));
+                                    }
+                                    else
+                                    {
+                                        var errors = FieldPropertiesValidator.Validate(nestedField.Properties);
+
+                                        foreach (var e in errors)
+                                        {
+                                            error(e.WithPrefix(nestedPrefix));
+                                        }
+                                    }
+                                }
+                            }
+
+                            if (field.Nested.Select(x => x.Name).Distinct().Count() != field.Nested.Count)
+                            {
+                                error(new ValidationError("Fields cannot have duplicate names.", $"{prefix}.Nested"));
+                            }
                         }
                     }
 
@@ -68,12 +115,17 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                         error(new ValidationError("Fields cannot have duplicate names.", nameof(command.Fields)));
                     }
                 }
-            });
+            }));
         }
 
         public static void CanReorder(Schema schema, ReorderFields command)
         {
             Guard.NotNull(command, nameof(command));
+
+            if (command.ParentFieldId.HasValue && !schema.FieldsById.ContainsKey(command.ParentFieldId.Value))
+            {
+                throw new DomainObjectNotFoundException(command.ParentFieldId.ToString(), "Fields", typeof(Schema));
+            }
 
             Validate.It(() => "Cannot reorder schema fields.", error =>
             {

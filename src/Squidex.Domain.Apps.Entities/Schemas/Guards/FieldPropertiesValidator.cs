@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
         public static IEnumerable<ValidationError> Validate(FieldProperties properties)
         {
-            return properties?.Accept(Instance) ?? Enumerable.Empty<ValidationError>();
+            return properties?.Accept(Instance);
         }
 
         public IEnumerable<ValidationError> Visit(ArrayFieldProperties properties)

@@ -6,7 +6,7 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.Schemas;
-using FieldChildren = System.Collections.Generic.List<Squidex.Domain.Apps.Events.Schemas.SchemaCreatedNestedField>;
+using FieldNested = System.Collections.Generic.List<Squidex.Domain.Apps.Events.Schemas.SchemaCreatedNestedField>;
 
 namespace Squidex.Domain.Apps.Events.Schemas
 {
@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Events.Schemas
 
         public bool IsDisabled { get; set; }
 
-        public FieldChildren Children { get; set; }
+        public FieldNested Nested { get; set; }
 
         public FieldProperties Properties { get; set; }
     }
