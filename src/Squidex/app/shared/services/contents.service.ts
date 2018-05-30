@@ -16,42 +16,58 @@ import {
     ApiUrlConfig,
     DateTime,
     HTTP,
+    Model,
     Version,
     Versioned
 } from '@app/framework';
 
-export class ContentsDto {
+export class ContentsDto extends Model {
     constructor(
         public readonly total: number,
         public readonly items: ContentDto[]
     ) {
+
+        super();
     }
-}
+
+    public with(value: Partial<ContentsDto>): ContentsDto {
+        return this.clone(value);
+    }}
 
 
-export class ScheduleDto {
+export class ScheduleDto extends Model {
     constructor(
         public readonly status: string,
         public readonly scheduledBy: string,
         public readonly dueTime: DateTime
     ) {
+        super();
+    }
+
+    public with(value: Partial<ScheduleDto>): ScheduleDto {
+        return this.clone(value);
     }
 }
 
-export class ContentDto {
+export class ContentDto extends Model {
     constructor(
         public readonly id: string,
         public readonly status: string,
-        public readonly createdBy: string,
-        public readonly lastModifiedBy: string,
         public readonly created: DateTime,
+        public readonly createdBy: string,
         public readonly lastModified: DateTime,
+        public readonly lastModifiedBy: string,
         public readonly scheduleJob: ScheduleDto | null,
         public readonly isPending: boolean,
         public readonly data: object | any,
         public readonly dataDraft: object,
         public readonly version: Version
     ) {
+        super();
+    }
+
+    public with(value: Partial<ContentDto>): ContentDto {
+        return this.clone(value);
     }
 }
 
@@ -107,10 +123,8 @@ export class ContentsService {
                         return new ContentDto(
                             item.id,
                             item.status,
-                            item.createdBy,
-                            item.lastModifiedBy,
-                            DateTime.parseISO_UTC(item.created),
-                            DateTime.parseISO_UTC(item.lastModified),
+                            DateTime.parseISO_UTC(item.created), item.createdBy,
+                            DateTime.parseISO_UTC(item.lastModified), item.lastModifiedBy,
                             item.scheduleJob
                                 ? new ScheduleDto(
                                     item.scheduleJob.status,
@@ -136,10 +150,8 @@ export class ContentsService {
                     return new ContentDto(
                         body.id,
                         body.status,
-                        body.createdBy,
-                        body.lastModifiedBy,
-                        DateTime.parseISO_UTC(body.created),
-                        DateTime.parseISO_UTC(body.lastModified),
+                        DateTime.parseISO_UTC(body.created), body.createdBy,
+                        DateTime.parseISO_UTC(body.lastModified), body.lastModifiedBy,
                         body.scheduleJob
                             ? new ScheduleDto(
                                 body.scheduleJob.status,
@@ -174,10 +186,8 @@ export class ContentsService {
                     return new ContentDto(
                         body.id,
                         body.status,
-                        body.createdBy,
-                        body.lastModifiedBy,
-                        DateTime.parseISO_UTC(body.created),
-                        DateTime.parseISO_UTC(body.lastModified),
+                        DateTime.parseISO_UTC(body.created), body.createdBy,
+                        DateTime.parseISO_UTC(body.lastModified), body.lastModifiedBy,
                         null,
                         true,
                         null,

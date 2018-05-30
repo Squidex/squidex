@@ -14,25 +14,36 @@ import '@app/framework/angular/http/http-extensions';
 import {
     ApiUrlConfig,
     HTTP,
+    Model,
     Version,
     Versioned
 } from '@app/framework';
 
-export class AppPatternsDto {
+export class AppPatternsDto extends Model {
     constructor(
         public readonly patterns: AppPatternDto[],
         public readonly version: Version
     ) {
+        super();
+    }
+
+    public with(value: Partial<AppPatternsDto>): AppPatternsDto {
+        return this.clone(value);
     }
 }
 
-export class AppPatternDto {
+export class AppPatternDto extends Model {
     constructor(
         public readonly id: string,
         public readonly name: string,
         public readonly pattern: string,
         public readonly message: string
     ) {
+        super();
+    }
+
+    public with(value: Partial<AppPatternDto>): AppPatternDto {
+        return this.clone(value);
     }
 }
 

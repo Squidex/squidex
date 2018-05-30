@@ -14,20 +14,26 @@ import {
     ApiUrlConfig,
     DateTime,
     HTTP,
+    Model,
     Types,
     Version,
     Versioned
 } from '@app/framework';
 
-export class AssetsDto {
+export class AssetsDto extends Model {
     constructor(
         public readonly total: number,
         public readonly items: AssetDto[]
     ) {
+        super();
+    }
+
+    public with(value: Partial<AssetsDto>): AssetsDto {
+        return this.clone(value);
     }
 }
 
-export class AssetDto {
+export class AssetDto extends Model {
     constructor(
         public readonly id: string,
         public readonly createdBy: string,
@@ -45,40 +51,29 @@ export class AssetDto {
         public readonly url: string,
         public readonly version: Version
     ) {
+        super();
+    }
+
+    public with(value: Partial<AssetDto>): AssetDto {
+        return this.clone(value);
     }
 
     public update(update: AssetReplacedDto, user: string, version: Version, now?: DateTime): AssetDto {
-        return new AssetDto(
-            this.id,
-            this.createdBy, user,
-            this.created, now || DateTime.now(),
-            this.fileName,
-            this.fileType,
-            update.fileSize,
-            update.fileVersion,
-            update.mimeType,
-            update.isImage,
-            update.pixelWidth,
-            update.pixelHeight,
-            this.url,
-            version);
+        return this.with({
+            ...update,
+            lastModified: now || DateTime.now(),
+            lastModifiedBy: user,
+            version
+        });
     }
 
-    public rename(name: string, user: string, version: Version, now?: DateTime): AssetDto {
-        return new AssetDto(
-            this.id,
-            this.createdBy, user,
-            this.created, now || DateTime.now(),
-            name,
-            this.fileType,
-            this.fileSize,
-            this.fileVersion,
-            this.mimeType,
-            this.isImage,
-            this.pixelWidth,
-            this.pixelHeight,
-            this.url,
-            version);
+    public rename(fileName: string, user: string, version: Version, now?: DateTime): AssetDto {
+        return this.with({
+            fileName,
+            lastModified: now || DateTime.now(),
+            lastModifiedBy: user,
+            version
+        });
     }
 }
 

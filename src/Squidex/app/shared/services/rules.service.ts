@@ -16,6 +16,7 @@ import {
     ApiUrlConfig,
     DateTime,
     HTTP,
+    Model,
     Version,
     Versioned
 } from '@app/framework';
@@ -50,7 +51,7 @@ export const ruleActions: any = {
     }
 };
 
-export class RuleDto {
+export class RuleDto extends Model {
     constructor(
         public readonly id: string,
         public readonly createdBy: string,
@@ -64,10 +65,28 @@ export class RuleDto {
         public readonly action: any,
         public readonly actionType: string
     ) {
+        super();
+    }
+
+    public with(value: Partial<RuleDto>): RuleDto {
+        return this.clone(value);
     }
 }
 
-export class RuleEventDto {
+export class RuleEventsDto extends Model {
+    constructor(
+        public readonly total: number,
+        public readonly items: RuleEventDto[]
+    ) {
+        super();
+    }
+
+    public with(value: Partial<RuleEventsDto>): RuleEventsDto {
+        return this.clone(value);
+    }
+}
+
+export class RuleEventDto extends Model {
     constructor(
         public readonly id: string,
         public readonly created: DateTime,
@@ -79,14 +98,11 @@ export class RuleEventDto {
         public readonly jobResult: string,
         public readonly numCalls: number
     ) {
+        super();
     }
-}
 
-export class RuleEventsDto {
-    constructor(
-        public readonly total: number,
-        public readonly items: RuleEventDto[]
-    ) {
+    public with(value: Partial<RuleEventDto>): RuleEventDto {
+        return this.clone(value);
     }
 }
 

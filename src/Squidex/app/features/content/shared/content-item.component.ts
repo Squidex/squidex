@@ -12,10 +12,10 @@ import {
     ContentDto,
     ContentsState,
     fadeAnimation,
-    FieldDto,
     fieldInvariant,
     ModalView,
     PatchContentForm,
+    RootFieldDto,
     SchemaDetailsDto,
     Types
 } from '@app/shared';
@@ -136,7 +136,7 @@ export class ContentItemComponent implements OnChanges {
         }
     }
 
-    private getRawValue(field: FieldDto): any {
+    private getRawValue(field: RootFieldDto): any {
         const contentField = this.content.dataDraft[field.name];
 
         if (contentField) {

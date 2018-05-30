@@ -147,37 +147,27 @@ export class RulesState extends State<Snapshot> {
 }
 
 const updateTrigger = (rule: RuleDto, trigger: any, user: string, version: Version, now?: DateTime) =>
-    new RuleDto(
-        rule.id,
-        rule.createdBy, user,
-        rule.created, now || DateTime.now(),
-        version,
-        rule.isEnabled,
+    rule.with({
         trigger,
-        trigger.triggerType,
-        rule.action,
-        rule.action.actionType);
+        triggerType: trigger.triggerType,
+        lastModified: now || DateTime.now(),
+        lastModifiedBy: user,
+        version
+    });
 
 const updateAction = (rule: RuleDto, action: any, user: string, version: Version, now?: DateTime) =>
-    new RuleDto(
-        rule.id,
-        rule.createdBy, user,
-        rule.created, now || DateTime.now(),
-        version,
-        rule.isEnabled,
-        rule.trigger,
-        rule.trigger.triggerType,
+    rule.with({
         action,
-        action.actionType);
+        actionType: action.triggerType,
+        lastModified: now || DateTime.now(),
+        lastModifiedBy: user,
+        version
+    });
 
 const setEnabled = (rule: RuleDto, isEnabled: boolean, user: string, version: Version, now?: DateTime) =>
-    new RuleDto(
-        rule.id,
-        rule.createdBy, user,
-        rule.created, now || DateTime.now(),
-        version,
+    rule.with({
         isEnabled,
-        rule.trigger,
-        rule.triggerType,
-        rule.action,
-        rule.actionType);
+        lastModified: now || DateTime.now(),
+        lastModifiedBy: user,
+        version
+    });

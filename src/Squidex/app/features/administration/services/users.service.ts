@@ -11,23 +11,37 @@ import { Observable } from 'rxjs';
 
 import '@app/framework/angular/http/http-extensions';
 
-import { ApiUrlConfig, HTTP } from '@app/shared';
+import {
+    ApiUrlConfig,
+    HTTP,
+    Model
+} from '@app/shared';
 
-export class UsersDto {
+export class UsersDto extends Model {
     constructor(
         public readonly total: number,
         public readonly items: UserDto[]
     ) {
+        super();
+    }
+
+    public with(value: Partial<UsersDto>): UsersDto {
+        return this.clone(value);
     }
 }
 
-export class UserDto {
+export class UserDto extends Model {
     constructor(
         public readonly id: string,
         public readonly email: string,
         public readonly displayName: string,
         public readonly isLocked: boolean
     ) {
+        super();
+    }
+
+    public with(value: Partial<UserDto>): UserDto {
+        return this.clone(value);
     }
 }
 

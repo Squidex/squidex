@@ -11,9 +11,13 @@ import { Observable } from 'rxjs';
 
 import '@app/framework/angular/http/http-extensions';
 
-import { ApiUrlConfig, HTTP } from '@app/shared';
+import {
+    ApiUrlConfig,
+    HTTP,
+    Model
+} from '@app/shared';
 
-export class EventConsumerDto {
+export class EventConsumerDto extends Model {
     constructor(
         public readonly name: string,
         public readonly isStopped: boolean,
@@ -21,6 +25,11 @@ export class EventConsumerDto {
         public readonly error: string,
         public readonly position: string
     ) {
+        super();
+    }
+
+    public with(value: Partial<EventConsumerDto>): EventConsumerDto {
+        return this.clone(value);
     }
 }
 

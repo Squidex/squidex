@@ -15,24 +15,35 @@ import {
     AnalyticsService,
     ApiUrlConfig,
     HTTP,
+    Model,
     Version,
     Versioned
 } from '@app/framework';
 
-export class AppContributorsDto {
+export class AppContributorsDto extends Model {
     constructor(
         public readonly contributors: AppContributorDto[],
         public readonly maxContributors: number,
         public readonly version: Version
     ) {
+        super();
+    }
+
+    public with(value: Partial<AppContributorsDto>): AppContributorsDto {
+        return this.clone(value);
     }
 }
 
-export class AppContributorDto {
+export class AppContributorDto extends Model {
     constructor(
         public readonly contributorId: string,
         public readonly permission: string
     ) {
+        super();
+    }
+
+    public with(value: Partial<AppContributorDto>): AppContributorDto {
+        return this.clone(value);
     }
 }
 

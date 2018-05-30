@@ -15,25 +15,36 @@ import {
     AnalyticsService,
     ApiUrlConfig,
     HTTP,
+    Model,
     Version,
     Versioned
 } from '@app/framework';
 
-export class AppClientsDto {
+export class AppClientsDto extends Model {
     constructor(
         public readonly clients: AppClientDto[],
         public readonly version: Version
     ) {
+        super();
+    }
+
+    public with(value: Partial<AppClientsDto>): AppClientsDto {
+        return this.clone(value);
     }
 }
 
-export class AppClientDto {
+export class AppClientDto extends Model {
     constructor(
         public readonly id: string,
         public readonly name: string,
         public readonly secret: string,
         public readonly permission: string
     ) {
+        super();
+    }
+
+    public with(value: Partial<AppClientDto>): AppClientDto {
+        return this.clone(value);
     }
 }
 

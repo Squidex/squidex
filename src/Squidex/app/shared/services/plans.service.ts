@@ -15,11 +15,12 @@ import {
     AnalyticsService,
     ApiUrlConfig,
     HTTP,
+    Model,
     Version,
     Versioned
 } from '@app/framework';
 
-export class PlansDto {
+export class PlansDto extends Model {
     constructor(
         public readonly currentPlanId: string,
         public readonly planOwner: string,
@@ -27,10 +28,15 @@ export class PlansDto {
         public readonly plans: PlanDto[],
         public readonly version: Version
     ) {
+        super();
+    }
+
+    public with(value: Partial<PlansDto>): PlansDto {
+        return this.clone(value);
     }
 }
 
-export class PlanDto {
+export class PlanDto extends Model {
     constructor(
         public readonly id: string,
         public readonly name: string,
@@ -41,6 +47,11 @@ export class PlanDto {
         public readonly maxAssetSize: number,
         public readonly maxContributors: number
     ) {
+        super();
+    }
+
+    public with(value: Partial<PlanDto>): PlanDto {
+        return this.clone(value);
     }
 }
 

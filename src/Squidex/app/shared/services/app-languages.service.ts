@@ -15,19 +15,25 @@ import {
     AnalyticsService,
     ApiUrlConfig,
     HTTP,
+    Model,
     Version,
     Versioned
 } from '@app/framework';
 
-export class AppLanguagesDto {
+export class AppLanguagesDto extends Model {
     constructor(
         public readonly languages: AppLanguageDto[],
         public readonly version: Version
     ) {
+        super();
+    }
+
+    public with(value: Partial<AppLanguagesDto>): AppLanguagesDto {
+        return this.clone(value);
     }
 }
 
-export class AppLanguageDto {
+export class AppLanguageDto extends Model {
     constructor(
         public readonly iso2Code: string,
         public readonly englishName: string,
@@ -35,6 +41,11 @@ export class AppLanguageDto {
         public readonly isOptional: boolean,
         public readonly fallback: string[]
     ) {
+        super();
+    }
+
+    public with(value: Partial<AppLanguageDto>): AppLanguageDto {
+        return this.clone(value);
     }
 }
 

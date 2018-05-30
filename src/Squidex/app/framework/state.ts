@@ -78,6 +78,27 @@ export class Form<T extends AbstractControl> {
     }
 }
 
+export class Model {
+    protected onCreated() {
+        return;
+    }
+
+    protected clone(update: ((v: any) => object) | object): any {
+        let values: object;
+        if (Types.isFunction(update)) {
+            values = update(<any>this);
+        } else {
+            values = update;
+        }
+
+        const clone = Object.assign(Object.create(Object.getPrototypeOf(this)), this, values);
+
+        clone.onCreated();
+
+        return clone;
+    }
+}
+
 export class State<T extends {}> {
     private readonly state: BehaviorSubject<T>;
     private readonly initialState: T;

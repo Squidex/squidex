@@ -67,41 +67,41 @@ export class EventConsumersState extends State<Snapshot> {
             });
     }
 
-    public start(es: EventConsumerDto): Observable<any> {
-        return this.eventConsumersService.putStart(es.name)
+    public start(eventConsumer: EventConsumerDto): Observable<any> {
+        return this.eventConsumersService.putStart(eventConsumer.name)
             .do(() => {
-                this.replaceEventConsumer(setStopped(es, false));
+                this.replaceEventConsumer(setStopped(eventConsumer, false));
             })
             .notify(this.dialogs);
     }
 
-    public stop(es: EventConsumerDto): Observable<any> {
-        return this.eventConsumersService.putStop(es.name)
+    public stop(eventConsumer: EventConsumerDto): Observable<any> {
+        return this.eventConsumersService.putStop(eventConsumer.name)
             .do(() => {
-                this.replaceEventConsumer(setStopped(es, true));
+                this.replaceEventConsumer(setStopped(eventConsumer, true));
             })
             .notify(this.dialogs);
     }
 
-    public reset(es: EventConsumerDto): Observable<any> {
-        return this.eventConsumersService.putReset(es.name)
+    public reset(eventConsumer: EventConsumerDto): Observable<any> {
+        return this.eventConsumersService.putReset(eventConsumer.name)
             .do(() => {
-                this.replaceEventConsumer(reset(es));
+                this.replaceEventConsumer(reset(eventConsumer));
             })
             .notify(this.dialogs);
     }
 
-    private replaceEventConsumer(es: EventConsumerDto) {
+    private replaceEventConsumer(eventConsumer: EventConsumerDto) {
         this.next(s => {
-            const eventConsumers = s.eventConsumers.replaceBy('name', es);
+            const eventConsumers = s.eventConsumers.replaceBy('name', eventConsumer);
 
             return { ...s, eventConsumers };
         });
     }
 }
 
-const setStopped = (es: EventConsumerDto, isStoped: boolean) =>
-    new EventConsumerDto(es.name, isStoped, false, es.error, es.position);
+const setStopped = (eventConsumer: EventConsumerDto, isStopped: boolean) =>
+    eventConsumer.with({ isStopped });
 
-const reset = (es: EventConsumerDto) =>
-    new EventConsumerDto(es.name, es.isStopped, true, es.error, es.position);
+const reset = (eventConsumer: EventConsumerDto) =>
+    eventConsumer.with({ isResetting: true });

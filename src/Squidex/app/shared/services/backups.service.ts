@@ -14,10 +14,11 @@ import '@app/framework/angular/http/http-extensions';
 import {
     AnalyticsService,
     ApiUrlConfig,
-    DateTime
+    DateTime,
+    Model
 } from '@app/framework';
 
-export class BackupDto {
+export class BackupDto extends Model {
     constructor(
         public readonly id: string,
         public readonly started: DateTime,
@@ -26,6 +27,11 @@ export class BackupDto {
         public readonly handledAssets: number,
         public readonly isFailed: boolean
     ) {
+        super();
+    }
+
+    public with(value: Partial<BackupDto>): BackupDto {
+        return this.clone(value);
     }
 }
 

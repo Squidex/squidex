@@ -247,7 +247,7 @@ export class UsersState extends State<Snapshot> {
 
 
 const update = (user: UserDto, request: UpdateUserDto) =>
-    new UserDto(user.id, request.email, request.displayName, user.isLocked);
+    user.with(request);
 
 const setLocked = (user: UserDto, isLocked: boolean) =>
-    new UserDto(user.id, user.email, user.displayName, isLocked);
+    user.with({ isLocked });

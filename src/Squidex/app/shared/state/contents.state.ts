@@ -439,74 +439,55 @@ export class ManualContentsState extends ContentsStateBase {
     }
 }
 
-const changeStatus = (content: ContentDto, status: string, user: string, version: Version, now?: DateTime) =>
-    new ContentDto(
-        content.id,
-        status,
-        content.createdBy, user,
-        content.created, now || DateTime.now(),
-        null,
-        content.isPending,
-        content.data,
-        content.dataDraft,
-        version);
-
 const changeScheduleStatus = (content: ContentDto, status: string, dueTime: string, user: string, version: Version, now?: DateTime) =>
-    new ContentDto(
-        content.id,
-        content.status,
-        content.createdBy, user,
-        content.created, now || DateTime.now(),
-        new ScheduleDto(status, user, DateTime.parseISO_UTC(dueTime)),
-        content.isPending,
-        content.data,
-        content.dataDraft,
-        version);
+    content.with({
+        scheduleJob: new ScheduleDto(status, user, DateTime.parseISO_UTC(dueTime)),
+        lastModified: now || DateTime.now(),
+        lastModifiedBy: user,
+        version
+    });
+
+const changeStatus = (content: ContentDto, status: string, user: string, version: Version, now?: DateTime) =>
+    content.with({
+        status,
+        scheduleJob: null,
+        lastModified: now || DateTime.now(),
+        lastModifiedBy: user,
+        version
+    });
 
 const updateData = (content: ContentDto, data: any, user: string, version: Version, now?: DateTime) =>
-    new ContentDto(
-        content.id,
-        content.status,
-        content.createdBy, user,
-        content.created, now || DateTime.now(),
-        content.scheduleJob,
-        content.isPending,
+    content.with({
         data,
-        data,
-        version);
+        dataDraft: data,
+        lastModified: now || DateTime.now(),
+        lastModifiedBy: user,
+        version
+    });
 
 const updateDataDraft = (content: ContentDto, data: any, user: string, version: Version, now?: DateTime) =>
-    new ContentDto(
-        content.id,
-        content.status,
-        content.createdBy, user,
-        content.created, now || DateTime.now(),
-        content.scheduleJob,
-        true,
-        content.data,
-        data,
-        version);
+    content.with({
+        isPending: true,
+        dataDraft: data,
+        lastModified: now || DateTime.now(),
+        lastModifiedBy: user,
+        version
+    });
 
 const confirmChanges = (content: ContentDto, user: string, version: Version, now?: DateTime) =>
-    new ContentDto(
-        content.id,
-        content.status,
-        content.createdBy, user,
-        content.created, now || DateTime.now(),
-        null,
-        false,
-        content.dataDraft,
-        content.dataDraft,
-        version);
+    content.with({
+        isPending: false,
+        data: content.dataDraft,
+        lastModified: now || DateTime.now(),
+        lastModifiedBy: user,
+        version
+    });
 
 const discardChanges = (content: ContentDto, user: string, version: Version, now?: DateTime) =>
-    new ContentDto(
-        content.id,
-        content.status,
-        content.createdBy, user,
-        content.created, now || DateTime.now(),
-        content.scheduleJob,
-        false,
-        content.data,
-        content.data,
-        version);
+    content.with({
+        isPending: false,
+        dataDraft: content.data,
+        lastModified: now || DateTime.now(),
+        lastModifiedBy: user,
+        version
+    });

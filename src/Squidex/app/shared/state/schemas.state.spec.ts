@@ -18,7 +18,8 @@ import {
     CreateSchemaDto,
     DateTime,
     DialogService,
-    FieldDto,
+    NestedFieldDto,
+    RootFieldDto,
     SchemaDetailsDto,
     SchemaDto,
     SchemasService,
@@ -40,17 +41,20 @@ describe('SchemasState', () => {
     const newVersion = new Version('2');
 
     const oldSchemas = [
-        new SchemaDto('id1', 'name1', 'category1', {}, false, creator, creator, creation, creation, version),
-        new SchemaDto('id2', 'name2', 'category2', {}, true , creator, creator, creation, creation, version)
+        new SchemaDto('id1', 'name1', 'category1', {}, false, creation, creator, creation, creator, version),
+        new SchemaDto('id2', 'name2', 'category2', {}, true , creation, creator, creation, creator, version)
     ];
 
-    const field1 = new FieldDto(1, '1', false, false, false, 'l', createProperties('String'));
-    const field2 = new FieldDto(2, '2', true,  true,  true,  'l', createProperties('Number'));
+    const field1 = new RootFieldDto(1, '1', createProperties('String'), 'invariant');
+    const field2 = new RootFieldDto(2, '2', createProperties('Array'), 'invariant', false, false, false, [
+                        new NestedFieldDto(3, '3', createProperties('Number'), 2),
+                        new NestedFieldDto(4, '4', createProperties('String'), 2)
+                    ]);
 
     const schema =
         new SchemaDetailsDto('id2', 'name2', 'category2', {}, true,
-            creator, creator,
-            creation, creation,
+            creation, creator,
+            creation, creator,
             version,
             [field1, field2]);
 
@@ -277,7 +281,7 @@ describe('SchemasState', () => {
         it('should add schema to snapshot when created', () => {
             const request = new CreateSchemaDto('newName');
 
-            const result = new SchemaDetailsDto('id4', 'newName', '', {}, false, modifier, modifier, modified, modified, version, []);
+            const result = new SchemaDetailsDto('id4', 'newName', '', {}, false, modified, modifier, modified, modifier, version, []);
 
             schemasService.setup(x => x.postSchema(app, request, modifier, modified))
                 .returns(() => Observable.of(result));
@@ -301,12 +305,12 @@ describe('SchemasState', () => {
         it('should add field and update user info when field added', () => {
             const request = new AddFieldDto(field1.name, field1.partitioning, field1.properties);
 
-            const newField = new FieldDto(3, '3', false, false, false, 'l', createProperties('String'));
+            const newField = new RootFieldDto(3, '3', createProperties('String'), 'invariant');
 
-            schemasService.setup(x => x.postField(app, schema.name, It.isAny(), version))
-                .returns(() => Observable.of(new Versioned<FieldDto>(newVersion, newField)));
+            schemasService.setup(x => x.postField(app, schema.name, It.isAny(), undefined, version))
+                .returns(() => Observable.of(new Versioned<RootFieldDto>(newVersion, newField)));
 
-            schemasState.addField(schema, request, modified).subscribe();
+            schemasState.addField(schema, request, undefined, modified).subscribe();
 
             const schema_1 = <SchemaDetailsDto>schemasState.snapshot.schemas.at(1);
 
@@ -315,7 +319,7 @@ describe('SchemasState', () => {
         });
 
         it('should remove field and update user info when field removed', () => {
-            schemasService.setup(x => x.deleteField(app, schema.name, field1.fieldId, version))
+            schemasService.setup(x => x.deleteField(app, schema.name, field1.fieldId, undefined, version))
                 .returns(() => Observable.of(new Versioned<any>(newVersion, {})));
 
             schemasState.deleteField(schema, field1, modified).subscribe();
@@ -327,10 +331,10 @@ describe('SchemasState', () => {
         });
 
         it('should sort fields and update user info when fields sorted', () => {
-            schemasService.setup(x => x.putFieldOrdering(app, schema.name, [field2.fieldId, field1.fieldId], version))
+            schemasService.setup(x => x.putFieldOrdering(app, schema.name, [field2.fieldId, field1.fieldId], undefined, version))
                 .returns(() => Observable.of(new Versioned<any>(newVersion, {})));
 
-            schemasState.sortFields(schema, [field2, field1], modified).subscribe();
+            schemasState.sortFields(schema, [field2, field1], undefined, modified).subscribe();
 
             const schema_1 = <SchemaDetailsDto>schemasState.snapshot.schemas.at(1);
 
@@ -341,7 +345,7 @@ describe('SchemasState', () => {
         it('should update field properties and update user info when field updated', () => {
             const request = new UpdateFieldDto(createProperties('String'));
 
-            schemasService.setup(x => x.putField(app, schema.name, field1.fieldId, request, version))
+            schemasService.setup(x => x.putField(app, schema.name, field1.fieldId, request, undefined, version))
                 .returns(() => Observable.of(new Versioned<any>(newVersion, {})));
 
             schemasState.updateField(schema, field1, request, modified).subscribe();
@@ -353,10 +357,10 @@ describe('SchemasState', () => {
         });
 
         it('should mark field hidden and update user info when field hidden', () => {
-            schemasService.setup(x => x.hideField(app, schema.name, field1.fieldId, version))
+            schemasService.setup(x => x.hideField(app, schema.name, field1.fieldId, undefined, version))
                 .returns(() => Observable.of(new Versioned<any>(newVersion, {})));
 
-            schemasState.hideField(schema, field1, modified).subscribe();
+            schemasState.hideField(schema, field1, undefined, modified).subscribe();
 
             const schema_1 = <SchemaDetailsDto>schemasState.snapshot.schemas.at(1);
 
@@ -365,7 +369,7 @@ describe('SchemasState', () => {
         });
 
         it('should mark field disabled and update user info when field disabled', () => {
-            schemasService.setup(x => x.disableField(app, schema.name, field1.fieldId, version))
+            schemasService.setup(x => x.disableField(app, schema.name, field1.fieldId, undefined, version))
                 .returns(() => Observable.of(new Versioned<any>(newVersion, {})));
 
             schemasState.disableField(schema, field1, modified).subscribe();
@@ -389,7 +393,7 @@ describe('SchemasState', () => {
         });
 
         it('should unmark field hidden and update user info when field shown', () => {
-            schemasService.setup(x => x.showField(app, schema.name, field2.fieldId, version))
+            schemasService.setup(x => x.showField(app, schema.name, field2.fieldId, undefined, version))
                 .returns(() => Observable.of(new Versioned<any>(newVersion, {})));
 
             schemasState.showField(schema, field2, modified).subscribe();
@@ -401,7 +405,7 @@ describe('SchemasState', () => {
         });
 
         it('should unmark field disabled and update user info when field enabled', () => {
-            schemasService.setup(x => x.enableField(app, schema.name, field2.fieldId, version))
+            schemasService.setup(x => x.enableField(app, schema.name, field2.fieldId, undefined, version))
                 .returns(() => Observable.of(new Versioned<any>(newVersion, {})));
 
             schemasState.enableField(schema, field2, modified).subscribe();

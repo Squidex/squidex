@@ -89,17 +89,17 @@ describe('ContentsService', () => {
 
         expect(contents).toEqual(
             new ContentsDto(10, [
-                new ContentDto('id1', 'Published', 'Created1', 'LastModifiedBy1',
-                    DateTime.parseISO_UTC('2016-12-12T10:10'),
-                    DateTime.parseISO_UTC('2017-12-12T10:10'),
+                new ContentDto('id1', 'Published',
+                    DateTime.parseISO_UTC('2016-12-12T10:10'), 'Created1',
+                    DateTime.parseISO_UTC('2017-12-12T10:10'), 'LastModifiedBy1',
                     new ScheduleDto('Draft', 'Scheduler1', DateTime.parseISO_UTC('2018-12-12T10:10')),
                     true,
                     {},
                     {},
                     new Version('11')),
-                new ContentDto('id2', 'Published', 'Created2', 'LastModifiedBy2',
-                    DateTime.parseISO_UTC('2016-10-12T10:10'),
-                    DateTime.parseISO_UTC('2017-10-12T10:10'),
+                new ContentDto('id2', 'Published',
+                    DateTime.parseISO_UTC('2016-10-12T10:10'), 'Created2',
+                    DateTime.parseISO_UTC('2017-10-12T10:10'), 'LastModifiedBy2',
                     null,
                     false,
                     {},
@@ -183,9 +183,9 @@ describe('ContentsService', () => {
         });
 
         expect(content).toEqual(
-            new ContentDto('id1', 'Published', 'Created1', 'LastModifiedBy1',
-                DateTime.parseISO_UTC('2016-12-12T10:10'),
-                DateTime.parseISO_UTC('2017-12-12T10:10'),
+            new ContentDto('id1', 'Published',
+                DateTime.parseISO_UTC('2016-12-12T10:10'), 'Created1',
+                DateTime.parseISO_UTC('2017-12-12T10:10'), 'LastModifiedBy1',
                 new ScheduleDto('Draft', 'Scheduler1', DateTime.parseISO_UTC('2018-12-12T10:10')),
                 true,
                 {},
@@ -224,9 +224,9 @@ describe('ContentsService', () => {
         });
 
         expect(content).toEqual(
-            new ContentDto('id1', 'Published', 'Created1', 'LastModifiedBy1',
-                DateTime.parseISO_UTC('2016-12-12T10:10'),
-                DateTime.parseISO_UTC('2017-12-12T10:10'),
+            new ContentDto('id1', 'Published',
+                DateTime.parseISO_UTC('2016-12-12T10:10'), 'Created1',
+                DateTime.parseISO_UTC('2017-12-12T10:10'), 'LastModifiedBy1',
                 null,
                 true,
                 null,

@@ -15,10 +15,11 @@ import {
     AnalyticsService,
     ApiUrlConfig,
     DateTime,
-    HTTP
+    HTTP,
+    Model
 } from '@app/framework';
 
-export class AppDto {
+export class AppDto extends Model {
     constructor(
         public readonly id: string,
         public readonly name: string,
@@ -28,6 +29,11 @@ export class AppDto {
         public readonly planName: string,
         public readonly planUpgrade: string
     ) {
+        super();
+    }
+
+    public with(value: Partial<AppDto>): AppDto {
+        return this.clone(value);
     }
 }
 

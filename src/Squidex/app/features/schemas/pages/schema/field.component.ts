@@ -9,15 +9,17 @@ import { Component, Input, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 
 import {
+    AnyFieldDto,
     AppPatternDto,
     createProperties,
     EditFieldForm,
     fadeAnimation,
-    FieldDto,
     ImmutableArray,
     ModalView,
+    RootFieldDto,
     SchemaDetailsDto,
     SchemasState,
+    Types,
     UpdateFieldDto
 } from '@app/shared';
 
@@ -31,7 +33,7 @@ import {
 })
 export class FieldComponent implements OnInit {
     @Input()
-    public field: FieldDto;
+    public field: AnyFieldDto;
 
     @Input()
     public schema: SchemaDetailsDto;
@@ -56,7 +58,7 @@ export class FieldComponent implements OnInit {
         this.editForm = new EditFieldForm(this.formBuilder);
         this.editForm.load(this.field.properties);
 
-        if (this.field.isLocked) {
+        if (Types.is(this.field, RootFieldDto) && this.field.isLocked) {
             this.editForm.form.disable();
         }
     }
@@ -95,7 +97,9 @@ export class FieldComponent implements OnInit {
     }
 
     public lockField() {
-        this.schemasState.lockField(this.schema, this.field).onErrorResumeNext().subscribe();
+        if (Types.is(this.field, RootFieldDto)) {
+            this.schemasState.lockField(this.schema, this.field).onErrorResumeNext().subscribe();
+        }
     }
 
     public save() {

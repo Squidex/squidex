@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
             Validate.It(() => "Cannot add a new field.", error =>
             {
-                if (!command.Partitioning.IsValidPartitioning())
+                if (command.ParentFieldId == null && !command.Partitioning.IsValidPartitioning())
                 {
                     error(new ValidationError("Partitioning is not valid.", nameof(command.Partitioning)));
                 }

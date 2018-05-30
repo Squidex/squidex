@@ -10,9 +10,9 @@ import { AbstractControl, FormGroup } from '@angular/forms';
 
 import {
     AppLanguageDto,
-    FieldDto,
     fieldInvariant,
-    ImmutableArray
+    ImmutableArray,
+    RootFieldDto
 } from '@app/shared';
 
 @Component({
@@ -22,7 +22,7 @@ import {
 })
 export class ContentFieldComponent implements OnChanges {
     @Input()
-    public field: FieldDto;
+    public field: RootFieldDto;
 
     @Input()
     public fieldForm: FormGroup;
