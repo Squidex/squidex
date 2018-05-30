@@ -45,11 +45,11 @@ describe('SchemasState', () => {
         new SchemaDto('id2', 'name2', 'category2', {}, true , creation, creator, creation, creator, version)
     ];
 
+    const nested1 = new NestedFieldDto(3, '3', createProperties('Number'), 2);
+    const nested2 = new NestedFieldDto(4, '4', createProperties('String'), 2, true, true);
+
     const field1 = new RootFieldDto(1, '1', createProperties('String'), 'invariant');
-    const field2 = new RootFieldDto(2, '2', createProperties('Array'), 'invariant', false, false, false, [
-                        new NestedFieldDto(3, '3', createProperties('Number'), 2),
-                        new NestedFieldDto(4, '4', createProperties('String'), 2)
-                    ]);
+    const field2 = new RootFieldDto(2, '2', createProperties('Array'), 'invariant', true, true, true, [nested1, nested2]);
 
     const schema =
         new SchemaDetailsDto('id2', 'name2', 'category2', {}, true,
@@ -230,7 +230,6 @@ describe('SchemasState', () => {
             expectToBeModified(schema_1);
         });
 
-
         it('should change category and update user info when category of selected schema changed', () => {
             const category = 'my-new-category';
 
@@ -318,6 +317,22 @@ describe('SchemasState', () => {
             expectToBeModified(schema_1);
         });
 
+        it('should add field and update user info when nested field added', () => {
+            const request = new AddFieldDto(field1.name, field1.partitioning, field1.properties);
+
+            const newField = new NestedFieldDto(3, '3', createProperties('String'), 2);
+
+            schemasService.setup(x => x.postField(app, schema.name, It.isAny(), 2, version))
+                .returns(() => Observable.of(new Versioned<NestedFieldDto>(newVersion, newField)));
+
+            schemasState.addField(schema, request, field2, modified).subscribe();
+
+            const schema_1 = <SchemaDetailsDto>schemasState.snapshot.schemas.at(1);
+
+            expect(schema_1.fields[1].nested).toEqual([nested1, nested2, newField]);
+            expectToBeModified(schema_1);
+        });
+
         it('should remove field and update user info when field removed', () => {
             schemasService.setup(x => x.deleteField(app, schema.name, field1.fieldId, undefined, version))
                 .returns(() => Observable.of(new Versioned<any>(newVersion, {})));
@@ -330,6 +345,18 @@ describe('SchemasState', () => {
             expectToBeModified(schema_1);
         });
 
+        it('should remove field and update user info when nested field removed', () => {
+            schemasService.setup(x => x.deleteField(app, schema.name, nested1.fieldId, 2, version))
+                .returns(() => Observable.of(new Versioned<any>(newVersion, {})));
+
+            schemasState.deleteField(schema, nested1, modified).subscribe();
+
+            const schema_1 = <SchemaDetailsDto>schemasState.snapshot.schemas.at(1);
+
+            expect(schema_1.fields[1].nested).toEqual([nested2]);
+            expectToBeModified(schema_1);
+        });
+
         it('should sort fields and update user info when fields sorted', () => {
             schemasService.setup(x => x.putFieldOrdering(app, schema.name, [field2.fieldId, field1.fieldId], undefined, version))
                 .returns(() => Observable.of(new Versioned<any>(newVersion, {})));
@@ -339,6 +366,18 @@ describe('SchemasState', () => {
             const schema_1 = <SchemaDetailsDto>schemasState.snapshot.schemas.at(1);
 
             expect(schema_1.fields).toEqual([field2, field1]);
+            expectToBeModified(schema_1);
+        });
+
+        it('should sort fields and update user info when nested fields sorted', () => {
+            schemasService.setup(x => x.putFieldOrdering(app, schema.name, [nested2.fieldId, nested1.fieldId], 2, version))
+                .returns(() => Observable.of(new Versioned<any>(newVersion, {})));
+
+            schemasState.sortFields(schema, [nested2, nested1], field2, modified).subscribe();
+
+            const schema_1 = <SchemaDetailsDto>schemasState.snapshot.schemas.at(1);
+
+            expect(schema_1.fields[1].nested).toEqual([nested2, nested1]);
             expectToBeModified(schema_1);
         });
 
@@ -356,15 +395,41 @@ describe('SchemasState', () => {
             expectToBeModified(schema_1);
         });
 
+        it('should update field properties and update user info when nested field updated', () => {
+            const request = new UpdateFieldDto(createProperties('String'));
+
+            schemasService.setup(x => x.putField(app, schema.name, nested1.fieldId, request, 2, version))
+                .returns(() => Observable.of(new Versioned<any>(newVersion, {})));
+
+            schemasState.updateField(schema, nested1, request, modified).subscribe();
+
+            const schema_1 = <SchemaDetailsDto>schemasState.snapshot.schemas.at(1);
+
+            expect(schema_1.fields[1].nested[0].properties).toBe(request.properties);
+            expectToBeModified(schema_1);
+        });
+
         it('should mark field hidden and update user info when field hidden', () => {
             schemasService.setup(x => x.hideField(app, schema.name, field1.fieldId, undefined, version))
                 .returns(() => Observable.of(new Versioned<any>(newVersion, {})));
 
-            schemasState.hideField(schema, field1, undefined, modified).subscribe();
+            schemasState.hideField(schema, field1, modified).subscribe();
 
             const schema_1 = <SchemaDetailsDto>schemasState.snapshot.schemas.at(1);
 
             expect(schema_1.fields[0].isHidden).toBeTruthy();
+            expectToBeModified(schema_1);
+        });
+
+        it('should mark field hidden and update user info when nested field hidden', () => {
+            schemasService.setup(x => x.hideField(app, schema.name, nested1.fieldId, 2, version))
+                .returns(() => Observable.of(new Versioned<any>(newVersion, {})));
+
+            schemasState.hideField(schema, nested1, modified).subscribe();
+
+            const schema_1 = <SchemaDetailsDto>schemasState.snapshot.schemas.at(1);
+
+            expect(schema_1.fields[1].nested[0].isHidden).toBeTruthy();
             expectToBeModified(schema_1);
         });
 
@@ -377,6 +442,18 @@ describe('SchemasState', () => {
             const schema_1 = <SchemaDetailsDto>schemasState.snapshot.schemas.at(1);
 
             expect(schema_1.fields[0].isDisabled).toBeTruthy();
+            expectToBeModified(schema_1);
+        });
+
+        it('should mark field disabled and update user info when nested disabled', () => {
+            schemasService.setup(x => x.disableField(app, schema.name, nested1.fieldId, 2, version))
+                .returns(() => Observable.of(new Versioned<any>(newVersion, {})));
+
+            schemasState.disableField(schema, nested1, modified).subscribe();
+
+            const schema_1 = <SchemaDetailsDto>schemasState.snapshot.schemas.at(1);
+
+            expect(schema_1.fields[1].nested[0].isDisabled).toBeTruthy();
             expectToBeModified(schema_1);
         });
 
@@ -404,6 +481,18 @@ describe('SchemasState', () => {
             expectToBeModified(schema_1);
         });
 
+        it('should unmark field hidden and update user info when nested field shown', () => {
+            schemasService.setup(x => x.showField(app, schema.name, nested2.fieldId, 2, version))
+                .returns(() => Observable.of(new Versioned<any>(newVersion, {})));
+
+            schemasState.showField(schema, nested2, modified).subscribe();
+
+            const schema_1 = <SchemaDetailsDto>schemasState.snapshot.schemas.at(1);
+
+            expect(schema_1.fields[1].nested[1].isHidden).toBeFalsy();
+            expectToBeModified(schema_1);
+        });
+
         it('should unmark field disabled and update user info when field enabled', () => {
             schemasService.setup(x => x.enableField(app, schema.name, field2.fieldId, undefined, version))
                 .returns(() => Observable.of(new Versioned<any>(newVersion, {})));
@@ -413,6 +502,18 @@ describe('SchemasState', () => {
             const schema_1 = <SchemaDetailsDto>schemasState.snapshot.schemas.at(1);
 
             expect(schema_1.fields[1].isDisabled).toBeFalsy();
+            expectToBeModified(schema_1);
+        });
+
+        it('should unmark field disabled and update user info when nested field enabled', () => {
+            schemasService.setup(x => x.enableField(app, schema.name, nested2.fieldId, 2, version))
+                .returns(() => Observable.of(new Versioned<any>(newVersion, {})));
+
+            schemasState.enableField(schema, nested2, modified).subscribe();
+
+            const schema_1 = <SchemaDetailsDto>schemasState.snapshot.schemas.at(1);
+
+            expect(schema_1.fields[1].nested[1].isDisabled).toBeFalsy();
             expectToBeModified(schema_1);
         });
     });

@@ -380,7 +380,7 @@ export class SchemasState extends State<Snapshot> {
             .notify(this.dialogs);
     }
 
-    public hideField(schema: SchemaDetailsDto, field: AnyFieldDto, parent?: RootFieldDto, now?: DateTime): Observable<any> {
+    public hideField(schema: SchemaDetailsDto, field: AnyFieldDto, now?: DateTime): Observable<any> {
         return this.schemasService.hideField(this.appName, schema.name, field.fieldId, pidof(field), schema.version)
             .do(dto => {
                 this.replaceField(schema, setHidden(field, true), dto.version, now);
