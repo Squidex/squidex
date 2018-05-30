@@ -14,7 +14,7 @@ namespace Squidex.Domain.Apps.Events.Schemas
     [EventType(nameof(SchemaFieldsReordered))]
     public sealed class SchemaFieldsReordered : SchemaEvent
     {
-        public NamedId<long> ParentFieldIdId { get; set; }
+        public NamedId<long> ParentFieldId { get; set; }
 
         public List<long> FieldIds { get; set; }
     }

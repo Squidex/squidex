@@ -34,8 +34,8 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         private readonly IUserResolver userResolver = A.Fake<IUserResolver>();
         private readonly IUser user = A.Fake<IUser>();
         private readonly IRuleUrlGenerator urlGenerator = A.Fake<IRuleUrlGenerator>();
-        private readonly NamedId<Guid> appId = new NamedId<Guid>(Guid.NewGuid(), "my-app");
-        private readonly NamedId<Guid> schemaId = new NamedId<Guid>(Guid.NewGuid(), "my-schema");
+        private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
+        private readonly NamedId<Guid> schemaId = NamedId.Of(Guid.NewGuid(), "my-schema");
         private readonly Guid contentId = Guid.NewGuid();
         private readonly RuleEventFormatter sut;
 

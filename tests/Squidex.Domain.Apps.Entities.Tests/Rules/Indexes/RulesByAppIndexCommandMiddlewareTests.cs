@@ -38,7 +38,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
         public async Task Should_add_rule_to_index_on_create()
         {
             var context =
-                new CommandContext(new CreateRule { RuleId = appId, AppId = new NamedId<Guid>(appId, "my-app") }, commandBus)
+                new CommandContext(new CreateRule { RuleId = appId, AppId = NamedId.Of(appId, "my-app") }, commandBus)
                     .Complete();
 
             await sut.HandleAsync(context);
@@ -60,7 +60,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
                 .Returns(J.AsTask(ruleState));
 
             A.CallTo(() => ruleState.AppId)
-                .Returns(new NamedId<Guid>(appId, "my-app"));
+                .Returns(NamedId.Of(appId, "my-app"));
 
             var context =
                 new CommandContext(new DeleteRule { RuleId = appId }, commandBus)

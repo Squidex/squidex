@@ -41,8 +41,10 @@ namespace Squidex.Infrastructure
             {
                 return new ValidationError(Message, propertyNames.Select(x => $"{prefix}.{x}").ToArray());
             }
-
-            return this;
+            else
+            {
+                return new ValidationError(Message, prefix);
+            }
         }
     }
 }

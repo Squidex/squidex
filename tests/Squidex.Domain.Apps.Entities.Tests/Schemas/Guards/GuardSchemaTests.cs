@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
     {
         private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
         private readonly Schema schema_0;
-        private readonly NamedId<Guid> appId = new NamedId<Guid>(Guid.NewGuid(), "my-app");
+        private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
 
         public GuardSchemaTests()
         {
@@ -80,14 +80,14 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                         Name = null,
                         Properties = new ArrayFieldProperties(),
                         Partitioning = "invalid",
-                        Nested = new List<CreateNestedSchemaField>
+                        Nested = new List<CreateSchemaNestedField>
                         {
-                            new CreateNestedSchemaField
+                            new CreateSchemaNestedField
                             {
                                 Name = null,
                                 Properties = InvalidProperties()
                             },
-                            new CreateNestedSchemaField
+                            new CreateSchemaNestedField
                             {
                                 Name = null,
                                 Properties = InvalidProperties()
@@ -99,14 +99,14 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                         Name = null,
                         Properties = InvalidProperties(),
                         Partitioning = "invalid",
-                        Nested = new List<CreateNestedSchemaField>
+                        Nested = new List<CreateSchemaNestedField>
                         {
-                            new CreateNestedSchemaField
+                            new CreateSchemaNestedField
                             {
                                 Name = null,
                                 Properties = InvalidProperties()
                             },
-                            new CreateNestedSchemaField
+                            new CreateSchemaNestedField
                             {
                                 Name = null,
                                 Properties = InvalidProperties()
@@ -145,14 +145,14 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                         Name = "field1",
                         Properties = new ArrayFieldProperties(),
                         Partitioning = "invariant",
-                        Nested = new List<CreateNestedSchemaField>
+                        Nested = new List<CreateSchemaNestedField>
                         {
-                            new CreateNestedSchemaField
+                            new CreateSchemaNestedField
                             {
                                 Name = "nested1",
                                 Properties = ValidProperties()
                             },
-                            new CreateNestedSchemaField
+                            new CreateSchemaNestedField
                             {
                                 Name = "nested1",
                                 Properties = ValidProperties()
@@ -191,14 +191,14 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                         Name = "field3",
                         Properties = new ArrayFieldProperties(),
                         Partitioning = "invariant",
-                        Nested = new List<CreateNestedSchemaField>
+                        Nested = new List<CreateSchemaNestedField>
                         {
-                            new CreateNestedSchemaField
+                            new CreateSchemaNestedField
                             {
                                 Name = "nested1",
                                 Properties = ValidProperties()
                             },
-                            new CreateNestedSchemaField
+                            new CreateSchemaNestedField
                             {
                                 Name = "nested2",
                                 Properties = ValidProperties()

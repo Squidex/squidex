@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Squidex.Areas.Api.Controllers.Schemas.Models
@@ -49,5 +50,10 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// </summary>
         [Required]
         public FieldPropertiesDto Properties { get; set; }
+
+        /// <summary>
+        /// The nested fields.
+        /// </summary>
+        public List<NestedFieldDto> Nested { get; set; }
     }
 }

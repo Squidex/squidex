@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
         private readonly IRuleEventRepository ruleEventRepository = A.Fake<IRuleEventRepository>();
         private readonly RuleService ruleService = A.Fake<RuleService>();
         private readonly Instant now = SystemClock.Instance.GetCurrentInstant();
-        private readonly NamedId<Guid> appId = new NamedId<Guid>(Guid.NewGuid(), "my-app");
+        private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
         private readonly RuleEnqueuer sut;
 
         public RuleEnqueuerTests()

@@ -6,21 +6,32 @@
 // ==========================================================================
 
 using System.ComponentModel.DataAnnotations;
-using Squidex.Domain.Apps.Entities.Schemas.Commands;
 
 namespace Squidex.Areas.Api.Controllers.Schemas.Models
 {
-    public sealed class UpdateFieldDto
+    public sealed class CreateSchemaNestedFieldDto
     {
+        /// <summary>
+        /// The name of the field. Must be unique within the schema.
+        /// </summary>
+        [Required]
+        [RegularExpression("^[a-zA-Z0-9]+(\\-[a-zA-Z0-9]+)*$")]
+        public string Name { get; set; }
+
+        /// <summary>
+        /// Defines if the field is hidden.
+        /// </summary>
+        public bool IsHidden { get; set; }
+
+        /// <summary>
+        /// Defines if the field is disabled.
+        /// </summary>
+        public bool IsDisabled { get; set; }
+
         /// <summary>
         /// The field properties.
         /// </summary>
         [Required]
         public FieldPropertiesDto Properties { get; set; }
-
-        public UpdateField ToCommand(long id, long? parentId = null)
-        {
-            return new UpdateField { ParentFieldId = parentId, FieldId = id, Properties = Properties?.ToProperties() };
-        }
     }
 }

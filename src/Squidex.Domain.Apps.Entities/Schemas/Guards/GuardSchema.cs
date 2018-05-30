@@ -5,6 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core;
@@ -20,7 +22,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            return Validate.It(() => "Cannot create schema.", (System.Func<System.Action<ValidationError>, Task>)(async (System.Action<ValidationError> error) =>
+            return Validate.It(() => "Cannot create schema.", async error =>
             {
                 if (!command.Name.IsSlug())
                 {
@@ -115,16 +117,27 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                         error(new ValidationError("Fields cannot have duplicate names.", nameof(command.Fields)));
                     }
                 }
-            }));
+            });
         }
 
         public static void CanReorder(Schema schema, ReorderFields command)
         {
             Guard.NotNull(command, nameof(command));
 
-            if (command.ParentFieldId.HasValue && !schema.FieldsById.ContainsKey(command.ParentFieldId.Value))
+            IArrayField arrayField = null;
+
+            if (command.ParentFieldId.HasValue)
             {
-                throw new DomainObjectNotFoundException(command.ParentFieldId.ToString(), "Fields", typeof(Schema));
+                var parentId = command.ParentFieldId.Value;
+
+                if (schema.FieldsById.TryGetValue(parentId, out var field) && field is IArrayField a)
+                {
+                    arrayField = a;
+                }
+                else
+                {
+                    throw new DomainObjectNotFoundException(parentId.ToString(), "Fields", typeof(Schema));
+                }
             }
 
             Validate.It(() => "Cannot reorder schema fields.", error =>
@@ -134,11 +147,23 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                     error(new ValidationError("Field ids is required.", nameof(command.FieldIds)));
                 }
 
-                if (command.FieldIds != null && (command.FieldIds.Count != schema.Fields.Count || command.FieldIds.Any(x => !schema.FieldsById.ContainsKey(x))))
+                if (arrayField == null)
                 {
-                    error(new ValidationError("Ids must cover all fields.", nameof(command.FieldIds)));
+                    CheckFields(error, command, schema.FieldsById);
+                }
+                else
+                {
+                    CheckFields(error, command, arrayField.FieldsById);
                 }
             });
+        }
+
+        private static void CheckFields<T>(Action<ValidationError> error, ReorderFields c, IReadOnlyDictionary<long, T> fields)
+        {
+            if (c.FieldIds != null && (c.FieldIds.Count != fields.Count || c.FieldIds.Any(x => !fields.ContainsKey(x))))
+            {
+                error(new ValidationError("Ids must cover all fields.", nameof(c.FieldIds)));
+            }
         }
 
         public static void CanPublish(Schema schema, PublishSchema command)

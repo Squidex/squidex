@@ -27,7 +27,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
         {
             if (context.IsCompleted && context.Command is CreateApp createApp && IsRightTemplate(createApp))
             {
-                var appId = new NamedId<Guid>(createApp.AppId, createApp.Name);
+                var appId = NamedId.Of(createApp.AppId, createApp.Name);
 
                 var publish = new Func<ICommand, Task>(command =>
                 {
@@ -233,7 +233,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
 
             await publish(command);
 
-            return new NamedId<Guid>(command.SchemaId, command.Name);
+            return NamedId.Of(command.SchemaId, command.Name);
         }
 
         private async Task<NamedId<Guid>> CreateProjectsSchemaAsync(Func<ICommand, Task> publish)
@@ -324,7 +324,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
 
             await publish(command);
 
-            return new NamedId<Guid>(command.SchemaId, command.Name);
+            return NamedId.Of(command.SchemaId, command.Name);
         }
 
         private async Task<NamedId<Guid>> CreateExperienceSchemaAsync(Func<ICommand, Task> publish)
@@ -404,7 +404,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
 
             await publish(command);
 
-            return new NamedId<Guid>(command.SchemaId, command.Name);
+            return NamedId.Of(command.SchemaId, command.Name);
         }
 
         private async Task<NamedId<Guid>> CreateEducationSchemaAsync(Func<ICommand, Task> publish)
@@ -484,7 +484,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
 
             await publish(command);
 
-            return new NamedId<Guid>(command.SchemaId, command.Name);
+            return NamedId.Of(command.SchemaId, command.Name);
         }
 
         private async Task<NamedId<Guid>> CreatePublicationsSchemaAsync(Func<ICommand, Task> publish)
@@ -552,7 +552,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
 
             await publish(command);
 
-            return new NamedId<Guid>(command.SchemaId, command.Name);
+            return NamedId.Of(command.SchemaId, command.Name);
         }
 
         private async Task<NamedId<Guid>> CreateSkillsSchemaAsync(Func<ICommand, Task> publish)
@@ -597,7 +597,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
 
             await publish(command);
 
-            return new NamedId<Guid>(command.SchemaId, command.Name);
+            return NamedId.Of(command.SchemaId, command.Name);
         }
     }
 }

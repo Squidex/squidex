@@ -178,7 +178,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.State
 
         protected void On(SchemaFieldsReordered @event, FieldRegistry registry)
         {
-            SchemaDef = SchemaDef.ReorderFields(@event.FieldIds, @event.ParentFieldIdId?.Id);
+            SchemaDef = SchemaDef.ReorderFields(@event.FieldIds, @event.ParentFieldId?.Id);
         }
 
         protected void On(FieldUpdated @event, FieldRegistry registry)

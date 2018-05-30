@@ -6,7 +6,7 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.Schemas;
-using FieldNested = System.Collections.Generic.List<Squidex.Domain.Apps.Entities.Schemas.Commands.CreateNestedSchemaField>;
+using FieldNested = System.Collections.Generic.List<Squidex.Domain.Apps.Entities.Schemas.Commands.CreateSchemaNestedField>;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.Commands
 {

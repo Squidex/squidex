@@ -31,9 +31,9 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         [Required]
         public FieldPropertiesDto Properties { get; set; }
 
-        public AddField ToCommand()
+        public AddField ToCommand(long? parentId = null)
         {
-            return SimpleMapper.Map(this, new AddField { Properties = Properties.ToProperties() });
+            return SimpleMapper.Map(this, new AddField { ParentFieldId = parentId, Properties = Properties.ToProperties() });
         }
     }
 }

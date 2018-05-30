@@ -62,6 +62,7 @@ namespace Squidex.Domain.Apps.Core
                     .AddDateTime(203, "nested-datetime")
                     .AddGeolocation(204, "nested-geolocation")
                     .AddJson(205, "nested-json")
+                    .AddJson(211, "nested-json2")
                     .AddNumber(206, "nested-number")
                     .AddReferences(207, "nested-references")
                     .AddString(208, "nested-string")
@@ -89,9 +90,11 @@ namespace Squidex.Domain.Apps.Core
                 .AddTags(112, "root-tags", Partitioning.Language,
                     new TagsFieldProperties())
                 .Update(new SchemaProperties { Hints = "The User" })
-                .UpdateField(104, f => f.Hide())
-                .UpdateField(108, f => f.Lock())
-                .UpdateField(109, f => f.Disable());
+                .HideField(104)
+                .HideField(211, 101)
+                .DisableField(109)
+                .DisableField(212, 101)
+                .LockField(105);
 
             return schema;
         }

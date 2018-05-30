@@ -27,8 +27,8 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules.Triggers
     public class ContentChangedTriggerTests
     {
         private readonly IRuleTriggerHandler sut = new ContentChangedTriggerHandler();
-        private static readonly NamedId<Guid> SchemaMatch = new NamedId<Guid>(Guid.NewGuid(), "my-schema1");
-        private static readonly NamedId<Guid> SchemaNonMatch = new NamedId<Guid>(Guid.NewGuid(), "my-schema2");
+        private static readonly NamedId<Guid> SchemaMatch = NamedId.Of(Guid.NewGuid(), "my-schema1");
+        private static readonly NamedId<Guid> SchemaNonMatch = NamedId.Of(Guid.NewGuid(), "my-schema2");
 
         public static IEnumerable<object[]> TestData = new[]
         {
