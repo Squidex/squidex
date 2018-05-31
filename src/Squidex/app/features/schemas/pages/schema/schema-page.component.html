@@ -59,17 +59,15 @@
             </button>
         </div>
 
-        <div dnd-sortable-container [sortableData]="schema.fields">
-            <div class="schemas">
-                <div *ngFor="let field of schema.fields; let i = index;" dnd-sortable [sortableIndex]="i" (sqxSorted)="sortFields($event)">
-                    <sqx-field [field]="field" [schema]="schema" [patterns]="patternsState.patterns | async"></sqx-field>
-                </div>
+        <ng-container *ngIf="patternsState.patterns | async; let patterns">
+            <div class="schemas" [sqxSortModel]="schema.fields" (sqxSorted)="sortFields($event)" handleClass="root">
+                <sqx-field *ngFor="let field of schema.fields" [field]="field" [schema]="schema" [patterns]="patterns" handleClass="root"></sqx-field>
             </div>
     
             <button class="btn btn-success field-button" (click)="addFieldDialog.show()">
                 <i class="icon icon-plus field-button-icon"></i> <div class="field-button-text">Add Field</div>
             </button>
-        </div>
+        </ng-container>
     </ng-container>
 
     <ng-container sidebar>

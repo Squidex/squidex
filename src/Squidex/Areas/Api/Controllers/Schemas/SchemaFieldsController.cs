@@ -122,7 +122,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// 404 => Schema, field or app not found.
         /// </returns>
         [HttpPut]
-        [Route("apps/{app}/schemas/{name}/fields/{parentId:long}/ordering/")]
+        [Route("apps/{app}/schemas/{name}/fields/{parentId:long}/nested/ordering/")]
         [ProducesResponseType(typeof(ErrorDto), 400)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutNestedFieldOrdering(string app, string name, long parentId, [FromBody] ReorderFieldsDto request)

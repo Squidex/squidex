@@ -12,8 +12,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule } from '@angular/router';
-import { DragulaModule } from 'ng2-dragula';
-
+import { DndModule } from 'ng2-dnd';
 
 import { AppComponent } from './app.component';
 
