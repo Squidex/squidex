@@ -69,7 +69,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// 201 => Schema field created.
         /// 400 => Schema field properties not valid.
         /// 409 => Schema field name already in use.
-        /// 404 => Field, schema or app not found.
+        /// 404 => Schema, field or app not found.
         /// </returns>
         [HttpPost]
         [Route("apps/{app}/schemas/{name}/fields/{parentId:long}/nested/")]
@@ -119,7 +119,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// <returns>
         /// 204 => Schema fields reorderd.
         /// 400 => Schema field ids do not cover the fields of the schema.
-        /// 404 => Field, schema or app not found.
+        /// 404 => Schema, field or app not found.
         /// </returns>
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/fields/{parentId:long}/ordering/")]
@@ -142,7 +142,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// <returns>
         /// 204 => Schema field updated.
         /// 400 => Schema field properties not valid or field is locked.
-        /// 404 => Field, schema or app not found.
+        /// 404 => Schema, field or app not found.
         /// </returns>
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/fields/{id:long}/")]
@@ -167,7 +167,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// <returns>
         /// 204 => Schema field updated.
         /// 400 => Schema field properties not valid or field is locked.
-        /// 404 => Field, schema or app not found.
+        /// 404 => Schema, field or app not found.
         /// </returns>
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/fields/{parentId:long}/nested/{id:long}/")]
@@ -190,10 +190,10 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// <returns>
         /// 204 => Schema field shown.
         /// 400 => Schema field already locked.
-        /// 404 => Field, schema or app not found.
+        /// 404 => Schema, field or app not found.
         /// </returns>
         /// <remarks>
-        /// A hidden field is not part of the API response, but can still be edited in the portal.
+        /// A locked field cannot be updated or deleted.
         /// </remarks>
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/fields/{id:long}/lock/")]
@@ -207,6 +207,32 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         }
 
         /// <summary>
+        /// Lock a nested schema field.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <param name="name">The name of the schema.</param>
+        /// <param name="parentId">The parent field id.</param>
+        /// <param name="id">The id of the field to lock.</param>
+        /// <returns>
+        /// 204 => Schema field hidden.
+        /// 400 => Schema field already hidden.
+        /// 404 => Field, schema, or app not found.
+        /// </returns>
+        /// <remarks>
+        /// A locked field cannot be edited or deleted.
+        /// </remarks>
+        [HttpPut]
+        [Route("apps/{app}/schemas/{name}/fields/{parentId:long}/nested/{id:long}/lock/")]
+        [ProducesResponseType(typeof(ErrorDto), 400)]
+        [ApiCosts(1)]
+        public async Task<IActionResult> LockNestedField(string app, string name, long parentId, long id)
+        {
+            await CommandBus.PublishAsync(new LockField { ParentFieldId = parentId, FieldId = id });
+
+            return NoContent();
+        }
+
+        /// <summary>
         /// Hide a schema field.
         /// </summary>
         /// <param name="app">The name of the app.</param>
@@ -215,10 +241,10 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// <returns>
         /// 204 => Schema field hidden.
         /// 400 => Schema field already hidden.
-        /// 404 => Field, schema or app not found.
+        /// 404 => Schema, field or app not found.
         /// </returns>
         /// <remarks>
-        /// A locked field cannot be edited or deleted.
+        /// A hidden field is not part of the API response, but can still be edited in the portal.
         /// </remarks>
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/fields/{id:long}/hide/")]
@@ -244,7 +270,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// 404 => Field, schema, or app not found.
         /// </returns>
         /// <remarks>
-        /// A locked field cannot be edited or deleted.
+        /// A hidden field is not part of the API response, but can still be edited in the portal.
         /// </remarks>
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/fields/{parentId:long}/nested/{id:long}/hide/")]
@@ -266,7 +292,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// <returns>
         /// 204 => Schema field shown.
         /// 400 => Schema field already visible.
-        /// 404 => Field, schema or app not found.
+        /// 404 => Schema, field or app not found.
         /// </returns>
         /// <remarks>
         /// A hidden field is not part of the API response, but can still be edited in the portal.
@@ -292,7 +318,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// <returns>
         /// 204 => Schema field shown.
         /// 400 => Schema field already visible.
-        /// 404 => Field, schema or app not found.
+        /// 404 => Schema, field or app not found.
         /// </returns>
         /// <remarks>
         /// A hidden field is not part of the API response, but can still be edited in the portal.
@@ -317,11 +343,10 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// <returns>
         /// 204 => Schema field enabled.
         /// 400 => Schema field already enabled.
-        /// 404 => Field, schema or app not found.
+        /// 404 => Schema, field or app not found.
         /// </returns>
         /// <remarks>
-        /// A disabled field cannot not be edited in the squidex portal anymore,
-        /// but will be part of the API response.
+        /// A disabled field cannot not be edited in the squidex portal anymore, but will be part of the API response.
         /// </remarks>
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/fields/{id:long}/enable/")]
@@ -344,11 +369,10 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// <returns>
         /// 204 => Schema field enabled.
         /// 400 => Schema field already enabled.
-        /// 404 => Field, schema or app not found.
+        /// 404 => Schema, field or app not found.
         /// </returns>
         /// <remarks>
-        /// A disabled field cannot not be edited in the squidex portal anymore,
-        /// but will be part of the API response.
+        /// A disabled field cannot not be edited in the squidex portal anymore, but will be part of the API response.
         /// </remarks>
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/fields/{parentId:long}/nested/{id:long}/enable/")]
@@ -370,11 +394,10 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// <returns>
         /// 204 => Schema field disabled.
         /// 400 => Schema field already disabled.
-        /// 404 => Field, schema or app not found.
+        /// 404 => Schema, field or app not found.
         /// </returns>
         /// <remarks>
-        /// A disabled field cannot not be edited in the squidex portal anymore,
-        /// but will be part of the API response.
+        /// A disabled field cannot not be edited in the squidex portal anymore, but will be part of the API response.
         /// </remarks>
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/fields/{id:long}/disable/")]
@@ -397,11 +420,10 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// <returns>
         /// 204 => Schema field disabled.
         /// 400 => Schema field already disabled.
-        /// 404 => Field, schema or app not found.
+        /// 404 => Schema, field or app not found.
         /// </returns>
         /// <remarks>
-        /// A disabled field cannot not be edited in the squidex portal anymore,
-        /// but will be part of the API response.
+        /// A disabled field cannot not be edited in the squidex portal anymore, but will be part of the API response.
         /// </remarks>
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/fields/{parentId:long}/nested/{id:long}/disable/")]
@@ -423,7 +445,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// <returns>
         /// 204 => Schema field deleted.
         /// 400 => Field is locked.
-        /// 404 => Field, schema or app not found.
+        /// 404 => Schema, field or app not found.
         /// </returns>
         [HttpDelete]
         [Route("apps/{app}/schemas/{name}/fields/{id:long}/")]
@@ -445,7 +467,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// <returns>
         /// 204 => Schema field deleted.
         /// 400 => Field is locked.
-        /// 404 => Field, schema or app not found.
+        /// 404 => Schema, field or app not found.
         /// </returns>
         [HttpDelete]
         [Route("apps/{app}/schemas/{name}/fields/{parentId:long}/nested/{id:long}/")]

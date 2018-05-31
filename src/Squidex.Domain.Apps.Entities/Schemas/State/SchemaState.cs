@@ -188,7 +188,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.State
 
         protected void On(FieldLocked @event, FieldRegistry registry)
         {
-            SchemaDef = SchemaDef.LockField(@event.FieldId.Id);
+            SchemaDef = SchemaDef.LockField(@event.FieldId.Id, @event.ParentFieldId?.Id);
         }
 
         protected void On(FieldDisabled @event, FieldRegistry registry)

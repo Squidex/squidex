@@ -20,11 +20,6 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
             Validate.It(() => "Cannot add a new field.", error =>
             {
-                if (command.ParentFieldId == null && !command.Partitioning.IsValidPartitioning())
-                {
-                    error(new ValidationError("Partitioning is not valid.", nameof(command.Partitioning)));
-                }
-
                 if (!command.Name.IsPropertyName())
                 {
                     error(new ValidationError("Name must be a valid property name.", nameof(command.Name)));
@@ -44,9 +39,30 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                     }
                 }
 
-                if (schema.FieldsByName.ContainsKey(command.Name))
+                if (command.ParentFieldId.HasValue)
                 {
-                    error(new ValidationError($"There is already a field with name '{command.Name}'", nameof(command.Name)));
+                    var parentId = command.ParentFieldId.Value;
+
+                    if (!schema.FieldsById.TryGetValue(parentId, out var rootField) || !(rootField is IArrayField arrayField))
+                    {
+                        throw new DomainObjectNotFoundException(parentId.ToString(), "Fields", typeof(Schema));
+                    }
+                    if (arrayField.FieldsByName.ContainsKey(command.Name))
+                    {
+                        error(new ValidationError($"There is already a field with name '{command.Name}'", nameof(command.Name)));
+                    }
+                }
+                else
+                {
+                    if (command.ParentFieldId == null && !command.Partitioning.IsValidPartitioning())
+                    {
+                        error(new ValidationError("Partitioning is not valid.", nameof(command.Partitioning)));
+                    }
+
+                    if (schema.FieldsByName.ContainsKey(command.Name))
+                    {
+                        error(new ValidationError($"There is already a field with name '{command.Name}'", nameof(command.Name)));
+                    }
                 }
             });
         }
@@ -80,7 +96,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             });
         }
 
-        public static void CanDelete(Schema schema, DeleteField command)
+        public static void CanHide(Schema schema, HideField command)
         {
             Guard.NotNull(command, nameof(command));
 
@@ -90,29 +106,10 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             {
                 throw new DomainException("Schema field is locked.");
             }
-        }
-
-        public static void CanHide(Schema schema, HideField command)
-        {
-            Guard.NotNull(command, nameof(command));
-
-            var field = GetFieldOrThrow(schema, command.FieldId, command.ParentFieldId);
 
             if (field.IsHidden)
             {
                 throw new DomainException("Schema field is already hidden.");
-            }
-        }
-
-        public static void CanShow(Schema schema, ShowField command)
-        {
-            Guard.NotNull(command, nameof(command));
-
-            var field = GetFieldOrThrow(schema, command.FieldId, command.ParentFieldId);
-
-            if (!field.IsHidden)
-            {
-                throw new DomainException("Schema field is already visible.");
             }
         }
 
@@ -128,8 +125,34 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             }
         }
 
+        public static void CanDelete(Schema schema, DeleteField command)
+        {
+            Guard.NotNull(command, nameof(command));
+
+            var field = GetFieldOrThrow(schema, command.FieldId, command.ParentFieldId);
+
+            if (field.IsLocked)
+            {
+                throw new DomainException("Schema field is locked.");
+            }
+        }
+
+        public static void CanShow(Schema schema, ShowField command)
+        {
+            Guard.NotNull(command, nameof(command));
+
+            var field = GetFieldOrThrow(schema, command.FieldId, command.ParentFieldId);
+
+            if (!field.IsHidden)
+            {
+                throw new DomainException("Schema field is already visible.");
+            }
+        }
+
         public static void CanEnable(Schema schema, EnableField command)
         {
+            Guard.NotNull(command, nameof(command));
+
             var field = GetFieldOrThrow(schema, command.FieldId, command.ParentFieldId);
 
             if (!field.IsDisabled)
@@ -142,7 +165,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            var field = GetFieldOrThrow(schema, command.FieldId, null);
+            var field = GetFieldOrThrow(schema, command.FieldId, command.ParentFieldId);
 
             if (field.IsLocked)
             {
@@ -154,7 +177,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             if (parentId.HasValue)
             {
-                if (!schema.FieldsById.TryGetValue(parentId.Value, out var rootField) || !(rootField is ArrayField arrayField))
+                if (!schema.FieldsById.TryGetValue(parentId.Value, out var rootField) || !(rootField is IArrayField arrayField))
                 {
                     throw new DomainObjectNotFoundException(parentId.ToString(), "Fields", typeof(Schema));
                 }

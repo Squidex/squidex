@@ -11,11 +11,6 @@ namespace Squidex.Domain.Apps.Core.Schemas
 {
     public static class FieldExtensions
     {
-        public static Schema LockField(this Schema schema, long fieldId)
-        {
-            return schema.UpdateField(fieldId, f => f.Lock());
-        }
-
         public static Schema ReorderFields(this Schema schema, List<long> ids, long? parentId = null)
         {
             if (parentId != null)
@@ -50,6 +45,24 @@ namespace Squidex.Domain.Apps.Core.Schemas
             }
 
             return schema.DeleteField(fieldId);
+        }
+
+        public static Schema LockField(this Schema schema, long fieldId, long? parentId = null)
+        {
+            if (parentId != null)
+            {
+                return schema.UpdateField(parentId.Value, f =>
+                {
+                    if (f is ArrayField arrayField)
+                    {
+                        return arrayField.UpdateField(fieldId, n => n.Lock());
+                    }
+
+                    return f;
+                });
+            }
+
+            return schema.UpdateField(fieldId, f => f.Lock());
         }
 
         public static Schema HideField(this Schema schema, long fieldId, long? parentId = null)

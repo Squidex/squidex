@@ -52,6 +52,9 @@ export const fieldTypes = [
     }, {
         type: 'Tags',
         description: 'Special format for tags.'
+    }, {
+        type: 'Array',
+        description: 'List of embedded objects.'
     }
 ];
 
@@ -118,6 +121,8 @@ export class SchemaDto extends Model {
         public readonly version: Version
     ) {
         super();
+
+        this.onCreated();
     }
 
     public onCreated() {
@@ -148,14 +153,16 @@ export class SchemaDetailsDto extends SchemaDto {
     public onCreated() {
         super.onCreated();
 
-        this.listFields = this.fields.filter(x => x.properties.isListField);
+        if (this.fields) {
+            this.listFields = this.fields.filter(x => x.properties.isListField);
 
-        if (this.listFields.length === 0 && this.fields.length > 0) {
-            this.listFields = [this.fields[0]];
-        }
+            if (this.listFields.length === 0 && this.fields.length > 0) {
+                this.listFields = [this.fields[0]];
+            }
 
-        if (this.listFields.length === 0) {
-            this.listFields = [<any>{ properties: {} }];
+            if (this.listFields.length === 0) {
+                this.listFields = [<any>{ properties: {} }];
+            }
         }
     }
 
@@ -171,7 +178,10 @@ export class FieldDto extends Model {
     constructor(
         public readonly fieldId: number,
         public readonly name: string,
-        public readonly properties: FieldPropertiesDto
+        public readonly properties: FieldPropertiesDto,
+        public readonly isLocked: boolean = false,
+        public readonly isHidden: boolean = false,
+        public readonly isDisabled: boolean = false
     ) {
         super();
     }
@@ -203,12 +213,12 @@ export class RootFieldDto extends FieldDto {
 
     constructor(fieldId: number, name: string, properties: FieldPropertiesDto,
         public readonly partitioning: string,
-        public readonly isHidden: boolean = false,
-        public readonly isDisabled: boolean = false,
-        public readonly isLocked: boolean = false,
+        isLocked: boolean = false,
+        isHidden: boolean = false,
+        isDisabled: boolean = false,
         public readonly nested: NestedFieldDto[] = []
     ) {
-        super(fieldId, name, properties);
+        super(fieldId, name, properties, isLocked, isHidden, isDisabled);
 
         this.onCreated();
     }
@@ -221,10 +231,11 @@ export class RootFieldDto extends FieldDto {
 export class NestedFieldDto extends FieldDto {
     constructor(fieldId: number, name: string, properties: FieldPropertiesDto,
         public readonly parentId: number,
-        public readonly isHidden: boolean = false,
-        public readonly isDisabled: boolean = false
+        isLocked: boolean = false,
+        isHidden: boolean = false,
+        isDisabled: boolean = false
     ) {
-        super(fieldId, name, properties);
+        super(fieldId, name, properties, isLocked, isHidden, isDisabled);
 
         this.onCreated();
     }
@@ -830,6 +841,7 @@ export class SchemasService {
                                 nestedItem.name,
                                 nestedPropertiesDto,
                                 item.fieldId,
+                                nestedItem.isLocked,
                                 nestedItem.isHidden,
                                 nestedItem.isDisabled);
                         });
@@ -840,9 +852,9 @@ export class SchemasService {
                         item.name,
                         propertiesDto,
                         item.partitioning,
+                        item.isLocked,
                         item.isHidden,
                         item.isDisabled,
-                        item.isLocked,
                         nested || []);
                 });
 
@@ -1001,8 +1013,8 @@ export class SchemasService {
             .pretifyError('Failed to update field. Please reload.');
     }
 
-    public lockField(appName: string, schemaName: string, fieldId: number, version: Version): Observable<Versioned<any>> {
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/fields/${fieldId}/lock`);
+    public lockField(appName: string, schemaName: string, fieldId: number, parentId: number | undefined, version: Version): Observable<Versioned<any>> {
+        const url = this.buildUrl(appName, schemaName, parentId, `/${fieldId}/lock`);
 
         return HTTP.putVersioned(this.http, url, {}, version)
             .do(() => {

@@ -16,10 +16,10 @@ import {
     fadeAnimation,
     ImmutableArray,
     ModalView,
+    NestedFieldDto,
     RootFieldDto,
     SchemaDetailsDto,
     SchemasState,
-    Types,
     UpdateFieldDto
 } from '@app/shared';
 
@@ -39,6 +39,9 @@ export class FieldComponent implements OnInit {
     public schema: SchemaDetailsDto;
 
     @Input()
+    public parent: RootFieldDto;
+
+    @Input()
     public patterns: ImmutableArray<AppPatternDto>;
 
     public dropdown = new ModalView(false, true);
@@ -47,6 +50,8 @@ export class FieldComponent implements OnInit {
     public selectedTab = 0;
 
     public editForm: EditFieldForm;
+
+    public addFieldDialog = new ModalView();
 
     constructor(
         private readonly formBuilder: FormBuilder,
@@ -58,7 +63,7 @@ export class FieldComponent implements OnInit {
         this.editForm = new EditFieldForm(this.formBuilder);
         this.editForm.load(this.field.properties);
 
-        if (Types.is(this.field, RootFieldDto) && this.field.isLocked) {
+        if (this.field.isLocked) {
             this.editForm.form.disable();
         }
     }
@@ -96,10 +101,12 @@ export class FieldComponent implements OnInit {
         this.schemasState.hideField(this.schema, this.field).onErrorResumeNext().subscribe();
     }
 
+    public sortFields(fields: NestedFieldDto[]) {
+        this.schemasState.sortFields(this.schema, fields, <any>this.field).subscribe();
+    }
+
     public lockField() {
-        if (Types.is(this.field, RootFieldDto)) {
-            this.schemasState.lockField(this.schema, this.field).onErrorResumeNext().subscribe();
-        }
+        this.schemasState.lockField(this.schema, this.field).onErrorResumeNext().subscribe();
     }
 
     public save() {

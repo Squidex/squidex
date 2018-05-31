@@ -16,6 +16,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         private readonly string fieldName;
         private bool isDisabled;
         private bool isHidden;
+        private bool isLocked;
 
         public long Id
         {
@@ -25,6 +26,11 @@ namespace Squidex.Domain.Apps.Core.Schemas
         public string Name
         {
             get { return fieldName; }
+        }
+
+        public bool IsLocked
+        {
+            get { return isLocked; }
         }
 
         public bool IsHidden
@@ -37,11 +43,6 @@ namespace Squidex.Domain.Apps.Core.Schemas
             get { return isDisabled; }
         }
 
-        public bool IsLocked
-        {
-            get { return false; }
-        }
-
         public abstract FieldProperties RawProperties { get; }
 
         protected NestedField(long id, string name)
@@ -51,6 +52,15 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
             fieldId = id;
             fieldName = name;
+        }
+
+        [Pure]
+        public NestedField Lock()
+        {
+            return Clone(clone =>
+            {
+                clone.isLocked = true;
+            });
         }
 
         [Pure]

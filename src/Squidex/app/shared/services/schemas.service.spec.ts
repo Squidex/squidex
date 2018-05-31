@@ -516,6 +516,32 @@ describe('SchemasService', () => {
         req.flush({});
     }));
 
+    it('should make put request to lock field',
+        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
+
+        schemasService.lockField('my-app', 'my-schema', 1, undefined, version).subscribe();
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/fields/1/lock');
+
+        expect(req.request.method).toEqual('PUT');
+        expect(req.request.headers.get('If-Match')).toBe(version.value);
+
+        req.flush({});
+    }));
+
+    it('should make put request to lock nested field',
+        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
+
+        schemasService.lockField('my-app', 'my-schema', 1, 13, version).subscribe();
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/fields/13/nested/1/lock');
+
+        expect(req.request.method).toEqual('PUT');
+        expect(req.request.headers.get('If-Match')).toBe(version.value);
+
+        req.flush({});
+    }));
+
     it('should make put request to enable field',
         inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
 
@@ -654,19 +680,6 @@ describe('SchemasService', () => {
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema');
 
         expect(req.request.method).toEqual('DELETE');
-        expect(req.request.headers.get('If-Match')).toBe(version.value);
-
-        req.flush({});
-    }));
-
-    it('should make put request to lock field',
-        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
-
-        schemasService.lockField('my-app', 'my-schema', 1, version).subscribe();
-
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/fields/1/lock');
-
-        expect(req.request.method).toEqual('PUT');
         expect(req.request.headers.get('If-Match')).toBe(version.value);
 
         req.flush({});

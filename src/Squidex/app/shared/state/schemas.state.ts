@@ -325,14 +325,6 @@ export class SchemasState extends State<Snapshot> {
             .notify(this.dialogs);
     }
 
-    public lockField(schema: SchemaDetailsDto, field: RootFieldDto, now?: DateTime): Observable<any> {
-        return this.schemasService.lockField(this.appName, schema.name, field.fieldId, schema.version)
-            .do(dto => {
-                this.replaceSchema(updateField(schema, setLocked(field, true), this.user, dto.version, now));
-            })
-            .notify(this.dialogs);
-    }
-
     public addField(schema: SchemaDetailsDto, request: AddFieldDto, parent?: RootFieldDto, now?: DateTime): Observable<FieldDto> {
         return this.schemasService.postField(this.appName, schema.name, request, pid(parent), schema.version)
             .do(dto => {
@@ -352,6 +344,14 @@ export class SchemasState extends State<Snapshot> {
                 } else {
                     this.replaceSchema(updateField(schema, replaceNested(parent, fields), this.user, dto.version, now));
                 }
+            })
+            .notify(this.dialogs);
+    }
+
+    public lockField(schema: SchemaDetailsDto, field: AnyFieldDto, now?: DateTime): Observable<any> {
+        return this.schemasService.lockField(this.appName, schema.name, field.fieldId, pidof(field), schema.version)
+            .do(dto => {
+                this.replaceField(schema, setLocked(field, true), dto.version, now);
             })
             .notify(this.dialogs);
     }
@@ -556,14 +556,14 @@ const replaceNested = (parent: RootFieldDto, nested: NestedFieldDto[]) =>
 const removeNested = (parent: RootFieldDto, nested: NestedFieldDto) =>
     parent.with({ nested: parent.nested.filter(f => f.fieldId !== nested.fieldId) });
 
-const setLocked = (field: RootFieldDto, isLocked: boolean) =>
-    field.with({ isLocked });
+const setLocked = <T extends FieldDto>(field: T, isLocked: boolean) =>
+    <T>field.with({ isLocked });
 
 const setHidden = <T extends FieldDto>(field: T, isHidden: boolean) =>
-    <T>field.with(<any>{ isHidden });
+    <T>field.with({ isHidden });
 
 const setDisabled = <T extends FieldDto>(field: T, isDisabled: boolean) =>
-    <T>field.with(<any>{ isDisabled });
+    <T>field.with({ isDisabled });
 
 const update = <T extends FieldDto>(field: T, properties: FieldPropertiesDto) =>
     <T>field.with({ properties });

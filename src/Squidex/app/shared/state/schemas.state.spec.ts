@@ -458,7 +458,7 @@ describe('SchemasState', () => {
         });
 
         it('should mark field locked and update user info when field locked', () => {
-            schemasService.setup(x => x.lockField(app, schema.name, field1.fieldId, version))
+            schemasService.setup(x => x.lockField(app, schema.name, field1.fieldId, undefined, version))
                 .returns(() => Observable.of(new Versioned<any>(newVersion, {})));
 
             schemasState.lockField(schema, field1, modified).subscribe();
@@ -466,6 +466,18 @@ describe('SchemasState', () => {
             const schema_1 = <SchemaDetailsDto>schemasState.snapshot.schemas.at(1);
 
             expect(schema_1.fields[0].isLocked).toBeTruthy();
+            expectToBeModified(schema_1);
+        });
+
+        it('should mark field locked and update user info when nested field locked', () => {
+            schemasService.setup(x => x.lockField(app, schema.name, nested1.fieldId, 2, version))
+                .returns(() => Observable.of(new Versioned<any>(newVersion, {})));
+
+            schemasState.lockField(schema, nested1, modified).subscribe();
+
+            const schema_1 = <SchemaDetailsDto>schemasState.snapshot.schemas.at(1);
+
+            expect(schema_1.fields[1].nested[0].isLocked).toBeTruthy();
             expectToBeModified(schema_1);
         });
 

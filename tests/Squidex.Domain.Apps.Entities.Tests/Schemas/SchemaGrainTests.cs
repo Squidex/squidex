@@ -244,26 +244,6 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         }
 
         [Fact]
-        public async Task LockField_should_create_events_and_update_state()
-        {
-            var command = new LockField { FieldId = 1 };
-
-            await ExecuteCreateAsync();
-            await ExecuteAddFieldAsync(fieldName);
-
-            var result = await sut.ExecuteAsync(CreateCommand(command));
-
-            result.ShouldBeEquivalent(new EntitySavedResult(2));
-
-            Assert.False(GetField(1).IsDisabled);
-
-            LastEvents
-                .ShouldHaveSameEvents(
-                    CreateEvent(new FieldLocked { FieldId = fieldId })
-                );
-        }
-
-        [Fact]
         public async Task Reorder_should_create_events_and_update_state()
         {
             var command = new ReorderFields { FieldIds = new List<long> { 1, 2 } };
@@ -381,6 +361,48 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             LastEvents
                 .ShouldHaveSameEvents(
                     CreateEvent(new FieldUpdated { ParentFieldId = arrayId, FieldId = nestedId, Properties = command.Properties })
+                );
+        }
+
+        [Fact]
+        public async Task LockField_should_create_events_and_update_state()
+        {
+            var command = new LockField { FieldId = 1 };
+
+            await ExecuteCreateAsync();
+            await ExecuteAddFieldAsync(fieldName);
+
+            var result = await sut.ExecuteAsync(CreateCommand(command));
+
+            result.ShouldBeEquivalent(new EntitySavedResult(2));
+
+            Assert.False(GetField(1).IsDisabled);
+
+            LastEvents
+                .ShouldHaveSameEvents(
+                    CreateEvent(new FieldLocked { FieldId = fieldId })
+                );
+        }
+
+        [Fact]
+        public async Task LockField_should_create_events_and_update_state_for_array()
+        {
+            var command = new LockField { ParentFieldId = 1, FieldId = 2 };
+
+            await ExecuteCreateAsync();
+            await ExecuteAddArrayFieldAsync();
+            await ExecuteAddFieldAsync(fieldName, 1);
+
+            var result = await sut.ExecuteAsync(CreateCommand(command));
+
+            result.ShouldBeEquivalent(new EntitySavedResult(3));
+
+            Assert.False(GetField(1).IsLocked);
+            Assert.True(GetNestedField(1, 2).IsLocked);
+
+            LastEvents
+                .ShouldHaveSameEvents(
+                    CreateEvent(new FieldLocked { ParentFieldId = arrayId, FieldId = nestedId })
                 );
         }
 

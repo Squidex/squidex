@@ -57,25 +57,26 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
         public static IEnumerable<object[]> InvalidStates = new[]
         {
-            new object[] { A<EnableField>(GuardSchemaField.CanEnable),   S(s => s) },
             new object[] { A<DisableField>(GuardSchemaField.CanDisable), S(s => s.DisableField(1)) },
+            new object[] { A<EnableField>(GuardSchemaField.CanEnable),   S(s => s) },
             new object[] { A<HideField>(GuardSchemaField.CanHide),       S(s => s.HideField(1)) },
-            new object[] { A<LockField>(GuardSchemaField.CanLock),       S(s => s.LockField(1)) },
-            new object[] { A<ShowField>(GuardSchemaField.CanShow),       S(s => s.LockField(1)) }
+            new object[] { A<ShowField>(GuardSchemaField.CanShow),       S(s => s.LockField(1)) },
+            new object[] { A<LockField>(GuardSchemaField.CanLock),       S(s => s.LockField(1)) }
         };
 
         public static IEnumerable<object[]> InvalidNestedStates = new[]
         {
-            new object[] { A<EnableField>(GuardSchemaField.CanEnable),   S(s => s) },
             new object[] { A<DisableField>(GuardSchemaField.CanDisable), S(s => s.DisableField(301, 3)) },
+            new object[] { A<EnableField>(GuardSchemaField.CanEnable),   S(s => s) },
             new object[] { A<HideField>(GuardSchemaField.CanHide),       S(s => s.HideField(301, 3)) },
-            new object[] { A<ShowField>(GuardSchemaField.CanShow),       S(s => s) }
+            new object[] { A<ShowField>(GuardSchemaField.CanShow),       S(s => s) },
+            new object[] { A<LockField>(GuardSchemaField.CanLock),       S(s => s.LockField(301, 3)) }
         };
 
         public static IEnumerable<object[]> ValidStates = new[]
         {
-            new object[] { A<EnableField>(GuardSchemaField.CanEnable),   S(s => s.DisableField(1)) },
             new object[] { A<DisableField>(GuardSchemaField.CanDisable), S(s => s) },
+            new object[] { A<EnableField>(GuardSchemaField.CanEnable),   S(s => s.DisableField(1)) },
             new object[] { A<HideField>(GuardSchemaField.CanHide),       S(s => s) },
             new object[] { A<ShowField>(GuardSchemaField.CanShow),       S(s => s.HideField(1)) }
         };
@@ -162,6 +163,16 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         }
 
         [Fact]
+        public void CanHide_should_throw_exception_if_locked()
+        {
+            var command = new HideField { FieldId = 1 };
+
+            var schema_1 = schema_0.UpdateField(1, f => f.Lock());
+
+            Assert.Throws<DomainException>(() => GuardSchemaField.CanHide(schema_1, command));
+        }
+
+        [Fact]
         public void CanDelete_should_not_throw_exception_if_not_locked()
         {
             var command = new DeleteField { FieldId = 1 };
@@ -172,7 +183,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         [Fact]
         public void CanUpdate_should_throw_exception_if_locked()
         {
-            var command = new UpdateField { FieldId = 1, Properties = new StringFieldProperties() };
+            var command = new UpdateField { FieldId = 1, Properties = validProperties };
 
             var schema_1 = schema_0.UpdateField(1, f => f.Lock());
 
@@ -182,7 +193,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         [Fact]
         public void CanUpdate_should_not_throw_exception_if_not_locked()
         {
-            var command = new UpdateField { FieldId = 1, Properties = new StringFieldProperties() };
+            var command = new UpdateField { FieldId = 1, Properties = validProperties };
 
             GuardSchemaField.CanUpdate(schema_0, command);
         }
@@ -206,7 +217,15 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         [Fact]
         public void CanAdd_should_throw_exception_if_field_already_exists()
         {
-            var command = new AddField { Name = "field1", Properties = new StringFieldProperties() };
+            var command = new AddField { Name = "field1", Properties = validProperties };
+
+            Assert.Throws<ValidationException>(() => GuardSchemaField.CanAdd(schema_0, command));
+        }
+
+        [Fact]
+        public void CanAdd_should_throw_exception_if_nested_field_already_exists()
+        {
+            var command = new AddField { Name = "field301", Properties = validProperties, ParentFieldId = 3 };
 
             Assert.Throws<ValidationException>(() => GuardSchemaField.CanAdd(schema_0, command));
         }
@@ -244,9 +263,25 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         }
 
         [Fact]
+        public void CanAdd_should_throw_exception_if_parent_not_exists()
+        {
+            var command = new AddField { Name = "field302", Properties = validProperties, ParentFieldId = 99 };
+
+            Assert.Throws<DomainObjectNotFoundException>(() => GuardSchemaField.CanAdd(schema_0, command));
+        }
+
+        [Fact]
         public void CanAdd_should_not_throw_exception_if_field_not_exists()
         {
-            var command = new AddField { Name = "field4", Properties = new StringFieldProperties() };
+            var command = new AddField { Name = "field4", Properties = validProperties };
+
+            GuardSchemaField.CanAdd(schema_0, command);
+        }
+
+        [Fact]
+        public void CanAdd_should_not_throw_exception_if_field_exists_in_root()
+        {
+            var command = new AddField { Name = "field1", Properties = validProperties, ParentFieldId = 3 };
 
             GuardSchemaField.CanAdd(schema_0, command);
         }
