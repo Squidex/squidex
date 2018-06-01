@@ -8,8 +8,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-
-import '@app/framework/angular/http/http-extensions';
+import { map, tap } from 'rxjs/operators';
 
 import {
     AnalyticsService,
@@ -17,6 +16,7 @@ import {
     DateTime,
     HTTP,
     Model,
+    pretifyError,
     StringHelper,
     Version,
     Versioned
@@ -227,8 +227,8 @@ export class SchemasService {
     public getSchemas(appName: string): Observable<SchemaDto[]> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas`);
 
-        return HTTP.getVersioned<any>(this.http, url)
-            .map(response => {
+        return HTTP.getVersioned<any>(this.http, url).pipe(
+            map(response => {
                 const body = response.payload.body;
 
                 const items: any[] = body;
@@ -245,18 +245,18 @@ export class SchemasService {
                         DateTime.parseISO_UTC(item.lastModified), item.lastModifiedBy,
                         new Version(item.version.toString()));
                 });
-            })
-            .pretifyError('Failed to load schemas. Please reload.');
+            }),
+            pretifyError('Failed to load schemas. Please reload.'));
     }
 
     public getSchema(appName: string, id: string): Observable<SchemaDetailsDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${id}`);
 
-        return HTTP.getVersioned<any>(this.http, url)
-            .map(response => {
+        return HTTP.getVersioned<any>(this.http, url).pipe(
+            map(response => {
                 const body = response.payload.body;
 
-                const fields = body.fields.map((item: any) => {
+                const fields = body.fieldsmap((item: any) => {
                     const propertiesDto =
                         createProperties(
                             item.properties.fieldType,
@@ -265,7 +265,7 @@ export class SchemasService {
                     let nested: NestedFieldDto[] | null = null;
 
                     if (item.nested && item.nested.length > 0) {
-                        nested = item.nested.map((nestedItem: any) => {
+                        nested = item.nestedmap((nestedItem: any) => {
                             const nestedPropertiesDto =
                                 createProperties(
                                     nestedItem.properties.fieldType,
@@ -310,15 +310,15 @@ export class SchemasService {
                     body.scriptUpdate,
                     body.scriptDelete,
                     body.scriptChange);
-            })
-            .pretifyError('Failed to load schema. Please reload.');
+            }),
+            pretifyError('Failed to load schema. Please reload.'));
     }
 
     public postSchema(appName: string, dto: CreateSchemaDto, user: string, now: DateTime): Observable<SchemaDetailsDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas`);
 
-        return HTTP.postVersioned<any>(this.http, url, dto)
-            .map(response => {
+        return HTTP.postVersioned<any>(this.http, url, dto).pipe(
+            map(response => {
                 const body = response.payload.body;
 
                 now = now || DateTime.now();
@@ -338,78 +338,78 @@ export class SchemasService {
                     body.scriptUpdate,
                     body.scriptDelete,
                     body.scriptChange);
-            })
-            .do(schema => {
+            }),
+            tap(schema => {
                 this.analytics.trackEvent('Schema', 'Created', appName);
-            })
-            .pretifyError('Failed to create schema. Please reload.');
+            }),
+            pretifyError('Failed to create schema. Please reload.'));
     }
 
     public deleteSchema(appName: string, schemaName: string, version: Version): Observable<Versioned<any>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}`);
 
-        return HTTP.deleteVersioned(this.http, url, version)
-            .do(() => {
+        return HTTP.deleteVersioned(this.http, url, version).pipe(
+            tap(() => {
                 this.analytics.trackEvent('Schema', 'Deleted', appName);
-            })
-            .pretifyError('Failed to delete schema. Please reload.');
+            }),
+            pretifyError('Failed to delete schema. Please reload.'));
     }
 
     public putScripts(appName: string, schemaName: string, dto: UpdateSchemaScriptsDto, version: Version): Observable<Versioned<any>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/scripts`);
 
-        return HTTP.putVersioned(this.http, url, dto, version)
-            .do(() => {
+        return HTTP.putVersioned(this.http, url, dto, version).pipe(
+            tap(() => {
                 this.analytics.trackEvent('Schema', 'ScriptsConfigured', appName);
-            })
-            .pretifyError('Failed to update schema scripts. Please reload.');
+            }),
+            pretifyError('Failed to update schema scripts. Please reload.'));
     }
 
     public putSchema(appName: string, schemaName: string, dto: UpdateSchemaDto, version: Version): Observable<Versioned<any>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}`);
 
-        return HTTP.putVersioned(this.http, url, dto, version)
-            .do(() => {
+        return HTTP.putVersioned(this.http, url, dto, version).pipe(
+            tap(() => {
                 this.analytics.trackEvent('Schema', 'Updated', appName);
-            })
-            .pretifyError('Failed to update schema. Please reload.');
+            }),
+            pretifyError('Failed to update schema. Please reload.'));
     }
 
     public publishSchema(appName: string, schemaName: string, version: Version): Observable<Versioned<any>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/publish`);
 
-        return HTTP.putVersioned(this.http, url, {}, version)
-            .do(() => {
+        return HTTP.putVersioned(this.http, url, {}, version).pipe(
+            tap(() => {
                 this.analytics.trackEvent('Schema', 'Published', appName);
-            })
-            .pretifyError('Failed to publish schema. Please reload.');
+            }),
+            pretifyError('Failed to publish schema. Please reload.'));
     }
 
     public unpublishSchema(appName: string, schemaName: string, version: Version): Observable<Versioned<any>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/unpublish`);
 
-        return HTTP.putVersioned(this.http, url, {}, version)
-            .do(() => {
+        return HTTP.putVersioned(this.http, url, {}, version).pipe(
+            tap(() => {
                 this.analytics.trackEvent('Schema', 'Unpublished', appName);
-            })
-            .pretifyError('Failed to unpublish schema. Please reload.');
+            }),
+            pretifyError('Failed to unpublish schema. Please reload.'));
     }
 
     public putCategory(appName: string, schemaName: string, dto: UpdateSchemaCategoryDto, version: Version): Observable<Versioned<any>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/category`);
 
-        return HTTP.putVersioned(this.http, url, dto, version)
-            .do(() => {
+        return HTTP.putVersioned(this.http, url, dto, version).pipe(
+            tap(() => {
                 this.analytics.trackEvent('Schema', 'CategoryChanged', appName);
-            })
-            .pretifyError('Failed to change category. Please reload.');
+            }),
+            pretifyError('Failed to change category. Please reload.'));
     }
 
     public postField(appName: string, schemaName: string, dto: AddFieldDto, parentId: number | undefined, version: Version): Observable<Versioned<RootFieldDto | NestedFieldDto>> {
         const url = this.buildUrl(appName, schemaName, parentId, '');
 
-        return HTTP.postVersioned<any>(this.http, url, dto, version)
-            .map(response => {
+        return HTTP.postVersioned<any>(this.http, url, dto, version).pipe(
+            map(response => {
                 const body = response.payload.body;
 
                 if (parentId) {
@@ -421,91 +421,91 @@ export class SchemasService {
 
                     return new Versioned(response.version, field);
                 }
-            })
-            .do(() => {
+            }),
+            tap(() => {
                 this.analytics.trackEvent('Schema', 'FieldCreated', appName);
-            })
-            .pretifyError('Failed to add field. Please reload.');
+            }),
+            pretifyError('Failed to add field. Please reload.'));
     }
 
     public putFieldOrdering(appName: string, schemaName: string, dto: number[], parentId: number | undefined, version: Version): Observable<Versioned<any>> {
         const url = this.buildUrl(appName, schemaName, parentId, '/ordering');
 
-        return HTTP.putVersioned(this.http, url, { fieldIds: dto }, version)
-            .do(() => {
+        return HTTP.putVersioned(this.http, url, { fieldIds: dto }, version).pipe(
+            tap(() => {
                 this.analytics.trackEvent('Schema', 'FieldsReordered', appName);
-            })
-            .pretifyError('Failed to reorder fields. Please reload.');
+            }),
+            pretifyError('Failed to reorder fields. Please reload.'));
     }
 
     public putField(appName: string, schemaName: string, fieldId: number, dto: UpdateFieldDto, parentId: number | undefined, version: Version): Observable<Versioned<any>> {
         const url = this.buildUrl(appName, schemaName, parentId, `/${fieldId}`);
 
-        return HTTP.putVersioned(this.http, url, dto, version)
-            .do(() => {
+        return HTTP.putVersioned(this.http, url, dto, version).pipe(
+            tap(() => {
                 this.analytics.trackEvent('Schema', 'FieldUpdated', appName);
-            })
-            .pretifyError('Failed to update field. Please reload.');
+            }),
+            pretifyError('Failed to update field. Please reload.'));
     }
 
     public lockField(appName: string, schemaName: string, fieldId: number, parentId: number | undefined, version: Version): Observable<Versioned<any>> {
         const url = this.buildUrl(appName, schemaName, parentId, `/${fieldId}/lock`);
 
-        return HTTP.putVersioned(this.http, url, {}, version)
-            .do(() => {
+        return HTTP.putVersioned(this.http, url, {}, version).pipe(
+            tap(() => {
                 this.analytics.trackEvent('Schema', 'FieldLocked', appName);
-            })
-            .pretifyError('Failed to lock field. Please reload.');
+            }),
+            pretifyError('Failed to lock field. Please reload.'));
     }
 
     public enableField(appName: string, schemaName: string, fieldId: number, parentId: number | undefined, version: Version): Observable<Versioned<any>> {
         const url = this.buildUrl(appName, schemaName, parentId, `/${fieldId}/enable`);
 
-        return HTTP.putVersioned(this.http, url, {}, version)
-            .do(() => {
+        return HTTP.putVersioned(this.http, url, {}, version).pipe(
+            tap(() => {
                 this.analytics.trackEvent('Schema', 'FieldEnabled', appName);
-            })
-            .pretifyError('Failed to enable field. Please reload.');
+            }),
+            pretifyError('Failed to enable field. Please reload.'));
     }
 
     public disableField(appName: string, schemaName: string, fieldId: number, parentId: number | undefined, version: Version): Observable<Versioned<any>> {
         const url = this.buildUrl(appName, schemaName, parentId, `/${fieldId}/disable`);
 
-        return HTTP.putVersioned(this.http, url, {}, version)
-            .do(() => {
+        return HTTP.putVersioned(this.http, url, {}, version).pipe(
+            tap(() => {
                 this.analytics.trackEvent('Schema', 'FieldDisabled', appName);
-            })
-            .pretifyError('Failed to disable field. Please reload.');
+            }),
+            pretifyError('Failed to disable field. Please reload.'));
     }
 
     public showField(appName: string, schemaName: string, fieldId: number, parentId: number | undefined, version: Version): Observable<Versioned<any>> {
         const url = this.buildUrl(appName, schemaName, parentId, `/${fieldId}/show`);
 
-        return HTTP.putVersioned(this.http, url, {}, version)
-            .do(() => {
+        return HTTP.putVersioned(this.http, url, {}, version).pipe(
+            tap(() => {
                 this.analytics.trackEvent('Schema', 'FieldShown', appName);
-            })
-            .pretifyError('Failed to show field. Please reload.');
+            }),
+            pretifyError('Failed to show field. Please reload.'));
     }
 
     public hideField(appName: string, schemaName: string, fieldId: number, parentId: number | undefined, version: Version): Observable<Versioned<any>> {
         const url = this.buildUrl(appName, schemaName, parentId, `/${fieldId}/hide`);
 
-        return HTTP.putVersioned(this.http, url, {}, version)
-            .do(() => {
+        return HTTP.putVersioned(this.http, url, {}, version).pipe(
+            tap(() => {
                 this.analytics.trackEvent('Schema', 'FieldHidden', appName);
-            })
-            .pretifyError('Failed to hide field. Please reload.');
+            }),
+            pretifyError('Failed to hide field. Please reload.'));
     }
 
     public deleteField(appName: string, schemaName: string, fieldId: number, parentId: number | undefined, version: Version): Observable<Versioned<any>> {
         const url = this.buildUrl(appName, schemaName, parentId, `/${fieldId}`);
 
-        return HTTP.deleteVersioned(this.http, url, version)
-            .do(() => {
+        return HTTP.deleteVersioned(this.http, url, version).pipe(
+            tap(() => {
                 this.analytics.trackEvent('Schema', 'FieldDeleted', appName);
-            })
-            .pretifyError('Failed to delete field. Please reload.');
+            }),
+            pretifyError('Failed to delete field. Please reload.'));
     }
 
     private buildUrl(appName: string, schemaName: string, parentId: number | undefined, suffix: string) {

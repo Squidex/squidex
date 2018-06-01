@@ -8,6 +8,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
+import { map, startWith } from 'rxjs/operators';
 
 import { FieldDto, NumberFieldPropertiesDto } from '@app/shared';
 
@@ -39,8 +40,7 @@ export class NumberValidationComponent implements OnInit {
             new FormControl(this.properties.defaultValue));
 
         this.showDefaultValue =
-            this.editForm.controls['isRequired'].valueChanges
-                .startWith(this.properties.isRequired)
-                .map(x => !x);
+            this.editForm.controls['isRequired'].valueChanges.pipe(
+                startWith(this.properties.isRequired), map(x => !x));
     }
 }

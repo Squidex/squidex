@@ -8,14 +8,14 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-
-import '@app/framework/angular/http/http-extensions';
+import { map, tap } from 'rxjs/operators';
 
 import {
     AnalyticsService,
     ApiUrlConfig,
     HTTP,
     Model,
+    pretifyError,
     Version,
     Versioned
 } from '@app/framework';
@@ -81,8 +81,8 @@ export class PlansService {
     public getPlans(appName: string): Observable<PlansDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/plans`);
 
-        return HTTP.getVersioned<any>(this.http, url)
-                .map(response => {
+        return HTTP.getVersioned<any>(this.http, url).pipe(
+                map(response => {
                     const body = response.payload.body;
 
                     const items: any[] = body.plans;
@@ -103,22 +103,22 @@ export class PlansService {
                                 item.maxContributors);
                         }),
                         response.version);
-                })
-                .pretifyError('Failed to load plans. Please reload.');
+                }),
+                pretifyError('Failed to load plans. Please reload.'));
     }
 
     public putPlan(appName: string, dto: ChangePlanDto, version: Version): Observable<Versioned<PlanChangedDto>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/plan`);
 
-        return HTTP.putVersioned<any>(this.http, url, dto, version)
-                .map(response => {
+        return HTTP.putVersioned<any>(this.http, url, dto, version).pipe(
+                map(response => {
                     const body = response.payload.body;
 
                     return new Versioned(response.version, new PlanChangedDto(body.redirectUri));
-                })
-                .do(() => {
+                }),
+                tap(() => {
                     this.analytics.trackEvent('Plan', 'Changed', appName);
-                })
-                .pretifyError('Failed to change plan. Please reload.');
+                }),
+                pretifyError('Failed to change plan. Please reload.'));
     }
 }

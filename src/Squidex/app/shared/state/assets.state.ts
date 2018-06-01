@@ -7,12 +7,12 @@
 
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-
-import '@app/framework/utils/rxjs-extensions';
+import { distinctUntilChanged, map, tap } from 'rxjs/operators';
 
 import {
     DialogService,
     ImmutableArray,
+    notify,
     Pager,
     State
 } from '@app/framework';
@@ -31,16 +31,16 @@ interface Snapshot {
 @Injectable()
 export class AssetsState extends State<Snapshot> {
     public assets =
-        this.changes.map(x => x.assets)
-            .distinctUntilChanged();
+        this.changes.pipe(map(x => x.assets),
+            distinctUntilChanged());
 
     public assetsPager =
-        this.changes.map(x => x.assetsPager)
-            .distinctUntilChanged();
+        this.changes.pipe(map(x => x.assetsPager),
+            distinctUntilChanged());
 
     public isLoaded =
-        this.changes.map(x => !!x.isLoaded)
-            .distinctUntilChanged();
+        this.changes.pipe(map(x => !!x.isLoaded),
+            distinctUntilChanged());
 
     constructor(
         private readonly appsState: AppsState,
@@ -59,8 +59,8 @@ export class AssetsState extends State<Snapshot> {
     }
 
     private loadInternal(isReload = false): Observable<any> {
-        return this.assetsService.getAssets(this.appName, this.snapshot.assetsPager.pageSize, this.snapshot.assetsPager.skip, this.snapshot.assetsQuery)
-            .do(dtos => {
+        return this.assetsService.getAssets(this.appName, this.snapshot.assetsPager.pageSize, this.snapshot.assetsPager.skip, this.snapshot.assetsQuery).pipe(
+            tap(dtos => {
                 if (isReload) {
                     this.dialogs.notifyInfo('Assets reloaded.');
                 }
@@ -71,8 +71,8 @@ export class AssetsState extends State<Snapshot> {
 
                     return { ...s, assets, assetsPager, isLoaded: true };
                 });
-            })
-            .notify(this.dialogs);
+            }),
+            notify(this.dialogs));
     }
 
     public add(asset: AssetDto) {
@@ -85,16 +85,16 @@ export class AssetsState extends State<Snapshot> {
     }
 
     public delete(asset: AssetDto): Observable<any> {
-        return this.assetsService.deleteAsset(this.appName, asset.id, asset.version)
-            .do(dto => {
+        return this.assetsService.deleteAsset(this.appName, asset.id, asset.version).pipe(
+            tap(dto => {
                 return this.next(s => {
                     const assets = s.assets.filter(x => x.id !== asset.id);
                     const assetsPager = s.assetsPager.decrementCount();
 
                     return { ...s, assets, assetsPager };
                 });
-            })
-            .notify(this.dialogs);
+            }),
+            notify(this.dialogs));
     }
 
     public update(asset: AssetDto) {

@@ -6,7 +6,8 @@
  */
 
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { Observable } from 'rxjs';
+import { of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
@@ -42,7 +43,7 @@ export class GraphQLPageComponent implements OnInit {
     }
 
     private request(params: any) {
-        return this.graphQlService.query(this.appsState.appName, params).catch(response => Observable.of(response.error)).toPromise();
+        return this.graphQlService.query(this.appsState.appName, params).pipe(catchError(response => of(response.error))).toPromise();
     }
 }
 

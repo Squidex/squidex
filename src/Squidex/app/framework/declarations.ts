@@ -27,7 +27,7 @@ export * from './angular/forms/toggle.component';
 export * from './angular/forms/transform-input.directive';
 export * from './angular/forms/validators';
 
-export * from './angular/http/http-extensions-impl';
+export * from './angular/http/http-extensions';
 
 export * from './angular/modals/dialog-renderer.component';
 export * from './angular/modals/modal-dialog.component';

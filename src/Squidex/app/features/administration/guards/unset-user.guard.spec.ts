@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Observable } from 'rxjs';
+import { of } from 'rxjs';
 import { IMock, Mock, Times } from 'typemoq';
 
 import { UsersState } from './../state/users.state';
@@ -22,7 +22,7 @@ describe('UnsetUserGuard', () => {
 
     it('should unset user', () => {
         usersState.setup(x => x.select(null))
-            .returns(() => Observable.of(null));
+            .returns(() => of(null));
 
         let result: boolean;
 

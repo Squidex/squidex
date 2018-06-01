@@ -11,7 +11,7 @@ describe('Pager', () => {
     it('should init with default values', () => {
         const pager_1 = new Pager(0);
 
-        expect(Object.assign({}, pager_1)).toEqual({
+        expect(Object.assign({}, pager_1)).toEqual(<any>{
             page: 0,
             pageSize: 10,
             itemFirst: 0,
@@ -26,7 +26,7 @@ describe('Pager', () => {
     it('should init with page size and page', () => {
         const pager_1 = new Pager(23, 2, 10);
 
-        expect(Object.assign({}, pager_1)).toEqual({
+        expect(Object.assign({}, pager_1)).toEqual(<any>{
             page: 2,
             pageSize: 10,
             itemFirst: 21,
@@ -42,7 +42,7 @@ describe('Pager', () => {
         const pager_1 = new Pager(23, 2, 10);
         const pager_2 = pager_1.reset();
 
-        expect(Object.assign({}, pager_2)).toEqual({
+        expect(Object.assign({}, pager_2)).toEqual(<any>{
             page: 0,
             pageSize: 10,
             itemFirst: 0,
@@ -65,7 +65,7 @@ describe('Pager', () => {
         const pager_1 = new Pager(23, 0, 10);
         const pager_2 = pager_1.goNext();
 
-        expect(Object.assign({}, pager_2)).toEqual({
+        expect(Object.assign({}, pager_2)).toEqual(<any>{
             page: 1,
             pageSize: 10,
             itemFirst: 11,
@@ -88,7 +88,7 @@ describe('Pager', () => {
         const pager_1 = new Pager(23, 2, 10);
         const pager_2 = pager_1.goPrev();
 
-        expect(Object.assign({}, pager_2)).toEqual({
+        expect(Object.assign({}, pager_2)).toEqual(<any>{
             page: 1,
             pageSize: 10,
             itemFirst: 11,
@@ -104,7 +104,7 @@ describe('Pager', () => {
         const pager_1 = new Pager(23, 2, 10);
         const pager_2 = pager_1.setCount(30);
 
-        expect(Object.assign({}, pager_2)).toEqual({
+        expect(Object.assign({}, pager_2)).toEqual(<any>{
             page: 2,
             pageSize: 10,
             itemFirst: 21,
@@ -120,7 +120,7 @@ describe('Pager', () => {
         const pager_1 = new Pager(23, 1, 10);
         const pager_2 = pager_1.incrementCount().incrementCount();
 
-        expect(Object.assign({}, pager_2)).toEqual({
+        expect(Object.assign({}, pager_2)).toEqual(<any>{
             page: 1,
             pageSize: 10,
             itemFirst: 11,
@@ -136,7 +136,7 @@ describe('Pager', () => {
         const pager_1 = new Pager(23, 2, 10);
         const pager_2 = pager_1.incrementCount();
 
-        expect(Object.assign({}, pager_2)).toEqual({
+        expect(Object.assign({}, pager_2)).toEqual(<any>{
             page: 2,
             pageSize: 10,
             itemFirst: 21,
@@ -152,7 +152,7 @@ describe('Pager', () => {
         const pager_1 = new Pager(23, 1, 10);
         const pager_2 = pager_1.decrementCount().decrementCount();
 
-        expect(Object.assign({}, pager_2)).toEqual({
+        expect(Object.assign({}, pager_2)).toEqual(<any>{
             page: 1,
             pageSize: 10,
             itemFirst: 11,
@@ -168,7 +168,7 @@ describe('Pager', () => {
         const pager_1 = new Pager(23, 2, 10);
         const pager_2 = pager_1.decrementCount();
 
-        expect(Object.assign({}, pager_2)).toEqual({
+        expect(Object.assign({}, pager_2)).toEqual(<any>{
             page: 2,
             pageSize: 10,
             itemFirst: 21,
@@ -184,7 +184,7 @@ describe('Pager', () => {
         const pager_1 = new Pager(21, 2, 10);
         const pager_2 = pager_1.decrementCount();
 
-        expect(Object.assign({}, pager_2)).toEqual({
+        expect(Object.assign({}, pager_2)).toEqual(<any>{
             page: 1,
             pageSize: 10,
             itemFirst: 11,

@@ -5,7 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Observable } from 'rxjs';
+import { of, throwError } from 'rxjs';
+import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
 
 import {
@@ -41,7 +42,7 @@ describe('BackupsState', () => {
         backupsService = Mock.ofType<BackupsService>();
 
         backupsService.setup(x => x.getBackups(app))
-            .returns(() => Observable.of(oldBackups));
+            .returns(() => of(oldBackups));
 
         backupsState = new BackupsState(appsState.object, backupsService.object, dialogs.object);
         backupsState.load().subscribe();
@@ -62,25 +63,25 @@ describe('BackupsState', () => {
 
     it('should show notification on load error when silent is true', () => {
         backupsService.setup(x => x.getBackups(app))
-            .returns(() => Observable.throw({}));
+            .returns(() => throwError({}));
 
-        backupsState.load(true, true).onErrorResumeNext().subscribe();
+        backupsState.load(true, true).pipe(onErrorResumeNext()).subscribe();
 
         dialogs.verify(x => x.notifyError(It.isAny()), Times.once());
     });
 
     it('should not show notification on load error when flag is false', () => {
         backupsService.setup(x => x.getBackups(app))
-            .returns(() => Observable.throw({}));
+            .returns(() => throwError({}));
 
-        backupsState.load().onErrorResumeNext().subscribe();
+        backupsState.load().pipe(onErrorResumeNext()).subscribe();
 
         dialogs.verify(x => x.notifyError(It.isAny()), Times.never());
     });
 
     it('should not add backup to snapshot', () => {
         backupsService.setup(x => x.postBackup(app))
-            .returns(() => Observable.of({}));
+            .returns(() => of({}));
 
         backupsState.start().subscribe();
 
@@ -91,7 +92,7 @@ describe('BackupsState', () => {
 
     it('should not remove backup from snapshot', () => {
         backupsService.setup(x => x.deleteBackup(app, oldBackups[0].id))
-            .returns(() => Observable.of({}));
+            .returns(() => of({}));
 
         backupsState.delete(oldBackups[0]).subscribe();
 

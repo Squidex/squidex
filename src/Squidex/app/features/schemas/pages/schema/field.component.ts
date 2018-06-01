@@ -7,6 +7,7 @@
 
 import { Component, Input, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
+import { onErrorResumeNext } from 'rxjs/operators';
 
 import {
     AppPatternDto,
@@ -84,23 +85,23 @@ export class FieldComponent implements OnInit {
     }
 
     public deleteField() {
-        this.schemasState.deleteField(this.schema, this.field).onErrorResumeNext().subscribe();
+        this.schemasState.deleteField(this.schema, this.field).pipe(onErrorResumeNext()).subscribe();
     }
 
     public enableField() {
-        this.schemasState.enableField(this.schema, this.field).onErrorResumeNext().subscribe();
+        this.schemasState.enableField(this.schema, this.field).pipe(onErrorResumeNext()).subscribe();
     }
 
     public disableField() {
-        this.schemasState.disableField(this.schema, this.field).onErrorResumeNext().subscribe();
+        this.schemasState.disableField(this.schema, this.field).pipe(onErrorResumeNext()).subscribe();
     }
 
     public showField() {
-        this.schemasState.showField(this.schema, this.field).onErrorResumeNext().subscribe();
+        this.schemasState.showField(this.schema, this.field).pipe(onErrorResumeNext()).subscribe();
     }
 
     public hideField() {
-        this.schemasState.hideField(this.schema, this.field).onErrorResumeNext().subscribe();
+        this.schemasState.hideField(this.schema, this.field).pipe(onErrorResumeNext()).subscribe();
     }
 
     public sortFields(fields: NestedFieldDto[]) {
@@ -108,7 +109,7 @@ export class FieldComponent implements OnInit {
     }
 
     public lockField() {
-        this.schemasState.lockField(this.schema, this.field).onErrorResumeNext().subscribe();
+        this.schemasState.lockField(this.schema, this.field).pipe(onErrorResumeNext()).subscribe();
     }
 
     public trackByField(index: number, field: NestedFieldDto) {

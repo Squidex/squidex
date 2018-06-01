@@ -7,9 +7,8 @@
 
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-
-import '@app/framework/angular/http/http-extensions';
+import { Observable, of } from 'rxjs';
+import { catchError, tap } from 'rxjs/operators';
 
 import { ApiUrlConfig } from '@app/framework';
 
@@ -30,17 +29,17 @@ export class UIService {
 
     public getSettings(): Observable<UISettingsDto> {
         if (this.settings) {
-            return Observable.of(this.settings);
+            return of(this.settings);
         } else {
             const url = this.apiUrl.buildUrl(`api/ui/settings`);
 
-            return this.http.get<UISettingsDto>(url)
-                .catch(error => {
-                    return Observable.of({ regexSuggestions: [], mapType: 'OSM', mapKey: '' });
-                })
-                .do(settings => {
+            return this.http.get<UISettingsDto>(url).pipe(
+                catchError(error => {
+                    return of({ regexSuggestions: [], mapType: 'OSM', mapKey: '' });
+                }),
+                tap(settings => {
                     this.settings = settings;
-                });
+                }));
         }
     }
 }

@@ -6,7 +6,7 @@
  */
 
 import { Router } from '@angular/router';
-import { Observable } from 'rxjs';
+import { of } from 'rxjs';
 import { IMock, Mock, Times } from 'typemoq';
 
 import { SchemaDetailsDto } from './../services/schemas.service';
@@ -32,7 +32,7 @@ describe('SchemaMustExistPublishedGuard', () => {
 
     it('should load schema and return true when found', () => {
         schemasState.setup(x => x.select('123'))
-            .returns(() => Observable.of(<SchemaDetailsDto>{ isPublished: true }));
+            .returns(() => of(<SchemaDetailsDto>{ isPublished: true }));
 
         let result: boolean;
 
@@ -47,7 +47,7 @@ describe('SchemaMustExistPublishedGuard', () => {
 
     it('should load schema and return false when not found', () => {
         schemasState.setup(x => x.select('123'))
-        .returns(() => Observable.of(<SchemaDetailsDto>{ isPublished: false }));
+        .returns(() => of(<SchemaDetailsDto>{ isPublished: false }));
 
         let result: boolean;
 
@@ -62,7 +62,7 @@ describe('SchemaMustExistPublishedGuard', () => {
 
     it('should load schema and return false when not found', () => {
         schemasState.setup(x => x.select('123'))
-            .returns(() => Observable.of(null));
+            .returns(() => of(null));
 
         let result: boolean;
 

@@ -6,14 +6,14 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-
-import '@app/framework/utils/rxjs-extensions';
+import { Observable, of } from 'rxjs';
+import { distinctUntilChanged, map, tap } from 'rxjs/operators';
 
 import {
     DateTime,
     DialogService,
     ImmutableArray,
+    notify,
     State
 } from '@app/framework';
 
@@ -36,12 +36,12 @@ export class AppsState extends State<Snapshot> {
     }
 
     public selectedApp =
-        this.changes.map(s => s.selectedApp)
-            .distinctUntilChanged();
+        this.changes.pipe(map(s => s.selectedApp),
+            distinctUntilChanged());
 
     public apps =
-        this.changes.map(s => s.apps)
-            .distinctUntilChanged();
+        this.changes.pipe(map(s => s.apps),
+            distinctUntilChanged());
 
     constructor(
         private readonly appsService: AppsService,
@@ -53,40 +53,40 @@ export class AppsState extends State<Snapshot> {
     public select(name: string | null): Observable<AppDto | null> {
         const observable =
             !name ?
-                Observable.of(null) :
-                Observable.of(this.snapshot.apps.find(x => x.name === name) || null);
+                of(null) :
+                of(this.snapshot.apps.find(x => x.name === name) || null);
 
-        return observable
-            .do(selectedApp => {
+        return observable.pipe(
+            tap(selectedApp => {
                 this.next(s => ({ ...s, selectedApp }));
-            });
+            }));
     }
 
     public load(): Observable<any> {
-        return this.appsService.getApps()
-            .do(dtos => {
+        return this.appsService.getApps().pipe(
+            tap(dtos => {
                 this.next(s => {
                     const apps = ImmutableArray.of(dtos);
 
                     return { ...s, apps };
                 });
-            });
+            }));
     }
 
     public create(request: CreateAppDto, now?: DateTime): Observable<AppDto> {
-        return this.appsService.postApp(request)
-            .do(dto => {
+        return this.appsService.postApp(request).pipe(
+            tap(dto => {
                 this.next(s => {
                     const apps = s.apps.push(dto).sortByStringAsc(x => x.name);
 
                     return { ...s, apps };
                 });
-            });
+            }));
     }
 
     public delete(name: string): Observable<any> {
-        return this.appsService.deleteApp(name)
-            .do(app => {
+        return this.appsService.deleteApp(name).pipe(
+            tap(app => {
                 this.next(s => {
                     const apps = s.apps.filter(x => x.name !== name);
 
@@ -94,7 +94,7 @@ export class AppsState extends State<Snapshot> {
 
                     return { ...s, apps, selectedApp };
                 });
-            })
-            .notify(this.dialogs);
+            }),
+            notify(this.dialogs));
     }
 }

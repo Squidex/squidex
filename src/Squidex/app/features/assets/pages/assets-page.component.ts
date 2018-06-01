@@ -9,6 +9,7 @@
 
 import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
+import { onErrorResumeNext } from 'rxjs/operators';
 
 import { AppsState, AssetsState } from '@app/shared';
 
@@ -27,23 +28,23 @@ export class AssetsPageComponent implements OnInit {
     }
 
     public ngOnInit() {
-        this.assetsState.load().onErrorResumeNext().subscribe();
+        this.assetsState.load().pipe(onErrorResumeNext()).subscribe();
     }
 
     public reload() {
-        this.assetsState.load(true).onErrorResumeNext().subscribe();
+        this.assetsState.load(true).pipe(onErrorResumeNext()).subscribe();
     }
 
     public search() {
-        this.assetsState.search(this.assetsFilter.value).onErrorResumeNext().subscribe();
+        this.assetsState.search(this.assetsFilter.value).pipe(onErrorResumeNext()).subscribe();
     }
 
     public goNext() {
-        this.assetsState.goNext().onErrorResumeNext().subscribe();
+        this.assetsState.goNext().pipe(onErrorResumeNext()).subscribe();
     }
 
     public goPrev() {
-        this.assetsState.goPrev().onErrorResumeNext().subscribe();
+        this.assetsState.goPrev().pipe(onErrorResumeNext()).subscribe();
     }
 }
 

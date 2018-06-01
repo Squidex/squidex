@@ -6,6 +6,7 @@
  */
 
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { map, startWith } from 'rxjs/operators';
 
 import { Form, ValidatorsEx } from '@app/framework';
 
@@ -23,7 +24,7 @@ export class RenameClientForm extends Form<FormGroup> {
 
 export class AttachClientForm extends Form<FormGroup> {
     public hasNoName =
-        this.form.controls['name'].valueChanges.startWith('').map(x => !x || x.length === 0);
+        this.form.controls['name'].valueChanges.pipe(startWith(''), map(x => !x || x.length === 0));
 
     constructor(formBuilder: FormBuilder) {
         super(formBuilder.group({

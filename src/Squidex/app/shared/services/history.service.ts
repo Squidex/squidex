@@ -7,16 +7,16 @@
 
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-
-import '@app/framework/angular/http/http-extensions';
+import { Observable, of } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 import { UsersProviderService } from './users-provider.service';
 
 import {
     ApiUrlConfig,
     DateTime,
-    HTTP
+    HTTP,
+    pretifyError
 } from '@app/framework';
 
 export class HistoryEventDto {
@@ -37,14 +37,14 @@ export function formatHistoryMessage(message: string, users: UsersProviderServic
         const parts = userId.split(':');
 
         if (parts.length === 1) {
-            return users.getUser(parts[0], null).map(u => u.displayName);
+            return users.getUser(parts[0], null).pipe(map(u => u.displayName));
         } else if (parts[0] === 'subject') {
-            return users.getUser(parts[1], null).map(u => u.displayName);
+            return users.getUser(parts[1], null).pipe(map(u => u.displayName));
         } else {
             if (parts[1].endsWith('client')) {
-                return Observable.of(parts[1]);
+                return of(parts[1]);
             } else {
-                return Observable.of(`${parts[1]}-client`);
+                return of(`${parts[1]}-client`);
             }
         }
     };
@@ -65,10 +65,10 @@ export function formatHistoryMessage(message: string, users: UsersProviderServic
     });
 
     if (foundUserId) {
-        return userName(foundUserId).map(t => message.replace(REPLACEMENT_TEMP, `<span class="user-ref">${t}</span>`));
+        return userName(foundUserId).pipe(map(t => message.replace(REPLACEMENT_TEMP, `<span class="user-ref">${t}</span>`)));
     }
 
-    return Observable.of(message);
+    return of(message);
 }
 
 @Injectable()
@@ -82,8 +82,8 @@ export class HistoryService {
     public getHistory(appName: string, channel: string): Observable<HistoryEventDto[]> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/history?channel=${channel}`);
 
-        return HTTP.getVersioned<any>(this.http, url)
-                .map(response => {
+        return HTTP.getVersioned<any>(this.http, url).pipe(
+                map(response => {
                     const body = response.payload.body;
 
                     const items: any[] = body;
@@ -96,7 +96,7 @@ export class HistoryService {
                             item.version,
                             DateTime.parseISO_UTC(item.created));
                     });
-                })
-                .pretifyError('Failed to load history. Please reload.');
+                }),
+                pretifyError('Failed to load history. Please reload.'));
     }
 }

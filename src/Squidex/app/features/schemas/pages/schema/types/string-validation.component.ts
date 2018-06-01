@@ -8,6 +8,7 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
+import { map, startWith } from 'rxjs/operators';
 
 import {
     AppPatternDto,
@@ -65,14 +66,12 @@ export class StringValidationComponent implements OnDestroy, OnInit {
             new FormControl(this.properties.defaultValue));
 
         this.showDefaultValue =
-            this.editForm.controls['isRequired'].valueChanges
-                .startWith(this.properties.isRequired)
-                .map(x => !x);
+            this.editForm.controls['isRequired'].valueChanges.pipe(
+                startWith(this.properties.isRequired), map(x => !x));
 
         this.showPatternSuggestions =
-            this.editForm.controls['pattern'].valueChanges
-                .startWith('')
-                .map(x => !x || x.trim().length === 0);
+            this.editForm.controls['pattern'].valueChanges.pipe(
+                startWith(''), map(x => !x || x.trim().length === 0));
 
         this.showPatternMessage =
             this.editForm.controls['pattern'].value && this.editForm.controls['pattern'].value.trim().length > 0;

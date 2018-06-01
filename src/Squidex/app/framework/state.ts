@@ -7,6 +7,7 @@
 
 import { AbstractControl } from '@angular/forms';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 import { ErrorDto, Types } from '@app/framework/internal';
 import { fullValue} from './angular/forms/forms-helper';
@@ -21,10 +22,10 @@ export class Form<T extends AbstractControl> {
     private readonly state = new State<FormState>({ submitted: false });
 
     public submitted =
-        this.state.changes.map(s => s.submitted);
+        this.state.changes.pipe(map(s => s.submitted));
 
     public error =
-        this.state.changes.map(s => s.error);
+        this.state.changes.pipe(map(s => s.error));
 
     constructor(
         public readonly form: T

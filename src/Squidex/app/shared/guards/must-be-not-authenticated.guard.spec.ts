@@ -6,7 +6,7 @@
  */
 
 import { Router } from '@angular/router';
-import { Observable } from 'rxjs';
+import { of } from 'rxjs';
 import { IMock, Mock, Times } from 'typemoq';
 
 import { AuthService } from '@app/shared';
@@ -28,7 +28,7 @@ describe('MustNotBeAuthenticatedGuard', () => {
 
     it('should navigate to app page if authenticated', () => {
         authService.setup(x => x.userChanges)
-            .returns(() => Observable.of(<any>{}));
+            .returns(() => of(<any>{}));
 
         let result: boolean;
 
@@ -43,7 +43,7 @@ describe('MustNotBeAuthenticatedGuard', () => {
 
     it('should return true if not authenticated', () => {
         authService.setup(x => x.userChanges)
-            .returns(() => Observable.of(null));
+            .returns(() => of(null));
 
         let result: boolean;
 

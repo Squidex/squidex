@@ -8,6 +8,7 @@
 import { Injectable } from '@angular/core';
 import { CanActivate } from '@angular/router';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 import { AppsState } from './../state/apps.state';
 
@@ -19,6 +20,6 @@ export class LoadAppsGuard implements CanActivate {
     }
 
     public canActivate(): Observable<boolean> {
-        return this.appsState.load().map(a => true);
+        return this.appsState.load().pipe(map(a => true));
     }
 }

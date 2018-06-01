@@ -8,6 +8,7 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
+import { map, startWith } from 'rxjs/operators';
 
 import { FieldDto, FloatConverter, NumberFieldPropertiesDto } from '@app/shared';
 
@@ -52,14 +53,12 @@ export class NumberUIComponent implements OnDestroy, OnInit {
             new FormControl(this.properties.inlineEditable));
 
         this.hideAllowedValues =
-            this.editForm.controls['editor'].valueChanges
-                .startWith(this.properties.editor)
-                .map(x => !(x && (x === 'Radio' || x === 'Dropdown')));
+            this.editForm.controls['editor'].valueChanges.pipe(
+                startWith(this.properties.editor), map(x => !(x && (x === 'Radio' || x === 'Dropdown'))));
 
         this.hideInlineEditable =
-            this.editForm.controls['editor'].valueChanges
-                .startWith(this.properties.editor)
-                .map(x => !(x && (x === 'Input' || x === 'Dropdown')));
+            this.editForm.controls['editor'].valueChanges.pipe(
+                startWith(this.properties.editor), map(x => !(x && (x === 'Input' || x === 'Dropdown'))));
 
         this.hideAllowedValuesSubscription =
             this.hideAllowedValues.subscribe(isSelection => {

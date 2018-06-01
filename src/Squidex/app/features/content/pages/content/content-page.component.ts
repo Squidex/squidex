@@ -7,7 +7,8 @@
 
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Observable, Subscription } from 'rxjs';
+import { Observable, of, Subscription } from 'rxjs';
+import { filter, map, onErrorResumeNext, switchMap } from 'rxjs/operators';
 
 import { ContentVersionSelected } from './../messages';
 
@@ -87,7 +88,7 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
                 });
 
         this.selectedSchemaSubscription =
-            this.schemasState.selectedSchema.filter(s => !!s).map(s => s!)
+            this.schemasState.selectedSchema.pipe(filter(s => !!s), map(s => s!))
                 .subscribe(schema => {
                     this.schema = schema;
 
@@ -95,7 +96,7 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
                 });
 
         this.contentSubscription =
-            this.contentsState.selectedContent.filter(c => !!c).map(c => c!)
+            this.contentsState.selectedContent.pipe(filter(c => !!c), map(c => c!))
                 .subscribe(content => {
                     this.content = content;
 
@@ -111,7 +112,7 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
 
     public canDeactivate(): Observable<boolean> {
         if (!this.contentForm.form.dirty || !this.content) {
-            return Observable.of(true);
+            return of(true);
         } else {
             return this.dialogs.confirmUnsavedChanges();
         }
@@ -175,7 +176,7 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
     }
 
     public discardChanges() {
-        this.contentsState.discardChanges(this.content).onErrorResumeNext().subscribe();
+        this.contentsState.discardChanges(this.content).pipe(onErrorResumeNext()).subscribe();
     }
 
     public publish() {
@@ -195,21 +196,21 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
     }
 
     public delete() {
-        this.contentsState.deleteMany([this.content]).onErrorResumeNext()
+        this.contentsState.deleteMany([this.content]).pipe(onErrorResumeNext())
             .subscribe(() => {
                 this.back();
             });
     }
 
     public publishChanges() {
-        this.dueTimeSelector.selectDueTime('Publish')
-            .switchMap(d => this.contentsState.publishChanges(this.content, d)).onErrorResumeNext()
+        this.dueTimeSelector.selectDueTime('Publish').pipe(
+                switchMap(d => this.contentsState.publishChanges(this.content, d)), onErrorResumeNext())
             .subscribe();
     }
 
     private changeContentItems(action: string, status: string) {
-        this.dueTimeSelector.selectDueTime(action)
-            .switchMap(d => this.contentsState.changeStatus(this.content, action, status, d)).onErrorResumeNext()
+        this.dueTimeSelector.selectDueTime(action).pipe(
+                switchMap(d => this.contentsState.changeStatus(this.content, action, status, d)), onErrorResumeNext())
             .subscribe();
     }
 

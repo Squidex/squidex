@@ -39,7 +39,7 @@ describe('AppPatternsService', () => {
     it('should make get request to get patterns',
         inject([AppPatternsService, HttpTestingController], (patternService: AppPatternsService, httpMock: HttpTestingController) => {
 
-        let patterns: AppPatternsDto | null = null;
+        let patterns: AppPatternsDto;
 
         patternService.getPatterns('my-app').subscribe(result => {
             patterns = result;
@@ -68,7 +68,7 @@ describe('AppPatternsService', () => {
             }
         });
 
-        expect(patterns).toEqual(
+        expect(patterns!).toEqual(
             new AppPatternsDto([
                 new AppPatternDto('1', 'Number', '[0-9]', 'Message1'),
                 new AppPatternDto('2', 'Numbers', '[0-9]*', 'Message2')
@@ -80,7 +80,7 @@ describe('AppPatternsService', () => {
 
         const dto = new EditAppPatternDto('Number', '[0-9]', 'Message1');
 
-        let pattern: AppPatternDto | null = null;
+        let pattern: AppPatternDto;
 
         patternService.postPattern('my-app', dto, version).subscribe(result => {
             pattern = result.payload;
@@ -98,7 +98,7 @@ describe('AppPatternsService', () => {
             message: 'Message1'
         });
 
-        expect(pattern).toEqual(new AppPatternDto('1', 'Number', '[0-9]', 'Message1'));
+        expect(pattern!).toEqual(new AppPatternDto('1', 'Number', '[0-9]', 'Message1'));
     }));
 
     it('should make put request to update pattern',

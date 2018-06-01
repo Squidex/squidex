@@ -7,6 +7,7 @@
 
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
+import { onErrorResumeNext } from 'rxjs/operators';
 
 import {
     AppClientDto,
@@ -32,11 +33,11 @@ export class ClientsPageComponent implements OnInit {
     }
 
     public ngOnInit() {
-        this.clientsState.load().onErrorResumeNext().subscribe();
+        this.clientsState.load().pipe(onErrorResumeNext()).subscribe();
     }
 
     public reload() {
-        this.clientsState.load(true).onErrorResumeNext().subscribe();
+        this.clientsState.load(true).pipe(onErrorResumeNext()).subscribe();
     }
 
     public attachClient() {
@@ -45,7 +46,7 @@ export class ClientsPageComponent implements OnInit {
         if (value) {
             const requestDto = new CreateAppClientDto(value.name);
 
-            this.clientsState.attach(requestDto).onErrorResumeNext()
+            this.clientsState.attach(requestDto).pipe(onErrorResumeNext())
                 .subscribe(() => {
                     this.addClientForm.submitCompleted();
                 }, error => {

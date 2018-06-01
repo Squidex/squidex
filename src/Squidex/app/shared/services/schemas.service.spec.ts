@@ -58,7 +58,7 @@ describe('SchemasService', () => {
     it('should make get request to get schemas',
         inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
 
-        let schemas: SchemaDto[] | null = null;
+        let schemas: SchemaDto[];
 
         schemasService.getSchemas('my-app').subscribe(result => {
             schemas = result;
@@ -104,22 +104,23 @@ describe('SchemasService', () => {
             }
         ]);
 
-        expect(schemas).toEqual([
-            new SchemaDto('id1', 'name1', 'category1', new SchemaPropertiesDto('label1', 'hints1'), true,
-                DateTime.parseISO_UTC('2016-12-12T10:10'), 'Created1',
-                DateTime.parseISO_UTC('2017-12-12T10:10'), 'LastModifiedBy1',
-                new Version('11')),
-            new SchemaDto('id2', 'name2', 'category2', new SchemaPropertiesDto('label2', 'hints2'), true,
-                DateTime.parseISO_UTC('2016-10-12T10:10'), 'Created2',
-                DateTime.parseISO_UTC('2017-10-12T10:10'), 'LastModifiedBy2',
-                new Version('22'))
-        ]);
+        expect(schemas!).toEqual(
+            [
+                new SchemaDto('id1', 'name1', 'category1', new SchemaPropertiesDto('label1', 'hints1'), true,
+                    DateTime.parseISO_UTC('2016-12-12T10:10'), 'Created1',
+                    DateTime.parseISO_UTC('2017-12-12T10:10'), 'LastModifiedBy1',
+                    new Version('11')),
+                new SchemaDto('id2', 'name2', 'category2', new SchemaPropertiesDto('label2', 'hints2'), true,
+                    DateTime.parseISO_UTC('2016-10-12T10:10'), 'Created2',
+                    DateTime.parseISO_UTC('2017-10-12T10:10'), 'LastModifiedBy2',
+                    new Version('22'))
+            ]);
     }));
 
     it('should make get request to get schema',
         inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
 
-        let schema: SchemaDetailsDto | null = null;
+        let schema: SchemaDetailsDto;
 
         schemasService.getSchema('my-app', 'my-schema').subscribe(result => {
             schema = result;
@@ -288,7 +289,7 @@ describe('SchemasService', () => {
             }
         });
 
-        expect(schema).toEqual(
+        expect(schema!).toEqual(
             new SchemaDetailsDto('id1', 'name1', 'category1', new SchemaPropertiesDto('label1', 'hints1'), true,
                 DateTime.parseISO_UTC('2016-12-12T10:10'), 'Created1',
                 DateTime.parseISO_UTC('2017-12-12T10:10'), 'LastModifiedBy1',
@@ -320,7 +321,7 @@ describe('SchemasService', () => {
 
         const dto = new CreateSchemaDto('name');
 
-        let schema: SchemaDetailsDto | null = null;
+        let schema: SchemaDetailsDto;
 
         schemasService.postSchema('my-app', dto, user, now).subscribe(result => {
             schema = result;
@@ -339,7 +340,7 @@ describe('SchemasService', () => {
             }
         });
 
-        expect(schema).toEqual(
+        expect(schema!).toEqual(
             new SchemaDetailsDto('1', dto.name, '', new SchemaPropertiesDto(), false, now, user, now, user, new Version('2'), []));
     }));
 
@@ -393,7 +394,7 @@ describe('SchemasService', () => {
 
         const dto = new AddFieldDto('name', 'invariant', createProperties('Number'));
 
-        let field: FieldDto | null = null;
+        let field: FieldDto;
 
         schemasService.postField('my-app', 'my-schema', dto, undefined, version).subscribe(result => {
             field = result.payload;
@@ -406,8 +407,7 @@ describe('SchemasService', () => {
 
         req.flush({ id: 123 });
 
-        expect(field).toEqual(
-            new RootFieldDto(123, dto.name, dto.properties, dto.partitioning));
+        expect(field!).toEqual(new RootFieldDto(123, dto.name, dto.properties, dto.partitioning));
     }));
 
     it('should make put request to publish schema',
@@ -441,7 +441,7 @@ describe('SchemasService', () => {
 
         const dto = new AddFieldDto('name', 'invariant', createProperties('Number'));
 
-        let field: FieldDto | null = null;
+        let field: FieldDto;
 
         schemasService.postField('my-app', 'my-schema', dto, 13, version).subscribe(result => {
             field = result.payload;
@@ -454,8 +454,7 @@ describe('SchemasService', () => {
 
         req.flush({ id: 123 });
 
-        expect(field).toEqual(
-            new NestedFieldDto(123, dto.name, dto.properties, 13));
+        expect(field!).toEqual(new NestedFieldDto(123, dto.name, dto.properties, 13));
     }));
 
     it('should make put request to update field',

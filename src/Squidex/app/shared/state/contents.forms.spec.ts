@@ -69,7 +69,7 @@ describe('SchemaDetailsDto', () => {
     it('should return empty list fields if fields is empty', () => {
         const schema = createSchema(new SchemaPropertiesDto(), 1, []);
 
-        expect(schema.listFields).toEqual([{ properties: {} }]);
+        expect(schema.listFields).toEqual(<any>[{ properties: {} }]);
     });
 });
 
@@ -228,7 +228,7 @@ describe('DateTimeField', () => {
     });
 
     it('should format to input if parsing failed', () => {
-        expect(FieldFormatter.format(field, true)).toBe(true);
+        expect(FieldFormatter.format(field, true)).toBe(<any>true);
     });
 
     it('should format to date', () => {
@@ -314,7 +314,7 @@ describe('NumberField', () => {
     });
 
     it('should format to number', () => {
-        expect(FieldFormatter.format(field, 42)).toBe(42);
+        expect(FieldFormatter.format(field, 42)).toBe('42');
     });
 
     it('should return default value for default properties', () => {

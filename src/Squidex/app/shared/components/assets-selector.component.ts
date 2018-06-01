@@ -9,6 +9,7 @@
 
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { FormControl } from '@angular/forms';
+import { onErrorResumeNext } from 'rxjs/operators';
 
 import {
     AssetDto,
@@ -39,17 +40,17 @@ export class AssetsSelectorComponent implements OnInit {
     }
 
     public ngOnInit() {
-        this.state.load().onErrorResumeNext().subscribe();
+        this.state.load().pipe(onErrorResumeNext()).subscribe();
 
         this.assetsFilter.setValue(this.state.snapshot.assetsQuery);
     }
 
     public reload() {
-        this.state.load(true).onErrorResumeNext().subscribe();
+        this.state.load(true).pipe(onErrorResumeNext()).subscribe();
     }
 
     public search() {
-        this.state.search(this.assetsFilter.value).onErrorResumeNext().subscribe();
+        this.state.search(this.assetsFilter.value).pipe(onErrorResumeNext()).subscribe();
     }
 
     public complete() {

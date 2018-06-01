@@ -8,6 +8,7 @@
 import { HttpClient, HttpEventType, HttpHeaders, HttpRequest, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { filter, map, tap } from 'rxjs/operators';
 
 import {
     AnalyticsService,
@@ -15,6 +16,7 @@ import {
     DateTime,
     HTTP,
     Model,
+    pretifyError,
     Types,
     Version,
     Versioned
@@ -126,8 +128,8 @@ export class AssetsService {
 
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets?${fullQuery}`);
 
-        return HTTP.getVersioned<any>(this.http, url)
-                .map(response => {
+        return HTTP.getVersioned<any>(this.http, url).pipe(
+                map(response => {
                     const body = response.payload.body;
 
                     const items: any[] = body.items;
@@ -152,8 +154,8 @@ export class AssetsService {
                             assetUrl,
                             new Version(item.version.toString()));
                     }));
-                })
-                .pretifyError('Failed to load assets. Please reload.');
+                }),
+                pretifyError('Failed to load assets. Please reload.'));
     }
 
     public uploadFile(appName: string, file: File, user: string, now: DateTime): Observable<number | AssetDto> {
@@ -163,11 +165,11 @@ export class AssetsService {
             reportProgress: true
         });
 
-        return this.http.request<any>(req)
-                .filter(event =>
+        return this.http.request<any>(req).pipe(
+                filter(event =>
                      event.type === HttpEventType.UploadProgress ||
-                     event.type === HttpEventType.Response)
-                .map(event => {
+                     event.type === HttpEventType.Response),
+                map(event => {
                     if (event.type === HttpEventType.UploadProgress) {
                         const percentDone = event.total ? Math.round(100 * event.loaded / event.total) : 0;
 
@@ -196,19 +198,21 @@ export class AssetsService {
                             new Version(event.headers.get('etag')!));
 
                         return dto;
+                    } else {
+                        throw 'Invalid';
                     }
-                })
-                .do(dto => {
+                }),
+                tap(dto => {
                     this.analytics.trackEvent('Asset', 'Uploaded', appName);
-                })
-                .pretifyError('Failed to upload asset. Please reload.');
+                }),
+                pretifyError('Failed to upload asset. Please reload.'));
     }
 
     public getAsset(appName: string, id: string): Observable<AssetDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/${id}`);
 
-        return HTTP.getVersioned<any>(this.http, url)
-                .map(response => {
+        return HTTP.getVersioned<any>(this.http, url).pipe(
+                map(response => {
                     const body = response.payload.body;
 
                     const assetUrl = this.apiUrl.buildUrl(`api/assets/${body.id}`);
@@ -229,8 +233,8 @@ export class AssetsService {
                         body.pixelHeight,
                         assetUrl,
                         response.version);
-                })
-                .pretifyError('Failed to load assets. Please reload.');
+                }),
+                pretifyError('Failed to load assets. Please reload.'));
     }
 
     public replaceFile(appName: string, id: string, file: File, version: Version): Observable<number | Versioned<AssetReplacedDto>> {
@@ -243,11 +247,11 @@ export class AssetsService {
             reportProgress: true
         });
 
-        return this.http.request(req)
-                .filter(event =>
+        return this.http.request(req).pipe(
+                filter(event =>
                     event.type === HttpEventType.UploadProgress ||
-                    event.type === HttpEventType.Response)
-                .map(event => {
+                    event.type === HttpEventType.Response),
+                map(event => {
                     if (event.type === HttpEventType.UploadProgress) {
                         const percentDone = event.total ? Math.round(100 * event.loaded / event.total) : 0;
 
@@ -264,32 +268,34 @@ export class AssetsService {
                             response.pixelHeight);
 
                         return new Versioned(new Version(event.headers.get('etag')!), replaced);
+                    } else {
+                        throw 'Invalid';
                     }
-                })
-                .do(() => {
+                }),
+                tap(() => {
                     this.analytics.trackEvent('Analytics', 'Replaced', appName);
-                })
-                .pretifyError('Failed to replace asset. Please reload.');
+                }),
+                pretifyError('Failed to replace asset. Please reload.'));
     }
 
     public deleteAsset(appName: string, id: string, version: Version): Observable<Versioned<any>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/${id}`);
 
-        return HTTP.deleteVersioned(this.http, url, version)
-                .do(() => {
+        return HTTP.deleteVersioned(this.http, url, version).pipe(
+                tap(() => {
                     this.analytics.trackEvent('Analytics', 'Deleted', appName);
-                })
-                .pretifyError('Failed to delete asset. Please reload.');
+                }),
+                pretifyError('Failed to delete asset. Please reload.'));
     }
 
     public putAsset(appName: string, id: string, dto: UpdateAssetDto, version: Version): Observable<Versioned<any>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/${id}`);
 
-        return HTTP.putVersioned(this.http, url, dto, version)
-                .do(() => {
+        return HTTP.putVersioned(this.http, url, dto, version).pipe(
+                tap(() => {
                     this.analytics.trackEvent('Analytics', 'Updated', appName);
-                })
-                .pretifyError('Failed to delete asset. Please reload.');
+                }),
+                pretifyError('Failed to delete asset. Please reload.'));
     }
 }
 

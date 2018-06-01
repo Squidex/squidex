@@ -47,7 +47,7 @@ describe('RulesService', () => {
     it('should make get request to get app rules',
         inject([RulesService, HttpTestingController], (rulesService: RulesService, httpMock: HttpTestingController) => {
 
-        let rules: RuleDto[] | null = null;
+        let rules: RuleDto[];
 
         rulesService.getRules('my-app').subscribe(result => {
             rules = result;
@@ -81,25 +81,26 @@ describe('RulesService', () => {
             }
         ]);
 
-        expect(rules).toEqual([
-            new RuleDto('id1', 'CreatedBy1', 'LastModifiedBy1',
-                DateTime.parseISO_UTC('2016-12-12T10:10'),
-                DateTime.parseISO_UTC('2017-12-12T10:10'),
-                version,
-                true,
-                {
-                    param1: 1,
-                    param2: 2,
-                    triggerType: 'ContentChanged'
-                },
-                'ContentChanged',
-                {
-                    param3: 3,
-                    param4: 4,
-                    actionType: 'Webhook'
-                },
-                'Webhook')
-        ]);
+        expect(rules!).toEqual(
+            [
+                new RuleDto('id1', 'CreatedBy1', 'LastModifiedBy1',
+                    DateTime.parseISO_UTC('2016-12-12T10:10'),
+                    DateTime.parseISO_UTC('2017-12-12T10:10'),
+                    version,
+                    true,
+                    {
+                        param1: 1,
+                        param2: 2,
+                        triggerType: 'ContentChanged'
+                    },
+                    'ContentChanged',
+                    {
+                        param3: 3,
+                        param4: 4,
+                        actionType: 'Webhook'
+                    },
+                    'Webhook')
+            ]);
     }));
 
     it('should make post request to create rule',
@@ -115,7 +116,7 @@ describe('RulesService', () => {
             actionType: 'Webhook'
         });
 
-        let rule: RuleDto | null = null;
+        let rule: RuleDto;
 
         rulesService.postRule('my-app', dto, user, now).subscribe(result => {
             rule = result;
@@ -132,7 +133,7 @@ describe('RulesService', () => {
             }
         });
 
-        expect(rule).toEqual(
+        expect(rule!).toEqual(
             new RuleDto('id1', user, user, now, now,
                 version,
                 true,
@@ -205,7 +206,7 @@ describe('RulesService', () => {
     it('should make get request to get app rule events',
         inject([RulesService, HttpTestingController], (rulesService: RulesService, httpMock: HttpTestingController) => {
 
-        let rules: RuleEventsDto | null = null;
+        let rules: RuleEventsDto;
 
         rulesService.getEvents('my-app', 10, 20).subscribe(result => {
             rules = result;
@@ -243,7 +244,7 @@ describe('RulesService', () => {
             ]
         });
 
-        expect(rules).toEqual(
+        expect(rules!).toEqual(
             new RuleEventsDto(20, [
                 new RuleEventDto('id1',
                     DateTime.parseISO_UTC('2017-12-12T10:10'),

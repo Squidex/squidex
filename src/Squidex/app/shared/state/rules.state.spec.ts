@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Observable } from 'rxjs';
+import { of } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 
 import { RulesState } from './rules.state';
@@ -59,7 +59,7 @@ describe('RulesState', () => {
         rulesService = Mock.ofType<RulesService>();
 
         rulesService.setup(x => x.getRules(app))
-            .returns(() => Observable.of(oldRules));
+            .returns(() => of(oldRules));
 
         rulesState = new RulesState(appsState.object, authService.object, dialogs.object, rulesService.object);
         rulesState.load().subscribe();
@@ -84,7 +84,7 @@ describe('RulesState', () => {
         const request = new CreateRuleDto({}, {});
 
         rulesService.setup(x => x.postRule(app, request, modifier, creation))
-            .returns(() => Observable.of(newRule));
+            .returns(() => of(newRule));
 
         rulesState.create(request, creation).subscribe();
 
@@ -95,7 +95,7 @@ describe('RulesState', () => {
         const newAction = {};
 
         rulesService.setup(x => x.putRule(app, oldRules[0].id, It.is<UpdateRuleDto>(i => true), version))
-            .returns(() => Observable.of(new Versioned<any>(newVersion, {})));
+            .returns(() => of(new Versioned<any>(newVersion, {})));
 
         rulesState.updateAction(oldRules[0], newAction, modified).subscribe();
 
@@ -109,7 +109,7 @@ describe('RulesState', () => {
         const newTrigger = {};
 
         rulesService.setup(x => x.putRule(app, oldRules[0].id, It.is<UpdateRuleDto>(i => true), version))
-            .returns(() => Observable.of(new Versioned<any>(newVersion, {})));
+            .returns(() => of(new Versioned<any>(newVersion, {})));
 
         rulesState.updateTrigger(oldRules[0], newTrigger, modified).subscribe();
 
@@ -121,7 +121,7 @@ describe('RulesState', () => {
 
     it('should mark as enabled and update and user info when enabled', () => {
         rulesService.setup(x => x.enableRule(app, oldRules[0].id, version))
-            .returns(() => Observable.of(new Versioned<any>(newVersion, {})));
+            .returns(() => of(new Versioned<any>(newVersion, {})));
 
         rulesState.enable(oldRules[0], modified).subscribe();
 
@@ -133,7 +133,7 @@ describe('RulesState', () => {
 
     it('should mark as disabled and update and user info when disabled', () => {
         rulesService.setup(x => x.disableRule(app, oldRules[1].id, version))
-            .returns(() => Observable.of(new Versioned<any>(newVersion, {})));
+            .returns(() => of(new Versioned<any>(newVersion, {})));
 
         rulesState.disable(oldRules[1], modified).subscribe();
 
@@ -145,7 +145,7 @@ describe('RulesState', () => {
 
     it('should remove rule from snapshot when deleted', () => {
         rulesService.setup(x => x.deleteRule(app, oldRules[0].id, version))
-            .returns(() => Observable.of(new Versioned<any>(newVersion, {})));
+            .returns(() => of(new Versioned<any>(newVersion, {})));
 
         rulesState.delete(oldRules[0]).subscribe();
 

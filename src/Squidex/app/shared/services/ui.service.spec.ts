@@ -34,8 +34,8 @@ describe('UIService', () => {
     it('should make get request to get settings',
         inject([UIService, HttpTestingController], (uiService: UIService, httpMock: HttpTestingController) => {
 
-        let settings1: UISettingsDto | null = null;
-        let settings2: UISettingsDto | null = null;
+        let settings1: UISettingsDto;
+        let settings2: UISettingsDto;
 
         uiService.getSettings().subscribe(result => {
             settings1 = result;
@@ -54,14 +54,14 @@ describe('UIService', () => {
             settings2 = result;
         });
 
-        expect(settings1).toEqual(response);
-        expect(settings2).toEqual(response);
+        expect(settings1!).toEqual(response);
+        expect(settings2!).toEqual(response);
     }));
 
     it('should return default settings when error occurs',
         inject([UIService, HttpTestingController], (uiService: UIService, httpMock: HttpTestingController) => {
 
-        let settings: UISettingsDto | null = null;
+        let settings: UISettingsDto;
 
         uiService.getSettings().subscribe(result => {
             settings = result;
@@ -74,6 +74,6 @@ describe('UIService', () => {
 
         req.error(new ErrorEvent('500'));
 
-        expect(settings).toBeDefined();
+        expect(settings!).toBeDefined();
     }));
 });

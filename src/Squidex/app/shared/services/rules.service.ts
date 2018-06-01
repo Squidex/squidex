@@ -8,8 +8,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-
-import '@app/framework/angular/http/http-extensions';
+import { map, tap } from 'rxjs/operators';
 
 import {
     AnalyticsService,
@@ -17,6 +16,7 @@ import {
     DateTime,
     HTTP,
     Model,
+    pretifyError,
     Version,
     Versioned
 } from '@app/framework';
@@ -134,8 +134,8 @@ export class RulesService {
     public getRules(appName: string): Observable<RuleDto[]> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/rules`);
 
-        return HTTP.getVersioned<any>(this.http, url)
-            .map(response => {
+        return HTTP.getVersioned<any>(this.http, url).pipe(
+            map(response => {
                 const items: any[] = response.payload.body;
 
                 return items.map(item => {
@@ -152,15 +152,15 @@ export class RulesService {
                         item.action,
                         item.action.actionType);
                 });
-            })
-            .pretifyError('Failed to load Rules. Please reload.');
+            }),
+            pretifyError('Failed to load Rules. Please reload.'));
     }
 
     public postRule(appName: string, dto: CreateRuleDto, user: string, now: DateTime): Observable<RuleDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/rules`);
 
-        return HTTP.postVersioned<any>(this.http, url, dto)
-            .map(response => {
+        return HTTP.postVersioned<any>(this.http, url, dto).pipe(
+            map(response => {
                 const body = response.payload.body;
 
                 return new RuleDto(
@@ -175,58 +175,58 @@ export class RulesService {
                     dto.trigger.triggerType,
                     dto.action,
                     dto.action.actionType);
-            })
-            .do(() => {
+            }),
+            tap(() => {
                 this.analytics.trackEvent('Rule', 'Created', appName);
-            })
-            .pretifyError('Failed to create rule. Please reload.');
+            }),
+            pretifyError('Failed to create rule. Please reload.'));
     }
 
     public putRule(appName: string, id: string, dto: UpdateRuleDto, version: Version): Observable<Versioned<any>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/rules/${id}`);
 
-        return HTTP.putVersioned(this.http, url, dto, version)
-            .do(() => {
+        return HTTP.putVersioned(this.http, url, dto, version).pipe(
+            tap(() => {
                 this.analytics.trackEvent('Rule', 'Updated', appName);
-            })
-            .pretifyError('Failed to update rule. Please reload.');
+            }),
+            pretifyError('Failed to update rule. Please reload.'));
     }
 
     public enableRule(appName: string, id: string, version: Version): Observable<Versioned<any>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/rules/${id}/enable`);
 
-        return HTTP.putVersioned(this.http, url, {}, version)
-            .do(() => {
+        return HTTP.putVersioned(this.http, url, {}, version).pipe(
+            tap(() => {
                 this.analytics.trackEvent('Rule', 'Updated', appName);
-            })
-            .pretifyError('Failed to enable rule. Please reload.');
+            }),
+            pretifyError('Failed to enable rule. Please reload.'));
     }
 
     public disableRule(appName: string, id: string, version: Version): Observable<Versioned<any>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/rules/${id}/disable`);
 
-        return HTTP.putVersioned(this.http, url, {}, version)
-            .do(() => {
+        return HTTP.putVersioned(this.http, url, {}, version).pipe(
+            tap(() => {
                 this.analytics.trackEvent('Rule', 'Updated', appName);
-            })
-            .pretifyError('Failed to disable rule. Please reload.');
+            }),
+            pretifyError('Failed to disable rule. Please reload.'));
     }
 
     public deleteRule(appName: string, id: string, version: Version): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/rules/${id}`);
 
-        return HTTP.deleteVersioned(this.http, url, version)
-            .do(() => {
+        return HTTP.deleteVersioned(this.http, url, version).pipe(
+            tap(() => {
                 this.analytics.trackEvent('Rule', 'Deleted', appName);
-            })
-            .pretifyError('Failed to delete rule. Please reload.');
+            }),
+            pretifyError('Failed to delete rule. Please reload.'));
     }
 
     public getEvents(appName: string, take: number, skip: number): Observable<RuleEventsDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/rules/events?take=${take}&skip=${skip}`);
 
-        return HTTP.getVersioned<any>(this.http, url)
-            .map(response => {
+        return HTTP.getVersioned<any>(this.http, url).pipe(
+            map(response => {
                 const body = response.payload.body;
 
                 const items: any[] = body.items;
@@ -243,17 +243,17 @@ export class RulesService {
                         item.jobResult,
                         item.numCalls);
                 }));
-            })
-            .pretifyError('Failed to load events. Please reload.');
+            }),
+            pretifyError('Failed to load events. Please reload.'));
     }
 
     public enqueueEvent(appName: string, id: string): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/rules/events/${id}`);
 
-        return HTTP.putVersioned(this.http, url, {})
-            .do(() => {
+        return HTTP.putVersioned(this.http, url, {}).pipe(
+            tap(() => {
                 this.analytics.trackEvent('Rule', 'EventEnqueued', appName);
-            })
-            .pretifyError('Failed to enqueue rule event. Please reload.');
+            }),
+            pretifyError('Failed to enqueue rule event. Please reload.'));
     }
 }

@@ -8,6 +8,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { filter, map, onErrorResumeNext } from 'rxjs/operators';
 
 import {
     AppsState,
@@ -65,10 +66,10 @@ export class SchemaPageComponent implements OnDestroy, OnInit {
     }
 
     public ngOnInit() {
-        this.patternsState.load().onErrorResumeNext().subscribe();
+        this.patternsState.load().pipe(onErrorResumeNext()).subscribe();
 
         this.selectedSchemaSubscription =
-            this.schemasState.selectedSchema.filter(s => !!s).map(s => s!)
+            this.schemasState.selectedSchema.pipe(filter(s => !!s), map(s => s!))
                 .subscribe(schema => {
                     this.schema = schema;
 

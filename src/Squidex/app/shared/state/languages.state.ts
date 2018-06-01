@@ -6,13 +6,13 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-
-import '@app/framework/utils/rxjs-extensions';
+import { forkJoin, Observable } from 'rxjs';
+import { distinctUntilChanged, map, tap } from 'rxjs/operators';
 
 import {
     DialogService,
     ImmutableArray,
+    notify,
     State,
     Version
 } from '@app/framework';
@@ -44,16 +44,16 @@ interface Snapshot {
 @Injectable()
 export class LanguagesState extends State<Snapshot> {
     public languages =
-        this.changes.map(x => x.languages)
-            .distinctUntilChanged();
+        this.changes.pipe(map(x => x.languages),
+            distinctUntilChanged());
 
     public newLanguages =
-        this.changes.map(x => x.allLanguagesNew)
-            .distinctUntilChanged();
+        this.changes.pipe(map(x => x.allLanguagesNew),
+            distinctUntilChanged());
 
     public isLoaded =
-        this.changes.map(x => !!x.isLoaded)
-            .distinctUntilChanged();
+        this.changes.pipe(map(x => !!x.isLoaded),
+            distinctUntilChanged());
 
     constructor(
         private readonly appLanguagesService: AppLanguagesService,
@@ -75,12 +75,13 @@ export class LanguagesState extends State<Snapshot> {
             this.resetState();
         }
 
-        return Observable.forkJoin(
+        return forkJoin(
                 this.languagesService.getLanguages(),
-                this.appLanguagesService.getLanguages(this.appName),
-                (allLanguages, languages) => ({ allLanguages, languages })
-            )
-            .do(dtos => {
+                this.appLanguagesService.getLanguages(this.appName)).pipe(
+            map(args => {
+                return { allLanguages: args[0], languages: args[1] };
+            }),
+            tap(dtos => {
                 if (isReload) {
                     this.dialogs.notifyInfo('Languages reloaded.');
                 }
@@ -88,33 +89,33 @@ export class LanguagesState extends State<Snapshot> {
                 const sorted = ImmutableArray.of(dtos.allLanguages).sortByStringAsc(x => x.englishName);
 
                 this.replaceLanguages(ImmutableArray.of(dtos.languages.languages), dtos.languages.version, sorted);
-            })
-            .notify(this.dialogs);
+            }),
+            notify(this.dialogs));
     }
 
     public add(language: LanguageDto): Observable<any> {
-        return this.appLanguagesService.postLanguage(this.appName, new AddAppLanguageDto(language.iso2Code), this.version)
-            .do(dto => {
+        return this.appLanguagesService.postLanguage(this.appName, new AddAppLanguageDto(language.iso2Code), this.version).pipe(
+            tap(dto => {
                 const languages = this.snapshot.plainLanguages.push(dto.payload).sortByStringAsc(x => x.englishName);
 
                 this.replaceLanguages(languages, dto.version);
-            })
-            .notify(this.dialogs);
+            }),
+            notify(this.dialogs));
     }
 
     public remove(language: AppLanguageDto): Observable<any> {
-        return this.appLanguagesService.deleteLanguage(this.appName, language.iso2Code, this.version)
-            .do(dto => {
+        return this.appLanguagesService.deleteLanguage(this.appName, language.iso2Code, this.version).pipe(
+            tap(dto => {
                 const languages = this.snapshot.plainLanguages.filter(x => x.iso2Code !== language.iso2Code);
 
                 this.replaceLanguages(languages, dto.version);
-            })
-            .notify(this.dialogs);
+            }),
+            notify(this.dialogs));
     }
 
     public update(language: AppLanguageDto, request: UpdateAppLanguageDto): Observable<any> {
-        return this.appLanguagesService.putLanguage(this.appName, language.iso2Code, request, this.version)
-            .do(dto => {
+        return this.appLanguagesService.putLanguage(this.appName, language.iso2Code, request, this.version).pipe(
+            tap(dto => {
                 const languages = this.snapshot.plainLanguages.map(l => {
                     if (l.iso2Code === language.iso2Code) {
                         return update(l, request.isMaster, request.isOptional, request.fallback);
@@ -126,8 +127,8 @@ export class LanguagesState extends State<Snapshot> {
                 });
 
                 this.replaceLanguages(languages, dto.version);
-            })
-            .notify(this.dialogs);
+            }),
+            notify(this.dialogs));
     }
 
     private replaceLanguages(languages: ImmutableArray<AppLanguageDto>, version: Version, allLanguages?: ImmutableArray<LanguageDto>) {
@@ -177,8 +178,6 @@ export class LanguagesState extends State<Snapshot> {
         };
     }
 }
-
-
 
 const update = (language: AppLanguageDto, isMaster: boolean, isOptional: boolean, fallback: string[]) =>
     new AppLanguageDto(

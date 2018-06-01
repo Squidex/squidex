@@ -42,7 +42,7 @@ describe('AppLanguagesService', () => {
     it('should make get request to get app languages',
         inject([AppLanguagesService, HttpTestingController], (appLanguagesService: AppLanguagesService, httpMock: HttpTestingController) => {
 
-        let languages: AppLanguagesDto | null = null;
+        let languages: AppLanguagesDto;
 
         appLanguagesService.getLanguages('my-app').subscribe(result => {
             languages = result;
@@ -73,7 +73,7 @@ describe('AppLanguagesService', () => {
             }
         });
 
-        expect(languages).toEqual(
+        expect(languages!).toEqual(
             new AppLanguagesDto([
                 new AppLanguageDto('en', 'English', true, true,  ['de', 'en']),
                 new AppLanguageDto('it', 'Italian', false, false, [])
@@ -85,7 +85,7 @@ describe('AppLanguagesService', () => {
 
         const dto = new AddAppLanguageDto('de');
 
-        let language: AppLanguageDto | null = null;
+        let language: AppLanguageDto;
 
         appLanguagesService.postLanguage('my-app', dto, version).subscribe(result => {
             language = result.payload;
@@ -98,8 +98,7 @@ describe('AppLanguagesService', () => {
 
         req.flush({ iso2Code: 'de', englishName: 'German' });
 
-        expect(language).toEqual(
-            new AppLanguageDto('de', 'German', false, false, []));
+        expect(language!).toEqual(new AppLanguageDto('de', 'German', false, false, []));
     }));
 
     it('should make put request to make master language',

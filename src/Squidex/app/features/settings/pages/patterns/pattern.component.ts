@@ -7,6 +7,7 @@
 
 import { Component, Input, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
+import { onErrorResumeNext } from 'rxjs/operators';
 
 import {
     AppPatternDto,
@@ -40,7 +41,7 @@ export class PatternComponent implements OnInit {
     }
 
     public delete() {
-        this.patternsState.delete(this.pattern).onErrorResumeNext().subscribe();
+        this.patternsState.delete(this.pattern).pipe(onErrorResumeNext()).subscribe();
     }
 
     public save() {

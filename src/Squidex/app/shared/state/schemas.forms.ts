@@ -6,6 +6,7 @@
  */
 
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { map, startWith } from 'rxjs/operators';
 
 import { Form, ValidatorsEx } from '@app/framework';
 
@@ -23,8 +24,8 @@ export class CreateCategoryForm extends Form<FormGroup> {
 
 export class CreateSchemaForm extends Form<FormGroup> {
     public schemaName =
-        this.form.controls['name'].valueChanges.map(n => n || FALLBACK_NAME)
-            .startWith(FALLBACK_NAME);
+        this.form.controls['name'].valueChanges.pipe(
+            map(n => n || FALLBACK_NAME), startWith(FALLBACK_NAME));
 
     constructor(formBuilder: FormBuilder) {
         super(formBuilder.group({

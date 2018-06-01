@@ -8,6 +8,7 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivate, Router } from '@angular/router';
 import { Observable } from 'rxjs';
+import { map, tap } from 'rxjs/operators';
 
 import { allParams } from '@app/framework';
 
@@ -25,13 +26,13 @@ export class SchemaMustExistGuard implements CanActivate {
         const schemaName = allParams(route)['schemaName'];
 
         const result =
-            this.schemasState.select(schemaName)
-                .do(dto => {
+            this.schemasState.select(schemaName).pipe(
+                tap(dto => {
                     if (!dto) {
                         this.router.navigate(['/404']);
                     }
-                })
-                .map(s => s !== null);
+                }),
+                map(s => s !== null));
 
         return result;
     }

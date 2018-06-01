@@ -32,7 +32,7 @@ describe('EventConsumersService', () => {
     it('should make get request to get event consumers',
         inject([EventConsumersService, HttpTestingController], (eventConsumersService: EventConsumersService, httpMock: HttpTestingController) => {
 
-        let eventConsumers: EventConsumerDto[] | null = null;
+        let eventConsumers: EventConsumerDto[];
 
         eventConsumersService.getEventConsumers().subscribe(result => {
             eventConsumers = result;
@@ -60,10 +60,11 @@ describe('EventConsumersService', () => {
             }
         ]);
 
-        expect(eventConsumers).toEqual([
-            new EventConsumerDto('event-consumer1', true, true, 'an error 1', '13'),
-            new EventConsumerDto('event-consumer2', true, true, 'an error 2', '29')
-        ]);
+        expect(eventConsumers!).toEqual(
+            [
+                new EventConsumerDto('event-consumer1', true, true, 'an error 1', '13'),
+                new EventConsumerDto('event-consumer2', true, true, 'an error 2', '29')
+            ]);
     }));
 
     it('should make put request to start event consumer',

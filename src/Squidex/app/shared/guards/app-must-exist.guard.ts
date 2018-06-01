@@ -8,6 +8,7 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivate, Router } from '@angular/router';
 import { Observable } from 'rxjs';
+import { map, tap } from 'rxjs/operators';
 
 import { AppsState } from './../state/apps.state';
 
@@ -23,12 +24,13 @@ export class AppMustExistGuard implements CanActivate {
         const appName = route.params['appName'];
 
         const result =
-            this.appsState.select(appName)
-                .do(dto => {
+            this.appsState.select(appName).pipe(
+                tap(dto => {
                     if (!dto) {
                         this.router.navigate(['/404']);
                     }
-                }).map(a => !!a);
+                }),
+                map(a => !!a));
 
         return result;
     }

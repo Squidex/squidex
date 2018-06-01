@@ -38,7 +38,7 @@ describe('UsersService', () => {
     it('should make get request to get many users',
         inject([UsersService, HttpTestingController], (userManagementService: UsersService, httpMock: HttpTestingController) => {
 
-        let users: UsersDto | null = null;
+        let users: UsersDto;
 
         userManagementService.getUsers(20, 30).subscribe(result => {
             users = result;
@@ -67,7 +67,7 @@ describe('UsersService', () => {
             ]
         });
 
-        expect(users).toEqual(
+        expect(users!).toEqual(
             new UsersDto(100, [
                 new UserDto('123', 'mail1@domain.com', 'User1', true),
                 new UserDto('456', 'mail2@domain.com', 'User2', true)
@@ -77,7 +77,7 @@ describe('UsersService', () => {
     it('should make get request with query to get many users',
         inject([UsersService, HttpTestingController], (userManagementService: UsersService, httpMock: HttpTestingController) => {
 
-        let users: UsersDto | null = null;
+        let users: UsersDto;
 
         userManagementService.getUsers(20, 30, 'my-query').subscribe(result => {
             users = result;
@@ -106,7 +106,7 @@ describe('UsersService', () => {
             ]
         });
 
-        expect(users).toEqual(
+        expect(users!).toEqual(
             new UsersDto(100, [
                 new UserDto('123', 'mail1@domain.com', 'User1', true),
                 new UserDto('456', 'mail2@domain.com', 'User2', true)
@@ -116,7 +116,7 @@ describe('UsersService', () => {
     it('should make get request to get single user',
         inject([UsersService, HttpTestingController], (userManagementService: UsersService, httpMock: HttpTestingController) => {
 
-        let user: UserDto | null = null;
+        let user: UserDto;
 
         userManagementService.getUser('123').subscribe(result => {
             user = result;
@@ -135,7 +135,7 @@ describe('UsersService', () => {
             isLocked: true
         });
 
-        expect(user).toEqual(new UserDto('123', 'mail1@domain.com', 'User1', true));
+        expect(user!).toEqual(new UserDto('123', 'mail1@domain.com', 'User1', true));
     }));
 
     it('should make post request to create user',
@@ -143,7 +143,7 @@ describe('UsersService', () => {
 
         const dto = new CreateUserDto('mail@squidex.io', 'Squidex User', 'password');
 
-        let user: UserDto | null = null;
+        let user: UserDto;
 
         userManagementService.postUser(dto).subscribe(result => {
             user = result;
@@ -156,7 +156,7 @@ describe('UsersService', () => {
 
         req.flush({ id: '123', pictureUrl: 'path/to/image1' });
 
-        expect(user).toEqual(new UserDto('123', dto.email, dto.displayName, false));
+        expect(user!).toEqual(new UserDto('123', dto.email, dto.displayName, false));
     }));
 
     it('should make put request to update user',

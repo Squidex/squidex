@@ -6,7 +6,8 @@
  */
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Observable, Subscription } from 'rxjs';
+import { Subscription, timer } from 'rxjs';
+import { onErrorResumeNext, switchMap } from 'rxjs/operators';
 
 import { ModalView } from '@app/shared';
 
@@ -34,28 +35,28 @@ export class EventConsumersPageComponent implements OnDestroy, OnInit {
     }
 
     public ngOnInit() {
-        this.eventConsumersState.load(false, true).onErrorResumeNext().subscribe();
+        this.eventConsumersState.load(false, true).pipe(onErrorResumeNext()).subscribe();
 
         this.timerSubscription =
-            Observable.timer(2000, 2000)
-                .switchMap(x => this.eventConsumersState.load(true, true).onErrorResumeNext())
+            timer(2000, 2000).pipe(
+                    switchMap(x => this.eventConsumersState.load(true, true)), onErrorResumeNext())
                 .subscribe();
     }
 
     public reload() {
-        this.eventConsumersState.load(true, false).onErrorResumeNext().subscribe();
+        this.eventConsumersState.load(true, false).pipe(onErrorResumeNext()).subscribe();
     }
 
     public start(es: EventConsumerDto) {
-        this.eventConsumersState.start(es).onErrorResumeNext().subscribe();
+        this.eventConsumersState.start(es).pipe(onErrorResumeNext()).subscribe();
     }
 
     public stop(es: EventConsumerDto) {
-        this.eventConsumersState.stop(es).onErrorResumeNext().subscribe();
+        this.eventConsumersState.stop(es).pipe(onErrorResumeNext()).subscribe();
     }
 
     public reset(es: EventConsumerDto) {
-        this.eventConsumersState.reset(es).onErrorResumeNext().subscribe();
+        this.eventConsumersState.reset(es).pipe(onErrorResumeNext()).subscribe();
     }
 
     public trackByEventConsumer(index: number, es: EventConsumerDto) {

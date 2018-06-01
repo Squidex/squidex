@@ -18,15 +18,6 @@ module.exports = webpackMerge(commonConfig, {
 
     plugins: [
         /**
-         * Shares common code between the pages.
-         *
-         * See: https://webpack.js.org/plugins/commons-chunk-plugin/
-         */
-        new webpack.optimize.CommonsChunkPlugin({
-            name: ['app', 'shims']
-        }),
-
-        /**
          * Simplifies creation of HTML files to serve your webpack bundles.
          * This is especially useful for webpack bundles that include a hash in the filename
          * which changes every compilation.

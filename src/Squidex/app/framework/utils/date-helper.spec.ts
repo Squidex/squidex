@@ -11,7 +11,7 @@ import { DateHelper } from './date-helper';
 
 describe('DateHelper', () => {
     it('should call config method of moment object', () => {
-        let called: string | null = null;
+        let called: string;
 
         DateHelper.setMoment({
             locale: (l: string) => { called = l; }
@@ -19,7 +19,7 @@ describe('DateHelper', () => {
 
         DateHelper.locale('en');
 
-        expect(called).toBe('en');
+        expect(called!).toBe('en');
     });
 
     it('should use global moment if not configured', () => {
