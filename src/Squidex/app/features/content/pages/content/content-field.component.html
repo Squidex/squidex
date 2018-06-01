@@ -19,7 +19,7 @@
         </sqx-onboarding-tooltip>
     </ng-container>
 
-    <sqx-control-errors [for]="selectedFormControl" [fieldName]="field.displayName" [submitted]="contentFormSubmitted"></sqx-control-errors>
+    <sqx-control-errors [for]="selectedFormControl" [fieldName]="field.displayName" [submitted]="form.submitted | async"></sqx-control-errors>
 
     <div>
         <ng-container *ngIf="field.properties.editorUrl">
@@ -109,6 +109,15 @@
                 </ng-container>
                 <ng-container *ngSwitchCase="'Tags'">
                     <sqx-tag-editor [formControl]="selectedFormControl"></sqx-tag-editor>
+                </ng-container>
+                <ng-container *ngSwitchCase="'Array'">
+                    <sqx-array-editor 
+                        [arrayControl]="selectedFormControl"
+                        [form]="form"
+                        [field]="field"
+                        [language]="language"
+                        [languages]="languages">
+                    </sqx-array-editor>
                 </ng-container>
                 <ng-container *ngSwitchCase="'References'">
                     <sqx-references-editor

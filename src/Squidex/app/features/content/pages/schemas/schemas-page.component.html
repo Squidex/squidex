@@ -16,12 +16,14 @@
     </ng-container>
 
     <ng-container content>
-        <sqx-schema-category *ngFor="let category of schemasState.categories | async; trackBy: trackByCategory"
-            [name]="category"
-            [schemas]="schemasState.schemas | async"
-            [schemasFilter]="schemasFilter.valueChanges | async"
-            [isReadonly]="true">
-        </sqx-schema-category>
+        <ng-container *ngIf="schemasState.publishedSchemas | async; let schemas">
+            <sqx-schema-category *ngFor="let category of schemasState.categories | async; trackBy: trackByCategory"
+                [name]="category"
+                [schemas]="schemas"
+                [schemasFilter]="schemasFilter.valueChanges | async"
+                [isReadonly]="true">
+            </sqx-schema-category>
+        </ng-container>
     </ng-container>
 </sqx-panel>
 

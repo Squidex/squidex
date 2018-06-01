@@ -19,6 +19,7 @@ import {
 } from '@app/shared';
 
 import {
+    ArrayEditorComponent,
     AssetsEditorComponent,
     ContentFieldComponent,
     ContentHistoryComponent,
@@ -84,6 +85,7 @@ const routes: Routes = [
         RouterModule.forChild(routes)
     ],
     declarations: [
+        ArrayEditorComponent,
         AssetsEditorComponent,
         ContentFieldComponent,
         ContentHistoryComponent,

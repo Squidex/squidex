@@ -1,0 +1,133 @@
+<div class="array-container" *ngIf="arrayControl.controls.length > 0">
+    <div class="array-item" *ngFor="let nestedForm of arrayControl.controls; let i = index">
+        <button type="button" class="btn btn-link btn-danger array-item-remove" (click)="removeItem(i)">
+            <i class="icon-bin2"></i>
+        </button>
+        
+        <div class="form-group" *ngFor="let nestedField of field.nested">
+            <ng-container *ngIf="nestedForm.get(nestedField.name); let nestedFieldForm">
+                <label>
+                    {{nestedField.displayName}} <span class="field-required" [class.hidden]="!nestedField.properties.isRequired">*</span>
+                </label> 
+                
+                <span class="field-disabled" *ngIf="nestedField.isDisabled">Disabled</span>
+            
+                <sqx-control-errors [for]="nestedFieldForm" [fieldName]="nestedField.displayName" [submitted]="form.submitted | async"></sqx-control-errors>
+            
+                <div>
+                    <ng-container *ngIf="nestedField.properties.editorUrl">
+                        <sqx-iframe-editor [url]="nestedField.properties.editorUrl" [formControl]="nestedFieldForm"></sqx-iframe-editor>
+                    </ng-container>
+            
+                    <ng-container *ngIf="!nestedField.properties.editorUrl">
+                        <ng-container [ngSwitch]="nestedField.properties.fieldType">
+                            <ng-container *ngSwitchCase="'Number'">
+                                <ng-container [ngSwitch]="nestedField.properties['editor']">
+                                    <ng-container *ngSwitchCase="'Input'">
+                                        <input class="form-control" type="number" [formControl]="nestedFieldForm" [placeholder]="nestedField.displayPlaceholder" />
+                                    </ng-container>
+                                    <ng-container *ngSwitchCase="'Stars'">
+                                        <sqx-stars [formControl]="nestedFieldForm" [maximumStars]="nestedField.properties['maxValue']"></sqx-stars>
+                                    </ng-container>
+                                    <ng-container *ngSwitchCase="'Dropdown'">
+                                        <select class="form-control" [formControl]="nestedFieldForm">
+                                            <option [ngValue]="null"></option>
+                                            <option *ngFor="let value of nestedField.properties['allowedValues']" [ngValue]="value">{{value}}</option>
+                                        </select>
+                                    </ng-container>
+                                    <ng-container *ngSwitchCase="'Radio'">
+                                        <ng-container class="form-check form-check-inline" *ngFor="let value of nestedField.properties['allowedValues']">
+                                            <input class="form-check-input" type="radio" [value]="value" [formControl]="nestedFieldForm" />
+                                            <label class="form-check-label">
+                                                {{value}}
+                                            </label>
+                                        </ng-container>
+                                    </ng-container>
+                                </ng-container>
+                            </ng-container>
+                            <ng-container *ngSwitchCase="'String'">
+                                <ng-container [ngSwitch]="nestedField.properties['editor']">
+                                    <ng-container *ngSwitchCase="'Input'">
+                                        <input class="form-control" type="text" [formControl]="nestedFieldForm" [placeholder]="nestedField.displayPlaceholder" />
+                                    </ng-container>
+                                    <ng-container *ngSwitchCase="'Slug'">
+                                        <input class="form-control" type="text" [formControl]="nestedFieldForm" [placeholder]="nestedField.displayPlaceholder" sqxTransformInput="Slugify" />
+                                    </ng-container>
+                                    <ng-container *ngSwitchCase="'TextArea'">
+                                        <textarea class="form-control" [formControl]="nestedFieldForm" rows="5" [placeholder]="nestedField.displayPlaceholder"></textarea>
+                                    </ng-container>
+                                    <ng-container *ngSwitchCase="'RichText'">
+                                        <sqx-rich-editor [formControl]="nestedFieldForm"></sqx-rich-editor>
+                                    </ng-container>
+                                    <ng-container *ngSwitchCase="'Markdown'">
+                                        <sqx-markdown-editor [formControl]="nestedFieldForm"></sqx-markdown-editor>
+                                    </ng-container>
+                                    <ng-container *ngSwitchCase="'Dropdown'">
+                                        <select class="form-control" [formControl]="nestedFieldForm">
+                                            <option [ngValue]="null"></option>
+                                            <option *ngFor="let value of nestedField.properties['allowedValues']" [ngValue]="value">{{value}}</option>
+                                        </select>
+                                    </ng-container>
+                                    <ng-container *ngSwitchCase="'Radio'">
+                                        <ng-container class="form-check form-check-inline" *ngFor="let value of nestedField.properties['allowedValues']">
+                                            <input class="form-check-input" type="radio" value="{{value}}" [formControl]="nestedFieldForm" />
+                                            <label class="form-check-label">
+                                                {{value}}
+                                            </label>
+                                        </ng-container>
+                                    </ng-container>
+                                </ng-container>
+                            </ng-container>
+                            <ng-container *ngSwitchCase="'Boolean'">
+                                <ng-container [ngSwitch]="nestedField.properties['editor']">
+                                    <ng-container *ngSwitchCase="'Toggle'">
+                                        <sqx-toggle [formControl]="nestedFieldForm"></sqx-toggle>
+                                    </ng-container>
+                                    <ng-container *ngSwitchCase="'Checkbox'">
+                                        <input type="checkbox" [formControl]="nestedFieldForm" sqxIndeterminateValue />
+                                    </ng-container>
+                                </ng-container>
+                            </ng-container>
+                            <ng-container *ngSwitchCase="'DateTime'">
+                                <sqx-date-time-editor enforceTime="true" [mode]="nestedField.properties['editor']" [formControl]="nestedFieldForm"></sqx-date-time-editor>
+                            </ng-container>
+                            <ng-container *ngSwitchCase="'Geolocation'">
+                                <sqx-geolocation-editor [formControl]="nestedFieldForm"></sqx-geolocation-editor>
+                            </ng-container>
+                            <ng-container *ngSwitchCase="'Json'">
+                                <sqx-json-editor [formControl]="nestedFieldForm"></sqx-json-editor>
+                            </ng-container>
+                            <ng-container *ngSwitchCase="'Assets'">
+                                <sqx-assets-editor [formControl]="nestedFieldForm"></sqx-assets-editor>
+                            </ng-container>
+                            <ng-container *ngSwitchCase="'Tags'">
+                                <sqx-tag-editor [formControl]="nestedFieldForm"></sqx-tag-editor>
+                            </ng-container>
+                            <ng-container *ngSwitchCase="'Array'">
+                                <sqx-array-editor [formControl]="nestedFieldForm" [field]="field"></sqx-array-editor>
+                            </ng-container>
+                            <ng-container *ngSwitchCase="'References'">
+                                <sqx-references-editor
+                                    [formControl]="nestedFieldForm" 
+                                    [language]="language"
+                                    [languages]="languages"
+                                    [schemaId]="nestedField.properties['schemaId']">
+                                </sqx-references-editor>
+                            </ng-container>
+                        </ng-container>
+                    </ng-container>
+                </div>
+            
+                <ng-container *ngIf="nestedField.properties['hints']; let hints">
+                    <small class="form-text text-muted" *ngIf="hints.length > 0">
+                        {{hints}}
+                    </small>
+                </ng-container>
+            </ng-container>
+        </div>
+    </div>
+</div>
+
+<button class="btn btn-success" (click)="addItem()">
+    Add Item
+</button>

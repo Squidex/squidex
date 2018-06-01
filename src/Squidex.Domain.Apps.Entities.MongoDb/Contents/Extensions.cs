@@ -42,7 +42,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             return result.ConvertName2Id(schema,
                 FieldConverters.ForValues(
                     ValueConverters.EncodeJson()),
-                FieldConverters.ForNestedId2Name(
+                FieldConverters.ForNestedName2Id(
                     ValueConverters.EncodeJson()));
         }
 

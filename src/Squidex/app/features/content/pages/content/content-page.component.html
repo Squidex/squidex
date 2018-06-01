@@ -104,11 +104,11 @@
 
             <div *ngFor="let field of schema.fields">
                 <sqx-content-field 
+                    [form]="contentForm"
                     [field]="field"
-                    [fieldForm]="contentForm.form.controls[field.name]" 
+                    [fieldForm]="contentForm.form.get(field.name)" 
                     [(language)]="language"
-                    [languages]="languages"
-                    [contentFormSubmitted]="contentForm.submitted | async">
+                    [languages]="languages">
                 </sqx-content-field>
             </div>
         </ng-container>
