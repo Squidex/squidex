@@ -106,7 +106,7 @@
             <span class="nested-field-line-v"></span>
 
             <div [sqxSortModel]="nested" (sqxSorted)="sortFields($event)" handleClass="nested">
-                <div class="nested-field" *ngFor="let nested of nested">
+                <div class="nested-field" *ngFor="let nested of nested; trackBy: trackByField">
                     <span class="nested-field-line-h"></span>
     
                     <sqx-field [field]="nested" [schema]="schema" [parent]="field" [patterns]="patterns" handleClass="nested"></sqx-field>

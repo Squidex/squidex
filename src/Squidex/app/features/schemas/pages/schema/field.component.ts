@@ -111,6 +111,10 @@ export class FieldComponent implements OnInit {
         this.schemasState.lockField(this.schema, this.field).onErrorResumeNext().subscribe();
     }
 
+    public trackByField(index: number, field: NestedFieldDto) {
+        return field.fieldId;
+    }
+
     public save() {
         const value = this.editForm.submit();
 

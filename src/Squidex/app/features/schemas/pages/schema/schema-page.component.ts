@@ -88,6 +88,10 @@ export class SchemaPageComponent implements OnDestroy, OnInit {
         this.schemasState.sortFields(this.schema, fields).subscribe();
     }
 
+    public trackByField(index: number, field: FieldDto) {
+        return field.fieldId;
+    }
+
     public deleteSchema() {
         this.schemasState.delete(this.schema)
             .subscribe(() => {
