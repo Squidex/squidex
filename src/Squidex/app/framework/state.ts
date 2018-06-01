@@ -5,45 +5,17 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AbstractControl, FormArray, FormGroup } from '@angular/forms';
+import { AbstractControl } from '@angular/forms';
 import { BehaviorSubject, Observable } from 'rxjs';
 
-import { ErrorDto } from './utils/error';
-import { Types } from './utils/types';
+import { ErrorDto, Types } from '@app/framework/internal';
+import { fullValue} from './angular/forms/forms-helper';
 
 export interface FormState {
     submitted: boolean;
 
     error?: string;
 }
-
-export class Lazy<T> {
-    private valueSet = false;
-    private valueField: T;
-
-    public get value(): T {
-        if (!this.valueSet) {
-            this.valueField = this.factory();
-            this.valueSet = true;
-        }
-
-        return this.valueField;
-    }
-    constructor(
-        private readonly factory: () => T
-    ) {
-    }
-}
-
-export const formControls = (form: AbstractControl): AbstractControl[] => {
-    if (Types.is(form, FormGroup)) {
-        return Object.values(form.controls);
-    } else if (Types.is(form, FormArray)) {
-        return form.controls;
-    } else {
-        return [];
-    }
-};
 
 export class Form<T extends AbstractControl> {
     private readonly state = new State<FormState>({ submitted: false });
@@ -85,7 +57,7 @@ export class Form<T extends AbstractControl> {
         this.state.next({ submitted: true });
 
         if (this.form.valid) {
-            const value = this.form.value;
+            const value = fullValue(this.form);
 
             this.disable();
 
@@ -132,6 +104,10 @@ export class Model {
         }
 
         const clone = Object.assign(Object.create(Object.getPrototypeOf(this)), this, values);
+
+        if (Types.isFunction(clone.onCloned)) {
+            clone.onCloned();
+        }
 
         return clone;
     }

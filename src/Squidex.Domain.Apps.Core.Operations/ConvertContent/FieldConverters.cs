@@ -233,54 +233,61 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
             {
                 if (field is IArrayField arrayField)
                 {
+                    var result = new ContentFieldData();
+
                     foreach (var partition in data)
                     {
-                        if (partition.Value is JArray jArray)
+                        if (!(partition.Value is JArray jArray))
                         {
-                            for (var i = 0; i < jArray.Count; i++)
+                            continue;
+                        }
+
+                        var newArray = new JArray();
+
+                        foreach (JObject item in jArray.OfType<JObject>())
+                        {
+                            var newItem = new JObject();
+
+                            foreach (var kvp in item)
                             {
-                                if (jArray[i] is JObject item)
+                                var nestedField = fieldResolver(arrayField, kvp.Key);
+
+                                if (nestedField == null)
                                 {
-                                    var result = new JObject();
+                                    continue;
+                                }
 
-                                    foreach (var kvp in item)
+                                var newValue = kvp.Value;
+
+                                var isUnset = false;
+
+                                if (converters != null)
+                                {
+                                    foreach (var converter in converters)
                                     {
-                                        var nestedField = fieldResolver(arrayField, kvp.Key);
+                                        newValue = converter(newValue, nestedField);
 
-                                        if (nestedField == null)
+                                        if (ReferenceEquals(newValue, Value.Unset))
                                         {
-                                            continue;
-                                        }
-
-                                        var newValue = kvp.Value;
-
-                                        var isUnset = false;
-
-                                        if (converters != null)
-                                        {
-                                            foreach (var converter in converters)
-                                            {
-                                                newValue = converter(newValue, nestedField);
-
-                                                if (ReferenceEquals(newValue, Value.Unset))
-                                                {
-                                                    isUnset = true;
-                                                    break;
-                                                }
-                                            }
-                                        }
-
-                                        if (!isUnset)
-                                        {
-                                            result.Add(keyResolver(nestedField), newValue);
+                                            isUnset = true;
+                                            break;
                                         }
                                     }
+                                }
 
-                                    jArray[i] = result;
+                                if (!isUnset)
+                                {
+                                    newItem.Add(keyResolver(nestedField), newValue);
                                 }
                             }
+
+                            newArray.Add(newItem);
                         }
+
+                        result.Add(partition.Key, newArray);
                     }
+
+                    return result;
                 }
 
                 return data;
@@ -293,7 +300,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
             {
                 if (!(field is IArrayField))
                 {
-                    ContentFieldData result = null;
+                    var result = new ContentFieldData();
 
                     foreach (var partition in data)
                     {
@@ -315,21 +322,13 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
                             }
                         }
 
-                        if (result != null || isUnset || !ReferenceEquals(newValue, partition.Value))
+                        if (!isUnset)
                         {
-                            if (result == null)
-                            {
-                                result = new ContentFieldData();
-                            }
-
-                            if (!isUnset)
-                            {
-                                result.Add(partition.Key, newValue);
-                            }
+                            result.Add(partition.Key, newValue);
                         }
                     }
 
-                    return result ?? data;
+                    return result;
                 }
 
                 return data;

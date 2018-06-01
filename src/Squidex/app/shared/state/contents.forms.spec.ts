@@ -129,7 +129,7 @@ describe('ArrayField', () => {
     });
 
     it('should format to asset count', () => {
-        expect(FieldFormatter.format(field, [1, 2, 3])).toBe('3 Items(s)');
+        expect(FieldFormatter.format(field, [1, 2, 3])).toBe('3 Item(s)');
     });
 
     it('should return zero formatting if other type', () => {
@@ -250,15 +250,15 @@ describe('DateTimeField', () => {
     });
 
     it('should return calculated date when Today for DateFieldProperties', () => {
-        Object.assign(field.properties, { calculatedFieldDefaultValue: 'Today' });
+        Object.assign(field.properties, { calculatedDefaultValue: 'Today' });
 
-        expect((<any>field).properties.getFieldDefaultValue(now)).toEqual('2017-10-12');
+        expect(FieldDefaultValue.get(field, now)).toEqual('2017-10-12');
     });
 
     it('should return calculated date when Now for DateFieldProperties', () => {
-        Object.assign(field.properties, { calculatedFieldDefaultValue: 'Now' });
+        Object.assign(field.properties, { calculatedDefaultValue: 'Now' });
 
-        expect((<any>field).properties.getFieldDefaultValue(now)).toEqual('2017-10-12T16:30:10Z');
+        expect(FieldDefaultValue.get(field, now)).toEqual('2017-10-12T16:30:10Z');
     });
 });
 

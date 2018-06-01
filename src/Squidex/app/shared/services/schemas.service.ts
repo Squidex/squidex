@@ -16,7 +16,6 @@ import {
     ApiUrlConfig,
     DateTime,
     HTTP,
-    Lazy,
     Model,
     StringHelper,
     Version,
@@ -26,10 +25,8 @@ import {
 import { createProperties, FieldPropertiesDto } from './schemas.types';
 
 export class SchemaDto extends Model {
-    private readonly displayNameValue = new Lazy((() => StringHelper.firstNonEmpty(this.properties.label, this.name)));
-
     public get displayName() {
-        return this.displayNameValue.value;
+        return StringHelper.firstNonEmpty(this.properties.label, this.name);
     }
 
     constructor(
@@ -53,28 +50,8 @@ export class SchemaDto extends Model {
 }
 
 export class SchemaDetailsDto extends SchemaDto {
-    private inlineEditableFieldsValue = new Lazy(() => this.listFields.filter(x => x.isInlineEditable));
-    private listFieldsValue = new Lazy(() => {
-        let fields = this.fields.filter(x => x.properties.isListField);
-
-        if (fields.length === 0 && this.fields.length > 0) {
-            fields = [this.fields[0]];
-        }
-
-        if (fields.length === 0) {
-            fields = [<any>{ properties: {} }];
-        }
-
-        return fields;
-    });
-
-    public get inlineEditableFields() {
-        return this.inlineEditableFieldsValue.value;
-    }
-
-    public get listFields() {
-        return this.listFieldsValue.value;
-    }
+    public listFields: RootFieldDto[];
+    public listFieldsEditable: RootFieldDto[];
 
     constructor(id: string, name: string, category: string, properties: SchemaPropertiesDto, isPublished: boolean, created: DateTime, createdBy: string, lastModified: DateTime, lastModifiedBy: string, version: Version,
         public readonly fields: RootFieldDto[],
@@ -85,6 +62,25 @@ export class SchemaDetailsDto extends SchemaDto {
         public readonly scriptChange?: string
     ) {
         super(id, name, category, properties, isPublished, created, createdBy, lastModified, lastModifiedBy, version);
+
+        this.onCloned();
+    }
+
+    protected onCloned() {
+        if (this.fields) {
+            let fields = this.fields.filter(x => x.properties.isListField);
+
+            if (fields.length === 0 && this.fields.length > 0) {
+                fields = [this.fields[0]];
+            }
+
+            if (fields.length === 0) {
+                fields = [<any>{ properties: {} }];
+            }
+
+            this.listFields = fields;
+            this.listFieldsEditable = fields.filter(x => x.isInlineEditable);
+        }
     }
 
     public with(value: Partial<SchemaDetailsDto>): SchemaDetailsDto {

@@ -43,7 +43,7 @@ export class FieldFormatter implements FieldPropertiesVisitor<string> {
     }
 
     public static format(field: FieldDto, value: any) {
-        if (!value) {
+        if (value === null || value === undefined) {
             return '';
         }
 
@@ -259,8 +259,25 @@ export class FieldValidatorsFactory implements FieldPropertiesVisitor<ValidatorF
 }
 
 export class FieldDefaultValue implements FieldPropertiesVisitor<any> {
-    public static get(field: FieldDto) {
-        return field.properties.accept(new FieldDefaultValue());
+    constructor(
+        private readonly now?: DateTime
+    ) {
+    }
+
+    public visitDateTime(properties: DateTimeFieldPropertiesDto): any {
+        const now = this.now || DateTime.now();
+
+        if (properties.calculatedDefaultValue === 'Now') {
+            return now.toUTCStringFormat('YYYY-MM-DDTHH:mm:ss') + 'Z';
+        } else if (properties.calculatedDefaultValue === 'Today') {
+            return now.toUTCStringFormat('YYYY-MM-DD');
+        } else {
+            return properties.defaultValue;
+        }
+    }
+
+    public static get(field: FieldDto, now?: DateTime) {
+        return field.properties.accept(new FieldDefaultValue(now));
     }
 
     public visitArray(properties: ArrayFieldPropertiesDto): any {
@@ -273,10 +290,6 @@ export class FieldDefaultValue implements FieldPropertiesVisitor<any> {
 
     public visitBoolean(properties: BooleanFieldPropertiesDto): any {
         return properties.defaultValue;
-    }
-
-    public visitDateTime(properties: DateTimeFieldPropertiesDto): any {
-        return null;
     }
 
     public visitGeolocation(properties: GeolocationFieldPropertiesDto): any {
@@ -388,16 +401,24 @@ export class EditContentForm extends Form<FormGroup> {
                 const fieldValue = value ? value[field.name] || {} : {};
 
                 const addControls = (key: string, language: AppLanguageDto | null) => {
-                    const languageValue = fieldValue[key];
-                    const languageForm = new FormArray([]);
+                    const partitionValue = fieldValue[key];
 
-                    if (Types.isArray(languageValue)) {
-                        for (let i = 0; i < languageValue.length; i++) {
-                            this.addArrayItem(field, language, languageForm);
-                        }
+                    let partitionForm = <FormArray>fieldForm.controls[key];
+
+                    if (!partitionForm) {
+                        partitionForm = new FormArray([]);
+
+                        fieldForm.setControl(key, partitionForm);
                     }
 
-                    fieldForm.setControl(key, languageForm);
+                    const length = Types.isArray(partitionValue) ? partitionValue.length : 0;
+
+                    while (partitionForm.controls.length < length) {
+                        this.addArrayItem(field, language, partitionForm);
+                    }
+                    while (partitionForm.controls.length > length) {
+                        partitionForm.removeAt(partitionForm.length - 1);
+                    }
                 };
 
                 if (field.isLocalizable) {
@@ -432,19 +453,21 @@ export class EditContentForm extends Form<FormGroup> {
                 continue;
             }
 
-            if (field.properties.fieldType === 'Array') {
+            if (field.isArray) {
+                fieldForm.enable();
+
                 for (let partitionForm of formControls(fieldForm)) {
-                    for (let nested of field.nested) {
-                        const nestedForm = partitionForm.get(nested.name);
+                    for (let itemForm of formControls(partitionForm)) {
+                        for (let nested of field.nested) {
+                            const nestedForm = itemForm.get(nested.name);
 
-                        if (!nestedForm) {
-                            continue;
-                        }
+                            if (!nestedForm) {
+                                continue;
+                            }
 
-                        if (nested.isDisabled) {
-                            nestedForm.disable();
-                        } else {
-                            nestedForm.enable();
+                            if (nested.isDisabled) {
+                                nestedForm.disable({ onlySelf: true });
+                            }
                         }
                     }
                 }
@@ -464,7 +487,7 @@ export class PatchContentForm extends Form<FormGroup> {
     ) {
         super(new FormGroup({}));
 
-        for (let field of this.schema.inlineEditableFields) {
+        for (let field of this.schema.listFieldsEditable) {
             const validators = FieldValidatorsFactory.createValidators(field, this.language.isOptional);
 
             this.form.setControl(field.name, new FormControl(undefined, validators));
@@ -477,7 +500,7 @@ export class PatchContentForm extends Form<FormGroup> {
         if (result) {
             const request = {};
 
-            for (let field of this.schema.inlineEditableFields) {
+            for (let field of this.schema.listFieldsEditable) {
                 const value = result[field.name];
 
                 if (field.isLocalizable) {

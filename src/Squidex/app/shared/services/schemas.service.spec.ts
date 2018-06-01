@@ -158,6 +158,7 @@ describe('SchemasService', () => {
                         {
                             fieldId: 101,
                             name: 'field101',
+                            isLocked: true,
                             isHidden: true,
                             isDisabled: true,
                             properties: {
@@ -167,6 +168,7 @@ describe('SchemasService', () => {
                         {
                             fieldId: 102,
                             name: 'field102',
+                            isLocked: true,
                             isHidden: true,
                             isDisabled: true,
                             properties: {
@@ -293,8 +295,8 @@ describe('SchemasService', () => {
                 new Version('2'),
                 [
                     new RootFieldDto(11, 'field11', createProperties('Array'), 'language', true, true, true, [
-                        new NestedFieldDto(101, 'field101', createProperties('String'), 11, true, true),
-                        new NestedFieldDto(102, 'field102', createProperties('Number'), 11, true, true)
+                        new NestedFieldDto(101, 'field101', createProperties('String'), 11, true, true, true),
+                        new NestedFieldDto(102, 'field102', createProperties('Number'), 11, true, true, true)
                     ]),
                     new RootFieldDto(12, 'field12', createProperties('Assets'), 'language', true, true, true),
                     new RootFieldDto(13, 'field13', createProperties('Boolean'), 'language', true, true, true),

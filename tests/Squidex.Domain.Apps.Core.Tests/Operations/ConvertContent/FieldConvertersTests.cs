@@ -28,18 +28,6 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
             Fields.Number(2, "field2").Hide());
 
         [Fact]
-        public void Should_return_same_object_for_value_conversion_if_nothing_converted()
-        {
-            var input =
-                new ContentFieldData()
-                    .AddValue("iv", new JObject());
-
-            var actual = FieldConverters.ForValues()(input, stringInvariantField);
-
-            Assert.Same(input, actual);
-        }
-
-        [Fact]
         public void Should_filter_for_value_conversion()
         {
             var input =
