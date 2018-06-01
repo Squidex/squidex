@@ -40,11 +40,15 @@ describe('EventConsumersState', () => {
         expect(eventConsumersState.snapshot.eventConsumers.values).toEqual(oldConsumers);
         expect(eventConsumersState.snapshot.isLoaded).toBeTruthy();
 
+        expect().nothing();
+
         dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
     });
 
     it('should show notification on load when reload is true', () => {
         eventConsumersState.load(true).subscribe();
+
+        expect().nothing();
 
         dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
     });
@@ -55,6 +59,8 @@ describe('EventConsumersState', () => {
 
         eventConsumersState.load(true, true).pipe(onErrorResumeNext()).subscribe();
 
+        expect().nothing();
+
         dialogs.verify(x => x.notifyError(It.isAny()), Times.once());
     });
 
@@ -63,6 +69,8 @@ describe('EventConsumersState', () => {
             .returns(() => throwError({}));
 
         eventConsumersState.load().pipe(onErrorResumeNext()).subscribe();
+
+        expect().nothing();
 
         dialogs.verify(x => x.notifyError(It.isAny()), Times.never());
     });

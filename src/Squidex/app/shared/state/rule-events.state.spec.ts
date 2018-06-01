@@ -63,6 +63,8 @@ describe('RuleEventsState', () => {
     it('should show notification on load when reload is true', () => {
         ruleEventsState.load(true).subscribe();
 
+        expect().nothing();
+
         dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
     });
 
@@ -73,6 +75,8 @@ describe('RuleEventsState', () => {
         ruleEventsState.goNext().subscribe();
         ruleEventsState.goPrev().subscribe();
 
+        expect().nothing();
+
         rulesService.verify(x => x.getEvents(app, 10, 10), Times.once());
         rulesService.verify(x => x.getEvents(app, 10, 0), Times.exactly(2));
     });
@@ -82,6 +86,8 @@ describe('RuleEventsState', () => {
             .returns(() => of({}));
 
         ruleEventsState.enqueue(oldRuleEvents[0]).subscribe();
+
+        expect().nothing();
 
         rulesService.verify(x => x.enqueueEvent(app, oldRuleEvents[0].id), Times.once());
     });

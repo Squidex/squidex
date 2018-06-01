@@ -58,6 +58,8 @@ describe('BackupsState', () => {
     it('should show notification on load when reload is true', () => {
         backupsState.load(true, false).subscribe();
 
+        expect().nothing();
+
         dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
     });
 
@@ -67,6 +69,8 @@ describe('BackupsState', () => {
 
         backupsState.load(true, true).pipe(onErrorResumeNext()).subscribe();
 
+        expect().nothing();
+
         dialogs.verify(x => x.notifyError(It.isAny()), Times.once());
     });
 
@@ -75,6 +79,8 @@ describe('BackupsState', () => {
             .returns(() => throwError({}));
 
         backupsState.load().pipe(onErrorResumeNext()).subscribe();
+
+        expect().nothing();
 
         dialogs.verify(x => x.notifyError(It.isAny()), Times.never());
     });

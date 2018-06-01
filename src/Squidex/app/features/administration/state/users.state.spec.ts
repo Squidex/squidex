@@ -64,6 +64,8 @@ describe('UsersState', () => {
     it('should show notification on load when reload is true', () => {
         usersState.load(true).subscribe();
 
+        expect().nothing();
+
         dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
     });
 
@@ -203,6 +205,8 @@ describe('UsersState', () => {
 
         usersState.goNext().subscribe();
         usersState.goPrev().subscribe();
+
+        expect().nothing();
 
         usersService.verify(x => x.getUsers(10, 10, undefined), Times.once());
         usersService.verify(x => x.getUsers(10, 0,  undefined), Times.exactly(2));

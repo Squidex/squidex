@@ -29,7 +29,7 @@
     "babel-polyfill": "6.26.0",
     "bootstrap": "4.1.1",
     "core-js": "2.5.7",
-    "dragula": "^3.7.2",
+    "dragula": "3.7.2",
     "graphiql": "0.11.11",
     "moment": "2.22.2",
     "mousetrap": "1.6.1",

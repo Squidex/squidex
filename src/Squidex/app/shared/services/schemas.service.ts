@@ -256,7 +256,7 @@ export class SchemasService {
             map(response => {
                 const body = response.payload.body;
 
-                const fields = body.fieldsmap((item: any) => {
+                const fields = body.fields.map((item: any) => {
                     const propertiesDto =
                         createProperties(
                             item.properties.fieldType,
@@ -265,7 +265,7 @@ export class SchemasService {
                     let nested: NestedFieldDto[] | null = null;
 
                     if (item.nested && item.nested.length > 0) {
-                        nested = item.nestedmap((nestedItem: any) => {
+                        nested = item.nested.map((nestedItem: any) => {
                             const nestedPropertiesDto =
                                 createProperties(
                                     nestedItem.properties.fieldType,

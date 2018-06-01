@@ -114,6 +114,8 @@ describe('SchemasState', () => {
     it('should show notification on load when reload is true', () => {
         schemasState.load(true).subscribe();
 
+        expect().nothing();
+
         dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
     });
 
@@ -134,6 +136,8 @@ describe('SchemasState', () => {
         schemasState.select('name2').subscribe();
 
         schemasService.verify(x => x.getSchema(app, 'name2'), Times.exactly(2));
+
+        expect().nothing();
     });
 
     it('should return schema on select and load when not loaded', () => {

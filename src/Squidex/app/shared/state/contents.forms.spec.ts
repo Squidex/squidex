@@ -209,9 +209,9 @@ describe('BooleanField', () => {
     });
 
     it('should return default value for default properties', () => {
-        Object.assign(field.properties, { defaultValue: true });
+        const field2 = createField(new BooleanFieldPropertiesDto('Checkbox', { defaultValue: true }));
 
-        expect(FieldDefaultValue.get(field)).toBeTruthy();
+        expect(FieldDefaultValue.get(field2)).toBeTruthy();
     });
 });
 
@@ -238,27 +238,27 @@ describe('DateTimeField', () => {
     });
 
     it('should format to date time', () => {
-        const dateTimeField = createField(new DateTimeFieldPropertiesDto('DateTime'));
+        const field2 = createField(new DateTimeFieldPropertiesDto('DateTime'));
 
-        expect(FieldFormatter.format(dateTimeField, '2017-12-12T16:00:00Z')).toBe('2017-12-12 16:00:00');
+        expect(FieldFormatter.format(field2, '2017-12-12T16:00:00Z')).toBe('2017-12-12 16:00:00');
     });
 
     it('should return default for DateFieldProperties', () => {
-        Object.assign(field.properties, { defaultValue: '2017-10-12T16:00:00Z' });
+        const field2 = createField(new DateTimeFieldPropertiesDto('DateTime', { defaultValue: '2017-10-12T16:00:00Z' }));
 
-        expect(FieldDefaultValue.get(field)).toEqual('2017-10-12T16:00:00Z');
+        expect(FieldDefaultValue.get(field2)).toEqual('2017-10-12T16:00:00Z');
     });
 
     it('should return calculated date when Today for DateFieldProperties', () => {
-        Object.assign(field.properties, { calculatedDefaultValue: 'Today' });
+        const field2 = createField(new DateTimeFieldPropertiesDto('DateTime', { calculatedDefaultValue: 'Today' }));
 
-        expect(FieldDefaultValue.get(field, now)).toEqual('2017-10-12');
+        expect(FieldDefaultValue.get(field2, now)).toEqual('2017-10-12');
     });
 
     it('should return calculated date when Now for DateFieldProperties', () => {
-        Object.assign(field.properties, { calculatedDefaultValue: 'Now' });
+        const field2 = createField(new DateTimeFieldPropertiesDto('DateTime', { calculatedDefaultValue: 'Now' }));
 
-        expect(FieldDefaultValue.get(field, now)).toEqual('2017-10-12T16:30:10Z');
+        expect(FieldDefaultValue.get(field2, now)).toEqual('2017-10-12T16:30:10Z');
     });
 });
 
@@ -314,13 +314,13 @@ describe('NumberField', () => {
     });
 
     it('should format to number', () => {
-        expect(FieldFormatter.format(field, 42)).toBe('42');
+        expect(FieldFormatter.format(field, 42)).toEqual(<any>42);
     });
 
     it('should return default value for default properties', () => {
-        Object.assign(field.properties, { defaultValue: 13 });
+        const field2 = createField(new NumberFieldPropertiesDto('Input', { defaultValue: 13 }));
 
-        expect(FieldDefaultValue.get(field)).toEqual(13);
+        expect(FieldDefaultValue.get(field2)).toEqual(13);
     });
 });
 
@@ -364,9 +364,9 @@ describe('StringField', () => {
     });
 
     it('should return default value for default properties', () => {
-        Object.assign(field.properties, { defaultValue: 'MyDefault' });
+        const field2 = createField(new StringFieldPropertiesDto('Input', { defaultValue: 'MyDefault' }));
 
-        expect(FieldDefaultValue.get(field)).toEqual('MyDefault');
+        expect(FieldDefaultValue.get(field2)).toEqual('MyDefault');
     });
 });
 

@@ -75,6 +75,8 @@ describe('RulesState', () => {
     it('should show notification on load when reload is true', () => {
         rulesState.load(true).subscribe();
 
+        expect().nothing();
+
         dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
     });
 

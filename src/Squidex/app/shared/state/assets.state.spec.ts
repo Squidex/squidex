@@ -71,6 +71,8 @@ describe('AssetsState', () => {
     it('should show notification on load when reload is true', () => {
         assetsState.load(true).subscribe();
 
+        expect().nothing();
+
         dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
     });
 
@@ -109,6 +111,8 @@ describe('AssetsState', () => {
 
         assetsState.goNext().subscribe();
         assetsState.goPrev().subscribe();
+
+        expect().nothing();
 
         assetsService.verify(x => x.getAssets(app, 30, 30, undefined), Times.once());
         assetsService.verify(x => x.getAssets(app, 30,  0, undefined), Times.exactly(2));

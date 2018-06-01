@@ -6,7 +6,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { ConnectableObservable, Observable, of } from 'rxjs';
 import { catchError, map, publishLast, share } from 'rxjs/operators';
 
 import { UserDto, UsersService } from './users.service';
@@ -33,6 +33,8 @@ export class UsersProviderService {
                         return of(new UserDto('Unknown', 'Unknown'));
                     }),
                     publishLast());
+
+            (<ConnectableObservable<any>>request).connect();
 
             result = this.caches[id] = request;
         }

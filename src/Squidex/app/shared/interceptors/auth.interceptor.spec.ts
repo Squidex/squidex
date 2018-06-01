@@ -100,6 +100,8 @@ describe('AuthInterceptor', () => {
         httpMock.expectOne('http://service/p/apps').error(<any>{}, { status: 401 });
         httpMock.expectOne('http://service/p/apps').error(<any>{}, { status: 401 });
 
+        expect().nothing();
+
         authService.verify(x => x.logoutRedirect(), Times.once());
     }));
 
@@ -114,6 +116,8 @@ describe('AuthInterceptor', () => {
             const req = httpMock.expectOne('http://service/p/apps');
 
             req.error(<any>{}, { status: statusCode });
+
+            expect().nothing();
 
             authService.verify(x => x.logoutRedirect(), Times.once());
         }));
@@ -130,6 +134,8 @@ describe('AuthInterceptor', () => {
             const req = httpMock.expectOne('http://service/p/apps');
 
             req.error(<any>{}, { status: statusCode });
+
+            expect().nothing();
 
             authService.verify(x => x.logoutRedirect(), Times.never());
         }));
