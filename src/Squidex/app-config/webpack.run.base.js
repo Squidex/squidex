@@ -25,11 +25,14 @@ module.exports = webpackMerge(commonConfig, {
          * See: https://github.com/ampedandwired/html-webpack-plugin
          */
         new HtmlWebpackPlugin({
-            template: 'wwwroot/index.html', hash: true
+            hash: true,
+            chunks: ['shims', 'app'],
+            chunksSortMode: 'manual',
+            template: 'wwwroot/index.html'
         }),
         
         new HtmlWebpackPlugin({
-            template: 'wwwroot/theme.html', hash: true, filename: 'theme.html'
+            template: 'wwwroot/theme.html', hash: true, chunksSortMode: 'none', filename: 'theme.html'
         })
     ]
 });
