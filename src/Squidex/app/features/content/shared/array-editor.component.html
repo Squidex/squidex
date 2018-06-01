@@ -1,5 +1,5 @@
 <div class="array-container" *ngIf="arrayControl.controls.length > 0">
-    <div class="array-item" *ngFor="let nestedForm of arrayControl.controls; let i = index">
+    <div class="array-item" *ngFor="let nestedForm of arrayControl.controls; let i = index" [class.invalid]="nestedForm.invalid">
         <button type="button" class="btn btn-link btn-danger array-item-remove" (click)="removeItem(i); $event.preventDefault()">
             <i class="icon-bin2"></i>
         </button>
