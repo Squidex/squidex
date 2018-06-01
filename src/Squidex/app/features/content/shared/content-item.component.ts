@@ -12,6 +12,7 @@ import {
     ContentDto,
     ContentsState,
     fadeAnimation,
+    FieldFormatter,
     fieldInvariant,
     ModalView,
     PatchContentForm,
@@ -123,7 +124,7 @@ export class ContentItemComponent implements OnChanges {
             if (Types.isUndefined(value)) {
                 this.values.push('');
             } else {
-                this.values.push(field.formatValue(value));
+                this.values.push(FieldFormatter.format(field, value));
             }
 
             if (this.patchForm) {

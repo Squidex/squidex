@@ -34,6 +34,7 @@ export * from './services/languages.service';
 export * from './services/plans.service';
 export * from './services/rules.service';
 export * from './services/schemas.service';
+export * from './services/schemas.types';
 export * from './services/ui.service';
 export * from './services/usages.service';
 export * from './services/users-provider.service';

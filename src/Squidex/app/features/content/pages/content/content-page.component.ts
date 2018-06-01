@@ -171,7 +171,7 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
     }
 
     private loadContent(data: any) {
-        this.contentForm.loadData(data, this.content && this.content.status === 'Archived');
+        this.contentForm.loadContent(data, this.content && this.content.status === 'Archived');
     }
 
     public discardChanges() {

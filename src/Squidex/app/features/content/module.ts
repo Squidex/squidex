@@ -29,6 +29,7 @@ import {
     ContentsSelectorComponent,
     ContentStatusComponent,
     DueTimeSelectorComponent,
+    FieldEditorComponent,
     ReferencesEditorComponent,
     SchemasPageComponent,
     SearchFormComponent
@@ -95,6 +96,7 @@ const routes: Routes = [
         ContentsPageComponent,
         ContentsSelectorComponent,
         DueTimeSelectorComponent,
+        FieldEditorComponent,
         ReferencesEditorComponent,
         SchemasPageComponent,
         SearchFormComponent

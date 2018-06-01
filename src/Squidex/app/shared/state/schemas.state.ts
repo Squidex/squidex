@@ -24,10 +24,8 @@ import { AppsState } from './apps.state';
 
 import {
     AddFieldDto,
-    AnyFieldDto,
     CreateSchemaDto,
     FieldDto,
-    FieldPropertiesDto,
     NestedFieldDto,
     RootFieldDto,
     SchemaDetailsDto,
@@ -39,6 +37,10 @@ import {
     UpdateSchemaDto,
     UpdateSchemaScriptsDto
 } from './../services/schemas.service';
+
+import { FieldPropertiesDto } from './../services/schemas.types';
+
+type AnyFieldDto = NestedFieldDto | RootFieldDto;
 
 interface Snapshot {
     categories: { [name: string]: boolean };

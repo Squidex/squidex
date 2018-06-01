@@ -9,7 +9,6 @@ import { Component, Input, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 
 import {
-    AnyFieldDto,
     AppPatternDto,
     createProperties,
     EditFieldForm,
@@ -33,7 +32,7 @@ import {
 })
 export class FieldComponent implements OnInit {
     @Input()
-    public field: AnyFieldDto;
+    public field: NestedFieldDto | RootFieldDto;
 
     @Input()
     public schema: SchemaDetailsDto;

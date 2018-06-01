@@ -5,8 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-// tslint:disable:prefer-for-of
-
 import { Component, Input } from '@angular/core';
 import { FormArray } from '@angular/forms';
 
@@ -40,13 +38,9 @@ export class ArrayEditorComponent {
 
     public removeItem(index: number) {
         this.form.removeArrayItem(this.field, this.language, index);
-
-        return false;
     }
 
     public addItem() {
         this.form.insertArrayItem(this.field, this.language);
-
-        return false;
     }
 }

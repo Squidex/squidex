@@ -8,17 +8,301 @@
 
 // tslint:disable:prefer-for-of
 
-import { FormArray, FormControl, FormGroup } from '@angular/forms';
+import { FormArray, FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 
 import {
-    ErrorDto,
+    DateTime,
     Form,
+    formControls,
     ImmutableArray,
-    Types
+    Types,
+    ValidatorsEx
 } from '@app/framework';
 
 import { AppLanguageDto } from './../services/app-languages.service';
-import { fieldInvariant, RootFieldDto, SchemaDetailsDto } from './../services/schemas.service';
+import { FieldDto, RootFieldDto, SchemaDetailsDto } from './../services/schemas.service';
+import {
+    ArrayFieldPropertiesDto,
+    AssetsFieldPropertiesDto,
+    BooleanFieldPropertiesDto,
+    DateTimeFieldPropertiesDto,
+    fieldInvariant,
+    FieldPropertiesVisitor,
+    GeolocationFieldPropertiesDto,
+    JsonFieldPropertiesDto,
+    NumberFieldPropertiesDto,
+    ReferencesFieldPropertiesDto,
+    StringFieldPropertiesDto,
+    TagsFieldPropertiesDto
+} from './../services/schemas.types';
+
+export class FieldFormatter implements FieldPropertiesVisitor<string> {
+    constructor(
+        private readonly value: any
+    ) {
+    }
+
+    public static format(field: FieldDto, value: any) {
+        if (!value) {
+            return '';
+        }
+
+        return field.properties.accept(new FieldFormatter(value));
+    }
+
+    public visitDateTime(properties: DateTimeFieldPropertiesDto): string {
+        try {
+            const parsed = DateTime.parseISO_UTC(this.value);
+
+            if (properties.editor === 'Date') {
+                return parsed.toUTCStringFormat('YYYY-MM-DD');
+            } else {
+                return parsed.toUTCStringFormat('YYYY-MM-DD HH:mm:ss');
+            }
+        } catch (ex) {
+            return this.value;
+        }
+    }
+
+    public visitArray(properties: ArrayFieldPropertiesDto): string {
+        if (this.value.length) {
+            return `${this.value.length} Item(s)`;
+        } else {
+            return '0 Items';
+        }
+    }
+
+    public visitAssets(properties: AssetsFieldPropertiesDto): string {
+        if (this.value.length) {
+            return `${this.value.length} Asset(s)`;
+        } else {
+            return '0 Assets';
+        }
+    }
+
+    public visitReferences(properties: ReferencesFieldPropertiesDto): string {
+        if (this.value.length) {
+            return `${this.value.length} Reference(s)`;
+        } else {
+            return '0 References';
+        }
+    }
+
+    public visitTags(properties: TagsFieldPropertiesDto): string {
+        if (this.value.length) {
+            return this.value.join(', ');
+        } else {
+            return '';
+        }
+    }
+
+    public visitBoolean(properties: BooleanFieldPropertiesDto): string {
+        return this.value ? 'Yes' : 'No';
+    }
+
+    public visitGeolocation(properties: GeolocationFieldPropertiesDto): string {
+        return `${this.value.longitude}, ${this.value.latitude}`;
+    }
+
+    public visitJson(properties: JsonFieldPropertiesDto): string {
+        return '<Json />';
+    }
+
+    public visitNumber(properties: NumberFieldPropertiesDto): string {
+        return this.value;
+    }
+
+    public visitString(properties: StringFieldPropertiesDto): string {
+        return this.value;
+    }
+}
+
+export class FieldValidatorsFactory implements FieldPropertiesVisitor<ValidatorFn[]> {
+    constructor(
+        private readonly isOptional: boolean
+    ) {
+    }
+
+    public static createValidators(field: FieldDto, isOptional: boolean) {
+        const validators = field.properties.accept(new FieldValidatorsFactory(isOptional));
+
+        if (field.properties.isRequired && !isOptional) {
+            validators.push(Validators.required);
+        }
+
+        return validators;
+    }
+
+    public visitNumber(properties: NumberFieldPropertiesDto): ValidatorFn[] {
+        const validators: ValidatorFn[] = [];
+
+        if (properties.minValue) {
+            validators.push(Validators.min(properties.minValue));
+        }
+
+        if (properties.maxValue) {
+            validators.push(Validators.max(properties.maxValue));
+        }
+
+        if (properties.allowedValues && properties.allowedValues.length > 0) {
+            const values: (number | null)[] = properties.allowedValues;
+
+            if (properties.isRequired && !this.isOptional) {
+                validators.push(ValidatorsEx.validValues(values));
+            } else {
+                validators.push(ValidatorsEx.validValues(values.concat([null])));
+            }
+        }
+
+        return validators;
+    }
+
+    public visitString(properties: StringFieldPropertiesDto): ValidatorFn[] {
+        const validators: ValidatorFn[] = [];
+
+        if (properties.minLength) {
+            validators.push(Validators.minLength(properties.minLength));
+        }
+
+        if (properties.maxLength) {
+            validators.push(Validators.maxLength(properties.maxLength));
+        }
+
+        if (properties.pattern && properties.pattern.length > 0) {
+            validators.push(ValidatorsEx.pattern(properties.pattern, properties.patternMessage));
+        }
+
+        if (properties.allowedValues && properties.allowedValues.length > 0) {
+            const values: (string | null)[] = properties.allowedValues;
+
+            if (properties.isRequired && !this.isOptional) {
+                validators.push(ValidatorsEx.validValues(values));
+            } else {
+                validators.push(ValidatorsEx.validValues(values.concat([null])));
+            }
+        }
+
+        return validators;
+    }
+
+    public visitArray(properties: ArrayFieldPropertiesDto): ValidatorFn[] {
+        const validators: ValidatorFn[] = [];
+
+        if (properties.minItems) {
+            validators.push(Validators.minLength(properties.minItems));
+        }
+
+        if (properties.maxItems) {
+            validators.push(Validators.maxLength(properties.maxItems));
+        }
+
+        return validators;
+    }
+
+    public visitAssets(properties: AssetsFieldPropertiesDto): ValidatorFn[] {
+        const validators: ValidatorFn[] = [];
+
+        if (properties.minItems) {
+            validators.push(Validators.minLength(properties.minItems));
+        }
+
+        if (properties.maxItems) {
+            validators.push(Validators.maxLength(properties.maxItems));
+        }
+
+        return validators;
+    }
+
+    public visitReferences(properties: ReferencesFieldPropertiesDto): ValidatorFn[] {
+        const validators: ValidatorFn[] = [];
+
+        if (properties.minItems) {
+            validators.push(Validators.minLength(properties.minItems));
+        }
+
+        if (properties.maxItems) {
+            validators.push(Validators.maxLength(properties.maxItems));
+        }
+
+        return validators;
+    }
+
+    public visitTags(properties: TagsFieldPropertiesDto): ValidatorFn[] {
+        const validators: ValidatorFn[] = [];
+
+        if (properties.minItems) {
+            validators.push(Validators.minLength(properties.minItems));
+        }
+
+        if (properties.maxItems) {
+            validators.push(Validators.maxLength(properties.maxItems));
+        }
+
+        return validators;
+    }
+
+    public visitBoolean(properties: BooleanFieldPropertiesDto): ValidatorFn[] {
+        return [];
+    }
+
+    public visitDateTime(properties: DateTimeFieldPropertiesDto): ValidatorFn[] {
+        return [];
+    }
+
+    public visitGeolocation(properties: GeolocationFieldPropertiesDto): ValidatorFn[] {
+        return [];
+    }
+
+    public visitJson(properties: JsonFieldPropertiesDto): ValidatorFn[] {
+        return [];
+    }
+}
+
+export class FieldDefaultValue implements FieldPropertiesVisitor<any> {
+    public static get(field: FieldDto) {
+        return field.properties.accept(new FieldDefaultValue());
+    }
+
+    public visitArray(properties: ArrayFieldPropertiesDto): any {
+        return null;
+    }
+
+    public visitAssets(properties: AssetsFieldPropertiesDto): any {
+        return null;
+    }
+
+    public visitBoolean(properties: BooleanFieldPropertiesDto): any {
+        return properties.defaultValue;
+    }
+
+    public visitDateTime(properties: DateTimeFieldPropertiesDto): any {
+        return null;
+    }
+
+    public visitGeolocation(properties: GeolocationFieldPropertiesDto): any {
+        return null;
+    }
+
+    public visitJson(properties: JsonFieldPropertiesDto): any {
+        return null;
+    }
+
+    public visitNumber(properties: NumberFieldPropertiesDto): any {
+        return properties.defaultValue;
+    }
+
+    public visitReferences(properties: ReferencesFieldPropertiesDto): any {
+        return null;
+    }
+
+    public visitString(properties: StringFieldPropertiesDto): any {
+        return properties.defaultValue;
+    }
+
+    public visitTags(properties: TagsFieldPropertiesDto): any {
+        return null;
+    }
+}
 
 export class EditContentForm extends Form<FormGroup> {
     constructor(
@@ -29,13 +313,15 @@ export class EditContentForm extends Form<FormGroup> {
 
         for (const field of schema.fields) {
             const fieldForm = new FormGroup({});
-            const fieldDefault = field.defaultValue();
+            const fieldDefault = FieldDefaultValue.get(field);
 
             const createControl = (isOptional: boolean) => {
-                if (field.properties.fieldType === 'Array') {
-                    return new FormArray([], field.createValidators(isOptional));
+                const validators = FieldValidatorsFactory.createValidators(field, isOptional);
+
+                if (field.isArray) {
+                    return new FormArray([], validators);
                 } else {
-                    return new FormControl(fieldDefault, field.createValidators(isOptional));
+                    return new FormControl(fieldDefault, validators);
                 }
             };
 
@@ -50,7 +336,7 @@ export class EditContentForm extends Form<FormGroup> {
             this.form.setControl(field.name, fieldForm);
         }
 
-        this.enableContentForm();
+        this.enable();
     }
 
     public removeArrayItem(field: RootFieldDto, language: AppLanguageDto, index: number) {
@@ -65,18 +351,19 @@ export class EditContentForm extends Form<FormGroup> {
         }
     }
 
-    private addArrayItem(field: RootFieldDto, language: AppLanguageDto | null, formControl: FormArray) {
-        const formItem = new FormGroup({});
+    private addArrayItem(field: RootFieldDto, language: AppLanguageDto | null, partitionForm: FormArray) {
+        const itemForm = new FormGroup({});
 
         let isOptional = field.isLocalizable && language !== null && language.isOptional;
 
         for (let nested of field.nested) {
-            const nestedDefault = field.defaultValue();
+            const nestedValidators = FieldValidatorsFactory.createValidators(nested, isOptional);
+            const nestedDefault = FieldDefaultValue.get(nested);
 
-            formItem.setControl(nested.name, new FormControl(nestedDefault, nested.createValidators(isOptional)));
+            itemForm.setControl(nested.name, new FormControl(nestedDefault, nestedValidators));
         }
 
-        formControl.push(formItem);
+        partitionForm.push(itemForm);
     }
 
     private findArrayItemForm(field: RootFieldDto, language: AppLanguageDto): FormArray {
@@ -89,23 +376,16 @@ export class EditContentForm extends Form<FormGroup> {
         }
     }
 
-    public submitCompleted(newValue?: any) {
-        super.submitCompleted(newValue);
-
-        this.enableContentForm();
-    }
-
-    public submitFailed(error?: string | ErrorDto) {
-        super.submitFailed(error);
-
-        this.enableContentForm();
-    }
-
-    public loadData(value: any, isArchive: boolean) {
+    public loadContent(value: any, isArchive: boolean) {
         for (let field of this.schema.fields) {
-            if (field.properties.fieldType === 'Array' && field.nested.length > 0) {
+            if (field.isArray && field.nested.length > 0) {
+                const fieldForm = <FormGroup>this.form.get(field.name);
+
+                if (!fieldForm) {
+                    continue;
+                }
+
                 const fieldValue = value ? value[field.name] || {} : {};
-                const fieldForm = <FormGroup>this.form.get(field.name)!;
 
                 const addControls = (key: string, language: AppLanguageDto | null) => {
                     const languageValue = fieldValue[key];
@@ -133,24 +413,45 @@ export class EditContentForm extends Form<FormGroup> {
         super.load(value);
 
         if (isArchive) {
-            this.form.disable();
+            this.disable();
         } else {
-            this.enableContentForm();
+            this.enable();
         }
     }
 
-    private enableContentForm() {
+    protected enable() {
         if (this.schema.fields.length === 0) {
             this.form.enable();
-        } else {
-            for (const field of this.schema.fields) {
-                const fieldForm = this.form.controls[field.name];
+            return;
+        }
 
-                if (field.isDisabled) {
-                    fieldForm.disable();
-                } else {
-                    fieldForm.enable();
+        for (const field of this.schema.fields) {
+            const fieldForm = this.form.get(field.name);
+
+            if (!fieldForm) {
+                continue;
+            }
+
+            if (field.properties.fieldType === 'Array') {
+                for (let partitionForm of formControls(fieldForm)) {
+                    for (let nested of field.nested) {
+                        const nestedForm = partitionForm.get(nested.name);
+
+                        if (!nestedForm) {
+                            continue;
+                        }
+
+                        if (nested.isDisabled) {
+                            nestedForm.disable();
+                        } else {
+                            nestedForm.enable();
+                        }
+                    }
                 }
+            } else if (field.isDisabled) {
+                fieldForm.disable();
+            } else {
+                fieldForm.enable();
             }
         }
     }
@@ -163,10 +464,10 @@ export class PatchContentForm extends Form<FormGroup> {
     ) {
         super(new FormGroup({}));
 
-        for (let field of this.schema.listFields) {
-            if (field.properties && field.properties['inlineEditable']) {
-                this.form.setControl(field.name, new FormControl(undefined, field.createValidators(this.language.isOptional)));
-            }
+        for (let field of this.schema.inlineEditableFields) {
+            const validators = FieldValidatorsFactory.createValidators(field, this.language.isOptional);
+
+            this.form.setControl(field.name, new FormControl(undefined, validators));
         }
     }
 
@@ -176,15 +477,13 @@ export class PatchContentForm extends Form<FormGroup> {
         if (result) {
             const request = {};
 
-            for (let field of this.schema.listFields) {
-                if (field.properties['inlineEditable']) {
-                    const value = result[field.name];
+            for (let field of this.schema.inlineEditableFields) {
+                const value = result[field.name];
 
-                    if (field.isLocalizable) {
-                        request[field.name] = { [this.language.iso2Code]: value };
-                    } else {
-                        request[field.name] = { iv: value };
-                    }
+                if (field.isLocalizable) {
+                    request[field.name] = { [this.language.iso2Code]: value };
+                } else {
+                    request[field.name] = { iv: value };
                 }
             }
 

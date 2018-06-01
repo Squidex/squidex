@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AbstractControl } from '@angular/forms';
+import { AbstractControl, FormArray, FormGroup } from '@angular/forms';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 import { ErrorDto } from './utils/error';
@@ -16,6 +16,34 @@ export interface FormState {
 
     error?: string;
 }
+
+export class Lazy<T> {
+    private valueSet = false;
+    private valueField: T;
+
+    public get value(): T {
+        if (!this.valueSet) {
+            this.valueField = this.factory();
+            this.valueSet = true;
+        }
+
+        return this.valueField;
+    }
+    constructor(
+        private readonly factory: () => T
+    ) {
+    }
+}
+
+export const formControls = (form: AbstractControl): AbstractControl[] => {
+    if (Types.is(form, FormGroup)) {
+        return Object.values(form.controls);
+    } else if (Types.is(form, FormArray)) {
+        return form.controls;
+    } else {
+        return [];
+    }
+};
 
 export class Form<T extends AbstractControl> {
     private readonly state = new State<FormState>({ submitted: false });
@@ -31,10 +59,26 @@ export class Form<T extends AbstractControl> {
     ) {
     }
 
+    protected disable() {
+        this.form.disable();
+    }
+
+    protected enable() {
+        this.form.enable();
+    }
+
+    protected reset(value: any) {
+        this.form.reset(value);
+    }
+
+    protected setValue(value: any) {
+        this.form.reset(value, { emitEvent: true });
+    }
+
     public load(value: any) {
         this.state.next({ submitted: false, error: null });
 
-        this.form.reset(value, { emitEvent: true });
+        this.setValue(value);
     }
 
     public submit(): any | null {
@@ -43,7 +87,7 @@ export class Form<T extends AbstractControl> {
         if (this.form.valid) {
             const value = this.form.value;
 
-            this.form.disable();
+            this.disable();
 
             return value;
         } else {
@@ -54,10 +98,10 @@ export class Form<T extends AbstractControl> {
     public submitCompleted(newValue?: any) {
         this.state.next({ submitted: false, error: null });
 
-        this.form.enable();
+        this.enable();
 
         if (newValue) {
-            this.form.reset(newValue);
+            this.reset(newValue);
         } else {
             this.form.markAsPristine();
         }
@@ -66,7 +110,7 @@ export class Form<T extends AbstractControl> {
     public submitFailed(error?: string | ErrorDto) {
         this.state.next({ submitted: false, error: this.getError(error) });
 
-        this.form.enable();
+        this.enable();
     }
 
     private getError(error?: string | ErrorDto) {
@@ -79,10 +123,6 @@ export class Form<T extends AbstractControl> {
 }
 
 export class Model {
-    protected onCreated() {
-        return;
-    }
-
     protected clone(update: ((v: any) => object) | object): any {
         let values: object;
         if (Types.isFunction(update)) {
@@ -92,8 +132,6 @@ export class Model {
         }
 
         const clone = Object.assign(Object.create(Object.getPrototypeOf(this)), this, values);
-
-        clone.onCreated();
 
         return clone;
     }

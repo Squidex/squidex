@@ -12,7 +12,10 @@ import {
     AssetsFieldPropertiesDto,
     BooleanFieldPropertiesDto,
     DateTimeFieldPropertiesDto,
+    FieldDefaultValue,
+    FieldFormatter,
     FieldPropertiesDto,
+    FieldValidatorsFactory,
     GeolocationFieldPropertiesDto,
     JsonFieldPropertiesDto,
     NumberFieldPropertiesDto,
@@ -118,23 +121,23 @@ describe('ArrayField', () => {
     const field = createField(new ArrayFieldPropertiesDto({ isRequired: true, minItems: 1, maxItems: 5 }));
 
     it('should create validators', () => {
-        expect(field.createValidators(false).length).toBe(3);
+        expect(FieldValidatorsFactory.createValidators(field, false).length).toBe(3);
     });
 
     it('should format to empty string if null', () => {
-        expect(field.formatValue(null)).toBe('');
+        expect(FieldFormatter.format(field, null)).toBe('');
     });
 
     it('should format to asset count', () => {
-        expect(field.formatValue([1, 2, 3])).toBe('3 Items(s)');
+        expect(FieldFormatter.format(field, [1, 2, 3])).toBe('3 Items(s)');
     });
 
     it('should return zero formatting if other type', () => {
-        expect(field.formatValue(1)).toBe('0 Items');
+        expect(FieldFormatter.format(field, 1)).toBe('0 Items');
     });
 
     it('should return null for default properties', () => {
-        expect(field.defaultValue()).toBeNull();
+        expect(FieldDefaultValue.get(field)).toBeNull();
     });
 });
 
@@ -142,23 +145,23 @@ describe('AssetsField', () => {
     const field = createField(new AssetsFieldPropertiesDto({ isRequired: true, minItems: 1, maxItems: 5 }));
 
     it('should create validators', () => {
-        expect(field.createValidators(false).length).toBe(3);
+        expect(FieldValidatorsFactory.createValidators(field, false).length).toBe(3);
     });
 
     it('should format to empty string if null', () => {
-        expect(field.formatValue(null)).toBe('');
+        expect(FieldFormatter.format(field, null)).toBe('');
     });
 
     it('should format to asset count', () => {
-        expect(field.formatValue([1, 2, 3])).toBe('3 Asset(s)');
+        expect(FieldFormatter.format(field, [1, 2, 3])).toBe('3 Asset(s)');
     });
 
     it('should return zero formatting if other type', () => {
-        expect(field.formatValue(1)).toBe('0 Assets');
+        expect(FieldFormatter.format(field, 1)).toBe('0 Assets');
     });
 
     it('should return null for default properties', () => {
-        expect(field.defaultValue()).toBeNull();
+        expect(FieldDefaultValue.get(field)).toBeNull();
     });
 });
 
@@ -166,23 +169,23 @@ describe('TagsField', () => {
     const field = createField(new TagsFieldPropertiesDto({ isRequired: true, minItems: 1, maxItems: 5 }));
 
     it('should create validators', () => {
-        expect(field.createValidators(false).length).toBe(3);
+        expect(FieldValidatorsFactory.createValidators(field, false).length).toBe(3);
     });
 
     it('should format to empty string if null', () => {
-        expect(field.formatValue(null)).toBe('');
+        expect(FieldFormatter.format(field, null)).toBe('');
     });
 
     it('should format to asset count', () => {
-        expect(field.formatValue(['hello', 'squidex', 'cms'])).toBe('hello, squidex, cms');
+        expect(FieldFormatter.format(field, ['hello', 'squidex', 'cms'])).toBe('hello, squidex, cms');
     });
 
     it('should return zero formatting if other type', () => {
-        expect(field.formatValue(1)).toBe('');
+        expect(FieldFormatter.format(field, 1)).toBe('');
     });
 
     it('should return null for default properties', () => {
-        expect(field.defaultValue()).toBeNull();
+        expect(FieldDefaultValue.get(field)).toBeNull();
     });
 });
 
@@ -190,25 +193,25 @@ describe('BooleanField', () => {
     const field = createField(new BooleanFieldPropertiesDto('Checkbox', { isRequired: true }));
 
     it('should create validators', () => {
-        expect(field.createValidators(false).length).toBe(1);
+        expect(FieldValidatorsFactory.createValidators(field, false).length).toBe(1);
     });
 
     it('should format to empty string if null', () => {
-        expect(field.formatValue(null)).toBe('');
+        expect(FieldFormatter.format(field, null)).toBe('');
     });
 
     it('should format to Yes if true', () => {
-        expect(field.formatValue(true)).toBe('Yes');
+        expect(FieldFormatter.format(field, true)).toBe('Yes');
     });
 
     it('should format to No if false', () => {
-        expect(field.formatValue(false)).toBe('No');
+        expect(FieldFormatter.format(field, false)).toBe('No');
     });
 
     it('should return default value for default properties', () => {
         Object.assign(field.properties, { defaultValue: true });
 
-        expect(field.defaultValue()).toBeTruthy();
+        expect(FieldDefaultValue.get(field)).toBeTruthy();
     });
 });
 
@@ -217,45 +220,45 @@ describe('DateTimeField', () => {
     const field = createField(new DateTimeFieldPropertiesDto('DateTime', { isRequired: true }));
 
     it('should create validators', () => {
-        expect(field.createValidators(false).length).toBe(1);
+        expect(FieldValidatorsFactory.createValidators(field, false).length).toBe(1);
     });
 
     it('should format to empty string if null', () => {
-        expect(field.formatValue(null)).toBe('');
+        expect(FieldFormatter.format(field, null)).toBe('');
     });
 
     it('should format to input if parsing failed', () => {
-        expect(field.formatValue(true)).toBe(true);
+        expect(FieldFormatter.format(field, true)).toBe(true);
     });
 
     it('should format to date', () => {
         const dateField = createField(new DateTimeFieldPropertiesDto('Date'));
 
-        expect(dateField.formatValue('2017-12-12T16:00:00Z')).toBe('2017-12-12');
+        expect(FieldFormatter.format(dateField, '2017-12-12T16:00:00Z')).toBe('2017-12-12');
     });
 
     it('should format to date time', () => {
         const dateTimeField = createField(new DateTimeFieldPropertiesDto('DateTime'));
 
-        expect(dateTimeField.formatValue('2017-12-12T16:00:00Z')).toBe('2017-12-12 16:00:00');
+        expect(FieldFormatter.format(dateTimeField, '2017-12-12T16:00:00Z')).toBe('2017-12-12 16:00:00');
     });
 
     it('should return default for DateFieldProperties', () => {
         Object.assign(field.properties, { defaultValue: '2017-10-12T16:00:00Z' });
 
-        expect(field.defaultValue()).toEqual('2017-10-12T16:00:00Z');
+        expect(FieldDefaultValue.get(field)).toEqual('2017-10-12T16:00:00Z');
     });
 
     it('should return calculated date when Today for DateFieldProperties', () => {
-        Object.assign(field.properties, { calculatedDefaultValue: 'Today' });
+        Object.assign(field.properties, { calculatedFieldDefaultValue: 'Today' });
 
-        expect((<any>field).properties.getDefaultValue(now)).toEqual('2017-10-12');
+        expect((<any>field).properties.getFieldDefaultValue(now)).toEqual('2017-10-12');
     });
 
     it('should return calculated date when Now for DateFieldProperties', () => {
-        Object.assign(field.properties, { calculatedDefaultValue: 'Now' });
+        Object.assign(field.properties, { calculatedFieldDefaultValue: 'Now' });
 
-        expect((<any>field).properties.getDefaultValue(now)).toEqual('2017-10-12T16:30:10Z');
+        expect((<any>field).properties.getFieldDefaultValue(now)).toEqual('2017-10-12T16:30:10Z');
     });
 });
 
@@ -263,19 +266,19 @@ describe('GeolocationField', () => {
     const field = createField(new GeolocationFieldPropertiesDto({ isRequired: true }));
 
     it('should create validators', () => {
-        expect(field.createValidators(false).length).toBe(1);
+        expect(FieldValidatorsFactory.createValidators(field, false).length).toBe(1);
     });
 
     it('should format to empty string if null', () => {
-        expect(field.formatValue(null)).toBe('');
+        expect(FieldFormatter.format(field, null)).toBe('');
     });
 
     it('should format to latitude and longitude', () => {
-        expect(field.formatValue({ latitude: 42, longitude: 3.14 })).toBe('3.14, 42');
+        expect(FieldFormatter.format(field, { latitude: 42, longitude: 3.14 })).toBe('3.14, 42');
     });
 
     it('should return null for default properties', () => {
-        expect(field.defaultValue()).toBeNull();
+        expect(FieldDefaultValue.get(field)).toBeNull();
     });
 });
 
@@ -283,19 +286,19 @@ describe('JsonField', () => {
     const field = createField(new JsonFieldPropertiesDto({ isRequired: true }));
 
     it('should create validators', () => {
-        expect(field.createValidators(false).length).toBe(1);
+        expect(FieldValidatorsFactory.createValidators(field, false).length).toBe(1);
     });
 
     it('should format to empty string if null', () => {
-        expect(field.formatValue(null)).toBe('');
+        expect(FieldFormatter.format(field, null)).toBe('');
     });
 
     it('should format to constant', () => {
-        expect(field.formatValue({})).toBe('<Json />');
+        expect(FieldFormatter.format(field, {})).toBe('<Json />');
     });
 
     it('should return null for default properties', () => {
-        expect(field.defaultValue()).toBeNull();
+        expect(FieldDefaultValue.get(field)).toBeNull();
     });
 });
 
@@ -303,21 +306,21 @@ describe('NumberField', () => {
     const field = createField(new NumberFieldPropertiesDto('Input', { isRequired: true, minValue: 1, maxValue: 6, allowedValues: [1, 3] }));
 
     it('should create validators', () => {
-        expect(field.createValidators(false).length).toBe(4);
+        expect(FieldValidatorsFactory.createValidators(field, false).length).toBe(4);
     });
 
     it('should format to empty string if null', () => {
-        expect(field.formatValue(null)).toBe('');
+        expect(FieldFormatter.format(field, null)).toBe('');
     });
 
     it('should format to number', () => {
-        expect(field.formatValue(42)).toBe(42);
+        expect(FieldFormatter.format(field, 42)).toBe(42);
     });
 
     it('should return default value for default properties', () => {
         Object.assign(field.properties, { defaultValue: 13 });
 
-        expect(field.defaultValue()).toEqual(13);
+        expect(FieldDefaultValue.get(field)).toEqual(13);
     });
 });
 
@@ -325,23 +328,23 @@ describe('ReferencesField', () => {
     const field = createField(new ReferencesFieldPropertiesDto({ isRequired: true, minItems: 1, maxItems: 5 }));
 
     it('should create validators', () => {
-        expect(field.createValidators(false).length).toBe(3);
+        expect(FieldValidatorsFactory.createValidators(field, false).length).toBe(3);
     });
 
     it('should format to empty string if null', () => {
-        expect(field.formatValue(null)).toBe('');
+        expect(FieldFormatter.format(field, null)).toBe('');
     });
 
     it('should format to asset count', () => {
-        expect(field.formatValue([1, 2, 3])).toBe('3 Reference(s)');
+        expect(FieldFormatter.format(field, [1, 2, 3])).toBe('3 Reference(s)');
     });
 
     it('should return zero formatting if other type', () => {
-        expect(field.formatValue(1)).toBe('0 References');
+        expect(FieldFormatter.format(field, 1)).toBe('0 References');
     });
 
     it('should return null for default properties', () => {
-        expect(field.defaultValue()).toBeNull();
+        expect(FieldDefaultValue.get(field)).toBeNull();
     });
 });
 
@@ -349,21 +352,21 @@ describe('StringField', () => {
     const field = createField(new StringFieldPropertiesDto('Input', { isRequired: true, pattern: 'pattern', minLength: 1, maxLength: 5, allowedValues: ['a', 'b'] }));
 
     it('should create validators', () => {
-        expect(field.createValidators(false).length).toBe(5);
+        expect(FieldValidatorsFactory.createValidators(field, false).length).toBe(5);
     });
 
     it('should format to empty string if null', () => {
-        expect(field.formatValue(null)).toBe('');
+        expect(FieldFormatter.format(field, null)).toBe('');
     });
 
     it('should format to string', () => {
-        expect(field.formatValue('hello')).toBe('hello');
+        expect(FieldFormatter.format(field, 'hello')).toBe('hello');
     });
 
     it('should return default value for default properties', () => {
         Object.assign(field.properties, { defaultValue: 'MyDefault' });
 
-        expect(field.defaultValue()).toEqual('MyDefault');
+        expect(FieldDefaultValue.get(field)).toEqual('MyDefault');
     });
 });
 

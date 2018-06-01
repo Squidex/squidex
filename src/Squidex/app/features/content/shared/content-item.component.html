@@ -6,7 +6,7 @@
 </td>
 
 <td class="cell-auto" *ngFor="let field of schema.listFields; let i = index" (click)="shouldStop($event)">
-    <div *ngIf="field.properties['inlineEditable'] && !isReadOnly" [formGroup]="patchForm.form" (click)="$event.stopPropagation()">
+    <div *ngIf="field.isInlineEditable && !isReadOnly" [formGroup]="patchForm.form" (click)="$event.stopPropagation()">
         <div [ngSwitch]="field.properties.fieldType">
             <div *ngSwitchCase="'Number'">
                 <div [ngSwitch]="field.properties['editor']">
@@ -51,7 +51,7 @@
             </div>
         </div>
     </div>
-    <div *ngIf="!field.properties['inlineEditable'] || isReadOnly" class="truncate">
+    <div *ngIf="!field.isInlineEditable || isReadOnly" class="truncate">
         {{values[i]}}
     </div>
 </td>

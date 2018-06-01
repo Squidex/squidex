@@ -9,7 +9,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { Form, ValidatorsEx } from '@app/framework';
 
-import { createProperties } from './../services/schemas.service';
+import { createProperties } from './../services/schemas.types';
 
 const FALLBACK_NAME = 'my-schema';
 

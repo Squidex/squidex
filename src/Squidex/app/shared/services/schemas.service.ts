@@ -7,7 +7,6 @@
 
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { ValidatorFn, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
 
 import '@app/framework/angular/http/http-extensions';
@@ -17,96 +16,21 @@ import {
     ApiUrlConfig,
     DateTime,
     HTTP,
+    Lazy,
     Model,
     StringHelper,
-    ValidatorsEx,
     Version,
     Versioned
 } from '@app/framework';
 
-export const fieldTypes = [
-    {
-        type: 'String',
-        description: 'Titles, names, paragraphs.'
-    }, {
-        type: 'Assets',
-        description: 'Images, videos, documents.'
-    }, {
-        type: 'Boolean',
-        description: 'Yes or no, true or false.'
-    }, {
-        type: 'DateTime',
-        description: 'Events date, opening hours.'
-    }, {
-        type: 'Geolocation',
-        description: 'Coordinates: latitude and longitude.'
-    }, {
-        type: 'Json',
-        description: 'Data in JSON format, for developers.'
-    }, {
-        type: 'Number',
-        description: 'ID, order number, rating, quantity.'
-    }, {
-        type: 'References',
-        description: 'Links to other content items.'
-    }, {
-        type: 'Tags',
-        description: 'Special format for tags.'
-    }, {
-        type: 'Array',
-        description: 'List of embedded objects.'
-    }
-];
-
-export const fieldInvariant = 'iv';
-
-export function createProperties(fieldType: string, values: Object | null = null): FieldPropertiesDto {
-    let properties: FieldPropertiesDto;
-
-    switch (fieldType) {
-        case 'Array':
-            properties = new ArrayFieldPropertiesDto();
-            break;
-        case 'Assets':
-            properties = new AssetsFieldPropertiesDto();
-            break;
-        case 'Boolean':
-            properties = new BooleanFieldPropertiesDto('Checkbox');
-            break;
-        case 'DateTime':
-            properties = new DateTimeFieldPropertiesDto('DateTime');
-            break;
-        case 'Geolocation':
-            properties = new GeolocationFieldPropertiesDto();
-            break;
-        case 'Json':
-            properties = new JsonFieldPropertiesDto();
-            break;
-        case 'Number':
-            properties = new NumberFieldPropertiesDto('Input');
-            break;
-        case 'References':
-            properties = new ReferencesFieldPropertiesDto();
-            break;
-        case 'String':
-            properties = new StringFieldPropertiesDto('Input');
-            break;
-        case 'Tags':
-            properties = new TagsFieldPropertiesDto();
-            break;
-        default:
-            throw 'Invalid properties type';
-    }
-
-    if (values) {
-        Object.assign(properties, values);
-    }
-
-    return properties;
-}
+import { createProperties, FieldPropertiesDto } from './schemas.types';
 
 export class SchemaDto extends Model {
-    public displayName: string;
+    private readonly displayNameValue = new Lazy((() => StringHelper.firstNonEmpty(this.properties.label, this.name)));
+
+    public get displayName() {
+        return this.displayNameValue.value;
+    }
 
     constructor(
         public readonly id: string,
@@ -121,12 +45,6 @@ export class SchemaDto extends Model {
         public readonly version: Version
     ) {
         super();
-
-        this.onCreated();
-    }
-
-    public onCreated() {
-        this.displayName = StringHelper.firstNonEmpty(this.properties.label, this.name);
     }
 
     public with(value: Partial<SchemaDto>): SchemaDto {
@@ -135,7 +53,28 @@ export class SchemaDto extends Model {
 }
 
 export class SchemaDetailsDto extends SchemaDto {
-    public listFields: RootFieldDto[];
+    private inlineEditableFieldsValue = new Lazy(() => this.listFields.filter(x => x.isInlineEditable));
+    private listFieldsValue = new Lazy(() => {
+        let fields = this.fields.filter(x => x.properties.isListField);
+
+        if (fields.length === 0 && this.fields.length > 0) {
+            fields = [this.fields[0]];
+        }
+
+        if (fields.length === 0) {
+            fields = [<any>{ properties: {} }];
+        }
+
+        return fields;
+    });
+
+    public get inlineEditableFields() {
+        return this.inlineEditableFieldsValue.value;
+    }
+
+    public get listFields() {
+        return this.listFieldsValue.value;
+    }
 
     constructor(id: string, name: string, category: string, properties: SchemaPropertiesDto, isPublished: boolean, created: DateTime, createdBy: string, lastModified: DateTime, lastModifiedBy: string, version: Version,
         public readonly fields: RootFieldDto[],
@@ -146,24 +85,6 @@ export class SchemaDetailsDto extends SchemaDto {
         public readonly scriptChange?: string
     ) {
         super(id, name, category, properties, isPublished, created, createdBy, lastModified, lastModifiedBy, version);
-
-        this.onCreated();
-    }
-
-    public onCreated() {
-        super.onCreated();
-
-        if (this.fields) {
-            this.listFields = this.fields.filter(x => x.properties.isListField);
-
-            if (this.listFields.length === 0 && this.fields.length > 0) {
-                this.listFields = [this.fields[0]];
-            }
-
-            if (this.listFields.length === 0) {
-                this.listFields = [<any>{ properties: {} }];
-            }
-        }
     }
 
     public with(value: Partial<SchemaDetailsDto>): SchemaDetailsDto {
@@ -172,8 +93,17 @@ export class SchemaDetailsDto extends SchemaDto {
 }
 
 export class FieldDto extends Model {
-    public displayName: string;
-    public displayPlaceholder: string;
+    public get isInlineEditable(): boolean {
+        return !this.isDisabled && this.properties['inlineEditable'] === true;
+    }
+
+    public get displayName() {
+        return StringHelper.firstNonEmpty(this.properties.label, this.name);
+    }
+
+    public get displayPlaceholder() {
+        return this.properties.placeholder || '';
+    }
 
     constructor(
         public readonly fieldId: number,
@@ -186,30 +116,19 @@ export class FieldDto extends Model {
         super();
     }
 
-    public onCreated() {
-        this.displayName = StringHelper.firstNonEmpty(this.properties.label, this.name);
-        this.displayPlaceholder = this.properties.placeholder || '';
-    }
-
-    public formatValue(value: any): string {
-        return this.properties.formatValue(value);
-    }
-
-    public createValidators(isOptional: boolean): ValidatorFn[] {
-        return this.properties.createValidators(isOptional);
-    }
-
-    public defaultValue(): any {
-        return this.properties.getDefaultValue();
-    }
-
     public with(value: Partial<FieldDto>): FieldDto {
         return this.clone(value);
     }
 }
 
 export class RootFieldDto extends FieldDto {
-    public readonly isLocalizable = this.partitioning === 'language';
+    public get isLocalizable() {
+        return this.partitioning === 'language';
+    }
+
+    public get isArray() {
+        return this.properties.fieldType === 'Array';
+    }
 
     constructor(fieldId: number, name: string, properties: FieldPropertiesDto,
         public readonly partitioning: string,
@@ -219,8 +138,6 @@ export class RootFieldDto extends FieldDto {
         public readonly nested: NestedFieldDto[] = []
     ) {
         super(fieldId, name, properties, isLocked, isHidden, isDisabled);
-
-        this.onCreated();
     }
 
     public with(value: Partial<RootFieldDto>): RootFieldDto {
@@ -236,8 +153,6 @@ export class NestedFieldDto extends FieldDto {
         isDisabled: boolean = false
     ) {
         super(fieldId, name, properties, isLocked, isHidden, isDisabled);
-
-        this.onCreated();
     }
 
     public with(value: Partial<NestedFieldDto>): NestedFieldDto {
@@ -245,501 +160,10 @@ export class NestedFieldDto extends FieldDto {
     }
 }
 
-export type AnyFieldDto = RootFieldDto | NestedFieldDto;
-
-export abstract class FieldPropertiesDto {
-    public abstract fieldType: string;
-
-    public readonly editorUrl?: string;
-    public readonly label?: string;
-    public readonly hints?: string;
-    public readonly placeholder?: string;
-    public readonly isRequired: boolean = false;
-    public readonly isListField: boolean = false;
-
-    constructor(public readonly editor: string,
-        props?: Partial<FieldPropertiesDto>
-    ) {
-        if (props) {
-            Object.assign(this, props);
-        }
-    }
-
-    public abstract formatValue(value: any): string;
-
-    public abstract createValidators(isOptional: boolean): ValidatorFn[];
-
-    public getDefaultValue(): any {
-        return null;
-    }
-}
-
-export class ArrayFieldPropertiesDto extends FieldPropertiesDto {
-    public readonly fieldType = 'Array';
-
-    public readonly minItems?: number;
-    public readonly maxItems?: number;
-
-    constructor(
-        props?: Partial<ArrayFieldPropertiesDto>
-    ) {
-        super('Default', props);
-    }
-
-    public formatValue(value: any): string {
-        if (!value) {
-            return '';
-        }
-
-        if (value.length) {
-            return `${value.length} Items(s)`;
-        } else {
-            return '0 Items';
-        }
-    }
-
-    public createValidators(isOptional: boolean): ValidatorFn[] {
-        const validators: ValidatorFn[] = [];
-
-        if (this.isRequired && !isOptional) {
-            validators.push(Validators.required);
-        }
-
-        if (this.minItems) {
-            validators.push(Validators.minLength(this.minItems));
-        }
-
-        if (this.maxItems) {
-            validators.push(Validators.maxLength(this.maxItems));
-        }
-
-        return validators;
-    }
-}
-
-export class AssetsFieldPropertiesDto extends FieldPropertiesDto {
-    public readonly fieldType = 'Assets';
-
-    public readonly minItems?: number;
-    public readonly maxItems?: number;
-    public readonly minSize?: number;
-    public readonly maxSize?: number;
-    public readonly allowedExtensions?: string[];
-    public readonly mustBeImage?: boolean;
-    public readonly minWidth?: number;
-    public readonly maxWidth?: number;
-    public readonly minHeight?: number;
-    public readonly maxHeight?: number;
-    public readonly aspectWidth?: number;
-    public readonly aspectHeight?: number;
-
-    constructor(
-        props?: Partial<AssetsFieldPropertiesDto>
-    ) {
-        super('Default', props);
-    }
-
-    public formatValue(value: any): string {
-        if (!value) {
-            return '';
-        }
-
-        if (value.length) {
-            return `${value.length} Asset(s)`;
-        } else {
-            return '0 Assets';
-        }
-    }
-
-    public createValidators(isOptional: boolean): ValidatorFn[] {
-        const validators: ValidatorFn[] = [];
-
-        if (this.isRequired && !isOptional) {
-            validators.push(Validators.required);
-        }
-
-        if (this.minItems) {
-            validators.push(Validators.minLength(this.minItems));
-        }
-
-        if (this.maxItems) {
-            validators.push(Validators.maxLength(this.maxItems));
-        }
-
-        return validators;
-    }
-}
-
-export class BooleanFieldPropertiesDto extends FieldPropertiesDto {
-    public readonly fieldType = 'Boolean';
-
-    public readonly inlineEditable: boolean = false;
-    public readonly defaultValue?: boolean;
-
-    constructor(editor: string,
-        props?: Partial<BooleanFieldPropertiesDto>
-    ) {
-        super(editor, props);
-    }
-
-    public formatValue(value: any): string {
-        if (value === null || value === undefined) {
-            return '';
-        }
-
-        return value ? 'Yes' : 'No';
-    }
-
-    public createValidators(isOptional: boolean): ValidatorFn[] {
-        const validators: ValidatorFn[] = [];
-
-        if (this.isRequired && !isOptional) {
-            validators.push(Validators.required);
-        }
-
-        return validators;
-    }
-
-    public getDefaultValue(): any {
-        return this.defaultValue;
-    }
-}
-
-export class DateTimeFieldPropertiesDto extends FieldPropertiesDto {
-    public readonly fieldType = 'DateTime';
-
-    public readonly defaultValue?: string;
-    public readonly maxValue?: string;
-    public readonly minValue?: string;
-    public readonly calculatedDefaultValue?: string;
-
-    constructor(editor: string,
-        props?: Partial<DateTimeFieldPropertiesDto>
-    ) {
-        super(editor, props);
-    }
-
-    public formatValue(value: any): string {
-        if (!value) {
-            return '';
-        }
-
-        try {
-            const parsed = DateTime.parseISO_UTC(value);
-
-            if (this.editor === 'Date') {
-                return parsed.toUTCStringFormat('YYYY-MM-DD');
-            } else {
-                return parsed.toUTCStringFormat('YYYY-MM-DD HH:mm:ss');
-            }
-        } catch (ex) {
-            return value;
-        }
-    }
-
-    public createValidators(isOptional: boolean): ValidatorFn[] {
-        const validators: ValidatorFn[] = [];
-
-        if (this.isRequired && !isOptional) {
-            validators.push(Validators.required);
-        }
-
-        return validators;
-    }
-
-    public getDefaultValue(now?: DateTime): any {
-        now = now || DateTime.now();
-
-        if (this.calculatedDefaultValue === 'Now') {
-            return now.toUTCStringFormat('YYYY-MM-DDTHH:mm:ss') + 'Z';
-        } else if (this.calculatedDefaultValue === 'Today') {
-            return now.toUTCStringFormat('YYYY-MM-DD');
-        } else {
-            return this.defaultValue;
-        }
-    }
-}
-
-export class GeolocationFieldPropertiesDto extends FieldPropertiesDto {
-    public readonly fieldType = 'Geolocation';
-
-    constructor(
-        props?: Partial<GeolocationFieldPropertiesDto>
-    ) {
-        super('Default', props);
-    }
-
-    public formatValue(value: any): string {
-        if (!value) {
-            return '';
-        }
-
-        return `${value.longitude}, ${value.latitude}`;
-    }
-
-    public createValidators(isOptional: boolean): ValidatorFn[] {
-        const validators: ValidatorFn[] = [];
-
-        if (this.isRequired && !isOptional) {
-            validators.push(Validators.required);
-        }
-
-        return validators;
-    }
-}
-
-export class JsonFieldPropertiesDto extends FieldPropertiesDto {
-    public readonly fieldType = 'Json';
-
-    constructor(
-        props?: Partial<JsonFieldPropertiesDto>
-    ) {
-        super('Default', props);
-    }
-
-    public formatValue(value: any): string {
-        if (!value) {
-            return '';
-        }
-
-        return '<Json />';
-    }
-
-    public createValidators(isOptional: boolean): ValidatorFn[] {
-        const validators: ValidatorFn[] = [];
-
-        if (this.isRequired && !isOptional) {
-            validators.push(Validators.required);
-        }
-
-        return validators;
-    }
-}
-
-export class NumberFieldPropertiesDto extends FieldPropertiesDto {
-    public readonly fieldType = 'Number';
-
-    public readonly inlineEditable: boolean = false;
-    public readonly defaultValue?: number;
-    public readonly maxValue?: number;
-    public readonly minValue?: number;
-    public readonly allowedValues?: number[];
-
-    constructor(editor: string,
-        props?: Partial<NumberFieldPropertiesDto>
-    ) {
-        super(editor, props);
-    }
-
-    public formatValue(value: any): string {
-        if (!value) {
-            return '';
-        }
-
-        return value;
-    }
-
-    public createValidators(isOptional: boolean): ValidatorFn[] {
-        const validators: ValidatorFn[] = [];
-
-        if (this.isRequired && !isOptional) {
-            validators.push(Validators.required);
-        }
-
-        if (this.minValue) {
-            validators.push(Validators.min(this.minValue));
-        }
-
-        if (this.maxValue) {
-            validators.push(Validators.max(this.maxValue));
-        }
-
-        if (this.allowedValues && this.allowedValues.length > 0) {
-            const values: (number | null)[] = this.allowedValues;
-
-            if (this.isRequired && !isOptional) {
-                validators.push(ValidatorsEx.validValues(values));
-            } else {
-                validators.push(ValidatorsEx.validValues(values.concat([null])));
-            }
-        }
-
-        return validators;
-    }
-
-    public getDefaultValue(): any {
-        return this.defaultValue;
-    }
-}
-
-export class ReferencesFieldPropertiesDto extends FieldPropertiesDto {
-    public readonly fieldType = 'References';
-
-    public readonly minItems?: number;
-    public readonly maxItems?: number;
-    public readonly schemaId?: string;
-
-    constructor(
-        props?: Partial<ReferencesFieldPropertiesDto>
-    ) {
-        super('Default', props);
-    }
-
-    public formatValue(value: any): string {
-        if (!value) {
-            return '';
-        }
-
-        if (value.length) {
-            return `${value.length} Reference(s)`;
-        } else {
-            return '0 References';
-        }
-    }
-
-    public createValidators(isOptional: boolean): ValidatorFn[] {
-        const validators: ValidatorFn[] = [];
-
-        if (this.isRequired && !isOptional) {
-            validators.push(Validators.required);
-        }
-
-        if (this.minItems) {
-            validators.push(Validators.minLength(this.minItems));
-        }
-
-        if (this.maxItems) {
-            validators.push(Validators.maxLength(this.maxItems));
-        }
-
-        return validators;
-    }
-}
-
-export class StringFieldPropertiesDto extends FieldPropertiesDto {
-    public readonly fieldType = 'String';
-
-    public readonly inlineEditable = false;
-    public readonly defaultValue?: string;
-    public readonly pattern?: string;
-    public readonly patternMessage?: string;
-    public readonly minLength?: number;
-    public readonly maxLength?: number;
-    public readonly allowedValues?: string[];
-
-    constructor(editor: string,
-        props?: Partial<StringFieldPropertiesDto>
-    ) {
-        super(editor, props);
-    }
-
-    public formatValue(value: any): string {
-        if (!value) {
-            return '';
-        }
-
-        return value;
-    }
-
-    public createValidators(isOptional: false): ValidatorFn[] {
-        const validators: ValidatorFn[] = [];
-
-        if (this.isRequired && !isOptional) {
-            validators.push(Validators.required);
-        }
-
-        if (this.minLength) {
-            validators.push(Validators.minLength(this.minLength));
-        }
-
-        if (this.maxLength) {
-            validators.push(Validators.maxLength(this.maxLength));
-        }
-
-        if (this.pattern && this.pattern.length > 0) {
-            validators.push(ValidatorsEx.pattern(this.pattern, this.patternMessage));
-        }
-
-        if (this.allowedValues && this.allowedValues.length > 0) {
-            const values: (string | null)[] = this.allowedValues;
-
-            if (this.isRequired && !isOptional) {
-                validators.push(ValidatorsEx.validValues(values));
-            } else {
-                validators.push(ValidatorsEx.validValues(values.concat([null])));
-            }
-        }
-
-        return validators;
-    }
-
-    public getDefaultValue(): any {
-        return this.defaultValue;
-    }
-}
-
-export class TagsFieldPropertiesDto extends FieldPropertiesDto {
-    public readonly fieldType = 'Tags';
-
-    public readonly minItems?: number;
-    public readonly maxItems?: number;
-
-    constructor(
-        props?: Partial<TagsFieldPropertiesDto>
-    ) {
-        super('Default', props);
-    }
-
-    public formatValue(value: any): string {
-        if (!value) {
-            return '';
-        }
-
-        if (value.length) {
-            return value.join(', ');
-        } else {
-            return '';
-        }
-    }
-
-    public createValidators(isOptional: boolean): ValidatorFn[] {
-        const validators: ValidatorFn[] = [];
-
-        if (this.isRequired && !isOptional) {
-            validators.push(Validators.required);
-        }
-
-        if (this.minItems) {
-            validators.push(Validators.minLength(this.minItems));
-        }
-
-        if (this.maxItems) {
-            validators.push(Validators.maxLength(this.maxItems));
-        }
-
-        return validators;
-    }
-}
-
 export class SchemaPropertiesDto {
     constructor(
         public readonly label?: string,
         public readonly hints?: string
-    ) {
-    }
-}
-
-export class UpdateSchemaDto {
-    constructor(
-        public readonly label?: string,
-        public readonly hints?: string
-    ) {
-    }
-}
-
-export class UpdateSchemaCategoryDto {
-    constructor(
-        public readonly name?: string
     ) {
     }
 }
@@ -753,6 +177,22 @@ export class AddFieldDto {
     }
 }
 
+export class CreateSchemaDto {
+    constructor(
+        public readonly name: string,
+        public readonly fields?: RootFieldDto[],
+        public readonly properties?: SchemaPropertiesDto
+    ) {
+    }
+}
+
+export class UpdateSchemaCategoryDto {
+    constructor(
+        public readonly name?: string
+    ) {
+    }
+}
+
 export class UpdateFieldDto {
     constructor(
         public readonly properties: FieldPropertiesDto
@@ -760,11 +200,10 @@ export class UpdateFieldDto {
     }
 }
 
-export class CreateSchemaDto {
+export class UpdateSchemaDto {
     constructor(
-        public readonly name: string,
-        public readonly fields?: RootFieldDto[],
-        public readonly properties?: SchemaPropertiesDto
+        public readonly label?: string,
+        public readonly hints?: string
     ) {
     }
 }
@@ -970,7 +409,7 @@ export class SchemasService {
             .pretifyError('Failed to change category. Please reload.');
     }
 
-    public postField(appName: string, schemaName: string, dto: AddFieldDto, parentId: number | undefined, version: Version): Observable<Versioned<AnyFieldDto>> {
+    public postField(appName: string, schemaName: string, dto: AddFieldDto, parentId: number | undefined, version: Version): Observable<Versioned<RootFieldDto | NestedFieldDto>> {
         const url = this.buildUrl(appName, schemaName, parentId, '');
 
         return HTTP.postVersioned<any>(this.http, url, dto, version)
