@@ -1,9 +1,9 @@
-        var webpack = require('webpack'),
-               path = require('path'),
-  HtmlWebpackPlugin = require('html-webpack-plugin'),
-  ExtractTextPlugin = require('extract-text-webpack-plugin'),
-TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin'),
-            helpers = require('./helpers');
+var webpack = require('webpack'),
+    path = require('path'),
+    HtmlWebpackPlugin = require('html-webpack-plugin'),
+    MiniCssExtractPlugin = require('mini-css-extract-plugin'),
+    TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin'),
+    helpers = require('./helpers');
 
 module.exports = {
     /**
@@ -21,7 +21,6 @@ module.exports = {
         modules: [
             helpers.root('app'),
             helpers.root('app', 'theme'),
-            helpers.root('app-libs'),
             helpers.root('node_modules')
         ],
 
@@ -45,19 +44,19 @@ module.exports = {
             {
                 test: /\.ts$/,
                 use: [{
-                    loader: 'awesome-typescript-loader' 
+                    loader: 'awesome-typescript-loader'
                 }, {
                     loader: 'angular2-router-loader'
                 }, {
                     loader: 'angular2-template-loader'
                 }, {
-                    loader: 'tslint-loader' 
+                    loader: 'tslint-loader'
                 }],
                 exclude: /node_modules/
             }, {
                 test: /\.ts$/,
                 use: [{
-                    loader: 'awesome-typescript-loader' 
+                    loader: 'awesome-typescript-loader'
                 }],
                 include: /node_modules/
             }, {
@@ -83,21 +82,17 @@ module.exports = {
                 }]
             }, {
                 test: /\.css$/,
-                /*
-                 * Extract the content from a bundle to a file
-                 * 
-                 * See: https://github.com/webpack-contrib/extract-text-webpack-plugin
-                 */
-                use: ExtractTextPlugin.extract({ fallback: 'style-loader', use: 'css-loader?sourceMap' })
+                use: [
+                    MiniCssExtractPlugin.loader,
+                {
+                    loader: 'css-loader'
+                }]
             }, {
                 test: /\.scss$/,
                 use: [{
                     loader: 'raw-loader'
                 }, {
-                    loader: 'sass-loader',
-                    options: {
-                        includePaths: [helpers.root('app', 'theme')]
-                    }
+                    loader: 'sass-loader', options: { includePaths: [helpers.root('app', 'theme')] }
                 }],
                 exclude: helpers.root('app', 'theme')
             }

@@ -1,9 +1,9 @@
-﻿      var webpack = require('webpack'),
-     webpackMerge = require('webpack-merge'),
-ExtractTextPlugin = require('extract-text-webpack-plugin'),
-   ngToolsWebpack = require('@ngtools/webpack'),
-        runConfig = require('./webpack.run.base.js'),
-          helpers = require('./helpers');
+﻿         var webpack = require('webpack'),
+        webpackMerge = require('webpack-merge'),
+MiniCssExtractPlugin = require('mini-css-extract-plugin'),
+      ngToolsWebpack = require('@ngtools/webpack'),
+           runConfig = require('./webpack.run.base.js'),
+             helpers = require('./helpers');
 
 helpers.removeLoaders(runConfig, ['scss', 'ts']);
 
@@ -56,7 +56,13 @@ module.exports = webpackMerge(runConfig, {
                  * 
                  * See: https://github.com/webpack-contrib/extract-text-webpack-plugin
                  */
-                use: ExtractTextPlugin.extract({ fallback: 'style-loader', use: 'css-loader?minimize!sass-loader?sourceMap' }),
+                use: [
+                    MiniCssExtractPlugin.loader,
+                {
+                    loader: 'css-loader'
+                }, {
+                    loader: 'sass-loader'
+                }],
                 /*
                  * Do not include component styles
                  */
@@ -66,10 +72,7 @@ module.exports = webpackMerge(runConfig, {
                 use: [{
                     loader: 'raw-loader'
                 }, {
-                    loader: 'sass-loader',
-                    options: {
-                        includePaths: [helpers.root('app', 'theme')]
-                    }
+                    loader: 'sass-loader', options: { includePaths: [helpers.root('app', 'theme')] }
                 }],
                 exclude: helpers.root('app', 'theme'),
             }, { 
@@ -85,9 +88,9 @@ module.exports = webpackMerge(runConfig, {
         /*
          * Puts each bundle into a file and appends the hash of the file to the path.
          * 
-         * See: https://github.com/webpack/extract-text-webpack-plugin
+         * See: https://github.com/webpack-contrib/mini-css-extract-plugin
          */
-        new ExtractTextPlugin('[name].css'),
+        new MiniCssExtractPlugin('[name].css'),
 
         new ngToolsWebpack.AngularCompilerPlugin({
             tsConfigPath: './tsconfig.json',

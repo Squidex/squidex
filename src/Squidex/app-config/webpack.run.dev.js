@@ -1,7 +1,7 @@
-﻿     var webpackMerge = require('webpack-merge'),
-    ExtractTextPlugin = require('extract-text-webpack-plugin'),
-            runConfig = require('./webpack.run.base.js'),
-              helpers = require('./helpers');
+﻿    var webpackMerge = require('webpack-merge'),
+MiniCssExtractPlugin = require('mini-css-extract-plugin'),
+           runConfig = require('./webpack.run.base.js'),
+             helpers = require('./helpers');
 
 module.exports = webpackMerge(runConfig, {
     mode: 'development',
@@ -31,10 +31,7 @@ module.exports = webpackMerge(runConfig, {
                 }, {
                     loader: 'css-loader'
                 }, {
-                    loader: 'sass-loader?sourceMap',
-                    options: {
-                        includePaths: [helpers.root('app', 'theme')]
-                    }
+                    loader: 'sass-loader?sourceMap', options: { includePaths: [helpers.root('app', 'theme')] }
                 }],
                 include: helpers.root('app', 'theme')
             }
@@ -42,7 +39,12 @@ module.exports = webpackMerge(runConfig, {
     },
 
     plugins: [
-        new ExtractTextPlugin('[name].css')
+        /*
+         * Puts each bundle into a file and appends the hash of the file to the path.
+         * 
+         * See: https://github.com/webpack-contrib/mini-css-extract-plugin
+         */
+        new MiniCssExtractPlugin('[name].css'),
     ],
 
     devServer: {
