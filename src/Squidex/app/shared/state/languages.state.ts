@@ -6,14 +6,12 @@
  */
 
 import { Injectable } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
 
 import '@app/framework/utils/rxjs-extensions';
 
 import {
     DialogService,
-    Form,
     ImmutableArray,
     State,
     Version
@@ -22,42 +20,6 @@ import {
 import { AddAppLanguageDto, AppLanguageDto, AppLanguagesService, UpdateAppLanguageDto } from './../services/app-languages.service';
 import { LanguageDto, LanguagesService } from './../services/languages.service';
 import { AppsState } from './apps.state';
-
-
-export class EditLanguageForm extends Form<FormGroup> {
-    constructor(formBuilder: FormBuilder) {
-        super(formBuilder.group({
-            isMaster: false,
-            isOptional: false
-        }));
-
-        this.form.controls['isMaster'].valueChanges
-            .subscribe(value => {
-                if (value) {
-                    this.form.controls['isOptional'].setValue(false);
-                }
-            });
-
-        this.form.controls['isOptional'].valueChanges
-            .subscribe(value => {
-                if (value) {
-                    this.form.controls['isMaster'].setValue(false);
-                }
-            });
-    }
-}
-
-export class AddLanguageForm extends Form<FormGroup> {
-    constructor(formBuilder: FormBuilder) {
-        super(formBuilder.group({
-            language: [null,
-                [
-                    Validators.required
-                ]
-            ]
-        }));
-    }
-}
 
 interface SnapshotLanguage {
     language: AppLanguageDto;

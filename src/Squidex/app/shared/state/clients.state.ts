@@ -6,17 +6,14 @@
  */
 
 import { Injectable } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
 
 import '@app/framework/utils/rxjs-extensions';
 
 import {
     DialogService,
-    Form,
     ImmutableArray,
     State,
-    ValidatorsEx,
     Version
 } from '@app/framework';
 
@@ -28,34 +25,6 @@ import {
     CreateAppClientDto,
     UpdateAppClientDto
 } from './../services/app-clients.service';
-
-export class RenameClientForm extends Form<FormGroup> {
-    constructor(formBuilder: FormBuilder) {
-        super(formBuilder.group({
-            name: ['',
-                [
-                    Validators.required
-                ]
-            ]
-        }));
-    }
-}
-
-export class AttachClientForm extends Form<FormGroup> {
-    public hasNoName =
-        this.form.controls['name'].valueChanges.startWith('').map(x => !x || x.length === 0);
-
-    constructor(formBuilder: FormBuilder) {
-        super(formBuilder.group({
-            name: ['',
-                [
-                    Validators.maxLength(40),
-                    ValidatorsEx.pattern('[a-z0-9]+(\-[a-z0-9]+)*', 'Name can contain lower case letters (a-z), numbers and dashes (not at the end).')
-                ]
-            ]
-        }));
-    }
-}
 
 interface Snapshot {
     clients: ImmutableArray<AppClientDto>;

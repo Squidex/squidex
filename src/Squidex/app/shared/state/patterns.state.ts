@@ -6,17 +6,14 @@
  */
 
 import { Injectable } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
 
 import '@app/framework/utils/rxjs-extensions';
 
 import {
     DialogService,
-    Form,
     ImmutableArray,
     State,
-    ValidatorsEx,
     Version
 } from '@app/framework';
 
@@ -27,30 +24,6 @@ import {
     AppPatternsService,
     EditAppPatternDto
 } from './../services/app-patterns.service';
-
-export class EditPatternForm extends Form<FormGroup> {
-    constructor(formBuilder: FormBuilder) {
-        super(formBuilder.group({
-            name: ['',
-                [
-                    Validators.required,
-                    Validators.maxLength(100),
-                    ValidatorsEx.pattern('[A-z0-9]+[A-z0-9\- ]*[A-z0-9]', 'Name can only contain letters, numbers, dashes and spaces.')
-                ]
-            ],
-            pattern: ['',
-                [
-                    Validators.required
-                ]
-            ],
-            message: ['',
-                [
-                    Validators.maxLength(1000)
-                ]
-            ]
-        }));
-    }
-}
 
 interface Snapshot {
     patterns: ImmutableArray<AppPatternDto>;

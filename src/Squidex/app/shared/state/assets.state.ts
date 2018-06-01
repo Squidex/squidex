@@ -6,14 +6,12 @@
  */
 
 import { Injectable } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
 
 import '@app/framework/utils/rxjs-extensions';
 
 import {
     DialogService,
-    Form,
     ImmutableArray,
     Pager,
     State
@@ -21,18 +19,6 @@ import {
 
 import { AssetDto, AssetsService} from './../services/assets.service';
 import { AppsState } from './apps.state';
-
-export class RenameAssetForm extends Form<FormGroup> {
-    constructor(formBuilder: FormBuilder) {
-        super(formBuilder.group({
-            name: ['',
-                [
-                    Validators.required
-                ]
-            ]
-        }));
-    }
-}
 
 interface Snapshot {
     assets: ImmutableArray<AssetDto>;

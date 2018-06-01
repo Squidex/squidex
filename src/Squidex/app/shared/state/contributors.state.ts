@@ -6,14 +6,12 @@
  */
 
 import { Injectable } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
 
 import '@app/framework/utils/rxjs-extensions';
 
 import {
     DialogService,
-    Form,
     ImmutableArray,
     State,
     Version
@@ -22,21 +20,6 @@ import {
 import { AppContributorDto, AppContributorsService } from './../services/app-contributors.service';
 import { AuthService } from './../services/auth.service';
 import { AppsState } from './apps.state';
-
-export class AssignContributorForm extends Form<FormGroup> {
-    public hasNoUser =
-        this.form.controls['user'].valueChanges.startWith(null).map(x => !x);
-
-    constructor(formBuilder: FormBuilder) {
-        super(formBuilder.group({
-            user: [null,
-                [
-                    Validators.required
-                ]
-            ]
-        }));
-    }
-}
 
 interface SnapshotContributor {
     contributor: AppContributorDto;
