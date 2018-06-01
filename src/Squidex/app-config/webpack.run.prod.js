@@ -5,14 +5,10 @@ ExtractTextPlugin = require('extract-text-webpack-plugin'),
         runConfig = require('./webpack.run.base.js'),
           helpers = require('./helpers');
 
-var ENV = process.env.NODE_ENV = process.env.ENV = 'production';
-
 helpers.removeLoaders(runConfig, ['scss', 'ts']);
 
 module.exports = webpackMerge(runConfig, {
     mode: 'production',
-    
-    devtool: 'source-map',
 
     output: {
         /**
@@ -86,10 +82,6 @@ module.exports = webpackMerge(runConfig, {
     },
 
     plugins: [
-        new webpack.NoEmitOnErrorsPlugin(),
-        new webpack.DefinePlugin({ 'process.env': { 'ENV': JSON.stringify(ENV) } }),
-        new webpack.optimize.ModuleConcatenationPlugin(),
-
         /*
          * Puts each bundle into a file and appends the hash of the file to the path.
          * 

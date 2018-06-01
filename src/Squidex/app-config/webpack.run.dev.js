@@ -5,14 +5,6 @@
 
 module.exports = webpackMerge(runConfig, {
     mode: 'development',
-    
-    /**
-     * Developer tool to enhance debugging
-     *
-     * See: https://webpack.js.org/configuration/devtool/#devtool
-     * See: https://webpack.js.org/guides/build-performance/
-     */
-    devtool: 'cheap-module-source-map',
 
     output: {
         filename: '[name].js',
