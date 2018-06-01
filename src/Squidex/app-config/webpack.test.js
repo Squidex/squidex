@@ -4,6 +4,8 @@ commonConfig = require('./webpack.config.js'),
      helpers = require('./helpers');
 
 module.exports = webpackMerge(commonConfig, { 
+    mode: 'development',
+
     /**
      * Source map for Karma from the help of karma-sourcemap-loader & karma-webpack
      *

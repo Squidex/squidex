@@ -1,4 +1,4 @@
-﻿var webpackConfig = require('./webpack.test.coverage');
+﻿var webpackConfig = require('./webpack.test');
 
 module.exports = function (config) {
     var _config = {

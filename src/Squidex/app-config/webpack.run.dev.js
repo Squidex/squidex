@@ -4,6 +4,8 @@
               helpers = require('./helpers');
 
 module.exports = webpackMerge(runConfig, {
+    mode: 'development',
+    
     /**
      * Developer tool to enhance debugging
      *

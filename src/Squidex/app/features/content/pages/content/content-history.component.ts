@@ -7,8 +7,8 @@
 
 import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Observable, timer } from 'rxjs';
-import { delay, merge, switchMap } from 'rxjs/operators';
+import { merge, Observable, timer } from 'rxjs';
+import { delay, switchMap } from 'rxjs/operators';
 
 import {
     allParams,
@@ -49,9 +49,10 @@ export class ContentHistoryComponent {
     }
 
     public events: Observable<HistoryEventDto[]> =
-        timer(0, 10000).pipe(
-            merge(this.messageBus.of(HistoryChannelUpdated)
-                .pipe(delay(1000))),
+        merge(
+            timer(0, 10000),
+            this.messageBus.of(HistoryChannelUpdated).pipe(delay(1000))
+        ).pipe(
             switchMap(app => this.historyService.getHistory(this.appsState.appName, this.channel)));
 
     constructor(

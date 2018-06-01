@@ -10,6 +10,8 @@ var ENV = process.env.NODE_ENV = process.env.ENV = 'production';
 helpers.removeLoaders(runConfig, ['scss', 'ts']);
 
 module.exports = webpackMerge(runConfig, {
+    mode: 'production',
+    
     devtool: 'source-map',
 
     output: {
@@ -94,17 +96,6 @@ module.exports = webpackMerge(runConfig, {
          * See: https://github.com/webpack/extract-text-webpack-plugin
          */
         new ExtractTextPlugin('[name].css'),
-        
-        new webpack.optimize.UglifyJsPlugin({
-            beautify: false,
-            mangle: {
-                screw_ie8: true, keep_fnames: true
-            },
-            compress: {
-                screw_ie8: true, warnings: false
-            },
-            comments: false
-        }),
 
         new ngToolsWebpack.AngularCompilerPlugin({
             tsConfigPath: './tsconfig.json',

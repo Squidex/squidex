@@ -8,12 +8,12 @@
     "test": "karma start",
     "test:coverage": "karma start karma.coverage.conf.js",
     "test:clean": "rimraf _test-output",
-    "dev": "cpx node_modules/oidc-client/dist/oidc-client.min.js wwwroot/scripts/ && webpack-dev-server --config app-config/webpack.run.dev.js --mode development --inline --port 3000",
+    "dev": "cpx node_modules/oidc-client/dist/oidc-client.min.js wwwroot/scripts/ && webpack-dev-server --config app-config/webpack.run.dev.js --inline --port 3000",
     "build": "webpack --config app-config/webpack.run.prod.js --display-error-details --bail --display-optimization-bailout",
     "build:nobail": "webpack --config app-config/webpack.run.prod.js --display-error-details",
     "build:copy": "cpx node_modules/oidc-client/dist/oidc-client.min.js wwwroot/scripts/",
     "build:clean": "rimraf wwwroot/build",
-    "tslint": "tslint app/**/*.ts"
+    "tslint": "tslint -c tslint.json -p tsconfig.json app/**/*.ts"
   },
   "dependencies": {
     "@angular/animations": "6.0.3",
@@ -83,6 +83,7 @@
     "null-loader": "0.1.1",
     "raw-loader": "0.5.1",
     "rimraf": "2.6.2",
+    "rxjs-tslint": "^0.1.4",
     "sass-lint": "1.12.1",
     "sass-loader": "7.0.1",
     "style-loader": "0.21.0",
@@ -90,7 +91,7 @@
     "tslint": "5.10.0",
     "tslint-loader": "3.6.0",
     "typemoq": "2.1.0",
-    "typescript": "2.9.1",
+    "typescript": "2.7.2",
     "underscore": "1.9.1",
     "webpack": "4.10.2",
     "webpack-cli": "^2.1.5",
