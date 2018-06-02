@@ -10,5 +10,7 @@ namespace Squidex.Infrastructure.Log.Internal
     public interface IConsole
     {
         void WriteLine(int color, string message);
+
+        void Reset();
     }
 }

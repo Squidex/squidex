@@ -1,8 +1,11 @@
-﻿      var webpack = require('webpack'),
-     webpackMerge = require('webpack-merge'),
-HtmlWebpackPlugin = require('html-webpack-plugin'),
-     commonConfig = require('./webpack.config.js'),
-          helpers = require('./helpers');
+﻿const webpack = require('webpack'),
+ webpackMerge = require('webpack-merge'),
+ commonConfig = require('./webpack.config.js'),
+      helpers = require('./helpers');
+
+const plugins = {
+    HtmlWebpackPlugin: require('html-webpack-plugin')
+};
 
 module.exports = webpackMerge(commonConfig, {
     /**
@@ -17,21 +20,14 @@ module.exports = webpackMerge(commonConfig, {
     },
 
     plugins: [
-        /**
-         * Simplifies creation of HTML files to serve your webpack bundles.
-         * This is especially useful for webpack bundles that include a hash in the filename
-         * which changes every compilation.
-         *
-         * See: https://github.com/ampedandwired/html-webpack-plugin
-         */
-        new HtmlWebpackPlugin({
+        new plugins.HtmlWebpackPlugin({
             hash: true,
             chunks: ['shims', 'app'],
             chunksSortMode: 'manual',
             template: 'wwwroot/index.html'
         }),
         
-        new HtmlWebpackPlugin({
+        new plugins.HtmlWebpackPlugin({
             template: 'wwwroot/theme.html', hash: true, chunksSortMode: 'none', filename: 'theme.html'
         })
     ]

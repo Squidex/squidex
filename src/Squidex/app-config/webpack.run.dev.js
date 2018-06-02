@@ -1,13 +1,13 @@
-﻿    var webpackMerge = require('webpack-merge'),
-MiniCssExtractPlugin = require('mini-css-extract-plugin'),
-           runConfig = require('./webpack.run.base.js'),
-             helpers = require('./helpers');
+﻿const webpackMerge = require('webpack-merge'),
+         runConfig = require('./webpack.run.base.js'),
+           helpers = require('./helpers');
 
 module.exports = webpackMerge(runConfig, {
     mode: 'development',
 
     output: {
         filename: '[name].js',
+
         // Set the public path, because we are running the website from another port (5000)
         publicPath: 'http://localhost:3000/'
     },
@@ -37,20 +37,10 @@ module.exports = webpackMerge(runConfig, {
             }
         ]
     },
-
-    plugins: [
-        /*
-         * Puts each bundle into a file and appends the hash of the file to the path.
-         * 
-         * See: https://github.com/webpack-contrib/mini-css-extract-plugin
-         */
-        new MiniCssExtractPlugin('[name].css'),
-    ],
-
     devServer: {
-        historyApiFallback: true, stats: 'minimal',
         headers: {
             'Access-Control-Allow-Origin': '*'
-        }
+        },
+        historyApiFallback: true
     }
 });

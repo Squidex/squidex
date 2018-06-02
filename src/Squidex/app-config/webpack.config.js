@@ -1,9 +1,13 @@
-var webpack = require('webpack'),
-    path = require('path'),
-    HtmlWebpackPlugin = require('html-webpack-plugin'),
-    MiniCssExtractPlugin = require('mini-css-extract-plugin'),
-    TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin'),
-    helpers = require('./helpers');
+const webpack = require('webpack'),
+         path = require('path'),
+      helpers = require('./helpers');
+
+const plugins = {
+    // https://github.com/webpack-contrib/mini-css-extract-plugin
+    MiniCssExtractPlugin: require('mini-css-extract-plugin'),
+    // https://github.com/dividab/tsconfig-paths-webpack-plugin
+    TsconfigPathsPlugin: require('tsconfig-paths-webpack-plugin')
+};
 
 module.exports = {
     /**
@@ -25,7 +29,7 @@ module.exports = {
         ],
 
         plugins: [
-            new TsconfigPathsPlugin()
+            new plugins.TsconfigPathsPlugin()
         ]
     },
 
@@ -83,7 +87,7 @@ module.exports = {
             }, {
                 test: /\.css$/,
                 use: [
-                    MiniCssExtractPlugin.loader,
+                    plugins.MiniCssExtractPlugin.loader,
                 {
                     loader: 'css-loader'
                 }]
@@ -100,6 +104,13 @@ module.exports = {
     },
 
     plugins: [
+        /*
+         * Puts each bundle into a file and appends the hash of the file to the path.
+         * 
+         * See: https://github.com/webpack-contrib/mini-css-extract-plugin
+         */
+        new plugins.MiniCssExtractPlugin('[name].css'),
+
         new webpack.LoaderOptionsPlugin({
             options: {
                 tslint: {

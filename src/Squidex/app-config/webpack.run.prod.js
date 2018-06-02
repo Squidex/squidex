@@ -1,10 +1,15 @@
-﻿         var webpack = require('webpack'),
-        webpackMerge = require('webpack-merge'),
-MiniCssExtractPlugin = require('mini-css-extract-plugin'),
-      ngToolsWebpack = require('@ngtools/webpack'),
-           runConfig = require('./webpack.run.base.js'),
-             helpers = require('./helpers');
+﻿const webpack = require('webpack'),
+ webpackMerge = require('webpack-merge'),
+    runConfig = require('./webpack.run.base.js'),
+      helpers = require('./helpers');
 
+const plugins = {
+    // https://www.npmjs.com/package/@ngtools/webpack
+    NgToolsWebpack: require('@ngtools/webpack'),
+    // https://github.com/webpack-contrib/mini-css-extract-plugin
+    MiniCssExtractPlugin: require('mini-css-extract-plugin'),
+};
+            
 helpers.removeLoaders(runConfig, ['scss', 'ts']);
 
 module.exports = webpackMerge(runConfig, {
@@ -57,9 +62,9 @@ module.exports = webpackMerge(runConfig, {
                  * See: https://github.com/webpack-contrib/extract-text-webpack-plugin
                  */
                 use: [
-                    MiniCssExtractPlugin.loader,
+                    plugins.MiniCssExtractPlugin.loader,
                 {
-                    loader: 'css-loader'
+                    loader: 'css-loader', options: { minimize: true },
                 }, {
                     loader: 'sass-loader'
                 }],
@@ -85,16 +90,11 @@ module.exports = webpackMerge(runConfig, {
     },
 
     plugins: [
-        /*
-         * Puts each bundle into a file and appends the hash of the file to the path.
-         * 
-         * See: https://github.com/webpack-contrib/mini-css-extract-plugin
-         */
-        new MiniCssExtractPlugin('[name].css'),
-
-        new ngToolsWebpack.AngularCompilerPlugin({
-            tsConfigPath: './tsconfig.json',
-            entryModule: 'app/app.module#AppModule'
+        new plugins.NgToolsWebpack.AngularCompilerPlugin({
+            entryModule: 'app/app.module#AppModule',
+            sourceMap: false,
+            skipSourceGeneration: false,
+            tsConfigPath: './tsconfig.json'
         })
     ]
 });
