@@ -1,7 +1,8 @@
-﻿var webpackMerge = require('webpack-merge'),
-            path = require('path'),
-         helpers = require('./helpers'),
-      testConfig = require('./webpack.test.js');
+﻿const webpack = require('webpack'),
+ webpackMerge = require('webpack-merge'),
+         path = require('path'),
+      helpers = require('./helpers'),
+   testConfig = require('./webpack.test.js');
 
 helpers.removeLoaders(testConfig, ['ts']);
 

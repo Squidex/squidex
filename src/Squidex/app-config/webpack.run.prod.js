@@ -1,13 +1,14 @@
 ﻿const webpack = require('webpack'),
  webpackMerge = require('webpack-merge'),
-    runConfig = require('./webpack.run.base.js'),
-      helpers = require('./helpers');
+         path = require('path'),
+      helpers = require('./helpers'),
+    runConfig = require('./webpack.run.base.js');
 
 const plugins = {
     // https://www.npmjs.com/package/@ngtools/webpack
     NgToolsWebpack: require('@ngtools/webpack'),
     // https://github.com/webpack-contrib/mini-css-extract-plugin
-    MiniCssExtractPlugin: require('mini-css-extract-plugin'),
+    MiniCssExtractPlugin: require('mini-css-extract-plugin')
 };
             
 helpers.removeLoaders(runConfig, ['scss', 'ts']);

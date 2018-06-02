@@ -1,7 +1,8 @@
-﻿ var webpack = require('webpack'),
-webpackMerge = require('webpack-merge'),
-commonConfig = require('./webpack.config.js'),
-     helpers = require('./helpers');
+﻿ const webpack = require('webpack'),
+  webpackMerge = require('webpack-merge'),
+          path = require('path'),
+       helpers = require('./helpers'),
+  commonConfig = require('./webpack.config.js');
 
 module.exports = webpackMerge(commonConfig, { 
     mode: 'development',
@@ -12,5 +13,5 @@ module.exports = webpackMerge(commonConfig, {
      * Do not change, leave as is or it wont work.
      * See: https://webpack.js.org/configuration/devtool/
      */
-    devtool: 'inline-source-map',
+    devtool: 'inline-source-map'
 });

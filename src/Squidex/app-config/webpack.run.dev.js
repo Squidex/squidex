@@ -1,6 +1,8 @@
-﻿const webpackMerge = require('webpack-merge'),
-         runConfig = require('./webpack.run.base.js'),
-           helpers = require('./helpers');
+﻿const webpack = require('webpack'),
+ webpackMerge = require('webpack-merge'),
+         path = require('path'),
+      helpers = require('./helpers'),
+    runConfig = require('./webpack.run.base.js');
 
 module.exports = webpackMerge(runConfig, {
     mode: 'development',
@@ -37,6 +39,7 @@ module.exports = webpackMerge(runConfig, {
             }
         ]
     },
+
     devServer: {
         headers: {
             'Access-Control-Allow-Origin': '*'

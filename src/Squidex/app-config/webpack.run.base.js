@@ -1,7 +1,8 @@
 ﻿const webpack = require('webpack'),
  webpackMerge = require('webpack-merge'),
- commonConfig = require('./webpack.config.js'),
-      helpers = require('./helpers');
+         path = require('path'),
+      helpers = require('./helpers'),
+ commonConfig = require('./webpack.config.js');
 
 const plugins = {
     HtmlWebpackPlugin: require('html-webpack-plugin')
