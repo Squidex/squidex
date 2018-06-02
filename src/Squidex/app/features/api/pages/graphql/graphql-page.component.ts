@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
@@ -21,7 +21,7 @@ import { AppsState, GraphQlService } from '@app/shared';
     styleUrls: ['./graphql-page.component.scss'],
     templateUrl: './graphql-page.component.html'
 })
-export class GraphQLPageComponent implements OnInit {
+export class GraphQLPageComponent implements AfterViewInit {
     @ViewChild('graphiQLContainer')
     public graphiQLContainer: ElementRef;
 
@@ -31,7 +31,7 @@ export class GraphQLPageComponent implements OnInit {
     ) {
     }
 
-    public ngOnInit() {
+    public ngAfterViewInit() {
         ReactDOM.render(
             React.createElement(GraphiQL, {
                 fetcher: (params: any) => {

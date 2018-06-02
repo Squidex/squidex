@@ -18,5 +18,8 @@
         "app/*"
       ]
     }
+  },
+  "angularCompilerOptions": { 
+    "preserveWhitespaces": true 
   }
 }

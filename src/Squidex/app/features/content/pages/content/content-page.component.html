@@ -31,7 +31,7 @@
                 <sqx-shortcut keys="ctrl+s" (trigger)="saveAndPublish()"></sqx-shortcut>
             </ng-container>
             <ng-template #notNew>
-                <div class="dropdown dropdown-options" *ngIf="content">
+                <div class="dropdown dropdown-options ml-1" *ngIf="content">
                     <button type="button" class="btn btn-outline-secondary" (click)="dropdown.toggle()" [class.active]="dropdown.isOpen | async" #optionsButton>
                         <sqx-content-status 
                             [status]="content.status"
@@ -80,11 +80,11 @@
                 </div>        
 
                 <ng-container *ngIf="content.status !== 'Archived'">
-                    <button type="button" class="btn btn-secondary" (click)="saveAsProposal()" *ngIf="content.status === 'Published'">
+                    <button type="button" class="btn btn-secondary ml-1" (click)="saveAsProposal()" *ngIf="content.status === 'Published'">
                         Save as Draft
                     </button>
                     
-                    <button type="submit" class="btn btn-primary" title="CTRL + S">
+                    <button type="submit" class="btn btn-primary ml-1" title="CTRL + S">
                         Save
                     </button>
 

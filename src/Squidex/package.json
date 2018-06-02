@@ -28,6 +28,7 @@
     "angular2-chartjs": "0.5.1",
     "babel-polyfill": "6.26.0",
     "bootstrap": "4.1.1",
+    "codemirror": "5.38.0",
     "core-js": "2.5.7",
     "dragula": "3.7.2",
     "graphiql": "0.11.11",

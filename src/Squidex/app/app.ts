@@ -7,15 +7,6 @@
 
 import './theme/theme.scss';
 
-// icomoon
-import './theme/icomoon/style.css';
-
-// Pikaday
-import 'pikaday/css/pikaday.css';
-
-// Dragula
-import 'dragula/dist/dragula.css';
-
 import { enableProdMode } from '@angular/core';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 
