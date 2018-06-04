@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Linq;
+using GraphQL.Resolvers;
 using GraphQL.Types;
 using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -32,10 +33,22 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
                 if (fieldInfo.ResolveType != null)
                 {
+                    var resolver = new FuncFieldResolver<object>(c =>
+                    {
+                        if (((JObject)c.Source).TryGetValue(nestedField.Name, out var value))
+                        {
+                            return fieldInfo.Resolver(value, c);
+                        }
+                        else
+                        {
+                            return fieldInfo;
+                        }
+                    });
+
                     AddField(new FieldType
                     {
                         Name = nestedField.Name.ToCamelCase(),
-                        Resolver = fieldInfo.Resolver,
+                        Resolver = resolver,
                         ResolvedType = fieldInfo.ResolveType,
                         Description = $"The {fieldName}/{nestedField.DisplayName()} nested field."
                     });

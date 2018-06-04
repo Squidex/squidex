@@ -273,6 +273,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                       myTags {
                         iv
                       }
+                      myArray {
+                        iv {
+                          nestedNumber
+                          nestedBoolean
+                        }
+                      }
                     }
                   }
                 }";
@@ -341,6 +347,22 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                                     {
                                         "tag1",
                                         "tag2"
+                                    }
+                                },
+                                myArray = new
+                                {
+                                    iv = new[]
+                                    {
+                                        new
+                                        {
+                                            nestedNumber = 1,
+                                            nestedBoolean = true
+                                        },
+                                        new
+                                        {
+                                            nestedNumber = 2,
+                                            nestedBoolean = false
+                                        }
                                     }
                                 }
                             }

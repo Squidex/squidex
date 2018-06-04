@@ -43,10 +43,22 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
                     foreach (var partitionItem in partition)
                     {
+                        var resolver = new FuncFieldResolver<object>(c =>
+                        {
+                            if (((ContentFieldData)c.Source).TryGetValue(c.FieldName, out var value))
+                            {
+                                return fieldInfo.Resolver(value, c);
+                            }
+                            else
+                            {
+                                return fieldInfo;
+                            }
+                        });
+
                         fieldGraphType.AddField(new FieldType
                         {
                             Name = partitionItem.Key,
-                            Resolver = fieldInfo.Resolver,
+                            Resolver = resolver,
                             ResolvedType = fieldInfo.ResolveType,
                             Description = field.RawProperties.Hints
                         });

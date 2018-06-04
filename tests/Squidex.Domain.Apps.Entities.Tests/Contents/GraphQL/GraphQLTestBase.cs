@@ -72,7 +72,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     .AddGeolocation(10, "my-geolocation", Partitioning.Invariant,
                         new GeolocationFieldProperties())
                     .AddTags(11, "my-tags", Partitioning.Invariant,
-                        new TagsFieldProperties());
+                        new TagsFieldProperties())
+                    .AddArray(12, "my-array", Partitioning.Invariant, f => f
+                        .AddBoolean(121, "nested-boolean")
+                        .AddNumber(122, "nested-number"));
 
             A.CallTo(() => app.Id).Returns(appId);
             A.CallTo(() => app.Name).Returns(appName);
@@ -122,7 +125,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                             .AddValue("iv", JToken.FromObject(new[] { refId })))
                     .AddField("my-geolocation",
                         new ContentFieldData()
-                            .AddValue("iv", JToken.FromObject(new { latitude = 10, longitude = 20 })));
+                            .AddValue("iv", JToken.FromObject(new { latitude = 10, longitude = 20 })))
+                    .AddField("my-array",
+                        new ContentFieldData()
+                            .AddValue("iv", new JArray(
+                                new JObject(
+                                    new JProperty("nested-boolean", true),
+                                    new JProperty("nested-number", 1)),
+                                new JObject(
+                                    new JProperty("nested-boolean", false),
+                                    new JProperty("nested-number", 2)))));
 
             if (!noJson)
             {

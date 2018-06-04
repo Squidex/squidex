@@ -10,6 +10,7 @@ using GraphQL.Resolvers;
 using GraphQL.Types;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types;
 using Squidex.Domain.Apps.Entities.Schemas;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
@@ -36,6 +37,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
         IGraphType GetInputGraphType(IField field);
 
-        (IGraphType ResolveType, IFieldResolver Resolver) GetGraphType(ISchemaEntity schema, IField field);
+        (IGraphType ResolveType, ValueResolver Resolver) GetGraphType(ISchemaEntity schema, IField field);
     }
 }
