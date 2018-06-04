@@ -1,35 +1,32 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using GraphQL.Language.AST;
 using GraphQL.Types;
+using Newtonsoft.Json.Linq;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Utils
 {
-    public sealed class NoopGraphType : ScalarGraphType
+    public sealed class JTokenConverter : IAstFromValueConverter
     {
-        public NoopGraphType(string name)
+        public static readonly JTokenConverter Instance = new JTokenConverter();
+
+        private JTokenConverter()
         {
-            Name = name;
         }
 
-        public override object Serialize(object value)
+        public IValue Convert(object value, IGraphType type)
         {
-            return value;
+            return new JTokenValue(value as JToken);
         }
 
-        public override object ParseValue(object value)
+        public bool Matches(object value, IGraphType type)
         {
-            return value;
-        }
-
-        public override object ParseLiteral(IValue value)
-        {
-            return value.Value;
+            return value is JToken;
         }
     }
 }

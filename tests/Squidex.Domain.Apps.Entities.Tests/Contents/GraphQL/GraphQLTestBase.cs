@@ -96,7 +96,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             sut = new CachingGraphQLService(cache, appProvider, assetRepository, commandBus, contentQuery, new FakeUrlGenerator());
         }
 
-        protected static IContentEntity CreateContent(Guid id, Guid refId, Guid assetId, NamedContentData data = null, bool noJson = false)
+        protected static IContentEntity CreateContent(Guid id, Guid refId, Guid assetId, NamedContentData data = null)
         {
             var now = DateTime.UtcNow.ToInstant();
 
@@ -126,6 +126,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     .AddField("my-geolocation",
                         new ContentFieldData()
                             .AddValue("iv", JToken.FromObject(new { latitude = 10, longitude = 20 })))
+                    .AddField("my-json",
+                        new ContentFieldData()
+                            .AddValue("iv", JToken.FromObject(new { value = 1 })))
                     .AddField("my-array",
                         new ContentFieldData()
                             .AddValue("iv", new JArray(
@@ -135,13 +138,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                                 new JObject(
                                     new JProperty("nested-boolean", false),
                                     new JProperty("nested-number", 2)))));
-
-            if (!noJson)
-            {
-                data.AddField("my-json",
-                    new ContentFieldData()
-                        .AddValue("iv", JToken.FromObject(new { value = 1 })));
-            }
 
             var content = new ContentEntity
             {

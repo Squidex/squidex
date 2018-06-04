@@ -18,6 +18,7 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types;
+using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Utils;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using GraphQLSchema = GraphQL.Types.Schema;
@@ -53,6 +54,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             schemasById = schemas.ToDictionary(x => x.Id);
 
             graphQLSchema = BuildSchema(this);
+            graphQLSchema.RegisterValueConverter(JTokenConverter.Instance);
 
             InitializeContentTypes();
         }
@@ -178,13 +180,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         {
             Guard.NotNull(context, nameof(context));
 
+            var inputs = InputConverter.ToInputs(query.Variables);
+
             var result = await new DocumentExecuter().ExecuteAsync(options =>
             {
-                options.Inputs = query.Variables?.ToInputs() ?? new Inputs();
-                options.Query = query.Query;
                 options.OperationName = query.OperationName;
-                options.Schema = graphQLSchema;
                 options.UserContext = context;
+                options.Schema = graphQLSchema;
+                options.Inputs = inputs;
+                options.Query = query.Query;
             }).ConfigureAwait(false);
 
             return (result.Data, result.Errors?.Select(x => (object)new { x.Message, x.Locations }).ToArray());

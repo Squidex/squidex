@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
         public GraphQLMutationTests()
         {
-            content = CreateContent(contentId, Guid.Empty, Guid.Empty, null, true);
+            content = CreateContent(contentId, Guid.NewGuid(), Guid.NewGuid(), null);
 
             A.CallTo(() => commandBus.PublishAsync(A<ICommand>.Ignored))
                 .Returns(commandContext);

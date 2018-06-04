@@ -20,27 +20,27 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
         public IGraphType Visit(IArrayField field)
         {
-            return AllTypes.NoopJson;
+            return AllTypes.NoopArray;
         }
 
         public IGraphType Visit(IField<AssetsFieldProperties> field)
         {
-            return AllTypes.ListOfNonNullGuid;
+            return AllTypes.NoopReferences;
         }
 
         public IGraphType Visit(IField<BooleanFieldProperties> field)
         {
-            return AllTypes.Boolean;
+            return AllTypes.NoopBoolean;
         }
 
         public IGraphType Visit(IField<DateTimeFieldProperties> field)
         {
-            return AllTypes.Date;
+            return AllTypes.NoopDate;
         }
 
         public IGraphType Visit(IField<GeolocationFieldProperties> field)
         {
-            return AllTypes.GeolocationInput;
+            return AllTypes.NoopGeolocation;
         }
 
         public IGraphType Visit(IField<JsonFieldProperties> field)
@@ -50,22 +50,22 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
         public IGraphType Visit(IField<NumberFieldProperties> field)
         {
-            return AllTypes.Float;
+            return AllTypes.NoopFloat;
         }
 
         public IGraphType Visit(IField<ReferencesFieldProperties> field)
         {
-            return AllTypes.ListOfNonNullGuid;
+            return AllTypes.NoopReferences;
         }
 
         public IGraphType Visit(IField<StringFieldProperties> field)
         {
-            return AllTypes.String;
+            return AllTypes.NoopString;
         }
 
         public IGraphType Visit(IField<TagsFieldProperties> field)
         {
-            return AllTypes.ListOfNonNullString;
+            return AllTypes.NoopTags;
         }
     }
 }

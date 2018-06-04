@@ -30,27 +30,21 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
         public static readonly IGraphType StatusType = new EnumerationGraphType<Status>();
 
-        public static readonly IGraphType NonNullInt = new NonNullGraphType(new IntGraphType());
+        public static readonly IGraphType NonNullInt = new NonNullGraphType(Int);
 
-        public static readonly IGraphType NonNullGuid = new NonNullGraphType(new GuidGraphType());
+        public static readonly IGraphType NonNullGuid = new NonNullGraphType(Guid);
 
-        public static readonly IGraphType NonNullDate = new NonNullGraphType(new DateGraphType());
+        public static readonly IGraphType NonNullDate = new NonNullGraphType(Date);
 
-        public static readonly IGraphType NonNullFloat = new NonNullGraphType(new FloatGraphType());
+        public static readonly IGraphType NonNullFloat = new NonNullGraphType(Float);
 
-        public static readonly IGraphType NonNullString = new NonNullGraphType(new StringGraphType());
+        public static readonly IGraphType NonNullString = new NonNullGraphType(String);
 
-        public static readonly IGraphType NonNullBoolean = new NonNullGraphType(new BooleanGraphType());
+        public static readonly IGraphType NonNullBoolean = new NonNullGraphType(Boolean);
 
-        public static readonly IGraphType NonNullStatusType = new NonNullGraphType(new EnumerationGraphType<Status>());
+        public static readonly IGraphType NonNullStatusType = new NonNullGraphType(StatusType);
 
-        public static readonly IGraphType ListOfNonNullGuid = new ListGraphType(new NonNullGraphType(new GuidGraphType()));
-
-        public static readonly IGraphType ListOfNonNullString = new ListGraphType(new NonNullGraphType(new StringGraphType()));
-
-        public static readonly IGraphType NoopInt = new NoopGraphType("Int");
-
-        public static readonly IGraphType NoopGuid = new NoopGraphType("Guid");
+        public static readonly IGraphType NoopArray = new NoopGraphType("Array");
 
         public static readonly IGraphType NoopDate = new NoopGraphType("Date");
 
@@ -65,6 +59,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
         public static readonly IGraphType NoopBoolean = new NoopGraphType("Boolean");
 
         public static readonly IGraphType NoopGeolocation = new NoopGraphType("Geolocation");
+
+        public static readonly IGraphType NoopReferences = new NoopGraphType("References");
 
         public static readonly IGraphType CommandVersion = new CommandVersionGraphType();
 
