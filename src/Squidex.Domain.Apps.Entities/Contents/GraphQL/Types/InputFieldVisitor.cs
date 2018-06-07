@@ -25,47 +25,47 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
         public IGraphType Visit(IField<AssetsFieldProperties> field)
         {
-            return AllTypes.NoopReferences;
+            return AllTypes.References;
         }
 
         public IGraphType Visit(IField<BooleanFieldProperties> field)
         {
-            return AllTypes.NoopBoolean;
+            return AllTypes.Boolean;
         }
 
         public IGraphType Visit(IField<DateTimeFieldProperties> field)
         {
-            return AllTypes.NoopDate;
+            return AllTypes.Date;
         }
 
         public IGraphType Visit(IField<GeolocationFieldProperties> field)
         {
-            return AllTypes.NoopGeolocation;
+            return AllTypes.GeolocationInput;
         }
 
         public IGraphType Visit(IField<JsonFieldProperties> field)
         {
-            return AllTypes.NoopJson;
+            return AllTypes.Json;
         }
 
         public IGraphType Visit(IField<NumberFieldProperties> field)
         {
-            return AllTypes.NoopFloat;
+            return AllTypes.Float;
         }
 
         public IGraphType Visit(IField<ReferencesFieldProperties> field)
         {
-            return AllTypes.NoopReferences;
+            return AllTypes.References;
         }
 
         public IGraphType Visit(IField<StringFieldProperties> field)
         {
-            return AllTypes.NoopString;
+            return AllTypes.String;
         }
 
         public IGraphType Visit(IField<TagsFieldProperties> field)
         {
-            return AllTypes.NoopTags;
+            return AllTypes.Tags;
         }
     }
 }

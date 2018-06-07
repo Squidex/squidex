@@ -10,16 +10,16 @@ using Newtonsoft.Json.Linq;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Utils
 {
-    public sealed class JTokenValue : ValueNode<JToken>
+    public sealed class JsonValue : ValueNode<JObject>
     {
-        public JTokenValue(JToken value)
+        public JsonValue(JObject value)
         {
             Value = value;
         }
 
-        protected override bool Equals(ValueNode<JToken> node)
+        protected override bool Equals(ValueNode<JObject> node)
         {
-            return node.Value.Equals(Value);
+            return false;
         }
     }
 }

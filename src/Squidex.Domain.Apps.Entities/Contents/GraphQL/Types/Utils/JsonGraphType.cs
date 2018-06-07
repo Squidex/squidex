@@ -7,26 +7,36 @@
 
 using GraphQL.Language.AST;
 using GraphQL.Types;
-using Newtonsoft.Json.Linq;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Utils
 {
-    public sealed class JTokenConverter : IAstFromValueConverter
+    public sealed class JsonGraphType : ScalarGraphType
     {
-        public static readonly JTokenConverter Instance = new JTokenConverter();
-
-        private JTokenConverter()
+        public JsonGraphType()
         {
+            Name = "Json";
+
+            Description = "Unstructured Json object";
         }
 
-        public IValue Convert(object value, IGraphType type)
+        public override object Serialize(object value)
         {
-            return new JTokenValue(value as JToken);
+            return value;
         }
 
-        public bool Matches(object value, IGraphType type)
+        public override object ParseValue(object value)
         {
-            return value is JToken;
+            return value;
+        }
+
+        public override object ParseLiteral(IValue value)
+        {
+            if (value is JsonValue jsonGraphType)
+            {
+                return jsonGraphType.Value;
+            }
+
+            return value;
         }
     }
 }

@@ -38,7 +38,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
         public (IGraphType ResolveType, ValueResolver Resolver) Visit(IField<AssetsFieldProperties> field)
         {
-            return ResolveAssets(assetListType);
+            return ResolveAssets();
         }
 
         public (IGraphType ResolveType, ValueResolver Resolver) Visit(IField<BooleanFieldProperties> field)
@@ -88,12 +88,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
         private (IGraphType ResolveType, ValueResolver Resolver) ResolveNested(IArrayField field)
         {
-            var schemaFieldType = new ListGraphType(new NonNullGraphType(new NestedObjectGraphType(model, schema, field)));
+            var schemaFieldType = new ListGraphType(new NonNullGraphType(new NestedGraphType(model, schema, field)));
 
             return (schemaFieldType, NoopResolver);
         }
 
-        private (IGraphType ResolveType, ValueResolver Resolver) ResolveAssets(IGraphType assetListType)
+        private (IGraphType ResolveType, ValueResolver Resolver) ResolveAssets()
         {
             var resolver = new ValueResolver((value, c) =>
             {

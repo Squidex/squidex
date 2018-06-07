@@ -22,13 +22,21 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
         public static readonly IGraphType Date = new DateGraphType();
 
+        public static readonly IGraphType Json = new JsonGraphType();
+
+        public static readonly IGraphType Tags = new ListGraphType<NonNullGraphType<StringGraphType>>();
+
         public static readonly IGraphType Float = new FloatGraphType();
+
+        public static readonly IGraphType Status = new EnumerationGraphType<Status>();
 
         public static readonly IGraphType String = new StringGraphType();
 
         public static readonly IGraphType Boolean = new BooleanGraphType();
 
-        public static readonly IGraphType StatusType = new EnumerationGraphType<Status>();
+        public static readonly IGraphType References = new ListGraphType<NonNullGraphType<GuidGraphType>>();
+
+        public static readonly IGraphType GeolocationInput = new GeolocationInputGraphType();
 
         public static readonly IGraphType NonNullInt = new NonNullGraphType(Int);
 
@@ -42,28 +50,24 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
         public static readonly IGraphType NonNullBoolean = new NonNullGraphType(Boolean);
 
-        public static readonly IGraphType NonNullStatusType = new NonNullGraphType(StatusType);
+        public static readonly IGraphType NonNullStatusType = new NonNullGraphType(Status);
 
         public static readonly IGraphType NoopArray = new NoopGraphType("Array");
 
-        public static readonly IGraphType NoopDate = new NoopGraphType("Date");
+        public static readonly IGraphType NoopDate = new NoopGraphType(Date);
 
-        public static readonly IGraphType NoopJson = new NoopGraphType("Json");
+        public static readonly IGraphType NoopJson = new NoopGraphType(Json);
 
-        public static readonly IGraphType NoopTags = new NoopGraphType("Tags");
+        public static readonly IGraphType NoopTags = new NoopGraphType(Tags);
 
-        public static readonly IGraphType NoopFloat = new NoopGraphType("Float");
+        public static readonly IGraphType NoopFloat = new NoopGraphType(Float);
 
-        public static readonly IGraphType NoopString = new NoopGraphType("String");
+        public static readonly IGraphType NoopString = new NoopGraphType(String);
 
-        public static readonly IGraphType NoopBoolean = new NoopGraphType("Boolean");
+        public static readonly IGraphType NoopBoolean = new NoopGraphType(Boolean);
 
-        public static readonly IGraphType NoopGeolocation = new NoopGraphType("Geolocation");
-
-        public static readonly IGraphType NoopReferences = new NoopGraphType("References");
+        public static readonly IGraphType NoopGeolocation = new NoopGraphType(GeolocationInput);
 
         public static readonly IGraphType CommandVersion = new CommandVersionGraphType();
-
-        public static readonly IGraphType GeolocationInput = new GeolocationInputGraphType();
     }
 }

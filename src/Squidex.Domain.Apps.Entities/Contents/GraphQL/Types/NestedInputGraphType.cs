@@ -6,18 +6,16 @@
 // ==========================================================================
 
 using System.Linq;
-using GraphQL.Resolvers;
 using GraphQL.Types;
-using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {
-    public sealed class NestedObjectGraphType : ObjectGraphType<JObject>
+    public sealed class NestedInputGraphType : InputObjectGraphType
     {
-        public NestedObjectGraphType(IGraphModel model, ISchemaEntity schema, IArrayField field)
+        public NestedInputGraphType(IGraphModel model, ISchemaEntity schema, IArrayField field)
         {
             var schemaType = schema.TypeName();
             var schemaName = schema.DisplayName();
@@ -33,29 +31,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
                 if (fieldInfo.ResolveType != null)
                 {
-                    var resolver = new FuncFieldResolver<object>(c =>
-                    {
-                        if (((JObject)c.Source).TryGetValue(nestedField.Name, out var value))
-                        {
-                            return fieldInfo.Resolver(value, c);
-                        }
-                        else
-                        {
-                            return fieldInfo;
-                        }
-                    });
-
                     AddField(new FieldType
                     {
                         Name = nestedField.Name.ToCamelCase(),
-                        Resolver = resolver,
+                        Resolver = null,
                         ResolvedType = fieldInfo.ResolveType,
                         Description = $"The {fieldName}/{nestedField.DisplayName()} nested field."
                     });
                 }
             }
 
-            Description = $"The structure of a {schemaName}.{fieldName} child schema.";
+            Description = $"The structure of a {schemaName}.{fieldName} nested schema.";
         }
     }
 }

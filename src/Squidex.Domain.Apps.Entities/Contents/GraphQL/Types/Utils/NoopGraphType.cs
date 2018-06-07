@@ -17,6 +17,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Utils
             Name = name;
         }
 
+        public NoopGraphType(IGraphType type)
+            : this(type.Name)
+        {
+            Description = type.Description;
+        }
+
         public override object Serialize(object value)
         {
             return value;

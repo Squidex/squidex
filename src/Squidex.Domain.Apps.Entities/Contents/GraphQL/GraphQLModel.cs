@@ -54,7 +54,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             schemasById = schemas.ToDictionary(x => x.Id);
 
             graphQLSchema = BuildSchema(this);
-            graphQLSchema.RegisterValueConverter(JTokenConverter.Instance);
+            graphQLSchema.RegisterValueConverter(JsonConverter.Instance);
 
             InitializeContentTypes();
         }
