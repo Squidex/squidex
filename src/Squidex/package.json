@@ -55,7 +55,7 @@
     "@types/node": "10.1.2",
     "@types/react": "16.3.16",
     "@types/react-dom": "16.0.5",
-    "angular2-router-loader": "0.3.5",
+    "angular-router-loader": "0.8.5",
     "angular2-template-loader": "0.6.2",
     "awesome-typescript-loader": "5.0.0",
     "codelyzer": "4.3.0",

@@ -44,63 +44,61 @@ module.exports = {
          *
          * See: https://webpack.js.org/configuration/module/#module-rules
          */
-        rules: [
+        rules: [{
+            test: /\.ts$/,
+            use: [{
+                loader: 'awesome-typescript-loader'
+            }, {
+                loader: 'angular-router-loader'
+            }, {
+                loader: 'angular2-template-loader'
+            }, {
+                loader: 'tslint-loader'
+            }],
+            exclude: /node_modules/
+        }, {
+            test: /\.ts$/,
+            use: [{
+                loader: 'awesome-typescript-loader'
+            }],
+            include: /node_modules/
+        }, {
+            test: /\.js\.flow$/,
+            use: [{
+                loader: 'ignore-loader'
+            }],
+            include: /node_modules/
+        }, {
+            test: /\.html$/,
+            use: [{
+                loader: 'raw-loader'
+            }]
+        }, {
+            test: /\.(woff|woff2|ttf|eot)(\?.*$|$)/,
+            use: [{
+                loader: 'file-loader?name=assets/[name].[hash].[ext]'
+            }]
+        }, {
+            test: /\.(png|jpe?g|gif|svg|ico)(\?.*$|$)/,
+            use: [{
+                loader: 'file-loader?name=assets/[name].[hash].[ext]'
+            }]
+        }, {
+            test: /\.css$/,
+            use: [
+                plugins.MiniCssExtractPlugin.loader,
             {
-                test: /\.ts$/,
-                use: [{
-                    loader: 'awesome-typescript-loader'
-                }, {
-                    loader: 'angular2-router-loader'
-                }, {
-                    loader: 'angular2-template-loader'
-                }, {
-                    loader: 'tslint-loader'
-                }],
-                exclude: /node_modules/
+                loader: 'css-loader'
+            }]
+        }, {
+            test: /\.scss$/,
+            use: [{
+                loader: 'raw-loader'
             }, {
-                test: /\.ts$/,
-                use: [{
-                    loader: 'awesome-typescript-loader'
-                }],
-                include: /node_modules/
-            }, {
-                test: /\.js\.flow$/,
-                use: [{
-                    loader: 'ignore-loader'
-                }],
-                include: /node_modules/
-            }, {
-                test: /\.html$/,
-                use: [{
-                    loader: 'raw-loader'
-                }]
-            }, {
-                test: /\.(woff|woff2|ttf|eot)(\?.*$|$)/,
-                use: [{
-                    loader: 'file-loader?name=assets/[name].[hash].[ext]'
-                }]
-            }, {
-                test: /\.(png|jpe?g|gif|svg|ico)(\?.*$|$)/,
-                use: [{
-                    loader: 'file-loader?name=assets/[name].[hash].[ext]'
-                }]
-            }, {
-                test: /\.css$/,
-                use: [
-                    plugins.MiniCssExtractPlugin.loader,
-                {
-                    loader: 'css-loader'
-                }]
-            }, {
-                test: /\.scss$/,
-                use: [{
-                    loader: 'raw-loader'
-                }, {
-                    loader: 'sass-loader', options: { includePaths: [helpers.root('app', 'theme')] }
-                }],
-                exclude: helpers.root('app', 'theme')
-            }
-        ]
+                loader: 'sass-loader', options: { includePaths: [helpers.root('app', 'theme')] }
+            }],
+            exclude: helpers.root('app', 'theme')
+        }]
     },
 
     plugins: [

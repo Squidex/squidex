@@ -54,40 +54,38 @@ module.exports = webpackMerge(runConfig, {
          *
          * See: https://webpack.js.org/configuration/module/#module-rules
          */
-        rules: [
+        rules: [{
+            test: /\.scss$/,
+            /*
+             * Extract the content from a bundle to a file
+             * 
+             * See: https://github.com/webpack-contrib/extract-text-webpack-plugin
+             */
+            use: [
+                plugins.MiniCssExtractPlugin.loader,
             {
-                test: /\.scss$/,
-                /*
-                 * Extract the content from a bundle to a file
-                 * 
-                 * See: https://github.com/webpack-contrib/extract-text-webpack-plugin
-                 */
-                use: [
-                    plugins.MiniCssExtractPlugin.loader,
-                {
-                    loader: 'css-loader', options: { minimize: true },
-                }, {
-                    loader: 'sass-loader'
-                }],
-                /*
-                 * Do not include component styles
-                 */
-                include: helpers.root('app', 'theme'),
+                loader: 'css-loader', options: { minimize: true },
             }, {
-                test: /\.scss$/,
-                use: [{
-                    loader: 'raw-loader'
-                }, {
-                    loader: 'sass-loader', options: { includePaths: [helpers.root('app', 'theme')] }
-                }],
-                exclude: helpers.root('app', 'theme'),
-            }, { 
-                test: /\.ts/, 
-                use: [{
-                    loader: '@ngtools/webpack'
-                }]
-            }
-        ]
+                loader: 'sass-loader'
+            }],
+            /*
+             * Do not include component styles
+             */
+            include: helpers.root('app', 'theme'),
+        }, {
+            test: /\.scss$/,
+            use: [{
+                loader: 'raw-loader'
+            }, {
+                loader: 'sass-loader', options: { includePaths: [helpers.root('app', 'theme')] }
+            }],
+            exclude: helpers.root('app', 'theme'),
+        }, { 
+            test: /\.ts/, 
+            use: [{
+                loader: '@ngtools/webpack'
+            }]
+        }]
     },
 
     plugins: [
