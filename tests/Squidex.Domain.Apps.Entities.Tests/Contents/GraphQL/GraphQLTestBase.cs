@@ -24,7 +24,6 @@ using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Domain.Apps.Entities.Contents.TestData;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Commands;
 using Xunit;
 
 #pragma warning disable SA1311 // Static readonly fields must begin with upper-case letter
@@ -39,7 +38,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         protected static readonly string appName = "my-app";
         protected readonly Schema schemaDef;
         protected readonly IContentQueryService contentQuery = A.Fake<IContentQueryService>();
-        protected readonly ICommandBus commandBus = A.Fake<ICommandBus>();
         protected readonly IAssetRepository assetRepository = A.Fake<IAssetRepository>();
         protected readonly ISchemaEntity schema = A.Fake<ISchemaEntity>();
         protected readonly IMemoryCache cache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
@@ -93,7 +91,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             A.CallTo(() => appProvider.GetSchemasAsync(appId)).Returns(allSchemas);
 
-            sut = new CachingGraphQLService(cache, appProvider, assetRepository, commandBus, contentQuery, new FakeUrlGenerator());
+            sut = new CachingGraphQLService(cache, appProvider, assetRepository, contentQuery, new FakeUrlGenerator());
         }
 
         protected static IContentEntity CreateContent(Guid id, Guid refId, Guid assetId, NamedContentData data = null)

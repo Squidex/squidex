@@ -64,7 +64,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                         });
                     }
 
-                    fieldGraphType.Description = $"The structure of the {fieldName} field of a {schemaName} content type.";
+                    fieldGraphType.Description = $"The structure of the {fieldName} field of the {schemaName} content type.";
 
                     var fieldResolver = new FuncFieldResolver<NamedContentData, IReadOnlyDictionary<string, JToken>>(c =>
                     {
@@ -81,7 +81,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 }
             }
 
-            Description = $"The structure of a {schemaName} content type.";
+            Description = $"The structure of the {schemaName} content type.";
         }
     }
 }

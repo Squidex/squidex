@@ -36,8 +36,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
         public static readonly IGraphType References = new ListGraphType<NonNullGraphType<GuidGraphType>>();
 
-        public static readonly IGraphType GeolocationInput = new GeolocationInputGraphType();
-
         public static readonly IGraphType NonNullInt = new NonNullGraphType(Int);
 
         public static readonly IGraphType NonNullGuid = new NonNullGraphType(Guid);
@@ -52,13 +50,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
         public static readonly IGraphType NonNullStatusType = new NonNullGraphType(Status);
 
-        public static readonly IGraphType NoopArray = new NoopGraphType("Array");
-
         public static readonly IGraphType NoopDate = new NoopGraphType(Date);
 
         public static readonly IGraphType NoopJson = new NoopGraphType(Json);
-
-        public static readonly IGraphType NoopTags = new NoopGraphType(Tags);
 
         public static readonly IGraphType NoopFloat = new NoopGraphType(Float);
 
@@ -66,8 +60,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
         public static readonly IGraphType NoopBoolean = new NoopGraphType(Boolean);
 
-        public static readonly IGraphType NoopGeolocation = new NoopGraphType(GeolocationInput);
+        public static readonly IGraphType NoopTags = new NoopGraphType("Tags");
 
-        public static readonly IGraphType CommandVersion = new CommandVersionGraphType();
+        public static readonly IGraphType NoopGeolocation = new NoopGraphType("Geolocation");
     }
 }

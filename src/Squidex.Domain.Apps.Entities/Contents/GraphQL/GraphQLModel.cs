@@ -63,7 +63,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         {
             var schemas = model.schemasById.Values;
 
-            return new GraphQLSchema { Query = new AppQueriesGraphType(model, schemas), Mutation = new AppMutationsGraphType(model, schemas) };
+            return new GraphQLSchema { Query = new AppQueriesGraphType(model, schemas) };
         }
 
         private void InitializeContentTypes()
@@ -142,11 +142,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             return field.Accept(new QueryGraphTypeVisitor(schema, GetContentType, this, assetListType));
         }
 
-        public IGraphType GetInputGraphType(IField field)
-        {
-            return field.GetInputGraphType();
-        }
-
         public IGraphType GetAssetType()
         {
             return assetType;
@@ -173,6 +168,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 return null;
             }
 
+            contentDataTypes.GetOrAdd(schema, s => new ContentDataGraphType());
+
             return contentTypes.GetOrAdd(schema, s => new ContentGraphType());
         }
 
@@ -180,7 +177,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         {
             Guard.NotNull(context, nameof(context));
 
-            var inputs = InputConverter.ToInputs(query.Variables);
+            var inputs = query.Variables?.ToInputs();
 
             var result = await new DocumentExecuter().ExecuteAsync(options =>
             {

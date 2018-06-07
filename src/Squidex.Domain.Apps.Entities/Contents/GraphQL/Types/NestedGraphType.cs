@@ -55,7 +55,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 }
             }
 
-            Description = $"The structure of a {schemaName}.{fieldName} child schema.";
+            Description = $"The structure of the {schemaName}.{fieldName} nested schema.";
         }
     }
 }
