@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 
@@ -16,6 +15,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Utils
         public NoopGraphType(string name)
         {
             Name = name;
+        }
+
+        public NoopGraphType(IGraphType type)
+            : this(type.Name)
+        {
+            Description = type.Description;
         }
 
         public override object Serialize(object value)
@@ -30,7 +35,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Utils
 
         public override object ParseLiteral(IValue value)
         {
-            throw new NotSupportedException();
+            return value.Value;
         }
     }
 }

@@ -5,27 +5,18 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { Observable } from 'rxjs/Observable';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 import { DialogService } from './../services/dialog.service';
 
-import { nextBy, notify } from './rxjs-extensions-impl';
-
 /* tslint:disable:no-shadowed-variable */
 
-declare module 'rxjs/BehaviorSubject' {
-    interface Observable<T> {
-        notify(dialogs: DialogService): Observable<T>;
-    }
-}
+export const notify = (dialogs: DialogService) => <T>(source: Observable<T>) =>
+    source.pipe(catchError(error => {
+        dialogs.notifyError(error);
 
-BehaviorSubject.prototype['nextBy'] = nextBy;
+        return throwError(error);
+    }));
 
-declare module 'rxjs/Observable' {
-    interface Observable<T> {
-        notify(dialogs: DialogService): Observable<T>;
-    }
-}
-
-Observable.prototype['notify'] = notify;
+export const nextBy = <T>(subject: BehaviorSubject<T>, updater: (value: T) => T) => subject.next(updater(this.value));

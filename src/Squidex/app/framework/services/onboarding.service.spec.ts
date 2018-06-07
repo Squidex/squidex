@@ -20,7 +20,11 @@ class LocalStoreMock {
 }
 
 describe('OnboardingService', () => {
-    const localStore = new LocalStoreMock();
+    let localStore: LocalStoreMock;
+
+    beforeEach(() => {
+        localStore = new LocalStoreMock();
+    });
 
     it('should instantiate from factory', () => {
         const onboardingService = OnboardingServiceFactory(<any>localStore);
@@ -35,29 +39,27 @@ describe('OnboardingService', () => {
     });
 
     it('should return true when value not in store', () => {
-        localStore.set('squidex.onboarding.disable.feature1', '0');
+        localStore.set('squidex.onboarding.disable.feature-a1', '0');
 
         const onboardingService = new OnboardingService(<any>localStore);
 
-        onboardingService.disable('feature2');
-
-        expect(onboardingService.shouldShow('feature1')).toBeTruthy();
+        expect(onboardingService.shouldShow('feature-a2')).toBeTruthy();
     });
 
     it('should return false when value in store', () => {
-        localStore.set('squidex.onboarding.disable.feature1', '1');
+        localStore.set('squidex.onboarding.disable.feature-b1', '1');
 
         const onboardingService = new OnboardingService(<any>localStore);
 
-        expect(onboardingService.shouldShow('feature1')).toBeFalsy();
+        expect(onboardingService.shouldShow('feature-b1')).toBeFalsy();
     });
 
     it('should return false when disabled', () => {
         const onboardingService = new OnboardingService(<any>localStore);
 
-        onboardingService.disable('feature1');
+        onboardingService.disable('feature-c1');
 
-        expect(onboardingService.shouldShow('feature1')).toBeFalsy();
+        expect(onboardingService.shouldShow('feature-c1')).toBeFalsy();
     });
 
     it('should return false when all disabled', () => {
@@ -65,6 +67,6 @@ describe('OnboardingService', () => {
 
         onboardingService.disableAll();
 
-        expect(onboardingService.shouldShow('feature1')).toBeFalsy();
+        expect(onboardingService.shouldShow('feature-d1')).toBeFalsy();
     });
 });

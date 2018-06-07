@@ -16,11 +16,11 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 {
     public sealed class JsonValueConverter : IFieldVisitor<object>
     {
-        public JToken Value { get; }
+        private readonly JToken value;
 
         private JsonValueConverter(JToken value)
         {
-            Value = value;
+            this.value = value;
         }
 
         public static object ConvertValue(IField field, JToken json)
@@ -28,21 +28,26 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             return field.Accept(new JsonValueConverter(json));
         }
 
+        public object Visit(IArrayField field)
+        {
+            return value.ToObject<List<JObject>>();
+        }
+
         public object Visit(IField<AssetsFieldProperties> field)
         {
-            return Value.ToObject<List<Guid>>();
+            return value.ToObject<List<Guid>>();
         }
 
         public object Visit(IField<BooleanFieldProperties> field)
         {
-            return (bool?)Value;
+            return (bool?)value;
         }
 
         public object Visit(IField<DateTimeFieldProperties> field)
         {
-            if (Value.Type == JTokenType.String)
+            if (value.Type == JTokenType.String)
             {
-                var parseResult = InstantPattern.General.Parse(Value.ToString());
+                var parseResult = InstantPattern.General.Parse(value.ToString());
 
                 if (!parseResult.Success)
                 {
@@ -57,7 +62,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
         public object Visit(IField<GeolocationFieldProperties> field)
         {
-            var geolocation = (JObject)Value;
+            var geolocation = (JObject)value;
 
             foreach (var property in geolocation.Properties())
             {
@@ -81,32 +86,32 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
                 throw new InvalidCastException("Longitude must be between -180 and 180.");
             }
 
-            return Value;
+            return value;
         }
 
         public object Visit(IField<JsonFieldProperties> field)
         {
-            return Value;
+            return value;
         }
 
         public object Visit(IField<NumberFieldProperties> field)
         {
-            return (double?)Value;
+            return (double?)value;
         }
 
         public object Visit(IField<ReferencesFieldProperties> field)
         {
-            return Value.ToObject<List<Guid>>();
+            return value.ToObject<List<Guid>>();
         }
 
         public object Visit(IField<StringFieldProperties> field)
         {
-            return Value.ToString();
+            return value.ToString();
         }
 
         public object Visit(IField<TagsFieldProperties> field)
         {
-            return Value.ToObject<List<string>>();
+            return value.ToObject<List<string>>();
         }
     }
 }

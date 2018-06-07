@@ -13,11 +13,11 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         string Name { get; }
 
+        bool IsLocked { get; }
+
         bool IsDisabled { get; }
 
         bool IsHidden { get; }
-
-        bool IsLocked { get; }
 
         FieldProperties RawProperties { get; }
 

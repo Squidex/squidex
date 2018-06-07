@@ -9,7 +9,7 @@ using System;
 using GraphQL.Language.AST;
 using GraphQL.Types;
 
-namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
+namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Utils
 {
     public sealed class GuidGraphType : ScalarGraphType
     {

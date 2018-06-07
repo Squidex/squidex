@@ -56,7 +56,7 @@ namespace Squidex.Infrastructure
         {
             var typeName = typeof(T).FullName;
 
-            return (RedisSubscription<T>)subscriptions.GetOrAdd(typeName, c => new RedisSubscription<T>(redisSubscriber.Value, c, log));
+            return (RedisSubscription<T>)subscriptions.GetOrAdd(typeName, this, (k, c) => new RedisSubscription<T>(c.redisSubscriber.Value, k, c.log));
         }
     }
 }

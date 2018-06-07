@@ -8,6 +8,7 @@
 import { AfterViewInit, Component, ElementRef, forwardRef, ViewChild } from '@angular/core';
 import { ControlValueAccessor,  NG_VALUE_ACCESSOR } from '@angular/forms';
 import { Subject } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 
 import { ResourceLoaderService, Types } from '@app/framework/internal';
 
@@ -64,7 +65,8 @@ export class JscriptEditorComponent implements ControlValueAccessor, AfterViewIn
     }
 
     public ngAfterViewInit() {
-        this.valueChanged.debounceTime(500)
+        this.valueChanged.pipe(
+                debounceTime(500))
             .subscribe(() => {
                 this.changeValue();
             });

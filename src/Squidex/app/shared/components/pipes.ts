@@ -6,7 +6,8 @@
  */
 
 import { ChangeDetectorRef, OnDestroy, Pipe, PipeTransform } from '@angular/core';
-import { Observable, Subscription } from 'rxjs';
+import { Observable, of, Subscription } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 import {
     ApiUrlConfig,
@@ -61,7 +62,7 @@ export class UserNamePipe extends UserAsyncPipe implements PipeTransform {
     }
 
     public transform(userId: string, placeholder = 'Me'): string | null {
-        return super.transformInternal(userId, users => users.getUser(userId, placeholder).map(u => u.displayName));
+        return super.transformInternal(userId, users => users.getUser(userId, placeholder).pipe(map(u => u.displayName)));
     }
 }
 
@@ -79,12 +80,12 @@ export class UserNameRefPipe extends UserAsyncPipe implements PipeTransform {
             const parts = userId.split(':');
 
             if (parts[0] === 'subject') {
-                return users.getUser(parts[1], placeholder).map(u => u.displayName);
+                return users.getUser(parts[1], placeholder).pipe(map(u => u.displayName));
             } else {
                 if (parts[1].endsWith('client')) {
-                    return Observable.of(parts[1]);
+                    return of(parts[1]);
                 } else {
-                    return Observable.of(`${parts[1]}-client`);
+                    return of(`${parts[1]}-client`);
                 }
             }
         });
@@ -133,7 +134,7 @@ export class UserPicturePipe extends UserAsyncPipe implements PipeTransform {
     }
 
     public transform(userId: string): string | null {
-        return super.transformInternal(userId, users => users.getUser(userId).map(u => this.apiUrl.buildUrl(`api/users/${u.id}/picture`)));
+        return super.transformInternal(userId, users => users.getUser(userId).pipe(map(u => this.apiUrl.buildUrl(`api/users/${u.id}/picture`))));
     }
 }
 
@@ -153,9 +154,9 @@ export class UserPictureRefPipe extends UserAsyncPipe implements PipeTransform {
             const parts = userId.split(':');
 
             if (parts[0] === 'subject') {
-                return users.getUser(parts[1]).map(u => this.apiUrl.buildUrl(`api/users/${u.id}/picture`));
+                return users.getUser(parts[1]).pipe(map(u => this.apiUrl.buildUrl(`api/users/${u.id}/picture`)));
             } else {
-                return Observable.of('/images/client.png');
+                return of('/images/client.png');
             }
         });
     }

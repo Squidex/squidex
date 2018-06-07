@@ -7,7 +7,6 @@
 
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { DndModule } from 'ng2-dnd';
 
 import {
     HelpComponent,
@@ -156,7 +155,6 @@ const routes: Routes = [
 
 @NgModule({
     imports: [
-        DndModule,
         SqxFrameworkModule,
         SqxSharedModule,
         RouterModule.forChild(routes)

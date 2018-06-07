@@ -5,6 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core;
@@ -32,12 +34,14 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                     error(new ValidationError($"A schema with name '{command.Name}' already exists", nameof(command.Name)));
                 }
 
-                if (command.Fields != null && command.Fields.Any())
+                if (command.Fields?.Count > 0)
                 {
                     var index = 0;
 
                     foreach (var field in command.Fields)
                     {
+                        index++;
+
                         var prefix = $"Fields.{index}";
 
                         if (!field.Partitioning.IsValidPartitioning())
@@ -54,12 +58,57 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                         {
                             error(new ValidationError("Properties is required.", $"{prefix}.{nameof(field.Properties)}"));
                         }
-
-                        var propertyErrors = FieldPropertiesValidator.Validate(field.Properties);
-
-                        foreach (var propertyError in propertyErrors)
+                        else
                         {
-                            error(propertyError);
+                            var errors = FieldPropertiesValidator.Validate(field.Properties);
+
+                            foreach (var e in errors)
+                            {
+                                error(e.WithPrefix(prefix));
+                            }
+                        }
+
+                        if (field.Nested?.Count > 0)
+                        {
+                            if (!(field.Properties is ArrayFieldProperties))
+                            {
+                                error(new ValidationError("Only array fields can have nested fields.", $"{prefix}.{nameof(field.Partitioning)}"));
+                            }
+                            else
+                            {
+                                var nestedIndex = 0;
+
+                                foreach (var nestedField in field.Nested)
+                                {
+                                    nestedIndex++;
+
+                                    var nestedPrefix = $"Fields.{index}.Nested.{nestedIndex}";
+
+                                    if (!nestedField.Name.IsPropertyName())
+                                    {
+                                        error(new ValidationError("Name must be a valid property name.", $"{prefix}.{nameof(nestedField.Name)}"));
+                                    }
+
+                                    if (nestedField.Properties == null)
+                                    {
+                                        error(new ValidationError("Properties is required.", $"{prefix}.{nameof(nestedField.Properties)}"));
+                                    }
+                                    else
+                                    {
+                                        var errors = FieldPropertiesValidator.Validate(nestedField.Properties);
+
+                                        foreach (var e in errors)
+                                        {
+                                            error(e.WithPrefix(nestedPrefix));
+                                        }
+                                    }
+                                }
+                            }
+
+                            if (field.Nested.Select(x => x.Name).Distinct().Count() != field.Nested.Count)
+                            {
+                                error(new ValidationError("Fields cannot have duplicate names.", $"{prefix}.Nested"));
+                            }
                         }
                     }
 
@@ -75,6 +124,22 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             Guard.NotNull(command, nameof(command));
 
+            IArrayField arrayField = null;
+
+            if (command.ParentFieldId.HasValue)
+            {
+                var parentId = command.ParentFieldId.Value;
+
+                if (schema.FieldsById.TryGetValue(parentId, out var field) && field is IArrayField a)
+                {
+                    arrayField = a;
+                }
+                else
+                {
+                    throw new DomainObjectNotFoundException(parentId.ToString(), "Fields", typeof(Schema));
+                }
+            }
+
             Validate.It(() => "Cannot reorder schema fields.", error =>
             {
                 if (command.FieldIds == null)
@@ -82,11 +147,23 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                     error(new ValidationError("Field ids is required.", nameof(command.FieldIds)));
                 }
 
-                if (command.FieldIds != null && (command.FieldIds.Count != schema.Fields.Count || command.FieldIds.Any(x => !schema.FieldsById.ContainsKey(x))))
+                if (arrayField == null)
                 {
-                    error(new ValidationError("Ids must cover all fields.", nameof(command.FieldIds)));
+                    CheckFields(error, command, schema.FieldsById);
+                }
+                else
+                {
+                    CheckFields(error, command, arrayField.FieldsById);
                 }
             });
+        }
+
+        private static void CheckFields<T>(Action<ValidationError> error, ReorderFields c, IReadOnlyDictionary<long, T> fields)
+        {
+            if (c.FieldIds != null && (c.FieldIds.Count != fields.Count || c.FieldIds.Any(x => !fields.ContainsKey(x))))
+            {
+                error(new ValidationError("Ids must cover all fields.", nameof(c.FieldIds)));
+            }
         }
 
         public static void CanPublish(Schema schema, PublishSchema command)

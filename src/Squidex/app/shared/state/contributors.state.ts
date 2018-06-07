@@ -6,15 +6,13 @@
  */
 
 import { Injectable } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
-
-import '@app/framework/utils/rxjs-extensions';
+import { distinctUntilChanged, map, tap } from 'rxjs/operators';
 
 import {
     DialogService,
-    Form,
     ImmutableArray,
+    notify,
     State,
     Version
 } from '@app/framework';
@@ -22,21 +20,6 @@ import {
 import { AppContributorDto, AppContributorsService } from './../services/app-contributors.service';
 import { AuthService } from './../services/auth.service';
 import { AppsState } from './apps.state';
-
-export class AssignContributorForm extends Form<FormGroup> {
-    public hasNoUser =
-        this.form.controls['user'].valueChanges.startWith(null).map(x => !x);
-
-    constructor(formBuilder: FormBuilder) {
-        super(formBuilder.group({
-            user: [null,
-                [
-                    Validators.required
-                ]
-            ]
-        }));
-    }
-}
 
 interface SnapshotContributor {
     contributor: AppContributorDto;
@@ -58,20 +41,20 @@ interface Snapshot {
 @Injectable()
 export class ContributorsState extends State<Snapshot> {
     public contributors =
-        this.changes.map(x => x.contributors)
-            .distinctUntilChanged();
+        this.changes.pipe(map(x => x.contributors),
+            distinctUntilChanged());
 
     public isMaxReached =
-        this.changes.map(x => x.isMaxReached)
-            .distinctUntilChanged();
+        this.changes.pipe(map(x => x.isMaxReached),
+            distinctUntilChanged());
 
     public isLoaded =
-        this.changes.map(x => !!x.isLoaded)
-            .distinctUntilChanged();
+        this.changes.pipe(map(x => !!x.isLoaded),
+            distinctUntilChanged());
 
     public maxContributors =
-        this.changes.map(x => x.maxContributors)
-            .distinctUntilChanged();
+        this.changes.pipe(map(x => x.maxContributors),
+            distinctUntilChanged());
 
     constructor(
         private readonly appContributorsService: AppContributorsService,
@@ -87,8 +70,8 @@ export class ContributorsState extends State<Snapshot> {
             this.resetState();
         }
 
-        return this.appContributorsService.getContributors(this.appName)
-            .do(dtos => {
+        return this.appContributorsService.getContributors(this.appName).pipe(
+            tap(dtos => {
                 if (isReload) {
                     this.dialogs.notifyInfo('Contributors reloaded.');
                 }
@@ -96,28 +79,28 @@ export class ContributorsState extends State<Snapshot> {
                 const contributors = ImmutableArray.of(dtos.contributors.map(x => this.createContributor(x)));
 
                 this.replaceContributors(contributors, dtos.version, dtos.maxContributors);
-            })
-            .notify(this.dialogs);
+            }),
+            notify(this.dialogs));
     }
 
     public revoke(contributor: AppContributorDto): Observable<any> {
-        return this.appContributorsService.deleteContributor(this.appName, contributor.contributorId, this.version)
-            .do(dto => {
+        return this.appContributorsService.deleteContributor(this.appName, contributor.contributorId, this.version).pipe(
+            tap(dto => {
                 const contributors = this.snapshot.contributors.filter(x => x.contributor.contributorId !== contributor.contributorId);
 
                 this.replaceContributors(contributors, dto.version);
-            })
-            .notify(this.dialogs);
+            }),
+            notify(this.dialogs));
     }
 
     public assign(request: AppContributorDto): Observable<any> {
-        return this.appContributorsService.postContributor(this.appName, request, this.version)
-            .do(dto => {
+        return this.appContributorsService.postContributor(this.appName, request, this.version).pipe(
+            tap(dto => {
                 const contributors = this.updateContributors(dto.payload.contributorId, request.permission, dto.version);
 
                 this.replaceContributors(contributors, dto.version);
-            })
-            .notify(this.dialogs);
+            }),
+            notify(this.dialogs));
     }
 
     private updateContributors(id: string, permission: string, version: Version) {

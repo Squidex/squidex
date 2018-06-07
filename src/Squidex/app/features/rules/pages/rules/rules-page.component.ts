@@ -6,6 +6,7 @@
  */
 
 import { Component, OnInit } from '@angular/core';
+import { onErrorResumeNext } from 'rxjs/operators';
 
 import {
     AppsState,
@@ -39,24 +40,24 @@ export class RulesPageComponent implements OnInit {
     }
 
     public ngOnInit() {
-        this.schemasState.load().onErrorResumeNext().subscribe();
+        this.schemasState.load().pipe(onErrorResumeNext()).subscribe();
 
-        this.rulesState.load().onErrorResumeNext().subscribe();
+        this.rulesState.load().pipe(onErrorResumeNext()).subscribe();
     }
 
     public reload() {
-        this.rulesState.load(true).onErrorResumeNext().subscribe();
+        this.rulesState.load(true).pipe(onErrorResumeNext()).subscribe();
     }
 
     public delete(rule: RuleDto) {
-        this.rulesState.delete(rule).onErrorResumeNext().subscribe();
+        this.rulesState.delete(rule).pipe(onErrorResumeNext()).subscribe();
     }
 
     public toggle(rule: RuleDto) {
         if (rule.isEnabled) {
-            this.rulesState.disable(rule).onErrorResumeNext().subscribe();
+            this.rulesState.disable(rule).pipe(onErrorResumeNext()).subscribe();
         } else {
-            this.rulesState.enable(rule).onErrorResumeNext().subscribe();
+            this.rulesState.enable(rule).pipe(onErrorResumeNext()).subscribe();
         }
     }
 

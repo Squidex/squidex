@@ -45,7 +45,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
             await sut.ValidateAsync(50, errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> is not an allowed value." });
+                new[] { "Not an allowed value." });
         }
     }
 }

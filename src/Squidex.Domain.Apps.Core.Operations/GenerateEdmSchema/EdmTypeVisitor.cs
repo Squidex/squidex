@@ -23,6 +23,11 @@ namespace Squidex.Domain.Apps.Core.GenerateEdmSchema
             return field.Accept(Instance);
         }
 
+        public IEdmTypeReference Visit(IArrayField field)
+        {
+            return null;
+        }
+
         public IEdmTypeReference Visit(IField<AssetsFieldProperties> field)
         {
             return CreatePrimitive(EdmPrimitiveTypeKind.String, field);

@@ -6,7 +6,7 @@
  */
 
 import { Router } from '@angular/router';
-import { Observable } from 'rxjs';
+import { of } from 'rxjs';
 import { IMock, Mock, Times } from 'typemoq';
 
 import { UserDto } from './../services/users.service';
@@ -32,7 +32,7 @@ describe('UserMustExistGuard', () => {
 
     it('should load user and return true when found', () => {
         usersState.setup(x => x.select('123'))
-            .returns(() => Observable.of(<UserDto>{}));
+            .returns(() => of(<UserDto>{}));
 
         let result: boolean;
 
@@ -47,7 +47,7 @@ describe('UserMustExistGuard', () => {
 
     it('should load user and return false when not found', () => {
         usersState.setup(x => x.select('123'))
-            .returns(() => Observable.of(null));
+            .returns(() => of(null));
 
         let result: boolean;
 

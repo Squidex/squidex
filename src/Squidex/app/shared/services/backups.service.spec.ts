@@ -37,7 +37,7 @@ describe('BackupsService', () => {
     it('should make get request to get backups',
         inject([BackupsService, HttpTestingController], (backupsService: BackupsService, httpMock: HttpTestingController) => {
 
-        let backups: BackupDto[] | null = null;
+        let backups: BackupDto[];
 
         backupsService.getBackups('my-app').subscribe(result => {
             backups = result;
@@ -67,10 +67,11 @@ describe('BackupsService', () => {
             }
         ]);
 
-        expect(backups).toEqual([
-            new BackupDto('1', DateTime.parseISO_UTC('2017-02-03'), DateTime.parseISO_UTC('2017-02-04'), 13, 17, false),
-            new BackupDto('2', DateTime.parseISO_UTC('2018-02-03'), null, 23, 27, true)
-        ]);
+        expect(backups!).toEqual(
+            [
+                new BackupDto('1', DateTime.parseISO_UTC('2017-02-03'), DateTime.parseISO_UTC('2017-02-04'), 13, 17, false),
+                new BackupDto('2', DateTime.parseISO_UTC('2018-02-03'), null, 23, 27, true)
+            ]);
     }));
 
     it('should make post request to start backup',

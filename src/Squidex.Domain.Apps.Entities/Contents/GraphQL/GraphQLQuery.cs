@@ -9,7 +9,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 {
-    public class GraphQLQuery
+    public sealed class GraphQLQuery
     {
         public string OperationName { get; set; }
 

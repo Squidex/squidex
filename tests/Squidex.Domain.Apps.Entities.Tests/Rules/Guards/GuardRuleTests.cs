@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
     {
         private readonly Uri validUrl = new Uri("https://squidex.io");
         private readonly Rule rule_0 = new Rule(new ContentChangedTrigger(), new WebhookAction());
-        private readonly NamedId<Guid> appId = new NamedId<Guid>(Guid.NewGuid(), "my-app");
+        private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
         private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
 
         public GuardRuleTests()

@@ -8,6 +8,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { Subscription } from 'rxjs';
+import { onErrorResumeNext } from 'rxjs/operators';
 
 import {
     AddLanguageForm,
@@ -46,11 +47,11 @@ export class LanguagesPageComponent implements OnDestroy, OnInit {
                     }
                 });
 
-        this.languagesState.load().onErrorResumeNext().subscribe();
+        this.languagesState.load().pipe(onErrorResumeNext()).subscribe();
     }
 
     public reload() {
-        this.languagesState.load(true).onErrorResumeNext().subscribe();
+        this.languagesState.load(true).pipe(onErrorResumeNext()).subscribe();
     }
 
     public addLanguage() {

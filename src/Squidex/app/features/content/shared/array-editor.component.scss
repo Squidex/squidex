@@ -1,0 +1,34 @@
+@import '_vars';
+@import '_mixins';
+
+.array {
+    &-container {
+        background: $color-border;
+        padding: 1rem;
+        position: relative;
+        margin-bottom: 1rem;
+    }
+    
+    &-item {
+        & {
+            background: $panel-light-background;
+            border: 1px solid darken($color-border, 5%);
+            border-left-width: 4px;
+            padding: 1rem;
+            position: relative;
+            margin-bottom: 1rem;
+        }
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+    }
+
+    &-item-remove {
+        @include absolute(.5rem, .5rem, auto, auto);
+    }
+}
+
+.invalid {
+    border-left-color: $color-theme-error;
+}

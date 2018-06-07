@@ -45,5 +45,12 @@ namespace Squidex.Domain.Apps.Core
         {
             return Key;
         }
+
+        public static Partitioning FromString(string value)
+        {
+            var isLanguage = string.Equals(value, Language.Key, StringComparison.OrdinalIgnoreCase);
+
+            return isLanguage ? Language : Invariant;
+        }
     }
 }

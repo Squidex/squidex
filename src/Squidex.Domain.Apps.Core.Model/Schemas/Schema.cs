@@ -7,9 +7,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Diagnostics.Contracts;
-using System.Linq;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Schemas
@@ -17,9 +15,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
     public sealed class Schema : Cloneable<Schema>
     {
         private readonly string name;
-        private ImmutableArray<Field> fieldsOrdered = ImmutableArray<Field>.Empty;
-        private ImmutableDictionary<long, Field> fieldsById;
-        private ImmutableDictionary<string, Field> fieldsByName;
+        private FieldCollection<RootField> fields = FieldCollection<RootField>.Empty;
         private SchemaProperties properties;
         private bool isPublished;
 
@@ -33,49 +29,19 @@ namespace Squidex.Domain.Apps.Core.Schemas
             get { return isPublished; }
         }
 
-        public IReadOnlyList<Field> Fields
+        public IReadOnlyList<RootField> Fields
         {
-            get { return fieldsOrdered; }
+            get { return fields.Ordered; }
         }
 
-        public IReadOnlyDictionary<long, Field> FieldsById
+        public IReadOnlyDictionary<long, RootField> FieldsById
         {
-            get
-            {
-                if (fieldsById == null)
-                {
-                    if (fieldsOrdered.Length == 0)
-                    {
-                        fieldsById = ImmutableDictionary<long, Field>.Empty;
-                    }
-                    else
-                    {
-                        fieldsById = fieldsOrdered.ToImmutableDictionary(x => x.Id);
-                    }
-                }
-
-                return fieldsById;
-            }
+            get { return fields.ById; }
         }
 
-        public IReadOnlyDictionary<string, Field> FieldsByName
+        public IReadOnlyDictionary<string, RootField> FieldsByName
         {
-            get
-            {
-                if (fieldsByName == null)
-                {
-                    if (fieldsOrdered.Length == 0)
-                    {
-                        fieldsByName = ImmutableDictionary<string, Field>.Empty;
-                    }
-                    else
-                    {
-                        fieldsByName = fieldsOrdered.ToImmutableDictionary(x => x.Name);
-                    }
-                }
-
-                return fieldsByName;
-            }
+            get { return fields.ByName; }
         }
 
         public SchemaProperties Properties
@@ -93,21 +59,14 @@ namespace Squidex.Domain.Apps.Core.Schemas
             this.properties.Freeze();
         }
 
-        public Schema(string name, Field[] fields, SchemaProperties properties, bool isPublished)
+        public Schema(string name, RootField[] fields, SchemaProperties properties, bool isPublished)
             : this(name, properties)
         {
-            Guard.NotNullOrEmpty(name, nameof(name));
             Guard.NotNull(fields, nameof(fields));
 
+            this.fields = new FieldCollection<RootField>(fields);
+
             this.isPublished = isPublished;
-
-            fieldsOrdered = ImmutableArray.Create(fields);
-        }
-
-        protected override void OnCloned()
-        {
-            fieldsById = null;
-            fieldsByName = null;
         }
 
         [Pure]
@@ -119,60 +78,6 @@ namespace Squidex.Domain.Apps.Core.Schemas
             {
                 clone.properties = newProperties;
                 clone.properties.Freeze();
-            });
-        }
-
-        [Pure]
-        public Schema UpdateField(long fieldId, FieldProperties newProperties)
-        {
-            return UpdateField(fieldId, field =>
-            {
-                return field.Update(newProperties);
-            });
-        }
-
-        [Pure]
-        public Schema LockField(long fieldId)
-        {
-            return UpdateField(fieldId, field =>
-            {
-                return field.Lock();
-            });
-        }
-
-        [Pure]
-        public Schema DisableField(long fieldId)
-        {
-            return UpdateField(fieldId, field =>
-            {
-                return field.Disable();
-            });
-        }
-
-        [Pure]
-        public Schema EnableField(long fieldId)
-        {
-            return UpdateField(fieldId, field =>
-            {
-                return field.Enable();
-            });
-        }
-
-        [Pure]
-        public Schema HideField(long fieldId)
-        {
-            return UpdateField(fieldId, field =>
-            {
-                return field.Hide();
-            });
-        }
-
-        [Pure]
-        public Schema ShowField(long fieldId)
-        {
-            return UpdateField(fieldId, field =>
-            {
-                return field.Show();
             });
         }
 
@@ -197,62 +102,39 @@ namespace Squidex.Domain.Apps.Core.Schemas
         [Pure]
         public Schema DeleteField(long fieldId)
         {
-            if (!FieldsById.TryGetValue(fieldId, out var field))
-            {
-                return this;
-            }
-
-            return Clone(clone =>
-            {
-                clone.fieldsOrdered = fieldsOrdered.Remove(field);
-            });
+            return Updatefields(f => f.Remove(fieldId));
         }
 
         [Pure]
         public Schema ReorderFields(List<long> ids)
         {
-            Guard.NotNull(ids, nameof(ids));
-
-            if (ids.Count != fieldsOrdered.Length || ids.Any(x => !FieldsById.ContainsKey(x)))
-            {
-                throw new ArgumentException("Ids must cover all fields.", nameof(ids));
-            }
-
-            return Clone(clone =>
-            {
-                clone.fieldsOrdered = fieldsOrdered.OrderBy(f => ids.IndexOf(f.Id)).ToImmutableArray();
-            });
+            return Updatefields(f => f.Reorder(ids));
         }
 
         [Pure]
-        public Schema AddField(Field field)
+        public Schema AddField(RootField field)
         {
-            Guard.NotNull(field, nameof(field));
-
-            if (FieldsByName.ContainsKey(field.Name) || FieldsById.ContainsKey(field.Id))
-            {
-                throw new ArgumentException($"A field with name '{field.Name}' and id {field.Id} already exists.", nameof(field));
-            }
-
-            return Clone(clone =>
-            {
-                clone.fieldsOrdered = clone.fieldsOrdered.Add(field);
-            });
+            return Updatefields(f => f.Add(field));
         }
 
         [Pure]
-        public Schema UpdateField(long fieldId, Func<Field, Field> updater)
+        public Schema UpdateField(long fieldId, Func<RootField, RootField> updater)
         {
-            Guard.NotNull(updater, nameof(updater));
+            return Updatefields(f => f.Update(fieldId, updater));
+        }
 
-            if (!FieldsById.TryGetValue(fieldId, out var field))
+        private Schema Updatefields(Func<FieldCollection<RootField>, FieldCollection<RootField>> updater)
+        {
+            var newFields = updater(fields);
+
+            if (ReferenceEquals(newFields, fields))
             {
                 return this;
             }
 
             return Clone(clone =>
             {
-                clone.fieldsOrdered = clone.fieldsOrdered.Replace(field, updater(field));
+                clone.fields = newFields;
             });
         }
     }

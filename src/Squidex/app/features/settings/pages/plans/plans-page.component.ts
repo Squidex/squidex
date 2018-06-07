@@ -7,6 +7,7 @@
 
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { onErrorResumeNext } from 'rxjs/operators';
 
 import {
     ApiUrlConfig,
@@ -38,15 +39,15 @@ export class PlansPageComponent implements OnInit {
             this.overridePlanId = params['planId'];
         }).unsubscribe();
 
-        this.plansState.load(false, this.overridePlanId).onErrorResumeNext().subscribe();
+        this.plansState.load(false, this.overridePlanId).pipe(onErrorResumeNext()).subscribe();
     }
 
     public reload() {
-        this.plansState.load(true, this.overridePlanId).onErrorResumeNext().subscribe();
+        this.plansState.load(true, this.overridePlanId).pipe(onErrorResumeNext()).subscribe();
     }
 
     public change(planId: string) {
-        this.plansState.change(planId).onErrorResumeNext().subscribe();
+        this.plansState.change(planId).pipe(onErrorResumeNext()).subscribe();
     }
 
     public trackByPlan(index: number, planInfo: { plan: PlanDto }) {

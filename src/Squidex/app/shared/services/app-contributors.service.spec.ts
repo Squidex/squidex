@@ -41,7 +41,7 @@ describe('AppContributorsService', () => {
     it('should make get request to get app contributors',
         inject([AppContributorsService, HttpTestingController], (appContributorsService: AppContributorsService, httpMock: HttpTestingController) => {
 
-        let contributors: AppContributorsDto | null = null;
+        let contributors: AppContributorsDto;
 
         appContributorsService.getContributors('my-app').subscribe(result => {
             contributors = result;
@@ -70,7 +70,7 @@ describe('AppContributorsService', () => {
             }
         });
 
-        expect(contributors).toEqual(
+        expect(contributors!).toEqual(
             new AppContributorsDto([
                 new AppContributorDto('123', 'Owner'),
                 new AppContributorDto('456', 'Owner')
@@ -82,7 +82,7 @@ describe('AppContributorsService', () => {
 
         const dto = new AppContributorDto('123', 'Owner');
 
-        let contributorAssignedDto: ContributorAssignedDto | null = null;
+        let contributorAssignedDto: ContributorAssignedDto;
 
         appContributorsService.postContributor('my-app', dto, version).subscribe(result => {
             contributorAssignedDto = result.payload;

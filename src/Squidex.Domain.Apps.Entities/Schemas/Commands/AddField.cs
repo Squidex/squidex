@@ -11,6 +11,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Commands
 {
     public sealed class AddField : SchemaCommand
     {
+        public long? ParentFieldId { get; set; }
+
         public string Name { get; set; }
 
         public string Partitioning { get; set; }

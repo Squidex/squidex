@@ -6,7 +6,7 @@
  */
 
 import { Router } from '@angular/router';
-import { Observable } from 'rxjs';
+import { of } from 'rxjs';
 import { IMock, Mock, Times } from 'typemoq';
 
 import { ContentDto } from './../services/contents.service';
@@ -32,7 +32,7 @@ describe('ContentMustExistGuard', () => {
 
     it('should load content and return true when found', () => {
         contentsState.setup(x => x.select('123'))
-            .returns(() => Observable.of(<ContentDto>{}));
+            .returns(() => of(<ContentDto>{}));
 
         let result: boolean;
 
@@ -47,7 +47,7 @@ describe('ContentMustExistGuard', () => {
 
     it('should load content and return false when not found', () => {
         contentsState.setup(x => x.select('123'))
-            .returns(() => Observable.of(null));
+            .returns(() => of(null));
 
         let result: boolean;
 

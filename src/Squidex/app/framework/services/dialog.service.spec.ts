@@ -70,7 +70,7 @@ describe('DialogService', () => {
         const dialogService = new DialogService();
         const notification = Notification.error('Message');
 
-        let publishedNotification: Notification | null = null;
+        let publishedNotification: Notification;
 
         dialogService.notifications.subscribe(result => {
             publishedNotification = result;
@@ -78,13 +78,13 @@ describe('DialogService', () => {
 
         dialogService.notify(notification);
 
-        expect(publishedNotification).toBe(notification);
+        expect(publishedNotification!).toBe(notification);
     });
 
     it('should publish dialog request', () => {
         const dialogService = new DialogService();
 
-        let pushedDialog: DialogRequest | null = null;
+        let pushedDialog: DialogRequest;
 
         dialogService.dialogs.subscribe(result => {
             pushedDialog = result;
@@ -92,6 +92,6 @@ describe('DialogService', () => {
 
         dialogService.confirm('MyTitle', 'MyText');
 
-        expect(pushedDialog).toEqual(new DialogRequest('MyTitle', 'MyText'));
+        expect(pushedDialog!).toEqual(new DialogRequest('MyTitle', 'MyText'));
     });
 });

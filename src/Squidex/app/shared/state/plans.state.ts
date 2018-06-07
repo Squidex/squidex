@@ -7,12 +7,12 @@
 
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-
-import '@app/framework/utils/rxjs-extensions';
+import { distinctUntilChanged, map, tap } from 'rxjs/operators';
 
 import {
     DialogService,
     ImmutableArray,
+    notify,
     State,
     Version
 } from '@app/framework';
@@ -47,24 +47,24 @@ interface Snapshot {
 @Injectable()
 export class PlansState extends State<Snapshot> {
     public plans =
-        this.changes.map(x => x.plans)
-            .distinctUntilChanged();
+        this.changes.pipe(map(x => x.plans),
+            distinctUntilChanged());
 
     public isOwner =
-        this.changes.map(x => !!x.isOwner)
-            .distinctUntilChanged();
+        this.changes.pipe(map(x => !!x.isOwner),
+            distinctUntilChanged());
 
     public isLoaded =
-        this.changes.map(x => !!x.isLoaded)
-            .distinctUntilChanged();
+        this.changes.pipe(map(x => !!x.isLoaded),
+            distinctUntilChanged());
 
     public isDisabled =
-        this.changes.map(x => !x.isOwner)
-            .distinctUntilChanged();
+        this.changes.pipe(map(x => !x.isOwner),
+            distinctUntilChanged());
 
     public hasPortal =
-        this.changes.map(x => x.hasPortal)
-            .distinctUntilChanged();
+        this.changes.pipe(map(x => x.hasPortal),
+            distinctUntilChanged());
 
     public window = window;
 
@@ -82,8 +82,8 @@ export class PlansState extends State<Snapshot> {
             this.resetState();
         }
 
-        return this.plansService.getPlans(this.appName)
-            .do(dto => {
+        return this.plansService.getPlans(this.appName).pipe(
+            tap(dto => {
                 if (isReload) {
                     this.dialogs.notifyInfo('Plans reloaded.');
                 }
@@ -101,13 +101,13 @@ export class PlansState extends State<Snapshot> {
                         hasPortal: dto.hasPortal
                     };
                 });
-            })
-            .notify(this.dialogs);
+            }),
+            notify(this.dialogs));
     }
 
     public change(planId: string): Observable<any> {
-        return this.plansService.putPlan(this.appName, new ChangePlanDto(planId), this.version)
-            .do(dto => {
+        return this.plansService.putPlan(this.appName, new ChangePlanDto(planId), this.version).pipe(
+            tap(dto => {
                 if (dto.payload.redirectUri && dto.payload.redirectUri.length > 0) {
                     this.window.location.href = dto.payload.redirectUri;
                 } else {
@@ -117,8 +117,8 @@ export class PlansState extends State<Snapshot> {
                         return { ...s, plans, isOwner: true, version: dto.version };
                     });
                 }
-            })
-            .notify(this.dialogs);
+            }),
+            notify(this.dialogs));
     }
 
     private createPlan(plan: PlanDto, id: string) {

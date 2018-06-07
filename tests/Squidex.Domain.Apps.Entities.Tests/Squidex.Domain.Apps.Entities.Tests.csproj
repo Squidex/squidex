@@ -21,6 +21,7 @@
   <ItemGroup>
     <PackageReference Include="FakeItEasy" Version="4.5.1" />
     <PackageReference Include="FluentAssertions" Version="4.19.4" />
+    <PackageReference Include="GraphQL" Version="2.0.0-alpha-912" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.7.0" />
     <PackageReference Include="MongoDB.Driver" Version="2.5.1" />
     <PackageReference Include="RefactoringEssentials" Version="5.6.0" />

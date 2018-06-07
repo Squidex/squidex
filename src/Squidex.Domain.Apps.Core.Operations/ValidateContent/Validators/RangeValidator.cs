@@ -27,7 +27,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
             this.max = max;
         }
 
-        public Task ValidateAsync(object value, ValidationContext context, Action<string> addError)
+        public Task ValidateAsync(object value, ValidationContext context, AddError addError)
         {
             if (value == null)
             {
@@ -38,12 +38,12 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
             if (min.HasValue && typedValue.CompareTo(min.Value) < 0)
             {
-                addError($"<FIELD> must be greater or equals than '{min}'.");
+                addError(context.Path, $"Must be greater or equals than '{min}'.");
             }
 
             if (max.HasValue && typedValue.CompareTo(max.Value) > 0)
             {
-                addError($"<FIELD> must be less or equals than '{max}'.");
+                addError(context.Path, $"Must be less or equals than '{max}'.");
             }
 
             return TaskHelper.Done;

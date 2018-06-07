@@ -1,0 +1,23 @@
+<div class="array-container" *ngIf="arrayControl.controls.length > 0">
+    <div class="array-item" *ngFor="let nestedForm of arrayControl.controls; let i = index" [class.invalid]="nestedForm.invalid">
+        <button type="button" class="btn btn-link btn-danger array-item-remove" (click)="removeItem(i); $event.preventDefault()">
+            <i class="icon-bin2"></i>
+        </button>
+        
+        <div class="form-group" *ngFor="let nestedField of field.nested">
+            <ng-container *ngIf="nestedForm.get(nestedField.name); let nestedFieldForm">
+                <sqx-field-editor
+                    [form]="form"
+                    [field]="nestedField"
+                    [language]="language"
+                    [languages]="languages"
+                    [control]="nestedFieldForm">
+                </sqx-field-editor>
+            </ng-container>
+        </div>
+    </div>
+</div>
+
+<button class="btn btn-success" (click)="addItem(); $event.preventDefault()">
+    Add Item
+</button>

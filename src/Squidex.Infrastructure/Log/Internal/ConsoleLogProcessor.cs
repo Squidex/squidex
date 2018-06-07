@@ -86,6 +86,10 @@ namespace Squidex.Infrastructure.Log.Internal
                 {
                     Debug.WriteLine($"Failed to shutdown log queue grateful: {ex}.");
                 }
+                finally
+                {
+                    console.Reset();
+                }
             }
         }
     }

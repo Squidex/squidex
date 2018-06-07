@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 using NJsonSchema;
 using Squidex.Domain.Apps.Core.Schemas;
 
@@ -19,6 +20,30 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
         public JsonTypeVisitor(Func<string, JsonSchema4, JsonSchema4> schemaResolver)
         {
             this.schemaResolver = schemaResolver;
+        }
+
+        public JsonProperty Visit(IArrayField field)
+        {
+            return CreateProperty(field, jsonProperty =>
+            {
+                var itemSchema = new JsonSchema4
+                {
+                    Type = JsonObjectType.Object
+                };
+
+                foreach (var nestedField in field.Fields.Where(x => !x.IsHidden))
+                {
+                    var childProperty = nestedField.Accept(this);
+
+                    childProperty.Description = nestedField.RawProperties.Hints;
+                    childProperty.IsRequired = nestedField.RawProperties.IsRequired;
+
+                    itemSchema.Properties.Add(nestedField.Name, childProperty);
+                }
+
+                jsonProperty.Type = JsonObjectType.Object;
+                jsonProperty.Item = itemSchema;
+            });
         }
 
         public JsonProperty Visit(IField<AssetsFieldProperties> field)

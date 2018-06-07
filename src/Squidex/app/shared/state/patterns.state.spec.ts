@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Observable } from 'rxjs';
+import { of } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 
 import {
@@ -46,7 +46,7 @@ describe('PatternsState', () => {
         patternsService = Mock.ofType<AppPatternsService>();
 
         patternsService.setup(x => x.getPatterns(app))
-            .returns(() => Observable.of(new AppPatternsDto(oldPatterns, version)));
+            .returns(() => of(new AppPatternsDto(oldPatterns, version)));
 
         patternsState = new PatternsState(patternsService.object, appsState.object, dialogs.object);
         patternsState.load().subscribe();
@@ -62,6 +62,8 @@ describe('PatternsState', () => {
     it('should show notification on load when reload is true', () => {
         patternsState.load(true).subscribe();
 
+        expect().nothing();
+
         dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
     });
 
@@ -71,7 +73,7 @@ describe('PatternsState', () => {
         const request = new EditAppPatternDto('name3', 'pattern3', '');
 
         patternsService.setup(x => x.postPattern(app, request, version))
-            .returns(() => Observable.of(new Versioned<AppPatternDto>(newVersion, newPattern)));
+            .returns(() => of(new Versioned<AppPatternDto>(newVersion, newPattern)));
 
         patternsState.create(request).subscribe();
 
@@ -83,7 +85,7 @@ describe('PatternsState', () => {
         const request = new EditAppPatternDto('a_name2', 'a_pattern2', 'a_message2');
 
         patternsService.setup(x => x.putPattern(app, oldPatterns[1].id, request, version))
-            .returns(() => Observable.of(new Versioned<any>(newVersion, {})));
+            .returns(() => of(new Versioned<any>(newVersion, {})));
 
         patternsState.update(oldPatterns[1], request).subscribe();
 
@@ -97,7 +99,7 @@ describe('PatternsState', () => {
 
     it('should remove pattern from snapshot when deleted', () => {
         patternsService.setup(x => x.deletePattern(app, oldPatterns[0].id, version))
-            .returns(() => Observable.of(new Versioned<any>(newVersion, {})));
+            .returns(() => of(new Versioned<any>(newVersion, {})));
 
         patternsState.delete(oldPatterns[0]).subscribe();
 

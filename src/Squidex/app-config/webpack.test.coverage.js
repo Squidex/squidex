@@ -1,8 +1,8 @@
-﻿
-var webpackMerge = require('webpack-merge'),
-            path = require('path'),
-         helpers = require('./helpers'),
-      testConfig = require('./webpack.test.js');
+﻿const webpack = require('webpack'),
+ webpackMerge = require('webpack-merge'),
+         path = require('path'),
+      helpers = require('./helpers'),
+   testConfig = require('./webpack.test.js');
 
 helpers.removeLoaders(testConfig, ['ts']);
 
@@ -25,9 +25,7 @@ module.exports = webpackMerge(testConfig, {
                 test: /\.ts$/,
                 use: [{
                     loader: 'istanbul-instrumenter-loader'
-                }, {
-                    loader: helpers.root('app-config', 'fix-coverage-loader')
-                }, {
+                },{
                     loader: 'awesome-typescript-loader'
                 }, {
                     loader: 'angular2-router-loader'

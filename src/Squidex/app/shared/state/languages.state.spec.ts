@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Observable } from 'rxjs';
+import { of } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 
 import {
@@ -55,12 +55,12 @@ describe('LanguagesState', () => {
         allLanguagesService = Mock.ofType<LanguagesService>();
 
         allLanguagesService.setup(x => x.getLanguages())
-            .returns(() => Observable.of([languageDE, languageEN, languageIT, languageES]));
+            .returns(() => of([languageDE, languageEN, languageIT, languageES]));
 
         languagesService = Mock.ofType<AppLanguagesService>();
 
         languagesService.setup(x => x.getLanguages(app))
-            .returns(() => Observable.of(new AppLanguagesDto(oldLanguages, version)));
+            .returns(() => of(new AppLanguagesDto(oldLanguages, version)));
 
         languagesState = new LanguagesState(languagesService.object, appsState.object, dialogs.object, allLanguagesService.object);
         languagesState.load().subscribe();
@@ -88,6 +88,8 @@ describe('LanguagesState', () => {
     it('should show notification on load when reload is true', () => {
         languagesState.load(true).subscribe();
 
+        expect().nothing();
+
         dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
     });
 
@@ -95,7 +97,7 @@ describe('LanguagesState', () => {
         const newLanguage = new AppLanguageDto(languageIT.iso2Code, languageIT.englishName, false, false, []);
 
         languagesService.setup(x => x.postLanguage(app, It.isAny(), version))
-            .returns(() => Observable.of(new Versioned<AppLanguageDto>(newVersion, newLanguage)));
+            .returns(() => of(new Versioned<AppLanguageDto>(newVersion, newLanguage)));
 
         languagesState.add(languageIT).subscribe();
 
@@ -122,7 +124,7 @@ describe('LanguagesState', () => {
         const request = new UpdateAppLanguageDto(true, false, []);
 
         languagesService.setup(x => x.putLanguage(app, oldLanguages[1].iso2Code, request, version))
-            .returns(() => Observable.of(new Versioned<any>(newVersion, {})));
+            .returns(() => of(new Versioned<any>(newVersion, {})));
 
         languagesState.update(oldLanguages[1], request).subscribe();
 
@@ -146,7 +148,7 @@ describe('LanguagesState', () => {
 
     it('should remove language from snapshot when deleted', () => {
         languagesService.setup(x => x.deleteLanguage(app, oldLanguages[1].iso2Code, version))
-            .returns(() => Observable.of(new Versioned<any>(newVersion, {})));
+            .returns(() => of(new Versioned<any>(newVersion, {})));
 
         languagesState.remove(oldLanguages[1]).subscribe();
 

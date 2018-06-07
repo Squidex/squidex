@@ -5,7 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Observable } from 'rxjs';
+import { of } from 'rxjs';
+import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
 
 import {
@@ -55,13 +56,13 @@ describe('PlansState', () => {
         plansService = Mock.ofType<PlansService>();
 
         plansService.setup(x => x.getPlans(app))
-            .returns(() => Observable.of(oldPlans));
+            .returns(() => of(oldPlans));
 
         plansState = new PlansState(appsState.object, authService.object, dialogs.object, plansService.object);
     });
 
     it('should load plans', () => {
-        plansState.load().onErrorResumeNext().subscribe();
+        plansState.load().pipe(onErrorResumeNext()).subscribe();
 
         expect(plansState.snapshot.plans.values).toEqual([
             { isSelected: true,  isYearlySelected: false, plan: oldPlans.plans[0] },
@@ -76,7 +77,7 @@ describe('PlansState', () => {
     });
 
     it('should load plans with overriden id', () => {
-        plansState.load(false, 'id2_yearly').onErrorResumeNext().subscribe();
+        plansState.load(false, 'id2_yearly').pipe(onErrorResumeNext()).subscribe();
 
         expect(plansState.snapshot.plans.values).toEqual([
             { isSelected: false, isYearlySelected: false, plan: oldPlans.plans[0] },
@@ -93,6 +94,8 @@ describe('PlansState', () => {
     it('should show notification on load when reload is true', () => {
         plansState.load(true).subscribe();
 
+        expect().nothing();
+
         dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
     });
 
@@ -100,10 +103,10 @@ describe('PlansState', () => {
         plansState.window = <any>{ location: {} };
 
         plansService.setup(x => x.putPlan(app, It.isAny(), version))
-            .returns(() => Observable.of(new Versioned<PlanChangedDto>(newVersion, new PlanChangedDto('URI'))));
+            .returns(() => of(new Versioned<PlanChangedDto>(newVersion, new PlanChangedDto('URI'))));
 
         plansState.load().subscribe();
-        plansState.change('free').onErrorResumeNext().subscribe();
+        plansState.change('free').pipe(onErrorResumeNext()).subscribe();
 
         expect(plansState.snapshot.plans.values).toEqual([
             { isSelected: true,  isYearlySelected: false, plan: oldPlans.plans[0] },
@@ -117,10 +120,10 @@ describe('PlansState', () => {
         plansState.window = <any>{ location: {} };
 
         plansService.setup(x => x.putPlan(app, It.isAny(), version))
-            .returns(() => Observable.of(new Versioned<PlanChangedDto>(newVersion, new PlanChangedDto(''))));
+            .returns(() => of(new Versioned<PlanChangedDto>(newVersion, new PlanChangedDto(''))));
 
         plansState.load().subscribe();
-        plansState.change('id2_yearly').onErrorResumeNext().subscribe();
+        plansState.change('id2_yearly').pipe(onErrorResumeNext()).subscribe();
 
         expect(plansState.snapshot.plans.values).toEqual([
             { isSelected: false, isYearlySelected: false, plan: oldPlans.plans[0] },

@@ -67,13 +67,13 @@ describe('ModalView', () => {
     });
 
     function checkValue(dialog: ModalView, expected: boolean) {
-        let result: boolean | null = null;
+        let result: boolean;
 
         dialog.isOpen.subscribe(value => {
             result = value;
         }).unsubscribe();
 
-        expect(result).toBe(expected);
+        expect(result!).toBe(expected);
     }
 });
 

@@ -33,7 +33,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                     .AddAssets(5, "assets1", Partitioning.Invariant)
                     .AddAssets(6, "assets2", Partitioning.Invariant)
                     .AddJson(4, "json", Partitioning.Language)
-                    .HideField(3);
+                    .UpdateField(3, f => f.Hide());
         }
 
         [Fact]

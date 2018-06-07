@@ -18,6 +18,10 @@ namespace Squidex.Infrastructure.Log.Internal
             this.logToStdError = logToStdError;
         }
 
+        public void Reset()
+        {
+        }
+
         public void WriteLine(int color, string message)
         {
             if (color != 0 && logToStdError)

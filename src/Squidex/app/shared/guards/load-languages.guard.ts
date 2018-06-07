@@ -8,6 +8,7 @@
 import { Injectable } from '@angular/core';
 import { CanActivate } from '@angular/router';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 import { LanguagesState } from './../state/languages.state';
 
@@ -19,6 +20,6 @@ export class LoadLanguagesGuard implements CanActivate {
     }
 
     public canActivate(): Observable<boolean> {
-        return this.languagesState.load().map(a => true);
+        return this.languagesState.load().pipe(map(a => true));
     }
 }

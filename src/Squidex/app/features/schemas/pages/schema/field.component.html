@@ -1,12 +1,12 @@
 <div class="table-items-row table-items-row-expandable field"> 
-    <div class="table-items-row-summary" dnd-sortable-handle>        
+    <div class="table-items-row-summary {{handleClass}}">        
         <div class="row">
             <div class="col col-6">
                 <span class="field-name">
                     <i class="field-icon icon-type-{{field.properties.fieldType}}"></i> 
 
                     <span [class.field-hidden]="field.isHidden" [attr.title]="field.isHidden ? 'Hidden Field' : 'Visible Field'">{{field.displayName}}</span>
-                    <span class="field-partitioning" *ngIf="field.isLocalizable">localizable</span>
+                    <span class="field-partitioning" *ngIf="field['isLocalizable']">localizable</span>
                 </span>
             </div>
             <div class="col col-tags">
@@ -27,36 +27,38 @@
                             <i class="icon-dots"></i>
                         </button>
                         <div class="dropdown-menu" *sqxModalView="dropdown" [sqxModalTarget]="optionsButton" @fade>
-                            <a class="dropdown-item" (click)="enableField()" *ngIf="field.isDisabled" [class.disabled]="field.isLocked">
+                            <a class="dropdown-item" (click)="enableField()" *ngIf="field.isDisabled">
                                 Enable in UI
                             </a>
-                            <a class="dropdown-item" (click)="disableField()" *ngIf="!field.isDisabled" [class.disabled]="field.isLocked">
+                            <a class="dropdown-item" (click)="disableField()" *ngIf="!field.isDisabled">
                                 Disable in UI
                             </a>
-                            <a class="dropdown-item" (click)="hideField()" *ngIf="!field.isHidden" [class.disabled]="field.isLocked">
+                            <a class="dropdown-item" (click)="hideField()" *ngIf="!field.isHidden && !field.isLocked">
                                 Hide in API
                             </a>
-                            <a class="dropdown-item" (click)="showField()" *ngIf="field.isHidden" [class.disabled]="field.isLocked">
+                            <a class="dropdown-item" (click)="showField()" *ngIf="field.isHidden && !field.isLocked">
                                 Show in API
                             </a>                           
                             
-                            <div class="dropdown-divider"></div>
+                            <ng-container *ngIf="!field.isLocked">
+                                <div class="dropdown-divider"></div>
+                        
+                                <a class="dropdown-item" 
+                                    (sqxConfirmClick)="lockField()"
+                                    confirmTitle="Lock field" 
+                                    confirmText="Do you really want to lock the field? Locked fields cannot be deleted or changed anymore.">
+                                    Lock and prevent changes
+                                </a>
                             
-                            <a class="dropdown-item" *ngIf="!field.isLocked" 
-                                (sqxConfirmClick)="lockField()"
-                                confirmTitle="Lock field" 
-                                confirmText="Do you really want to lock the field? Lock fields cannot be deleted or changed.">
-                                Lock and prevent changes
-                            </a>
-                            
-                            <div class="dropdown-divider"></div>
+                                <div class="dropdown-divider"></div>
 
-                            <a class="dropdown-item dropdown-item-delete" [class.disabled]="field.isLocked"
-                                (sqxConfirmClick)="deleteField()"
-                                confirmTitle="Delete field" 
-                                confirmText="Do you really want to delete the field?">
-                                Delete
-                            </a>
+                                <a class="dropdown-item dropdown-item-delete"
+                                    (sqxConfirmClick)="deleteField()"
+                                    confirmTitle="Delete field" 
+                                    confirmText="Do you really want to delete the field?">
+                                    Delete
+                                </a>
+                            </ng-container>
                         </div>
                     </div>
                 </div>
@@ -97,5 +99,33 @@
                 <sqx-field-form-ui [editForm]="editForm.form" [field]="field"></sqx-field-form-ui>
             </div>
         </form> 
+    </div>
+
+    <div class="nested-fields" *ngIf="field.properties.fieldType === 'Array'">
+        <ng-container *ngIf="field['nested']; let nested">
+            <span class="nested-field-line-v"></span>
+
+            <div [sqxSortModel]="nested" (sqxSorted)="sortFields($event)" handleClass="nested">
+                <div class="nested-field" *ngFor="let nested of nested; trackBy: trackByField">
+                    <span class="nested-field-line-h"></span>
+    
+                    <sqx-field [field]="nested" [schema]="schema" [parent]="field" [patterns]="patterns" handleClass="nested"></sqx-field>
+                </div>
+            </div>
+            
+            <div class="nested-field nested-field-add">
+                <span class="nested-field-line-h"></span>
+
+                <button class="btn btn-success btn-sm" (click)="addFieldDialog.show()">
+                    <i class="icon icon-plus"></i> Add Nested Field
+                </button>
+            </div>
+                
+            <ng-container *sqxModalView="addFieldDialog;onRoot:true;closeAuto:false">
+                <sqx-field-wizard [schema]="schema" [parent]="field"
+                    (completed)="addFieldDialog.hide()">
+                </sqx-field-wizard>
+            </ng-container>
+        </ng-container>
     </div>
 </div>

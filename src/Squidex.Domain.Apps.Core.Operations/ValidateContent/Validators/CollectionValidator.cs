@@ -5,14 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
+using System.Collections;
 using System.Threading.Tasks;
 using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 {
-    public sealed class CollectionValidator<T> : IValidator
+    public sealed class CollectionValidator : IValidator
     {
         private readonly bool isRequired;
         private readonly int? minItems;
@@ -25,13 +24,13 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
             this.maxItems = maxItems;
         }
 
-        public Task ValidateAsync(object value, ValidationContext context, Action<string> addError)
+        public Task ValidateAsync(object value, ValidationContext context, AddError addError)
         {
-            if (!(value is ICollection<T> items) || items.Count == 0)
+            if (!(value is ICollection items) || items.Count == 0)
             {
                 if (isRequired && !context.IsOptional)
                 {
-                    addError("<FIELD> is required.");
+                    addError(context.Path, "Field is required.");
                 }
 
                 return TaskHelper.Done;
@@ -39,12 +38,12 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
             if (minItems.HasValue && items.Count < minItems.Value)
             {
-                addError($"<FIELD> must have at least {minItems} item(s).");
+                addError(context.Path, $"Must have at least {minItems} item(s).");
             }
 
             if (maxItems.HasValue && items.Count > maxItems.Value)
             {
-                addError($"<FIELD> must have not more than {maxItems} item(s).");
+                addError(context.Path, $"Must have not more than {maxItems} item(s).");
             }
 
             return TaskHelper.Done;

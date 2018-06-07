@@ -14,6 +14,7 @@ export * from './angular/forms/dropdown.component';
 export * from './angular/forms/file-drop.directive';
 export * from './angular/forms/focus-on-init.directive';
 export * from './angular/forms/form-error.component';
+export * from './angular/forms/forms-helper';
 export * from './angular/forms/iframe-editor.component';
 export * from './angular/forms/indeterminate-value.directive';
 export * from './angular/forms/jscript-editor.component';
@@ -26,7 +27,7 @@ export * from './angular/forms/toggle.component';
 export * from './angular/forms/transform-input.directive';
 export * from './angular/forms/validators';
 
-export * from './angular/http/http-extensions-impl';
+export * from './angular/http/http-extensions';
 
 export * from './angular/modals/dialog-renderer.component';
 export * from './angular/modals/modal-dialog.component';

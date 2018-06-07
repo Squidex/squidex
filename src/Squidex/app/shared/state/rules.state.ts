@@ -7,13 +7,13 @@
 
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-
-import '@app/framework/utils/rxjs-extensions';
+import { distinctUntilChanged, map, tap } from 'rxjs/operators';
 
 import {
     DateTime,
     DialogService,
     ImmutableArray,
+    notify,
     State,
     Version
 } from '@app/framework';
@@ -37,12 +37,12 @@ interface Snapshot {
 @Injectable()
 export class RulesState extends State<Snapshot> {
     public rules =
-        this.changes.map(x => x.rules)
-            .distinctUntilChanged();
+        this.changes.pipe(map(x => x.rules),
+            distinctUntilChanged());
 
     public isLoaded =
-        this.changes.map(x => !!x.isLoaded)
-            .distinctUntilChanged();
+        this.changes.pipe(map(x => !!x.isLoaded),
+            distinctUntilChanged());
 
     constructor(
         private readonly appsState: AppsState,
@@ -58,8 +58,8 @@ export class RulesState extends State<Snapshot> {
             this.resetState();
         }
 
-        return this.rulesService.getRules(this.appName)
-            .do(dtos => {
+        return this.rulesService.getRules(this.appName).pipe(
+            tap(dtos => {
                 if (isReload) {
                     this.dialogs.notifyInfo('Rules reloaded.');
                 }
@@ -69,64 +69,64 @@ export class RulesState extends State<Snapshot> {
 
                     return { ...s, rules, isLoaded: true };
                 });
-            })
-            .notify(this.dialogs);
+            }),
+            notify(this.dialogs));
     }
 
     public create(request: CreateRuleDto, now?: DateTime): Observable<any> {
-        return this.rulesService.postRule(this.appName, request, this.user, now || DateTime.now())
-            .do(dto => {
+        return this.rulesService.postRule(this.appName, request, this.user, now || DateTime.now()).pipe(
+            tap(dto => {
                 this.next(s => {
                     const rules = s.rules.push(dto);
 
                     return { ...s, rules };
                 });
-            })
-            .notify(this.dialogs);
+            }),
+            notify(this.dialogs));
     }
 
     public delete(rule: RuleDto): Observable<any> {
-        return this.rulesService.deleteRule(this.appName, rule.id, rule.version)
-            .do(dto => {
+        return this.rulesService.deleteRule(this.appName, rule.id, rule.version).pipe(
+            tap(dto => {
                 this.next(s => {
                     const rules = s.rules.removeAll(x => x.id === rule.id);
 
                     return { ...s, rules };
                 });
-            })
-            .notify(this.dialogs);
+            }),
+            notify(this.dialogs));
     }
 
     public updateAction(rule: RuleDto, action: any, now?: DateTime): Observable<any> {
-        return this.rulesService.putRule(this.appName, rule.id, new UpdateRuleDto(null, action), rule.version)
-            .do(dto => {
+        return this.rulesService.putRule(this.appName, rule.id, new UpdateRuleDto(null, action), rule.version).pipe(
+            tap(dto => {
                 this.replaceRule(updateAction(rule, action, this.user, dto.version, now));
-            })
-            .notify(this.dialogs);
+            }),
+            notify(this.dialogs));
     }
 
     public updateTrigger(rule: RuleDto, trigger: any, now?: DateTime): Observable<any> {
-        return this.rulesService.putRule(this.appName, rule.id, new UpdateRuleDto(trigger, null), rule.version)
-            .do(dto => {
+        return this.rulesService.putRule(this.appName, rule.id, new UpdateRuleDto(trigger, null), rule.version).pipe(
+            tap(dto => {
                 this.replaceRule(updateTrigger(rule, trigger, this.user, dto.version, now));
-            })
-            .notify(this.dialogs);
+            }),
+            notify(this.dialogs));
     }
 
     public enable(rule: RuleDto, now?: DateTime): Observable<any> {
-        return this.rulesService.enableRule(this.appName, rule.id, rule.version)
-            .do(dto => {
+        return this.rulesService.enableRule(this.appName, rule.id, rule.version).pipe(
+            tap(dto => {
                 this.replaceRule(setEnabled(rule, true, this.user, dto.version, now));
-            })
-            .notify(this.dialogs);
+            }),
+            notify(this.dialogs));
     }
 
     public disable(rule: RuleDto, now?: DateTime): Observable<any> {
-        return this.rulesService.disableRule(this.appName, rule.id, rule.version)
-            .do(dto => {
+        return this.rulesService.disableRule(this.appName, rule.id, rule.version).pipe(
+            tap(dto => {
                 this.replaceRule(setEnabled(rule, false, this.user, dto.version, now));
-            })
-            .notify(this.dialogs);
+            }),
+            notify(this.dialogs));
     }
 
     private replaceRule(rule: RuleDto) {
@@ -147,37 +147,27 @@ export class RulesState extends State<Snapshot> {
 }
 
 const updateTrigger = (rule: RuleDto, trigger: any, user: string, version: Version, now?: DateTime) =>
-    new RuleDto(
-        rule.id,
-        rule.createdBy, user,
-        rule.created, now || DateTime.now(),
-        version,
-        rule.isEnabled,
+    rule.with({
         trigger,
-        trigger.triggerType,
-        rule.action,
-        rule.action.actionType);
+        triggerType: trigger.triggerType,
+        lastModified: now || DateTime.now(),
+        lastModifiedBy: user,
+        version
+    });
 
 const updateAction = (rule: RuleDto, action: any, user: string, version: Version, now?: DateTime) =>
-    new RuleDto(
-        rule.id,
-        rule.createdBy, user,
-        rule.created, now || DateTime.now(),
-        version,
-        rule.isEnabled,
-        rule.trigger,
-        rule.trigger.triggerType,
+    rule.with({
         action,
-        action.actionType);
+        actionType: action.triggerType,
+        lastModified: now || DateTime.now(),
+        lastModifiedBy: user,
+        version
+    });
 
 const setEnabled = (rule: RuleDto, isEnabled: boolean, user: string, version: Version, now?: DateTime) =>
-    new RuleDto(
-        rule.id,
-        rule.createdBy, user,
-        rule.created, now || DateTime.now(),
-        version,
+    rule.with({
         isEnabled,
-        rule.trigger,
-        rule.triggerType,
-        rule.action,
-        rule.actionType);
+        lastModified: now || DateTime.now(),
+        lastModifiedBy: user,
+        version
+    });

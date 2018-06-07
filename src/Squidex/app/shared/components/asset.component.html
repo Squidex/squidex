@@ -16,17 +16,17 @@
                 <div class="file-overlay-background"></div>
                 
                 <div class="file-menu">
-                    <a class="file-edit" *ngIf="!isDisabled" (click)="renameDialog.show()">
+                    <a class="file-edit ml-1" *ngIf="!isDisabled" (click)="renameDialog.show()">
                         <i class="icon-pencil"></i>
                     </a>
-                    <a class="file-download" [attr.href]="asset | sqxAssetUrl" target="_blank" (click)="$event.stopPropagation()">
+                    <a class="file-download ml-1" [attr.href]="asset | sqxAssetUrl" target="_blank" (click)="$event.stopPropagation()">
                         <i class="icon-download"></i>
                     </a>
     
-                    <a class="file-delete" (click)="deleting.emit(asset); $event.stopPropagation()" *ngIf="!isDisabled && !removeMode">
+                    <a class="file-delete ml-1" (click)="deleting.emit(asset); $event.stopPropagation()" *ngIf="!isDisabled && !removeMode">
                         <i class="icon-delete"></i>
                     </a>
-                    <a class="file-delete" (click)="removing.emit(asset); $event.stopPropagation()" *ngIf="removeMode">
+                    <a class="file-delete ml-1" (click)="removing.emit(asset); $event.stopPropagation()" *ngIf="removeMode">
                         <i class="icon-close"></i>
                     </a>
                 </div>

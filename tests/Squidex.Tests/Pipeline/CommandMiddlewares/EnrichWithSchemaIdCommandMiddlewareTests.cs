@@ -101,7 +101,7 @@ namespace Squidex.Pipeline.CommandMiddlewares
 
             await sut.HandleAsync(context);
 
-            Assert.Equal(new NamedId<Guid>(schemaId, schemaName), command.SchemaId);
+            Assert.Equal(NamedId.Of(schemaId, schemaName), command.SchemaId);
         }
 
         [Fact]
@@ -117,7 +117,7 @@ namespace Squidex.Pipeline.CommandMiddlewares
 
             await sut.HandleAsync(context);
 
-            Assert.Equal(new NamedId<Guid>(schemaId, schemaName), command.SchemaId);
+            Assert.Equal(NamedId.Of(schemaId, schemaName), command.SchemaId);
         }
 
         [Fact]
@@ -139,7 +139,7 @@ namespace Squidex.Pipeline.CommandMiddlewares
         [Fact]
         public async Task Should_use_app_id_from_command()
         {
-            var appId = new NamedId<Guid>(Guid.NewGuid(), "my-app");
+            var appId = NamedId.Of(Guid.NewGuid(), "my-app");
 
             SetupSchema(appId.Id, out var schemaId, out var schemaName);
 
@@ -150,7 +150,7 @@ namespace Squidex.Pipeline.CommandMiddlewares
 
             await sut.HandleAsync(context);
 
-            Assert.Equal(new NamedId<Guid>(schemaId, schemaName), command.SchemaId);
+            Assert.Equal(NamedId.Of(schemaId, schemaName), command.SchemaId);
         }
 
         [Fact]
@@ -173,12 +173,12 @@ namespace Squidex.Pipeline.CommandMiddlewares
             SetupApp(out var appId, out var appName);
             SetupSchema(appId, out var schemaId, out var schemaName);
 
-            var command = new CreateContent { SchemaId = new NamedId<Guid>(Guid.NewGuid(), "other-schema") };
+            var command = new CreateContent { SchemaId = NamedId.Of(Guid.NewGuid(), "other-schema") };
             var context = new CommandContext(command, commandBus);
 
             await sut.HandleAsync(context);
 
-            Assert.NotEqual(new NamedId<Guid>(appId, appName), command.AppId);
+            Assert.NotEqual(NamedId.Of(appId, appName), command.AppId);
         }
 
         private void SetupSchema(Guid appId, out Guid schemaId, out string schemaName)

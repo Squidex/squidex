@@ -28,7 +28,12 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
                 return default(T);
             }
 
-            public override Field CreateField(long id, string name, Partitioning partitioning)
+            public override RootField CreateRootField(long id, string name, Partitioning partitioning)
+            {
+                return null;
+            }
+
+            public override NestedField CreateNestedField(long id, string name)
             {
                 return null;
             }
@@ -37,7 +42,7 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
         [Fact]
         public void Should_throw_exception_if_creating_field_and_field_is_not_registered()
         {
-            Assert.Throws<InvalidOperationException>(() => sut.CreateField(1, "name", Partitioning.Invariant, new InvalidProperties()));
+            Assert.Throws<InvalidOperationException>(() => sut.CreateRootField(1, "name", Partitioning.Invariant, new InvalidProperties()));
         }
 
         [Theory]
@@ -54,7 +59,7 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
         {
             var properties = (FieldProperties)Activator.CreateInstance(propertyType);
 
-            var field = sut.CreateField(1, "name", Partitioning.Invariant, properties);
+            var field = sut.CreateRootField(1, "name", Partitioning.Invariant, properties);
 
             Assert.Equal(properties, field.RawProperties);
         }

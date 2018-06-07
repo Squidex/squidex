@@ -8,6 +8,7 @@
 // tslint:disable:prefer-for-of
 
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { onErrorResumeNext } from 'rxjs/operators';
 
 import {
     AssetDto,
@@ -42,19 +43,19 @@ export class AssetsListComponent {
     }
 
     public search() {
-        this.state.load().onErrorResumeNext().subscribe();
+        this.state.load().pipe(onErrorResumeNext()).subscribe();
     }
 
     public delete(asset: AssetDto) {
-        this.state.delete(asset).onErrorResumeNext().subscribe();
+        this.state.delete(asset).pipe(onErrorResumeNext()).subscribe();
     }
 
     public goNext() {
-        this.state.goNext().onErrorResumeNext().subscribe();
+        this.state.goNext().pipe(onErrorResumeNext()).subscribe();
     }
 
     public goPrev() {
-        this.state.goPrev().onErrorResumeNext().subscribe();
+        this.state.goPrev().pipe(onErrorResumeNext()).subscribe();
     }
 
     public trackByAsset(index: number, asset: AssetDto) {

@@ -54,7 +54,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             await sut.ValidateAsync(CreateValue(null), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> is required." });
+                new[] { "Field is required." });
         }
 
         [Fact]
@@ -65,7 +65,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             await sut.ValidateAsync(CreateValue("Invalid"), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> is not a valid value." });
+                new[] { "Not a valid value." });
         }
 
         private static JValue CreateValue(object v)
@@ -73,7 +73,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             return new JValue(v);
         }
 
-        private static Field<BooleanFieldProperties> Field(BooleanFieldProperties properties)
+        private static RootField<BooleanFieldProperties> Field(BooleanFieldProperties properties)
         {
             return Fields.Boolean(1, "my-boolean", Partitioning.Invariant, properties);
         }

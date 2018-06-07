@@ -8,6 +8,7 @@
 import { Injectable } from '@angular/core';
 import { CanActivate } from '@angular/router';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 import { AppsState } from './../state/apps.state';
 
@@ -19,6 +20,6 @@ export class UnsetAppGuard implements CanActivate {
     }
 
     public canActivate(): Observable<boolean> {
-        return this.appsState.select(null).map(a => a === null);
+        return this.appsState.select(null).pipe(map(a => a === null));
     }
 }

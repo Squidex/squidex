@@ -5,7 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Observable } from 'rxjs';
+import { of, throwError } from 'rxjs';
+import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
 
 import { DialogService } from '@app/shared';
@@ -29,7 +30,7 @@ describe('EventConsumersState', () => {
         eventConsumersService = Mock.ofType<EventConsumersService>();
 
         eventConsumersService.setup(x => x.getEventConsumers())
-            .returns(() => Observable.of(oldConsumers));
+            .returns(() => of(oldConsumers));
 
         eventConsumersState = new EventConsumersState(dialogs.object, eventConsumersService.object);
         eventConsumersState.load().subscribe();
@@ -39,36 +40,44 @@ describe('EventConsumersState', () => {
         expect(eventConsumersState.snapshot.eventConsumers.values).toEqual(oldConsumers);
         expect(eventConsumersState.snapshot.isLoaded).toBeTruthy();
 
+        expect().nothing();
+
         dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
     });
 
     it('should show notification on load when reload is true', () => {
         eventConsumersState.load(true).subscribe();
 
+        expect().nothing();
+
         dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
     });
 
     it('should show notification on load error when silent is true', () => {
         eventConsumersService.setup(x => x.getEventConsumers())
-            .returns(() => Observable.throw({}));
+            .returns(() => throwError({}));
 
-        eventConsumersState.load(true, true).onErrorResumeNext().subscribe();
+        eventConsumersState.load(true, true).pipe(onErrorResumeNext()).subscribe();
+
+        expect().nothing();
 
         dialogs.verify(x => x.notifyError(It.isAny()), Times.once());
     });
 
     it('should not show notification on load error when flag is false', () => {
         eventConsumersService.setup(x => x.getEventConsumers())
-            .returns(() => Observable.throw({}));
+            .returns(() => throwError({}));
 
-        eventConsumersState.load().onErrorResumeNext().subscribe();
+        eventConsumersState.load().pipe(onErrorResumeNext()).subscribe();
+
+        expect().nothing();
 
         dialogs.verify(x => x.notifyError(It.isAny()), Times.never());
     });
 
     it('should unmark as stopped when started', () => {
         eventConsumersService.setup(x => x.putStart(oldConsumers[1].name))
-            .returns(() => Observable.of({}));
+            .returns(() => of({}));
 
         eventConsumersState.start(oldConsumers[1]).subscribe();
 
@@ -79,7 +88,7 @@ describe('EventConsumersState', () => {
 
     it('should mark as stopped when stopped', () => {
         eventConsumersService.setup(x => x.putStop(oldConsumers[0].name))
-            .returns(() => Observable.of({}));
+            .returns(() => of({}));
 
         eventConsumersState.stop(oldConsumers[0]).subscribe();
 
@@ -90,7 +99,7 @@ describe('EventConsumersState', () => {
 
     it('should mark as resetting when reset', () => {
         eventConsumersService.setup(x => x.putReset(oldConsumers[0].name))
-            .returns(() => Observable.of({}));
+            .returns(() => of({}));
 
         eventConsumersState.reset(oldConsumers[0]).subscribe();
 

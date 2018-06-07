@@ -66,7 +66,7 @@ namespace Squidex.Pipeline.CommandMiddlewares
 
             await sut.HandleAsync(context);
 
-            Assert.Equal(new NamedId<Guid>(appId, appName), command.AppId);
+            Assert.Equal(NamedId.Of(appId, appName), command.AppId);
         }
 
         [Fact]
@@ -100,12 +100,12 @@ namespace Squidex.Pipeline.CommandMiddlewares
         {
             SetupApp(out var appId, out var appName);
 
-            var command = new CreateContent { AppId = new NamedId<Guid>(Guid.NewGuid(), "other-app") };
+            var command = new CreateContent { AppId = NamedId.Of(Guid.NewGuid(), "other-app") };
             var context = new CommandContext(command, commandBus);
 
             await sut.HandleAsync(context);
 
-            Assert.NotEqual(new NamedId<Guid>(appId, appName), command.AppId);
+            Assert.NotEqual(NamedId.Of(appId, appName), command.AppId);
         }
 
         private void SetupApp(out Guid appId, out string appName)

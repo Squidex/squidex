@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Observable } from 'rxjs';
+import { of } from 'rxjs';
 
 import { CanDeactivateGuard } from './can-deactivate.guard';
 
@@ -17,7 +17,7 @@ describe('CanDeactivateGuard', () => {
             canDeactivate: () => {
                 called = true;
 
-                return Observable.of(true);
+                return of(true);
             }
         };
 

@@ -5,16 +5,16 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using GraphQL.Types;
-using Squidex.Domain.Apps.Core.Schemas;
+using System.Collections.Generic;
 
-namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
+namespace Squidex.Domain.Apps.Core.Schemas
 {
-    public static class InputFieldExtensions
+    public interface IArrayField : IField<ArrayFieldProperties>
     {
-        public static IGraphType GetInputGraphType(this IField field)
-        {
-            return field.Accept(InputFieldVisitor.Default);
-        }
+        IReadOnlyList<NestedField> Fields { get; }
+
+        IReadOnlyDictionary<long, NestedField> FieldsById { get; }
+
+        IReadOnlyDictionary<string, NestedField> FieldsByName { get; }
     }
 }

@@ -6,6 +6,7 @@
  */
 
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { onErrorResumeNext } from 'rxjs/operators';
 
 import {
     fadeAnimation,
@@ -90,7 +91,7 @@ export class SchemaCategoryComponent implements OnInit, OnChanges {
     }
 
     public changeCategory(schema: SchemaDto) {
-        this.schemasState.changeCategory(schema, this.name).onErrorResumeNext().subscribe();
+        this.schemasState.changeCategory(schema, this.name).pipe(onErrorResumeNext()).subscribe();
     }
 
     public trackBySchema(index: number, schema: SchemaDto) {

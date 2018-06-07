@@ -8,10 +8,13 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
-import '@app/framework/angular/http/http-extensions';
-
-import { ApiUrlConfig, HTTP } from '@app/framework';
+import {
+    ApiUrlConfig,
+    HTTP,
+    pretifyError
+} from '@app/framework';
 
 export class UserDto {
     constructor(
@@ -32,8 +35,8 @@ export class UsersService {
     public getUsers(query?: string): Observable<UserDto[]> {
         const url = this.apiUrl.buildUrl(`api/users?query=${query || ''}`);
 
-        return HTTP.getVersioned<any>(this.http, url)
-                .map(response => {
+        return HTTP.getVersioned<any>(this.http, url).pipe(
+                map(response => {
                     const body = response.payload.body;
 
                     const items: any[] = body;
@@ -43,21 +46,21 @@ export class UsersService {
                             item.id,
                             item.displayName);
                     });
-                })
-                .pretifyError('Failed to load users. Please reload.');
+                }),
+                pretifyError('Failed to load users. Please reload.'));
     }
 
     public getUser(id: string): Observable<UserDto> {
         const url = this.apiUrl.buildUrl(`api/users/${id}`);
 
-        return HTTP.getVersioned<any>(this.http, url)
-                .map(response => {
+        return HTTP.getVersioned<any>(this.http, url).pipe(
+                map(response => {
                     const body = response.payload.body;
 
                     return new UserDto(
                         body.id,
                         body.displayName);
-                })
-                .pretifyError('Failed to load user. Please reload.');
+                }),
+                pretifyError('Failed to load user. Please reload.'));
     }
 }

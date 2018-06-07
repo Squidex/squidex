@@ -22,9 +22,14 @@ namespace Squidex.Domain.Apps.Core.Schemas
             return visitor.Visit((IField<JsonFieldProperties>)field);
         }
 
-        public override Field CreateField(long id, string name, Partitioning partitioning)
+        public override RootField CreateRootField(long id, string name, Partitioning partitioning)
         {
-            return new Field<JsonFieldProperties>(id, name, partitioning, this);
+            return Fields.Json(id, name, partitioning, this);
+        }
+
+        public override NestedField CreateNestedField(long id, string name)
+        {
+            return Fields.Json(id, name, this);
         }
     }
 }

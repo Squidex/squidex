@@ -16,6 +16,8 @@ import {
     CreateSchemaDto,
     DateTime,
     FieldDto,
+    NestedFieldDto,
+    RootFieldDto,
     SchemaDetailsDto,
     SchemaDto,
     SchemaPropertiesDto,
@@ -56,7 +58,7 @@ describe('SchemasService', () => {
     it('should make get request to get schemas',
         inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
 
-        let schemas: SchemaDto[] | null = null;
+        let schemas: SchemaDto[];
 
         schemasService.getSchemas('my-app').subscribe(result => {
             schemas = result;
@@ -102,22 +104,23 @@ describe('SchemasService', () => {
             }
         ]);
 
-        expect(schemas).toEqual([
-            new SchemaDto('id1', 'name1', 'category1', new SchemaPropertiesDto('label1', 'hints1'), true, 'Created1', 'LastModifiedBy1',
-                DateTime.parseISO_UTC('2016-12-12T10:10'),
-                DateTime.parseISO_UTC('2017-12-12T10:10'),
-                new Version('11')),
-            new SchemaDto('id2', 'name2', 'category2', new SchemaPropertiesDto('label2', 'hints2'), true, 'Created2', 'LastModifiedBy2',
-                DateTime.parseISO_UTC('2016-10-12T10:10'),
-                DateTime.parseISO_UTC('2017-10-12T10:10'),
-                new Version('22'))
-        ]);
+        expect(schemas!).toEqual(
+            [
+                new SchemaDto('id1', 'name1', 'category1', new SchemaPropertiesDto('label1', 'hints1'), true,
+                    DateTime.parseISO_UTC('2016-12-12T10:10'), 'Created1',
+                    DateTime.parseISO_UTC('2017-12-12T10:10'), 'LastModifiedBy1',
+                    new Version('11')),
+                new SchemaDto('id2', 'name2', 'category2', new SchemaPropertiesDto('label2', 'hints2'), true,
+                    DateTime.parseISO_UTC('2016-10-12T10:10'), 'Created2',
+                    DateTime.parseISO_UTC('2017-10-12T10:10'), 'LastModifiedBy2',
+                    new Version('22'))
+            ]);
     }));
 
     it('should make get request to get schema',
         inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
 
-        let schema: SchemaDetailsDto | null = null;
+        let schema: SchemaDetailsDto;
 
         schemasService.getSchema('my-app', 'my-schema').subscribe(result => {
             schema = result;
@@ -143,74 +146,41 @@ describe('SchemasService', () => {
             },
             fields: [
                 {
-                    fieldId: 1,
-                    name: 'field1',
+                    fieldId: 11,
+                    name: 'field11',
                     isLocked: true,
                     isHidden: true,
                     isDisabled: true,
                     partitioning: 'language',
                     properties: {
-                        fieldType: 'Number'
-                    }
+                        fieldType: 'Array'
+                    },
+                    nested: [
+                        {
+                            fieldId: 101,
+                            name: 'field101',
+                            isLocked: true,
+                            isHidden: true,
+                            isDisabled: true,
+                            properties: {
+                                fieldType: 'String'
+                            }
+                        },
+                        {
+                            fieldId: 102,
+                            name: 'field102',
+                            isLocked: true,
+                            isHidden: true,
+                            isDisabled: true,
+                            properties: {
+                                fieldType: 'Number'
+                            }
+                        }
+                    ]
                 },
                 {
-                    fieldId: 2,
-                    name: 'field2',
-                    isLocked: true,
-                    isHidden: true,
-                    isDisabled: true,
-                    partitioning: 'language',
-                    properties: {
-                        fieldType: 'String'
-                    }
-                },
-                {
-                    fieldId: 3,
-                    name: 'field3',
-                    isLocked: true,
-                    isHidden: true,
-                    isDisabled: true,
-                    partitioning: 'language',
-                    properties: {
-                        fieldType: 'Boolean'
-                    }
-                },
-                {
-                    fieldId: 4,
-                    name: 'field4',
-                    isLocked: true,
-                    isHidden: true,
-                    isDisabled: true,
-                    partitioning: 'language',
-                    properties: {
-                        fieldType: 'DateTime'
-                    }
-                },
-                {
-                    fieldId: 5,
-                    name: 'field5',
-                    isLocked: true,
-                    isHidden: true,
-                    isDisabled: true,
-                    partitioning: 'language',
-                    properties: {
-                        fieldType: 'Json'
-                    }
-                },
-                {
-                    fieldId: 6,
-                    name: 'field6',
-                    isLocked: true,
-                    isHidden: true,
-                    isDisabled: true,
-                    partitioning: 'language',
-                    properties: {
-                        fieldType: 'Geolocation'
-                    }
-                },
-                {
-                    fieldId: 7,
-                    name: 'field7',
+                    fieldId: 12,
+                    name: 'field12',
                     isLocked: true,
                     isHidden: true,
                     isDisabled: true,
@@ -220,8 +190,63 @@ describe('SchemasService', () => {
                     }
                 },
                 {
-                    fieldId: 8,
-                    name: 'field8',
+                    fieldId: 13,
+                    name: 'field13',
+                    isLocked: true,
+                    isHidden: true,
+                    isDisabled: true,
+                    partitioning: 'language',
+                    properties: {
+                        fieldType: 'Boolean'
+                    }
+                },
+                {
+                    fieldId: 14,
+                    name: 'field14',
+                    isLocked: true,
+                    isHidden: true,
+                    isDisabled: true,
+                    partitioning: 'language',
+                    properties: {
+                        fieldType: 'DateTime'
+                    }
+                },
+                {
+                    fieldId: 15,
+                    name: 'field15',
+                    isLocked: true,
+                    isHidden: true,
+                    isDisabled: true,
+                    partitioning: 'language',
+                    properties: {
+                        fieldType: 'Geolocation'
+                    }
+                },
+                {
+                    fieldId: 16,
+                    name: 'field16',
+                    isLocked: true,
+                    isHidden: true,
+                    isDisabled: true,
+                    partitioning: 'language',
+                    properties: {
+                        fieldType: 'Json'
+                    }
+                },
+                {
+                    fieldId: 17,
+                    name: 'field17',
+                    isLocked: true,
+                    isHidden: true,
+                    isDisabled: true,
+                    partitioning: 'language',
+                    properties: {
+                        fieldType: 'Number'
+                    }
+                },
+                {
+                    fieldId: 18,
+                    name: 'field18',
                     isLocked: true,
                     isHidden: true,
                     isDisabled: true,
@@ -231,8 +256,19 @@ describe('SchemasService', () => {
                     }
                 },
                 {
-                    fieldId: 9,
-                    name: 'field9',
+                    fieldId: 19,
+                    name: 'field19',
+                    isLocked: true,
+                    isHidden: true,
+                    isDisabled: true,
+                    partitioning: 'language',
+                    properties: {
+                        fieldType: 'String'
+                    }
+                },
+                {
+                    fieldId: 20,
+                    name: 'field20',
                     isLocked: true,
                     isHidden: true,
                     isDisabled: true,
@@ -253,21 +289,25 @@ describe('SchemasService', () => {
             }
         });
 
-        expect(schema).toEqual(
-            new SchemaDetailsDto('id1', 'name1', 'category1', new SchemaPropertiesDto('label1', 'hints1'), true, 'Created1', 'LastModifiedBy1',
-                DateTime.parseISO_UTC('2016-12-12T10:10'),
-                DateTime.parseISO_UTC('2017-12-12T10:10'),
+        expect(schema!).toEqual(
+            new SchemaDetailsDto('id1', 'name1', 'category1', new SchemaPropertiesDto('label1', 'hints1'), true,
+                DateTime.parseISO_UTC('2016-12-12T10:10'), 'Created1',
+                DateTime.parseISO_UTC('2017-12-12T10:10'), 'LastModifiedBy1',
                 new Version('2'),
                 [
-                    new FieldDto(1, 'field1', true, true, true, 'language', createProperties('Number')),
-                    new FieldDto(2, 'field2', true, true, true, 'language', createProperties('String')),
-                    new FieldDto(3, 'field3', true, true, true, 'language', createProperties('Boolean')),
-                    new FieldDto(4, 'field4', true, true, true, 'language', createProperties('DateTime')),
-                    new FieldDto(5, 'field5', true, true, true, 'language', createProperties('Json')),
-                    new FieldDto(6, 'field6', true, true, true, 'language', createProperties('Geolocation')),
-                    new FieldDto(7, 'field7', true, true, true, 'language', createProperties('Assets')),
-                    new FieldDto(8, 'field8', true, true, true, 'language', createProperties('References')),
-                    new FieldDto(9, 'field9', true, true, true, 'language', createProperties('Tags'))
+                    new RootFieldDto(11, 'field11', createProperties('Array'), 'language', true, true, true, [
+                        new NestedFieldDto(101, 'field101', createProperties('String'), 11, true, true, true),
+                        new NestedFieldDto(102, 'field102', createProperties('Number'), 11, true, true, true)
+                    ]),
+                    new RootFieldDto(12, 'field12', createProperties('Assets'), 'language', true, true, true),
+                    new RootFieldDto(13, 'field13', createProperties('Boolean'), 'language', true, true, true),
+                    new RootFieldDto(14, 'field14', createProperties('DateTime'), 'language', true, true, true),
+                    new RootFieldDto(15, 'field15', createProperties('Geolocation'), 'language', true, true, true),
+                    new RootFieldDto(16, 'field16', createProperties('Json'), 'language', true, true, true),
+                    new RootFieldDto(17, 'field17', createProperties('Number'), 'language', true, true, true),
+                    new RootFieldDto(18, 'field18', createProperties('References'), 'language', true, true, true),
+                    new RootFieldDto(19, 'field19', createProperties('String'), 'language', true, true, true),
+                    new RootFieldDto(20, 'field20', createProperties('Tags'), 'language', true, true, true)
                 ],
                 '<script-query>',
                 '<script-create>',
@@ -281,7 +321,7 @@ describe('SchemasService', () => {
 
         const dto = new CreateSchemaDto('name');
 
-        let schema: SchemaDetailsDto | null = null;
+        let schema: SchemaDetailsDto;
 
         schemasService.postSchema('my-app', dto, user, now).subscribe(result => {
             schema = result;
@@ -300,30 +340,8 @@ describe('SchemasService', () => {
             }
         });
 
-        expect(schema).toEqual(
-            new SchemaDetailsDto('1', dto.name, '', new SchemaPropertiesDto(), false, user, user, now, now, new Version('2'), []));
-    }));
-
-    it('should make post request to add field',
-        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
-
-        const dto = new AddFieldDto('name', 'invariant', createProperties('Number'));
-
-        let field: FieldDto | null = null;
-
-        schemasService.postField('my-app', 'my-schema', dto, version).subscribe(result => {
-            field = result.payload;
-        });
-
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/fields');
-
-        expect(req.request.method).toEqual('POST');
-        expect(req.request.headers.get('If-Match')).toBe(version.value);
-
-        req.flush({ id: 123 });
-
-        expect(field).toEqual(
-            new FieldDto(123, dto.name, false, false, false, dto.partitioning, dto.properties));
+        expect(schema!).toEqual(
+            new SchemaDetailsDto('1', dto.name, '', new SchemaPropertiesDto(), false, now, user, now, user, new Version('2'), []));
     }));
 
     it('should make put request to update schema',
@@ -371,34 +389,25 @@ describe('SchemasService', () => {
         req.flush({});
     }));
 
-    it('should make put request to update field',
+    it('should make post request to add field',
         inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
 
-        const dto = new UpdateFieldDto(createProperties('Number'));
+        const dto = new AddFieldDto('name', 'invariant', createProperties('Number'));
 
-        schemasService.putField('my-app', 'my-schema', 1, dto, version).subscribe();
+        let field: FieldDto;
 
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/fields/1');
+        schemasService.postField('my-app', 'my-schema', dto, undefined, version).subscribe(result => {
+            field = result.payload;
+        });
 
-        expect(req.request.method).toEqual('PUT');
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/fields');
+
+        expect(req.request.method).toEqual('POST');
         expect(req.request.headers.get('If-Match')).toBe(version.value);
 
-        req.flush({});
-    }));
+        req.flush({ id: 123 });
 
-    it('should make put request to update field ordering',
-        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
-
-        const dto = [1, 2, 3];
-
-        schemasService.putFieldOrdering('my-app', 'my-schema', dto, version).subscribe();
-
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/fields/ordering');
-
-        expect(req.request.method).toEqual('PUT');
-        expect(req.request.headers.get('If-Match')).toBe(version.value);
-
-        req.flush({});
+        expect(field!).toEqual(new RootFieldDto(123, dto.name, dto.properties, dto.partitioning));
     }));
 
     it('should make put request to publish schema',
@@ -427,12 +436,35 @@ describe('SchemasService', () => {
         req.flush({});
     }));
 
-    it('should make put request to enable field',
+    it('should make post request to add nested field',
         inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
 
-        schemasService.enableField('my-app', 'my-schema', 1, version).subscribe();
+        const dto = new AddFieldDto('name', 'invariant', createProperties('Number'));
 
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/fields/1/enable');
+        let field: FieldDto;
+
+        schemasService.postField('my-app', 'my-schema', dto, 13, version).subscribe(result => {
+            field = result.payload;
+        });
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/fields/13/nested');
+
+        expect(req.request.method).toEqual('POST');
+        expect(req.request.headers.get('If-Match')).toBe(version.value);
+
+        req.flush({ id: 123 });
+
+        expect(field!).toEqual(new NestedFieldDto(123, dto.name, dto.properties, 13));
+    }));
+
+    it('should make put request to update field',
+        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
+
+        const dto = new UpdateFieldDto(createProperties('Number'));
+
+        schemasService.putField('my-app', 'my-schema', 1, dto, undefined, version).subscribe();
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/fields/1');
 
         expect(req.request.method).toEqual('PUT');
         expect(req.request.headers.get('If-Match')).toBe(version.value);
@@ -440,12 +472,44 @@ describe('SchemasService', () => {
         req.flush({});
     }));
 
-    it('should make put request to disable field',
+    it('should make put request to update nested field',
         inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
 
-        schemasService.disableField('my-app', 'my-schema', 1, version).subscribe();
+        const dto = new UpdateFieldDto(createProperties('Number'));
 
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/fields/1/disable');
+        schemasService.putField('my-app', 'my-schema', 1, dto, 13, version).subscribe();
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/fields/13/nested/1');
+
+        expect(req.request.method).toEqual('PUT');
+        expect(req.request.headers.get('If-Match')).toBe(version.value);
+
+        req.flush({});
+    }));
+
+    it('should make put request to update field ordering',
+        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
+
+        const dto = [1, 2, 3];
+
+        schemasService.putFieldOrdering('my-app', 'my-schema', dto, undefined, version).subscribe();
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/fields/ordering');
+
+        expect(req.request.method).toEqual('PUT');
+        expect(req.request.headers.get('If-Match')).toBe(version.value);
+
+        req.flush({});
+    }));
+
+    it('should make put request to update nested field ordering',
+        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
+
+        const dto = [1, 2, 3];
+
+        schemasService.putFieldOrdering('my-app', 'my-schema', dto, 13, version).subscribe();
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/fields/13/nested/ordering');
 
         expect(req.request.method).toEqual('PUT');
         expect(req.request.headers.get('If-Match')).toBe(version.value);
@@ -456,9 +520,74 @@ describe('SchemasService', () => {
     it('should make put request to lock field',
         inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
 
-        schemasService.lockField('my-app', 'my-schema', 1, version).subscribe();
+        schemasService.lockField('my-app', 'my-schema', 1, undefined, version).subscribe();
 
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/fields/1/lock');
+
+        expect(req.request.method).toEqual('PUT');
+        expect(req.request.headers.get('If-Match')).toBe(version.value);
+
+        req.flush({});
+    }));
+
+    it('should make put request to lock nested field',
+        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
+
+        schemasService.lockField('my-app', 'my-schema', 1, 13, version).subscribe();
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/fields/13/nested/1/lock');
+
+        expect(req.request.method).toEqual('PUT');
+        expect(req.request.headers.get('If-Match')).toBe(version.value);
+
+        req.flush({});
+    }));
+
+    it('should make put request to enable field',
+        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
+
+        schemasService.enableField('my-app', 'my-schema', 1, undefined, version).subscribe();
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/fields/1/enable');
+
+        expect(req.request.method).toEqual('PUT');
+        expect(req.request.headers.get('If-Match')).toBe(version.value);
+
+        req.flush({});
+    }));
+
+    it('should make put request to enable nested field',
+        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
+
+        schemasService.enableField('my-app', 'my-schema', 1, 13, version).subscribe();
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/fields/13/nested/1/enable');
+
+        expect(req.request.method).toEqual('PUT');
+        expect(req.request.headers.get('If-Match')).toBe(version.value);
+
+        req.flush({});
+    }));
+
+    it('should make put request to disable field',
+        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
+
+        schemasService.disableField('my-app', 'my-schema', 1, undefined, version).subscribe();
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/fields/1/disable');
+
+        expect(req.request.method).toEqual('PUT');
+        expect(req.request.headers.get('If-Match')).toBe(version.value);
+
+        req.flush({});
+    }));
+
+    it('should make put request to disable nested field',
+        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
+
+        schemasService.disableField('my-app', 'my-schema', 1, 13, version).subscribe();
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/fields/13/nested/1/disable');
 
         expect(req.request.method).toEqual('PUT');
         expect(req.request.headers.get('If-Match')).toBe(version.value);
@@ -469,9 +598,22 @@ describe('SchemasService', () => {
     it('should make put request to show field',
         inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
 
-        schemasService.showField('my-app', 'my-schema', 1, version).subscribe();
+        schemasService.showField('my-app', 'my-schema', 1, undefined, version).subscribe();
 
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/fields/1/show');
+
+        expect(req.request.method).toEqual('PUT');
+        expect(req.request.headers.get('If-Match')).toBe(version.value);
+
+        req.flush({});
+    }));
+
+    it('should make put request to show nested field',
+        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
+
+        schemasService.showField('my-app', 'my-schema', 1, 13, version).subscribe();
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/fields/13/nested/1/show');
 
         expect(req.request.method).toEqual('PUT');
         expect(req.request.headers.get('If-Match')).toBe(version.value);
@@ -482,9 +624,22 @@ describe('SchemasService', () => {
     it('should make put request to hide field',
         inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
 
-        schemasService.hideField('my-app', 'my-schema', 1, version).subscribe();
+        schemasService.hideField('my-app', 'my-schema', 1, undefined, version).subscribe();
 
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/fields/1/hide');
+
+        expect(req.request.method).toEqual('PUT');
+        expect(req.request.headers.get('If-Match')).toBe(version.value);
+
+        req.flush({});
+    }));
+
+    it('should make put request to hide nested field',
+        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
+
+        schemasService.hideField('my-app', 'my-schema', 1, 13, version).subscribe();
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/fields/13/nested/1/hide');
 
         expect(req.request.method).toEqual('PUT');
         expect(req.request.headers.get('If-Match')).toBe(version.value);
@@ -495,9 +650,22 @@ describe('SchemasService', () => {
     it('should make delete request to delete field',
         inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
 
-        schemasService.deleteField('my-app', 'my-schema', 1, version).subscribe();
+        schemasService.deleteField('my-app', 'my-schema', 1, undefined, version).subscribe();
 
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/fields/1');
+
+        expect(req.request.method).toEqual('DELETE');
+        expect(req.request.headers.get('If-Match')).toBe(version.value);
+
+        req.flush({});
+    }));
+
+    it('should make delete request to delete nested field',
+        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
+
+        schemasService.deleteField('my-app', 'my-schema', 1, 13, version).subscribe();
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/fields/13/nested/1');
 
         expect(req.request.method).toEqual('DELETE');
         expect(req.request.headers.get('If-Match')).toBe(version.value);

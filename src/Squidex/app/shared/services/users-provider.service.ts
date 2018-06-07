@@ -6,7 +6,8 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { ConnectableObservable, Observable, of } from 'rxjs';
+import { catchError, map, publishLast, share } from 'rxjs/operators';
 
 import { UserDto, UsersService } from './users.service';
 
@@ -27,23 +28,24 @@ export class UsersProviderService {
 
         if (!result) {
             const request =
-                this.usersService.getUser(id)
-                    .catch(error => {
-                        return Observable.of(new UserDto('Unknown', 'Unknown'));
-                    })
-                    .publishLast();
+                this.usersService.getUser(id).pipe(
+                    catchError(error => {
+                        return of(new UserDto('Unknown', 'Unknown'));
+                    }),
+                    publishLast());
 
-            request.connect();
+            (<ConnectableObservable<any>>request).connect();
 
             result = this.caches[id] = request;
         }
 
-        return result
-            .map(dto => {
+        return result.pipe(
+            map(dto => {
                 if (me && this.authService.user && dto.id === this.authService.user.id) {
                     dto = new UserDto(dto.id, me);
                 }
                 return dto;
-            }).share();
+            }),
+            share());
     }
 }

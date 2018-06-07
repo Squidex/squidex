@@ -7,7 +7,7 @@
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Host, Input, OnChanges, OnDestroy, Optional } from '@angular/core';
 import { AbstractControl, FormGroupDirective } from '@angular/forms';
-import { Observable, Subscription } from 'rxjs';
+import { merge, Subscription } from 'rxjs';
 
 import { fadeAnimation, Types } from '@app/framework/internal';
 
@@ -93,7 +93,7 @@ export class ControlErrorsComponent implements OnChanges, OnDestroy {
 
             if (control) {
                 this.controlSubscription =
-                    Observable.merge(control.valueChanges, control.statusChanges)
+                    merge(control.valueChanges, control.statusChanges)
                         .subscribe(() => {
                             this.createMessages();
                         });

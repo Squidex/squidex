@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
             regex = new Regex("^" + pattern + "$", RegexOptions.None, Timeout);
         }
 
-        public Task ValidateAsync(object value, ValidationContext context, Action<string> addError)
+        public Task ValidateAsync(object value, ValidationContext context, AddError addError)
         {
             if (value is string stringValue)
             {
@@ -37,17 +37,17 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
                         {
                             if (string.IsNullOrWhiteSpace(errorMessage))
                             {
-                                addError("<FIELD> is not valid.");
+                                addError(context.Path, "Not valid.");
                             }
                             else
                             {
-                                addError(errorMessage);
+                                addError(context.Path, errorMessage);
                             }
                         }
                     }
                     catch
                     {
-                        addError("<FIELD> has a regex that is too slow.");
+                        addError(context.Path, "Regex is too slow.");
                     }
                 }
             }

@@ -8,17 +8,18 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-
-import '@app/framework/angular/http/http-extensions';
+import { map, tap } from 'rxjs/operators';
 
 import {
     AnalyticsService,
     ApiUrlConfig,
     DateTime,
-    HTTP
+    HTTP,
+    Model,
+    pretifyError
 } from '@app/framework';
 
-export class AppDto {
+export class AppDto extends Model {
     constructor(
         public readonly id: string,
         public readonly name: string,
@@ -28,6 +29,11 @@ export class AppDto {
         public readonly planName: string,
         public readonly planUpgrade: string
     ) {
+        super();
+    }
+
+    public with(value: Partial<AppDto>): AppDto {
+        return this.clone(value);
     }
 }
 
@@ -51,8 +57,8 @@ export class AppsService {
     public getApps(): Observable<AppDto[]> {
         const url = this.apiUrl.buildUrl('/api/apps');
 
-        return HTTP.getVersioned<any>(this.http, url)
-                .map(response => {
+        return HTTP.getVersioned<any>(this.http, url).pipe(
+                map(response => {
                     const body = response.payload.body;
 
                     const items: any[] = body;
@@ -67,34 +73,34 @@ export class AppsService {
                             item.planName,
                             item.planUpgrade);
                     });
-                })
-                .pretifyError('Failed to load apps. Please reload.');
+                }),
+                pretifyError('Failed to load apps. Please reload.'));
     }
 
     public postApp(dto: CreateAppDto, now?: DateTime): Observable<AppDto> {
         const url = this.apiUrl.buildUrl('api/apps');
 
-        return HTTP.postVersioned<any>(this.http, url, dto)
-                .map(response => {
+        return HTTP.postVersioned<any>(this.http, url, dto).pipe(
+                map(response => {
                     const body = response.payload.body;
 
                     now = now || DateTime.now();
 
                     return new AppDto(body.id, dto.name, body.permission, now, now, body.planName, body.planUpgrade);
-                })
-                .do(() => {
+                }),
+                tap(() => {
                     this.analytics.trackEvent('App', 'Created', dto.name);
-                })
-                .pretifyError('Failed to create app. Please reload.');
+                }),
+                pretifyError('Failed to create app. Please reload.'));
     }
 
     public deleteApp(appName: string): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}`);
 
-        return this.http.delete(url)
-                .do(() => {
+        return this.http.delete(url).pipe(
+                tap(() => {
                     this.analytics.trackEvent('App', 'Archived', appName);
-                })
-                .pretifyError('Failed to archive app. Please reload.');
+                }),
+                pretifyError('Failed to archive app. Please reload.'));
     }
 }

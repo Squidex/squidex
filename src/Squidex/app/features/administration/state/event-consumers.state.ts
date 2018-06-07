@@ -6,13 +6,13 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-
-import '@app/framework/utils/rxjs-extensions';
+import { Observable, throwError } from 'rxjs';
+import { catchError, distinctUntilChanged, map, tap } from 'rxjs/operators';
 
 import {
     DialogService,
     ImmutableArray,
+    notify,
     State
 } from '@app/shared';
 
@@ -27,12 +27,12 @@ interface Snapshot {
 @Injectable()
 export class EventConsumersState extends State<Snapshot> {
     public eventConsumers =
-        this.changes.map(x => x.eventConsumers)
-            .distinctUntilChanged();
+        this.changes.pipe(map(x => x.eventConsumers),
+            distinctUntilChanged());
 
     public isLoaded =
-        this.changes.map(x => !!x.isLoaded)
-            .distinctUntilChanged();
+        this.changes.pipe(map(x => !!x.isLoaded),
+            distinctUntilChanged());
 
     constructor(
         private readonly dialogs: DialogService,
@@ -46,8 +46,8 @@ export class EventConsumersState extends State<Snapshot> {
             this.resetState();
         }
 
-        return this.eventConsumersService.getEventConsumers()
-            .do(dtos => {
+        return this.eventConsumersService.getEventConsumers().pipe(
+            tap(dtos => {
                 if (isReload && !silent) {
                     this.dialogs.notifyInfo('Event Consumers reloaded.');
                 }
@@ -57,51 +57,51 @@ export class EventConsumersState extends State<Snapshot> {
 
                     return { ...s, eventConsumers, isLoaded: true };
                 });
-            })
-            .catch(error => {
+            }),
+            catchError(error => {
                 if (silent) {
                     this.dialogs.notifyError(error);
                 }
 
-                return Observable.throw(error);
-            });
+                return throwError(error);
+            }));
     }
 
-    public start(es: EventConsumerDto): Observable<any> {
-        return this.eventConsumersService.putStart(es.name)
-            .do(() => {
-                this.replaceEventConsumer(setStopped(es, false));
-            })
-            .notify(this.dialogs);
+    public start(eventConsumer: EventConsumerDto): Observable<any> {
+        return this.eventConsumersService.putStart(eventConsumer.name).pipe(
+            tap(() => {
+                this.replaceEventConsumer(setStopped(eventConsumer, false));
+            }),
+            notify(this.dialogs));
     }
 
-    public stop(es: EventConsumerDto): Observable<any> {
-        return this.eventConsumersService.putStop(es.name)
-            .do(() => {
-                this.replaceEventConsumer(setStopped(es, true));
-            })
-            .notify(this.dialogs);
+    public stop(eventConsumer: EventConsumerDto): Observable<any> {
+        return this.eventConsumersService.putStop(eventConsumer.name).pipe(
+            tap(() => {
+                this.replaceEventConsumer(setStopped(eventConsumer, true));
+            }),
+            notify(this.dialogs));
     }
 
-    public reset(es: EventConsumerDto): Observable<any> {
-        return this.eventConsumersService.putReset(es.name)
-            .do(() => {
-                this.replaceEventConsumer(reset(es));
-            })
-            .notify(this.dialogs);
+    public reset(eventConsumer: EventConsumerDto): Observable<any> {
+        return this.eventConsumersService.putReset(eventConsumer.name).pipe(
+            tap(() => {
+                this.replaceEventConsumer(reset(eventConsumer));
+            }),
+            notify(this.dialogs));
     }
 
-    private replaceEventConsumer(es: EventConsumerDto) {
+    private replaceEventConsumer(eventConsumer: EventConsumerDto) {
         this.next(s => {
-            const eventConsumers = s.eventConsumers.replaceBy('name', es);
+            const eventConsumers = s.eventConsumers.replaceBy('name', eventConsumer);
 
             return { ...s, eventConsumers };
         });
     }
 }
 
-const setStopped = (es: EventConsumerDto, isStoped: boolean) =>
-    new EventConsumerDto(es.name, isStoped, false, es.error, es.position);
+const setStopped = (eventConsumer: EventConsumerDto, isStopped: boolean) =>
+    eventConsumer.with({ isStopped });
 
-const reset = (es: EventConsumerDto) =>
-    new EventConsumerDto(es.name, es.isStopped, true, es.error, es.position);
+const reset = (eventConsumer: EventConsumerDto) =>
+    eventConsumer.with({ isResetting: true });

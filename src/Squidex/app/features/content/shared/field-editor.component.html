@@ -1,0 +1,124 @@
+<ng-container *ngIf="field">
+<label>
+    {{field.displayName}} <span class="field-required" [class.hidden]="!field.properties.isRequired">*</span>
+</label> 
+
+<span class="field-disabled" *ngIf="field.isDisabled">Disabled</span>
+
+<sqx-control-errors [for]="control" [fieldName]="field.displayName" [submitted]="form.submitted | async"></sqx-control-errors>
+
+<div>
+    <ng-container *ngIf="field.properties.editorUrl; else noEditor">
+        <sqx-iframe-editor [url]="field.properties.editorUrl" [formControl]="control"></sqx-iframe-editor>
+    </ng-container>
+
+    <ng-template #noEditor>
+        <ng-container [ngSwitch]="field.properties.fieldType">
+            <ng-container *ngSwitchCase="'Number'">
+                <ng-container [ngSwitch]="field.properties['editor']">
+                    <ng-container *ngSwitchCase="'Input'">
+                        <input class="form-control" type="number" [formControl]="control" [placeholder]="field.displayPlaceholder" />
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'Stars'">
+                        <sqx-stars [formControl]="control" [maximumStars]="field.properties['maxValue']"></sqx-stars>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'Dropdown'">
+                        <select class="form-control" [formControl]="control">
+                            <option [ngValue]="null"></option>
+                            <option *ngFor="let value of field.properties['allowedValues']" [ngValue]="value">{{value}}</option>
+                        </select>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'Radio'">
+                        <ng-container class="form-check form-check-inline" *ngFor="let value of field.properties['allowedValues']">
+                            <input class="form-check-input" type="radio" [value]="value" [formControl]="control" />
+                            <label class="form-check-label">
+                                {{value}}
+                            </label>
+                        </ng-container>
+                    </ng-container>
+                </ng-container>
+            </ng-container>
+            <ng-container *ngSwitchCase="'String'">
+                <ng-container [ngSwitch]="field.properties['editor']">
+                    <ng-container *ngSwitchCase="'Input'">
+                        <input class="form-control" type="text" [formControl]="control" [placeholder]="field.displayPlaceholder" />
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'Slug'">
+                        <input class="form-control" type="text" [formControl]="control" [placeholder]="field.displayPlaceholder" sqxTransformInput="Slugify" />
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'TextArea'">
+                        <textarea class="form-control" [formControl]="control" rows="5" [placeholder]="field.displayPlaceholder"></textarea>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'RichText'">
+                        <sqx-rich-editor [formControl]="control"></sqx-rich-editor>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'Markdown'">
+                        <sqx-markdown-editor [formControl]="control"></sqx-markdown-editor>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'Dropdown'">
+                        <select class="form-control" [formControl]="control">
+                            <option [ngValue]="null"></option>
+                            <option *ngFor="let value of field.properties['allowedValues']" [ngValue]="value">{{value}}</option>
+                        </select>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'Radio'">
+                        <ng-container class="form-check form-check-inline" *ngFor="let value of field.properties['allowedValues']">
+                            <input class="form-check-input" type="radio" value="{{value}}" [formControl]="control" />
+                            <label class="form-check-label">
+                                {{value}}
+                            </label>
+                        </ng-container>
+                    </ng-container>
+                </ng-container>
+            </ng-container>
+            <ng-container *ngSwitchCase="'Boolean'">
+                <ng-container [ngSwitch]="field.properties['editor']">
+                    <ng-container *ngSwitchCase="'Toggle'">
+                        <sqx-toggle [formControl]="control"></sqx-toggle>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'Checkbox'">
+                        <input type="checkbox" [formControl]="control" sqxIndeterminateValue />
+                    </ng-container>
+                </ng-container>
+            </ng-container>
+            <ng-container *ngSwitchCase="'DateTime'">
+                <sqx-date-time-editor enforceTime="true" [mode]="field.properties['editor']" [formControl]="control"></sqx-date-time-editor>
+            </ng-container>
+            <ng-container *ngSwitchCase="'Geolocation'">
+                <sqx-geolocation-editor [formControl]="control"></sqx-geolocation-editor>
+            </ng-container>
+            <ng-container *ngSwitchCase="'Json'">
+                <sqx-json-editor [formControl]="control"></sqx-json-editor>
+            </ng-container>
+            <ng-container *ngSwitchCase="'Assets'">
+                <sqx-assets-editor [formControl]="control"></sqx-assets-editor>
+            </ng-container>
+            <ng-container *ngSwitchCase="'Tags'">
+                <sqx-tag-editor [formControl]="control"></sqx-tag-editor>
+            </ng-container>
+            <ng-container *ngSwitchCase="'Array'">
+                <sqx-array-editor 
+                    [arrayControl]="control"
+                    [form]="form"
+                    [field]="field"
+                    [language]="language"
+                    [languages]="languages">
+                </sqx-array-editor>
+            </ng-container>
+            <ng-container *ngSwitchCase="'References'">
+                <sqx-references-editor
+                    [formControl]="control" 
+                    [language]="language"
+                    [languages]="languages"
+                    [schemaId]="field.properties['schemaId']">
+                </sqx-references-editor>
+            </ng-container>
+        </ng-container>
+    </ng-template>
+</div>
+
+<ng-container *ngIf="field.properties.hints; let hints">
+    <small class="form-text text-muted" *ngIf="hints.length > 0">
+        {{hints}}
+    </small>
+</ng-container>

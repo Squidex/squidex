@@ -5,128 +5,92 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
+using System.Collections.Generic;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.ConvertContent
 {
-    public delegate ContentFieldData FieldConverter(ContentFieldData data, Field field);
-
     public static class ContentConverter
     {
-        public static NamedContentData ToNameModel(this IdContentData source, Schema schema, params FieldConverter[] converters)
+        private static readonly Func<IRootField, string> KeyNameResolver = f => f.Name;
+        private static readonly Func<IRootField, long> KeyIdResolver = f => f.Id;
+
+        public static NamedContentData ConvertId2Name(this IdContentData content, Schema schema, params FieldConverter[] converters)
         {
             Guard.NotNull(schema, nameof(schema));
 
-            var result = new NamedContentData();
+            var result = new NamedContentData(content.Count);
 
-            foreach (var fieldValue in source)
+            return ConvertInternal(content, result, schema.FieldsById, KeyNameResolver, converters);
+        }
+
+        public static IdContentData ConvertId2Id(this IdContentData content, Schema schema, params FieldConverter[] converters)
+        {
+            Guard.NotNull(schema, nameof(schema));
+
+            var result = new IdContentData(content.Count);
+
+            return ConvertInternal(content, result, schema.FieldsById, KeyIdResolver, converters);
+        }
+
+        public static NamedContentData ConvertName2Name(this NamedContentData content, Schema schema, params FieldConverter[] converters)
+        {
+            Guard.NotNull(schema, nameof(schema));
+
+            var result = new NamedContentData(content.Count);
+
+            return ConvertInternal(content, result, schema.FieldsByName, KeyNameResolver, converters);
+        }
+
+        public static IdContentData ConvertName2Id(this NamedContentData content, Schema schema, params FieldConverter[] converters)
+        {
+            Guard.NotNull(schema, nameof(schema));
+
+            var result = new IdContentData(content.Count);
+
+            return ConvertInternal(content, result, schema.FieldsByName, KeyIdResolver, converters);
+        }
+
+        private static TDict2 ConvertInternal<TKey1, TKey2, TDict1, TDict2>(
+            TDict1 source,
+            TDict2 target,
+            IReadOnlyDictionary<TKey1, RootField> fields,
+            Func<IRootField, TKey2> targetKey, params FieldConverter[] converters)
+            where TDict1 : IDictionary<TKey1, ContentFieldData>
+            where TDict2 : IDictionary<TKey2, ContentFieldData>
+        {
+            foreach (var fieldKvp in source)
             {
-                if (!schema.FieldsById.TryGetValue(fieldValue.Key, out var field))
+                if (!fields.TryGetValue(fieldKvp.Key, out var field))
                 {
                     continue;
                 }
 
-                var fieldData = Convert(fieldValue.Value, field, converters);
+                var newvalue = fieldKvp.Value;
 
-                if (fieldData != null)
+                if (converters != null)
                 {
-                    result[field.Name] = fieldData;
-                }
-            }
-
-            return result;
-        }
-
-        public static IdContentData ToIdModel(this NamedContentData content, Schema schema, params FieldConverter[] converters)
-        {
-            Guard.NotNull(schema, nameof(schema));
-
-            var result = new IdContentData();
-
-            foreach (var fieldValue in content)
-            {
-                if (!schema.FieldsByName.TryGetValue(fieldValue.Key, out var field))
-                {
-                    continue;
-                }
-
-                var fieldData = Convert(fieldValue.Value, field, converters);
-
-                if (fieldData != null)
-                {
-                    result[field.Id] = fieldData;
-                }
-            }
-
-            return result;
-        }
-
-        public static IdContentData Convert(this IdContentData content, Schema schema, params FieldConverter[] converters)
-        {
-            Guard.NotNull(schema, nameof(schema));
-
-            var result = new IdContentData();
-
-            foreach (var fieldValue in content)
-            {
-                if (!schema.FieldsById.TryGetValue(fieldValue.Key, out var field))
-                {
-                    continue;
-                }
-
-                var fieldData = Convert(fieldValue.Value, field, converters);
-
-                if (fieldData != null)
-                {
-                    result[field.Id] = fieldData;
-                }
-            }
-
-            return result;
-        }
-
-        public static NamedContentData Convert(this NamedContentData content, Schema schema, params FieldConverter[] converters)
-        {
-            Guard.NotNull(schema, nameof(schema));
-
-            var result = new NamedContentData();
-
-            foreach (var fieldValue in content)
-            {
-                if (!schema.FieldsByName.TryGetValue(fieldValue.Key, out var field))
-                {
-                    continue;
-                }
-
-                var fieldData = Convert(fieldValue.Value, field, converters);
-
-                if (fieldData != null)
-                {
-                    result[field.Name] = fieldData;
-                }
-            }
-
-            return result;
-        }
-
-        private static ContentFieldData Convert(ContentFieldData fieldData, Field field, FieldConverter[] converters)
-        {
-            if (converters != null)
-            {
-                foreach (var converter in converters)
-                {
-                    fieldData = converter(fieldData, field);
-
-                    if (fieldData == null)
+                    foreach (var converter in converters)
                     {
-                        break;
+                        newvalue = converter(newvalue, field);
+
+                        if (newvalue == null)
+                        {
+                            break;
+                        }
                     }
                 }
+
+                if (newvalue != null)
+                {
+                    target.Add(targetKey(field), newvalue);
+                }
             }
 
-            return fieldData;
+            return target;
         }
     }
 }

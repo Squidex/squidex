@@ -7,12 +7,12 @@
 
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-
-import '@app/framework/utils/rxjs-extensions';
+import { distinctUntilChanged, map, tap } from 'rxjs/operators';
 
 import {
     DialogService,
     ImmutableArray,
+    notify,
     Pager,
     State
 } from '@app/framework';
@@ -31,16 +31,16 @@ interface Snapshot {
 @Injectable()
 export class RuleEventsState extends State<Snapshot> {
     public ruleEvents =
-        this.changes.map(x => x.ruleEvents)
-            .distinctUntilChanged();
+        this.changes.pipe(map(x => x.ruleEvents),
+            distinctUntilChanged());
 
     public ruleEventsPager =
-        this.changes.map(x => x.ruleEventsPager)
-            .distinctUntilChanged();
+        this.changes.pipe(map(x => x.ruleEventsPager),
+            distinctUntilChanged());
 
     public isLoaded =
-        this.changes.map(x => !!x.isLoaded)
-            .distinctUntilChanged();
+        this.changes.pipe(map(x => !!x.isLoaded),
+            distinctUntilChanged());
 
     constructor(
         private readonly appsState: AppsState,
@@ -61,8 +61,8 @@ export class RuleEventsState extends State<Snapshot> {
     private loadInternal(isReload = false): Observable<any> {
         return this.rulesService.getEvents(this.appName,
                 this.snapshot.ruleEventsPager.pageSize,
-                this.snapshot.ruleEventsPager.skip)
-            .do(dtos => {
+                this.snapshot.ruleEventsPager.skip).pipe(
+            tap(dtos => {
                 if (isReload) {
                     this.dialogs.notifyInfo('RuleEvents reloaded.');
                 }
@@ -73,16 +73,16 @@ export class RuleEventsState extends State<Snapshot> {
 
                     return { ...s, ruleEvents, ruleEventsPager, isLoaded: true };
                 });
-            })
-            .notify(this.dialogs);
+            }),
+            notify(this.dialogs));
     }
 
     public enqueue(event: RuleEventDto): Observable<any> {
-        return this.rulesService.enqueueEvent(this.appsState.appName, event.id)
-            .do(() => {
+        return this.rulesService.enqueueEvent(this.appsState.appName, event.id).pipe(
+            tap(() => {
                 this.dialogs.notifyInfo('Events enqueued. Will be resend in a few seconds.');
-            })
-            .notify(this.dialogs);
+            }),
+            notify(this.dialogs));
     }
 
     public goNext(): Observable<any> {

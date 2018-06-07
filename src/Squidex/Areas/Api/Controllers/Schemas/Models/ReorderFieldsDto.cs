@@ -19,9 +19,9 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         [Required]
         public List<long> FieldIds { get; set; }
 
-        public ReorderFields ToCommand()
+        public ReorderFields ToCommand(long? parentId = null)
         {
-            return new ReorderFields { FieldIds = FieldIds };
+            return new ReorderFields { ParentFieldId = parentId, FieldIds = FieldIds };
         }
     }
 }

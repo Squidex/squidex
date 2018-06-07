@@ -42,7 +42,7 @@ describe('ContentsService', () => {
     it('should make get request to get contents',
         inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
 
-        let contents: ContentsDto | null = null;
+        let contents: ContentsDto;
 
         contentsService.getContents('my-app', 'my-schema', 17, 13, undefined, undefined, true).subscribe(result => {
             contents = result;
@@ -87,19 +87,19 @@ describe('ContentsService', () => {
             ]
         });
 
-        expect(contents).toEqual(
+        expect(contents!).toEqual(
             new ContentsDto(10, [
-                new ContentDto('id1', 'Published', 'Created1', 'LastModifiedBy1',
-                    DateTime.parseISO_UTC('2016-12-12T10:10'),
-                    DateTime.parseISO_UTC('2017-12-12T10:10'),
+                new ContentDto('id1', 'Published',
+                    DateTime.parseISO_UTC('2016-12-12T10:10'), 'Created1',
+                    DateTime.parseISO_UTC('2017-12-12T10:10'), 'LastModifiedBy1',
                     new ScheduleDto('Draft', 'Scheduler1', DateTime.parseISO_UTC('2018-12-12T10:10')),
                     true,
                     {},
                     {},
                     new Version('11')),
-                new ContentDto('id2', 'Published', 'Created2', 'LastModifiedBy2',
-                    DateTime.parseISO_UTC('2016-10-12T10:10'),
-                    DateTime.parseISO_UTC('2017-10-12T10:10'),
+                new ContentDto('id2', 'Published',
+                    DateTime.parseISO_UTC('2016-10-12T10:10'), 'Created2',
+                    DateTime.parseISO_UTC('2017-10-12T10:10'), 'LastModifiedBy2',
                     null,
                     false,
                     {},
@@ -150,7 +150,7 @@ describe('ContentsService', () => {
     it('should make get request to get content',
         inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
 
-        let content: ContentDto | null = null;
+        let content: ContentDto;
 
         contentsService.getContent('my-app', 'my-schema', '1').subscribe(result => {
             content = result;
@@ -182,10 +182,10 @@ describe('ContentsService', () => {
             }
         });
 
-        expect(content).toEqual(
-            new ContentDto('id1', 'Published', 'Created1', 'LastModifiedBy1',
-                DateTime.parseISO_UTC('2016-12-12T10:10'),
-                DateTime.parseISO_UTC('2017-12-12T10:10'),
+        expect(content!).toEqual(
+            new ContentDto('id1', 'Published',
+                DateTime.parseISO_UTC('2016-12-12T10:10'), 'Created1',
+                DateTime.parseISO_UTC('2017-12-12T10:10'), 'LastModifiedBy1',
                 new ScheduleDto('Draft', 'Scheduler1', DateTime.parseISO_UTC('2018-12-12T10:10')),
                 true,
                 {},
@@ -198,7 +198,7 @@ describe('ContentsService', () => {
 
         const dto = {};
 
-        let content: ContentDto | null = null;
+        let content: ContentDto;
 
         contentsService.postContent('my-app', 'my-schema', dto, true).subscribe(result => {
             content = result;
@@ -223,10 +223,10 @@ describe('ContentsService', () => {
             }
         });
 
-        expect(content).toEqual(
-            new ContentDto('id1', 'Published', 'Created1', 'LastModifiedBy1',
-                DateTime.parseISO_UTC('2016-12-12T10:10'),
-                DateTime.parseISO_UTC('2017-12-12T10:10'),
+        expect(content!).toEqual(
+            new ContentDto('id1', 'Published',
+                DateTime.parseISO_UTC('2016-12-12T10:10'), 'Created1',
+                DateTime.parseISO_UTC('2017-12-12T10:10'), 'LastModifiedBy1',
                 null,
                 true,
                 null,
@@ -239,7 +239,7 @@ describe('ContentsService', () => {
 
         const response = {};
 
-        let data: any | null = null;
+        let data: any;
 
         contentsService.getVersionData('my-app', 'my-schema', 'content1', version).subscribe(result => {
             data = result;

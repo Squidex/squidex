@@ -42,6 +42,13 @@ namespace Squidex.Config.Domain
                     .As<IInitializable>();
             }
 
+            var useColors = config.GetValue<bool>("logging:colors");
+
+            if (console == null)
+            {
+                console = new ConsoleLogChannel(useColors);
+            }
+
             services.AddSingletonAs(console)
                 .As<ILogChannel>();
 

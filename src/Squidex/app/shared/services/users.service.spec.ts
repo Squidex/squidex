@@ -34,7 +34,7 @@ describe('UsersService', () => {
     it('should make get request to get many users',
         inject([UsersService, HttpTestingController], (usersService: UsersService, httpMock: HttpTestingController) => {
 
-        let users: UserDto[] | null = null;
+        let users: UserDto[];
 
         usersService.getUsers().subscribe(result => {
             users = result;
@@ -56,7 +56,7 @@ describe('UsersService', () => {
             }
         ]);
 
-        expect(users).toEqual(
+        expect(users!).toEqual(
             [
                 new UserDto('123', 'User1'),
                 new UserDto('456', 'User2')
@@ -66,7 +66,7 @@ describe('UsersService', () => {
     it('should make get request with query to get many users',
         inject([UsersService, HttpTestingController], (usersService: UsersService, httpMock: HttpTestingController) => {
 
-        let users: UserDto[] | null = null;
+        let users: UserDto[];
 
         usersService.getUsers('my-query').subscribe(result => {
             users = result;
@@ -88,7 +88,7 @@ describe('UsersService', () => {
             }
         ]);
 
-        expect(users).toEqual(
+        expect(users!).toEqual(
             [
                 new UserDto('123', 'User1'),
                 new UserDto('456', 'User2')
@@ -98,7 +98,7 @@ describe('UsersService', () => {
     it('should make get request to get single user',
         inject([UsersService, HttpTestingController], (usersService: UsersService, httpMock: HttpTestingController) => {
 
-        let user: UserDto | null = null;
+        let user: UserDto;
 
         usersService.getUser('123').subscribe(result => {
             user = result;
@@ -111,6 +111,6 @@ describe('UsersService', () => {
 
         req.flush({ id: '123', displayName: 'User1' });
 
-        expect(user).toEqual(new UserDto('123', 'User1'));
+        expect(user!).toEqual(new UserDto('123', 'User1'));
     }));
 });

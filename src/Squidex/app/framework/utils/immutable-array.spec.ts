@@ -20,9 +20,9 @@ describe('ImmutableArray', () => {
         const array_c = ImmutableArray.of([]);
         const array_d = ImmutableArray.empty();
 
-        expect(array_b).toBe(array_a);
-        expect(array_c).toBe(array_a);
-        expect(array_d).toBe(array_a);
+        expect(array_b).toBe(<any>array_a);
+        expect(array_c).toBe(<any>array_a);
+        expect(array_d).toBe(<any>array_a);
     });
 
     it('should create non empty instance', () => {

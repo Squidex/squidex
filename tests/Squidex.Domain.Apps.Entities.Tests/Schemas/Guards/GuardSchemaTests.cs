@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
     {
         private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
         private readonly Schema schema_0;
-        private readonly NamedId<Guid> appId = new NamedId<Guid>(Guid.NewGuid(), "my-app");
+        private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
 
         public GuardSchemaTests()
         {
@@ -74,6 +74,44 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                         Name = null,
                         Properties = InvalidProperties(),
                         Partitioning = "invalid"
+                    },
+                    new CreateSchemaField
+                    {
+                        Name = null,
+                        Properties = new ArrayFieldProperties(),
+                        Partitioning = "invalid",
+                        Nested = new List<CreateSchemaNestedField>
+                        {
+                            new CreateSchemaNestedField
+                            {
+                                Name = null,
+                                Properties = InvalidProperties()
+                            },
+                            new CreateSchemaNestedField
+                            {
+                                Name = null,
+                                Properties = InvalidProperties()
+                            }
+                        }
+                    },
+                    new CreateSchemaField
+                    {
+                        Name = null,
+                        Properties = InvalidProperties(),
+                        Partitioning = "invalid",
+                        Nested = new List<CreateSchemaNestedField>
+                        {
+                            new CreateSchemaNestedField
+                            {
+                                Name = null,
+                                Properties = InvalidProperties()
+                            },
+                            new CreateSchemaNestedField
+                            {
+                                Name = null,
+                                Properties = InvalidProperties()
+                            }
+                        }
                     }
                 },
                 Name = "new-schema"
@@ -101,6 +139,25 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                         Name = "field1",
                         Properties = ValidProperties(),
                         Partitioning = "invariant"
+                    },
+                    new CreateSchemaField
+                    {
+                        Name = "field1",
+                        Properties = new ArrayFieldProperties(),
+                        Partitioning = "invariant",
+                        Nested = new List<CreateSchemaNestedField>
+                        {
+                            new CreateSchemaNestedField
+                            {
+                                Name = "nested1",
+                                Properties = ValidProperties()
+                            },
+                            new CreateSchemaNestedField
+                            {
+                                Name = "nested1",
+                                Properties = ValidProperties()
+                            }
+                        }
                     }
                 },
                 Name = "new-schema"
@@ -112,7 +169,45 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         [Fact]
         public Task CanCreate_should_not_throw_exception_if_command_is_valid()
         {
-            var command = new CreateSchema { AppId = appId, Name = "new-schema" };
+            var command = new CreateSchema
+            {
+                AppId = appId,
+                Fields = new List<CreateSchemaField>
+                {
+                    new CreateSchemaField
+                    {
+                        Name = "field1",
+                        Properties = ValidProperties(),
+                        Partitioning = "invariant"
+                    },
+                    new CreateSchemaField
+                    {
+                        Name = "field2",
+                        Properties = ValidProperties(),
+                        Partitioning = "invariant"
+                    },
+                    new CreateSchemaField
+                    {
+                        Name = "field3",
+                        Properties = new ArrayFieldProperties(),
+                        Partitioning = "invariant",
+                        Nested = new List<CreateSchemaNestedField>
+                        {
+                            new CreateSchemaNestedField
+                            {
+                                Name = "nested1",
+                                Properties = ValidProperties()
+                            },
+                            new CreateSchemaNestedField
+                            {
+                                Name = "nested2",
+                                Properties = ValidProperties()
+                            }
+                        }
+                    }
+                },
+                Name = "new-schema"
+            };
 
             return GuardSchema.CanCreate(command, appProvider);
         }
@@ -178,7 +273,14 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         }
 
         [Fact]
+        public void CanReorder_should_throw_exception_if_parent_field_not_found()
+        {
+            var command = new ReorderFields { FieldIds = new List<long> { 1, 2 }, ParentFieldId = 99 };
 
+            Assert.Throws<DomainObjectNotFoundException>(() => GuardSchema.CanReorder(schema_0, command));
+        }
+
+        [Fact]
         public void CanReorder_should_not_throw_exception_if_field_ids_are_valid()
         {
             var command = new ReorderFields { FieldIds = new List<long> { 1, 2 } };

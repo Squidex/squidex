@@ -10,7 +10,7 @@ import { Types } from './types';
 describe('Types', () => {
     it('should calculate hash string', () => {
         expect(Types.hash(null)).toBe('null');
-        expect(Types.hash(undefined)).toBe(undefined);
+        expect(Types.hash(undefined)).toBeUndefined();
 
         expect(Types.hash(new RegExp('.*'))).toEqual('{}');
     });

@@ -7,6 +7,7 @@
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
+import { filter } from 'rxjs/operators';
 
 import {
     ApiUrlConfig,
@@ -47,7 +48,7 @@ export class ProfileMenuComponent implements OnDestroy, OnInit {
 
     public ngOnInit() {
         this.authenticationSubscription =
-            this.authService.userChanges.filter(user => !!user)
+            this.authService.userChanges.pipe(filter(user => !!user))
                 .subscribe(user => {
                     this.profileId = user!.id;
                     this.profileDisplayName = user!.displayName;
