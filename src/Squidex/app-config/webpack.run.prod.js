@@ -81,7 +81,7 @@ module.exports = webpackMerge(runConfig, {
             }],
             exclude: helpers.root('app', 'theme'),
         }, { 
-            test: /\.ts/, 
+            test: /(?:\.ngfactory\.js|\.ngstyle\.js|\.ts)$/,
             use: [{
                 loader: '@ngtools/webpack'
             }]
