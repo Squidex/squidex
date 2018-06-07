@@ -35,7 +35,7 @@
     "moment": "2.22.2",
     "mousetrap": "1.6.2",
     "ng2-dnd": "5.0.2",
-    "oidc-client": "1.5.1",
+    "oidc-client": "1.4.1",
     "pikaday": "1.7.0",
     "progressbar.js": "1.0.1",
     "react": "16.4.0",
