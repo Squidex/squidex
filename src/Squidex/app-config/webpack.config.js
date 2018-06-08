@@ -21,7 +21,7 @@ module.exports = {
          *
          * See: https://webpack.js.org/configuration/resolve/#resolve-extensions
          */
-        extensions: ['.js', '.ts', '.css', '.scss'],
+        extensions: ['.js', '.mjs', '.ts', '.css', '.scss'],
         modules: [
             helpers.root('app'),
             helpers.root('app', 'theme'),
@@ -45,6 +45,10 @@ module.exports = {
          * See: https://webpack.js.org/configuration/module/#module-rules
          */
         rules: [{
+            test: /\.mjs$/,
+            type: "javascript/auto",
+            include: /node_modules/,
+          },{
             test: /\.ts$/,
             use: [{
                 loader: 'awesome-typescript-loader'
@@ -134,7 +138,7 @@ module.exports = {
                 context: '/'
             }
         }),
-
+        
         new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, /en/),
 
         /**

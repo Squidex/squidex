@@ -5,6 +5,8 @@
     runConfig = require('./webpack.run.base.js');
 
 const plugins = {
+    // https://github.com/mishoo/UglifyJS2/tree/harmony
+    UglifyJsPlugin: require('uglifyjs-webpack-plugin'),
     // https://www.npmjs.com/package/@ngtools/webpack
     NgToolsWebpack: require('@ngtools/webpack'),
     // https://github.com/webpack-contrib/mini-css-extract-plugin
@@ -94,6 +96,22 @@ module.exports = webpackMerge(runConfig, {
             sourceMap: false,
             skipSourceGeneration: false,
             tsConfigPath: './tsconfig.json'
-        })
-    ]
+        }),  
+    ],
+
+    optimization: {
+        minimizer: [
+            new plugins.UglifyJsPlugin({
+                uglifyOptions: {
+                    compress: false,
+                    ecma: 6,
+                    mangle: true
+                }
+            })
+        ]
+    },
+
+    performance: {
+        hints: false 
+    }
 });
