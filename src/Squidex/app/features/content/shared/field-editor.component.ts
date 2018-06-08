@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { FormControl } from '@angular/forms';
 
 import {
@@ -18,8 +18,7 @@ import {
 @Component({
     selector: 'sqx-field-editor',
     styleUrls: ['./field-editor.component.scss'],
-    templateUrl: './field-editor.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    templateUrl: './field-editor.component.html'
 })
 export class FieldEditorComponent {
     @Input()
