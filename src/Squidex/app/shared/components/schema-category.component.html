@@ -3,7 +3,7 @@
 
     <div class="header clearfix">
         <a class="btn btn-sm btn-link" (click)="toggle()">
-            <i [class.icon-caret-right]="isOpen" [class.icon-caret-down]="!isOpen"></i> 
+            <i [class.icon-caret-right]="!isOpen" [class.icon-caret-down]="isOpen"></i> 
         </a>
 
         <h3>{{displayName}} ({{schemasForCategory.length}})</h3>
