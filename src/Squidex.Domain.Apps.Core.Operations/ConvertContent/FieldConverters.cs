@@ -64,10 +64,10 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
             };
         }
 
-        public static FieldConverter ResolveInvariant(LanguagesConfig languagesConfig)
+        public static FieldConverter ResolveInvariant(LanguagesConfig config)
         {
             var codeForInvariant = InvariantPartitioning.Instance.Master.Key;
-            var codeForMasterLanguage = languagesConfig.Master.Language.Iso2Code;
+            var codeForMasterLanguage = config.Master.Language.Iso2Code;
 
             return (data, field) =>
             {
@@ -95,10 +95,10 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
             };
         }
 
-        public static FieldConverter ResolveLanguages(LanguagesConfig languagesConfig)
+        public static FieldConverter ResolveLanguages(LanguagesConfig config)
         {
             var codeForInvariant = InvariantPartitioning.Instance.Master.Key;
-            var codeForMasterLanguage = languagesConfig.Master.Language.Iso2Code;
+            var codeForMasterLanguage = config.Master.Language.Iso2Code;
 
             return (data, field) =>
             {
@@ -106,7 +106,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
                 {
                     var result = new ContentFieldData();
 
-                    foreach (var languageConfig in languagesConfig)
+                    foreach (var languageConfig in config)
                     {
                         var languageCode = languageConfig.Key;
 
@@ -114,7 +114,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
                         {
                             result[languageCode] = value;
                         }
-                        else if (languageConfig == languagesConfig.Master && data.TryGetValue(codeForInvariant, out value))
+                        else if (languageConfig == config.Master && data.TryGetValue(codeForInvariant, out value))
                         {
                             result[languageCode] = value;
                         }
@@ -127,15 +127,15 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
             };
         }
 
-        public static FieldConverter ResolveFallbackLanguages(LanguagesConfig languagesConfig)
+        public static FieldConverter ResolveFallbackLanguages(LanguagesConfig config)
         {
-            var master = languagesConfig.Master;
+            var master = config.Master;
 
             return (data, field) =>
             {
                 if (field.Partitioning.Equals(Partitioning.Language))
                 {
-                    foreach (var languageConfig in languagesConfig)
+                    foreach (var languageConfig in config)
                     {
                         var languageCode = languageConfig.Key;
 
@@ -168,19 +168,26 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
             };
         }
 
-        public static FieldConverter FilterLanguages(LanguagesConfig languagesConfig, IEnumerable<Language> languages)
+        public static FieldConverter FilterLanguages(LanguagesConfig config, IEnumerable<Language> languages)
         {
-            if (languages == null)
+            if (languages?.Any() != true)
             {
                 return (data, field) => data;
             }
 
-            var languageCodes = languages.Select(x => x.Iso2Code).Where(x => languagesConfig.Contains(x));
-            var languageSet = new HashSet<string>(languageCodes, StringComparer.OrdinalIgnoreCase);
+            var languageSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var language in languages)
+            {
+                if (config.Contains(language.Iso2Code))
+                {
+                    languageSet.Add(language.Iso2Code);
+                }
+            }
 
             if (languageSet.Count == 0)
             {
-                return (data, field) => data;
+                languageSet.Add(config.Master.Language.Iso2Code);
             }
 
             return (data, field) =>

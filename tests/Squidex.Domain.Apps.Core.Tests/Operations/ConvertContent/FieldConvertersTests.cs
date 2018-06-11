@@ -361,21 +361,28 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         }
 
         [Fact]
+        public void Should_return_master_language_if_languages_to_filter_are_invalid()
+        {
+            var source =
+                new ContentFieldData()
+                    .AddValue("en", "EN")
+                    .AddValue("de", "DE");
+
+            var expected =
+                new ContentFieldData()
+                    .AddValue("en", "EN");
+
+            var result = FieldConverters.FilterLanguages(languagesConfig, new[] { Language.CA })(source, stringLanguageField);
+
+            Assert.Equal(expected, result);
+        }
+
+        [Fact]
         public void Should_return_same_values_if_resolving_fallback_languages_from_invariant_field()
         {
             var source = new ContentFieldData();
 
             var result = FieldConverters.ResolveFallbackLanguages(languagesConfig)(source, stringInvariantField);
-
-            Assert.Same(source, result);
-        }
-
-        [Fact]
-        public void Should_return_same_values_if_filtered_languages_are_invalid()
-        {
-            var source = new ContentFieldData();
-
-            var result = FieldConverters.FilterLanguages(languagesConfig, new[] { Language.CA })(source, stringLanguageField);
 
             Assert.Same(source, result);
         }
