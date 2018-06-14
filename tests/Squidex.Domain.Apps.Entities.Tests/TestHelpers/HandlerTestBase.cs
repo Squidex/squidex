@@ -38,12 +38,12 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
 
         protected NamedId<Guid> AppNamedId
         {
-            get { return new NamedId<Guid>(AppId, AppName); }
+            get { return NamedId.Of(AppId, AppName); }
         }
 
         protected NamedId<Guid> SchemaNamedId
         {
-            get { return new NamedId<Guid>(SchemaId, SchemaName); }
+            get { return NamedId.Of(SchemaId, SchemaName); }
         }
 
         protected abstract Guid Id { get; }

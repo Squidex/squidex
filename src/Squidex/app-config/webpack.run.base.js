@@ -1,8 +1,12 @@
-﻿      var webpack = require('webpack'),
-     webpackMerge = require('webpack-merge'),
-HtmlWebpackPlugin = require('html-webpack-plugin'),
-     commonConfig = require('./webpack.config.js'),
-          helpers = require('./helpers');
+﻿const webpack = require('webpack'),
+ webpackMerge = require('webpack-merge'),
+         path = require('path'),
+      helpers = require('./helpers'),
+ commonConfig = require('./webpack.config.js');
+
+const plugins = {
+    HtmlWebpackPlugin: require('html-webpack-plugin')
+};
 
 module.exports = webpackMerge(commonConfig, {
     /**
@@ -17,28 +21,15 @@ module.exports = webpackMerge(commonConfig, {
     },
 
     plugins: [
-        /**
-         * Shares common code between the pages.
-         *
-         * See: https://webpack.js.org/plugins/commons-chunk-plugin/
-         */
-        new webpack.optimize.CommonsChunkPlugin({
-            name: ['app', 'shims']
-        }),
-
-        /**
-         * Simplifies creation of HTML files to serve your webpack bundles.
-         * This is especially useful for webpack bundles that include a hash in the filename
-         * which changes every compilation.
-         *
-         * See: https://github.com/ampedandwired/html-webpack-plugin
-         */
-        new HtmlWebpackPlugin({
-            template: 'wwwroot/index.html', hash: true
+        new plugins.HtmlWebpackPlugin({
+            hash: true,
+            chunks: ['shims', 'app'],
+            chunksSortMode: 'manual',
+            template: 'wwwroot/index.html'
         }),
         
-        new HtmlWebpackPlugin({
-            template: 'wwwroot/theme.html', hash: true, filename: 'theme.html'
+        new plugins.HtmlWebpackPlugin({
+            template: 'wwwroot/theme.html', hash: true, chunksSortMode: 'none', filename: 'theme.html'
         })
     ]
 });

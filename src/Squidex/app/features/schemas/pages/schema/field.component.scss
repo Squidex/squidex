@@ -2,6 +2,9 @@
 @import '_mixins';
 
 $field-header: #e7ebef;
+$field-line: #c7cfd7;
+
+$padding: 1rem;
 
 .table-items-row-details {
     & {
@@ -21,6 +24,38 @@ $field-header: #e7ebef;
 
     &-options {
         max-width: 140px;
+    }
+}
+
+.nested-fields {
+    padding: $padding;
+    padding-left: 2 * $padding;
+    position: relative;
+    border: 0;
+    background: $color-border;
+}
+
+.nested-field {
+    & {
+        position: relative;
+    }
+
+    &-add {
+        border: 2px dashed $field-line;
+        position: relative;
+        padding: 1rem;
+    }
+
+    &-line-v {
+        @include absolute($padding, auto, 3 * $padding + .25rem, $padding);
+        border-left: 2px dashed $field-line;
+        width: 2px;
+    }
+
+    &-line-h {
+        @include absolute(-2px, auto, 50%, -$padding);
+        border-bottom: 2px dashed $field-line;
+        width: $padding - .25rem;
     }
 }
 

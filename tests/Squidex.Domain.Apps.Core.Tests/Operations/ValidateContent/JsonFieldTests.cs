@@ -44,7 +44,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             await sut.ValidateAsync(CreateValue(JValue.CreateNull()), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> is required." });
+                new[] { "Field is required." });
         }
 
         private static JValue CreateValue(JValue v)
@@ -52,9 +52,9 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             return v;
         }
 
-        private static JsonField Field(JsonFieldProperties properties)
+        private static RootField<JsonFieldProperties> Field(JsonFieldProperties properties)
         {
-            return new JsonField(1, "my-json", Partitioning.Invariant, properties);
+            return Fields.Json(1, "my-json", Partitioning.Invariant, properties);
         }
     }
 }

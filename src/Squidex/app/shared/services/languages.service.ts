@@ -8,10 +8,13 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
-import '@app/framework/angular/http/http-extensions';
-
-import { ApiUrlConfig, HTTP } from '@app/framework';
+import {
+    ApiUrlConfig,
+    HTTP,
+    pretifyError
+} from '@app/framework';
 
 export class LanguageDto {
     constructor(
@@ -32,8 +35,8 @@ export class LanguagesService {
     public getLanguages(): Observable<LanguageDto[]> {
         const url = this.apiUrl.buildUrl('api/languages');
 
-        return HTTP.getVersioned<any>(this.http, url)
-                .map(response => {
+        return HTTP.getVersioned<any>(this.http, url).pipe(
+                map(response => {
                     const body = response.payload.body;
 
                     const items: any[] = body;
@@ -43,7 +46,7 @@ export class LanguagesService {
                             item.iso2Code,
                             item.englishName);
                     });
-                })
-                .pretifyError('Failed to load languages. Please reload.');
+                }),
+                pretifyError('Failed to load languages. Please reload.'));
     }
 }

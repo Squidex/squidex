@@ -6,7 +6,7 @@
  */
 
 import { Router } from '@angular/router';
-import { Observable } from 'rxjs';
+import { of } from 'rxjs';
 import { IMock, Mock, Times } from 'typemoq';
 
 import { AppsState } from '@app/shared';
@@ -34,7 +34,7 @@ describe('AppMustExistGuard', () => {
 
     it('should navigate to 404 page if app is not found', () => {
         appsState.setup(x => x.select('my-app'))
-            .returns(() => Observable.of(null));
+            .returns(() => of(null));
 
         let result: boolean;
 
@@ -49,7 +49,7 @@ describe('AppMustExistGuard', () => {
 
     it('should return true if app is found', () => {
         appsState.setup(x => x.select('my-app'))
-            .returns(() => Observable.of(<any>{}));
+            .returns(() => of(<any>{}));
 
         let result: boolean;
 

@@ -14,7 +14,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {
     public sealed class ContentsResultGraphType : ObjectGraphType<IResultList<IContentEntity>>
     {
-        public ContentsResultGraphType(string schemaType, string schemaName, IComplexGraphType contentType)
+        public ContentsResultGraphType(string schemaType, string schemaName, IGraphType contentType)
         {
             Name = $"{schemaType}ResultDto";
 

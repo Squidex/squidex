@@ -18,9 +18,9 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         [Required]
         public FieldPropertiesDto Properties { get; set; }
 
-        public UpdateField ToCommand(long id)
+        public UpdateField ToCommand(long id, long? parentId = null)
         {
-            return new UpdateField { FieldId = id, Properties = Properties?.ToProperties() };
+            return new UpdateField { ParentFieldId = parentId, FieldId = id, Properties = Properties?.ToProperties() };
         }
     }
 }

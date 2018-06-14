@@ -18,57 +18,62 @@ namespace Squidex.Domain.Apps.Core.GenerateEdmSchema
         {
         }
 
-        public static IEdmTypeReference CreateEdmType(Field field)
+        public static IEdmTypeReference CreateEdmType(IField field)
         {
             return field.Accept(Instance);
         }
 
-        public IEdmTypeReference Visit(AssetsField field)
+        public IEdmTypeReference Visit(IArrayField field)
+        {
+            return null;
+        }
+
+        public IEdmTypeReference Visit(IField<AssetsFieldProperties> field)
         {
             return CreatePrimitive(EdmPrimitiveTypeKind.String, field);
         }
 
-        public IEdmTypeReference Visit(BooleanField field)
+        public IEdmTypeReference Visit(IField<BooleanFieldProperties> field)
         {
             return CreatePrimitive(EdmPrimitiveTypeKind.Boolean, field);
         }
 
-        public IEdmTypeReference Visit(DateTimeField field)
+        public IEdmTypeReference Visit(IField<DateTimeFieldProperties> field)
         {
             return CreatePrimitive(EdmPrimitiveTypeKind.DateTimeOffset, field);
         }
 
-        public IEdmTypeReference Visit(GeolocationField field)
+        public IEdmTypeReference Visit(IField<GeolocationFieldProperties> field)
         {
             return null;
         }
 
-        public IEdmTypeReference Visit(JsonField field)
+        public IEdmTypeReference Visit(IField<JsonFieldProperties> field)
         {
             return null;
         }
 
-        public IEdmTypeReference Visit(NumberField field)
+        public IEdmTypeReference Visit(IField<NumberFieldProperties> field)
         {
             return CreatePrimitive(EdmPrimitiveTypeKind.Double, field);
         }
 
-        public IEdmTypeReference Visit(ReferencesField field)
+        public IEdmTypeReference Visit(IField<ReferencesFieldProperties> field)
         {
             return CreatePrimitive(EdmPrimitiveTypeKind.String, field);
         }
 
-        public IEdmTypeReference Visit(StringField field)
+        public IEdmTypeReference Visit(IField<StringFieldProperties> field)
         {
             return CreatePrimitive(EdmPrimitiveTypeKind.String, field);
         }
 
-        public IEdmTypeReference Visit(TagsField field)
+        public IEdmTypeReference Visit(IField<TagsFieldProperties> field)
         {
             return CreatePrimitive(EdmPrimitiveTypeKind.String, field);
         }
 
-        private static IEdmTypeReference CreatePrimitive(EdmPrimitiveTypeKind kind, Field field)
+        private static IEdmTypeReference CreatePrimitive(EdmPrimitiveTypeKind kind, IField field)
         {
             return EdmCoreModel.Instance.GetPrimitive(kind, !field.RawProperties.IsRequired);
         }

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Observable } from 'rxjs';
+import { of } from 'rxjs';
 import { IMock, Mock, Times } from 'typemoq';
 
 import { AppsState } from '@app/shared';
@@ -23,7 +23,7 @@ describe('LoadAppsGuard', () => {
 
     it('should load apps', () => {
         appsState.setup(x => x.load())
-            .returns(() => Observable.of(null));
+            .returns(() => of(null));
 
         let result = false;
 

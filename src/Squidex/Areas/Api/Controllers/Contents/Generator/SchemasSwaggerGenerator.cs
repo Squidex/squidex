@@ -78,7 +78,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
         {
             name = char.ToUpperInvariant(name[0]) + name.Substring(1);
 
-            return new JsonSchema4 { Reference = document.Definitions.GetOrAdd(name, x => schema) };
+            return new JsonSchema4 { Reference = document.Definitions.GetOrAdd(name, schema, (k, c) => c) };
         }
     }
 }

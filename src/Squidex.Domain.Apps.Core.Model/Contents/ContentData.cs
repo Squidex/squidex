@@ -25,8 +25,8 @@ namespace Squidex.Domain.Apps.Core.Contents
         {
         }
 
-        protected ContentData(IDictionary<T, ContentFieldData> copy, IEqualityComparer<T> comparer)
-            : base(copy, comparer)
+        protected ContentData(int capacity, IEqualityComparer<T> comparer)
+            : base(capacity, comparer)
         {
         }
 
@@ -43,7 +43,7 @@ namespace Squidex.Domain.Apps.Core.Contents
             {
                 foreach (var otherValue in source)
                 {
-                    var fieldValue = target.GetOrAdd(otherValue.Key, x => new ContentFieldData());
+                    var fieldValue = target.GetOrAddNew(otherValue.Key);
 
                     foreach (var value in otherValue.Value)
                     {

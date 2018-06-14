@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FakeItEasy;
+using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Domain.Apps.Entities.Schemas.State;
@@ -27,7 +28,10 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
         private readonly FieldRegistry registry = new FieldRegistry(new TypeNameRegistry());
         private readonly string fieldName = "age";
-        private readonly NamedId<long> fieldId;
+        private readonly string arrayName = "array";
+        private readonly NamedId<long> fieldId = NamedId.Of(1L, "age");
+        private readonly NamedId<long> arrayId = NamedId.Of(1L, "array");
+        private readonly NamedId<long> nestedId = NamedId.Of(2L, "age");
         private readonly SchemaGrain sut;
 
         protected override Guid Id
@@ -39,8 +43,6 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         {
             A.CallTo(() => appProvider.GetSchemaAsync(AppId, SchemaName))
                 .Returns((ISchemaEntity)null);
-
-            fieldId = new NamedId<long>(1, fieldName);
 
             sut = new SchemaGrain(Store, A.Dummy<ISemanticLog>(), appProvider, registry);
             sut.OnActivateAsync(Id).Wait();
@@ -85,7 +87,18 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             var fields = new List<CreateSchemaField>
             {
                 new CreateSchemaField { Name = "field1", Properties = ValidProperties() },
-                new CreateSchemaField { Name = "field2", Properties = ValidProperties() }
+                new CreateSchemaField { Name = "field2", Properties = ValidProperties() },
+                new CreateSchemaField
+                {
+                    Name = "field3",
+                    Partitioning = Partitioning.Language.Key,
+                    Properties = new ArrayFieldProperties(),
+                    Nested = new List<CreateSchemaNestedField>
+                    {
+                        new CreateSchemaNestedField { Name = "nested1", Properties = ValidProperties() },
+                        new CreateSchemaNestedField { Name = "nested2", Properties = ValidProperties() }
+                    }
+                }
             };
 
             var command = new CreateSchema { Name = SchemaName, SchemaId = SchemaId, Properties = properties, Fields = fields };
@@ -100,7 +113,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             Assert.Equal(SchemaName, sut.Snapshot.Name);
             Assert.Equal(SchemaName, sut.Snapshot.SchemaDef.Name);
 
-            Assert.Equal(2, @event.Fields.Count);
+            Assert.Equal(3, @event.Fields.Count);
         }
 
         [Fact]
@@ -150,25 +163,6 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                         ScriptDelete = "<script-delete>",
                         ScriptChange = "<script-change>"
                     })
-                );
-        }
-
-        [Fact]
-        public async Task Reorder_should_create_events_and_update_state()
-        {
-            var command = new ReorderFields { FieldIds = new List<long> { 1, 2 } };
-
-            await ExecuteCreateAsync();
-            await ExecuteAddFieldAsync("field1");
-            await ExecuteAddFieldAsync("field2");
-
-            var result = await sut.ExecuteAsync(CreateCommand(command));
-
-            result.ShouldBeEquivalent(new EntitySavedResult(3));
-
-            LastEvents
-                .ShouldHaveSameEvents(
-                    CreateEvent(new SchemaFieldsReordered { FieldIds = command.FieldIds })
                 );
         }
 
@@ -250,6 +244,45 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         }
 
         [Fact]
+        public async Task Reorder_should_create_events_and_update_state()
+        {
+            var command = new ReorderFields { FieldIds = new List<long> { 1, 2 } };
+
+            await ExecuteCreateAsync();
+            await ExecuteAddFieldAsync("field1");
+            await ExecuteAddFieldAsync("field2");
+
+            var result = await sut.ExecuteAsync(CreateCommand(command));
+
+            result.ShouldBeEquivalent(new EntitySavedResult(3));
+
+            LastEvents
+                .ShouldHaveSameEvents(
+                    CreateEvent(new SchemaFieldsReordered { FieldIds = command.FieldIds })
+                );
+        }
+
+        [Fact]
+        public async Task Reorder_should_create_events_and_update_state_for_array()
+        {
+            var command = new ReorderFields { ParentFieldId = 1, FieldIds = new List<long> { 2, 3 } };
+
+            await ExecuteCreateAsync();
+            await ExecuteAddArrayFieldAsync();
+            await ExecuteAddFieldAsync("field1", 1);
+            await ExecuteAddFieldAsync("field2", 1);
+
+            var result = await sut.ExecuteAsync(CreateCommand(command));
+
+            result.ShouldBeEquivalent(new EntitySavedResult(4));
+
+            LastEvents
+                .ShouldHaveSameEvents(
+                    CreateEvent(new SchemaFieldsReordered { ParentFieldId = arrayId, FieldIds = command.FieldIds })
+                );
+        }
+
+        [Fact]
         public async Task Add_should_create_events_and_update_state()
         {
             var command = new AddField { Name = fieldName, Properties = ValidProperties() };
@@ -260,11 +293,32 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             result.ShouldBeEquivalent(EntityCreatedResult.Create(1, 1));
 
-            Assert.Equal(command.Properties, sut.Snapshot.SchemaDef.FieldsById[1].RawProperties);
+            Assert.Equal(command.Properties, GetField(1).RawProperties);
 
             LastEvents
                 .ShouldHaveSameEvents(
                     CreateEvent(new FieldAdded { Name = fieldName, FieldId = fieldId, Properties = command.Properties })
+                );
+        }
+
+        [Fact]
+        public async Task Add_should_create_events_and_update_state_for_array()
+        {
+            var command = new AddField { ParentFieldId = 1, Name = fieldName, Properties = ValidProperties() };
+
+            await ExecuteCreateAsync();
+            await ExecuteAddArrayFieldAsync();
+
+            var result = await sut.ExecuteAsync(CreateCommand(command));
+
+            result.ShouldBeEquivalent(EntityCreatedResult.Create(2, 2));
+
+            Assert.NotEqual(command.Properties, GetField(1).RawProperties);
+            Assert.Equal(command.Properties, GetNestedField(1, 2).RawProperties);
+
+            LastEvents
+                .ShouldHaveSameEvents(
+                    CreateEvent(new FieldAdded { ParentFieldId = arrayId, Name = fieldName, FieldId = nestedId, Properties = command.Properties })
                 );
         }
 
@@ -280,11 +334,33 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             result.ShouldBeEquivalent(new EntitySavedResult(2));
 
-            Assert.Equal(command.Properties, sut.Snapshot.SchemaDef.FieldsById[1].RawProperties);
+            Assert.Equal(command.Properties, GetField(1).RawProperties);
 
             LastEvents
                 .ShouldHaveSameEvents(
                     CreateEvent(new FieldUpdated { FieldId = fieldId, Properties = command.Properties })
+                );
+        }
+
+        [Fact]
+        public async Task UpdateField_should_create_events_and_update_state_for_array()
+        {
+            var command = new UpdateField { ParentFieldId = 1, FieldId = 2, Properties = new StringFieldProperties() };
+
+            await ExecuteCreateAsync();
+            await ExecuteAddArrayFieldAsync();
+            await ExecuteAddFieldAsync(fieldName, 1);
+
+            var result = await sut.ExecuteAsync(CreateCommand(command));
+
+            result.ShouldBeEquivalent(new EntitySavedResult(3));
+
+            Assert.NotEqual(command.Properties, GetField(1).RawProperties);
+            Assert.Equal(command.Properties, GetNestedField(1, 2).RawProperties);
+
+            LastEvents
+                .ShouldHaveSameEvents(
+                    CreateEvent(new FieldUpdated { ParentFieldId = arrayId, FieldId = nestedId, Properties = command.Properties })
                 );
         }
 
@@ -300,11 +376,33 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             result.ShouldBeEquivalent(new EntitySavedResult(2));
 
-            Assert.False(sut.Snapshot.SchemaDef.FieldsById[1].IsDisabled);
+            Assert.False(GetField(1).IsDisabled);
 
             LastEvents
                 .ShouldHaveSameEvents(
                     CreateEvent(new FieldLocked { FieldId = fieldId })
+                );
+        }
+
+        [Fact]
+        public async Task LockField_should_create_events_and_update_state_for_array()
+        {
+            var command = new LockField { ParentFieldId = 1, FieldId = 2 };
+
+            await ExecuteCreateAsync();
+            await ExecuteAddArrayFieldAsync();
+            await ExecuteAddFieldAsync(fieldName, 1);
+
+            var result = await sut.ExecuteAsync(CreateCommand(command));
+
+            result.ShouldBeEquivalent(new EntitySavedResult(3));
+
+            Assert.False(GetField(1).IsLocked);
+            Assert.True(GetNestedField(1, 2).IsLocked);
+
+            LastEvents
+                .ShouldHaveSameEvents(
+                    CreateEvent(new FieldLocked { ParentFieldId = arrayId, FieldId = nestedId })
                 );
         }
 
@@ -320,11 +418,33 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             result.ShouldBeEquivalent(new EntitySavedResult(2));
 
-            Assert.True(sut.Snapshot.SchemaDef.FieldsById[1].IsHidden);
+            Assert.True(GetField(1).IsHidden);
 
             LastEvents
                 .ShouldHaveSameEvents(
                     CreateEvent(new FieldHidden { FieldId = fieldId })
+                );
+        }
+
+        [Fact]
+        public async Task HideField_should_create_events_and_update_state_for_array()
+        {
+            var command = new HideField { ParentFieldId = 1, FieldId = 2 };
+
+            await ExecuteCreateAsync();
+            await ExecuteAddArrayFieldAsync();
+            await ExecuteAddFieldAsync(fieldName, 1);
+
+            var result = await sut.ExecuteAsync(CreateCommand(command));
+
+            result.ShouldBeEquivalent(new EntitySavedResult(3));
+
+            Assert.False(GetField(1).IsHidden);
+            Assert.True(GetNestedField(1, 2).IsHidden);
+
+            LastEvents
+                .ShouldHaveSameEvents(
+                    CreateEvent(new FieldHidden { ParentFieldId = arrayId, FieldId = nestedId })
                 );
         }
 
@@ -341,11 +461,34 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             result.ShouldBeEquivalent(new EntitySavedResult(3));
 
-            Assert.False(sut.Snapshot.SchemaDef.FieldsById[1].IsHidden);
+            Assert.False(GetField(1).IsHidden);
 
             LastEvents
                 .ShouldHaveSameEvents(
                     CreateEvent(new FieldShown { FieldId = fieldId })
+                );
+        }
+
+        [Fact]
+        public async Task ShowField_should_create_events_and_update_state_for_array()
+        {
+            var command = new ShowField { ParentFieldId = 1, FieldId = 2 };
+
+            await ExecuteCreateAsync();
+            await ExecuteAddArrayFieldAsync();
+            await ExecuteAddFieldAsync(fieldName, 1);
+            await ExecuteHideFieldAsync(2, 1);
+
+            var result = await sut.ExecuteAsync(CreateCommand(command));
+
+            result.ShouldBeEquivalent(new EntitySavedResult(4));
+
+            Assert.False(GetField(1).IsHidden);
+            Assert.False(GetNestedField(1, 2).IsHidden);
+
+            LastEvents
+                .ShouldHaveSameEvents(
+                    CreateEvent(new FieldShown { ParentFieldId = arrayId, FieldId = nestedId })
                 );
         }
 
@@ -361,11 +504,33 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             result.ShouldBeEquivalent(new EntitySavedResult(2));
 
-            Assert.True(sut.Snapshot.SchemaDef.FieldsById[1].IsDisabled);
+            Assert.True(GetField(1).IsDisabled);
 
             LastEvents
                 .ShouldHaveSameEvents(
                     CreateEvent(new FieldDisabled { FieldId = fieldId })
+                );
+        }
+
+        [Fact]
+        public async Task DisableField_should_create_events_and_update_state_for_array()
+        {
+            var command = new DisableField { ParentFieldId = 1, FieldId = 2 };
+
+            await ExecuteCreateAsync();
+            await ExecuteAddArrayFieldAsync();
+            await ExecuteAddFieldAsync(fieldName, 1);
+
+            var result = await sut.ExecuteAsync(CreateCommand(command));
+
+            result.ShouldBeEquivalent(new EntitySavedResult(3));
+
+            Assert.False(GetField(1).IsDisabled);
+            Assert.True(GetNestedField(1, 2).IsDisabled);
+
+            LastEvents
+                .ShouldHaveSameEvents(
+                    CreateEvent(new FieldDisabled { ParentFieldId = arrayId, FieldId = nestedId })
                 );
         }
 
@@ -382,11 +547,34 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             result.ShouldBeEquivalent(new EntitySavedResult(3));
 
-            Assert.False(sut.Snapshot.SchemaDef.FieldsById[1].IsDisabled);
+            Assert.False(GetField(1).IsDisabled);
 
             LastEvents
                 .ShouldHaveSameEvents(
                     CreateEvent(new FieldEnabled { FieldId = fieldId })
+                );
+        }
+
+        [Fact]
+        public async Task EnableField_should_create_events_and_update_state_for_array()
+        {
+            var command = new EnableField { ParentFieldId = 1, FieldId = 2 };
+
+            await ExecuteCreateAsync();
+            await ExecuteAddArrayFieldAsync();
+            await ExecuteAddFieldAsync(fieldName, 1);
+            await ExecuteDisableFieldAsync(2, 1);
+
+            var result = await sut.ExecuteAsync(CreateCommand(command));
+
+            result.ShouldBeEquivalent(new EntitySavedResult(4));
+
+            Assert.False(GetField(1).IsDisabled);
+            Assert.False(GetNestedField(1, 2).IsDisabled);
+
+            LastEvents
+                .ShouldHaveSameEvents(
+                    CreateEvent(new FieldEnabled { ParentFieldId = arrayId, FieldId = nestedId })
                 );
         }
 
@@ -402,11 +590,33 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             result.ShouldBeEquivalent(new EntitySavedResult(2));
 
-            Assert.False(sut.Snapshot.SchemaDef.FieldsById.ContainsKey(1));
+            Assert.Null(GetField(1));
 
             LastEvents
                 .ShouldHaveSameEvents(
                     CreateEvent(new FieldDeleted { FieldId = fieldId })
+                );
+        }
+
+        [Fact]
+        public async Task DeleteField_should_create_events_and_update_state_for_array()
+        {
+            var command = new DeleteField { ParentFieldId = 1, FieldId = 2 };
+
+            await ExecuteCreateAsync();
+            await ExecuteAddArrayFieldAsync();
+            await ExecuteAddFieldAsync(fieldName, 1);
+
+            var result = await sut.ExecuteAsync(CreateCommand(command));
+
+            result.ShouldBeEquivalent(new EntitySavedResult(3));
+
+            Assert.NotNull(GetField(1));
+            Assert.Null(GetNestedField(1, 2));
+
+            LastEvents
+                .ShouldHaveSameEvents(
+                    CreateEvent(new FieldDeleted { ParentFieldId = arrayId, FieldId = nestedId })
                 );
         }
 
@@ -415,19 +625,24 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             return sut.ExecuteAsync(CreateCommand(new CreateSchema { Name = SchemaName }));
         }
 
-        private Task ExecuteAddFieldAsync(string name)
+        private Task ExecuteAddArrayFieldAsync()
         {
-            return sut.ExecuteAsync(CreateCommand(new AddField { Properties = ValidProperties(), Name = name }));
+            return sut.ExecuteAsync(CreateCommand(new AddField { Properties = new ArrayFieldProperties(), Name = arrayName }));
         }
 
-        private Task ExecuteHideFieldAsync(long id)
+        private Task ExecuteAddFieldAsync(string name, long? parentId = null)
         {
-            return sut.ExecuteAsync(CreateCommand(new HideField { FieldId = id }));
+            return sut.ExecuteAsync(CreateCommand(new AddField { ParentFieldId = parentId, Properties = ValidProperties(), Name = name }));
         }
 
-        private Task ExecuteDisableFieldAsync(long id)
+        private Task ExecuteHideFieldAsync(long id, long? parentId = null)
         {
-            return sut.ExecuteAsync(CreateCommand(new DisableField { FieldId = id }));
+            return sut.ExecuteAsync(CreateCommand(new HideField { ParentFieldId = parentId, FieldId = id }));
+        }
+
+        private Task ExecuteDisableFieldAsync(long id, long? parentId = null)
+        {
+            return sut.ExecuteAsync(CreateCommand(new DisableField { ParentFieldId = parentId, FieldId = id }));
         }
 
         private Task ExecutePublishAsync()
@@ -438,6 +653,16 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         private Task ExecuteDeleteAsync()
         {
             return sut.ExecuteAsync(CreateCommand(new DeleteSchema()));
+        }
+
+        private IField GetField(int id)
+        {
+            return sut.Snapshot.SchemaDef.FieldsById.GetOrDefault(id);
+        }
+
+        private IField GetNestedField(int parentId, int childId)
+        {
+            return ((IArrayField)sut.Snapshot.SchemaDef.FieldsById[parentId]).FieldsById.GetOrDefault(childId);
         }
 
         private static StringFieldProperties ValidProperties()

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Observable } from 'rxjs';
+import { of } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 
 import {
@@ -46,7 +46,7 @@ describe('RuleEventsState', () => {
         rulesService = Mock.ofType<RulesService>();
 
         rulesService.setup(x => x.getEvents(app, 10, 0))
-            .returns(() => Observable.of(new RuleEventsDto(200, oldRuleEvents)));
+            .returns(() => of(new RuleEventsDto(200, oldRuleEvents)));
 
         ruleEventsState = new RuleEventsState(appsState.object, dialogs.object, rulesService.object);
         ruleEventsState.load().subscribe();
@@ -63,15 +63,19 @@ describe('RuleEventsState', () => {
     it('should show notification on load when reload is true', () => {
         ruleEventsState.load(true).subscribe();
 
+        expect().nothing();
+
         dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
     });
 
     it('should load next page and prev page when paging', () => {
         rulesService.setup(x => x.getEvents(app, 10, 10))
-            .returns(() => Observable.of(new RuleEventsDto(200, [])));
+            .returns(() => of(new RuleEventsDto(200, [])));
 
         ruleEventsState.goNext().subscribe();
         ruleEventsState.goPrev().subscribe();
+
+        expect().nothing();
 
         rulesService.verify(x => x.getEvents(app, 10, 10), Times.once());
         rulesService.verify(x => x.getEvents(app, 10, 0), Times.exactly(2));
@@ -79,9 +83,11 @@ describe('RuleEventsState', () => {
 
     it('should call service when enqueuing event', () => {
         rulesService.setup(x => x.enqueueEvent(app, oldRuleEvents[0].id))
-            .returns(() => Observable.of({}));
+            .returns(() => of({}));
 
         ruleEventsState.enqueue(oldRuleEvents[0]).subscribe();
+
+        expect().nothing();
 
         rulesService.verify(x => x.enqueueEvent(app, oldRuleEvents[0].id), Times.once());
     });

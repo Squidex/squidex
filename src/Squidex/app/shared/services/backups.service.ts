@@ -8,16 +8,17 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-
-import '@app/framework/angular/http/http-extensions';
+import { map, tap } from 'rxjs/operators';
 
 import {
     AnalyticsService,
     ApiUrlConfig,
-    DateTime
+    DateTime,
+    Model,
+    pretifyError
 } from '@app/framework';
 
-export class BackupDto {
+export class BackupDto extends Model {
     constructor(
         public readonly id: string,
         public readonly started: DateTime,
@@ -26,6 +27,11 @@ export class BackupDto {
         public readonly handledAssets: number,
         public readonly isFailed: boolean
     ) {
+        super();
+    }
+
+    public with(value: Partial<BackupDto>): BackupDto {
+        return this.clone(value);
     }
 }
 
@@ -41,8 +47,8 @@ export class BackupsService {
     public getBackups(appName: string): Observable<BackupDto[]> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/backups`);
 
-        return this.http.get(url)
-                .map(response => {
+        return this.http.get(url).pipe(
+                map(response => {
                     const items: any[] = <any>response;
 
                     return items.map(item => {
@@ -54,27 +60,27 @@ export class BackupsService {
                             item.handledAssets,
                             item.isFailed);
                     });
-                })
-                .pretifyError('Failed to load backups.');
+                }),
+                pretifyError('Failed to load backups.'));
     }
 
     public postBackup(appName: string): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/backups`);
 
-        return this.http.post(url, {})
-                .do(() => {
+        return this.http.post(url, {}).pipe(
+                tap(() => {
                     this.analytics.trackEvent('Backup', 'Started', appName);
-                })
-                .pretifyError('Failed to start backup.');
+                }),
+                pretifyError('Failed to start backup.'));
     }
 
     public deleteBackup(appName: string, id: string): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/backups/${id}`);
 
-        return this.http.delete(url)
-                .do(() => {
+        return this.http.delete(url).pipe(
+                tap(() => {
                     this.analytics.trackEvent('Backup', 'Deleted', appName);
-                })
-                .pretifyError('Failed to delete backup.');
+                }),
+                pretifyError('Failed to delete backup.'));
     }
 }

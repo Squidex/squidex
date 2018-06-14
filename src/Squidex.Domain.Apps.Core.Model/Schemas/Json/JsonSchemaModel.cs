@@ -13,7 +13,7 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
 {
     public sealed class JsonSchemaModel
     {
-        private static readonly Field[] Empty = new Field[0];
+        private static readonly RootField[] Empty = new RootField[0];
 
         [JsonProperty]
         public string Name { get; set; }
@@ -38,11 +38,12 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
             Properties = schema.Properties;
 
             Fields =
-                schema.Fields?.Select(x =>
+                schema.Fields.Select(x =>
                     new JsonFieldModel
                     {
                         Id = x.Id,
                         Name = x.Name,
+                        Children = CreateChildren(x),
                         IsHidden = x.IsHidden,
                         IsLocked = x.IsLocked,
                         IsDisabled = x.IsDisabled,
@@ -53,13 +54,31 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
             IsPublished = schema.IsPublished;
         }
 
-        public Schema ToSchema(FieldRegistry fieldRegistry)
+        private static List<JsonNestedFieldModel> CreateChildren(IField field)
         {
-            Field[] fields = Empty;
+            if (field is ArrayField arrayField)
+            {
+                return arrayField.Fields.Select(x =>
+                    new JsonNestedFieldModel
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        IsHidden = x.IsHidden,
+                        IsDisabled = x.IsDisabled,
+                        Properties = x.RawProperties
+                    }).ToList();
+            }
+
+            return null;
+        }
+
+        public Schema ToSchema(FieldRegistry registry)
+        {
+            RootField[] fields = Empty;
 
             if (Fields != null)
             {
-                fields = new Field[Fields.Count];
+                fields = new RootField[Fields.Count];
 
                 for (var i = 0; i < fields.Length; i++)
                 {
@@ -67,7 +86,29 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
 
                     var parititonKey = new Partitioning(fieldModel.Partitioning);
 
-                    var field = fieldRegistry.CreateField(fieldModel.Id, fieldModel.Name, parititonKey, fieldModel.Properties);
+                    var field = registry.CreateRootField(fieldModel.Id, fieldModel.Name, parititonKey, fieldModel.Properties);
+
+                    if (field is ArrayField arrayField && fieldModel.Children?.Count > 0)
+                    {
+                        foreach (var nestedFieldModel in fieldModel.Children)
+                        {
+                            var nestedField = registry.CreateNestedField(nestedFieldModel.Id, nestedFieldModel.Name, nestedFieldModel.Properties);
+
+                            if (nestedFieldModel.IsHidden)
+                            {
+                                nestedField = nestedField.Hide();
+                            }
+
+                            if (nestedFieldModel.IsDisabled)
+                            {
+                                nestedField = nestedField.Disable();
+                            }
+
+                            arrayField = arrayField.AddField(nestedField);
+                        }
+
+                        field = arrayField;
+                    }
 
                     if (fieldModel.IsDisabled)
                     {

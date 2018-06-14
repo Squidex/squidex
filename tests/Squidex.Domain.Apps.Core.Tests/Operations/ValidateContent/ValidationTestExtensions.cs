@@ -25,22 +25,50 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
         public static Task ValidateAsync(this IValidator validator, object value, IList<string> errors, ValidationContext context = null)
         {
-            return validator.ValidateAsync(value, context ?? ValidContext, errors.Add);
+            return validator.ValidateAsync(value,
+                CreateContext(context),
+                CreateFormatter(errors));
         }
 
         public static Task ValidateOptionalAsync(this IValidator validator, object value, IList<string> errors, ValidationContext context = null)
         {
-            return validator.ValidateAsync(value, (context ?? ValidContext).Optional(true), errors.Add);
+            return validator.ValidateAsync(value,
+                CreateContext(context).Optional(true),
+                CreateFormatter(errors));
         }
 
-        public static Task ValidateAsync(this Field field, JToken value, IList<string> errors, ValidationContext context = null)
+        public static Task ValidateAsync(this IField field, JToken value, IList<string> errors, ValidationContext context = null)
         {
-            return field.ValidateAsync(value, context ?? ValidContext, errors.Add);
+            return new FieldValidator(ValidatorsFactory.CreateValidators(field).ToArray(), field).ValidateAsync(value,
+                CreateContext(context),
+                CreateFormatter(errors));
         }
 
-        public static Task ValidateOptionalAsync(this Field field, JToken value, IList<string> errors, ValidationContext context = null)
+        public static Task ValidateOptionalAsync(this IField field, JToken value, IList<string> errors, ValidationContext context = null)
         {
-            return field.ValidateAsync(value, (context ?? ValidContext).Optional(true), errors.Add);
+            return new FieldValidator(ValidatorsFactory.CreateValidators(field).ToArray(), field).ValidateAsync(value,
+                CreateContext(context).Optional(true),
+                CreateFormatter(errors));
+        }
+
+        private static AddError CreateFormatter(IList<string> errors)
+        {
+            return (field, message) =>
+            {
+                if (field == null || !field.Any())
+                {
+                    errors.Add(message);
+                }
+                else
+                {
+                    errors.Add($"{field.ToPathString()}: {message}");
+                }
+            };
+        }
+
+        private static ValidationContext CreateContext(ValidationContext context)
+        {
+            return context ?? ValidContext;
         }
 
         public static ValidationContext Assets(params IAssetInfo[] assets)

@@ -32,7 +32,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
         {
             if (context.IsCompleted && context.Command is CreateApp createApp && IsRightTemplate(createApp))
             {
-                var appId = new NamedId<Guid>(createApp.AppId, createApp.Name);
+                var appId = NamedId.Of(createApp.AppId, createApp.Name);
 
                 var publish = new Func<ICommand, Task>(command =>
                 {
@@ -156,7 +156,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
 
             await publish(command);
 
-            var schemaId = new NamedId<Guid>(command.SchemaId, command.Name);
+            var schemaId = NamedId.Of(command.SchemaId, command.Name);
 
             await publish(new ConfigureScripts
             {
@@ -222,7 +222,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
 
             await publish(command);
 
-            var schemaId = new NamedId<Guid>(command.SchemaId, command.Name);
+            var schemaId = NamedId.Of(command.SchemaId, command.Name);
 
             await publish(new ConfigureScripts
             {

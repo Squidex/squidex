@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Observable } from 'rxjs';
+import { of } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 
 import {
@@ -50,7 +50,7 @@ describe('AssetsState', () => {
         assetsService = Mock.ofType<AssetsService>();
 
         assetsService.setup(x => x.getAssets(app, 30, 0, undefined))
-            .returns(() => Observable.of(new AssetsDto(200, oldAssets)));
+            .returns(() => of(new AssetsDto(200, oldAssets)));
 
         assetsState = new AssetsState(appsState.object, assetsService.object, dialogs.object);
         assetsState.load().subscribe();
@@ -70,6 +70,8 @@ describe('AssetsState', () => {
 
     it('should show notification on load when reload is true', () => {
         assetsState.load(true).subscribe();
+
+        expect().nothing();
 
         dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
     });
@@ -95,7 +97,7 @@ describe('AssetsState', () => {
 
     it('should remove asset from snapshot when deleted', () => {
         assetsService.setup(x => x.deleteAsset(app, oldAssets[0].id, version))
-            .returns(() => Observable.of(new Versioned<any>(newVersion, {})));
+            .returns(() => of(new Versioned<any>(newVersion, {})));
 
         assetsState.delete(oldAssets[0]).subscribe();
 
@@ -105,10 +107,12 @@ describe('AssetsState', () => {
 
     it('should load next page and prev page when paging', () => {
         assetsService.setup(x => x.getAssets(app, 30, 30, undefined))
-            .returns(() => Observable.of(new AssetsDto(200, [])));
+            .returns(() => of(new AssetsDto(200, [])));
 
         assetsState.goNext().subscribe();
         assetsState.goPrev().subscribe();
+
+        expect().nothing();
 
         assetsService.verify(x => x.getAssets(app, 30, 30, undefined), Times.once());
         assetsService.verify(x => x.getAssets(app, 30,  0, undefined), Times.exactly(2));
@@ -116,7 +120,7 @@ describe('AssetsState', () => {
 
     it('should load with query when searching', () => {
         assetsService.setup(x => x.getAssets(app, 30, 0, 'my-query'))
-            .returns(() => Observable.of(new AssetsDto(0, [])));
+            .returns(() => of(new AssetsDto(0, [])));
 
         assetsState.search('my-query').subscribe();
 

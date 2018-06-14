@@ -6,6 +6,7 @@
  */
 
 import { Component, OnInit } from '@angular/core';
+import { take } from 'rxjs/operators';
 
 import {
     AppsState,
@@ -33,7 +34,8 @@ export class AppsPageComponent implements OnInit {
     }
 
     public ngOnInit() {
-        this.appsState.apps.take(1)
+        this.appsState.apps.pipe(
+                take(1))
             .subscribe(apps => {
                 if (this.onboardingService.shouldShow('dialog') && apps.length === 0) {
                     this.onboardingService.disable('dialog');

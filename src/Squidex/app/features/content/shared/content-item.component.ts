@@ -12,10 +12,11 @@ import {
     ContentDto,
     ContentsState,
     fadeAnimation,
-    FieldDto,
+    FieldFormatter,
     fieldInvariant,
     ModalView,
     PatchContentForm,
+    RootFieldDto,
     SchemaDetailsDto,
     Types
 } from '@app/shared';
@@ -123,7 +124,7 @@ export class ContentItemComponent implements OnChanges {
             if (Types.isUndefined(value)) {
                 this.values.push('');
             } else {
-                this.values.push(field.formatValue(value));
+                this.values.push(FieldFormatter.format(field, value));
             }
 
             if (this.patchForm) {
@@ -136,7 +137,7 @@ export class ContentItemComponent implements OnChanges {
         }
     }
 
-    private getRawValue(field: FieldDto): any {
+    private getRawValue(field: RootFieldDto): any {
         const contentField = this.content.dataDraft[field.name];
 
         if (contentField) {

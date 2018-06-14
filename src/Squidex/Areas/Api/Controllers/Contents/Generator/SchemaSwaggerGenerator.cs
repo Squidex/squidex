@@ -242,7 +242,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
 
         private SwaggerOperations AddOperation(SwaggerOperationMethod method, string entityName, string path, Action<SwaggerOperation> updater)
         {
-            var operations = document.Paths.GetOrAdd(path, k => new SwaggerOperations());
+            var operations = document.Paths.GetOrAddNew(path);
             var operation = new SwaggerOperation();
 
             updater(operation);

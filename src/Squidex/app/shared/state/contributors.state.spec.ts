@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Observable } from 'rxjs';
+import { of } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 
 import {
@@ -52,7 +52,7 @@ describe('ContributorsState', () => {
         contributorsService = Mock.ofType<AppContributorsService>();
 
         contributorsService.setup(x => x.getContributors(app))
-            .returns(() => Observable.of(new AppContributorsDto(oldContributors, 3, version)));
+            .returns(() => of(new AppContributorsDto(oldContributors, 3, version)));
 
         contributorsState = new ContributorsState(contributorsService.object, appsState.object, authService.object, dialogs.object);
         contributorsState.load().subscribe();
@@ -74,6 +74,8 @@ describe('ContributorsState', () => {
     it('should show notification on load when reload is true', () => {
         contributorsState.load(true).subscribe();
 
+        expect().nothing();
+
         dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
     });
 
@@ -83,7 +85,7 @@ describe('ContributorsState', () => {
         const request = new AppContributorDto('mail2stehle@gmail.com', 'Developer');
 
         contributorsService.setup(x => x.postContributor(app, request, version))
-            .returns(() => Observable.of(new Versioned<AppContributorDto>(newVersion, newContributor)));
+            .returns(() => of(new Versioned<AppContributorDto>(newVersion, newContributor)));
 
         contributorsState.assign(request).subscribe();
 
@@ -103,7 +105,7 @@ describe('ContributorsState', () => {
         const request = new AppContributorDto('mail2stehle@gmail.com', 'Owner');
 
         contributorsService.setup(x => x.postContributor(app, request, version))
-            .returns(() => Observable.of(new Versioned<AppContributorDto>(newVersion, newContributor)));
+            .returns(() => of(new Versioned<AppContributorDto>(newVersion, newContributor)));
 
         contributorsState.assign(request).subscribe();
 
@@ -118,7 +120,7 @@ describe('ContributorsState', () => {
 
     it('should remove contributor from snapshot when revoked', () => {
         contributorsService.setup(x => x.deleteContributor(app, oldContributors[0].contributorId, version))
-            .returns(() => Observable.of(new Versioned<any>(newVersion, {})));
+            .returns(() => of(new Versioned<any>(newVersion, {})));
 
         contributorsState.revoke(oldContributors[0]).subscribe();
 

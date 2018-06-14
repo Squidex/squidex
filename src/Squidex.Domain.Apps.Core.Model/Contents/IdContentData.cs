@@ -18,8 +18,8 @@ namespace Squidex.Domain.Apps.Core.Contents
         {
         }
 
-        public IdContentData(IdContentData copy)
-            : base(copy, EqualityComparer<long>.Default)
+        public IdContentData(int capacity)
+            : base(capacity, EqualityComparer<long>.Default)
         {
         }
 

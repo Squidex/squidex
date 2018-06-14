@@ -6,7 +6,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
+import { Observable, Subject, throwError } from 'rxjs';
 
 import { ErrorDto } from './../utils/error';
 import { Types } from './../utils/types';
@@ -71,7 +71,7 @@ export class DialogService {
             this.notify(Notification.error(error));
         }
 
-        return Observable.throw(error);
+        return throwError(error);
     }
 
     public notifyInfo(text: string) {

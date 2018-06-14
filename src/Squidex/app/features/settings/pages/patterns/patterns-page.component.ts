@@ -6,6 +6,7 @@
  */
 
 import { Component, OnInit } from '@angular/core';
+import { onErrorResumeNext } from 'rxjs/operators';
 
 import {
     AppPatternDto,
@@ -26,11 +27,11 @@ export class PatternsPageComponent implements OnInit {
     }
 
     public ngOnInit() {
-        this.patternsState.load().onErrorResumeNext().subscribe();
+        this.patternsState.load().pipe(onErrorResumeNext()).subscribe();
     }
 
     public reload() {
-        this.patternsState.load(true).onErrorResumeNext().subscribe();
+        this.patternsState.load(true).pipe(onErrorResumeNext()).subscribe();
     }
 
     public trackByPattern(index: number, pattern: AppPatternDto) {

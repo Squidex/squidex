@@ -48,9 +48,9 @@ pipeline:
     image: plugins/slack
     template: >
       {{#success build.status}}
-        build {{build.number}} succeeded. Good job.
+        Squidex build {{build.number}} succeeded. Good job.
       {{else}}
-        build {{build.number}} failed. Fix me please.
+        Squidex build {{build.number}} failed. Fix me please.
       {{/success}}
     secrets: [ slack_webhook ]
     when:

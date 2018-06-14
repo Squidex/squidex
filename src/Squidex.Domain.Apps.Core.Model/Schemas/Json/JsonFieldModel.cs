@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Collections.Generic;
 using Newtonsoft.Json;
 
 namespace Squidex.Domain.Apps.Core.Schemas.Json
@@ -13,6 +14,12 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
     {
         [JsonProperty]
         public long Id { get; set; }
+
+        [JsonProperty]
+        public string Name { get; set; }
+
+        [JsonProperty]
+        public string Partitioning { get; set; }
 
         [JsonProperty]
         public bool IsHidden { get; set; }
@@ -24,12 +31,9 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
         public bool IsDisabled { get; set; }
 
         [JsonProperty]
-        public string Name { get; set; }
-
-        [JsonProperty]
-        public string Partitioning { get; set; }
-
-        [JsonProperty]
         public FieldProperties Properties { get; set; }
+
+        [JsonProperty]
+        public List<JsonNestedFieldModel> Children { get; set; }
     }
 }

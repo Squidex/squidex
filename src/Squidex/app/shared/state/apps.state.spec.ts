@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Observable } from 'rxjs';
+import { of } from 'rxjs';
 import { IMock, Mock, Times } from 'typemoq';
 
 import {
@@ -37,7 +37,7 @@ describe('AppsState', () => {
         appsService = Mock.ofType<AppsService>();
 
         appsService.setup(x => x.getApps())
-            .returns(() => Observable.of(oldApps))
+            .returns(() => of(oldApps))
             .verifiable(Times.once());
 
         appsState = new AppsState(appsService.object, dialogs.object);
@@ -85,7 +85,7 @@ describe('AppsState', () => {
         const request = new CreateAppDto(newApp.name);
 
         appsService.setup(x => x.postApp(request))
-            .returns(() => Observable.of(newApp));
+            .returns(() => of(newApp));
 
         appsState.create(request, now).subscribe();
 
@@ -96,10 +96,10 @@ describe('AppsState', () => {
         const request = new CreateAppDto(newApp.name);
 
         appsService.setup(x => x.postApp(request))
-            .returns(() => Observable.of(newApp));
+            .returns(() => of(newApp));
 
         appsService.setup(x => x.deleteApp(newApp.name))
-            .returns(() => Observable.of({}));
+            .returns(() => of({}));
 
         appsState.create(request, now).subscribe();
 

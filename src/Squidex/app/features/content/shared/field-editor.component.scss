@@ -1,0 +1,14 @@
+@import '_vars';
+@import '_mixins';
+
+.field {
+    &-required {
+        color: $color-theme-error;
+    }
+
+    &-disabled {
+        color: $color-border-dark;
+        font-size: .8rem;
+        font-weight: normal;
+    }
+}

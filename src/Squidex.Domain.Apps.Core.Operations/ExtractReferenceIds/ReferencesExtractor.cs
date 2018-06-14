@@ -13,50 +13,93 @@ using Squidex.Domain.Apps.Core.Schemas;
 
 namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 {
-    public static class ReferencesExtractor
+    public sealed class ReferencesExtractor : IFieldVisitor<IEnumerable<Guid>>
     {
-        public static IEnumerable<Guid> ExtractReferences(this Field field, JToken value)
-        {
-            switch (field)
-            {
-                case AssetsField assetsField:
-                    return Visit(assetsField, value);
+        private readonly JToken value;
 
-                case ReferencesField referencesField:
-                    return Visit(referencesField, value);
+        private ReferencesExtractor(JToken value)
+        {
+            this.value = value;
+        }
+
+        public static IEnumerable<Guid> ExtractReferences(IField field, JToken value)
+        {
+            return field.Accept(new ReferencesExtractor(value));
+        }
+
+        public IEnumerable<Guid> Visit(IArrayField field)
+        {
+            var result = new List<Guid>();
+
+            if (value is JArray items)
+            {
+                foreach (JObject item in value)
+                {
+                    foreach (var nestedField in field.Fields)
+                    {
+                        if (item.TryGetValue(field.Name, out var value))
+                        {
+                            result.AddRange(nestedField.Accept(new ReferencesExtractor(value)));
+                        }
+                    }
+                }
             }
 
+            return result;
+        }
+
+        public IEnumerable<Guid> Visit(IField<AssetsFieldProperties> field)
+        {
+            var ids = value.ToGuidSet();
+
+            return ids;
+        }
+
+        public IEnumerable<Guid> Visit(IField<ReferencesFieldProperties> field)
+        {
+            var ids = value.ToGuidSet();
+
+            if (field.Properties.SchemaId != Guid.Empty)
+            {
+                ids.Add(field.Properties.SchemaId);
+            }
+
+            return ids;
+        }
+
+        public IEnumerable<Guid> Visit(IField<BooleanFieldProperties> field)
+        {
             return Enumerable.Empty<Guid>();
         }
 
-        public static IEnumerable<Guid> Visit(AssetsField field, JToken value)
+        public IEnumerable<Guid> Visit(IField<DateTimeFieldProperties> field)
         {
-            IEnumerable<Guid> result;
-            try
-            {
-                result = value?.ToObject<List<Guid>>();
-            }
-            catch
-            {
-                result = null;
-            }
-
-            return result ?? Enumerable.Empty<Guid>();
+            return Enumerable.Empty<Guid>();
         }
 
-        private static IEnumerable<Guid> Visit(ReferencesField field, JToken value)
+        public IEnumerable<Guid> Visit(IField<GeolocationFieldProperties> field)
         {
-            IEnumerable<Guid> result;
-            try
-            {
-                result = value?.ToObject<List<Guid>>() ?? Enumerable.Empty<Guid>();
-            }
-            catch
-            {
-                result = Enumerable.Empty<Guid>();
-            }
+            return Enumerable.Empty<Guid>();
+        }
 
-            return result.Union(new[] { field.Properties.SchemaId });
+        public IEnumerable<Guid> Visit(IField<JsonFieldProperties> field)
+        {
+            return Enumerable.Empty<Guid>();
+        }
+
+        public IEnumerable<Guid> Visit(IField<NumberFieldProperties> field)
+        {
+            return Enumerable.Empty<Guid>();
+        }
+
+        public IEnumerable<Guid> Visit(IField<StringFieldProperties> field)
+        {
+            return Enumerable.Empty<Guid>();
+        }
+
+        public IEnumerable<Guid> Visit(IField<TagsFieldProperties> field)
+        {
+            return Enumerable.Empty<Guid>();
         }
     }
 }

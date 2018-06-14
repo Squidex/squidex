@@ -11,6 +11,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Commands
 {
     public sealed class ReorderFields : SchemaCommand
     {
+        public long? ParentFieldId { get; set; }
+
         public List<long> FieldIds { get; set; }
     }
 }

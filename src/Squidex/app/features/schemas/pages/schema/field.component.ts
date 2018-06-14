@@ -7,15 +7,17 @@
 
 import { Component, Input, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
+import { onErrorResumeNext } from 'rxjs/operators';
 
 import {
     AppPatternDto,
     createProperties,
     EditFieldForm,
     fadeAnimation,
-    FieldDto,
     ImmutableArray,
     ModalView,
+    NestedFieldDto,
+    RootFieldDto,
     SchemaDetailsDto,
     SchemasState,
     UpdateFieldDto
@@ -31,10 +33,16 @@ import {
 })
 export class FieldComponent implements OnInit {
     @Input()
-    public field: FieldDto;
+    public field: NestedFieldDto | RootFieldDto;
 
     @Input()
     public schema: SchemaDetailsDto;
+
+    @Input()
+    public parent: RootFieldDto;
+
+    @Input()
+    public handleClass: string;
 
     @Input()
     public patterns: ImmutableArray<AppPatternDto>;
@@ -45,6 +53,8 @@ export class FieldComponent implements OnInit {
     public selectedTab = 0;
 
     public editForm: EditFieldForm;
+
+    public addFieldDialog = new ModalView();
 
     constructor(
         private readonly formBuilder: FormBuilder,
@@ -75,27 +85,35 @@ export class FieldComponent implements OnInit {
     }
 
     public deleteField() {
-        this.schemasState.deleteField(this.schema, this.field).onErrorResumeNext().subscribe();
+        this.schemasState.deleteField(this.schema, this.field).pipe(onErrorResumeNext()).subscribe();
     }
 
     public enableField() {
-        this.schemasState.enableField(this.schema, this.field).onErrorResumeNext().subscribe();
+        this.schemasState.enableField(this.schema, this.field).pipe(onErrorResumeNext()).subscribe();
     }
 
     public disableField() {
-        this.schemasState.disableField(this.schema, this.field).onErrorResumeNext().subscribe();
+        this.schemasState.disableField(this.schema, this.field).pipe(onErrorResumeNext()).subscribe();
     }
 
     public showField() {
-        this.schemasState.showField(this.schema, this.field).onErrorResumeNext().subscribe();
+        this.schemasState.showField(this.schema, this.field).pipe(onErrorResumeNext()).subscribe();
     }
 
     public hideField() {
-        this.schemasState.hideField(this.schema, this.field).onErrorResumeNext().subscribe();
+        this.schemasState.hideField(this.schema, this.field).pipe(onErrorResumeNext()).subscribe();
+    }
+
+    public sortFields(fields: NestedFieldDto[]) {
+        this.schemasState.sortFields(this.schema, fields, <any>this.field).subscribe();
     }
 
     public lockField() {
-        this.schemasState.lockField(this.schema, this.field).onErrorResumeNext().subscribe();
+        this.schemasState.lockField(this.schema, this.field).pipe(onErrorResumeNext()).subscribe();
+    }
+
+    public trackByField(index: number, field: NestedFieldDto) {
+        return field.fieldId;
     }
 
     public save() {

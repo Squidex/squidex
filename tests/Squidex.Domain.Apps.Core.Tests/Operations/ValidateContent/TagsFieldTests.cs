@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -31,11 +30,9 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_not_add_error_if_tags_are_valid()
         {
-            var referenceId = Guid.NewGuid();
-
             var sut = Field(new TagsFieldProperties());
 
-            await sut.ValidateAsync(CreateValue(referenceId), errors, ValidationTestExtensions.ValidContext);
+            await sut.ValidateAsync(CreateValue("tag"), errors, ValidationTestExtensions.ValidContext);
 
             Assert.Empty(errors);
         }
@@ -58,7 +55,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             await sut.ValidateAsync(CreateValue(null), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> is required." });
+                new[] { "Field is required." });
         }
 
         [Fact]
@@ -69,7 +66,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             await sut.ValidateAsync(CreateValue(), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> is required." });
+                new[] { "Field is required." });
         }
 
         [Fact]
@@ -80,7 +77,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             await sut.ValidateAsync("invalid", errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> is not a valid value." });
+                new[] { "Not a valid value." });
         }
 
         [Fact]
@@ -88,10 +85,10 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new TagsFieldProperties { MinItems = 3 });
 
-            await sut.ValidateAsync(CreateValue(Guid.NewGuid(), Guid.NewGuid()), errors);
+            await sut.ValidateAsync(CreateValue("tag-1", "tag-2"), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> must have at least 3 item(s)." });
+                new[] { "Must have at least 3 item(s)." });
         }
 
         [Fact]
@@ -99,20 +96,20 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new TagsFieldProperties { MaxItems = 1 });
 
-            await sut.ValidateAsync(CreateValue(Guid.NewGuid(), Guid.NewGuid()), errors);
+            await sut.ValidateAsync(CreateValue("tag-1", "tag-2"), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> must have not more than 1 item(s)." });
+                new[] { "Must have not more than 1 item(s)." });
         }
 
-        private static JToken CreateValue(params Guid[] ids)
+        private static JToken CreateValue(params string[] ids)
         {
             return ids == null ? JValue.CreateNull() : (JToken)new JArray(ids.OfType<object>().ToArray());
         }
 
-        private static TagsField Field(TagsFieldProperties properties)
+        private static RootField<TagsFieldProperties> Field(TagsFieldProperties properties)
         {
-            return new TagsField(1, "my-tags", Partitioning.Invariant, properties);
+            return Fields.Tags(1, "my-tags", Partitioning.Invariant, properties);
         }
     }
 }

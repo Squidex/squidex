@@ -83,12 +83,33 @@ namespace Squidex.Domain.Apps.Entities.Schemas.State
                 {
                     TotalFields++;
 
-                    var partitioning =
-                        string.Equals(eventField.Partitioning, Partitioning.Language.Key, StringComparison.OrdinalIgnoreCase) ?
-                            Partitioning.Language :
-                            Partitioning.Invariant;
+                    var partitioning = Partitioning.FromString(eventField.Partitioning);
 
-                    var field = registry.CreateField(TotalFields, eventField.Name, partitioning, eventField.Properties);
+                    var field = registry.CreateRootField(TotalFields, eventField.Name, partitioning, eventField.Properties);
+
+                    if (field is ArrayField arrayField && eventField.Nested?.Count > 0)
+                    {
+                        foreach (var nestedEventField in eventField.Nested)
+                        {
+                            TotalFields++;
+
+                            var nestedField = registry.CreateNestedField(TotalFields, nestedEventField.Name, nestedEventField.Properties);
+
+                            if (nestedEventField.IsHidden)
+                            {
+                                nestedField = nestedField.Hide();
+                            }
+
+                            if (nestedEventField.IsDisabled)
+                            {
+                                nestedField = nestedField.Disable();
+                            }
+
+                            arrayField = arrayField.AddField(nestedField);
+                        }
+
+                        field = arrayField;
+                    }
 
                     if (eventField.IsHidden)
                     {
@@ -116,15 +137,21 @@ namespace Squidex.Domain.Apps.Entities.Schemas.State
 
         protected void On(FieldAdded @event, FieldRegistry registry)
         {
-            var partitioning =
-                string.Equals(@event.Partitioning, Partitioning.Language.Key, StringComparison.OrdinalIgnoreCase) ?
-                    Partitioning.Language :
-                    Partitioning.Invariant;
+            if (@event.ParentFieldId != null)
+            {
+                var field = registry.CreateNestedField(@event.FieldId.Id, @event.Name, @event.Properties);
 
-            var field = registry.CreateField(@event.FieldId.Id, @event.Name, partitioning, @event.Properties);
+                SchemaDef = SchemaDef.UpdateField(@event.ParentFieldId.Id, x => ((ArrayField)x).AddField(field));
+            }
+            else
+            {
+                var partitioning = Partitioning.FromString(@event.Partitioning);
 
-            SchemaDef = SchemaDef.DeleteField(@event.FieldId.Id);
-            SchemaDef = SchemaDef.AddField(field);
+                var field = registry.CreateRootField(@event.FieldId.Id, @event.Name, partitioning, @event.Properties);
+
+                SchemaDef = SchemaDef.DeleteField(@event.FieldId.Id);
+                SchemaDef = SchemaDef.AddField(field);
+            }
 
             TotalFields++;
         }
@@ -151,42 +178,42 @@ namespace Squidex.Domain.Apps.Entities.Schemas.State
 
         protected void On(SchemaFieldsReordered @event, FieldRegistry registry)
         {
-            SchemaDef = SchemaDef.ReorderFields(@event.FieldIds);
+            SchemaDef = SchemaDef.ReorderFields(@event.FieldIds, @event.ParentFieldId?.Id);
         }
 
         protected void On(FieldUpdated @event, FieldRegistry registry)
         {
-            SchemaDef = SchemaDef.UpdateField(@event.FieldId.Id, @event.Properties);
+            SchemaDef = SchemaDef.UpdateField(@event.FieldId.Id, @event.Properties, @event.ParentFieldId?.Id);
         }
 
         protected void On(FieldLocked @event, FieldRegistry registry)
         {
-            SchemaDef = SchemaDef.LockField(@event.FieldId.Id);
+            SchemaDef = SchemaDef.LockField(@event.FieldId.Id, @event.ParentFieldId?.Id);
         }
 
         protected void On(FieldDisabled @event, FieldRegistry registry)
         {
-            SchemaDef = SchemaDef.DisableField(@event.FieldId.Id);
+            SchemaDef = SchemaDef.DisableField(@event.FieldId.Id, @event.ParentFieldId?.Id);
         }
 
         protected void On(FieldEnabled @event, FieldRegistry registry)
         {
-            SchemaDef = SchemaDef.EnableField(@event.FieldId.Id);
+            SchemaDef = SchemaDef.EnableField(@event.FieldId.Id, @event.ParentFieldId?.Id);
         }
 
         protected void On(FieldHidden @event, FieldRegistry registry)
         {
-            SchemaDef = SchemaDef.HideField(@event.FieldId.Id);
+            SchemaDef = SchemaDef.HideField(@event.FieldId.Id, @event.ParentFieldId?.Id);
         }
 
         protected void On(FieldShown @event, FieldRegistry registry)
         {
-            SchemaDef = SchemaDef.ShowField(@event.FieldId.Id);
+            SchemaDef = SchemaDef.ShowField(@event.FieldId.Id, @event.ParentFieldId?.Id);
         }
 
         protected void On(FieldDeleted @event, FieldRegistry registry)
         {
-            SchemaDef = SchemaDef.DeleteField(@event.FieldId.Id);
+            SchemaDef = SchemaDef.DeleteField(@event.FieldId.Id, @event.ParentFieldId?.Id);
         }
 
         protected void On(SchemaDeleted @event, FieldRegistry registry)

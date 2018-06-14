@@ -7,6 +7,7 @@
 
 import { Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
+import { filter, map } from 'rxjs/operators';
 
 interface Message {
     channel: string;
@@ -30,6 +31,6 @@ export class MessageBus {
     public of<T>(messageType: { new(...args: any[]): T }): Observable<T> {
         const channel = (<any>messageType).name;
 
-        return this.message$.filter(m => m.channel === channel).map(m => m.data);
+        return this.message$.pipe(filter(m => m.channel === channel), map(m => m.data));
     }
 }

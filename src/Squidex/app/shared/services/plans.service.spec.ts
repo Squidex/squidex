@@ -42,7 +42,7 @@ describe('PlansService', () => {
     it('should make get request to get app plans',
         inject([PlansService, HttpTestingController], (plansService: PlansService, httpMock: HttpTestingController) => {
 
-        let plans: PlansDto | null = null;
+        let plans: PlansDto;
 
         plansService.getPlans('my-app').subscribe(result => {
             plans = result;
@@ -85,7 +85,7 @@ describe('PlansService', () => {
             }
         });
 
-        expect(plans).toEqual(
+        expect(plans!).toEqual(
             new PlansDto(
                 '123',
                 '456',
@@ -103,7 +103,7 @@ describe('PlansService', () => {
 
         const dto = new ChangePlanDto('enterprise');
 
-        let planChanged: PlanChangedDto | null = null;
+        let planChanged: PlanChangedDto;
 
         plansService.putPlan('my-app', dto, version).subscribe(result => {
             planChanged = result.payload;
@@ -116,6 +116,6 @@ describe('PlansService', () => {
         expect(req.request.method).toEqual('PUT');
         expect(req.request.headers.get('If-Match')).toBe(version.value);
 
-        expect(planChanged).toEqual(new PlanChangedDto('my-url'));
+        expect(planChanged!).toEqual(new PlanChangedDto('my-url'));
     }));
 });

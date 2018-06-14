@@ -7,6 +7,7 @@
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
+import { filter, map, switchMap } from 'rxjs/operators';
 
 import {
     AppDto,
@@ -39,7 +40,7 @@ export class DashboardPageComponent implements OnDestroy, OnInit {
     public chartCallsCount: any;
     public chartCallsPerformance: any;
 
-    public app = this.appsState.selectedApp.filter(x => !!x).map(x => <AppDto>x);
+    public app = this.appsState.selectedApp.pipe(filter(x => !!x), map(x => <AppDto>x));
 
     public chartOptions = {
         responsive: true,
@@ -86,31 +87,31 @@ export class DashboardPageComponent implements OnDestroy, OnInit {
 
     public ngOnInit() {
         this.subscriptions.push(
-            this.app
-                .switchMap(app => this.usagesService.getTodayStorage(app.name))
+            this.app.pipe(
+                    switchMap(app => this.usagesService.getTodayStorage(app.name)))
                 .subscribe(dto => {
                     this.assetsCurrent = dto.size;
                     this.assetsMax = dto.maxAllowed;
                 }));
 
         this.subscriptions.push(
-            this.app
-                .switchMap(app => this.usagesService.getMonthCalls(app.name))
+            this.app.pipe(
+                    switchMap(app => this.usagesService.getMonthCalls(app.name)))
                 .subscribe(dto => {
                     this.callsCurrent = dto.count;
                     this.callsMax = dto.maxAllowed;
                 }));
 
         this.subscriptions.push(
-            this.app
-                .switchMap(app => this.historyService.getHistory(app.name, ''))
+            this.app.pipe(
+                    switchMap(app => this.historyService.getHistory(app.name, '')))
                 .subscribe(dto => {
                     this.history = dto;
                 }));
 
         this.subscriptions.push(
-            this.app
-                .switchMap(app => this.usagesService.getStorageUsages(app.name, DateTime.today().addDays(-20), DateTime.today()))
+            this.app.pipe(
+                    switchMap(app => this.usagesService.getStorageUsages(app.name, DateTime.today().addDays(-20), DateTime.today())))
                 .subscribe(dtos => {
                     this.chartStorageCount = {
                         labels: createLabels(dtos),
@@ -144,8 +145,8 @@ export class DashboardPageComponent implements OnDestroy, OnInit {
                 }));
 
         this.subscriptions.push(
-            this.app
-                .switchMap(app => this.usagesService.getCallsUsages(app.name, DateTime.today().addDays(-20), DateTime.today()))
+            this.app.pipe(
+                    switchMap(app => this.usagesService.getCallsUsages(app.name, DateTime.today().addDays(-20), DateTime.today())))
                 .subscribe(dtos => {
                     this.chartCallsCount = {
                         labels: createLabels(dtos),

@@ -7,6 +7,7 @@
 
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Subscription } from 'rxjs';
+import { onErrorResumeNext, switchMap, tap } from 'rxjs/operators';
 
 import {
     AppLanguageDto,
@@ -72,7 +73,7 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
 
                     this.schema = schema!;
 
-                    this.contentsState.init().onErrorResumeNext().subscribe();
+                    this.contentsState.init().pipe(onErrorResumeNext()).subscribe();
                 });
 
         this.contentsSubscription =
@@ -90,15 +91,15 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
     }
 
     public reload() {
-        this.contentsState.load(true).onErrorResumeNext().subscribe();
+        this.contentsState.load(true).pipe(onErrorResumeNext()).subscribe();
     }
 
     public deleteSelected() {
-        this.contentsState.deleteMany(this.select()).onErrorResumeNext().subscribe();
+        this.contentsState.deleteMany(this.select()).pipe(onErrorResumeNext()).subscribe();
     }
 
     public delete(content: ContentDto) {
-        this.contentsState.deleteMany([content]).onErrorResumeNext().subscribe();
+        this.contentsState.deleteMany([content]).pipe(onErrorResumeNext()).subscribe();
     }
 
     public publish(content: ContentDto) {
@@ -138,36 +139,37 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
             return;
         }
 
-        this.dueTimeSelector.selectDueTime(action)
-            .do(() => {
-                this.resetSelection();
-            })
-            .switchMap(d => this.contentsState.changeManyStatus(contents, action, d)).onErrorResumeNext()
+        this.dueTimeSelector.selectDueTime(action).pipe(
+                tap(() => {
+                    this.resetSelection();
+                }),
+                switchMap(d => this.contentsState.changeManyStatus(contents, action, d)),
+                onErrorResumeNext())
             .subscribe();
     }
 
     public goArchive(isArchive: boolean) {
         this.resetSelection();
 
-        this.contentsState.goArchive(isArchive).onErrorResumeNext().subscribe();
+        this.contentsState.goArchive(isArchive).pipe(onErrorResumeNext()).subscribe();
     }
 
     public goPrev() {
         this.resetSelection();
 
-        this.contentsState.goPrev().onErrorResumeNext().subscribe();
+        this.contentsState.goPrev().pipe(onErrorResumeNext()).subscribe();
     }
 
     public goNext() {
         this.resetSelection();
 
-        this.contentsState.goNext().onErrorResumeNext().subscribe();
+        this.contentsState.goNext().pipe(onErrorResumeNext()).subscribe();
     }
 
     public search(query: string) {
         this.resetSelection();
 
-        this.contentsState.search(query).onErrorResumeNext().subscribe();
+        this.contentsState.search(query).pipe(onErrorResumeNext()).subscribe();
     }
 
     public isItemSelected(content: ContentDto): boolean {

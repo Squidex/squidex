@@ -18,8 +18,8 @@ namespace Squidex.Domain.Apps.Core.Contents
         {
         }
 
-        public NamedContentData(NamedContentData copy)
-            : base(copy, EqualityComparer<string>.Default)
+        public NamedContentData(int capacity)
+            : base(capacity, EqualityComparer<string>.Default)
         {
         }
 

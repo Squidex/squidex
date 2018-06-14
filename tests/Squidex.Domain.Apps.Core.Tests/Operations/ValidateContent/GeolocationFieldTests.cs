@@ -62,7 +62,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             await sut.ValidateAsync(CreateValue(geolocation), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> is not a valid value." });
+                new[] { "Not a valid value." });
         }
 
         [Fact]
@@ -77,7 +77,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             await sut.ValidateAsync(CreateValue(geolocation), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> is not a valid value." });
+                new[] { "Not a valid value." });
         }
 
         [Fact]
@@ -93,7 +93,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             await sut.ValidateAsync(CreateValue(geolocation), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> is not a valid value." });
+                new[] { "Not a valid value." });
         }
 
         [Fact]
@@ -104,7 +104,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             await sut.ValidateAsync(CreateValue(JValue.CreateNull()), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> is required." });
+                new[] { "Field is required." });
         }
 
         private static JToken CreateValue(JToken v)
@@ -112,9 +112,9 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             return v;
         }
 
-        private static GeolocationField Field(GeolocationFieldProperties properties)
+        private static RootField<GeolocationFieldProperties> Field(GeolocationFieldProperties properties)
         {
-            return new GeolocationField(1, "my-geolocation", Partitioning.Invariant, properties);
+            return Fields.Geolocation(1, "my-geolocation", Partitioning.Invariant, properties);
         }
     }
 }

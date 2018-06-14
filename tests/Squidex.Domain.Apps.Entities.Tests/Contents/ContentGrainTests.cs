@@ -78,10 +78,10 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var schemaDef =
                  new Schema("my-schema")
-                     .AddField(new NumberField(1, "my-field1", Partitioning.Invariant,
-                         new NumberFieldProperties { IsRequired = true }))
-                     .AddField(new NumberField(2, "my-field2", Partitioning.Invariant,
-                         new NumberFieldProperties { IsRequired = false }));
+                     .AddNumber(1, "my-field1", Partitioning.Invariant,
+                         new NumberFieldProperties { IsRequired = true })
+                     .AddNumber(2, "my-field2", Partitioning.Invariant,
+                         new NumberFieldProperties { IsRequired = false });
 
             A.CallTo(() => app.LanguagesConfig).Returns(languagesConfig);
 

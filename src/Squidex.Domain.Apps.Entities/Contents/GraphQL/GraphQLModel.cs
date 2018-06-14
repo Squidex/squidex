@@ -12,127 +12,62 @@ using System.Threading.Tasks;
 using GraphQL;
 using GraphQL.Resolvers;
 using GraphQL.Types;
+using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core;
-using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types;
+using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Utils;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using GraphQLSchema = GraphQL.Types.Schema;
+
+#pragma warning disable IDE0003
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 {
     public sealed class GraphQLModel : IGraphModel
     {
-        private readonly Dictionary<Type, Func<Field, (IGraphType ResolveType, IFieldResolver Resolver)>> fieldInfos;
-        private readonly Dictionary<Type, IGraphType> inputFieldInfos;
         private readonly Dictionary<ISchemaEntity, ContentGraphType> contentTypes = new Dictionary<ISchemaEntity, ContentGraphType>();
         private readonly Dictionary<ISchemaEntity, ContentDataGraphType> contentDataTypes = new Dictionary<ISchemaEntity, ContentDataGraphType>();
-        private readonly Dictionary<Guid, ISchemaEntity> schemas;
+        private readonly Dictionary<Guid, ISchemaEntity> schemasById;
         private readonly PartitionResolver partitionResolver;
         private readonly IAppEntity app;
+        private readonly IGraphType assetType;
         private readonly IGraphType assetListType;
-        private readonly IComplexGraphType assetType;
         private readonly GraphQLSchema graphQLSchema;
 
-        public bool CanGenerateAssetSourceUrl { get; }
+        public bool CanGenerateAssetSourceUrl { get; private set; }
 
         public GraphQLModel(IAppEntity app, IEnumerable<ISchemaEntity> schemas, IGraphQLUrlGenerator urlGenerator)
         {
             this.app = app;
 
-            CanGenerateAssetSourceUrl = urlGenerator.CanGenerateAssetSourceUrl;
-
             partitionResolver = app.PartitionResolver();
+
+            CanGenerateAssetSourceUrl = urlGenerator.CanGenerateAssetSourceUrl;
 
             assetType = new AssetGraphType(this);
             assetListType = new ListGraphType(new NonNullGraphType(assetType));
 
-            inputFieldInfos = new Dictionary<Type, IGraphType>
-            {
-                {
-                    typeof(StringField),
-                    AllTypes.String
-                },
-                {
-                    typeof(BooleanField),
-                    AllTypes.Boolean
-                },
-                {
-                    typeof(NumberField),
-                    AllTypes.Boolean
-                },
-                {
-                    typeof(DateTimeField),
-                    AllTypes.Date
-                },
-                {
-                    typeof(GeolocationField),
-                    AllTypes.GeolocationInput
-                },
-                {
-                    typeof(TagsField),
-                    AllTypes.ListOfNonNullString
-                },
-                {
-                    typeof(AssetsField),
-                    AllTypes.ListOfNonNullGuid
-                },
-                {
-                    typeof(ReferencesField),
-                    AllTypes.ListOfNonNullGuid
-                }
-            };
+            schemasById = schemas.ToDictionary(x => x.Id);
 
-            fieldInfos = new Dictionary<Type, Func<Field, (IGraphType ResolveType, IFieldResolver Resolver)>>
-            {
-                {
-                    typeof(StringField),
-                    field => ResolveDefault(AllTypes.NoopString)
-                },
-                {
-                    typeof(BooleanField),
-                    field => ResolveDefault(AllTypes.NoopBoolean)
-                },
-                {
-                    typeof(NumberField),
-                    field => ResolveDefault(AllTypes.NoopFloat)
-                },
-                {
-                    typeof(DateTimeField),
-                    field => ResolveDefault(AllTypes.NoopDate)
-                },
-                {
-                    typeof(JsonField),
-                    field => ResolveDefault(AllTypes.NoopJson)
-                },
-                {
-                    typeof(GeolocationField),
-                    field => ResolveDefault(AllTypes.NoopGeolocation)
-                },
-                {
-                    typeof(TagsField),
-                    field => ResolveDefault(AllTypes.NoopTags)
-                },
-                {
-                    typeof(AssetsField),
-                    field => ResolveAssets(assetListType)
-                },
-                {
-                    typeof(ReferencesField),
-                    field => ResolveReferences(field)
-                }
-            };
+            graphQLSchema = BuildSchema(this);
+            graphQLSchema.RegisterValueConverter(JsonConverter.Instance);
 
-            this.schemas = schemas.ToDictionary(x => x.Id);
+            InitializeContentTypes();
+        }
 
-            var m = new AppMutationsGraphType(this, this.schemas.Values);
-            var q = new AppQueriesGraphType(this, this.schemas.Values);
+        private static GraphQLSchema BuildSchema(GraphQLModel model)
+        {
+            var schemas = model.schemasById.Values;
 
-            graphQLSchema = new GraphQLSchema { Query = q, Mutation = m };
+            return new GraphQLSchema { Query = new AppQueriesGraphType(model, schemas) };
+        }
 
+        private void InitializeContentTypes()
+        {
             foreach (var kvp in contentDataTypes)
             {
                 kvp.Value.Initialize(this, kvp.Key);
@@ -146,7 +81,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
         private static (IGraphType ResolveType, IFieldResolver Resolver) ResolveDefault(IGraphType type)
         {
-            return (type, new FuncFieldResolver<ContentFieldData, object>(c => c.Source.GetOrDefault(c.FieldName)));
+            return (type, new FuncFieldResolver<IReadOnlyDictionary<string, JToken>, object>(c => c.Source.GetOrDefault(c.FieldName)));
         }
 
         public IFieldResolver ResolveAssetUrl()
@@ -197,101 +132,63 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             return resolver;
         }
 
-        private static ValueTuple<IGraphType, IFieldResolver> ResolveAssets(IGraphType assetListType)
+        public IFieldPartitioning ResolvePartition(Partitioning key)
         {
-            var resolver = new FuncFieldResolver<ContentFieldData, object>(c =>
-            {
-                var context = (GraphQLExecutionContext)c.UserContext;
-                var contentIds = c.Source.GetOrDefault(c.FieldName);
-
-                return context.GetReferencedAssetsAsync(contentIds);
-            });
-
-            return (assetListType, resolver);
+            return partitionResolver(key);
         }
 
-        private ValueTuple<IGraphType, IFieldResolver> ResolveReferences(Field field)
+        public (IGraphType ResolveType, ValueResolver Resolver) GetGraphType(ISchemaEntity schema, IField field)
         {
-            var schemaId = ((ReferencesField)field).Properties.SchemaId;
+            return field.Accept(new QueryGraphTypeVisitor(schema, GetContentType, this, assetListType));
+        }
 
-            var contentType = GetContentType(schemaId);
+        public IGraphType GetAssetType()
+        {
+            return assetType;
+        }
 
-            if (contentType == null)
+        public IGraphType GetContentDataType(Guid schemaId)
+        {
+            var schema = schemasById.GetOrDefault(schemaId);
+
+            if (schema == null)
             {
-                return (null, null);
+                return null;
             }
 
-            var resolver = new FuncFieldResolver<ContentFieldData, object>(c =>
+            return schema != null ? contentDataTypes.GetOrAddNew(schema) : null;
+        }
+
+        public IGraphType GetContentType(Guid schemaId)
+        {
+            var schema = schemasById.GetOrDefault(schemaId);
+
+            if (schema == null)
             {
-                var context = (GraphQLExecutionContext)c.UserContext;
-                var contentIds = c.Source.GetOrDefault(c.FieldName);
+                return null;
+            }
 
-                return context.GetReferencedContentsAsync(schemaId, contentIds);
-            });
+            contentDataTypes.GetOrAdd(schema, s => new ContentDataGraphType());
 
-            var schemaFieldType = new ListGraphType(new NonNullGraphType(contentType));
-
-            return (schemaFieldType, resolver);
+            return contentTypes.GetOrAdd(schema, s => new ContentGraphType());
         }
 
         public async Task<(object Data, object[] Errors)> ExecuteAsync(GraphQLExecutionContext context, GraphQLQuery query)
         {
             Guard.NotNull(context, nameof(context));
 
+            var inputs = query.Variables?.ToInputs();
+
             var result = await new DocumentExecuter().ExecuteAsync(options =>
             {
-                options.Query = query.Query;
-                options.Schema = graphQLSchema;
-                options.Inputs = query.Variables?.ToInputs() ?? new Inputs();
-                options.UserContext = context;
                 options.OperationName = query.OperationName;
+                options.UserContext = context;
+                options.Schema = graphQLSchema;
+                options.Inputs = inputs;
+                options.Query = query.Query;
             }).ConfigureAwait(false);
 
             return (result.Data, result.Errors?.Select(x => (object)new { x.Message, x.Locations }).ToArray());
-        }
-
-        public IFieldPartitioning ResolvePartition(Partitioning key)
-        {
-            return partitionResolver(key);
-        }
-
-        public IComplexGraphType GetAssetType()
-        {
-            return assetType;
-        }
-
-        public (IGraphType ResolveType, IFieldResolver Resolver) GetGraphType(Field field)
-        {
-            return fieldInfos[field.GetType()](field);
-        }
-
-        public IComplexGraphType GetContentDataType(Guid schemaId)
-        {
-            var schema = schemas.GetOrDefault(schemaId);
-
-            if (schema == null)
-            {
-                return null;
-            }
-
-            return schema != null ? contentDataTypes.GetOrAdd(schema, s => new ContentDataGraphType()) : null;
-        }
-
-        public IComplexGraphType GetContentType(Guid schemaId)
-        {
-            var schema = schemas.GetOrDefault(schemaId);
-
-            if (schema == null)
-            {
-                return null;
-            }
-
-            return contentTypes.GetOrAdd(schema, s => new ContentGraphType());
-        }
-
-        public IGraphType GetInputGraphType(Field field)
-        {
-            return inputFieldInfos.GetOrAddDefault(field.GetType());
         }
     }
 }

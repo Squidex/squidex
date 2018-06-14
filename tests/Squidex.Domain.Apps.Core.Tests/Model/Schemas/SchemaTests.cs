@@ -62,7 +62,7 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
         {
             var schema_1 = schema_0.AddField(CreateField(1));
 
-            Assert.Throws<ArgumentException>(() => schema_1.AddField(new NumberField(2, "my-field-1", Partitioning.Invariant)));
+            Assert.Throws<ArgumentException>(() => schema_1.AddNumber(2, "my-field-1", Partitioning.Invariant));
         }
 
         [Fact]
@@ -70,7 +70,7 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
         {
             var schema_1 = schema_0.AddField(CreateField(1));
 
-            Assert.Throws<ArgumentException>(() => schema_1.AddField(new NumberField(1, "my-field-2", Partitioning.Invariant)));
+            Assert.Throws<ArgumentException>(() => schema_1.AddNumber(1, "my-field-2", Partitioning.Invariant));
         }
 
         [Fact]
@@ -78,8 +78,8 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
         {
             var schema_1 = schema_0.AddField(CreateField(1));
 
-            var schema_2 = schema_1.HideField(1);
-            var schema_3 = schema_2.HideField(1);
+            var schema_2 = schema_1.UpdateField(1, f => f.Hide());
+            var schema_3 = schema_2.UpdateField(1, f => f.Hide());
 
             Assert.False(schema_1.FieldsById[1].IsHidden);
             Assert.True(schema_3.FieldsById[1].IsHidden);
@@ -88,7 +88,7 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
         [Fact]
         public void Should_return_same_schema_if_field_to_hide_does_not_exist()
         {
-            var schema_1 = schema_0.HideField(1);
+            var schema_1 = schema_0.UpdateField(1, f => f.Hide());
 
             Assert.Same(schema_0, schema_1);
         }
@@ -98,9 +98,9 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
         {
             var schema_1 = schema_0.AddField(CreateField(1));
 
-            var schema_2 = schema_1.HideField(1);
-            var schema_3 = schema_2.ShowField(1);
-            var schema_4 = schema_3.ShowField(1);
+            var schema_2 = schema_1.UpdateField(1, f => f.Hide());
+            var schema_3 = schema_2.UpdateField(1, f => f.Show());
+            var schema_4 = schema_3.UpdateField(1, f => f.Show());
 
             Assert.True(schema_2.FieldsById[1].IsHidden);
             Assert.False(schema_4.FieldsById[1].IsHidden);
@@ -109,7 +109,7 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
         [Fact]
         public void Should_return_same_schema_if_field_to_show_does_not_exist()
         {
-            var schema_1 = schema_0.ShowField(1);
+            var schema_1 = schema_0.UpdateField(1, f => f.Show());
 
             Assert.Same(schema_0, schema_1);
         }
@@ -119,8 +119,8 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
         {
             var schema_1 = schema_0.AddField(CreateField(1));
 
-            var schema_2 = schema_1.DisableField(1);
-            var schema_3 = schema_2.DisableField(1);
+            var schema_2 = schema_1.UpdateField(1, f => f.Disable());
+            var schema_3 = schema_2.UpdateField(1, f => f.Disable());
 
             Assert.False(schema_1.FieldsById[1].IsDisabled);
             Assert.True(schema_3.FieldsById[1].IsDisabled);
@@ -129,7 +129,7 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
         [Fact]
         public void Should_return_same_schema_if_field_to_disable_does_not_exist()
         {
-            var schema_1 = schema_0.DisableField(1);
+            var schema_1 = schema_0.UpdateField(1, f => f.Disable());
 
             Assert.Same(schema_0, schema_1);
         }
@@ -139,9 +139,9 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
         {
             var schema_1 = schema_0.AddField(CreateField(1));
 
-            var schema_2 = schema_1.DisableField(1);
-            var schema_3 = schema_2.EnableField(1);
-            var schema_4 = schema_3.EnableField(1);
+            var schema_2 = schema_1.UpdateField(1, f => f.Disable());
+            var schema_3 = schema_2.UpdateField(1, f => f.Enable());
+            var schema_4 = schema_3.UpdateField(1, f => f.Enable());
 
             Assert.True(schema_2.FieldsById[1].IsDisabled);
             Assert.False(schema_4.FieldsById[1].IsDisabled);
@@ -150,7 +150,7 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
         [Fact]
         public void Should_return_same_schema_if_field_to_enable_does_not_exist()
         {
-            var schema_1 = schema_0.EnableField(1);
+            var schema_1 = schema_0.UpdateField(1, f => f.Enable());
 
             Assert.Same(schema_0, schema_1);
         }
@@ -160,8 +160,8 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
         {
             var schema_1 = schema_0.AddField(CreateField(1));
 
-            var schema_2 = schema_1.LockField(1);
-            var schema_3 = schema_2.LockField(1);
+            var schema_2 = schema_1.UpdateField(1, f => f.Lock());
+            var schema_3 = schema_2.UpdateField(1, f => f.Lock());
 
             Assert.False(schema_1.FieldsById[1].IsLocked);
             Assert.True(schema_3.FieldsById[1].IsLocked);
@@ -170,7 +170,7 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
         [Fact]
         public void Should_return_same_schema_if_field_to_lock_does_not_exist()
         {
-            var schema_1 = schema_0.LockField(1);
+            var schema_1 = schema_0.UpdateField(1, f => f.Lock());
 
             Assert.Same(schema_0, schema_1);
         }
@@ -181,7 +181,7 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
             var properties = new NumberFieldProperties();
 
             var schema_1 = schema_0.AddField(CreateField(1));
-            var schema_2 = schema_1.UpdateField(1, properties);
+            var schema_2 = schema_1.UpdateField(1, f => f.Update(properties));
 
             Assert.NotSame(properties, schema_1.FieldsById[1].RawProperties);
             Assert.Same(properties, schema_2.FieldsById[1].RawProperties);
@@ -192,13 +192,13 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
         {
             var schema_1 = schema_0.AddField(CreateField(1));
 
-            Assert.Throws<ArgumentException>(() => schema_1.UpdateField(1, new StringFieldProperties()));
+            Assert.Throws<ArgumentException>(() => schema_1.UpdateField(1, f => f.Update(new StringFieldProperties())));
         }
 
         [Fact]
         public void Should_return_same_schema_if_field_to_update_does_not_exist()
         {
-            var schema_1 = schema_0.UpdateField(1, new StringFieldProperties());
+            var schema_1 = schema_0.UpdateField(1, f => f.Update(new StringFieldProperties()));
 
             Assert.Same(schema_0, schema_1);
         }
@@ -251,7 +251,7 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
             var schema_3 = schema_2.AddField(field3);
             var schema_4 = schema_3.ReorderFields(new List<long> { 3, 2, 1 });
 
-            Assert.Equal(new List<Field> { field3, field2, field1 }, schema_4.Fields.ToList());
+            Assert.Equal(new List<RootField> { field3, field2, field1 }, schema_4.Fields.ToList());
         }
 
         [Fact]
@@ -287,9 +287,9 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
             schemaTarget.ShouldBeEquivalentTo(schemaSource);
         }
 
-        private static NumberField CreateField(int id)
+        private static RootField<NumberFieldProperties> CreateField(int id)
         {
-            return new NumberField(id, $"my-field-{id}", Partitioning.Invariant);
+            return Fields.Number(id, $"my-field-{id}", Partitioning.Invariant);
         }
     }
 }

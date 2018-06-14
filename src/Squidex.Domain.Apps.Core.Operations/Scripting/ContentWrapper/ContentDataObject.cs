@@ -95,14 +95,14 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
         {
             EnsurePropertiesInitialized();
 
-            fieldProperties.GetOrAdd(propertyName, x => new ContentDataProperty(this)).Value = value;
+            fieldProperties.GetOrAdd(propertyName, this, (k, c) => new ContentDataProperty(c)).Value = value;
         }
 
         public override PropertyDescriptor GetOwnProperty(string propertyName)
         {
             EnsurePropertiesInitialized();
 
-            return fieldProperties.GetOrAdd(propertyName, x => new ContentDataProperty(this, new ContentFieldObject(this, new ContentFieldData(), false)));
+            return fieldProperties.GetOrAdd(propertyName, this, (k, c) => new ContentDataProperty(c, new ContentFieldObject(c, new ContentFieldData(), false)));
         }
 
         public override IEnumerable<KeyValuePair<string, PropertyDescriptor>> GetOwnProperties()

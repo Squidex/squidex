@@ -7,6 +7,7 @@
 
 import { Component, Input, OnChanges } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
+import { onErrorResumeNext } from 'rxjs/operators';
 
 import {
     AccessTokenDto,
@@ -54,11 +55,11 @@ export class ClientComponent implements OnChanges {
     }
 
     public revoke() {
-        this.clientsState.revoke(this.client).onErrorResumeNext().subscribe();
+        this.clientsState.revoke(this.client).pipe(onErrorResumeNext()).subscribe();
     }
 
     public update(permission: string) {
-        this.clientsState.update(this.client, new UpdateAppClientDto(undefined, permission)).onErrorResumeNext().subscribe();
+        this.clientsState.update(this.client, new UpdateAppClientDto(undefined, permission)).pipe(onErrorResumeNext()).subscribe();
     }
 
     public toggleRename() {

@@ -200,7 +200,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         public void Create(CreateApp command)
         {
-            var appId = new NamedId<Guid>(command.AppId, command.Name);
+            var appId = NamedId.Of(command.AppId, command.Name);
 
             var events = new List<AppEvent>
             {
@@ -308,7 +308,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             if (@event.AppId == null)
             {
-                @event.AppId = new NamedId<Guid>(Snapshot.Id, Snapshot.Name);
+                @event.AppId = NamedId.Of(Snapshot.Id, Snapshot.Name);
             }
 
             RaiseEvent(Envelope.Create(@event));

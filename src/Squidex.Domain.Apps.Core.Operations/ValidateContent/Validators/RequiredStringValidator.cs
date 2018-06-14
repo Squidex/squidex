@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Threading.Tasks;
 using Squidex.Infrastructure.Tasks;
 
@@ -20,7 +19,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
             this.validateEmptyStrings = validateEmptyStrings;
         }
 
-        public Task ValidateAsync(object value, ValidationContext context, Action<string> addError)
+        public Task ValidateAsync(object value, ValidationContext context, AddError addError)
         {
             if (context.IsOptional || (value != null && !(value is string)))
             {
@@ -31,7 +30,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
             if (valueAsString == null || (validateEmptyStrings && string.IsNullOrWhiteSpace(valueAsString)))
             {
-                addError("<FIELD> is required.");
+                addError(context.Path, "Field is required.");
             }
 
             return TaskHelper.Done;

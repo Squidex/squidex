@@ -1,8 +1,16 @@
 # Changelog
 
+## v1.6.0 - 2018-06-07
+
+### Features
+
+* **Schemas**: Nested Schemas**
+* **UI**: Migration to RxJS6
+* **UI**: Migration to Angular6
+
 ## v1.5.0 - 2018-05-20
 
-### Bugfixe
+### Bugfixes
 
 * **UI**: Fixed the pattern selector in field editor.
 

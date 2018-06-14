@@ -7,18 +7,22 @@
 
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Core.ValidateContent.Validators;
 using Squidex.Infrastructure;
 
-#pragma warning disable 168
+#pragma warning disable SA1028, IDE0004 // Code must not contain trailing whitespace
 
 namespace Squidex.Domain.Apps.Core.ValidateContent
 {
     public sealed class ContentValidator
     {
+        private static readonly ContentFieldData DefaultFieldData = new ContentFieldData();
+        private static readonly JToken DefaultValue = JValue.CreateNull();
         private readonly Schema schema;
         private readonly PartitionResolver partitionResolver;
         private readonly ValidationContext context;
@@ -39,103 +43,60 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             this.partitionResolver = partitionResolver;
         }
 
+        private void AddError(IEnumerable<string> path, string message)
+        {
+            var pathString = path.ToPathString();
+
+            errors.Add(new ValidationError($"{pathString}: {message}", pathString));
+        }
+
         public Task ValidatePartialAsync(NamedContentData data)
         {
             Guard.NotNull(data, nameof(data));
 
-            var tasks = new List<Task>();
+            var validator = CreateSchemaValidator(true);
 
-            foreach (var fieldData in data)
-            {
-                var fieldName = fieldData.Key;
-
-                if (!schema.FieldsByName.TryGetValue(fieldData.Key, out var field))
-                {
-                    errors.AddError("<FIELD> is not a known field.", fieldName);
-                }
-                else
-                {
-                    tasks.Add(ValidateFieldPartialAsync(field, fieldData.Value));
-                }
-            }
-
-            return Task.WhenAll(tasks);
-        }
-
-        private Task ValidateFieldPartialAsync(Field field, ContentFieldData fieldData)
-        {
-            var partitioning = field.Partitioning;
-            var partition = partitionResolver(partitioning);
-
-            var tasks = new List<Task>();
-
-            foreach (var partitionValues in fieldData)
-            {
-                if (partition.TryGetItem(partitionValues.Key, out var item))
-                {
-                    tasks.Add(field.ValidateAsync(partitionValues.Value, context.Optional(item.IsOptional), m => errors.AddError(m, field, item)));
-                }
-                else
-                {
-                    errors.AddError($"<FIELD> has an unsupported {partitioning.Key} value '{partitionValues.Key}'.", field);
-                }
-            }
-
-            return Task.WhenAll(tasks);
+            return validator.ValidateAsync(data, context, AddError);
         }
 
         public Task ValidateAsync(NamedContentData data)
         {
             Guard.NotNull(data, nameof(data));
 
-            ValidateUnknownFields(data);
+            var validator = CreateSchemaValidator(false);
 
-            var tasks = new List<Task>();
-
-            foreach (var field in schema.FieldsByName.Values)
-            {
-                var fieldData = data.GetOrCreate(field.Name, k => new ContentFieldData());
-
-                tasks.Add(ValidateFieldAsync(field, fieldData));
-            }
-
-            return Task.WhenAll(tasks);
+            return validator.ValidateAsync(data, context, AddError);
         }
 
-        private void ValidateUnknownFields(NamedContentData data)
+        private IValidator CreateSchemaValidator(bool isPartial)
         {
-            foreach (var fieldData in data)
+            var fieldsValidators = new Dictionary<string, (bool IsOptional, IValidator Validator)>();
+
+            foreach (var field in schema.FieldsByName)
             {
-                if (!schema.FieldsByName.ContainsKey(fieldData.Key))
-                {
-                    errors.AddError("<FIELD> is not a known field.", fieldData.Key);
-                }
+                fieldsValidators[field.Key] = (!field.Value.RawProperties.IsRequired, CreateFieldValidator(field.Value, isPartial));
             }
+
+            return new ObjectValidator<ContentFieldData>(fieldsValidators, isPartial, "field", DefaultFieldData);
         }
 
-        private Task ValidateFieldAsync(Field field, ContentFieldData fieldData)
+        private IValidator CreateFieldValidator(IRootField field, bool isPartial)
         {
-            var partitioning = field.Partitioning;
-            var partition = partitionResolver(partitioning);
+            var partitioning = partitionResolver(field.Partitioning);
 
-            var tasks = new List<Task>();
+            var fieldValidator = new FieldValidator(ValidatorsFactory.CreateValidators(field).ToArray(), field);
+            var fieldsValidators = new Dictionary<string, (bool IsOptional, IValidator Validator)>();
 
-            foreach (var partitionValues in fieldData)
+            foreach (var partition in partitioning)
             {
-                if (!partition.TryGetItem(partitionValues.Key, out var _))
-                {
-                    errors.AddError($"<FIELD> has an unsupported {partitioning.Key} value '{partitionValues.Key}'.", field);
-                }
+                fieldsValidators[partition.Key] = (partition.IsOptional, fieldValidator);
             }
 
-            foreach (var item in partition)
-            {
-                var value = fieldData.GetOrCreate(item.Key, k => JValue.CreateNull());
+            var isLanguage = field.Partitioning.Equals(Partitioning.Language);
 
-                tasks.Add(field.ValidateAsync(value, context.Optional(item.IsOptional), m => errors.AddError(m, field, item)));
-            }
+            var type = isLanguage ? "language" : "invariant value";
 
-            return Task.WhenAll(tasks);
+            return new ObjectValidator<JToken>(fieldsValidators, isPartial, type, DefaultValue);
         }
     }
 }

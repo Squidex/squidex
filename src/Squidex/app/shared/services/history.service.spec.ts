@@ -36,7 +36,7 @@ describe('HistoryService', () => {
     it('should make get request to get history events',
         inject([HistoryService, HttpTestingController], (historyService: HistoryService, httpMock: HttpTestingController) => {
 
-        let events: HistoryEventDto[] | null = null;
+        let events: HistoryEventDto[];
 
         historyService.getHistory('my-app', 'settings.contributors').subscribe(result => {
             events = result;
@@ -64,7 +64,7 @@ describe('HistoryService', () => {
             }
         ]);
 
-        expect(events).toEqual(
+        expect(events!).toEqual(
             [
                 new HistoryEventDto('1', 'User1', 'Message 1', 2, DateTime.parseISO_UTC('2016-12-12T10:10')),
                 new HistoryEventDto('2', 'User2', 'Message 2', 3, DateTime.parseISO_UTC('2016-12-13T10:10'))

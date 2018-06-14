@@ -82,7 +82,7 @@ describe('AssetsService', () => {
     it('should make get request to get assets',
         inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
 
-        let assets: AssetsDto | null = null;
+        let assets: AssetsDto;
 
         assetsService.getAssets('my-app', 17, 13).subscribe(result => {
             assets = result;
@@ -131,7 +131,7 @@ describe('AssetsService', () => {
             ]
         });
 
-        expect(assets).toEqual(
+        expect(assets!).toEqual(
             new AssetsDto(10, [
                 new AssetDto(
                     'id1', 'Created1', 'LastModifiedBy1',
@@ -166,7 +166,7 @@ describe('AssetsService', () => {
     it('should make get request to get asset',
         inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
 
-        let asset: AssetDto | null = null;
+        let asset: AssetDto;
 
         assetsService.getAsset('my-app', '123').subscribe(result => {
             asset = result;
@@ -197,7 +197,7 @@ describe('AssetsService', () => {
             }
         });
 
-        expect(asset).toEqual(
+        expect(asset!).toEqual(
             new AssetDto(
                 'id1', 'Created1', 'LastModifiedBy1',
                 DateTime.parseISO_UTC('2016-12-12T10:10'),
@@ -243,7 +243,7 @@ describe('AssetsService', () => {
     it('should make post request to create asset',
         inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
 
-        let asset: AssetDto | null = null;
+        let asset: AssetDto;
 
         assetsService.uploadFile('my-app', null!, user, now).subscribe(result => {
             asset = <AssetDto>result;
@@ -270,7 +270,7 @@ describe('AssetsService', () => {
             }
         });
 
-        expect(asset).toEqual(
+        expect(asset!).toEqual(
             new AssetDto(
                 'id1',
                 user,
@@ -291,7 +291,7 @@ describe('AssetsService', () => {
     it('should make put request to replace asset content',
         inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
 
-        let asset: AssetReplacedDto | null = null;
+        let asset: AssetReplacedDto;
 
         assetsService.replaceFile('my-app', '123', null!, version).subscribe(result => {
             asset = (<Versioned<AssetReplacedDto>>result).payload;
@@ -311,7 +311,7 @@ describe('AssetsService', () => {
             pixelHeight: 2048
         });
 
-        expect(asset).toEqual(
+        expect(asset!).toEqual(
             new AssetReplacedDto(
                 1024, 2,
                 'image/png',

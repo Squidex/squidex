@@ -113,7 +113,9 @@ body {
 // Drop area for drag and drop features.
 //
 .drop-container {
-    position: relative;
+    & {
+        position: relative;
+    }
 
     .drop-area {
         & {
@@ -144,6 +146,13 @@ body {
 
     .drop-text {
         background: $color-dark-foreground;
+    }
+}
+
+.sorting {
+    &,
+    & > * {
+        @include opacity(.5);
     }
 }
 

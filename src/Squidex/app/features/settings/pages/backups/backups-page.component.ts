@@ -6,7 +6,8 @@
  */
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Observable, Subscription } from 'rxjs';
+import { Subscription, timer } from 'rxjs';
+import { onErrorResumeNext, switchMap } from 'rxjs/operators';
 
 import {
     AppsState,
@@ -33,24 +34,24 @@ export class BackupsPageComponent implements OnInit, OnDestroy {
     }
 
     public ngOnInit() {
-        this.backupsState.load(false, true).onErrorResumeNext().subscribe();
+        this.backupsState.load(false, true).pipe(onErrorResumeNext()).subscribe();
 
         this.timerSubscription =
-            Observable.timer(3000, 3000)
-                .switchMap(t => this.backupsState.load(true, true).onErrorResumeNext())
+            timer(3000, 3000).pipe(
+                    switchMap(t => this.backupsState.load(true, true)), onErrorResumeNext())
                 .subscribe();
     }
 
     public reload() {
-        this.backupsState.load(true, false).onErrorResumeNext().subscribe();
+        this.backupsState.load(true, false).pipe(onErrorResumeNext()).subscribe();
     }
 
     public start() {
-        this.backupsState.start().onErrorResumeNext().subscribe();
+        this.backupsState.start().pipe(onErrorResumeNext()).subscribe();
     }
 
     public delete(backup: BackupDto) {
-        this.backupsState.delete(backup).onErrorResumeNext().subscribe();
+        this.backupsState.delete(backup).pipe(onErrorResumeNext()).subscribe();
     }
 
     public trackByBackup(index: number, item: BackupDto) {

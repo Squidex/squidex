@@ -24,7 +24,7 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
                 .Select(x => new object[] { x })
                 .ToList();
 
-        private readonly NumberField field_0 = new NumberField(1, "my-field", Partitioning.Invariant);
+        private readonly RootField<NumberFieldProperties> field_0 = Fields.Number(1, "my-field", Partitioning.Invariant);
 
         [Fact]
         public void Should_instantiate_field()
@@ -36,7 +36,7 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
         [Fact]
         public void Should_throw_exception_if_creating_field_with_invalid_name()
         {
-            Assert.Throws<ArgumentException>(() => new NumberField(1, string.Empty, Partitioning.Invariant));
+            Assert.Throws<ArgumentException>(() => Fields.Number(1, string.Empty, Partitioning.Invariant));
         }
 
         [Fact]

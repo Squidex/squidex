@@ -34,7 +34,7 @@ describe('LanguageService', () => {
     it('should make get request to get languages',
         inject([LanguagesService, HttpTestingController], (languagesService: LanguagesService, httpMock: HttpTestingController) => {
 
-        let languages: LanguageDto[] | null = null;
+        let languages: LanguageDto[];
 
         languagesService.getLanguages().subscribe(result => {
             languages = result;
@@ -56,7 +56,7 @@ describe('LanguageService', () => {
             }
         ]);
 
-        expect(languages).toEqual(
+        expect(languages!).toEqual(
             [
                 new LanguageDto('de', 'German'),
                 new LanguageDto('en', 'English')

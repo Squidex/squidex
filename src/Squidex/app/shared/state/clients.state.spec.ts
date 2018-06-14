@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Observable } from 'rxjs';
+import { of } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 
 import {
@@ -47,7 +47,7 @@ describe('ClientsState', () => {
         clientsService = Mock.ofType<AppClientsService>();
 
         clientsService.setup(x => x.getClients(app))
-            .returns(() => Observable.of(new AppClientsDto(oldClients, version)));
+            .returns(() => of(new AppClientsDto(oldClients, version)));
 
         clientsState = new ClientsState(clientsService.object, appsState.object, dialogs.object);
         clientsState.load().subscribe();
@@ -64,6 +64,8 @@ describe('ClientsState', () => {
     it('should show notification on load when reload is true', () => {
         clientsState.load(true).subscribe();
 
+        expect().nothing();
+
         dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
     });
 
@@ -73,7 +75,7 @@ describe('ClientsState', () => {
         const request = new CreateAppClientDto('id3');
 
         clientsService.setup(x => x.postClient(app, request, version))
-            .returns(() => Observable.of(new Versioned<AppClientDto>(newVersion, newClient)));
+            .returns(() => of(new Versioned<AppClientDto>(newVersion, newClient)));
 
         clientsState.attach(request).subscribe();
 
@@ -85,7 +87,7 @@ describe('ClientsState', () => {
         const request = new UpdateAppClientDto('NewName', 'NewPermission');
 
         clientsService.setup(x => x.putClient(app, oldClients[0].id, request, version))
-            .returns(() => Observable.of(new Versioned<any>(newVersion, {})));
+            .returns(() => of(new Versioned<any>(newVersion, {})));
 
         clientsState.update(oldClients[0], request).subscribe();
 
@@ -98,7 +100,7 @@ describe('ClientsState', () => {
 
     it('should remove client from snapshot when revoked', () => {
         clientsService.setup(x => x.deleteClient(app, oldClients[0].id, version))
-            .returns(() => Observable.of(new Versioned<any>(newVersion, {})));
+            .returns(() => of(new Versioned<any>(newVersion, {})));
 
         clientsState.revoke(oldClients[0]).subscribe();
 

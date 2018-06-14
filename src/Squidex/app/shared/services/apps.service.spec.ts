@@ -40,7 +40,7 @@ describe('AppsService', () => {
     it('should make get request to get apps',
         inject([AppsService, HttpTestingController], (appsService: AppsService, httpMock: HttpTestingController) => {
 
-        let apps: AppDto[] | null = null;
+        let apps: AppDto[];
 
         appsService.getApps().subscribe(result => {
             apps = result;
@@ -72,10 +72,11 @@ describe('AppsService', () => {
             }
         ]);
 
-        expect(apps).toEqual([
-            new AppDto('123', 'name1', 'Owner', DateTime.parseISO('2016-01-01'), DateTime.parseISO('2016-02-02'), 'Free', 'Basic'),
-            new AppDto('456', 'name2', 'Owner', DateTime.parseISO('2017-01-01'), DateTime.parseISO('2017-02-02'), 'Basic', 'Enterprise')
-        ]);
+        expect(apps!).toEqual(
+            [
+                new AppDto('123', 'name1', 'Owner', DateTime.parseISO('2016-01-01'), DateTime.parseISO('2016-02-02'), 'Free', 'Basic'),
+                new AppDto('456', 'name2', 'Owner', DateTime.parseISO('2017-01-01'), DateTime.parseISO('2017-02-02'), 'Basic', 'Enterprise')
+            ]);
     }));
 
     it('should make post request to create app',
@@ -83,7 +84,7 @@ describe('AppsService', () => {
 
         const dto = new CreateAppDto('new-app');
 
-        let app: AppDto | null = null;
+        let app: AppDto;
 
         appsService.postApp(dto, now).subscribe(result => {
             app = result;
@@ -101,7 +102,7 @@ describe('AppsService', () => {
             planUpgrade: 'Enterprise'
         });
 
-        expect(app).toEqual(new AppDto('123', dto.name, 'Reader', now, now, 'Basic', 'Enterprise'));
+        expect(app!).toEqual(new AppDto('123', dto.name, 'Reader', now, now, 'Basic', 'Enterprise'));
     }));
 
     it('should make delete request to archive app',

@@ -1,9 +1,9 @@
-<div dnd-droppable class="droppable category" [allowDrop]="allowDrop" (onDropSuccess)="changeCategory($event.dragData)">
+<div *ngIf="!isReadonly || (schemasForCategory && schemasForCategory.length > 0)" dnd-droppable class="droppable category" [allowDrop]="allowDrop" (onDropSuccess)="changeCategory($event.dragData)">
     <div class="drop-indicator"></div>
 
     <div class="header clearfix">
         <a class="btn btn-sm btn-link" (click)="toggle()">
-            <i [class.icon-caret-right]="isOpen" [class.icon-caret-down]="!isOpen"></i> 
+            <i [class.icon-caret-right]="!isOpen" [class.icon-caret-down]="isOpen"></i> 
         </a>
 
         <h3>{{displayName}} ({{schemasForCategory.length}})</h3>

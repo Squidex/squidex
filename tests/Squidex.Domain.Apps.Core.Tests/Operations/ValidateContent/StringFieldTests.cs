@@ -45,7 +45,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             await sut.ValidateAsync(CreateValue(null), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> is required." });
+                new[] { "Field is required." });
         }
 
         [Fact]
@@ -56,7 +56,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             await sut.ValidateAsync(CreateValue("123"), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> must have more than '10' characters." });
+                new[] { "Must have more than '10' characters." });
         }
 
         [Fact]
@@ -67,7 +67,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             await sut.ValidateAsync(CreateValue("12345678"), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> must have less than '5' characters." });
+                new[] { "Must have less than '5' characters." });
         }
 
         [Fact]
@@ -78,7 +78,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             await sut.ValidateAsync(CreateValue("Bar"), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> is not an allowed value." });
+                new[] { "Not an allowed value." });
         }
 
         [Fact]
@@ -89,7 +89,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             await sut.ValidateAsync(CreateValue("abc"), errors);
 
             errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> is not valid." });
+                new[] { "Not valid." });
         }
 
         [Fact]
@@ -108,9 +108,9 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             return new JValue(v);
         }
 
-        private static StringField Field(StringFieldProperties properties)
+        private static RootField<StringFieldProperties> Field(StringFieldProperties properties)
         {
-            return new StringField(1, "my-string", Partitioning.Invariant, properties);
+            return Fields.String(1, "my-string", Partitioning.Invariant, properties);
         }
     }
 }

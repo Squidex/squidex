@@ -18,4 +18,8 @@
             overflow: hidden;
         }
     }
+
+    .CodeMirror-linenumbers {
+        min-width: 29px;
+    }
 }

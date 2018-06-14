@@ -68,7 +68,7 @@ namespace Squidex.Pipeline.CommandMiddlewares
 
                 if (appFeature != null && appFeature.App != null)
                 {
-                    appId = new NamedId<Guid>(appFeature.App.Id, appFeature.App.Name);
+                    appId = NamedId.Of(appFeature.App.Id, appFeature.App.Name);
                 }
             }
 
@@ -96,7 +96,7 @@ namespace Squidex.Pipeline.CommandMiddlewares
                         throw new DomainObjectNotFoundException(schemaName, typeof(ISchemaEntity));
                     }
 
-                    return new NamedId<Guid>(schema.Id, schema.Name);
+                    return NamedId.Of(schema.Id, schema.Name);
                 }
             }
 

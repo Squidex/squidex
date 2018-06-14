@@ -1,5 +1,5 @@
 <span *ngIf="!scheduledTo">
-    <span class="content-status content-status-{{displayStatus | lowercase}}" #statusIcon>
+    <span class="content-status content-status-{{displayStatus | lowercase}} mr-1" #statusIcon>
         <i class="icon-circle"></i>
     </span>
 
@@ -7,7 +7,7 @@
 </span>
 
 <span *ngIf="scheduledTo">
-    <span class="content-status content-status-{{scheduledTo | lowercase}}" #statusIcon>
+    <span class="content-status content-status-{{scheduledTo | lowercase}} mr-1" #statusIcon>
         <i class="icon-clock"></i>
     </span>
 

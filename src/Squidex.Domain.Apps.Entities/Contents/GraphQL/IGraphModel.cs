@@ -10,6 +10,7 @@ using GraphQL.Resolvers;
 using GraphQL.Types;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types;
 using Squidex.Domain.Apps.Entities.Schemas;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
@@ -20,12 +21,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
         IFieldPartitioning ResolvePartition(Partitioning key);
 
-        IComplexGraphType GetAssetType();
-
-        IComplexGraphType GetContentType(Guid schemaId);
-
-        IComplexGraphType GetContentDataType(Guid schemaId);
-
         IFieldResolver ResolveAssetUrl();
 
         IFieldResolver ResolveAssetSourceUrl();
@@ -34,8 +29,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
         IFieldResolver ResolveContentUrl(ISchemaEntity schema);
 
-        IGraphType GetInputGraphType(Field field);
+        IGraphType GetAssetType();
 
-        (IGraphType ResolveType, IFieldResolver Resolver) GetGraphType(Field field);
+        IGraphType GetContentType(Guid schemaId);
+
+        IGraphType GetContentDataType(Guid schemaId);
+
+        (IGraphType ResolveType, ValueResolver Resolver) GetGraphType(ISchemaEntity schema, IField field);
     }
 }

@@ -7,6 +7,7 @@
 
 import { Component, Input, OnChanges } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
+import { onErrorResumeNext } from 'rxjs/operators';
 
 import {
     AppLanguageDto,
@@ -56,7 +57,7 @@ export class LanguageComponent implements OnChanges {
     }
 
     public remove() {
-        this.languagesState.remove(this.language).onErrorResumeNext().subscribe();
+        this.languagesState.remove(this.language).pipe(onErrorResumeNext()).subscribe();
     }
 
     public save() {

@@ -57,7 +57,7 @@ namespace Squidex.Pipeline.CommandMiddlewares
                 throw new InvalidOperationException("Cannot resolve app.");
             }
 
-            return new NamedId<Guid>(appFeature.App.Id, appFeature.App.Name);
+            return NamedId.Of(appFeature.App.Id, appFeature.App.Name);
         }
     }
 }

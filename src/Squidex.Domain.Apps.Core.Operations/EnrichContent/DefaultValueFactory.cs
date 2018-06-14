@@ -13,7 +13,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.EnrichContent
 {
-    public sealed class DefaultValueFactory : IFieldPropertiesVisitor<JToken>
+    public sealed class DefaultValueFactory : IFieldVisitor<JToken>
     {
         private readonly Instant now;
 
@@ -22,66 +22,71 @@ namespace Squidex.Domain.Apps.Core.EnrichContent
             this.now = now;
         }
 
-        public static JToken CreateDefaultValue(Field field, Instant now)
+        public static JToken CreateDefaultValue(IField field, Instant now)
         {
             Guard.NotNull(field, nameof(field));
 
-            return field.RawProperties.Accept(new DefaultValueFactory(now));
+            return field.Accept(new DefaultValueFactory(now));
         }
 
-        public JToken Visit(AssetsFieldProperties properties)
+        public JToken Visit(IArrayField field)
         {
             return new JArray();
         }
 
-        public JToken Visit(BooleanFieldProperties properties)
+        public JToken Visit(IField<AssetsFieldProperties> field)
         {
-            return properties.DefaultValue;
+            return new JArray();
         }
 
-        public JToken Visit(GeolocationFieldProperties properties)
+        public JToken Visit(IField<BooleanFieldProperties> field)
+        {
+            return field.Properties.DefaultValue;
+        }
+
+        public JToken Visit(IField<GeolocationFieldProperties> field)
         {
             return JValue.CreateNull();
         }
 
-        public JToken Visit(JsonFieldProperties properties)
+        public JToken Visit(IField<JsonFieldProperties> field)
         {
             return JValue.CreateNull();
         }
 
-        public JToken Visit(NumberFieldProperties properties)
+        public JToken Visit(IField<NumberFieldProperties> field)
         {
-            return properties.DefaultValue;
+            return field.Properties.DefaultValue;
         }
 
-        public JToken Visit(ReferencesFieldProperties properties)
+        public JToken Visit(IField<ReferencesFieldProperties> field)
         {
             return new JArray();
         }
 
-        public JToken Visit(StringFieldProperties properties)
+        public JToken Visit(IField<StringFieldProperties> field)
         {
-            return properties.DefaultValue;
+            return field.Properties.DefaultValue;
         }
 
-        public JToken Visit(TagsFieldProperties properties)
+        public JToken Visit(IField<TagsFieldProperties> field)
         {
             return new JArray();
         }
 
-        public JToken Visit(DateTimeFieldProperties properties)
+        public JToken Visit(IField<DateTimeFieldProperties> field)
         {
-            if (properties.CalculatedDefaultValue == DateTimeCalculatedDefaultValue.Now)
+            if (field.Properties.CalculatedDefaultValue == DateTimeCalculatedDefaultValue.Now)
             {
                 return now.ToString();
             }
 
-            if (properties.CalculatedDefaultValue == DateTimeCalculatedDefaultValue.Today)
+            if (field.Properties.CalculatedDefaultValue == DateTimeCalculatedDefaultValue.Today)
             {
                 return now.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
             }
 
-            return properties.DefaultValue?.ToString();
+            return field.Properties.DefaultValue?.ToString();
         }
     }
 }

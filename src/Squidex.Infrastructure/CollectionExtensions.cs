@@ -172,6 +172,18 @@ namespace Squidex.Infrastructure
             return result;
         }
 
+        public static TValue GetOrAdd<TKey, TContext, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, TContext context, Func<TKey, TContext, TValue> creator)
+        {
+            if (!dictionary.TryGetValue(key, out var result))
+            {
+                result = creator(key, context);
+
+                dictionary.Add(key, result);
+            }
+
+            return result;
+        }
+
         public static void Foreach<T>(this IEnumerable<T> collection, Action<T> action)
         {
             foreach (var item in collection)

@@ -15,7 +15,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {
     public sealed class AssetsResultGraphType : ObjectGraphType<IResultList<IAssetEntity>>
     {
-        public AssetsResultGraphType(IComplexGraphType assetType)
+        public AssetsResultGraphType(IGraphType assetType)
         {
             Name = $"AssetResultDto";
 

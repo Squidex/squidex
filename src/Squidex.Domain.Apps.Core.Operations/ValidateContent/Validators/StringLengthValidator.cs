@@ -27,18 +27,18 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
             this.maxLength = maxLength;
         }
 
-        public Task ValidateAsync(object value, ValidationContext context, Action<string> addError)
+        public Task ValidateAsync(object value, ValidationContext context, AddError addError)
         {
             if (value is string stringValue && !string.IsNullOrEmpty(stringValue))
             {
                 if (minLength.HasValue && stringValue.Length < minLength.Value)
                 {
-                    addError($"<FIELD> must have more than '{minLength}' characters.");
+                    addError(context.Path, $"Must have more than '{minLength}' characters.");
                 }
 
                 if (maxLength.HasValue && stringValue.Length > maxLength.Value)
                 {
-                    addError($"<FIELD> must have less than '{maxLength}' characters.");
+                    addError(context.Path, $"Must have less than '{maxLength}' characters.");
                 }
             }
 

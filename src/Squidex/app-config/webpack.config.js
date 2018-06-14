@@ -1,9 +1,13 @@
-        var webpack = require('webpack'),
-               path = require('path'),
-  HtmlWebpackPlugin = require('html-webpack-plugin'),
-  ExtractTextPlugin = require('extract-text-webpack-plugin'),
-TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin'),
-            helpers = require('./helpers');
+const webpack = require('webpack'),
+         path = require('path'),
+      helpers = require('./helpers');
+
+const plugins = {
+    // https://github.com/webpack-contrib/mini-css-extract-plugin
+    MiniCssExtractPlugin: require('mini-css-extract-plugin'),
+    // https://github.com/dividab/tsconfig-paths-webpack-plugin
+    TsconfigPathsPlugin: require('tsconfig-paths-webpack-plugin')
+};
 
 module.exports = {
     /**
@@ -17,16 +21,15 @@ module.exports = {
          *
          * See: https://webpack.js.org/configuration/resolve/#resolve-extensions
          */
-        extensions: ['.js', '.ts', '.css', '.scss'],
+        extensions: ['.js', '.mjs', '.ts', '.css', '.scss'],
         modules: [
             helpers.root('app'),
             helpers.root('app', 'theme'),
-            helpers.root('app-libs'),
             helpers.root('node_modules')
         ],
 
         plugins: [
-            new TsconfigPathsPlugin()
+            new plugins.TsconfigPathsPlugin()
         ]
     },
 
@@ -41,70 +44,75 @@ module.exports = {
          *
          * See: https://webpack.js.org/configuration/module/#module-rules
          */
-        rules: [
+        rules: [{
+            test: /\.mjs$/,
+            type: "javascript/auto",
+            include: /node_modules/,
+          },{
+            test: /\.ts$/,
+            use: [{
+                loader: 'awesome-typescript-loader'
+            }, {
+                loader: 'angular-router-loader'
+            }, {
+                loader: 'angular2-template-loader'
+            }, {
+                loader: 'tslint-loader'
+            }],
+            exclude: /node_modules/
+        }, {
+            test: /\.ts$/,
+            use: [{
+                loader: 'awesome-typescript-loader'
+            }],
+            include: /node_modules/
+        }, {
+            test: /\.js\.flow$/,
+            use: [{
+                loader: 'ignore-loader'
+            }],
+            include: /node_modules/
+        }, {
+            test: /\.html$/,
+            use: [{
+                loader: 'raw-loader'
+            }]
+        }, {
+            test: /\.(woff|woff2|ttf|eot)(\?.*$|$)/,
+            use: [{
+                loader: 'file-loader?name=assets/[name].[hash].[ext]'
+            }]
+        }, {
+            test: /\.(png|jpe?g|gif|svg|ico)(\?.*$|$)/,
+            use: [{
+                loader: 'file-loader?name=assets/[name].[hash].[ext]'
+            }]
+        }, {
+            test: /\.css$/,
+            use: [
+                plugins.MiniCssExtractPlugin.loader,
             {
-                test: /\.ts$/,
-                use: [{
-                    loader: 'awesome-typescript-loader' 
-                }, {
-                    loader: 'angular2-router-loader'
-                }, {
-                    loader: 'angular2-template-loader'
-                }, {
-                    loader: 'tslint-loader' 
-                }],
-                exclude: /node_modules/
+                loader: 'css-loader'
+            }]
+        }, {
+            test: /\.scss$/,
+            use: [{
+                loader: 'raw-loader'
             }, {
-                test: /\.ts$/,
-                use: [{
-                    loader: 'awesome-typescript-loader' 
-                }],
-                include: /node_modules/
-            }, {
-                test: /\.js\.flow$/,
-                use: [{
-                    loader: 'ignore-loader'
-                }],
-                include: /node_modules/
-            }, {
-                test: /\.html$/,
-                use: [{
-                    loader: 'raw-loader'
-                }]
-            }, {
-                test: /\.(woff|woff2|ttf|eot)(\?.*$|$)/,
-                use: [{
-                    loader: 'file-loader?name=assets/[name].[hash].[ext]'
-                }]
-            }, {
-                test: /\.(png|jpe?g|gif|svg|ico)(\?.*$|$)/,
-                use: [{
-                    loader: 'file-loader?name=assets/[name].[hash].[ext]'
-                }]
-            }, {
-                test: /\.css$/,
-                /*
-                 * Extract the content from a bundle to a file
-                 * 
-                 * See: https://github.com/webpack-contrib/extract-text-webpack-plugin
-                 */
-                use: ExtractTextPlugin.extract({ fallback: 'style-loader', use: 'css-loader?sourceMap' })
-            }, {
-                test: /\.scss$/,
-                use: [{
-                    loader: 'raw-loader'
-                }, {
-                    loader: 'sass-loader',
-                    options: {
-                        includePaths: [helpers.root('app', 'theme')]
-                    }
-                }],
-                exclude: helpers.root('app', 'theme')
-            }
-        ]
+                loader: 'sass-loader', options: { includePaths: [helpers.root('app', 'theme')] }
+            }],
+            exclude: helpers.root('app', 'theme')
+        }]
     },
 
     plugins: [
+        /*
+         * Puts each bundle into a file and appends the hash of the file to the path.
+         * 
+         * See: https://github.com/webpack-contrib/mini-css-extract-plugin
+         */
+        new plugins.MiniCssExtractPlugin('[name].css'),
+
         new webpack.LoaderOptionsPlugin({
             options: {
                 tslint: {
@@ -130,7 +138,7 @@ module.exports = {
                 context: '/'
             }
         }),
-
+        
         new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, /en/),
 
         /**

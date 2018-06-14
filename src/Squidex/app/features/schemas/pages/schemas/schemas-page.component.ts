@@ -9,6 +9,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormControl } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { map, onErrorResumeNext } from 'rxjs/operators';
 
 import {
     AppsState,
@@ -59,14 +60,14 @@ export class SchemasPageComponent implements OnDestroy, OnInit {
                     this.addSchemaDialog.show();
                 });
 
-        this.route.params.map(q => q['showDialog'])
+        this.route.params.pipe(map(q => q['showDialog']))
             .subscribe(showDialog => {
                 if (showDialog) {
                     this.addSchemaDialog.show();
                 }
             });
 
-        this.schemasState.load().onErrorResumeNext().subscribe();
+        this.schemasState.load().pipe(onErrorResumeNext()).subscribe();
     }
 
     public removeCategory(name: string) {

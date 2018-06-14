@@ -8,6 +8,7 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivate, Router } from '@angular/router';
 import { Observable } from 'rxjs';
+import { map, tap } from 'rxjs/operators';
 
 import { allParams } from '@app/framework';
 
@@ -25,13 +26,13 @@ export class UserMustExistGuard implements CanActivate {
         const userId = allParams(route)['userId'];
 
         const result =
-            this.usersState.select(userId)
-                .do(dto => {
+            this.usersState.select(userId).pipe(
+                tap(dto => {
                     if (!dto) {
                         this.router.navigate(['/404']);
                     }
-                })
-                .map(u => u !== null);
+                }),
+                map(u => u !== null));
 
         return result;
     }

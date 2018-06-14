@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Observable } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 
 import { AuthService, DialogService } from '@app/shared';
@@ -44,7 +44,7 @@ describe('UsersState', () => {
         usersService = Mock.ofType<UsersService>();
 
         usersService.setup(x => x.getUsers(10, 0, undefined))
-            .returns(() => Observable.of(new UsersDto(200, oldUsers)));
+            .returns(() => of(new UsersDto(200, oldUsers)));
 
         usersState = new UsersState(authService.object, dialogs.object, usersService.object);
         usersState.load().subscribe();
@@ -64,6 +64,8 @@ describe('UsersState', () => {
     it('should show notification on load when reload is true', () => {
         usersState.load(true).subscribe();
 
+        expect().nothing();
+
         dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
     });
 
@@ -76,7 +78,7 @@ describe('UsersState', () => {
         ];
 
         usersService.setup(x => x.getUsers(10, 0, undefined))
-            .returns(() => Observable.of(new UsersDto(200, newUsers)));
+            .returns(() => of(new UsersDto(200, newUsers)));
 
         usersState.load().subscribe();
 
@@ -98,7 +100,7 @@ describe('UsersState', () => {
 
     it('should return user on select and load when not loaded', () => {
         usersService.setup(x => x.getUser('id3'))
-            .returns(() => Observable.of(newUser));
+            .returns(() => of(newUser));
 
         let selectedUser: UserDto;
 
@@ -127,7 +129,7 @@ describe('UsersState', () => {
 
     it('should return null on select when user is not found', () => {
         usersService.setup(x => x.getUser('unknown'))
-            .returns(() => Observable.throw({}));
+            .returns(() => throwError({}));
 
         let selectedUser: UserDto;
 
@@ -141,7 +143,7 @@ describe('UsersState', () => {
 
     it('should mark as locked when locked', () => {
         usersService.setup(x => x.lockUser('id1'))
-            .returns(() => Observable.of({}));
+            .returns(() => of({}));
 
         usersState.select('id1').subscribe();
         usersState.lock(oldUsers[0]).subscribe();
@@ -149,12 +151,12 @@ describe('UsersState', () => {
         const user_1 = usersState.snapshot.users.at(0);
 
         expect(user_1.user.isLocked).toBeTruthy();
-        expect(user_1).toBe(usersState.snapshot.selectedUser);
+        expect(user_1).toBe(usersState.snapshot.selectedUser!);
     });
 
     it('should unmark as locked when unlocked', () => {
         usersService.setup(x => x.unlockUser('id2'))
-            .returns(() => Observable.of({}));
+            .returns(() => of({}));
 
         usersState.select('id2').subscribe();
         usersState.unlock(oldUsers[1]).subscribe();
@@ -162,14 +164,14 @@ describe('UsersState', () => {
         const user_1 = usersState.snapshot.users.at(1);
 
         expect(user_1.user.isLocked).toBeFalsy();
-        expect(user_1).toBe(usersState.snapshot.selectedUser);
+        expect(user_1).toBe(usersState.snapshot.selectedUser!);
     });
 
     it('should update user properties when updated', () => {
         const request = new UpdateUserDto('new@mail.com', 'New');
 
         usersService.setup(x => x.putUser('id1', request))
-            .returns(() => Observable.of({}));
+            .returns(() => of({}));
 
         usersState.select('id1').subscribe();
         usersState.update(oldUsers[0], request).subscribe();
@@ -178,14 +180,14 @@ describe('UsersState', () => {
 
         expect(user_1.user.email).toEqual('new@mail.com');
         expect(user_1.user.displayName).toEqual('New');
-        expect(user_1).toBe(usersState.snapshot.selectedUser);
+        expect(user_1).toBe(usersState.snapshot.selectedUser!);
     });
 
     it('should add user to snapshot when created', () => {
         const request = new CreateUserDto(newUser.email, newUser.displayName, 'password');
 
         usersService.setup(x => x.postUser(request))
-            .returns(() => Observable.of(newUser));
+            .returns(() => of(newUser));
 
         usersState.create(request).subscribe();
 
@@ -199,10 +201,12 @@ describe('UsersState', () => {
 
     it('should load next page and prev page when paging', () => {
         usersService.setup(x => x.getUsers(10, 10, undefined))
-            .returns(() => Observable.of(new UsersDto(200, [])));
+            .returns(() => of(new UsersDto(200, [])));
 
         usersState.goNext().subscribe();
         usersState.goPrev().subscribe();
+
+        expect().nothing();
 
         usersService.verify(x => x.getUsers(10, 10, undefined), Times.once());
         usersService.verify(x => x.getUsers(10, 0,  undefined), Times.exactly(2));
@@ -210,7 +214,7 @@ describe('UsersState', () => {
 
     it('should load with query when searching', () => {
         usersService.setup(x => x.getUsers(10, 0, 'my-query'))
-            .returns(() => Observable.of(new UsersDto(0, [])));
+            .returns(() => of(new UsersDto(0, [])));
 
         usersState.search('my-query').subscribe();
 

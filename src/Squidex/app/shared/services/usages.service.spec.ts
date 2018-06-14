@@ -38,7 +38,7 @@ describe('UsagesService', () => {
     it('should make get request to get calls usages',
         inject([UsagesService, HttpTestingController], (usagesService: UsagesService, httpMock: HttpTestingController) => {
 
-        let usages: CallsUsageDto[] | null = null;
+        let usages: CallsUsageDto[];
 
         usagesService.getCallsUsages('my-app', DateTime.parseISO_UTC('2017-10-12'), DateTime.parseISO_UTC('2017-10-13')).subscribe(result => {
             usages = result;
@@ -62,7 +62,7 @@ describe('UsagesService', () => {
             }
         ]);
 
-        expect(usages).toEqual(
+        expect(usages!).toEqual(
             [
                 new CallsUsageDto(DateTime.parseISO_UTC('2017-10-12'), 10, 130),
                 new CallsUsageDto(DateTime.parseISO_UTC('2017-10-13'), 13, 170)
@@ -72,7 +72,7 @@ describe('UsagesService', () => {
     it('should make get request to get month calls',
         inject([UsagesService, HttpTestingController], (usagesService: UsagesService, httpMock: HttpTestingController) => {
 
-        let usages: CurrentCallsDto | null = null;
+        let usages: CurrentCallsDto;
 
         usagesService.getMonthCalls('my-app').subscribe(result => {
             usages = result;
@@ -85,13 +85,13 @@ describe('UsagesService', () => {
 
         req.flush({ count: 130, maxAllowed: 150 });
 
-        expect(usages).toEqual(new CurrentCallsDto(130, 150));
+        expect(usages!).toEqual(new CurrentCallsDto(130, 150));
     }));
 
     it('should make get request to get storage usages',
         inject([UsagesService, HttpTestingController], (usagesService: UsagesService, httpMock: HttpTestingController) => {
 
-        let usages: StorageUsageDto[] | null = null;
+        let usages: StorageUsageDto[];
 
         usagesService.getStorageUsages('my-app', DateTime.parseISO_UTC('2017-10-12'), DateTime.parseISO_UTC('2017-10-13')).subscribe(result => {
             usages = result;
@@ -115,7 +115,7 @@ describe('UsagesService', () => {
             }
         ]);
 
-        expect(usages).toEqual(
+        expect(usages!).toEqual(
             [
                 new StorageUsageDto(DateTime.parseISO_UTC('2017-10-12'), 10, 130),
                 new StorageUsageDto(DateTime.parseISO_UTC('2017-10-13'), 13, 170)
@@ -125,7 +125,7 @@ describe('UsagesService', () => {
     it('should make get request to get today storage',
         inject([UsagesService, HttpTestingController], (usagesService: UsagesService, httpMock: HttpTestingController) => {
 
-        let usages: CurrentStorageDto | null = null;
+        let usages: CurrentStorageDto;
 
         usagesService.getTodayStorage('my-app').subscribe(result => {
             usages = result;
@@ -138,6 +138,6 @@ describe('UsagesService', () => {
 
         req.flush({ size: 130, maxAllowed: 150 });
 
-        expect(usages).toEqual(new CurrentStorageDto(130, 150));
+        expect(usages!).toEqual(new CurrentStorageDto(130, 150));
     }));
 });

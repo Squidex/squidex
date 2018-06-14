@@ -9,6 +9,8 @@ namespace Squidex.Domain.Apps.Core.Schemas
 {
     public interface IFieldPropertiesVisitor<out T>
     {
+        T Visit(ArrayFieldProperties properties);
+
         T Visit(AssetsFieldProperties properties);
 
         T Visit(BooleanFieldProperties properties);

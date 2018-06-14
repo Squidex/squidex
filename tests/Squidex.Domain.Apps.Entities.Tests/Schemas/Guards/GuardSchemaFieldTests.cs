@@ -5,6 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
+using System.Collections.Generic;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
@@ -12,6 +14,7 @@ using Squidex.Infrastructure;
 using Xunit;
 
 #pragma warning disable SA1310 // Field names must not contain underscore
+#pragma warning disable SA1401 // Fields must be private
 
 namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 {
@@ -25,146 +28,128 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             schema_0 =
                 new Schema("my-schema")
-                    .AddField(new StringField(1, "field1", Partitioning.Invariant))
-                    .AddField(new StringField(2, "field2", Partitioning.Invariant));
+                    .AddString(1, "field1", Partitioning.Invariant)
+                    .AddString(2, "field2", Partitioning.Invariant)
+                    .AddArray(3, "field3", Partitioning.Invariant, f => f
+                        .AddNumber(301, "field301"));
         }
 
-        [Fact]
-        public void CanHide_should_throw_exception_if_already_hidden()
+        private static Action<Schema, T> A<T>(Action<Schema, T> method) where T : FieldCommand
         {
-            var command = new HideField { FieldId = 1 };
-
-            var schema_1 = schema_0.HideField(1);
-
-            Assert.Throws<DomainException>(() => GuardSchemaField.CanHide(schema_1, command));
+            return new Action<Schema, T>(method);
         }
 
-        [Fact]
-        public void CanHide_should_throw_exception_if_not_found()
+        private static Func<Schema, Schema> S(Func<Schema, Schema> method)
         {
-            var command = new HideField { FieldId = 3 };
-
-            Assert.Throws<DomainObjectNotFoundException>(() => GuardSchemaField.CanHide(schema_0, command));
+            return new Func<Schema, Schema>(method);
         }
 
-        [Fact]
-        public void CanHide_hould_not_throw_exception_if_visible()
+        public static IEnumerable<object[]> FieldCommandData = new[]
         {
-            var command = new HideField { FieldId = 1 };
+            new object[] { A<EnableField>(GuardSchemaField.CanEnable) },
+            new object[] { A<DeleteField>(GuardSchemaField.CanDelete) },
+            new object[] { A<DisableField>(GuardSchemaField.CanDisable) },
+            new object[] { A<HideField>(GuardSchemaField.CanHide) },
+            new object[] { A<LockField>(GuardSchemaField.CanLock) },
+            new object[] { A<ShowField>(GuardSchemaField.CanShow) },
+            new object[] { A<UpdateField>(GuardSchemaField.CanUpdate) }
+        };
 
-            GuardSchemaField.CanHide(schema_0, command);
+        public static IEnumerable<object[]> InvalidStates = new[]
+        {
+            new object[] { A<DisableField>(GuardSchemaField.CanDisable), S(s => s.DisableField(1)) },
+            new object[] { A<EnableField>(GuardSchemaField.CanEnable),   S(s => s) },
+            new object[] { A<HideField>(GuardSchemaField.CanHide),       S(s => s.HideField(1)) },
+            new object[] { A<ShowField>(GuardSchemaField.CanShow),       S(s => s.LockField(1)) },
+            new object[] { A<LockField>(GuardSchemaField.CanLock),       S(s => s.LockField(1)) }
+        };
+
+        public static IEnumerable<object[]> InvalidNestedStates = new[]
+        {
+            new object[] { A<DisableField>(GuardSchemaField.CanDisable), S(s => s.DisableField(301, 3)) },
+            new object[] { A<EnableField>(GuardSchemaField.CanEnable),   S(s => s) },
+            new object[] { A<HideField>(GuardSchemaField.CanHide),       S(s => s.HideField(301, 3)) },
+            new object[] { A<ShowField>(GuardSchemaField.CanShow),       S(s => s) },
+            new object[] { A<LockField>(GuardSchemaField.CanLock),       S(s => s.LockField(301, 3)) }
+        };
+
+        public static IEnumerable<object[]> ValidStates = new[]
+        {
+            new object[] { A<DisableField>(GuardSchemaField.CanDisable), S(s => s) },
+            new object[] { A<EnableField>(GuardSchemaField.CanEnable),   S(s => s.DisableField(1)) },
+            new object[] { A<HideField>(GuardSchemaField.CanHide),       S(s => s) },
+            new object[] { A<ShowField>(GuardSchemaField.CanShow),       S(s => s.HideField(1)) }
+        };
+
+        public static IEnumerable<object[]> ValidNestedStates = new[]
+        {
+            new object[] { A<EnableField>(GuardSchemaField.CanEnable),   S(s => s.DisableField(301, 3)) },
+            new object[] { A<DisableField>(GuardSchemaField.CanDisable), S(s => s) },
+            new object[] { A<HideField>(GuardSchemaField.CanHide),       S(s => s) },
+            new object[] { A<ShowField>(GuardSchemaField.CanShow),       S(s => s.HideField(301, 3)) }
+        };
+
+        [Theory]
+        [MemberData(nameof(FieldCommandData))]
+        public void Commands_should_throw_exception_if_field_not_found<T>(Action<Schema, T> action) where T : FieldCommand, new()
+        {
+            var command = new T { FieldId = 4 };
+
+            Assert.Throws<DomainObjectNotFoundException>(() => action(schema_0, command));
         }
 
-        [Fact]
-        public void CanDisable_should_throw_exception_if_already_disabled()
+        [Theory]
+        [MemberData(nameof(FieldCommandData))]
+        public void Commands_should_throw_exception_if_parent_field_not_found<T>(Action<Schema, T> action) where T : FieldCommand, new()
         {
-            var command = new DisableField { FieldId = 1 };
+            var command = new T { ParentFieldId = 4, FieldId = 401 };
 
-            var schema_1 = schema_0.DisableField(1);
-
-            Assert.Throws<DomainException>(() => GuardSchemaField.CanDisable(schema_1, command));
+            Assert.Throws<DomainObjectNotFoundException>(() => action(schema_0, command));
         }
 
-        [Fact]
-        public void CanDisable_should_throw_exception_if_not_found()
+        [Theory]
+        [MemberData(nameof(FieldCommandData))]
+        public void Commands_should_throw_exception_if_child_field_not_found<T>(Action<Schema, T> action) where T : FieldCommand, new()
         {
-            var command = new DisableField { FieldId = 3 };
+            var command = new T { ParentFieldId = 3, FieldId = 302 };
 
-            Assert.Throws<DomainObjectNotFoundException>(() => GuardSchemaField.CanDisable(schema_0, command));
+            Assert.Throws<DomainObjectNotFoundException>(() => action(schema_0, command));
         }
 
-        [Fact]
-        public void CanDisable_Should_not_throw_exception_if_enabled()
+        [Theory]
+        [MemberData(nameof(InvalidStates))]
+        public void Commands_should_throw_exception_if_state_not_valid<T>(Action<Schema, T> action, Func<Schema, Schema> updater) where T : FieldCommand, new()
         {
-            var command = new DisableField { FieldId = 1 };
+            var command = new T { FieldId = 1 };
 
-            GuardSchemaField.CanDisable(schema_0, command);
+            Assert.Throws<DomainException>(() => action(updater(schema_0), command));
         }
 
-        [Fact]
-        public void CanShow_should_throw_exception_if_already_shown()
+        [Theory]
+        [MemberData(nameof(InvalidNestedStates))]
+        public void Commands_should_throw_exception_if_nested_state_not_valid<T>(Action<Schema, T> action, Func<Schema, Schema> updater) where T : FieldCommand, new()
         {
-            var command = new ShowField { FieldId = 1 };
+            var command = new T { ParentFieldId = 3, FieldId = 301 };
 
-            Assert.Throws<DomainException>(() => GuardSchemaField.CanShow(schema_0, command));
+            Assert.Throws<DomainException>(() => action(updater(schema_0), command));
         }
 
-        [Fact]
-        public void CanShow_should_throw_exception_if_not_found()
+        [Theory]
+        [MemberData(nameof(ValidStates))]
+        public void Commands_should_not_throw_exception_if_state_valid<T>(Action<Schema, T> action, Func<Schema, Schema> updater) where T : FieldCommand, new()
         {
-            var command = new ShowField { FieldId = 3 };
+            var command = new T { FieldId = 1 };
 
-            Assert.Throws<DomainObjectNotFoundException>(() => GuardSchemaField.CanShow(schema_0, command));
+            action(updater(schema_0), command);
         }
 
-        [Fact]
-        public void CanShow_should_not_throw_exception_if_hidden()
+        [Theory]
+        [MemberData(nameof(ValidNestedStates))]
+        public void Commands_should_not_throw_exception_if_nested_state_valid<T>(Action<Schema, T> action, Func<Schema, Schema> updater) where T : FieldCommand, new()
         {
-            var command = new ShowField { FieldId = 1 };
+            var command = new T { ParentFieldId = 3, FieldId = 301 };
 
-            var schema_1 = schema_0.HideField(1);
-
-            GuardSchemaField.CanShow(schema_1, command);
-        }
-
-        [Fact]
-        public void CanEnable_should_throw_exception_if_already_enabled()
-        {
-            var command = new EnableField { FieldId = 1 };
-
-            Assert.Throws<DomainException>(() => GuardSchemaField.CanEnable(schema_0, command));
-        }
-
-        [Fact]
-        public void CanEnable_should_throw_exception_if_not_found()
-        {
-            var command = new EnableField { FieldId = 3 };
-
-            Assert.Throws<DomainObjectNotFoundException>(() => GuardSchemaField.CanEnable(schema_0, command));
-        }
-
-        [Fact]
-        public void CanEnable_should_not_throw_exception_if_disabled()
-        {
-            var command = new EnableField { FieldId = 1 };
-
-            var schema_1 = schema_0.DisableField(1);
-
-            GuardSchemaField.CanEnable(schema_1, command);
-        }
-
-        [Fact]
-        public void CanLock_should_throw_exception_if_already_locked()
-        {
-            var command = new LockField { FieldId = 1 };
-
-            var schema_1 = schema_0.LockField(1);
-
-            Assert.Throws<DomainException>(() => GuardSchemaField.CanLock(schema_1, command));
-        }
-
-        [Fact]
-        public void LockField_should_throw_exception_if_not_found()
-        {
-            var command = new LockField { FieldId = 3 };
-
-            Assert.Throws<DomainObjectNotFoundException>(() => GuardSchemaField.CanLock(schema_0, command));
-        }
-
-        [Fact]
-        public void CanLock_should_not_throw_exception_if_not_locked()
-        {
-            var command = new LockField { FieldId = 1 };
-
-            GuardSchemaField.CanLock(schema_0, command);
-        }
-
-        [Fact]
-        public void CanDelete_should_throw_exception_if_not_found()
-        {
-            var command = new DeleteField { FieldId = 3 };
-
-            Assert.Throws<DomainObjectNotFoundException>(() => GuardSchemaField.CanDelete(schema_0, command));
+            action(updater(schema_0), command);
         }
 
         [Fact]
@@ -172,9 +157,19 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             var command = new DeleteField { FieldId = 1 };
 
-            var schema_1 = schema_0.LockField(1);
+            var schema_1 = schema_0.UpdateField(1, f => f.Lock());
 
             Assert.Throws<DomainException>(() => GuardSchemaField.CanDelete(schema_1, command));
+        }
+
+        [Fact]
+        public void CanHide_should_throw_exception_if_locked()
+        {
+            var command = new HideField { FieldId = 1 };
+
+            var schema_1 = schema_0.UpdateField(1, f => f.Lock());
+
+            Assert.Throws<DomainException>(() => GuardSchemaField.CanHide(schema_1, command));
         }
 
         [Fact]
@@ -188,9 +183,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         [Fact]
         public void CanUpdate_should_throw_exception_if_locked()
         {
-            var command = new UpdateField { FieldId = 1, Properties = new StringFieldProperties() };
+            var command = new UpdateField { FieldId = 1, Properties = validProperties };
 
-            var schema_1 = schema_0.LockField(1);
+            var schema_1 = schema_0.UpdateField(1, f => f.Lock());
 
             Assert.Throws<DomainException>(() => GuardSchemaField.CanUpdate(schema_1, command));
         }
@@ -198,7 +193,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         [Fact]
         public void CanUpdate_should_not_throw_exception_if_not_locked()
         {
-            var command = new UpdateField { FieldId = 1, Properties = new StringFieldProperties() };
+            var command = new UpdateField { FieldId = 1, Properties = validProperties };
 
             GuardSchemaField.CanUpdate(schema_0, command);
         }
@@ -222,7 +217,15 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         [Fact]
         public void CanAdd_should_throw_exception_if_field_already_exists()
         {
-            var command = new AddField { Name = "field1", Properties = new StringFieldProperties() };
+            var command = new AddField { Name = "field1", Properties = validProperties };
+
+            Assert.Throws<ValidationException>(() => GuardSchemaField.CanAdd(schema_0, command));
+        }
+
+        [Fact]
+        public void CanAdd_should_throw_exception_if_nested_field_already_exists()
+        {
+            var command = new AddField { Name = "field301", Properties = validProperties, ParentFieldId = 3 };
 
             Assert.Throws<ValidationException>(() => GuardSchemaField.CanAdd(schema_0, command));
         }
@@ -260,9 +263,25 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         }
 
         [Fact]
+        public void CanAdd_should_throw_exception_if_parent_not_exists()
+        {
+            var command = new AddField { Name = "field302", Properties = validProperties, ParentFieldId = 99 };
+
+            Assert.Throws<DomainObjectNotFoundException>(() => GuardSchemaField.CanAdd(schema_0, command));
+        }
+
+        [Fact]
         public void CanAdd_should_not_throw_exception_if_field_not_exists()
         {
-            var command = new AddField { Name = "field3", Properties = new StringFieldProperties() };
+            var command = new AddField { Name = "field4", Properties = validProperties };
+
+            GuardSchemaField.CanAdd(schema_0, command);
+        }
+
+        [Fact]
+        public void CanAdd_should_not_throw_exception_if_field_exists_in_root()
+        {
+            var command = new AddField { Name = "field1", Properties = validProperties, ParentFieldId = 3 };
 
             GuardSchemaField.CanAdd(schema_0, command);
         }

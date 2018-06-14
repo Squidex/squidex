@@ -10,9 +10,11 @@ import { AbstractControl, FormGroup } from '@angular/forms';
 
 import {
     AppLanguageDto,
-    FieldDto,
+    EditContentForm,
     fieldInvariant,
-    ImmutableArray
+    ImmutableArray,
+    RootFieldDto,
+    Types
 } from '@app/shared';
 
 @Component({
@@ -22,7 +24,10 @@ import {
 })
 export class ContentFieldComponent implements OnChanges {
     @Input()
-    public field: FieldDto;
+    public form: EditContentForm;
+
+    @Input()
+    public field: RootFieldDto;
 
     @Input()
     public fieldForm: FormGroup;
@@ -30,14 +35,11 @@ export class ContentFieldComponent implements OnChanges {
     @Input()
     public language: AppLanguageDto;
 
-    @Output()
-    public languageChange = new EventEmitter<AppLanguageDto>();
-
     @Input()
     public languages: ImmutableArray<AppLanguageDto>;
 
-    @Input()
-    public contentFormSubmitted: boolean;
+    @Output()
+    public languageChange = new EventEmitter<AppLanguageDto>();
 
     public selectedFormControl: AbstractControl;
 
@@ -49,7 +51,9 @@ export class ContentFieldComponent implements OnChanges {
         }
 
         if (changes['language']) {
-            this.selectedFormControl['_clearChangeFns']();
+            if (Types.isFunction(this.selectedFormControl['_clearChangeFns'])) {
+                this.selectedFormControl['_clearChangeFns']();
+            }
         }
     }
 }

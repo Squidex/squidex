@@ -8,7 +8,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
@@ -21,8 +20,17 @@ using Squidex.Infrastructure.Json;
 
 namespace Squidex.Domain.Apps.Core.ConvertContent
 {
+    public delegate ContentFieldData FieldConverter(ContentFieldData data, IRootField field);
+
     public static class FieldConverters
     {
+        private static readonly Func<IField, string> KeyNameResolver = f => f.Name;
+        private static readonly Func<IField, string> KeyIdResolver = f => f.Id.ToString();
+        private static readonly Func<IArrayField, string, IField> FieldByIdResolver =
+            (f, k) => long.TryParse(k, out var id) ? f.FieldsById.GetOrDefault(id) : null;
+        private static readonly Func<IArrayField, string, IField> FieldByNameResolver =
+            (f, k) => f.FieldsByName.GetOrDefault(k);
+
         public static FieldConverter ExcludeHidden()
         {
             return (data, field) =>
@@ -35,37 +43,31 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
         {
             return (data, field) =>
             {
-                var isValid = true;
-
                 foreach (var value in data.Values)
                 {
+                    if (value.IsNull())
+                    {
+                        continue;
+                    }
+
                     try
                     {
-                        if (!value.IsNull())
-                        {
-                            JsonValueConverter.ConvertValue(field, value);
-                        }
+                        JsonValueConverter.ConvertValue(field, value);
                     }
                     catch
                     {
-                        isValid = false;
-                        break;
+                        return null;
                     }
-                }
-
-                if (!isValid)
-                {
-                    return null;
                 }
 
                 return data;
             };
         }
 
-        public static FieldConverter ResolveInvariant(LanguagesConfig languagesConfig)
+        public static FieldConverter ResolveInvariant(LanguagesConfig config)
         {
             var codeForInvariant = InvariantPartitioning.Instance.Master.Key;
-            var codeForMasterLanguage = languagesConfig.Master.Language.Iso2Code;
+            var codeForMasterLanguage = config.Master.Language.Iso2Code;
 
             return (data, field) =>
             {
@@ -93,10 +95,10 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
             };
         }
 
-        public static FieldConverter ResolveLanguages(LanguagesConfig languagesConfig)
+        public static FieldConverter ResolveLanguages(LanguagesConfig config)
         {
             var codeForInvariant = InvariantPartitioning.Instance.Master.Key;
-            var codeForMasterLanguage = languagesConfig.Master.Language.Iso2Code;
+            var codeForMasterLanguage = config.Master.Language.Iso2Code;
 
             return (data, field) =>
             {
@@ -104,7 +106,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
                 {
                     var result = new ContentFieldData();
 
-                    foreach (var languageConfig in languagesConfig)
+                    foreach (var languageConfig in config)
                     {
                         var languageCode = languageConfig.Key;
 
@@ -112,7 +114,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
                         {
                             result[languageCode] = value;
                         }
-                        else if (languageConfig == languagesConfig.Master && data.TryGetValue(codeForInvariant, out value))
+                        else if (languageConfig == config.Master && data.TryGetValue(codeForInvariant, out value))
                         {
                             result[languageCode] = value;
                         }
@@ -125,15 +127,15 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
             };
         }
 
-        public static FieldConverter ResolveFallbackLanguages(LanguagesConfig languagesConfig)
+        public static FieldConverter ResolveFallbackLanguages(LanguagesConfig config)
         {
-            var master = languagesConfig.Master;
+            var master = config.Master;
 
             return (data, field) =>
             {
                 if (field.Partitioning.Equals(Partitioning.Language))
                 {
-                    foreach (var languageConfig in languagesConfig)
+                    foreach (var languageConfig in config)
                     {
                         var languageCode = languageConfig.Key;
 
@@ -166,21 +168,26 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
             };
         }
 
-        public static FieldConverter FilterLanguages(LanguagesConfig languagesConfig, IEnumerable<Language> languages)
+        public static FieldConverter FilterLanguages(LanguagesConfig config, IEnumerable<Language> languages)
         {
-            if (languages == null)
+            if (languages?.Any() != true)
             {
                 return (data, field) => data;
             }
 
-            var languageCodes =
-                new HashSet<string>(
-                        languages.Select(x => x.Iso2Code).Where(x => languagesConfig.Contains(x)),
-                    StringComparer.OrdinalIgnoreCase);
+            var languageSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-            if (languageCodes.Count == 0)
+            foreach (var language in languages)
             {
-                return (data, field) => data;
+                if (config.Contains(language.Iso2Code))
+                {
+                    languageSet.Add(language.Iso2Code);
+                }
+            }
+
+            if (languageSet.Count == 0)
+            {
+                languageSet.Add(config.Master.Language.Iso2Code);
             }
 
             return (data, field) =>
@@ -189,7 +196,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
                 {
                     var result = new ContentFieldData();
 
-                    foreach (var languageCode in languageCodes)
+                    foreach (var languageCode in languageSet)
                     {
                         if (data.TryGetValue(languageCode, out var value))
                         {
@@ -204,26 +211,87 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
             };
         }
 
-        public static FieldConverter DecodeJson()
+        public static FieldConverter ForNestedName2Name(params ValueConverter[] converters)
+        {
+            return ForNested(FieldByNameResolver, KeyNameResolver, converters);
+        }
+
+        public static FieldConverter ForNestedName2Id(params ValueConverter[] converters)
+        {
+            return ForNested(FieldByNameResolver, KeyIdResolver, converters);
+        }
+
+        public static FieldConverter ForNestedId2Name(params ValueConverter[] converters)
+        {
+            return ForNested(FieldByIdResolver, KeyNameResolver, converters);
+        }
+
+        public static FieldConverter ForNestedId2Id(params ValueConverter[] converters)
+        {
+            return ForNested(FieldByIdResolver, KeyIdResolver, converters);
+        }
+
+        private static FieldConverter ForNested(
+            Func<IArrayField, string, IField> fieldResolver,
+            Func<IField, string> keyResolver,
+            params ValueConverter[] converters)
         {
             return (data, field) =>
             {
-                if (field is JsonField)
+                if (field is IArrayField arrayField)
                 {
                     var result = new ContentFieldData();
 
-                    foreach (var partitionValue in data)
+                    foreach (var partition in data)
                     {
-                        if (partitionValue.Value.IsNull())
+                        if (!(partition.Value is JArray jArray))
                         {
-                            result[partitionValue.Key] = null;
+                            continue;
                         }
-                        else
-                        {
-                            var value = Encoding.UTF8.GetString(Convert.FromBase64String(partitionValue.Value.ToString()));
 
-                            result[partitionValue.Key] = JToken.Parse(value);
+                        var newArray = new JArray();
+
+                        foreach (JObject item in jArray.OfType<JObject>())
+                        {
+                            var newItem = new JObject();
+
+                            foreach (var kvp in item)
+                            {
+                                var nestedField = fieldResolver(arrayField, kvp.Key);
+
+                                if (nestedField == null)
+                                {
+                                    continue;
+                                }
+
+                                var newValue = kvp.Value;
+
+                                var isUnset = false;
+
+                                if (converters != null)
+                                {
+                                    foreach (var converter in converters)
+                                    {
+                                        newValue = converter(newValue, nestedField);
+
+                                        if (ReferenceEquals(newValue, Value.Unset))
+                                        {
+                                            isUnset = true;
+                                            break;
+                                        }
+                                    }
+                                }
+
+                                if (!isUnset)
+                                {
+                                    newItem.Add(keyResolver(nestedField), newValue);
+                                }
+                            }
+
+                            newArray.Add(newItem);
                         }
+
+                        result.Add(partition.Key, newArray);
                     }
 
                     return result;
@@ -233,25 +301,37 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
             };
         }
 
-        public static FieldConverter EncodeJson()
+        public static FieldConverter ForValues(params ValueConverter[] converters)
         {
             return (data, field) =>
             {
-                if (field is JsonField)
+                if (!(field is IArrayField))
                 {
                     var result = new ContentFieldData();
 
-                    foreach (var partitionValue in data)
+                    foreach (var partition in data)
                     {
-                        if (partitionValue.Value.IsNull())
-                        {
-                            result[partitionValue.Key] = null;
-                        }
-                        else
-                        {
-                            var value = Convert.ToBase64String(Encoding.UTF8.GetBytes(partitionValue.Value.ToString()));
+                        var newValue = partition.Value;
 
-                            result[partitionValue.Key] = value;
+                        var isUnset = false;
+
+                        if (converters != null)
+                        {
+                            foreach (var converter in converters)
+                            {
+                                newValue = converter(newValue, field);
+
+                                if (ReferenceEquals(newValue, Value.Unset))
+                                {
+                                    isUnset = true;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (!isUnset)
+                        {
+                            result.Add(partition.Key, newValue);
                         }
                     }
 

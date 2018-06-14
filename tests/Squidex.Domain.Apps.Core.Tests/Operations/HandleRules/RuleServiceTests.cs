@@ -116,7 +116,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public async Task Should_not_create_job_if_too_old()
         {
-            var e = new ContentCreated { SchemaId = new NamedId<Guid>(Guid.NewGuid(), "my-schema"), AppId = new NamedId<Guid>(Guid.NewGuid(), "my-event") };
+            var e = new ContentCreated { SchemaId = NamedId.Of(Guid.NewGuid(), "my-schema"), AppId = NamedId.Of(Guid.NewGuid(), "my-event") };
 
             var now = SystemClock.Instance.GetCurrentInstant();
 
@@ -147,7 +147,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public async Task Should_create_job_if_triggered()
         {
-            var e = new ContentCreated { SchemaId = new NamedId<Guid>(Guid.NewGuid(), "my-schema"), AppId = new NamedId<Guid>(Guid.NewGuid(), "my-event") };
+            var e = new ContentCreated { SchemaId = NamedId.Of(Guid.NewGuid(), "my-schema"), AppId = NamedId.Of(Guid.NewGuid(), "my-event") };
 
             var now = SystemClock.Instance.GetCurrentInstant();
 
