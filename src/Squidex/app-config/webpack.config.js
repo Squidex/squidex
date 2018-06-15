@@ -47,7 +47,7 @@ module.exports = {
         rules: [{
             test: /\.mjs$/,
             type: "javascript/auto",
-            include: /node_modules/,
+            include: [/node_modules/],
           },{
             test: /\.ts$/,
             use: [{
@@ -59,19 +59,19 @@ module.exports = {
             }, {
                 loader: 'tslint-loader'
             }],
-            exclude: /node_modules/
+            exclude: [/node_modules/]
         }, {
             test: /\.ts$/,
             use: [{
                 loader: 'awesome-typescript-loader'
             }],
-            include: /node_modules/
+            include: [/node_modules/]
         }, {
             test: /\.js\.flow$/,
             use: [{
                 loader: 'ignore-loader'
             }],
-            include: /node_modules/
+            include: [/node_modules/]
         }, {
             test: /\.html$/,
             use: [{

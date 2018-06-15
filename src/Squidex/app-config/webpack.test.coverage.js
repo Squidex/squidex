@@ -30,7 +30,9 @@ module.exports = webpackMerge(testConfig, {
                 loader: 'angular-router-loader'
             }, {
                 loader: 'angular2-template-loader'
-            }],
+            }, {
+				loader: 'tslint-loader' 
+			}],
             exclude: [/\.(e2e|spec)\.ts$/]
         }]
     }
