@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                 }
                 else if (clients.ContainsKey(command.Id))
                 {
-                    error(new ValidationError("Client id already exists."));
+                    error(new ValidationError($"A client with id '{command.Id}' has already been added."));
                 }
             });
         }
