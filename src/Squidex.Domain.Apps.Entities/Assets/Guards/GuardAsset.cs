@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
 
                 if (string.Equals(command.FileName, oldName))
                 {
-                    error(new ValidationError("Name is equal to old name.", nameof(command.FileName)));
+                    error(new ValidationError("Asset has already this name.", nameof(command.FileName)));
                 }
             });
         }

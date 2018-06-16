@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Entities.Assets.Commands;
+using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Xunit;
 
@@ -18,7 +19,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
         {
             var command = new RenameAsset();
 
-            Assert.Throws<ValidationException>(() => GuardAsset.CanRename(command, "asset-name"));
+            ValidationAssert.Throws(() => GuardAsset.CanRename(command, "asset-name"),
+                new ValidationError("Name is required.", "FileName"));
         }
 
         [Fact]
@@ -26,7 +28,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
         {
             var command = new RenameAsset { FileName = "asset-name" };
 
-            Assert.Throws<ValidationException>(() => GuardAsset.CanRename(command, "asset-name"));
+            ValidationAssert.Throws(() => GuardAsset.CanRename(command, "asset-name"),
+                new ValidationError("Asset has already this name.", "FileName"));
         }
 
         [Fact]
