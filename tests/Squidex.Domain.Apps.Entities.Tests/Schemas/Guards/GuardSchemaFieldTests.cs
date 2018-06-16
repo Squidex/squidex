@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
+using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Xunit;
 
@@ -203,7 +204,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             var command = new UpdateField { FieldId = 2, Properties = null };
 
-            Assert.Throws<ValidationException>(() => GuardSchemaField.CanUpdate(schema_0, command));
+            ValidationAssert.Throws(() => GuardSchemaField.CanUpdate(schema_0, command),
+                new ValidationError("Properties is required.", "Properties"));
         }
 
         [Fact]
@@ -211,7 +213,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             var command = new UpdateField { FieldId = 2, Properties = new StringFieldProperties { MinLength = 10, MaxLength = 5 } };
 
-            Assert.Throws<ValidationException>(() => GuardSchemaField.CanUpdate(schema_0, command));
+            ValidationAssert.Throws(() => GuardSchemaField.CanUpdate(schema_0, command),
+                new ValidationError("Max length must be greater than min length.", "Properties.MinLength", "Properties.MaxLength"));
         }
 
         [Fact]
@@ -219,7 +222,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             var command = new AddField { Name = "field1", Properties = validProperties };
 
-            Assert.Throws<ValidationException>(() => GuardSchemaField.CanAdd(schema_0, command));
+            ValidationAssert.Throws(() => GuardSchemaField.CanAdd(schema_0, command),
+                new ValidationError("A field with the same name already exists."));
         }
 
         [Fact]
@@ -227,7 +231,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             var command = new AddField { Name = "field301", Properties = validProperties, ParentFieldId = 3 };
 
-            Assert.Throws<ValidationException>(() => GuardSchemaField.CanAdd(schema_0, command));
+            ValidationAssert.Throws(() => GuardSchemaField.CanAdd(schema_0, command),
+                new ValidationError("A field with the same name already exists."));
         }
 
         [Fact]
@@ -235,31 +240,35 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             var command = new AddField { Name = "INVALID_NAME", Properties = validProperties };
 
-            Assert.Throws<ValidationException>(() => GuardSchemaField.CanAdd(schema_0, command));
+            ValidationAssert.Throws(() => GuardSchemaField.CanAdd(schema_0, command),
+                new ValidationError("Name must be a valid javascript property name.", "Name"));
         }
 
         [Fact]
         public void CanAdd_should_throw_exception_if_properties_not_valid()
         {
-            var command = new AddField { Name = "field3", Properties = invalidProperties };
+            var command = new AddField { Name = "field4", Properties = invalidProperties };
 
-            Assert.Throws<ValidationException>(() => GuardSchemaField.CanAdd(schema_0, command));
+            ValidationAssert.Throws(() => GuardSchemaField.CanAdd(schema_0, command),
+                new ValidationError("Max length must be greater than min length.", "Properties.MinLength", "Properties.MaxLength"));
         }
 
         [Fact]
         public void CanAdd_should_throw_exception_if_properties_null()
         {
-            var command = new AddField { Name = "field3", Properties = null };
+            var command = new AddField { Name = "field4", Properties = null };
 
-            Assert.Throws<ValidationException>(() => GuardSchemaField.CanAdd(schema_0, command));
+            ValidationAssert.Throws(() => GuardSchemaField.CanAdd(schema_0, command),
+                new ValidationError("Properties is required.", "Properties"));
         }
 
         [Fact]
         public void CanAdd_should_throw_exception_if_partitioning_not_valid()
         {
-            var command = new AddField { Name = "field3", Partitioning = "INVALID_PARTITIONING", Properties = validProperties };
+            var command = new AddField { Name = "field4", Partitioning = "INVALID_PARTITIONING", Properties = validProperties };
 
-            Assert.Throws<ValidationException>(() => GuardSchemaField.CanAdd(schema_0, command));
+            ValidationAssert.Throws(() => GuardSchemaField.CanAdd(schema_0, command),
+                new ValidationError("Partitioning is not valid.", "Partitioning"));
         }
 
         [Fact]

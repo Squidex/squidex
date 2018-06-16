@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             {
                 if (!command.Name.IsPropertyName())
                 {
-                    error(new ValidationError("Name must be a valid property name.", nameof(command.Name)));
+                    error(new ValidationError("Name must be a valid javascript property name.", nameof(command.Name)));
                 }
 
                 if (command.Properties == null)
@@ -49,7 +49,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                     }
                     if (arrayField.FieldsByName.ContainsKey(command.Name))
                     {
-                        error(new ValidationError($"There is already a field with name '{command.Name}'", nameof(command.Name)));
+                        error(new ValidationError($"A field with the same name already exists."));
                     }
                 }
                 else
@@ -61,7 +61,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
                     if (schema.FieldsByName.ContainsKey(command.Name))
                     {
-                        error(new ValidationError($"There is already a field with name '{command.Name}'", nameof(command.Name)));
+                        error(new ValidationError($"A field with the same name already exists."));
                     }
                 }
             });

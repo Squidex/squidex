@@ -24,7 +24,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             {
                 if (!command.Name.IsSlug())
                 {
-                    error(new ValidationError("Name must be a valid slug (lowercase characters, numbers and dashes).", nameof(command.Name)));
+                    error(new ValidationError("Name must be a valid slug.", nameof(command.Name)));
                 }
                 else if (await appProvider.GetAppAsync(command.Name) != null)
                 {

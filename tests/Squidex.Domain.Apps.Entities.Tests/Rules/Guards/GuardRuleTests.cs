@@ -119,8 +119,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
 
             var rule_1 = rule_0.Enable();
 
-            ValidationAssert.Throws(() => GuardRule.CanEnable(command, rule_1),
-                new ValidationError("Rule is already enabled.")); ;
+            Assert.Throws<DomainException>(() => GuardRule.CanEnable(command, rule_1));
         }
 
         [Fact]
@@ -140,8 +139,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
 
             var rule_1 = rule_0.Disable();
 
-            ValidationAssert.Throws(() => GuardRule.CanDisable(command, rule_1),
-                new ValidationError("Rule is already disabled."));
+            Assert.Throws<DomainException>(() => GuardRule.CanDisable(command, rule_1));
         }
 
         [Fact]

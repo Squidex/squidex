@@ -76,26 +76,20 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            Validate.It(() => "Cannot enable rule.", error =>
+            if (rule.IsEnabled)
             {
-                if (rule.IsEnabled)
-                {
-                    error(new ValidationError("Rule is already enabled."));
-                }
-            });
+                throw new DomainException("Rule is already enabled.");
+            }
         }
 
         public static void CanDisable(DisableRule command, Rule rule)
         {
             Guard.NotNull(command, nameof(command));
 
-            Validate.It(() => "Cannot disable rule.", error =>
+            if (!rule.IsEnabled)
             {
-                if (!rule.IsEnabled)
-                {
-                    error(new ValidationError("Rule is already disabled."));
-                }
-            });
+                throw new DomainException("Rule is already disabled.");
+            }
         }
 
         public static void CanDelete(DeleteRule command)

@@ -25,23 +25,26 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
         public GuardAppTests()
         {
-            A.CallTo(() => apps.GetAppAsync("new-app"))
+            A.CallTo(() => apps.GetAppAsync(A<string>.Ignored))
                 .Returns(Task.FromResult<IAppEntity>(null));
 
+            A.CallTo(() => apps.GetAppAsync("existing"))
+                .Returns(A.Dummy<IAppEntity>());
+
             A.CallTo(() => users.FindByIdOrEmailAsync(A<string>.Ignored))
-                .Returns(A.Fake<IUser>());
+                .Returns(A.Dummy<IUser>());
+
+            A.CallTo(() => appPlans.GetPlan("notfound"))
+                .Returns(null);
 
             A.CallTo(() => appPlans.GetPlan("free"))
-                .Returns(A.Fake<IAppLimitsPlan>());
+                .Returns(A.Dummy<IAppLimitsPlan>());
         }
 
         [Fact]
         public Task CanCreate_should_throw_exception_if_name_already_in_use()
         {
-            A.CallTo(() => apps.GetAppAsync("new-app"))
-                .Returns(A.Fake<IAppEntity>());
-
-            var command = new CreateApp { Name = "new-app" };
+            var command = new CreateApp { Name = "existing" };
 
             return ValidationAssert.ThrowsAsync(() => GuardApp.CanCreate(command, apps),
                 new ValidationError("An app with the same name already exists.", "Name"));
@@ -53,7 +56,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             var command = new CreateApp { Name = "INVALID NAME" };
 
             return ValidationAssert.ThrowsAsync(() => GuardApp.CanCreate(command, apps),
-                new ValidationError("Name must be a valid slug (lowercase characters, numbers and dashes).", "Name"));
+                new ValidationError("Name must be a valid slug.", "Name"));
         }
 
         [Fact]
@@ -78,10 +81,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         [Fact]
         public void CanChangePlan_should_throw_exception_if_plan_not_found()
         {
-            A.CallTo(() => appPlans.GetPlan("free"))
-                .Returns(null);
-
-            var command = new ChangePlan { PlanId = "free", Actor = new RefToken("user", "me") };
+            var command = new ChangePlan { PlanId = "notfound", Actor = new RefToken("user", "me") };
 
             AppPlan plan = null;
 
