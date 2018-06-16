@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Infrastructure;
 using Xunit;
+using Xunit.Sdk;
 
 namespace Squidex.Domain.Apps.Entities.TestHelpers
 {
@@ -26,6 +27,10 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
             catch (ValidationException ex)
             {
                 ex.Errors.ToArray().ShouldBeEquivalent(errors);
+            }
+            catch (XunitException)
+            {
+                throw;
             }
             catch (Exception ex)
             {
@@ -44,6 +49,10 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
             catch (ValidationException ex)
             {
                 ex.Errors.ToArray().ShouldBeEquivalent(errors);
+            }
+            catch (XunitException)
+            {
+                throw;
             }
             catch (Exception ex)
             {

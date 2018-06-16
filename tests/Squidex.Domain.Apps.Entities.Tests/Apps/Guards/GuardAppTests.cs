@@ -44,7 +44,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             var command = new CreateApp { Name = "new-app" };
 
             return ValidationAssert.ThrowsAsync(() => GuardApp.CanCreate(command, apps),
-                new ValidationError("An app with name 'new-app' already exists.", "Name"));
+                new ValidationError("An app with the same name already exists.", "Name"));
         }
 
         [Fact]
@@ -86,7 +86,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             AppPlan plan = null;
 
             ValidationAssert.Throws(() => GuardApp.CanChangePlan(command, plan, appPlans),
-                new ValidationError("Plan with id 'free' is not available.", "PlanId"));
+                new ValidationError("A plan with this id does not exist.", "PlanId"));
         }
 
         [Fact]

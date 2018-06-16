@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                 }
                 else if (await appProvider.GetAppAsync(command.Name) != null)
                 {
-                    error(new ValidationError($"An app with name '{command.Name}' already exists.", nameof(command.Name)));
+                    error(new ValidationError($"An app with the same name already exists.", nameof(command.Name)));
                 }
             });
         }
@@ -47,7 +47,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                 {
                     if (appPlans.GetPlan(command.PlanId) == null)
                     {
-                        error(new ValidationError($"Plan with id '{command.PlanId}' is not available.", nameof(command.PlanId)));
+                        error(new ValidationError("A plan with this id does not exist.", nameof(command.PlanId)));
                     }
 
                     if (!string.IsNullOrWhiteSpace(command.PlanId) && plan != null && !plan.Owner.Equals(command.Actor))

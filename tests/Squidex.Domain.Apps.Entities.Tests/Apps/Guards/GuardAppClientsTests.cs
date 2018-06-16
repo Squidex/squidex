@@ -36,7 +36,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             var clients_1 = clients_0.Add("android", "secret");
 
             ValidationAssert.Throws(() => GuardAppClients.CanAttach(clients_1, command),
-                new ValidationError("A client with id 'android' has already been added."));
+                new ValidationError("A client with the same id already exists."));
         }
 
         [Fact]
