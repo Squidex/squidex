@@ -5,6 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+// tslint:disable:no-shadowed-variable
+
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
@@ -19,7 +21,8 @@ import {
     ModalView,
     PatternsState,
     SchemaDetailsDto,
-    SchemasState
+    SchemasState,
+    Types
 } from '@app/shared';
 
 import {
@@ -109,9 +112,17 @@ export class SchemaPageComponent implements OnDestroy, OnInit {
             fields: this.schema.fields.map(field => {
                 const { fieldId, ...copy } = field;
 
+                if (Types.isArray(copy.nested)) {
+                    for (let i = 0; i < copy.nested.length; i++) {
+                        const { fieldId, parentId, ...nestedCopy } = copy.nested[i];
+
+                        copy.nested[i] = <any>nestedCopy;
+                    }
+                }
+
                 for (const key in copy.properties) {
                     if (copy.properties.hasOwnProperty(key)) {
-                        if (!copy.properties[key]) {
+                        if (!!copy.properties[key]) {
                             delete copy.properties[key];
                         }
                     }

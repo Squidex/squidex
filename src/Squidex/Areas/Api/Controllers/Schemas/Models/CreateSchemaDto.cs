@@ -56,23 +56,23 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
 
                 foreach (var fieldDto in Fields)
                 {
-                    var fieldProperties = fieldDto?.Properties.ToProperties();
-                    var field = SimpleMapper.Map(fieldDto, new CreateSchemaField { Properties = fieldProperties });
+                    var rootProperties = fieldDto?.Properties.ToProperties();
+                    var rootField = SimpleMapper.Map(fieldDto, new CreateSchemaField { Properties = rootProperties });
 
                     if (fieldDto.Nested != null)
                     {
-                        field.Nested = new List<CreateSchemaNestedField>();
+                        rootField.Nested = new List<CreateSchemaNestedField>();
 
                         foreach (var nestedFieldDto in fieldDto.Nested)
                         {
-                            var nestedFieldProperties = nestedFieldDto?.Properties.ToProperties();
-                            var nestedField = SimpleMapper.Map(fieldDto, new CreateSchemaNestedField { Properties = fieldProperties });
+                            var nestedProperties = nestedFieldDto?.Properties.ToProperties();
+                            var nestedField = SimpleMapper.Map(nestedFieldDto, new CreateSchemaNestedField { Properties = nestedProperties });
 
-                            field.Nested.Add(nestedField);
+                            rootField.Nested.Add(nestedField);
                         }
                     }
 
-                    command.Fields.Add(field);
+                    command.Fields.Add(rootField);
                 }
             }
 
