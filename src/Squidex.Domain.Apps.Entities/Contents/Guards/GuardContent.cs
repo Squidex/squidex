@@ -18,12 +18,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            Validate.It(() => "Cannot created content.", error =>
+            Validate.It(() => "Cannot created content.", e =>
             {
-                if (command.Data == null)
-                {
-                    error(new ValidationError("Data cannot be null.", nameof(command.Data)));
-                }
+                ValidateData(command, e);
             });
         }
 
@@ -31,12 +28,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            Validate.It(() => "Cannot update content.", error =>
+            Validate.It(() => "Cannot update content.", e =>
             {
-                if (command.Data == null)
-                {
-                    error(new ValidationError("Data cannot be null.", nameof(command.Data)));
-                }
+                ValidateData(command, e);
             });
         }
 
@@ -44,12 +38,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            Validate.It(() => "Cannot patch content.", error =>
+            Validate.It(() => "Cannot patch content.", e =>
             {
-                if (command.Data == null)
-                {
-                    error(new ValidationError("Data cannot be null.", nameof(command.Data)));
-                }
+                ValidateData(command, e);
             });
         }
 
@@ -57,11 +48,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            Validate.It(() => "Cannot discard pending changes.", error =>
+            Validate.It(() => "Cannot discard pending changes.", e =>
             {
                 if (!isPending)
                 {
-                    error(new ValidationError("The content has no pending changes."));
+                    e("The content has no pending changes.");
                 }
             });
         }
@@ -70,7 +61,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            Validate.It(() => "Cannot change status.", error =>
+            Validate.It(() => "Cannot change status.", e =>
             {
                 var isAllowedPendingUpdate =
                     status == command.Status &&
@@ -79,12 +70,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
 
                 if (!StatusFlow.Exists(command.Status) || (!StatusFlow.CanChange(status, command.Status) && !isAllowedPendingUpdate))
                 {
-                    error(new ValidationError($"Content cannot be changed from status {status} to {command.Status}.", nameof(command.Status)));
+                    e($"Content cannot be changed from status {status} to {command.Status}.", nameof(command.Status));
                 }
 
                 if (command.DueTime.HasValue && command.DueTime.Value < SystemClock.Instance.GetCurrentInstant())
                 {
-                    error(new ValidationError("DueTime must be in the future.", nameof(command.DueTime)));
+                    e("DueTime must be in the future.", nameof(command.DueTime));
                 }
             });
         }
@@ -92,6 +83,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
         public static void CanDelete(DeleteContent command)
         {
             Guard.NotNull(command, nameof(command));
+        }
+
+        private static void ValidateData(ContentDataCommand command, AddValidation e)
+        {
+            if (command.Data == null)
+            {
+                e("Data is required.", nameof(command.Data));
+            }
         }
     }
 }

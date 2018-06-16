@@ -12,27 +12,49 @@ using System.Threading.Tasks;
 
 namespace Squidex.Infrastructure
 {
+    public delegate void AddValidation(string message, params string[] propertyNames);
+
     public static class Validate
     {
-        public static void It(Func<string> message, Action<Action<ValidationError>> action)
+        public static void It(Func<string> message, Action<AddValidation> action)
         {
-            var errors = new List<ValidationError>();
+            List<ValidationError> errors = null;
 
-            action(errors.Add);
+            var addValidation = new AddValidation((m, p) =>
+            {
+                if (errors == null)
+                {
+                    errors = new List<ValidationError>();
+                }
 
-            if (errors.Any())
+                errors.Add(new ValidationError(m, p));
+            });
+
+            action(addValidation);
+
+            if (errors != null)
             {
                 throw new ValidationException(message(), errors);
             }
         }
 
-        public static async Task It(Func<string> message, Func<Action<ValidationError>, Task> action)
+        public static async Task It(Func<string> message, Func<AddValidation, Task> action)
         {
-            var errors = new List<ValidationError>();
+            List<ValidationError> errors = null;
 
-            await action(errors.Add);
+            var addValidation = new AddValidation((m, p) =>
+            {
+                if (errors == null)
+                {
+                    errors = new List<ValidationError>();
+                }
 
-            if (errors.Any())
+                errors.Add(new ValidationError(m, p));
+            });
+
+            await action(addValidation);
+
+            if (errors != null)
             {
                 throw new ValidationException(message(), errors);
             }

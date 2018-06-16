@@ -7,6 +7,7 @@
 
 using System;
 using System.Linq;
+using System.Security;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
@@ -22,45 +23,43 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            return Validate.It(() => "Cannot assign contributor.", async error =>
+            return Validate.It(() => "Cannot assign contributor.", async e =>
             {
                 if (!command.Permission.IsEnumValue())
                 {
-                    error(new ValidationError("Permission is not valid.", nameof(command.Permission)));
+                    e("Permission is not valid.", nameof(command.Permission));
                 }
 
                 if (string.IsNullOrWhiteSpace(command.ContributorId))
                 {
-                    error(new ValidationError("Contributor id is required.", nameof(command.ContributorId)));
+                    e("Contributor id is required.", nameof(command.ContributorId));
+                    return;
                 }
-                else
+
+                var user = await users.FindByIdOrEmailAsync(command.ContributorId);
+
+                if (user == null)
                 {
-                    var user = await users.FindByIdOrEmailAsync(command.ContributorId);
+                    throw new DomainObjectNotFoundException(command.ContributorId, "Contributors", typeof(IAppEntity));
+                }
 
-                    if (user == null)
-                    {
-                        throw new DomainObjectNotFoundException(command.ContributorId, "Contributors", typeof(IAppEntity));
-                    }
-                    else
-                    {
-                        command.ContributorId = user.Id;
+                command.ContributorId = user.Id;
 
-                        if (string.Equals(command.ContributorId, command.Actor?.Identifier, StringComparison.OrdinalIgnoreCase))
-                        {
-                            error(new ValidationError("You cannot change your own permission."));
-                        }
-                        else if (contributors.TryGetValue(command.ContributorId, out var existing))
-                        {
-                            if (existing == command.Permission)
-                            {
-                                error(new ValidationError("Contributor has already this permission.", nameof(command.Permission)));
-                            }
-                        }
-                        else if (plan.MaxContributors == contributors.Count)
-                        {
-                            error(new ValidationError("You have reached the maximum number of contributors for your plan."));
-                        }
+                if (string.Equals(command.ContributorId, command.Actor?.Identifier, StringComparison.OrdinalIgnoreCase))
+                {
+                    throw new SecurityException("You cannot change your own permission.");
+                }
+
+                if (contributors.TryGetValue(command.ContributorId, out var existing))
+                {
+                    if (existing == command.Permission)
+                    {
+                        e("Contributor has already this permission.", nameof(command.Permission));
                     }
+                }
+                else if (plan.MaxContributors == contributors.Count)
+                {
+                    e("You have reached the maximum number of contributors for your plan.");
                 }
             });
         }
@@ -69,18 +68,18 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            Validate.It(() => "Cannot remove contributor.", error =>
+            Validate.It(() => "Cannot remove contributor.", e =>
             {
                 if (string.IsNullOrWhiteSpace(command.ContributorId))
                 {
-                    error(new ValidationError("Contributor id is required.", nameof(command.ContributorId)));
+                    e("Contributor id is required.", nameof(command.ContributorId));
                 }
 
                 var ownerIds = contributors.Where(x => x.Value == AppContributorPermission.Owner).Select(x => x.Key).ToList();
 
                 if (ownerIds.Count == 1 && ownerIds.Contains(command.ContributorId))
                 {
-                    error(new ValidationError("Cannot remove the only owner."));
+                    e("Cannot remove the only owner.");
                 }
             });
 

@@ -56,7 +56,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             var command = new AddPattern { PatternId = patternId, Name = "any", Pattern = ".*" };
 
             ValidationAssert.Throws(() => GuardAppPattern.CanAdd(patterns_1, command),
-                new ValidationError("An pattern with the same name already exists."));
+                new ValidationError("A pattern with the same name already exists."));
         }
 
         [Fact]
@@ -141,7 +141,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             var command = new UpdatePattern { PatternId = id2, Name = "Pattern1", Pattern = "[0-4]" };
 
             ValidationAssert.Throws(() => GuardAppPattern.CanUpdate(patterns_2, command),
-                new ValidationError("An pattern with the same name already exists."));
+                new ValidationError("A pattern with the same name already exists."));
         }
 
         [Fact]

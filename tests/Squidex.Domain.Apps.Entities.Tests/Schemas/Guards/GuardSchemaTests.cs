@@ -207,7 +207,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             };
 
             return ValidationAssert.ThrowsAsync(() => GuardSchema.CanCreate(command, appProvider),
-                new ValidationError("Nested field name must be a valid javascript property name.",
+                new ValidationError("Field name must be a valid javascript property name.",
                     "Fields[1].Nested[1].Name"));
         }
 
@@ -238,7 +238,38 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             };
 
             return ValidationAssert.ThrowsAsync(() => GuardSchema.CanCreate(command, appProvider),
-                new ValidationError("Nested field properties is required.",
+                new ValidationError("Field properties is required.",
+                    "Fields[1].Nested[1].Properties"));
+        }
+
+        [Fact]
+        public Task CanCreate_should_throw_exception_if_nested_field_is_array()
+        {
+            var command = new CreateSchema
+            {
+                AppId = appId,
+                Fields = new List<CreateSchemaField>
+                {
+                    new CreateSchemaField
+                    {
+                        Name = "array",
+                        Properties = new ArrayFieldProperties(),
+                        Partitioning = Partitioning.Invariant.Key,
+                        Nested = new List<CreateSchemaNestedField>
+                        {
+                            new CreateSchemaNestedField
+                            {
+                                Name = "nested1",
+                                Properties = new ArrayFieldProperties()
+                            }
+                        }
+                    }
+                },
+                Name = "new-schema"
+            };
+
+            return ValidationAssert.ThrowsAsync(() => GuardSchema.CanCreate(command, appProvider),
+                new ValidationError("Nested field cannot be array fields.",
                     "Fields[1].Nested[1].Properties"));
         }
 
@@ -309,55 +340,6 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                 new ValidationError("Fields cannot have duplicate names.",
                     "Fields[1].Nested"));
         }
-
-        /*
-
-        [Fact]
-        public Task CanCreate_should_throw_exception_if_fields_contain_duplicate_names()
-        {
-            var command = new CreateSchema
-            {
-                AppId = appId,
-                Fields = new List<CreateSchemaField>
-                {
-                    new CreateSchemaField
-                    {
-                        Name = "field1",
-                        Properties = ValidProperties(),
-                        Partitioning = "invariant"
-                    },
-                    new CreateSchemaField
-                    {
-                        Name = "field1",
-                        Properties = ValidProperties(),
-                        Partitioning = "invariant"
-                    },
-                    new CreateSchemaField
-                    {
-                        Name = "field1",
-                        Properties = new ArrayFieldProperties(),
-                        Partitioning = "invariant",
-                        Nested = new List<CreateSchemaNestedField>
-                        {
-                            new CreateSchemaNestedField
-                            {
-                                Name = "nested1",
-                                Properties = ValidProperties()
-                            },
-                            new CreateSchemaNestedField
-                            {
-                                Name = "nested1",
-                                Properties = ValidProperties()
-                            }
-                        }
-                    }
-                },
-                Name = "new-schema"
-            };
-
-            return ValidationAssert.ThrowsAsync(() => GuardSchema.CanCreate(command, appProvider));
-        }
-        */
 
         [Fact]
         public Task CanCreate_should_not_throw_exception_if_command_is_valid()

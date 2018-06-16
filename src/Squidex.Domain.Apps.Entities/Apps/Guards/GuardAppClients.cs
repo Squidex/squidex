@@ -17,15 +17,15 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            Validate.It(() => "Cannot attach client.", error =>
+            Validate.It(() => "Cannot attach client.", e =>
             {
                 if (string.IsNullOrWhiteSpace(command.Id))
                 {
-                    error(new ValidationError("Client id is required.", nameof(command.Id)));
+                    e("Client id is required.", nameof(command.Id));
                 }
                 else if (clients.ContainsKey(command.Id))
                 {
-                    error(new ValidationError($"A client with the same id already exists."));
+                    e($"A client with the same id already exists.");
                 }
             });
         }
@@ -36,11 +36,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             GetClientOrThrow(clients, command.Id);
 
-            Validate.It(() => "Cannot revoke client.", error =>
+            Validate.It(() => "Cannot revoke client.", e =>
             {
                 if (string.IsNullOrWhiteSpace(command.Id))
                 {
-                    error(new ValidationError("Client id is required.", nameof(command.Id)));
+                    e("Client id is required.", nameof(command.Id));
                 }
             });
         }
@@ -51,41 +51,43 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             var client = GetClientOrThrow(clients, command.Id);
 
-            Validate.It(() => "Cannot revoke client.", error =>
+            Validate.It(() => "Cannot update client.", e =>
             {
                 if (string.IsNullOrWhiteSpace(command.Id))
                 {
-                    error(new ValidationError("Client id is required.", nameof(command.Id)));
+                    e("Client id is required.", nameof(command.Id));
                 }
 
                 if (string.IsNullOrWhiteSpace(command.Name) && command.Permission == null)
                 {
-                    error(new ValidationError("Either name or permission must be defined.", nameof(command.Name), nameof(command.Permission)));
+                    e("Either name or permission must be defined.", nameof(command.Name), nameof(command.Permission));
                 }
 
                 if (command.Permission.HasValue && !command.Permission.Value.IsEnumValue())
                 {
-                    error(new ValidationError("Permission is not valid.", nameof(command.Permission)));
+                    e("Permission is not valid.", nameof(command.Permission));
                 }
 
-                if (client != null)
+                if (client == null)
                 {
-                    if (!string.IsNullOrWhiteSpace(command.Name) && string.Equals(client.Name, command.Name))
-                    {
-                        error(new ValidationError("Client has already this name.", nameof(command.Name)));
-                    }
+                    return;
+                }
 
-                    if (command.Permission == client.Permission)
-                    {
-                        error(new ValidationError("Client has already this permission.", nameof(command.Permission)));
-                    }
+                if (!string.IsNullOrWhiteSpace(command.Name) && string.Equals(client.Name, command.Name))
+                {
+                    e("Client has already this name.", nameof(command.Name));
+                }
+
+                if (command.Permission == client.Permission)
+                {
+                    e("Client has already this permission.", nameof(command.Permission));
                 }
             });
         }
 
         private static AppClient GetClientOrThrow(AppClients clients, string id)
         {
-            if (id == null)
+            if (string.IsNullOrWhiteSpace(id))
             {
                 return null;
             }

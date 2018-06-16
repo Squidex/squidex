@@ -9,14 +9,7 @@ using Squidex.Domain.Apps.Core.Schemas;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.Commands
 {
-    public sealed class CreateSchemaNestedField
+    public sealed class CreateSchemaNestedField : CreateSchemaFieldBase
     {
-        public string Name { get; set; }
-
-        public bool IsHidden { get; set; }
-
-        public bool IsDisabled { get; set; }
-
-        public FieldProperties Properties { get; set; }
     }
 }

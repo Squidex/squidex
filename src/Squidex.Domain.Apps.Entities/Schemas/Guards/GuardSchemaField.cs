@@ -18,50 +18,43 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            Validate.It(() => "Cannot add a new field.", error =>
+            Validate.It(() => "Cannot add a new field.", e =>
             {
                 if (!command.Name.IsPropertyName())
                 {
-                    error(new ValidationError("Name must be a valid javascript property name.", nameof(command.Name)));
+                    e("Name must be a valid javascript property name.", nameof(command.Name));
                 }
 
                 if (command.Properties == null)
                 {
-                    error(new ValidationError("Properties is required.", nameof(command.Properties)));
+                    e("Properties is required.", nameof(command.Properties));
                 }
                 else
                 {
                     var errors = FieldPropertiesValidator.Validate(command.Properties);
 
-                    foreach (var e in errors)
-                    {
-                        error(e.WithPrefix(nameof(command.Properties)));
-                    }
+                    errors.Foreach(x => x.WithPrefix(nameof(command.Properties)).AddTo(e));
                 }
 
                 if (command.ParentFieldId.HasValue)
                 {
-                    var parentId = command.ParentFieldId.Value;
+                    var arrayField = GuardHelper.GetArrayFieldOrThrow(schema, command.ParentFieldId.Value);
 
-                    if (!schema.FieldsById.TryGetValue(parentId, out var rootField) || !(rootField is IArrayField arrayField))
-                    {
-                        throw new DomainObjectNotFoundException(parentId.ToString(), "Fields", typeof(Schema));
-                    }
                     if (arrayField.FieldsByName.ContainsKey(command.Name))
                     {
-                        error(new ValidationError($"A field with the same name already exists."));
+                        e($"A field with the same name already exists.");
                     }
                 }
                 else
                 {
                     if (command.ParentFieldId == null && !command.Partitioning.IsValidPartitioning())
                     {
-                        error(new ValidationError("Partitioning is not valid.", nameof(command.Partitioning)));
+                        e("Partitioning is not valid.", nameof(command.Partitioning));
                     }
 
                     if (schema.FieldsByName.ContainsKey(command.Name))
                     {
-                        error(new ValidationError($"A field with the same name already exists."));
+                        e($"A field with the same name already exists.");
                     }
                 }
             });
@@ -71,27 +64,24 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            var field = GetFieldOrThrow(schema, command.FieldId, command.ParentFieldId);
+            var field = GuardHelper.GetFieldOrThrow(schema, command.FieldId, command.ParentFieldId);
 
             if (field.IsLocked)
             {
                 throw new DomainException("Schema field is already locked.");
             }
 
-            Validate.It(() => "Cannot update field.", error =>
+            Validate.It(() => "Cannot update field.", e =>
             {
                 if (command.Properties == null)
                 {
-                    error(new ValidationError("Properties is required.", nameof(command.Properties)));
+                    e("Properties is required.", nameof(command.Properties));
                 }
                 else
                 {
                     var errors = FieldPropertiesValidator.Validate(command.Properties);
 
-                    foreach (var e in errors)
-                    {
-                        error(e.WithPrefix(nameof(command.Properties)));
-                    }
+                    errors.Foreach(x => x.WithPrefix(nameof(command.Properties)).AddTo(e));
                 }
             });
         }
@@ -100,7 +90,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            var field = GetFieldOrThrow(schema, command.FieldId, command.ParentFieldId);
+            var field = GuardHelper.GetFieldOrThrow(schema, command.FieldId, command.ParentFieldId);
 
             if (field.IsLocked)
             {
@@ -117,7 +107,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            var field = GetFieldOrThrow(schema, command.FieldId, command.ParentFieldId);
+            var field = GuardHelper.GetFieldOrThrow(schema, command.FieldId, command.ParentFieldId);
 
             if (field.IsDisabled)
             {
@@ -129,7 +119,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            var field = GetFieldOrThrow(schema, command.FieldId, command.ParentFieldId);
+            var field = GuardHelper.GetFieldOrThrow(schema, command.FieldId, command.ParentFieldId);
 
             if (field.IsLocked)
             {
@@ -141,7 +131,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            var field = GetFieldOrThrow(schema, command.FieldId, command.ParentFieldId);
+            var field = GuardHelper.GetFieldOrThrow(schema, command.FieldId, command.ParentFieldId);
 
             if (!field.IsHidden)
             {
@@ -153,7 +143,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            var field = GetFieldOrThrow(schema, command.FieldId, command.ParentFieldId);
+            var field = GuardHelper.GetFieldOrThrow(schema, command.FieldId, command.ParentFieldId);
 
             if (!field.IsDisabled)
             {
@@ -165,37 +155,12 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            var field = GetFieldOrThrow(schema, command.FieldId, command.ParentFieldId);
+            var field = GuardHelper.GetFieldOrThrow(schema, command.FieldId, command.ParentFieldId);
 
             if (field.IsLocked)
             {
                 throw new DomainException("Schema field is already locked.");
             }
-        }
-
-        private static IField GetFieldOrThrow(Schema schema, long fieldId, long? parentId)
-        {
-            if (parentId.HasValue)
-            {
-                if (!schema.FieldsById.TryGetValue(parentId.Value, out var rootField) || !(rootField is IArrayField arrayField))
-                {
-                    throw new DomainObjectNotFoundException(parentId.ToString(), "Fields", typeof(Schema));
-                }
-
-                if (!arrayField.FieldsById.TryGetValue(fieldId, out var nestedField))
-                {
-                    throw new DomainObjectNotFoundException(fieldId.ToString(), $"Fields[{parentId}].Fields", typeof(Schema));
-                }
-
-                return nestedField;
-            }
-
-            if (!schema.FieldsById.TryGetValue(fieldId, out var field))
-            {
-                throw new DomainObjectNotFoundException(fieldId.ToString(), "Fields", typeof(Schema));
-            }
-
-            return field;
         }
     }
 }

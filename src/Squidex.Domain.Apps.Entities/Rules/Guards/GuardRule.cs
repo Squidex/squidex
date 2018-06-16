@@ -19,28 +19,28 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            return Validate.It(() => "Cannot create rule.", async error =>
+            return Validate.It(() => "Cannot create rule.", async e =>
             {
                 if (command.Trigger == null)
                 {
-                    error(new ValidationError("Trigger is required.", nameof(command.Trigger)));
+                    e("Trigger is required.", nameof(command.Trigger));
                 }
                 else
                 {
                     var errors = await RuleTriggerValidator.ValidateAsync(command.AppId.Id, command.Trigger, appProvider);
 
-                    errors.Foreach(error);
+                    errors.Foreach(x => x.AddTo(e));
                 }
 
                 if (command.Action == null)
                 {
-                    error(new ValidationError("Action is required.", nameof(command.Action)));
+                    e("Action is required.", nameof(command.Action));
                 }
                 else
                 {
                     var errors = await RuleActionValidator.ValidateAsync(command.Action);
 
-                    errors.Foreach(error);
+                    errors.Foreach(x => x.AddTo(e));
                 }
             });
         }
@@ -49,25 +49,25 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            return Validate.It(() => "Cannot update rule.", async error =>
+            return Validate.It(() => "Cannot update rule.", async e =>
             {
                 if (command.Trigger == null && command.Action == null)
                 {
-                    error(new ValidationError("Either trigger or action is required.", nameof(command.Trigger), nameof(command.Action)));
+                    e("Either trigger or action is required.", nameof(command.Trigger), nameof(command.Action));
                 }
 
                 if (command.Trigger != null)
                 {
                     var errors = await RuleTriggerValidator.ValidateAsync(appId, command.Trigger, appProvider);
 
-                    errors.Foreach(error);
+                    errors.Foreach(x => x.AddTo(e));
                 }
 
                 if (command.Action != null)
                 {
                     var errors = await RuleActionValidator.ValidateAsync(command.Action);
 
-                    errors.Foreach(error);
+                    errors.Foreach(x => x.AddTo(e));
                 }
             });
         }

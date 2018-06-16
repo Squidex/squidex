@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -22,106 +21,69 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            return Validate.It(() => "Cannot create schema.", async error =>
+            return Validate.It(() => "Cannot create schema.", async e =>
             {
                 if (!command.Name.IsSlug())
                 {
-                    error(new ValidationError("Name is not a valid slug.", nameof(command.Name)));
+                    e("Name is not a valid slug.", nameof(command.Name));
                 }
                 else if (await appProvider.GetSchemaAsync(command.AppId.Id, command.Name) != null)
                 {
-                    error(new ValidationError("A schema with the same name already exists."));
+                    e("A schema with the same name already exists.");
                 }
 
                 if (command.Fields?.Count > 0)
                 {
-                    var index = 0;
+                    var fieldIndex = 0;
+                    var fieldPrefix = string.Empty;
 
                     foreach (var field in command.Fields)
                     {
-                        index++;
-
-                        var prefix = $"Fields[{index}]";
+                        fieldIndex++;
+                        fieldPrefix = $"Fields[{fieldIndex}]";
 
                         if (!field.Partitioning.IsValidPartitioning())
                         {
-                            error(new ValidationError("Field partitioning is not valid.",
-                                $"{prefix}.{nameof(field.Partitioning)}"));
+                            e("Field partitioning is not valid.", $"{fieldPrefix}.{nameof(field.Partitioning)}");
                         }
 
-                        if (!field.Name.IsPropertyName())
-                        {
-                            error(new ValidationError("Field name must be a valid javascript property name.",
-                                $"{prefix}.{nameof(field.Name)}"));
-                        }
-
-                        if (field.Properties == null)
-                        {
-                            error(new ValidationError("Field properties is required.",
-                                $"{prefix}.{nameof(field.Properties)}"));
-                        }
-                        else
-                        {
-                            var errors = FieldPropertiesValidator.Validate(field.Properties);
-
-                            foreach (var e in errors)
-                            {
-                                error(e.WithPrefix($"{prefix}.Properties"));
-                            }
-                        }
+                        ValidateField(e, fieldPrefix, field);
 
                         if (field.Nested?.Count > 0)
                         {
-                            if (!(field.Properties is ArrayFieldProperties))
-                            {
-                                error(new ValidationError("Only array fields can have nested fields.",
-                                    $"{prefix}.{nameof(field.Partitioning)}"));
-                            }
-                            else
+                            if (field.Properties is ArrayFieldProperties)
                             {
                                 var nestedIndex = 0;
+                                var nestedPrefix = string.Empty;
 
                                 foreach (var nestedField in field.Nested)
                                 {
                                     nestedIndex++;
+                                    nestedPrefix = $"{fieldPrefix}.Nested[{nestedIndex}]";
 
-                                    var nestedPrefix = $"{prefix}.Nested[{nestedIndex}]";
-
-                                    if (!nestedField.Name.IsPropertyName())
+                                    if (nestedField.Properties is ArrayFieldProperties)
                                     {
-                                        error(new ValidationError("Nested field name must be a valid javascript property name.",
-                                            $"{nestedPrefix}.{nameof(nestedField.Name)}"));
+                                        e("Nested field cannot be array fields.", $"{nestedPrefix}.{nameof(nestedField.Properties)}");
                                     }
 
-                                    if (nestedField.Properties == null)
-                                    {
-                                        error(new ValidationError("Nested field properties is required.",
-                                            $"{nestedPrefix}.{nameof(nestedField.Properties)}"));
-                                    }
-                                    else
-                                    {
-                                        var errors = FieldPropertiesValidator.Validate(nestedField.Properties);
-
-                                        foreach (var e in errors)
-                                        {
-                                            error(e.WithPrefix($"{nestedPrefix}.Properties"));
-                                        }
-                                    }
+                                    ValidateField(e, nestedPrefix, nestedField);
                                 }
+                            }
+                            else if (field.Nested.Count > 0)
+                            {
+                                e("Only array fields can have nested fields.", $"{fieldPrefix}.{nameof(field.Partitioning)}");
                             }
 
                             if (field.Nested.Select(x => x.Name).Distinct().Count() != field.Nested.Count)
                             {
-                                error(new ValidationError("Fields cannot have duplicate names.",
-                                    $"{prefix}.Nested"));
+                                e("Fields cannot have duplicate names.", $"{fieldPrefix}.Nested");
                             }
                         }
                     }
 
                     if (command.Fields.Select(x => x.Name).Distinct().Count() != command.Fields.Count)
                     {
-                        error(new ValidationError("Fields cannot have duplicate names.",
-                            nameof(command.Fields)));
+                        e("Fields cannot have duplicate names.", nameof(command.Fields));
                     }
                 }
             });
@@ -135,42 +97,25 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
             if (command.ParentFieldId.HasValue)
             {
-                var parentId = command.ParentFieldId.Value;
-
-                if (schema.FieldsById.TryGetValue(parentId, out var field) && field is IArrayField a)
-                {
-                    arrayField = a;
-                }
-                else
-                {
-                    throw new DomainObjectNotFoundException(parentId.ToString(), "Fields", typeof(Schema));
-                }
+                arrayField = GuardHelper.GetArrayFieldOrThrow(schema, command.ParentFieldId.Value);
             }
 
             Validate.It(() => "Cannot reorder schema fields.", error =>
             {
                 if (command.FieldIds == null)
                 {
-                    error(new ValidationError("Field ids is required.", nameof(command.FieldIds)));
+                    error("Field ids is required.", nameof(command.FieldIds));
                 }
 
                 if (arrayField == null)
                 {
-                    CheckFields(error, command, schema.FieldsById);
+                    ValidateFieldIds(error, command, schema.FieldsById);
                 }
                 else
                 {
-                    CheckFields(error, command, arrayField.FieldsById);
+                    ValidateFieldIds(error, command, arrayField.FieldsById);
                 }
             });
-        }
-
-        private static void CheckFields<T>(Action<ValidationError> error, ReorderFields c, IReadOnlyDictionary<long, T> fields)
-        {
-            if (c.FieldIds != null && (c.FieldIds.Count != fields.Count || c.FieldIds.Any(x => !fields.ContainsKey(x))))
-            {
-                error(new ValidationError("Field ids do not cover all fields.", nameof(c.FieldIds)));
-            }
         }
 
         public static void CanPublish(Schema schema, PublishSchema command)
@@ -211,6 +156,33 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         public static void CanDelete(Schema schema, DeleteSchema command)
         {
             Guard.NotNull(command, nameof(command));
+        }
+
+        private static void ValidateField(AddValidation e, string prefix, CreateSchemaFieldBase field)
+        {
+            if (!field.Name.IsPropertyName())
+            {
+                e("Field name must be a valid javascript property name.", $"{prefix}.{nameof(field.Name)}");
+            }
+
+            if (field.Properties == null)
+            {
+                e("Field properties is required.", $"{prefix}.{nameof(field.Properties)}");
+            }
+            else
+            {
+                var errors = FieldPropertiesValidator.Validate(field.Properties);
+
+                errors.Foreach(x => x.WithPrefix($"{prefix}.{nameof(field.Properties)}").AddTo(e));
+            }
+        }
+
+        private static void ValidateFieldIds<T>(AddValidation error, ReorderFields c, IReadOnlyDictionary<long, T> fields)
+        {
+            if (c.FieldIds != null && (c.FieldIds.Count != fields.Count || c.FieldIds.Any(x => !fields.ContainsKey(x))))
+            {
+                error("Field ids do not cover all fields.", nameof(c.FieldIds));
+            }
         }
     }
 }

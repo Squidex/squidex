@@ -46,5 +46,10 @@ namespace Squidex.Infrastructure
                 return new ValidationError(Message, prefix);
             }
         }
+
+        public void AddTo(AddValidation e)
+        {
+            e(Message, propertyNames);
+        }
     }
 }

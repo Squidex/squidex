@@ -1,18 +1,24 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
+using Squidex.Domain.Apps.Core.Schemas;
 
 namespace Squidex.Domain.Apps.Events.Schemas
 {
-    public sealed class SchemaCreatedField : SchemaCreatedFieldBase
+    public abstract class SchemaCreatedFieldBase
     {
-        public string Partitioning { get; set; }
+        public string Name { get; set; }
 
-        public List<SchemaCreatedNestedField> Nested { get; set; }
+        public bool IsHidden { get; set; }
+
+        public bool IsLocked { get; set; }
+
+        public bool IsDisabled { get; set; }
+
+        public FieldProperties Properties { get; set; }
     }
 }
