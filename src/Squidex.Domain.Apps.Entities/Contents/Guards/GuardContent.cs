@@ -81,7 +81,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
 
                 if (command.DueTime.HasValue && command.DueTime.Value < SystemClock.Instance.GetCurrentInstant())
                 {
-                    e("DueTime must be in the future.", nameof(command.DueTime));
+                    e("Due time must be in the future.", nameof(command.DueTime));
                 }
             });
         }
