@@ -9,6 +9,7 @@ using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Contents.Guards;
+using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Xunit;
 
@@ -23,7 +24,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         {
             var command = new CreateContent();
 
-            Assert.Throws<ValidationException>(() => GuardContent.CanCreate(command));
+            ValidationAssert.Throws(() => GuardContent.CanCreate(command),
+                new ValidationError("Data is required.", "Data"));
         }
 
         [Fact]
@@ -39,7 +41,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         {
             var command = new UpdateContent();
 
-            Assert.Throws<ValidationException>(() => GuardContent.CanUpdate(command));
+            ValidationAssert.Throws(() => GuardContent.CanUpdate(command),
+                new ValidationError("Data is required.", "Data"));
         }
 
         [Fact]
@@ -55,7 +58,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         {
             var command = new PatchContent();
 
-            Assert.Throws<ValidationException>(() => GuardContent.CanPatch(command));
+            ValidationAssert.Throws(() => GuardContent.CanPatch(command),
+                new ValidationError("Data is required.", "Data"));
         }
 
         [Fact]
@@ -71,7 +75,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         {
             var command = new ChangeContentStatus { Status = (Status)10 };
 
-            Assert.Throws<ValidationException>(() => GuardContent.CanChangeContentStatus(false, Status.Archived, command));
+            ValidationAssert.Throws(() => GuardContent.CanChangeContentStatus(false, Status.Archived, command),
+                new ValidationError("Status is not valid.", "Status"));
         }
 
         [Fact]
@@ -79,7 +84,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         {
             var command = new ChangeContentStatus { Status = Status.Published };
 
-            Assert.Throws<ValidationException>(() => GuardContent.CanChangeContentStatus(false, Status.Archived, command));
+            ValidationAssert.Throws(() => GuardContent.CanChangeContentStatus(false, Status.Archived, command),
+                new ValidationError("Cannot change status from Archived to Published.", "Status"));
         }
 
         [Fact]
@@ -87,7 +93,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         {
             var command = new ChangeContentStatus { Status = Status.Published, DueTime = dueTimeInPast };
 
-            Assert.Throws<ValidationException>(() => GuardContent.CanChangeContentStatus(false, Status.Draft, command));
+            ValidationAssert.Throws(() => GuardContent.CanChangeContentStatus(false, Status.Draft, command),
+                new ValidationError("Due time must be in the future.", "DueTime"));
         }
 
         [Fact]
@@ -95,7 +102,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         {
             var command = new ChangeContentStatus { Status = Status.Published };
 
-            Assert.Throws<ValidationException>(() => GuardContent.CanChangeContentStatus(false, Status.Published, command));
+            ValidationAssert.Throws(() => GuardContent.CanChangeContentStatus(false, Status.Published, command),
+                new ValidationError("Content has no changes to publish.", "Status"));
         }
 
         [Fact]
@@ -119,7 +127,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         {
             var command = new DiscardChanges();
 
-            Assert.Throws<ValidationException>(() => GuardContent.CanDiscardChanges(false, command));
+            Assert.Throws<DomainException>(() => GuardContent.CanDiscardChanges(false, command));
         }
 
         [Fact]

@@ -48,13 +48,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            Validate.It(() => "Cannot discard pending changes.", e =>
+            if (!isPending)
             {
-                if (!isPending)
-                {
-                    e("The content has no pending changes.");
-                }
-            });
+                throw new DomainException("The content has no pending changes.");
+            }
         }
 
         public static void CanChangeContentStatus(bool isPending, Status status, ChangeContentStatus command)
@@ -63,14 +60,23 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
 
             Validate.It(() => "Cannot change status.", e =>
             {
-                var isAllowedPendingUpdate =
-                    status == command.Status &&
-                    status == Status.Published &&
-                    isPending;
-
-                if (!StatusFlow.Exists(command.Status) || (!StatusFlow.CanChange(status, command.Status) && !isAllowedPendingUpdate))
+                if (!StatusFlow.Exists(command.Status))
                 {
-                    e($"Content cannot be changed from status {status} to {command.Status}.", nameof(command.Status));
+                    e("Status is not valid.", nameof(command.Status));
+                }
+                else if (!StatusFlow.CanChange(status, command.Status))
+                {
+                    if (status == command.Status && status == Status.Published)
+                    {
+                        if (!isPending)
+                        {
+                            e("Content has no changes to publish.", nameof(command.Status));
+                        }
+                    }
+                    else
+                    {
+                        e($"Cannot change status from {status} to {command.Status}.", nameof(command.Status));
+                    }
                 }
 
                 if (command.DueTime.HasValue && command.DueTime.Value < SystemClock.Instance.GetCurrentInstant())
