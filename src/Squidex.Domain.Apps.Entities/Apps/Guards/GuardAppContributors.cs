@@ -31,7 +31,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
                 if (string.IsNullOrWhiteSpace(command.ContributorId))
                 {
-                    error(new ValidationError("Contributor id not assigned.", nameof(command.ContributorId)));
+                    error(new ValidationError("Contributor id is required.", nameof(command.ContributorId)));
                 }
                 else
                 {
@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
                     if (user == null)
                     {
-                        error(new ValidationError("Cannot find contributor id.", nameof(command.ContributorId)));
+                        throw new DomainObjectNotFoundException(command.ContributorId, "Contributors", typeof(IAppEntity));
                     }
                     else
                     {
@@ -73,14 +73,14 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             {
                 if (string.IsNullOrWhiteSpace(command.ContributorId))
                 {
-                    error(new ValidationError("Contributor id not assigned.", nameof(command.ContributorId)));
+                    error(new ValidationError("Contributor id is required.", nameof(command.ContributorId)));
                 }
 
                 var ownerIds = contributors.Where(x => x.Value == AppContributorPermission.Owner).Select(x => x.Key).ToList();
 
                 if (ownerIds.Count == 1 && ownerIds.Contains(command.ContributorId))
                 {
-                    error(new ValidationError("Cannot remove the only owner.", nameof(command.ContributorId)));
+                    error(new ValidationError("Cannot remove the only owner."));
                 }
             });
 

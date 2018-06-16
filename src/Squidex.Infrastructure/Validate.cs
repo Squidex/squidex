@@ -14,7 +14,7 @@ namespace Squidex.Infrastructure
 {
     public static class Validate
     {
-        public static void It(Func<string> message, Action<Action<ValidationError>> action)
+        public static void It(Func<string> message, Action<Action<ValidationError>> action, IReadOnlyDictionary<string, string> messages = null)
         {
             var errors = new List<ValidationError>();
 
@@ -26,7 +26,7 @@ namespace Squidex.Infrastructure
             }
         }
 
-        public static async Task It(Func<string> message, Func<Action<ValidationError>, Task> action)
+        public static async Task It(Func<string> message, Func<Action<ValidationError>, Task> action, IReadOnlyDictionary<string, string> messages = null)
         {
             var errors = new List<ValidationError>();
 

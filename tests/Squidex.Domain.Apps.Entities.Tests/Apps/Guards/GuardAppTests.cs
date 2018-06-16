@@ -10,6 +10,7 @@ using FakeItEasy;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Services;
+using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Shared.Users;
 using Xunit;
@@ -42,7 +43,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             var command = new CreateApp { Name = "new-app" };
 
-            return Assert.ThrowsAsync<ValidationException>(() => GuardApp.CanCreate(command, apps));
+            return ValidationAssert.ThrowsAsync(() => GuardApp.CanCreate(command, apps),
+                new ValidationError("An app with name 'new-app' already exists.", "Name"));
         }
 
         [Fact]
@@ -50,7 +52,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             var command = new CreateApp { Name = "INVALID NAME" };
 
-            return Assert.ThrowsAsync<ValidationException>(() => GuardApp.CanCreate(command, apps));
+            return ValidationAssert.ThrowsAsync(() => GuardApp.CanCreate(command, apps),
+                new ValidationError("Name must be a valid slug (lowercase characters, numbers and dashes).", "Name"));
         }
 
         [Fact]
@@ -62,13 +65,14 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         }
 
         [Fact]
-        public void CanChangePlan_should_throw_exception_if_plan_id_null()
+        public void CanChangePlan_should_throw_exception_if_plan_id_is_null()
         {
             var command = new ChangePlan { Actor = new RefToken("user", "me") };
 
             AppPlan plan = null;
 
-            Assert.Throws<ValidationException>(() => GuardApp.CanChangePlan(command, plan, appPlans));
+            ValidationAssert.Throws(() => GuardApp.CanChangePlan(command, plan, appPlans),
+                new ValidationError("Plan id is required.", "PlanId"));
         }
 
         [Fact]
@@ -81,7 +85,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             AppPlan plan = null;
 
-            Assert.Throws<ValidationException>(() => GuardApp.CanChangePlan(command, plan, appPlans));
+            ValidationAssert.Throws(() => GuardApp.CanChangePlan(command, plan, appPlans),
+                new ValidationError("Plan with id 'free' is not available.", "PlanId"));
         }
 
         [Fact]
@@ -91,7 +96,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             var plan = new AppPlan(new RefToken("user", "other"), "premium");
 
-            Assert.Throws<ValidationException>(() => GuardApp.CanChangePlan(command, plan, appPlans));
+            ValidationAssert.Throws(() => GuardApp.CanChangePlan(command, plan, appPlans),
+                new ValidationError("Plan can only changed from the user who configured the plan initially."));
         }
 
         [Fact]
@@ -101,7 +107,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             var plan = new AppPlan(new RefToken("user", "me"), "free");
 
-            Assert.Throws<ValidationException>(() => GuardApp.CanChangePlan(command, plan, appPlans));
+            ValidationAssert.Throws(() => GuardApp.CanChangePlan(command, plan, appPlans),
+                new ValidationError("App has already this plan."));
         }
 
         [Fact]

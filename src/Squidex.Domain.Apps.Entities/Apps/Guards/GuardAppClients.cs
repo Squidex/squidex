@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                 }
                 else if (clients.ContainsKey(command.Id))
                 {
-                    error(new ValidationError("Client id already added.", nameof(command.Id)));
+                    error(new ValidationError("Client id already exists."));
                 }
             });
         }
@@ -60,7 +60,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
                 if (string.IsNullOrWhiteSpace(command.Name) && command.Permission == null)
                 {
-                    error(new ValidationError("Either name or permission is required.", nameof(command.Name), nameof(command.Permission)));
+                    error(new ValidationError("Either name or permission must be defined.", nameof(command.Name), nameof(command.Permission)));
                 }
 
                 if (command.Permission.HasValue && !command.Permission.Value.IsEnumValue())
@@ -72,12 +72,12 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                 {
                     if (!string.IsNullOrWhiteSpace(command.Name) && string.Equals(client.Name, command.Name))
                     {
-                        error(new ValidationError("Client already has this name.", nameof(command.Permission)));
+                        error(new ValidationError("Client has already this name.", nameof(command.Name)));
                     }
 
                     if (command.Permission == client.Permission)
                     {
-                        error(new ValidationError("Client already has this permission.", nameof(command.Permission)));
+                        error(new ValidationError("Client has already this permission.", nameof(command.Permission)));
                     }
                 }
             });

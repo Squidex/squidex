@@ -22,14 +22,13 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             return Validate.It(() => "Cannot create app.", async error =>
             {
-                if (await appProvider.GetAppAsync(command.Name) != null)
-                {
-                    error(new ValidationError($"An app with name '{command.Name}' already exists", nameof(command.Name)));
-                }
-
                 if (!command.Name.IsSlug())
                 {
-                    error(new ValidationError("Name must be a valid slug.", nameof(command.Name)));
+                    error(new ValidationError("Name must be a valid slug (lowercase characters, numbers and dashes).", nameof(command.Name)));
+                }
+                else if (await appProvider.GetAppAsync(command.Name) != null)
+                {
+                    error(new ValidationError($"An app with name '{command.Name}' already exists.", nameof(command.Name)));
                 }
             });
         }
@@ -42,21 +41,24 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             {
                 if (string.IsNullOrWhiteSpace(command.PlanId))
                 {
-                    error(new ValidationError("PlanId is not defined.", nameof(command.PlanId)));
+                    error(new ValidationError("Plan id is required.", nameof(command.PlanId)));
                 }
-                else if (appPlans.GetPlan(command.PlanId) == null)
+                else
                 {
-                    error(new ValidationError("Plan id not available.", nameof(command.PlanId)));
-                }
+                    if (appPlans.GetPlan(command.PlanId) == null)
+                    {
+                        error(new ValidationError($"Plan with id '{command.PlanId}' is not available.", nameof(command.PlanId)));
+                    }
 
-                if (!string.IsNullOrWhiteSpace(command.PlanId) && plan != null && !plan.Owner.Equals(command.Actor))
-                {
-                    error(new ValidationError("Plan can only be changed from current user."));
-                }
+                    if (!string.IsNullOrWhiteSpace(command.PlanId) && plan != null && !plan.Owner.Equals(command.Actor))
+                    {
+                        error(new ValidationError("Plan can only changed from the user who configured the plan initially."));
+                    }
 
-                if (string.Equals(command.PlanId, plan?.PlanId, StringComparison.OrdinalIgnoreCase))
-                {
-                    error(new ValidationError("App has already this plan."));
+                    if (string.Equals(command.PlanId, plan?.PlanId, StringComparison.OrdinalIgnoreCase))
+                    {
+                        error(new ValidationError("App has already this plan."));
+                    }
                 }
             });
         }
