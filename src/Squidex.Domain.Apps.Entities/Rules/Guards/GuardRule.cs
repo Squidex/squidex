@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
 
                 if (command.Action == null)
                 {
-                    error(new ValidationError("Trigger is required.", nameof(command.Action)));
+                    error(new ValidationError("Action is required.", nameof(command.Action)));
                 }
                 else
                 {

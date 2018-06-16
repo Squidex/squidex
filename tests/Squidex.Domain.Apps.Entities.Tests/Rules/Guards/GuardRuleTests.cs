@@ -14,6 +14,7 @@ using Squidex.Domain.Apps.Core.Rules.Actions;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.Schemas;
+using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Xunit;
 
@@ -46,7 +47,8 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
                 }
             });
 
-            await Assert.ThrowsAsync<ValidationException>(() => GuardRule.CanCreate(command, appProvider));
+            await ValidationAssert.ThrowsAsync(() => GuardRule.CanCreate(command, appProvider),
+                new ValidationError("Trigger is required.", "Trigger"));
         }
 
         [Fact]
@@ -61,7 +63,8 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
                 Action = null
             });
 
-            await Assert.ThrowsAsync<ValidationException>(() => GuardRule.CanCreate(command, appProvider));
+            await ValidationAssert.ThrowsAsync(() => GuardRule.CanCreate(command, appProvider),
+                new ValidationError("Action is required.", "Action"));
         }
 
         [Fact]
@@ -87,7 +90,8 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
         {
             var command = new UpdateRule();
 
-            await Assert.ThrowsAsync<ValidationException>(() => GuardRule.CanUpdate(command, appId.Id, appProvider));
+            await ValidationAssert.ThrowsAsync(() => GuardRule.CanUpdate(command, appId.Id, appProvider),
+                new ValidationError("Either trigger or action is required.", "Trigger", "Action"));
         }
 
         [Fact]
@@ -115,7 +119,8 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
 
             var rule_1 = rule_0.Enable();
 
-            Assert.Throws<ValidationException>(() => GuardRule.CanEnable(command, rule_1));
+            ValidationAssert.Throws(() => GuardRule.CanEnable(command, rule_1),
+                new ValidationError("Rule is already enabled.")); ;
         }
 
         [Fact]
@@ -135,7 +140,8 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
 
             var rule_1 = rule_0.Disable();
 
-            Assert.Throws<ValidationException>(() => GuardRule.CanDisable(command, rule_1));
+            ValidationAssert.Throws(() => GuardRule.CanDisable(command, rule_1),
+                new ValidationError("Rule is already disabled."));
         }
 
         [Fact]

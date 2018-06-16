@@ -6,8 +6,11 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Squidex.Domain.Apps.Core.Rules.Actions;
+using Squidex.Infrastructure;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Rules.Guards.Actions
@@ -21,7 +24,11 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards.Actions
 
             var errors = await RuleActionValidator.ValidateAsync(action);
 
-            Assert.NotEmpty(errors);
+            errors.ShouldBeEquivalentTo(
+                new List<ValidationError>
+                {
+                    new ValidationError("Host is required and must be an absolute URL.", "Host")
+                });
         }
 
         [Fact]
@@ -31,7 +38,11 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards.Actions
 
             var errors = await RuleActionValidator.ValidateAsync(action);
 
-            Assert.NotEmpty(errors);
+            errors.ShouldBeEquivalentTo(
+                new List<ValidationError>
+                {
+                    new ValidationError("Host is required and must be an absolute URL.", "Host")
+                });
         }
 
         [Fact]
@@ -41,7 +52,11 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards.Actions
 
             var errors = await RuleActionValidator.ValidateAsync(action);
 
-            Assert.NotEmpty(errors);
+            errors.ShouldBeEquivalentTo(
+                new List<ValidationError>
+                {
+                    new ValidationError("Index name is required.", "IndexName")
+                });
         }
 
         [Fact]
@@ -51,7 +66,11 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards.Actions
 
             var errors = await RuleActionValidator.ValidateAsync(action);
 
-            Assert.NotEmpty(errors);
+            errors.ShouldBeEquivalentTo(
+                new List<ValidationError>
+                {
+                    new ValidationError("Type name is required.", "IndexType")
+                });
         }
 
         [Fact]

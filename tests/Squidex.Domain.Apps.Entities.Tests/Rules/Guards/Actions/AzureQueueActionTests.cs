@@ -5,8 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Squidex.Domain.Apps.Core.Rules.Actions;
+using Squidex.Infrastructure;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Rules.Guards.Actions
@@ -20,7 +23,11 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards.Actions
 
             var errors = await RuleActionValidator.ValidateAsync(action);
 
-            Assert.NotEmpty(errors);
+            errors.ShouldBeEquivalentTo(
+                new List<ValidationError>
+                {
+                    new ValidationError("Connection string is required.", "ConnectionString")
+                });
         }
 
         [Fact]
@@ -30,7 +37,11 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards.Actions
 
             var errors = await RuleActionValidator.ValidateAsync(action);
 
-            Assert.NotEmpty(errors);
+            errors.ShouldBeEquivalentTo(
+                new List<ValidationError>
+                {
+                    new ValidationError("Queue name is required.", "Queue")
+                });
         }
 
         [Fact]
@@ -40,7 +51,11 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards.Actions
 
             var errors = await RuleActionValidator.ValidateAsync(action);
 
-            Assert.NotEmpty(errors);
+            errors.ShouldBeEquivalentTo(
+                new List<ValidationError>
+                {
+                    new ValidationError("Queue name must be valid azure queue name.", "Queue")
+                });
         }
 
         [Fact]
