@@ -215,7 +215,7 @@ export class GeolocationFieldPropertiesDto extends FieldPropertiesDto {
     constructor(
         props?: Partial<GeolocationFieldPropertiesDto>
     ) {
-        super('Default', props);
+        super('Map', props);
     }
 
     public accept<T>(visitor: FieldPropertiesVisitor<T>): T {

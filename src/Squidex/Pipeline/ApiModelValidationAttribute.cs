@@ -35,6 +35,10 @@ namespace Squidex.Pipeline
                         {
                             errors.Add(new ValidationError(e.ErrorMessage, m.Key));
                         }
+                        else if (e.Exception is JsonException jsonException)
+                        {
+                            errors.Add(new ValidationError(jsonException.Message));
+                        }
                     }
                 }
 
