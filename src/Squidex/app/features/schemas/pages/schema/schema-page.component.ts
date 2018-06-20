@@ -108,45 +108,47 @@ export class SchemaPageComponent implements OnDestroy, OnInit {
     }
 
     private export() {
+        const cleanup = (source: any, ...exclude: string[]): any => {
+            const clone = {};
+
+            for (const key in source) {
+                if (source.hasOwnProperty(key) && exclude.indexOf(key) < 0) {
+                    const value = source[key];
+
+                    if (value) {
+                        clone[key] = value;
+                    }
+                }
+            }
+
+            return clone;
+        };
+
         const result: any = {
             fields: this.schema.fields.map(field => {
-                const { fieldId, ...copy } = field;
+                const copy = cleanup(field, 'fieldId');
 
                 if (Types.isArray(copy.nested)) {
-                    for (let i = 0; i < copy.nested.length; i++) {
-                        const nestedField = copy.nested[i];
-                        const { fieldId, parentId, ...nestedCopy } = nestedField;
+                    if (copy.nested.length === 0) {
+                        delete copy['nested'];
+                    } else {
+                        for (let i = 0; i < copy.nested.length; i++) {
+                            const nestedField = copy.nested[i];
+                            const nestedCopy = cleanup(nestedField, 'fieldId', 'parentId');
 
-                        for (const key in nestedCopy.properties) {
-                            if (nestedCopy.properties.hasOwnProperty(key) &&
-                               !nestedCopy.properties[key]) {
-                                delete copy.properties[key];
-                            }
+                            nestedCopy.properties = cleanup(nestedField.properties);
+
+                            copy.nested[i] = nestedCopy;
                         }
-
-                        copy.nested[i] = <any>nestedCopy;
                     }
                 }
 
-                for (const key in copy.properties) {
-                    if (copy.properties.hasOwnProperty(key) &&
-                       !copy.properties[key]) {
-                        delete copy.properties[key];
-                    }
-                }
+                copy.properties = cleanup(field.properties);
 
                 return copy;
             }),
-            properties: {}
+            properties: cleanup(this.schema.properties)
         };
-
-        if (this.schema.properties.label) {
-            result.properties.label = this.schema.properties.label;
-        }
-
-        if (this.schema.properties.hints) {
-            result.properties.hints = this.schema.properties.hints;
-        }
 
         this.schemaExport = result;
     }
