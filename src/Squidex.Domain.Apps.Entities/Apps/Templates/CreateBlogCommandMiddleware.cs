@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
 
             replace(data);";
 
-        public Task HandleAsync(CommandContext context, Func<Task> next)
+        public async Task HandleAsync(CommandContext context, Func<Task> next)
         {
             if (context.IsCompleted && context.Command is CreateApp createApp && IsRightTemplate(createApp))
             {
@@ -44,13 +44,13 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
                     return context.CommandBus.PublishAsync(command);
                 });
 
-                return Task.WhenAll(
+                await Task.WhenAll(
                     CreatePagesAsync(publish),
                     CreatePostsAsync(publish),
                     CreateClientAsync(publish, appId.Id));
             }
 
-            return next();
+            await next();
         }
 
         private static bool IsRightTemplate(CreateApp createApp)
@@ -173,6 +173,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
             var command = new CreateSchema
             {
                 Name = "pages",
+                Publish = true,
                 Properties = new SchemaProperties
                 {
                     Label = "Pages"

@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
     {
         private const string TemplateName = "Profile";
 
-        public Task HandleAsync(CommandContext context, Func<Task> next)
+        public async Task HandleAsync(CommandContext context, Func<Task> next)
         {
             if (context.IsCompleted && context.Command is CreateApp createApp && IsRightTemplate(createApp))
             {
@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
                     return context.CommandBus.PublishAsync(command);
                 });
 
-                return Task.WhenAll(
+                await Task.WhenAll(
                     CreateBasicsAsync(publish),
                     CreateProjectsSchemaAsync(publish),
                     CreateExperienceSchemaAsync(publish),
@@ -49,7 +49,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
                     CreateClientAsync(publish, appId.Id));
             }
 
-            return next();
+            await next();
         }
 
         private static bool IsRightTemplate(CreateApp createApp)
