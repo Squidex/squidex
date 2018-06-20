@@ -114,17 +114,24 @@ export class SchemaPageComponent implements OnDestroy, OnInit {
 
                 if (Types.isArray(copy.nested)) {
                     for (let i = 0; i < copy.nested.length; i++) {
-                        const { fieldId, parentId, ...nestedCopy } = copy.nested[i];
+                        const nestedField = copy.nested[i];
+                        const { fieldId, parentId, ...nestedCopy } = nestedField;
+
+                        for (const key in nestedCopy.properties) {
+                            if (nestedCopy.properties.hasOwnProperty(key) &&
+                               !nestedCopy.properties[key]) {
+                                delete copy.properties[key];
+                            }
+                        }
 
                         copy.nested[i] = <any>nestedCopy;
                     }
                 }
 
                 for (const key in copy.properties) {
-                    if (copy.properties.hasOwnProperty(key)) {
-                        if (!!copy.properties[key]) {
-                            delete copy.properties[key];
-                        }
+                    if (copy.properties.hasOwnProperty(key) &&
+                       !copy.properties[key]) {
+                        delete copy.properties[key];
                     }
                 }
 
