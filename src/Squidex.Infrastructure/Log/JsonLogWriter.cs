@@ -63,7 +63,7 @@ namespace Squidex.Infrastructure.Log
 
         IArrayWriter IArrayWriter.WriteValue(DateTimeOffset value)
         {
-            jsonWriter.WriteValue(value.ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture));
+            jsonWriter.WriteValue(value.ToString("o", CultureInfo.InvariantCulture));
 
             return this;
         }
