@@ -97,21 +97,19 @@
         <div class="grid-content">
             <div sqxIgnoreScrollbar>
                 <table class="table table-items table-fixed">
-                    <tbody>
-                        <ng-template ngFor let-content [ngForOf]="contentsState.contents | async" [ngForTrackBy]="trackByContent">
-                            <tr [sqxContent]="content" [routerLink]="[content.id]" routerLinkActive="active"
-                                [language]="language"
-                                [schema]="schema"
-                                [selected]="isItemSelected(content)"
-                                (selectedChange)="selectItem(content, $event)"
-                                (unpublishing)="unpublish(content)"
-                                (publishing)="publish(content)"
-                                (archiving)="archive(content)"
-                                (restoring)="restore(content)"
-                                (deleting)="delete(content)">
-                            </tr>
-                            <tr class="spacer"></tr>
-                        </ng-template>
+                    <tbody *ngFor="let content of contentsState.contents | async; trackBy: trackByContent">
+                        <tr [sqxContent]="content" [routerLink]="[content.id]" routerLinkActive="active"
+                            [language]="language"
+                            [schema]="schema"
+                            [selected]="isItemSelected(content)"
+                            (selectedChange)="selectItem(content, $event)"
+                            (unpublishing)="unpublish(content)"
+                            (publishing)="publish(content)"
+                            (archiving)="archive(content)"
+                            (restoring)="restore(content)"
+                            (deleting)="delete(content)">
+                        </tr>
+                        <tr class="spacer"></tr>
                     </tbody>
                 </table>
             </div>

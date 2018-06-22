@@ -23,28 +23,26 @@
             
             <ng-container *ngIf="contributorsState.contributors | async; let contributors">
                 <table class="table table-items table-fixed">
-                    <tbody>
-                        <ng-template ngFor let-contributorInfo [ngForOf]="contributors" [ngForTrackBy]="trackByContributor">
-                            <tr>
-                                <td class="cell-user">
-                                    <img class="user-picture" [attr.title]="contributorInfo.contributor.contributorId | sqxUserName" [attr.src]="contributorInfo.contributor.contributorId | sqxUserPicture" />
-                                </td>
-                                <td class="cell-auto">
-                                    <span class="user-name table-cell">{{contributorInfo.contributor.contributorId | sqxUserName}}</span>
-                                </td>
-                                <td class="cell-time">
-                                    <select class="form-control" [ngModel]="contributorInfo.contributor.permission" (ngModelChange)="changePermission(contributorInfo.contributor, $event)" [disabled]="contributorInfo.isCurrentUser">
-                                        <option *ngFor="let permission of usersPermissions" [ngValue]="permission">{{permission}}</option>
-                                    </select>
-                                </td>
-                                <td class="cell-actions">
-                                    <button *ngIf="!contributorInfo.isCurrentUser" type="button" class="btn btn-link btn-danger" (click)="remove(contributorInfo.contributor)">
-                                        <i class="icon-bin2"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr class="spacer"></tr>
-                        </ng-template>
+                    <tbody *ngFor="let contributorInfo of contributors; trackBy: trackByContributor">
+                        <tr>
+                            <td class="cell-user">
+                                <img class="user-picture" [attr.title]="contributorInfo.contributor.contributorId | sqxUserName" [attr.src]="contributorInfo.contributor.contributorId | sqxUserPicture" />
+                            </td>
+                            <td class="cell-auto">
+                                <span class="user-name table-cell">{{contributorInfo.contributor.contributorId | sqxUserName}}</span>
+                            </td>
+                            <td class="cell-time">
+                                <select class="form-control" [ngModel]="contributorInfo.contributor.permission" (ngModelChange)="changePermission(contributorInfo.contributor, $event)" [disabled]="contributorInfo.isCurrentUser">
+                                    <option *ngFor="let permission of usersPermissions" [ngValue]="permission">{{permission}}</option>
+                                </select>
+                            </td>
+                            <td class="cell-actions">
+                                <button *ngIf="!contributorInfo.isCurrentUser" type="button" class="btn btn-link btn-danger" (click)="remove(contributorInfo.contributor)">
+                                    <i class="icon-bin2"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr class="spacer"></tr>
                     </tbody>
                 </table>
                 

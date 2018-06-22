@@ -55,6 +55,7 @@ export * from './angular/popup-link.directive';
 export * from './angular/scroll-active.directive';
 export * from './angular/shortcut.component';
 export * from './angular/sorted.directive';
+export * from './angular/sorted-dnd.directive';
 export * from './angular/template-wrapper.directive';
 export * from './angular/title.component';
 export * from './angular/user-report.component';

@@ -538,3 +538,7 @@ a {
         }
     }
 }
+
+.table tbody + tbody {
+    border: 0;
+}

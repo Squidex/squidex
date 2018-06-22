@@ -22,6 +22,9 @@ export class SortedDirective implements OnDestroy, OnInit {
     @Input()
     public handleClass: string | null = null;
 
+    @Input()
+    public mirrorToSelf: boolean;
+
     @Output('sqxSorted')
     public sorted = new EventEmitter<any[]>();
 
@@ -57,7 +60,9 @@ export class SortedDirective implements OnDestroy, OnInit {
                 }
 
                 return false;
-            }
+            },
+
+            mirrorContainer: this.mirrorToSelf ? this.elementRef.nativeElement : document.body
         });
 
         let dragIndex: number;

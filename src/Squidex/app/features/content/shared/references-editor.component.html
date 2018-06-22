@@ -6,17 +6,16 @@
             </div>
         </div>
         
-        <table class="table table-items table-fixed" [class.disabled]="isDisabled" *ngIf="schema && contentItems && contentItems.length > 0">
-            <tbody [sqxSortModel]="contentItems.mutableValues" (sqxSorted)="sort($event)">
-                <ng-template ngFor let-content [ngForOf]="contentItems">
-                    <tr [sqxContent]="content"
-                        [language]="language"
-                        [schema]="schema"
-                        (deleting)="remove(content)"
-                        isReadOnly="true" 
-                        isReference="true"></tr>
-                    <tr class="spacer"></tr>
-                </ng-template>
+        <table class="table table-items table-fixed" [class.disabled]="isDisabled" *ngIf="schema && contentItems && contentItems.length > 0"
+            dnd-sortable-container [sortableData]="contentItems.mutableValues">
+            <tbody *ngFor="let content of contentItems; let i = index"  dnd-sortable [sortableIndex]="i" (sqxSortedDnd)="sort($event)">
+                <tr [sqxContent]="content"
+                    [language]="language"
+                    [schema]="schema"
+                    (deleting)="remove(content)"
+                    isReadOnly="true" 
+                    isReference="true"></tr>
+                <tr class="spacer"></tr>
             </tbody>
         </table>
     </ng-container>

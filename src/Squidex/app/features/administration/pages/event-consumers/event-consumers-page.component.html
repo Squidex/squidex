@@ -29,33 +29,31 @@
                 </tr>
             </thead>
 
-            <tbody>
-                <ng-template ngFor let-eventConsumer [ngForOf]="eventConsumersState.eventConsumers | async" [ngForTrackBy]="trackByEventConsumer">
-                    <tr [class.faulted]="eventConsumer.error && eventConsumer.error.length > 0">
-                        <td class="auto-auto">
-                            <span class="truncate">
-                                <i class="faulted-icon icon icon-bug" (click)="showError(eventConsumer)" [class.hidden]="!eventConsumer.error || eventConsumer.error.length === 0"></i>
+            <tbody *ngFor="let eventConsumer of eventConsumersState.eventConsumers | async; trackBy: trackByEventConsumer">
+                <tr [class.faulted]="eventConsumer.error && eventConsumer.error.length > 0">
+                    <td class="auto-auto">
+                        <span class="truncate">
+                            <i class="faulted-icon icon icon-bug" (click)="showError(eventConsumer)" [class.hidden]="!eventConsumer.error || eventConsumer.error.length === 0"></i>
 
-                                {{eventConsumer.name}}
-                            </span>
-                        </td>
-                        <td class="cell-auto-right">
-                            <span>{{eventConsumer.position}}</span>
-                        </td>
-                        <td class="cell-actions-lg">
-                            <button class="btn btn-link" (click)="reset(eventConsumer)" *ngIf="!eventConsumer.isResetting" title="Reset Event Consumer">
-                                <i class="icon icon-reset"></i>
-                            </button>
-                            <button class="btn btn-link" (click)="start(eventConsumer)" *ngIf="eventConsumer.isStopped" title="Start Event Consumer">
-                                <i class="icon icon-play"></i>
-                            </button>
-                            <button class="btn btn-link" (click)="stop(eventConsumer)" *ngIf="!eventConsumer.isStopped" title="Stop Event Consumer">
-                                <i class="icon icon-pause"></i>
-                            </button>
-                        </td>
-                    </tr>
-                    <tr class="spacer"></tr>
-                </ng-template>
+                            {{eventConsumer.name}}
+                        </span>
+                    </td>
+                    <td class="cell-auto-right">
+                        <span>{{eventConsumer.position}}</span>
+                    </td>
+                    <td class="cell-actions-lg">
+                        <button class="btn btn-link" (click)="reset(eventConsumer)" *ngIf="!eventConsumer.isResetting" title="Reset Event Consumer">
+                            <i class="icon icon-reset"></i>
+                        </button>
+                        <button class="btn btn-link" (click)="start(eventConsumer)" *ngIf="eventConsumer.isStopped" title="Start Event Consumer">
+                            <i class="icon icon-play"></i>
+                        </button>
+                        <button class="btn btn-link" (click)="stop(eventConsumer)" *ngIf="!eventConsumer.isStopped" title="Stop Event Consumer">
+                            <i class="icon icon-pause"></i>
+                        </button>
+                    </td>
+                </tr>
+                <tr class="spacer"></tr>
             </tbody>
         </table>
     </ng-container>

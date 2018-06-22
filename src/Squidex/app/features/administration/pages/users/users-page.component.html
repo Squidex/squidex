@@ -48,35 +48,33 @@
         <div class="grid-content">
             <div sqxIgnoreScrollbar>
                 <table class="table table-items table-fixed">
-                    <tbody>
-                        <ng-template ngFor let-userInfo [ngForOf]="usersState.users | async" [ngForTrackBy]="trackByUser">
-                            <tr [routerLink]="userInfo.user.id" routerLinkActive="active">
-                                <td class="cell-user">
-                                    <img class="user-picture" [attr.title]="userInfo.user.name" [attr.src]="userInfo.user | sqxUserDtoPicture" />
-                                </td>
-                                <td class="cell-auto">
-                                    <span class="user-name table-cell">{{userInfo.user.displayName}}</span>
-                                </td>
-                                <td class="cell-auto">
-                                    <span class="user-email table-cell">{{userInfo.user.email}}</span>
-                                </td>
-                                <td class="cell-actions">
-                                    <ng-container *ngIf="!userInfo.isCurrentUser">
-                                        <button class="btn btn-link" (click)="lock(userInfo.user); $event.stopPropagation();" *ngIf="!userInfo.user.isLocked" title="Lock User">
-                                            <i class="icon icon-unlocked"></i>
-                                        </button>
-                                        <button class="btn btn-link" (click)="unlock(userInfo.user); $event.stopPropagation();" *ngIf="userInfo.user.isLocked" title="Unlock User">
-                                            <i class="icon icon-lock"></i>
-                                        </button>
-                                    </ng-container>
-
-                                    <button *ngIf="userInfo.isCurrentUser" class="btn btn-link invisible">
-                                        &nbsp;
+                    <tbody *ngFor="let userInfo of usersState.users | async; trackBy: trackByUser">
+                        <tr [routerLink]="userInfo.user.id" routerLinkActive="active">
+                            <td class="cell-user">
+                                <img class="user-picture" [attr.title]="userInfo.user.name" [attr.src]="userInfo.user | sqxUserDtoPicture" />
+                            </td>
+                            <td class="cell-auto">
+                                <span class="user-name table-cell">{{userInfo.user.displayName}}</span>
+                            </td>
+                            <td class="cell-auto">
+                                <span class="user-email table-cell">{{userInfo.user.email}}</span>
+                            </td>
+                            <td class="cell-actions">
+                                <ng-container *ngIf="!userInfo.isCurrentUser">
+                                    <button class="btn btn-link" (click)="lock(userInfo.user); $event.stopPropagation();" *ngIf="!userInfo.user.isLocked" title="Lock User">
+                                        <i class="icon icon-unlocked"></i>
                                     </button>
-                                </td>
-                            </tr>
-                            <tr class="spacer"></tr>
-                        </ng-template>
+                                    <button class="btn btn-link" (click)="unlock(userInfo.user); $event.stopPropagation();" *ngIf="userInfo.user.isLocked" title="Unlock User">
+                                        <i class="icon icon-lock"></i>
+                                    </button>
+                                </ng-container>
+
+                                <button *ngIf="userInfo.isCurrentUser" class="btn btn-link invisible">
+                                    &nbsp;
+                                </button>
+                            </td>
+                        </tr>
+                        <tr class="spacer"></tr>
                     </tbody>
                 </table>
             </div>
