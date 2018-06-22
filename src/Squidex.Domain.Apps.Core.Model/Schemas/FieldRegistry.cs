@@ -30,8 +30,8 @@ namespace Squidex.Domain.Apps.Core.Schemas
                 RegisterField(type);
             }
 
-            typeNameRegistry.MapObsolete(typeof(ReferencesFieldProperties), "DateTime");
-            typeNameRegistry.MapObsolete(typeof(DateTimeFieldProperties), "References");
+            typeNameRegistry.MapObsolete(typeof(ReferencesFieldProperties), "References");
+            typeNameRegistry.MapObsolete(typeof(DateTimeFieldProperties), "DateTime");
         }
 
         private void RegisterField(Type type)
