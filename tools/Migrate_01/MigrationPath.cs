@@ -15,7 +15,7 @@ namespace Migrate_01
 {
     public sealed class MigrationPath : IMigrationPath
     {
-        private const int CurrentVersion = 11;
+        private const int CurrentVersion = 12;
         private readonly IServiceProvider serviceProvider;
 
         public MigrationPath(IServiceProvider serviceProvider)
@@ -64,7 +64,8 @@ namespace Migrate_01
             }
 
             // Version 11: Introduce content drafts.
-            if (version < 11)
+            // Version 12: Fix problems with datetimes.
+            if (version < 12)
             {
                 var migration = serviceProvider.GetService<DeleteContentCollections>();
 
