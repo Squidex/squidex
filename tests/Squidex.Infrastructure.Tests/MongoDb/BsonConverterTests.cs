@@ -87,7 +87,7 @@ namespace Squidex.Infrastructure.MongoDb
                     Bool = true,
                     Byte = 0x2,
                     Bytes = new byte[] { 0x10, 0x12, 0x13 },
-                    DateTimeOffset = DateTime.UtcNow.Date,
+                    DateTimeOffset = DateTime.Today,
                     DateTime = DateTime.UtcNow.Date,
                     Float32 = 32.5f,
                     Float64 = 32.5d,
@@ -126,15 +126,33 @@ namespace Squidex.Infrastructure.MongoDb
         }
 
         [Fact]
-        public void Should_serialize_to_iso()
+        public void Should_serialize_datetime_to_iso()
         {
             source.DateTime = new DateTime(2012, 12, 12, 12, 12, 12, DateTimeKind.Utc);
-            source.DateTimeOffset = new DateTime(2012, 12, 12, 12, 12, 12, DateTimeKind.Utc);
 
             var target = JObject.FromObject(source).ToBson();
 
             Assert.Equal("2012-12-12T12:12:12Z", target["DateTime"].ToString());
+        }
+
+        [Fact]
+        public void Should_serialize_datetimeoffset_to_iso_utc()
+        {
+            source.DateTimeOffset = new DateTime(2012, 12, 12, 12, 12, 12, DateTimeKind.Utc);
+
+            var target = JObject.FromObject(source).ToBson();
+
             Assert.Equal("2012-12-12T12:12:12Z", target["DateTimeOffset"].ToString());
+        }
+
+        [Fact]
+        public void Should_serialize_datetimeoffset_to_iso_utc_with_offset()
+        {
+            source.DateTimeOffset = new DateTimeOffset(2012, 12, 12, 12, 12, 12, TimeSpan.FromHours(2));
+
+            var target = JObject.FromObject(source).ToBson();
+
+            Assert.Equal("2012-12-12T12:12:12+02:00", target["DateTimeOffset"].ToString());
         }
 
         [Fact]

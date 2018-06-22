@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Globalization;
 using MongoDB.Bson;
 using Newtonsoft.Json.Linq;
 
@@ -95,11 +96,18 @@ namespace Squidex.Infrastructure.MongoDb
 
                         if (value is DateTime dateTime)
                         {
-                            return dateTime.ToString("yyyy-MM-ddTHH:mm:ssK");
+                            return dateTime.ToString("yyyy-MM-ddTHH:mm:ssK", CultureInfo.InvariantCulture);
                         }
                         else if (value is DateTimeOffset dateTimeOffset)
                         {
-                            return dateTimeOffset.UtcDateTime.ToString("yyyy-MM-ddTHH:mm:ssK");
+                            if (dateTimeOffset.Offset == TimeSpan.Zero)
+                            {
+                                return dateTimeOffset.UtcDateTime.ToString("yyyy-MM-ddTHH:mm:ssK", CultureInfo.InvariantCulture);
+                            }
+                            else
+                            {
+                                return dateTimeOffset.ToString("yyyy-MM-ddTHH:mm:ssK", CultureInfo.InvariantCulture);
+                            }
                         }
                         else
                         {

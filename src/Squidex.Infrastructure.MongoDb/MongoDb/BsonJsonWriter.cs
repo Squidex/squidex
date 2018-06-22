@@ -135,12 +135,19 @@ namespace Squidex.Infrastructure.MongoDb
 
         public override void WriteValue(DateTime value)
         {
-            bsonWriter.WriteString(value.ToString("yyyy-MM-ddTHH:mm:ssZ", CultureInfo.InvariantCulture));
+            bsonWriter.WriteString(value.ToString("yyyy-MM-ddTHH:mm:ssK", CultureInfo.InvariantCulture));
         }
 
         public override void WriteValue(DateTimeOffset value)
         {
-            bsonWriter.WriteString(value.ToString("yyyy-MM-ddTHH:mm:ssZ", CultureInfo.InvariantCulture));
+            if (value.Offset == TimeSpan.Zero)
+            {
+                bsonWriter.WriteString(value.UtcDateTime.ToString("yyyy-MM-ddTHH:mm:ssK", CultureInfo.InvariantCulture));
+            }
+            else
+            {
+                bsonWriter.WriteString(value.UtcDateTime.ToString("yyyy-MM-ddTHH:mm:ssK", CultureInfo.InvariantCulture));
+            }
         }
 
         public override void WriteValue(byte[] value)
