@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Core.Contents
         }
 
         public NamedContentData(int capacity)
-            : base(capacity, EqualityComparer<string>.Default)
+            : base(capacity, StringComparer.OrdinalIgnoreCase)
         {
         }
 

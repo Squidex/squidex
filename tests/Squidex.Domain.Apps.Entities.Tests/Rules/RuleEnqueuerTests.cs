@@ -9,6 +9,8 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FakeItEasy;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 using NodaTime;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
@@ -25,6 +27,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
     public class RuleEnqueuerTests
     {
         private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
+        private readonly IMemoryCache cache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
         private readonly IRuleEventRepository ruleEventRepository = A.Fake<IRuleEventRepository>();
         private readonly RuleService ruleService = A.Fake<RuleService>();
         private readonly Instant now = SystemClock.Instance.GetCurrentInstant();
@@ -35,6 +38,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
         {
             sut = new RuleEnqueuer(
                 appProvider,
+                cache,
                 ruleEventRepository,
                 ruleService);
         }

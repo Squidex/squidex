@@ -70,6 +70,22 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             return new Immutable<List<EventConsumerInfo>>(consumerInfos.Select(r => r.Value).ToList());
         }
 
+        public Task StartAllAsync()
+        {
+            return Task.WhenAll(
+                eventConsumers
+                    .Select(c => GrainFactory.GetGrain<IEventConsumerGrain>(c.Name))
+                    .Select(c => c.StartAsync()));
+        }
+
+        public Task StopAllAsync()
+        {
+            return Task.WhenAll(
+                eventConsumers
+                    .Select(c => GrainFactory.GetGrain<IEventConsumerGrain>(c.Name))
+                    .Select(c => c.StopAsync()));
+        }
+
         public Task ResetAsync(string consumerName)
         {
             var eventConsumer = GrainFactory.GetGrain<IEventConsumerGrain>(consumerName);

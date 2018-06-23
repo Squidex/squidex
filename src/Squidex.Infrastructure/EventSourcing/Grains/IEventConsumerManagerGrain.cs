@@ -16,7 +16,11 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
     {
         Task ActivateAsync(string streamName);
 
+        Task StopAllAsync();
+
         Task StopAsync(string consumerName);
+
+        Task StartAllAsync();
 
         Task StartAsync(string consumerName);
 

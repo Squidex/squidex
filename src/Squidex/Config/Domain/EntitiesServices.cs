@@ -187,6 +187,12 @@ namespace Squidex.Config.Domain
             services.AddTransientAs<RebuildAssets>()
                 .As<IMigration>();
 
+            services.AddTransientAs<StartEventConsumers>()
+                .As<IMigration>();
+
+            services.AddTransientAs<StopEventConsumers>()
+                .As<IMigration>();
+
             services.AddTransientAs<Rebuilder>()
                 .AsSelf();
         }

@@ -103,6 +103,18 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         }
 
         [Fact]
+        public async Task Should_start_all_grains()
+        {
+            await sut.StartAllAsync();
+
+            A.CallTo(() => grainA.StartAsync())
+                .MustHaveHappened();
+
+            A.CallTo(() => grainB.StartAsync())
+                .MustHaveHappened();
+        }
+
+        [Fact]
         public async Task Should_start_matching_grain()
         {
             await sut.StartAsync("a");
@@ -112,6 +124,18 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
             A.CallTo(() => grainB.StartAsync())
                 .MustNotHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_stop_all_grains()
+        {
+            await sut.StopAllAsync();
+
+            A.CallTo(() => grainA.StopAsync())
+                .MustHaveHappened();
+
+            A.CallTo(() => grainB.StopAsync())
+                .MustHaveHappened();
         }
 
         [Fact]

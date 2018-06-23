@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics.Contracts;
+using System.Globalization;
 using System.Linq;
 using Squidex.Infrastructure;
 
@@ -59,7 +60,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
                     }
                     else
                     {
-                        fieldsByName = fieldsOrdered.ToImmutableDictionary(x => x.Name);
+                        fieldsByName = fieldsOrdered.ToImmutableDictionary(x => x.Name, StringComparer.OrdinalIgnoreCase);
                     }
                 }
 
