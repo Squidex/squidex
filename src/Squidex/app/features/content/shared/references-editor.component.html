@@ -7,8 +7,9 @@
         </div>
         
         <table class="table table-items table-fixed" [class.disabled]="isDisabled" *ngIf="schema && contentItems && contentItems.length > 0"
-            dnd-sortable-container [sortableData]="contentItems.mutableValues">
-            <tbody *ngFor="let content of contentItems; let i = index"  dnd-sortable [sortableIndex]="i" (sqxSortedDnd)="sort($event)">
+            [sqxSortModel]="contentItems.values" 
+            (sqxSorted)="sort($event)">
+            <tbody *ngFor="let content of contentItems">
                 <tr [sqxContent]="content"
                     [language]="language"
                     [schema]="schema"

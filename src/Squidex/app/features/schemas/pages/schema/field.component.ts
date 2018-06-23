@@ -42,9 +42,6 @@ export class FieldComponent implements OnInit {
     public parent: RootFieldDto;
 
     @Input()
-    public handleClass: string;
-
-    @Input()
     public patterns: ImmutableArray<AppPatternDto>;
 
     public dropdown = new ModalView(false, true);

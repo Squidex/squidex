@@ -60,8 +60,10 @@
         </div>
 
         <ng-container *ngIf="patternsState.patterns | async; let patterns">
-            <div class="schemas" [sqxSortModel]="schema.fields" (sqxSorted)="sortFields($event)" handleClass="root">
-                <sqx-field *ngFor="let field of schema.fields; trackBy: trackByField" [field]="field" [schema]="schema" [patterns]="patterns" handleClass="root"></sqx-field>
+            <div class="schemas" [sqxSortModel]="schema.fields" (sqxSorted)="sortFields($event)">
+                <div *ngFor="let field of schema.fields; trackBy: trackByField">
+                    <sqx-field [field]="field" [schema]="schema" [patterns]="patterns"></sqx-field>
+                </div>
             </div>
     
             <button class="btn btn-success field-button" (click)="addFieldDialog.show()">
