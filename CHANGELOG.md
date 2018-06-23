@@ -4,28 +4,28 @@
 
 ### Features
 
-* **UI**: Better sortable with improved UX
-* **Migration**: Increased performance
+* **UI**: Better sortable with improved UX.
+* **Migration**: Increased performance.
 * **Migration**: Disable event handlers during migration.
 
 ### Bugfixes
 
-* **Schemas**: Invariant name handling for field names
+* **Schemas**: Invariant name handling for field names.
 
 
 ## v1.6.1 - 2018-06-22
 
 ### Bugfixes
 
-* **MongoDB**: Fixed date time handling
+* **MongoDB**: Fixed date time handling.
 
 ## v1.6.0 - 2018-06-07
 
 ### Features
 
-* **Schemas**: Nested Schemas**
-* **UI**: Migration to RxJS6
-* **UI**: Migration to Angular6
+* **Schemas**: Nested Schemas.
+* **UI**: Migration to RxJS6.
+* **UI**: Migration to Angular6.
 
 ## v1.5.0 - 2018-05-20
 
