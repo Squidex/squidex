@@ -28,9 +28,14 @@ namespace Squidex.Infrastructure.Log.Adapter
             this.log = log;
         }
 
+        public static SemanticLogLoggerProvider ForTesting(ISemanticLog log)
+        {
+            return new SemanticLogLoggerProvider(log);
+        }
+
         public ILogger CreateLogger(string categoryName)
         {
-            if (log == null)
+            if (log == null && services != null)
             {
                 log = services.GetService(typeof(ISemanticLog)) as ISemanticLog;
             }
