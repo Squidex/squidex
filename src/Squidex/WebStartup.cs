@@ -46,6 +46,8 @@ namespace Squidex
             app.ApplicationServices.RunMigrate();
             app.ApplicationServices.RunRunnables();
 
+            app.UseDeveloperExceptionPage();
+
             app.UseMyLocalCache();
             app.UseMyCors();
             app.UseMyForwardingRules();

@@ -8,6 +8,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Areas.Api.Config.Swagger;
+using Squidex.Areas.Api.Controllers.Contents;
 using Squidex.Areas.IdentityServer.Config;
 using Squidex.Config;
 using Squidex.Config.Authentication;
@@ -43,6 +44,8 @@ namespace Squidex
 
             services.Configure<ReadonlyOptions>(
                 config.GetSection("mode"));
+            services.Configure<ContentsControllerOptions>(
+                config.GetSection("contentsController"));
             services.Configure<MyUrlsOptions>(
                 config.GetSection("urls"));
             services.Configure<MyIdentityOptions>(

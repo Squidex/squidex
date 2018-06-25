@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using NodaTime;
 using NodaTime.Text;
 using NSwag.Annotations;
@@ -29,15 +30,18 @@ namespace Squidex.Areas.Api.Controllers.Contents
     [SwaggerIgnore]
     public sealed class ContentsController : ApiController
     {
+        private readonly IOptions<ContentsControllerOptions> controllerOptions;
         private readonly IContentQueryService contentQuery;
         private readonly IGraphQLService graphQl;
 
         public ContentsController(ICommandBus commandBus,
             IContentQueryService contentQuery,
-            IGraphQLService graphQl)
+            IGraphQLService graphQl,
+            IOptions<ContentsControllerOptions> controllerOptions)
             : base(commandBus)
         {
             this.contentQuery = contentQuery;
+            this.controllerOptions = controllerOptions;
 
             this.graphQl = graphQl;
         }
@@ -121,7 +125,12 @@ namespace Squidex.Areas.Api.Controllers.Contents
                 Items = result.Take(200).Select(x => ContentDto.FromContent(x, context)).ToArray()
             };
 
-            Response.Headers["Surrogate-Key"] = string.Join(" ", response.Items.Select(x => x.Id));
+            var options = controllerOptions.Value;
+
+            if (options.EnableSurrogateKeys && response.Items.Length <= options.MaxItemsForSurrogateKeys)
+            {
+                Response.Headers["Surrogate-Key"] = string.Join(" ", response.Items.Select(x => x.Id));
+            }
 
             return Ok(response);
         }
@@ -151,7 +160,11 @@ namespace Squidex.Areas.Api.Controllers.Contents
             var response = ContentDto.FromContent(content, context);
 
             Response.Headers["ETag"] = content.Version.ToString();
-            Response.Headers["Surrogate-Key"] = content.Id.ToString();
+
+            if (controllerOptions.Value.EnableSurrogateKeys)
+            {
+                Response.Headers["Surrogate-Key"] = content.Id.ToString();
+            }
 
             return Ok(response);
         }
@@ -183,7 +196,11 @@ namespace Squidex.Areas.Api.Controllers.Contents
             var response = ContentDto.FromContent(content, context);
 
             Response.Headers["ETag"] = content.Version.ToString();
-            Response.Headers["Surrogate-Key"] = content.Id.ToString();
+
+            if (controllerOptions.Value.EnableSurrogateKeys)
+            {
+                Response.Headers["Surrogate-Key"] = content.Id.ToString();
+            }
 
             return Ok(response.Data);
         }
