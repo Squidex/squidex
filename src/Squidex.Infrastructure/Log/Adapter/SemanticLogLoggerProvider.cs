@@ -5,24 +5,42 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Squidex.Infrastructure.Log.Adapter
 {
     public class SemanticLogLoggerProvider : ILoggerProvider
     {
-        private readonly ISemanticLog semanticLog;
+        private readonly IServiceProvider services;
+        private ISemanticLog log;
 
-        public SemanticLogLoggerProvider(ISemanticLog semanticLog)
+        public SemanticLogLoggerProvider(IServiceProvider services)
         {
-            Guard.NotNull(semanticLog, nameof(semanticLog));
+            Guard.NotNull(services, nameof(services));
 
-            this.semanticLog = semanticLog;
+            this.services = services;
+        }
+
+        internal SemanticLogLoggerProvider(ISemanticLog log)
+        {
+            this.log = log;
         }
 
         public ILogger CreateLogger(string categoryName)
         {
-            return new SemanticLogLogger(semanticLog.CreateScope(writer =>
+            if (log == null)
+            {
+                log = services.GetService(typeof(ISemanticLog)) as ISemanticLog;
+            }
+
+            if (log == null)
+            {
+                return NullLogger.Instance;
+            }
+
+            return new SemanticLogLogger(log.CreateScope(writer =>
             {
                 writer.WriteProperty("category", categoryName);
             }));

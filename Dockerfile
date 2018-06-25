@@ -33,7 +33,7 @@ RUN dotnet publish src/Squidex/Squidex.csproj --output /out/ --configuration Rel
 #
 # Stage 2, Build runtime
 #
-FROM microsoft/aspnetcore:2.0.3-jessie
+FROM microsoft/dotnet:2.1.0-aspnetcore-runtime
 
 # Default AspNetCore directory
 WORKDIR /app

@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.IO;
+using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -20,6 +21,10 @@ namespace Squidex
     {
         public static void Main(string[] args)
         {
+            BuildWebHost(args).Run();
+        }
+
+        public static IWebHost BuildWebHost(string[] args) =>
             new WebHostBuilder()
                 .UseKestrel(k => { k.AddServerHeader = false; })
                 .UseContentRoot(Directory.GetCurrentDirectory())
@@ -42,8 +47,6 @@ namespace Squidex
 
                     builder.AddCommandLine(args);
                 })
-                .Build()
-                .Run();
-        }
+                .Build();
     }
 }

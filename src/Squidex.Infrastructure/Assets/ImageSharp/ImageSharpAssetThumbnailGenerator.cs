@@ -10,6 +10,7 @@ using System.IO;
 using System.Threading.Tasks;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
+using SixLabors.ImageSharp.Processing.Transforms;
 using SixLabors.Primitives;
 
 namespace Squidex.Infrastructure.Assets.ImageSharp
@@ -18,8 +19,8 @@ namespace Squidex.Infrastructure.Assets.ImageSharp
     {
         public ImageSharpAssetThumbnailGenerator()
         {
-            Configuration.Default.AddImageFormat(ImageFormats.Jpeg);
-            Configuration.Default.AddImageFormat(ImageFormats.Png);
+            Configuration.Default.ImageFormatsManager.AddImageFormat(ImageFormats.Jpeg);
+            Configuration.Default.ImageFormatsManager.AddImageFormat(ImageFormats.Png);
         }
 
         public Task CreateThumbnailAsync(Stream source, Stream destination, int? width, int? height, string mode)

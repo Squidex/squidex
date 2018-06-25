@@ -1,4 +1,4 @@
-FROM microsoft/aspnetcore-build:2.0.3-jessie
+FROM microsoft/dotnet:2.1-sdk
 
 # Install runtime dependencies
 RUN apt-get update \
