@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Orleans;
 
 namespace Squidex.Domain.Apps.Entities.TestHelpers
 {
@@ -33,7 +34,7 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
         {
             lhs.Should().BeOfType(rhs.GetType());
 
-            ((object)lhs).ShouldBeEquivalentTo(rhs, o => o.IncludingAllDeclaredProperties());
+            ((object)lhs).Should().BeEquivalentTo(rhs, o => o.IncludingAllRuntimeProperties());
         }
 
         public static void ShouldBeSameEventType(this IEvent lhs, IEvent rhs)
@@ -41,9 +42,9 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
             lhs.Should().BeOfType(rhs.GetType());
         }
 
-        public static void ShouldBeEquivalent<T>(this T result, T value)
+        public static void ShouldBeEquivalent<T>(this J<T> lhs, T rhs)
         {
-            result.ShouldBeEquivalentTo(value, o => o.IncludingAllDeclaredProperties());
+            lhs.Value.Should().BeEquivalentTo(rhs, o => o.IncludingProperties());
         }
     }
 }

@@ -44,7 +44,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
 
             await sut.ValidateAsync(new List<int> { 2, 1, 4, 5 }, errors);
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new[]
                 {
                     "[2]: Must be greater or equals than '2'.",

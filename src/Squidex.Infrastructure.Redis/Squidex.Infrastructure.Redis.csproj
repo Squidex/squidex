@@ -14,7 +14,7 @@
     <PackageReference Include="RefactoringEssentials" Version="5.6.0" />
     <PackageReference Include="StackExchange.Redis.StrongName" Version="1.2.6" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.0.2" />
-    <PackageReference Include="System.ValueTuple" Version="4.4.0" />
+    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
   </ItemGroup>
   <PropertyGroup>
     <CodeAnalysisRuleSet>..\..\Squidex.ruleset</CodeAnalysisRuleSet>

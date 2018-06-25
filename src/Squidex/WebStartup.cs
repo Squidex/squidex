@@ -21,7 +21,7 @@ using Squidex.Config.Web;
 
 namespace Squidex
 {
-    public sealed class WebStartup : IStartup
+    public sealed class WebStartup
     {
         private readonly IConfiguration configuration;
 
@@ -30,13 +30,10 @@ namespace Squidex
             this.configuration = configuration;
         }
 
-        public IServiceProvider ConfigureServices(IServiceCollection services)
+        public void ConfigureServices(IServiceCollection services)
         {
             services.AddOrleansSilo();
-            services.AddOrleansClient();
             services.AddAppServices(configuration);
-
-            return services.BuildServiceProvider();
         }
 
         public void Configure(IApplicationBuilder app)

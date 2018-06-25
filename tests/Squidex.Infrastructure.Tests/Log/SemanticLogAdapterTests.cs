@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using FakeItEasy;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Squidex.Infrastructure.Log.Adapter;
 using Xunit;
 
@@ -39,13 +40,21 @@ namespace Squidex.Infrastructure.Log
 
             log = new Lazy<SemanticLog>(() => new SemanticLog(channels, new List<ILogAppender>(), () => new JsonLogWriter()));
 
-            sut = new SemanticLogLoggerProvider(log.Value);
+            sut = SemanticLogLoggerProvider.ForTesting(log.Value);
         }
 
         [Fact]
         public void Should_do_nothing_when_disposing()
         {
             sut.Dispose();
+        }
+
+        [Fact]
+        public void Should_provide_null_logger_when_no_log_provided()
+        {
+            var provider = SemanticLogLoggerProvider.ForTesting(null);
+
+            Assert.Same(provider.CreateLogger("test"), NullLogger.Instance);
         }
 
         [Fact]

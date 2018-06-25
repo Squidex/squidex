@@ -44,7 +44,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
 
             await sut.ValidateAsync(50, errors);
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new[] { "Not an allowed value." });
         }
     }

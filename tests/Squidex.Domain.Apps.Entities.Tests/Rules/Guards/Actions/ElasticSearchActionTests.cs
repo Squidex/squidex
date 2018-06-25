@@ -24,7 +24,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards.Actions
 
             var errors = await RuleActionValidator.ValidateAsync(action);
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
                     new ValidationError("Host is required and must be an absolute URL.", "Host")
@@ -38,7 +38,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards.Actions
 
             var errors = await RuleActionValidator.ValidateAsync(action);
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
                     new ValidationError("Host is required and must be an absolute URL.", "Host")
@@ -52,7 +52,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards.Actions
 
             var errors = await RuleActionValidator.ValidateAsync(action);
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
                     new ValidationError("Index name is required.", "IndexName")
@@ -66,7 +66,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards.Actions
 
             var errors = await RuleActionValidator.ValidateAsync(action);
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
                     new ValidationError("Type name is required.", "IndexType")

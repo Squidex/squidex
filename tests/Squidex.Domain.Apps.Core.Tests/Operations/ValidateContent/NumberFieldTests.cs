@@ -44,7 +44,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
             await sut.ValidateAsync(CreateValue(null), errors);
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new[] { "Field is required." });
         }
 
@@ -55,7 +55,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
             await sut.ValidateAsync(CreateValue(5), errors);
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new[] { "Must be greater or equals than '10'." });
         }
 
@@ -66,7 +66,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
             await sut.ValidateAsync(CreateValue(20), errors);
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new[] { "Must be less or equals than '10'." });
         }
 
@@ -77,7 +77,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
             await sut.ValidateAsync(CreateValue(20), errors);
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new[] { "Not an allowed value." });
         }
 
@@ -88,7 +88,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
             await sut.ValidateAsync(CreateValue("Invalid"), errors);
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new[] { "Not a valid value." });
         }
 

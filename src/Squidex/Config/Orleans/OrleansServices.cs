@@ -16,24 +16,18 @@ namespace Squidex.Config.Orleans
         public static void AddOrleansSilo(this IServiceCollection services)
         {
             services.AddSingletonAs<SiloWrapper>()
-                .As<IInitializable>();
-        }
+                .As<IInitializable>()
+                .AsSelf();
 
-        public static void AddOrleansClient(this IServiceCollection services)
-        {
             services.AddServicesForSelfHostedDashboard(null, options =>
             {
                 options.HideTrace = true;
             });
 
-            services.AddSingletonAs<ClientWrapper>()
-                .As<IInitializable>()
-                .AsSelf();
-
-            services.AddSingletonAs(c => c.GetRequiredService<ClientWrapper>().Client)
+            services.AddSingletonAs(c => c.GetRequiredService<SiloWrapper>().Client)
                 .As<IClusterClient>();
 
-            services.AddSingletonAs(c => c.GetRequiredService<ClientWrapper>().Client)
+            services.AddSingletonAs(c => c.GetRequiredService<SiloWrapper>().Client)
                 .As<IGrainFactory>();
         }
     }

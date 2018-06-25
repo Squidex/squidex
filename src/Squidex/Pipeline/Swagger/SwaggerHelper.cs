@@ -108,7 +108,7 @@ namespace Squidex.Pipeline.Swagger
         {
             var errorType = typeof(ErrorDto);
 
-            return await schemaGenerator.GenerateWithReference<JsonSchema4>(errorType, Enumerable.Empty<Attribute>(), resolver);
+            return await schemaGenerator.GenerateWithReferenceAsync<JsonSchema4>(errorType, Enumerable.Empty<Attribute>(), resolver);
         }
 
         public static void AddQueryParameter(this SwaggerOperation operation, string name, JsonObjectType type, string description = null)

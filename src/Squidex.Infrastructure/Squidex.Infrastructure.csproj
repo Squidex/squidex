@@ -8,23 +8,23 @@
     <DebugSymbols>True</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="2.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="2.0.1" />
-    <PackageReference Include="Microsoft.Orleans.Core" Version="2.0.0-ci.20180515.5" />
-    <PackageReference Include="Microsoft.Orleans.OrleansCodeGenerator.Build" Version="2.0.0-ci.20180515.5" />
-    <PackageReference Include="Microsoft.Orleans.OrleansRuntime" Version="2.0.0-ci.20180515.5" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="2.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="2.1.1" />
+    <PackageReference Include="Microsoft.Orleans.Core" Version="2.0.4-ci.20180622.3" />
+    <PackageReference Include="Microsoft.Orleans.OrleansCodeGenerator.Build" Version="2.0.4-ci.20180622.3" />
+    <PackageReference Include="Microsoft.Orleans.OrleansRuntime" Version="2.0.4-ci.20180622.3" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
-    <PackageReference Include="NodaTime" Version="2.2.5" />
+    <PackageReference Include="NodaTime" Version="2.3.0" />
     <PackageReference Include="RefactoringEssentials" Version="5.6.0" />
-    <PackageReference Include="SixLabors.ImageSharp" Version="1.0.0-beta0001" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="1.0.0-beta0004" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.0.2" />
     <PackageReference Include="System.Collections.Immutable" Version="1.4.0" />
     <PackageReference Include="System.Linq" Version="4.3.0" />
-    <PackageReference Include="System.Reactive" Version="3.1.1" />
-    <PackageReference Include="System.Reflection.TypeExtensions" Version="4.4.0" />
+    <PackageReference Include="System.Reactive" Version="4.0.0" />
+    <PackageReference Include="System.Reflection.TypeExtensions" Version="4.5.0" />
     <PackageReference Include="System.Security.Claims" Version="4.3.0" />
-    <PackageReference Include="System.Threading.Tasks.Dataflow" Version="4.8.0" />
-    <PackageReference Include="System.ValueTuple" Version="4.4.0" />
+    <PackageReference Include="System.Threading.Tasks.Dataflow" Version="4.9.0" />
+    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
   </ItemGroup>
   <PropertyGroup>
     <CodeAnalysisRuleSet>..\..\Squidex.ruleset</CodeAnalysisRuleSet>

@@ -122,7 +122,7 @@ namespace Squidex.Infrastructure.MongoDb
         {
             var target = JObject.FromObject(source).ToBson().ToJson().ToObject<TestObject>();
 
-            target.ShouldBeEquivalentTo(source);
+            target.Should().BeEquivalentTo(source);
         }
 
         [Fact]
@@ -189,7 +189,7 @@ namespace Squidex.Infrastructure.MongoDb
             {
                 var target = serializer.Deserialize(reader, buggy.GetType());
 
-                target.ShouldBeEquivalentTo(buggy);
+                target.Should().BeEquivalentTo(buggy);
             }
         }
 
@@ -211,7 +211,7 @@ namespace Squidex.Infrastructure.MongoDb
             {
                 var target = serializer.Deserialize<TestObject>(reader);
 
-                target.ShouldBeEquivalentTo(source);
+                target.Should().BeEquivalentTo(source);
             }
         }
     }

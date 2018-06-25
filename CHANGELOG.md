@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.7.0 - 2018-06-25
+
+* Migration to .NET Core 2.1
+
 ## v1.6.2 - 2018-06-23
 
 ### Features
@@ -11,7 +15,6 @@
 ### Bugfixes
 
 * **Schemas**: Invariant name handling for field names.
-
 
 ## v1.6.1 - 2018-06-22
 

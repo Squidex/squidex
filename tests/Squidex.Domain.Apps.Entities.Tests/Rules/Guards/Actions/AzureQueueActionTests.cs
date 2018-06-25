@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards.Actions
 
             var errors = await RuleActionValidator.ValidateAsync(action);
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
                     new ValidationError("Connection string is required.", "ConnectionString")
@@ -37,7 +37,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards.Actions
 
             var errors = await RuleActionValidator.ValidateAsync(action);
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
                     new ValidationError("Queue name is required.", "Queue")
@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards.Actions
 
             var errors = await RuleActionValidator.ValidateAsync(action);
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
                     new ValidationError("Queue name must be valid azure queue name.", "Queue")

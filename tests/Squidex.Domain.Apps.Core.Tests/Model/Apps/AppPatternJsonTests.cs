@@ -37,7 +37,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
 
             var appPatterns = JToken.FromObject(patterns, serializer).ToObject<AppPatterns>(serializer);
 
-            appPatterns.ShouldBeEquivalentTo(patterns);
+            appPatterns.Should().BeEquivalentTo(patterns);
         }
     }
 }

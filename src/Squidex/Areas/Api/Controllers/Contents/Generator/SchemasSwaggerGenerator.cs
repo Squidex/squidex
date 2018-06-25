@@ -25,13 +25,13 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
     public sealed class SchemasSwaggerGenerator
     {
         private readonly HttpContext context;
-        private readonly SwaggerSettings settings;
+        private readonly SwaggerSettings<SwaggerGeneratorSettings> settings;
         private readonly MyUrlsOptions urlOptions;
         private SwaggerJsonSchemaGenerator schemaGenerator;
         private JsonSchemaResolver schemaResolver;
         private SwaggerDocument document;
 
-        public SchemasSwaggerGenerator(IHttpContextAccessor context, SwaggerSettings settings, IOptions<MyUrlsOptions> urlOptions)
+        public SchemasSwaggerGenerator(IHttpContextAccessor context, SwaggerSettings<SwaggerGeneratorSettings> settings, IOptions<MyUrlsOptions> urlOptions)
         {
             this.context = context.HttpContext;
             this.settings = settings;
@@ -42,8 +42,8 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
         {
             document = SwaggerHelper.CreateApiDocument(context, urlOptions, app.Name);
 
-            schemaGenerator = new SwaggerJsonSchemaGenerator(settings);
-            schemaResolver = new SwaggerSchemaResolver(document, settings);
+            schemaGenerator = new SwaggerJsonSchemaGenerator(settings.GeneratorSettings);
+            schemaResolver = new SwaggerSchemaResolver(document, settings.GeneratorSettings);
 
             GenerateSchemasOperations(schemas, app);
 

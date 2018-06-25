@@ -44,7 +44,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
 
             await sut.ValidateAsync(null, errors);
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new[] { "Field is required." });
         }
 
@@ -55,7 +55,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
 
             await sut.ValidateAsync(new List<int> { 1 }, errors);
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new[] { "Must have at least 2 item(s)." });
         }
 
@@ -66,7 +66,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
 
             await sut.ValidateAsync(new List<int> { 1, 2, 3, 4 }, errors);
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new[] { "Must have not more than 3 item(s)." });
         }
     }
