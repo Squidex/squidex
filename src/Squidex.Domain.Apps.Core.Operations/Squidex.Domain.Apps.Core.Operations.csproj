@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>Squidex.Domain.Apps.Core</RootNamespace>
@@ -14,18 +14,18 @@
     <ProjectReference Include="..\Squidex.Shared\Squidex.Shared.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Algolia.Search" Version="4.2.2" />
-    <PackageReference Include="Elasticsearch.Net" Version="6.0.2" />
+    <PackageReference Include="Algolia.Search" Version="5.0.0" />
+    <PackageReference Include="Elasticsearch.Net" Version="6.1.0" />
     <PackageReference Include="Jint" Version="2.11.58" />
     <PackageReference Include="Microsoft.OData.Core" Version="7.4.4" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
-    <PackageReference Include="NJsonSchema" Version="9.10.35" />
-    <PackageReference Include="NodaTime" Version="2.2.5" />
+    <PackageReference Include="NJsonSchema" Version="9.10.56" />
+    <PackageReference Include="NodaTime" Version="2.3.0" />
     <PackageReference Include="RefactoringEssentials" Version="5.6.0" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.0.2" />
     <PackageReference Include="System.Collections.Immutable" Version="1.4.0" />
-    <PackageReference Include="System.ValueTuple" Version="4.4.0" />
-    <PackageReference Include="WindowsAzure.Storage" Version="9.1.1" />
+    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
+    <PackageReference Include="WindowsAzure.Storage" Version="9.2.0" />
   </ItemGroup>
   <PropertyGroup>
     <CodeAnalysisRuleSet>..\..\Squidex.ruleset</CodeAnalysisRuleSet>

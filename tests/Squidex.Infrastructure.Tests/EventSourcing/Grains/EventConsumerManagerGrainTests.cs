@@ -175,7 +175,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
             var infos = await sut.GetConsumersAsync();
 
-            infos.Value.ShouldBeEquivalentTo(
+            infos.Value.Should().BeEquivalentTo(
                 new List<EventConsumerInfo>
                 {
                     new EventConsumerInfo { Name = "A", Error = "A-Error", IsStopped = false, Position = "123" },

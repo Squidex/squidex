@@ -8,7 +8,7 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Internal;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Logging;
 
 namespace Squidex.Pipeline
@@ -24,7 +24,7 @@ namespace Squidex.Pipeline
         {
             try
             {
-                SetHeadersAndLog(context, result, null);
+                SetHeadersAndLog(context, result, null, false);
 
                 await result.Callback(context.HttpContext.Response.Body);
             }

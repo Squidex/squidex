@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         {
             var config_0 = LanguagesConfig.Build(Language.DE);
 
-            config_0.OfType<LanguageConfig>().ToList().ShouldBeEquivalentTo(
+            config_0.OfType<LanguageConfig>().ToList().Should().BeEquivalentTo(
                 new List<LanguageConfig>
                 {
                     new LanguageConfig(Language.DE)
@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         {
             var config_0 = LanguagesConfig.Build(Language.DE, Language.EN, Language.IT);
 
-            config_0.OfType<LanguageConfig>().ToList().ShouldBeEquivalentTo(
+            config_0.OfType<LanguageConfig>().ToList().Should().BeEquivalentTo(
                 new List<LanguageConfig>
                 {
                     new LanguageConfig(Language.DE),
@@ -66,7 +66,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
             };
             var config_0 = LanguagesConfig.Build(configs);
 
-            config_0.OfType<LanguageConfig>().ToList().ShouldBeEquivalentTo(configs);
+            config_0.OfType<LanguageConfig>().ToList().Should().BeEquivalentTo(configs);
 
             Assert.Equal(configs[0], config_0.Master);
             Assert.Same(configs[0], config_0.Master);
@@ -78,7 +78,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
             var config_0 = LanguagesConfig.Build(Language.DE);
             var config_1 = config_0.Set(new LanguageConfig(Language.IT));
 
-            config_1.OfType<LanguageConfig>().ToList().ShouldBeEquivalentTo(
+            config_1.OfType<LanguageConfig>().ToList().Should().BeEquivalentTo(
                 new List<LanguageConfig>
                 {
                     new LanguageConfig(Language.DE),
@@ -141,7 +141,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
 
             Assert.Same(config_1.Master, config_1.OfType<LanguageConfig>().FirstOrDefault(x => x.Language == Language.DE));
 
-            config_1.ToList().ShouldBeEquivalentTo(
+            config_1.ToList().Should().BeEquivalentTo(
                 new List<LanguageConfig>
                 {
                     new LanguageConfig(Language.DE),
@@ -159,7 +159,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
                     new LanguageConfig(Language.RU, false, Language.DE, Language.IT));
             var config_1 = config_0.Remove(Language.IT);
 
-            config_1.OfType<LanguageConfig>().ToList().ShouldBeEquivalentTo(
+            config_1.OfType<LanguageConfig>().ToList().Should().BeEquivalentTo(
                 new List<LanguageConfig>
                 {
                     new LanguageConfig(Language.DE),
@@ -190,7 +190,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
             var config_1 = config_0.Set(new LanguageConfig(Language.IT));
             var config_2 = config_1.Set(new LanguageConfig(Language.IT, true, Language.DE));
 
-            config_2.OfType<LanguageConfig>().ToList().ShouldBeEquivalentTo(
+            config_2.OfType<LanguageConfig>().ToList().Should().BeEquivalentTo(
                 new List<LanguageConfig>
                 {
                     new LanguageConfig(Language.DE),

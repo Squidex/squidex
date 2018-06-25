@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards.Actions
 
             var errors = await RuleActionValidator.ValidateAsync(action);
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
                     new ValidationError("Service ID is required.", "ServiceId")
@@ -37,7 +37,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards.Actions
 
             var errors = await RuleActionValidator.ValidateAsync(action);
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
                     new ValidationError("Api Key is required.", "ApiKey")

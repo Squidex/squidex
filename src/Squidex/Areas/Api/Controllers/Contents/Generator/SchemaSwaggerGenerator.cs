@@ -85,7 +85,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                     Name = schemaName, Description = $"API to managed {schemaName} contents."
                 });
 
-            var schemaOperations = new List<SwaggerOperations>
+            var schemaOperations = new List<SwaggerPathItem>
             {
                 GenerateSchemaQueryOperation(),
                 GenerateSchemaCreateOperation(),
@@ -105,7 +105,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
             }
         }
 
-        private SwaggerOperations GenerateSchemaQueryOperation()
+        private SwaggerPathItem GenerateSchemaQueryOperation()
         {
             return AddOperation(SwaggerOperationMethod.Get, null, $"{appPath}/{schemaPath}", operation =>
             {
@@ -125,7 +125,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
             });
         }
 
-        private SwaggerOperations GenerateSchemaGetOperation()
+        private SwaggerPathItem GenerateSchemaGetOperation()
         {
             return AddOperation(SwaggerOperationMethod.Get, schemaName, $"{appPath}/{schemaPath}/{{id}}", operation =>
             {
@@ -137,7 +137,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
             });
         }
 
-        private SwaggerOperations GenerateSchemaCreateOperation()
+        private SwaggerPathItem GenerateSchemaCreateOperation()
         {
             return AddOperation(SwaggerOperationMethod.Post, null, $"{appPath}/{schemaPath}", operation =>
             {
@@ -152,7 +152,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
             });
         }
 
-        private SwaggerOperations GenerateSchemaUpdateOperation()
+        private SwaggerPathItem GenerateSchemaUpdateOperation()
         {
             return AddOperation(SwaggerOperationMethod.Put, schemaName, $"{appPath}/{schemaPath}/{{id}}", operation =>
             {
@@ -166,7 +166,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
             });
         }
 
-        private SwaggerOperations GenerateSchemaPatchOperation()
+        private SwaggerPathItem GenerateSchemaPatchOperation()
         {
             return AddOperation(SwaggerOperationMethod.Patch, schemaName, $"{appPath}/{schemaPath}/{{id}}", operation =>
             {
@@ -180,7 +180,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
             });
         }
 
-        private SwaggerOperations GenerateSchemaPublishOperation()
+        private SwaggerPathItem GenerateSchemaPublishOperation()
         {
             return AddOperation(SwaggerOperationMethod.Put, schemaName, $"{appPath}/{schemaPath}/{{id}}/publish", operation =>
             {
@@ -192,7 +192,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
             });
         }
 
-        private SwaggerOperations GenerateSchemaUnpublishOperation()
+        private SwaggerPathItem GenerateSchemaUnpublishOperation()
         {
             return AddOperation(SwaggerOperationMethod.Put, schemaName, $"{appPath}/{schemaPath}/{{id}}/unpublish", operation =>
             {
@@ -204,7 +204,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
             });
         }
 
-        private SwaggerOperations GenerateSchemaArchiveOperation()
+        private SwaggerPathItem GenerateSchemaArchiveOperation()
         {
             return AddOperation(SwaggerOperationMethod.Put, schemaName, $"{appPath}/{schemaPath}/{{id}}/archive", operation =>
             {
@@ -216,7 +216,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
             });
         }
 
-        private SwaggerOperations GenerateSchemaRestoreOperation()
+        private SwaggerPathItem GenerateSchemaRestoreOperation()
         {
             return AddOperation(SwaggerOperationMethod.Put, schemaName, $"{appPath}/{schemaPath}/{{id}}/restore", operation =>
             {
@@ -228,7 +228,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
             });
         }
 
-        private SwaggerOperations GenerateSchemaDeleteOperation()
+        private SwaggerPathItem GenerateSchemaDeleteOperation()
         {
             return AddOperation(SwaggerOperationMethod.Delete, schemaName, $"{appPath}/{schemaPath}/{{id}}/", operation =>
             {
@@ -240,7 +240,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
             });
         }
 
-        private SwaggerOperations AddOperation(SwaggerOperationMethod method, string entityName, string path, Action<SwaggerOperation> updater)
+        private SwaggerPathItem AddOperation(SwaggerOperationMethod method, string entityName, string path, Action<SwaggerOperation> updater)
         {
             var operations = document.Paths.GetOrAddNew(path);
             var operation = new SwaggerOperation();

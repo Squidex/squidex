@@ -284,7 +284,7 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
             var schemaSource = TestData.MixedSchema();
             var schemaTarget = JToken.FromObject(schemaSource, serializer).ToObject<Schema>(serializer);
 
-            schemaTarget.ShouldBeEquivalentTo(schemaSource);
+            schemaTarget.Should().BeEquivalentTo(schemaSource);
         }
 
         private static RootField<NumberFieldProperties> CreateField(int id)

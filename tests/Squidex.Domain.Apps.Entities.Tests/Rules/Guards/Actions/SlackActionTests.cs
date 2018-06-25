@@ -24,7 +24,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards.Actions
 
             var errors = await RuleActionValidator.ValidateAsync(action);
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
                     new ValidationError("Webhook URL is required and must be an absolute URL.", "WebhookUrl")
@@ -38,7 +38,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards.Actions
 
             var errors = await RuleActionValidator.ValidateAsync(action);
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
                     new ValidationError("Webhook URL is required and must be an absolute URL.", "WebhookUrl")

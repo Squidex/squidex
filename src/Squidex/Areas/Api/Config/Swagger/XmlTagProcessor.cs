@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using NJsonSchema.Infrastructure;
@@ -25,7 +26,7 @@ namespace Squidex.Areas.Api.Config.Swagger
 
                 if (tagAttribute != null)
                 {
-                    var tag = context.Document.Tags.Find(x => x.Name == tagAttribute.Name);
+                    var tag = context.Document.Tags.FirstOrDefault(x => x.Name == tagAttribute.Name);
 
                     if (tag != null)
                     {

@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards.FieldProperties
 
             var errors = FieldPropertiesValidator.Validate(sut).ToList();
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
                     new ValidationError("Max items must be greater than min items.", "MinItems", "MaxItems")
@@ -37,7 +37,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards.FieldProperties
 
             var errors = FieldPropertiesValidator.Validate(sut).ToList();
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
                     new ValidationError("Max width must be greater than min width.", "MinWidth", "MaxWidth")
@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards.FieldProperties
 
             var errors = FieldPropertiesValidator.Validate(sut).ToList();
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
                     new ValidationError("Max height must be greater than min height.", "MinHeight", "MaxHeight")
@@ -65,7 +65,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards.FieldProperties
 
             var errors = FieldPropertiesValidator.Validate(sut).ToList();
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
                     new ValidationError("Max size must be greater than min size.", "MinSize", "MaxSize")
@@ -79,7 +79,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards.FieldProperties
 
             var errors = FieldPropertiesValidator.Validate(sut).ToList();
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
                     new ValidationError("Aspect width and height is required.", "AspectWidth", "AspectHeight")
@@ -93,7 +93,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards.FieldProperties
 
             var errors = FieldPropertiesValidator.Validate(sut).ToList();
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
                     new ValidationError("Aspect width and height is required.", "AspectWidth", "AspectHeight")

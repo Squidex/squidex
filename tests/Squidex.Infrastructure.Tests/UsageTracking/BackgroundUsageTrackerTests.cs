@@ -91,7 +91,7 @@ namespace Squidex.Infrastructure.UsageTracking
 
             var result = await sut.QueryAsync("key", dateFrom, dateTo);
 
-            result.ShouldBeEquivalentTo(new List<StoredUsage>
+            result.Should().BeEquivalentTo(new List<StoredUsage>
             {
                 new StoredUsage(dateFrom.AddDays(0), 00, 00),
                 new StoredUsage(dateFrom.AddDays(1), 10, 15),

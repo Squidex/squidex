@@ -12,6 +12,7 @@ using NJsonSchema;
 using NJsonSchema.Generation.TypeMappers;
 using NodaTime;
 using NSwag.AspNetCore;
+using NSwag.SwaggerGeneration;
 using NSwag.SwaggerGeneration.Processors.Security;
 using Squidex.Areas.Api.Controllers.Contents.Generator;
 using Squidex.Config;
@@ -24,13 +25,13 @@ namespace Squidex.Areas.Api.Config.Swagger
     {
         public static void AddMySwaggerSettings(this IServiceCollection services)
         {
-            services.AddSingleton(typeof(SwaggerSettings), s =>
+            services.AddSingleton(typeof(SwaggerSettings<SwaggerGeneratorSettings>), s =>
             {
                 var urlOptions = s.GetService<IOptions<MyUrlsOptions>>().Value;
 
-                var settings =
-                    new SwaggerSettings { Title = "Squidex API", Version = "1.0", IsAspNetCore = false }
+                var settings = new SwaggerSettings<SwaggerGeneratorSettings>()
                         .AddAssetODataParams()
+                        .ConfigureNames()
                         .ConfigurePaths(urlOptions)
                         .ConfigureSchemaSettings()
                         .ConfigureIdentity(urlOptions);
@@ -41,25 +42,33 @@ namespace Squidex.Areas.Api.Config.Swagger
             services.AddTransient<SchemasSwaggerGenerator>();
         }
 
-        private static SwaggerSettings AddAssetODataParams(this SwaggerSettings settings)
+        public static SwaggerSettings<T> ConfigureNames<T>(this SwaggerSettings<T> settings) where T : SwaggerGeneratorSettings, new()
         {
-            settings.OperationProcessors.Add(new ODataQueryParamsProcessor("/apps/{app}/assets", "assets", false));
+            settings.GeneratorSettings.Title = "Squidex API";
+            settings.GeneratorSettings.Version = "1.0";
 
             return settings;
         }
 
-        private static SwaggerSettings ConfigureIdentity(this SwaggerSettings settings, MyUrlsOptions urlOptions)
+        public static SwaggerSettings<T> AddAssetODataParams<T>(this SwaggerSettings<T> settings) where T : SwaggerGeneratorSettings, new()
         {
-            settings.DocumentProcessors.Add(
+            settings.GeneratorSettings.OperationProcessors.Add(new ODataQueryParamsProcessor("/apps/{app}/assets", "assets", false));
+
+            return settings;
+        }
+
+        public static SwaggerSettings<T> ConfigureIdentity<T>(this SwaggerSettings<T> settings, MyUrlsOptions urlOptions) where T : SwaggerGeneratorSettings, new()
+        {
+            settings.GeneratorSettings.DocumentProcessors.Add(
                 new SecurityDefinitionAppender(
                     Constants.SecurityDefinition, SwaggerHelper.CreateOAuthSchema(urlOptions)));
 
-            settings.OperationProcessors.Add(new ScopesProcessor());
+            settings.GeneratorSettings.OperationProcessors.Add(new ScopesProcessor());
 
             return settings;
         }
 
-        private static SwaggerSettings ConfigurePaths(this SwaggerSettings settings, MyUrlsOptions urlOptions)
+        public static SwaggerSettings<T> ConfigurePaths<T>(this SwaggerSettings<T> settings, MyUrlsOptions urlOptions) where T : SwaggerGeneratorSettings, new()
         {
             settings.SwaggerRoute = $"{Constants.ApiPrefix}/swagger/v1/swagger.json";
 
@@ -77,12 +86,12 @@ namespace Squidex.Areas.Api.Config.Swagger
             return settings;
         }
 
-        private static SwaggerSettings ConfigureSchemaSettings(this SwaggerSettings settings)
+        public static SwaggerSettings<T> ConfigureSchemaSettings<T>(this SwaggerSettings<T> settings) where T : SwaggerGeneratorSettings, new()
         {
-            settings.DefaultEnumHandling = EnumHandling.String;
-            settings.DefaultPropertyNameHandling = PropertyNameHandling.CamelCase;
+            settings.GeneratorSettings.DefaultEnumHandling = EnumHandling.String;
+            settings.GeneratorSettings.DefaultPropertyNameHandling = PropertyNameHandling.CamelCase;
 
-            settings.TypeMappers = new List<ITypeMapper>
+            settings.GeneratorSettings.TypeMappers = new List<ITypeMapper>
             {
                 new PrimitiveTypeMapper(typeof(Instant), schema =>
                 {
@@ -93,10 +102,10 @@ namespace Squidex.Areas.Api.Config.Swagger
                 new PrimitiveTypeMapper(typeof(RefToken), s => s.Type = JsonObjectType.String)
             };
 
-            settings.DocumentProcessors.Add(new XmlTagProcessor());
+            settings.GeneratorSettings.DocumentProcessors.Add(new XmlTagProcessor());
 
-            settings.OperationProcessors.Add(new XmlTagProcessor());
-            settings.OperationProcessors.Add(new XmlResponseTypesProcessor());
+            settings.GeneratorSettings.OperationProcessors.Add(new XmlTagProcessor());
+            settings.GeneratorSettings.OperationProcessors.Add(new XmlResponseTypesProcessor());
 
             return settings;
         }

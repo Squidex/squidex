@@ -44,7 +44,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
             await sut.ValidateAsync(CreateValue(null), errors);
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new[] { "Field is required." });
         }
 
@@ -55,7 +55,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
             await sut.ValidateAsync(CreateValue("123"), errors);
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new[] { "Must have more than '10' characters." });
         }
 
@@ -66,7 +66,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
             await sut.ValidateAsync(CreateValue("12345678"), errors);
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new[] { "Must have less than '5' characters." });
         }
 
@@ -77,7 +77,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
             await sut.ValidateAsync(CreateValue("Bar"), errors);
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new[] { "Not an allowed value." });
         }
 
@@ -88,7 +88,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
             await sut.ValidateAsync(CreateValue("abc"), errors);
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new[] { "Not valid." });
         }
 
@@ -99,7 +99,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
             await sut.ValidateAsync(CreateValue("abc"), errors);
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new[] { "Custom Error Message." });
         }
 

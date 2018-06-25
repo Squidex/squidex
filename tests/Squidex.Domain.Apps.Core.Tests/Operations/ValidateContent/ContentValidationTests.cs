@@ -35,7 +35,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
             await data.ValidateAsync(context, schema, languagesConfig.ToResolver(), errors);
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
                     new ValidationError("unknown: Not a known field.", "unknown")
@@ -56,7 +56,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
             await data.ValidateAsync(context, schema, languagesConfig.ToResolver(), errors);
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
                     new ValidationError("my-field: Must be less or equals than '100'.", "my-field")
@@ -77,7 +77,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
             await data.ValidateAsync(context, schema, languagesConfig.ToResolver(), errors);
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
                     new ValidationError("my-field(es): Not a known invariant value.", "my-field(es)"),
@@ -96,7 +96,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
             await data.ValidateAsync(context, schema, languagesConfig.ToResolver(), errors);
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
                     new ValidationError("my-field(de): Field is required.", "my-field(de)"),
@@ -115,7 +115,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
             await data.ValidateAsync(context, schema, languagesConfig.ToResolver(), errors);
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
                     new ValidationError("my-field: Field is required.", "my-field")
@@ -136,7 +136,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
             await data.ValidateAsync(context, schema, languagesConfig.ToResolver(), errors);
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
                     new ValidationError("my-field(xx): Not a known language.", "my-field(xx)")
@@ -179,7 +179,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
             await data.ValidateAsync(context, schema, languagesConfig.ToResolver(), errors);
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
                     new ValidationError("my-field(es): Not a known language.", "my-field(es)"),
@@ -197,7 +197,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
             await data.ValidatePartialAsync(context, schema, languagesConfig.ToResolver(), errors);
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
                     new ValidationError("unknown: Not a known field.", "unknown")
@@ -218,7 +218,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
             await data.ValidatePartialAsync(context, schema, languagesConfig.ToResolver(), errors);
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
                     new ValidationError("my-field: Must be less or equals than '100'.", "my-field")
@@ -239,7 +239,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
             await data.ValidatePartialAsync(context, schema, languagesConfig.ToResolver(), errors);
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
                     new ValidationError("my-field(es): Not a known invariant value.", "my-field(es)"),
@@ -289,7 +289,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
             await data.ValidatePartialAsync(context, schema, languagesConfig.ToResolver(), errors);
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
                     new ValidationError("my-field(xx): Not a known language.", "my-field(xx)")
@@ -310,7 +310,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
             await data.ValidatePartialAsync(context, schema, languagesConfig.ToResolver(), errors);
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
                     new ValidationError("my-field(es): Not a known language.", "my-field(es)"),
@@ -336,7 +336,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
             await data.ValidatePartialAsync(context, schema, languagesConfig.ToResolver(), errors);
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
                     new ValidationError("my-field[1].my-nested: Field is required.", "my-field[1].my-nested"),

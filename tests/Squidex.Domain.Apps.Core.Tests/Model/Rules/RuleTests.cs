@@ -131,7 +131,7 @@ namespace Squidex.Domain.Apps.Core.Model.Rules
 
             var appClients = JToken.FromObject(rule_1, serializer).ToObject<Rule>(serializer);
 
-            appClients.ShouldBeEquivalentTo(rule_0);
+            appClients.Should().BeEquivalentTo(rule_0);
         }
 
         [Theory]

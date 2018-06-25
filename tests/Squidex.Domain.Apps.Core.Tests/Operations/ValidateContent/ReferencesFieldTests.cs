@@ -56,7 +56,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
             await sut.ValidateAsync(CreateValue(null), errors);
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new[] { "Field is required." });
         }
 
@@ -67,7 +67,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
             await sut.ValidateAsync(CreateValue(), errors);
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new[] { "Field is required." });
         }
 
@@ -78,7 +78,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
             await sut.ValidateAsync("invalid", errors);
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new[] { "Not a valid value." });
         }
 
@@ -89,7 +89,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
             await sut.ValidateAsync(CreateValue(Guid.NewGuid(), Guid.NewGuid()), errors);
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new[] { "Must have at least 3 item(s)." });
         }
 
@@ -100,7 +100,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
             await sut.ValidateAsync(CreateValue(Guid.NewGuid(), Guid.NewGuid()), errors);
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new[] { "Must have not more than 1 item(s)." });
         }
 
@@ -113,7 +113,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
             await sut.ValidateAsync(CreateValue(referenceId), errors, ValidationTestExtensions.InvalidReferences(referenceId));
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new[] { $"Contains invalid reference '{referenceId}'." });
         }
 

@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards.FieldProperties
 
             var errors = FieldPropertiesValidator.Validate(sut).ToList();
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
                     new ValidationError("Default value must be greater than min value.", "DefaultValue")
@@ -53,7 +53,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards.FieldProperties
 
             var errors = FieldPropertiesValidator.Validate(sut).ToList();
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
                     new ValidationError("Default value must be less than max value.", "DefaultValue")
@@ -67,7 +67,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards.FieldProperties
 
             var errors = FieldPropertiesValidator.Validate(sut).ToList();
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
                     new ValidationError("Max value must be greater than min value.", "MinValue", "MaxValue")
@@ -81,7 +81,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards.FieldProperties
 
             var errors = FieldPropertiesValidator.Validate(sut).ToList();
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
                     new ValidationError("Either allowed values or min and max value can be defined.", "AllowedValues", "MinValue", "MaxValue")
@@ -95,7 +95,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards.FieldProperties
 
             var errors = FieldPropertiesValidator.Validate(sut).ToList();
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
                     new ValidationError("Either allowed values or min and max value can be defined.", "AllowedValues", "MinValue", "MaxValue")
@@ -109,7 +109,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards.FieldProperties
 
             var errors = FieldPropertiesValidator.Validate(sut).ToList();
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
                     new ValidationError("Radio buttons or dropdown list need allowed values.", "AllowedValues")
@@ -123,7 +123,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards.FieldProperties
 
             var errors = FieldPropertiesValidator.Validate(sut).ToList();
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
                     new ValidationError("Editor is not a valid value.", "Editor")
@@ -139,7 +139,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards.FieldProperties
 
             var errors = FieldPropertiesValidator.Validate(sut).ToList();
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
                     new ValidationError("Inline editing is only allowed for dropdowns and input fields.", "InlineEditable", "Editor")

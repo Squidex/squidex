@@ -33,7 +33,7 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
         {
             lhs.Should().BeOfType(rhs.GetType());
 
-            ((object)lhs).ShouldBeEquivalentTo(rhs, o => o.IncludingAllDeclaredProperties());
+            ((object)lhs).Should().BeEquivalentTo(rhs, o => o.IncludingAllDeclaredProperties());
         }
 
         public static void ShouldBeSameEventType(this IEvent lhs, IEvent rhs)
@@ -43,7 +43,7 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
 
         public static void ShouldBeEquivalent<T>(this T result, T value)
         {
-            result.ShouldBeEquivalentTo(value, o => o.IncludingAllDeclaredProperties());
+            result.Should().BeEquivalentTo(value, o => o.IncludingAllDeclaredProperties());
         }
     }
 }

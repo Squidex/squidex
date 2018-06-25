@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>Squidex.Domain.Apps.Core</RootNamespace>
@@ -8,10 +8,10 @@
     <DebugSymbols>True</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Fody" Version="3.0.3" />
-    <PackageReference Include="Freezable.Fody" Version="1.9.0" />
+    <PackageReference Include="Fody" Version="3.1.3" />
+    <PackageReference Include="Freezable.Fody" Version="1.9.1" />
     <PackageReference Include="System.Collections.Immutable" Version="1.4.0" />
-    <PackageReference Include="System.ValueTuple" Version="4.4.0" />
+    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Squidex.Infrastructure\Squidex.Infrastructure.csproj" />

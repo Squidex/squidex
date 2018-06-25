@@ -8,7 +8,9 @@
 using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using NSwag.AspNetCore;
+using Squidex.Config;
 
 namespace Squidex.Areas.Api.Config.Swagger
 {
@@ -16,9 +18,16 @@ namespace Squidex.Areas.Api.Config.Swagger
     {
         public static void UseMySwagger(this IApplicationBuilder app)
         {
-            var settings = app.ApplicationServices.GetService<SwaggerSettings>();
+            var urlOptions = app.ApplicationServices.GetService<IOptions<MyUrlsOptions>>().Value;
 
-            app.UseSwagger(typeof(SwaggerExtensions).GetTypeInfo().Assembly, settings);
+            app.UseSwagger(typeof(SwaggerExtensions).GetTypeInfo().Assembly, settings =>
+            {
+                settings.AddAssetODataParams();
+                settings.ConfigureNames();
+                settings.ConfigurePaths(urlOptions);
+                settings.ConfigureSchemaSettings();
+                settings.ConfigureIdentity(urlOptions);
+            });
         }
     }
 }
