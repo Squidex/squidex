@@ -46,6 +46,11 @@ namespace Squidex.Config.Orleans
             }
         }
 
+        public IClusterClient Client
+        {
+            get { return silo.Value.Services.GetRequiredService<IClusterClient>(); }
+        }
+
         public SiloWrapper(IConfiguration config, ISemanticLog log)
         {
             this.log = log;
@@ -54,6 +59,7 @@ namespace Squidex.Config.Orleans
             {
                 var hostBuilder = new SiloHostBuilder()
                     .UseDashboard(options => options.HostSelf = false)
+                    .EnableDirectClient()
                     .AddIncomingGrainCallFilter<LocalCacheFilter>()
                     .AddStartupTask<Bootstrap<IContentSchedulerGrain>>()
                     .AddStartupTask<Bootstrap<IEventConsumerManagerGrain>>()

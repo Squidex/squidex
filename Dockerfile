@@ -1,7 +1,7 @@
 #
 # Stage 1, Prebuild
 #
-FROM squidex/aspnetcore-build-phantomjs-chromium:2.0.3-jessie-fix1 as builder
+FROM squidex/dotnet:2.1-sdk-chromium-phantomjs-node as builder
 
 COPY src/Squidex/package.json /tmp/package.json
 

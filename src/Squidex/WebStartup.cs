@@ -33,7 +33,6 @@ namespace Squidex
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddOrleansSilo();
-            services.AddOrleansClient();
             services.AddAppServices(configuration);
         }
 
