@@ -78,6 +78,7 @@ describe('SchemasService', () => {
                     label: 'label1',
                     hints: 'hints1'
                 },
+                isSingleton: true,
                 isPublished: true,
                 created: '2016-12-12T10:10',
                 createdBy: 'Created1',
@@ -94,6 +95,7 @@ describe('SchemasService', () => {
                     label: 'label2',
                     hints: 'hints2'
                 },
+                isSingleton: true,
                 isPublished: true,
                 created: '2016-10-12T10:10',
                 createdBy: 'Created2',
@@ -106,11 +108,11 @@ describe('SchemasService', () => {
 
         expect(schemas!).toEqual(
             [
-                new SchemaDto('id1', 'name1', 'category1', new SchemaPropertiesDto('label1', 'hints1'), true,
+                new SchemaDto('id1', 'name1', 'category1', new SchemaPropertiesDto('label1', 'hints1'), true, true,
                     DateTime.parseISO_UTC('2016-12-12T10:10'), 'Created1',
                     DateTime.parseISO_UTC('2017-12-12T10:10'), 'LastModifiedBy1',
                     new Version('11')),
-                new SchemaDto('id2', 'name2', 'category2', new SchemaPropertiesDto('label2', 'hints2'), true,
+                new SchemaDto('id2', 'name2', 'category2', new SchemaPropertiesDto('label2', 'hints2'), true, true,
                     DateTime.parseISO_UTC('2016-10-12T10:10'), 'Created2',
                     DateTime.parseISO_UTC('2017-10-12T10:10'), 'LastModifiedBy2',
                     new Version('22'))
@@ -135,6 +137,7 @@ describe('SchemasService', () => {
             id: 'id1',
             name: 'name1',
             category: 'category1',
+            isSingleton: true,
             isPublished: true,
             created: '2016-12-12T10:10',
             createdBy: 'Created1',
@@ -290,7 +293,7 @@ describe('SchemasService', () => {
         });
 
         expect(schema!).toEqual(
-            new SchemaDetailsDto('id1', 'name1', 'category1', new SchemaPropertiesDto('label1', 'hints1'), true,
+            new SchemaDetailsDto('id1', 'name1', 'category1', new SchemaPropertiesDto('label1', 'hints1'), true, true,
                 DateTime.parseISO_UTC('2016-12-12T10:10'), 'Created1',
                 DateTime.parseISO_UTC('2017-12-12T10:10'), 'LastModifiedBy1',
                 new Version('2'),
@@ -319,7 +322,7 @@ describe('SchemasService', () => {
     it('should make post request to create schema',
         inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
 
-        const dto = new CreateSchemaDto('name');
+        const dto = new CreateSchemaDto('name', undefined, undefined, true);
 
         let schema: SchemaDetailsDto;
 
@@ -341,7 +344,7 @@ describe('SchemasService', () => {
         });
 
         expect(schema!).toEqual(
-            new SchemaDetailsDto('1', dto.name, '', new SchemaPropertiesDto(), false, now, user, now, user, new Version('2'), []));
+            new SchemaDetailsDto('1', dto.name, '', new SchemaPropertiesDto(), true, false, now, user, now, user, new Version('2'), []));
     }));
 
     it('should make put request to update schema',

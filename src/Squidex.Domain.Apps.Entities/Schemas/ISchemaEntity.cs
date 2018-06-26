@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
         string Category { get; }
 
-        bool Singleton { get; }
+        bool IsSingleton { get; }
 
         bool IsPublished { get; }
 

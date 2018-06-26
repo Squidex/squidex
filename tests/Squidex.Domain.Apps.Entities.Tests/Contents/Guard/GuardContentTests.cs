@@ -35,7 +35,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         [Fact]
         public void CanCreate_should_throw_exception_if_singleton()
         {
-            A.CallTo(() => schema.Singleton).Returns(true);
+            A.CallTo(() => schema.IsSingleton).Returns(true);
 
             var command = new CreateContent { Data = new NamedContentData() };
 
@@ -45,7 +45,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         [Fact]
         public void CanCreate_should_not_throw_exception_if_singleton_and_id_empty()
         {
-            A.CallTo(() => schema.Singleton).Returns(true);
+            A.CallTo(() => schema.IsSingleton).Returns(true);
 
             var command = new CreateContent { Data = new NamedContentData(), ContentId = Guid.Empty };
 
@@ -133,7 +133,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         [Fact]
         public void CanChangeContentStatus_should_throw_exception_if_singleton()
         {
-            A.CallTo(() => schema.Singleton).Returns(true);
+            A.CallTo(() => schema.IsSingleton).Returns(true);
 
             var command = new ChangeContentStatus { Status = Status.Draft };
 
@@ -143,7 +143,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         [Fact]
         public void CanChangeContentStatus_should_not_throw_exception_if_publishing_with_pending_changes()
         {
-            A.CallTo(() => schema.Singleton).Returns(true);
+            A.CallTo(() => schema.IsSingleton).Returns(true);
 
             var command = new ChangeContentStatus { Status = Status.Published };
 
@@ -177,7 +177,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         [Fact]
         public void CanDelete_should_throw_exception_if_singleton()
         {
-            A.CallTo(() => schema.Singleton).Returns(true);
+            A.CallTo(() => schema.IsSingleton).Returns(true);
 
             var command = new DeleteContent();
 

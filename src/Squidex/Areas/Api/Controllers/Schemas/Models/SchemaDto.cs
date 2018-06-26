@@ -40,14 +40,14 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         public SchemaPropertiesDto Properties { get; set; }
 
         /// <summary>
-        /// Indicates if the schema is published.
-        /// </summary>
-        public bool IsPublished { get; set; }
-
-        /// <summary>
         /// Indicates if the schema is a singleton.
         /// </summary>
         public bool IsSingleton { get; set; }
+
+        /// <summary>
+        /// Indicates if the schema is published.
+        /// </summary>
+        public bool IsPublished { get; set; }
 
         /// <summary>
         /// The user that has created the schema.
