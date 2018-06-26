@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
                 ValidateData(command, e);
             });
 
-            if (schema.IsSingleton && command.ContentId != Guid.Empty)
+            if (schema.Singleton && command.ContentId != Guid.Empty)
             {
                 throw new DomainException("Singleton content cannot be created.");
             }
@@ -65,7 +65,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            if (schema.IsSingleton && command.Status != Status.Published)
+            if (schema.Singleton && command.Status != Status.Published)
             {
                 throw new DomainException("Singleton content archived or unpublished.");
             }
@@ -102,7 +102,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            if (schema.IsSingleton)
+            if (schema.Singleton)
             {
                 throw new DomainException("Singleton content cannot be deleted.");
             }

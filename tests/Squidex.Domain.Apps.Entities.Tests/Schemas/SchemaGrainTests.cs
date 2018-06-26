@@ -72,7 +72,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             Assert.Equal(SchemaName, sut.Snapshot.Name);
             Assert.Equal(SchemaName, sut.Snapshot.SchemaDef.Name);
-            Assert.True(sut.Snapshot.IsSingleton);
+            Assert.True(sut.Snapshot.Singleton);
 
             LastEvents
                 .ShouldHaveSameEvents(
