@@ -37,6 +37,11 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// </summary>
         public bool Publish { get; set; }
 
+        /// <summary>
+        /// Set to true to allow a single content item only.
+        /// </summary>
+        public bool Singleton { get; set; }
+
         public CreateSchema ToCommand()
         {
             var command = new CreateSchema();
