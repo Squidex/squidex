@@ -31,6 +31,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
         private IAppEntity appEntity;
         private Func<string> message;
 
+        public ISchemaEntity Schema
+        {
+            get { return schemaEntity; }
+        }
+
         public static async Task<ContentOperationContext> CreateAsync(
             Guid appId,
             Guid schemaId,
