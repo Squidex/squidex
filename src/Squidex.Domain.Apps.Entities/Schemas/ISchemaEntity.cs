@@ -25,6 +25,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
         bool IsPublished { get; }
 
+        bool IsSingleton { get; }
+
         bool IsDeleted { get; }
 
         string ScriptQuery { get; }

@@ -38,6 +38,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas.State
         public bool IsDeleted { get; set; }
 
         [JsonProperty]
+        public bool IsSingleton { get; set; }
+
+        [JsonProperty]
         public string ScriptQuery { get; set; }
 
         [JsonProperty]
@@ -64,6 +67,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.State
         protected void On(SchemaCreated @event, FieldRegistry registry)
         {
             Name = @event.Name;
+
+            IsSingleton = @event.Singleton;
 
             var schema = new Schema(@event.Name);
 
