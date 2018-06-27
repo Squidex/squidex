@@ -42,7 +42,7 @@ namespace Squidex.Infrastructure.States
 
         public IPersistence WithEventSourcing(Type owner, TKey key, Func<Envelope<IEvent>, Task> applyEvent)
         {
-            Guard.NotDefault(key, nameof(key));
+            Guard.NotNull(key, nameof(key));
 
             var snapshotStore = (ISnapshotStore<object, TKey>)services.GetService(typeof(ISnapshotStore<object, TKey>));
 
@@ -51,7 +51,7 @@ namespace Squidex.Infrastructure.States
 
         private IPersistence<TState> CreatePersistence<TState>(Type owner, TKey key, PersistenceMode mode, Func<TState, Task> applySnapshot, Func<Envelope<IEvent>, Task> applyEvent)
         {
-            Guard.NotDefault(key, nameof(key));
+            Guard.NotNull(key, nameof(key));
 
             var snapshotStore = (ISnapshotStore<TState, TKey>)services.GetService(typeof(ISnapshotStore<TState, TKey>));
 

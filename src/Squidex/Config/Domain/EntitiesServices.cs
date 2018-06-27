@@ -128,6 +128,9 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<SchemasByAppIndexCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
+            services.AddSingletonAs<SingletonCommandMiddleware>()
+                .As<ICommandMiddleware>();
+
             services.AddSingletonAs<CreateBlogCommandMiddleware>()
                 .As<ICommandMiddleware>();
 

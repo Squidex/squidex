@@ -1,6 +1,8 @@
 @import '_vars';
 @import '_mixins';
 
+$icon-size: 4.5rem;
+
 .btn-link {
     margin-top: -1rem;
     margin-left: -.5rem;
@@ -10,4 +12,64 @@
     height: 15rem !important;
     margin-bottom: .5rem;
     margin-top: 0;
+}
+
+.name-group {
+    margin-bottom: 1.5rem;
+}
+
+.type {
+    & {
+        margin-bottom: .5rem;
+    }
+
+    &-title {
+        font-weight: bold;
+    }
+
+    &-text {
+        font-size: .9rem;
+    }
+
+    &-icon {
+        & {
+            @include border-radius;
+            height: $icon-size;
+            color: $color-theme-blue;
+            cursor: pointer;
+            border: 1px solid $color-border;
+            background: transparent;
+            margin-right: .5rem;
+            line-height: $icon-size;
+            font-size: 1.75rem;
+            font-weight: normal;
+            text-align: center;
+            width: $icon-size;
+        }
+
+        .radio-input {
+            display: none;
+        }
+
+        &.active {
+            & {
+                @include box-shadow(0, 0, 10px, .5);
+                background: $color-theme-blue;
+                border-color: $color-theme-blue;
+                color: $color-dark-foreground;
+            }
+
+            &:hover {
+                color: $color-dark-foreground;
+            }
+        }
+
+        &:hover {
+            border-color: $color-border-dark;
+        }
+    }
+
+    .radio-input {
+        display: none;
+    }
 }

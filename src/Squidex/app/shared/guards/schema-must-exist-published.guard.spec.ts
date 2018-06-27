@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Router } from '@angular/router';
+import { Router, RouterStateSnapshot } from '@angular/router';
 import { of } from 'rxjs';
 import { IMock, Mock, Times } from 'typemoq';
 
@@ -21,6 +21,7 @@ describe('SchemaMustExistPublishedGuard', () => {
     };
 
     let schemasState: IMock<SchemasState>;
+    let state: RouterStateSnapshot = <any>{};
     let router: IMock<Router>;
     let schemaGuard: SchemaMustExistPublishedGuard;
 
@@ -36,7 +37,7 @@ describe('SchemaMustExistPublishedGuard', () => {
 
         let result: boolean;
 
-        schemaGuard.canActivate(route).subscribe(x => {
+        schemaGuard.canActivate(route, state).subscribe(x => {
             result = x;
         }).unsubscribe();
 
@@ -51,7 +52,7 @@ describe('SchemaMustExistPublishedGuard', () => {
 
         let result: boolean;
 
-        schemaGuard.canActivate(route).subscribe(x => {
+        schemaGuard.canActivate(route, state).subscribe(x => {
             result = x;
         }).unsubscribe();
 
@@ -66,7 +67,7 @@ describe('SchemaMustExistPublishedGuard', () => {
 
         let result: boolean;
 
-        schemaGuard.canActivate(route).subscribe(x => {
+        schemaGuard.canActivate(route, state).subscribe(x => {
             result = x;
         }).unsubscribe();
 

@@ -63,7 +63,6 @@ namespace Squidex.Domain.Apps.Entities.Contents
         public async Task<IContentEntity> FindContentAsync(QueryContext context, Guid id, long version = -1)
         {
             Guard.NotNull(context, nameof(context));
-            Guard.NotEmpty(id, nameof(id));
 
             var schema = await GetSchemaAsync(context);
 

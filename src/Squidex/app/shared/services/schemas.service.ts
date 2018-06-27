@@ -179,7 +179,7 @@ export class CreateSchemaDto {
         public readonly name: string,
         public readonly fields?: RootFieldDto[],
         public readonly properties?: SchemaPropertiesDto,
-        public readonly singleton?: boolean
+        public readonly isSingleton?: boolean
     ) {
     }
 }
@@ -332,7 +332,7 @@ export class SchemasService {
                     dto.name,
                     '',
                     dto.properties || new SchemaPropertiesDto(),
-                    dto.singleton === true,
+                    dto.isSingleton === true,
                     false,
                     now, user,
                     now, user,

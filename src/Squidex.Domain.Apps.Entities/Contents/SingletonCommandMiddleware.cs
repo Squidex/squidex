@@ -7,6 +7,7 @@
 
 using System;
 using System.Threading.Tasks;
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Infrastructure;
@@ -27,9 +28,14 @@ namespace Squidex.Domain.Apps.Entities.Contents
             {
                 var schemaId = new NamedId<Guid>(createSchema.SchemaId, createSchema.Name);
 
-                var command = SimpleMapper.Map(createSchema, new CreateContent { ContentId = Guid.Empty, SchemaId = schemaId, Publish = true });
+                var data = new NamedContentData();
 
-                await context.CommandBus.PublishAsync(command);
+                var contentId = Guid.Empty;
+                var content = new CreateContent { Data = data, ContentId = contentId, SchemaId = schemaId, Publish = true };
+
+                SimpleMapper.Map(context.Command, content);
+
+                await context.CommandBus.PublishAsync(content);
             }
         }
     }
