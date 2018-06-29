@@ -128,24 +128,21 @@ export class SchemaPageComponent implements OnDestroy, OnInit {
             fields: this.schema.fields.map(field => {
                 const copy = cleanup(field, 'fieldId');
 
+                copy.properties = cleanup(field.properties);
+
                 if (Types.isArray(copy.nested)) {
                     if (copy.nested.length === 0) {
                         delete copy['nested'];
                     } else {
-                        copy.nested = [];
-
-                        for (let i = 0; i < copy.nested.length; i++) {
-                            const nestedField = copy.nested[i];
+                        copy.nested = field.nested.map(nestedField => {
                             const nestedCopy = cleanup(nestedField, 'fieldId', 'parentId');
 
                             nestedCopy.properties = cleanup(nestedField.properties);
 
-                            copy.nested[i] = nestedCopy;
-                        }
+                            return nestedCopy;
+                        });
                     }
                 }
-
-                copy.properties = cleanup(field.properties);
 
                 return copy;
             }),
