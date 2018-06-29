@@ -132,6 +132,8 @@ export class SchemaPageComponent implements OnDestroy, OnInit {
                     if (copy.nested.length === 0) {
                         delete copy['nested'];
                     } else {
+                        copy.nested = [];
+
                         for (let i = 0; i < copy.nested.length; i++) {
                             const nestedField = copy.nested[i];
                             const nestedCopy = cleanup(nestedField, 'fieldId', 'parentId');
