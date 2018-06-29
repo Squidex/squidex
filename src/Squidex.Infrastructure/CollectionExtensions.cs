@@ -14,6 +14,13 @@ namespace Squidex.Infrastructure
 {
     public static class CollectionExtensions
     {
+        public static IEnumerable<T> Shuffle<T>(this IEnumerable<T> enumerable)
+        {
+            var random = new Random();
+
+            return enumerable.OrderBy(x => random.Next()).ToList();
+        }
+
         public static ImmutableDictionary<TKey, TValue> SetItem<TKey, TValue>(this ImmutableDictionary<TKey, TValue> dictionary, TKey key, Func<TValue, TValue> updater)
         {
             if (dictionary.TryGetValue(key, out var value))

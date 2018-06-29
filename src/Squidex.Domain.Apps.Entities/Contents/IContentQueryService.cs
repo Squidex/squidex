@@ -14,7 +14,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 {
     public interface IContentQueryService
     {
-        Task<IResultList<IContentEntity>> QueryAsync(QueryContext context, HashSet<Guid> ids);
+        Task<IResultList<IContentEntity>> QueryAsync(QueryContext context, IList<Guid> ids);
 
         Task<IResultList<IContentEntity>> QueryAsync(QueryContext context, string query);
 

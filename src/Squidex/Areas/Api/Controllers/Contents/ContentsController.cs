@@ -97,11 +97,11 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(2)]
         public async Task<IActionResult> GetContents(string app, string name, [FromQuery] bool archived = false, [FromQuery] string ids = null)
         {
-            HashSet<Guid> idsList = null;
+            List<Guid> idsList = null;
 
             if (!string.IsNullOrWhiteSpace(ids))
             {
-                idsList = new HashSet<Guid>();
+                idsList = new List<Guid>();
 
                 foreach (var id in ids.Split(','))
                 {

@@ -635,7 +635,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             A.CallTo(() => contentQuery.FindContentAsync(ContextMatch(), contentId, EtagVersion.Any))
                 .Returns(content);
 
-            A.CallTo(() => contentQuery.QueryAsync(ContextMatch(), A<HashSet<Guid>>.That.Matches(x => x.Contains(contentRefId))))
+            A.CallTo(() => contentQuery.QueryAsync(ContextMatch(), A<IList<Guid>>.That.IsSameSequenceAs(new[] { contentRefId })))
                 .Returns(ResultList.Create(refContents, 0));
 
             var result = await sut.QueryAsync(context, new GraphQLQuery { Query = query });

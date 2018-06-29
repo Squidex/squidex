@@ -83,7 +83,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     throw new DomainObjectNotFoundException(id.ToString(), typeof(ISchemaEntity));
                 }
 
-                return TransformContent(context, schema, true, content);
+                return Transform(context, schema, true, content);
             }
         }
 
@@ -100,11 +100,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                 var contents = await contentRepository.QueryAsync(context.App, schema, parsedStatus, parsedQuery);
 
-                return TransformContents(context, schema, true, contents);
+                return Transform(context, schema, true, contents);
             }
         }
 
-        public async Task<IResultList<IContentEntity>> QueryAsync(QueryContext context, HashSet<Guid> ids)
+        public async Task<IResultList<IContentEntity>> QueryAsync(QueryContext context, IList<Guid> ids)
         {
             Guard.NotNull(context, nameof(context));
             Guard.NotNull(ids, nameof(ids));
@@ -115,25 +115,32 @@ namespace Squidex.Domain.Apps.Entities.Contents
             {
                 var parsedStatus = ParseStatus(context);
 
-                var contents = await contentRepository.QueryAsync(context.App, schema, parsedStatus, ids);
+                var contents = await contentRepository.QueryAsync(context.App, schema, parsedStatus, new HashSet<Guid>(ids));
 
-                return TransformContents(context, schema, false, contents);
+                return Sort(Transform(context, schema, false, contents), ids);
             }
         }
 
-        private IContentEntity TransformContent(QueryContext context, ISchemaEntity schema, bool checkType, IContentEntity content)
+        private IContentEntity Transform(QueryContext context, ISchemaEntity schema, bool checkType, IContentEntity content)
         {
-            return TransformContents(context, schema, checkType, Enumerable.Repeat(content, 1)).FirstOrDefault();
+            return Transform(context, schema, checkType, Enumerable.Repeat(content, 1)).FirstOrDefault();
         }
 
-        private IResultList<IContentEntity> TransformContents(QueryContext context, ISchemaEntity schema, bool checkType, IResultList<IContentEntity> contents)
+        private IResultList<IContentEntity> Transform(QueryContext context, ISchemaEntity schema, bool checkType, IResultList<IContentEntity> contents)
         {
-            var transformed = TransformContents(context, schema, checkType, (IEnumerable<IContentEntity>)contents);
+            var transformed = Transform(context, schema, checkType, (IEnumerable<IContentEntity>)contents);
 
             return ResultList.Create(transformed, contents.Total);
         }
 
-        private IEnumerable<IContentEntity> TransformContents(QueryContext context, ISchemaEntity schema, bool checkType, IEnumerable<IContentEntity> contents)
+        private IResultList<IContentEntity> Sort(IResultList<IContentEntity> contents, IList<Guid> ids)
+        {
+            var sorted = ids.Select(id => contents.FirstOrDefault(x => x.Id == id)).Where(x => x != null);
+
+            return ResultList.Create(sorted, contents.Total);
+        }
+
+        private IEnumerable<IContentEntity> Transform(QueryContext context, ISchemaEntity schema, bool checkType, IEnumerable<IContentEntity> contents)
         {
             using (Profiler.TraceMethod<ContentQueryService>())
             {

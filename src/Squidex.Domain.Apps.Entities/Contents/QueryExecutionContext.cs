@@ -118,7 +118,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             Guard.NotNull(ids, nameof(ids));
 
-            var notLoadedContents = new HashSet<Guid>(ids.Where(id => !cachedContents.ContainsKey(id)));
+            var notLoadedContents = ids.Where(id => !cachedContents.ContainsKey(id)).ToList();
 
             if (notLoadedContents.Count > 0)
             {
