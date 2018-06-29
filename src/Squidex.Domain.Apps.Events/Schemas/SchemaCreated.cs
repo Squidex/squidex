@@ -20,6 +20,8 @@ namespace Squidex.Domain.Apps.Events.Schemas
 
         public SchemaProperties Properties { get; set; }
 
+        public bool Singleton { get; set; }
+
         public bool Publish { get; set; }
     }
 }

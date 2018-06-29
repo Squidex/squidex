@@ -61,17 +61,17 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 case CreateContent createContent:
                     return CreateReturnAsync(createContent, async c =>
                     {
-                        GuardContent.CanCreate(c);
+                        var ctx = await CreateContext(c.AppId.Id, c.SchemaId.Id, () => "Failed to create content.");
 
-                        var operationContext = await CreateContext(c.AppId.Id, c.SchemaId.Id, () => "Failed to create content.");
+                        GuardContent.CanCreate(ctx.Schema, c);
 
-                        await operationContext.ExecuteScriptAndTransformAsync(x => x.ScriptCreate, "Create", c, c.Data, null);
-                        await operationContext.EnrichAsync(c.Data);
-                        await operationContext.ValidateAsync(c.Data);
+                        await ctx.ExecuteScriptAndTransformAsync(x => x.ScriptCreate, "Create", c, c.Data, null);
+                        await ctx.EnrichAsync(c.Data);
+                        await ctx.ValidateAsync(c.Data);
 
                         if (c.Publish)
                         {
-                            await operationContext.ExecuteScriptAsync(x => x.ScriptChange, "Published", c, c.Data, null);
+                            await ctx.ExecuteScriptAsync(x => x.ScriptChange, "Published", c, c.Data, null);
                         }
 
                         Create(c);
@@ -100,7 +100,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     {
                         try
                         {
-                            GuardContent.CanChangeContentStatus(Snapshot.IsPending, Snapshot.Status, c);
+                            var ctx = await CreateContext(Snapshot.AppId.Id, Snapshot.SchemaId.Id, () => "Failed to change content.");
+
+                            GuardContent.CanChangeContentStatus(ctx.Schema, Snapshot.IsPending, Snapshot.Status, c);
 
                             if (c.DueTime.HasValue)
                             {
@@ -114,8 +116,6 @@ namespace Squidex.Domain.Apps.Entities.Contents
                                 }
                                 else
                                 {
-                                    var ctx = await CreateContext(Snapshot.AppId.Id, Snapshot.SchemaId.Id, () => "Failed to change content.");
-
                                     await ctx.ExecuteScriptAsync(x => x.ScriptChange, c.Status, c, Snapshot.Data);
 
                                     ChangeStatus(c);
@@ -138,11 +138,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 case DeleteContent deleteContent:
                     return UpdateAsync(deleteContent, async c =>
                     {
-                        GuardContent.CanDelete(c);
+                        var ctx = await CreateContext(Snapshot.AppId.Id, Snapshot.SchemaId.Id, () => "Failed to delete content.");
 
-                        var operationContext = await CreateContext(Snapshot.AppId.Id, Snapshot.SchemaId.Id, () => "Failed to delete content.");
+                        GuardContent.CanDelete(ctx.Schema, c);
 
-                        await operationContext.ExecuteScriptAsync(x => x.ScriptDelete, "Delete", c, Snapshot.Data);
+                        await ctx.ExecuteScriptAsync(x => x.ScriptDelete, "Delete", c, Snapshot.Data);
 
                         Delete(c);
                     });

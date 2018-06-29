@@ -5,10 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
+using FakeItEasy;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Contents.Guards;
+using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Xunit;
@@ -17,6 +20,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
 {
     public class GuardContentTests
     {
+        private readonly ISchemaEntity schema = A.Fake<ISchemaEntity>();
         private readonly Instant dueTimeInPast = SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromHours(1));
 
         [Fact]
@@ -24,8 +28,28 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         {
             var command = new CreateContent();
 
-            ValidationAssert.Throws(() => GuardContent.CanCreate(command),
+            ValidationAssert.Throws(() => GuardContent.CanCreate(schema, command),
                 new ValidationError("Data is required.", "Data"));
+        }
+
+        [Fact]
+        public void CanCreate_should_throw_exception_if_singleton()
+        {
+            A.CallTo(() => schema.IsSingleton).Returns(true);
+
+            var command = new CreateContent { Data = new NamedContentData() };
+
+            Assert.Throws<DomainException>(() => GuardContent.CanCreate(schema, command));
+        }
+
+        [Fact]
+        public void CanCreate_should_not_throw_exception_if_singleton_and_id_empty()
+        {
+            A.CallTo(() => schema.IsSingleton).Returns(true);
+
+            var command = new CreateContent { Data = new NamedContentData(), ContentId = Guid.Empty };
+
+            GuardContent.CanCreate(schema, command);
         }
 
         [Fact]
@@ -33,7 +57,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         {
             var command = new CreateContent { Data = new NamedContentData() };
 
-            GuardContent.CanCreate(command);
+            GuardContent.CanCreate(schema, command);
         }
 
         [Fact]
@@ -75,7 +99,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         {
             var command = new ChangeContentStatus { Status = (Status)10 };
 
-            ValidationAssert.Throws(() => GuardContent.CanChangeContentStatus(false, Status.Archived, command),
+            ValidationAssert.Throws(() => GuardContent.CanChangeContentStatus(schema, false, Status.Archived, command),
                 new ValidationError("Status is not valid.", "Status"));
         }
 
@@ -84,7 +108,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         {
             var command = new ChangeContentStatus { Status = Status.Published };
 
-            ValidationAssert.Throws(() => GuardContent.CanChangeContentStatus(false, Status.Archived, command),
+            ValidationAssert.Throws(() => GuardContent.CanChangeContentStatus(schema, false, Status.Archived, command),
                 new ValidationError("Cannot change status from Archived to Published.", "Status"));
         }
 
@@ -93,7 +117,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         {
             var command = new ChangeContentStatus { Status = Status.Published, DueTime = dueTimeInPast };
 
-            ValidationAssert.Throws(() => GuardContent.CanChangeContentStatus(false, Status.Draft, command),
+            ValidationAssert.Throws(() => GuardContent.CanChangeContentStatus(schema, false, Status.Draft, command),
                 new ValidationError("Due time must be in the future.", "DueTime"));
         }
 
@@ -102,16 +126,28 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         {
             var command = new ChangeContentStatus { Status = Status.Published };
 
-            ValidationAssert.Throws(() => GuardContent.CanChangeContentStatus(false, Status.Published, command),
+            ValidationAssert.Throws(() => GuardContent.CanChangeContentStatus(schema, false, Status.Published, command),
                 new ValidationError("Content has no changes to publish.", "Status"));
+        }
+
+        [Fact]
+        public void CanChangeContentStatus_should_throw_exception_if_singleton()
+        {
+            A.CallTo(() => schema.IsSingleton).Returns(true);
+
+            var command = new ChangeContentStatus { Status = Status.Draft };
+
+            Assert.Throws<DomainException>(() => GuardContent.CanChangeContentStatus(schema, false, Status.Published, command));
         }
 
         [Fact]
         public void CanChangeContentStatus_should_not_throw_exception_if_publishing_with_pending_changes()
         {
+            A.CallTo(() => schema.IsSingleton).Returns(true);
+
             var command = new ChangeContentStatus { Status = Status.Published };
 
-            GuardContent.CanChangeContentStatus(true, Status.Published, command);
+            GuardContent.CanChangeContentStatus(schema, true, Status.Published, command);
         }
 
         [Fact]
@@ -119,7 +155,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         {
             var command = new ChangeContentStatus { Status = Status.Published };
 
-            GuardContent.CanChangeContentStatus(false, Status.Draft, command);
+            GuardContent.CanChangeContentStatus(schema, false, Status.Draft, command);
         }
 
         [Fact]
@@ -139,11 +175,21 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         }
 
         [Fact]
-        public void CanPatch_should_not_throw_exception()
+        public void CanDelete_should_throw_exception_if_singleton()
+        {
+            A.CallTo(() => schema.IsSingleton).Returns(true);
+
+            var command = new DeleteContent();
+
+            Assert.Throws<DomainException>(() => GuardContent.CanDelete(schema, command));
+        }
+
+        [Fact]
+        public void CanDelete_should_not_throw_exception()
         {
             var command = new DeleteContent();
 
-            GuardContent.CanDelete(command);
+            GuardContent.CanDelete(schema, command);
         }
     }
 }

@@ -5,9 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Router } from '@angular/router';
+import { Router, RouterStateSnapshot } from '@angular/router';
 import { of } from 'rxjs';
 import { IMock, Mock, Times } from 'typemoq';
+
+import { MathHelper } from '@app/framework';
 
 import { SchemaDetailsDto } from './../services/schemas.service';
 import { SchemasState } from './../state/schemas.state';
@@ -21,6 +23,7 @@ describe('SchemaMustExistPublishedGuard', () => {
     };
 
     let schemasState: IMock<SchemasState>;
+    let state: RouterStateSnapshot = <any>{ url: 'current-url' };
     let router: IMock<Router>;
     let schemaGuard: SchemaMustExistPublishedGuard;
 
@@ -36,7 +39,7 @@ describe('SchemaMustExistPublishedGuard', () => {
 
         let result: boolean;
 
-        schemaGuard.canActivate(route).subscribe(x => {
+        schemaGuard.canActivate(route, state).subscribe(x => {
             result = x;
         }).unsubscribe();
 
@@ -51,7 +54,7 @@ describe('SchemaMustExistPublishedGuard', () => {
 
         let result: boolean;
 
-        schemaGuard.canActivate(route).subscribe(x => {
+        schemaGuard.canActivate(route, state).subscribe(x => {
             result = x;
         }).unsubscribe();
 
@@ -66,12 +69,27 @@ describe('SchemaMustExistPublishedGuard', () => {
 
         let result: boolean;
 
-        schemaGuard.canActivate(route).subscribe(x => {
+        schemaGuard.canActivate(route, state).subscribe(x => {
             result = x;
         }).unsubscribe();
 
         expect(result!).toBeFalsy();
 
         router.verify(x => x.navigate(['/404']), Times.once());
+    });
+
+    it('should redirect to content when singleton', () => {
+        schemasState.setup(x => x.select('123'))
+        .returns(() => of(<SchemaDetailsDto>{ isSingleton: true }));
+
+        let result: boolean;
+
+        schemaGuard.canActivate(route, state).subscribe(x => {
+            result = x;
+        }).unsubscribe();
+
+        expect(result!).toBeFalsy();
+
+        router.verify(x => x.navigate([state.url, MathHelper.EMPTY_GUID]), Times.once());
     });
 });

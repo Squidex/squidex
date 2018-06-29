@@ -6,11 +6,11 @@
  */
 
 import { Injectable } from '@angular/core';
-import { ActivatedRouteSnapshot, CanActivate, Router } from '@angular/router';
+import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from '@angular/router';
 import { Observable } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 
-import { allParams } from '@app/framework';
+import { allParams, MathHelper } from '@app/framework';
 
 import { SchemasState } from './../state/schemas.state';
 
@@ -22,7 +22,7 @@ export class SchemaMustExistPublishedGuard implements CanActivate {
     ) {
     }
 
-    public canActivate(route: ActivatedRouteSnapshot): Observable<boolean> {
+    public canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> {
         const schemaName = allParams(route)['schemaName'];
 
         const result =
@@ -30,6 +30,10 @@ export class SchemaMustExistPublishedGuard implements CanActivate {
                 tap(dto => {
                     if (!dto || !dto.isPublished) {
                         this.router.navigate(['/404']);
+                    }
+
+                    if (dto && dto.isSingleton && state.url.indexOf(MathHelper.EMPTY_GUID) < 0) {
+                        this.router.navigate([state.url, MathHelper.EMPTY_GUID]);
                     }
                 }),
                 map(s => s !== null && s.isPublished));

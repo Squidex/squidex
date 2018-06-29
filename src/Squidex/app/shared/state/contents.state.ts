@@ -213,7 +213,9 @@ export abstract class ContentsStateBase extends State<Snapshot> {
             tap(dto => {
                 this.dialogs.notifyInfo('Content updated successfully.');
 
-                this.replaceContent(updateData(content, dto.payload, this.user, dto.version, now));
+                if (dto.version.value !== content.version.value) {
+                    this.replaceContent(updateData(content, dto.payload, this.user, dto.version, now));
+                }
             }),
             notify(this.dialogs));
     }
@@ -223,7 +225,9 @@ export abstract class ContentsStateBase extends State<Snapshot> {
             tap(dto => {
                 this.dialogs.notifyInfo('Content updated successfully.');
 
-                this.replaceContent(updateDataDraft(content, dto.payload, this.user, dto.version, now));
+                if (dto.version.value !== content.version.value) {
+                    this.replaceContent(updateDataDraft(content, dto.payload, this.user, dto.version, now));
+                }
             }),
             notify(this.dialogs));
     }
@@ -233,7 +237,9 @@ export abstract class ContentsStateBase extends State<Snapshot> {
             tap(dto => {
                 this.dialogs.notifyInfo('Content updated successfully.');
 
-                this.replaceContent(discardChanges(content, this.user, dto.version, now));
+                if (dto.version.value !== content.version.value) {
+                    this.replaceContent(discardChanges(content, this.user, dto.version, now));
+                }
             }),
             notify(this.dialogs));
     }
@@ -243,7 +249,9 @@ export abstract class ContentsStateBase extends State<Snapshot> {
             tap(dto => {
                 this.dialogs.notifyInfo('Content updated successfully.');
 
-                this.replaceContent(updateData(content, dto.payload, this.user, dto.version, now));
+                if (dto.version.value !== content.version.value) {
+                    this.replaceContent(updateData(content, dto.payload, this.user, dto.version, now));
+                }
             }),
             notify(this.dialogs));
     }

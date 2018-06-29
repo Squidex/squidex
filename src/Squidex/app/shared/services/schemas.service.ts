@@ -34,6 +34,7 @@ export class SchemaDto extends Model {
         public readonly name: string,
         public readonly category: string,
         public readonly properties: SchemaPropertiesDto,
+        public readonly isSingleton: boolean,
         public readonly isPublished: boolean,
         public readonly created: DateTime,
         public readonly createdBy: string,
@@ -53,7 +54,7 @@ export class SchemaDetailsDto extends SchemaDto {
     public listFields: RootFieldDto[];
     public listFieldsEditable: RootFieldDto[];
 
-    constructor(id: string, name: string, category: string, properties: SchemaPropertiesDto, isPublished: boolean, created: DateTime, createdBy: string, lastModified: DateTime, lastModifiedBy: string, version: Version,
+    constructor(id: string, name: string, category: string, properties: SchemaPropertiesDto, isSingleton: boolean, isPublished: boolean, created: DateTime, createdBy: string, lastModified: DateTime, lastModifiedBy: string, version: Version,
         public readonly fields: RootFieldDto[],
         public readonly scriptQuery?: string,
         public readonly scriptCreate?: string,
@@ -61,7 +62,7 @@ export class SchemaDetailsDto extends SchemaDto {
         public readonly scriptDelete?: string,
         public readonly scriptChange?: string
     ) {
-        super(id, name, category, properties, isPublished, created, createdBy, lastModified, lastModifiedBy, version);
+        super(id, name, category, properties, isSingleton, isPublished, created, createdBy, lastModified, lastModifiedBy, version);
 
         this.onCloned();
     }
@@ -177,7 +178,8 @@ export class CreateSchemaDto {
     constructor(
         public readonly name: string,
         public readonly fields?: RootFieldDto[],
-        public readonly properties?: SchemaPropertiesDto
+        public readonly properties?: SchemaPropertiesDto,
+        public readonly isSingleton?: boolean
     ) {
     }
 }
@@ -240,6 +242,7 @@ export class SchemasService {
                         item.id,
                         item.name,
                         item.category, properties,
+                        item.isSingleton,
                         item.isPublished,
                         DateTime.parseISO_UTC(item.created), item.createdBy,
                         DateTime.parseISO_UTC(item.lastModified), item.lastModifiedBy,
@@ -300,6 +303,7 @@ export class SchemasService {
                     body.name,
                     body.category,
                     properties,
+                    body.isSingleton,
                     body.isPublished,
                     DateTime.parseISO_UTC(body.created), body.createdBy,
                     DateTime.parseISO_UTC(body.lastModified), body.lastModifiedBy,
@@ -328,6 +332,7 @@ export class SchemasService {
                     dto.name,
                     '',
                     dto.properties || new SchemaPropertiesDto(),
+                    dto.isSingleton === true,
                     false,
                     now, user,
                     now, user,
