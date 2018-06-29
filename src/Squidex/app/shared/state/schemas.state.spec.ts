@@ -41,8 +41,8 @@ describe('SchemasState', () => {
     const newVersion = new Version('2');
 
     const oldSchemas = [
-        new SchemaDto('id1', 'name1', 'category1', {}, false, creation, creator, creation, creator, version),
-        new SchemaDto('id2', 'name2', 'category2', {}, true , creation, creator, creation, creator, version)
+        new SchemaDto('id1', 'name1', 'category1', {}, false, false, creation, creator, creation, creator, version),
+        new SchemaDto('id2', 'name2', 'category2', {}, false, true , creation, creator, creation, creator, version)
     ];
 
     const nested1 = new NestedFieldDto(3, '3', createProperties('Number'), 2);
@@ -52,7 +52,7 @@ describe('SchemasState', () => {
     const field2 = new RootFieldDto(2, '2', createProperties('Array'), 'invariant', true, true, true, [nested1, nested2]);
 
     const schema =
-        new SchemaDetailsDto('id2', 'name2', 'category2', {}, true,
+        new SchemaDetailsDto('id2', 'name2', 'category2', {}, false, true,
             creation, creator,
             creation, creator,
             version,
@@ -284,7 +284,7 @@ describe('SchemasState', () => {
         it('should add schema to snapshot when created', () => {
             const request = new CreateSchemaDto('newName');
 
-            const result = new SchemaDetailsDto('id4', 'newName', '', {}, false, modified, modifier, modified, modifier, version, []);
+            const result = new SchemaDetailsDto('id4', 'newName', '', {}, false, false, modified, modifier, modified, modifier, version, []);
 
             schemasService.setup(x => x.postSchema(app, request, modifier, modified))
                 .returns(() => of(result));

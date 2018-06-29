@@ -5,16 +5,18 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
+using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Guards
 {
     public static class GuardContent
     {
-        public static void CanCreate(CreateContent command)
+        public static void CanCreate(ISchemaEntity schema, CreateContent command)
         {
             Guard.NotNull(command, nameof(command));
 
@@ -22,6 +24,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
             {
                 ValidateData(command, e);
             });
+
+            if (schema.IsSingleton && command.ContentId != Guid.Empty)
+            {
+                throw new DomainException("Singleton content cannot be created.");
+            }
         }
 
         public static void CanUpdate(UpdateContent command)
@@ -54,9 +61,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
             }
         }
 
-        public static void CanChangeContentStatus(bool isPending, Status status, ChangeContentStatus command)
+        public static void CanChangeContentStatus(ISchemaEntity schema, bool isPending, Status status, ChangeContentStatus command)
         {
             Guard.NotNull(command, nameof(command));
+
+            if (schema.IsSingleton && command.Status != Status.Published)
+            {
+                throw new DomainException("Singleton content archived or unpublished.");
+            }
 
             Validate.It(() => "Cannot change status.", e =>
             {
@@ -86,9 +98,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
             });
         }
 
-        public static void CanDelete(DeleteContent command)
+        public static void CanDelete(ISchemaEntity schema, DeleteContent command)
         {
             Guard.NotNull(command, nameof(command));
+
+            if (schema.IsSingleton)
+            {
+                throw new DomainException("Singleton content cannot be deleted.");
+            }
         }
 
         private static void ValidateData(ContentDataCommand command, AddValidation e)

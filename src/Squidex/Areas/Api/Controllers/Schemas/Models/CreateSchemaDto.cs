@@ -33,6 +33,11 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         public List<CreateSchemaFieldDto> Fields { get; set; }
 
         /// <summary>
+        /// Set to true to allow a single content item only.
+        /// </summary>
+        public bool Singleton { get; set; }
+
+        /// <summary>
         /// Set it to true to autopublish the schema.
         /// </summary>
         public bool Publish { get; set; }

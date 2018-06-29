@@ -67,7 +67,7 @@ export class SchemaFormComponent implements OnInit {
         const value = this.createForm.submit();
 
         if (value) {
-            const schemaDto = Object.assign(value.import || {}, { name: value.name });
+            const schemaDto = Object.assign(value.import || {}, { name: value.name, singleton: value.singleton });
 
             this.schemasState.create(schemaDto)
                 .subscribe(dto => {

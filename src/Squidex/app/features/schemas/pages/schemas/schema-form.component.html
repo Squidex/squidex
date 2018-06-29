@@ -12,7 +12,7 @@
         <ng-container content>
             <sqx-form-error [error]="createForm.error | async"></sqx-form-error>
         
-            <div class="form-group">
+            <div class="form-group name-group">
                 <label for="schemaName">Name</label>
                 
                 <sqx-control-errors for="name" submitOnly="true" [submitted]="createForm.submitted | async"></sqx-control-errors>
@@ -28,10 +28,50 @@
             </div>
 
             <div class="form-group">
-                <a class="btn btn-sm btn-link" (click)="toggleImport()" [class.hidden]="showImport">
+                <div class="row no-gutters">
+                    <div class="col-6 type">
+                        <label>
+                            <input type="radio" class="radio-input" formControlName="singleton" [value]="false" />
+                        
+                            <div class="row no-gutters">
+                                <div class="col col-auto">
+                                    <div class="type-icon" [class.active]="createForm.form.controls['singleton'].value !== true">
+                                        <i class="icon-multiple-content"></i>
+                                    </div>
+                                </div>
+                                <div class="col-lg">
+                                    <div class="type-title">Multiple contents</div>
+                                    <div class="type-text text-muted">Blog posts, texts, pages...</div>
+                                </div>
+                            </div>
+
+                        </label>
+                    </div>
+                    <div class="col-6 type">
+                        <label>
+                            <input type="radio" class="radio-input" formControlName="singleton" [value]="true" />
+                        
+                            <div class="row no-gutters">
+                                <div class="col col-auto">
+                                    <div class="type-icon" [class.active]="createForm.form.controls['singleton'].value === true">
+                                        <i class="icon-single-content"></i>
+                                    </div>
+                                </div>
+                                <div class="col-lg">
+                                    <div class="type-title">Single content</div>
+                                    <div class="type-text text-muted">Settings, single content types</div>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <a class="btn btn-sm btn-link force" (click)="toggleImport()" [class.hidden]="showImport">
                     Import schema
                 </a>
-                <a class="btn btn-sm btn-link" (click)="toggleImport()" [class.hidden]="!showImport">
+                <a class="btn btn-sm btn-link force" (click)="toggleImport()" [class.hidden]="!showImport">
                     Hide
                 </a>
         
