@@ -1,5 +1,16 @@
 # Changelog
 
+## v1.8.0 - 2018-06-30
+
+### Features
+
+* **Schemas**: Singleton schemas (can only have single content)
+
+### Bugfixes
+
+* **UI**: Nested fields got wrong ids and names and could not be saved.
+* **Content**: Ensure that the content api returns content in correct order when querying by ids.
+
 ## v1.7.0 - 2018-06-25
 
 * Migration to .NET Core 2.1
