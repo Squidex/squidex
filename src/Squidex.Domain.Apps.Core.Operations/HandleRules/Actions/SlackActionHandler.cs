@@ -11,10 +11,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules.Actions;
-using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Http;
 
 #pragma warning disable SA1649 // File name must match first type name
@@ -50,9 +49,11 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
             this.formatter = formatter;
         }
 
-        protected override async Task<(string Description, SlackJob Data)> CreateJobAsync(Envelope<AppEvent> @event, string eventName, SlackAction action)
+        protected override async Task<(string Description, SlackJob Data)> CreateJobAsync(EnrichedEvent @event, SlackAction action)
         {
-            var body = await CreatePayloadAsync(@event, action.Text);
+            var body =
+                new JObject(
+                    new JProperty("text", await formatter.FormatStringAsync(action.Text, @event)));
 
             var ruleJob = new SlackJob
             {
@@ -61,11 +62,6 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
             };
 
             return (Description, ruleJob);
-        }
-
-        private async Task<JObject> CreatePayloadAsync(Envelope<AppEvent> @event, string text)
-        {
-            return new JObject(new JProperty("text", await formatter.FormatStringAsync(text, @event)));
         }
 
         protected override async Task<(string Dump, Exception Exception)> ExecuteJobAsync(SlackJob job)

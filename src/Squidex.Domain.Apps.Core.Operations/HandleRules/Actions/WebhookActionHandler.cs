@@ -11,10 +11,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules.Actions;
-using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Http;
 
 #pragma warning disable SA1649 // File name must match first type name
@@ -24,7 +23,9 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
     public sealed class WebhookJob
     {
         public string RequestUrl { get; set; }
+
         public string RequestSignature { get; set; }
+
         public string RequestBodyV2 { get; set; }
 
         public JObject RequestBody { get; set; }
@@ -49,16 +50,17 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
             this.formatter = formatter;
         }
 
-        protected override async Task<(string Description, WebhookJob Data)> CreateJobAsync(Envelope<AppEvent> @event, string eventName, WebhookAction action)
+        protected override async Task<(string Description, WebhookJob Data)> CreateJobAsync(EnrichedEvent @event, WebhookAction action)
         {
-            var body = formatter.ToRouteData(@event, eventName).ToString(Formatting.Indented);
+            var requestBody = formatter.ToEnvelope(@event).ToString(Formatting.Indented);
+            var requestUrl = await formatter.FormatStringAsync(action.Url.ToString(), @event);
 
-            var ruleDescription = $"Send event to webhook '{action.Url}'";
+            var ruleDescription = $"Send event to webhook '{requestUrl}'";
             var ruleJob = new WebhookJob
             {
-                RequestUrl = await formatter.FormatStringAsync(action.Url.ToString(), @event),
-                RequestSignature = $"{body}{action.SharedSecret}".Sha256Base64(),
-                RequestBodyV2 = body
+                RequestUrl = requestUrl,
+                RequestSignature = $"{requestBody}{action.SharedSecret}".Sha256Base64(),
+                RequestBodyV2 = requestBody
             };
 
             return (ruleDescription, ruleJob);

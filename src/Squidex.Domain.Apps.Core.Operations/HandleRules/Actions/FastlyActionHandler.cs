@@ -8,9 +8,8 @@
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules.Actions;
-using Squidex.Domain.Apps.Events;
-using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Http;
 
 #pragma warning disable SA1649 // File name must match first type name
@@ -28,23 +27,17 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
     public sealed class FastlyActionHandler : RuleActionHandler<FastlyAction, FastlyJob>
     {
         private const string Description = "Purge key in fastly";
-        private const string DescriptionIgnore = "Ignore";
 
-        protected override Task<(string Description, FastlyJob Data)> CreateJobAsync(Envelope<AppEvent> @event, string eventName, FastlyAction action)
+        protected override Task<(string Description, FastlyJob Data)> CreateJobAsync(EnrichedEvent @event, FastlyAction action)
         {
-            if (@event.Headers.Contains(CommonHeaders.AggregateId))
+            var ruleJob = new FastlyJob
             {
-                var ruleJob = new FastlyJob
-                {
-                    Key = @event.Headers.AggregateId().ToString(),
-                    FastlyApiKey = action.ApiKey,
-                    FastlyServiceID = action.ServiceId
-                };
+                Key = @event.AggregateId.ToString(),
+                FastlyApiKey = action.ApiKey,
+                FastlyServiceID = action.ServiceId
+            };
 
-                return Task.FromResult((Description, ruleJob));
-            }
-
-            return Task.FromResult((DescriptionIgnore, new FastlyJob()));
+            return Task.FromResult((Description, ruleJob));
         }
 
         protected override async Task<(string Dump, Exception Exception)> ExecuteJobAsync(FastlyJob job)

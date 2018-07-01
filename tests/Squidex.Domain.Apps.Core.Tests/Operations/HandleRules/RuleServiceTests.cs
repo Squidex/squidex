@@ -11,6 +11,7 @@ using FakeItEasy;
 using Newtonsoft.Json.Linq;
 using NodaTime;
 using Squidex.Domain.Apps.Core.HandleRules;
+using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Actions;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
@@ -28,6 +29,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
     {
         private readonly IRuleTriggerHandler ruleTriggerHandler = A.Fake<IRuleTriggerHandler>();
         private readonly IRuleActionHandler ruleActionHandler = A.Fake<IRuleActionHandler>();
+        private readonly IEventEnricher eventEnricher = A.Fake<IEventEnricher>();
         private readonly IClock clock = A.Fake<IClock>();
         private readonly TypeNameRegistry typeNameRegistry = new TypeNameRegistry();
         private readonly RuleService sut;
@@ -57,13 +59,16 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             typeNameRegistry.Map(typeof(ContentCreated));
             typeNameRegistry.Map(typeof(WebhookAction));
 
+            A.CallTo(() => eventEnricher.EnrichAsync(A<Envelope<AppEvent>>.Ignored))
+                .Returns(new EnrichedContentEvent());
+
             A.CallTo(() => ruleActionHandler.ActionType)
                 .Returns(typeof(WebhookAction));
 
             A.CallTo(() => ruleTriggerHandler.TriggerType)
                 .Returns(typeof(ContentChangedTrigger));
 
-            sut = new RuleService(new[] { ruleTriggerHandler }, new[] { ruleActionHandler }, clock, typeNameRegistry);
+            sut = new RuleService(new[] { ruleTriggerHandler }, new[] { ruleActionHandler }, eventEnricher, clock, typeNameRegistry);
         }
 
         [Fact]
@@ -128,15 +133,13 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             var actionData = new JObject();
             var actionDescription = "MyDescription";
 
-            var eventName = "MySchemaCreatedEvent";
-
             A.CallTo(() => clock.GetCurrentInstant())
                 .Returns(now);
 
             A.CallTo(() => ruleTriggerHandler.Triggers(A<Envelope<AppEvent>>.Ignored, ruleConfig.Trigger))
                 .Returns(true);
 
-            A.CallTo(() => ruleActionHandler.CreateJobAsync(A<Envelope<AppEvent>>.Ignored, eventName, ruleConfig.Action))
+            A.CallTo(() => ruleActionHandler.CreateJobAsync(A<EnrichedEvent>.Ignored, ruleConfig.Action))
                 .Returns((actionDescription, actionData));
 
             var job = await sut.CreateJobAsync(ruleConfig, ruleEnvelope);
@@ -160,20 +163,16 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             var actionData = new JObject();
             var actionDescription = "MyDescription";
 
-            var eventName = "MySchemaCreatedEvent";
-
             A.CallTo(() => clock.GetCurrentInstant())
                 .Returns(now);
 
             A.CallTo(() => ruleTriggerHandler.Triggers(A<Envelope<AppEvent>>.Ignored, ruleConfig.Trigger))
                 .Returns(true);
 
-            A.CallTo(() => ruleActionHandler.CreateJobAsync(A<Envelope<AppEvent>>.Ignored, eventName, ruleConfig.Action))
+            A.CallTo(() => ruleActionHandler.CreateJobAsync(A<EnrichedEvent>.Ignored, ruleConfig.Action))
                 .Returns((actionDescription, actionData));
 
             var job = await sut.CreateJobAsync(ruleConfig, ruleEnvelope);
-
-            Assert.Equal(eventName, job.EventName);
 
             Assert.Equal(actionData, job.ActionData);
             Assert.Equal(actionName, job.ActionName);

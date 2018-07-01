@@ -13,10 +13,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules.Actions;
-using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Http;
 
 namespace Squidex.Domain.Apps.Core.HandleRules.Actions
@@ -24,6 +23,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
     public sealed class MediumJob
     {
         public string RequestUrl { get; set; }
+
         public string RequestBody { get; set; }
 
         public string AccessToken { get; set; }
@@ -42,7 +42,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
             this.formatter = formatter;
         }
 
-        protected override async Task<(string Description, MediumJob Data)> CreateJobAsync(Envelope<AppEvent> @event, string eventName, MediumAction action)
+        protected override async Task<(string Description, MediumJob Data)> CreateJobAsync(EnrichedEvent @event, MediumAction action)
         {
             var requestUrl =
                 !string.IsNullOrWhiteSpace(action.Author) ?
@@ -67,7 +67,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
             return (Description, ruleJob);
         }
 
-        private async Task<JArray> ParseTagsAsync(Envelope<AppEvent> @event, MediumAction action)
+        private async Task<JArray> ParseTagsAsync(EnrichedEvent @event, MediumAction action)
         {
             if (string.IsNullOrWhiteSpace(action.Tags))
             {

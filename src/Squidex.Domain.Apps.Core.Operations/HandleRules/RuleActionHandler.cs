@@ -8,9 +8,8 @@
 using System;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
+using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules;
-using Squidex.Domain.Apps.Events;
-using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Core.HandleRules
 {
@@ -21,9 +20,9 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             get { return typeof(TAction); }
         }
 
-        async Task<(string Description, JObject Data)> IRuleActionHandler.CreateJobAsync(Envelope<AppEvent> @event, string eventName, RuleAction action)
+        async Task<(string Description, JObject Data)> IRuleActionHandler.CreateJobAsync(EnrichedEvent @event, RuleAction action)
         {
-            var (description, data) = await CreateJobAsync(@event, eventName, (TAction)action);
+            var (description, data) = await CreateJobAsync(@event, (TAction)action);
 
             return (description, JObject.FromObject(data));
         }
@@ -35,7 +34,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             return await ExecuteJobAsync(typedData);
         }
 
-        protected abstract Task<(string Description, TData Data)> CreateJobAsync(Envelope<AppEvent> @event, string eventName, TAction action);
+        protected abstract Task<(string Description, TData Data)> CreateJobAsync(EnrichedEvent @event, TAction action);
 
         protected abstract Task<(string Dump, Exception Exception)> ExecuteJobAsync(TData job);
     }

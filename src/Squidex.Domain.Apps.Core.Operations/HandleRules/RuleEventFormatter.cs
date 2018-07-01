@@ -14,11 +14,9 @@ using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Domain.Apps.Events;
-using Squidex.Domain.Apps.Events.Contents;
+using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Caching;
-using Squidex.Infrastructure.EventSourcing;
 using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Core.HandleRules
@@ -61,20 +59,20 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             this.urlGenerator = urlGenerator;
         }
 
-        public virtual JToken ToRouteData(object value)
+        public virtual JObject ToPayload(object @event)
         {
-            return JToken.FromObject(value, serializer);
+            return JObject.FromObject(@event, serializer);
         }
 
-        public virtual JToken ToRouteData(Envelope<AppEvent> @event, string eventName)
+        public virtual JObject ToEnvelope(EnrichedEvent @event)
         {
             return new JObject(
-                new JProperty("type", eventName),
-                new JProperty("payload", JToken.FromObject(@event.Payload, serializer)),
-                new JProperty("timestamp", @event.Headers.Timestamp().ToString()));
+                new JProperty("type", @event),
+                new JProperty("payload", ToPayload(@event)),
+                new JProperty("timestamp", @event.Timestamp.ToString()));
         }
 
-        public async virtual Task<string> FormatStringAsync(string text, Envelope<AppEvent> @event)
+        public async virtual Task<string> FormatStringAsync(string text, EnrichedEvent @event)
         {
             if (string.IsNullOrWhiteSpace(text))
             {
@@ -83,57 +81,46 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
             var sb = new StringBuilder(text);
 
-            if (@event.Headers.Contains(CommonHeaders.Timestamp))
-            {
-                var timestamp = @event.Headers.Timestamp().ToDateTimeUtc();
+            sb.Replace(TimestampDateTimePlaceholder, @event.Timestamp.ToString("yyy-MM-dd-hh-mm-ss", CultureInfo.InvariantCulture));
+            sb.Replace(TimestampDatePlaceholder, @event.Timestamp.ToString("yyy-MM-dd", CultureInfo.InvariantCulture));
 
-                sb.Replace(TimestampDateTimePlaceholder, timestamp.ToString("yyy-MM-dd-hh-mm-ss", CultureInfo.InvariantCulture));
-                sb.Replace(TimestampDatePlaceholder, timestamp.ToString("yyy-MM-dd", CultureInfo.InvariantCulture));
+            if (@event.AppId != null)
+            {
+                sb.Replace(AppIdPlaceholder, @event.AppId.Id.ToString());
+                sb.Replace(AppNamePlaceholder, @event.AppId.Name);
             }
 
-            if (@event.Payload.AppId != null)
-            {
-                sb.Replace(AppIdPlaceholder, @event.Payload.AppId.Id.ToString());
-                sb.Replace(AppNamePlaceholder, @event.Payload.AppId.Name);
-            }
-
-            if (@event.Payload is SchemaEvent schemaEvent && schemaEvent.SchemaId != null)
+            if (@event is EnrichedSchemaEvent schemaEvent && schemaEvent.SchemaId != null)
             {
                 sb.Replace(SchemaIdPlaceholder, schemaEvent.SchemaId.Id.ToString());
                 sb.Replace(SchemaNamePlaceholder, schemaEvent.SchemaId.Name);
             }
 
-            if (@event.Payload is ContentEvent contentEvent)
+            if (@event is EnrichedContentEvent contentEvent)
             {
-                sb.Replace(ContentUrlPlaceholder, urlGenerator.GenerateContentUIUrl(@event.Payload.AppId, contentEvent.SchemaId, contentEvent.ContentId));
+                sb.Replace(ContentUrlPlaceholder, urlGenerator.GenerateContentUIUrl(@event.AppId, contentEvent.SchemaId, contentEvent.Id));
+                sb.Replace(ContentActionPlaceholder, contentEvent.Action.ToString());
             }
 
             await FormatUserInfoAsync(@event, sb);
 
-            FormatContentAction(@event, sb);
-
             var result = sb.ToString();
 
-            if (@event.Payload is ContentCreated contentCreated && contentCreated.Data != null)
+            if (@event is EnrichedContentEvent contentEvent2)
             {
-                result = ReplaceData(contentCreated.Data, result);
-            }
-
-            if (@event.Payload is ContentUpdated contentUpdated && contentUpdated.Data != null)
-            {
-                result = ReplaceData(contentUpdated.Data, result);
+                result = ReplaceData(contentEvent2.Data, result);
             }
 
             return result;
         }
 
-        private async Task FormatUserInfoAsync(Envelope<AppEvent> @event, StringBuilder sb)
+        private async Task FormatUserInfoAsync(EnrichedEvent @event, StringBuilder sb)
         {
             var text = sb.ToString();
 
             if (text.Contains(UserEmailPlaceholder) || text.Contains(UserNamePlaceholder))
             {
-                var actor = @event.Payload.Actor;
+                var actor = @event.Actor;
 
                 if (actor.Type.Equals("client", StringComparison.OrdinalIgnoreCase))
                 {
@@ -157,28 +144,6 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                         sb.Replace(UserNamePlaceholder, Undefined);
                     }
                 }
-            }
-        }
-
-        private static void FormatContentAction(Envelope<AppEvent> @event, StringBuilder sb)
-        {
-            switch (@event.Payload)
-            {
-                case ContentCreated contentCreated:
-                    sb.Replace(ContentActionPlaceholder, "created");
-                    break;
-
-                case ContentUpdated contentUpdated:
-                    sb.Replace(ContentActionPlaceholder, "updated");
-                    break;
-
-                case ContentStatusChanged contentStatusChanged:
-                    sb.Replace(ContentActionPlaceholder, $"set to {contentStatusChanged.Status.ToString().ToLowerInvariant()}");
-                    break;
-
-                case ContentDeleted contentDeleted:
-                    sb.Replace(ContentActionPlaceholder, "deleted");
-                    break;
             }
         }
 
