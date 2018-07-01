@@ -21,8 +21,9 @@ namespace Squidex.Infrastructure.Commands
         private readonly List<Envelope<IEvent>> uncomittedEvents = new List<Envelope<IEvent>>();
         private readonly IStore<Guid> store;
         private readonly ISemanticLog log;
+        private readonly List<T> snapshots = new List<T> { new T { Version = EtagVersion.Empty } };
+        private bool cleanup;
         private Guid id;
-        private T snapshot = new T { Version = EtagVersion.Empty };
         private IPersistence<T> persistence;
 
         public Guid Id
@@ -32,17 +33,17 @@ namespace Squidex.Infrastructure.Commands
 
         public long Version
         {
-            get { return snapshot.Version; }
+            get { return snapshots.Count - 2; }
         }
 
         public long NewVersion
         {
-            get { return snapshot.Version + uncomittedEvents.Count; }
+            get { return Version; }
         }
 
         public T Snapshot
         {
-            get { return snapshot; }
+            get { return snapshots[snapshots.Count - 1]; }
         }
 
         protected DomainObjectGrain(IStore<Guid> store, ISemanticLog log)
@@ -53,6 +54,31 @@ namespace Squidex.Infrastructure.Commands
             this.store = store;
 
             this.log = log;
+        }
+
+        public void CleanupOldSnapshots()
+        {
+            cleanup = true;
+        }
+
+        public T GetSnapshot(long version)
+        {
+            if (version == EtagVersion.Any)
+            {
+                return Snapshot;
+            }
+
+            if (version == EtagVersion.Empty)
+            {
+                return snapshots[0];
+            }
+
+            if (version >= 0 && version < snapshots.Count - 1)
+            {
+                return snapshots[(int)version + 1];
+            }
+
+            return default(T);
         }
 
         public override async Task OnActivateAsync(Guid key)
@@ -96,9 +122,11 @@ namespace Squidex.Infrastructure.Commands
             uncomittedEvents.Clear();
         }
 
-        public virtual void ApplySnapshot(T newSnapshot)
+        public virtual void ApplySnapshot(T snapshot)
         {
-            snapshot = newSnapshot;
+            snapshot.Version = snapshots.Count - 1;
+
+            snapshots.Add(snapshot);
         }
 
         public virtual void ApplyEvent(Envelope<IEvent> @event)
@@ -172,7 +200,8 @@ namespace Squidex.Infrastructure.Commands
                 throw new DomainException("Object has already been created.");
             }
 
-            var previousSnapshot = snapshot;
+            var size = snapshots.Count;
+
             try
             {
                 var result = await handler(command);
@@ -181,10 +210,8 @@ namespace Squidex.Infrastructure.Commands
 
                 if (events.Length > 0)
                 {
-                    snapshot.Version = NewVersion;
-
                     await persistence.WriteEventsAsync(events);
-                    await persistence.WriteSnapshotAsync(snapshot);
+                    await persistence.WriteSnapshotAsync(Snapshot);
                 }
 
                 if (result == null)
@@ -203,12 +230,23 @@ namespace Squidex.Infrastructure.Commands
             }
             catch
             {
-                snapshot = previousSnapshot;
+                while (snapshots.Count > size)
+                {
+                    snapshots.RemoveAt(snapshots.Count - 1);
+                }
 
                 throw;
             }
             finally
             {
+                if (cleanup)
+                {
+                    for (var i = 0; i < snapshots.Count - 1; i++)
+                    {
+                        snapshots[i] = default(T);
+                    }
+                }
+
                 uncomittedEvents.Clear();
             }
         }

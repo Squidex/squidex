@@ -57,6 +57,13 @@ namespace Squidex.Domain.Apps.Entities.Apps
             this.initialPatterns = initialPatterns;
         }
 
+        public override Task OnActivateAsync()
+        {
+            CleanupOldSnapshots();
+
+            return base.OnActivateAsync();
+        }
+
         protected override Task<object> ExecuteAsync(IAggregateCommand command)
         {
             VerifyNotArchived();

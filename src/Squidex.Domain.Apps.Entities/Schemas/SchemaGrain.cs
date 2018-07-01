@@ -40,6 +40,13 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             this.registry = registry;
         }
 
+        public override Task OnActivateAsync()
+        {
+            CleanupOldSnapshots();
+
+            return base.OnActivateAsync();
+        }
+
         protected override Task<object> ExecuteAsync(IAggregateCommand command)
         {
             VerifyNotDeleted();

@@ -20,6 +20,7 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Log;
+using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
 
@@ -288,6 +289,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     message);
 
             return operationContext;
+        }
+
+        public Task<J<IContentEntity>> GetStateAsync(long version = -2)
+        {
+            return Task.FromResult(J.Of<IContentEntity>(GetSnapshot(version)));
         }
     }
 }

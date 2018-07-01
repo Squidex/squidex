@@ -34,6 +34,13 @@ namespace Squidex.Domain.Apps.Entities.Rules
             this.appProvider = appProvider;
         }
 
+        public override Task OnActivateAsync()
+        {
+            CleanupOldSnapshots();
+
+            return base.OnActivateAsync();
+        }
+
         protected override Task<object> ExecuteAsync(IAggregateCommand command)
         {
             VerifyNotDeleted();

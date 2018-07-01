@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FakeItEasy;
+using FluentAssertions;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Orleans;
@@ -122,6 +123,72 @@ namespace Squidex.Infrastructure.Commands
         public void Should_instantiate()
         {
             Assert.Equal(EtagVersion.Empty, sut.Version);
+        }
+
+        [Fact]
+        public async Task Should_get_latestet_version_when_requesting_state_with_any()
+        {
+            await SetupEmptyAsync();
+
+            await sut.ExecuteAsync(C(new CreateAuto { Value = 5 }));
+            await sut.ExecuteAsync(C(new UpdateAuto { Value = 10 }));
+
+            var result = sut.GetSnapshot(EtagVersion.Any);
+
+            result.Should().BeEquivalentTo(new MyDomainState { Value = 10, Version = 1 });
+        }
+
+        [Fact]
+        public async Task Should_get_empty_version_when_requesting_state_with_empty_version()
+        {
+            await SetupEmptyAsync();
+
+            await sut.ExecuteAsync(C(new CreateAuto { Value = 5 }));
+            await sut.ExecuteAsync(C(new UpdateAuto { Value = 10 }));
+
+            var result = sut.GetSnapshot(EtagVersion.Empty);
+
+            result.Should().BeEquivalentTo(new MyDomainState { Value = 0, Version = -1 });
+        }
+
+        [Fact]
+        public async Task Should_get_specific_version_when_requesting_state_with_specific_version()
+        {
+            await SetupEmptyAsync();
+
+            await sut.ExecuteAsync(C(new CreateAuto { Value = 5 }));
+            await sut.ExecuteAsync(C(new UpdateAuto { Value = 10 }));
+
+            sut.GetSnapshot(0).Should().BeEquivalentTo(new MyDomainState { Value = 5, Version = 0 });
+            sut.GetSnapshot(1).Should().BeEquivalentTo(new MyDomainState { Value = 10, Version = 1 });
+        }
+
+        [Fact]
+        public async Task Should_automatically_cleanup_old_snapshots_when_enabled()
+        {
+            await SetupEmptyAsync();
+
+            sut.CleanupOldSnapshots();
+
+            await sut.ExecuteAsync(C(new CreateAuto { Value = 5 }));
+            await sut.ExecuteAsync(C(new UpdateAuto { Value = 10 }));
+            await sut.ExecuteAsync(C(new UpdateAuto { Value = 15 }));
+
+            Assert.Null(sut.GetSnapshot(0));
+            Assert.Null(sut.GetSnapshot(1));
+            Assert.NotNull(sut.GetSnapshot(2));
+        }
+
+        [Fact]
+        public async Task Should_get_null_state_when_requesting_state_with_invalid_version()
+        {
+            await SetupEmptyAsync();
+
+            await sut.ExecuteAsync(C(new CreateAuto { Value = 5 }));
+            await sut.ExecuteAsync(C(new UpdateAuto { Value = 10 }));
+
+            Assert.Null(sut.GetSnapshot(-3));
+            Assert.Null(sut.GetSnapshot(2));
         }
 
         [Fact]
