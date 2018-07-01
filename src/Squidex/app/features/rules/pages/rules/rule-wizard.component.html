@@ -96,6 +96,13 @@
                             [actionFormSubmitted]="actionForm.submitted | async">
                         </sqx-fastly-action>
                     </ng-container>
+                    <ng-container *ngSwitchCase="'Medium'">
+                        <sqx-medium-action
+                            [action]="action"
+                            [actionForm]="actionForm.form"
+                            [actionFormSubmitted]="actionForm.submitted | async">
+                        </sqx-medium-action>
+                    </ng-container>
                     <ng-container *ngSwitchCase="'Slack'">
                         <sqx-slack-action
                             [action]="action"

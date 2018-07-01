@@ -17,6 +17,7 @@ using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Shared.Users;
 
@@ -36,13 +37,18 @@ namespace Squidex.Domain.Apps.Core.HandleRules
         private const string UserNamePlaceholder = "$USER_NAME";
         private const string UserEmailPlaceholder = "$USER_EMAIL";
         private static readonly Regex ContentDataPlaceholder = new Regex(@"\$CONTENT_DATA(\.([0-9A-Za-z\-_]*)){2,}", RegexOptions.Compiled);
+        private static readonly Regex ContentDataPlaceholderV2 = new Regex(@"\$\{CONTENT_DATA(\.([0-9A-Za-z\-_]*)){2,}\}", RegexOptions.Compiled);
         private static readonly TimeSpan UserCacheDuration = TimeSpan.FromMinutes(10);
         private readonly JsonSerializer serializer;
         private readonly IRuleUrlGenerator urlGenerator;
         private readonly IMemoryCache memoryCache;
         private readonly IUserResolver userResolver;
 
-        public RuleEventFormatter(JsonSerializer serializer, IRuleUrlGenerator urlGenerator, IMemoryCache memoryCache, IUserResolver userResolver)
+        public RuleEventFormatter(
+            JsonSerializer serializer,
+            IRuleUrlGenerator urlGenerator,
+            IMemoryCache memoryCache,
+            IUserResolver userResolver)
         {
             Guard.NotNull(memoryCache, nameof(memoryCache));
             Guard.NotNull(serializer, nameof(serializer));
@@ -70,6 +76,11 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
         public async virtual Task<string> FormatStringAsync(string text, Envelope<AppEvent> @event)
         {
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                return text;
+            }
+
             var sb = new StringBuilder(text);
 
             if (@event.Headers.Contains(CommonHeaders.Timestamp))
@@ -173,55 +184,68 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
         private static string ReplaceData(NamedContentData data, string text)
         {
-            return ContentDataPlaceholder.Replace(text, match =>
+            text = ContentDataPlaceholder.Replace(text, match =>
             {
-                var captures = match.Groups[2].Captures;
-
-                var path = new string[captures.Count];
-
-                for (var i = 0; i < path.Length; i++)
-                {
-                    path[i] = captures[i].Value;
-                }
-
-                if (!data.TryGetValue(path[0], out var field))
-                {
-                    return Undefined;
-                }
-
-                if (!field.TryGetValue(path[1], out var value))
-                {
-                    return Undefined;
-                }
-
-                for (var j = 2; j < path.Length; j++)
-                {
-                    if (value is JObject obj && obj.TryGetValue(path[j], out value))
-                    {
-                        continue;
-                    }
-                    if (value is JArray arr && int.TryParse(path[j], out var idx) && idx >= 0 && idx < arr.Count)
-                    {
-                        value = arr[idx];
-                    }
-                    else
-                    {
-                        return Undefined;
-                    }
-                }
-
-                if (value == null || value.Type == JTokenType.Null || value.Type == JTokenType.Undefined)
-                {
-                    return Undefined;
-                }
-
-                if (value is JValue jValue && jValue != null)
-                {
-                    return jValue.Value.ToString();
-                }
-
-                return value?.ToString(Formatting.Indented) ?? Undefined;
+                return Replace(data, match);
             });
+
+            text = ContentDataPlaceholderV2.Replace(text, match =>
+            {
+                return Replace(data, match);
+            });
+
+            return text;
+        }
+
+        private static string Replace(NamedContentData data, Match match)
+        {
+            var captures = match.Groups[2].Captures;
+
+            var path = new string[captures.Count];
+
+            for (var i = 0; i < path.Length; i++)
+            {
+                path[i] = captures[i].Value;
+            }
+
+            if (!data.TryGetValue(path[0], out var field))
+            {
+                return Undefined;
+            }
+
+            if (!field.TryGetValue(path[1], out var value))
+            {
+                return Undefined;
+            }
+
+            for (var j = 2; j < path.Length; j++)
+            {
+                if (value is JObject obj && obj.TryGetValue(path[j], out value))
+                {
+                    continue;
+                }
+
+                if (value is JArray arr && int.TryParse(path[j], out var idx) && idx >= 0 && idx < arr.Count)
+                {
+                    value = arr[idx];
+                }
+                else
+                {
+                    return Undefined;
+                }
+            }
+
+            if (value == null || value.Type == JTokenType.Null || value.Type == JTokenType.Undefined)
+            {
+                return Undefined;
+            }
+
+            if (value is JValue jValue && jValue != null)
+            {
+                return jValue.Value.ToString();
+            }
+
+            return value?.ToString(Formatting.Indented) ?? Undefined;
         }
 
         private Task<IUser> FindUserAsync(RefToken actor)

@@ -1,13 +1,18 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Schemas.Commands
+using System;
+using System.Threading.Tasks;
+using Squidex.Domain.Apps.Core.Contents;
+
+namespace Squidex.Domain.Apps.Core.HandleRules
 {
-    public sealed class CreateSchemaNestedField : CreateSchemaFieldBase
+    public interface IContentResolver
     {
+        Task<NamedContentData> GetContentDataAsync(Guid id);
     }
 }

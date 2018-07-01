@@ -43,6 +43,9 @@ export const ruleActions: any = {
     'Fastly': {
         name: 'Purge fastly Cache'
     },
+    'Medium': {
+        name: 'Post to Medium'
+    },
     'Slack': {
         name: 'Send to Slack'
     },

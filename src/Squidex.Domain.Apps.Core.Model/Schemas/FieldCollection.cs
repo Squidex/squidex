@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics.Contracts;
-using System.Globalization;
 using System.Linq;
 using Squidex.Infrastructure;
 

@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 {
     public sealed class RuleEnqueuer : IEventConsumer
     {
-        private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(2);
+        private static readonly TimeSpan CacheDuration = TimeSpan.FromSeconds(10);
         private readonly IRuleEventRepository ruleEventRepository;
         private readonly IAppProvider appProvider;
         private readonly IMemoryCache cache;

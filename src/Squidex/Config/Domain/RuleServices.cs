@@ -36,6 +36,9 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<FastlyActionHandler>()
                 .As<IRuleActionHandler>();
 
+            services.AddSingletonAs<MediumActionHandler>()
+                .As<IRuleActionHandler>();
+
             services.AddSingletonAs<SlackActionHandler>()
                 .As<IRuleActionHandler>();
 
