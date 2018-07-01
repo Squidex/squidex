@@ -78,13 +78,13 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
                 };
 
                 if (contentEvent.Action == EnrichedContentEventAction.Deleted ||
-                    contentEvent.Action == EnrichedContentEventAction.Archived)
+                    contentEvent.Action == EnrichedContentEventAction.Unpublished)
                 {
-                    ruleDescription = $"Delete entry from Algolia index: {action.IndexName}";
+                    ruleDescription = $"Delete entry index: {action.IndexName}";
                 }
                 else
                 {
-                    ruleDescription = $"Upsert to ES index: {action.IndexName}";
+                    ruleDescription = $"Upsert to index: {action.IndexName}";
 
                     ruleJob.Content = formatter.ToPayload(contentEvent);
                     ruleJob.Content["objectID"] = contentId;

@@ -9,11 +9,10 @@ namespace Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents
 {
     public enum EnrichedContentEventAction
     {
-        Archived,
         Created,
         Deleted,
         Published,
-        Restored,
+        Unpublished,
         Updated
     }
 }

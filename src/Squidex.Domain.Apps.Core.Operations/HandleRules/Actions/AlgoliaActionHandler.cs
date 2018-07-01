@@ -68,7 +68,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
                 };
 
                 if (contentEvent.Action == EnrichedContentEventAction.Deleted ||
-                    contentEvent.Action == EnrichedContentEventAction.Archived)
+                    contentEvent.Action == EnrichedContentEventAction.Unpublished)
                 {
                     ruleDescription = $"Delete entry from Algolia index: {action.IndexName}";
                 }

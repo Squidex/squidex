@@ -20,5 +20,7 @@ namespace Squidex.Domain.Apps.Core.Rules.Triggers
         public bool SendDelete { get; set; }
 
         public bool SendPublish { get; set; }
+
+        public bool SendUnpublish { get; set; }
     }
 }

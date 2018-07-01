@@ -44,10 +44,36 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Triggers
         private static bool MatchsType(ContentChangedTriggerSchema schema, SchemaEvent @event)
         {
             return
-                (schema.SendCreate && @event is ContentCreated) ||
-                (schema.SendUpdate && @event is ContentUpdated) ||
-                (schema.SendDelete && @event is ContentDeleted) ||
-                (schema.SendPublish && @event is ContentStatusChanged statusChanged && statusChanged.Status == Status.Published);
+                IsCreate(schema, @event) ||
+                IsUpdate(schema, @event) ||
+                IsDelete(schema, @event) ||
+                IsPublished(schema, @event) ||
+                IsUnpublished(schema, @event);
+        }
+
+        private static bool IsPublished(ContentChangedTriggerSchema schema, SchemaEvent @event)
+        {
+            return schema.SendPublish && @event is ContentStatusChanged statusChanged && statusChanged.Status == Status.Published;
+        }
+
+        private static bool IsUnpublished(ContentChangedTriggerSchema schema, SchemaEvent @event)
+        {
+            return schema.SendUnpublish && @event is ContentStatusChanged statusChanged && statusChanged.Status != Status.Published;
+        }
+
+        private static bool IsCreate(ContentChangedTriggerSchema schema, SchemaEvent @event)
+        {
+            return schema.SendCreate && @event is ContentCreated;
+        }
+
+        private static bool IsUpdate(ContentChangedTriggerSchema schema, SchemaEvent @event)
+        {
+            return schema.SendUpdate && @event is ContentUpdated || schema.SendUpdate && @event is ContentChangesPublished;
+        }
+
+        private static bool IsDelete(ContentChangedTriggerSchema schema, SchemaEvent @event)
+        {
+            return (schema.SendDelete && @event is ContentDeleted);
         }
     }
 }
