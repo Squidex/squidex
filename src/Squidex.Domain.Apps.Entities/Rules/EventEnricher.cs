@@ -7,11 +7,13 @@
 
 using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Caching.Memory;
 using NodaTime;
 using Orleans;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
+using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Assets;
@@ -19,44 +21,90 @@ using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Rules
 {
     public sealed class EventEnricher : IEventEnricher
     {
+        private static readonly TimeSpan UserCacheDuration = TimeSpan.FromMinutes(10);
         private readonly IGrainFactory grainFactory;
+        private readonly IMemoryCache cache;
+        private readonly IUserResolver userResolver;
         private readonly IClock clock;
 
-        public EventEnricher(IGrainFactory grainFactory, IClock clock)
+        public EventEnricher(IGrainFactory grainFactory, IMemoryCache cache, IUserResolver userResolver, IClock clock)
         {
             Guard.NotNull(grainFactory, nameof(grainFactory));
+            Guard.NotNull(cache, nameof(cache));
             Guard.NotNull(clock, nameof(clock));
+            Guard.NotNull(userResolver, nameof(userResolver));
 
-            this.grainFactory = grainFactory;
-
+            this.userResolver = userResolver;
+            this.cache = cache;
             this.clock = clock;
+            this.grainFactory = grainFactory;
         }
 
-        public Task<EnrichedEvent> EnrichAsync(Envelope<AppEvent> @event)
+        public async Task<EnrichedEvent> EnrichAsync(Envelope<AppEvent> @event)
         {
             Guard.NotNull(@event, nameof(@event));
 
             if (@event.Payload is ContentEvent contentEvent)
             {
-                return CreateContentEventAsync(contentEvent, @event);
+                var result = new EnrichedContentEvent();
+
+                await Task.WhenAll(
+                    EnrichContentAsync(result, contentEvent, @event),
+                    EnrichDefaultAsync(result, @event));
+
+                return result;
             }
 
             if (@event.Payload is AssetEvent assetEvent)
             {
+                var result = new EnrichedAssetEvent();
+
+                await Task.WhenAll(
+                    EnrichAssetAsync(result, assetEvent, @event),
+                    EnrichDefaultAsync(result, @event));
+
+                return result;
             }
 
-            return Task.FromResult<EnrichedEvent>(null);
+            return null;
         }
 
-        private async Task<EnrichedEvent> CreateContentEventAsync(ContentEvent contentEvent, Envelope<AppEvent> @event)
+        private async Task EnrichAssetAsync(EnrichedAssetEvent result, AssetEvent assetEvent, Envelope<AppEvent> @event)
         {
-            var result = new EnrichedContentEvent();
+            var asset =
+                (await grainFactory
+                    .GetGrain<IAssetGrain>(assetEvent.AssetId)
+                    .GetStateAsync(@event.Headers.EventStreamNumber())).Value;
 
+            SimpleMapper.Map(asset, result);
+
+            switch (assetEvent)
+            {
+                case AssetCreated _:
+                    result.Type = EnrichedAssetEventType.Created;
+                    break;
+                case AssetRenamed _:
+                    result.Type = EnrichedAssetEventType.Renamed;
+                    break;
+                case AssetUpdated _:
+                    result.Type = EnrichedAssetEventType.Updated;
+                    break;
+                case AssetDeleted _:
+                    result.Type = EnrichedAssetEventType.Deleted;
+                    break;
+            }
+
+            result.Name = $"Asset{result.Type}";
+        }
+
+        private async Task EnrichContentAsync(EnrichedContentEvent result, ContentEvent contentEvent, Envelope<AppEvent> @event)
+        {
             var content =
                 (await grainFactory
                     .GetGrain<IContentGrain>(contentEvent.ContentId)
@@ -68,46 +116,37 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
             switch (contentEvent)
             {
-                case ContentCreated e:
-                    result.Action = EnrichedContentEventAction.Created;
+                case ContentCreated _:
+                    result.Type = EnrichedContentEventType.Created;
                     break;
-                case ContentDeleted e:
-                    result.Action = EnrichedContentEventAction.Deleted;
+                case ContentDeleted _:
+                    result.Type = EnrichedContentEventType.Deleted;
                     break;
-                case ContentUpdated e:
-                    result.Action = EnrichedContentEventAction.Updated;
+                case ContentUpdated _:
+                    result.Type = EnrichedContentEventType.Updated;
                     break;
-                case ContentStatusChanged e:
-                    if (e.Status == Status.Published)
+                case ContentStatusChanged contentStatusChanged:
+                    if (contentStatusChanged.Status == Status.Published)
                     {
-                        result.Action = EnrichedContentEventAction.Published;
+                        result.Type = EnrichedContentEventType.Published;
                     }
                     else
                     {
-                        result.Action = EnrichedContentEventAction.Unpublished;
+                        result.Type = EnrichedContentEventType.Unpublished;
                     }
 
                     break;
             }
 
-            result.Name = $"{content.SchemaId.Name.ToPascalCase()}{result.Action}";
-
-            SetDefault(result, @event);
-
-            return result;
+            result.Name = $"{content.SchemaId.Name.ToPascalCase()}{result.Type}";
         }
 
-        private void SetDefault(EnrichedEvent result, Envelope<AppEvent> @event)
+        private async Task EnrichDefaultAsync(EnrichedEvent result, Envelope<AppEvent> @event)
         {
             result.Timestamp =
                 @event.Headers.Contains(CommonHeaders.Timestamp) ?
                 @event.Headers.Timestamp() :
                 clock.GetCurrentInstant();
-
-            result.AggregateId =
-                @event.Headers.Contains(CommonHeaders.AggregateId) ?
-                @event.Headers.AggregateId() :
-                Guid.NewGuid();
 
             if (@event.Payload is SquidexEvent squidexEvent)
             {
@@ -118,6 +157,27 @@ namespace Squidex.Domain.Apps.Entities.Rules
             {
                 result.AppId = appEvent.AppId;
             }
+
+            result.User = await FindUserAsync(result.Actor);
+        }
+
+        private Task<IUser> FindUserAsync(RefToken actor)
+        {
+            var key = $"EventEnrichers_Users_${actor.Identifier}";
+
+            return cache.GetOrCreateAsync(key, async x =>
+            {
+                x.AbsoluteExpirationRelativeToNow = UserCacheDuration;
+
+                try
+                {
+                    return await userResolver.FindByIdOrEmailAsync(actor.Identifier);
+                }
+                catch
+                {
+                    return null;
+                }
+            });
         }
     }
 }

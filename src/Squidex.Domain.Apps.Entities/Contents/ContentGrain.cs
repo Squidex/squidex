@@ -26,7 +26,7 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Contents
 {
-    public class ContentGrain : SquidexDomainObjectGrain<ContentState>, IContentGrain
+    public sealed class ContentGrain : SquidexDomainObjectGrain<ContentState>, IContentGrain
     {
         private readonly IAppProvider appProvider;
         private readonly IAssetRepository assetRepository;
@@ -293,7 +293,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public Task<J<IContentEntity>> GetStateAsync(long version = -2)
         {
-            return Task.FromResult(J.Of<IContentEntity>(GetSnapshot(version)));
+            return J.AsTask<IContentEntity>(GetSnapshot(version));
         }
     }
 }

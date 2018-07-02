@@ -7,14 +7,13 @@
 
 using System;
 using NodaTime;
-using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents
 {
-    public sealed class EnrichedContentEvent : EnrichedSchemaEvent
+    public sealed class EnrichedAssetEvent : EnrichedEvent
     {
-        public EnrichedContentEventType Type { get; set; }
+        public EnrichedAssetEventType Type { get; set; }
 
         public Guid Id { get; set; }
 
@@ -26,9 +25,19 @@ namespace Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents
 
         public RefToken LastModifiedBy { get; set; }
 
-        public NamedContentData Data { get; set; }
+        public string MimeType { get; set; }
 
-        public Status Status { get; set; }
+        public string FileName { get; set; }
+
+        public long FileVersion { get; set; }
+
+        public long FileSize { get; set; }
+
+        public bool IsImage { get; set; }
+
+        public int? PixelWidth { get; set; }
+
+        public int? PixelHeight { get; set; }
 
         public override Guid AggregateId
         {

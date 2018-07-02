@@ -52,7 +52,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
             });
         }
 
-        protected override async Task<(string Description, AlgoliaJob Data)> CreateJobAsync(EnrichedEvent @event, AlgoliaAction action)
+        protected override (string Description, AlgoliaJob Data) CreateJob(EnrichedEvent @event, AlgoliaAction action)
         {
             if (@event is EnrichedContentEvent contentEvent)
             {
@@ -64,11 +64,11 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
                     AppId = action.AppId,
                     ApiKey = action.ApiKey,
                     ContentId = contentId,
-                    IndexName = await formatter.FormatStringAsync(action.IndexName, @event)
+                    IndexName = formatter.Format(action.IndexName, @event)
                 };
 
-                if (contentEvent.Action == EnrichedContentEventAction.Deleted ||
-                    contentEvent.Action == EnrichedContentEventAction.Unpublished)
+                if (contentEvent.Type == EnrichedContentEventType.Deleted ||
+                    contentEvent.Type == EnrichedContentEventType.Unpublished)
                 {
                     ruleDescription = $"Delete entry from Algolia index: {action.IndexName}";
                 }

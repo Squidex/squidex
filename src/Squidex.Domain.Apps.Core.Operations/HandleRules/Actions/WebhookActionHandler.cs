@@ -50,10 +50,10 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
             this.formatter = formatter;
         }
 
-        protected override async Task<(string Description, WebhookJob Data)> CreateJobAsync(EnrichedEvent @event, WebhookAction action)
+        protected override (string Description, WebhookJob Data) CreateJob(EnrichedEvent @event, WebhookAction action)
         {
             var requestBody = formatter.ToEnvelope(@event).ToString(Formatting.Indented);
-            var requestUrl = await formatter.FormatStringAsync(action.Url.ToString(), @event);
+            var requestUrl = formatter.Format(action.Url.ToString(), @event);
 
             var ruleDescription = $"Send event to webhook '{requestUrl}'";
             var ruleJob = new WebhookJob

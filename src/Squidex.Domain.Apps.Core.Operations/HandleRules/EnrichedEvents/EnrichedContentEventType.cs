@@ -5,15 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
-using Squidex.Infrastructure;
-using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Orleans;
-
-namespace Squidex.Domain.Apps.Entities.Assets
+namespace Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents
 {
-    public interface IAssetGrain : IDomainObjectGrain
+    public enum EnrichedContentEventType
     {
-        Task<J<IAssetEntity>> GetStateAsync(long version = EtagVersion.Any);
+        Created,
+        Deleted,
+        Published,
+        Unpublished,
+        Updated
     }
 }

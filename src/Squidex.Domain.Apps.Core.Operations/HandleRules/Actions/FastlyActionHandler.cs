@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
     {
         private const string Description = "Purge key in fastly";
 
-        protected override Task<(string Description, FastlyJob Data)> CreateJobAsync(EnrichedEvent @event, FastlyAction action)
+        protected override (string Description, FastlyJob Data) CreateJob(EnrichedEvent @event, FastlyAction action)
         {
             var ruleJob = new FastlyJob
             {
@@ -37,7 +37,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
                 FastlyServiceID = action.ServiceId
             };
 
-            return Task.FromResult((Description, ruleJob));
+            return (Description, ruleJob);
         }
 
         protected override async Task<(string Dump, Exception Exception)> ExecuteJobAsync(FastlyJob job)

@@ -6,17 +6,15 @@
 // =========================================-=================================
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Caching;
 using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Core.HandleRules
@@ -24,42 +22,38 @@ namespace Squidex.Domain.Apps.Core.HandleRules
     public class RuleEventFormatter
     {
         private const string Undefined = "UNDEFINED";
-        private const string AppIdPlaceholder = "$APP_ID";
-        private const string AppNamePlaceholder = "$APP_NAME";
-        private const string SchemaIdPlaceholder = "$SCHEMA_ID";
-        private const string SchemaNamePlaceholder = "$SCHEMA_NAME";
-        private const string TimestampDatePlaceholder = "$TIMESTAMP_DATE";
-        private const string TimestampDateTimePlaceholder = "$TIMESTAMP_DATETIME";
-        private const string ContentActionPlaceholder = "$CONTENT_ACTION";
-        private const string ContentUrlPlaceholder = "$CONTENT_URL";
-        private const string UserNamePlaceholder = "$USER_NAME";
-        private const string UserEmailPlaceholder = "$USER_EMAIL";
-        private static readonly Regex ContentDataPlaceholder = new Regex(@"\$CONTENT_DATA(\.([0-9A-Za-z\-_]*)){2,}", RegexOptions.Compiled);
-        private static readonly Regex ContentDataPlaceholderV2 = new Regex(@"\$\{CONTENT_DATA(\.([0-9A-Za-z\-_]*)){2,}\}", RegexOptions.Compiled);
-        private static readonly TimeSpan UserCacheDuration = TimeSpan.FromMinutes(10);
+        private static readonly Regex ContentDataPlaceholder = new Regex(@"^CONTENT_DATA(\.([0-9A-Za-z\-_]*)){2,}", RegexOptions.Compiled);
+        private static readonly Regex ContentDataPlaceholder2 = new Regex(@"^\{CONTENT_DATA(\.([0-9A-Za-z\-_]*)){2,}\}", RegexOptions.Compiled);
+        private readonly List<(string Pattern, Func<EnrichedEvent, string> Replacer)> patterns = new List<(string Pattern, Func<EnrichedEvent, string> Replacer)>();
         private readonly JsonSerializer serializer;
         private readonly IRuleUrlGenerator urlGenerator;
-        private readonly IMemoryCache memoryCache;
-        private readonly IUserResolver userResolver;
 
-        public RuleEventFormatter(
-            JsonSerializer serializer,
-            IRuleUrlGenerator urlGenerator,
-            IMemoryCache memoryCache,
-            IUserResolver userResolver)
+        public RuleEventFormatter(JsonSerializer serializer, IRuleUrlGenerator urlGenerator)
         {
-            Guard.NotNull(memoryCache, nameof(memoryCache));
             Guard.NotNull(serializer, nameof(serializer));
             Guard.NotNull(urlGenerator, nameof(urlGenerator));
-            Guard.NotNull(userResolver, nameof(userResolver));
 
-            this.memoryCache = memoryCache;
             this.serializer = serializer;
-            this.userResolver = userResolver;
             this.urlGenerator = urlGenerator;
+
+            AddPattern("APP_ID", AppId);
+            AddPattern("APP_NAME", AppName);
+            AddPattern("CONTENT_ACTION", ContentAction);
+            AddPattern("CONTENT_URL", ContentUrl);
+            AddPattern("SCHEMA_ID", SchemaId);
+            AddPattern("SCHEMA_NAME", SchemaName);
+            AddPattern("TIMESTAMP_DATETIME", TimestampTime);
+            AddPattern("TIMESTAMP_DATE", TimestampDate);
+            AddPattern("USER_NAME", UserName);
+            AddPattern("USER_EMAIL", UserEmail);
         }
 
-        public virtual JObject ToPayload(object @event)
+        private void AddPattern(string placeholder, Func<EnrichedEvent, string> generator)
+        {
+            patterns.Add((placeholder, generator));
+        }
+
+        public virtual JObject ToPayload<T>(T @event)
         {
             return JObject.FromObject(@event, serializer);
         }
@@ -67,102 +61,184 @@ namespace Squidex.Domain.Apps.Core.HandleRules
         public virtual JObject ToEnvelope(EnrichedEvent @event)
         {
             return new JObject(
-                new JProperty("type", @event),
+                new JProperty("type", @event.Name),
                 new JProperty("payload", ToPayload(@event)),
                 new JProperty("timestamp", @event.Timestamp.ToString()));
         }
 
-        public async virtual Task<string> FormatStringAsync(string text, EnrichedEvent @event)
+        public string Format(string text, EnrichedEvent @event)
         {
             if (string.IsNullOrWhiteSpace(text))
             {
                 return text;
             }
 
-            var sb = new StringBuilder(text);
+            var current = text.AsSpan();
 
-            sb.Replace(TimestampDateTimePlaceholder, @event.Timestamp.ToString("yyy-MM-dd-hh-mm-ss", CultureInfo.InvariantCulture));
-            sb.Replace(TimestampDatePlaceholder, @event.Timestamp.ToString("yyy-MM-dd", CultureInfo.InvariantCulture));
+            var sb = new StringBuilder();
 
-            if (@event.AppId != null)
+            for (var i = 0; i < current.Length; i++)
             {
-                sb.Replace(AppIdPlaceholder, @event.AppId.Id.ToString());
-                sb.Replace(AppNamePlaceholder, @event.AppId.Name);
+                var c = current[i];
+
+                if (c == '$')
+                {
+                    sb.Append(current.Slice(0, i));
+
+                    current = current.Slice(i);
+
+                    var test = current.Slice(1);
+                    var tested = false;
+
+                    for (var j = 0; j < patterns.Count; j++)
+                    {
+                        var (Pattern, Replacer) = patterns[j];
+
+                        if (test.StartsWith(Pattern, StringComparison.OrdinalIgnoreCase))
+                        {
+                            sb.Append(Replacer(@event));
+
+                            current = current.Slice(Pattern.Length + 1);
+                            i = 0;
+
+                            tested = true;
+                            break;
+                        }
+                    }
+
+                    if (!tested &&
+                       (test.StartsWith("CONTENT_DATA", StringComparison.OrdinalIgnoreCase) ||
+                        test.StartsWith("{CONTENT_DATA", StringComparison.OrdinalIgnoreCase)))
+                    {
+                        var currentString = new string(test);
+
+                        var match = ContentDataPlaceholder.Match(currentString);
+
+                        if (!match.Success)
+                        {
+                            match = ContentDataPlaceholder2.Match(currentString);
+                        }
+
+                        if (match.Success)
+                        {
+                            if (@event is EnrichedContentEvent contentEvent)
+                            {
+                                sb.Append(CalculateData(contentEvent.Data, match));
+                            }
+                            else
+                            {
+                                sb.Append(Undefined);
+                            }
+
+                            current = current.Slice(match.Length + 1);
+                            i = 0;
+                        }
+                    }
+                }
             }
 
-            if (@event is EnrichedSchemaEvent schemaEvent && schemaEvent.SchemaId != null)
+            sb.Append(current);
+
+            return sb.ToString();
+        }
+
+        private static string TimestampDate(EnrichedEvent @event)
+        {
+            return @event.Timestamp.ToDateTimeUtc().ToString("yyy-MM-dd", CultureInfo.InvariantCulture);
+        }
+
+        private static string TimestampTime(EnrichedEvent @event)
+        {
+            return @event.Timestamp.ToDateTimeUtc().ToString("yyy-MM-dd-hh-mm-ss", CultureInfo.InvariantCulture);
+        }
+
+        private static string AppId(EnrichedEvent @event)
+        {
+            return @event.AppId.Id.ToString();
+        }
+
+        private static string AppName(EnrichedEvent @event)
+        {
+            return @event.AppId.Name;
+        }
+
+        private static string SchemaId(EnrichedEvent @event)
+        {
+            if (@event is EnrichedSchemaEvent schemaEvent)
             {
-                sb.Replace(SchemaIdPlaceholder, schemaEvent.SchemaId.Id.ToString());
-                sb.Replace(SchemaNamePlaceholder, schemaEvent.SchemaId.Name);
+                return schemaEvent.SchemaId.Id.ToString();
             }
 
+            return Undefined;
+        }
+
+        private static string SchemaName(EnrichedEvent @event)
+        {
+            if (@event is EnrichedSchemaEvent schemaEvent)
+            {
+                return schemaEvent.SchemaId.Name;
+            }
+
+            return Undefined;
+        }
+
+        private static string ContentAction(EnrichedEvent @event)
+        {
             if (@event is EnrichedContentEvent contentEvent)
             {
-                sb.Replace(ContentUrlPlaceholder, urlGenerator.GenerateContentUIUrl(@event.AppId, contentEvent.SchemaId, contentEvent.Id));
-                sb.Replace(ContentActionPlaceholder, contentEvent.Action.ToString());
+                return contentEvent.Type.ToString().ToLowerInvariant();
             }
 
-            await FormatUserInfoAsync(@event, sb);
-
-            var result = sb.ToString();
-
-            if (@event is EnrichedContentEvent contentEvent2)
-            {
-                result = ReplaceData(contentEvent2.Data, result);
-            }
-
-            return result;
+            return Undefined;
         }
 
-        private async Task FormatUserInfoAsync(EnrichedEvent @event, StringBuilder sb)
+        private string ContentUrl(EnrichedEvent @event)
         {
-            var text = sb.ToString();
-
-            if (text.Contains(UserEmailPlaceholder) || text.Contains(UserNamePlaceholder))
+            if (@event is EnrichedContentEvent contentEvent)
             {
-                var actor = @event.Actor;
+                return urlGenerator.GenerateContentUIUrl(contentEvent.AppId, contentEvent.SchemaId, contentEvent.Id);
+            }
 
-                if (actor.Type.Equals("client", StringComparison.OrdinalIgnoreCase))
+            return Undefined;
+        }
+
+        private static string UserName(EnrichedEvent @event)
+        {
+            if (@event.Actor != null)
+            {
+                if (@event.Actor.Type.Equals("client", StringComparison.OrdinalIgnoreCase))
                 {
-                    var displayText = actor.ToString();
-
-                    sb.Replace(UserEmailPlaceholder, displayText);
-                    sb.Replace(UserNamePlaceholder, displayText);
+                    return @event.Actor.ToString();
                 }
-                else
-                {
-                    var user = await FindUserAsync(actor);
 
-                    if (user != null)
-                    {
-                        sb.Replace(UserEmailPlaceholder, user.Email);
-                        sb.Replace(UserNamePlaceholder, user.DisplayName());
-                    }
-                    else
-                    {
-                        sb.Replace(UserEmailPlaceholder, Undefined);
-                        sb.Replace(UserNamePlaceholder, Undefined);
-                    }
+                if (@event.User != null)
+                {
+                    return @event.User.DisplayName();
                 }
             }
+
+            return Undefined;
         }
 
-        private static string ReplaceData(NamedContentData data, string text)
+        private static string UserEmail(EnrichedEvent @event)
         {
-            text = ContentDataPlaceholder.Replace(text, match =>
+            if (@event.Actor != null)
             {
-                return Replace(data, match);
-            });
+                if (@event.Actor.Type.Equals("client", StringComparison.OrdinalIgnoreCase))
+                {
+                    return @event.Actor.ToString();
+                }
 
-            text = ContentDataPlaceholderV2.Replace(text, match =>
-            {
-                return Replace(data, match);
-            });
+                if (@event.User != null)
+                {
+                    return @event.User.Email;
+                }
+            }
 
-            return text;
+            return Undefined;
         }
 
-        private static string Replace(NamedContentData data, Match match)
+        private static string CalculateData(NamedContentData data, Match match)
         {
             var captures = match.Groups[2].Captures;
 
@@ -211,25 +287,6 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             }
 
             return value?.ToString(Formatting.Indented) ?? Undefined;
-        }
-
-        private Task<IUser> FindUserAsync(RefToken actor)
-        {
-            var key = $"RuleEventFormatter_Users_${actor.Identifier}";
-
-            return memoryCache.GetOrCreateAsync(key, async x =>
-            {
-                x.AbsoluteExpirationRelativeToNow = UserCacheDuration;
-
-                try
-                {
-                    return await userResolver.FindByIdOrEmailAsync(actor.Identifier);
-                }
-                catch
-                {
-                    return null;
-                }
-            });
         }
     }
 }

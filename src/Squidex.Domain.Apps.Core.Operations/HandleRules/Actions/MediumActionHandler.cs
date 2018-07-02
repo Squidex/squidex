@@ -42,7 +42,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
             this.formatter = formatter;
         }
 
-        protected override async Task<(string Description, MediumJob Data)> CreateJobAsync(EnrichedEvent @event, MediumAction action)
+        protected override (string Description, MediumJob Data) CreateJob(EnrichedEvent @event, MediumAction action)
         {
             var requestUrl =
                 !string.IsNullOrWhiteSpace(action.Author) ?
@@ -51,11 +51,11 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
 
             var requestBody =
                 new JObject(
-                    new JProperty("title", await formatter.FormatStringAsync(action.Title, @event)),
+                    new JProperty("title", formatter.Format(action.Title, @event)),
                     new JProperty("contentFormat", action.IsHtml ? "html" : "markdown"),
-                    new JProperty("content", await formatter.FormatStringAsync(action.Content, @event)),
-                    new JProperty("canonicalUrl", await formatter.FormatStringAsync(action.CanonicalUrl, @event)),
-                    new JProperty("tags", await ParseTagsAsync(@event, action)));
+                    new JProperty("content", formatter.Format(action.Content, @event)),
+                    new JProperty("canonicalUrl", formatter.Format(action.CanonicalUrl, @event)),
+                    new JProperty("tags", ParseTags(@event, action)));
 
             var ruleJob = new MediumJob
             {
@@ -67,7 +67,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
             return (Description, ruleJob);
         }
 
-        private async Task<JArray> ParseTagsAsync(EnrichedEvent @event, MediumAction action)
+        private JArray ParseTags(EnrichedEvent @event, MediumAction action)
         {
             if (string.IsNullOrWhiteSpace(action.Tags))
             {
@@ -77,7 +77,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
             string[] tags;
             try
             {
-                var jsonTags = await formatter.FormatStringAsync(action.Tags, @event);
+                var jsonTags = formatter.Format(action.Tags, @event);
 
                 tags = JsonConvert.DeserializeObject<string[]>(jsonTags);
             }

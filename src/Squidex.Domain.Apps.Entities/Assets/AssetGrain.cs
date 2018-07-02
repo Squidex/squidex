@@ -22,7 +22,7 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public class AssetGrain : SquidexDomainObjectGrain<AssetState>, IAssetGrain
+    public sealed class AssetGrain : SquidexDomainObjectGrain<AssetState>, IAssetGrain
     {
         public AssetGrain(IStore<Guid> store, ISemanticLog log)
             : base(store, log)
@@ -140,9 +140,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
             ApplySnapshot(Snapshot.Apply(@event));
         }
 
-        public Task<J<IAssetEntity>> GetStateAsync()
+        public Task<J<IAssetEntity>> GetStateAsync(long version = EtagVersion.Empty)
         {
-            return J.AsTask<IAssetEntity>(Snapshot);
+            return J.AsTask<IAssetEntity>(GetSnapshot(version));
         }
     }
 }

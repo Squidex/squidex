@@ -10,7 +10,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents
 {
-    public class EnrichedSchemaEvent : EnrichedEvent
+    public abstract class EnrichedSchemaEvent : EnrichedEvent
     {
         public NamedId<Guid> SchemaId { get; set; }
     }

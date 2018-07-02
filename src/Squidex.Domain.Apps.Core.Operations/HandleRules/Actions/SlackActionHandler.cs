@@ -49,11 +49,11 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
             this.formatter = formatter;
         }
 
-        protected override async Task<(string Description, SlackJob Data)> CreateJobAsync(EnrichedEvent @event, SlackAction action)
+        protected override (string Description, SlackJob Data) CreateJob(EnrichedEvent @event, SlackAction action)
         {
             var body =
                 new JObject(
-                    new JProperty("text", await formatter.FormatStringAsync(action.Text, @event)));
+                    new JProperty("text", formatter.Format(action.Text, @event)));
 
             var ruleJob = new SlackJob
             {

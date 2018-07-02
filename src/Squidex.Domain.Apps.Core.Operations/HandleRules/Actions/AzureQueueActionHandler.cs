@@ -60,11 +60,11 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
             });
         }
 
-        protected override async Task<(string Description, AzureQueueJob Data)> CreateJobAsync(EnrichedEvent @event, AzureQueueAction action)
+        protected override (string Description, AzureQueueJob Data) CreateJob(EnrichedEvent @event, AzureQueueAction action)
         {
             var body = formatter.ToEnvelope(@event).ToString(Formatting.Indented);
 
-            var queueName = await formatter.FormatStringAsync(action.Queue, @event);
+            var queueName = formatter.Format(action.Queue, @event);
 
             var ruleDescription = $"Send AzureQueueJob to azure queue '{action.Queue}'";
             var ruleJob = new AzureQueueJob

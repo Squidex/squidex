@@ -24,7 +24,7 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Schemas
 {
-    public class SchemaGrain : SquidexDomainObjectGrain<SchemaState>, ISchemaGrain
+    public sealed class SchemaGrain : SquidexDomainObjectGrain<SchemaState>, ISchemaGrain
     {
         private readonly IAppProvider appProvider;
         private readonly FieldRegistry registry;

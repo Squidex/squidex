@@ -60,7 +60,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
             });
         }
 
-        protected override async Task<(string Description, ElasticSearchJob Data)> CreateJobAsync(EnrichedEvent @event, ElasticSearchAction action)
+        protected override (string Description, ElasticSearchJob Data) CreateJob(EnrichedEvent @event, ElasticSearchAction action)
         {
             if (@event is EnrichedContentEvent contentEvent)
             {
@@ -73,12 +73,12 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
                     Username = action.Username,
                     Password = action.Password,
                     ContentId = contentId,
-                    IndexName = await formatter.FormatStringAsync(action.IndexName, @event),
-                    IndexType = await formatter.FormatStringAsync(action.IndexType, @event),
+                    IndexName = formatter.Format(action.IndexName, @event),
+                    IndexType = formatter.Format(action.IndexType, @event),
                 };
 
-                if (contentEvent.Action == EnrichedContentEventAction.Deleted ||
-                    contentEvent.Action == EnrichedContentEventAction.Unpublished)
+                if (contentEvent.Type == EnrichedContentEventType.Deleted ||
+                    contentEvent.Type == EnrichedContentEventType.Unpublished)
                 {
                     ruleDescription = $"Delete entry index: {action.IndexName}";
                 }
