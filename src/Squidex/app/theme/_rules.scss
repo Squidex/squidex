@@ -38,12 +38,10 @@ $action-medium:           #00ab6c;
         @include transition(background-color .4s ease);
         color: $color-dark-foreground;
         cursor: pointer;
-        display: inline-block;
         line-height: 2.8rem;
         font-size: 1rem;
         font-weight: normal;
         padding-right: .8rem;
-        width: 15rem;
     }
 
     &-icon {
