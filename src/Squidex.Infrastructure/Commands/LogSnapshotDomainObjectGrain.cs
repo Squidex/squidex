@@ -59,7 +59,7 @@ namespace Squidex.Infrastructure.Commands
             var snapshot = OnEvent(@event);
 
             snapshot.Version = NewVersion + 1;
-            snapshots.Add(OnEvent(@event));
+            snapshots.Add(snapshot);
         }
 
         protected sealed override Task ReadAsync(Type type, Guid id)
@@ -73,16 +73,16 @@ namespace Squidex.Infrastructure.Commands
         {
             if (events.Length > 0)
             {
-                var snaphosts = store.GetSnapshotStore<T>();
+                var persistedSnapshots = store.GetSnapshotStore<T>();
 
                 await persistence.WriteEventsAsync(events);
-                await snaphosts.WriteAsync(Id, Snapshot, previousVersion, previousVersion + events.Length);
+                await persistedSnapshots.WriteAsync(Id, Snapshot, previousVersion, previousVersion + events.Length);
             }
         }
 
         protected sealed override void RestorePreviousSnapshot(T previousSnapshot, long previousVersion)
         {
-            while (snapshots.Count > previousVersion)
+            while (snapshots.Count > previousVersion + 2)
             {
                 snapshots.RemoveAt(snapshots.Count - 1);
             }
