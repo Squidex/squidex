@@ -11,10 +11,10 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Squidex.Domain.Apps.Core.HandleRules.Actions.Utils;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules.Actions;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Http;
 
 #pragma warning disable SA1649 // File name must match first type name
 
@@ -42,12 +42,25 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
     public sealed class WebhookActionHandler : RuleActionHandler<WebhookAction, WebhookJob>
     {
         private readonly RuleEventFormatter formatter;
+        private readonly ClientPool<string, HttpClient> clients;
 
         public WebhookActionHandler(RuleEventFormatter formatter)
         {
             Guard.NotNull(formatter, nameof(formatter));
 
             this.formatter = formatter;
+
+            clients = new ClientPool<string, HttpClient>(key =>
+            {
+                var client = new HttpClient
+                {
+                    Timeout = TimeSpan.FromSeconds(4)
+                };
+
+                client.DefaultRequestHeaders.Add("User-Agent", "Squidex Webhook");
+
+                return client;
+            });
         }
 
         protected override (string Description, WebhookJob Data) CreateJob(EnrichedEvent @event, WebhookAction action)
@@ -66,35 +79,11 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
             return (ruleDescription, ruleJob);
         }
 
-        protected override async Task<(string Dump, Exception Exception)> ExecuteJobAsync(WebhookJob job)
+        protected override Task<(string Dump, Exception Exception)> ExecuteJobAsync(WebhookJob job)
         {
-            var requestBody = job.Body;
-            var request = BuildRequest(job, requestBody);
+            var httpClient = clients.GetClient(string.Empty);
 
-            HttpResponseMessage response = null;
-
-            try
-            {
-                response = await HttpClientPool.GetHttpClient().SendAsync(request);
-
-                var responseString = await response.Content.ReadAsStringAsync();
-                var requestDump = DumpFormatter.BuildDump(request, response, requestBody, responseString);
-
-                Exception ex = null;
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    ex = new HttpRequestException($"Response code does not indicate success: {(int)response.StatusCode} ({response.StatusCode}).");
-                }
-
-                return (requestDump, ex);
-            }
-            catch (Exception ex)
-            {
-                var requestDump = DumpFormatter.BuildDump(request, response, requestBody, ex.ToString());
-
-                return (requestDump, ex);
-            }
+            return httpClient.OneWayRequestAsync(BuildRequest(job, job.Body), job.Body);
         }
 
         private static HttpRequestMessage BuildRequest(WebhookJob job, string requestBody)
@@ -105,7 +94,6 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
             };
 
             request.Headers.Add("X-Signature", job.RequestSignature);
-            request.Headers.Add("User-Agent", "Squidex Webhook");
 
             return request;
         }

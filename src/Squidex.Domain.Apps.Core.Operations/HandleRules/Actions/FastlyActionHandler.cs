@@ -8,10 +8,9 @@
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Squidex.Domain.Apps.Core.HandleRules.Actions.Utils;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules.Actions;
-using Squidex.Infrastructure;
-using Squidex.Infrastructure.Http;
 
 #pragma warning disable SA1649 // File name must match first type name
 
@@ -29,6 +28,19 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
     {
         private const string Description = "Purge key in fastly";
 
+        private readonly ClientPool<string, HttpClient> clients;
+
+        public FastlyActionHandler()
+        {
+            clients = new ClientPool<string, HttpClient>(key =>
+            {
+                return new HttpClient
+                {
+                    Timeout = TimeSpan.FromSeconds(2)
+                };
+            });
+        }
+
         protected override (string Description, FastlyJob Data) CreateJob(EnrichedEvent @event, FastlyAction action)
         {
             var ruleJob = new FastlyJob
@@ -43,32 +55,9 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
 
         protected override async Task<(string Dump, Exception Exception)> ExecuteJobAsync(FastlyJob job)
         {
-            if (string.IsNullOrWhiteSpace(job.Key))
-            {
-                return (null, new InvalidOperationException("The action cannot handle this event."));
-            }
+            var httpClient = clients.GetClient(string.Empty);
 
-            var request = BuildRequest(job);
-
-            HttpResponseMessage response = null;
-
-            try
-            {
-                var valueWatch = ValueStopwatch.StartNew();
-
-                response = await HttpClientPool.GetHttpClient().SendAsync(request);
-
-                var responseString = await response.Content.ReadAsStringAsync();
-                var requestDump = DumpFormatter.BuildDump(request, response, null, responseString, TimeSpan.Zero, false);
-
-                return (requestDump, null);
-            }
-            catch (Exception ex)
-            {
-                var requestDump = DumpFormatter.BuildDump(request, response, null, ex.ToString(), TimeSpan.Zero, false);
-
-                return (requestDump, ex);
-            }
+            return await httpClient.OneWayRequestAsync(BuildRequest(job), null);
         }
 
         private static HttpRequestMessage BuildRequest(FastlyJob job)

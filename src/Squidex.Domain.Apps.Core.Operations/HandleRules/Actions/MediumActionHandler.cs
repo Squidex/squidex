@@ -13,6 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Squidex.Domain.Apps.Core.HandleRules.Actions.Utils;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules.Actions;
 using Squidex.Infrastructure;
@@ -32,12 +33,27 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
         private const string Description = "Post to medium";
 
         private readonly RuleEventFormatter formatter;
+        private readonly ClientPool<string, HttpClient> clients;
 
         public MediumActionHandler(RuleEventFormatter formatter)
         {
             Guard.NotNull(formatter, nameof(formatter));
 
             this.formatter = formatter;
+
+            clients = new ClientPool<string, HttpClient>(key =>
+            {
+                var client = new HttpClient
+                {
+                    Timeout = TimeSpan.FromSeconds(4)
+                };
+
+                client.DefaultRequestHeaders.Add("Accept", "application/json");
+                client.DefaultRequestHeaders.Add("Accept-Charset", "utf-8");
+                client.DefaultRequestHeaders.Add("User-Agent", "Squidex Headless CMS");
+
+                return client;
+            });
         }
 
         protected override (string Description, MediumJob Data) CreateJob(EnrichedEvent @event, MediumAction action)
@@ -79,6 +95,8 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
 
         protected override async Task<(string Dump, Exception Exception)> ExecuteJobAsync(MediumJob job)
         {
+            var httpClient = clients.GetClient(string.Empty);
+
             string id;
 
             HttpResponseMessage response = null;
@@ -86,7 +104,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
             var meRequest = BuildMeRequest(job);
             try
             {
-                response = await HttpClientPool.GetHttpClient().SendAsync(meRequest);
+                response = await httpClient.SendAsync(meRequest);
 
                 var responseString = await response.Content.ReadAsStringAsync();
                 var responseJson = JToken.Parse(responseString);
@@ -100,42 +118,16 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
                 return (requestDump, ex);
             }
 
-            var postRequestBody = job.RequestBody;
-            var postRequest = BuildPostRequest(job, postRequestBody, id);
-
-            try
-            {
-                response = await HttpClientPool.GetHttpClient().SendAsync(postRequest);
-
-                var responseString = await response.Content.ReadAsStringAsync();
-                var requestDump = DumpFormatter.BuildDump(postRequest, response, postRequestBody, responseString);
-
-                Exception ex = null;
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    ex = new HttpRequestException($"Response code does not indicate success: {(int)response.StatusCode} ({response.StatusCode}).");
-                }
-
-                return (requestDump, ex);
-            }
-            catch (Exception ex)
-            {
-                var requestDump = DumpFormatter.BuildDump(postRequest, response, postRequestBody, ex.ToString());
-
-                return (requestDump, ex);
-            }
+            return await httpClient.OneWayRequestAsync(BuildPostRequest(job, id), job.RequestBody);
         }
 
-        private static HttpRequestMessage BuildPostRequest(MediumJob job, string requestBody, string id)
+        private static HttpRequestMessage BuildPostRequest(MediumJob job, string id)
         {
             var request = new HttpRequestMessage(HttpMethod.Post, $"https://api.medium.com/v1/users/{id}/posts")
             {
-                Content = new StringContent(requestBody, Encoding.UTF8, "application/json")
+                Content = new StringContent(job.RequestBody, Encoding.UTF8, "application/json")
             };
 
-            request.Headers.Add("Accept", "application/json");
-            request.Headers.Add("Accept-Charset", "utf-8");
             request.Headers.Add("Authorization", $"Bearer {job.AccessToken}");
 
             return request;
@@ -145,8 +137,6 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
         {
             var request = new HttpRequestMessage(HttpMethod.Get, "https://api.medium.com/v1/me");
 
-            request.Headers.Add("Accept", "application/json");
-            request.Headers.Add("Accept-Charset", "utf-8");
             request.Headers.Add("Authorization", $"Bearer {job.AccessToken}");
 
             return request;

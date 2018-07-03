@@ -11,10 +11,10 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Squidex.Domain.Apps.Core.HandleRules.Actions.Utils;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules.Actions;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Http;
 
 #pragma warning disable SA1649 // File name must match first type name
 
@@ -41,12 +41,21 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
         private const string Description = "Send message to slack";
 
         private readonly RuleEventFormatter formatter;
+        private readonly ClientPool<string, HttpClient> clients;
 
         public SlackActionHandler(RuleEventFormatter formatter)
         {
             Guard.NotNull(formatter, nameof(formatter));
 
             this.formatter = formatter;
+
+            clients = new ClientPool<string, HttpClient>(key =>
+            {
+                return new HttpClient
+                {
+                    Timeout = TimeSpan.FromSeconds(2)
+                };
+            });
         }
 
         protected override (string Description, SlackJob Data) CreateJob(EnrichedEvent @event, SlackAction action)
@@ -64,28 +73,11 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
             return (Description, ruleJob);
         }
 
-        protected override async Task<(string Dump, Exception Exception)> ExecuteJobAsync(SlackJob job)
+        protected override Task<(string Dump, Exception Exception)> ExecuteJobAsync(SlackJob job)
         {
-            var requestBody = job.Body;
-            var request = BuildRequest(job, requestBody);
+            var httpClient = clients.GetClient(string.Empty);
 
-            HttpResponseMessage response = null;
-
-            try
-            {
-                response = await HttpClientPool.GetHttpClient().SendAsync(request);
-
-                var responseString = await response.Content.ReadAsStringAsync();
-                var requestDump = DumpFormatter.BuildDump(request, response, requestBody, responseString);
-
-                return (requestDump, null);
-            }
-            catch (Exception ex)
-            {
-                var requestDump = DumpFormatter.BuildDump(request, response, requestBody, ex.ToString());
-
-                return (requestDump, ex);
-            }
+            return httpClient.OneWayRequestAsync(BuildRequest(job, job.Body), job.Body);
         }
 
         private static HttpRequestMessage BuildRequest(SlackJob job, string requestBody)
