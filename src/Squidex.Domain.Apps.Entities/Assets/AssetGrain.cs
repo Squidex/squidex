@@ -135,9 +135,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
             }
         }
 
-        public override void ApplyEvent(Envelope<IEvent> @event)
+        protected override AssetState OnEvent(Envelope<IEvent> @event)
         {
-            ApplySnapshot(Snapshot.Apply(@event));
+            return Snapshot.Apply(@event);
         }
 
         public Task<J<IAssetEntity>> GetStateAsync()

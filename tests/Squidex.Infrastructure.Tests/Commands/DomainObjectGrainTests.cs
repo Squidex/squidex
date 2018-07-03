@@ -101,12 +101,9 @@ namespace Squidex.Infrastructure.Commands
                 return Task.FromResult<object>(null);
             }
 
-            public override void ApplyEvent(Envelope<IEvent> @event)
+            protected override MyDomainState OnEvent(Envelope<IEvent> @event)
             {
-                if (@event.Payload is ValueChanged valueChanged)
-                {
-                    ApplySnapshot(new MyDomainState { Value = valueChanged.Value });
-                }
+                return new MyDomainState { Value = ((ValueChanged)@event.Payload).Value };
             }
         }
 

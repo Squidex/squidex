@@ -1,13 +1,17 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.States
+namespace Squidex.Domain.Apps.Core.Contents
 {
-    public interface IPersistence : IPersistence<object>
+    public enum StatusChange
     {
+        Archived,
+        Published,
+        Restored,
+        Unpublished
     }
 }

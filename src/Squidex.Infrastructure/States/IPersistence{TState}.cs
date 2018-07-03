@@ -5,23 +5,20 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using Orleans;
-using Squidex.Infrastructure.Tasks;
+using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Infrastructure.Orleans
+namespace Squidex.Infrastructure.States
 {
-    public abstract class GrainOfGuid : Grain
+    public interface IPersistence<TState>
     {
-        public sealed override Task OnActivateAsync()
-        {
-            return OnActivateAsync(this.GetPrimaryKey());
-        }
+        long Version { get; }
 
-        public virtual Task OnActivateAsync(Guid key)
-        {
-            return TaskHelper.Done;
-        }
+        Task WriteEventsAsync(IEnumerable<Envelope<IEvent>> @events);
+
+        Task WriteSnapshotAsync(TState state);
+
+        Task ReadAsync(long expectedVersion = EtagVersion.Any);
     }
 }

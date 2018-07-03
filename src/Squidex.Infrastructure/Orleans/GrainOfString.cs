@@ -13,7 +13,7 @@ namespace Squidex.Infrastructure.Orleans
 {
     public abstract class GrainOfString : Grain
     {
-        public override Task OnActivateAsync()
+        public sealed override Task OnActivateAsync()
         {
             return OnActivateAsync(this.GetPrimaryKeyString());
         }
