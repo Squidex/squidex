@@ -15,7 +15,7 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Infrastructure.Commands
 {
-    public abstract class MultiSnapshotDomainObjectGrain<T> : DomainObjectGrainBase<T> where T : IDomainState, new()
+    public abstract class LogSnapshotDomainObjectGrain<T> : DomainObjectGrainBase<T> where T : IDomainState, new()
     {
         private readonly IStore<Guid> store;
         private readonly List<T> snapshots = new List<T> { new T { Version = EtagVersion.Empty } };
@@ -26,7 +26,7 @@ namespace Squidex.Infrastructure.Commands
             get { return snapshots.Last(); }
         }
 
-        protected MultiSnapshotDomainObjectGrain(IStore<Guid> store, ISemanticLog log)
+        protected LogSnapshotDomainObjectGrain(IStore<Guid> store, ISemanticLog log)
             : base(log)
         {
             Guard.NotNull(log, nameof(log));
@@ -58,7 +58,7 @@ namespace Squidex.Infrastructure.Commands
         {
             var snapshot = OnEvent(@event);
 
-            snapshot.Version = NewVersion + 1;
+            snapshot.Version = Version + 1;
             snapshots.Add(snapshot);
         }
 

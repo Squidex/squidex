@@ -23,16 +23,6 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models.Actions
         public string AccessToken { get; set; }
 
         /// <summary>
-        /// The author name.
-        /// </summary>
-        public string Author { get; set; }
-
-        /// <summary>
-        /// The author name.
-        /// </summary>
-        public string Publication { get; set; }
-
-        /// <summary>
         /// The optional comma separated list of tags.
         /// </summary>
         public string Tags { get; set; }

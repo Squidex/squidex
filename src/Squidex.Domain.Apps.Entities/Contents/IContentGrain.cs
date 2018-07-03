@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Threading.Tasks;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Orleans;
 
@@ -13,6 +14,6 @@ namespace Squidex.Domain.Apps.Entities.Contents
 {
     public interface IContentGrain : IDomainObjectGrain
     {
-        Task<J<IContentEntity>> GetStateAsync();
+        Task<J<IContentEntity>> GetStateAsync(long version = EtagVersion.Any);
     }
 }

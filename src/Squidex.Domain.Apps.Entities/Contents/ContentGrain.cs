@@ -26,7 +26,7 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Contents
 {
-    public sealed class ContentGrain : SquidexDomainObjectGrain<ContentState>, IContentGrain
+    public sealed class ContentGrain : SquidexDomainObjectGrainLogSnapshots<ContentState>, IContentGrain
     {
         private readonly IAppProvider appProvider;
         private readonly IAssetRepository assetRepository;
@@ -60,7 +60,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             switch (command)
             {
                 case CreateContent createContent:
-                    return CreateReturnAsync(createContent, async c =>
+                    return CreateReturnAsync(createContent, (Func<CreateContent, Task<object>>)(async c =>
                     {
                         var ctx = await CreateContext(c.AppId.Id, c.SchemaId.Id, () => "Failed to create content.");
 
@@ -77,8 +77,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                         Create(c);
 
-                        return EntityCreatedResult.Create(c.Data, NewVersion);
-                    });
+                        return EntityCreatedResult.Create(c.Data, (long)base.Version);
+                    }));
 
                 case UpdateContent updateContent:
                     return UpdateReturnAsync(updateContent, c =>
@@ -216,7 +216,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 }
             }
 
-            return new ContentDataChangedResult(newData, NewVersion);
+            return new ContentDataChangedResult(newData, Version);
         }
 
         public void Create(CreateContent command)
@@ -307,9 +307,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return operationContext;
         }
 
-        public Task<J<IContentEntity>> GetStateAsync()
+        public Task<J<IContentEntity>> GetStateAsync(long version = EtagVersion.Any)
         {
-            return J.AsTask<IContentEntity>(Snapshot);
+            return J.AsTask<IContentEntity>(GetSnapshot(version));
         }
     }
 }

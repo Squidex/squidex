@@ -22,7 +22,7 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public sealed class AssetGrain : SquidexDomainObjectGrain<AssetState>, IAssetGrain
+    public sealed class AssetGrain : SquidexDomainObjectGrainLogSnapshots<AssetState>, IAssetGrain
     {
         public AssetGrain(IStore<Guid> store, ISemanticLog log)
             : base(store, log)
@@ -34,23 +34,23 @@ namespace Squidex.Domain.Apps.Entities.Assets
             switch (command)
             {
                 case CreateAsset createRule:
-                    return CreateReturnAsync(createRule, c =>
+                    return CreateReturnAsync(createRule, (Func<CreateAsset, object>)(c =>
                     {
                         GuardAsset.CanCreate(c);
 
                         Create(c);
 
-                        return new AssetSavedResult(NewVersion, Snapshot.FileVersion);
-                    });
+                        return new AssetSavedResult((long)base.Version, Snapshot.FileVersion);
+                    }));
                 case UpdateAsset updateRule:
-                    return UpdateReturnAsync(updateRule, c =>
+                    return UpdateReturnAsync(updateRule, (Func<UpdateAsset, object>)(c =>
                     {
                         GuardAsset.CanUpdate(c);
 
                         Update(c);
 
-                        return new AssetSavedResult(NewVersion, Snapshot.FileVersion);
-                    });
+                        return new AssetSavedResult((long)base.Version, Snapshot.FileVersion);
+                    }));
                 case RenameAsset renameAsset:
                     return UpdateAsync(renameAsset, c =>
                     {
@@ -140,9 +140,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
             return Snapshot.Apply(@event);
         }
 
-        public Task<J<IAssetEntity>> GetStateAsync()
+        public Task<J<IAssetEntity>> GetStateAsync(long version = EtagVersion.Any)
         {
-            return J.AsTask<IAssetEntity>(Snapshot);
+            return J.AsTask<IAssetEntity>(GetSnapshot(version));
         }
     }
 }

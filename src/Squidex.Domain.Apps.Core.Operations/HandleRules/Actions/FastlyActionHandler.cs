@@ -10,6 +10,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules.Actions;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Http;
 
 #pragma warning disable SA1649 // File name must match first type name
@@ -47,22 +48,24 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
                 return (null, new InvalidOperationException("The action cannot handle this event."));
             }
 
-            var requestMsg = BuildRequest(job);
+            var request = BuildRequest(job);
 
             HttpResponseMessage response = null;
 
             try
             {
-                response = await HttpClientPool.GetHttpClient().SendAsync(requestMsg);
+                var valueWatch = ValueStopwatch.StartNew();
+
+                response = await HttpClientPool.GetHttpClient().SendAsync(request);
 
                 var responseString = await response.Content.ReadAsStringAsync();
-                var requestDump = DumpFormatter.BuildDump(requestMsg, response, null, responseString, TimeSpan.Zero, false);
+                var requestDump = DumpFormatter.BuildDump(request, response, null, responseString, TimeSpan.Zero, false);
 
                 return (requestDump, null);
             }
             catch (Exception ex)
             {
-                var requestDump = DumpFormatter.BuildDump(requestMsg, response, null, ex.ToString(), TimeSpan.Zero, false);
+                var requestDump = DumpFormatter.BuildDump(request, response, null, ex.ToString(), TimeSpan.Zero, false);
 
                 return (requestDump, ex);
             }

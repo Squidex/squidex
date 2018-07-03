@@ -31,11 +31,6 @@ namespace Squidex.Infrastructure.Commands
             get { return Snapshot.Version; }
         }
 
-        public long NewVersion
-        {
-            get { return Snapshot.Version + uncomittedEvents.Count; }
-        }
-
         public abstract T Snapshot { get; }
 
         protected DomainObjectGrainBase(ISemanticLog log)

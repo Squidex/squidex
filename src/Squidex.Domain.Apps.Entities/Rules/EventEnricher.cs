@@ -76,10 +76,9 @@ namespace Squidex.Domain.Apps.Entities.Rules
             var asset =
                 (await grainFactory
                     .GetGrain<IAssetGrain>(assetEvent.AssetId)
-                    .GetStateAsync()).Value;
+                    .GetStateAsync(@event.Headers.EventStreamNumber())).Value;
 
             SimpleMapper.Map(asset, result);
-            SimpleMapper.Map(assetEvent, result);
 
             switch (assetEvent)
             {
@@ -105,13 +104,11 @@ namespace Squidex.Domain.Apps.Entities.Rules
             var content =
                 (await grainFactory
                     .GetGrain<IContentGrain>(contentEvent.ContentId)
-                    .GetStateAsync()).Value;
+                    .GetStateAsync(@event.Headers.EventStreamNumber())).Value;
 
             SimpleMapper.Map(content, result);
 
             result.Data = content.Data ?? content.DataDraft;
-
-            SimpleMapper.Map(contentEvent, result);
 
             switch (contentEvent)
             {

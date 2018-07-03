@@ -20,7 +20,7 @@ using Xunit;
 
 namespace Squidex.Infrastructure.Commands
 {
-    public class MultiSnapshotDomainObjectGrainTests
+    public class LogSnapshotDomainObjectGrainTests
     {
         private readonly IStore<Guid> store = A.Fake<IStore<Guid>>();
         private readonly ISnapshotStore<MyDomainState, Guid> snapshotStore = A.Fake<ISnapshotStore<MyDomainState, Guid>>();
@@ -53,7 +53,7 @@ namespace Squidex.Infrastructure.Commands
             public int Value { get; set; }
         }
 
-        public sealed class MyDomainObject : MultiSnapshotDomainObjectGrain<MyDomainState>
+        public sealed class MyDomainObject : LogSnapshotDomainObjectGrain<MyDomainState>
         {
             public MyDomainObject(IStore<Guid> store)
                : base(store, A.Dummy<ISemanticLog>())
@@ -102,7 +102,7 @@ namespace Squidex.Infrastructure.Commands
             }
         }
 
-        public MultiSnapshotDomainObjectGrainTests()
+        public LogSnapshotDomainObjectGrainTests()
         {
             A.CallTo(() => store.WithEventSourcing(typeof(MyDomainObject), id, A<Func<Envelope<IEvent>, Task>>.Ignored))
                 .Returns(persistence);

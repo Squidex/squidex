@@ -69,16 +69,16 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
         protected override async Task<(string Dump, Exception Exception)> ExecuteJobAsync(WebhookJob job)
         {
             var requestBody = job.Body;
-            var requestMessage = BuildRequest(job, requestBody);
+            var request = BuildRequest(job, requestBody);
 
             HttpResponseMessage response = null;
 
             try
             {
-                response = await HttpClientPool.GetHttpClient().SendAsync(requestMessage);
+                response = await HttpClientPool.GetHttpClient().SendAsync(request);
 
                 var responseString = await response.Content.ReadAsStringAsync();
-                var requestDump = DumpFormatter.BuildDump(requestMessage, response, requestBody, responseString, TimeSpan.Zero, false);
+                var requestDump = DumpFormatter.BuildDump(request, response, requestBody, responseString);
 
                 Exception ex = null;
 
@@ -91,7 +91,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
             }
             catch (Exception ex)
             {
-                var requestDump = DumpFormatter.BuildDump(requestMessage, response, requestBody, ex.ToString(), TimeSpan.Zero, false);
+                var requestDump = DumpFormatter.BuildDump(request, response, requestBody, ex.ToString());
 
                 return (requestDump, ex);
             }

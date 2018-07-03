@@ -116,11 +116,6 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
                 errors.Add(new ValidationError("Access token is required.", nameof(action.AccessToken)));
             }
 
-            if (string.IsNullOrWhiteSpace(action.Author) && string.IsNullOrWhiteSpace(action.Publication))
-            {
-                errors.Add(new ValidationError("Author or publication is required.", nameof(action.Author), nameof(action.Publication)));
-            }
-
             if (string.IsNullOrWhiteSpace(action.Content))
             {
                 errors.Add(new ValidationError("Content is required.", nameof(action.Content)));

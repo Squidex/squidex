@@ -39,12 +39,6 @@ export class MediumActionComponent implements OnInit {
                 Validators.required
             ]));
 
-        this.actionForm.setControl('author',
-            new FormControl(this.action.author || ''));
-
-        this.actionForm.setControl('publication',
-            new FormControl(this.action.publication || ''));
-
         this.actionForm.setControl('canonicalUrl',
             new FormControl(this.action.canonicalUrl || ''));
 

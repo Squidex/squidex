@@ -22,8 +22,6 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
 {
     public sealed class MediumJob
     {
-        public string RequestUrl { get; set; }
-
         public string RequestBody { get; set; }
 
         public string AccessToken { get; set; }
@@ -44,11 +42,6 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
 
         protected override (string Description, MediumJob Data) CreateJob(EnrichedEvent @event, MediumAction action)
         {
-            var requestUrl =
-                !string.IsNullOrWhiteSpace(action.Author) ?
-                $"https://api.medium.com/v1/users/{action.Author}/posts" :
-                $"https://api.medium.com/v1/publication/{action.Publication}/posts";
-
             var requestBody =
                 new JObject(
                     new JProperty("title", formatter.Format(action.Title, @event)),
@@ -57,12 +50,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
                     new JProperty("canonicalUrl", formatter.Format(action.CanonicalUrl, @event)),
                     new JProperty("tags", ParseTags(@event, action)));
 
-            var ruleJob = new MediumJob
-            {
-                AccessToken = action.AccessToken,
-                RequestUrl = requestUrl,
-                RequestBody = requestBody.ToString(Formatting.Indented)
-            };
+            var ruleJob = new MediumJob { AccessToken = action.AccessToken, RequestBody = requestBody.ToString(Formatting.Indented) };
 
             return (Description, ruleJob);
         }
@@ -91,17 +79,36 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
 
         protected override async Task<(string Dump, Exception Exception)> ExecuteJobAsync(MediumJob job)
         {
-            var requestBody = job.RequestBody;
-            var requestMessage = BuildRequest(job, requestBody);
+            string id;
 
             HttpResponseMessage response = null;
 
+            var meRequest = BuildMeRequest(job);
             try
             {
-                response = await HttpClientPool.GetHttpClient().SendAsync(requestMessage);
+                response = await HttpClientPool.GetHttpClient().SendAsync(meRequest);
 
                 var responseString = await response.Content.ReadAsStringAsync();
-                var requestDump = DumpFormatter.BuildDump(requestMessage, response, requestBody, responseString, TimeSpan.Zero, false);
+                var responseJson = JToken.Parse(responseString);
+
+                id = responseJson["data"]["id"].ToString();
+            }
+            catch (Exception ex)
+            {
+                var requestDump = DumpFormatter.BuildDump(meRequest, response, ex.ToString());
+
+                return (requestDump, ex);
+            }
+
+            var postRequestBody = job.RequestBody;
+            var postRequest = BuildPostRequest(job, postRequestBody, id);
+
+            try
+            {
+                response = await HttpClientPool.GetHttpClient().SendAsync(postRequest);
+
+                var responseString = await response.Content.ReadAsStringAsync();
+                var requestDump = DumpFormatter.BuildDump(postRequest, response, postRequestBody, responseString);
 
                 Exception ex = null;
 
@@ -114,18 +121,29 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
             }
             catch (Exception ex)
             {
-                var requestDump = DumpFormatter.BuildDump(requestMessage, response, requestBody, ex.ToString(), TimeSpan.Zero, false);
+                var requestDump = DumpFormatter.BuildDump(postRequest, response, postRequestBody, ex.ToString());
 
                 return (requestDump, ex);
             }
         }
 
-        private static HttpRequestMessage BuildRequest(MediumJob job, string requestBody)
+        private static HttpRequestMessage BuildPostRequest(MediumJob job, string requestBody, string id)
         {
-            var request = new HttpRequestMessage(HttpMethod.Post, job.RequestUrl)
+            var request = new HttpRequestMessage(HttpMethod.Post, $"https://api.medium.com/v1/users/{id}/posts")
             {
                 Content = new StringContent(requestBody, Encoding.UTF8, "application/json")
             };
+
+            request.Headers.Add("Accept", "application/json");
+            request.Headers.Add("Accept-Charset", "utf-8");
+            request.Headers.Add("Authorization", $"Bearer {job.AccessToken}");
+
+            return request;
+        }
+
+        private static HttpRequestMessage BuildMeRequest(MediumJob job)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Get, "https://api.medium.com/v1/me");
 
             request.Headers.Add("Accept", "application/json");
             request.Headers.Add("Accept-Charset", "utf-8");

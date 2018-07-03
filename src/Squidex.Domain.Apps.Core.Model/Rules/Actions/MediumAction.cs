@@ -14,10 +14,6 @@ namespace Squidex.Domain.Apps.Core.Rules.Actions
     {
         public string AccessToken { get; set; }
 
-        public string Author { get; set; }
-
-        public string Publication { get; set; }
-
         public string Tags { get; set; }
 
         public string Title { get; set; }
