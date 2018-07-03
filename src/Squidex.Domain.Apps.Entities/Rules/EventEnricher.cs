@@ -8,7 +8,6 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
-using NodaTime;
 using Orleans;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.HandleRules;
@@ -31,19 +30,16 @@ namespace Squidex.Domain.Apps.Entities.Rules
         private readonly IGrainFactory grainFactory;
         private readonly IMemoryCache cache;
         private readonly IUserResolver userResolver;
-        private readonly IClock clock;
 
-        public EventEnricher(IGrainFactory grainFactory, IMemoryCache cache, IUserResolver userResolver, IClock clock)
+        public EventEnricher(IGrainFactory grainFactory, IMemoryCache cache, IUserResolver userResolver)
         {
             Guard.NotNull(grainFactory, nameof(grainFactory));
             Guard.NotNull(cache, nameof(cache));
-            Guard.NotNull(clock, nameof(clock));
             Guard.NotNull(userResolver, nameof(userResolver));
 
-            this.userResolver = userResolver;
-            this.cache = cache;
-            this.clock = clock;
             this.grainFactory = grainFactory;
+            this.cache = cache;
+            this.userResolver = userResolver;
         }
 
         public async Task<EnrichedEvent> EnrichAsync(Envelope<AppEvent> @event)
@@ -80,9 +76,10 @@ namespace Squidex.Domain.Apps.Entities.Rules
             var asset =
                 (await grainFactory
                     .GetGrain<IAssetGrain>(assetEvent.AssetId)
-                    .GetStateAsync(@event.Headers.EventStreamNumber())).Value;
+                    .GetStateAsync()).Value;
 
             SimpleMapper.Map(asset, result);
+            SimpleMapper.Map(assetEvent, result);
 
             switch (assetEvent)
             {
@@ -108,11 +105,13 @@ namespace Squidex.Domain.Apps.Entities.Rules
             var content =
                 (await grainFactory
                     .GetGrain<IContentGrain>(contentEvent.ContentId)
-                    .GetStateAsync(@event.Headers.EventStreamNumber())).Value;
+                    .GetStateAsync()).Value;
 
             SimpleMapper.Map(content, result);
 
             result.Data = content.Data ?? content.DataDraft;
+
+            SimpleMapper.Map(contentEvent, result);
 
             switch (contentEvent)
             {
@@ -122,17 +121,25 @@ namespace Squidex.Domain.Apps.Entities.Rules
                 case ContentDeleted _:
                     result.Type = EnrichedContentEventType.Deleted;
                     break;
+                case ContentChangesPublished _:
                 case ContentUpdated _:
                     result.Type = EnrichedContentEventType.Updated;
                     break;
                 case ContentStatusChanged contentStatusChanged:
-                    if (contentStatusChanged.Status == Status.Published)
+                    switch (contentStatusChanged.Change)
                     {
-                        result.Type = EnrichedContentEventType.Published;
-                    }
-                    else
-                    {
-                        result.Type = EnrichedContentEventType.Unpublished;
+                        case StatusChange.Published:
+                            result.Type = EnrichedContentEventType.Published;
+                            break;
+                        case StatusChange.Unpublished:
+                            result.Type = EnrichedContentEventType.Unpublished;
+                            break;
+                        case StatusChange.Archived:
+                            result.Type = EnrichedContentEventType.Archived;
+                            break;
+                        case StatusChange.Restored:
+                            result.Type = EnrichedContentEventType.Restored;
+                            break;
                     }
 
                     break;
@@ -143,10 +150,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
         private async Task EnrichDefaultAsync(EnrichedEvent result, Envelope<AppEvent> @event)
         {
-            result.Timestamp =
-                @event.Headers.Contains(CommonHeaders.Timestamp) ?
-                @event.Headers.Timestamp() :
-                clock.GetCurrentInstant();
+            result.Timestamp = @event.Headers.Timestamp();
 
             if (@event.Payload is SquidexEvent squidexEvent)
             {

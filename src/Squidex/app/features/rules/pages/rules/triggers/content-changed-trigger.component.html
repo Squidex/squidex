@@ -10,6 +10,9 @@
             <col style="width: 40px" />
             <col style="width: 40px" />
             <col style="width: 40px" />
+            <col style="width: 40px" />
+            <col style="width: 40px" />
+            <col style="width: 40px" />
         </colgroup>
 
         <tr>
@@ -30,6 +33,15 @@
             </th>
             <th class="text-center">
                 <div class="rotated-label">Published</div>
+            </th>
+            <th class="text-center">
+                <div class="rotated-label">Unpublished</div>
+            </th>
+            <th class="text-center">
+                <div class="rotated-label">Archived</div>
+            </th>
+            <th class="text-center">
+                <div class="rotated-label">Restored</div>
             </th>
             <th></th>
         </tr>
@@ -52,6 +64,15 @@
             </td>
             <td class="text-center" title="Published">
                 <input type="checkbox" [ngModel]="schema.sendPublish" (ngModelChange)="toggle(schema, 'sendPublish')" />
+            </td>
+            <td class="text-center" title="Unpublished">
+                <input type="checkbox" [ngModel]="schema.sendUnpublish" (ngModelChange)="toggle(schema, 'sendUnpublish')" />
+            </td>
+            <td class="text-center" title="Archived">
+                <input type="checkbox" [ngModel]="schema.sendArchived" (ngModelChange)="toggle(schema, 'sendArchived')" />
+            </td>
+            <td class="text-center" title="Restored">
+                <input type="checkbox" [ngModel]="schema.sendRestored" (ngModelChange)="toggle(schema, 'sendRestored')" />
             </td>
             <td class="text-center">
                 <button type="button" class="btn btn-link btn-secondary" (click)="removeSchema(schema)">

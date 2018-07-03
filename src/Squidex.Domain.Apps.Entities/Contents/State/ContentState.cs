@@ -32,10 +32,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.State
         public NamedContentData DataDraft { get; set; }
 
         [JsonProperty]
-        public Status Status { get; set; }
+        public ScheduleJob ScheduleJob { get; set; }
 
         [JsonProperty]
-        public ScheduleJob ScheduleJob { get; set; }
+        public Status Status { get; set; }
 
         [JsonProperty]
         public bool IsPending { get; set; }

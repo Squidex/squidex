@@ -140,9 +140,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
             ApplySnapshot(Snapshot.Apply(@event));
         }
 
-        public Task<J<IAssetEntity>> GetStateAsync(long version = EtagVersion.Empty)
+        public Task<J<IAssetEntity>> GetStateAsync()
         {
-            return J.AsTask<IAssetEntity>(GetSnapshot(version));
+            return J.AsTask<IAssetEntity>(Snapshot);
         }
     }
 }

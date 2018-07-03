@@ -21,7 +21,7 @@ namespace Squidex.Infrastructure
 
         public IReadOnlyList<ValidationError> Errors
         {
-            get { return errors; }
+            get { return errors ?? FallbackErrors; }
         }
 
         public string Summary { get; }

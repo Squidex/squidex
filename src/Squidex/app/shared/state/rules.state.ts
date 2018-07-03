@@ -158,7 +158,7 @@ const updateTrigger = (rule: RuleDto, trigger: any, user: string, version: Versi
 const updateAction = (rule: RuleDto, action: any, user: string, version: Version, now?: DateTime) =>
     rule.with({
         action,
-        actionType: action.triggerType,
+        actionType: action.actionType,
         lastModified: now || DateTime.now(),
         lastModifiedBy: user,
         version
