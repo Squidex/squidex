@@ -1,7 +1,7 @@
 <div class="assets-container" [class.disabled]="isDisabled">
     <div class="row">
         <div class="drop-area-container">
-            <div class="drop-area" (sqxFileDrop)="addFiles($event)" (click)="selectorModal.show()">
+            <div class="drop-area" (sqxFileDrop)="addFiles($event)" (click)="assetsDialog.show()">
                 Drop files here to add them.
             </div>
         </div>
@@ -16,6 +16,6 @@
     </div>
 </div>
 
-<ng-container *sqxModalView="selectorModal;onRoot:true;closeAuto:false">
+<ng-container *sqxModalView="assetsDialog;onRoot:true;closeAuto:false">
     <sqx-assets-selector (selected)="onAssetsSelected($event)"></sqx-assets-selector>
 </ng-container>
