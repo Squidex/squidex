@@ -9,8 +9,9 @@ import { Component } from '@angular/core';
 
 import {
     AppsState,
+    DialogModel,
     fadeAnimation,
-    ModalView
+    ModalModel
 } from '@app/shared';
 
 @Component({
@@ -22,9 +23,9 @@ import {
     ]
 })
 export class AppsMenuComponent {
-    public addAppDialog = new ModalView();
+    public addAppDialog = new DialogModel();
 
-    public appsMenu = new ModalView(false, true);
+    public appsMenu = new ModalModel();
 
     constructor(
         public readonly appsState: AppsState

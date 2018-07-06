@@ -20,8 +20,6 @@ import {
     UsagesService
 } from '@app/shared';
 
-declare var _urq: any;
-
 @Component({
     selector: 'sqx-dashboard-page',
     styleUrls: ['./dashboard-page.component.scss'],
@@ -174,10 +172,6 @@ export class DashboardPageComponent implements OnDestroy, OnInit {
                         ]
                     };
                 }));
-    }
-
-    public showForum() {
-        _urq.push(['Feedback_Open']);
     }
 }
 

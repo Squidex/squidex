@@ -14,7 +14,7 @@ import {
     fadeAnimation,
     FieldFormatter,
     fieldInvariant,
-    ModalView,
+    ModalModel,
     PatchContentForm,
     RootFieldDto,
     SchemaDetailsDto,
@@ -70,7 +70,7 @@ export class ContentItemComponent implements OnChanges {
 
     public patchForm: PatchContentForm;
 
-    public dropdown = new ModalView(false, true);
+    public dropdown = new ModalModel();
 
     public values: any[] = [];
 

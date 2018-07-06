@@ -11,7 +11,8 @@ import { take } from 'rxjs/operators';
 import {
     AppsState,
     AuthService,
-    ModalView,
+    DialogModel,
+    ModalModel,
     OnboardingService
 } from '@app/shared';
 
@@ -21,10 +22,10 @@ import {
     templateUrl: './apps-page.component.html'
 })
 export class AppsPageComponent implements OnInit {
-    public addAppDialog = new ModalView();
+    public addAppDialog = new DialogModel();
     public addAppTemplate = '';
 
-    public onboardingModal = new ModalView();
+    public onboardingModal = new ModalModel();
 
     constructor(
         public readonly appsState: AppsState,

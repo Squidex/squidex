@@ -14,11 +14,12 @@ import { filter, map, onErrorResumeNext } from 'rxjs/operators';
 
 import {
     AppsState,
+    DialogModel,
     fadeAnimation,
     FieldDto,
     fieldTypes,
     MessageBus,
-    ModalView,
+    ModalModel,
     PatternsState,
     SchemaDetailsDto,
     SchemasState,
@@ -45,14 +46,14 @@ export class SchemaPageComponent implements OnDestroy, OnInit {
     public schemaExport: any;
     public schema: SchemaDetailsDto;
 
-    public exportSchemaDialog = new ModalView();
+    public exportSchemaDialog = new DialogModel();
 
-    public configureScriptsDialog = new ModalView();
+    public configureScriptsDialog = new DialogModel();
 
-    public editOptionsDropdown = new ModalView();
-    public editSchemaDialog = new ModalView();
+    public editOptionsDropdown = new ModalModel();
+    public editSchemaDialog = new DialogModel();
 
-    public addFieldDialog = new ModalView();
+    public addFieldDialog = new DialogModel();
 
     constructor(
         public readonly appsState: AppsState,

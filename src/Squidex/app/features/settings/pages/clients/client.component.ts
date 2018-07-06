@@ -15,8 +15,8 @@ import {
     AppClientsService,
     AppsState,
     ClientsState,
+    DialogModel,
     DialogService,
-    ModalView,
     RenameClientForm,
     UpdateAppClientDto
 } from '@app/shared';
@@ -37,7 +37,7 @@ export class ClientComponent implements OnChanges {
     public isRenaming = false;
 
     public token: AccessTokenDto;
-    public tokenDialog = new ModalView();
+    public tokenDialog = new DialogModel();
 
     public renameForm = new RenameClientForm(this.formBuilder);
 

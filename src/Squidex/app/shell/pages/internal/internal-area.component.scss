@@ -23,49 +23,52 @@
     float: left;
 }
 
-.github {
+$support-icon-size: 50px;
+$support-text-size: 200px;
+
+.support {
     &-button {
         & {
-            @include fixed(50%, -103px, auto, auto);
-            @include border-radius-left(3px);
+            @include fixed(50%, -$support-text-size, auto, auto);
             @include transition(transform .3s ease);
-            background: lighten($color-extern-github, 10%);
-            border: 0;
-            cursor: pointer;
-            color: $color-dark-foreground;
-            margin-top: -60px;
-            padding-left: 65px;
+            background: $color-theme-blue;
             font-size: .9rem;
             font-weight: bold;
-            height: 44px;
-            line-height: 40px;
-            width: 147px;
-            z-index: 1000000094;
+            height: $support-icon-size;
+            line-break: normal;
+            line-height: $support-icon-size - 6px;
+            z-index: 100000000;
         }
 
         &:hover {
             & {
-                @include translate(-103px, 0);
+                @include translate(-$support-text-size, 0);
                 text-decoration: none;
             }
 
-            .github-icon {
-                background: $color-extern-github;
+            .support-icon {
+                background: $color-theme-blue-dark;
             }
         }
     }
 
+    &-icon,
+    &-text {
+        cursor: pointer;
+        color: $color-dark-foreground;
+        text-align: center;
+    }
+
+    &-text {
+        width: $support-text-size;
+    }
+
     &-icon {
-        @include absolute(0, auto, auto, 0);
-        @include border-radius-left(3px);
         @include transition(background-color .4s ease);
-        background: lighten($color-extern-github, 10%);
-        display: inline-block;
-        line-height: 44px;
+        background: $color-theme-blue;
+        line-height: $support-icon-size;
         font-size: 1.5rem;
         font-weight: normal;
-        width: 44px;
-        text-align: center;
-        color: $color-dark-foreground;
+        width: $support-icon-size;
     }
 }

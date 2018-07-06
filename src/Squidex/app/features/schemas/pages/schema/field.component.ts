@@ -12,10 +12,11 @@ import { onErrorResumeNext } from 'rxjs/operators';
 import {
     AppPatternDto,
     createProperties,
+    DialogModel,
     EditFieldForm,
     fadeAnimation,
     ImmutableArray,
-    ModalView,
+    ModalModel,
     NestedFieldDto,
     RootFieldDto,
     SchemaDetailsDto,
@@ -44,14 +45,14 @@ export class FieldComponent implements OnInit {
     @Input()
     public patterns: ImmutableArray<AppPatternDto>;
 
-    public dropdown = new ModalView(false, true);
+    public dropdown = new ModalModel();
 
     public isEditing = false;
     public selectedTab = 0;
 
     public editForm: EditFieldForm;
 
-    public addFieldDialog = new ModalView();
+    public addFieldDialog = new DialogModel();
 
     constructor(
         private readonly formBuilder: FormBuilder,

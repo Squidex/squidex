@@ -10,7 +10,7 @@ import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from
 import { Observable } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 
-import { allParams, MathHelper } from '@app/framework';
+import { allParams } from '@app/framework';
 
 import { SchemasState } from './../state/schemas.state';
 
@@ -32,8 +32,8 @@ export class SchemaMustExistPublishedGuard implements CanActivate {
                         this.router.navigate(['/404']);
                     }
 
-                    if (dto && dto.isSingleton && state.url.indexOf(MathHelper.EMPTY_GUID) < 0) {
-                        this.router.navigate([state.url, MathHelper.EMPTY_GUID]);
+                    if (dto && dto.isSingleton && state.url.indexOf(dto.id) < 0) {
+                        this.router.navigate([state.url, dto.id]);
                     }
                 }),
                 map(s => s !== null && s.isPublished));

@@ -10,7 +10,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import {
     AssetDto,
-    ModalView,
+    DialogModel,
     ResourceLoaderService,
     Types
 } from '@app/shared/internal';
@@ -35,7 +35,7 @@ export class RichEditorComponent implements ControlValueAccessor, AfterViewInit,
     private value: string;
     private isDisabled = false;
 
-    public selectorModal = new ModalView();
+    public assetsDialog = new DialogModel();
 
     @ViewChild('editor')
     public editor: ElementRef;
@@ -63,7 +63,7 @@ export class RichEditorComponent implements ControlValueAccessor, AfterViewInit,
     }
 
     private showSelector = () => {
-        this.selectorModal.show();
+        this.assetsDialog.show();
     }
 
     private getEditorOptions() {
@@ -147,6 +147,6 @@ export class RichEditorComponent implements ControlValueAccessor, AfterViewInit,
             this.tinyEditor.execCommand('mceInsertContent', false, content);
         }
 
-        this.selectorModal.hide();
+        this.assetsDialog.hide();
     }
 }

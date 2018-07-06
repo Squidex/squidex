@@ -10,7 +10,7 @@ import { onErrorResumeNext } from 'rxjs/operators';
 
 import {
     AppsState,
-    ModalView,
+    DialogModel,
     ruleActions,
     RuleDto,
     RulesState,
@@ -27,7 +27,7 @@ export class RulesPageComponent implements OnInit {
     public ruleActions = ruleActions;
     public ruleTriggers = ruleTriggers;
 
-    public addRuleDialog = new ModalView();
+    public addRuleDialog = new DialogModel();
 
     public wizardMode = 'Wizard';
     public wizardRule: RuleDto | null;

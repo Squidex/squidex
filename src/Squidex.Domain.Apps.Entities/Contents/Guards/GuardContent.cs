@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
@@ -25,7 +24,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
                 ValidateData(command, e);
             });
 
-            if (schema.IsSingleton && command.ContentId != Guid.Empty)
+            if (schema.IsSingleton && command.ContentId != schema.Id)
             {
                 throw new DomainException("Singleton content cannot be created.");
             }

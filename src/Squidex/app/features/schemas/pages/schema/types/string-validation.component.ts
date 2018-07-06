@@ -14,7 +14,7 @@ import {
     AppPatternDto,
     FieldDto,
     ImmutableArray,
-    ModalView,
+    ModalModel,
     StringFieldPropertiesDto
 } from '@app/shared';
 
@@ -43,7 +43,7 @@ export class StringValidationComponent implements OnDestroy, OnInit {
     public showPatternSuggestions: Observable<boolean>;
 
     public patternName: string;
-    public patternsModal = new ModalView(false, false);
+    public patternsModal = new ModalModel();
 
     public ngOnDestroy() {
         this.patternSubscription.unsubscribe();

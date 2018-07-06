@@ -9,7 +9,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription, timer } from 'rxjs';
 import { onErrorResumeNext, switchMap } from 'rxjs/operators';
 
-import { ModalView } from '@app/shared';
+import { DialogModel } from '@app/shared';
 
 import { EventConsumerDto } from './../../services/event-consumers.service';
 import { EventConsumersState } from './../../state/event-consumers.state';
@@ -22,7 +22,7 @@ import { EventConsumersState } from './../../state/event-consumers.state';
 export class EventConsumersPageComponent implements OnDestroy, OnInit {
     private timerSubscription: Subscription;
 
-    public eventConsumerErrorDialog = new ModalView();
+    public eventConsumerErrorDialog = new DialogModel();
     public eventConsumerError = '';
 
     constructor(

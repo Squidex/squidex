@@ -14,8 +14,8 @@ import { map, onErrorResumeNext } from 'rxjs/operators';
 import {
     AppsState,
     CreateCategoryForm,
+    DialogModel,
     MessageBus,
-    ModalView,
     SchemaDto,
     SchemasState
 } from '@app/shared';
@@ -30,7 +30,7 @@ import { SchemaCloning } from './../messages';
 export class SchemasPageComponent implements OnDestroy, OnInit {
     private schemaCloningSubscription: Subscription;
 
-    public addSchemaDialog = new ModalView();
+    public addSchemaDialog = new DialogModel();
     public addCategoryForm = new CreateCategoryForm(this.formBuilder);
 
     public schemasFilter = new FormControl();

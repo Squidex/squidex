@@ -14,9 +14,9 @@ import {
     AssetsService,
     AuthService,
     DateTime,
+    DialogModel,
     DialogService,
     fadeAnimation,
-    ModalView,
     RenameAssetForm,
     Types,
     UpdateAssetDto,
@@ -68,7 +68,7 @@ export class AssetComponent implements OnInit {
     @Output()
     public failed = new EventEmitter();
 
-    public renameDialog = new ModalView();
+    public renameDialog = new DialogModel();
     public renameForm = new RenameAssetForm(this.formBuilder);
 
     public progress = 0;

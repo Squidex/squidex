@@ -5,37 +5,17 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ModalView } from './modal-view';
+import { DialogModel, ModalModel, Openable } from './modal-view';
 
-describe('ModalView', () => {
+describe('DialogModel', () => {
     it('should have default values', () => {
-        const dialog = new ModalView();
+        const dialog = new DialogModel();
 
         checkValue(dialog, false);
-
-        expect(dialog.closeAlways).toBeFalsy();
-    });
-
-    it('should have initial true value', () => {
-        const dialog = new ModalView(true);
-
-        checkValue(dialog, true);
-    });
-
-    it('should have initial false value', () => {
-        const dialog = new ModalView(false);
-
-        checkValue(dialog, false);
-    });
-
-    it('should have close always set by constructor', () => {
-        const dialog = new ModalView(false, true);
-
-        expect(dialog.closeAlways).toBeTruthy();
     });
 
     it('should become open after show', () => {
-        const dialog = new ModalView(false);
+        const dialog = new DialogModel();
 
         dialog.show();
 
@@ -43,7 +23,7 @@ describe('ModalView', () => {
     });
 
     it('should become open after toggle', () => {
-        const dialog = new ModalView(false);
+        const dialog = new DialogModel();
 
         dialog.toggle();
 
@@ -51,7 +31,7 @@ describe('ModalView', () => {
     });
 
     it('should become closed after hide', () => {
-        const dialog = new ModalView(true);
+        const dialog = new DialogModel().show();
 
         dialog.hide();
 
@@ -59,21 +39,81 @@ describe('ModalView', () => {
     });
 
     it('should become closed after toggle', () => {
-        const dialog = new ModalView(true);
+        const dialog = new DialogModel().show();
 
         dialog.toggle();
 
         checkValue(dialog, false);
     });
 
-    function checkValue(dialog: ModalView, expected: boolean) {
-        let result: boolean;
+    it('should not hide other dialog', () => {
+        const dialog1 = new DialogModel().show();
+        const dialog2 = new DialogModel();
 
-        dialog.isOpen.subscribe(value => {
-            result = value;
-        }).unsubscribe();
+        dialog2.toggle();
 
-        expect(result!).toBe(expected);
-    }
+        checkValue(dialog1, true);
+        checkValue(dialog2, true);
+    });
 });
+
+describe('ModalModel', () => {
+    it('should have default values', () => {
+        const modal = new ModalModel();
+
+        checkValue(modal, false);
+    });
+
+    it('should become open after show', () => {
+        const modal = new ModalModel();
+
+        modal.show();
+
+        checkValue(modal, true);
+    });
+
+    it('should become open after toggle', () => {
+        const modal = new ModalModel();
+
+        modal.toggle();
+
+        checkValue(modal, true);
+    });
+
+    it('should become closed after hide', () => {
+        const modal = new ModalModel().show();
+
+        modal.hide();
+
+        checkValue(modal, false);
+    });
+
+    it('should become closed after toggle', () => {
+        const modal = new ModalModel().show();
+
+        modal.toggle();
+
+        checkValue(modal, false);
+    });
+
+    it('should hide other modal', () => {
+        const modal1 = new ModalModel().show();
+        const modal2 = new ModalModel();
+
+        modal2.toggle();
+
+        checkValue(modal1, false);
+        checkValue(modal2, true);
+    });
+});
+
+function checkValue(modal: Openable, expected: boolean) {
+    let result: boolean;
+
+    modal.isOpen.subscribe(value => {
+        result = value;
+    }).unsubscribe();
+
+    expect(result!).toBe(expected);
+}
 

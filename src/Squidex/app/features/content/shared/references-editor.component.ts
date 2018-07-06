@@ -15,6 +15,7 @@ import {
     AppsState,
     ContentDto,
     ContentsService,
+    DialogModel,
     ImmutableArray,
     MathHelper,
     SchemaDetailsDto,
@@ -47,7 +48,7 @@ export class ReferencesEditorComponent implements ControlValueAccessor, OnInit {
     @Input()
     public languages: ImmutableArray<AppLanguageDto>;
 
-    public isModalVisibible = false;
+    public selectorDialog = new DialogModel();
 
     public schema: SchemaDetailsDto;
 
@@ -110,14 +111,6 @@ export class ReferencesEditorComponent implements ControlValueAccessor, OnInit {
         this.callTouched = fn;
     }
 
-    public showModal() {
-        this.isModalVisibible = true;
-    }
-
-    public hideModal() {
-        this.isModalVisibible = false;
-    }
-
     public select(contents: ContentDto[]) {
         for (let content of contents) {
             this.contentItems = this.contentItems.push(content);
@@ -127,7 +120,7 @@ export class ReferencesEditorComponent implements ControlValueAccessor, OnInit {
             this.updateValue();
         }
 
-        this.hideModal();
+        this.selectorDialog.hide();
     }
 
     public remove(content: ContentDto) {

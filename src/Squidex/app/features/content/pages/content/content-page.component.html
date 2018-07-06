@@ -44,7 +44,7 @@
                     </button>
 
                     <ng-container *ngIf="content.isPending || !schema.isSingleton">
-                        <div class="dropdown-menu" *sqxModalView="dropdown" [sqxModalTarget]="optionsButton" @fade>
+                        <div class="dropdown-menu" *sqxModalView="dropdown;closeAlways:true" [sqxModalTarget]="optionsButton" @fade>
                             <ng-container *ngIf="content.isPending">
                                 <a class="dropdown-item" (click)="discardChanges()">
                                     Discard changes
