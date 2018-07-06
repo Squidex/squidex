@@ -9,8 +9,6 @@ import { Router, RouterStateSnapshot } from '@angular/router';
 import { of } from 'rxjs';
 import { IMock, Mock, Times } from 'typemoq';
 
-import { MathHelper } from '@app/framework';
-
 import { SchemaDetailsDto } from './../services/schemas.service';
 import { SchemasState } from './../state/schemas.state';
 import { SchemaMustExistPublishedGuard } from './schema-must-exist-published.guard';
@@ -50,7 +48,7 @@ describe('SchemaMustExistPublishedGuard', () => {
 
     it('should load schema and return false when not found', () => {
         schemasState.setup(x => x.select('123'))
-        .returns(() => of(<SchemaDetailsDto>{ isPublished: false }));
+            .returns(() => of(<SchemaDetailsDto>{ isPublished: false }));
 
         let result: boolean;
 
@@ -80,7 +78,7 @@ describe('SchemaMustExistPublishedGuard', () => {
 
     it('should redirect to content when singleton', () => {
         schemasState.setup(x => x.select('123'))
-        .returns(() => of(<SchemaDetailsDto>{ isSingleton: true }));
+            .returns(() => of(<SchemaDetailsDto>{ isSingleton: true, id: 'schema-id' }));
 
         let result: boolean;
 
@@ -90,6 +88,6 @@ describe('SchemaMustExistPublishedGuard', () => {
 
         expect(result!).toBeFalsy();
 
-        router.verify(x => x.navigate([state.url, MathHelper.EMPTY_GUID]), Times.once());
+        router.verify(x => x.navigate([state.url, 'schema-id']), Times.once());
     });
 });

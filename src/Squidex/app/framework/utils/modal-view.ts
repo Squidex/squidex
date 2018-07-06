@@ -7,49 +7,78 @@
 
 import { BehaviorSubject, Observable } from 'rxjs';
 
-export class ModalView {
-    private readonly isOpen$: BehaviorSubject<boolean>;
-    private static openView: ModalView | null = null;
+export interface Openable {
+    isOpen: Observable<boolean>;
+}
+
+export class DialogModel implements Openable {
+    private readonly isOpen$ = new BehaviorSubject<boolean>(false);
 
     public get isOpen(): Observable<boolean> {
         return this.isOpen$;
     }
 
-    constructor(isOpen = false,
-        public readonly closeAlways: boolean = false
-    ) {
-        this.isOpen$ = new BehaviorSubject(isOpen);
-    }
-
-    public show() {
-        if (ModalView.openView !== this && ModalView.openView) {
-            ModalView.openView.hide();
-        }
-
-        ModalView.openView = this;
-
+    public show(): DialogModel {
         this.isOpen$.next(true);
+
+        return this;
     }
 
-    public hide() {
-        if (ModalView.openView === this) {
-            ModalView.openView = null;
+    public hide(): DialogModel {
+        this.isOpen$.next(false);
+
+        return this;
+    }
+
+    public toggle(): DialogModel {
+        this.isOpen$.next(!this.isOpen$.value);
+
+        return this;
+    }
+}
+
+export class ModalModel implements Openable {
+    private readonly isOpen$ = new BehaviorSubject<boolean>(false);
+
+    public get isOpen(): Observable<boolean> {
+        return this.isOpen$;
+    }
+
+    public show(): ModalModel {
+        if (!this.isOpen$.value) {
+            if (openModal && openModal !== this) {
+                openModal.hide();
+            }
+
+            openModal = this;
+
+            this.isOpen$.next(true);
         }
 
-        this.isOpen$.next(false);
+        return this;
     }
 
-    public toggle() {
-        let isOpenSnapshot = false;
+    public hide(): ModalModel {
+        if (this.isOpen$.value) {
+            if (openModal === this) {
+                openModal = null;
+            }
 
-        this.isOpen.subscribe(v => {
-            isOpenSnapshot = v;
-        }).unsubscribe();
+            this.isOpen$.next(false);
+        }
 
-        if (isOpenSnapshot) {
+        return this;
+    }
+
+    public toggle(): ModalModel {
+        if (this.isOpen$.value) {
             this.hide();
         } else {
             this.show();
         }
+
+        return this;
     }
 }
+
+let openModal: ModalModel | null = null;

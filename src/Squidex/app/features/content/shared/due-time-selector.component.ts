@@ -8,7 +8,7 @@
 import { Component } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 
-import { fadeAnimation, ModalView } from '@app/shared';
+import { DialogModel, fadeAnimation } from '@app/shared';
 
 @Component({
     selector: 'sqx-due-time-selector',
@@ -19,7 +19,7 @@ import { fadeAnimation, ModalView } from '@app/shared';
     ]
 })
 export class DueTimeSelectorComponent {
-    public dueTimeDialog = new ModalView();
+    public dueTimeDialog = new DialogModel();
     public dueTime: string | null = '';
     public dueTimeFunction: Subject<string | null>;
     public dueTimeAction: string | null = '';

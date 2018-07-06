@@ -11,7 +11,7 @@
         </span>
 
         <ng-container *ngIf="appsState.apps | async; let apps">
-            <div class="dropdown-menu" *sqxModalView="appsMenu" @fade>
+            <div class="dropdown-menu" *sqxModalView="appsMenu;closeAlways:true" @fade>
                 <a class="dropdown-item all-apps" routerLink="/app">
                     <span class="all-apps-text">All Apps</span> 
                     <span class="all-apps-pill badge badge-pill badge-primary">{{apps.length}}</span>

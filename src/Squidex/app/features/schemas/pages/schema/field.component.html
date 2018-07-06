@@ -121,7 +121,7 @@
                 </button>
             </div>
                 
-            <ng-container *sqxModalView="addFieldDialog;onRoot:true;closeAuto:false">
+            <ng-container *sqxModalView="addFieldDialog;onRoot:true;closeAuto:false;closeAlways:true">
                 <sqx-field-wizard [schema]="schema" [parent]="field"
                     (completed)="addFieldDialog.hide()">
                 </sqx-field-wizard>

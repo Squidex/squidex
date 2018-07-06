@@ -10,7 +10,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import {
     AssetDto,
-    ModalView,
+    DialogModel,
     ResourceLoaderService,
     Types
 } from '@app/shared/internal';
@@ -34,7 +34,7 @@ export class MarkdownEditorComponent implements ControlValueAccessor, AfterViewI
     private value: string;
     private isDisabled = false;
 
-    public selectorModal = new ModalView();
+    public assetsDialog = new DialogModel();
 
     @ViewChild('editor')
     public editor: ElementRef;
@@ -79,7 +79,7 @@ export class MarkdownEditorComponent implements ControlValueAccessor, AfterViewI
     }
 
     private showSelector = () => {
-        this.selectorModal.show();
+        this.assetsDialog.show();
     }
 
     public ngAfterViewInit() {
@@ -206,6 +206,6 @@ export class MarkdownEditorComponent implements ControlValueAccessor, AfterViewI
             this.simplemde.codemirror.replaceSelection(content);
         }
 
-        this.selectorModal.hide();
+        this.assetsDialog.hide();
     }
 }

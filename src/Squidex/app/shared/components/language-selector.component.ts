@@ -7,7 +7,7 @@
 
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
 
-import { fadeAnimation, ModalView } from '@app/shared/internal';
+import { fadeAnimation, ModalModel } from '@app/shared/internal';
 
 export interface Language { iso2Code: string; englishName: string; isMasterLanguage: true; }
 
@@ -20,7 +20,7 @@ export interface Language { iso2Code: string; englishName: string; isMasterLangu
     ]
 })
 export class LanguageSelectorComponent implements OnChanges, OnInit {
-    public dropdown = new ModalView(false, true);
+    public dropdown = new ModalModel();
 
     @Input()
     public size: string;

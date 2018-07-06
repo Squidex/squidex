@@ -7,7 +7,7 @@
 
 import { ChangeDetectionStrategy, Component, Input, OnDestroy, OnInit, Renderer2 } from '@angular/core';
 
-import { ModalView } from './../../utils/modal-view';
+import { ModalModel } from './../../utils/modal-view';
 
 import { fadeAnimation } from './../animations';
 
@@ -30,7 +30,7 @@ export class TooltipComponent implements OnDestroy, OnInit {
     @Input()
     public position = 'topLeft';
 
-    public modal = new ModalView(false, false);
+    public modal = new ModalModel();
 
     constructor(
         private readonly renderer: Renderer2

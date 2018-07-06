@@ -86,7 +86,7 @@
         <button type="button" class="btn btn-link btn-secondary" (click)="dropdown.toggle(); $event.stopPropagation()" [class.active]="dropdown.isOpen | async" #optionsButton>
             <i class="icon-dots"></i>
         </button>
-        <div class="dropdown-menu" *sqxModalView="dropdown" [sqxModalTarget]="optionsButton" @fade>
+        <div class="dropdown-menu" *sqxModalView="dropdown;closeAlways:true" [sqxModalTarget]="optionsButton" @fade>
             <a class="dropdown-item" (click)="publishing.emit(); $event.stopPropagation()" *ngIf="content.status === 'Draft'">
                 Publish
             </a>

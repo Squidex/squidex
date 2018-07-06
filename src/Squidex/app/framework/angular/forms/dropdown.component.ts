@@ -13,7 +13,7 @@ const KEY_ESCAPE = 27;
 const KEY_UP = 38;
 const KEY_DOWN = 40;
 
-import { ModalView } from '@app/framework/internal';
+import { ModalModel } from '@app/framework/internal';
 
 export const SQX_DROPDOWN_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => DropdownComponent), multi: true
@@ -35,7 +35,7 @@ export class DropdownComponent implements AfterContentInit, ControlValueAccessor
     @ContentChildren(TemplateRef)
     public templates: QueryList<any>;
 
-    public dropdown = new ModalView();
+    public dropdown = new ModalModel();
 
     public selectedItem: any;
     public selectedIndex = -1;

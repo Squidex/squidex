@@ -9,7 +9,7 @@ import { Component, Input, OnDestroy, OnInit, Renderer2 } from '@angular/core';
 
 import {
     fadeAnimation,
-    ModalView,
+    ModalModel,
     OnboardingService,
     Types
 } from '@app/framework/internal';
@@ -27,7 +27,7 @@ export class OnboardingTooltipComponent implements OnDestroy, OnInit {
     private closeTimer: any;
     private forMouseDownListener: Function | null;
 
-    public tooltipModal = new ModalView();
+    public tooltipModal = new ModalModel();
 
     @Input()
     public for: any;

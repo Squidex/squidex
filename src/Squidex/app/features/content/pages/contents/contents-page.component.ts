@@ -16,7 +16,7 @@ import {
     ContentsState,
     ImmutableArray,
     LanguagesState,
-    ModalView,
+    ModalModel,
     SchemaDetailsDto,
     SchemasState
 } from '@app/shared';
@@ -35,7 +35,7 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
 
     public schema: SchemaDetailsDto;
 
-    public searchModal = new ModalView();
+    public searchModal = new ModalModel();
 
     public selectedItems:  { [id: string]: boolean; } = {};
     public selectionCount = 0;

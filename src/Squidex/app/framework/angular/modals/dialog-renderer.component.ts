@@ -9,10 +9,10 @@ import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 
 import {
+    DialogModel,
     DialogRequest,
     DialogService,
     fadeAnimation,
-    ModalView,
     Notification
 } from '@app/framework/internal';
 
@@ -29,7 +29,7 @@ export class DialogRendererComponent implements OnDestroy, OnInit {
     private dialogsSubscription: Subscription;
     private notificationsSubscription: Subscription;
 
-    public dialogView = new ModalView(false, true);
+    public dialogView = new DialogModel();
     public dialogRequest: DialogRequest | null = null;
 
     public notifications: Notification[] = [];

@@ -43,11 +43,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         }
 
         [Fact]
-        public void CanCreate_should_not_throw_exception_if_singleton_and_id_empty()
+        public void CanCreate_should_not_throw_exception_if_singleton_and_id_is_schema_id()
         {
             A.CallTo(() => schema.IsSingleton).Returns(true);
 
-            var command = new CreateContent { Data = new NamedContentData(), ContentId = Guid.Empty };
+            var command = new CreateContent { Data = new NamedContentData(), ContentId = schema.Id };
 
             GuardContent.CanCreate(schema, command);
         }

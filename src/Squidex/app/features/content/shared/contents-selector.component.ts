@@ -12,7 +12,7 @@ import {
     ContentDto,
     LanguageDto,
     ManualContentsState,
-    ModalView,
+    ModalModel,
     SchemaDetailsDto
 } from '@app/shared';
 
@@ -37,7 +37,7 @@ export class ContentsSelectorComponent implements OnInit {
     @Output()
     public selected = new EventEmitter<ContentDto[]>();
 
-    public searchModal = new ModalView();
+    public searchModal = new ModalModel();
 
     public selectedItems:  { [id: string]: ContentDto; } = {};
     public selectionCount = 0;

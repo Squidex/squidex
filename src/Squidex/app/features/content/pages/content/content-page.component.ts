@@ -24,7 +24,7 @@ import {
     ImmutableArray,
     LanguagesState,
     MessageBus,
-    ModalView,
+    ModalModel,
     SchemaDetailsDto,
     SchemasState,
     Version
@@ -52,7 +52,7 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
     public contentVersion: Version | null;
     public contentForm: EditContentForm;
 
-    public dropdown = new ModalView(false, true);
+    public dropdown = new ModalModel();
 
     public language: AppLanguageDto;
     public languages: ImmutableArray<AppLanguageDto>;

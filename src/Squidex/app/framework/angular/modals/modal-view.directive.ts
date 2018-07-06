@@ -8,7 +8,11 @@
 import { Directive, EmbeddedViewRef, Input, OnChanges, OnDestroy, Renderer2, SimpleChanges, TemplateRef, ViewContainerRef } from '@angular/core';
 import { Subscription } from 'rxjs';
 
-import { ModalView, Types } from '@app/framework/internal';
+import {
+    DialogModel,
+    ModalModel,
+    Types
+} from '@app/framework/internal';
 
 import { RootViewComponent } from './root-view.component';
 
@@ -21,13 +25,16 @@ export class ModalViewDirective implements OnChanges, OnDestroy {
     private renderedView: EmbeddedViewRef<any> | null = null;
 
     @Input('sqxModalView')
-    public modalView: ModalView | any;
+    public modalView: DialogModel | ModalModel | any;
 
     @Input('sqxModalViewOnRoot')
     public placeOnRoot = false;
 
     @Input('sqxModalViewCloseAuto')
     public closeAuto = true;
+
+    @Input('sqxModalViewCloseAlways')
+    public closeAlways = false;
 
     constructor(
         private readonly templateRef: TemplateRef<any>,
@@ -38,9 +45,10 @@ export class ModalViewDirective implements OnChanges, OnDestroy {
     }
 
     public ngOnDestroy() {
-        this.stopListening();
+        this.unsubscribeToModal();
+        this.unsubscribeToClick();
 
-        if (Types.is(this.modalView, ModalView)) {
+        if (Types.is(this.modalView, DialogModel) || Types.is(this.modalView, ModalModel)) {
             this.modalView.hide();
         }
     }
@@ -50,12 +58,9 @@ export class ModalViewDirective implements OnChanges, OnDestroy {
             return;
         }
 
-        if (this.subscription) {
-            this.subscription.unsubscribe();
-            this.subscription = null;
-        }
+        this.unsubscribeToModal();
 
-        if (Types.is(this.modalView, ModalView)) {
+        if (Types.is(this.modalView, DialogModel) || Types.is(this.modalView, ModalModel)) {
             this.subscription =
                 this.modalView.isOpen.subscribe(isOpen => {
                     this.update(isOpen);
@@ -71,11 +76,9 @@ export class ModalViewDirective implements OnChanges, OnDestroy {
         }
 
         if (isOpen && !this.renderedView) {
-            if (this.placeOnRoot) {
-                this.renderedView = this.rootView.viewContainer.createEmbeddedView(this.templateRef);
-            } else {
-                this.renderedView = this.viewContainer.createEmbeddedView(this.templateRef);
-            }
+            const container = this.getContainer();
+
+            this.renderedView = container.createEmbeddedView(this.templateRef);
 
             if (this.renderedView.rootNodes[0].style) {
                 this.renderer.setStyle(this.renderedView.rootNodes[0], 'display', 'block');
@@ -85,16 +88,19 @@ export class ModalViewDirective implements OnChanges, OnDestroy {
                 this.startListening();
             });
         } else if (!isOpen && this.renderedView) {
+            const container = this.getContainer();
+            const containerIndex = container.indexOf(this.renderedView);
+
+            container.remove(containerIndex);
+
             this.renderedView = null;
 
-            if (this.placeOnRoot) {
-                this.rootView.viewContainer.clear();
-            } else {
-                this.viewContainer.clear();
-            }
-
-            this.stopListening();
+            this.unsubscribeToClick();
         }
+    }
+
+    private getContainer() {
+        return this.placeOnRoot ? this.rootView.viewContainer : this.viewContainer;
     }
 
     private startListening() {
@@ -112,7 +118,7 @@ export class ModalViewDirective implements OnChanges, OnDestroy {
                     return;
                 }
 
-                if (this.modalView.closeAlways) {
+                if (this.closeAlways) {
                     this.modalView.hide();
                 } else {
                     try {
@@ -133,7 +139,14 @@ export class ModalViewDirective implements OnChanges, OnDestroy {
             });
     }
 
-    private stopListening() {
+    private unsubscribeToModal() {
+        if (this.subscription) {
+            this.subscription.unsubscribe();
+            this.subscription = null;
+        }
+    }
+
+    private unsubscribeToClick() {
         if (this.documentClickListener) {
             this.documentClickListener();
             this.documentClickListener = null;

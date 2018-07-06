@@ -13,7 +13,7 @@ import {
     ApiUrlConfig,
     AuthService,
     fadeAnimation,
-    ModalView
+    ModalModel
 } from '@app/shared';
 
 @Component({
@@ -27,7 +27,7 @@ import {
 export class ProfileMenuComponent implements OnDestroy, OnInit {
     private authenticationSubscription: Subscription;
 
-    public modalMenu = new ModalView(false, true);
+    public modalMenu = new ModalModel();
 
     public profileDisplayName = '';
     public profileId = '';

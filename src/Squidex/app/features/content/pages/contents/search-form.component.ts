@@ -8,7 +8,7 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
 import { FormBuilder, FormControl } from '@angular/forms';
 
-import { ModalView } from '@app/shared';
+import { ModalModel } from '@app/shared';
 
 @Component({
     selector: 'sqx-search-form',
@@ -40,7 +40,7 @@ export class SearchFormComponent implements OnChanges {
 
     public contentsFilter = new FormControl();
 
-    public searchModal = new ModalView();
+    public searchModal = new ModalModel();
     public searchForm =
         this.formBuilder.group({
             odataOrderBy: '',
