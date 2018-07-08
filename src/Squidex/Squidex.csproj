@@ -6,6 +6,7 @@
     <PackageId>Squidex</PackageId>
     <PreserveCompilationContext>true</PreserveCompilationContext>
     <TargetFramework>netcoreapp2.1</TargetFramework>
+    <RuntimeFrameworkVersion>2.1.1</RuntimeFrameworkVersion>
     <TypeScriptToolsVersion>Latest</TypeScriptToolsVersion>
     <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
   </PropertyGroup>
