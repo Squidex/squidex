@@ -6,7 +6,7 @@
   <ItemGroup>
     <PackageReference Include="RefactoringEssentials" Version="5.6.0" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.0.2" />
-    <PackageReference Include="WindowsAzure.Storage" Version="9.2.0" />
+    <PackageReference Include="WindowsAzure.Storage" Version="9.3.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Squidex.Infrastructure\Squidex.Infrastructure.csproj" />

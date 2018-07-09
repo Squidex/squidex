@@ -46,8 +46,10 @@ namespace Squidex.Infrastructure.EventSourcing
         protected override Task SetupCollectionAsync(IMongoCollection<MongoEventCommit> collection)
         {
             return Task.WhenAll(
-                collection.Indexes.CreateOneAsync(Index.Ascending(x => x.Timestamp).Ascending(x => x.EventStream)),
-                collection.Indexes.CreateOneAsync(Index.Ascending(x => x.EventStream).Descending(x => x.EventStreamOffset), new CreateIndexOptions { Unique = true }));
+                collection.Indexes.CreateOneAsync(
+                    new CreateIndexModel<MongoEventCommit>(Index.Ascending(x => x.Timestamp).Ascending(x => x.EventStream))),
+                collection.Indexes.CreateOneAsync(
+                    new CreateIndexModel<MongoEventCommit>(Index.Ascending(x => x.EventStream).Descending(x => x.EventStreamOffset), new CreateIndexOptions { Unique = true })));
         }
     }
 }

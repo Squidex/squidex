@@ -28,7 +28,8 @@ namespace Squidex.Domain.Users.MongoDb
 
         protected override Task SetupCollectionAsync(IMongoCollection<MongoRole> collection)
         {
-            return collection.Indexes.CreateOneAsync(Index.Ascending(x => x.NormalizedName), new CreateIndexOptions { Unique = true });
+            return collection.Indexes.CreateOneAsync(
+                new CreateIndexModel<MongoRole>(Index.Ascending(x => x.NormalizedName), new CreateIndexOptions { Unique = true }));
         }
 
         protected override MongoCollectionSettings CollectionSettings()

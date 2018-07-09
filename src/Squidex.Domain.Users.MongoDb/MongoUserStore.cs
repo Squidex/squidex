@@ -49,9 +49,12 @@ namespace Squidex.Domain.Users.MongoDb
         protected override Task SetupCollectionAsync(IMongoCollection<MongoUser> collection)
         {
             return Task.WhenAll(
-                collection.Indexes.CreateOneAsync(Index.Ascending("Logins.LoginProvider").Ascending("Logins.ProviderKey")),
-                collection.Indexes.CreateOneAsync(Index.Ascending(x => x.NormalizedUserName), new CreateIndexOptions { Unique = true }),
-                collection.Indexes.CreateOneAsync(Index.Ascending(x => x.NormalizedEmail), new CreateIndexOptions { Unique = true }));
+                collection.Indexes.CreateOneAsync(
+                    new CreateIndexModel<MongoUser>(Index.Ascending("Logins.LoginProvider").Ascending("Logins.ProviderKey"))),
+                collection.Indexes.CreateOneAsync(
+                    new CreateIndexModel<MongoUser>(Index.Ascending(x => x.NormalizedUserName), new CreateIndexOptions { Unique = true })),
+                collection.Indexes.CreateOneAsync(
+                    new CreateIndexModel<MongoUser>(Index.Ascending(x => x.NormalizedEmail), new CreateIndexOptions { Unique = true })));
         }
 
         protected override MongoCollectionSettings CollectionSettings()

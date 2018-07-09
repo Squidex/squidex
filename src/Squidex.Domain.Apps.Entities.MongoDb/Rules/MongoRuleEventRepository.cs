@@ -34,9 +34,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
 
         protected override async Task SetupCollectionAsync(IMongoCollection<MongoRuleEventEntity> collection)
         {
-            await collection.Indexes.CreateOneAsync(Index.Ascending(x => x.NextAttempt));
-            await collection.Indexes.CreateOneAsync(Index.Ascending(x => x.AppId).Descending(x => x.Created));
-            await collection.Indexes.CreateOneAsync(Index.Ascending(x => x.Expires), new CreateIndexOptions { ExpireAfter = TimeSpan.Zero });
+            await collection.Indexes.CreateOneAsync(
+                new CreateIndexModel<MongoRuleEventEntity>(Index.Ascending(x => x.NextAttempt)));
+            await collection.Indexes.CreateOneAsync(
+                new CreateIndexModel<MongoRuleEventEntity>(Index.Ascending(x => x.AppId).Descending(x => x.Created)));
+            await collection.Indexes.CreateOneAsync(
+                new CreateIndexModel<MongoRuleEventEntity>(Index.Ascending(x => x.Expires), new CreateIndexOptions { ExpireAfter = TimeSpan.Zero }));
         }
 
         public Task QueryPendingAsync(Instant now, Func<IRuleEventEntity, Task> callback, CancellationToken ct = default(CancellationToken))
@@ -64,7 +67,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
 
         public async Task<int> CountByAppAsync(Guid appId)
         {
-            return (int)await Collection.CountAsync(x => x.AppId == appId);
+            return (int)await Collection.CountDocumentsAsync(x => x.AppId == appId);
         }
 
         public Task EnqueueAsync(Guid id, Instant nextAttempt)

@@ -28,7 +28,8 @@ namespace Squidex.Infrastructure.UsageTracking
 
         protected override Task SetupCollectionAsync(IMongoCollection<MongoUsage> collection)
         {
-            return collection.Indexes.CreateOneAsync(Index.Ascending(x => x.Key).Ascending(x => x.Date));
+            return collection.Indexes.CreateOneAsync(
+                new CreateIndexModel<MongoUsage>(Index.Ascending(x => x.Key).Ascending(x => x.Date)));
         }
 
         public Task TrackUsagesAsync(DateTime date, string key, double count, double elapsedMs)

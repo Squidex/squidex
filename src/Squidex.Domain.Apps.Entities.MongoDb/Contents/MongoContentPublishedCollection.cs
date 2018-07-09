@@ -24,12 +24,14 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         protected override async Task SetupCollectionAsync(IMongoCollection<MongoContentEntity> collection)
         {
-            await collection.Indexes.CreateOneAsync(Index.Text(x => x.DataText).Ascending(x => x.IndexedSchemaId));
+            await collection.Indexes.CreateOneAsync(
+                new CreateIndexModel<MongoContentEntity>(Index.Text(x => x.DataText).Ascending(x => x.IndexedSchemaId)));
 
             await collection.Indexes.CreateOneAsync(
-                Index
-                    .Ascending(x => x.IndexedSchemaId)
-                    .Ascending(x => x.Id));
+                new CreateIndexModel<MongoContentEntity>(
+                    Index
+                        .Ascending(x => x.IndexedSchemaId)
+                        .Ascending(x => x.Id)));
 
             await base.SetupCollectionAsync(collection);
         }

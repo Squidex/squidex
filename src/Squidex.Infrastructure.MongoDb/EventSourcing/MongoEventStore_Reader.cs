@@ -19,7 +19,8 @@ namespace Squidex.Infrastructure.EventSourcing
     {
         public Task CreateIndexAsync(string property)
         {
-            return Collection.Indexes.CreateOneAsync(Index.Ascending(CreateIndexPath(property)));
+            return Collection.Indexes.CreateOneAsync(
+                new CreateIndexModel<MongoEventCommit>(Index.Ascending(CreateIndexPath(property))));
         }
 
         public IEventSubscription CreateSubscription(IEventSubscriber subscriber, string streamFilter, string position = null)

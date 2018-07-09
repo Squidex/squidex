@@ -35,11 +35,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
         protected override Task SetupCollectionAsync(IMongoCollection<MongoAssetEntity> collection)
         {
             return collection.Indexes.CreateOneAsync(
-                Index
-                    .Ascending(x => x.AppId)
-                    .Ascending(x => x.IsDeleted)
-                    .Ascending(x => x.FileName)
-                    .Descending(x => x.LastModified));
+                new CreateIndexModel<MongoAssetEntity>(
+                    Index
+                        .Ascending(x => x.AppId)
+                        .Ascending(x => x.IsDeleted)
+                        .Ascending(x => x.FileName)
+                        .Descending(x => x.LastModified)));
         }
 
         public async Task<IResultList<IAssetEntity>> QueryAsync(Guid appId, string query = null)
@@ -52,7 +53,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 
                     var filter = FindExtensions.BuildQuery(odataQuery, appId);
 
-                    var contentCount = Collection.Find(filter).CountAsync();
+                    var contentCount = Collection.Find(filter).CountDocumentsAsync();
                     var contentItems =
                         Collection.Find(filter)
                             .AssetTake(odataQuery)
@@ -93,7 +94,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                 var find = Collection.Find(x => ids.Contains(x.Id)).SortByDescending(x => x.LastModified);
 
                 var assetItems = find.ToListAsync();
-                var assetCount = find.CountAsync();
+                var assetCount = find.CountDocumentsAsync();
 
                 await Task.WhenAll(assetItems, assetCount);
 

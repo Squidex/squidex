@@ -33,7 +33,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         protected override async Task SetupCollectionAsync(IMongoCollection<MongoContentEntity> collection)
         {
-            await collection.Indexes.CreateOneAsync(Index.Ascending(x => x.ReferencedIds));
+            await collection.Indexes.CreateOneAsync(
+                new CreateIndexModel<MongoContentEntity>(Index.Ascending(x => x.ReferencedIds)));
         }
 
         protected override string CollectionName()
@@ -49,7 +50,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
                 var filter = FindExtensions.BuildQuery(odataQuery, schema.Id, status, propertyCalculator);
 
-                var contentCount = Collection.Find(filter).CountAsync();
+                var contentCount = Collection.Find(filter).CountDocumentsAsync();
                 var contentItems =
                     Collection.Find(filter)
                         .ContentTake(odataQuery)
@@ -96,7 +97,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                     Collection.Find(x => x.IndexedSchemaId == schema.Id && ids.Contains(x.Id));
 
             var contentItems = find.Not(x => x.DataText).ToListAsync();
-            var contentCount = find.CountAsync();
+            var contentCount = find.CountDocumentsAsync();
 
             await Task.WhenAll(contentItems, contentCount);
 

@@ -55,13 +55,15 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.History
         protected override async Task SetupCollectionAsync(IMongoCollection<MongoHistoryEventEntity> collection)
         {
             await collection.Indexes.CreateOneAsync(
-                Index
-                    .Ascending(x => x.AppId)
-                    .Ascending(x => x.Channel)
-                    .Descending(x => x.Created)
-                    .Descending(x => x.Version));
+                new CreateIndexModel<MongoHistoryEventEntity>(
+                    Index
+                        .Ascending(x => x.AppId)
+                        .Ascending(x => x.Channel)
+                        .Descending(x => x.Created)
+                        .Descending(x => x.Version)));
 
-            await collection.Indexes.CreateOneAsync(Index.Ascending(x => x.Created), new CreateIndexOptions { ExpireAfter = TimeSpan.FromDays(365) });
+            await collection.Indexes.CreateOneAsync(
+                new CreateIndexModel<MongoHistoryEventEntity>(Index.Ascending(x => x.Created), new CreateIndexOptions { ExpireAfter = TimeSpan.FromDays(365) }));
         }
 
         public async Task<IReadOnlyList<IHistoryEventEntity>> QueryByChannelAsync(Guid appId, string channelPrefix, int count)
