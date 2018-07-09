@@ -22,9 +22,11 @@ namespace Squidex.Domain.Apps.Core.HandleRules
     public class RuleEventFormatter
     {
         private const string Undefined = "UNDEFINED";
-        private static readonly Regex ContentDataPlaceholder = new Regex(@"^CONTENT_DATA(\.([0-9A-Za-z\-_]*)){2,}", RegexOptions.Compiled);
-        private static readonly Regex ContentDataPlaceholder2 = new Regex(@"^\{CONTENT_DATA(\.([0-9A-Za-z\-_]*)){2,}\}", RegexOptions.Compiled);
-        private readonly List<(string Pattern, Func<EnrichedEvent, string> Replacer)> patterns = new List<(string Pattern, Func<EnrichedEvent, string> Replacer)>();
+        private static readonly char[] ContentPlaceholderStartOld = "CONTENT_DATA".ToCharArray();
+        private static readonly char[] ContentPlaceholderStartNew = "{CONTENT_DATA".ToCharArray();
+        private static readonly Regex ContentDataPlaceholderOld = new Regex(@"^CONTENT_DATA(\.([0-9A-Za-z\-_]*)){2,}", RegexOptions.Compiled);
+        private static readonly Regex ContentDataPlaceholderNew = new Regex(@"^\{CONTENT_DATA(\.([0-9A-Za-z\-_]*)){2,}\}", RegexOptions.Compiled);
+        private readonly List<(char[] Pattern, Func<EnrichedEvent, string> Replacer)> patterns = new List<(char[] Pattern, Func<EnrichedEvent, string> Replacer)>();
         private readonly JsonSerializer serializer;
         private readonly IRuleUrlGenerator urlGenerator;
 
@@ -50,7 +52,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
         private void AddPattern(string placeholder, Func<EnrichedEvent, string> generator)
         {
-            patterns.Add((placeholder, generator));
+            patterns.Add((placeholder.ToCharArray(), generator));
         }
 
         public virtual JObject ToPayload<T>(T @event)
@@ -77,13 +79,16 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
             var sb = new StringBuilder();
 
+            var cp2 = new ReadOnlySpan<char>(ContentPlaceholderStartNew);
+            var cp1 = new ReadOnlySpan<char>(ContentPlaceholderStartOld);
+
             for (var i = 0; i < current.Length; i++)
             {
                 var c = current[i];
 
                 if (c == '$')
                 {
-                    sb.Append(current.Slice(0, i));
+                    sb.Append(current.Slice(0, i).ToString());
 
                     current = current.Slice(i);
 
@@ -106,17 +111,15 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                         }
                     }
 
-                    if (!tested &&
-                       (test.StartsWith("CONTENT_DATA", StringComparison.OrdinalIgnoreCase) ||
-                        test.StartsWith("{CONTENT_DATA", StringComparison.OrdinalIgnoreCase)))
+                    if (!tested && (test.StartsWith(cp1, StringComparison.OrdinalIgnoreCase) || test.StartsWith(cp2, StringComparison.OrdinalIgnoreCase)))
                     {
-                        var currentString = new string(test);
+                        var currentString = test.ToString();
 
-                        var match = ContentDataPlaceholder.Match(currentString);
+                        var match = ContentDataPlaceholderOld.Match(currentString);
 
                         if (!match.Success)
                         {
-                            match = ContentDataPlaceholder2.Match(currentString);
+                            match = ContentDataPlaceholderNew.Match(currentString);
                         }
 
                         if (match.Success)
@@ -137,7 +140,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                 }
             }
 
-            sb.Append(current);
+            sb.Append(current.ToString());
 
             return sb.ToString();
         }
