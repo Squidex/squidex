@@ -31,6 +31,7 @@ namespace Squidex.Domain.Apps.Entities
             Guard.NotNull(localCache, nameof(localCache));
 
             this.grainFactory = grainFactory;
+
             this.localCache = localCache;
         }
 

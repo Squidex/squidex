@@ -24,7 +24,7 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Schemas
 {
-    public class SchemaGrain : SquidexDomainObjectGrain<SchemaState>, ISchemaGrain
+    public sealed class SchemaGrain : SquidexDomainObjectGrain<SchemaState>, ISchemaGrain
     {
         private readonly IAppProvider appProvider;
         private readonly FieldRegistry registry;
@@ -47,7 +47,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             switch (command)
             {
                 case AddField addField:
-                    return UpdateReturnAsync(addField, c =>
+                    return UpdateReturnAsync(addField, (Func<AddField, object>)(c =>
                     {
                         GuardSchemaField.CanAdd(Snapshot.SchemaDef, c);
 
@@ -64,8 +64,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                             id = ((IArrayField)Snapshot.SchemaDef.FieldsById[c.ParentFieldId.Value]).FieldsByName[c.Name].Id;
                         }
 
-                        return EntityCreatedResult.Create(id, NewVersion);
-                    });
+                        return EntityCreatedResult.Create(id, (long)base.Version);
+                    }));
 
                 case CreateSchema createSchema:
                     return CreateAsync(createSchema, async c =>
@@ -360,9 +360,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             }
         }
 
-        public override void ApplyEvent(Envelope<IEvent> @event)
+        protected override SchemaState OnEvent(Envelope<IEvent> @event)
         {
-            ApplySnapshot(Snapshot.Apply(@event, registry));
+            return Snapshot.Apply(@event, registry);
         }
 
         public Task<J<ISchemaEntity>> GetStateAsync()

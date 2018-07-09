@@ -32,19 +32,23 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules.Triggers
 
         public static IEnumerable<object[]> TestData = new[]
         {
-            new object[] { 0, 1, 1, 1, 1, new RuleCreated() },
-            new object[] { 0, 1, 1, 1, 1, new ContentCreated { SchemaId = SchemaNonMatch } },
-            new object[] { 1, 1, 0, 0, 0, new ContentCreated { SchemaId = SchemaMatch } },
-            new object[] { 0, 0, 0, 0, 0, new ContentCreated { SchemaId = SchemaMatch } },
-            new object[] { 1, 0, 1, 0, 0, new ContentUpdated { SchemaId = SchemaMatch } },
-            new object[] { 0, 0, 0, 0, 0, new ContentUpdated { SchemaId = SchemaMatch } },
-            new object[] { 1, 0, 0, 1, 0, new ContentDeleted { SchemaId = SchemaMatch } },
-            new object[] { 0, 0, 0, 0, 0, new ContentDeleted { SchemaId = SchemaMatch } },
-            new object[] { 1, 0, 0, 0, 1, new ContentStatusChanged { SchemaId = SchemaMatch, Status = Status.Published } },
-            new object[] { 0, 0, 0, 0, 0, new ContentStatusChanged { SchemaId = SchemaMatch, Status = Status.Published } },
-            new object[] { 0, 1, 1, 1, 1, new ContentStatusChanged { SchemaId = SchemaMatch, Status = Status.Archived } },
-            new object[] { 0, 1, 1, 1, 1, new ContentStatusChanged { SchemaId = SchemaMatch, Status = Status.Draft } },
-            new object[] { 0, 1, 1, 1, 1, new SchemaCreated { SchemaId = SchemaNonMatch } }
+            new object[] { 0, 1, 1, 1, 1, 0, 0, 0, new RuleCreated() },
+            new object[] { 0, 1, 1, 1, 1, 0, 0, 0, new ContentCreated { SchemaId = SchemaNonMatch } },
+            new object[] { 1, 1, 0, 0, 0, 0, 0, 0, new ContentCreated { SchemaId = SchemaMatch } },
+            new object[] { 0, 0, 0, 0, 0, 0, 0, 0, new ContentCreated { SchemaId = SchemaMatch } },
+            new object[] { 1, 0, 1, 0, 0, 0, 0, 0, new ContentUpdated { SchemaId = SchemaMatch } },
+            new object[] { 0, 0, 0, 0, 0, 0, 0, 0, new ContentUpdated { SchemaId = SchemaMatch } },
+            new object[] { 1, 0, 0, 1, 0, 0, 0, 0, new ContentDeleted { SchemaId = SchemaMatch } },
+            new object[] { 0, 0, 0, 0, 0, 0, 0, 0, new ContentDeleted { SchemaId = SchemaMatch } },
+            new object[] { 1, 1, 1, 1, 0, 0, 1, 0, new ContentStatusChanged { SchemaId = SchemaMatch, Change = StatusChange.Archived } },
+            new object[] { 0, 1, 1, 1, 0, 0, 0, 0, new ContentStatusChanged { SchemaId = SchemaMatch, Change = StatusChange.Archived } },
+            new object[] { 1, 0, 0, 0, 0, 0, 0, 1, new ContentStatusChanged { SchemaId = SchemaMatch, Change = StatusChange.Restored } },
+            new object[] { 0, 0, 0, 0, 0, 0, 0, 0, new ContentStatusChanged { SchemaId = SchemaMatch, Change = StatusChange.Restored } },
+            new object[] { 1, 0, 0, 0, 1, 0, 0, 0, new ContentStatusChanged { SchemaId = SchemaMatch, Change = StatusChange.Published } },
+            new object[] { 0, 0, 0, 0, 0, 0, 0, 0, new ContentStatusChanged { SchemaId = SchemaMatch, Change = StatusChange.Published } },
+            new object[] { 1, 1, 1, 1, 0, 1, 0, 0, new ContentStatusChanged { SchemaId = SchemaMatch, Change = StatusChange.Unpublished } },
+            new object[] { 0, 1, 1, 1, 0, 0, 0, 0, new ContentStatusChanged { SchemaId = SchemaMatch, Change = StatusChange.Unpublished } },
+            new object[] { 0, 1, 1, 1, 1, 0, 0, 0, new SchemaCreated { SchemaId = SchemaNonMatch } }
         };
 
         [Fact]
@@ -69,7 +73,15 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules.Triggers
 
         [Theory]
         [MemberData(nameof(TestData))]
-        public void Should_return_result_depending_on_event(int expected, int sendCreate, int sendUpdate, int sendDelete, int sendPublish, AppEvent @event)
+        public void Should_return_result_depending_on_event(int expected,
+            int sendCreate,
+            int sendUpdate,
+            int sendDelete,
+            int sendPublish,
+            int sendUnpublish,
+            int sendArchive,
+            int sendRestore,
+            AppEvent @event)
         {
             var trigger = new ContentChangedTrigger
             {
@@ -80,6 +92,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules.Triggers
                         SendUpdate = sendUpdate == 1,
                         SendDelete = sendDelete == 1,
                         SendPublish = sendPublish == 1,
+                        SendUnpublish = sendUnpublish == 1,
+                        SendArchived = sendArchive == 1,
+                        SendRestore = sendRestore == 1,
                         SchemaId = SchemaMatch.Id
                     })
             };

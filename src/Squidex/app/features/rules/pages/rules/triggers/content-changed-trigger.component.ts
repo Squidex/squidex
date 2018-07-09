@@ -21,6 +21,9 @@ export interface TriggerSchemaForm {
     sendUpdate: boolean;
     sendDelete: boolean;
     sendPublish: boolean;
+    sendUnpublish: boolean;
+    sendArchive: boolean;
+    sendRestore: boolean;
 }
 
 @Component({
@@ -71,7 +74,10 @@ export class ContentChangedTriggerComponent implements OnInit {
                             sendCreate: triggerSchema.sendCreate,
                             sendUpdate: triggerSchema.sendUpdate,
                             sendDelete: triggerSchema.sendDelete,
-                            sendPublish: triggerSchema.sendPublish
+                            sendPublish: triggerSchema.sendPublish,
+                            sendUnpublish: triggerSchema.sendUnpublish,
+                            sendArchive: triggerSchema.sendArchive,
+                            sendRestore: triggerSchema.sendRestore
                         });
                     } else {
                         return null;
@@ -104,7 +110,10 @@ export class ContentChangedTriggerComponent implements OnInit {
                     sendCreate: false,
                     sendUpdate: false,
                     sendDelete: false,
-                    sendPublish: false
+                    sendPublish: false,
+                    sendUnpublish: false,
+                    sendArchive: false,
+                    sendRestore: false
                 })).sortByStringAsc(x => x.schema.name);
 
         this.updateValue();
@@ -137,7 +146,10 @@ export class ContentChangedTriggerComponent implements OnInit {
                     sendCreate: s.sendCreate,
                     sendUpdate: s.sendUpdate,
                     sendDelete: s.sendDelete,
-                    sendPublish: s.sendPublish
+                    sendPublish: s.sendPublish,
+                    sendUnpublish: s.sendUnpublish,
+                    sendArchive: s.sendArchive,
+                    sendRestore: s.sendRestore
                 };
             });
 
@@ -150,6 +162,9 @@ export class ContentChangedTriggerComponent implements OnInit {
         schemaForm.sendUpdate = value;
         schemaForm.sendDelete = value;
         schemaForm.sendPublish = value;
+        schemaForm.sendUnpublish = value;
+        schemaForm.sendArchive = value;
+        schemaForm.sendRestore = value;
 
         return schemaForm;
     }
@@ -159,7 +174,10 @@ export class ContentChangedTriggerComponent implements OnInit {
             schemaForm.sendCreate &&
             schemaForm.sendUpdate &&
             schemaForm.sendDelete &&
-            schemaForm.sendPublish;
+            schemaForm.sendPublish &&
+            schemaForm.sendUnpublish &&
+            schemaForm.sendArchive &&
+            schemaForm.sendRestore;
 
         return schemaForm;
     }

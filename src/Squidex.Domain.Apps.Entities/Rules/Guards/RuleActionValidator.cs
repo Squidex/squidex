@@ -107,6 +107,28 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
             return Task.FromResult<IEnumerable<ValidationError>>(errors);
         }
 
+        public Task<IEnumerable<ValidationError>> Visit(MediumAction action)
+        {
+            var errors = new List<ValidationError>();
+
+            if (string.IsNullOrWhiteSpace(action.AccessToken))
+            {
+                errors.Add(new ValidationError("Access token is required.", nameof(action.AccessToken)));
+            }
+
+            if (string.IsNullOrWhiteSpace(action.Content))
+            {
+                errors.Add(new ValidationError("Content is required.", nameof(action.Content)));
+            }
+
+            if (string.IsNullOrWhiteSpace(action.Title))
+            {
+                errors.Add(new ValidationError("Title is required.", nameof(action.Title)));
+            }
+
+            return Task.FromResult<IEnumerable<ValidationError>>(errors);
+        }
+
         public Task<IEnumerable<ValidationError>> Visit(SlackAction action)
         {
             var errors = new List<ValidationError>();

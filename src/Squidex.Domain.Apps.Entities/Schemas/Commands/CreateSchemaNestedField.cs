@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Core.Schemas;
-
 namespace Squidex.Domain.Apps.Entities.Schemas.Commands
 {
     public sealed class CreateSchemaNestedField : CreateSchemaFieldBase

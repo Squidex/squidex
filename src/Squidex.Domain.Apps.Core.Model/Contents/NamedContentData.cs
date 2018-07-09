@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Contents

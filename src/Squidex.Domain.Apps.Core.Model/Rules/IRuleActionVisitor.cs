@@ -19,6 +19,8 @@ namespace Squidex.Domain.Apps.Core.Rules
 
         T Visit(FastlyAction action);
 
+        T Visit(MediumAction action);
+
         T Visit(SlackAction action);
 
         T Visit(WebhookAction action);

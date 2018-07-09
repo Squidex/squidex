@@ -21,16 +21,18 @@
     </ng-container>
 
     <ng-container content>
-        <ng-container *ngIf="step === 1">        
-            <span *ngFor="let trigger of ruleTriggers | sqxKeys" class="rule-element rule-element-{{trigger}}" (click)="selectTriggerType(trigger)">
-                <span class="rule-element-icon">
-                    <i class="icon-trigger-{{trigger}}"></i>
-                </span>
-                <span class="rule-element-text">
-                    {{ruleTriggers[trigger].name}}
-                </span>
-            </span>
-        </ng-container>
+        <div class="row no-gutters" *ngIf="step === 1">
+            <div *ngFor="let trigger of ruleTriggers | sqxKeys" class="col-12 col-md-6 col-lg-4">
+                <div class="rule-element rule-element-{{trigger}} " (click)="selectTriggerType(trigger)">
+                    <span class="rule-element-icon">
+                        <i class="icon-trigger-{{trigger}}"></i>
+                    </span>
+                    <span class="rule-element-text">
+                        {{ruleTriggers[trigger].name}}
+                    </span>
+                </div>
+            </div>
+        </div>
         
         <ng-container *ngIf="step === 2 && schemas">
             <form [formGroup]="triggerForm.form" (submit)="saveTrigger()">  
@@ -54,16 +56,18 @@
             </form>
         </ng-container>
     
-        <ng-container *ngIf="step === 3">        
-            <span *ngFor="let action of ruleActions | sqxKeys" class="rule-element rule-element-{{action}}" (click)="selectActionType(action)">
-                <span class="rule-element-icon">
-                    <i class="icon-action-{{action}}"></i>
-                </span>
-                <span class="rule-element-text">
-                    {{ruleActions[action].name}}
-                </span>
-            </span>
-        </ng-container>
+        <div class="row no-gutters" *ngIf="step === 3">
+            <div *ngFor="let action of ruleActions | sqxKeys" class="col-12 col-md-6 col-lg-4">
+                <div class="rule-element rule-element-{{action}} " (click)="selectActionType(action)">
+                    <span class="rule-element-icon">
+                        <i class="icon-action-{{action}}"></i>
+                    </span>
+                    <span class="rule-element-text">
+                            {{ruleActions[action].name}}
+                    </span>
+                </div>
+            </div>
+        </div>
     
         <ng-container *ngIf="step === 4">
             <form [formGroup]="actionForm.form" (submit)="saveAction()">
@@ -95,6 +99,13 @@
                             [actionForm]="actionForm.form"
                             [actionFormSubmitted]="actionForm.submitted | async">
                         </sqx-fastly-action>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'Medium'">
+                        <sqx-medium-action
+                            [action]="action"
+                            [actionForm]="actionForm.form"
+                            [actionFormSubmitted]="actionForm.submitted | async">
+                        </sqx-medium-action>
                     </ng-container>
                     <ng-container *ngSwitchCase="'Slack'">
                         <sqx-slack-action

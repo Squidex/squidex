@@ -44,7 +44,7 @@ namespace Squidex.Infrastructure.States
         {
             Guard.NotNull(key, nameof(key));
 
-            var snapshotStore = (ISnapshotStore<object, TKey>)services.GetService(typeof(ISnapshotStore<object, TKey>));
+            var snapshotStore = GetSnapshotStore<object>();
 
             return new Persistence<TKey>(key, owner, eventStore, eventDataFormatter, snapshotStore, streamNameResolver, applyEvent);
         }
@@ -53,16 +53,19 @@ namespace Squidex.Infrastructure.States
         {
             Guard.NotNull(key, nameof(key));
 
-            var snapshotStore = (ISnapshotStore<TState, TKey>)services.GetService(typeof(ISnapshotStore<TState, TKey>));
+            var snapshotStore = GetSnapshotStore<TState>();
 
             return new Persistence<TState, TKey>(key, owner, eventStore, eventDataFormatter, snapshotStore, streamNameResolver, mode, applySnapshot, applyEvent);
         }
 
         public Task ClearSnapshotsAsync<TState>()
         {
-            var snapshotStore = (ISnapshotStore<TState, TKey>)services.GetService(typeof(ISnapshotStore<TState, TKey>));
+            return GetSnapshotStore<TState>().ClearAsync();
+        }
 
-            return snapshotStore.ClearAsync();
+        public ISnapshotStore<TState, TKey> GetSnapshotStore<TState>()
+        {
+            return (ISnapshotStore<TState, TKey>)services.GetService(typeof(ISnapshotStore<TState, TKey>));
         }
     }
 }

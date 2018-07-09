@@ -18,6 +18,9 @@ namespace Squidex.Config.Domain
     {
         public static void AddMyRuleServices(this IServiceCollection services)
         {
+            services.AddSingletonAs<EventEnricher>()
+                .As<IEventEnricher>();
+
             services.AddSingletonAs<AssetChangedTriggerHandler>()
                 .As<IRuleTriggerHandler>();
 
@@ -34,6 +37,9 @@ namespace Squidex.Config.Domain
                 .As<IRuleActionHandler>();
 
             services.AddSingletonAs<FastlyActionHandler>()
+                .As<IRuleActionHandler>();
+
+            services.AddSingletonAs<MediumActionHandler>()
                 .As<IRuleActionHandler>();
 
             services.AddSingletonAs<SlackActionHandler>()

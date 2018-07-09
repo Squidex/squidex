@@ -10,12 +10,9 @@ using System.Threading.Tasks;
 using Algolia.Search;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules.Actions;
-using Squidex.Domain.Apps.Events;
-using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.EventSourcing;
 
 #pragma warning disable SA1649 // File name must match first type name
 
@@ -24,6 +21,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
     public sealed class AlgoliaJob
     {
         public string AppId { get; set; }
+
         public string ApiKey { get; set; }
 
         public string ContentId { get; set; }
@@ -54,11 +52,11 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
             });
         }
 
-        protected override async Task<(string Description, AlgoliaJob Data)> CreateJobAsync(Envelope<AppEvent> @event, string eventName, AlgoliaAction action)
+        protected override (string Description, AlgoliaJob Data) CreateJob(EnrichedEvent @event, AlgoliaAction action)
         {
-            if (@event.Payload is ContentEvent contentEvent)
+            if (@event is EnrichedContentEvent contentEvent)
             {
-                var contentId = contentEvent.ContentId.ToString();
+                var contentId = contentEvent.Id.ToString();
 
                 var ruleDescription = string.Empty;
                 var ruleJob = new AlgoliaJob
@@ -66,59 +64,20 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
                     AppId = action.AppId,
                     ApiKey = action.ApiKey,
                     ContentId = contentId,
-                    IndexName = await formatter.FormatStringAsync(action.IndexName, @event)
+                    IndexName = formatter.Format(action.IndexName, @event)
                 };
 
-                var timestamp = @event.Headers.Timestamp().ToString();
-
-                switch (@event.Payload)
+                if (contentEvent.Type == EnrichedContentEventType.Deleted ||
+                    contentEvent.Type == EnrichedContentEventType.Unpublished)
                 {
-                    case ContentCreated created:
-                    {
-                        ruleDescription = $"Add entry to Algolia index: {action.IndexName}";
+                    ruleDescription = $"Delete entry from Algolia index: {action.IndexName}";
+                }
+                else
+                {
+                    ruleDescription = $"Add entry to Algolia index: {action.IndexName}";
 
-                        ruleJob.Content = new JObject(
-                            new JProperty("objectID", contentId),
-                            new JProperty("id", contentId),
-                            new JProperty("created", timestamp),
-                            new JProperty("createdBy", created.Actor.ToString()),
-                            new JProperty("lastModified", timestamp),
-                            new JProperty("lastModifiedBy", created.Actor.ToString()),
-                            new JProperty("status", Status.Draft.ToString()),
-                            new JProperty("data", formatter.ToRouteData(created.Data)));
-                        break;
-                    }
-
-                    case ContentUpdated updated:
-                    {
-                        ruleDescription = $"Update entry in Algolia index: {action.IndexName}";
-
-                        ruleJob.Content = new JObject(
-                            new JProperty("objectID", contentId),
-                            new JProperty("lastModified", timestamp),
-                            new JProperty("lastModifiedBy", updated.Actor.ToString()),
-                            new JProperty("data", formatter.ToRouteData(updated.Data)));
-                        break;
-                    }
-
-                    case ContentStatusChanged statusChanged:
-                    {
-                        ruleDescription = $"Update entry in Algolia index: {action.IndexName}";
-
-                        ruleJob.Content = new JObject(
-                            new JProperty("objectID", contentId),
-                            new JProperty("lastModified", timestamp),
-                            new JProperty("lastModifiedBy", statusChanged.Actor.ToString()),
-                            new JProperty("status", statusChanged.Status.ToString()));
-                        break;
-                    }
-
-                    case ContentDeleted deleted:
-                    {
-                        ruleDescription = $"Delete entry from Algolia index: {action.IndexName}";
-
-                        break;
-                    }
+                    ruleJob.Content = formatter.ToPayload(contentEvent);
+                    ruleJob.Content["objectID"] = contentId;
                 }
 
                 return (ruleDescription, ruleJob);

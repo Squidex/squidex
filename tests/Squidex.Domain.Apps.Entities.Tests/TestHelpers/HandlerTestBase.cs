@@ -24,7 +24,8 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
     public abstract class HandlerTestBase<T, TState> where T : IDomainObjectGrain
     {
         private readonly IStore<Guid> store = A.Fake<IStore<Guid>>();
-        private readonly IPersistence<TState> persistence = A.Fake<IPersistence<TState>>();
+        private readonly IPersistence<TState> persistence1 = A.Fake<IPersistence<TState>>();
+        private readonly IPersistence persistence2 = A.Fake<IPersistence>();
 
         protected RefToken User { get; } = new RefToken("subject", Guid.NewGuid().ToString());
 
@@ -58,9 +59,18 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
         protected HandlerTestBase()
         {
             A.CallTo(() => store.WithSnapshotsAndEventSourcing(A<Type>.Ignored, Id, A<Func<TState, Task>>.Ignored, A<Func<Envelope<IEvent>, Task>>.Ignored))
-                .Returns(persistence);
+                .Returns(persistence1);
 
-            A.CallTo(() => persistence.WriteEventsAsync(A<IEnumerable<Envelope<IEvent>>>.Ignored))
+            A.CallTo(() => store.WithEventSourcing(A<Type>.Ignored, Id, A<Func<Envelope<IEvent>, Task>>.Ignored))
+                .Returns(persistence2);
+
+            A.CallTo(() => persistence1.WriteEventsAsync(A<IEnumerable<Envelope<IEvent>>>.Ignored))
+                .Invokes(new Action<IEnumerable<Envelope<IEvent>>>(events =>
+                {
+                    LastEvents = events;
+                }));
+
+            A.CallTo(() => persistence2.WriteEventsAsync(A<IEnumerable<Envelope<IEvent>>>.Ignored))
                 .Invokes(new Action<IEnumerable<Envelope<IEvent>>>(events =>
                 {
                     LastEvents = events;

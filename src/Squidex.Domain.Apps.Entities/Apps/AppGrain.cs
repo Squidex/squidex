@@ -26,7 +26,7 @@ using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Apps
 {
-    public class AppGrain : SquidexDomainObjectGrain<AppState>, IAppGrain
+    public sealed class AppGrain : SquidexDomainObjectGrain<AppState>, IAppGrain
     {
         private readonly InitialPatterns initialPatterns;
         private readonly IAppProvider appProvider;
@@ -72,14 +72,14 @@ namespace Squidex.Domain.Apps.Entities.Apps
                     });
 
                 case AssignContributor assigneContributor:
-                    return UpdateReturnAsync(assigneContributor, async c =>
+                    return UpdateReturnAsync(assigneContributor, (Func<AssignContributor, Task<object>>)(async c =>
                     {
                         await GuardAppContributors.CanAssign(Snapshot.Contributors, c, userResolver, appPlansProvider.GetPlan(Snapshot.Plan?.PlanId));
 
                         AssignContributor(c);
 
-                        return EntityCreatedResult.Create(c.ContributorId, NewVersion);
-                    });
+                        return EntityCreatedResult.Create(c.ContributorId, (long)base.Version);
+                    }));
 
                 case RemoveContributor removeContributor:
                     return UpdateAsync(removeContributor, c =>
@@ -334,9 +334,9 @@ namespace Squidex.Domain.Apps.Entities.Apps
             return new AppContributorAssigned { ContributorId = actor.Identifier, Permission = AppContributorPermission.Owner };
         }
 
-        public override void ApplyEvent(Envelope<IEvent> @event)
+        protected override AppState OnEvent(Envelope<IEvent> @event)
         {
-            ApplySnapshot(Snapshot.Apply(@event));
+            return Snapshot.Apply(@event);
         }
 
         public Task<J<IAppEntity>> GetStateAsync()

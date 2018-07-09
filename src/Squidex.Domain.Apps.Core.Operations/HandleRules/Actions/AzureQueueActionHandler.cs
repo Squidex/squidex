@@ -11,10 +11,9 @@ using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Queue;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules.Actions;
-using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.EventSourcing;
 
 #pragma warning disable SA1649 // File name must match first type name
 
@@ -23,6 +22,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
     public sealed class AzureQueueJob
     {
         public string QueueConnectionString { get; set; }
+
         public string QueueName { get; set; }
 
         public string MessageBodyV2 { get; set; }
@@ -60,11 +60,11 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
             });
         }
 
-        protected override async Task<(string Description, AzureQueueJob Data)> CreateJobAsync(Envelope<AppEvent> @event, string eventName, AzureQueueAction action)
+        protected override (string Description, AzureQueueJob Data) CreateJob(EnrichedEvent @event, AzureQueueAction action)
         {
-            var body = formatter.ToRouteData(@event, eventName).ToString(Formatting.Indented);
+            var body = formatter.ToEnvelope(@event).ToString(Formatting.Indented);
 
-            var queueName = await formatter.FormatStringAsync(action.Queue, @event);
+            var queueName = formatter.Format(action.Queue, @event);
 
             var ruleDescription = $"Send AzureQueueJob to azure queue '{action.Queue}'";
             var ruleJob = new AzureQueueJob

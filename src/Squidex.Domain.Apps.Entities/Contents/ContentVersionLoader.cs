@@ -7,52 +7,37 @@
 
 using System;
 using System.Threading.Tasks;
-using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Domain.Apps.Entities.Contents.State;
+using Orleans;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
-using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Contents
 {
     public sealed class ContentVersionLoader : IContentVersionLoader
     {
-        private readonly IStore<Guid> store;
-        private readonly FieldRegistry registry;
+        private readonly IGrainFactory grainFactory;
 
-        public ContentVersionLoader(IStore<Guid> store, FieldRegistry registry)
+        public ContentVersionLoader(IGrainFactory grainFactory)
         {
-            Guard.NotNull(store, nameof(store));
-            Guard.NotNull(registry, nameof(registry));
+            Guard.NotNull(grainFactory, nameof(grainFactory));
 
-            this.store = store;
-
-            this.registry = registry;
+            this.grainFactory = grainFactory;
         }
 
         public async Task<IContentEntity> LoadAsync(Guid id, long version)
         {
             using (Profiler.TraceMethod<ContentVersionLoader>())
             {
-                var content = new ContentState();
+                var grain = grainFactory.GetGrain<IContentGrain>(id);
 
-                var persistence = store.WithEventSourcing<ContentGrain, Guid>(id, e =>
-                {
-                    if (content.Version < version)
-                    {
-                        content = content.Apply(e);
-                        content.Version++;
-                    }
-                });
+                var content = await grain.GetStateAsync(version);
 
-                await persistence.ReadAsync();
-
-                if (content.Version != version)
+                if (content.Value == null || content.Value.Version != version)
                 {
                     throw new DomainObjectNotFoundException(id.ToString(), typeof(IContentEntity));
                 }
 
-                return content;
+                return content.Value;
             }
         }
     }

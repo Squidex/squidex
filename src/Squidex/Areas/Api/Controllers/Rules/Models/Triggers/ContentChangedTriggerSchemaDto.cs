@@ -35,5 +35,20 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models.Triggers
         /// Determines whether to handle the event when a content is published.
         /// </summary>
         public bool SendPublish { get; set; }
+
+        /// <summary>
+        /// Determines whether to handle the event when a content is unpublished.
+        /// </summary>
+        public bool SendUnpublish { get; set; }
+
+        /// <summary>
+        /// Determines whether to handle the event when a content is archived.
+        /// </summary>
+        public bool SendArchived { get; set; }
+
+        /// <summary>
+        /// Determines whether to handle the event when a content is restored.
+        /// </summary>
+        public bool SendRestore { get; set; }
     }
 }

@@ -9,8 +9,10 @@ using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Infrastructure.TestHelpers
 {
-    public class MyDomainState : IDomainState
+    public sealed class MyDomainState : IDomainState
     {
         public long Version { get; set; }
+
+        public int Value { get; set; }
     }
 }

@@ -8,9 +8,10 @@
 using System;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
+using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules;
-using Squidex.Domain.Apps.Events;
-using Squidex.Infrastructure.EventSourcing;
+
+#pragma warning disable RECS0083 // Shows NotImplementedException throws in the quick task bar
 
 namespace Squidex.Domain.Apps.Core.HandleRules
 {
@@ -21,9 +22,9 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             get { return typeof(TAction); }
         }
 
-        async Task<(string Description, JObject Data)> IRuleActionHandler.CreateJobAsync(Envelope<AppEvent> @event, string eventName, RuleAction action)
+        async Task<(string Description, JObject Data)> IRuleActionHandler.CreateJobAsync(EnrichedEvent @event, RuleAction action)
         {
-            var (description, data) = await CreateJobAsync(@event, eventName, (TAction)action);
+            var (description, data) = await CreateJobAsync(@event, (TAction)action);
 
             return (description, JObject.FromObject(data));
         }
@@ -35,7 +36,15 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             return await ExecuteJobAsync(typedData);
         }
 
-        protected abstract Task<(string Description, TData Data)> CreateJobAsync(Envelope<AppEvent> @event, string eventName, TAction action);
+        protected virtual Task<(string Description, TData Data)> CreateJobAsync(EnrichedEvent @event, TAction action)
+        {
+            return Task.FromResult(CreateJob(@event, action));
+        }
+
+        protected virtual (string Description, TData Data) CreateJob(EnrichedEvent @event, TAction action)
+        {
+            throw new NotImplementedException();
+        }
 
         protected abstract Task<(string Dump, Exception Exception)> ExecuteJobAsync(TData job);
     }

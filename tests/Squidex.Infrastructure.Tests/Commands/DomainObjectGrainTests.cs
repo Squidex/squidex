@@ -101,12 +101,9 @@ namespace Squidex.Infrastructure.Commands
                 return Task.FromResult<object>(null);
             }
 
-            public override void ApplyEvent(Envelope<IEvent> @event)
+            protected override MyDomainState OnEvent(Envelope<IEvent> @event)
             {
-                if (@event.Payload is ValueChanged valueChanged)
-                {
-                    ApplySnapshot(new MyDomainState { Value = valueChanged.Value });
-                }
+                return new MyDomainState { Value = ((ValueChanged)@event.Payload).Value };
             }
         }
 
@@ -129,9 +126,9 @@ namespace Squidex.Infrastructure.Commands
         {
             await SetupEmptyAsync();
 
-            var result = await sut.ExecuteAsync(C(new CreateAuto { Value = 5 }));
+            var result = await sut.ExecuteAsync(C(new CreateAuto { Value = 4 }));
 
-            A.CallTo(() => persistence.WriteSnapshotAsync(A<MyDomainState>.That.Matches(x => x.Value == 5)))
+            A.CallTo(() => persistence.WriteSnapshotAsync(A<MyDomainState>.That.Matches(x => x.Value == 4)))
                 .MustHaveHappened();
             A.CallTo(() => persistence.WriteEventsAsync(A<IEnumerable<Envelope<IEvent>>>.That.Matches(x => x.Count() == 1)))
                 .MustHaveHappened();
@@ -139,7 +136,9 @@ namespace Squidex.Infrastructure.Commands
             Assert.True(result.Value is EntityCreatedResult<Guid>);
 
             Assert.Empty(sut.GetUncomittedEvents());
-            Assert.Equal(5, sut.Snapshot.Value);
+
+            Assert.Equal(4, sut.Snapshot.Value);
+            Assert.Equal(0, sut.Snapshot.Version);
         }
 
         [Fact]
@@ -147,9 +146,9 @@ namespace Squidex.Infrastructure.Commands
         {
             await SetupCreatedAsync();
 
-            var result = await sut.ExecuteAsync(C(new UpdateAuto { Value = 5 }));
+            var result = await sut.ExecuteAsync(C(new UpdateAuto { Value = 8 }));
 
-            A.CallTo(() => persistence.WriteSnapshotAsync(A<MyDomainState>.That.Matches(x => x.Value == 5)))
+            A.CallTo(() => persistence.WriteSnapshotAsync(A<MyDomainState>.That.Matches(x => x.Value == 8)))
                 .MustHaveHappened();
             A.CallTo(() => persistence.WriteEventsAsync(A<IEnumerable<Envelope<IEvent>>>.That.Matches(x => x.Count() == 1)))
                 .MustHaveHappened();
@@ -157,7 +156,9 @@ namespace Squidex.Infrastructure.Commands
             Assert.True(result.Value is EntitySavedResult);
 
             Assert.Empty(sut.GetUncomittedEvents());
-            Assert.Equal(5, sut.Snapshot.Value);
+
+            Assert.Equal(8, sut.Snapshot.Value);
+            Assert.Equal(1, sut.Snapshot.Version);
         }
 
         [Fact]
@@ -215,7 +216,9 @@ namespace Squidex.Infrastructure.Commands
             await Assert.ThrowsAsync<InvalidOperationException>(() => sut.ExecuteAsync(C(new CreateAuto())));
 
             Assert.Empty(sut.GetUncomittedEvents());
-            Assert.Equal(0, sut.Snapshot.Value);
+
+            Assert.Equal(0,  sut.Snapshot.Value);
+            Assert.Equal(-1, sut.Snapshot.Version);
         }
 
         [Fact]
@@ -229,14 +232,16 @@ namespace Squidex.Infrastructure.Commands
             await Assert.ThrowsAsync<InvalidOperationException>(() => sut.ExecuteAsync(C(new UpdateAuto())));
 
             Assert.Empty(sut.GetUncomittedEvents());
-            Assert.Equal(0, sut.Snapshot.Value);
+
+            Assert.Equal(4, sut.Snapshot.Value);
+            Assert.Equal(0, sut.Snapshot.Version);
         }
 
         private async Task SetupCreatedAsync()
         {
             await sut.OnActivateAsync(id);
 
-            await sut.ExecuteAsync(C(new CreateAuto()));
+            await sut.ExecuteAsync(C(new CreateAuto { Value = 4 }));
         }
 
         private static J<IAggregateCommand> C(IAggregateCommand command)

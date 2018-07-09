@@ -10,6 +10,7 @@ $action-algolia:          #0d9bf9;
 $action-slack:            #5c3a58;
 $action-azure:            #55b3ff;
 $action-fastly:           #e23335;
+$action-medium:           #00ab6c;
 
 // sass-lint:disable class-name-format
 
@@ -37,12 +38,10 @@ $action-fastly:           #e23335;
         @include transition(background-color .4s ease);
         color: $color-dark-foreground;
         cursor: pointer;
-        display: inline-block;
         line-height: 2.8rem;
         font-size: 1rem;
         font-weight: normal;
         padding-right: .8rem;
-        width: 15rem;
     }
 
     &-icon {
@@ -79,6 +78,10 @@ $action-fastly:           #e23335;
 
 .rule-element-Fastly {
     @include build-element($action-fastly);
+}
+
+.rule-element-Medium {
+    @include build-element($action-medium);
 }
 
 .rule-element-Slack {

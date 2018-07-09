@@ -5,21 +5,15 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Net.Http;
+using System.Threading.Tasks;
+using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
+using Squidex.Domain.Apps.Events;
+using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Core.HandleRules
 {
-    public static class HttpClientPool
+    public interface IEventEnricher
     {
-        private static readonly ClientPool<string, HttpClient> Pool = new ClientPool<string, HttpClient>(key =>
-        {
-            return new HttpClient { Timeout = TimeSpan.FromSeconds(2) };
-        });
-
-        public static HttpClient GetHttpClient()
-        {
-            return Pool.GetClient(string.Empty);
-        }
+        Task<EnrichedEvent> EnrichAsync(Envelope<AppEvent> @event);
     }
 }

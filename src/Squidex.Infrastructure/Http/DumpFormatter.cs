@@ -15,7 +15,17 @@ namespace Squidex.Infrastructure.Http
 {
     public static class DumpFormatter
     {
-        public static string BuildDump(HttpRequestMessage request, HttpResponseMessage response, string requestBody, string responseBody, TimeSpan elapsed, bool isTimeout)
+        public static string BuildDump(HttpRequestMessage request, HttpResponseMessage response, string responseBody)
+        {
+            return BuildDump(request, response, null, responseBody, TimeSpan.Zero, false);
+        }
+
+        public static string BuildDump(HttpRequestMessage request, HttpResponseMessage response, string requestBody, string responseBody)
+        {
+            return BuildDump(request, response, requestBody, responseBody, TimeSpan.Zero, false);
+        }
+
+        public static string BuildDump(HttpRequestMessage request, HttpResponseMessage response, string requestBody, string responseBody, TimeSpan elapsed, bool isTimeout = false)
         {
             var writer = new StringBuilder();
 

@@ -11,11 +11,10 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Squidex.Domain.Apps.Core.HandleRules.Actions.Utils;
+using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules.Actions;
-using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.Http;
 
 #pragma warning disable SA1649 // File name must match first type name
 
@@ -42,17 +41,28 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
         private const string Description = "Send message to slack";
 
         private readonly RuleEventFormatter formatter;
+        private readonly ClientPool<string, HttpClient> clients;
 
         public SlackActionHandler(RuleEventFormatter formatter)
         {
             Guard.NotNull(formatter, nameof(formatter));
 
             this.formatter = formatter;
+
+            clients = new ClientPool<string, HttpClient>(key =>
+            {
+                return new HttpClient
+                {
+                    Timeout = TimeSpan.FromSeconds(2)
+                };
+            });
         }
 
-        protected override async Task<(string Description, SlackJob Data)> CreateJobAsync(Envelope<AppEvent> @event, string eventName, SlackAction action)
+        protected override (string Description, SlackJob Data) CreateJob(EnrichedEvent @event, SlackAction action)
         {
-            var body = await CreatePayloadAsync(@event, action.Text);
+            var body =
+                new JObject(
+                    new JProperty("text", formatter.Format(action.Text, @event)));
 
             var ruleJob = new SlackJob
             {
@@ -63,33 +73,11 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
             return (Description, ruleJob);
         }
 
-        private async Task<JObject> CreatePayloadAsync(Envelope<AppEvent> @event, string text)
+        protected override Task<(string Dump, Exception Exception)> ExecuteJobAsync(SlackJob job)
         {
-            return new JObject(new JProperty("text", await formatter.FormatStringAsync(text, @event)));
-        }
+            var httpClient = clients.GetClient(string.Empty);
 
-        protected override async Task<(string Dump, Exception Exception)> ExecuteJobAsync(SlackJob job)
-        {
-            var requestBody = job.Body;
-            var requestMessage = BuildRequest(job, requestBody);
-
-            HttpResponseMessage response = null;
-
-            try
-            {
-                response = await HttpClientPool.GetHttpClient().SendAsync(requestMessage);
-
-                var responseString = await response.Content.ReadAsStringAsync();
-                var requestDump = DumpFormatter.BuildDump(requestMessage, response, requestBody, responseString, TimeSpan.Zero, false);
-
-                return (requestDump, null);
-            }
-            catch (Exception ex)
-            {
-                var requestDump = DumpFormatter.BuildDump(requestMessage, response, requestBody, ex.ToString(), TimeSpan.Zero, false);
-
-                return (requestDump, ex);
-            }
+            return httpClient.OneWayRequestAsync(BuildRequest(job, job.Body), job.Body);
         }
 
         private static HttpRequestMessage BuildRequest(SlackJob job, string requestBody)
