@@ -28,17 +28,17 @@ namespace Squidex.Domain.Apps.Entities.Rules
     {
         private static readonly TimeSpan UserCacheDuration = TimeSpan.FromMinutes(10);
         private readonly IGrainFactory grainFactory;
-        private readonly IMemoryCache cache;
+        private readonly IMemoryCache userCache;
         private readonly IUserResolver userResolver;
 
-        public EventEnricher(IGrainFactory grainFactory, IMemoryCache cache, IUserResolver userResolver)
+        public EventEnricher(IGrainFactory grainFactory, IMemoryCache userCache, IUserResolver userResolver)
         {
             Guard.NotNull(grainFactory, nameof(grainFactory));
-            Guard.NotNull(cache, nameof(cache));
+            Guard.NotNull(userCache, nameof(userCache));
             Guard.NotNull(userResolver, nameof(userResolver));
 
             this.grainFactory = grainFactory;
-            this.cache = cache;
+            this.userCache = userCache;
             this.userResolver = userResolver;
         }
 
@@ -166,7 +166,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
         {
             var key = $"EventEnrichers_Users_${actor.Identifier}";
 
-            return cache.GetOrCreateAsync(key, async x =>
+            return userCache.GetOrCreateAsync(key, async x =>
             {
                 x.AbsoluteExpirationRelativeToNow = UserCacheDuration;
 
