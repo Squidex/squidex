@@ -147,6 +147,22 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 Description = "The height of the image in pixels if the asset is an image."
             });
 
+            AddField(new FieldType
+            {
+                Name = "folderId",
+                ResolvedType = AllTypes.Guid,
+                Resolver = Resolve(x => x.FolderId),
+                Description = "The folder id."
+            });
+
+            AddField(new FieldType
+            {
+                Name = "isFolder",
+                ResolvedType = AllTypes.Boolean,
+                Resolver = Resolve(x => x.IsFolder),
+                Description = "Determines whether the asset is a folder."
+            });
+
             if (model.CanGenerateAssetSourceUrl)
             {
                 AddField(new FieldType

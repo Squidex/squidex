@@ -163,6 +163,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 CreatedBy = new RefToken("subject", "user1"),
                 LastModified = now,
                 LastModifiedBy = new RefToken("subject", "user2"),
+                IsFolder = true,
                 Name = "MyFile.png",
                 FileSize = 1024,
                 FileVersion = 123,

@@ -48,11 +48,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     createdBy
                     lastModified
                     lastModifiedBy
+                    isFolder
+                    folderId
                     url
                     thumbnailUrl
                     sourceUrl
                     mimeType
-                    fileName
+                    name
                     fileSize
                     fileVersion
                     isImage
@@ -84,11 +86,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                             createdBy = "subject:user1",
                             lastModified = asset.LastModified.ToDateTimeUtc(),
                             lastModifiedBy = "subject:user2",
+                            isFolder = true,
+                            folderId = (Guid?)null,
                             url = $"assets/{asset.Id}",
                             thumbnailUrl = $"assets/{asset.Id}?width=100",
                             sourceUrl = $"assets/source/{asset.Id}",
                             mimeType = "image/png",
-                            fileName = "MyFile.png",
+                            name = "MyFile.png",
                             fileSize = 1024,
                             fileVersion = 123,
                             isImage = true,
@@ -116,11 +120,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                       createdBy
                       lastModified
                       lastModifiedBy
+                      isFolder
+                      folderId
                       url
                       thumbnailUrl
                       sourceUrl
                       mimeType
-                      fileName
+                      name
                       fileSize
                       fileVersion
                       isImage
@@ -156,11 +162,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                                 createdBy = "subject:user1",
                                 lastModified = asset.LastModified.ToDateTimeUtc(),
                                 lastModifiedBy = "subject:user2",
+                                isFolder = true,
+                                folderId = (Guid?)null,
                                 url = $"assets/{asset.Id}",
                                 thumbnailUrl = $"assets/{asset.Id}?width=100",
                                 sourceUrl = $"assets/source/{asset.Id}",
                                 mimeType = "image/png",
-                                fileName = "MyFile.png",
+                                name = "MyFile.png",
                                 fileSize = 1024,
                                 fileVersion = 123,
                                 isImage = true,
@@ -190,11 +198,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     createdBy
                     lastModified
                     lastModifiedBy
+                    isFolder
+                    folderId
                     url
                     thumbnailUrl
                     sourceUrl
                     mimeType
-                    fileName
+                    name
                     fileSize
                     fileVersion
                     isImage
@@ -220,11 +230,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                         createdBy = "subject:user1",
                         lastModified = asset.LastModified.ToDateTimeUtc(),
                         lastModifiedBy = "subject:user2",
+                        isFolder = true,
+                        folderId = (Guid?)null,
                         url = $"assets/{asset.Id}",
                         thumbnailUrl = $"assets/{asset.Id}?width=100",
                         sourceUrl = $"assets/source/{asset.Id}",
                         mimeType = "image/png",
-                        fileName = "MyFile.png",
+                        name = "MyFile.png",
                         fileSize = 1024,
                         fileVersion = 123,
                         isImage = true,

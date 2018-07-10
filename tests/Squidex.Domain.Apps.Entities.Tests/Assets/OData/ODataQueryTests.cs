@@ -85,8 +85,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.OData
         [Fact]
         public void Should_make_query_with_fileName()
         {
-            var i = F("$filter=fileName eq 'Logo.png'");
-            var o = C("{ 'FileName' : 'Logo.png' }");
+            var i = F("$filter=name eq 'Logo.png'");
+            var o = C("{ 'Name' : 'Logo.png' }");
 
             Assert.Equal(o, i);
         }
@@ -141,6 +141,33 @@ namespace Squidex.Domain.Apps.Entities.Assets.OData
         {
             var i = F("$filter=pixelWidth eq 600");
             var o = C("{ 'PixelWidth' : 600 }");
+
+            Assert.Equal(o, i);
+        }
+
+        [Fact]
+        public void Should_make_query_with_folderId()
+        {
+            var i = F("$filter=folderId eq '53bb884f-d847-48da-bf06-b83f39f8a657'");
+            var o = C("{ 'FolderId' : CSUUID('53bb884f-d847-48da-bf06-b83f39f8a657') }");
+
+            Assert.Equal(o, i);
+        }
+
+        [Fact]
+        public void Should_make_query_with_null_folderId()
+        {
+            var i = F("$filter=folderId eq null");
+            var o = C("{ 'FolderId' : null }");
+
+            Assert.Equal(o, i);
+        }
+
+        [Fact]
+        public void Should_make_query_with_isFolder()
+        {
+            var i = F("$filter=isFolder eq true");
+            var o = C("{ 'IsFolder' : true }");
 
             Assert.Equal(o, i);
         }

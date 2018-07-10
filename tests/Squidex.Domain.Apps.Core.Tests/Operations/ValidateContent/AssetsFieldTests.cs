@@ -26,7 +26,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             public Guid AssetId { get; set; }
 
-            public string FileName { get; set; }
+            public string Name { get; set; }
 
             public long FileSize { get; set; }
 
@@ -40,7 +40,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         private readonly AssetInfo document = new AssetInfo
         {
             AssetId = Guid.NewGuid(),
-            FileName = "MyDocument.pdf",
+            Name = "MyDocument.pdf",
             FileSize = 1024 * 4,
             IsImage = false,
             PixelWidth = null,
@@ -50,7 +50,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         private readonly AssetInfo image = new AssetInfo
         {
             AssetId = Guid.NewGuid(),
-            FileName = "MyImage.png",
+            Name = "MyImage.png",
             FileSize = 1024 * 8,
             IsImage = true,
             PixelWidth = 800,

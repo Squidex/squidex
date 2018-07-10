@@ -93,7 +93,7 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
 
         public static AssetDto FromAsset(IAssetEntity asset)
         {
-            return SimpleMapper.Map(asset, new AssetDto { FileType = asset.FileName.FileType() });
+            return SimpleMapper.Map(asset, new AssetDto { FileType = asset.Name.FileType() });
         }
     }
 }

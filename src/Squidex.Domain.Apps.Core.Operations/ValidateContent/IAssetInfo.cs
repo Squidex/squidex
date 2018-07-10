@@ -13,13 +13,9 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
     {
         Guid AssetId { get; }
 
-        Guid? FolderId { get; }
-
         long FileSize { get; }
 
         bool IsImage { get; }
-
-        bool IsFolder { get; }
 
         int? PixelWidth { get; }
 
