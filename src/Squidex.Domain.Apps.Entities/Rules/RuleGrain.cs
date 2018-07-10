@@ -55,21 +55,21 @@ namespace Squidex.Domain.Apps.Entities.Rules
                         Update(c);
                     });
                 case EnableRule enableRule:
-                    return UpdateAsync(enableRule, c =>
+                    return Update(enableRule, c =>
                     {
                         GuardRule.CanEnable(c, Snapshot.RuleDef);
 
                         Enable(c);
                     });
                 case DisableRule disableRule:
-                    return UpdateAsync(disableRule, c =>
+                    return Update(disableRule, c =>
                     {
                         GuardRule.CanDisable(c, Snapshot.RuleDef);
 
                         Disable(c);
                     });
                 case DeleteRule deleteRule:
-                    return UpdateAsync(deleteRule, c =>
+                    return Update(deleteRule, c =>
                     {
                         GuardRule.CanDelete(deleteRule);
 

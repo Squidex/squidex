@@ -72,17 +72,17 @@ namespace Squidex.Domain.Apps.Entities.Apps
                     });
 
                 case AssignContributor assigneContributor:
-                    return UpdateReturnAsync(assigneContributor, (Func<AssignContributor, Task<object>>)(async c =>
+                    return UpdateReturnAsync(assigneContributor, async c =>
                     {
                         await GuardAppContributors.CanAssign(Snapshot.Contributors, c, userResolver, appPlansProvider.GetPlan(Snapshot.Plan?.PlanId));
 
                         AssignContributor(c);
 
-                        return EntityCreatedResult.Create(c.ContributorId, (long)base.Version);
-                    }));
+                        return EntityCreatedResult.Create(c.ContributorId, Version);
+                    });
 
                 case RemoveContributor removeContributor:
-                    return UpdateAsync(removeContributor, c =>
+                    return Update(removeContributor, c =>
                     {
                         GuardAppContributors.CanRemove(Snapshot.Contributors, c);
 
@@ -90,7 +90,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                     });
 
                 case AttachClient attachClient:
-                    return UpdateAsync(attachClient, c =>
+                    return Update(attachClient, c =>
                     {
                         GuardAppClients.CanAttach(Snapshot.Clients, c);
 
@@ -98,7 +98,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                     });
 
                 case UpdateClient updateClient:
-                    return UpdateAsync(updateClient, c =>
+                    return Update(updateClient, c =>
                     {
                         GuardAppClients.CanUpdate(Snapshot.Clients, c);
 
@@ -106,7 +106,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                     });
 
                 case RevokeClient revokeClient:
-                    return UpdateAsync(revokeClient, c =>
+                    return Update(revokeClient, c =>
                     {
                         GuardAppClients.CanRevoke(Snapshot.Clients, c);
 
@@ -114,7 +114,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                     });
 
                 case AddLanguage addLanguage:
-                    return UpdateAsync(addLanguage, c =>
+                    return Update(addLanguage, c =>
                     {
                         GuardAppLanguages.CanAdd(Snapshot.LanguagesConfig, c);
 
@@ -122,7 +122,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                     });
 
                 case RemoveLanguage removeLanguage:
-                    return UpdateAsync(removeLanguage, c =>
+                    return Update(removeLanguage, c =>
                     {
                         GuardAppLanguages.CanRemove(Snapshot.LanguagesConfig, c);
 
@@ -130,7 +130,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                     });
 
                 case UpdateLanguage updateLanguage:
-                    return UpdateAsync(updateLanguage, c =>
+                    return Update(updateLanguage, c =>
                     {
                         GuardAppLanguages.CanUpdate(Snapshot.LanguagesConfig, c);
 
@@ -138,7 +138,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                     });
 
                 case AddPattern addPattern:
-                    return UpdateAsync(addPattern, c =>
+                    return Update(addPattern, c =>
                     {
                         GuardAppPattern.CanAdd(Snapshot.Patterns, c);
 
@@ -146,7 +146,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                     });
 
                 case DeletePattern deletePattern:
-                    return UpdateAsync(deletePattern, c =>
+                    return Update(deletePattern, c =>
                     {
                         GuardAppPattern.CanDelete(Snapshot.Patterns, c);
 
@@ -154,7 +154,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                     });
 
                 case UpdatePattern updatePattern:
-                    return UpdateAsync(updatePattern, c =>
+                    return Update(updatePattern, c =>
                     {
                         GuardAppPattern.CanUpdate(Snapshot.Patterns, c);
 

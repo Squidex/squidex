@@ -9,6 +9,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.Commands
 {
     public sealed class RenameAsset : AssetCommand
     {
-        public string FileName { get; set; }
+        public string Name { get; set; }
     }
 }

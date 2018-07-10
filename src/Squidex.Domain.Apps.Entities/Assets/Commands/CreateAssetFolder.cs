@@ -6,25 +6,21 @@
 // ==========================================================================
 
 using System;
+using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Core.ValidateContent
+namespace Squidex.Domain.Apps.Entities.Assets.Commands
 {
-    public interface IAssetInfo
+    public sealed class CreateAssetFolder : AssetCommand, IAppCommand
     {
-        Guid AssetId { get; }
+        public NamedId<Guid> AppId { get; set; }
 
-        Guid? FolderId { get; }
+        public Guid? FolderId { get; set; }
 
-        long FileSize { get; }
+        public string Name { get; set; }
 
-        bool IsImage { get; }
-
-        bool IsFolder { get; }
-
-        int? PixelWidth { get; }
-
-        int? PixelHeight { get; }
-
-        string Name { get; }
+        public CreateAssetFolder()
+        {
+            AssetId = Guid.NewGuid();
+        }
     }
 }

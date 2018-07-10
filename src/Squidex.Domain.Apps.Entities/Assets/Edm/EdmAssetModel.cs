@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Edm
             entityType.AddStructuralProperty(nameof(IAssetEntity.LastModified).ToCamelCase(), EdmPrimitiveTypeKind.DateTimeOffset);
             entityType.AddStructuralProperty(nameof(IAssetEntity.LastModifiedBy).ToCamelCase(), EdmPrimitiveTypeKind.String);
             entityType.AddStructuralProperty(nameof(IAssetEntity.Version).ToCamelCase(), EdmPrimitiveTypeKind.Int64);
-            entityType.AddStructuralProperty(nameof(IAssetEntity.FileName).ToCamelCase(), EdmPrimitiveTypeKind.String);
+            entityType.AddStructuralProperty(nameof(IAssetEntity.Name).ToCamelCase(), EdmPrimitiveTypeKind.String);
             entityType.AddStructuralProperty(nameof(IAssetEntity.FileSize).ToCamelCase(), EdmPrimitiveTypeKind.Int64);
             entityType.AddStructuralProperty(nameof(IAssetEntity.FileVersion).ToCamelCase(), EdmPrimitiveTypeKind.Int64);
             entityType.AddStructuralProperty(nameof(IAssetEntity.IsImage).ToCamelCase(), EdmPrimitiveTypeKind.Boolean);

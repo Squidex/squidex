@@ -93,9 +93,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
             AddField(new FieldType
             {
-                Name = "fileName",
+                Name = "name",
                 ResolvedType = AllTypes.NonNullString,
-                Resolver = Resolve(x => x.FileName),
+                Resolver = Resolve(x => x.Name),
                 Description = "The file name."
             });
 
@@ -103,7 +103,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             {
                 Name = "fileType",
                 ResolvedType = AllTypes.NonNullString,
-                Resolver = Resolve(x => x.FileName.FileType()),
+                Resolver = Resolve(x => x.Name.FileType()),
                 Description = "The file type."
             });
 

@@ -20,7 +20,7 @@ using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 {
-    public sealed partial class MongoAssetRepository : MongoRepositoryBase<MongoAssetEntity>, IAssetRepository
+    public sealed partial class MongoAssetRepository : MongoRepositoryBase<MongoAssetEntity>, IAssetRepository, IAssetVerifier
     {
         public MongoAssetRepository(IMongoDatabase database)
             : base(database)
@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                     Index
                         .Ascending(x => x.AppId)
                         .Ascending(x => x.IsDeleted)
-                        .Ascending(x => x.FileName)
+                        .Ascending(x => x.Name)
                         .Descending(x => x.LastModified)));
         }
 
@@ -111,6 +111,18 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                         .FirstOrDefaultAsync();
 
                 return assetEntity;
+            }
+        }
+
+        public async Task<bool> FolderExistsAsync(Guid id)
+        {
+            using (Profiler.TraceMethod<MongoAssetRepository>())
+            {
+                var assetsCount =
+                    await Collection.Find(x => x.Id == id && x.IsFolder)
+                        .CountDocumentsAsync();
+
+                return assetsCount == 1;
             }
         }
     }
