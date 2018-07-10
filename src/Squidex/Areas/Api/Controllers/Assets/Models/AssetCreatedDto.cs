@@ -30,7 +30,7 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         /// The file name.
         /// </summary>
         [Required]
-        public string FileName { get; set; }
+        public string Name { get; set; }
 
         /// <summary>
         /// The mime type.
@@ -73,7 +73,7 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
             var response = new AssetCreatedDto
             {
                 Id = command.AssetId,
-                FileName = command.File.FileName,
+                Name = command.File.FileName,
                 FileSize = command.File.FileSize,
                 FileType = command.File.FileName.FileType(),
                 FileVersion = result.Version,

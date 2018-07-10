@@ -28,7 +28,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.Edm
             entityType.AddStructuralProperty(nameof(IAssetEntity.IsImage).ToCamelCase(), EdmPrimitiveTypeKind.Boolean);
             entityType.AddStructuralProperty(nameof(IAssetEntity.FileSize).ToCamelCase(), EdmPrimitiveTypeKind.Int64);
             entityType.AddStructuralProperty(nameof(IAssetEntity.FileVersion).ToCamelCase(), EdmPrimitiveTypeKind.Int64);
-            entityType.AddStructuralProperty(nameof(IAssetEntity.FolderId).ToCamelCase(), EdmPrimitiveTypeKind.String);
             entityType.AddStructuralProperty(nameof(IAssetEntity.MimeType).ToCamelCase(), EdmPrimitiveTypeKind.String);
             entityType.AddStructuralProperty(nameof(IAssetEntity.PixelHeight).ToCamelCase(), EdmPrimitiveTypeKind.Int32);
             entityType.AddStructuralProperty(nameof(IAssetEntity.PixelWidth).ToCamelCase(), EdmPrimitiveTypeKind.Int32);

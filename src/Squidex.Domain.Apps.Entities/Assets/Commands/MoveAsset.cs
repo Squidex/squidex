@@ -11,6 +11,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.Commands
 {
     public sealed class MoveAsset : AssetCommand
     {
-        public Guid? FolderId { get; set; }
+        public Guid FolderId { get; set; }
     }
 }

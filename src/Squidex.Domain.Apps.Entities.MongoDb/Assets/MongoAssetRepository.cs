@@ -43,7 +43,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                         .Descending(x => x.LastModified)));
         }
 
-        public async Task<IResultList<IAssetEntity>> QueryAsync(Guid appId, string query = null)
+        public async Task<IResultList<IAssetEntity>> QueryAsync(Guid appId, Guid? folderId = null, string query = null)
         {
             using (Profiler.TraceMethod<MongoAssetRepository>("QueryAsyncByQuery"))
             {
@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                 {
                     var odataQuery = EdmAssetModel.Edm.ParseQuery(query);
 
-                    var filter = FindExtensions.BuildQuery(odataQuery, appId);
+                    var filter = FindExtensions.BuildQuery(odataQuery, appId, folderId);
 
                     var contentCount = Collection.Find(filter).CountDocumentsAsync();
                     var contentItems =

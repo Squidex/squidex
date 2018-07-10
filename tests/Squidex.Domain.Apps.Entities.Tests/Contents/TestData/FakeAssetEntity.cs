@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.TestData
 
         public Guid AssetId { get; set; }
 
-        public Guid? FolderId { get; set; }
+        public Guid FolderId { get; set; }
 
         public Instant Created { get; set; }
 

@@ -146,24 +146,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.OData
         }
 
         [Fact]
-        public void Should_make_query_with_folderId()
-        {
-            var i = F("$filter=folderId eq '53bb884f-d847-48da-bf06-b83f39f8a657'");
-            var o = C("{ 'FolderId' : CSUUID('53bb884f-d847-48da-bf06-b83f39f8a657') }");
-
-            Assert.Equal(o, i);
-        }
-
-        [Fact]
-        public void Should_make_query_with_null_folderId()
-        {
-            var i = F("$filter=folderId eq null");
-            var o = C("{ 'FolderId' : null }");
-
-            Assert.Equal(o, i);
-        }
-
-        [Fact]
         public void Should_make_query_with_isFolder()
         {
             var i = F("$filter=isFolder eq true");

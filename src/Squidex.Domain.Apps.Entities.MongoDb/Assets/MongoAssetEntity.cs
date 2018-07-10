@@ -32,7 +32,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 
         [BsonRequired]
         [BsonElement]
-        public Guid? FolderId { get; set; }
+        public Guid FolderId { get; set; }
 
         [BsonRequired]
         [BsonElement]

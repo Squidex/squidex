@@ -27,6 +27,6 @@ namespace Squidex.Domain.Apps.Events.Assets
 
         public int? PixelHeight { get; set; }
 
-        public Guid? FolderId { get; set; }
+        public Guid FolderId { get; set; }
     }
 }

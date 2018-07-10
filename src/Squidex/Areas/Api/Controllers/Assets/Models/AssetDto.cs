@@ -25,7 +25,7 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         /// The file name.
         /// </summary>
         [Required]
-        public string FileName { get; set; }
+        public string Name { get; set; }
 
         /// <summary>
         /// The mime type.

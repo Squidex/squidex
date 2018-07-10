@@ -55,7 +55,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
                 {
                     e("Asset is already in this folder.", nameof(command.FolderId));
                 }
-                else if (command.FolderId.HasValue && !await assetVerifier.FolderExistsAsync(command.FolderId.Value))
+                else if (command.FolderId != Guid.Empty && !await assetVerifier.FolderExistsAsync(command.FolderId))
                 {
                     e("Folder not found.", nameof(command.FolderId));
                 }
@@ -68,7 +68,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
 
             return Validate.It(() => "Cannot rename asset.", async e =>
             {
-                if (command.FolderId.HasValue && !await assetVerifier.FolderExistsAsync(command.FolderId.Value))
+                if (command.FolderId != Guid.Empty && !await assetVerifier.FolderExistsAsync(command.FolderId))
                 {
                     e("Folder not found.", nameof(command.FolderId));
                 }

@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
     {
         NamedId<Guid> AppId { get; }
 
-        Guid? FolderId { get; }
+        Guid FolderId { get; }
 
         string MimeType { get; }
 

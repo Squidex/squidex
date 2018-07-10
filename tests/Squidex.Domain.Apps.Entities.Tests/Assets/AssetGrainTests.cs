@@ -93,8 +93,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             Assert.Equal(0, sut.Snapshot.FileVersion);
 
-            Assert.Null(sut.Snapshot.FolderId);
             Assert.True(sut.Snapshot.IsFolder);
+            Assert.Equal(Guid.Empty, sut.Snapshot.FolderId);
             Assert.Equal("my-folder", sut.Snapshot.Name);
 
             LastEvents

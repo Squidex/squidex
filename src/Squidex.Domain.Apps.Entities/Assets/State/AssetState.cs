@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.State
         public NamedId<Guid> AppId { get; set; }
 
         [JsonProperty]
-        public Guid? FolderId { get; set; }
+        public Guid FolderId { get; set; }
 
         [JsonProperty]
         public string Name { get; set; }

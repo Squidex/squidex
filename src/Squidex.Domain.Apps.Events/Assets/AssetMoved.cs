@@ -13,6 +13,6 @@ namespace Squidex.Domain.Apps.Events.Assets
     [EventType(nameof(AssetMoved))]
     public sealed class AssetMoved : AssetEvent
     {
-        public Guid? FolderId { get; set; }
+        public Guid FolderId { get; set; }
     }
 }
