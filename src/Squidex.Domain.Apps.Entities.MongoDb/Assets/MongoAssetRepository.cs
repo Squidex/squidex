@@ -87,7 +87,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             }
         }
 
-        public async Task<IResultList<IAssetEntity>> QueryAsync(Guid appId, HashSet<Guid> ids)
+        public async Task<IResultList<IAssetEntity>> QueryAsync(Guid appId, IList<Guid> ids)
         {
             using (Profiler.TraceMethod<MongoAssetRepository>("QueryAsyncByIds"))
             {
@@ -98,7 +98,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 
                 await Task.WhenAll(assetItems, assetCount);
 
-                return ResultList.Create(assetItems.Result.OfType<IAssetEntity>().ToList(), assetCount.Result);
+                var items = ids.Select(x => assetItems.Result.Find(a => a.Id == x)).Where(a => a != null).ToList();
+
+                return ResultList.Create(items.OfType<IAssetEntity>().ToList(), assetCount.Result);
             }
         }
 

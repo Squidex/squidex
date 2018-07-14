@@ -75,20 +75,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         {
             var folderIdValue = ParseFolderId(folderId);
 
-            HashSet<Guid> idsList = null;
-
-            if (!string.IsNullOrWhiteSpace(ids))
-            {
-                idsList = new HashSet<Guid>();
-
-                foreach (var id in ids.Split(','))
-                {
-                    if (Guid.TryParse(id, out var guid))
-                    {
-                        idsList.Add(guid);
-                    }
-                }
-            }
+            var idsList = ParseIds(ids);
 
             var assets =
                 idsList?.Count > 0 ?
@@ -97,7 +84,56 @@ namespace Squidex.Areas.Api.Controllers.Assets
 
             var response = AssetsDto.FromAssets(assets);
 
-            Response.Headers["Surrogate-Key"] = string.Join(" ", response.Items.Select(x => x.Id));
+            Response.Headers["Surrogate-Key"] = string.Join(" ", response.Items.Where(x => !x.IsFolder).Select(x => x.Id));
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Get folder structure.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <param name="path">The path to the folder to retrieve.</param>
+        /// <returns>
+        /// 200 => Folder found.
+        /// 404 => Folder or app not found.
+        /// </returns>
+        [MustBeAppReader]
+        [HttpGet]
+        [Route("apps/{app}/assets/folder/{*path}")]
+        [ProducesResponseType(typeof(FolderDto), 200)]
+        [ApiCosts(1)]
+        public async Task<IActionResult> GetFolder(string app, string path)
+        {
+            var idsList = ParseIds(path, '/');
+
+            var folders = ResultList.Empty<IAssetEntity>();
+
+            if (idsList?.Count > 0)
+            {
+                var foldersFromPath = await assetRepository.QueryAsync(App.Id, idsList);
+
+                if (foldersFromPath.Count != idsList.Count)
+                {
+                    return NotFound();
+                }
+
+                for (var i = 0; i < idsList.Count - 1; i++)
+                {
+                    if (foldersFromPath[i + 1].FolderId != foldersFromPath[i + 1].Id)
+                    {
+                        return NotFound();
+                    }
+                }
+
+                folders = foldersFromPath;
+            }
+
+            var assets = await assetRepository.QueryAsync(App.Id, folders.LastOrDefault()?.Id, Request.QueryString.ToString());
+
+            var response = FolderDto.FromAssets(assets, folders.Select(FolderPathItem.FromAsset).ToArray());
+
+            Response.Headers["Surrogate-Key"] = string.Join(" ", response.Items.Where(x => !x.IsFolder).Select(x => x.Id));
 
             return Ok(response);
         }
@@ -277,6 +313,26 @@ namespace Squidex.Areas.Api.Controllers.Assets
             await CommandBus.PublishAsync(new DeleteAsset { AssetId = id });
 
             return NoContent();
+        }
+
+        private static List<Guid> ParseIds(string ids, char separator = ',')
+        {
+            List<Guid> idsList = null;
+
+            if (!string.IsNullOrWhiteSpace(ids))
+            {
+                idsList = new List<Guid>();
+
+                foreach (var id in ids.Split(separator))
+                {
+                    if (Guid.TryParse(id, out var guid))
+                    {
+                        idsList.Add(guid);
+                    }
+                }
+            }
+
+            return idsList;
         }
 
         private static Guid? ParseFolderId(string folderId)

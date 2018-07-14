@@ -50,7 +50,12 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         public long FileVersion { get; set; }
 
         /// <summary>
-        /// Determines of the created file is an image.
+        /// Indicates whether the asset is a folder.
+        /// </summary>
+        public bool IsFolder { get; set; }
+
+        /// <summary>
+        /// Indicates where the asset is an image.
         /// </summary>
         public bool IsImage { get; set; }
 

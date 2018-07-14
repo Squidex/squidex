@@ -128,7 +128,7 @@ export class AssetComponent implements OnInit {
 
             this.assetsService.putAsset(this.appsState.appName, this.asset.id, requestDto, this.asset.version)
                 .subscribe(dto => {
-                    this.updateAsset(this.asset.rename(requestDto.fileName, this.authState.user!.token, dto.version), true);
+                    this.updateAsset(this.asset.rename(requestDto.name, this.authState.user!.token, dto.version), true);
 
                     this.renameForm.submitCompleted();
                     this.renameDialog.hide();

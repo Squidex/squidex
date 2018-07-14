@@ -5,29 +5,26 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
+using System;
 using Squidex.Domain.Apps.Entities.Assets;
-using Squidex.Infrastructure;
 
 namespace Squidex.Areas.Api.Controllers.Assets.Models
 {
-    public class AssetsDto
+    public sealed class FolderPathItem
     {
         /// <summary>
-        /// The assets.
+        /// The id of the folder.
         /// </summary>
-        [Required]
-        public AssetDto[] Items { get; set; }
+        public Guid Id { get; set; }
 
         /// <summary>
-        /// The total number of assets.
+        /// The name of the folder.
         /// </summary>
-        public long Total { get; set; }
+        public string Name { get; set; }
 
-        public static AssetsDto FromAssets(IResultList<IAssetEntity> assets)
+        public static FolderPathItem FromAsset(IAssetEntity asset)
         {
-            return new AssetsDto { Total = assets.Total, Items = assets.Select(AssetDto.FromAsset).ToArray() };
+            return new FolderPathItem { Id = asset.Id, Name = asset.Name };
         }
     }
 }

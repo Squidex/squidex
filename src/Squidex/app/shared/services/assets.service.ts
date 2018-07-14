@@ -22,10 +22,32 @@ import {
     Versioned
 } from '@app/framework';
 
+export class FolderPathItemDto {
+    constructor(
+        public readonly id: string,
+        public readonly name: string
+    ) {
+    }
+}
+
 export class AssetsDto extends Model {
     constructor(
         public readonly total: number,
         public readonly items: AssetDto[]
+    ) {
+        super();
+    }
+
+    public with(value: Partial<AssetsDto>): AssetsDto {
+        return this.clone(value);
+    }
+}
+
+export class FolderDto extends Model {
+    constructor(
+        public readonly total: number,
+        public readonly items: AssetDto[],
+        public readonly path: FolderPathItemDto[]
     ) {
         super();
     }
@@ -42,11 +64,13 @@ export class AssetDto extends Model {
         public readonly lastModifiedBy: string,
         public readonly created: DateTime,
         public readonly lastModified: DateTime,
-        public readonly fileName: string,
+        public readonly name: string,
         public readonly fileType: string,
         public readonly fileSize: number,
         public readonly fileVersion: number,
         public readonly mimeType: string,
+        public readonly folderId: string,
+        public readonly isFolder: boolean,
         public readonly isImage: boolean,
         public readonly pixelWidth: number | null,
         public readonly pixelHeight: number | null,
@@ -69,9 +93,9 @@ export class AssetDto extends Model {
         });
     }
 
-    public rename(fileName: string, user: string, version: Version, now?: DateTime): AssetDto {
+    public rename(name: string, user: string, version: Version, now?: DateTime): AssetDto {
         return this.with({
-            fileName,
+            name,
             lastModified: now || DateTime.now(),
             lastModifiedBy: user,
             version
@@ -79,9 +103,23 @@ export class AssetDto extends Model {
     }
 }
 
+export class CreateFolderDto {
+    constructor(
+        public readonly name: string
+    ) {
+    }
+}
+
 export class UpdateAssetDto {
     constructor(
-        public readonly fileName: string
+        public readonly name: string
+    ) {
+    }
+}
+
+export class MoveAssetDto {
+    constructor(
+        public readonly folderId: string
     ) {
     }
 }
@@ -125,7 +163,6 @@ export class AssetsService {
             fullQuery = queries.join('&');
         }
 
-
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets?${fullQuery}`);
 
         return HTTP.getVersioned<any>(this.http, url).pipe(
@@ -143,11 +180,13 @@ export class AssetsService {
                             item.lastModifiedBy,
                             DateTime.parseISO_UTC(item.created),
                             DateTime.parseISO_UTC(item.lastModified),
-                            item.fileName,
+                            item.name,
                             item.fileType,
                             item.fileSize,
                             item.fileVersion,
                             item.mimeType,
+                            item.folderId,
+                            item.isFolder,
                             item.isImage,
                             item.pixelWidth,
                             item.pixelHeight,
@@ -158,7 +197,7 @@ export class AssetsService {
                 pretifyError('Failed to load assets. Please reload.'));
     }
 
-    public uploadFile(appName: string, file: File, user: string, now: DateTime): Observable<number | AssetDto> {
+    public uploadFile(appName: string, file: File, folderId: string, user: string, now: DateTime): Observable<number | AssetDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets`);
 
         const req = new HttpRequest('POST', url, getFormData(file), {
@@ -186,11 +225,13 @@ export class AssetsService {
                             user,
                             now,
                             now,
-                            response.fileName,
+                            response.name,
                             response.fileType,
                             response.fileSize,
                             response.fileVersion,
                             response.mimeType,
+                            folderId,
+                            false,
                             response.isImage,
                             response.pixelWidth,
                             response.pixelHeight,
@@ -208,6 +249,42 @@ export class AssetsService {
                 pretifyError('Failed to upload asset. Please reload.'));
     }
 
+    public postFolder(appName: string, request: CreateFolderDto, folderId: string, user: string, now: DateTime): Observable<number | AssetDto> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets`);
+
+        return HTTP.postVersioned<any>(this.http, url, request).pipe(
+                map(response => {
+                    const body = response.payload.body;
+
+                    now = now || DateTime.now();
+
+                    const dto =  new AssetDto(
+                        body.id,
+                        user,
+                        user,
+                        now,
+                        now,
+                        request.name,
+                        '',
+                        0,
+                        0,
+                        '',
+                        folderId,
+                        true,
+                        false,
+                        null,
+                        null,
+                        '',
+                        response.version);
+
+                    return dto;
+                }),
+                tap(dto => {
+                    this.analytics.trackEvent('Asset', 'FolderCreated', appName);
+                }),
+                pretifyError('Failed to create folder. Please reload.'));
+    }
+
     public getAsset(appName: string, id: string): Observable<AssetDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/${id}`);
 
@@ -223,11 +300,13 @@ export class AssetsService {
                         body.lastModifiedBy,
                         DateTime.parseISO_UTC(body.created),
                         DateTime.parseISO_UTC(body.lastModified),
-                        body.fileName,
+                        body.name,
                         body.fileType,
                         body.fileSize,
                         body.fileVersion,
                         body.mimeType,
+                        body.folderId,
+                        body.isFolder,
                         body.isImage,
                         body.pixelWidth,
                         body.pixelHeight,
@@ -273,7 +352,7 @@ export class AssetsService {
                     }
                 }),
                 tap(() => {
-                    this.analytics.trackEvent('Analytics', 'Replaced', appName);
+                    this.analytics.trackEvent('Assets', 'Replaced', appName);
                 }),
                 pretifyError('Failed to replace asset. Please reload.'));
     }
@@ -283,9 +362,19 @@ export class AssetsService {
 
         return HTTP.deleteVersioned(this.http, url, version).pipe(
                 tap(() => {
-                    this.analytics.trackEvent('Analytics', 'Deleted', appName);
+                    this.analytics.trackEvent('Assets', 'Deleted', appName);
                 }),
                 pretifyError('Failed to delete asset. Please reload.'));
+    }
+
+    public moveAsset(appName: string, id: string, dto: MoveAssetDto, version: Version): Observable<Versioned<any>> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/${id}/move`);
+
+        return HTTP.putVersioned(this.http, url, dto, version).pipe(
+                tap(() => {
+                    this.analytics.trackEvent('Assets', 'Moved', appName);
+                }),
+                pretifyError('Failed to move asset. Please reload.'));
     }
 
     public putAsset(appName: string, id: string, dto: UpdateAssetDto, version: Version): Observable<Versioned<any>> {
@@ -293,7 +382,7 @@ export class AssetsService {
 
         return HTTP.putVersioned(this.http, url, dto, version).pipe(
                 tap(() => {
-                    this.analytics.trackEvent('Analytics', 'Updated', appName);
+                    this.analytics.trackEvent('Assets', 'Updated', appName);
                 }),
                 pretifyError('Failed to delete asset. Please reload.'));
     }

@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Squidex.Infrastructure
 {
@@ -25,6 +26,11 @@ namespace Squidex.Infrastructure
         public static IResultList<T> Create<T>(IEnumerable<T> items, long total)
         {
             return new Impl<T>(items, total);
+        }
+
+        public static IResultList<T> Empty<T>()
+        {
+            return Create(Enumerable.Empty<T>(), 0);
         }
     }
 }

@@ -30,10 +30,10 @@ describe('AssetDto', () => {
     const newVersion = new Version('2');
 
     it('should update name property and user info when renaming', () => {
-        const asset_1 = new AssetDto('1', creator, creator, creation, creation, 'name.png', 'png', 1, 1, 'image/png', false, 1, 1, 'url', version);
+        const asset_1 = new AssetDto('1', creator, creator, creation, creation, 'name.png', 'png', 1, 1, 'image/png', '', false, false, 1, 1, 'url', version);
         const asset_2 = asset_1.rename('new-name.png', modifier, newVersion, modified);
 
-        expect(asset_2.fileName).toEqual('new-name.png');
+        expect(asset_2.name).toEqual('new-name.png');
         expect(asset_2.lastModified).toEqual(modified);
         expect(asset_2.lastModifiedBy).toEqual(modifier);
         expect(asset_2.version).toEqual(newVersion);
@@ -42,7 +42,7 @@ describe('AssetDto', () => {
     it('should update file properties when uploading', () => {
         const update = new AssetReplacedDto(2, 2, 'image/jpeg', true, 2, 2);
 
-        const asset_1 = new AssetDto('1', creator, creator, creation, creation, 'name.png', 'png', 1, 1, 'image/png', false, 1, 1, 'url', version);
+        const asset_1 = new AssetDto('1', creator, creator, creation, creation, 'name.png', 'png', 1, 1, 'image/png', '', false, false, 1, 1, 'url', version);
         const asset_2 = asset_1.update(update, modifier, newVersion, modified);
 
         expect(asset_2.fileSize).toEqual(2);
@@ -102,7 +102,7 @@ describe('AssetsService', () => {
                     createdBy: 'Created1',
                     lastModified: '2017-12-12T10:10',
                     lastModifiedBy: 'LastModifiedBy1',
-                    fileName: 'my-asset1.png',
+                    name: 'my-asset1.png',
                     fileType: 'png',
                     fileSize: 1024,
                     fileVersion: 2000,
@@ -118,7 +118,7 @@ describe('AssetsService', () => {
                     createdBy: 'Created2',
                     lastModified: '2017-10-12T10:10',
                     lastModifiedBy: 'LastModifiedBy2',
-                    fileName: 'my-asset2.png',
+                    name: 'my-asset2.png',
                     fileType: 'png',
                     fileSize: 1024,
                     fileVersion: 2000,
@@ -142,6 +142,8 @@ describe('AssetsService', () => {
                     1024,
                     2000,
                     'image/png',
+                    '',
+                    false,
                     true,
                     1024,
                     2048,
@@ -155,6 +157,8 @@ describe('AssetsService', () => {
                     1024,
                     2000,
                     'image/png',
+                    '',
+                    false,
                     true,
                     1024,
                     2048,
@@ -183,7 +187,7 @@ describe('AssetsService', () => {
             createdBy: 'Created1',
             lastModified: '2017-12-12T10:10',
             lastModifiedBy: 'LastModifiedBy1',
-            fileName: 'my-asset1.png',
+            name: 'my-asset1.png',
             fileType: 'png',
             fileSize: 1024,
             fileVersion: 2000,
@@ -207,6 +211,8 @@ describe('AssetsService', () => {
                 1024,
                 2000,
                 'image/png',
+                '',
+                false,
                 true,
                 1024,
                 2048,
@@ -219,7 +225,7 @@ describe('AssetsService', () => {
 
         assetsService.getAssets('my-app', 17, 13, 'my-query').subscribe();
 
-        const req = httpMock.expectOne(`http://service/p/api/apps/my-app/assets?$filter=contains(fileName,'my-query')&$top=17&$skip=13`);
+        const req = httpMock.expectOne(`http://service/p/api/apps/my-app/assets?$filter=contains(name,'my-query')&$top=17&$skip=13`);
 
         expect(req.request.method).toEqual('GET');
         expect(req.request.headers.get('If-Match')).toBeNull();
@@ -245,18 +251,18 @@ describe('AssetsService', () => {
 
         let asset: AssetDto;
 
-        assetsService.uploadFile('my-app', null!, user, now).subscribe(result => {
+        assetsService.uploadFile('my-app', null!, 'folder', user, now).subscribe(result => {
             asset = <AssetDto>result;
         });
 
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets');
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets?folderId=folder');
 
         expect(req.request.method).toEqual('POST');
         expect(req.request.headers.get('If-Match')).toBeNull();
 
         req.flush({
             id: 'id1',
-            fileName: 'my-asset1.png',
+            name: 'my-asset1.png',
             fileType: 'png',
             fileSize: 1024,
             fileVersion: 2,
@@ -281,6 +287,8 @@ describe('AssetsService', () => {
                 'png',
                 1024, 2,
                 'image/png',
+                '',
+                false,
                 true,
                 1024,
                 2048,
