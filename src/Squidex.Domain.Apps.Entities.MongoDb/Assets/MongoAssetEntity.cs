@@ -32,11 +32,15 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 
         [BsonRequired]
         [BsonElement]
+        public Guid FolderId { get; set; }
+
+        [BsonRequired]
+        [BsonElement]
         public string MimeType { get; set; }
 
         [BsonRequired]
         [BsonElement]
-        public string FileName { get; set; }
+        public string Name { get; set; }
 
         [BsonRequired]
         [BsonElement]
@@ -72,6 +76,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 
         [BsonElement]
         public bool IsDeleted { get; set; }
+
+        [BsonElement]
+        public bool IsFolder { get; set; }
 
         Guid IAssetInfo.AssetId
         {

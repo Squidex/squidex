@@ -84,7 +84,7 @@ namespace Squidex.Infrastructure.Commands
             return InvokeAsync(command, handler, false);
         }
 
-        protected Task<object> CreateReturnAsync<TCommand>(TCommand command, Func<TCommand, object> handler) where TCommand : class, IAggregateCommand
+        protected Task<object> CreateReturn<TCommand>(TCommand command, Func<TCommand, object> handler) where TCommand : class, IAggregateCommand
         {
             return InvokeAsync(command, handler?.ToAsync(), false);
         }
@@ -94,7 +94,7 @@ namespace Squidex.Infrastructure.Commands
             return InvokeAsync(command, handler.ToDefault<TCommand, object>(), false);
         }
 
-        protected Task<object> CreateAsync<TCommand>(TCommand command, Action<TCommand> handler) where TCommand : class, IAggregateCommand
+        protected Task<object> Create<TCommand>(TCommand command, Action<TCommand> handler) where TCommand : class, IAggregateCommand
         {
             return InvokeAsync(command, handler?.ToDefault<TCommand, object>()?.ToAsync(), false);
         }
@@ -104,7 +104,7 @@ namespace Squidex.Infrastructure.Commands
             return InvokeAsync(command, handler, true);
         }
 
-        protected Task<object> UpdateReturnAsync<TCommand>(TCommand command, Func<TCommand, object> handler) where TCommand : class, IAggregateCommand
+        protected Task<object> UpdateReturn<TCommand>(TCommand command, Func<TCommand, object> handler) where TCommand : class, IAggregateCommand
         {
             return InvokeAsync(command, handler?.ToAsync(), true);
         }
@@ -114,7 +114,7 @@ namespace Squidex.Infrastructure.Commands
             return InvokeAsync(command, handler?.ToDefault<TCommand, object>(), true);
         }
 
-        protected Task<object> UpdateAsync<TCommand>(TCommand command, Action<TCommand> handler) where TCommand : class, IAggregateCommand
+        protected Task<object> Update<TCommand>(TCommand command, Action<TCommand> handler) where TCommand : class, IAggregateCommand
         {
             return InvokeAsync(command, handler?.ToDefault<TCommand, object>()?.ToAsync(), true);
         }

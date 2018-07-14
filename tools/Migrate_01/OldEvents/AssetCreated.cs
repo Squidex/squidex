@@ -5,15 +5,17 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
+using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Reflection;
+using NewAssetCreated = Squidex.Domain.Apps.Events.Assets.AssetCreated;
 
-namespace Squidex.Domain.Apps.Events.Assets
+namespace Migrate_01.OldEvents
 {
     [EventType(nameof(AssetCreated))]
-    public sealed class AssetCreated : AssetEvent
+    public sealed class AssetCreated : AssetEvent, IMigratedEvent
     {
-        public string Name { get; set; }
+        public string FileName { get; set; }
 
         public string MimeType { get; set; }
 
@@ -27,6 +29,9 @@ namespace Squidex.Domain.Apps.Events.Assets
 
         public int? PixelHeight { get; set; }
 
-        public Guid FolderId { get; set; }
+        public IEvent Migrate()
+        {
+            return SimpleMapper.Map(this, new NewAssetCreated { Name = FileName });
+        }
     }
 }

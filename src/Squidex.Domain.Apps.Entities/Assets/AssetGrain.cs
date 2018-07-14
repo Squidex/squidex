@@ -24,42 +24,67 @@ namespace Squidex.Domain.Apps.Entities.Assets
 {
     public sealed class AssetGrain : SquidexDomainObjectGrainLogSnapshots<AssetState>, IAssetGrain
     {
-        public AssetGrain(IStore<Guid> store, ISemanticLog log)
+        private readonly IAssetVerifier assetVerifier;
+
+        public AssetGrain(IStore<Guid> store, ISemanticLog log, IAssetVerifier assetVerifier)
             : base(store, log)
         {
+            Guard.NotNull(assetVerifier, nameof(assetVerifier));
+
+            this.assetVerifier = assetVerifier;
         }
 
         protected override Task<object> ExecuteAsync(IAggregateCommand command)
         {
+            VerifyNotDeleted();
+
             switch (command)
             {
-                case CreateAsset createRule:
-                    return CreateReturnAsync(createRule, (Func<CreateAsset, object>)(c =>
+                case CreateAsset createAsset:
+                    return CreateReturnAsync(createAsset, async c =>
                     {
-                        GuardAsset.CanCreate(c);
+                        await GuardAsset.CanCreate(c, assetVerifier);
 
                         Create(c);
 
-                        return new AssetSavedResult((long)base.Version, Snapshot.FileVersion);
-                    }));
-                case UpdateAsset updateRule:
-                    return UpdateReturnAsync(updateRule, (Func<UpdateAsset, object>)(c =>
+                        return new AssetSavedResult(Version, Snapshot.FileVersion);
+                    });
+                case CreateAssetFolder createAssetFolder:
+                    return CreateReturn(createAssetFolder, c =>
                     {
-                        GuardAsset.CanUpdate(c);
+                        GuardAsset.CanCreateFolder(c);
+
+                        CreateFolder(c);
+
+                        return new AssetSavedResult(Version, Snapshot.FileVersion);
+                    });
+                case UpdateAsset updateAsset:
+                    return UpdateReturn(updateAsset, c =>
+                    {
+                        GuardAsset.CanUpdate(c, Snapshot.IsFolder);
 
                         Update(c);
 
-                        return new AssetSavedResult((long)base.Version, Snapshot.FileVersion);
-                    }));
-                case RenameAsset renameAsset:
-                    return UpdateAsync(renameAsset, c =>
+                        return new AssetSavedResult(Version, Snapshot.FileVersion);
+                    });
+                case MoveAsset moveAsset:
+                    return UpdateReturnAsync(moveAsset, async c =>
                     {
-                        GuardAsset.CanRename(c, Snapshot.FileName);
+                        await GuardAsset.CanMove(c, assetVerifier, Snapshot.FolderId);
+
+                        Move(c);
+
+                        return new AssetSavedResult(Version, Snapshot.FileVersion);
+                    });
+                case RenameAsset renameAsset:
+                    return Update(renameAsset, c =>
+                    {
+                        GuardAsset.CanRename(c, Snapshot.Name);
 
                         Rename(c);
                     });
                 case DeleteAsset deleteAsset:
-                    return UpdateAsync(deleteAsset, c =>
+                    return Update(deleteAsset, c =>
                     {
                         GuardAsset.CanDelete(c);
 
@@ -74,7 +99,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             var @event = SimpleMapper.Map(command, new AssetCreated
             {
-                FileName = command.File.FileName,
+                Name = command.File.FileName,
                 FileSize = command.File.FileSize,
                 FileVersion = 0,
                 MimeType = command.File.MimeType,
@@ -103,18 +128,24 @@ namespace Squidex.Domain.Apps.Entities.Assets
             RaiseEvent(@event);
         }
 
-        public void Delete(DeleteAsset command)
+        public void CreateFolder(CreateAssetFolder command)
         {
-            VerifyNotDeleted();
+            RaiseEvent(SimpleMapper.Map(command, new AssetFolderCreated()));
+        }
 
-            RaiseEvent(SimpleMapper.Map(command, new AssetDeleted { DeletedSize = Snapshot.TotalSize }));
+        public void Move(MoveAsset command)
+        {
+            RaiseEvent(SimpleMapper.Map(command, new AssetMoved()));
         }
 
         public void Rename(RenameAsset command)
         {
-            VerifyNotDeleted();
-
             RaiseEvent(SimpleMapper.Map(command, new AssetRenamed()));
+        }
+
+        public void Delete(DeleteAsset command)
+        {
+            RaiseEvent(SimpleMapper.Map(command, new AssetDeleted { DeletedSize = Snapshot.TotalSize }));
         }
 
         private void RaiseEvent(AppEvent @event)

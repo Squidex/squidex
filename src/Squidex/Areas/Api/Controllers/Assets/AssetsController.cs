@@ -58,6 +58,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="ids">The optional asset ids.</param>
+        /// <param name="folderId">The folder to query from.</param>
         /// <returns>
         /// 200 => Assets returned.
         /// 404 => App not found.
@@ -70,31 +71,69 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [Route("apps/{app}/assets/")]
         [ProducesResponseType(typeof(AssetsDto), 200)]
         [ApiCosts(1)]
-        public async Task<IActionResult> GetAssets(string app, [FromQuery] string ids = null)
+        public async Task<IActionResult> GetAssets(string app, string folderId, [FromQuery] string ids = null)
         {
-            HashSet<Guid> idsList = null;
+            var folderIdValue = ParseFolderId(folderId);
 
-            if (!string.IsNullOrWhiteSpace(ids))
-            {
-                idsList = new HashSet<Guid>();
-
-                foreach (var id in ids.Split(','))
-                {
-                    if (Guid.TryParse(id, out var guid))
-                    {
-                        idsList.Add(guid);
-                    }
-                }
-            }
+            var idsList = ParseIds(ids);
 
             var assets =
                 idsList?.Count > 0 ?
                     await assetRepository.QueryAsync(App.Id, idsList) :
-                    await assetRepository.QueryAsync(App.Id, Request.QueryString.ToString());
+                    await assetRepository.QueryAsync(App.Id, folderIdValue, Request.QueryString.ToString());
 
             var response = AssetsDto.FromAssets(assets);
 
-            Response.Headers["Surrogate-Key"] = string.Join(" ", response.Items.Select(x => x.Id));
+            Response.Headers["Surrogate-Key"] = string.Join(" ", response.Items.Where(x => !x.IsFolder).Select(x => x.Id));
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Get folder structure.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <param name="path">The path to the folder to retrieve.</param>
+        /// <returns>
+        /// 200 => Folder found.
+        /// 404 => Folder or app not found.
+        /// </returns>
+        [MustBeAppReader]
+        [HttpGet]
+        [Route("apps/{app}/assets/folder/{*path}")]
+        [ProducesResponseType(typeof(FolderDto), 200)]
+        [ApiCosts(1)]
+        public async Task<IActionResult> GetFolder(string app, string path)
+        {
+            var idsList = ParseIds(path, '/');
+
+            var folders = ResultList.Empty<IAssetEntity>();
+
+            if (idsList?.Count > 0)
+            {
+                var foldersFromPath = await assetRepository.QueryAsync(App.Id, idsList);
+
+                if (foldersFromPath.Count != idsList.Count)
+                {
+                    return NotFound();
+                }
+
+                for (var i = 0; i < idsList.Count - 1; i++)
+                {
+                    if (foldersFromPath[i + 1].FolderId != foldersFromPath[i + 1].Id)
+                    {
+                        return NotFound();
+                    }
+                }
+
+                folders = foldersFromPath;
+            }
+
+            var assets = await assetRepository.QueryAsync(App.Id, folders.LastOrDefault()?.Id, Request.QueryString.ToString());
+
+            var response = FolderDto.FromAssets(assets, folders.Select(FolderPathItem.FromAsset).ToArray());
+
+            Response.Headers["Surrogate-Key"] = string.Join(" ", response.Items.Where(x => !x.IsFolder).Select(x => x.Id));
 
             return Ok(response);
         }
@@ -131,10 +170,12 @@ namespace Squidex.Areas.Api.Controllers.Assets
         }
 
         /// <summary>
-        /// Upload a new asset.
+        /// Upload asset or folder.
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="file">The file to upload.</param>
+        /// <param name="folderId">The folder to upload the asset to.</param>
+        /// <param name="request">The request if you want to create a folder.</param>
         /// <returns>
         /// 201 => Asset created.
         /// 404 => App not found.
@@ -148,17 +189,31 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [Route("apps/{app}/assets/")]
         [ProducesResponseType(typeof(AssetCreatedDto), 201)]
         [ProducesResponseType(typeof(ErrorDto), 400)]
-        public async Task<IActionResult> PostAsset(string app, [SwaggerIgnore] List<IFormFile> file)
+        public async Task<IActionResult> PostAsset(string app, string folderId, [SwaggerIgnore] List<IFormFile> file, CreateAssetFolderDto request)
         {
-            var assetFile = await CheckAssetFileAsync(file);
+            Guid.TryParse(folderId, out var folderIdValue);
 
-            var command = new CreateAsset { File = assetFile };
-            var context = await CommandBus.PublishAsync(command);
+            if (file.Count > 0)
+            {
+                var assetFile = await CheckAssetFileAsync(file);
 
-            var result = context.Result<EntityCreatedResult<Guid>>();
-            var response = AssetCreatedDto.FromCommand(command, result);
+                var command = new CreateAsset { File = assetFile, FolderId = folderIdValue };
+                var context = await CommandBus.PublishAsync(command);
 
-            return StatusCode(201, response);
+                var result = context.Result<EntityCreatedResult<Guid>>();
+                var response = AssetCreatedDto.FromCommand(command, result);
+
+                return StatusCode(201, response);
+            }
+            else
+            {
+                var context = await CommandBus.PublishAsync(request.ToCommand(folderIdValue));
+
+                var result = context.Result<EntityCreatedResult<Guid>>();
+                var response = EntityCreatedDto.FromResult(result);
+
+                return StatusCode(201, response);
+            }
         }
 
         /// <summary>
@@ -210,7 +265,30 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [Route("apps/{app}/assets/{id}/")]
         [ProducesResponseType(typeof(ErrorDto), 400)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PutAsset(string app, Guid id, [FromBody] AssetUpdateDto request)
+        public async Task<IActionResult> PutAsset(string app, Guid id, [FromBody] RenameAssetDto request)
+        {
+            await CommandBus.PublishAsync(request.ToCommand(id));
+
+            return NoContent();
+        }
+
+        /// <summary>
+        /// Moves the the asset.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <param name="id">The id of the asset.</param>
+        /// <param name="request">The asset object that needs to updated.</param>
+        /// <returns>
+        /// 204 => Asset moved.
+        /// 400 => Asset folder not found.
+        /// 404 => Asset or app not found.
+        /// </returns>
+        [MustBeAppReader]
+        [HttpPut]
+        [Route("apps/{app}/assets/{id}/move")]
+        [ProducesResponseType(typeof(ErrorDto), 400)]
+        [ApiCosts(1)]
+        public async Task<IActionResult> MoveAsset(string app, Guid id, [FromBody] MoveAssetDto request)
         {
             await CommandBus.PublishAsync(request.ToCommand(id));
 
@@ -237,9 +315,44 @@ namespace Squidex.Areas.Api.Controllers.Assets
             return NoContent();
         }
 
+        private static List<Guid> ParseIds(string ids, char separator = ',')
+        {
+            List<Guid> idsList = null;
+
+            if (!string.IsNullOrWhiteSpace(ids))
+            {
+                idsList = new List<Guid>();
+
+                foreach (var id in ids.Split(separator))
+                {
+                    if (Guid.TryParse(id, out var guid))
+                    {
+                        idsList.Add(guid);
+                    }
+                }
+            }
+
+            return idsList;
+        }
+
+        private static Guid? ParseFolderId(string folderId)
+        {
+            Guid? parsedFolderId = null;
+
+            if (!string.IsNullOrWhiteSpace(folderId))
+            {
+                if (Guid.TryParse(folderId, out var temp))
+                {
+                    parsedFolderId = temp;
+                }
+            }
+
+            return parsedFolderId;
+        }
+
         private async Task<AssetFile> CheckAssetFileAsync(IReadOnlyList<IFormFile> file)
         {
-            if (file.Count != 1)
+            if (file.Count > 1)
             {
                 var error = new ValidationError($"Can only upload one file, found {file.Count} files.");
 

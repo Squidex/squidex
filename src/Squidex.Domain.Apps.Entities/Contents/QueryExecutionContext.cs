@@ -71,9 +71,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return content;
         }
 
-        public async Task<IResultList<IAssetEntity>> QueryAssetsAsync(string query)
+        public async Task<IResultList<IAssetEntity>> QueryAssetsAsync(Guid? folderId, string query)
         {
-            var assets = await assetRepository.QueryAsync(context.App.Id, query);
+            var assets = await assetRepository.QueryAsync(context.App.Id, folderId, query);
 
             foreach (var asset in assets)
             {

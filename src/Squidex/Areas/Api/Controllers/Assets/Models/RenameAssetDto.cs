@@ -12,13 +12,13 @@ using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Areas.Api.Controllers.Assets.Models
 {
-    public sealed class AssetUpdateDto
+    public sealed class RenameAssetDto
     {
         /// <summary>
         /// The new name of the asset.
         /// </summary>
         [Required]
-        public string FileName { get; set; }
+        public string Name { get; set; }
 
         public RenameAsset ToCommand(Guid id)
         {

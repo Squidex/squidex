@@ -54,7 +54,7 @@ namespace Squidex.Infrastructure.MongoDb.OData
                 return InstantPattern.General.Parse(Visit(nodeIn.Source).ToString()).Value;
             }
 
-            return base.Visit(nodeIn);
+            return Visit(nodeIn.Source);
         }
 
         public override object Visit(ConstantNode nodeIn)

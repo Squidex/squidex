@@ -63,14 +63,14 @@ namespace Squidex.Areas.Api.Controllers.Assets
         {
             var entity = await assetRepository.FindAssetAsync(id);
 
-            if (entity == null || entity.FileVersion < version || width == 0 || height == 0)
+            if (entity == null || entity.FileVersion < version || width == 0 || height == 0 || entity.IsFolder)
             {
                 return NotFound();
             }
 
             var assetId = entity.Id.ToString();
 
-            return new FileCallbackResult(entity.MimeType, entity.FileName, async bodyStream =>
+            return new FileCallbackResult(entity.MimeType, entity.Name, async bodyStream =>
             {
                 if (entity.IsImage && (width.HasValue || height.HasValue))
                 {

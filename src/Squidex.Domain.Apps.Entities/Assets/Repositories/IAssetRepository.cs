@@ -14,9 +14,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.Repositories
 {
     public interface IAssetRepository
     {
-        Task<IResultList<IAssetEntity>> QueryAsync(Guid appId, string query = null);
+        Task<IResultList<IAssetEntity>> QueryAsync(Guid appId, Guid? folderId, string query = null);
 
-        Task<IResultList<IAssetEntity>> QueryAsync(Guid appId, HashSet<Guid> ids);
+        Task<IResultList<IAssetEntity>> QueryAsync(Guid appId, IList<Guid> ids);
 
         Task<IAssetEntity> FindAssetAsync(Guid id);
     }

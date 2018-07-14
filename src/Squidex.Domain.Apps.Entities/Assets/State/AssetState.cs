@@ -23,7 +23,10 @@ namespace Squidex.Domain.Apps.Entities.Assets.State
         public NamedId<Guid> AppId { get; set; }
 
         [JsonProperty]
-        public string FileName { get; set; }
+        public Guid FolderId { get; set; }
+
+        [JsonProperty]
+        public string Name { get; set; }
 
         [JsonProperty]
         public string MimeType { get; set; }
@@ -45,6 +48,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.State
 
         [JsonProperty]
         public int? PixelHeight { get; set; }
+
+        [JsonProperty]
+        public bool IsFolder { get; set; }
 
         [JsonProperty]
         public bool IsDeleted { get; set; }
@@ -70,9 +76,21 @@ namespace Squidex.Domain.Apps.Entities.Assets.State
             TotalSize += @event.FileSize;
         }
 
+        protected void On(AssetFolderCreated @event)
+        {
+            SimpleMapper.Map(@event, this);
+
+            IsFolder = true;
+        }
+
         protected void On(AssetRenamed @event)
         {
-            FileName = @event.FileName;
+            Name = @event.Name;
+        }
+
+        protected void On(AssetMoved @event)
+        {
+            FolderId = @event.FolderId;
         }
 
         protected void On(AssetDeleted @event)

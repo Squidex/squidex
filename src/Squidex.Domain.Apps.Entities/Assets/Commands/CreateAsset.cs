@@ -15,6 +15,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.Commands
     {
         public NamedId<Guid> AppId { get; set; }
 
+        public Guid FolderId { get; set; }
+
         public AssetFile File { get; set; }
 
         public ImageInfo ImageInfo { get; set; }

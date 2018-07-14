@@ -25,7 +25,7 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         /// The file name.
         /// </summary>
         [Required]
-        public string FileName { get; set; }
+        public string Name { get; set; }
 
         /// <summary>
         /// The mime type.
@@ -50,7 +50,12 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         public long FileVersion { get; set; }
 
         /// <summary>
-        /// Determines of the created file is an image.
+        /// Indicates whether the asset is a folder.
+        /// </summary>
+        public bool IsFolder { get; set; }
+
+        /// <summary>
+        /// Indicates where the asset is an image.
         /// </summary>
         public bool IsImage { get; set; }
 
@@ -93,7 +98,7 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
 
         public static AssetDto FromAsset(IAssetEntity asset)
         {
-            return SimpleMapper.Map(asset, new AssetDto { FileType = asset.FileName.FileType() });
+            return SimpleMapper.Map(asset, new AssetDto { FileType = asset.Name.FileType() });
         }
     }
 }

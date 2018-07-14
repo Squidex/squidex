@@ -93,9 +93,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
             AddField(new FieldType
             {
-                Name = "fileName",
+                Name = "name",
                 ResolvedType = AllTypes.NonNullString,
-                Resolver = Resolve(x => x.FileName),
+                Resolver = Resolve(x => x.Name),
                 Description = "The file name."
             });
 
@@ -103,7 +103,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             {
                 Name = "fileType",
                 ResolvedType = AllTypes.NonNullString,
-                Resolver = Resolve(x => x.FileName.FileType()),
+                Resolver = Resolve(x => x.Name.FileType()),
                 Description = "The file type."
             });
 
@@ -145,6 +145,22 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 ResolvedType = AllTypes.Int,
                 Resolver = Resolve(x => x.PixelHeight),
                 Description = "The height of the image in pixels if the asset is an image."
+            });
+
+            AddField(new FieldType
+            {
+                Name = "folderId",
+                ResolvedType = AllTypes.Guid,
+                Resolver = Resolve(x => x.FolderId),
+                Description = "The folder id."
+            });
+
+            AddField(new FieldType
+            {
+                Name = "isFolder",
+                ResolvedType = AllTypes.Boolean,
+                Resolver = Resolve(x => x.IsFolder),
+                Description = "Determines whether the asset is a folder."
             });
 
             if (model.CanGenerateAssetSourceUrl)

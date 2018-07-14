@@ -1,17 +1,16 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure.EventSourcing;
+using System;
 
-namespace Squidex.Domain.Apps.Events.Assets
+namespace Squidex.Domain.Apps.Entities.Assets.Commands
 {
-    [EventType(nameof(AssetRenamed), 2)]
-    public sealed class AssetRenamed : AssetEvent
+    public sealed class MoveAsset : AssetCommand
     {
-        public string Name { get; set; }
+        public Guid FolderId { get; set; }
     }
 }

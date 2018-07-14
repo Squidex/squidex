@@ -85,8 +85,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.OData
         [Fact]
         public void Should_make_query_with_fileName()
         {
-            var i = F("$filter=fileName eq 'Logo.png'");
-            var o = C("{ 'FileName' : 'Logo.png' }");
+            var i = F("$filter=name eq 'Logo.png'");
+            var o = C("{ 'Name' : 'Logo.png' }");
 
             Assert.Equal(o, i);
         }
@@ -141,6 +141,15 @@ namespace Squidex.Domain.Apps.Entities.Assets.OData
         {
             var i = F("$filter=pixelWidth eq 600");
             var o = C("{ 'PixelWidth' : 600 }");
+
+            Assert.Equal(o, i);
+        }
+
+        [Fact]
+        public void Should_make_query_with_isFolder()
+        {
+            var i = F("$filter=isFolder eq true");
+            var o = C("{ 'IsFolder' : true }");
 
             Assert.Equal(o, i);
         }

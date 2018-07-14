@@ -11,12 +11,15 @@ using System.Linq;
 using System.Threading.Tasks;
 using GraphQL.Resolvers;
 using GraphQL.Types;
+using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Utils;
 using Squidex.Domain.Apps.Entities.Schemas;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {
     public sealed class AppQueriesGraphType : ObjectGraphType
     {
+        private static readonly HashSet<string> AssetArgumentsToSkip = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "FolderId" };
+
         public AppQueriesGraphType(IGraphModel model, IEnumerable<ISchemaEntity> schemas)
         {
             var assetType = model.GetAssetType();
@@ -82,9 +85,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 ResolvedType = new ListGraphType(new NonNullGraphType(assetType)),
                 Resolver = ResolveAsync((c, e) =>
                 {
-                    var assetQuery = BuildODataQuery(c);
+                    var assetQuery = c.Arguments.ToOData(AssetArgumentsToSkip);
+                    var assetFolder = c.GetArgument<Guid?>("folderId");
 
-                    return e.QueryAssetsAsync(assetQuery);
+                    return e.QueryAssetsAsync(assetFolder, assetQuery);
                 }),
                 Description = "Get assets."
             });
@@ -96,9 +100,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 ResolvedType = new AssetsResultGraphType(assetType),
                 Resolver = ResolveAsync((c, e) =>
                 {
-                    var assetQuery = BuildODataQuery(c);
+                    var assetQuery = c.Arguments.ToOData(AssetArgumentsToSkip);
+                    var assetFolder = c.GetArgument<Guid?>("folderId");
 
-                    return e.QueryAssetsAsync(assetQuery);
+                    return e.QueryAssetsAsync(assetFolder, assetQuery);
                 }),
                 Description = "Get assets and total count."
             });
@@ -113,7 +118,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 ResolvedType = new ListGraphType(new NonNullGraphType(contentType)),
                 Resolver = ResolveAsync((c, e) =>
                 {
-                    var contentQuery = BuildODataQuery(c);
+                    var contentQuery = c.Arguments.ToOData();
 
                     return e.QueryContentsAsync(schemaId.ToString(), contentQuery);
                 }),
@@ -127,7 +132,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 ResolvedType = new ContentsResultGraphType(schemaType, schemaName, contentType),
                 Resolver = ResolveAsync((c, e) =>
                 {
-                    var contentQuery = BuildODataQuery(c);
+                    var contentQuery = c.Arguments.ToOData();
 
                     return e.QueryContentsAsync(schemaId.ToString(), contentQuery);
                 }),
@@ -183,6 +188,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 },
                 new QueryArgument(AllTypes.None)
                 {
+                    Name = "folderId",
+                    Description = "Folder id.",
+                    DefaultValue = null,
+                    ResolvedType = AllTypes.Guid
+                },
+                new QueryArgument(AllTypes.None)
+                {
                     Name = "search",
                     Description = "Optional query to limit the files by name.",
                     DefaultValue = string.Empty,
@@ -231,17 +243,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                     ResolvedType = AllTypes.String
                 }
             };
-        }
-
-        private static string BuildODataQuery(ResolveFieldContext c)
-        {
-            var odataQuery = "?" +
-                string.Join("&",
-                    c.Arguments
-                        .Select(x => new { x.Key, Value = x.Value.ToString() }).Where(x => !string.IsNullOrWhiteSpace(x.Value))
-                        .Select(x => $"${x.Key}={x.Value}"));
-
-            return odataQuery;
         }
 
         private static IFieldResolver ResolveAsync<T>(Func<ResolveFieldContext, GraphQLExecutionContext, Task<T>> action)

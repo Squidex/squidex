@@ -25,6 +25,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
     public class AssetCommandMiddlewareTests : HandlerTestBase<AssetGrain, AssetState>
     {
         private readonly IAssetThumbnailGenerator assetThumbnailGenerator = A.Fake<IAssetThumbnailGenerator>();
+        private readonly IAssetVerifier assetVerifier = A.Fake<IAssetVerifier>();
         private readonly IAssetStore assetStore = A.Fake<IAssetStore>();
         private readonly IGrainFactory grainFactory = A.Fake<IGrainFactory>();
         private readonly Guid assetId = Guid.NewGuid();
@@ -43,7 +44,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             file = new AssetFile("my-image.png", "image/png", 1024, () => stream);
 
-            asset = new AssetGrain(Store, A.Dummy<ISemanticLog>());
+            asset = new AssetGrain(Store, A.Dummy<ISemanticLog>(), assetVerifier);
             asset.OnActivateAsync(Id).Wait();
 
             A.CallTo(() => grainFactory.GetGrain<IAssetGrain>(Id, null))

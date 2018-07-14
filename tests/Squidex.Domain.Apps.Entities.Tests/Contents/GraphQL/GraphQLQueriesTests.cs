@@ -39,33 +39,37 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         [Fact]
         public async Task Should_return_multiple_assets_when_querying_assets()
         {
-            const string query = @"
-                query {
-                  queryAssets(search: ""my-query"", take: 30, skip: 5) {
+            var folderId = Guid.NewGuid();
+
+            var query = $@"
+                query {{
+                  queryAssets(search: ""my-query"", folderId: ""{folderId}"", take: 30, skip: 5) {{
                     id
                     version
                     created
                     createdBy
                     lastModified
                     lastModifiedBy
+                    isFolder
+                    folderId
                     url
                     thumbnailUrl
                     sourceUrl
                     mimeType
-                    fileName
+                    name
                     fileSize
                     fileVersion
                     isImage
                     pixelWidth
                     pixelHeight
-                  }
-                }";
+                  }}
+                }}";
 
             var asset = CreateAsset(Guid.NewGuid());
 
             var assets = new List<IAssetEntity> { asset };
 
-            A.CallTo(() => assetRepository.QueryAsync(app.Id, "?$take=30&$skip=5&$search=my-query"))
+            A.CallTo(() => assetRepository.QueryAsync(app.Id, A<Guid?>.That.Matches(x => x.Value == folderId), "?$take=30&$skip=5&$search=my-query"))
                 .Returns(ResultList.Create(assets, 0));
 
             var result = await sut.QueryAsync(context, new GraphQLQuery { Query = query });
@@ -84,11 +88,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                             createdBy = "subject:user1",
                             lastModified = asset.LastModified.ToDateTimeUtc(),
                             lastModifiedBy = "subject:user2",
+                            isFolder = true,
+                            folderId = Guid.Empty,
                             url = $"assets/{asset.Id}",
                             thumbnailUrl = $"assets/{asset.Id}?width=100",
                             sourceUrl = $"assets/source/{asset.Id}",
                             mimeType = "image/png",
-                            fileName = "MyFile.png",
+                            name = "MyFile.png",
                             fileSize = 1024,
                             fileVersion = 123,
                             isImage = true,
@@ -116,11 +122,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                       createdBy
                       lastModified
                       lastModifiedBy
+                      isFolder
+                      folderId
                       url
                       thumbnailUrl
                       sourceUrl
                       mimeType
-                      fileName
+                      name
                       fileSize
                       fileVersion
                       isImage
@@ -134,7 +142,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             var assets = new List<IAssetEntity> { asset };
 
-            A.CallTo(() => assetRepository.QueryAsync(app.Id, "?$take=30&$skip=5&$search=my-query"))
+            A.CallTo(() => assetRepository.QueryAsync(app.Id, null, "?$take=30&$skip=5&$search=my-query"))
                 .Returns(ResultList.Create(assets, 10));
 
             var result = await sut.QueryAsync(context, new GraphQLQuery { Query = query });
@@ -156,11 +164,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                                 createdBy = "subject:user1",
                                 lastModified = asset.LastModified.ToDateTimeUtc(),
                                 lastModifiedBy = "subject:user2",
+                                isFolder = true,
+                                folderId = Guid.Empty,
                                 url = $"assets/{asset.Id}",
                                 thumbnailUrl = $"assets/{asset.Id}?width=100",
                                 sourceUrl = $"assets/source/{asset.Id}",
                                 mimeType = "image/png",
-                                fileName = "MyFile.png",
+                                name = "MyFile.png",
                                 fileSize = 1024,
                                 fileVersion = 123,
                                 isImage = true,
@@ -190,11 +200,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     createdBy
                     lastModified
                     lastModifiedBy
+                    isFolder
+                    folderId
                     url
                     thumbnailUrl
                     sourceUrl
                     mimeType
-                    fileName
+                    name
                     fileSize
                     fileVersion
                     isImage
@@ -220,11 +232,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                         createdBy = "subject:user1",
                         lastModified = asset.LastModified.ToDateTimeUtc(),
                         lastModifiedBy = "subject:user2",
+                        isFolder = true,
+                        folderId = Guid.Empty,
                         url = $"assets/{asset.Id}",
                         thumbnailUrl = $"assets/{asset.Id}?width=100",
                         sourceUrl = $"assets/source/{asset.Id}",
                         mimeType = "image/png",
-                        fileName = "MyFile.png",
+                        name = "MyFile.png",
                         fileSize = 1024,
                         fileVersion = 123,
                         isImage = true,

@@ -5,13 +5,22 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure.EventSourcing;
+using System;
+using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Events.Assets
+namespace Squidex.Domain.Apps.Entities.Assets.Commands
 {
-    [EventType(nameof(AssetRenamed), 2)]
-    public sealed class AssetRenamed : AssetEvent
+    public sealed class CreateAssetFolder : AssetCommand, IAppCommand
     {
+        public NamedId<Guid> AppId { get; set; }
+
+        public Guid FolderId { get; set; }
+
         public string Name { get; set; }
+
+        public CreateAssetFolder()
+        {
+            AssetId = Guid.NewGuid();
+        }
     }
 }

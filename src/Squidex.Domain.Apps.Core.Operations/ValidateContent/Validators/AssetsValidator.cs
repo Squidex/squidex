@@ -56,7 +56,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
                     if (properties.AllowedExtensions != null &&
                         properties.AllowedExtensions.Count > 0 &&
-                       !properties.AllowedExtensions.Any(x => asset.FileName.EndsWith("." + x, StringComparison.OrdinalIgnoreCase)))
+                       !properties.AllowedExtensions.Any(x => asset.Name.EndsWith("." + x, StringComparison.OrdinalIgnoreCase)))
                     {
                         addError(path, "Invalid file extension.");
                     }

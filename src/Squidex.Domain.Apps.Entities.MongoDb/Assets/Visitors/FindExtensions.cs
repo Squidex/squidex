@@ -47,13 +47,18 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets.Visitors
             return cursor.Skip(query);
         }
 
-        public static FilterDefinition<MongoAssetEntity> BuildQuery(ODataUriParser query, Guid appId)
+        public static FilterDefinition<MongoAssetEntity> BuildQuery(ODataUriParser query, Guid appId, Guid? folderId)
         {
             var filters = new List<FilterDefinition<MongoAssetEntity>>
             {
                 Filter.Eq(x => x.IndexedAppId, appId),
                 Filter.Eq(x => x.IsDeleted, false)
             };
+
+            if (folderId.HasValue)
+            {
+                filters.Add(Filter.Eq(x => x.FolderId, folderId.Value));
+            }
 
             var filter = query.BuildFilter<MongoAssetEntity>(PropertyCalculator, false);
 

@@ -20,6 +20,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.TestData
 
         public Guid AssetId { get; set; }
 
+        public Guid FolderId { get; set; }
+
         public Instant Created { get; set; }
 
         public Instant LastModified { get; set; }
@@ -32,11 +34,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.TestData
 
         public string MimeType { get; set; }
 
-        public string FileName { get; set; }
+        public string Name { get; set; }
 
         public long FileSize { get; set; }
 
         public long FileVersion { get; set; }
+
+        public bool IsFolder { get; set; }
 
         public bool IsImage { get; set; }
 
