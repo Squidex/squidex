@@ -17,10 +17,10 @@ import {
     AssetsService,
     DateTime,
     RenameAssetDto,
+    TagAssetDto,
     Version,
     Versioned
 } from './../';
-import { TagAssetDto } from '@appshared/services/assets.service';
 
 describe('AssetDto', () => {
     const creation = DateTime.today();
@@ -35,6 +35,16 @@ describe('AssetDto', () => {
         const asset_2 = asset_1.rename('new-name.png', modifier, newVersion, modified);
 
         expect(asset_2.fileName).toEqual('new-name.png');
+        expect(asset_2.lastModified).toEqual(modified);
+        expect(asset_2.lastModifiedBy).toEqual(modifier);
+        expect(asset_2.version).toEqual(newVersion);
+    });
+
+    it('should update tag property and user info when tagged', () => {
+        const asset_1 = new AssetDto('1', creator, creator, creation, creation, 'name.png', 'png', 1, 1, 'image/png', false, 1, 1, [], 'url', version);
+        const asset_2 = asset_1.tag(['tag1', 'tag2'], modifier, newVersion, modified);
+
+        expect(asset_2.tags).toEqual(['tag1', 'tag2']);
         expect(asset_2.lastModified).toEqual(modified);
         expect(asset_2.lastModifiedBy).toEqual(modifier);
         expect(asset_2.version).toEqual(newVersion);

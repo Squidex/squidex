@@ -1,29 +1,20 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using System;
-using Squidex.Domain.Apps.Core.ValidateContent;
+using System.Threading.Tasks;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public interface IAssetEntity :
-        IEntity,
-        IEntityWithCreatedBy,
-        IEntityWithLastModifiedBy,
-        IEntityWithVersion,
-        IAssetInfo
+    public interface IAssetQueryService
     {
-        NamedId<Guid> AppId { get; }
+        Task<IResultList<IAssetEntity>> QueryAsync(QueryContext contex, Query query);
 
-        string MimeType { get; }
-
-        string[] Tags { get; set; }
-
-        long FileVersion { get; }
+        Task<IAssetEntity> FindAssetAsync(QueryContext context, Guid id);
     }
 }

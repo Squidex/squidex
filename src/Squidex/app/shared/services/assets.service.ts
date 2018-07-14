@@ -70,6 +70,15 @@ export class AssetDto extends Model {
         });
     }
 
+    public tag(tags: string[], user: string, version: Version, now?: DateTime): AssetDto {
+        return this.with({
+            tags,
+            lastModified: now || DateTime.now(),
+            lastModifiedBy: user,
+            version
+        });
+    }
+
     public rename(fileName: string, user: string, version: Version, now?: DateTime): AssetDto {
         return this.with({
             fileName,

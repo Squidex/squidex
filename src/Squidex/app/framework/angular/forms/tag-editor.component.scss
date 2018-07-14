@@ -18,6 +18,7 @@
         border: 0;
         background: transparent;
         min-width: 40px;
+        max-width: 100%;
     }
 
     &:focus,
@@ -38,6 +39,7 @@
 .item {
     & {
         @include border-radius(10px);
+        @include truncate;
         display: inline-block;
         color: $color-dark-foreground;
         cursor: default;
@@ -48,6 +50,7 @@
         font-size: .8rem;
         font-weight: normal;
         line-height: 20px;
+        vertical-align: middle;
     }
 
     &-container {

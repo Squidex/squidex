@@ -5,8 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { FormBuilder, FormControl } from '@angular/forms';
+import { Subscription } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 import {
     AppsState,
@@ -21,6 +23,7 @@ import {
     Types,
     Versioned
 } from '@app/shared/internal';
+import { TagAssetDto } from '@appshared/services/assets.service';
 
 @Component({
     selector: 'sqx-asset',
@@ -30,7 +33,9 @@ import {
         fadeAnimation
     ]
 })
-export class AssetComponent implements OnInit {
+export class AssetComponent implements OnDestroy, OnInit {
+    private tagSubscription: Subscription;
+
     @Input()
     public initFile: File;
 
@@ -72,6 +77,8 @@ export class AssetComponent implements OnInit {
 
     public renameForm = new RenameAssetForm(this.formBuilder);
 
+    public tagInput = new FormControl();
+
     public progress = 0;
 
     constructor(
@@ -102,6 +109,18 @@ export class AssetComponent implements OnInit {
         } else {
             this.updateAsset(this.asset, false);
         }
+
+        this.tagSubscription =
+            this.tagInput.valueChanges.pipe(
+                distinctUntilChanged(),
+                debounceTime(2000)
+            ).subscribe(tags => {
+                this.tagAsset(tags);
+            });
+    }
+
+    public ngOnDestroy() {
+        this.tagSubscription.unsubscribe();
     }
 
     public updateFile(files: FileList) {
@@ -136,6 +155,19 @@ export class AssetComponent implements OnInit {
                     this.dialogs.notifyError(error);
 
                     this.renameForm.submitFailed(error);
+                });
+        }
+    }
+
+    public tagAsset(tags: string[]) {
+        if (tags) {
+            const requestDto = new TagAssetDto(tags);
+
+            this.assetsService.putAsset(this.appsState.appName, this.asset.id, requestDto, this.asset.version)
+                .subscribe(dto => {
+                    this.updateAsset(this.asset.tag(tags, this.authState.user!.token, dto.version), true);
+                }, error => {
+                    this.dialogs.notifyError(error);
                 });
         }
     }
@@ -176,8 +208,9 @@ export class AssetComponent implements OnInit {
 
     private updateAsset(asset: AssetDto, emitEvent: boolean) {
         this.asset = asset;
-
         this.progress = 0;
+
+        this.tagInput.setValue(asset.tags);
 
         if (emitEvent) {
             this.emitUpdated(asset);

@@ -16,6 +16,7 @@ using NodaTime.Text;
 using NSwag.Annotations;
 using Squidex.Areas.Api.Controllers.Contents.Models;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL;
@@ -65,7 +66,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(2)]
         public async Task<IActionResult> PostGraphQL(string app, [FromBody] GraphQLQuery query)
         {
-            var result = await graphQl.QueryAsync(Context(), query);
+            var result = await graphQl.QueryAsync(Context().Base, query);
 
             if (result.Errors?.Length > 0)
             {
@@ -97,32 +98,14 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(2)]
         public async Task<IActionResult> GetContents(string app, string name, [FromQuery] bool archived = false, [FromQuery] string ids = null)
         {
-            List<Guid> idsList = null;
+            var context = Context().WithArchived(archived).WithSchemaName(name);
 
-            if (!string.IsNullOrWhiteSpace(ids))
-            {
-                idsList = new List<Guid>();
-
-                foreach (var id in ids.Split(','))
-                {
-                    if (Guid.TryParse(id, out var guid))
-                    {
-                        idsList.Add(guid);
-                    }
-                }
-            }
-
-            var context = Context().WithSchemaName(name).WithArchived(archived);
-
-            var result =
-                idsList?.Count > 0 ?
-                    await contentQuery.QueryAsync(context, idsList) :
-                    await contentQuery.QueryAsync(context, Request.QueryString.ToString());
+            var result = await contentQuery.QueryAsync(context, Query.Empty.WithIds(ids).WithODataQuery(Request.QueryString.ToString()));
 
             var response = new ContentsDto
             {
                 Total = result.Total,
-                Items = result.Take(200).Select(x => ContentDto.FromContent(x, context)).ToArray()
+                Items = result.Take(200).Select(x => ContentDto.FromContent(x, context.Base)).ToArray()
             };
 
             var options = controllerOptions.Value;
@@ -157,7 +140,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
             var context = Context().WithSchemaName(name);
             var content = await contentQuery.FindContentAsync(context, id);
 
-            var response = ContentDto.FromContent(content, context);
+            var response = ContentDto.FromContent(content, context.Base);
 
             Response.Headers["ETag"] = content.Version.ToString();
 
@@ -193,7 +176,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
             var context = Context().WithSchemaName(name);
             var content = await contentQuery.FindContentAsync(context, id, version);
 
-            var response = ContentDto.FromContent(content, context);
+            var response = ContentDto.FromContent(content, context.Base);
 
             Response.Headers["ETag"] = content.Version.ToString();
 
@@ -498,9 +481,9 @@ namespace Squidex.Areas.Api.Controllers.Contents
             return new ChangeContentStatus { Status = status, ContentId = id, DueTime = dt };
         }
 
-        private QueryContext Context()
+        private ContentQueryContext Context()
         {
-            return QueryContext.Create(App, User, Request.Headers["X-Languages"]).WithFlatten(Request.Headers.ContainsKey("X-Flatten"));
+            return new ContentQueryContext(QueryContext.Create(App, User).WithLanguages(Request.Headers["X-Languages"])).WithFlatten(Request.Headers.ContainsKey("X-Flatten"));
         }
     }
 }

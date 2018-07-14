@@ -176,7 +176,7 @@ export class TagEditorComponent implements ControlValueAccessor {
             const value = <string>this.addInput.value;
 
             if (!value || value.length === 0) {
-                this.updateItems(this.items.slice(0, this.items.length - 2));
+                this.updateItems(this.items.slice(0, this.items.length - 1));
 
                 return false;
             }

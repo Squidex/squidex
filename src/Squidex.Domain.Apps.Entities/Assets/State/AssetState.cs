@@ -73,6 +73,11 @@ namespace Squidex.Domain.Apps.Entities.Assets.State
             TotalSize += @event.FileSize;
         }
 
+        protected void On(AssetTagged @event)
+        {
+            Tags = @event.Tags;
+        }
+
         protected void On(AssetRenamed @event)
         {
             FileName = @event.FileName;

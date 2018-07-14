@@ -5,14 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
 
-namespace Squidex.Domain.Apps.Entities.Contents
+namespace Squidex.Domain.Apps.Entities
 {
     public sealed class QueryContext : Cloneable<QueryContext>
     {
@@ -20,38 +19,19 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public IAppEntity App { get; private set; }
 
-        public IEnumerable<Language> Languages { get; private set; }
-
-        public string SchemaIdOrName { get; private set; }
-
         public bool Archived { get; private set; }
 
         public bool Flatten { get; private set; }
+
+        public IEnumerable<Language> Languages { get; private set; }
 
         private QueryContext()
         {
         }
 
-        public static QueryContext Create(IAppEntity app, ClaimsPrincipal user, IEnumerable<string> languageCodes = null)
+        public static QueryContext Create(IAppEntity app, ClaimsPrincipal user)
         {
-            var result = new QueryContext { App = app, User = user };
-
-            if (languageCodes != null)
-            {
-                var languages = new List<Language>();
-
-                foreach (var iso2Code in languageCodes)
-                {
-                    if (Language.TryGetLanguage(iso2Code, out var language))
-                    {
-                        languages.Add(language);
-                    }
-                }
-
-                result.Languages = languages;
-            }
-
-            return result;
+            return new QueryContext { App = app, User = user };
         }
 
         public QueryContext WithArchived(bool archived)
@@ -64,14 +44,27 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return Clone(c => c.Flatten = flatten);
         }
 
-        public QueryContext WithSchemaName(string name)
+        public QueryContext WithLanguages(IEnumerable<string> languageCodes)
         {
-            return Clone(c => c.SchemaIdOrName = name);
-        }
+            if (languageCodes != null)
+            {
+                return Clone(c =>
+                {
+                    var languages = new List<Language>();
 
-        public QueryContext WithSchemaId(Guid id)
-        {
-            return Clone(c => c.SchemaIdOrName = id.ToString());
+                    foreach (var iso2Code in languageCodes)
+                    {
+                        if (Language.TryGetLanguage(iso2Code, out var language))
+                        {
+                            languages.Add(language);
+                        }
+                    }
+
+                    c.Languages = languages;
+                });
+            }
+
+            return this;
         }
 
         public bool IsFrontendClient

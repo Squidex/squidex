@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
 using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Infrastructure;
 
@@ -20,23 +21,23 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(10);
         private readonly IContentQueryService contentQuery;
         private readonly IGraphQLUrlGenerator urlGenerator;
-        private readonly IAssetRepository assetRepository;
+        private readonly IAssetQueryService assetQuery;
         private readonly IAppProvider appProvider;
 
         public CachingGraphQLService(IMemoryCache cache,
             IAppProvider appProvider,
-            IAssetRepository assetRepository,
+            IAssetQueryService assetQuery,
             IContentQueryService contentQuery,
             IGraphQLUrlGenerator urlGenerator)
             : base(cache)
         {
             Guard.NotNull(appProvider, nameof(appProvider));
-            Guard.NotNull(assetRepository, nameof(assetRepository));
+            Guard.NotNull(assetQuery, nameof(assetQuery));
             Guard.NotNull(contentQuery, nameof(contentQuery));
             Guard.NotNull(urlGenerator, nameof(urlGenerator));
 
             this.appProvider = appProvider;
-            this.assetRepository = assetRepository;
+            this.assetQuery = assetQuery;
             this.contentQuery = contentQuery;
             this.urlGenerator = urlGenerator;
         }
@@ -53,7 +54,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             var modelContext = await GetModelAsync(context.App);
 
-            var ctx = new GraphQLExecutionContext(context, assetRepository, contentQuery, urlGenerator);
+            var ctx = new GraphQLExecutionContext(context, assetQuery, contentQuery, urlGenerator);
 
             return await modelContext.ExecuteAsync(ctx, query);
         }
