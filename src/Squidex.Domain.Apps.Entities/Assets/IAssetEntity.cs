@@ -22,6 +22,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         string MimeType { get; }
 
+        string[] Tags { get; }
+
         long FileVersion { get; }
     }
 }

@@ -29,6 +29,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.State
         public string MimeType { get; set; }
 
         [JsonProperty]
+        public string[] Tags { get; set; }
+
+        [JsonProperty]
         public long FileVersion { get; set; }
 
         [JsonProperty]

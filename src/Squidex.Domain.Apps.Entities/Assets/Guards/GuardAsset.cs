@@ -35,6 +35,11 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
             Guard.NotNull(command, nameof(command));
         }
 
+        public static void CanTag(TagAsset command)
+        {
+            Guard.NotNull(command, nameof(command));
+        }
+
         public static void CanUpdate(UpdateAsset command)
         {
             Guard.NotNull(command, nameof(command));

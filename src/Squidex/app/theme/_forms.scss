@@ -4,16 +4,18 @@
 //
 // Support for Angular validation states.
 // 
-.ng-invalid {
-    &.ng-dirty {
-        & {
-            border-color: $color-theme-error;
-        }
+.form-control {
+    &.ng-invalid {
+        &.ng-dirty {
+            & {
+                border-color: $color-theme-error;
+            }
 
-        &:hover,
-        &:focus {
-            @include box-shadow-colored(0, 0, .2rem, $color-theme-error);
-            border-color: $color-theme-error-dark;
+            &:hover,
+            &:focus {
+                @include box-shadow-colored(0, 0, .2rem, $color-theme-error);
+                border-color: $color-theme-error-dark;
+            }
         }
     }
 }
@@ -174,5 +176,41 @@
         background: lighten($color-dark2-control, 2%);
         border-color: lighten($color-dark2-control, 2%);
         color: $color-dark2-focus-foreground;
+    }
+}
+
+.form-underlined {
+    & {
+        @include border-radius(0);
+        padding-left: 0;
+        padding-right: 0;
+        border-color: transparent;
+        border-bottom: 1px solid $color-input-border;
+    }
+
+    &:focus,
+    &.focus {
+        @include box-shadow-none;
+        background: transparent;
+        border-color: transparent;
+        border-bottom-color: $color-theme-blue;
+        outline: none;
+    }
+
+    &.ng-invalid.ng-dirty {
+        & {
+            @include box-shadow-none;
+            background: transparent;
+            border-color: transparent;
+            border-bottom-color: $color-theme-error;
+            outline: none;
+        }
+
+        &:hover,
+        &:focus {
+            @include box-shadow-none;
+            border-color: transparent;
+            border-bottom-color: $color-theme-error-dark;
+        }
     }
 }

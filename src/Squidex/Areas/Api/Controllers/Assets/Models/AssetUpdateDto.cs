@@ -8,7 +8,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
-using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Areas.Api.Controllers.Assets.Models
 {
@@ -20,9 +19,22 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         [Required]
         public string FileName { get; set; }
 
-        public RenameAsset ToCommand(Guid id)
+        /// <summary>
+        /// The new asset tags.
+        /// </summary>
+        [Required]
+        public string[] Tags { get; set; }
+
+        public AssetCommand ToCommand(Guid id)
         {
-            return SimpleMapper.Map(this, new RenameAsset { AssetId = id });
+            if (Tags != null)
+            {
+                return new TagAsset { AssetId = id, Tags = Tags };
+            }
+            else
+            {
+                return new RenameAsset { AssetId = id, FileName = FileName };
+            }
         }
     }
 }

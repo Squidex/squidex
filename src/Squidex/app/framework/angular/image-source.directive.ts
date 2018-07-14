@@ -48,12 +48,12 @@ export class ImageSourceDirective implements OnChanges, OnDestroy, OnInit, After
 
         this.parentResizeListener =
             this.renderer.listen(this.parent, 'resize', () => {
-                this.resize(this.parent);
+                this.resize();
             });
     }
 
     public ngAfterViewInit() {
-        this.resize(this.parent);
+        this.resize();
     }
 
     public ngOnChanges() {
@@ -75,7 +75,7 @@ export class ImageSourceDirective implements OnChanges, OnDestroy, OnInit, After
         this.retryLoadingImage();
     }
 
-    private resize(parent: any) {
+    private resize() {
         this.size = this.parent.getBoundingClientRect();
 
         this.renderer.setStyle(this.element.nativeElement, 'display', 'inline-block');

@@ -50,6 +50,7 @@ export class AssetDto extends Model {
         public readonly isImage: boolean,
         public readonly pixelWidth: number | null,
         public readonly pixelHeight: number | null,
+        public readonly tags: string[],
         public readonly url: string,
         public readonly version: Version
     ) {
@@ -79,9 +80,16 @@ export class AssetDto extends Model {
     }
 }
 
-export class UpdateAssetDto {
+export class RenameAssetDto {
     constructor(
         public readonly fileName: string
+    ) {
+    }
+}
+
+export class TagAssetDto {
+    constructor(
+        public readonly tags: string[]
     ) {
     }
 }
@@ -151,6 +159,7 @@ export class AssetsService {
                             item.isImage,
                             item.pixelWidth,
                             item.pixelHeight,
+                            item.tags || [],
                             assetUrl,
                             new Version(item.version.toString()));
                     }));
@@ -194,6 +203,7 @@ export class AssetsService {
                             response.isImage,
                             response.pixelWidth,
                             response.pixelHeight,
+                            [],
                             assetUrl,
                             new Version(event.headers.get('etag')!));
 
@@ -231,6 +241,7 @@ export class AssetsService {
                         body.isImage,
                         body.pixelWidth,
                         body.pixelHeight,
+                        body.tags || [],
                         assetUrl,
                         response.version);
                 }),
@@ -288,7 +299,7 @@ export class AssetsService {
                 pretifyError('Failed to delete asset. Please reload.'));
     }
 
-    public putAsset(appName: string, id: string, dto: UpdateAssetDto, version: Version): Observable<Versioned<any>> {
+    public putAsset(appName: string, id: string, dto: RenameAssetDto | TagAssetDto, version: Version): Observable<Versioned<any>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/${id}`);
 
         return HTTP.putVersioned(this.http, url, dto, version).pipe(

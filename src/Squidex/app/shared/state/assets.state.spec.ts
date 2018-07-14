@@ -30,8 +30,8 @@ describe('AssetsState', () => {
     const newVersion = new Version('2');
 
     const oldAssets = [
-        new AssetDto('id1', creator, creator, creation, creation, 'name1', 'type1', 1, 1, 'mime1', false, null, null, 'url1', version),
-        new AssetDto('id2', creator, creator, creation, creation, 'name2', 'type2', 2, 2, 'mime2', false, null, null, 'url2', version)
+        new AssetDto('id1', creator, creator, creation, creation, 'name1', 'type1', 1, 1, 'mime1', false, null, null, [], 'url1', version),
+        new AssetDto('id2', creator, creator, creation, creation, 'name2', 'type2', 2, 2, 'mime2', false, null, null, [], 'url2', version)
     ];
 
     let dialogs: IMock<DialogService>;
@@ -77,7 +77,7 @@ describe('AssetsState', () => {
     });
 
     it('should add asset to snapshot when created', () => {
-        const newAsset = new AssetDto('id3', creator, creator, creation, creation, 'name3', 'type3', 3, 3, 'mime3', true, 0, 0, 'url3', version);
+        const newAsset = new AssetDto('id3', creator, creator, creation, creation, 'name3', 'type3', 3, 3, 'mime3', true, 0, 0, [], 'url3', version);
 
         assetsState.add(newAsset);
 
@@ -86,7 +86,7 @@ describe('AssetsState', () => {
     });
 
     it('should update properties when updated', () => {
-        const newAsset = new AssetDto('id1', modifier, modifier, modified, modified, 'name3', 'type3', 3, 3, 'mime3', true, 0, 0, 'url3', version);
+        const newAsset = new AssetDto('id1', modifier, modifier, modified, modified, 'name3', 'type3', 3, 3, 'mime3', true, 0, 0, [], 'url3', version);
 
         assetsState.update(newAsset);
 

@@ -16,10 +16,11 @@ import {
     AssetsDto,
     AssetsService,
     DateTime,
-    UpdateAssetDto,
+    RenameAssetDto,
     Version,
     Versioned
 } from './../';
+import { TagAssetDto } from '@appshared/services/assets.service';
 
 describe('AssetDto', () => {
     const creation = DateTime.today();
@@ -30,7 +31,7 @@ describe('AssetDto', () => {
     const newVersion = new Version('2');
 
     it('should update name property and user info when renaming', () => {
-        const asset_1 = new AssetDto('1', creator, creator, creation, creation, 'name.png', 'png', 1, 1, 'image/png', false, 1, 1, 'url', version);
+        const asset_1 = new AssetDto('1', creator, creator, creation, creation, 'name.png', 'png', 1, 1, 'image/png', false, 1, 1, [], 'url', version);
         const asset_2 = asset_1.rename('new-name.png', modifier, newVersion, modified);
 
         expect(asset_2.fileName).toEqual('new-name.png');
@@ -42,7 +43,7 @@ describe('AssetDto', () => {
     it('should update file properties when uploading', () => {
         const update = new AssetReplacedDto(2, 2, 'image/jpeg', true, 2, 2);
 
-        const asset_1 = new AssetDto('1', creator, creator, creation, creation, 'name.png', 'png', 1, 1, 'image/png', false, 1, 1, 'url', version);
+        const asset_1 = new AssetDto('1', creator, creator, creation, creation, 'name.png', 'png', 1, 1, 'image/png', false, 1, 1, [], 'url', version);
         const asset_2 = asset_1.update(update, modifier, newVersion, modified);
 
         expect(asset_2.fileSize).toEqual(2);
@@ -110,6 +111,7 @@ describe('AssetsService', () => {
                     isImage: true,
                     pixelWidth: 1024,
                     pixelHeight: 2048,
+                    tags: undefined,
                     version: 11
                 },
                 {
@@ -126,6 +128,7 @@ describe('AssetsService', () => {
                     isImage: true,
                     pixelWidth: 1024,
                     pixelHeight: 2048,
+                    tags: ['tag1', 'tag2'],
                     version: 22
                 }
             ]
@@ -145,6 +148,7 @@ describe('AssetsService', () => {
                     true,
                     1024,
                     2048,
+                    [],
                     'http://service/p/api/assets/id1',
                     new Version('11')),
                 new AssetDto('id2', 'Created2', 'LastModifiedBy2',
@@ -158,6 +162,7 @@ describe('AssetsService', () => {
                     true,
                     1024,
                     2048,
+                    ['tag1', 'tag2'],
                     'http://service/p/api/assets/id2',
                     new Version('22'))
         ]));
@@ -190,7 +195,8 @@ describe('AssetsService', () => {
             mimeType: 'image/png',
             isImage: true,
             pixelWidth: 1024,
-            pixelHeight: 2048
+            pixelHeight: 2048,
+            tags: ['tag1', 'tag2']
         }, {
             headers: {
                 etag: '2'
@@ -210,6 +216,7 @@ describe('AssetsService', () => {
                 true,
                 1024,
                 2048,
+                ['tag1', 'tag2'],
                 'http://service/p/api/assets/id1',
                 new Version('2')));
     }));
@@ -284,6 +291,7 @@ describe('AssetsService', () => {
                 true,
                 1024,
                 2048,
+                [],
                 'http://service/p/api/assets/id1',
                 new Version('2')));
     }));
@@ -323,7 +331,22 @@ describe('AssetsService', () => {
     it('should make put request to update asset',
         inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
 
-        const dto = new UpdateAssetDto('My-Asset.pdf');
+        const dto = new RenameAssetDto('My-Asset.pdf');
+
+        assetsService.putAsset('my-app', '123', dto, version).subscribe();
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets/123');
+
+        expect(req.request.method).toEqual('PUT');
+        expect(req.request.headers.get('If-Match')).toEqual(version.value);
+
+        req.flush({});
+    }));
+
+    it('should make put request to update asset',
+        inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
+
+        const dto = new TagAssetDto(['tag1', 'tag2']);
 
         assetsService.putAsset('my-app', '123', dto, version).subscribe();
 

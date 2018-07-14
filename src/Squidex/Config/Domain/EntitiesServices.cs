@@ -32,6 +32,7 @@ using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.Rules.Indexes;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Indexes;
+using Squidex.Domain.Apps.Entities.Tags;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Migrations;
@@ -103,6 +104,9 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<AssetCommandMiddleware>()
                 .As<ICommandMiddleware>();
+
+            services.AddSingletonAs<GrainTagService>()
+                .As<ITagService>();
 
             services.AddSingletonAs<GrainCommandMiddleware<AppCommand, IAppGrain>>()
                 .As<ICommandMiddleware>();

@@ -14,12 +14,11 @@ import {
     AssetsService,
     AuthService,
     DateTime,
-    DialogModel,
     DialogService,
     fadeAnimation,
+    RenameAssetDto,
     RenameAssetForm,
     Types,
-    UpdateAssetDto,
     Versioned
 } from '@app/shared/internal';
 
@@ -68,7 +67,9 @@ export class AssetComponent implements OnInit {
     @Output()
     public failed = new EventEmitter();
 
-    public renameDialog = new DialogModel();
+    public renaming = false;
+    public isTagging = false;
+
     public renameForm = new RenameAssetForm(this.formBuilder);
 
     public progress = 0;
@@ -121,17 +122,16 @@ export class AssetComponent implements OnInit {
     }
 
     public renameAsset() {
-        const value = this.renameForm.submit();
+        const value = this.renameForm.submit(this.asset);
 
         if (value) {
-            const requestDto = new UpdateAssetDto(value.name);
+            const requestDto = new RenameAssetDto(value.name);
 
             this.assetsService.putAsset(this.appsState.appName, this.asset.id, requestDto, this.asset.version)
                 .subscribe(dto => {
                     this.updateAsset(this.asset.rename(requestDto.fileName, this.authState.user!.token, dto.version), true);
 
-                    this.renameForm.submitCompleted();
-                    this.renameDialog.hide();
+                    this.renameCancel();
                 }, error => {
                     this.dialogs.notifyError(error);
 
@@ -140,9 +140,22 @@ export class AssetComponent implements OnInit {
         }
     }
 
-    public cancelRenameAsset() {
+    public renameStart() {
+        if (!this.isDisabled) {
+            this.renameForm.load(this.asset);
+            this.renaming = true;
+        }
+    }
+
+    public renameCancel() {
         this.renameForm.submitCompleted();
-        this.renameDialog.hide();
+        this.renaming = false;
+    }
+
+    public startTagging() {
+        if (!this.isDisabled) {
+            this.isTagging = true;
+        }
     }
 
     private setProgress(progress = 0) {
@@ -162,14 +175,14 @@ export class AssetComponent implements OnInit {
     }
 
     private updateAsset(asset: AssetDto, emitEvent: boolean) {
-        this.renameForm.load({ name: asset.fileName });
         this.asset = asset;
+
         this.progress = 0;
 
         if (emitEvent) {
             this.emitUpdated(asset);
         }
 
-        this.cancelRenameAsset();
+        this.renameCancel();
     }
 }

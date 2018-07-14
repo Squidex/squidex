@@ -2,7 +2,7 @@
 
 <sqx-panel desiredWidth="60rem" [showSidebar]="true">
     <ng-container title>
-        <i class="schema-edit icon-pencil" (click)="editSchemaDialog.show()"></i> {{schema.displayName}} 
+        <i class="schema-edit icon-pencil" (click)="editSchemaDialog.show()"></i> <span (dblclick)="editSchemaDialog.show()">{{schema.displayName}}</span> 
     </ng-container>
 
     <ng-container menu>

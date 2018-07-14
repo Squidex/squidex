@@ -38,6 +38,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
         [BsonElement]
         public string FileName { get; set; }
 
+        [BsonIgnoreIfNull]
+        [BsonElement]
+        public string[] Tags { get; set; }
+
         [BsonRequired]
         [BsonElement]
         public long FileSize { get; set; }

@@ -73,7 +73,6 @@
 .card {
     & {
         @include overlay-container;
-        height: $asset-height;
     }
 
     &.selectable {
@@ -82,6 +81,7 @@
 
     &-body {
         position: relative;
+        height: 0.7 * $asset-height;
     }
 
     &-footer {
@@ -89,7 +89,6 @@
         background: transparent;
         padding: .8rem;
         padding-top: .4rem;
-        height: 70px;
     }
 }
 
@@ -103,7 +102,8 @@
     }
 
     &-image {
-        height: 100%;
+        min-height: 100%;
+        max-height: 100%;
     }
 
     &-preview {
@@ -120,6 +120,10 @@
                 @include opacity(0);
             }
         }
+    }
+
+    &-info {
+        margin-top: .25rem;
     }
 
     &-user {
@@ -178,4 +182,8 @@
             @include asset-type;
         }
     }
+}
+
+.editable {
+    height: 2rem;
 }

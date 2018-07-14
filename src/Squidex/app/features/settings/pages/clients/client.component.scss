@@ -30,31 +30,13 @@ $color-editor: #eceeef;
     }
 
     &-name {
-        & {
-            @include border-radius(.25rem);
-            margin: 0;
-            margin-left: -.6rem;
-            height: 2.5rem;
-            padding: 0 .6rem;
-            border: 0;
-            background: transparent;
-            font-family: -apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            font-size: 1.2rem;
-            font-weight: normal;
-            display: inline-block;
-            line-height: 2.5rem;
-        }
-
-        &.enabled,
-        &:hover {
-            & {
-                background: $color-editor;
-            }
-        }
-
-        h3 {
-            font-size: 1.6rem;
-        }
+        padding: .375rem 0;
+        font-family: -apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        font-size: 1.2rem;
+        font-weight: normal;
+        line-height: 1.5rem;
+        display: inline-block;
+        margin: 0;
     }
 
     &-header {
@@ -66,12 +48,15 @@ $color-editor: #eceeef;
     }
 }
 
-.col-form-label {
-    text-align: left;
+h3 {
+    &.client-name {
+        border-top: 1px solid transparent;
+        border-bottom: 1px solid transparent;
+    }
 }
 
-.btn-cancel {
-    padding: .4rem;
+.col-form-label {
+    text-align: left;
 }
 
 .form-check {

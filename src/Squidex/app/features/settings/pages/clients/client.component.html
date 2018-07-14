@@ -6,7 +6,7 @@
                     <div class="form-group mr-1">
                         <sqx-control-errors for="name"></sqx-control-errors>
                         
-                        <input type="text" class="form-control client-name enabled" formControlName="name" maxlength="20" sqxFocusOnInit (keydown)="onKeyDown($event.keyCode)" />
+                        <input type="text" class="form-control client-name form-underlined" formControlName="name" maxlength="20" sqxFocusOnInit (keydown)="onKeyDown($event.keyCode)" />
                     </div>
 
                     <button type="submit" class="btn btn-primary" [disabled]="!renameForm.form.valid || !renameForm.form.dirty">Save</button>
@@ -17,8 +17,8 @@
                 </form>
 
                 <ng-container *ngIf="!isRenaming">
-                    <h3 class="client-name">
-                        <span (dblclick)="toggleRename()">{{client.name}}</span> 
+                    <h3 class="client-name" (dblclick)="toggleRename()">
+                        {{client.name}}
                     </h3>
 
                     <i class="client-edit icon-pencil" (click)="toggleRename()"></i>

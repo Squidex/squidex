@@ -47,7 +47,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             switch (command)
             {
                 case AddField addField:
-                    return UpdateReturnAsync(addField, (Func<AddField, object>)(c =>
+                    return UpdateAsync(addField, c =>
                     {
                         GuardSchemaField.CanAdd(Snapshot.SchemaDef, c);
 
@@ -64,8 +64,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                             id = ((IArrayField)Snapshot.SchemaDef.FieldsById[c.ParentFieldId.Value]).FieldsByName[c.Name].Id;
                         }
 
-                        return EntityCreatedResult.Create(id, (long)base.Version);
-                    }));
+                        return EntityCreatedResult.Create(id, (long)Version);
+                    });
 
                 case CreateSchema createSchema:
                     return CreateAsync(createSchema, async c =>

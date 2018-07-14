@@ -1,4 +1,4 @@
-<div class="card" [class.selectable]="isSelectable" [class.border-primary]="isSelected" (click)="selected.emit(asset)" (sqxFileDrop)="updateFile($event)">
+ <div class="card" [class.selectable]="isSelectable" [class.border-primary]="isSelected" (click)="selected.emit(asset)" (sqxFileDrop)="updateFile($event)">
     <div class="card-body">
         <div class="file-preview" *ngIf="asset && progress == 0" @fade>
             <span class="file-type" *ngIf="asset.fileType">
@@ -16,17 +16,14 @@
                 <div class="file-overlay-background"></div>
                 
                 <div class="file-menu">
-                    <a class="file-edit ml-1" *ngIf="!isDisabled" (click)="renameDialog.show()">
-                        <i class="icon-pencil"></i>
-                    </a>
-                    <a class="file-download ml-1" [attr.href]="asset | sqxAssetUrl" target="_blank" (click)="$event.stopPropagation()">
+                    <a class="file-download" [attr.href]="asset | sqxAssetUrl" target="_blank" (click)="$event.stopPropagation()">
                         <i class="icon-download"></i>
                     </a>
     
-                    <a class="file-delete ml-1" (click)="deleting.emit(asset); $event.stopPropagation()" *ngIf="!isDisabled && !removeMode">
+                    <a class="file-delete ml-2" (click)="deleting.emit(asset); $event.stopPropagation()" *ngIf="!isDisabled && !removeMode">
                         <i class="icon-delete"></i>
                     </a>
-                    <a class="file-delete ml-1" (click)="removing.emit(asset); $event.stopPropagation()" *ngIf="removeMode">
+                    <a class="file-delete ml-2" (click)="removing.emit(asset); $event.stopPropagation()" *ngIf="removeMode">
                         <i class="icon-close"></i>
                     </a>
                 </div>
@@ -44,8 +41,20 @@
         </div>
     </div>
     <div class="card-footer" *ngIf="asset && progress == 0">
-        <div class="file-name" [attr.title]="asset.fileName">
-            {{asset.fileName}}
+        <div>
+            <div *ngIf="!renaming" class="file-name editable" [attr.title]="asset.fileName" (dblclick)="renameStart()">
+                {{asset.fileName}}
+            </div>
+            <div *ngIf="renaming">
+                <form [formGroup]="renameForm.form" (ngSubmit)="renameAsset()">                   
+                    <sqx-control-errors for="name" [submitted]="renameForm.submitted | async"></sqx-control-errors>
+
+                    <input type="text" class="form-control form-underlined editable" id="assetName" formControlName="name" autocomplete="off" sqxFocusOnInit (blur)="renameCancel()" />
+                </form>
+            </div>
+        </div>
+        <div>
+            <sqx-tag-editor class="blank"></sqx-tag-editor>
         </div>
         <div class="file-info">
             <ng-container *ngIf="asset.pixelWidth">{{asset.pixelWidth}}x{{asset.pixelHeight}}px, </ng-container> {{asset.fileSize | sqxFileSize}}
@@ -62,28 +71,3 @@
         <span class="drop-overlay-text">Drop to update</span>
     </div>
 </div>
-
-<ng-container *sqxModalView="renameDialog;onRoot:true">
-    <form [formGroup]="renameForm.form" (ngSubmit)="renameAsset()">
-        <sqx-modal-dialog (closed)="cancelRenameAsset()">
-            <ng-container title>
-                Rename asset
-            </ng-container>
-
-            <ng-container content>
-                <div class="form-group">
-                    <label for="assetName">Name</label>
-                    
-                    <sqx-control-errors for="name" [submitted]="renameForm.submitted | async"></sqx-control-errors>
-
-                    <input type="text" class="form-control" id="assetName" formControlName="name" autocomplete="off" sqxFocusOnInit />
-                </div>
-            </ng-container>
-
-            <ng-container footer>
-                <button type="reset" class="float-left btn btn-secondary" (click)="cancelRenameAsset()">Cancel</button>
-                <button type="submit" class="float-right btn btn-success">Rename</button>
-            </ng-container>
-        </sqx-modal-dialog>
-    </form>
-</ng-container>

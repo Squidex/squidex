@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.Assets.Guards;
 using Squidex.Domain.Apps.Entities.Assets.State;
+using Squidex.Domain.Apps.Entities.Tags;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
@@ -24,33 +25,40 @@ namespace Squidex.Domain.Apps.Entities.Assets
 {
     public sealed class AssetGrain : SquidexDomainObjectGrainLogSnapshots<AssetState>, IAssetGrain
     {
-        public AssetGrain(IStore<Guid> store, ISemanticLog log)
+        private readonly ITagService tagService;
+
+        public AssetGrain(IStore<Guid> store, ITagService tagService, ISemanticLog log)
             : base(store, log)
         {
+            Guard.NotNull(tagService, nameof(tagService));
+
+            this.tagService = tagService;
         }
 
         protected override Task<object> ExecuteAsync(IAggregateCommand command)
         {
+            VerifyNotDeleted();
+
             switch (command)
             {
                 case CreateAsset createRule:
-                    return CreateReturnAsync(createRule, (Func<CreateAsset, object>)(c =>
+                    return CreateReturnAsync(createRule, c =>
                     {
                         GuardAsset.CanCreate(c);
 
                         Create(c);
 
-                        return new AssetSavedResult((long)base.Version, Snapshot.FileVersion);
-                    }));
+                        return new AssetSavedResult(Version, Snapshot.FileVersion);
+                    });
                 case UpdateAsset updateRule:
-                    return UpdateReturnAsync(updateRule, (Func<UpdateAsset, object>)(c =>
+                    return UpdateAsync(updateRule, c =>
                     {
                         GuardAsset.CanUpdate(c);
 
                         Update(c);
 
-                        return new AssetSavedResult((long)base.Version, Snapshot.FileVersion);
-                    }));
+                        return new AssetSavedResult(Version, Snapshot.FileVersion);
+                    });
                 case RenameAsset renameAsset:
                     return UpdateAsync(renameAsset, c =>
                     {
@@ -64,6 +72,15 @@ namespace Squidex.Domain.Apps.Entities.Assets
                         GuardAsset.CanDelete(c);
 
                         Delete(c);
+                    });
+                case TagAsset tagAsset:
+                    return UpdateAsync(tagAsset, async c =>
+                    {
+                        GuardAsset.CanTag(c);
+
+                        c.Tags = await tagService.NormalizeTagsAsync(Snapshot.AppId.Id, "Assets", c.Tags, Snapshot.Tags);
+
+                        Tag(c);
                     });
                 default:
                     throw new NotSupportedException();
@@ -105,16 +122,17 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public void Delete(DeleteAsset command)
         {
-            VerifyNotDeleted();
-
             RaiseEvent(SimpleMapper.Map(command, new AssetDeleted { DeletedSize = Snapshot.TotalSize }));
         }
 
         public void Rename(RenameAsset command)
         {
-            VerifyNotDeleted();
-
             RaiseEvent(SimpleMapper.Map(command, new AssetRenamed()));
+        }
+
+        public void Tag(TagAsset command)
+        {
+            RaiseEvent(SimpleMapper.Map(command, new AssetTagged()));
         }
 
         private void RaiseEvent(AppEvent @event)

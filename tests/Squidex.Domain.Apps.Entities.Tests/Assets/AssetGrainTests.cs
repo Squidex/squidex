@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.Assets.State;
+using Squidex.Domain.Apps.Entities.Tags;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
@@ -23,6 +24,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 {
     public class AssetGrainTests : HandlerTestBase<AssetGrain, AssetState>
     {
+        private readonly ITagService tagService = A.Fake<ITagService>();
         private readonly ImageInfo image = new ImageInfo(2048, 2048);
         private readonly Guid assetId = Guid.NewGuid();
         private readonly AssetFile file = new AssetFile("my-image.png", "image/png", 1024, () => new MemoryStream());
@@ -35,7 +37,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public AssetGrainTests()
         {
-            sut = new AssetGrain(Store, A.Dummy<ISemanticLog>());
+            sut = new AssetGrain(Store, tagService, A.Dummy<ISemanticLog>());
             sut.OnActivateAsync(Id).Wait();
         }
 

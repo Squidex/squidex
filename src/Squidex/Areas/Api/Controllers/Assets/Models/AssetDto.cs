@@ -40,6 +40,11 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         public string FileType { get; set; }
 
         /// <summary>
+        /// The asset tags.
+        /// </summary>
+        public string[] Tags { get; set; }
+
+        /// <summary>
         /// The size of the file in bytes.
         /// </summary>
         public long FileSize { get; set; }

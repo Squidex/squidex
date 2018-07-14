@@ -1,12 +1,19 @@
-    <input type="text" class="form-control" [attr.name]="inputName" (keydown)="onKeyDown($event)" (blur)="markTouched()"
+<div class="form-control {{class}}" (click)="input.focus()" [class.focus]="hasFocus">
+    <span class="items">
+        <span class="item-container" *ngFor="let item of items; let i = index" [class.disabled]="addInput.disabled">
+            <span class="item">
+                {{item}} <i class="icon-close" (click)="remove(i)"></i>
+            </span>
+        </span>
+    </span>
+
+    <input type="text" class="blank" [attr.name]="inputName" (keydown)="onKeyDown($event)" #input
+        (focus)="focus()"
+        (blur)="markTouched()"
+        (input)="adjustSize($event.target)"
         [formControl]="addInput"
         autocomplete="off" 
         autocorrect="off"
         autocapitalize="off"
-        placeholder="Press enter to add new item">
-
-    <div class="items">
-        <span class="item" *ngFor="let item of items; let i = index" [class.disabled]="addInput.disabled">
-            {{item}} <i class="icon-close" (click)="remove(i)"></i>
-        </span>
-    </div>
+        placeholder="+Tag">   
+</div>
