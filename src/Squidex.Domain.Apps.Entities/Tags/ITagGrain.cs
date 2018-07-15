@@ -13,11 +13,11 @@ namespace Squidex.Domain.Apps.Entities.Tags
 {
     public interface ITagGrain : IGrainWithStringKey
     {
-        Task<string[]> NormalizeTagsAsync(string[] names, string[] ids);
+        Task<HashSet<string>> NormalizeTagsAsync(HashSet<string> names, HashSet<string> ids);
 
-        Task<string[]> GetTagIdsAsync(string[] names);
+        Task<HashSet<string>> GetTagIdsAsync(HashSet<string> names);
 
-        Task<Dictionary<string, string>> DenormalizeTagsAsync(string[] ids);
+        Task<Dictionary<string, string>> DenormalizeTagsAsync(HashSet<string> ids);
 
         Task<Dictionary<string, int>> GetTagsAsync();
     }

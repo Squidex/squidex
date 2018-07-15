@@ -30,8 +30,8 @@ describe('AssetsState', () => {
     const newVersion = new Version('2');
 
     const oldAssets = [
-        new AssetDto('id1', creator, creator, creation, creation, 'name1', 'type1', 1, 1, 'mime1', false, null, null, [], 'url1', version),
-        new AssetDto('id2', creator, creator, creation, creation, 'name2', 'type2', 2, 2, 'mime2', false, null, null, [], 'url2', version)
+        new AssetDto('id1', creator, creator, creation, creation, 'name1', 'type1', 1, 1, 'mime1', false, null, null, ['tag1', 'shared'], 'url1', version),
+        new AssetDto('id2', creator, creator, creation, creation, 'name2', 'type2', 2, 2, 'mime2', false, null, null, ['tag2', 'shared'], 'url2', version)
     ];
 
     let dialogs: IMock<DialogService>;

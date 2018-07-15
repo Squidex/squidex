@@ -105,7 +105,17 @@ export class AssetsState extends State<Snapshot> {
                     const assets = s.assets.filter(x => x.id !== asset.id);
                     const assetsPager = s.assetsPager.decrementCount();
 
-                    return { ...s, assets, assetsPager };
+                    const tags = { ...s.tags };
+
+                    for (let tag of asset.tags) {
+                        if (tags[tag] === 1) {
+                            delete tags[tag];
+                        } else {
+                            tags[tag]--;
+                        }
+                    }
+
+                    return { ...s, assets, assetsPager, tags };
                 });
             }),
             notify(this.dialogs));
@@ -113,9 +123,33 @@ export class AssetsState extends State<Snapshot> {
 
     public update(asset: AssetDto) {
         this.next(s => {
+            const previous = s.assets.find(x => x.id === asset.id);
+
+            const tags = { ...s.tags };
+
+            if (previous) {
+                for (let tag of previous.tags) {
+                    if (tags[tag] === 1) {
+                        delete tags[tag];
+                    } else {
+                        tags[tag]--;
+                    }
+                }
+            }
+
+            if (asset) {
+                for (let tag of asset.tags) {
+                    if (tags[tag]) {
+                        tags[tag]++;
+                    } else {
+                        tags[tag] = 1;
+                    }
+                }
+            }
+
             const assets = s.assets.replaceBy('id', asset);
 
-            return { ...s, assets };
+            return { ...s, assets, tags };
         });
     }
 

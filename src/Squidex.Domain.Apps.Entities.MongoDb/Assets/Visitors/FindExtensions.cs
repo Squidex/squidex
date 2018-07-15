@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.OData.UriParser;
 using MongoDB.Bson;
@@ -93,12 +94,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets.Visitors
             {
                 if (string.Equals(field, nameof(MongoAssetEntity.Tags), StringComparison.OrdinalIgnoreCase))
                 {
-                    var tags = Task.Run(() => tagService.GetTagIdsAsync(appId, TagGroups.Assets, new[] { value.ToString() })).Result;
+                    var tagIds = new HashSet<string>(new[] { value.ToString() });
+                    var tagNames = Task.Run(() => tagService.GetTagIdsAsync(appId, TagGroups.Assets, tagIds)).Result;
 
-                    if (tags.Length == 1)
-                    {
-                        return tags[0] ?? value;
-                    }
+                    return tagNames?.FirstOrDefault() ?? value;
                 }
 
                 return value;

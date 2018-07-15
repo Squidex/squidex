@@ -132,9 +132,9 @@ export class TagEditorComponent implements ControlValueAccessor {
     }
 
     private resetForm() {
-        this.adjustSize();
-
         this.addInput.reset();
+
+        this.adjustSize();
     }
 
     public markTouched() {

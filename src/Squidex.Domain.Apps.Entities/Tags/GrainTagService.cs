@@ -24,17 +24,17 @@ namespace Squidex.Domain.Apps.Entities.Tags
             this.grainFactory = grainFactory;
         }
 
-        public Task<string[]> NormalizeTagsAsync(Guid appId, string category, string[] names, string[] ids)
+        public Task<HashSet<string>> NormalizeTagsAsync(Guid appId, string category, HashSet<string> names, HashSet<string> ids)
         {
             return GetGrain(appId, category).NormalizeTagsAsync(names, ids);
         }
 
-        public Task<string[]> GetTagIdsAsync(Guid appId, string category, string[] names)
+        public Task<HashSet<string>> GetTagIdsAsync(Guid appId, string category, HashSet<string> names)
         {
             return GetGrain(appId, category).GetTagIdsAsync(names);
         }
 
-        public Task<Dictionary<string, string>> DenormalizeTagsAsync(Guid appId, string category, string[] ids)
+        public Task<Dictionary<string, string>> DenormalizeTagsAsync(Guid appId, string category, HashSet<string> ids)
         {
             return GetGrain(appId, category).DenormalizeTagsAsync(ids);
         }

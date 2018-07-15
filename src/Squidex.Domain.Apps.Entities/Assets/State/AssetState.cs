@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 using Squidex.Domain.Apps.Core.ValidateContent;
 using Squidex.Domain.Apps.Events;
@@ -29,9 +30,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.State
         public string MimeType { get; set; }
 
         [JsonProperty]
-        public string[] Tags { get; set; }
-
-        [JsonProperty]
         public long FileVersion { get; set; }
 
         [JsonProperty]
@@ -51,6 +49,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.State
 
         [JsonProperty]
         public bool IsDeleted { get; set; }
+
+        [JsonProperty]
+        public HashSet<string> Tags { get; set; }
 
         Guid IAssetInfo.AssetId
         {

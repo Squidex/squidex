@@ -25,6 +25,7 @@
             [isDisabled]="isDisabled"
             [isSelectable]="selectedIds"
             [isSelected]="isSelected(asset)"
+            (updated)="update($event)"
             (selected)="select($event)"
             (deleting)="delete($event)">
         </sqx-asset>

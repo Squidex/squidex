@@ -58,6 +58,10 @@ export class AssetsListComponent {
         this.state.goPrev().pipe(onErrorResumeNext()).subscribe();
     }
 
+    public update(asset: AssetDto) {
+        this.state.update(asset);
+    }
+
     public trackByAsset(index: number, asset: AssetDto) {
         return asset.id;
     }

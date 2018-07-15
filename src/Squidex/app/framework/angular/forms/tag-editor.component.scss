@@ -32,10 +32,6 @@
     font-size: .6rem;
 }
 
-.items {
-    margin-left: -2px;
-}
-
 .item {
     & {
         @include border-radius(10px);
@@ -50,11 +46,19 @@
         font-size: .8rem;
         font-weight: normal;
         line-height: 20px;
+        margin: 2px 2px 2px 0;
         vertical-align: middle;
     }
 
+    &,
     &-container {
+        display: inline-block;
+    }
+
+    &-container {
+        height: 24px;
         padding: 2px;
+        padding-left: 0;
     }
 
     &.disabled {

@@ -54,7 +54,7 @@
             </div>
         </div>
         <div>
-            <sqx-tag-editor [formControl]="tagInput" class="blank"></sqx-tag-editor>
+            <sqx-tag-editor [useDefaultValue]="false" [formControl]="tagInput" class="blank"></sqx-tag-editor>
         </div>
         <div class="file-info">
             <ng-container *ngIf="asset.pixelWidth">{{asset.pixelWidth}}x{{asset.pixelHeight}}px, </ng-container> {{asset.fileSize | sqxFileSize}}

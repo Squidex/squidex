@@ -16,13 +16,12 @@ namespace Squidex.Domain.Apps.Entities.Assets
         IEntityWithCreatedBy,
         IEntityWithLastModifiedBy,
         IEntityWithVersion,
+        IEntityWithTags,
         IAssetInfo
     {
         NamedId<Guid> AppId { get; }
 
         string MimeType { get; }
-
-        string[] Tags { get; set; }
 
         long FileVersion { get; }
     }

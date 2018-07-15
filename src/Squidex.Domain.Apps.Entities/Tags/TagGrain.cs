@@ -51,9 +51,9 @@ namespace Squidex.Domain.Apps.Entities.Tags
             return persistence.ReadAsync();
         }
 
-        public async Task<string[]> NormalizeTagsAsync(string[] names, string[] ids)
+        public async Task<HashSet<string>> NormalizeTagsAsync(HashSet<string> names, HashSet<string> ids)
         {
-            var result = new List<string>();
+            var result = new HashSet<string>();
 
             if (names != null)
             {
@@ -108,22 +108,22 @@ namespace Squidex.Domain.Apps.Entities.Tags
 
             await persistence.WriteSnapshotAsync(state);
 
-            return result.ToArray();
+            return result;
         }
 
-        public Task<string[]> GetTagIdsAsync(string[] names)
+        public Task<HashSet<string>> GetTagIdsAsync(HashSet<string> names)
         {
-            var result = new List<string>();
+            var result = new HashSet<string>();
 
             foreach (var name in names)
             {
                 result.Add(state.Tags.FirstOrDefault(x => x.Value.Name == name).Key);
             }
 
-            return Task.FromResult(result.ToArray());
+            return Task.FromResult(result);
         }
 
-        public Task<Dictionary<string, string>> DenormalizeTagsAsync(string[] ids)
+        public Task<Dictionary<string, string>> DenormalizeTagsAsync(HashSet<string> ids)
         {
             var result = new Dictionary<string, string>();
 

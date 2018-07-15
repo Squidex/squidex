@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using FakeItEasy;
 using Microsoft.OData.Edm;
 using MongoDB.Bson.Serialization;
@@ -36,8 +37,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.OData
 
         public ODataQueryTests()
         {
-            A.CallTo(() => tagService.GetTagIdsAsync(appId, TagGroups.Assets, A<string[]>.That.Contains("tag1")))
-                .Returns(new[] { "normalized1" });
+            A.CallTo(() => tagService.GetTagIdsAsync(appId, TagGroups.Assets, A<HashSet<string>>.That.Contains("tag1")))
+                .Returns(new HashSet<string>(new[] { "normalized1" }));
 
             valueConverter = FindExtensions.CreateValueConverter(appId, tagService);
         }

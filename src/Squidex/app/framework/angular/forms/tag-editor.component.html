@@ -1,10 +1,6 @@
 <div class="form-control {{class}}" (click)="input.focus()" [class.focus]="hasFocus">
-    <span class="items">
-        <span class="item-container" *ngFor="let item of items; let i = index" [class.disabled]="addInput.disabled">
-            <span class="item">
-                {{item}} <i class="icon-close" (click)="remove(i)"></i>
-            </span>
-        </span>
+    <span class="item" *ngFor="let item of items; let i = index" [class.disabled]="addInput.disabled">
+        {{item}} <i class="icon-close" (click)="remove(i)"></i>
     </span>
 
     <input type="text" class="blank" [attr.name]="inputName" (keydown)="onKeyDown($event)" #input

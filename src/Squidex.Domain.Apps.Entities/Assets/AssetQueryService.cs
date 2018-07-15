@@ -75,25 +75,29 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         private async Task DenormalizeTagsAsync(Guid appId, IEnumerable<IAssetEntity> assets)
         {
-            var tags = assets.Where(x => x.Tags != null).SelectMany(x => x.Tags).Distinct().ToArray();
+            var tags = new HashSet<string>(assets.Where(x => x.Tags != null).SelectMany(x => x.Tags).Distinct());
 
             var tagsById = await tagService.DenormalizeTagsAsync(appId, TagGroups.Assets, tags);
 
             foreach (var asset in assets)
             {
-                if (asset.Tags?.Length > 0)
+                if (asset.Tags?.Count > 0)
                 {
-                    var tagNames = new List<string>();
+                    var tagNames = asset.Tags.ToList();
 
-                    foreach (var id in asset.Tags)
+                    asset.Tags.Clear();
+
+                    foreach (var id in tagNames)
                     {
                         if (tagsById.TryGetValue(id, out var name))
                         {
-                            tagNames.Add(name);
+                            asset.Tags.Add(name);
                         }
                     }
-
-                    asset.Tags = tagNames.ToArray();
+                }
+                else
+                {
+                    asset.Tags?.Clear();
                 }
             }
         }
