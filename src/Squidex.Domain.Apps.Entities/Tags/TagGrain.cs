@@ -117,7 +117,12 @@ namespace Squidex.Domain.Apps.Entities.Tags
 
             foreach (var name in names)
             {
-                result.Add(state.Tags.FirstOrDefault(x => x.Value.Name == name).Key);
+                var id = state.Tags.FirstOrDefault(x => string.Equals(x.Value.Name, name, StringComparison.OrdinalIgnoreCase)).Key;
+
+                if (!string.IsNullOrWhiteSpace(id))
+                {
+                    result.Add(id);
+                }
             }
 
             return Task.FromResult(result);

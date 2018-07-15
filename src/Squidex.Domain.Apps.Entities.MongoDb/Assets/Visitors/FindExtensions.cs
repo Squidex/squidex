@@ -94,8 +94,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets.Visitors
             {
                 if (string.Equals(field, nameof(MongoAssetEntity.Tags), StringComparison.OrdinalIgnoreCase))
                 {
-                    var tagIds = new HashSet<string>(new[] { value.ToString() });
-                    var tagNames = Task.Run(() => tagService.GetTagIdsAsync(appId, TagGroups.Assets, tagIds)).Result;
+                    var tagNames = Task.Run(() => tagService.GetTagIdsAsync(appId, TagGroups.Assets, HashSet.Of(value.ToString()))).Result;
 
                     return tagNames?.FirstOrDefault() ?? value;
                 }

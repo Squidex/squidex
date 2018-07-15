@@ -15,6 +15,7 @@ using Squidex.Domain.Apps.Entities.Assets.Edm;
 using Squidex.Domain.Apps.Entities.MongoDb.Assets;
 using Squidex.Domain.Apps.Entities.MongoDb.Assets.Visitors;
 using Squidex.Domain.Apps.Entities.Tags;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.MongoDb.OData;
 using Xunit;
@@ -38,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.OData
         public ODataQueryTests()
         {
             A.CallTo(() => tagService.GetTagIdsAsync(appId, TagGroups.Assets, A<HashSet<string>>.That.Contains("tag1")))
-                .Returns(new HashSet<string>(new[] { "normalized1" }));
+                .Returns(HashSet.Of("normalized1"));
 
             valueConverter = FindExtensions.CreateValueConverter(appId, tagService);
         }

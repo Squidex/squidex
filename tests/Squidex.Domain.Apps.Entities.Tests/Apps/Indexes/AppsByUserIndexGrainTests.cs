@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FakeItEasy;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.States;
 using Xunit;
 
@@ -63,11 +64,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         [Fact]
         public async Task Should_replace_app_ids_on_rebuild()
         {
-            var state = new HashSet<Guid>
-            {
-                appId1,
-                appId2
-            };
+            var state = HashSet.Of(appId1, appId2);
 
             await sut.RebuildAsync(state);
 

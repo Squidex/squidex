@@ -140,7 +140,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
 
             var sut = Fields.Assets(1, "my-asset", Partitioning.Invariant);
 
-            var result = sut.CleanReferences(CreateValue(id1, id2), new HashSet<Guid>(new[] { id2 }));
+            var result = sut.CleanReferences(CreateValue(id1, id2), HashSet.Of(id2));
 
             Assert.Equal(CreateValue(id1), result);
         }
@@ -154,7 +154,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
             var sut = Fields.Assets(1, "my-asset", Partitioning.Invariant);
 
             var token = CreateValue(id1, id2);
-            var result = sut.CleanReferences(token, new HashSet<Guid>(new[] { Guid.NewGuid() }));
+            var result = sut.CleanReferences(token, HashSet.Of(Guid.NewGuid()));
 
             Assert.Same(token, result);
         }
@@ -214,7 +214,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
             var sut = Fields.References(1, "my-refs", Partitioning.Invariant,
                 new ReferencesFieldProperties { SchemaId = schemaId });
 
-            var result = sut.CleanReferences(CreateValue(id1, id2), new HashSet<Guid>(new[] { id2 }));
+            var result = sut.CleanReferences(CreateValue(id1, id2), HashSet.Of(id2));
 
             Assert.Equal(CreateValue(id1), result);
         }
@@ -228,7 +228,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
             var sut = Fields.References(1, "my-refs", Partitioning.Invariant,
                 new ReferencesFieldProperties { SchemaId = schemaId });
 
-            var result = sut.CleanReferences(CreateValue(id1, id2), new HashSet<Guid>(new[] { schemaId }));
+            var result = sut.CleanReferences(CreateValue(id1, id2), HashSet.Of(schemaId));
 
             Assert.Equal(CreateValue(), result);
         }
@@ -242,7 +242,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
             var sut = Fields.References(1, "my-refs", Partitioning.Invariant);
 
             var token = CreateValue(id1, id2);
-            var result = sut.CleanReferences(token, new HashSet<Guid>(new[] { Guid.NewGuid() }));
+            var result = sut.CleanReferences(token, HashSet.Of(Guid.NewGuid()));
 
             Assert.Same(token, result);
         }
