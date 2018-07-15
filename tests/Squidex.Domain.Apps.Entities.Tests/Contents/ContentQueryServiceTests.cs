@@ -187,7 +187,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             A.CallTo(() => contentRepository.QueryAsync(app, schema, A<Status[]>.That.IsSameSequenceAs(status), A<ODataUriParser>.Ignored))
                 .Returns(ResultList.Create(Enumerable.Repeat(content, count), total));
 
-            var result = await sut.QueryAsync(context.WithSchemaId(schemaId).WithArchived(archive), A<Query>.That.Matches(x => x.ODataQuery == string.Empty));
+            var result = await sut.QueryAsync(context.WithSchemaId(schemaId).WithArchived(archive), Query.Empty);
 
             Assert.Equal(contentData, result[0].Data);
             Assert.Equal(content.Id, result[0].Id);
@@ -215,7 +215,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             A.CallTo(() => modelBuilder.BuildEdmModel(schema, app))
                 .Throws(new ODataException());
 
-            return Assert.ThrowsAsync<ValidationException>(() => sut.QueryAsync(context.WithSchemaId(schemaId), A<Query>.That.Matches(x => x.ODataQuery == "query")));
+            return Assert.ThrowsAsync<ValidationException>(() => sut.QueryAsync(context.WithSchemaId(schemaId), Query.Empty.WithODataQuery("query")));
         }
 
         public static IEnumerable<object[]> ManyIdRequestData = new[]
@@ -241,7 +241,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             A.CallTo(() => contentRepository.QueryAsync(app, schema, A<Status[]>.That.IsSameSequenceAs(status), A<HashSet<Guid>>.Ignored))
                 .Returns(ResultList.Create(ids.Select(x => CreateContent(x)).Shuffle(), total));
 
-            var result = await sut.QueryAsync(context.WithSchemaId(schemaId).WithArchived(archive), A<Query>.Ignored);
+            var result = await sut.QueryAsync(context.WithSchemaId(schemaId).WithArchived(archive), Query.Empty.WithIds(ids));
 
             Assert.Equal(ids, result.Select(x => x.Id).ToList());
             Assert.Equal(total, result.Total);

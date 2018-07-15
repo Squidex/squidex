@@ -27,7 +27,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors
             typeof(MongoContentEntity).GetProperties()
                 .ToDictionary(x => x.Name, x => x.GetCustomAttribute<BsonElementAttribute>()?.ElementName ?? x.Name, StringComparer.OrdinalIgnoreCase);
 
-        public static PropertyCalculator CreatePropertyCalculator(Schema schema, bool useDraft)
+        public static ConvertProperty CreatePropertyCalculator(Schema schema, bool useDraft)
         {
             return propertyNames =>
             {
@@ -68,7 +68,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors
             };
         }
 
-        public static IFindFluent<MongoContentEntity, MongoContentEntity> ContentSort(this IFindFluent<MongoContentEntity, MongoContentEntity> cursor, ODataUriParser query, PropertyCalculator propertyCalculator)
+        public static IFindFluent<MongoContentEntity, MongoContentEntity> ContentSort(this IFindFluent<MongoContentEntity, MongoContentEntity> cursor, ODataUriParser query, ConvertProperty propertyCalculator)
         {
             var sort = query.BuildSort<MongoContentEntity>(propertyCalculator);
 
@@ -85,7 +85,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors
             return cursor.Skip(query);
         }
 
-        public static FilterDefinition<MongoContentEntity> BuildQuery(ODataUriParser query, Guid schemaId, Status[] status, PropertyCalculator propertyCalculator)
+        public static FilterDefinition<MongoContentEntity> BuildQuery(ODataUriParser query, Guid schemaId, Status[] status, ConvertProperty propertyCalculator)
         {
             var filters = new List<FilterDefinition<MongoContentEntity>>
             {

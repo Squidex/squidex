@@ -15,6 +15,8 @@ namespace Squidex.Domain.Apps.Entities.Tags
     {
         Task<string[]> NormalizeTagsAsync(Guid appId, string category, string[] names, string[] ids);
 
+        Task<string[]> GetTagIdsAsync(Guid appId, string category, string[] names);
+
         Task<Dictionary<string, string>> DenormalizeTagsAsync(Guid appId, string category, string[] ids);
 
         Task<Dictionary<string, int>> GetTagsAsync(Guid appId, string category);

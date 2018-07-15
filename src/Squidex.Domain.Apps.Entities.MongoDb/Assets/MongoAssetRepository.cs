@@ -14,6 +14,7 @@ using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Edm;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Domain.Apps.Entities.MongoDb.Assets.Visitors;
+using Squidex.Domain.Apps.Entities.Tags;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.MongoDb;
@@ -22,9 +23,14 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 {
     public sealed partial class MongoAssetRepository : MongoRepositoryBase<MongoAssetEntity>, IAssetRepository
     {
-        public MongoAssetRepository(IMongoDatabase database)
+        private readonly ITagService tagService;
+
+        public MongoAssetRepository(IMongoDatabase database, ITagService tagService)
             : base(database)
         {
+            Guard.NotNull(tagService, nameof(tagService));
+
+            this.tagService = tagService;
         }
 
         protected override string CollectionName()
@@ -51,7 +57,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                 {
                     var odataQuery = EdmAssetModel.Edm.ParseQuery(query);
 
-                    var filter = FindExtensions.BuildQuery(odataQuery, appId);
+                    var filter = FindExtensions.BuildQuery(odataQuery, appId, tagService);
 
                     var contentCount = Collection.Find(filter).CountDocumentsAsync();
                     var contentItems =

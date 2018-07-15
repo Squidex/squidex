@@ -7,9 +7,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.OData.UriParser;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using Squidex.Domain.Apps.Entities.Tags;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb.OData;
 
@@ -18,7 +20,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets.Visitors
     public static class FindExtensions
     {
         private static readonly FilterDefinitionBuilder<MongoAssetEntity> Filter = Builders<MongoAssetEntity>.Filter;
-        private static readonly PropertyCalculator PropertyCalculator = propertyNames =>
+        private static readonly ConvertProperty PropertyCalculator = propertyNames =>
         {
             if (propertyNames.Length > 0)
             {
@@ -47,15 +49,17 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets.Visitors
             return cursor.Skip(query);
         }
 
-        public static FilterDefinition<MongoAssetEntity> BuildQuery(ODataUriParser query, Guid appId)
+        public static FilterDefinition<MongoAssetEntity> BuildQuery(ODataUriParser query, Guid appId, ITagService tagService)
         {
+            var convertValue = CreateValueConverter(appId, tagService);
+
             var filters = new List<FilterDefinition<MongoAssetEntity>>
             {
                 Filter.Eq(x => x.IndexedAppId, appId),
                 Filter.Eq(x => x.IsDeleted, false)
             };
 
-            var filter = query.BuildFilter<MongoAssetEntity>(PropertyCalculator, false);
+            var filter = query.BuildFilter<MongoAssetEntity>(PropertyCalculator, convertValue, false);
 
             if (filter.Filter != null)
             {
@@ -81,6 +85,24 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets.Visitors
             {
                 return new BsonDocument();
             }
+        }
+
+        public static ConvertValue CreateValueConverter(Guid appId, ITagService tagService)
+        {
+            return new ConvertValue((field, value) =>
+            {
+                if (string.Equals(field, nameof(MongoAssetEntity.Tags), StringComparison.OrdinalIgnoreCase))
+                {
+                    var tags = Task.Run(() => tagService.GetTagIdsAsync(appId, TagGroups.Assets, new[] { value.ToString() })).Result;
+
+                    if (tags.Length == 1)
+                    {
+                        return tags[0] ?? value;
+                    }
+                }
+
+                return value;
+            });
         }
     }
 }

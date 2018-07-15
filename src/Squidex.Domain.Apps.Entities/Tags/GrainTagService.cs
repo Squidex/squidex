@@ -29,6 +29,11 @@ namespace Squidex.Domain.Apps.Entities.Tags
             return GetGrain(appId, category).NormalizeTagsAsync(names, ids);
         }
 
+        public Task<string[]> GetTagIdsAsync(Guid appId, string category, string[] names)
+        {
+            return GetGrain(appId, category).GetTagIdsAsync(names);
+        }
+
         public Task<Dictionary<string, string>> DenormalizeTagsAsync(Guid appId, string category, string[] ids)
         {
             return GetGrain(appId, category).DenormalizeTagsAsync(ids);

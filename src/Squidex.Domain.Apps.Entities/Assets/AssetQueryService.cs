@@ -77,7 +77,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             var tags = assets.SelectMany(x => x.Tags).Distinct().ToArray();
 
-            var tagsById = await tagService.DenormalizeTagsAsync(appId, "Assets", tags);
+            var tagsById = await tagService.DenormalizeTagsAsync(appId, TagGroups.Assets, tags);
 
             foreach (var asset in assets)
             {

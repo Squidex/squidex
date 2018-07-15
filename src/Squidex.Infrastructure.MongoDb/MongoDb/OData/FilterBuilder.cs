@@ -13,7 +13,7 @@ namespace Squidex.Infrastructure.MongoDb.OData
 {
     public static class FilterBuilder
     {
-        public static (FilterDefinition<T> Filter, bool Last) BuildFilter<T>(this ODataUriParser query, PropertyCalculator propertyCalculator = null, bool supportsSearch = true)
+        public static (FilterDefinition<T> Filter, bool Last) BuildFilter<T>(this ODataUriParser query, ConvertProperty convertProperty = null, ConvertValue convertValue = null, bool supportsSearch = true)
         {
             SearchClause search;
             try
@@ -47,7 +47,7 @@ namespace Squidex.Infrastructure.MongoDb.OData
 
             if (filter != null)
             {
-                return (FilterVisitor<T>.Visit(filter.Expression, propertyCalculator), true);
+                return (FilterVisitor<T>.Visit(filter.Expression, convertProperty, convertValue), true);
             }
 
             return (null, false);

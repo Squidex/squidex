@@ -16,16 +16,18 @@ namespace Squidex.Infrastructure.MongoDb.OData
     public sealed class FilterVisitor<T> : QueryNodeVisitor<FilterDefinition<T>>
     {
         private static readonly FilterDefinitionBuilder<T> Filter = Builders<T>.Filter;
-        private readonly PropertyCalculator propertyCalculator;
+        private readonly ConvertProperty convertProperty;
+        private readonly ConvertValue convertValue;
 
-        private FilterVisitor(PropertyCalculator propertyCalculator)
+        private FilterVisitor(ConvertProperty convertProperty, ConvertValue convertValue)
         {
-            this.propertyCalculator = propertyCalculator;
+            this.convertProperty = convertProperty;
+            this.convertValue = convertValue;
         }
 
-        public static FilterDefinition<T> Visit(QueryNode node, PropertyCalculator propertyCalculator)
+        public static FilterDefinition<T> Visit(QueryNode node, ConvertProperty propertyCalculator, ConvertValue convertValue)
         {
-            var visitor = new FilterVisitor<T>(propertyCalculator);
+            var visitor = new FilterVisitor<T>(propertyCalculator, convertValue);
 
             return node.Accept(visitor);
         }
@@ -52,23 +54,26 @@ namespace Squidex.Infrastructure.MongoDb.OData
 
             if (string.Equals(nodeIn.Name, "endswith", StringComparison.OrdinalIgnoreCase))
             {
-                var value = BuildRegex(valueNode, v => v + "$");
+                var f = BuildFieldDefinition(fieldNode);
+                var v = BuildRegex(f, valueNode, s => s + "$");
 
-                return Filter.Regex(BuildFieldDefinition(fieldNode), value);
+                return Filter.Regex(f, v);
             }
 
             if (string.Equals(nodeIn.Name, "startswith", StringComparison.OrdinalIgnoreCase))
             {
-                var value = BuildRegex(valueNode, v => "^" + v);
+                var f = BuildFieldDefinition(fieldNode);
+                var v = BuildRegex(f, valueNode, s => "^" + s);
 
-                return Filter.Regex(BuildFieldDefinition(fieldNode), value);
+                return Filter.Regex(f, v);
             }
 
             if (string.Equals(nodeIn.Name, "contains", StringComparison.OrdinalIgnoreCase))
             {
-                var value = BuildRegex(valueNode, v => v);
+                var f = BuildFieldDefinition(fieldNode);
+                var v = BuildRegex(f, valueNode, s => s);
 
-                return Filter.Regex(BuildFieldDefinition(fieldNode), value);
+                return Filter.Regex(f, v);
             }
 
             throw new NotSupportedException();
@@ -107,53 +112,72 @@ namespace Squidex.Infrastructure.MongoDb.OData
             {
                 if (nodeIn.OperatorKind == BinaryOperatorKind.NotEqual)
                 {
-                    var field = BuildFieldDefinition(nodeIn.Left);
+                    var f = BuildFieldDefinition(nodeIn.Left);
+                    var v = BuildValue(f, nodeIn.Right);
 
-                    return Filter.Or(
-                        Filter.Not(Filter.Exists(field)),
-                        Filter.Ne(field, BuildValue(nodeIn.Right)));
+                    return Filter.Or(Filter.Not(Filter.Exists(f)), Filter.Ne(f, v));
                 }
 
                 if (nodeIn.OperatorKind == BinaryOperatorKind.Equal)
                 {
-                    return Filter.Eq(BuildFieldDefinition(nodeIn.Left), BuildValue(nodeIn.Right));
+                    var f = BuildFieldDefinition(nodeIn.Left);
+                    var v = BuildValue(f, nodeIn.Right);
+
+                    return Filter.Eq(f, v);
                 }
 
                 if (nodeIn.OperatorKind == BinaryOperatorKind.LessThan)
                 {
-                    return Filter.Lt(BuildFieldDefinition(nodeIn.Left), BuildValue(nodeIn.Right));
+                    var f = BuildFieldDefinition(nodeIn.Left);
+                    var v = BuildValue(f, nodeIn.Right);
+
+                    return Filter.Lt(f, v);
                 }
 
                 if (nodeIn.OperatorKind == BinaryOperatorKind.LessThanOrEqual)
                 {
-                    return Filter.Lte(BuildFieldDefinition(nodeIn.Left), BuildValue(nodeIn.Right));
+                    var f = BuildFieldDefinition(nodeIn.Left);
+                    var v = BuildValue(f, nodeIn.Right);
+
+                    return Filter.Lte(f, v);
                 }
 
                 if (nodeIn.OperatorKind == BinaryOperatorKind.GreaterThan)
                 {
-                    return Filter.Gt(BuildFieldDefinition(nodeIn.Left), BuildValue(nodeIn.Right));
+                    var f = BuildFieldDefinition(nodeIn.Left);
+                    var v = BuildValue(f, nodeIn.Right);
+
+                    return Filter.Gt(f, v);
                 }
 
                 if (nodeIn.OperatorKind == BinaryOperatorKind.GreaterThanOrEqual)
                 {
-                    return Filter.Gte(BuildFieldDefinition(nodeIn.Left), BuildValue(nodeIn.Right));
+                    var f = BuildFieldDefinition(nodeIn.Left);
+                    var v = BuildValue(f, nodeIn.Right);
+
+                    return Filter.Gte(f, v);
                 }
             }
 
             throw new NotSupportedException();
         }
 
-        private static BsonRegularExpression BuildRegex(QueryNode node, Func<string, string> formatter)
+        private BsonRegularExpression BuildRegex(string field, QueryNode node, Func<string, string> formatter)
         {
-            return new BsonRegularExpression(formatter(BuildValue(node).ToString()), "i");
+            return new BsonRegularExpression(formatter(BuildValue(field, node).ToString()), "i");
         }
 
-        private FieldDefinition<T, object> BuildFieldDefinition(QueryNode nodeIn)
+        private string BuildFieldDefinition(QueryNode nodeIn)
         {
-            return nodeIn.BuildFieldDefinition<T>(propertyCalculator);
+            return nodeIn.BuildFieldDefinition(convertProperty);
         }
 
-        private static object BuildValue(QueryNode nodeIn)
+        private object BuildValue(string field, QueryNode nodeIn)
+        {
+            return ValueConversion.Convert(field, ConstantVisitor.Visit(nodeIn), convertValue);
+        }
+
+        private object BuildValue(QueryNode nodeIn)
         {
             return ConstantVisitor.Visit(nodeIn);
         }

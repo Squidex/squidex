@@ -106,6 +106,18 @@ namespace Squidex.Domain.Apps.Entities.Tags
             return result.ToArray();
         }
 
+        public Task<string[]> GetTagIdsAsync(string[] names)
+        {
+            var result = new List<string>();
+
+            foreach (var name in names)
+            {
+                result.Add(state.Tags.FirstOrDefault(x => x.Value.Name == name).Key);
+            }
+
+            return Task.FromResult(result.ToArray());
+        }
+
         public Task<Dictionary<string, string>> DenormalizeTagsAsync(string[] ids)
         {
             var result = new Dictionary<string, string>();

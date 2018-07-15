@@ -78,7 +78,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                     {
                         GuardAsset.CanTag(c);
 
-                        c.Tags = await tagService.NormalizeTagsAsync(Snapshot.AppId.Id, "Assets", c.Tags, Snapshot.Tags);
+                        c.Tags = await tagService.NormalizeTagsAsync(Snapshot.AppId.Id, TagGroups.Assets, c.Tags, Snapshot.Tags);
 
                         Tag(c);
                     });

@@ -5,20 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Orleans;
-
 namespace Squidex.Domain.Apps.Entities.Tags
 {
-    public interface ITagGrain : IGrainWithStringKey
+    public static class TagGroups
     {
-        Task<string[]> NormalizeTagsAsync(string[] names, string[] ids);
-
-        Task<string[]> GetTagIdsAsync(string[] names);
-
-        Task<Dictionary<string, string>> DenormalizeTagsAsync(string[] ids);
-
-        Task<Dictionary<string, int>> GetTagsAsync();
+        public const string Assets = "Assets";
     }
 }
