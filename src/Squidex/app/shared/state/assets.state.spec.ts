@@ -49,8 +49,11 @@ describe('AssetsState', () => {
 
         assetsService = Mock.ofType<AssetsService>();
 
-        assetsService.setup(x => x.getAssets(app, 30, 0, undefined))
+        assetsService.setup(x => x.getAssets(app, 30, 0, undefined, undefined))
             .returns(() => of(new AssetsDto(200, oldAssets)));
+
+        assetsService.setup(x => x.getTags(app))
+            .returns(() => of({ tag1: 1, shared: 2, tag2: 1 }));
 
         assetsState = new AssetsState(appsState.object, assetsService.object, dialogs.object);
         assetsState.load().subscribe();
@@ -63,7 +66,8 @@ describe('AssetsState', () => {
         expect(assetsState.snapshot.assetsPager.numberOfItems).toEqual(200);
         expect(assetsState.snapshot.isLoaded).toBeTruthy();
 
-        assetsService.verify(x => x.getAssets(app, 30, 0, undefined), Times.exactly(2));
+        assetsService.verify(x => x.getAssets(app, 30, 0, undefined, undefined), Times.exactly(2));
+        assetsService.verify(x => x.getTags(app), Times.exactly(2));
 
         dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
     });
@@ -86,13 +90,14 @@ describe('AssetsState', () => {
     });
 
     it('should update properties when updated', () => {
-        const newAsset = new AssetDto('id1', modifier, modifier, modified, modified, 'name3', 'type3', 3, 3, 'mime3', true, 0, 0, [], 'url3', version);
+        const newAsset = new AssetDto('id1', modifier, modifier, modified, modified, 'name3', 'type3', 3, 3, 'mime3', true, 0, 0, ['new'], 'url3', version);
 
         assetsState.update(newAsset);
 
         const asset_1 = assetsState.snapshot.assets.at(0);
 
         expect(asset_1).toBe(newAsset);
+        expect(assetsState.snapshot.tags).toEqual({ tag2: 1, shared: 1, new: 1 });
     });
 
     it('should remove asset from snapshot when deleted', () => {
@@ -103,10 +108,11 @@ describe('AssetsState', () => {
 
         expect(assetsState.snapshot.assets.values.length).toBe(1);
         expect(assetsState.snapshot.assetsPager.numberOfItems).toBe(199);
+        expect(assetsState.snapshot.tags).toEqual({ shared: 1, tag2: 1 });
     });
 
     it('should load next page and prev page when paging', () => {
-        assetsService.setup(x => x.getAssets(app, 30, 30, undefined))
+        assetsService.setup(x => x.getAssets(app, 30, 30, undefined, undefined))
             .returns(() => of(new AssetsDto(200, [])));
 
         assetsState.goNext().subscribe();
@@ -114,18 +120,29 @@ describe('AssetsState', () => {
 
         expect().nothing();
 
-        assetsService.verify(x => x.getAssets(app, 30, 30, undefined), Times.once());
-        assetsService.verify(x => x.getAssets(app, 30,  0, undefined), Times.exactly(2));
+        assetsService.verify(x => x.getAssets(app, 30, 30, undefined, undefined), Times.once());
+        assetsService.verify(x => x.getAssets(app, 30,  0, undefined, undefined), Times.exactly(2));
     });
 
     it('should load with query when searching', () => {
-        assetsService.setup(x => x.getAssets(app, 30, 0, 'my-query'))
+        assetsService.setup(x => x.getAssets(app, 30, 0, 'my-query', undefined))
             .returns(() => of(new AssetsDto(0, [])));
 
         assetsState.search('my-query').subscribe();
 
         expect(assetsState.snapshot.assetsQuery).toEqual('my-query');
 
-        assetsService.verify(x => x.getAssets(app, 30, 0, 'my-query'), Times.once());
+        assetsService.verify(x => x.getAssets(app, 30, 0, 'my-query', undefined), Times.once());
+    });
+
+    it('should load with tag when tag changed', () => {
+        assetsService.setup(x => x.getAssets(app, 30, 0, undefined, 'tag1'))
+            .returns(() => of(new AssetsDto(0, [])));
+
+        assetsState.selectTag('tag1').subscribe();
+
+        expect(assetsState.snapshot.tag).toEqual('tag1');
+
+        assetsService.verify(x => x.getAssets(app, 30, 0, undefined, 'tag1'), Times.once());
     });
 });

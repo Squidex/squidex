@@ -274,7 +274,7 @@ describe('AssetsService', () => {
 
         assetsService.getAssets('my-app', 17, 13, 'my-query', 'tag1').subscribe();
 
-        const req = httpMock.expectOne(`http://service/p/api/apps/my-app/assets?$filter=contains(fileName,'my-query') and tag eq 'tag1'&$top=17&$skip=13`);
+        const req = httpMock.expectOne(`http://service/p/api/apps/my-app/assets?$filter=contains(fileName,'my-query') and tags eq 'tag1'&$top=17&$skip=13`);
 
         expect(req.request.method).toEqual('GET');
         expect(req.request.headers.get('If-Match')).toBeNull();
