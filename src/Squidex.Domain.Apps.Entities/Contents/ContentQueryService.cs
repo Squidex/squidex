@@ -123,14 +123,14 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var transformed = Transform(context, schema, checkType, (IEnumerable<IContentEntity>)contents);
 
-            return ResultList.Create(transformed, contents.Total);
+            return ResultList.Create(contents.Total, transformed);
         }
 
         private IResultList<IContentEntity> Sort(IResultList<IContentEntity> contents, IList<Guid> ids)
         {
             var sorted = ids.Select(id => contents.FirstOrDefault(x => x.Id == id)).Where(x => x != null);
 
-            return ResultList.Create(sorted, contents.Total);
+            return ResultList.Create(contents.Total, sorted);
         }
 
         private IEnumerable<IContentEntity> Transform(QueryContext context, ISchemaEntity schema, bool checkType, IEnumerable<IContentEntity> contents)

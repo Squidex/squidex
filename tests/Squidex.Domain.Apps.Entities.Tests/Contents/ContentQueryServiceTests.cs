@@ -185,7 +185,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 .Returns(schema);
 
             A.CallTo(() => contentRepository.QueryAsync(app, schema, A<Status[]>.That.IsSameSequenceAs(status), A<ODataUriParser>.Ignored))
-                .Returns(ResultList.Create(Enumerable.Repeat(content, count), total));
+                .Returns(ResultList.Create(total, Enumerable.Repeat(content, count)));
 
             var result = await sut.QueryAsync(context.WithSchemaId(schemaId).WithArchived(archive), Query.Empty);
 
@@ -239,7 +239,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 .Returns(schema);
 
             A.CallTo(() => contentRepository.QueryAsync(app, schema, A<Status[]>.That.IsSameSequenceAs(status), A<HashSet<Guid>>.Ignored))
-                .Returns(ResultList.Create(ids.Select(x => CreateContent(x)).Shuffle(), total));
+                .Returns(ResultList.Create(total, ids.Select(x => CreateContent(x)).Shuffle()));
 
             var result = await sut.QueryAsync(context.WithSchemaId(schemaId).WithArchived(archive), Query.Empty.WithIds(ids));
 

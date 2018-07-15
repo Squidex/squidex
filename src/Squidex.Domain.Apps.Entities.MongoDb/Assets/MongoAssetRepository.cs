@@ -70,7 +70,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 
                     await Task.WhenAll(contentItems, contentCount);
 
-                    return ResultList.Create<IAssetEntity>(contentItems.Result, contentCount.Result);
+                    return ResultList.Create<IAssetEntity>(contentCount.Result, contentItems.Result);
                 }
                 catch (NotSupportedException)
                 {
@@ -105,7 +105,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 
                 await Task.WhenAll(assetItems, assetCount);
 
-                return ResultList.Create(assetItems.Result.OfType<IAssetEntity>().ToList(), assetCount.Result);
+                return ResultList.Create(assetCount.Result, assetItems.Result.OfType<IAssetEntity>());
             }
         }
 

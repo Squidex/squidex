@@ -70,7 +70,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             var sorted = ids.Select(id => assets.FirstOrDefault(x => x.Id == id)).Where(x => x != null);
 
-            return ResultList.Create(sorted, assets.Total);
+            return ResultList.Create(assets.Total, sorted);
         }
 
         private async Task DenormalizeTagsAsync(Guid appId, IEnumerable<IAssetEntity> assets)
