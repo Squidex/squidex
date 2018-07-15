@@ -73,6 +73,7 @@
 .card {
     & {
         @include overlay-container;
+        min-height: $asset-height + 1.5rem;
     }
 
     &.selectable {
@@ -81,7 +82,8 @@
 
     &-body {
         position: relative;
-        height: 0.7 * $asset-height;
+        min-height: 0.75 * $asset-height;
+        max-height: 0.75 * $asset-height;
     }
 
     &-footer {

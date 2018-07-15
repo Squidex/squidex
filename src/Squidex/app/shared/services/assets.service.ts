@@ -124,7 +124,14 @@ export class AssetsService {
     ) {
     }
 
-    public getAssets(appName: string, take: number, skip: number, query?: string, ids?: string[]): Observable<AssetsDto> {
+    public getTags(appName: string): Observable<{ [name: string]: number }> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/tags`);
+
+        return this.http.get(url).pipe(
+                map(response => <any>response));
+    }
+
+    public getAssets(appName: string, take: number, skip: number, query?: string, tag?: string, ids?: string[]): Observable<AssetsDto> {
         let fullQuery = '';
 
         if (ids) {
@@ -132,8 +139,18 @@ export class AssetsService {
         } else {
             const queries: string[] = [];
 
+            const filters: string[] = [];
+
             if (query && query.length > 0) {
-                queries.push(`$filter=contains(fileName,'${encodeURIComponent(query)}')`);
+                filters.push(`contains(fileName,'${encodeURIComponent(query)}')`);
+            }
+
+            if (tag && tag.length > 0) {
+                filters.push(`tags eq '${encodeURIComponent(tag)}'`);
+            }
+
+            if (filters.length > 0) {
+                queries.push(`$filter=${filters.join(' and ')}`);
             }
 
             queries.push(`$top=${take}`);
@@ -141,7 +158,6 @@ export class AssetsService {
 
             fullQuery = queries.join('&');
         }
-
 
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets?${fullQuery}`);
 

@@ -78,7 +78,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
                         AssignContributor(c);
 
-                        return EntityCreatedResult.Create(c.ContributorId, (long)Version);
+                        return EntityCreatedResult.Create(c.ContributorId, Version);
                     });
 
                 case RemoveContributor removeContributor:

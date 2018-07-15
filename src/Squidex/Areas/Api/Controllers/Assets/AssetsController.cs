@@ -19,6 +19,7 @@ using Squidex.Domain.Apps.Entities.Apps.Services;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
+using Squidex.Domain.Apps.Entities.Tags;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;
@@ -38,6 +39,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         private readonly IAssetQueryService assetQuery;
         private readonly IAssetStatsRepository assetStatsRepository;
         private readonly IAppPlansProvider appPlanProvider;
+        private readonly ITagService tagService;
         private readonly AssetConfig assetsConfig;
 
         public AssetsController(
@@ -45,13 +47,38 @@ namespace Squidex.Areas.Api.Controllers.Assets
             IAssetQueryService assetQuery,
             IAssetStatsRepository assetStatsRepository,
             IAppPlansProvider appPlanProvider,
-            IOptions<AssetConfig> assetsConfig)
+            IOptions<AssetConfig> assetsConfig,
+            ITagService tagService)
             : base(commandBus)
         {
             this.assetsConfig = assetsConfig.Value;
             this.assetQuery = assetQuery;
             this.assetStatsRepository = assetStatsRepository;
             this.appPlanProvider = appPlanProvider;
+            this.tagService = tagService;
+        }
+
+        /// <summary>
+        /// Get assets tags.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <returns>
+        /// 200 => Assets returned.
+        /// 404 => App not found.
+        /// </returns>
+        /// <remarks>
+        /// Get all tags for assets.
+        /// </remarks>
+        [MustBeAppReader]
+        [HttpGet]
+        [Route("apps/{app}/assets/tags")]
+        [ProducesResponseType(typeof(Dictionary<string, int>), 200)]
+        [ApiCosts(1)]
+        public async Task<IActionResult> GetTags(string app)
+        {
+            var response = await tagService.GetTagsAsync(App.Id, TagGroups.Assets);
+
+            return Ok(response);
         }
 
         /// <summary>

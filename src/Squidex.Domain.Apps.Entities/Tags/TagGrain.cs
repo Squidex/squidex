@@ -69,6 +69,11 @@ namespace Squidex.Domain.Apps.Entities.Tags
                         if (found.Value != null)
                         {
                             tagId = found.Key;
+
+                            if (ids == null || !ids.Contains(tagId))
+                            {
+                                found.Value.Count++;
+                            }
                         }
                         else
                         {

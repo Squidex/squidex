@@ -77,7 +77,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                         Create(c);
 
-                        return EntityCreatedResult.Create(c.Data, (long)Version);
+                        return EntityCreatedResult.Create(c.Data, Version);
                     });
 
                 case UpdateContent updateContent:

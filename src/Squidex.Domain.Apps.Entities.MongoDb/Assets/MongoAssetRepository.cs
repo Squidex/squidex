@@ -46,6 +46,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                         .Ascending(x => x.AppId)
                         .Ascending(x => x.IsDeleted)
                         .Ascending(x => x.FileName)
+                        .Ascending(x => x.Tags)
                         .Descending(x => x.LastModified)));
         }
 

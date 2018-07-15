@@ -63,6 +63,9 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<AppProvider>()
                 .As<IAppProvider>();
 
+            services.AddSingletonAs<AssetQueryService>()
+                .As<IAssetQueryService>();
+
             services.AddSingletonAs<ContentQueryService>()
                 .As<IContentQueryService>();
 

@@ -152,6 +152,11 @@
             max-width: $panel-sidebar;
         }
 
+        &.wide {
+            min-width: 16rem;
+            max-width: 16rem;
+        }
+
         & .panel-link {
             & {
                 @include transition(background-color .3s ease);

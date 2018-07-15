@@ -32,7 +32,7 @@ namespace Squidex.Domain.Apps.Entities
 
         public Query WithIds(string ids)
         {
-            if (string.IsNullOrEmpty(ids))
+            if (!string.IsNullOrEmpty(ids))
             {
                 return Clone(c =>
                 {

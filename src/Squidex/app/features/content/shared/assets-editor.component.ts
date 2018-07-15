@@ -53,7 +53,7 @@ export class AssetsEditorComponent implements ControlValueAccessor {
             if (!Types.isEquals(obj, this.oldAssets.map(x => x.id).values)) {
                 const assetIds: string[] = obj;
 
-                this.assetsService.getAssets(this.appsState.appName, 0, 0, undefined, obj)
+                this.assetsService.getAssets(this.appsState.appName, 0, 0, undefined, undefined, obj)
                     .subscribe(dtos => {
                         this.oldAssets = ImmutableArray.of(assetIds.map(id => dtos.items.find(x => x.id === id)).filter(a => !!a).map(a => a!));
 

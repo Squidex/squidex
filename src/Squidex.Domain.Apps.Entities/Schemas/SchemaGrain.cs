@@ -64,7 +64,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                             id = ((IArrayField)Snapshot.SchemaDef.FieldsById[c.ParentFieldId.Value]).FieldsByName[c.Name].Id;
                         }
 
-                        return EntityCreatedResult.Create(id, (long)Version);
+                        return EntityCreatedResult.Create(id, Version);
                     });
 
                 case CreateSchema createSchema:

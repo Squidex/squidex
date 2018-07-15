@@ -1,6 +1,6 @@
 <sqx-title message="{app} | Assets" parameter1="app" [value1]="appsState.appName"></sqx-title>
 
-<sqx-panel desiredWidth="*">
+<sqx-panel desiredWidth="*" showSidebar="true" sidebarClass="wide">
     <ng-container title>
         Assets
     </ng-container>
@@ -20,5 +20,30 @@
 
     <ng-container content>
         <sqx-assets-list [state]="assetsState"></sqx-assets-list>
+    </ng-container>
+
+    <ng-container sidebar>    
+        <div class="section">
+            <a class="row tag" (click)="selectTag(undefined)" [class.active]="!assetsState.snapshot.tag">
+                <div class="col">
+                    All Assets
+                </div>
+            </a>
+        </div>
+        
+        <div class="section">
+            <h3>Tags</h3>
+    
+            <ng-container *ngIf="assetsState.tags | async; let tags">
+                <a class="row tag" *ngFor="let tag of tags | sqxKeys" (click)="selectTag(tag)" [class.active]="tag === assetsState.snapshot.tag">
+                    <div class="col">
+                        {{tag}}
+                    </div>
+                    <div class="col col-auto">
+                        {{tags[tag]}}
+                    </div>
+                </a>
+            </ng-container>
+        </div>
     </ng-container>
 </sqx-panel>

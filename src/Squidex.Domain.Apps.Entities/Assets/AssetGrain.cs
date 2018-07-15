@@ -67,9 +67,11 @@ namespace Squidex.Domain.Apps.Entities.Assets
                         Rename(c);
                     });
                 case DeleteAsset deleteAsset:
-                    return UpdateAsync(deleteAsset, c =>
+                    return UpdateAsync(deleteAsset, async c =>
                     {
                         GuardAsset.CanDelete(c);
+
+                        await tagService.NormalizeTagsAsync(Snapshot.AppId.Id, TagGroups.Assets, null, Snapshot.Tags);
 
                         Delete(c);
                     });

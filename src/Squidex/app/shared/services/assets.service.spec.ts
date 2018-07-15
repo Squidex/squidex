@@ -90,6 +90,31 @@ describe('AssetsService', () => {
         httpMock.verify();
     }));
 
+    it('should make get request to get asset tags',
+        inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
+
+        let tags: any;
+
+        assetsService.getTags('my-app').subscribe(result => {
+            tags = result;
+        });
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets/tags');
+
+        expect(req.request.method).toEqual('GET');
+        expect(req.request.headers.get('If-Match')).toBeNull();
+
+        req.flush({
+            tag1: 1,
+            tag2: 4
+        });
+
+        expect(tags!).toEqual({
+            tag1: 1,
+            tag2: 4
+        });
+    }));
+
     it('should make get request to get assets',
         inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
 
@@ -244,10 +269,23 @@ describe('AssetsService', () => {
         req.flush({ total: 10, items: [] });
     }));
 
+    it('should append query to find by name and tag',
+        inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
+
+        assetsService.getAssets('my-app', 17, 13, 'my-query', 'tag1').subscribe();
+
+        const req = httpMock.expectOne(`http://service/p/api/apps/my-app/assets?$filter=contains(fileName,'my-query') and tag eq 'tag1'&$top=17&$skip=13`);
+
+        expect(req.request.method).toEqual('GET');
+        expect(req.request.headers.get('If-Match')).toBeNull();
+
+        req.flush({ total: 10, items: [] });
+    }));
+
     it('should append ids query to find by ids',
         inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
 
-        assetsService.getAssets('my-app', 0, 0, undefined, ['12', '23']).subscribe();
+        assetsService.getAssets('my-app', 0, 0, undefined, undefined, ['12', '23']).subscribe();
 
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets?ids=12,23');
 
