@@ -29,11 +29,6 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
             return field.Accept(new ReferencesCleaner(value, oldReferences));
         }
 
-        public JToken Visit(IArrayField field)
-        {
-            return value;
-        }
-
         public JToken Visit(IField<AssetsFieldProperties> field)
         {
             return CleanIds();
@@ -94,6 +89,11 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
         }
 
         public JToken Visit(IField<TagsFieldProperties> field)
+        {
+            return value;
+        }
+
+        public JToken Visit(IArrayField field)
         {
             return value;
         }
