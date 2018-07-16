@@ -6,7 +6,7 @@
     <input type="text" class="blank" [attr.name]="inputName" (keydown)="onKeyDown($event)" [class.hidden]="addInput.disabled" #input
         (focus)="focus()"
         (blur)="markTouched()"
-        (input)="adjustSize($event.target)"
+        (input)="adjustSize()"
         [formControl]="addInput"
         autocomplete="off" 
         autocorrect="off"
