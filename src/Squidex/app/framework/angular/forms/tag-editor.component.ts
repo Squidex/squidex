@@ -123,12 +123,10 @@ export class TagEditorComponent implements ControlValueAccessor {
         this.callTouched = fn;
     }
 
-    public remove(index: number) {
-        this.updateItems([...this.items.slice(0, index), ...this.items.splice(index + 1)]);
-    }
-
     public focus() {
-        this.hasFocus = true;
+        if (this.addInput.enabled) {
+            this.hasFocus = true;
+        }
     }
 
     private resetForm() {
@@ -141,6 +139,10 @@ export class TagEditorComponent implements ControlValueAccessor {
         this.callTouched();
 
         this.hasFocus = false;
+    }
+
+    public remove(index: number) {
+        this.updateItems([...this.items.slice(0, index), ...this.items.splice(index + 1)]);
     }
 
     public adjustSize() {

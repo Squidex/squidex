@@ -49,7 +49,7 @@ describe('AssetsState', () => {
 
         assetsService = Mock.ofType<AssetsService>();
 
-        assetsService.setup(x => x.getAssets(app, 30, 0, undefined, undefined))
+        assetsService.setup(x => x.getAssets(app, 30, 0, undefined, []))
             .returns(() => of(new AssetsDto(200, oldAssets)));
 
         assetsService.setup(x => x.getTags(app))
@@ -66,7 +66,7 @@ describe('AssetsState', () => {
         expect(assetsState.snapshot.assetsPager.numberOfItems).toEqual(200);
         expect(assetsState.snapshot.isLoaded).toBeTruthy();
 
-        assetsService.verify(x => x.getAssets(app, 30, 0, undefined, undefined), Times.exactly(2));
+        assetsService.verify(x => x.getAssets(app, 30, 0, undefined, []), Times.exactly(2));
         assetsService.verify(x => x.getTags(app), Times.exactly(2));
 
         dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
@@ -112,7 +112,7 @@ describe('AssetsState', () => {
     });
 
     it('should load next page and prev page when paging', () => {
-        assetsService.setup(x => x.getAssets(app, 30, 30, undefined, undefined))
+        assetsService.setup(x => x.getAssets(app, 30, 30, undefined, []))
             .returns(() => of(new AssetsDto(200, [])));
 
         assetsState.goNext().subscribe();
@@ -120,29 +120,40 @@ describe('AssetsState', () => {
 
         expect().nothing();
 
-        assetsService.verify(x => x.getAssets(app, 30, 30, undefined, undefined), Times.once());
-        assetsService.verify(x => x.getAssets(app, 30,  0, undefined, undefined), Times.exactly(2));
+        assetsService.verify(x => x.getAssets(app, 30, 30, undefined, []), Times.once());
+        assetsService.verify(x => x.getAssets(app, 30,  0, undefined, []), Times.exactly(2));
     });
 
     it('should load with query when searching', () => {
-        assetsService.setup(x => x.getAssets(app, 30, 0, 'my-query', undefined))
+        assetsService.setup(x => x.getAssets(app, 30, 0, 'my-query', []))
             .returns(() => of(new AssetsDto(0, [])));
 
         assetsState.search('my-query').subscribe();
 
         expect(assetsState.snapshot.assetsQuery).toEqual('my-query');
 
-        assetsService.verify(x => x.getAssets(app, 30, 0, 'my-query', undefined), Times.once());
+        assetsService.verify(x => x.getAssets(app, 30, 0, 'my-query', []), Times.once());
     });
 
-    it('should load with tag when tag changed', () => {
-        assetsService.setup(x => x.getAssets(app, 30, 0, undefined, 'tag1'))
+    it('should load with tags when tag toggled', () => {
+        assetsService.setup(x => x.getAssets(app, 30, 0, undefined, ['tag1']))
             .returns(() => of(new AssetsDto(0, [])));
 
-        assetsState.selectTag('tag1').subscribe();
+        assetsState.toggleTag('tag1').subscribe();
 
-        expect(assetsState.snapshot.tag).toEqual('tag1');
+        expect(assetsState.isTagSelected('tag1')).toBeTruthy();
 
-        assetsService.verify(x => x.getAssets(app, 30, 0, undefined, 'tag1'), Times.once());
+        assetsService.verify(x => x.getAssets(app, 30, 0, undefined, ['tag1']), Times.once());
+    });
+
+    it('should load without tags when tags reset', () => {
+        assetsService.setup(x => x.getAssets(app, 30, 0, undefined, []))
+            .returns(() => of(new AssetsDto(0, [])));
+
+        assetsState.resetTags().subscribe();
+
+        expect(assetsState.isTagSelectionEmpty()).toBeTruthy();
+
+        assetsService.verify(x => x.getAssets(app, 30, 0, undefined, []), Times.exactly(2));
     });
 });

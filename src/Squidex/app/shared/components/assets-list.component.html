@@ -14,7 +14,7 @@
     <div class="file-drop-info">Drop file on existing item to replace the asset with a newer version.</div>
 </div>
 
-<div class="row">
+<div class="row assets">
     <sqx-asset *ngFor="let file of newFiles" [initFile]="file" 
         (failed)="remove(file)" 
         (loaded)="add(file, $event)">

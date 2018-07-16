@@ -39,8 +39,12 @@ export class AssetsPageComponent implements OnInit {
         this.assetsState.search(this.assetsFilter.value).pipe(onErrorResumeNext()).subscribe();
     }
 
-    public selectTag(tag: string) {
-        this.assetsState.selectTag(tag).pipe(onErrorResumeNext()).subscribe();
+    public resetTags() {
+        this.assetsState.resetTags().pipe(onErrorResumeNext()).subscribe();
+    }
+
+    public toggleTag(tag: string) {
+        this.assetsState.toggleTag(tag).pipe(onErrorResumeNext()).subscribe();
     }
 
     public goNext() {

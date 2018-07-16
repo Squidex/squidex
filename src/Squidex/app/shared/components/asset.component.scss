@@ -49,13 +49,6 @@
     }
 }
 
-:host {
-    width: $asset-height;
-    padding-bottom: 1rem;
-    padding-left: 8px;
-    padding-right: 8px;
-}
-
 .drop-overlay {
     & {
         @include overlay;
@@ -73,7 +66,11 @@
 .card {
     & {
         @include overlay-container;
-        min-height: $asset-height + 1.5rem;
+        width: $asset-width;
+        margin-bottom: 1rem;
+        margin-left: 8px;
+        margin-right: 8px;
+        min-height: $asset-height;
     }
 
     &.selectable {
@@ -188,4 +185,8 @@
 
 .editable {
     height: 2rem;
+}
+
+.tags {
+    min-height: 26px;
 }

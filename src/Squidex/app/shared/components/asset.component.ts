@@ -110,6 +110,10 @@ export class AssetComponent implements OnDestroy, OnInit {
             this.updateAsset(this.asset, false);
         }
 
+        if (this.isDisabled) {
+            this.tagInput.disable();
+        }
+
         this.tagSubscription =
             this.tagInput.valueChanges.pipe(
                 distinctUntilChanged(),
@@ -182,12 +186,6 @@ export class AssetComponent implements OnDestroy, OnInit {
     public renameCancel() {
         this.renameForm.submitCompleted();
         this.renaming = false;
-    }
-
-    public startTagging() {
-        if (!this.isDisabled) {
-            this.isTagging = true;
-        }
     }
 
     private setProgress(progress = 0) {

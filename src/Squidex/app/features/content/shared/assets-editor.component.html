@@ -1,11 +1,9 @@
 <div class="assets-container" [class.disabled]="isDisabled">
     <div class="row">
-        <div class="drop-area-container">
-            <div class="drop-area" (sqxFileDrop)="addFiles($event)" (click)="assetsDialog.show()">
-                Drop files here to add them.
-            </div>
+        <div class="drop-area align-items-center" (sqxFileDrop)="addFiles($event)" (click)="assetsDialog.show()">
+            Drop files here to add them.
         </div>
-
+            
         <sqx-asset *ngFor="let file of newAssets" [initFile]="file" 
             (failed)="onAssetFailed(file)" 
             (loaded)="onAssetLoaded(file, $event)">

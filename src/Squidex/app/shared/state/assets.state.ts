@@ -22,7 +22,7 @@ import { AppsState } from './apps.state';
 
 interface Snapshot {
     tags: { [name: string]: number };
-    tag?: string;
+    tagsSelected: { [name: string]: boolean };
 
     assets: ImmutableArray<AssetDto>;
     assetsPager: Pager;
@@ -35,10 +35,6 @@ interface Snapshot {
 export class AssetsState extends State<Snapshot> {
     public tags =
         this.changes.pipe(map(x => x.tags),
-            distinctUntilChanged());
-
-    public tag =
-        this.changes.pipe(map(x => x.tag),
             distinctUntilChanged());
 
     public assets =
@@ -58,7 +54,7 @@ export class AssetsState extends State<Snapshot> {
         private readonly assetsService: AssetsService,
         private readonly dialogs: DialogService
     ) {
-        super({ assets: ImmutableArray.empty(), assetsPager: new Pager(0, 0, 30), tags: {} });
+        super({ assets: ImmutableArray.empty(), assetsPager: new Pager(0, 0, 30), tags: {}, tagsSelected: {} });
     }
 
     public load(isReload = false): Observable<any> {
@@ -71,7 +67,11 @@ export class AssetsState extends State<Snapshot> {
 
     private loadInternal(isReload = false): Observable<any> {
         return combineLatest(
-            this.assetsService.getAssets(this.appName, this.snapshot.assetsPager.pageSize, this.snapshot.assetsPager.skip, this.snapshot.assetsQuery, this.snapshot.tag),
+            this.assetsService.getAssets(this.appName,
+                this.snapshot.assetsPager.pageSize,
+                this.snapshot.assetsPager.skip,
+                this.snapshot.assetsQuery,
+                Object.keys(this.snapshot.tagsSelected)),
             this.assetsService.getTags(this.appName)
         ).pipe(
             tap(dtos => {
@@ -106,16 +106,18 @@ export class AssetsState extends State<Snapshot> {
                     const assetsPager = s.assetsPager.decrementCount();
 
                     const tags = { ...s.tags };
+                    const tagsSelected = { ...s.tagsSelected };
 
                     for (let tag of asset.tags) {
                         if (tags[tag] === 1) {
                             delete tags[tag];
+                            delete tagsSelected[tag];
                         } else {
                             tags[tag]--;
                         }
                     }
 
-                    return { ...s, assets, assetsPager, tags };
+                    return { ...s, assets, assetsPager, tags, tagsSelected };
                 });
             }),
             notify(this.dialogs));
@@ -126,11 +128,13 @@ export class AssetsState extends State<Snapshot> {
             const previous = s.assets.find(x => x.id === asset.id);
 
             const tags = { ...s.tags };
+            const tagsSelected = { ...s.tagsSelected };
 
             if (previous) {
                 for (let tag of previous.tags) {
                     if (tags[tag] === 1) {
                         delete tags[tag];
+                        delete tagsSelected[tag];
                     } else {
                         tags[tag]--;
                     }
@@ -149,12 +153,28 @@ export class AssetsState extends State<Snapshot> {
 
             const assets = s.assets.replaceBy('id', asset);
 
-            return { ...s, assets, tags };
+            return { ...s, assets, tags, tagsSelected };
         });
     }
 
-    public selectTag(tag: string): Observable<any> {
-        this.next(s => ({ ...s, assetsPager: new Pager(0, 0, 30), tag }));
+    public toggleTag(tag: string): Observable<any> {
+        this.next(s => {
+            const tagsSelected = { ...s.tagsSelected };
+
+            if (tagsSelected[tag]) {
+                delete tagsSelected[tag];
+            } else {
+                tagsSelected[tag] = true;
+            }
+
+            return { ...s, assetsPager: new Pager(0, 0, 30), tagsSelected };
+        });
+
+        return this.loadInternal();
+    }
+
+    public resetTags(): Observable<any> {
+        this.next(s => ({ ...s, assetsPager: new Pager(0, 0, 30), tagsSelected: {} }));
 
         return this.loadInternal();
     }
@@ -175,6 +195,14 @@ export class AssetsState extends State<Snapshot> {
         this.next(s => ({ ...s, assetsPager: s.assetsPager.goPrev() }));
 
         return this.loadInternal();
+    }
+
+    public isTagSelected(tag: string) {
+        return this.snapshot.tagsSelected[tag] === true;
+    }
+
+    public isTagSelectionEmpty() {
+        return Object.keys(this.snapshot.tagsSelected).length === 0;
     }
 
     private get appName() {

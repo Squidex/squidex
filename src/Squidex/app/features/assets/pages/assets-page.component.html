@@ -24,7 +24,7 @@
 
     <ng-container sidebar>    
         <div class="section">
-            <a class="row tag" (click)="selectTag(undefined)" [class.active]="!assetsState.snapshot.tag">
+            <a class="row tag" (click)="resetTags()" [class.active]="assetsState.isTagSelectionEmpty()">
                 <div class="col">
                     All Assets
                 </div>
@@ -35,7 +35,7 @@
             <h3>Tags</h3>
     
             <ng-container *ngIf="assetsState.tags | async; let tags">
-                <a class="row tag" *ngFor="let tag of tags | sqxKeys" (click)="selectTag(tag)" [class.active]="tag === assetsState.snapshot.tag">
+                <a class="row tag" *ngFor="let tag of tags | sqxKeys" (click)="toggleTag(tag)" [class.active]="assetsState.isTagSelected(tag)">
                     <div class="col">
                         {{tag}}
                     </div>

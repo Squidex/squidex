@@ -5,6 +5,10 @@
     & {
         cursor: text;
     }
+
+    &.disabled {
+        cursor: inherit;
+    }
     
     &.focus {
         @include box-shadow-raw(0 0 0 0.2rem rgba(51, 137, 255, 0.25));
@@ -25,6 +29,10 @@
     &.focus {
         @include box-shadow-none;
         outline: none;
+    }
+
+    &:hover {
+        background: transparent;
     }
 }
 
@@ -62,14 +70,7 @@
     }
 
     &.disabled {
-        & {
-            pointer-events: none;
-        }
-
-        &,
-        &:hover {
-            background: $color-theme-blue-light;
-        }
+        pointer-events: none;
     }
 
     &:hover {

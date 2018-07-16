@@ -272,9 +272,9 @@ describe('AssetsService', () => {
     it('should append query to find by name and tag',
         inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
 
-        assetsService.getAssets('my-app', 17, 13, 'my-query', 'tag1').subscribe();
+        assetsService.getAssets('my-app', 17, 13, 'my-query', ['tag1', 'tag2']).subscribe();
 
-        const req = httpMock.expectOne(`http://service/p/api/apps/my-app/assets?$filter=contains(fileName,'my-query') and tags eq 'tag1'&$top=17&$skip=13`);
+        const req = httpMock.expectOne(`http://service/p/api/apps/my-app/assets?$filter=contains(fileName,'my-query') and tags eq 'tag1' and tags eq 'tag2'&$top=17&$skip=13`);
 
         expect(req.request.method).toEqual('GET');
         expect(req.request.headers.get('If-Match')).toBeNull();

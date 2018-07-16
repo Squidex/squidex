@@ -131,7 +131,7 @@ export class AssetsService {
                 map(response => <any>response));
     }
 
-    public getAssets(appName: string, take: number, skip: number, query?: string, tag?: string, ids?: string[]): Observable<AssetsDto> {
+    public getAssets(appName: string, take: number, skip: number, query?: string, tags?: string[], ids?: string[]): Observable<AssetsDto> {
         let fullQuery = '';
 
         if (ids) {
@@ -145,8 +145,12 @@ export class AssetsService {
                 filters.push(`contains(fileName,'${encodeURIComponent(query)}')`);
             }
 
-            if (tag && tag.length > 0) {
-                filters.push(`tags eq '${encodeURIComponent(tag)}'`);
+            if (tags) {
+                for (let tag of tags) {
+                    if (tag && tag.length > 0) {
+                        filters.push(`tags eq '${encodeURIComponent(tag)}'`);
+                    }
+                }
             }
 
             if (filters.length > 0) {
