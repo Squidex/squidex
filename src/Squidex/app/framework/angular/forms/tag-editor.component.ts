@@ -12,6 +12,7 @@ import { Types } from '@app/framework/internal';
 
 const KEY_SPACE = 32;
 const KEY_DELETE = 8;
+const KEY_ENTER = 13;
 
 export interface Converter {
     convert(input: string): any;
@@ -83,7 +84,13 @@ export class TagEditorComponent implements ControlValueAccessor {
     public useDefaultValue = true;
 
     @Input()
+    public acceptEnter = false;
+
+    @Input()
     public class: string;
+
+    @Input()
+    public placeholder = '+Tag';
 
     @Input()
     public inputName = 'tag-editor';
@@ -164,7 +171,7 @@ export class TagEditorComponent implements ControlValueAccessor {
     }
 
     public onKeyDown(event: KeyboardEvent) {
-        if (event.keyCode === KEY_SPACE) {
+        if (event.keyCode === KEY_SPACE || (event.keyCode === KEY_ENTER && this.acceptEnter)) {
             const value = <string>this.addInput.value;
 
             if (value && this.converter.isValidInput(value)) {

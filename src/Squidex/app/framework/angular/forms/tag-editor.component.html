@@ -3,13 +3,16 @@
         {{item}} <i class="icon-close" (click)="remove(i)"></i>
     </span>
 
-    <input type="text" class="blank" [attr.name]="inputName" (keydown)="onKeyDown($event)" [class.hidden]="addInput.disabled" #input
-        (focus)="focus()"
+    <input type="text" class="blank" #input
         (blur)="markTouched()"
+        (focus)="focus()"
         (input)="adjustSize()"
+        (keydown)="onKeyDown($event)"
         [formControl]="addInput"
+        [attr.name]="inputName"
+        [attr.placeholder]="placeholder"
+        [class.hidden]="addInput.disabled"
         autocomplete="off" 
         autocorrect="off"
-        autocapitalize="off"
-        placeholder="+Tag">   
+        autocapitalize="off">   
 </div>

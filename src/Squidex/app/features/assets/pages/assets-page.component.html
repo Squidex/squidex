@@ -34,16 +34,14 @@
         <div class="section">
             <h3>Tags</h3>
     
-            <ng-container *ngIf="assetsState.tags | async; let tags">
-                <a class="row tag" *ngFor="let tag of tags | sqxKeys" (click)="toggleTag(tag)" [class.active]="assetsState.isTagSelected(tag)">
-                    <div class="col">
-                        {{tag}}
-                    </div>
-                    <div class="col col-auto">
-                        {{tags[tag]}}
-                    </div>
-                </a>
-            </ng-container>
+            <a class="row tag" *ngFor="let tag of assetsState.tags | async" (click)="toggleTag(tag.name)" [class.active]="assetsState.isTagSelected(tag)">
+                <div class="col">
+                    {{tag.name}}
+                </div>
+                <div class="col col-auto">
+                    {{tag.count}}
+                </div>
+            </a>
         </div>
     </ng-container>
 </sqx-panel>

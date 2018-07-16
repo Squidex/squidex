@@ -35,7 +35,7 @@ interface Snapshot {
 export class AssetsState extends State<Snapshot> {
     public tags =
         this.changes.pipe(map(x => x.tags),
-            distinctUntilChanged());
+            distinctUntilChanged(), map(x => sort(x)));
 
     public assets =
         this.changes.pipe(map(x => x.assets),
@@ -208,6 +208,20 @@ export class AssetsState extends State<Snapshot> {
     private get appName() {
         return this.appsState.appName;
     }
+}
+
+function sort(tags: { [name: string]: number }) {
+    return Object.keys(tags).sort((a, b) => {
+        if (a < b) {
+            return -1;
+        }
+        if (a > b) {
+            return 1;
+        }
+        return 0;
+    }).map(key => {
+        return { name: key, count: tags[key] };
+    });
 }
 
 @Injectable()
