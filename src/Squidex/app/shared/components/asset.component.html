@@ -8,14 +8,14 @@
             <div *ngIf="asset.isImage" class="file-image">
                 <img [sqxImageSource]="asset | sqxAssetPreviewUrl">
             </div>
-            <div *ngIf="!asset.isImage" class="file-icon-container">
-                <img class="file-icon" [attr.src]="asset | sqxFileIcon">
+            <div *ngIf="!asset.isImage" class="file-icon">
+                <img [attr.src]="asset | sqxFileIcon">
             </div>
 
-            <div class="file-overlay">
-                <div class="file-overlay-background"></div>
+            <div class="overlay">
+                <div class="overlay-background"></div>
                 
-                <div class="file-menu">
+                <div class="overlay-menu">
                     <a class="file-download" [attr.href]="asset | sqxAssetUrl" target="_blank" (click)="$event.stopPropagation()">
                         <i class="icon-download"></i>
                     </a>
@@ -28,46 +28,51 @@
                     </a>
                 </div>
 
-                <span class="file-overlay-type" *ngIf="asset.fileType">
+                <span class="overlay-type" *ngIf="asset.fileType">
                     {{asset.fileType}}
                 </span>
-                <span class="file-user">
-                    <i class="icon-user"></i> {{asset.lastModifiedBy | sqxUserNameRef}}
-                </span>
-                <span class="file-modified">
-                    {{asset.lastModified | sqxFromNow}}
-                </span>
+
+                <div class="overlay-user">
+                    <div>
+                        <i class="icon-user"></i> {{asset.lastModifiedBy | sqxUserNameRef}}
+                    </div>
+                    <div>
+                        {{asset.lastModified | sqxFromNow}}
+                    </div>
+                </div>
             </div>
         </div>
+
+        <div class="upload-progress" *ngIf="progress > 0">
+            <sqx-progress-bar mode="Circle" [value]="progress"></sqx-progress-bar>
+        </div>
+    
+        <div class="drop-overlay" *ngIf="asset && progress === 0">
+            <div class="drop-overlay-background"></div>
+    
+            <span class="drop-overlay-text">Drop to update</span>
+        </div>
     </div>
-    <div class="card-footer" *ngIf="asset && progress == 0">
-        <div>
-            <div *ngIf="!renaming" class="file-name editable" [attr.title]="asset.fileName" (dblclick)="renameStart()">
-                {{asset.fileName}}
+    <div class="card-footer">
+        <ng-container *ngIf="asset">
+            <div>
+                <div *ngIf="!renaming" class="file-name editable" [attr.title]="asset.fileName" (dblclick)="renameStart()">
+                    {{asset.fileName}}
+                </div>
+                <div *ngIf="renaming">
+                    <form [formGroup]="renameForm.form" (ngSubmit)="renameAsset()">                   
+                        <sqx-control-errors for="name" [submitted]="renameForm.submitted | async"></sqx-control-errors>
+
+                        <input type="text" class="form-control form-underlined editable" id="assetName" formControlName="name" autocomplete="off" sqxFocusOnInit (blur)="renameCancel()" />
+                    </form>
+                </div>
             </div>
-            <div *ngIf="renaming">
-                <form [formGroup]="renameForm.form" (ngSubmit)="renameAsset()">                   
-                    <sqx-control-errors for="name" [submitted]="renameForm.submitted | async"></sqx-control-errors>
-
-                    <input type="text" class="form-control form-underlined editable" id="assetName" formControlName="name" autocomplete="off" sqxFocusOnInit (blur)="renameCancel()" />
-                </form>
+            <div class="file-tags tags">
+                <sqx-tag-editor [useDefaultValue]="false" [formControl]="tagInput" class="blank"></sqx-tag-editor>
             </div>
-        </div>
-        <div class="tags">
-            <sqx-tag-editor [useDefaultValue]="false" [formControl]="tagInput" class="blank"></sqx-tag-editor>
-        </div>
-        <div class="file-info">
-            <ng-container *ngIf="asset.pixelWidth">{{asset.pixelWidth}}x{{asset.pixelHeight}}px, </ng-container> {{asset.fileSize | sqxFileSize}}
-        </div>
-    </div>
-
-    <div class="upload-progress" *ngIf="progress > 0">
-        <sqx-progress-bar mode="Circle" [value]="progress"></sqx-progress-bar>
-    </div>
-
-    <div class="drop-overlay" *ngIf="asset && progress == 0">
-        <div class="drop-overlay-background"></div>
-
-        <span class="drop-overlay-text">Drop to update</span>
+            <div class="file-info">
+                <ng-container *ngIf="asset.pixelWidth">{{asset.pixelWidth}}x{{asset.pixelHeight}}px, </ng-container> {{asset.fileSize | sqxFileSize}}
+            </div>
+        </ng-container>
     </div>
 </div>

@@ -24,8 +24,8 @@
         @include border-radius;
         @include flex-box;
         border: 2px dashed $color-border;
-        height: $asset-height + 1.5rem;
-        width: $asset-height;
+        height: $asset-height;
+        width: $asset-width;
         margin-left: 8px;
         font-size: 1.2rem;
         font-weight: normal;
