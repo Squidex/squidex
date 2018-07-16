@@ -42,9 +42,11 @@ namespace Squidex.Domain.Apps.Entities.Assets
             switch (command)
             {
                 case CreateAsset createRule:
-                    return CreateReturnAsync(createRule, c =>
+                    return CreateReturnAsync(createRule, async c =>
                     {
                         GuardAsset.CanCreate(c);
+
+                        c.Tags = await tagService.NormalizeTagsAsync(c.AppId.Id, TagGroups.Assets, c.Tags, Snapshot.Tags);
 
                         Create(c);
 
@@ -59,12 +61,14 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                         return new AssetSavedResult(Version, Snapshot.FileVersion);
                     });
-                case RenameAsset renameAsset:
-                    return UpdateAsync(renameAsset, c =>
+                case TagAsset tagAsset:
+                    return UpdateAsync(tagAsset, async c =>
                     {
-                        GuardAsset.CanRename(c, Snapshot.FileName);
+                        GuardAsset.CanTag(c);
 
-                        Rename(c);
+                        c.Tags = await tagService.NormalizeTagsAsync(Snapshot.AppId.Id, TagGroups.Assets, c.Tags, Snapshot.Tags);
+
+                        Tag(c);
                     });
                 case DeleteAsset deleteAsset:
                     return UpdateAsync(deleteAsset, async c =>
@@ -75,14 +79,12 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                         Delete(c);
                     });
-                case TagAsset tagAsset:
-                    return UpdateAsync(tagAsset, async c =>
+                case RenameAsset renameAsset:
+                    return UpdateAsync(renameAsset, c =>
                     {
-                        GuardAsset.CanTag(c);
+                        GuardAsset.CanRename(c, Snapshot.FileName);
 
-                        c.Tags = await tagService.NormalizeTagsAsync(Snapshot.AppId.Id, TagGroups.Assets, c.Tags, Snapshot.Tags);
-
-                        Tag(c);
+                        Rename(c);
                     });
                 default:
                     throw new NotSupportedException();

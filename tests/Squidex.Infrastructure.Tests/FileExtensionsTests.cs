@@ -16,6 +16,8 @@ namespace Squidex.Infrastructure
         [InlineData("test.MP4", "mp4")]
         [InlineData("test.txt", "txt")]
         [InlineData("test.TXT", "txt")]
+        [InlineData("test.jpg", "jpg")]
+        [InlineData("test.jpeg", "jpg")]
         public void Should_calculate_file_type(string fileName, string expected)
         {
             var actual = fileName.FileType();

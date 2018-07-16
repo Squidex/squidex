@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
 
@@ -18,6 +19,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.Commands
         public AssetFile File { get; set; }
 
         public ImageInfo ImageInfo { get; set; }
+
+        public HashSet<string> Tags { get; set; }
 
         public CreateAsset()
         {

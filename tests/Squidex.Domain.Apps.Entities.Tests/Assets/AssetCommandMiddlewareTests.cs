@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -28,6 +29,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         private readonly IAssetThumbnailGenerator assetThumbnailGenerator = A.Fake<IAssetThumbnailGenerator>();
         private readonly IAssetStore assetStore = A.Fake<IAssetStore>();
         private readonly ITagService tagService = A.Fake<ITagService>();
+        private readonly ITagGenerator<CreateAsset> tagGenerator = A.Fake<ITagGenerator<CreateAsset>>();
         private readonly IGrainFactory grainFactory = A.Fake<IGrainFactory>();
         private readonly Guid assetId = Guid.NewGuid();
         private readonly Stream stream = new MemoryStream();
@@ -48,23 +50,38 @@ namespace Squidex.Domain.Apps.Entities.Assets
             asset = new AssetGrain(Store, tagService, A.Dummy<ISemanticLog>());
             asset.OnActivateAsync(Id).Wait();
 
+            A.CallTo(() => tagService.NormalizeTagsAsync(AppId, TagGroups.Assets, A<HashSet<string>>.Ignored, A<HashSet<string>>.Ignored))
+                .Returns(new HashSet<string>());
+
             A.CallTo(() => grainFactory.GetGrain<IAssetGrain>(Id, null))
                 .Returns(asset);
 
-            sut = new AssetCommandMiddleware(grainFactory, assetStore, assetThumbnailGenerator);
+            sut = new AssetCommandMiddleware(grainFactory, assetStore, assetThumbnailGenerator, new[] { tagGenerator });
         }
 
         [Fact]
         public async Task Create_should_create_domain_object()
         {
-            var context = CreateContextForCommand(new CreateAsset { AssetId = assetId, File = file });
+            var command = new CreateAsset { AssetId = assetId, File = file };
+            var context = CreateContextForCommand(command);
+
+            A.CallTo(() => tagGenerator.GenerateTags(command, A<HashSet<string>>.Ignored))
+                .Invokes(new Action<CreateAsset, HashSet<string>>((c, tags) =>
+                {
+                    tags.Add("tag1");
+                    tags.Add("tag2");
+                }));
 
             SetupStore(0, context.ContextId);
             SetupImageInfo();
 
             await sut.HandleAsync(context);
 
-            Assert.Equal(assetId, context.Result<EntityCreatedResult<Guid>>().IdOrValue);
+            var result = context.Result<AssetCreatedResult>();
+
+            Assert.Equal(assetId, result.Id);
+            Assert.Contains("tag1", result.Tags);
+            Assert.Contains("tag2", result.Tags);
 
             AssertAssetHasBeenUploaded(0, context.ContextId);
             AssertAssetImageChecked();

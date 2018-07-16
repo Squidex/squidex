@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using FakeItEasy;
@@ -37,6 +38,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public AssetGrainTests()
         {
+            A.CallTo(() => tagService.NormalizeTagsAsync(AppId, TagGroups.Assets, A<HashSet<string>>.Ignored, A<HashSet<string>>.Ignored))
+                .Returns(new HashSet<string>());
+
             sut = new AssetGrain(Store, tagService, A.Dummy<ISemanticLog>());
             sut.OnActivateAsync(Id).Wait();
         }
@@ -71,7 +75,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
                         FileVersion = 0,
                         MimeType = file.MimeType,
                         PixelWidth = image.PixelWidth,
-                        PixelHeight = image.PixelHeight
+                        PixelHeight = image.PixelHeight,
+                        Tags = new HashSet<string>()
                     })
                 );
         }
@@ -119,6 +124,23 @@ namespace Squidex.Domain.Apps.Entities.Assets
             LastEvents
                 .ShouldHaveSameEvents(
                     CreateAssetEvent(new AssetRenamed { FileName = "my-new-image.png" })
+                );
+        }
+
+        [Fact]
+        public async Task Tag_should_create_events()
+        {
+            var command = new TagAsset();
+
+            await ExecuteCreateAsync();
+
+            var result = await sut.ExecuteAsync(CreateAssetCommand(command));
+
+            result.ShouldBeEquivalent(new EntitySavedResult(1));
+
+            LastEvents
+                .ShouldHaveSameEvents(
+                    CreateAssetEvent(new AssetTagged { Tags = new HashSet<string>() })
                 );
         }
 

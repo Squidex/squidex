@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Collections.Generic;
 using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Events.Assets
@@ -25,5 +26,7 @@ namespace Squidex.Domain.Apps.Events.Assets
         public int? PixelWidth { get; set; }
 
         public int? PixelHeight { get; set; }
+
+        public HashSet<string> Tags { get; set; }
     }
 }

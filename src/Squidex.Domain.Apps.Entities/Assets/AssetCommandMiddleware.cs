@@ -6,9 +6,11 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Orleans;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
+using Squidex.Domain.Apps.Entities.Tags;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;
@@ -19,18 +21,23 @@ namespace Squidex.Domain.Apps.Entities.Assets
     {
         private readonly IAssetStore assetStore;
         private readonly IAssetThumbnailGenerator assetThumbnailGenerator;
+        private readonly IEnumerable<ITagGenerator<CreateAsset>> tagGenerators;
 
         public AssetCommandMiddleware(
             IGrainFactory grainFactory,
             IAssetStore assetStore,
-            IAssetThumbnailGenerator assetThumbnailGenerator)
+            IAssetThumbnailGenerator assetThumbnailGenerator,
+            IEnumerable<ITagGenerator<CreateAsset>> tagGenerators)
             : base(grainFactory)
         {
             Guard.NotNull(assetStore, nameof(assetStore));
             Guard.NotNull(assetThumbnailGenerator, nameof(assetThumbnailGenerator));
+            Guard.NotNull(tagGenerators, nameof(tagGenerators));
 
             this.assetStore = assetStore;
             this.assetThumbnailGenerator = assetThumbnailGenerator;
+
+            this.tagGenerators = tagGenerators;
         }
 
         public async override Task HandleAsync(CommandContext context, Func<Task> next)
@@ -39,14 +46,26 @@ namespace Squidex.Domain.Apps.Entities.Assets
             {
                 case CreateAsset createAsset:
                     {
+                        if (createAsset.Tags == null)
+                        {
+                            createAsset.Tags = new HashSet<string>();
+                        }
+
                         createAsset.ImageInfo = await assetThumbnailGenerator.GetImageInfoAsync(createAsset.File.OpenRead());
+
+                        foreach (var tagGenerator in tagGenerators)
+                        {
+                            tagGenerator.GenerateTags(createAsset, createAsset.Tags);
+                        }
+
+                        var originalTags = new HashSet<string>(createAsset.Tags);
 
                         await assetStore.UploadAsync(context.ContextId.ToString(), createAsset.File.OpenRead());
                         try
                         {
                             var result = await ExecuteCommandAsync(createAsset) as AssetSavedResult;
 
-                            context.Complete(EntityCreatedResult.Create(createAsset.AssetId, result.Version));
+                            context.Complete(new AssetCreatedResult(createAsset.AssetId, originalTags, result.Version));
 
                             await assetStore.CopyAsync(context.ContextId.ToString(), createAsset.AssetId.ToString(), result.FileVersion, null);
                         }
