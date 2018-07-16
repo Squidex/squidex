@@ -14,10 +14,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using NSwag.Annotations;
 using Squidex.Areas.Api.Controllers.Assets.Models;
+using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps.Services;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
+using Squidex.Domain.Apps.Entities.Tags;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;
@@ -34,23 +36,49 @@ namespace Squidex.Areas.Api.Controllers.Assets
     [SwaggerTag(nameof(Assets))]
     public sealed class AssetsController : ApiController
     {
-        private readonly IAssetRepository assetRepository;
+        private readonly IAssetQueryService assetQuery;
         private readonly IAssetStatsRepository assetStatsRepository;
         private readonly IAppPlansProvider appPlanProvider;
+        private readonly ITagService tagService;
         private readonly AssetConfig assetsConfig;
 
         public AssetsController(
             ICommandBus commandBus,
-            IAssetRepository assetRepository,
+            IAssetQueryService assetQuery,
             IAssetStatsRepository assetStatsRepository,
             IAppPlansProvider appPlanProvider,
-            IOptions<AssetConfig> assetsConfig)
+            IOptions<AssetConfig> assetsConfig,
+            ITagService tagService)
             : base(commandBus)
         {
             this.assetsConfig = assetsConfig.Value;
-            this.assetRepository = assetRepository;
+            this.assetQuery = assetQuery;
             this.assetStatsRepository = assetStatsRepository;
             this.appPlanProvider = appPlanProvider;
+            this.tagService = tagService;
+        }
+
+        /// <summary>
+        /// Get assets tags.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <returns>
+        /// 200 => Assets returned.
+        /// 404 => App not found.
+        /// </returns>
+        /// <remarks>
+        /// Get all tags for assets.
+        /// </remarks>
+        [MustBeAppReader]
+        [HttpGet]
+        [Route("apps/{app}/assets/tags")]
+        [ProducesResponseType(typeof(Dictionary<string, int>), 200)]
+        [ApiCosts(1)]
+        public async Task<IActionResult> GetTags(string app)
+        {
+            var response = await tagService.GetTagsAsync(App.Id, TagGroups.Assets);
+
+            return Ok(response);
         }
 
         /// <summary>
@@ -72,25 +100,9 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [ApiCosts(1)]
         public async Task<IActionResult> GetAssets(string app, [FromQuery] string ids = null)
         {
-            HashSet<Guid> idsList = null;
+            var context = Context();
 
-            if (!string.IsNullOrWhiteSpace(ids))
-            {
-                idsList = new HashSet<Guid>();
-
-                foreach (var id in ids.Split(','))
-                {
-                    if (Guid.TryParse(id, out var guid))
-                    {
-                        idsList.Add(guid);
-                    }
-                }
-            }
-
-            var assets =
-                idsList?.Count > 0 ?
-                    await assetRepository.QueryAsync(App.Id, idsList) :
-                    await assetRepository.QueryAsync(App.Id, Request.QueryString.ToString());
+            var assets = await assetQuery.QueryAsync(context, Query.Empty.WithODataQuery(Request.QueryString.ToString()).WithIds(ids));
 
             var response = AssetsDto.FromAssets(assets);
 
@@ -115,7 +127,9 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [ApiCosts(1)]
         public async Task<IActionResult> GetAsset(string app, Guid id)
         {
-            var entity = await assetRepository.FindAssetAsync(id);
+            var context = Context();
+
+            var entity = await assetQuery.FindAssetAsync(context, id);
 
             if (entity == null)
             {
@@ -269,6 +283,11 @@ namespace Squidex.Areas.Api.Controllers.Assets
             var assetFile = new AssetFile(formFile.FileName, formFile.ContentType, formFile.Length, formFile.OpenReadStream);
 
             return assetFile;
+        }
+
+        private QueryContext Context()
+        {
+            return QueryContext.Create(App, User);
         }
     }
 }

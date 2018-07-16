@@ -104,7 +104,7 @@ namespace Squidex.Infrastructure.Commands
             return InvokeAsync(command, handler, true);
         }
 
-        protected Task<object> UpdateReturnAsync<TCommand>(TCommand command, Func<TCommand, object> handler) where TCommand : class, IAggregateCommand
+        protected Task<object> UpdateAsync<TCommand>(TCommand command, Func<TCommand, object> handler) where TCommand : class, IAggregateCommand
         {
             return InvokeAsync(command, handler?.ToAsync(), true);
         }

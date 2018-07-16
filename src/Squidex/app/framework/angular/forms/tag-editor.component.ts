@@ -5,12 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, forwardRef, Input } from '@angular/core';
+import { Component, ElementRef, forwardRef, Input, ViewChild } from '@angular/core';
 import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import { Types } from '@app/framework/internal';
 
-const KEY_ENTER = 13;
+const KEY_SPACE = 32;
+const KEY_DELETE = 8;
 
 export interface Converter {
     convert(input: string): any;
@@ -82,7 +83,15 @@ export class TagEditorComponent implements ControlValueAccessor {
     public useDefaultValue = true;
 
     @Input()
+    public class: string;
+
+    @Input()
     public inputName = 'tag-editor';
+
+    @ViewChild('input')
+    public inputElement: ElementRef;
+
+    public hasFocus = false;
 
     public items: any[] = [];
 
@@ -114,27 +123,63 @@ export class TagEditorComponent implements ControlValueAccessor {
         this.callTouched = fn;
     }
 
-    public remove(index: number) {
-        this.updateItems([...this.items.slice(0, index), ...this.items.splice(index + 1)]);
-    }
-
-    public markTouched() {
-        this.callTouched();
+    public focus() {
+        if (this.addInput.enabled) {
+            this.hasFocus = true;
+        }
     }
 
     private resetForm() {
         this.addInput.reset();
+
+        this.adjustSize();
+    }
+
+    public markTouched() {
+        this.callTouched();
+
+        this.hasFocus = false;
+    }
+
+    public remove(index: number) {
+        this.updateItems([...this.items.slice(0, index), ...this.items.splice(index + 1)]);
+    }
+
+    public adjustSize() {
+        const style = window.getComputedStyle(this.inputElement.nativeElement);
+
+        if (!canvas) {
+            canvas = document.createElement('canvas');
+        }
+
+        if (canvas) {
+            const ctx = canvas.getContext('2d');
+
+            if (ctx) {
+                ctx.font = `${style.getPropertyValue('font-size')} ${style.getPropertyValue('font-family')}`;
+
+                this.inputElement.nativeElement.style.width = <any>((ctx.measureText(this.inputElement.nativeElement.value).width + 20) + 'px');
+            }
+        }
     }
 
     public onKeyDown(event: KeyboardEvent) {
-        if (event.keyCode === KEY_ENTER) {
+        if (event.keyCode === KEY_SPACE) {
             const value = <string>this.addInput.value;
 
-            if (this.converter.isValidInput(value)) {
+            if (value && this.converter.isValidInput(value)) {
                 const converted = this.converter.convert(value);
 
                 this.updateItems([...this.items, converted]);
                 this.resetForm();
+                return false;
+            }
+        } else if (event.keyCode === KEY_DELETE) {
+            const value = <string>this.addInput.value;
+
+            if (!value || value.length === 0) {
+                this.updateItems(this.items.slice(0, this.items.length - 1));
+
                 return false;
             }
         }
@@ -152,3 +197,5 @@ export class TagEditorComponent implements ControlValueAccessor {
         }
     }
 }
+
+let canvas: HTMLCanvasElement | null = null;

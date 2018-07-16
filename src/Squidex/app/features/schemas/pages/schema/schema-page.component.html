@@ -2,15 +2,15 @@
 
 <sqx-panel desiredWidth="60rem" [showSidebar]="true">
     <ng-container title>
-        <i class="schema-edit icon-pencil" (click)="editSchemaDialog.show()"></i> {{schema.displayName}} 
+        <i class="schema-edit icon-pencil" (click)="editSchemaDialog.show()"></i> <span (dblclick)="editSchemaDialog.show()">{{schema.displayName}}</span> 
     </ng-container>
 
     <ng-container menu>
-        <button type="button" class="btn btn-link btn-export" (click)="exportSchemaDialog.show()">
+        <button type="button" class="btn btn-link btn-export mr-1" (click)="exportSchemaDialog.show()">
             JSON Preview
         </button>
 
-        <div class="btn-group" data-toggle="buttons" #buttonPublish>
+        <div class="btn-group mr-1" data-toggle="buttons" #buttonPublish>
             <button type="button" class="btn btn-publishing btn-toggle" [class.btn-success]="schema.isPublished" [disabled]="schema.isPublished" (click)="publish()">
                 Published
             </button>

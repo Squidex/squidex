@@ -16,6 +16,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         IEntityWithCreatedBy,
         IEntityWithLastModifiedBy,
         IEntityWithVersion,
+        IEntityWithTags,
         IAssetInfo
     {
         NamedId<Guid> AppId { get; }

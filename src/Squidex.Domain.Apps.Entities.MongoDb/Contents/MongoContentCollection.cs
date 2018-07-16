@@ -66,7 +66,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                     entity.ParseData(schema.SchemaDef);
                 }
 
-                return ResultList.Create<IContentEntity>(contentItems.Result, contentCount.Result);
+                return ResultList.Create<IContentEntity>(contentCount.Result, contentItems.Result);
             }
             catch (NotSupportedException)
             {
@@ -106,7 +106,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                 entity.ParseData(schema.SchemaDef);
             }
 
-            return ResultList.Create<IContentEntity>(contentItems.Result, contentCount.Result);
+            return ResultList.Create<IContentEntity>(contentCount.Result, contentItems.Result);
         }
 
         public Task CleanupAsync(Guid id)

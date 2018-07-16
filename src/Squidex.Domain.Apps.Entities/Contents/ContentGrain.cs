@@ -60,7 +60,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             switch (command)
             {
                 case CreateContent createContent:
-                    return CreateReturnAsync(createContent, (Func<CreateContent, Task<object>>)(async c =>
+                    return CreateReturnAsync(createContent, async c =>
                     {
                         var ctx = await CreateContext(c.AppId.Id, c.SchemaId.Id, () => "Failed to create content.");
 
@@ -77,8 +77,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                         Create(c);
 
-                        return EntityCreatedResult.Create(c.Data, (long)base.Version);
-                    }));
+                        return EntityCreatedResult.Create(c.Data, Version);
+                    });
 
                 case UpdateContent updateContent:
                     return UpdateReturnAsync(updateContent, c =>

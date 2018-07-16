@@ -32,28 +32,7 @@
 }
 
 @mixin asset-link {
-    & {
-        font-size: 1.1rem;
-        font-weight: normal;
-        cursor: pointer;
-        color: darken($color-dark-foreground, 10%);
-    }
-
-    &:hover {
-        color: $color-dark-foreground;
-    }
-
-    &:focus,
-    &:hover {
-        text-decoration: none;
-    }
-}
-
-:host {
-    width: $asset-height;
-    padding-bottom: 1rem;
-    padding-left: 8px;
-    padding-right: 8px;
+    
 }
 
 .drop-overlay {
@@ -70,49 +49,63 @@
     }
 }
 
+:host {
+    padding-bottom: 1rem;
+    padding-left: 8px;
+    padding-right: 8px;
+}
+
 .card {
     & {
         @include overlay-container;
-        height: $asset-height;
+        width: $asset-width;
+    }
+
+    &-body,
+    &-footer {
+        position: relative;
+        padding: 1rem;
+    }
+
+    &-body {
+        padding: 0;
+        min-height: $asset-header;
+        max-height: $asset-header;
+    }
+
+    &-footer {
+        padding-top: .5rem;
+        min-height: $asset-footer;
+        max-height: auto;
+    }
+
+    &.drag {
+        .drop-overlay {
+            @include opacity(1);
+        }
+
+        .file-type {
+            @include opacity(0);
+        }
     }
 
     &.selectable {
         cursor: pointer;
     }
-
-    &-body {
-        position: relative;
-    }
-
-    &-footer {
-        border: 0;
-        background: transparent;
-        padding: .8rem;
-        padding-top: .4rem;
-        height: 70px;
-    }
 }
 
 .upload-progress {
-    @include absolute(2rem, 2rem, 2rem, 2rem);
+    @include absolute(1rem, 3em, 1rem, 3rem);
 }
 
 .file {
-    &-info {
-        font-size: .8rem;
-    }
-
-    &-image {
-        height: 100%;
-    }
-
     &-preview {
         & {
-            @include absolute(.8rem, .8rem, 0, .8rem);
+            @include absolute(0, 0, 0, 0);
         }
 
         &:hover {
-            .file-overlay {
+            .overlay {
                 @include opacity(1);
             }
 
@@ -122,60 +115,89 @@
         }
     }
 
-    &-user {
-        @include absolute(auto, auto, 1.7rem, .5rem);
-    }
-
-    &-modified {
-        @include absolute(auto, auto, .5rem, .5rem);
-    }
-
-    &-menu {
-        @include absolute(.5rem, 1rem, auto, auto);
-
-        a {
-            @include asset-link;
-        }
-    }
-
     &-type {
-        @include transition(opacity.4s ease);
-        @include absolute(.7rem, auto, auto, .5rem);
+        @include transition(opacity .4s ease);
+        @include absolute(1rem, auto, auto, 1rem);
         @include asset-type;
         @include border-radius(3px);
         background: $color-dark-black;
     }
 
-    &-name {
+    &-name,
+    &-info {
         @include truncate;
-        font-size: 1rem;
-        font-weight: normal;
+    }
+
+    &-image,
+    &-icon {
+        height: $asset-image;
+    }
+
+    &-name {
         line-height: 2rem;
     }
 
-    &-icon {
-        margin-top: 10%;
-        margin-bottom: 0;
-        height: 70%;
+    &-tags {
+        margin-bottom: .25rem;
     }
 
-    &-icon-container {
+    &-info {
+        font-size: .75rem;
+    }
+
+    &-icon {
+        line-height: $asset-image;
         background: $color-border;
         border: 0;
         text-align: center;
-        height: 100%;
+    }
+}
+
+.overlay {
+    & {
+        @include overlay;
+        font-size: .8rem;
+        font-weight: normal;
     }
 
-    &-overlay {
+    &-menu {
         & {
-            @include overlay;
-            font-size: .8rem;
-            font-weight: normal;
+            @include absolute(1rem, 1rem, auto, auto);
         }
 
-        &-type {
-            @include absolute(.7rem, auto, auto, .5rem);
-            @include asset-type;
+        a {
+            & {
+                font-size: 1.1rem;
+                font-weight: normal;
+                cursor: pointer;
+                color: darken($color-dark-foreground, 10%);
+            }
+        
+            &:hover {
+                color: $color-dark-foreground;
+            }
+        
+            &:focus,
+            &:hover {
+                text-decoration: none;
+            }
         }
     }
+
+    &-type {
+        @include absolute(1rem, auto, auto, 1rem);
+        @include asset-type;
+    }
+
+    &-user {
+        @include absolute(auto, auto, 1rem, 1rem);
+    }
+}
+
+.editable {
+    height: 2rem;
+}
+
+.tags {
+    min-height: 26px;
 }

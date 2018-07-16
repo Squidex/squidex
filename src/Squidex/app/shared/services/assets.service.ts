@@ -50,6 +50,7 @@ export class AssetDto extends Model {
         public readonly isImage: boolean,
         public readonly pixelWidth: number | null,
         public readonly pixelHeight: number | null,
+        public readonly tags: string[],
         public readonly url: string,
         public readonly version: Version
     ) {
@@ -69,6 +70,15 @@ export class AssetDto extends Model {
         });
     }
 
+    public tag(tags: string[], user: string, version: Version, now?: DateTime): AssetDto {
+        return this.with({
+            tags,
+            lastModified: now || DateTime.now(),
+            lastModifiedBy: user,
+            version
+        });
+    }
+
     public rename(fileName: string, user: string, version: Version, now?: DateTime): AssetDto {
         return this.with({
             fileName,
@@ -79,9 +89,16 @@ export class AssetDto extends Model {
     }
 }
 
-export class UpdateAssetDto {
+export class RenameAssetDto {
     constructor(
         public readonly fileName: string
+    ) {
+    }
+}
+
+export class TagAssetDto {
+    constructor(
+        public readonly tags: string[]
     ) {
     }
 }
@@ -107,7 +124,14 @@ export class AssetsService {
     ) {
     }
 
-    public getAssets(appName: string, take: number, skip: number, query?: string, ids?: string[]): Observable<AssetsDto> {
+    public getTags(appName: string): Observable<{ [name: string]: number }> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/tags`);
+
+        return this.http.get(url).pipe(
+                map(response => <any>response));
+    }
+
+    public getAssets(appName: string, take: number, skip: number, query?: string, tags?: string[], ids?: string[]): Observable<AssetsDto> {
         let fullQuery = '';
 
         if (ids) {
@@ -115,8 +139,22 @@ export class AssetsService {
         } else {
             const queries: string[] = [];
 
+            const filters: string[] = [];
+
             if (query && query.length > 0) {
-                queries.push(`$filter=contains(fileName,'${encodeURIComponent(query)}')`);
+                filters.push(`contains(fileName,'${encodeURIComponent(query)}')`);
+            }
+
+            if (tags) {
+                for (let tag of tags) {
+                    if (tag && tag.length > 0) {
+                        filters.push(`tags eq '${encodeURIComponent(tag)}'`);
+                    }
+                }
+            }
+
+            if (filters.length > 0) {
+                queries.push(`$filter=${filters.join(' and ')}`);
             }
 
             queries.push(`$top=${take}`);
@@ -124,7 +162,6 @@ export class AssetsService {
 
             fullQuery = queries.join('&');
         }
-
 
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets?${fullQuery}`);
 
@@ -151,6 +188,7 @@ export class AssetsService {
                             item.isImage,
                             item.pixelWidth,
                             item.pixelHeight,
+                            item.tags || [],
                             assetUrl,
                             new Version(item.version.toString()));
                     }));
@@ -194,6 +232,7 @@ export class AssetsService {
                             response.isImage,
                             response.pixelWidth,
                             response.pixelHeight,
+                            [],
                             assetUrl,
                             new Version(event.headers.get('etag')!));
 
@@ -231,6 +270,7 @@ export class AssetsService {
                         body.isImage,
                         body.pixelWidth,
                         body.pixelHeight,
+                        body.tags || [],
                         assetUrl,
                         response.version);
                 }),
@@ -288,7 +328,7 @@ export class AssetsService {
                 pretifyError('Failed to delete asset. Please reload.'));
     }
 
-    public putAsset(appName: string, id: string, dto: UpdateAssetDto, version: Version): Observable<Versioned<any>> {
+    public putAsset(appName: string, id: string, dto: RenameAssetDto | TagAssetDto, version: Version): Observable<Versioned<any>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/${id}`);
 
         return HTTP.putVersioned(this.http, url, dto, version).pipe(

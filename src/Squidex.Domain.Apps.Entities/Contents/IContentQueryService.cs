@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Squidex.Infrastructure;
 
@@ -14,12 +13,10 @@ namespace Squidex.Domain.Apps.Entities.Contents
 {
     public interface IContentQueryService
     {
-        Task<IResultList<IContentEntity>> QueryAsync(QueryContext context, IList<Guid> ids);
+        Task<IResultList<IContentEntity>> QueryAsync(ContentQueryContext context, Query query);
 
-        Task<IResultList<IContentEntity>> QueryAsync(QueryContext context, string query);
+        Task<IContentEntity> FindContentAsync(ContentQueryContext context, Guid id, long version = EtagVersion.Any);
 
-        Task<IContentEntity> FindContentAsync(QueryContext context, Guid id, long version = EtagVersion.Any);
-
-        Task ThrowIfSchemaNotExistsAsync(QueryContext context);
+        Task ThrowIfSchemaNotExistsAsync(ContentQueryContext context);
     }
 }

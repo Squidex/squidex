@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 using Squidex.Domain.Apps.Core.ValidateContent;
 using Squidex.Domain.Apps.Events;
@@ -49,6 +50,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.State
         [JsonProperty]
         public bool IsDeleted { get; set; }
 
+        [JsonProperty]
+        public HashSet<string> Tags { get; set; }
+
         Guid IAssetInfo.AssetId
         {
             get { return Id; }
@@ -68,6 +72,11 @@ namespace Squidex.Domain.Apps.Entities.Assets.State
             SimpleMapper.Map(@event, this);
 
             TotalSize += @event.FileSize;
+        }
+
+        protected void On(AssetTagged @event)
+        {
+            Tags = @event.Tags;
         }
 
         protected void On(AssetRenamed @event)

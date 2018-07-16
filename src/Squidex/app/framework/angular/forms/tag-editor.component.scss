@@ -1,36 +1,76 @@
 @import '_mixins';
 @import '_vars';
 
-.items {
-    margin-top: .4rem;
-    min-height: 1.6rem;
+.form-control {
+    & {
+        cursor: text;
+    }
+
+    &.disabled {
+        cursor: inherit;
+    }
+    
+    &.focus {
+        @include box-shadow-raw(0 0 0 0.2rem rgba(51, 137, 255, 0.25));
+        border-color: #b3d3ff;
+    }
+}
+
+.blank {
+    & {
+        padding: 0;
+        border: 0;
+        background: transparent;
+        min-width: 40px;
+        max-width: 100%;
+    }
+
+    &:focus,
+    &.focus {
+        @include box-shadow-none;
+        outline: none;
+    }
+
+    &:hover {
+        background: transparent;
+    }
+}
+
+.icon-close {
+    font-size: .6rem;
 }
 
 .item {
     & {
-        @include border-radius(.8rem);
+        @include border-radius(10px);
+        @include truncate;
         display: inline-block;
         color: $color-dark-foreground;
-        margin-right: .4rem;
-        margin-bottom: .25rem;
-        min-height: 1.6rem;
+        cursor: default;
+        height: 20px;
         padding: 0 .6rem;
         background: $color-theme-blue;
         border: 0;
         font-size: .8rem;
         font-weight: normal;
-        line-height: 1.6rem;
+        line-height: 20px;
+        margin: 2px 2px 2px 0;
+        vertical-align: middle;
+    }
+
+    &,
+    &-container {
+        display: inline-block;
+    }
+
+    &-container {
+        height: 24px;
+        padding: 2px;
+        padding-left: 0;
     }
 
     &.disabled {
-        & {
-            pointer-events: none;
-        }
-
-        &,
-        &:hover {
-            background: $color-theme-blue-light;
-        }
+        pointer-events: none;
     }
 
     &:hover {

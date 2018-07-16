@@ -11,7 +11,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Assets;
-using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents
@@ -21,18 +20,16 @@ namespace Squidex.Domain.Apps.Entities.Contents
         private readonly ConcurrentDictionary<Guid, IContentEntity> cachedContents = new ConcurrentDictionary<Guid, IContentEntity>();
         private readonly ConcurrentDictionary<Guid, IAssetEntity> cachedAssets = new ConcurrentDictionary<Guid, IAssetEntity>();
         private readonly IContentQueryService contentQuery;
-        private readonly IAssetRepository assetRepository;
+        private readonly IAssetQueryService assetQuery;
         private readonly QueryContext context;
 
-        public QueryExecutionContext(QueryContext context,
-            IAssetRepository assetRepository,
-            IContentQueryService contentQuery)
+        public QueryExecutionContext(QueryContext context, IAssetQueryService assetQuery, IContentQueryService contentQuery)
         {
-            Guard.NotNull(assetRepository, nameof(assetRepository));
+            Guard.NotNull(assetQuery, nameof(assetQuery));
             Guard.NotNull(contentQuery, nameof(contentQuery));
             Guard.NotNull(context, nameof(context));
 
-            this.assetRepository = assetRepository;
+            this.assetQuery = assetQuery;
             this.contentQuery = contentQuery;
             this.context = context;
         }
@@ -43,7 +40,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             if (asset == null)
             {
-                asset = await assetRepository.FindAssetAsync(id);
+                asset = await assetQuery.FindAssetAsync(context, id);
 
                 if (asset != null)
                 {
@@ -60,7 +57,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             if (content == null)
             {
-                content = await contentQuery.FindContentAsync(context.WithSchemaId(schemaId), id);
+                content = await contentQuery.FindContentAsync(new ContentQueryContext(context).WithSchemaId(schemaId), id);
 
                 if (content != null)
                 {
@@ -73,7 +70,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public async Task<IResultList<IAssetEntity>> QueryAssetsAsync(string query)
         {
-            var assets = await assetRepository.QueryAsync(context.App.Id, query);
+            var assets = await assetQuery.QueryAsync(context, Query.Empty.WithODataQuery(query));
 
             foreach (var asset in assets)
             {
@@ -85,7 +82,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public async Task<IResultList<IContentEntity>> QueryContentsAsync(string schemaIdOrName, string query)
         {
-            var result = await contentQuery.QueryAsync(context.WithSchemaName(schemaIdOrName), query);
+            var result = await contentQuery.QueryAsync(new ContentQueryContext(context).WithSchemaName(schemaIdOrName), Query.Empty.WithODataQuery(query));
 
             foreach (var content in result)
             {
@@ -103,7 +100,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             if (notLoadedAssets.Count > 0)
             {
-                var assets = await assetRepository.QueryAsync(context.App.Id, notLoadedAssets);
+                var assets = await assetQuery.QueryAsync(context, Query.Empty.WithIds(notLoadedAssets));
 
                 foreach (var asset in assets)
                 {
@@ -122,7 +119,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             if (notLoadedContents.Count > 0)
             {
-                var result = await contentQuery.QueryAsync(context.WithSchemaId(schemaId), notLoadedContents);
+                var result = await contentQuery.QueryAsync(new ContentQueryContext(context).WithSchemaId(schemaId), Query.Empty.WithIds(notLoadedContents));
 
                 foreach (var content in result)
                 {

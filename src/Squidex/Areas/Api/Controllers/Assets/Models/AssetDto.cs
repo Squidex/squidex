@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using NodaTime;
 using Squidex.Domain.Apps.Entities.Assets;
@@ -38,6 +39,11 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         /// </summary>
         [Required]
         public string FileType { get; set; }
+
+        /// <summary>
+        /// The asset tags.
+        /// </summary>
+        public HashSet<string> Tags { get; set; }
 
         /// <summary>
         /// The size of the file in bytes.

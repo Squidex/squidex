@@ -85,7 +85,7 @@ namespace Squidex.Infrastructure.Commands
                         });
 
                     case UpdateCustom updateCustom:
-                        return UpdateReturnAsync(updateCustom, c =>
+                        return UpdateAsync(updateCustom, c =>
                         {
                             RaiseEvent(new ValueChanged { Value = c.Value });
 

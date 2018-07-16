@@ -45,7 +45,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         private readonly ClaimsPrincipal user;
         private readonly ClaimsIdentity identity = new ClaimsIdentity();
         private readonly EdmModelBuilder modelBuilder = A.Fake<EdmModelBuilder>();
-        private readonly QueryContext context;
+        private readonly ContentQueryContext context;
         private readonly ContentQueryService sut;
 
         public ContentQueryServiceTests()
@@ -58,7 +58,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             A.CallTo(() => schema.SchemaDef).Returns(new Schema("my-schema"));
 
-            context = QueryContext.Create(app, user);
+            context = new ContentQueryContext(QueryContext.Create(app, user));
 
             sut = new ContentQueryService(contentRepository, contentVersionLoader, appProvider, scriptEngine, modelBuilder);
         }
@@ -185,9 +185,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 .Returns(schema);
 
             A.CallTo(() => contentRepository.QueryAsync(app, schema, A<Status[]>.That.IsSameSequenceAs(status), A<ODataUriParser>.Ignored))
-                .Returns(ResultList.Create(Enumerable.Repeat(content, count), total));
+                .Returns(ResultList.Create(total, Enumerable.Repeat(content, count)));
 
-            var result = await sut.QueryAsync(context.WithSchemaId(schemaId).WithArchived(archive), string.Empty);
+            var result = await sut.QueryAsync(context.WithSchemaId(schemaId).WithArchived(archive), Query.Empty);
 
             Assert.Equal(contentData, result[0].Data);
             Assert.Equal(content.Id, result[0].Id);
@@ -215,7 +215,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             A.CallTo(() => modelBuilder.BuildEdmModel(schema, app))
                 .Throws(new ODataException());
 
-            return Assert.ThrowsAsync<ValidationException>(() => sut.QueryAsync(context.WithSchemaId(schemaId), "query"));
+            return Assert.ThrowsAsync<ValidationException>(() => sut.QueryAsync(context.WithSchemaId(schemaId), Query.Empty.WithODataQuery("query")));
         }
 
         public static IEnumerable<object[]> ManyIdRequestData = new[]
@@ -239,9 +239,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 .Returns(schema);
 
             A.CallTo(() => contentRepository.QueryAsync(app, schema, A<Status[]>.That.IsSameSequenceAs(status), A<HashSet<Guid>>.Ignored))
-                .Returns(ResultList.Create(ids.Select(x => CreateContent(x)).Shuffle(), total));
+                .Returns(ResultList.Create(total, ids.Select(x => CreateContent(x)).Shuffle()));
 
-            var result = await sut.QueryAsync(context.WithSchemaId(schemaId).WithArchived(archive), ids);
+            var result = await sut.QueryAsync(context.WithSchemaId(schemaId).WithArchived(archive), Query.Empty.WithIds(ids));
 
             Assert.Equal(ids, result.Select(x => x.Id).ToList());
             Assert.Equal(total, result.Total);

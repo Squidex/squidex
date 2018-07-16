@@ -11,23 +11,23 @@ using MongoDB.Driver;
 
 namespace Squidex.Infrastructure.MongoDb.OData
 {
-    public delegate string PropertyCalculator(string[] parts);
+    public delegate string ConvertProperty(string[] parts);
 
     public static class PropertyBuilder
     {
-        private static readonly PropertyCalculator DefaultCalculator = parts =>
+        private static readonly ConvertProperty Default = parts =>
         {
             return string.Join(".", parts).ToPascalCase();
         };
 
-        public static StringFieldDefinition<T, object> BuildFieldDefinition<T>(this QueryNode node, PropertyCalculator propertyCalculator)
+        public static string BuildFieldDefinition(this QueryNode node, ConvertProperty convertProperty)
         {
-            propertyCalculator = propertyCalculator ?? DefaultCalculator;
+            convertProperty = convertProperty ?? Default;
 
             var propertyParts = node.Accept(PropertyNameVisitor.Instance).ToArray();
-            var propertyName = propertyCalculator(propertyParts);
+            var propertyName = convertProperty(propertyParts);
 
-            return new StringFieldDefinition<T, object>(propertyName);
+            return propertyName;
         }
     }
 }

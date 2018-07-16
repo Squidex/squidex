@@ -1,2 +1,26 @@
 @import '_vars';
 @import '_mixins';
+
+.section {
+    border-top: 1px solid $color-border;
+    padding: 1rem;
+}
+
+.tag {
+    & {
+        padding: .25rem 0;
+    }
+
+    &.active {
+        font-weight: bold;
+    }
+    
+    &.active,
+    &:hover {
+        background: $color-background;
+    }
+}
+
+a.tag {
+    cursor: pointer !important;
+}

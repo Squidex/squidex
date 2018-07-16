@@ -30,6 +30,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Edm
             entityType.AddStructuralProperty(nameof(IAssetEntity.MimeType).ToCamelCase(), EdmPrimitiveTypeKind.String);
             entityType.AddStructuralProperty(nameof(IAssetEntity.PixelHeight).ToCamelCase(), EdmPrimitiveTypeKind.Int32);
             entityType.AddStructuralProperty(nameof(IAssetEntity.PixelWidth).ToCamelCase(), EdmPrimitiveTypeKind.Int32);
+            entityType.AddStructuralProperty(nameof(IAssetEntity.Tags).ToCamelCase(), EdmPrimitiveTypeKind.String);
 
             var container = new EdmEntityContainer("Squidex", "Container");
 

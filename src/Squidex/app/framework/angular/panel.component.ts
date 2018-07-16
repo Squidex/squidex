@@ -54,6 +54,9 @@ export class PanelComponent implements AfterViewInit, OnDestroy, OnInit {
     @Input()
     public contentClass = '';
 
+    @Input()
+    public sidebarClass = '';
+
     @ViewChild('panel')
     public panel: ElementRef;
 

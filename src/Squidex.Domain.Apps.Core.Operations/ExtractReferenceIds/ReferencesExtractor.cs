@@ -37,7 +37,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
                 {
                     foreach (var nestedField in field.Fields)
                     {
-                        if (item.TryGetValue(field.Name, out var value))
+                        if (item.TryGetValue(nestedField.Name, out var value))
                         {
                             result.AddRange(nestedField.Accept(new ReferencesExtractor(value)));
                         }

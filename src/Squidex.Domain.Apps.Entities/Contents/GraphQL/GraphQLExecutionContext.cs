@@ -10,8 +10,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Entities.Assets;
-using Squidex.Domain.Apps.Entities.Assets.Repositories;
-
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 {
     public sealed class GraphQLExecutionContext : QueryExecutionContext
@@ -19,10 +17,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         public IGraphQLUrlGenerator UrlGenerator { get; }
 
         public GraphQLExecutionContext(QueryContext context,
-            IAssetRepository assetRepository,
+            IAssetQueryService assetQueryService,
             IContentQueryService contentQuery,
             IGraphQLUrlGenerator urlGenerator)
-            : base(context, assetRepository, contentQuery)
+            : base(context, assetQueryService, contentQuery)
         {
             UrlGenerator = urlGenerator;
         }

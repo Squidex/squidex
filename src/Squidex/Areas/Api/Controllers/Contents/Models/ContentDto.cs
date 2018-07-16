@@ -10,6 +10,7 @@ using System.ComponentModel.DataAnnotations;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.ConvertContent;
+using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Infrastructure;

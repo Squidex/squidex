@@ -6,7 +6,7 @@
     </ng-container>
 
     <ng-container menu>
-        <button class="btn btn-link btn-secondary" (click)="reload()" title="Refresh Users (CTRL + SHIFT + R)">
+        <button class="btn btn-link btn-secondary mr-1" (click)="reload()" title="Refresh Users (CTRL + SHIFT + R)">
             <i class="icon-reset"></i> Refresh
         </button>
 
@@ -14,7 +14,7 @@
         <sqx-shortcut keys="ctrl+shift+f" (trigger)="inputFind.focus()"></sqx-shortcut>
         <sqx-shortcut keys="ctrl+shift+n" (trigger)="buttonNew.click()"></sqx-shortcut>
 
-        <form class="form-inline" (ngSubmit)="search()">
+        <form class="form-inline mr-1" (ngSubmit)="search()">
             <input class="form-control" #inputFind [formControl]="usersFilter" placeholder="Search for user" />
         </form>
 

@@ -5,8 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { FormBuilder, FormControl } from '@angular/forms';
+import { Subscription } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 import {
     AppsState,
@@ -14,14 +16,14 @@ import {
     AssetsService,
     AuthService,
     DateTime,
-    DialogModel,
     DialogService,
     fadeAnimation,
+    RenameAssetDto,
     RenameAssetForm,
     Types,
-    UpdateAssetDto,
     Versioned
 } from '@app/shared/internal';
+import { TagAssetDto } from '@appshared/services/assets.service';
 
 @Component({
     selector: 'sqx-asset',
@@ -31,7 +33,9 @@ import {
         fadeAnimation
     ]
 })
-export class AssetComponent implements OnInit {
+export class AssetComponent implements OnDestroy, OnInit {
+    private tagSubscription: Subscription;
+
     @Input()
     public initFile: File;
 
@@ -68,8 +72,12 @@ export class AssetComponent implements OnInit {
     @Output()
     public failed = new EventEmitter();
 
-    public renameDialog = new DialogModel();
+    public renaming = false;
+    public isTagging = false;
+
     public renameForm = new RenameAssetForm(this.formBuilder);
+
+    public tagInput = new FormControl();
 
     public progress = 0;
 
@@ -101,6 +109,22 @@ export class AssetComponent implements OnInit {
         } else {
             this.updateAsset(this.asset, false);
         }
+
+        if (this.isDisabled) {
+            this.tagInput.disable();
+        }
+
+        this.tagSubscription =
+            this.tagInput.valueChanges.pipe(
+                distinctUntilChanged(),
+                debounceTime(2000)
+            ).subscribe(tags => {
+                this.tagAsset(tags);
+            });
+    }
+
+    public ngOnDestroy() {
+        this.tagSubscription.unsubscribe();
     }
 
     public updateFile(files: FileList) {
@@ -121,17 +145,16 @@ export class AssetComponent implements OnInit {
     }
 
     public renameAsset() {
-        const value = this.renameForm.submit();
+        const value = this.renameForm.submit(this.asset);
 
         if (value) {
-            const requestDto = new UpdateAssetDto(value.name);
+            const requestDto = new RenameAssetDto(value.name);
 
             this.assetsService.putAsset(this.appsState.appName, this.asset.id, requestDto, this.asset.version)
                 .subscribe(dto => {
                     this.updateAsset(this.asset.rename(requestDto.fileName, this.authState.user!.token, dto.version), true);
 
-                    this.renameForm.submitCompleted();
-                    this.renameDialog.hide();
+                    this.renameCancel();
                 }, error => {
                     this.dialogs.notifyError(error);
 
@@ -140,9 +163,29 @@ export class AssetComponent implements OnInit {
         }
     }
 
-    public cancelRenameAsset() {
+    public tagAsset(tags: string[]) {
+        if (tags) {
+            const requestDto = new TagAssetDto(tags);
+
+            this.assetsService.putAsset(this.appsState.appName, this.asset.id, requestDto, this.asset.version)
+                .subscribe(dto => {
+                    this.updateAsset(this.asset.tag(tags, this.authState.user!.token, dto.version), true);
+                }, error => {
+                    this.dialogs.notifyError(error);
+                });
+        }
+    }
+
+    public renameStart() {
+        if (!this.isDisabled) {
+            this.renameForm.load(this.asset);
+            this.renaming = true;
+        }
+    }
+
+    public renameCancel() {
         this.renameForm.submitCompleted();
-        this.renameDialog.hide();
+        this.renaming = false;
     }
 
     private setProgress(progress = 0) {
@@ -162,14 +205,15 @@ export class AssetComponent implements OnInit {
     }
 
     private updateAsset(asset: AssetDto, emitEvent: boolean) {
-        this.renameForm.load({ name: asset.fileName });
         this.asset = asset;
         this.progress = 0;
+
+        this.tagInput.setValue(asset.tags);
 
         if (emitEvent) {
             this.emitUpdated(asset);
         }
 
-        this.cancelRenameAsset();
+        this.renameCancel();
     }
 }

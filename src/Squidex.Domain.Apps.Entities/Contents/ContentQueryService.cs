@@ -55,12 +55,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
             this.scriptEngine = scriptEngine;
         }
 
-        public Task ThrowIfSchemaNotExistsAsync(QueryContext context)
+        public Task ThrowIfSchemaNotExistsAsync(ContentQueryContext context)
         {
             return GetSchemaAsync(context);
         }
 
-        public async Task<IContentEntity> FindContentAsync(QueryContext context, Guid id, long version = -1)
+        public async Task<IContentEntity> FindContentAsync(ContentQueryContext context, Guid id, long version = -1)
         {
             Guard.NotNull(context, nameof(context));
 
@@ -70,53 +70,47 @@ namespace Squidex.Domain.Apps.Entities.Contents
             {
                 var isVersioned = version > EtagVersion.Empty;
 
-                var parsedStatus = context.IsFrontendClient ? StatusAll : StatusPublished;
+                var parsedStatus = context.Base.IsFrontendClient ? StatusAll : StatusPublished;
 
                 var content =
                     isVersioned ?
                     await FindContentByVersionAsync(id, version) :
-                    await FindContentAsync(context, id, parsedStatus, schema);
+                    await FindContentAsync(context.Base, id, parsedStatus, schema);
 
-                if (content == null || (content.Status != Status.Published && !context.IsFrontendClient) || content.SchemaId.Id != schema.Id)
+                if (content == null || (content.Status != Status.Published && !context.Base.IsFrontendClient) || content.SchemaId.Id != schema.Id)
                 {
                     throw new DomainObjectNotFoundException(id.ToString(), typeof(ISchemaEntity));
                 }
 
-                return Transform(context, schema, true, content);
+                return Transform(context.Base, schema, true, content);
             }
         }
 
-        public async Task<IResultList<IContentEntity>> QueryAsync(QueryContext context, string query)
+        public async Task<IResultList<IContentEntity>> QueryAsync(ContentQueryContext context, Query query)
         {
             Guard.NotNull(context, nameof(context));
 
             var schema = await GetSchemaAsync(context);
 
-            using (Profiler.TraceMethod<ContentQueryService>("QueryAsyncByQuery"))
+            using (Profiler.TraceMethod<ContentQueryService>())
             {
-                var parsedQuery = ParseQuery(context, query, schema);
-                var parsedStatus = ParseStatus(context);
+                var parsedStatus = ParseStatus(context.Base);
 
-                var contents = await contentRepository.QueryAsync(context.App, schema, parsedStatus, parsedQuery);
+                IResultList<IContentEntity> contents;
 
-                return Transform(context, schema, true, contents);
-            }
-        }
+                if (query.Ids?.Count > 0)
+                {
+                    contents = await contentRepository.QueryAsync(context.Base.App, schema, parsedStatus, new HashSet<Guid>(query.Ids));
+                    contents = Sort(contents, query.Ids);
+                }
+                else
+                {
+                    var parsedQuery = ParseQuery(context.Base, query.ODataQuery, schema);
 
-        public async Task<IResultList<IContentEntity>> QueryAsync(QueryContext context, IList<Guid> ids)
-        {
-            Guard.NotNull(context, nameof(context));
-            Guard.NotNull(ids, nameof(ids));
+                    contents = await contentRepository.QueryAsync(context.Base.App, schema, parsedStatus, parsedQuery);
+                }
 
-            var schema = await GetSchemaAsync(context);
-
-            using (Profiler.TraceMethod<ContentQueryService>("QueryAsyncByIds"))
-            {
-                var parsedStatus = ParseStatus(context);
-
-                var contents = await contentRepository.QueryAsync(context.App, schema, parsedStatus, new HashSet<Guid>(ids));
-
-                return Sort(Transform(context, schema, false, contents), ids);
+                return Transform(context.Base, schema, true, contents);
             }
         }
 
@@ -129,14 +123,14 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var transformed = Transform(context, schema, checkType, (IEnumerable<IContentEntity>)contents);
 
-            return ResultList.Create(transformed, contents.Total);
+            return ResultList.Create(contents.Total, transformed);
         }
 
         private IResultList<IContentEntity> Sort(IResultList<IContentEntity> contents, IList<Guid> ids)
         {
             var sorted = ids.Select(id => contents.FirstOrDefault(x => x.Id == id)).Where(x => x != null);
 
-            return ResultList.Create(sorted, contents.Total);
+            return ResultList.Create(contents.Total, sorted);
         }
 
         private IEnumerable<IContentEntity> Transform(QueryContext context, ISchemaEntity schema, bool checkType, IEnumerable<IContentEntity> contents)
@@ -218,18 +212,18 @@ namespace Squidex.Domain.Apps.Entities.Contents
             }
         }
 
-        public async Task<ISchemaEntity> GetSchemaAsync(QueryContext context)
+        public async Task<ISchemaEntity> GetSchemaAsync(ContentQueryContext context)
         {
             ISchemaEntity schema = null;
 
             if (Guid.TryParse(context.SchemaIdOrName, out var id))
             {
-                schema = await appProvider.GetSchemaAsync(context.App.Id, id);
+                schema = await appProvider.GetSchemaAsync(context.Base.App.Id, id);
             }
 
             if (schema == null)
             {
-                schema = await appProvider.GetSchemaAsync(context.App.Id, context.SchemaIdOrName);
+                schema = await appProvider.GetSchemaAsync(context.Base.App.Id, context.SchemaIdOrName);
             }
 
             if (schema == null)

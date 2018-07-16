@@ -5,6 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
+using System.Collections.Generic;
 using FakeItEasy;
 using Microsoft.OData.Edm;
 using MongoDB.Bson.Serialization;
@@ -12,6 +14,8 @@ using MongoDB.Driver;
 using Squidex.Domain.Apps.Entities.Assets.Edm;
 using Squidex.Domain.Apps.Entities.MongoDb.Assets;
 using Squidex.Domain.Apps.Entities.MongoDb.Assets.Visitors;
+using Squidex.Domain.Apps.Entities.Tags;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.MongoDb.OData;
 using Xunit;
@@ -20,13 +24,24 @@ namespace Squidex.Domain.Apps.Entities.Assets.OData
 {
     public class ODataQueryTests
     {
+        private readonly ITagService tagService = A.Fake<ITagService>();
         private readonly IBsonSerializerRegistry registry = BsonSerializer.SerializerRegistry;
         private readonly IBsonSerializer<MongoAssetEntity> serializer = BsonSerializer.SerializerRegistry.GetSerializer<MongoAssetEntity>();
         private readonly IEdmModel edmModel = EdmAssetModel.Edm;
+        private readonly Guid appId = Guid.NewGuid();
+        private readonly ConvertValue valueConverter;
 
         static ODataQueryTests()
         {
             InstantSerializer.Register();
+        }
+
+        public ODataQueryTests()
+        {
+            A.CallTo(() => tagService.GetTagIdsAsync(appId, TagGroups.Assets, A<HashSet<string>>.That.Contains("tag1")))
+                .Returns(HashSet.Of("normalized1"));
+
+            valueConverter = FindExtensions.CreateValueConverter(appId, tagService);
         }
 
         [Fact]
@@ -78,6 +93,24 @@ namespace Squidex.Domain.Apps.Entities.Assets.OData
         {
             var i = F("$filter=version eq 0");
             var o = C("{ 'Version' : NumberLong(0) }");
+
+            Assert.Equal(o, i);
+        }
+
+        [Fact]
+        public void Should_make_query_with_normalized_tags()
+        {
+            var i = F("$filter=tags eq 'tag1'");
+            var o = C("{ 'Tags' : 'normalized1' }");
+
+            Assert.Equal(o, i);
+        }
+
+        [Fact]
+        public void Should_make_query_with_tags()
+        {
+            var i = F("$filter=tags eq 'tag2'");
+            var o = C("{ 'Tags' : 'tag2' }");
 
             Assert.Equal(o, i);
         }
@@ -246,7 +279,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.OData
             var parser = edmModel.ParseQuery(value);
 
             var query =
-                parser.BuildFilter<MongoAssetEntity>()
+                parser.BuildFilter<MongoAssetEntity>(convertValue: valueConverter)
                     .Filter.Render(serializer, registry).ToString();
 
             return query;

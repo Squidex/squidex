@@ -13,7 +13,7 @@ namespace Squidex.Infrastructure.MongoDb.OData
 {
     public static class SortBuilder
     {
-        public static SortDefinition<T> BuildSort<T>(this ODataUriParser query, PropertyCalculator propertyCalculator = null)
+        public static SortDefinition<T> BuildSort<T>(this ODataUriParser query, ConvertProperty propertyCalculator = null)
         {
             var orderBy = query.ParseOrderBy();
 
@@ -41,9 +41,9 @@ namespace Squidex.Infrastructure.MongoDb.OData
             return null;
         }
 
-        public static SortDefinition<T> OrderBy<T>(OrderByClause clause, PropertyCalculator propertyCalculator = null)
+        public static SortDefinition<T> OrderBy<T>(OrderByClause clause, ConvertProperty propertyCalculator = null)
         {
-            var propertyName = clause.Expression.BuildFieldDefinition<T>(propertyCalculator);
+            var propertyName = clause.Expression.BuildFieldDefinition(propertyCalculator);
 
             if (clause.Direction == OrderByDirection.Ascending)
             {

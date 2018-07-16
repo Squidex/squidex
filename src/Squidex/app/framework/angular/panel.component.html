@@ -30,7 +30,7 @@
                 <ng-content select=[content]></ng-content>
             </div>
 
-            <div class="panel-sidebar" *ngIf="showSidebar">
+            <div class="panel-sidebar {{sidebarClass}}" *ngIf="showSidebar">
                 <ng-content select=[sidebar]></ng-content>
             </div>
         </div>

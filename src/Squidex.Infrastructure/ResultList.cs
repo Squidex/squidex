@@ -22,7 +22,12 @@ namespace Squidex.Infrastructure
             }
         }
 
-        public static IResultList<T> Create<T>(IEnumerable<T> items, long total)
+        public static IResultList<T> Create<T>(long total, IEnumerable<T> items)
+        {
+            return new Impl<T>(items, total);
+        }
+
+        public static IResultList<T> Create<T>(long total, params T[] items)
         {
             return new Impl<T>(items, total);
         }
