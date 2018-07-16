@@ -6,10 +6,11 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Areas.Api.Controllers.Assets.Models
 {
@@ -37,6 +38,12 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         /// </summary>
         [Required]
         public string MimeType { get; set; }
+
+        /// <summary>
+        /// The default tags.
+        /// </summary>
+        [Required]
+        public HashSet<string> Tags { get; set; }
 
         /// <summary>
         /// The size of the file in bytes.
@@ -68,7 +75,7 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         /// </summary>
         public long Version { get; set; }
 
-        public static AssetCreatedDto FromCommand(CreateAsset command, EntityCreatedResult<Guid> result)
+        public static AssetCreatedDto FromCommand(CreateAsset command, AssetCreatedResult result)
         {
             var response = new AssetCreatedDto
             {
@@ -81,6 +88,7 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
                 IsImage = command.ImageInfo != null,
                 PixelWidth = command.ImageInfo?.PixelWidth,
                 PixelHeight = command.ImageInfo?.PixelHeight,
+                Tags = result.Tags,
                 Version = result.Version
             };
 

@@ -318,7 +318,8 @@ describe('AssetsService', () => {
             mimeType: 'image/png',
             isImage: true,
             pixelWidth: 1024,
-            pixelHeight: 2048
+            pixelHeight: 2048,
+            tags: ['tag1', 'tag2']
         }, {
             headers: {
                 etag: '2'
@@ -339,7 +340,7 @@ describe('AssetsService', () => {
                 true,
                 1024,
                 2048,
-                [],
+                ['tag1', 'tag2'],
                 'http://service/p/api/assets/id1',
                 new Version('2')));
     }));

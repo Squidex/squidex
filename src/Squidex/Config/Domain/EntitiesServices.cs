@@ -21,6 +21,7 @@ using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Indexes;
 using Squidex.Domain.Apps.Entities.Apps.Templates;
 using Squidex.Domain.Apps.Entities.Assets;
+using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.Backup;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
@@ -84,6 +85,15 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<EdmModelBuilder>()
                 .AsSelf();
 
+            services.AddSingletonAs<GrainTagService>()
+                .As<ITagService>();
+
+            services.AddSingletonAs<FileTypeTagGenerator>()
+                .As<ITagGenerator<CreateAsset>>();
+
+            services.AddSingletonAs<ImageTagGenerator>()
+                .As<ITagGenerator<CreateAsset>>();
+
             services.AddSingletonAs<InMemoryCommandBus>()
                 .As<ICommandBus>();
 
@@ -107,9 +117,6 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<AssetCommandMiddleware>()
                 .As<ICommandMiddleware>();
-
-            services.AddSingletonAs<GrainTagService>()
-                .As<ITagService>();
 
             services.AddSingletonAs<GrainCommandMiddleware<AppCommand, IAppGrain>>()
                 .As<ICommandMiddleware>();

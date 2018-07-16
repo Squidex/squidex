@@ -232,7 +232,7 @@ export class AssetsService {
                             response.isImage,
                             response.pixelWidth,
                             response.pixelHeight,
-                            [],
+                            response.tags || [],
                             assetUrl,
                             new Version(event.headers.get('etag')!));
 

@@ -94,7 +94,11 @@ export class AssetsState extends State<Snapshot> {
             const assets = s.assets.pushFront(asset);
             const assetsPager = s.assetsPager.incrementCount();
 
-            return { ...s, assets, assetsPager };
+            const tags = { ...s.tags };
+
+            addTags(asset, tags);
+
+            return { ...s, assets, assetsPager, tags };
         });
     }
 
@@ -108,14 +112,7 @@ export class AssetsState extends State<Snapshot> {
                     const tags = { ...s.tags };
                     const tagsSelected = { ...s.tagsSelected };
 
-                    for (let tag of asset.tags) {
-                        if (tags[tag] === 1) {
-                            delete tags[tag];
-                            delete tagsSelected[tag];
-                        } else {
-                            tags[tag]--;
-                        }
-                    }
+                    removeTags(asset, tags, tagsSelected);
 
                     return { ...s, assets, assetsPager, tags, tagsSelected };
                 });
@@ -131,24 +128,11 @@ export class AssetsState extends State<Snapshot> {
             const tagsSelected = { ...s.tagsSelected };
 
             if (previous) {
-                for (let tag of previous.tags) {
-                    if (tags[tag] === 1) {
-                        delete tags[tag];
-                        delete tagsSelected[tag];
-                    } else {
-                        tags[tag]--;
-                    }
-                }
+                removeTags(previous, tags, tagsSelected);
             }
 
             if (asset) {
-                for (let tag of asset.tags) {
-                    if (tags[tag]) {
-                        tags[tag]++;
-                    } else {
-                        tags[tag] = 1;
-                    }
-                }
+                addTags(asset, tags);
             }
 
             const assets = s.assets.replaceBy('id', asset);
@@ -207,6 +191,27 @@ export class AssetsState extends State<Snapshot> {
 
     private get appName() {
         return this.appsState.appName;
+    }
+}
+
+function addTags(asset: AssetDto, tags: { [x: string]: number; }) {
+    for (let tag of asset.tags) {
+        if (tags[tag]) {
+            tags[tag]++;
+        } else {
+            tags[tag] = 1;
+        }
+    }
+}
+
+function removeTags(previous: AssetDto, tags: { [x: string]: number; }, tagsSelected: { [x: string]: boolean; }) {
+    for (let tag of previous.tags) {
+        if (tags[tag] === 1) {
+            delete tags[tag];
+            delete tagsSelected[tag];
+        } else {
+            tags[tag]--;
+        }
     }
 }
 

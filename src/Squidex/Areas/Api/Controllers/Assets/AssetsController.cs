@@ -169,7 +169,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
             var command = new CreateAsset { File = assetFile };
             var context = await CommandBus.PublishAsync(command);
 
-            var result = context.Result<EntityCreatedResult<Guid>>();
+            var result = context.Result<AssetCreatedResult>();
             var response = AssetCreatedDto.FromCommand(command, result);
 
             return StatusCode(201, response);
