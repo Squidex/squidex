@@ -182,7 +182,7 @@ export class AssetsState extends State<Snapshot> {
     }
 
     public isTagSelected(tag: string) {
-        return this.snapshot.tagsSelected[tag] === true;
+        return this.snapshot.tagsSelected[tag];
     }
 
     public isTagSelectionEmpty() {

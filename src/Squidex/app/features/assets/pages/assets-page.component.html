@@ -34,7 +34,7 @@
         <div class="section">
             <h3>Tags</h3>
     
-            <a class="row tag" *ngFor="let tag of assetsState.tags | async" (click)="toggleTag(tag.name)" [class.active]="assetsState.isTagSelected(tag)">
+            <a class="row tag" *ngFor="let tag of assetsState.tags | async" (click)="toggleTag(tag.name)" [class.active]="assetsState.isTagSelected(tag.name)">
                 <div class="col">
                     {{tag.name}}
                 </div>
