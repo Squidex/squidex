@@ -32,9 +32,10 @@ Current Version 1.8.0. Roadmap: https://trello.com/b/KakM4F3S/squidex-roadmap
 
 ### Contributors
 
-* [pushrbx](https://pushrbx.net/): Azure Store Support.
+* [pushrbx](https://pushrbx.net/): Azure Store support.
 * [cpmstars](https://www.cpmstars.com): Asset support for rich editor.
 * [civicplus](https://www.civicplus.com/) ([Avd6977](https://github.com/Avd6977), [dsbegnoce](https://github.com/dsbegnoche)): Google Maps support, custom regex patterns and a lot of small improvements.
+* [razims](https://github.com/razims): GridFS support.
 
 ## Contributing
 

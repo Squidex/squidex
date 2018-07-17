@@ -59,7 +59,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 var attachmentPath = $"attachments/{attachmentFolder}/{writtenEvents}.blob";
                 var attachmentEntry = archive.GetEntry(attachmentPath) ?? archive.CreateEntry(attachmentPath);
 
-                using (var stream = eventEntry.Open())
+                using (var stream = attachmentEntry.Open())
                 {
                     await attachment(stream);
                 }

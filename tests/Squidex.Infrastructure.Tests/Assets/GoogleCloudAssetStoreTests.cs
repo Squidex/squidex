@@ -8,6 +8,8 @@
 using System;
 using Xunit;
 
+#pragma warning disable xUnit1000 // Test classes must be public
+
 namespace Squidex.Infrastructure.Assets
 {
     internal class GoogleCloudAssetStoreTests : AssetStoreTests<GoogleCloudAssetStore>
@@ -21,7 +23,7 @@ namespace Squidex.Infrastructure.Assets
         {
         }
 
-        // [Fact]
+        [Fact]
         public void Should_calculate_source_url()
         {
             Sut.Initialize();

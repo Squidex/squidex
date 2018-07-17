@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Assets;
-using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL

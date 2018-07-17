@@ -6,11 +6,9 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Infrastructure;
 using Xunit;
 

@@ -31,7 +31,7 @@ namespace Squidex.Infrastructure.Assets
         public abstract void Dispose();
 
         [Fact]
-        public Task Should_throw_exception_if_asset_to_download_is_not_found()
+        public virtual Task Should_throw_exception_if_asset_to_download_is_not_found()
         {
             ((IInitializable)Sut).Initialize();
 
@@ -64,7 +64,7 @@ namespace Squidex.Infrastructure.Assets
         }
 
         [Fact]
-        public async Task Should_commit_temporary_file()
+        public virtual async Task Should_commit_temporary_file()
         {
             ((IInitializable)Sut).Initialize();
 
@@ -111,7 +111,7 @@ namespace Squidex.Infrastructure.Assets
             await Sut.DeleteAsync(tempId, 0, null);
         }
 
-        private static string Id()
+        protected static string Id()
         {
             return Guid.NewGuid().ToString();
         }

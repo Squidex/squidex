@@ -7,7 +7,6 @@
 
 using System.Linq;
 using Microsoft.OData.UriParser;
-using MongoDB.Driver;
 
 namespace Squidex.Infrastructure.MongoDb.OData
 {
