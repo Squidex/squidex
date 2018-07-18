@@ -10,7 +10,7 @@ import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR } from '@angular/f
 
 import { Types } from '@app/framework/internal';
 
-const KEY_SPACE = 32;
+const KEY_COMMA = 188;
 const KEY_DELETE = 8;
 const KEY_ENTER = 13;
 
@@ -171,7 +171,7 @@ export class TagEditorComponent implements ControlValueAccessor {
     }
 
     public onKeyDown(event: KeyboardEvent) {
-        if (event.keyCode === KEY_SPACE || (event.keyCode === KEY_ENTER && this.acceptEnter)) {
+        if (event.keyCode === KEY_COMMA || (event.keyCode === KEY_ENTER && this.acceptEnter)) {
             const value = <string>this.addInput.value;
 
             if (value && this.converter.isValidInput(value)) {
