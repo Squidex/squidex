@@ -68,5 +68,13 @@ namespace Squidex.Infrastructure.States
                 await Collection.Find(new BsonDocument()).ForEachAsync(x => callback(x.Doc, x.Version));
             }
         }
+
+        public async Task RemoveAsync(TKey key)
+        {
+            using (Profiler.TraceMethod<MongoSnapshotStore<T, TKey>>())
+            {
+                await Collection.DeleteOneAsync(x => x.Id.Equals(key));
+            }
+        }
     }
 }

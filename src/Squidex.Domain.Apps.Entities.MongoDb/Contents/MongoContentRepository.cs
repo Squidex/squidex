@@ -99,6 +99,14 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
         }
 
+        public async Task<IReadOnlyList<Guid>> QueryIdsAsync(Guid appId)
+        {
+            using (Profiler.TraceMethod<MongoContentRepository>())
+            {
+                return await contentsDraft.QueryIdsAsync(appId);
+            }
+        }
+
         public async Task QueryScheduledWithoutDataAsync(Instant now, Func<IContentEntity, Task> callback)
         {
             using (Profiler.TraceMethod<MongoContentRepository>())

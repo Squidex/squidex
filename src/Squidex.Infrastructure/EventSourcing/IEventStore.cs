@@ -26,6 +26,10 @@ namespace Squidex.Infrastructure.EventSourcing
 
         Task AppendAsync(Guid commitId, string streamName, long expectedVersion, ICollection<EventData> events);
 
+        Task DeleteStreamAsync(string streamName);
+
+        Task DeleteManyAsync(string property, object value);
+
         IEventSubscription CreateSubscription(IEventSubscriber subscriber, string streamFilter, string position = null);
     }
 }

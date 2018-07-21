@@ -76,5 +76,10 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         {
             return Task.FromResult(state.Schemas.Values.ToList());
         }
+
+        public Task ClearAsync()
+        {
+            return persistence.DeleteAsync();
+        }
     }
 }

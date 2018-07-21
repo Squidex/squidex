@@ -118,6 +118,11 @@ namespace Squidex.Infrastructure.EventSourcing
             }
         }
 
+        public Task DeleteStreamAsync(string streamName)
+        {
+            return connection.DeleteStreamAsync(streamName, ExpectedVersion.Any);
+        }
+
         public Task AppendAsync(Guid commitId, string streamName, ICollection<EventData> events)
         {
             return AppendEventsInternalAsync(streamName, EtagVersion.Any, events);
@@ -161,6 +166,11 @@ namespace Squidex.Infrastructure.EventSourcing
                     }
                 }
             }
+        }
+
+        public Task DeleteManyAsync(string property, object value)
+        {
+            throw new NotSupportedException();
         }
 
         private string GetStreamName(string streamName)

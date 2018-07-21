@@ -18,6 +18,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
         Task RemoveSchemaAsync(Guid schemaId);
 
+        Task ClearAsync();
+
         Task RebuildAsync(Dictionary<string, Guid> schemas);
 
         Task<Guid> GetSchemaIdAsync(string name);

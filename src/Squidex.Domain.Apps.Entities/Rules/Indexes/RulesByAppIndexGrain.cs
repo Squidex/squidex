@@ -69,5 +69,10 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
         {
             return Task.FromResult(state.Rules.ToList());
         }
+
+        public Task ClearAsync()
+        {
+            return persistence.DeleteAsync();
+        }
     }
 }

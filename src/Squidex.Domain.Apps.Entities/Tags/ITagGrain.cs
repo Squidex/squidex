@@ -20,5 +20,7 @@ namespace Squidex.Domain.Apps.Entities.Tags
         Task<Dictionary<string, string>> DenormalizeTagsAsync(HashSet<string> ids);
 
         Task<Dictionary<string, int>> GetTagsAsync();
+
+        Task ClearAsync();
     }
 }

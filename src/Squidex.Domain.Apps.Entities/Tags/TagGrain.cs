@@ -147,5 +147,10 @@ namespace Squidex.Domain.Apps.Entities.Tags
         {
             return Task.FromResult(state.Tags.Values.ToDictionary(x => x.Name, x => x.Count));
         }
+
+        public Task ClearAsync()
+        {
+            return persistence.DeleteAsync();
+        }
     }
 }
