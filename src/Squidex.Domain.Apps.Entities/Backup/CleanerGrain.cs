@@ -126,14 +126,14 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             foreach (var ruleId in ruleIds)
             {
-                await store.ClearSnapshotAsync<RuleState>(ruleId);
+                await store.RemoveSnapshotAsync<RuleState>(ruleId);
             }
 
             var schemaIds = await grainFactory.GetGrain<ISchemasByAppIndex>(appId).GetSchemaIdsAsync();
 
             foreach (var schemaId in schemaIds)
             {
-                await store.ClearSnapshotAsync<SchemaState>(schemaId);
+                await store.RemoveSnapshotAsync<SchemaState>(schemaId);
             }
 
             foreach (var storage in storages)
@@ -141,12 +141,12 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 await storage.ClearAsync(appId);
             }
 
-            await store.ClearSnapshotAsync<AppState>(appId);
+            await store.RemoveSnapshotAsync<AppState>(appId);
         }
 
         private async Task DeleteAsync<TState>(Guid id)
         {
-            await store.ClearSnapshotAsync<TState>(id);
+            await store.RemoveSnapshotAsync<TState>(id);
         }
     }
 }

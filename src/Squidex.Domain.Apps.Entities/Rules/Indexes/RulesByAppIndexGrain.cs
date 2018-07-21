@@ -65,16 +65,16 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
             return persistence.WriteSnapshotAsync(state);
         }
 
-        public Task<List<Guid>> GetRuleIdsAsync()
-        {
-            return Task.FromResult(state.Rules.ToList());
-        }
-
         public Task ClearAsync()
         {
             state = new State();
 
             return persistence.DeleteAsync();
+        }
+
+        public Task<List<Guid>> GetRuleIdsAsync()
+        {
+            return Task.FromResult(state.Rules.ToList());
         }
     }
 }

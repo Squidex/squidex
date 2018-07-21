@@ -72,16 +72,16 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             return Task.FromResult(schemaId);
         }
 
-        public Task<List<Guid>> GetSchemaIdsAsync()
-        {
-            return Task.FromResult(state.Schemas.Values.ToList());
-        }
-
         public Task ClearAsync()
         {
             state = new State();
 
             return persistence.DeleteAsync();
+        }
+
+        public Task<List<Guid>> GetSchemaIdsAsync()
+        {
+            return Task.FromResult(state.Schemas.Values.ToList());
         }
     }
 }

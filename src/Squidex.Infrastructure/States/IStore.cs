@@ -23,6 +23,6 @@ namespace Squidex.Infrastructure.States
 
         Task ClearSnapshotsAsync<TState>();
 
-        Task ClearSnapshotAsync<TState>(TKey key);
+        Task RemoveSnapshotAsync<TState>(TKey key);
     }
 }
