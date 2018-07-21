@@ -54,6 +54,9 @@ export class AssetComponent implements OnDestroy, OnInit {
     @Input()
     public isSelectable = false;
 
+    @Input()
+    public allTags: string[];
+
     @Output()
     public loaded = new EventEmitter<AssetDto>();
 

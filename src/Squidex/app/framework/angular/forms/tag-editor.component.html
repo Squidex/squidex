@@ -1,18 +1,30 @@
-<div class="form-control {{class}}" (click)="input.focus()" [class.focus]="hasFocus" [class.disabled]="addInput.disabled">
-    <span class="item" *ngFor="let item of items; let i = index" [class.disabled]="addInput.disabled">
-        {{item}} <i class="icon-close" (click)="remove(i)"></i>
-    </span>
+<ng-container>
+    <div class="form-control {{class}}" #form (click)="input.focus()" [class.focus]="hasFocus" [class.disabled]="addInput.disabled">
+        <span class="item" *ngFor="let item of items; let i = index" [class.disabled]="addInput.disabled">
+            {{item}} <i class="icon-close" (click)="remove(i)"></i>
+        </span>
 
-    <input type="text" class="blank" #input
-        (blur)="markTouched()"
-        (focus)="focus()"
-        (input)="adjustSize()"
-        (keydown)="onKeyDown($event)"
-        [formControl]="addInput"
-        [attr.name]="inputName"
-        [attr.placeholder]="placeholder"
-        [class.hidden]="addInput.disabled"
-        autocomplete="off" 
-        autocorrect="off"
-        autocapitalize="off">   
-</div>
+        <input type="text" class="blank" #input
+            (blur)="markTouched()"
+            (focus)="focus()"
+            (keydown)="onKeyDown($event)"
+            [formControl]="addInput"
+            [attr.name]="inputName"
+            [attr.placeholder]="placeholder"
+            [class.hidden]="addInput.disabled"
+            autocomplete="off" 
+            autocorrect="off"
+            autocapitalize="off">
+    </div>
+
+    <div *ngIf="suggestedItems.length > 0" [sqxModalTarget]="form" class="control-dropdown" #container position="bottomLeft">
+        <div *ngFor="let item of suggestedItems; let i = index;" class="control-dropdown-item control-dropdown-item-selectable"
+            [class.active]="i === suggestedIndex"
+            [container]="container"
+            (mousedown)="selectValue(item)" 
+            (mouseover)="selectIndex(i)"
+            [sqxScrollActive]="i === suggestedIndex">
+            <ng-container>{{item}}</ng-container>
+        </div>
+    </div>
+</ng-container>

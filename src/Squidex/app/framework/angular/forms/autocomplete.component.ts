@@ -49,9 +49,8 @@ export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, O
     @ContentChild(TemplateRef)
     public itemTemplate: TemplateRef<any>;
 
-    public items: any[] = [];
-
-    public selectedIndex = -1;
+    public suggestedItems: any[] = [];
+    public suggestedIndex = -1;
 
     public queryInput = new FormControl();
 
@@ -72,14 +71,13 @@ export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, O
                             this.reset();
                         }
                     }),
-                    distinctUntilChanged(),
                     debounceTime(200),
+                    distinctUntilChanged(),
                     filter(query => !!query && !!this.source),
-                    switchMap(query => this.source.find(query)),
-                    catchError(error => of([])))
+                    switchMap(query => this.source.find(query)), catchError(() => of([])))
                 .subscribe(items => {
-                    this.reset();
-                    this.items = items || [];
+                    this.suggestedIndex = -1;
+                    this.suggestedItems = items || [];
                 });
     }
 
@@ -96,7 +94,7 @@ export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, O
                 this.reset();
                 return false;
             case KEY_ENTER:
-                if (this.items.length > 0) {
+                if (this.suggestedItems.length > 0) {
                     this.selectItem();
                     return false;
                 }
@@ -110,7 +108,7 @@ export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, O
         if (!obj) {
             this.resetForm();
         } else {
-            const item = this.items.find(i => i === obj);
+            const item = this.suggestedItems.find(i => i === obj);
 
             if (item) {
                 this.queryInput.setValue(obj.title || '');
@@ -144,11 +142,11 @@ export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, O
 
     public selectItem(selection: any | null = null) {
         if (!selection) {
-            selection = this.items[this.selectedIndex];
+            selection = this.suggestedItems[this.suggestedIndex];
         }
 
-        if (!selection && this.items.length === 1) {
-            selection = this.items[0];
+        if (!selection && this.suggestedItems.length === 1) {
+            selection = this.suggestedItems[0];
         }
 
         if (selection) {
@@ -170,19 +168,19 @@ export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, O
             selection = 0;
         }
 
-        if (selection >= this.items.length) {
-            selection = this.items.length - 1;
+        if (selection >= this.suggestedItems.length) {
+            selection = this.suggestedItems.length - 1;
         }
 
-        this.selectedIndex = selection;
+        this.suggestedIndex = selection;
     }
 
     private up() {
-        this.selectIndex(this.selectedIndex - 1);
+        this.selectIndex(this.suggestedIndex - 1);
     }
 
     private down() {
-        this.selectIndex(this.selectedIndex + 1);
+        this.selectIndex(this.suggestedIndex + 1);
     }
 
     private resetForm() {
@@ -190,7 +188,7 @@ export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, O
     }
 
     private reset() {
-        this.items = [];
-        this.selectedIndex = -1;
+        this.suggestedItems = [];
+        this.suggestedIndex = -1;
     }
 }
