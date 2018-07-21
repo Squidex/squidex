@@ -16,7 +16,7 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 {
-    public sealed class AppsByNameIndexCommandMiddlewareTests
+    public class AppsByNameIndexCommandMiddlewareTests
     {
         private readonly IGrainFactory grainFactory = A.Fake<IGrainFactory>();
         private readonly ICommandBus commandBus = A.Fake<ICommandBus>();

@@ -17,7 +17,7 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Rules.Indexes
 {
-    public sealed class RulesByAppIndexCommandMiddlewareTests
+    public class RulesByAppIndexCommandMiddlewareTests
     {
         private readonly IGrainFactory grainFactory = A.Fake<IGrainFactory>();
         private readonly ICommandBus commandBus = A.Fake<ICommandBus>();
@@ -38,7 +38,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
         public async Task Should_add_rule_to_index_on_create()
         {
             var context =
-                new CommandContext(new CreateRule { RuleId = appId, AppId = NamedId.Of(appId, "my-app") }, commandBus)
+                new CommandContext(new CreateRule { RuleId = appId, AppId = BuildAppId() }, commandBus)
                     .Complete();
 
             await sut.HandleAsync(context);
@@ -60,7 +60,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
                 .Returns(J.AsTask(ruleState));
 
             A.CallTo(() => ruleState.AppId)
-                .Returns(NamedId.Of(appId, "my-app"));
+                .Returns(BuildAppId());
 
             var context =
                 new CommandContext(new DeleteRule { RuleId = appId }, commandBus)
@@ -70,6 +70,11 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
 
             A.CallTo(() => index.RemoveRuleAsync(appId))
                 .MustHaveHappened();
+        }
+
+        private NamedId<Guid> BuildAppId()
+        {
+            return NamedId.Of(appId, "my-app");
         }
     }
 }

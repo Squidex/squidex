@@ -15,7 +15,7 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 {
-    public sealed class AppsByUserIndexGrainTests
+    public class AppsByUserIndexGrainTests
     {
         private readonly IStore<string> store = A.Fake<IStore<string>>();
         private readonly IPersistence<AppsByUserIndexGrain.State> persistence = A.Fake<IPersistence<AppsByUserIndexGrain.State>>();

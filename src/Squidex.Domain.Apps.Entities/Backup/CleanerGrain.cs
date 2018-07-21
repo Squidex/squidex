@@ -25,7 +25,7 @@ using Squidex.Infrastructure.States;
 namespace Squidex.Domain.Apps.Entities.Backup
 {
     [Reentrant]
-    public sealed class CleanerGrain : GrainOfGuid, IRemindable
+    public sealed class CleanerGrain : GrainOfString, IRemindable, IBackgroundGrain
     {
         private readonly IGrainFactory grainFactory;
         private readonly IStore<Guid> store;
@@ -58,11 +58,11 @@ namespace Squidex.Domain.Apps.Entities.Backup
             this.eventStore = eventStore;
         }
 
-        public async override Task OnActivateAsync(Guid key)
+        public async override Task OnActivateAsync(string key)
         {
             await RegisterOrUpdateReminder("Default", TimeSpan.Zero, TimeSpan.FromMinutes(10));
 
-            persistence = store.WithSnapshots<CleanerGrain, State, Guid>(key, s =>
+            persistence = store.WithSnapshots<CleanerGrain, State, Guid>(Guid.Empty, s =>
             {
                 state = s;
             });
@@ -70,6 +70,11 @@ namespace Squidex.Domain.Apps.Entities.Backup
             await persistence.ReadAsync();
 
             await CleanAsync();
+        }
+
+        public Task ActivateAsync()
+        {
+            return CleanAsync();
         }
 
         public Task ReceiveReminder(string reminderName, TickStatus status)
@@ -136,7 +141,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 await storage.ClearAsync(appId);
             }
 
-            await store.ClearSnapshotAsync<AppState>(appId;
+            await store.ClearSnapshotAsync<AppState>(appId);
         }
 
         private async Task DeleteAsync<TState>(Guid id)

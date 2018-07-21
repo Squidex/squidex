@@ -72,6 +72,8 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
 
         public Task ClearAsync()
         {
+            state = new State();
+
             return persistence.DeleteAsync();
         }
     }
