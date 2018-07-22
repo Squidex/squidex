@@ -25,7 +25,7 @@ using Squidex.Infrastructure.States;
 namespace Squidex.Domain.Apps.Entities.Backup
 {
     [Reentrant]
-    public sealed class CleanerGrain : GrainOfString, IRemindable, IBackgroundGrain
+    public sealed class CleanerGrain : GrainOfString, IRemindable, ICleanerGrain
     {
         private readonly IGrainFactory grainFactory;
         private readonly IStore<Guid> store;
@@ -70,6 +70,13 @@ namespace Squidex.Domain.Apps.Entities.Backup
             await persistence.ReadAsync();
 
             await CleanAsync();
+        }
+
+        public Task EnqueueAppAsync(Guid appId)
+        {
+            state.Apps.Add(appId);
+
+            return persistence.WriteSnapshotAsync(state);
         }
 
         public Task ActivateAsync()

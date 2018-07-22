@@ -44,6 +44,13 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             return persistence.ReadAsync();
         }
 
+        public Task ClearAsync()
+        {
+            state = new State();
+
+            return persistence.DeleteAsync();
+        }
+
         public Task RebuildAsync(Dictionary<string, Guid> schemas)
         {
             state = new State { Schemas = schemas };
@@ -70,13 +77,6 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             state.Schemas.TryGetValue(name, out var schemaId);
 
             return Task.FromResult(schemaId);
-        }
-
-        public Task ClearAsync()
-        {
-            state = new State();
-
-            return persistence.DeleteAsync();
         }
 
         public Task<List<Guid>> GetSchemaIdsAsync()

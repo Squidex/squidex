@@ -13,7 +13,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Tags
 {
-    public sealed class GrainTagService : ITagService
+    public sealed class GrainTagService : ITagService, IAppStorage
     {
         private readonly IGrainFactory grainFactory;
 
@@ -24,31 +24,36 @@ namespace Squidex.Domain.Apps.Entities.Tags
             this.grainFactory = grainFactory;
         }
 
-        public Task<HashSet<string>> NormalizeTagsAsync(Guid appId, string category, HashSet<string> names, HashSet<string> ids)
+        public Task<HashSet<string>> NormalizeTagsAsync(Guid appId, string group, HashSet<string> names, HashSet<string> ids)
         {
-            return GetGrain(appId, category).NormalizeTagsAsync(names, ids);
+            return GetGrain(appId, group).NormalizeTagsAsync(names, ids);
         }
 
-        public Task<HashSet<string>> GetTagIdsAsync(Guid appId, string category, HashSet<string> names)
+        public Task<HashSet<string>> GetTagIdsAsync(Guid appId, string group, HashSet<string> names)
         {
-            return GetGrain(appId, category).GetTagIdsAsync(names);
+            return GetGrain(appId, group).GetTagIdsAsync(names);
         }
 
-        public Task<Dictionary<string, string>> DenormalizeTagsAsync(Guid appId, string category, HashSet<string> ids)
+        public Task<Dictionary<string, string>> DenormalizeTagsAsync(Guid appId, string group, HashSet<string> ids)
         {
-            return GetGrain(appId, category).DenormalizeTagsAsync(ids);
+            return GetGrain(appId, group).DenormalizeTagsAsync(ids);
         }
 
-        public Task<Dictionary<string, int>> GetTagsAsync(Guid appId, string category)
+        public Task<Dictionary<string, int>> GetTagsAsync(Guid appId, string group)
         {
-            return GetGrain(appId, category).GetTagsAsync();
+            return GetGrain(appId, group).GetTagsAsync();
         }
 
-        private ITagGrain GetGrain(Guid appId, string category)
+        public Task ClearAsync(Guid appId)
         {
-            Guard.NotNullOrEmpty(category, nameof(category));
+            return GetGrain(appId, TagGroups.Assets).ClearAsync();
+        }
 
-            return grainFactory.GetGrain<ITagGrain>($"{appId}_{category}");
+        private ITagGrain GetGrain(Guid appId, string group)
+        {
+            Guard.NotNullOrEmpty(group, nameof(group));
+
+            return grainFactory.GetGrain<ITagGrain>($"{appId}_{group}");
         }
     }
 }

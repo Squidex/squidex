@@ -31,6 +31,21 @@ namespace Squidex.Domain.Apps.Entities.Tags
         }
 
         [Fact]
+        public async Task Should_delete_and_reset_state_when_cleaning()
+        {
+            await sut.NormalizeTagsAsync(HashSet.Of("tag1", "tag2"), null);
+            await sut.NormalizeTagsAsync(HashSet.Of("tag2", "tag3"), null);
+            await sut.ClearAsync();
+
+            var allTags = await sut.GetTagsAsync();
+
+            Assert.Empty(allTags);
+
+            A.CallTo(() => persistence.DeleteAsync())
+                .MustHaveHappened();
+        }
+
+        [Fact]
         public async Task Should_add_tags_to_grain()
         {
             var result1 = await sut.NormalizeTagsAsync(HashSet.Of("tag1", "tag2"), null);
