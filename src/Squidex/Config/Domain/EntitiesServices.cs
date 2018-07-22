@@ -52,8 +52,7 @@ namespace Squidex.Config.Domain
                     c.GetRequiredService<IOptions<MyUrlsOptions>>(),
                     c.GetRequiredService<IAssetStore>(),
                     exposeSourceUrl))
-                .As<IGraphQLUrlGenerator>()
-                .As<IRuleUrlGenerator>();
+                .As<IGraphQLUrlGenerator>().As<IRuleUrlGenerator>();
 
             services.AddSingletonAs<CachingGraphQLService>()
                 .As<IGraphQLService>();
@@ -86,7 +85,7 @@ namespace Squidex.Config.Domain
                 .AsSelf();
 
             services.AddSingletonAs<GrainTagService>()
-                .As<ITagService>().As<IAppStorage>();
+                .As<ITagService>().As<ICleanableAppStorage>();
 
             services.AddSingletonAs<FileTypeTagGenerator>()
                 .As<ITagGenerator<CreateAsset>>();
@@ -94,11 +93,14 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<ImageTagGenerator>()
                 .As<ITagGenerator<CreateAsset>>();
 
-            services.AddSingletonAs<RuleIndexCleaner>()
-                .As<IAppStorage>();
+            services.AddSingletonAs<AppGrainCleaner<IBackupGrain>>()
+                .As<ICleanableAppStorage>();
 
-            services.AddSingletonAs<SchemaIndexCleaner>()
-                .As<IAppStorage>();
+            services.AddSingletonAs<AppGrainCleaner<IRulesByAppIndex>>()
+                .As<ICleanableAppStorage>();
+
+            services.AddSingletonAs<AppGrainCleaner<ISchemasByAppIndex>>()
+                .As<ICleanableAppStorage>();
 
             services.AddSingletonAs<JintScriptEngine>()
                 .As<IScriptEngine>();

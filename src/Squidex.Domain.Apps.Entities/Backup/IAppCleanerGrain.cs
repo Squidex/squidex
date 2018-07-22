@@ -7,11 +7,12 @@
 
 using System;
 using System.Threading.Tasks;
+using Squidex.Infrastructure.Orleans;
 
-namespace Squidex.Domain.Apps.Entities
+namespace Squidex.Domain.Apps.Entities.Backup
 {
-    public interface IAppStorage
+    public interface IAppCleanerGrain : IBackgroundGrain
     {
-        Task ClearAsync(Guid appId);
+        Task EnqueueAppAsync(Guid appId);
     }
 }

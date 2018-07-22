@@ -8,12 +8,11 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Orleans;
 using Squidex.Infrastructure.Orleans;
 
 namespace Squidex.Domain.Apps.Entities.Backup
 {
-    public interface IBackupGrain : IGrainWithGuidKey
+    public interface IBackupGrain : ICleanableAppGrain
     {
         Task RunAsync();
 

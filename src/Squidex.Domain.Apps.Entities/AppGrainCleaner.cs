@@ -10,13 +10,13 @@ using System.Threading.Tasks;
 using Orleans;
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Rules.Indexes
+namespace Squidex.Domain.Apps.Entities
 {
-    public sealed class RuleIndexCleaner : IAppStorage
+    public sealed class AppGrainCleaner<T> : ICleanableAppStorage where T : ICleanableAppGrain
     {
         private readonly IGrainFactory grainFactory;
 
-        public RuleIndexCleaner(IGrainFactory grainFactory)
+        public AppGrainCleaner(IGrainFactory grainFactory)
         {
             Guard.NotNull(grainFactory, nameof(grainFactory));
 
@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
 
         public Task ClearAsync(Guid appId)
         {
-            return grainFactory.GetGrain<IRulesByAppIndex>(appId).ClearAsync();
+            return grainFactory.GetGrain<T>(appId).ClearAsync();
         }
     }
 }

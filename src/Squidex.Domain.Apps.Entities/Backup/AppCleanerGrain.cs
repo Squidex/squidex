@@ -21,16 +21,17 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.States;
+using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.Backup
 {
     [Reentrant]
-    public sealed class CleanerGrain : GrainOfString, IRemindable, ICleanerGrain
+    public sealed class AppCleanerGrain : GrainOfString, IRemindable, IAppCleanerGrain
     {
         private readonly IGrainFactory grainFactory;
         private readonly IStore<Guid> store;
         private readonly IEventStore eventStore;
-        private readonly IEnumerable<IAppStorage> storages;
+        private readonly IEnumerable<ICleanableAppStorage> storages;
         private IPersistence<State> persistence;
         private bool isCleaning;
         private State state = new State();
@@ -43,7 +44,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             public HashSet<Guid> PendingApps { get; set; } = new HashSet<Guid>();
         }
 
-        public CleanerGrain(IGrainFactory grainFactory, IEventStore eventStore, IStore<Guid> store, IEnumerable<IAppStorage> storages)
+        public AppCleanerGrain(IGrainFactory grainFactory, IEventStore eventStore, IStore<Guid> store, IEnumerable<ICleanableAppStorage> storages)
         {
             Guard.NotNull(grainFactory, nameof(grainFactory));
             Guard.NotNull(store, nameof(store));
@@ -60,9 +61,9 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         public async override Task OnActivateAsync(string key)
         {
-            await RegisterOrUpdateReminder("Default", TimeSpan.Zero, TimeSpan.FromMinutes(10));
+            await RegisterOrUpdateReminder("Default", TimeSpan.Zero, TimeSpan.FromMinutes(2));
 
-            persistence = store.WithSnapshots<CleanerGrain, State, Guid>(Guid.Empty, s =>
+            persistence = store.WithSnapshots<AppCleanerGrain, State, Guid>(Guid.Empty, s =>
             {
                 state = s;
             });
@@ -81,12 +82,16 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         public Task ActivateAsync()
         {
-            return CleanAsync();
+            CleanAsync().Forget();
+
+            return TaskHelper.Done;
         }
 
         public Task ReceiveReminder(string reminderName, TickStatus status)
         {
-            return CleanAsync();
+            CleanAsync().Forget();
+
+            return TaskHelper.Done;
         }
 
         private async Task CleanAsync()

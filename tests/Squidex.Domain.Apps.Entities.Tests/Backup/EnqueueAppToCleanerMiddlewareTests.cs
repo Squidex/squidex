@@ -20,13 +20,13 @@ namespace Squidex.Domain.Apps.Entities.Backup
     {
         private readonly IGrainFactory grainFactory = A.Fake<IGrainFactory>();
         private readonly ICommandBus commandBus = A.Fake<ICommandBus>();
-        private readonly ICleanerGrain index = A.Fake<ICleanerGrain>();
+        private readonly IAppCleanerGrain index = A.Fake<IAppCleanerGrain>();
         private readonly Guid appId = Guid.NewGuid();
         private readonly EnqueueAppToCleanerMiddleware sut;
 
         public EnqueueAppToCleanerMiddlewareTests()
         {
-            A.CallTo(() => grainFactory.GetGrain<ICleanerGrain>(SingleGrain.Id, null))
+            A.CallTo(() => grainFactory.GetGrain<IAppCleanerGrain>(SingleGrain.Id, null))
                 .Returns(index);
 
             sut = new EnqueueAppToCleanerMiddleware(grainFactory);

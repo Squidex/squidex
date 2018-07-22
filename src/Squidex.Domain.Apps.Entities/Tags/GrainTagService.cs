@@ -13,7 +13,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Tags
 {
-    public sealed class GrainTagService : ITagService, IAppStorage
+    public sealed class GrainTagService : ITagService, ICleanableAppStorage
     {
         private readonly IGrainFactory grainFactory;
 

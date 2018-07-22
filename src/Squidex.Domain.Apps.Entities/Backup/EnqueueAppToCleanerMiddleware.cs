@@ -17,13 +17,13 @@ namespace Squidex.Domain.Apps.Entities.Backup
 {
     public sealed class EnqueueAppToCleanerMiddleware : ICommandMiddleware
     {
-        private readonly ICleanerGrain cleaner;
+        private readonly IAppCleanerGrain cleaner;
 
         public EnqueueAppToCleanerMiddleware(IGrainFactory grainFactory)
         {
             Guard.NotNull(grainFactory, nameof(grainFactory));
 
-            cleaner = grainFactory.GetGrain<ICleanerGrain>(SingleGrain.Id);
+            cleaner = grainFactory.GetGrain<IAppCleanerGrain>(SingleGrain.Id);
         }
 
         public async Task HandleAsync(CommandContext context, Func<Task> next)

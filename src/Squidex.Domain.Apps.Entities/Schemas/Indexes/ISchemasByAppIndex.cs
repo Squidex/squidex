@@ -8,17 +8,14 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Orleans;
 
 namespace Squidex.Domain.Apps.Entities.Schemas
 {
-    public interface ISchemasByAppIndex : IGrainWithGuidKey
+    public interface ISchemasByAppIndex : ICleanableAppGrain
     {
         Task AddSchemaAsync(Guid schemaId, string name);
 
         Task RemoveSchemaAsync(Guid schemaId);
-
-        Task ClearAsync();
 
         Task RebuildAsync(Dictionary<string, Guid> schemas);
 

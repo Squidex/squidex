@@ -11,21 +11,21 @@ using FakeItEasy;
 using Orleans;
 using Xunit;
 
-namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
+namespace Squidex.Domain.Apps.Entities
 {
-    public class SchemaIndexCleanerTests
+    public class AppGrainCleanerTests
     {
         private readonly IGrainFactory grainFactory = A.Fake<IGrainFactory>();
-        private readonly ISchemasByAppIndex index = A.Fake<ISchemasByAppIndex>();
+        private readonly ICleanableAppGrain index = A.Fake<ICleanableAppGrain>();
         private readonly Guid appId = Guid.NewGuid();
-        private readonly SchemaIndexCleaner sut;
+        private readonly AppGrainCleaner<ICleanableAppGrain> sut;
 
-        public SchemaIndexCleanerTests()
+        public AppGrainCleanerTests()
         {
-            A.CallTo(() => grainFactory.GetGrain<ISchemasByAppIndex>(appId, null))
+            A.CallTo(() => grainFactory.GetGrain<ICleanableAppGrain>(appId, null))
                 .Returns(index);
 
-            sut = new SchemaIndexCleaner(grainFactory);
+            sut = new AppGrainCleaner<ICleanableAppGrain>(grainFactory);
         }
 
         [Fact]
