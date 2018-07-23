@@ -98,14 +98,14 @@ namespace Squidex.Infrastructure.Assets
             }
         }
 
-        public Task UploadAsync(string fileName, Stream stream, CancellationToken ct = default(CancellationToken))
-        {
-            return UploadCoreAsync(GetFile(fileName), stream, ct);
-        }
-
         public Task UploadAsync(string id, long version, string suffix, Stream stream, CancellationToken ct = default(CancellationToken))
         {
             return UploadCoreAsync(GetFile(id, version, suffix), stream, ct);
+        }
+
+        public Task UploadAsync(string fileName, Stream stream, CancellationToken ct = default(CancellationToken))
+        {
+            return UploadCoreAsync(GetFile(fileName), stream, ct);
         }
 
         public Task DeleteAsync(string id, long version, string suffix)

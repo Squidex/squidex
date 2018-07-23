@@ -31,6 +31,11 @@ namespace Squidex.Infrastructure.Assets
             get { return sut.Value; }
         }
 
+        protected string AssetId
+        {
+            get { return assetId; }
+        }
+
         public abstract T CreateStore();
 
         public abstract void Dispose();
