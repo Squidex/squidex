@@ -83,7 +83,7 @@ namespace Squidex.Infrastructure.Assets
             }
             catch (StorageException ex) when (ex.RequestInformation.HttpStatusCode == 404)
             {
-                throw new AssetNotFoundException($"Asset {name} not found.", ex);
+                throw new AssetNotFoundException(name, ex);
             }
         }
 
@@ -98,7 +98,7 @@ namespace Squidex.Infrastructure.Assets
             }
             catch (StorageException ex) when (ex.RequestInformation.HttpStatusCode == 404)
             {
-                throw new AssetNotFoundException($"Asset {id}, {version} not found.", ex);
+                throw new AssetNotFoundException($"Id={id}, Version={version}", ex);
             }
         }
 

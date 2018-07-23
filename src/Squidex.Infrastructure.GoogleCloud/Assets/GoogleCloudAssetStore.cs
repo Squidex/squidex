@@ -71,7 +71,7 @@ namespace Squidex.Infrastructure.Assets
             }
             catch (GoogleApiException ex) when (ex.HttpStatusCode == HttpStatusCode.NotFound)
             {
-                throw new AssetNotFoundException($"Asset {name} not found.", ex);
+                throw new AssetNotFoundException(name, ex);
             }
         }
 
@@ -85,7 +85,7 @@ namespace Squidex.Infrastructure.Assets
             }
             catch (GoogleApiException ex) when (ex.HttpStatusCode == HttpStatusCode.NotFound)
             {
-                throw new AssetNotFoundException($"Asset {id}, {version} not found.", ex);
+                throw new AssetNotFoundException($"Id={id}, Version={version}", ex);
             }
         }
 

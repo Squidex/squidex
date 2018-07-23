@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
 
@@ -43,20 +44,20 @@ namespace Squidex.Infrastructure.Assets
             return "UNSUPPORTED";
         }
 
-        public async Task CopyAsync(string name, string id, long version, string suffix, CancellationToken ct = default(CancellationToken))
+        public async Task CopyAsync(string sourceFileName, string id, long version, string suffix, CancellationToken ct = default(CancellationToken))
         {
             try
             {
                 var target = GetFileName(id, version, suffix);
 
-                using (var readStream = await bucket.OpenDownloadStreamAsync(name, cancellationToken: ct))
+                using (var readStream = await bucket.OpenDownloadStreamAsync(sourceFileName, cancellationToken: ct))
                 {
-                    await bucket.UploadFromStreamAsync(target, target, readStream, cancellationToken: ct);
+                    await UploadFileCoreAsync(target, readStream, ct);
                 }
             }
             catch (GridFSFileNotFoundException ex)
             {
-                throw new AssetNotFoundException($"Asset {name} not found.", ex);
+                throw new AssetNotFoundException(sourceFileName, ex);
             }
         }
 
@@ -73,13 +74,13 @@ namespace Squidex.Infrastructure.Assets
             }
             catch (GridFSFileNotFoundException ex)
             {
-                throw new AssetNotFoundException($"Asset {id}, {version} not found.", ex);
+                throw new AssetNotFoundException($"Id={id}, Version={version}", ex);
             }
         }
 
-        public Task UploadAsync(string name, Stream stream, CancellationToken ct = default(CancellationToken))
+        public Task UploadAsync(string fileName, Stream stream, CancellationToken ct = default(CancellationToken))
         {
-            return UploadFileCoreAsync(name, stream, ct);
+            return UploadFileCoreAsync(fileName, stream, ct);
         }
 
         public Task UploadAsync(string id, long version, string suffix, Stream stream, CancellationToken ct = default(CancellationToken))
@@ -87,9 +88,9 @@ namespace Squidex.Infrastructure.Assets
             return UploadFileCoreAsync(GetFileName(id, version, suffix), stream, ct);
         }
 
-        public Task DeleteAsync(string name)
+        public Task DeleteAsync(string fileName)
         {
-            return DeleteCoreAsync(name);
+            return DeleteCoreAsync(fileName);
         }
 
         public Task DeleteAsync(string id, long version, string suffix)
@@ -109,9 +110,20 @@ namespace Squidex.Infrastructure.Assets
             }
         }
 
-        private Task UploadFileCoreAsync(string id, Stream stream, CancellationToken ct = default(CancellationToken))
+        private async Task UploadFileCoreAsync(string id, Stream stream, CancellationToken ct = default(CancellationToken))
         {
-            return bucket.UploadFromStreamAsync(id, id, stream, cancellationToken: ct);
+            try
+            {
+                await bucket.UploadFromStreamAsync(id, id, stream, cancellationToken: ct);
+            }
+            catch (MongoWriteException ex) when (ex.WriteError.Category == ServerErrorCategory.DuplicateKey)
+            {
+                throw new AssetAlreadyExistsException(id);
+            }
+            catch (MongoBulkWriteException<BsonDocument> ex) when (ex.WriteErrors.Any(x => x.Category == ServerErrorCategory.DuplicateKey))
+            {
+                throw new AssetAlreadyExistsException(id);
+            }
         }
 
         private static string GetFileName(string id, long version, string suffix)
