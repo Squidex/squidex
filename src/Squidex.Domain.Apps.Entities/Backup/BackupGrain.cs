@@ -26,7 +26,7 @@ using Squidex.Infrastructure.States;
 namespace Squidex.Domain.Apps.Entities.Backup
 {
     [Reentrant]
-    public sealed class BackupGrain : Grain, IBackupGrain
+    public sealed class BackupGrain : GrainOfGuid, IBackupGrain
     {
         private const int MaxBackups = 10;
         private static readonly Duration UpdateDuration = Duration.FromSeconds(1);
@@ -69,16 +69,11 @@ namespace Squidex.Domain.Apps.Entities.Backup
             this.log = log;
         }
 
-        public override Task OnActivateAsync()
+        public override async Task OnActivateAsync(Guid key)
         {
-            return OnActivateAsync(this.GetPrimaryKey());
-        }
+            appId = key;
 
-        public async Task OnActivateAsync(Guid appId)
-        {
-            this.appId = appId;
-
-            persistence = store.WithSnapshots<BackupState, Guid>(GetType(), appId, s => state = s);
+            persistence = store.WithSnapshots<BackupState, Guid>(GetType(), key, s => state = s);
 
             await ReadAsync();
             await CleanupAsync();

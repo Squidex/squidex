@@ -28,6 +28,14 @@ namespace Squidex.Domain.Apps.Entities.Backup
             archive = new ZipArchive(stream, ZipArchiveMode.Update, true);
         }
 
+        protected override void DisposeObject(bool disposing)
+        {
+            if (disposing)
+            {
+                archive.Dispose();
+            }
+        }
+
         public async Task WriteEventAsync(EventData eventData, Func<Stream, Task> attachment = null)
         {
             var eventObject =
@@ -65,14 +73,6 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 }
 
                 writtenAttachments++;
-            }
-        }
-
-        protected override void DisposeObject(bool disposing)
-        {
-            if (disposing)
-            {
-                archive.Dispose();
             }
         }
     }
