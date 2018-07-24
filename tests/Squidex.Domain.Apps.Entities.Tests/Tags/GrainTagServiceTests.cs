@@ -30,6 +30,12 @@ namespace Squidex.Domain.Apps.Entities.Tags
         }
 
         [Fact]
+        public void Should_provide_name()
+        {
+            Assert.Equal("Tags", sut.Name);
+        }
+
+        [Fact]
         public async Task Should_call_grain_when_clearing()
         {
             await sut.ClearAsync(appId);

@@ -12,6 +12,8 @@ namespace Squidex.Domain.Apps.Entities
 {
     public interface ICleanableAppStorage
     {
+        string Name { get; }
+
         Task ClearAsync(Guid appId);
     }
 }

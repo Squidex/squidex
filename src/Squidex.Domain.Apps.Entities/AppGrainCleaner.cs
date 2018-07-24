@@ -16,6 +16,11 @@ namespace Squidex.Domain.Apps.Entities
     {
         private readonly IGrainFactory grainFactory;
 
+        public string Name
+        {
+            get { return typeof(T).Name; }
+        }
+
         public AppGrainCleaner(IGrainFactory grainFactory)
         {
             Guard.NotNull(grainFactory, nameof(grainFactory));

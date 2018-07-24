@@ -29,6 +29,12 @@ namespace Squidex.Domain.Apps.Entities
         }
 
         [Fact]
+        public void Should_provide_name()
+        {
+            Assert.Equal(typeof(ICleanableAppGrain).Name, sut.Name);
+        }
+
+        [Fact]
         public async Task Should_forward_to_index()
         {
             await sut.ClearAsync(appId);
