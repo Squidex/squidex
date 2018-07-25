@@ -11,7 +11,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using NodaTime;
-using Orleans;
 using Orleans.Concurrency;
 using Squidex.Domain.Apps.Entities.Backup.State;
 using Squidex.Domain.Apps.Events;
@@ -191,28 +190,28 @@ namespace Squidex.Domain.Apps.Entities.Backup
                                 var assetVersion = 0L;
                                 var assetId = Guid.Empty;
 
-                                if (parsedEvent.Payload is AssetCreated assetCreated)
+                                switch (parsedEvent.Payload)
                                 {
-                                    assetId = assetCreated.AssetId;
-                                    assetVersion = assetCreated.FileVersion;
+                                    case AssetCreated assetCreated:
+                                        assetId = assetCreated.AssetId;
+                                        assetVersion = assetCreated.FileVersion;
+                                        break;
+                                    case AssetUpdated asetUpdated:
+                                        assetId = asetUpdated.AssetId;
+                                        assetVersion = asetUpdated.FileVersion;
+                                        break;
                                 }
 
-                                if (parsedEvent.Payload is AssetUpdated asetUpdated)
+                                await writer.WriteEventAsync(@event, attachment =>
                                 {
-                                    assetId = asetUpdated.AssetId;
-                                    assetVersion = asetUpdated.FileVersion;
-                                }
-
-                                await writer.WriteEventAsync(eventData, async attachmentStream =>
-                                {
-                                    await assetStore.DownloadAsync(assetId.ToString(), assetVersion, null, attachmentStream);
+                                    return assetStore.DownloadAsync(assetId.ToString(), assetVersion, null, attachment);
                                 });
 
                                 job.HandledAssets++;
                             }
                             else
                             {
-                                await writer.WriteEventAsync(eventData);
+                                await writer.WriteEventAsync(@event);
                             }
 
                             job.HandledEvents++;

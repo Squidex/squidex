@@ -18,7 +18,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
     {
         public sealed class EventInfo
         {
-            public EventData Data { get; set; }
+            public StoredEvent Stored { get; set; }
 
             public byte[] Attachment { get; set; }
         }
@@ -33,7 +33,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             for (var i = 0; i < 1000; i++)
             {
                 var eventData = new EventData { Type = i.ToString(), Metadata = i, Payload = i };
-                var eventInfo = new EventInfo { Data = eventData };
+                var eventInfo = new EventInfo { Stored = new StoredEvent("S", "1", 2, eventData) };
 
                 if (i % 10 == 0)
                 {
@@ -49,11 +49,11 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 {
                     if (@event.Attachment == null)
                     {
-                        await reader.WriteEventAsync(@event.Data);
+                        await reader.WriteEventAsync(@event.Stored);
                     }
                     else
                     {
-                        await reader.WriteEventAsync(@event.Data, s => s.WriteAsync(@event.Attachment, 0, 1));
+                        await reader.WriteEventAsync(@event.Stored, s => s.WriteAsync(@event.Attachment, 0, 1));
                     }
                 }
             }
@@ -64,9 +64,9 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             using (var reader = new EventStreamReader(stream))
             {
-                await reader.ReadEventsAsync(async (eventData, attachment) =>
+                await reader.ReadEventsAsync(async (stored, attachment) =>
                 {
-                    var eventInfo = new EventInfo { Data = eventData };
+                    var eventInfo = new EventInfo { Stored = stored };
 
                     if (attachment != null)
                     {

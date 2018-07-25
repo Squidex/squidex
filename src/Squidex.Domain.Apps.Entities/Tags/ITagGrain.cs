@@ -22,5 +22,6 @@ namespace Squidex.Domain.Apps.Entities.Tags
         Task<Dictionary<string, int>> GetTagsAsync();
 
         Task ClearAsync();
+        Task RebuildTagsAsync(Dictionary<string, string> allTags);
     }
 }

@@ -56,7 +56,7 @@ namespace Squidex.Infrastructure.States
         [Fact]
         public async Task Should_ignore_old_events()
         {
-            var storedEvent = new StoredEvent("1", 0, new EventData());
+            var storedEvent = new StoredEvent("1", "1", 0, new EventData());
 
             A.CallTo(() => eventStore.QueryAsync(key, 0))
                 .Returns(new List<StoredEvent> { storedEvent });
@@ -252,7 +252,7 @@ namespace Squidex.Infrastructure.States
             foreach (var @event in events)
             {
                 var eventData = new EventData();
-                var eventStored = new StoredEvent(i.ToString(), i, eventData);
+                var eventStored = new StoredEvent(i.ToString(), i.ToString(), i, eventData);
 
                 eventsStored.Add(eventStored);
 

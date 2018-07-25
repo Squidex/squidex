@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             }
         }
 
-        public async Task ReadEventsAsync(Func<EventData, Stream, Task> eventHandler)
+        public async Task ReadEventsAsync(Func<StoredEvent, Stream, Task> eventHandler)
         {
             Guard.NotNull(eventHandler, nameof(eventHandler));
 
@@ -52,17 +52,15 @@ namespace Squidex.Domain.Apps.Entities.Backup
                     break;
                 }
 
-                EventData eventData;
+                StoredEvent eventData;
 
                 using (var stream = eventEntry.Open())
                 {
                     using (var textReader = new StreamReader(stream))
                     {
-                        eventData = (EventData)JsonSerializer.Deserialize(textReader, typeof(EventData));
+                        eventData = (StoredEvent)JsonSerializer.Deserialize(textReader, typeof(StoredEvent));
                     }
                 }
-
-                readEvents++;
 
                 var attachmentFolder = readAttachments / MaxItemsPerFolder;
                 var attachmentPath = $"attachments/{attachmentFolder}/{readEvents}.blob";
@@ -81,6 +79,8 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 {
                     await eventHandler(eventData, null);
                 }
+
+                readEvents++;
             }
         }
     }

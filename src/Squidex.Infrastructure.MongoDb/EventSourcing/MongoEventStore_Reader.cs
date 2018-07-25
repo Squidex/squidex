@@ -60,7 +60,7 @@ namespace Squidex.Infrastructure.EventSourcing
                             var eventData = e.ToEventData();
                             var eventToken = new StreamPosition(commitTimestamp, commitOffset, commit.Events.Length);
 
-                            result.Add(new StoredEvent(eventToken, eventStreamOffset, eventData));
+                            result.Add(new StoredEvent(streamName, eventToken, eventStreamOffset, eventData));
                         }
                     }
                 }
@@ -111,7 +111,7 @@ namespace Squidex.Infrastructure.EventSourcing
                             var eventData = e.ToEventData();
                             var eventToken = new StreamPosition(commitTimestamp, commitOffset, commit.Events.Length);
 
-                            await callback(new StoredEvent(eventToken, eventStreamOffset, eventData));
+                            await callback(new StoredEvent(commit.EventStream, eventToken, eventStreamOffset, eventData));
 
                             commitOffset++;
                         }

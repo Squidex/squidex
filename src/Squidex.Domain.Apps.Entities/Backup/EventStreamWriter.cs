@@ -36,13 +36,9 @@ namespace Squidex.Domain.Apps.Entities.Backup
             }
         }
 
-        public async Task WriteEventAsync(EventData eventData, Func<Stream, Task> attachment = null)
+        public async Task WriteEventAsync(StoredEvent storedEvent, Func<Stream, Task> attachment = null)
         {
-            var eventObject =
-                new JObject(
-                    new JProperty("type", eventData.Type),
-                    new JProperty("payload", eventData.Payload),
-                    new JProperty("metadata", eventData.Metadata));
+            var eventObject = JObject.FromObject(storedEvent);
 
             var eventFolder = writtenEvents / MaxItemsPerFolder;
             var eventPath = $"events/{eventFolder}/{writtenEvents}.json";
@@ -59,8 +55,6 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 }
             }
 
-            writtenEvents++;
-
             if (attachment != null)
             {
                 var attachmentFolder = writtenAttachments / MaxItemsPerFolder;
@@ -74,6 +68,8 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
                 writtenAttachments++;
             }
+
+            writtenEvents++;
         }
     }
 }
