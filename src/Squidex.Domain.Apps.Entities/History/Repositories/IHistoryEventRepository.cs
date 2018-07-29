@@ -14,5 +14,7 @@ namespace Squidex.Domain.Apps.Entities.History.Repositories
     public interface IHistoryEventRepository
     {
         Task<IReadOnlyList<IHistoryEventEntity>> QueryByChannelAsync(Guid appId, string channelPrefix, int count);
+
+        Task RemoveAsync(Guid appId);
     }
 }

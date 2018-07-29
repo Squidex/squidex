@@ -13,7 +13,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Tags
 {
-    public sealed class GrainTagService : ITagService, ICleanableAppStorage
+    public sealed class GrainTagService : ITagService
     {
         private readonly IGrainFactory grainFactory;
 
@@ -54,9 +54,9 @@ namespace Squidex.Domain.Apps.Entities.Tags
             return GetGrain(appId, group).RebuildTagsAsync(allTags);
         }
 
-        public Task ClearAsync(Guid appId)
+        public Task ClearAsync(Guid appId, string group)
         {
-            return GetGrain(appId, TagGroups.Assets).ClearAsync();
+            return GetGrain(appId, group).ClearAsync();
         }
 
         private ITagGrain GetGrain(Guid appId, string group)

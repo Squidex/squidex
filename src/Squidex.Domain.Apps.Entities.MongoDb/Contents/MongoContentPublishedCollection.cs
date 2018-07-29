@@ -56,10 +56,5 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
             return Collection.ReplaceOneAsync(x => x.Id == content.Id, content, new UpdateOptions { IsUpsert = true });
         }
-
-        public Task RemoveAsync(Guid id)
-        {
-            return Collection.DeleteOneAsync(x => x.Id == id);
-        }
     }
 }

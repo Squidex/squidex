@@ -29,7 +29,6 @@ namespace Squidex.Domain.Apps.Entities.Apps
     public sealed class AppGrain : SquidexDomainObjectGrain<AppState>, IAppGrain
     {
         private readonly InitialPatterns initialPatterns;
-        private readonly IAppProvider appProvider;
         private readonly IAppPlansProvider appPlansProvider;
         private readonly IAppPlanBillingManager appPlansBillingManager;
         private readonly IUserResolver userResolver;
@@ -38,20 +37,17 @@ namespace Squidex.Domain.Apps.Entities.Apps
             InitialPatterns initialPatterns,
             IStore<Guid> store,
             ISemanticLog log,
-            IAppProvider appProvider,
             IAppPlansProvider appPlansProvider,
             IAppPlanBillingManager appPlansBillingManager,
             IUserResolver userResolver)
             : base(store, log)
         {
             Guard.NotNull(initialPatterns, nameof(initialPatterns));
-            Guard.NotNull(appProvider, nameof(appProvider));
             Guard.NotNull(userResolver, nameof(userResolver));
             Guard.NotNull(appPlansProvider, nameof(appPlansProvider));
             Guard.NotNull(appPlansBillingManager, nameof(appPlansBillingManager));
 
             this.userResolver = userResolver;
-            this.appProvider = appProvider;
             this.appPlansProvider = appPlansProvider;
             this.appPlansBillingManager = appPlansBillingManager;
             this.initialPatterns = initialPatterns;
@@ -64,9 +60,9 @@ namespace Squidex.Domain.Apps.Entities.Apps
             switch (command)
             {
                 case CreateApp createApp:
-                    return CreateAsync(createApp, async c =>
+                    return CreateAsync(createApp, c =>
                     {
-                        await GuardApp.CanCreate(c, appProvider);
+                        GuardApp.CanCreate(c);
 
                         Create(c);
                     });

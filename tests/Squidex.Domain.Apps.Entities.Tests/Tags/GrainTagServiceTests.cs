@@ -38,7 +38,7 @@ namespace Squidex.Domain.Apps.Entities.Tags
         [Fact]
         public async Task Should_call_grain_when_clearing()
         {
-            await sut.ClearAsync(appId);
+            await sut.ClearAsync(appId, TagGroups.Assets);
 
             A.CallTo(() => grain.ClearAsync())
                 .MustHaveHappened();

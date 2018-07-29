@@ -10,20 +10,31 @@ using System.IO;
 using System.IO.Compression;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Entities.Backup
 {
-    public sealed class EventStreamWriter : DisposableObjectBase
+    public sealed class BackupWriter : DisposableObjectBase
     {
-        private const int MaxItemsPerFolder = 1000;
+        private const int MaxEventsPerFolder = 1000;
+        private const int MaxAttachmentFolders = 1000;
+        private static readonly JsonSerializer JsonSerializer = JsonSerializer.CreateDefault();
         private readonly ZipArchive archive;
         private int writtenEvents;
         private int writtenAttachments;
 
-        public EventStreamWriter(Stream stream)
+        public int WrittenEvents
+        {
+            get { return writtenEvents; }
+        }
+
+        public int WrittenAttachments
+        {
+            get { return writtenAttachments; }
+        }
+
+        public BackupWriter(Stream stream)
         {
             archive = new ZipArchive(stream, ZipArchiveMode.Update, true);
         }
@@ -36,11 +47,26 @@ namespace Squidex.Domain.Apps.Entities.Backup
             }
         }
 
-        public async Task WriteEventAsync(StoredEvent storedEvent, Func<Stream, Task> attachment = null)
+        public async Task WriteAttachmentAsync(string name, Func<Stream, Task> handler)
         {
-            var eventObject = JObject.FromObject(storedEvent);
+            Guard.NotNullOrEmpty(name, nameof(name));
+            Guard.NotNull(handler, nameof(handler));
 
-            var eventFolder = writtenEvents / MaxItemsPerFolder;
+            var attachmentFolder = Math.Abs(name.GetHashCode() % MaxAttachmentFolders);
+            var attachmentPath = $"attachments/{attachmentFolder}/{name}";
+            var attachmentEntry = archive.CreateEntry(attachmentPath);
+
+            using (var stream = attachmentEntry.Open())
+            {
+                await handler(stream);
+            }
+
+            writtenAttachments++;
+        }
+
+        public void WriteEvent(StoredEvent storedEvent)
+        {
+            var eventFolder = writtenEvents / MaxEventsPerFolder;
             var eventPath = $"events/{eventFolder}/{writtenEvents}.json";
             var eventEntry = archive.GetEntry(eventPath) ?? archive.CreateEntry(eventPath);
 
@@ -48,25 +74,8 @@ namespace Squidex.Domain.Apps.Entities.Backup
             {
                 using (var textWriter = new StreamWriter(stream))
                 {
-                    using (var jsonWriter = new JsonTextWriter(textWriter))
-                    {
-                        await eventObject.WriteToAsync(jsonWriter);
-                    }
+                    JsonSerializer.Serialize(textWriter, storedEvent);
                 }
-            }
-
-            if (attachment != null)
-            {
-                var attachmentFolder = writtenAttachments / MaxItemsPerFolder;
-                var attachmentPath = $"attachments/{attachmentFolder}/{writtenEvents}.blob";
-                var attachmentEntry = archive.GetEntry(attachmentPath) ?? archive.CreateEntry(attachmentPath);
-
-                using (var stream = attachmentEntry.Open())
-                {
-                    await attachment(stream);
-                }
-
-                writtenAttachments++;
             }
 
             writtenEvents++;

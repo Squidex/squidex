@@ -9,7 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Squidex.Domain.Apps.Entities.Schemas
+namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 {
     public interface ISchemasByAppIndex : ICleanableAppGrain
     {

@@ -25,7 +25,6 @@ namespace Squidex.Domain.Apps.Entities.Apps
 {
     public class AppGrainTests : HandlerTestBase<AppGrain, AppState>
     {
-        private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
         private readonly IAppPlansProvider appPlansProvider = A.Fake<IAppPlansProvider>();
         private readonly IAppPlanBillingManager appPlansBillingManager = A.Fake<IAppPlanBillingManager>();
         private readonly IUser user = A.Fake<IUser>();
@@ -47,9 +46,6 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         public AppGrainTests()
         {
-            A.CallTo(() => appProvider.GetAppAsync(AppName))
-                .Returns((IAppEntity)null);
-
             A.CallTo(() => user.Id)
                 .Returns(contributorId);
 
@@ -62,7 +58,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 { patternId2, new AppPattern("Numbers", "[0-9]*") }
             };
 
-            sut = new AppGrain(initialPatterns, Store, A.Dummy<ISemanticLog>(), appProvider, appPlansProvider, appPlansBillingManager, userResolver);
+            sut = new AppGrain(initialPatterns, Store, A.Dummy<ISemanticLog>(), appPlansProvider, appPlansBillingManager, userResolver);
             sut.OnActivateAsync(Id).Wait();
         }
 

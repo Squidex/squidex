@@ -115,6 +115,13 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
         }
 
+        public Task RemoveAsync(Guid appId)
+        {
+            return Task.WhenAll(
+                contentsDraft.RemoveAsync(appId),
+                contentsPublished.RemoveAsync(appId));
+        }
+
         public Task ClearAsync()
         {
             return Task.WhenAll(

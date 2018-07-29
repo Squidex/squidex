@@ -85,22 +85,13 @@ namespace Squidex.Config.Domain
                 .AsSelf();
 
             services.AddSingletonAs<GrainTagService>()
-                .As<ITagService>().As<ICleanableAppStorage>();
+                .As<ITagService>();
 
             services.AddSingletonAs<FileTypeTagGenerator>()
                 .As<ITagGenerator<CreateAsset>>();
 
             services.AddSingletonAs<ImageTagGenerator>()
                 .As<ITagGenerator<CreateAsset>>();
-
-            services.AddSingletonAs<AppGrainCleaner<IBackupGrain>>()
-                .As<ICleanableAppStorage>();
-
-            services.AddSingletonAs<AppGrainCleaner<IRulesByAppIndex>>()
-                .As<ICleanableAppStorage>();
-
-            services.AddSingletonAs<AppGrainCleaner<ISchemasByAppIndex>>()
-                .As<ICleanableAppStorage>();
 
             services.AddSingletonAs<JintScriptEngine>()
                 .As<IScriptEngine>();

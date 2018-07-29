@@ -13,17 +13,22 @@ using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.States;
 
-namespace Squidex.Domain.Apps.Entities.Backup.Handlers
+namespace Squidex.Domain.Apps.Entities.Backup
 {
-    public abstract class HandlerBase
+    public abstract class BackupHandlerWithStore : BackupHandler
     {
         private readonly IStore<Guid> store;
 
-        protected HandlerBase(IStore<Guid> store)
+        protected BackupHandlerWithStore(IStore<Guid> store)
         {
             Guard.NotNull(store, nameof(store));
 
             this.store = store;
+        }
+
+        protected Task RemoveSnapshotAsync<TState>(Guid id)
+        {
+            return store.RemoveSnapshotAsync<TState>(id);
         }
 
         protected async Task RebuildManyAsync(IEnumerable<Guid> ids, Func<Guid, Task> action)

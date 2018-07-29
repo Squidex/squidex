@@ -14,5 +14,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
     public interface IAppCleanerGrain : IBackgroundGrain
     {
         Task EnqueueAppAsync(Guid appId);
+
+        Task<CleanerStatus> GetStatusAsync(Guid appId);
     }
 }

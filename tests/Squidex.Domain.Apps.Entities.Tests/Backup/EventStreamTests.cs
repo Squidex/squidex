@@ -10,72 +10,64 @@ using System.IO;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Tasks;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Backup
 {
     public class EventStreamTests
     {
-        public sealed class EventInfo
-        {
-            public StoredEvent Stored { get; set; }
-
-            public byte[] Attachment { get; set; }
-        }
-
         [Fact]
         public async Task Should_write_and_read_events()
         {
             var stream = new MemoryStream();
 
-            var sourceEvents = new List<EventInfo>();
+            var sourceEvents = new List<StoredEvent>();
 
-            for (var i = 0; i < 1000; i++)
+            using (var writer = new BackupWriter(stream))
             {
-                var eventData = new EventData { Type = i.ToString(), Metadata = i, Payload = i };
-                var eventInfo = new EventInfo { Stored = new StoredEvent("S", "1", 2, eventData) };
-
-                if (i % 10 == 0)
+                for (var i = 0; i < 1000; i++)
                 {
-                    eventInfo.Attachment = new byte[] { (byte)i };
-                }
+                    var eventData = new EventData { Type = i.ToString(), Metadata = i, Payload = i };
+                    var eventStored = new StoredEvent("S", "1", 2, eventData);
 
-                sourceEvents.Add(eventInfo);
-            }
+                    if (i % 10 == 0)
+                    {
+                        await writer.WriteAttachmentAsync(eventData.Type, innerStream =>
+                        {
+                            return innerStream.WriteAsync(new byte[] { (byte)i }, 0, 1);
+                        });
+                    }
 
-            using (var reader = new EventStreamWriter(stream))
-            {
-                foreach (var @event in sourceEvents)
-                {
-                    if (@event.Attachment == null)
-                    {
-                        await reader.WriteEventAsync(@event.Stored);
-                    }
-                    else
-                    {
-                        await reader.WriteEventAsync(@event.Stored, s => s.WriteAsync(@event.Attachment, 0, 1));
-                    }
+                    writer.WriteEvent(eventStored);
+
+                    sourceEvents.Add(eventStored);
                 }
             }
 
             stream.Position = 0;
 
-            var readEvents = new List<EventInfo>();
+            var readEvents = new List<StoredEvent>();
 
-            using (var reader = new EventStreamReader(stream))
+            using (var reader = new BackupReader(stream))
             {
-                await reader.ReadEventsAsync(async (stored, attachment) =>
+                await reader.ReadEventsAsync(async @event =>
                 {
-                    var eventInfo = new EventInfo { Stored = stored };
+                    var i = int.Parse(@event.Data.Type);
 
-                    if (attachment != null)
+                    if (i % 10 == 0)
                     {
-                        eventInfo.Attachment = new byte[1];
+                        await reader.ReadAttachmentAsync(@event.Data.Type, innerStream =>
+                        {
+                            var b = innerStream.ReadByte();
 
-                        await attachment.ReadAsync(eventInfo.Attachment, 0, 1);
+                            Assert.Equal((byte)i, b);
+
+                            return TaskHelper.Done;
+                        });
                     }
 
-                    readEvents.Add(eventInfo);
+                    readEvents.Add(@event);
                 });
             }
 

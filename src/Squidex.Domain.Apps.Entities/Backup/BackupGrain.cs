@@ -14,7 +14,6 @@ using NodaTime;
 using Orleans.Concurrency;
 using Squidex.Domain.Apps.Entities.Backup.State;
 using Squidex.Domain.Apps.Events;
-using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.EventSourcing;
@@ -32,6 +31,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
         private readonly IClock clock;
         private readonly IAssetStore assetStore;
         private readonly IEventDataFormatter eventDataFormatter;
+        private readonly IEnumerable<BackupHandler> handlers;
         private readonly ISemanticLog log;
         private readonly IEventStore eventStore;
         private readonly IBackupArchiveLocation backupArchiveLocation;
@@ -48,6 +48,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             IClock clock,
             IEventStore eventStore,
             IEventDataFormatter eventDataFormatter,
+            IEnumerable<BackupHandler> handlers,
             ISemanticLog log,
             IStore<Guid> store)
         {
@@ -56,6 +57,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             Guard.NotNull(clock, nameof(clock));
             Guard.NotNull(eventStore, nameof(eventStore));
             Guard.NotNull(eventDataFormatter, nameof(eventDataFormatter));
+            Guard.NotNull(handlers, nameof(handlers));
             Guard.NotNull(store, nameof(store));
             Guard.NotNull(log, nameof(log));
 
@@ -64,6 +66,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             this.clock = clock;
             this.eventStore = eventStore;
             this.eventDataFormatter = eventDataFormatter;
+            this.handlers = handlers;
             this.store = store;
             this.log = log;
         }
@@ -176,45 +179,21 @@ namespace Squidex.Domain.Apps.Entities.Backup
             {
                 using (var stream = await backupArchiveLocation.OpenStreamAsync(job.Id))
                 {
-                    using (var writer = new EventStreamWriter(stream))
+                    using (var writer = new BackupWriter(stream))
                     {
                         await eventStore.QueryAsync(async @event =>
                         {
                             var eventData = @event.Data;
 
-                            if (eventData.Type == "AssetCreatedEvent" ||
-                                eventData.Type == "AssetUpdatedEvent")
+                            writer.WriteEvent(@event);
+
+                            foreach (var handler in handlers)
                             {
-                                var parsedEvent = eventDataFormatter.Parse(eventData);
-
-                                var assetVersion = 0L;
-                                var assetId = Guid.Empty;
-
-                                switch (parsedEvent.Payload)
-                                {
-                                    case AssetCreated assetCreated:
-                                        assetId = assetCreated.AssetId;
-                                        assetVersion = assetCreated.FileVersion;
-                                        break;
-                                    case AssetUpdated asetUpdated:
-                                        assetId = asetUpdated.AssetId;
-                                        assetVersion = asetUpdated.FileVersion;
-                                        break;
-                                }
-
-                                await writer.WriteEventAsync(@event, attachment =>
-                                {
-                                    return assetStore.DownloadAsync(assetId.ToString(), assetVersion, null, attachment);
-                                });
-
-                                job.HandledAssets++;
-                            }
-                            else
-                            {
-                                await writer.WriteEventAsync(@event);
+                                await handler.BackupEventAsync(eventData, appId, writer);
                             }
 
-                            job.HandledEvents++;
+                            job.HandledEvents = writer.WrittenEvents;
+                            job.HandledAssets = writer.WrittenAttachments;
 
                             var now = clock.GetCurrentInstant();
 
@@ -225,6 +204,16 @@ namespace Squidex.Domain.Apps.Entities.Backup
                                 await WriteAsync();
                             }
                         }, SquidexHeaders.AppId, appId.ToString(), null, currentTask.Token);
+
+                        foreach (var handler in handlers)
+                        {
+                            await handler.BackupAsync(appId, writer);
+                        }
+
+                        foreach (var handler in handlers)
+                        {
+                            await handler.CompleteBackupAsync(appId, writer);
+                        }
                     }
 
                     stream.Position = 0;

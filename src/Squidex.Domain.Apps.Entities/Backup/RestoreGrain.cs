@@ -13,6 +13,7 @@ using NodaTime;
 using Orleans;
 using Squidex.Domain.Apps.Entities.Backup.State;
 using Squidex.Domain.Apps.Events;
+using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.EventSourcing;
@@ -29,12 +30,13 @@ namespace Squidex.Domain.Apps.Entities.Backup
         private readonly IClock clock;
         private readonly IAssetStore assetStore;
         private readonly IEventDataFormatter eventDataFormatter;
+        private readonly IGrainFactory grainFactory;
         private readonly IAppCleanerGrain appCleaner;
         private readonly ISemanticLog log;
         private readonly IEventStore eventStore;
         private readonly IBackupArchiveLocation backupArchiveLocation;
         private readonly IStore<string> store;
-        private readonly IEnumerable<IRestoreHandler> handlers;
+        private readonly IEnumerable<BackupHandler> handlers;
         private RestoreState state = new RestoreState();
         private IPersistence<RestoreState> persistence;
 
@@ -45,9 +47,9 @@ namespace Squidex.Domain.Apps.Entities.Backup
             IEventStore eventStore,
             IEventDataFormatter eventDataFormatter,
             IGrainFactory grainFactory,
-            IEnumerable<IRestoreHandler> handlers,
+            IEnumerable<BackupHandler> handlers,
             ISemanticLog log,
-            IStore<Guid> store)
+            IStore<string> store)
         {
             Guard.NotNull(assetStore, nameof(assetStore));
             Guard.NotNull(backupArchiveLocation, nameof(backupArchiveLocation));
@@ -64,9 +66,12 @@ namespace Squidex.Domain.Apps.Entities.Backup
             this.clock = clock;
             this.eventStore = eventStore;
             this.eventDataFormatter = eventDataFormatter;
+            this.grainFactory = grainFactory;
             this.handlers = handlers;
             this.store = store;
             this.log = log;
+
+            appCleaner = grainFactory.GetGrain<IAppCleanerGrain>(SingleGrain.Id);
         }
 
         public override async Task OnActivateAsync(string key)
@@ -97,10 +102,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 state.Job.Status = "Failed due application restart";
                 state.Job.IsFailed = true;
 
-                if (state.Job.AppId != Guid.Empty)
-                {
-                    appCleaner.EnqueueAppAsync(state.Job.AppId).Forget();
-                }
+                TryCleanup();
 
                 await persistence.WriteSnapshotAsync(state);
             }
@@ -108,47 +110,95 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         private async Task ProcessAsync()
         {
-            try
+            using (Profiler.StartSession())
             {
-                await DoAsync(
-                    "Downloading Backup",
-                    "Downloaded Backup",
-                    DownloadAsync);
-
-                await DoAsync(
-                    "Reading Events",
-                    "Readed Events",
-                    ReadEventsAsync);
-
-                foreach (var handler in handlers)
+                try
                 {
-                    await DoAsync($"{handler.Name} Proessing", $"{handler.Name} Processed", handler.ProcessAsync);
-                }
+                    log.LogInformation(w => w
+                        .WriteProperty("action", "restore")
+                        .WriteProperty("status", "started")
+                        .WriteProperty("url", state.Job.Uri.ToString()));
 
-                foreach (var handler in handlers)
+                    state.Job.Status = "Downloading Backup";
+
+                    using (Profiler.Trace("Download"))
+                    {
+                        await DownloadAsync();
+                    }
+
+                    state.Job.Status = "Downloaded Backup";
+
+                    using (var stream = await backupArchiveLocation.OpenStreamAsync(state.Job.Id))
+                    {
+                        using (var reader = new BackupReader(stream))
+                        {
+                            using (Profiler.Trace("ReadEvents"))
+                            {
+                                await ReadEventsAsync(reader);
+                            }
+
+                            state.Job.Status = "Events read";
+
+                            foreach (var handler in handlers)
+                            {
+                                using (Profiler.TraceMethod(handler.GetType(), nameof(BackupHandler.RestoreAsync)))
+                                {
+                                    await handler.RestoreAsync(state.Job.AppId, reader);
+                                }
+
+                                state.Job.Status = $"{handler} Processed";
+                            }
+
+                            foreach (var handler in handlers)
+                            {
+                                using (Profiler.TraceMethod(handler.GetType(), nameof(BackupHandler.CompleteRestoreAsync)))
+                                {
+                                    await handler.CompleteRestoreAsync(state.Job.AppId, reader);
+                                }
+
+                                state.Job.Status = $"{handler} Completed";
+                            }
+                        }
+                    }
+
+                    state.Job = null;
+
+                    log.LogInformation(w =>
+                    {
+                        w.WriteProperty("action", "restore");
+                        w.WriteProperty("status", "completed");
+                        w.WriteProperty("url", state.Job.Uri.ToString());
+
+                        Profiler.Session?.Write(w);
+                    });
+                }
+                catch (Exception ex)
                 {
-                    await DoAsync($"{handler.Name} Completing", $"{handler.Name} Completed", handler.CompleteAsync);
+                    state.Job.IsFailed = true;
+
+                    if (state.Job.AppId != Guid.Empty)
+                    {
+                        foreach (var handler in handlers)
+                        {
+                            await handler.CleanupRestoreAsync(state.Job.AppId, ex);
+                        }
+                    }
+
+                    TryCleanup();
+
+                    log.LogError(ex, w =>
+                    {
+                        w.WriteProperty("action", "retore");
+                        w.WriteProperty("status", "failed");
+                        w.WriteProperty("url", state.Job.Uri.ToString());
+
+                        Profiler.Session?.Write(w);
+                    });
                 }
-
-                state.Job = null;
-            }
-            catch (Exception ex)
-            {
-                log.LogError(ex, w => w
-                    .WriteProperty("action", "makeBackup")
-                    .WriteProperty("status", "failed")
-                    .WriteProperty("backupId", state.Job.Id.ToString()));
-
-                state.Job.IsFailed = true;
-
-                if (state.Job.AppId != Guid.Empty)
+                finally
                 {
-                    appCleaner.EnqueueAppAsync(state.Job.AppId).Forget();
+                    await persistence.WriteSnapshotAsync(state);
                 }
-            }
-            finally
-            {
-                await persistence.WriteSnapshotAsync(state);
             }
         }
 
@@ -166,47 +216,58 @@ namespace Squidex.Domain.Apps.Entities.Backup
             }
         }
 
-        private async Task ReadEventsAsync()
+        private async Task ReadEventsAsync(BackupReader reader)
         {
-            using (var stream = await backupArchiveLocation.OpenStreamAsync(state.Job.Id))
+            await reader.ReadEventsAsync(async (storedEvent) =>
             {
-                using (var reader = new EventStreamReader(stream))
+                var eventData = storedEvent.Data;
+                var eventParsed = eventDataFormatter.Parse(eventData);
+
+                if (eventParsed.Payload is SquidexEvent squidexEvent)
                 {
-                    var eventIndex = 0;
-
-                    await reader.ReadEventsAsync(async (@event, attachment) =>
-                    {
-                        var eventData = @event.Data;
-
-                        var parsedEvent = eventDataFormatter.Parse(eventData);
-
-                        if (parsedEvent.Payload is SquidexEvent squidexEvent)
-                        {
-                            squidexEvent.Actor = state.Job.User;
-                        }
-
-                        foreach (var handler in handlers)
-                        {
-                            await handler.HandleAsync(parsedEvent, attachment);
-                        }
-
-                        await eventStore.AppendAsync(Guid.NewGuid(), @event.StreamName, new List<EventData> { @event.Data });
-
-                        eventIndex++;
-
-                        state.Job.Status = $"Handled event {eventIndex}";
-                    });
+                    squidexEvent.Actor = state.Job.User;
                 }
+                else if (eventParsed.Payload is AppCreated appCreated)
+                {
+                    state.Job.AppId = appCreated.AppId.Id;
+
+                    await CheckCleanupStatus();
+                }
+
+                foreach (var handler in handlers)
+                {
+                    await handler.RestoreEventAsync(eventParsed, state.Job.AppId, reader);
+                }
+
+                await eventStore.AppendAsync(Guid.NewGuid(), storedEvent.StreamName, new List<EventData> { storedEvent.Data });
+
+                state.Job.Status = $"Handled event {reader.ReadEvents} events and {reader.ReadAttachments} attachments";
+            });
+        }
+
+        private async Task CheckCleanupStatus()
+        {
+            var cleaner = grainFactory.GetGrain<IAppCleanerGrain>(SingleGrain.Id);
+
+            var status = await cleaner.GetStatusAsync(state.Job.AppId);
+
+            if (status == CleanerStatus.Cleaning)
+            {
+                throw new DomainException("The app is removed in the background.");
+            }
+
+            if (status == CleanerStatus.Cleaning)
+            {
+                throw new DomainException("The app could not be cleaned.");
             }
         }
 
-        private async Task DoAsync(string start, string end, Func<Task> action)
+        private void TryCleanup()
         {
-            state.Job.Status = start;
-
-            await action();
-
-            state.Job.Status = end;
+            if (state.Job.AppId != Guid.Empty)
+            {
+                appCleaner.EnqueueAppAsync(state.Job.AppId).Forget();
+            }
         }
 
         public Task<J<IRestoreJob>> GetStateAsync()

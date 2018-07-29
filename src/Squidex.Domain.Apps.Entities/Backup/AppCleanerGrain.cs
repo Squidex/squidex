@@ -12,11 +12,6 @@ using System.Threading.Tasks;
 using Orleans;
 using Orleans.Concurrency;
 using Orleans.Runtime;
-using Squidex.Domain.Apps.Entities.Apps.State;
-using Squidex.Domain.Apps.Entities.Rules;
-using Squidex.Domain.Apps.Entities.Rules.State;
-using Squidex.Domain.Apps.Entities.Schemas;
-using Squidex.Domain.Apps.Entities.Schemas.State;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Log;
@@ -32,7 +27,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
         private readonly IGrainFactory grainFactory;
         private readonly IStore<Guid> store;
         private readonly IEventStore eventStore;
-        private readonly IEnumerable<ICleanableAppStorage> storages;
+        private readonly IEnumerable<BackupHandler> handlers;
         private readonly ISemanticLog log;
         private IPersistence<State> persistence;
         private bool isCleaning;
@@ -43,21 +38,21 @@ namespace Squidex.Domain.Apps.Entities.Backup
         {
             public HashSet<Guid> Apps { get; set; } = new HashSet<Guid>();
 
-            public HashSet<Guid> PendingApps { get; set; } = new HashSet<Guid>();
+            public HashSet<Guid> FailedApps { get; set; } = new HashSet<Guid>();
         }
 
-        public AppCleanerGrain(IGrainFactory grainFactory, IEventStore eventStore, IStore<Guid> store, IEnumerable<ICleanableAppStorage> storages, ISemanticLog log)
+        public AppCleanerGrain(IGrainFactory grainFactory, IEventStore eventStore, IStore<Guid> store, IEnumerable<BackupHandler> handlers, ISemanticLog log)
         {
             Guard.NotNull(grainFactory, nameof(grainFactory));
             Guard.NotNull(store, nameof(store));
-            Guard.NotNull(storages, nameof(storages));
+            Guard.NotNull(handlers, nameof(handlers));
             Guard.NotNull(eventStore, nameof(eventStore));
             Guard.NotNull(log, nameof(log));
 
             this.grainFactory = grainFactory;
 
             this.store = store;
-            this.storages = storages;
+            this.handlers = handlers;
 
             this.log = log;
 
@@ -99,6 +94,22 @@ namespace Squidex.Domain.Apps.Entities.Backup
             return TaskHelper.Done;
         }
 
+        public Task<CleanerStatus> GetStatusAsync(Guid appId)
+        {
+            if (state.Apps.Contains(appId))
+            {
+                return Task.FromResult(CleanerStatus.Cleaning);
+            }
+            else if (state.FailedApps.Contains(appId))
+            {
+                return Task.FromResult(CleanerStatus.Failed);
+            }
+            else
+            {
+                return Task.FromResult(CleanerStatus.Cleaned);
+            }
+        }
+
         private async Task CleanAsync()
         {
             if (isCleaning)
@@ -111,43 +122,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             {
                 foreach (var appId in state.Apps.ToList())
                 {
-                    using (Profiler.StartSession())
-                    {
-                        try
-                        {
-                            log.LogInformation(w => w
-                                .WriteProperty("action", "cleanApp")
-                                .WriteProperty("status", "started")
-                                .WriteProperty("appId", appId.ToString()));
-
-                            await CleanAsync(appId);
-
-                            state.Apps.Remove(appId);
-
-                            log.LogInformation(w =>
-                            {
-                                w.WriteProperty("action", "cleanApp");
-                                w.WriteProperty("status", "completed");
-                                w.WriteProperty("appId", appId.ToString());
-
-                                Profiler.Session?.Write(w);
-                            });
-                        }
-                        catch (Exception ex)
-                        {
-                            state.PendingApps.Add(appId);
-
-                            log.LogError(ex, w => w
-                                .WriteProperty("action", "cleanApp")
-                                .WriteProperty("appId", appId.ToString()));
-                        }
-                        finally
-                        {
-                            state.Apps.Remove(appId);
-
-                            await persistence.WriteSnapshotAsync(state);
-                        }
-                    }
+                    await CleanupAppAsync(appId);
                 }
             }
             finally
@@ -156,47 +131,64 @@ namespace Squidex.Domain.Apps.Entities.Backup
             }
         }
 
-        private async Task CleanAsync(Guid appId)
+        private async Task CleanupAppAsync(Guid appId)
+        {
+            using (Profiler.StartSession())
+            {
+                try
+                {
+                    log.LogInformation(w => w
+                        .WriteProperty("action", "cleanApp")
+                        .WriteProperty("status", "started")
+                        .WriteProperty("appId", appId.ToString()));
+
+                    await CleanupCoreAsync(appId);
+
+                    log.LogInformation(w =>
+                    {
+                        w.WriteProperty("action", "cleanApp");
+                        w.WriteProperty("status", "completed");
+                        w.WriteProperty("appId", appId.ToString());
+
+                        Profiler.Session?.Write(w);
+                    });
+                }
+                catch (Exception ex)
+                {
+                    state.FailedApps.Add(appId);
+
+                    log.LogError(ex, w =>
+                    {
+                        w.WriteProperty("action", "cleanApp");
+                        w.WriteProperty("status", "failed");
+                        w.WriteProperty("appId", appId.ToString());
+
+                        Profiler.Session?.Write(w);
+                    });
+                }
+                finally
+                {
+                    state.Apps.Remove(appId);
+
+                    await persistence.WriteSnapshotAsync(state);
+                }
+            }
+        }
+
+        private async Task CleanupCoreAsync(Guid appId)
         {
             using (Profiler.Trace("DeleteEvents"))
             {
                 await eventStore.DeleteManyAsync("AppId", appId);
             }
 
-            using (Profiler.Trace("DeleteRules"))
+            foreach (var handler in handlers)
             {
-                var ruleIds = await grainFactory.GetGrain<IRulesByAppIndex>(appId).GetRuleIdsAsync();
-
-                foreach (var ruleId in ruleIds)
+                using (Profiler.TraceMethod(handler.GetType(), nameof(BackupHandler.RemoveAsync)))
                 {
-                    await store.RemoveSnapshotAsync<RuleState>(ruleId);
+                    await handler.RemoveAsync(appId);
                 }
             }
-
-            using (Profiler.Trace("DeleteSchemas"))
-            {
-                var schemaIds = await grainFactory.GetGrain<ISchemasByAppIndex>(appId).GetSchemaIdsAsync();
-
-                foreach (var schemaId in schemaIds)
-                {
-                    await store.RemoveSnapshotAsync<SchemaState>(schemaId);
-                }
-            }
-
-            foreach (var storage in storages)
-            {
-                using (Profiler.Trace($"{storage.Name}.ClearAsync"))
-                {
-                    await storage.ClearAsync(appId);
-                }
-            }
-
-            await store.RemoveSnapshotAsync<AppState>(appId);
-        }
-
-        private async Task DeleteAsync<TState>(Guid id)
-        {
-            await store.RemoveSnapshotAsync<TState>(id);
         }
     }
 }

@@ -7,33 +7,29 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Orleans;
 using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Domain.Apps.Entities.Schemas;
+using Squidex.Domain.Apps.Entities.Backup;
+using Squidex.Domain.Apps.Entities.Schemas.Indexes;
 using Squidex.Domain.Apps.Entities.Schemas.State;
-using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Domain.Apps.Events.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.Tasks;
 
-namespace Squidex.Domain.Apps.Entities.Backup.Handlers
+namespace Squidex.Domain.Apps.Entities.Schemas
 {
-    public sealed class RestoreSchemas : HandlerBase, IRestoreHandler
+    public sealed class BackupSchemas : BackupHandlerWithStore
     {
         private readonly HashSet<NamedId<Guid>> schemaIds = new HashSet<NamedId<Guid>>();
         private readonly Dictionary<string, Guid> schemasByName = new Dictionary<string, Guid>();
         private readonly FieldRegistry fieldRegistry;
         private readonly IGrainFactory grainFactory;
-        private Guid appId;
 
-        public string Name { get; } = "Schemas";
-
-        public RestoreSchemas(IStore<Guid> store, FieldRegistry fieldRegistry, IGrainFactory grainFactory)
+        public BackupSchemas(IStore<Guid> store, FieldRegistry fieldRegistry, IGrainFactory grainFactory)
             : base(store)
         {
             Guard.NotNull(fieldRegistry, nameof(fieldRegistry));
@@ -44,13 +40,24 @@ namespace Squidex.Domain.Apps.Entities.Backup.Handlers
             this.grainFactory = grainFactory;
         }
 
-        public Task HandleAsync(Envelope<IEvent> @event, Stream attachment)
+        public override async Task RemoveAsync(Guid appId)
+        {
+            var index = grainFactory.GetGrain<ISchemasByAppIndex>(appId);
+
+            var idsToRemove = await index.GetSchemaIdsAsync();
+
+            foreach (var schemaId in idsToRemove)
+            {
+                await RemoveSnapshotAsync<SchemaState>(schemaId);
+            }
+
+            await index.ClearAsync();
+        }
+
+        public override Task RestoreEventAsync(Envelope<IEvent> @event, Guid appId, BackupReader reader)
         {
             switch (@event.Payload)
             {
-                case AppCreated appCreated:
-                    appId = appCreated.AppId.Id;
-                    break;
                 case SchemaCreated schemaCreated:
                     schemaIds.Add(schemaCreated.SchemaId);
                     schemasByName[schemaCreated.SchemaId.Name] = schemaCreated.SchemaId.Id;
@@ -60,16 +67,11 @@ namespace Squidex.Domain.Apps.Entities.Backup.Handlers
             return TaskHelper.Done;
         }
 
-        public async Task ProcessAsync()
+        public async override Task RestoreAsync(Guid appId, BackupReader reader)
         {
             await RebuildManyAsync(schemaIds.Select(x => x.Id), id => RebuildAsync<SchemaState, SchemaGrain>(id, (e, s) => s.Apply(e, fieldRegistry)));
 
             await grainFactory.GetGrain<ISchemasByAppIndex>(appId).RebuildAsync(schemasByName);
-        }
-
-        public Task CompleteAsync()
-        {
-            return TaskHelper.Done;
         }
     }
 }

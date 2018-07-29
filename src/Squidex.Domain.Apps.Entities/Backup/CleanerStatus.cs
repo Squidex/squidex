@@ -5,15 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading.Tasks;
-
-namespace Squidex.Domain.Apps.Entities
+namespace Squidex.Domain.Apps.Entities.Backup
 {
-    public interface ICleanableAppStorage
+    public enum CleanerStatus
     {
-        string Name { get; }
-
-        Task ClearAsync(Guid appId);
+        Cleaned,
+        Cleaning,
+        Failed
     }
 }
