@@ -60,11 +60,11 @@
 </sqx-panel>
 
 <sqx-modal-dialog *sqxModalView="eventConsumerErrorDialog;onRoot:true" (closed)="eventConsumerErrorDialog.hide()">
-    <ng-container #title>
+    <ng-container title>
         Error
     </ng-container>
 
-    <ng-container #content>
+    <ng-container content>
         <textarea readonly class="form-control error-message">{{eventConsumerError}}</textarea>
     </ng-container>
 </sqx-modal-dialog>

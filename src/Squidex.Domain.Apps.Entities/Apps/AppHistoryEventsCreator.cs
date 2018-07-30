@@ -53,7 +53,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 "added pattern {[Name]}");
 
             AddEventMessage<AppPatternDeleted>(
-                "deleted pattern {[Name]}");
+                "deleted pattern {[PatternId]}");
 
             AddEventMessage<AppPatternUpdated>(
                 "updated pattern {[Name]}");
@@ -164,7 +164,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             return Task.FromResult(
                 ForEvent(@event, channel)
-                    .AddParameter("Name", @event.Name));
+                    .AddParameter("PatternId", @event.PatternId));
         }
 
         protected override Task<HistoryEventToStore> CreateEventCoreAsync(Envelope<IEvent> @event)

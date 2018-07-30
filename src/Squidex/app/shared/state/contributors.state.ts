@@ -6,14 +6,16 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { distinctUntilChanged, map, tap } from 'rxjs/operators';
+import { Observable, throwError } from 'rxjs';
+import { catchError, distinctUntilChanged, map, tap } from 'rxjs/operators';
 
 import {
     DialogService,
+    ErrorDto,
     ImmutableArray,
     notify,
     State,
+    Types,
     Version
 } from '@app/framework';
 
@@ -99,6 +101,13 @@ export class ContributorsState extends State<Snapshot> {
                 const contributors = this.updateContributors(dto.payload.contributorId, request.permission, dto.version);
 
                 this.replaceContributors(contributors, dto.version);
+            }),
+            catchError(error => {
+                if (Types.is(error, ErrorDto) && error.statusCode === 404) {
+                    return throwError(new ErrorDto(404, 'The user does not exist.'));
+                } else {
+                    return throwError(error);
+                }
             }),
             notify(this.dialogs));
     }
