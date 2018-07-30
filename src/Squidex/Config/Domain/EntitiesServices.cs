@@ -96,7 +96,8 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<JintScriptEngine>()
                 .As<IScriptEngine>();
 
-            AddCommandPipeline(services);
+            services.AddCommandPipeline();
+            services.AddBackupHandlers();
 
             services.AddSingleton<Func<IGrainCallContext, string>>(DomainObjectGrainFormatter.Format);
 
@@ -119,7 +120,7 @@ namespace Squidex.Config.Domain
             });
         }
 
-        private static void AddCommandPipeline(IServiceCollection services)
+        private static void AddCommandPipeline(this IServiceCollection services)
         {
             services.AddSingletonAs<InMemoryCommandBus>()
                 .As<ICommandBus>();
@@ -145,6 +146,9 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<AssetCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
+            services.AddSingletonAs<AppsByNameIndexCommandMiddleware>()
+                .As<ICommandMiddleware>();
+
             services.AddSingletonAs<GrainCommandMiddleware<AppCommand, IAppGrain>>()
                 .As<ICommandMiddleware>();
 
@@ -155,9 +159,6 @@ namespace Squidex.Config.Domain
                 .As<ICommandMiddleware>();
 
             services.AddSingletonAs<GrainCommandMiddleware<RuleCommand, IRuleGrain>>()
-                .As<ICommandMiddleware>();
-
-            services.AddSingletonAs<AppsByNameIndexCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
             services.AddSingletonAs<AppsByUserIndexCommandMiddleware>()
@@ -180,6 +181,16 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<EnqueueAppToCleanerMiddleware>()
                 .As<ICommandMiddleware>();
+        }
+
+        private static void AddBackupHandlers(this IServiceCollection services)
+        {
+            services.AddTransient<BackupApps>();
+            services.AddTransient<BackupAssets>();
+            services.AddTransient<BackupContents>();
+            services.AddTransient<BackupHistory>();
+            services.AddTransient<BackupRules>();
+            services.AddTransient<BackupSchemas>();
         }
 
         public static void AddMyMigrationServices(this IServiceCollection services)

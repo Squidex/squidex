@@ -46,6 +46,30 @@ namespace Squidex.Domain.Apps.Entities.Tags
         }
 
         [Fact]
+        public async Task Should_rebuild_tags()
+        {
+            var tags = new TagSet
+            {
+                ["1"] = new Tag { Name = "tag1", Count = 1 },
+                ["2"] = new Tag { Name = "tag2", Count = 2 },
+                ["3"] = new Tag { Name = "tag3", Count = 6 }
+            };
+
+            await sut.RebuildAsync(tags);
+
+            var allTags = await sut.GetTagsAsync();
+
+            Assert.Equal(new Dictionary<string, int>
+            {
+                ["tag1"] = 1,
+                ["tag2"] = 2,
+                ["tag3"] = 6
+            }, allTags);
+
+            Assert.Same(tags, await sut.GetExportableTagsAsync());
+        }
+
+        [Fact]
         public async Task Should_add_tags_to_grain()
         {
             var result1 = await sut.NormalizeTagsAsync(HashSet.Of("tag1", "tag2"), null);

@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Orleans;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
+using Squidex.Domain.Apps.Entities.Apps.Indexes;
 using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.Orleans;
 

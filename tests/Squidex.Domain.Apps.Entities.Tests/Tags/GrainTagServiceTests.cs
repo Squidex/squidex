@@ -45,6 +45,26 @@ namespace Squidex.Domain.Apps.Entities.Tags
         }
 
         [Fact]
+        public async Task Should_call_grain_when_rebuilding()
+        {
+            var tags = new TagSet();
+
+            await sut.RebuildTagsAsync(appId, TagGroups.Assets, tags);
+
+            A.CallTo(() => grain.RebuildAsync(tags))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_call_grain_when_retrieving_raw_tags()
+        {
+            await sut.GetExportableTagsAsync(appId, TagGroups.Assets);
+
+            A.CallTo(() => grain.GetTagsAsync())
+                .MustHaveHappened();
+        }
+
+        [Fact]
         public async Task Should_call_grain_when_retrieving_tags()
         {
             await sut.GetTagsAsync(appId, TagGroups.Assets);

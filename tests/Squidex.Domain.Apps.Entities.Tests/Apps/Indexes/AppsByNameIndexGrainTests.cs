@@ -48,6 +48,64 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         }
 
         [Fact]
+        public async Task Should_not_be_able_to_reserve_index_if_name_taken()
+        {
+            await sut.AddAppAsync(appId2, appName1);
+
+            Assert.False(await sut.ReserveAppAsync(appId1, appName1));
+        }
+
+        [Fact]
+        public async Task Should_not_be_able_to_reserve_if_name_reserved()
+        {
+            await sut.ReserveAppAsync(appId2, appName1);
+
+            Assert.False(await sut.ReserveAppAsync(appId1, appName1));
+        }
+
+        [Fact]
+        public async Task Should_not_be_able_to_reserve_if_id_taken()
+        {
+            await sut.AddAppAsync(appId1, appName1);
+
+            Assert.False(await sut.ReserveAppAsync(appId1, appName2));
+        }
+
+        [Fact]
+        public async Task Should_not_be_able_to_reserve_if_id_reserved()
+        {
+            await sut.ReserveAppAsync(appId1, appName1);
+
+            Assert.False(await sut.ReserveAppAsync(appId1, appName2));
+        }
+
+        [Fact]
+        public async Task Should_be_able_to_reserve_if_id_and_name_not_reserved()
+        {
+            await sut.ReserveAppAsync(appId1, appName1);
+
+            Assert.True(await sut.ReserveAppAsync(appId2, appName2));
+        }
+
+        [Fact]
+        public async Task Should_be_able_to_reserve_after_app_removed()
+        {
+            await sut.AddAppAsync(appId1, appName1);
+            await sut.RemoveAppAsync(appId1);
+
+            Assert.True(await sut.ReserveAppAsync(appId1, appName1));
+        }
+
+        [Fact]
+        public async Task Should_be_able_to_reserve_after_reservation_removed()
+        {
+            await sut.ReserveAppAsync(appId1, appName1);
+            await sut.RemoveReservationAsync(appId1, appName1);
+
+            Assert.True(await sut.ReserveAppAsync(appId1, appName1));
+        }
+
+        [Fact]
         public async Task Should_remove_app_id_from_index()
         {
             await sut.AddAppAsync(appId1, appName1);

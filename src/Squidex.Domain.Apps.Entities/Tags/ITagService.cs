@@ -21,7 +21,9 @@ namespace Squidex.Domain.Apps.Entities.Tags
 
         Task<Dictionary<string, int>> GetTagsAsync(Guid appId, string group);
 
-        Task RebuildTagsAsync(Guid appId, string group, Dictionary<string, string> allTags);
+        Task<TagSet> GetExportableTagsAsync(Guid appId, string group);
+
+        Task RebuildTagsAsync(Guid appId, string group, TagSet tags);
 
         Task ClearAsync(Guid appId, string group);
     }
