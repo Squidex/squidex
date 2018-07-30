@@ -26,7 +26,7 @@ export class BackupDto extends Model {
         public readonly stopped: DateTime | null,
         public readonly handledEvents: number,
         public readonly handledAssets: number,
-        public readonly isFailed: boolean
+        public readonly status: string
     ) {
         super();
     }
@@ -38,10 +38,11 @@ export class BackupDto extends Model {
 
 export class RestoreDto {
     constructor(
-        public readonly started: DateTime,
-        public readonly status: string,
         public readonly url: string,
-        public readonly isFailed: boolean
+        public readonly started: DateTime,
+        public readonly stopped: DateTime | null,
+        public readonly status: string,
+        public readonly log: string[]
     ) {
     }
 }
@@ -69,7 +70,7 @@ export class BackupsService {
                             item.stopped ? DateTime.parseISO_UTC(item.stopped) : null,
                             item.handledEvents,
                             item.handledAssets,
-                            item.isFailed);
+                            item.status);
                     });
                 }),
                 pretifyError('Failed to load backups.'));
@@ -83,10 +84,11 @@ export class BackupsService {
                     const body: any = response;
 
                     return new RestoreDto(
+                        body.id,
                         DateTime.parseISO_UTC(body.started),
+                        body.stopped ? DateTime.parseISO_UTC(body.stopped) : null,
                         body.status,
-                        body.url,
-                        body.isFailed);
+                        body.log);
                 }),
                 catchError(error => {
                     if (Types.is(error, HttpErrorResponse) && error.status === 404) {

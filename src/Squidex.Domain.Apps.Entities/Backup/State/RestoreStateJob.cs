@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Entities.Backup.State
         public Instant? Stopped { get; set; }
 
         [JsonProperty]
-        public List<string> Log { get; set; }
+        public List<string> Log { get; set; } = new List<string>();
 
         [JsonProperty]
         public JobStatus Status { get; set; }

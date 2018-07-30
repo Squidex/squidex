@@ -32,6 +32,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
         private readonly ITagService tagService;
         private readonly IEventDataFormatter eventDataFormatter;
 
+        public override string Name { get; } = "Assets";
+
         public BackupAssets(IStore<Guid> store,
             IEventDataFormatter eventDataFormatter,
             IAssetStore assetStore,

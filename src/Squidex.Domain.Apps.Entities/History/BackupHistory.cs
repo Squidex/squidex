@@ -17,6 +17,8 @@ namespace Squidex.Domain.Apps.Entities.History
     {
         private readonly IHistoryEventRepository historyEventRepository;
 
+        public override string Name { get; } = "History";
+
         public BackupHistory(IHistoryEventRepository historyEventRepository)
         {
             Guard.NotNull(historyEventRepository, nameof(historyEventRepository));

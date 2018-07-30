@@ -12,6 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using NodaTime;
 using Orleans.Concurrency;
+using Squidex.Domain.Apps.Entities.Backup.Helpers;
 using Squidex.Domain.Apps.Entities.Backup.State;
 using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
@@ -20,6 +21,7 @@ using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.States;
+using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.Backup
 {
@@ -78,33 +80,16 @@ namespace Squidex.Domain.Apps.Entities.Backup
             persistence = store.WithSnapshots<BackupState, Guid>(GetType(), key, s => state = s);
 
             await ReadAsync();
-            await CleanupAsync();
+
+            RecoverAfterRestart();
         }
 
-        public async Task ClearAsync()
+        private void RecoverAfterRestart()
         {
-            foreach (var job in state.Jobs)
-            {
-                await CleanupArchiveAsync(job);
-                await CleanupBackupAsync(job);
-            }
-
-            state = new BackupState();
-
-            await persistence.DeleteAsync();
+            RecoverAfterRestartAsync().Forget();
         }
 
-        private async Task ReadAsync()
-        {
-            await persistence.ReadAsync();
-        }
-
-        private async Task WriteAsync()
-        {
-            await persistence.WriteSnapshotAsync(state);
-        }
-
-        private async Task CleanupAsync()
+        private async Task RecoverAfterRestartAsync()
         {
             foreach (var job in state.Jobs)
             {
@@ -112,43 +97,13 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 {
                     job.Stopped = clock.GetCurrentInstant();
 
-                    await CleanupArchiveAsync(job);
-                    await CleanupBackupAsync(job);
+                    await Safe.DeleteAsync(backupArchiveLocation, job.Id, log);
+                    await Safe.DeleteAsync(assetStore, job.Id, log);
 
                     job.Status = JobStatus.Failed;
 
                     await WriteAsync();
                 }
-            }
-        }
-
-        private async Task CleanupBackupAsync(BackupStateJob job)
-        {
-            try
-            {
-                await assetStore.DeleteAsync(job.Id.ToString(), 0, null);
-            }
-            catch (Exception ex)
-            {
-                log.LogError(ex, w => w
-                    .WriteProperty("action", "deleteBackup")
-                    .WriteProperty("status", "failed")
-                    .WriteProperty("backupId", job.Id.ToString()));
-            }
-        }
-
-        private async Task CleanupArchiveAsync(BackupStateJob job)
-        {
-            try
-            {
-                await backupArchiveLocation.DeleteArchiveAsync(job.Id);
-            }
-            catch (Exception ex)
-            {
-                log.LogError(ex, w => w
-                    .WriteProperty("action", "deleteArchive")
-                    .WriteProperty("status", "failed")
-                    .WriteProperty("backupId", job.Id.ToString()));
             }
         }
 
@@ -220,6 +175,8 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
                     await assetStore.UploadAsync(job.Id.ToString(), 0, null, stream, currentTask.Token);
                 }
+
+                job.Status = JobStatus.Completed;
             }
             catch (Exception ex)
             {
@@ -232,7 +189,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             }
             finally
             {
-                await CleanupArchiveAsync(job);
+                await Safe.DeleteAsync(backupArchiveLocation, job.Id, log);
 
                 job.Stopped = clock.GetCurrentInstant();
 
@@ -247,7 +204,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
         {
             var now = clock.GetCurrentInstant();
 
-            if (ShouldUpdate(lastTimestamp, now))
+            if ((now - lastTimestamp) >= UpdateDuration)
             {
                 lastTimestamp = now;
 
@@ -272,8 +229,8 @@ namespace Squidex.Domain.Apps.Entities.Backup
             }
             else
             {
-                await CleanupArchiveAsync(job);
-                await CleanupBackupAsync(job);
+                await Safe.DeleteAsync(backupArchiveLocation, job.Id, log);
+                await Safe.DeleteAsync(assetStore, job.Id, log);
 
                 state.Jobs.Remove(job);
 
@@ -286,14 +243,14 @@ namespace Squidex.Domain.Apps.Entities.Backup
             return J.AsTask(state.Jobs.OfType<IBackupJob>().ToList());
         }
 
-        private static bool ShouldUpdate(Instant lastTimestamp, Instant now)
+        private async Task ReadAsync()
         {
-            return (now - lastTimestamp) >= UpdateDuration;
+            await persistence.ReadAsync();
         }
 
-        private bool IsRunning()
+        private async Task WriteAsync()
         {
-            return state.Jobs.Any(x => !x.Stopped.HasValue);
+            await persistence.WriteSnapshotAsync(state);
         }
     }
 }

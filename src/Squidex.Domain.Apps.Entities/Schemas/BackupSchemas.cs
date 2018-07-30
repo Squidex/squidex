@@ -29,6 +29,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         private readonly FieldRegistry fieldRegistry;
         private readonly IGrainFactory grainFactory;
 
+        public override string Name { get; } = "Schemas";
+
         public BackupSchemas(IStore<Guid> store, FieldRegistry fieldRegistry, IGrainFactory grainFactory)
             : base(store)
         {

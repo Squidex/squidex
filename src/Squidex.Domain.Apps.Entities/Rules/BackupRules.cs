@@ -25,6 +25,8 @@ namespace Squidex.Domain.Apps.Entities.Rules
         private readonly HashSet<Guid> ruleIds = new HashSet<Guid>();
         private readonly IGrainFactory grainFactory;
 
+        public override string Name { get; } = "Rules";
+
         public BackupRules(IStore<Guid> store, IGrainFactory grainFactory)
             : base(store)
         {

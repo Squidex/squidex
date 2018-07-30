@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using NodaTime;
 using Squidex.Domain.Apps.Entities.Backup;
@@ -22,20 +23,25 @@ namespace Squidex.Areas.Api.Controllers.Backups.Models
         public Uri Uri { get; set; }
 
         /// <summary>
-        /// The status text.
+        /// The status log.
         /// </summary>
         [Required]
-        public string Status { get; set; }
+        public List<string> Log { get; set; }
 
         /// <summary>
-        /// Indicates when the restore operation has been started.
+        /// The time when the job has been started.
         /// </summary>
         public Instant Started { get; set; }
 
         /// <summary>
-        /// Indicates if the restore has failed.
+        /// The time when the job has been stopped.
         /// </summary>
-        public bool IsFailed { get; set; }
+        public Instant? Stopped { get; set; }
+
+        /// <summary>
+        /// The status of the operation.
+        /// </summary>
+        public JobStatus Status { get; set; }
 
         public static RestoreJobDto FromJob(IRestoreJob job)
         {

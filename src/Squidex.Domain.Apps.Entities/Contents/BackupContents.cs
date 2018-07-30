@@ -24,6 +24,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
         private readonly HashSet<Guid> contentIds = new HashSet<Guid>();
         private readonly IContentRepository contentRepository;
 
+        public override string Name { get; } = "Contents";
+
         public BackupContents(IStore<Guid> store, IContentRepository contentRepository)
             : base(store)
         {

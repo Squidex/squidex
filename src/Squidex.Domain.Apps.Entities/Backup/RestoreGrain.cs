@@ -40,6 +40,11 @@ namespace Squidex.Domain.Apps.Entities.Backup
         private RestoreState state = new RestoreState();
         private IPersistence<RestoreState> persistence;
 
+        private RestoreStateJob CurrentJob
+        {
+            get { return state.Job; }
+        }
+
         public RestoreGrain(
             IAssetStore assetStore,
             IBackupArchiveLocation backupArchiveLocation,
@@ -92,9 +97,11 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         private async Task RecoverAfterRestartAsync()
         {
-            if (state.Job?.Status == JobStatus.Started)
+            if (CurrentJob?.Status == JobStatus.Started)
             {
                 Log("Failed due application restart");
+
+                CurrentJob.Status = JobStatus.Failed;
 
                 await CleanupAsync();
                 await WriteAsync();
@@ -105,7 +112,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
         {
             Guard.NotNull(url, nameof(url));
 
-            if (state.Job?.Status == JobStatus.Started)
+            if (CurrentJob?.Status == JobStatus.Started)
             {
                 throw new DomainException("A restore operation is already running.");
             }
@@ -134,17 +141,24 @@ namespace Squidex.Domain.Apps.Entities.Backup
             {
                 try
                 {
+                    Log("Started. The restore process has the following steps:");
+                    Log("  * Download backup");
+                    Log("  * Restore events and attachments.");
+                    Log("  * Restore all objects like app, schemas and contents");
+                    Log("  * Complete the restore operation for all objects");
+
                     log.LogInformation(w => w
                         .WriteProperty("action", "restore")
                         .WriteProperty("status", "started")
-                        .WriteProperty("url", state.Job.Uri.ToString()));
+                        .WriteProperty("operationId", CurrentJob.Id.ToString())
+                        .WriteProperty("url", CurrentJob.Uri.ToString()));
 
                     using (Profiler.Trace("Download"))
                     {
                         await DownloadAsync();
                     }
 
-                    using (var reader = await backupArchiveLocation.OpenArchiveAsync(state.Job.Id))
+                    using (var reader = await backupArchiveLocation.OpenArchiveAsync(CurrentJob.Id))
                     {
                         using (Profiler.Trace("ReadEvents"))
                         {
@@ -155,7 +169,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                         {
                             using (Profiler.TraceMethod(handler.GetType(), nameof(BackupHandler.RestoreAsync)))
                             {
-                                await handler.RestoreAsync(state.Job.AppId, reader);
+                                await handler.RestoreAsync(CurrentJob.AppId, reader);
                             }
 
                             Log($"Restored {handler.Name}");
@@ -165,20 +179,23 @@ namespace Squidex.Domain.Apps.Entities.Backup
                         {
                             using (Profiler.TraceMethod(handler.GetType(), nameof(BackupHandler.CompleteRestoreAsync)))
                             {
-                                await handler.CompleteRestoreAsync(state.Job.AppId, reader);
+                                await handler.CompleteRestoreAsync(CurrentJob.AppId, reader);
                             }
 
                             Log($"Completed {handler.Name}");
                         }
                     }
 
-                    state.Job.Status = JobStatus.Failed;
+                    CurrentJob.Status = JobStatus.Completed;
+
+                    Log("Completed, Yeah!");
 
                     log.LogInformation(w =>
                     {
                         w.WriteProperty("action", "restore");
                         w.WriteProperty("status", "completed");
-                        w.WriteProperty("url", state.Job.Uri.ToString());
+                        w.WriteProperty("operationId", CurrentJob.Id.ToString());
+                        w.WriteProperty("url", CurrentJob.Uri.ToString());
 
                         Profiler.Session?.Write(w);
                     });
@@ -194,28 +211,24 @@ namespace Squidex.Domain.Apps.Entities.Backup
                         Log("Failed with internal error");
                     }
 
-                    try
-                    {
-                        await CleanupAsync(ex);
-                    }
-                    catch (Exception ex2)
-                    {
-                        ex = ex2;
-                    }
+                    await CleanupAsync(ex);
 
-                    state.Job.Status = JobStatus.Failed;
+                    CurrentJob.Status = JobStatus.Failed;
 
                     log.LogError(ex, w =>
                     {
                         w.WriteProperty("action", "retore");
                         w.WriteProperty("status", "failed");
-                        w.WriteProperty("url", state.Job.Uri.ToString());
+                        w.WriteProperty("operationId", CurrentJob.Id.ToString());
+                        w.WriteProperty("url", CurrentJob.Uri.ToString());
 
                         Profiler.Session?.Write(w);
                     });
                 }
                 finally
                 {
+                    CurrentJob.Stopped = clock.GetCurrentInstant();
+
                     await WriteAsync();
                 }
             }
@@ -223,16 +236,16 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         private async Task CleanupAsync(Exception exception = null)
         {
-            await backupArchiveLocation.DeleteArchiveAsync(state.Job.Id);
+            await Safe.DeleteAsync(backupArchiveLocation, CurrentJob.Id, log);
 
-            if (state.Job.AppId != Guid.Empty)
+            if (CurrentJob.AppId != Guid.Empty)
             {
                 foreach (var handler in handlers)
                 {
-                    await handler.CleanupRestoreAsync(state.Job.AppId, exception);
+                    await Safe.CleanupRestoreAsync(handler, CurrentJob.AppId, CurrentJob.Id, log);
                 }
 
-                await appCleaner.EnqueueAppAsync(state.Job.AppId);
+                await appCleaner.EnqueueAppAsync(CurrentJob.AppId);
             }
         }
 
@@ -240,7 +253,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
         {
             Log("Downloading Backup");
 
-            await backupArchiveLocation.DownloadAsync(state.Job.Uri, state.Job.Id);
+            await backupArchiveLocation.DownloadAsync(CurrentJob.Uri, CurrentJob.Id);
 
             Log("Downloaded Backup");
         }
@@ -255,21 +268,22 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 {
                     squidexEvent.Actor = actor;
                 }
-                else if (@event.Payload is AppCreated appCreated)
+
+                if (@event.Payload is AppCreated appCreated)
                 {
-                    state.Job.AppId = appCreated.AppId.Id;
+                    CurrentJob.AppId = appCreated.AppId.Id;
 
                     await CheckCleanupStatus();
                 }
 
                 foreach (var handler in handlers)
                 {
-                    await handler.RestoreEventAsync(@event, state.Job.AppId, reader);
+                    await handler.RestoreEventAsync(@event, CurrentJob.AppId, reader);
                 }
 
                 await eventStore.AppendAsync(Guid.NewGuid(), storedEvent.StreamName, new List<EventData> { storedEvent.Data });
 
-                Log($"Read {reader.ReadEvents} events and {reader.ReadAttachments} attachments.");
+                Log($"Read {reader.ReadEvents} events and {reader.ReadAttachments} attachments.", true);
             });
 
             Log("Reading events completed.");
@@ -279,7 +293,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
         {
             var cleaner = grainFactory.GetGrain<IAppCleanerGrain>(SingleGrain.Id);
 
-            var status = await cleaner.GetStatusAsync(state.Job.AppId);
+            var status = await cleaner.GetStatusAsync(CurrentJob.AppId);
 
             if (status == CleanerStatus.Cleaning)
             {
@@ -292,9 +306,16 @@ namespace Squidex.Domain.Apps.Entities.Backup
             }
         }
 
-        private void Log(string message)
+        private void Log(string message, bool replace = false)
         {
-            state.Job.Log.Add($"{clock.GetCurrentInstant()}: {message}");
+            if (replace && CurrentJob.Log.Count > 0)
+            {
+                CurrentJob.Log[CurrentJob.Log.Count - 1] = $"{clock.GetCurrentInstant()}: {message}";
+            }
+            else
+            {
+                CurrentJob.Log.Add($"{clock.GetCurrentInstant()}: {message}");
+            }
         }
 
         private async Task ReadAsync()
@@ -309,7 +330,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         public Task<J<IRestoreJob>> GetJobAsync()
         {
-            return Task.FromResult<J<IRestoreJob>>(state.Job);
+            return Task.FromResult<J<IRestoreJob>>(CurrentJob);
         }
     }
 }

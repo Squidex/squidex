@@ -55,7 +55,7 @@ describe('BackupsService', () => {
                 stopped: '2017-02-04',
                 handledEvents: 13,
                 handledAssets: 17,
-                isFailed: false
+                status: 'Failed'
             },
             {
                 id: '2',
@@ -63,14 +63,14 @@ describe('BackupsService', () => {
                 stopped: null,
                 handledEvents: 23,
                 handledAssets: 27,
-                isFailed: true
+                status: 'Completed'
             }
         ]);
 
         expect(backups!).toEqual(
             [
-                new BackupDto('1', DateTime.parseISO_UTC('2017-02-03'), DateTime.parseISO_UTC('2017-02-04'), 13, 17, false),
-                new BackupDto('2', DateTime.parseISO_UTC('2018-02-03'), null, 23, 27, true)
+                new BackupDto('1', DateTime.parseISO_UTC('2017-02-03'), DateTime.parseISO_UTC('2017-02-04'), 13, 17, 'Failed'),
+                new BackupDto('2', DateTime.parseISO_UTC('2018-02-03'), null, 23, 27, 'Completed')
             ]);
     }));
 

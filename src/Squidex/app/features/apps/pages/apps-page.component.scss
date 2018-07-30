@@ -12,20 +12,13 @@
         padding-top: 2rem;
         padding-right: 1.25rem;
         padding-bottom: 0;
+        padding-left: $size-sidebar-width + .25rem;
         display: block;
     }
 }
 
-.col-left {
-    padding-left: $size-sidebar-width + .25rem;
-}
-
-.col-right {
-    border-left: 1px solid darken($color-border, 3%);
-    min-height: 200px;
-    min-width: 300px;
-    max-width: 300px;
-    padding: 0 2rem 0 1rem;
+.restore-link {
+    font-size: 0.8rem;
 }
 
 .card {
@@ -88,39 +81,6 @@
         &:focus,
         &:active {
             text-decoration: none;
-        }
-    }
-}
-
-$cicle-size: 1.5rem;
-
-.restore {
-    &-card {
-        float: none;
-    }
-
-    &-status {
-        & {
-            @include circle($cicle-size);
-            line-height: $cicle-size + .1rem;
-            text-align: center;
-            font-size: .6 * $cicle-size;
-            font-weight: normal;
-            background: $color-border;
-            color: $color-dark-foreground;
-            vertical-align: middle;
-        }
-    
-        &-pending {
-            color: inherit;
-        }
-    
-        &-failed {
-            background: $color-theme-error;
-        }
-    
-        &-success {
-            background: $color-theme-green;
         }
     }
 }

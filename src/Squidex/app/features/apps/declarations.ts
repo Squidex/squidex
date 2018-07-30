@@ -7,3 +7,4 @@
 
 export * from './pages/apps-page.component';
 export * from './pages/onboarding-dialog.component';
+export * from './pages/restore-page.component';

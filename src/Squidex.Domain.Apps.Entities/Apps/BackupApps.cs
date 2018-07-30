@@ -27,6 +27,8 @@ namespace Squidex.Domain.Apps.Entities.Apps
         private bool isReserved;
         private AppCreated appCreated;
 
+        public override string Name { get; } = "Apps";
+
         public BackupApps(IStore<Guid> store, IGrainFactory grainFactory)
             : base(store)
         {
@@ -78,7 +80,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             }
         }
 
-        public override async Task CleanupRestoreAsync(Guid appId, Exception exception)
+        public override async Task CleanupRestoreAsync(Guid appId)
         {
             if (isReserved)
             {

@@ -12,13 +12,17 @@ import { SqxFrameworkModule, SqxSharedModule } from '@app/shared';
 
 import {
     AppsPageComponent,
-    OnboardingDialogComponent
+    OnboardingDialogComponent,
+    RestorePageComponent
 } from './declarations';
 
 const routes: Routes = [
     {
         path: '',
         component: AppsPageComponent
+    }, {
+        path: 'restore',
+        component: RestorePageComponent
     }
 ];
 
@@ -30,7 +34,8 @@ const routes: Routes = [
     ],
     declarations: [
         AppsPageComponent,
-        OnboardingDialogComponent
+        OnboardingDialogComponent,
+        RestorePageComponent
     ]
 })
 export class SqxFeatureAppsModule { }
