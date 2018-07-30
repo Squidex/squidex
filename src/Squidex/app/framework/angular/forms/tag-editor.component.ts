@@ -5,14 +5,18 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, ElementRef, forwardRef, Input, ViewChild } from '@angular/core';
+import { Component, ElementRef, forwardRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { Subscription } from 'rxjs';
+import { distinctUntilChanged, map, tap } from 'rxjs/operators';
 
 import { Types } from '@app/framework/internal';
 
 const KEY_COMMA = 188;
 const KEY_DELETE = 8;
 const KEY_ENTER = 13;
+const KEY_UP = 38;
+const KEY_DOWN = 40;
 
 export interface Converter {
     convert(input: string): any;
@@ -73,7 +77,8 @@ export const SQX_TAG_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     templateUrl: './tag-editor.component.html',
     providers: [SQX_TAG_EDITOR_CONTROL_VALUE_ACCESSOR]
 })
-export class TagEditorComponent implements ControlValueAccessor {
+export class TagEditorComponent implements ControlValueAccessor, OnDestroy, OnInit {
+    private subscription: Subscription;
     private callChange = (v: any) => { /* NOOP */ };
     private callTouched = () => { /* NOOP */ };
 
@@ -81,10 +86,16 @@ export class TagEditorComponent implements ControlValueAccessor {
     public converter: Converter = new StringConverter();
 
     @Input()
-    public useDefaultValue = true;
+    public undefinedWhenEmpty = true;
 
     @Input()
     public acceptEnter = false;
+
+    @Input()
+    public allowDuplicates = true;
+
+    @Input()
+    public suggestions: string[] = [];
 
     @Input()
     public class: string;
@@ -100,9 +111,43 @@ export class TagEditorComponent implements ControlValueAccessor {
 
     public hasFocus = false;
 
+    public suggestedItems: string[] = [];
+    public suggestedIndex = 0;
+
     public items: any[] = [];
 
     public addInput = new FormControl();
+
+    public ngOnDestroy() {
+        this.subscription.unsubscribe();
+    }
+
+    public ngOnInit() {
+        this.subscription =
+            this.addInput.valueChanges.pipe(
+                    tap(() => {
+                        this.adjustSize();
+                    }),
+                    map(query => <string>query),
+                    map(query => query ? query.trim() : query),
+                    tap(query => {
+                        if (!query) {
+                            this.resetAutocompletion();
+                        }
+                    }),
+                    distinctUntilChanged(),
+                    map(query => {
+                        if (Types.isArray(this.suggestions) && query && query.length > 0) {
+                            return this.suggestions.filter(s => s.indexOf(query) >= 0 && this.items.indexOf(s) < 0);
+                        } else {
+                            return [];
+                        }
+                    }))
+                .subscribe(items => {
+                    this.suggestedIndex = -1;
+                    this.suggestedItems = items || [];
+                });
+    }
 
     public writeValue(obj: any) {
         this.resetForm();
@@ -136,12 +181,6 @@ export class TagEditorComponent implements ControlValueAccessor {
         }
     }
 
-    private resetForm() {
-        this.addInput.reset();
-
-        this.adjustSize();
-    }
-
     public markTouched() {
         this.callTouched();
 
@@ -171,17 +210,13 @@ export class TagEditorComponent implements ControlValueAccessor {
     }
 
     public onKeyDown(event: KeyboardEvent) {
-        if (event.keyCode === KEY_COMMA || (event.keyCode === KEY_ENTER && this.acceptEnter)) {
-            const value = <string>this.addInput.value;
+        const key = event.keyCode;
 
-            if (value && this.converter.isValidInput(value)) {
-                const converted = this.converter.convert(value);
-
-                this.updateItems([...this.items, converted]);
-                this.resetForm();
+        if (key === KEY_COMMA) {
+            if (this.selectValue(this.addInput.value)) {
                 return false;
             }
-        } else if (event.keyCode === KEY_DELETE) {
+        } else if (key === KEY_DELETE) {
             const value = <string>this.addInput.value;
 
             if (!value || value.length === 0) {
@@ -189,15 +224,74 @@ export class TagEditorComponent implements ControlValueAccessor {
 
                 return false;
             }
+        } else if (key === KEY_UP) {
+            this.up();
+            return false;
+        } else if (key === KEY_DOWN) {
+            this.down();
+            return false;
+        } else if (key === KEY_ENTER) {
+            if (this.suggestedIndex >= 0) {
+                if (this.selectValue(this.suggestedItems[this.suggestedIndex])) {
+                    return false;
+                }
+            } else if (this.acceptEnter) {
+                if (this.selectValue(this.addInput.value)) {
+                    return false;
+                }
+            }
         }
 
         return true;
     }
 
-    private updateItems(items: string[]) {
+    public selectValue(value: string) {
+        if (value && this.converter.isValidInput(value)) {
+            const converted = this.converter.convert(value);
+
+            if (this.allowDuplicates || this.items.indexOf(converted) < 0) {
+                this.updateItems([...this.items, converted]);
+            }
+
+            this.resetForm();
+            this.resetAutocompletion();
+            return true;
+        }
+    }
+
+    private resetAutocompletion() {
+        this.suggestedItems = [];
+        this.suggestedIndex = -1;
+    }
+
+    public selectIndex(selection: number) {
+        if (selection < 0) {
+            selection = 0;
+        }
+
+        if (selection >= this.items.length) {
+            selection = this.items.length - 1;
+        }
+
+        this.suggestedIndex = selection;
+    }
+
+    private resetForm() {
+        this.addInput.reset();
+    }
+
+    private up() {
+        this.selectIndex(this.suggestedIndex - 1);
+    }
+
+    private down() {
+        this.selectIndex(this.suggestedIndex + 1);
+    }
+
+    private updateItems(items: any[]) {
         this.items = items;
 
-        if (items.length === 0 && this.useDefaultValue) {
+        if (items.length === 0 && this.undefinedWhenEmpty) {
             this.callChange(undefined);
         } else {
             this.callChange(this.items);

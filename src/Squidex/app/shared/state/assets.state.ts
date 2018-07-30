@@ -37,6 +37,10 @@ export class AssetsState extends State<Snapshot> {
         this.changes.pipe(map(x => x.tags),
             distinctUntilChanged(), map(x => sort(x)));
 
+    public tagsNames =
+        this.tags.pipe(
+            distinctUntilChanged(), map(x => x.map(t => t.name)));
+
     public assets =
         this.changes.pipe(map(x => x.assets),
             distinctUntilChanged());

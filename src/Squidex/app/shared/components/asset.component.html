@@ -68,7 +68,13 @@
                 </div>
             </div>
             <div class="file-tags tags">
-                <sqx-tag-editor [acceptEnter]="true" [useDefaultValue]="false" [formControl]="tagInput" class="blank"></sqx-tag-editor>
+                <sqx-tag-editor
+                    [suggestions]="allTags" 
+                    [acceptEnter]="true"
+                    [allowDuplicates]="false"
+                    [undefinedWhenEmpty]="false" 
+                    [formControl]="tagInput" class="blank">
+                </sqx-tag-editor>
             </div>
             <div class="file-info">
                 <ng-container *ngIf="asset.pixelWidth">{{asset.pixelWidth}}x{{asset.pixelHeight}}px, </ng-container> {{asset.fileSize | sqxFileSize}}
