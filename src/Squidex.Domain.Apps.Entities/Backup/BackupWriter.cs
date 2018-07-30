@@ -10,6 +10,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Squidex.Domain.Apps.Entities.Backup.Archive;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 
@@ -17,8 +18,6 @@ namespace Squidex.Domain.Apps.Entities.Backup
 {
     public sealed class BackupWriter : DisposableObjectBase
     {
-        private const int MaxEventsPerFolder = 1000;
-        private const int MaxAttachmentFolders = 1000;
         private static readonly JsonSerializer JsonSerializer = JsonSerializer.CreateDefault();
         private readonly ZipArchive archive;
         private int writtenEvents;
@@ -52,9 +51,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             Guard.NotNullOrEmpty(name, nameof(name));
             Guard.NotNull(handler, nameof(handler));
 
-            var attachmentFolder = Math.Abs(name.GetHashCode() % MaxAttachmentFolders);
-            var attachmentPath = $"attachments/{attachmentFolder}/{name}";
-            var attachmentEntry = archive.CreateEntry(attachmentPath);
+            var attachmentEntry = archive.CreateEntry(ArchiveHelper.GetAttachmentPath(name));
 
             using (var stream = attachmentEntry.Open())
             {
@@ -66,9 +63,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         public void WriteEvent(StoredEvent storedEvent)
         {
-            var eventFolder = writtenEvents / MaxEventsPerFolder;
-            var eventPath = $"events/{eventFolder}/{writtenEvents}.json";
-            var eventEntry = archive.GetEntry(eventPath) ?? archive.CreateEntry(eventPath);
+            var eventEntry = archive.CreateEntry(ArchiveHelper.GetEventPath(writtenEvents));
 
             using (var stream = eventEntry.Open())
             {

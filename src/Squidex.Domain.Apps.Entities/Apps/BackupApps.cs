@@ -52,7 +52,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
                         if (!(isReserved = await index.ReserveAppAsync(appCreated.AppId.Id, appCreated.AppId.Name)))
                         {
-                            throw new DomainException("The app id or name is not available.");
+                            throw new BackupRestoreException("The app id or name is not available.");
                         }
 
                         break;
@@ -68,7 +68,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             }
         }
 
-        public override async Task RestoreAsync(Guid appId, BackupReader reader)
+        public override async Task CompleteRestoreAsync(Guid appId, BackupReader reader)
         {
             await grainFactory.GetGrain<IAppsByNameIndex>(SingleGrain.Id).AddAppAsync(appCreated.AppId.Id, appCreated.AppId.Name);
 

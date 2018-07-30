@@ -185,17 +185,31 @@ namespace Squidex.Config.Domain
 
         private static void AddBackupHandlers(this IServiceCollection services)
         {
-            services.AddTransient<BackupApps>();
-            services.AddTransient<BackupAssets>();
-            services.AddTransient<BackupContents>();
-            services.AddTransient<BackupHistory>();
-            services.AddTransient<BackupRules>();
-            services.AddTransient<BackupSchemas>();
+            services.AddTransientAs<BackupApps>()
+                .As<BackupHandler>();
+
+            services.AddTransientAs<BackupAssets>()
+                .As<BackupHandler>();
+
+            services.AddTransientAs<BackupContents>()
+                .As<BackupHandler>();
+
+            services.AddTransientAs<BackupHistory>()
+                .As<BackupHandler>();
+
+            services.AddTransientAs<BackupRules>()
+                .As<BackupHandler>();
+
+            services.AddTransientAs<BackupSchemas>()
+                .As<BackupHandler>();
         }
 
         public static void AddMyMigrationServices(this IServiceCollection services)
         {
             services.AddSingletonAs<Migrator>()
+                .AsSelf();
+
+            services.AddTransientAs<Rebuilder>()
                 .AsSelf();
 
             services.AddTransientAs<MigrationPath>()
@@ -227,9 +241,6 @@ namespace Squidex.Config.Domain
 
             services.AddTransientAs<StopEventConsumers>()
                 .As<IMigration>();
-
-            services.AddTransientAs<Rebuilder>()
-                .AsSelf();
         }
     }
 }

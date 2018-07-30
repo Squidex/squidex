@@ -7,15 +7,15 @@
 
 using System;
 using System.Threading.Tasks;
-using Squidex.Infrastructure;
+using Orleans;
 using Squidex.Infrastructure.Orleans;
 
 namespace Squidex.Domain.Apps.Entities.Backup
 {
-    public interface IRestoreGrain
+    public interface IRestoreGrain : IGrainWithStringKey
     {
-        Task RestoreAsync(Uri url, RefToken user);
+        Task RestoreAsync(Uri url);
 
-        Task<J<IRestoreJob>> GetStateAsync();
+        Task<J<IRestoreJob>> GetJobAsync();
     }
 }

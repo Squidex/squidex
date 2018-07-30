@@ -14,6 +14,8 @@ namespace Squidex.Domain.Apps.Entities.Backup
 {
     public abstract class BackupHandler
     {
+        public abstract string Name { get; }
+
         public virtual Task RestoreEventAsync(Envelope<IEvent> @event, Guid appId, BackupReader reader)
         {
             return TaskHelper.Done;

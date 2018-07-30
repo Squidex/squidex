@@ -29,6 +29,6 @@ namespace Squidex.Domain.Apps.Entities.Backup.State
         public int HandledAssets { get; set; }
 
         [JsonProperty]
-        public bool IsFailed { get; set; }
+        public JobStatus Status { get; set; }
     }
 }

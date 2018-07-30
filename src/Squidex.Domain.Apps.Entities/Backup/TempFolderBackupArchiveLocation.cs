@@ -18,7 +18,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
         {
             var tempFile = GetTempFile(backupId);
 
-            return Task.FromResult<Stream>(new FileStream(tempFile, FileMode.Create, FileAccess.ReadWrite));
+            return Task.FromResult<Stream>(new FileStream(tempFile, FileMode.OpenOrCreate, FileAccess.ReadWrite));
         }
 
         public Task DeleteArchiveAsync(Guid backupId)
@@ -38,7 +38,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         private static string GetTempFile(Guid backupId)
         {
-            return Path.Combine(Path.GetTempPath(), backupId.ToString());
+            return Path.Combine(Path.GetTempPath(), backupId.ToString() + ".zip");
         }
     }
 }

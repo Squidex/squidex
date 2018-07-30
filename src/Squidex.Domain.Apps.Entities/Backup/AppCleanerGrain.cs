@@ -33,7 +33,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
         private bool isCleaning;
         private State state = new State();
 
-        [CollectionName("Index_AppsByName")]
+        [CollectionName("AppCleaner")]
         public sealed class State
         {
             public HashSet<Guid> Apps { get; set; } = new HashSet<Guid>();
@@ -61,35 +61,40 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         public async override Task OnActivateAsync(string key)
         {
-            await RegisterOrUpdateReminder("Default", TimeSpan.Zero, TimeSpan.FromMinutes(2));
+            await RegisterOrUpdateReminder("Default", TimeSpan.Zero, TimeSpan.FromMinutes(1));
 
             persistence = store.WithSnapshots<AppCleanerGrain, State, Guid>(Guid.Empty, s =>
             {
                 state = s;
             });
 
-            await persistence.ReadAsync();
+            await ReadAsync();
 
-            await CleanAsync();
+            Clean();
         }
 
         public Task EnqueueAppAsync(Guid appId)
         {
-            state.Apps.Add(appId);
+            if (appId != Guid.Empty)
+            {
+                state.Apps.Add(appId);
 
-            return persistence.WriteSnapshotAsync(state);
+                Clean();
+            }
+
+            return WriteAsync();
         }
 
         public Task ActivateAsync()
         {
-            CleanAsync().Forget();
+            Clean();
 
             return TaskHelper.Done;
         }
 
         public Task ReceiveReminder(string reminderName, TickStatus status)
         {
-            CleanAsync().Forget();
+            Clean();
 
             return TaskHelper.Done;
         }
@@ -100,14 +105,18 @@ namespace Squidex.Domain.Apps.Entities.Backup
             {
                 return Task.FromResult(CleanerStatus.Cleaning);
             }
-            else if (state.FailedApps.Contains(appId))
+
+            if (state.FailedApps.Contains(appId))
             {
                 return Task.FromResult(CleanerStatus.Failed);
             }
-            else
-            {
-                return Task.FromResult(CleanerStatus.Cleaned);
-            }
+
+            return Task.FromResult(CleanerStatus.Cleaned);
+        }
+
+        private void Clean()
+        {
+            CleanAsync().Forget();
         }
 
         private async Task CleanAsync()
@@ -142,7 +151,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                         .WriteProperty("status", "started")
                         .WriteProperty("appId", appId.ToString()));
 
-                    await CleanupCoreAsync(appId);
+                    await CleanupAppCoreAsync(appId);
 
                     log.LogInformation(w =>
                     {
@@ -170,16 +179,16 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 {
                     state.Apps.Remove(appId);
 
-                    await persistence.WriteSnapshotAsync(state);
+                    await WriteAsync();
                 }
             }
         }
 
-        private async Task CleanupCoreAsync(Guid appId)
+        private async Task CleanupAppCoreAsync(Guid appId)
         {
             using (Profiler.Trace("DeleteEvents"))
             {
-                await eventStore.DeleteManyAsync("AppId", appId);
+                await eventStore.DeleteManyAsync("AppId", appId.ToString());
             }
 
             foreach (var handler in handlers)
@@ -189,6 +198,16 @@ namespace Squidex.Domain.Apps.Entities.Backup
                     await handler.RemoveAsync(appId);
                 }
             }
+        }
+
+        private async Task ReadAsync()
+        {
+            await persistence.ReadAsync();
+        }
+
+        private async Task WriteAsync()
+        {
+            await persistence.WriteSnapshotAsync(state);
         }
     }
 }

@@ -115,7 +115,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                     await CleanupArchiveAsync(job);
                     await CleanupBackupAsync(job);
 
-                    job.IsFailed = true;
+                    job.Status = JobStatus.Failed;
 
                     await WriteAsync();
                 }
@@ -164,7 +164,12 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 throw new DomainException($"You cannot have more than {MaxBackups} backups.");
             }
 
-            var job = new BackupStateJob { Id = Guid.NewGuid(), Started = clock.GetCurrentInstant() };
+            var job = new BackupStateJob
+            {
+                Id = Guid.NewGuid(),
+                Started = clock.GetCurrentInstant(),
+                Status = JobStatus.Started
+            };
 
             currentTask = new CancellationTokenSource();
             currentJob = job;
@@ -195,14 +200,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                             job.HandledEvents = writer.WrittenEvents;
                             job.HandledAssets = writer.WrittenAttachments;
 
-                            var now = clock.GetCurrentInstant();
-
-                            if ((now - lastTimestamp) >= UpdateDuration)
-                            {
-                                lastTimestamp = now;
-
-                                await WriteAsync();
-                            }
+                            lastTimestamp = await WritePeriodically(lastTimestamp);
                         }, SquidexHeaders.AppId, appId.ToString(), null, currentTask.Token);
 
                         foreach (var handler in handlers)
@@ -230,7 +228,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                     .WriteProperty("status", "failed")
                     .WriteProperty("backupId", job.Id.ToString()));
 
-                job.IsFailed = true;
+                job.Status = JobStatus.Failed;
             }
             finally
             {
@@ -243,6 +241,20 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 currentTask = null;
                 currentJob = null;
             }
+        }
+
+        private async Task<Instant> WritePeriodically(Instant lastTimestamp)
+        {
+            var now = clock.GetCurrentInstant();
+
+            if (ShouldUpdate(lastTimestamp, now))
+            {
+                lastTimestamp = now;
+
+                await WriteAsync();
+            }
+
+            return lastTimestamp;
         }
 
         public async Task DeleteAsync(Guid id)
@@ -272,6 +284,11 @@ namespace Squidex.Domain.Apps.Entities.Backup
         public Task<J<List<IBackupJob>>> GetStateAsync()
         {
             return J.AsTask(state.Jobs.OfType<IBackupJob>().ToList());
+        }
+
+        private static bool ShouldUpdate(Instant lastTimestamp, Instant now)
+        {
+            return (now - lastTimestamp) >= UpdateDuration;
         }
 
         private bool IsRunning()

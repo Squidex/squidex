@@ -6,14 +6,30 @@
 // ==========================================================================
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Squidex.Infrastructure.Tasks
 {
     public static class TaskExtensions
     {
+        private static readonly Action<Task> IgnoreTaskContinuation = t => { var ignored = t.Exception; };
+
         public static void Forget(this Task task)
         {
+            if (task.IsCompleted)
+            {
+                var ignored = task.Exception;
+            }
+            else
+            {
+                task.ContinueWith(
+                    IgnoreTaskContinuation,
+                    CancellationToken.None,
+                    TaskContinuationOptions.OnlyOnFaulted |
+                    TaskContinuationOptions.ExecuteSynchronously,
+                    TaskScheduler.Default);
+            }
         }
 
         public static Func<TInput, TOutput> ToDefault<TInput, TOutput>(this Action<TInput> action)

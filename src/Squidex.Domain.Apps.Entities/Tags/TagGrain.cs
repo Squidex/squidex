@@ -55,7 +55,7 @@ namespace Squidex.Domain.Apps.Entities.Tags
         {
             state.Tags = tags;
 
-            return persistence.DeleteAsync();
+            return persistence.WriteSnapshotAsync(state);
         }
 
         public async Task<HashSet<string>> NormalizeTagsAsync(HashSet<string> names, HashSet<string> ids)

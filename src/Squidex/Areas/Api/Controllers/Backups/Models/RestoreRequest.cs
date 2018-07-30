@@ -6,22 +6,16 @@
 // ==========================================================================
 
 using System;
-using NodaTime;
+using System.ComponentModel.DataAnnotations;
 
-namespace Squidex.Domain.Apps.Entities.Backup
+namespace Squidex.Areas.Api.Controllers.Backups.Models
 {
-    public interface IBackupJob
+    public sealed class RestoreRequest
     {
-        Guid Id { get; }
-
-        Instant Started { get; }
-
-        Instant? Stopped { get; }
-
-        int HandledEvents { get; }
-
-        int HandledAssets { get; }
-
-        JobStatus Status { get; }
+        /// <summary>
+        /// The url to the restore file.
+        /// </summary>
+        [Required]
+        public Uri Url { get; set; }
     }
 }

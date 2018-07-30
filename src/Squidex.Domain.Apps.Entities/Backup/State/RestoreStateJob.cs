@@ -6,22 +6,19 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 using NodaTime;
-using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Backup.State
 {
     public sealed class RestoreStateJob : IRestoreJob
     {
         [JsonProperty]
-        public Guid Id { get; set; } = Guid.NewGuid();
+        public Guid Id { get; set; }
 
         [JsonProperty]
         public Guid AppId { get; set; }
-
-        [JsonProperty]
-        public RefToken User { get; set; }
 
         [JsonProperty]
         public Uri Uri { get; set; }
@@ -30,9 +27,12 @@ namespace Squidex.Domain.Apps.Entities.Backup.State
         public Instant Started { get; set; }
 
         [JsonProperty]
-        public string Status { get; set; }
+        public Instant? Stopped { get; set; }
 
         [JsonProperty]
-        public bool IsFailed { get; set; }
+        public List<string> Log { get; set; }
+
+        [JsonProperty]
+        public JobStatus Status { get; set; }
     }
 }

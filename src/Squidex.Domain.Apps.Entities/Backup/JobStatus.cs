@@ -5,23 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using NodaTime;
-
 namespace Squidex.Domain.Apps.Entities.Backup
 {
-    public interface IBackupJob
+    public enum JobStatus
     {
-        Guid Id { get; }
-
-        Instant Started { get; }
-
-        Instant? Stopped { get; }
-
-        int HandledEvents { get; }
-
-        int HandledAssets { get; }
-
-        JobStatus Status { get; }
+        Created,
+        Started,
+        Completed,
+        Failed
     }
 }

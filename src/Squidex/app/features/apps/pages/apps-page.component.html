@@ -1,6 +1,6 @@
 ﻿<sqx-title message="Apps"></sqx-title>
 
-<div class="apps-section">
+<div class="col-left apps-section">
     <h1 class="apps-title">Hi {{authState.user?.displayName}}</h1>
 
     <div class="subtext">
@@ -8,71 +8,115 @@
     </div>
 </div>
 
-<ng-container *ngIf="appsState.apps | async; let apps">
-    <div class="apps-section">
-        <div class="empty" *ngIf="apps.length === 0">
-            <h3 class="empty-headline">You are not collaborating to any app yet</h3>
-        </div>
-
-        <div class="card card-href card-app float-left" *ngFor="let app of apps" [routerLink]="['/app', app.name]">
-            <div class="card-body">
-                <h4 class="card-title">{{app.name}}</h4>
-
-                <div class="card-text">
-                    <a [routerLink]="['/app', app.name]">Edit</a>
+<div class="row no-gutters">
+    <div class="col">
+        <div class="col-left">
+            <ng-container *ngIf="appsState.apps | async; let apps">
+                <div class="apps-section">
+                    <div class="empty" *ngIf="apps.length === 0">
+                        <h3 class="empty-headline">You are not collaborating to any app yet</h3>
+                    </div>
+            
+                    <div class="card card-href card-app float-left" *ngFor="let app of apps" [routerLink]="['/app', app.name]">
+                        <div class="card-body">
+                            <h4 class="card-title">{{app.name}}</h4>
+            
+                            <div class="card-text">
+                                <a [routerLink]="['/app', app.name]">Edit</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </ng-container>
+            
+            <div class="apps-section">
+                <div class="card card-template card-href" (click)="createNewApp('')">
+                    <div class="card-body">
+                        <div class="card-image">
+                            <img src="/images/add-app.png" />
+                        </div>
+            
+                        <h4 class="card-title">New App</h4>
+            
+                        <div class="card-text">
+                            Create a new blank app without content and schemas.
+                        </div>
+                    </div>
+                </div>
+            
+                <div class="card card-template card-href" (click)="createNewApp('Blog')">
+                    <div class="card-body">
+                        <div class="card-image">
+                            <img src="/images/add-blog.png" />
+                        </div>
+            
+                        <h4 class="card-title">New Blog Sample</h4>
+            
+                        <div class="card-text">
+                            <div>Start with our ready to use blog.</div>
+                            <div>
+                                Sample Code: <a href="https://github.com/Squidex/squidex-samples/tree/master/csharp/Sample.Blog" (click)="$event.stopPropagation()" target="_blank">C#</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            
+                <div class="card card-template card-href" (click)="createNewApp('Profile')">
+                    <div class="card-body">
+                        <div class="card-image">
+                            <img src="/images/add-profile.png" />
+                        </div>
+            
+                        <h4 class="card-title">New Profile Sample</h4>
+            
+                        <div class="card-text">
+                            <div>Create your profile page.</div>
+                            <div>
+                                Sample Code: <a href="https://github.com/Squidex/squidex-samples/tree/master/csharp/Sample.Profile" (click)="$event.stopPropagation()" target="_blank">C#</a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</ng-container>
+    <div class="col col-auto col-right">
+        <h3>Restore Backup</h3>
 
-<div class="apps-section">
-    <div class="card card-template card-href" (click)="createNewApp('')">
-        <div class="card-body">
-            <div class="card-image">
-                <img src="/images/add-app.png" />
-            </div>
-
-            <h4 class="card-title">New App</h4>
-
-            <div class="card-text">
-                Create a new blank app without content and schemas.
-            </div>
-        </div>
-    </div>
-
-    <div class="card card-template card-href" (click)="createNewApp('Blog')">
-        <div class="card-body">
-            <div class="card-image">
-                <img src="/images/add-blog.png" />
-            </div>
-
-            <h4 class="card-title">New Blog Sample</h4>
-
-            <div class="card-text">
-                <div>Start with our ready to use blog.</div>
-                <div>
-                    Sample Code: <a href="https://github.com/Squidex/squidex-samples/tree/master/csharp/Sample.Blog" (click)="$event.stopPropagation()" target="_blank">C#</a>
+        <ng-container *ngIf="restoreJob; let job">
+            <div class="card restore-card">
+                <div class="card-header">
+                    <div class="row no-gutters">
+                        <div class="col col-auto pr-2">
+                            <div *ngIf="!job.isFailed" class="restore-status restore-status-pending spin">
+                                <i class="icon-hour-glass"></i>
+                            </div>
+                            <div *ngIf="job.isFailed" class="restore-status restore-status-failed">
+                                <i class="icon-exclamation"></i>
+                            </div>
+                        </div>
+                            
+                        <div class="col">
+                            <h3>Restore</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    Status: {{job.status}}
                 </div>
             </div>
-        </div>
-    </div>
+        </ng-container>
 
-    <div class="card card-template card-href" (click)="createNewApp('Profile')">
-        <div class="card-body">
-            <div class="card-image">
-                <img src="/images/add-profile.png" />
-            </div>
-
-            <h4 class="card-title">New Profile Sample</h4>
-
-            <div class="card-text">
-                <div>Create your profile page.</div>
-                <div>
-                    Sample Code: <a href="https://github.com/Squidex/squidex-samples/tree/master/csharp/Sample.Profile" (click)="$event.stopPropagation()" target="_blank">C#</a>
+        <form [formGroup]="restoreForm.form" class="mt-2" (submit)="restore()">
+            <div class="row no-gutters">
+                <div class="col">
+                    <input class="form-control form-control-sm" name="url" formControlName="url" placeholder="Url" />
+                </div>
+                <div class="col col-auto pl-1">
+                    <button type="submit" class="btn btn-sm btn-success" [disabled]="restoreForm.hasNoUrl | async">Restore</button>
                 </div>
             </div>
-        </div>
+        </form>
     </div>
 </div>
 

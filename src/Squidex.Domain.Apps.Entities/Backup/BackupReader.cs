@@ -10,6 +10,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Squidex.Domain.Apps.Entities.Backup.Archive;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 
@@ -17,8 +18,6 @@ namespace Squidex.Domain.Apps.Entities.Backup
 {
     public sealed class BackupReader : DisposableObjectBase
     {
-        private const int MaxEventsPerFolder = 1000;
-        private const int MaxAttachmentFolders = 1000;
         private static readonly JsonSerializer JsonSerializer = JsonSerializer.CreateDefault();
         private readonly ZipArchive archive;
         private int readEvents;
@@ -52,9 +51,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             Guard.NotNullOrEmpty(name, nameof(name));
             Guard.NotNull(handler, nameof(handler));
 
-            var attachmentFolder = Math.Abs(name.GetHashCode() % MaxAttachmentFolders);
-            var attachmentPath = $"attachments/{attachmentFolder}/{name}";
-            var attachmentEntry = archive.GetEntry(attachmentPath);
+            var attachmentEntry = archive.GetEntry(ArchiveHelper.GetAttachmentPath(name));
 
             if (attachmentEntry == null)
             {
@@ -75,9 +72,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             while (true)
             {
-                var eventFolder = readEvents / MaxEventsPerFolder;
-                var eventPath = $"events/{eventFolder}/{readEvents}.json";
-                var eventEntry = archive.GetEntry(eventPath);
+                var eventEntry = archive.GetEntry(ArchiveHelper.GetEventPath(readEvents));
 
                 if (eventEntry == null)
                 {

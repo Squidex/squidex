@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using NodaTime;
 
 namespace Squidex.Domain.Apps.Entities.Backup
@@ -16,8 +17,10 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         Instant Started { get; }
 
-        bool IsFailed { get; }
+        Instant? Stopped { get; }
 
-        string Status { get; }
+        List<string> Log { get; }
+
+        JobStatus Status { get; }
     }
 }
