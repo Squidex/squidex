@@ -43,19 +43,14 @@
 .item {
     & {
         @include border-radius(10px);
-        @include truncate;
-        display: inline-block;
         color: $color-dark-foreground;
         cursor: default;
-        height: 20px;
         padding: 0 .6rem;
         background: $color-theme-blue;
         border: 0;
         font-size: .8rem;
         font-weight: normal;
-        line-height: 20px;
-        margin: 2px 2px 2px 0;
-        vertical-align: middle;
+        margin: 0px 2px 2px 0;
     }
 
     &,
