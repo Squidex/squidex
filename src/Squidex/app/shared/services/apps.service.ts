@@ -31,10 +31,6 @@ export class AppDto extends Model {
     ) {
         super();
     }
-
-    public with(value: Partial<AppDto>): AppDto {
-        return this.clone(value);
-    }
 }
 
 export class CreateAppDto {

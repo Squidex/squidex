@@ -43,10 +43,6 @@ export class ScheduleDto extends Model {
     ) {
         super();
     }
-
-    public with(value: Partial<ScheduleDto>): ScheduleDto {
-        return this.clone(value);
-    }
 }
 
 export class ContentDto extends Model {
@@ -233,7 +229,7 @@ export class ContentsService {
     public discardChanges(appName: string, schemaName: string, id: string, version: Version): Observable<Versioned<any>> {
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}/discard`);
 
-        return HTTP.putVersioned(this.http, url, version).pipe(
+        return HTTP.putVersioned(this.http, url, {}, version).pipe(
                 tap(() => {
                     this.analytics.trackEvent('Content', 'Discarded', appName);
                 }),

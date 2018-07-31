@@ -201,6 +201,8 @@ describe('RulesService', () => {
 
         expect(req.request.method).toEqual('DELETE');
         expect(req.request.headers.get('If-Match')).toEqual(version.value);
+
+        req.flush({});
     }));
 
     it('should make get request to get app rule events',
@@ -265,5 +267,8 @@ describe('RulesService', () => {
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/rules/events/123');
 
         expect(req.request.method).toEqual('PUT');
+        expect(req.request.headers.get('If-Match')).toBeNull();
+
+        req.flush({});
     }));
 });

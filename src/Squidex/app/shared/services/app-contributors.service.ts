@@ -28,10 +28,6 @@ export class AppContributorsDto extends Model {
     ) {
         super();
     }
-
-    public with(value: Partial<AppContributorsDto>): AppContributorsDto {
-        return this.clone(value);
-    }
 }
 
 export class AppContributorDto extends Model {
@@ -40,10 +36,6 @@ export class AppContributorDto extends Model {
         public readonly permission: string
     ) {
         super();
-    }
-
-    public with(value: Partial<AppContributorDto>): AppContributorDto {
-        return this.clone(value);
     }
 }
 

@@ -30,10 +30,6 @@ export class BackupDto extends Model {
     ) {
         super();
     }
-
-    public with(value: Partial<BackupDto>): BackupDto {
-        return this.clone(value);
-    }
 }
 
 export class RestoreDto {
@@ -84,7 +80,7 @@ export class BackupsService {
                     const body: any = response;
 
                     return new RestoreDto(
-                        body.id,
+                        body.url,
                         DateTime.parseISO_UTC(body.started),
                         body.stopped ? DateTime.parseISO_UTC(body.stopped) : null,
                         body.status,

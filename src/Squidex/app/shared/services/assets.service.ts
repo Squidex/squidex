@@ -29,10 +29,6 @@ export class AssetsDto extends Model {
     ) {
         super();
     }
-
-    public with(value: Partial<AssetsDto>): AssetsDto {
-        return this.clone(value);
-    }
 }
 
 export class AssetDto extends Model {
