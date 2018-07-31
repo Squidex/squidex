@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Orleans;
 using Squidex.Domain.Apps.Entities.Backup;
 using Squidex.Domain.Apps.Entities.Rules.Indexes;
+using Squidex.Domain.Apps.Entities.Rules.Repositories;
 using Squidex.Domain.Apps.Entities.Rules.State;
 using Squidex.Domain.Apps.Events.Rules;
 using Squidex.Infrastructure;
@@ -24,20 +25,24 @@ namespace Squidex.Domain.Apps.Entities.Rules
     {
         private readonly HashSet<Guid> ruleIds = new HashSet<Guid>();
         private readonly IGrainFactory grainFactory;
+        private readonly IRuleEventRepository ruleEventRepository;
 
         public override string Name { get; } = "Rules";
 
-        public BackupRules(IStore<Guid> store, IGrainFactory grainFactory)
+        public BackupRules(IStore<Guid> store, IGrainFactory grainFactory, IRuleEventRepository ruleEventRepository)
             : base(store)
         {
             Guard.NotNull(grainFactory, nameof(grainFactory));
+            Guard.NotNull(ruleEventRepository, nameof(ruleEventRepository));
 
             this.grainFactory = grainFactory;
+
+            this.ruleEventRepository = ruleEventRepository;
         }
 
         public override async Task RemoveAsync(Guid appId)
         {
-            var index = grainFactory.GetGrain<IRulesByAppIndex>(appId);
+            await grainFactory.GetGrain<IRulesByAppIndex>(appId).ClearAsync();
 
             var idsToRemove = await grainFactory.GetGrain<IRulesByAppIndex>(appId).GetRuleIdsAsync();
 
@@ -46,7 +51,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
                 await RemoveSnapshotAsync<RuleState>(ruleId);
             }
 
-            await index.ClearAsync();
+            await ruleEventRepository.RemoveAsync(appId);
         }
 
         public override Task RestoreEventAsync(Envelope<IEvent> @event, Guid appId, BackupReader reader)

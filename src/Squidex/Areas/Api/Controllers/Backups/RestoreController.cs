@@ -13,7 +13,6 @@ using Squidex.Areas.Api.Controllers.Backups.Models;
 using Squidex.Domain.Apps.Entities.Backup;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Security;
-using Squidex.Infrastructure.Tasks;
 using Squidex.Pipeline;
 
 namespace Squidex.Areas.Api.Controllers.Backups

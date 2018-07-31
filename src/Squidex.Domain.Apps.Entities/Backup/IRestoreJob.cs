@@ -13,7 +13,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 {
     public interface IRestoreJob
     {
-        Uri Uri { get; }
+        Uri Url { get; }
 
         Instant Started { get; }
 

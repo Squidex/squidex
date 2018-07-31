@@ -122,7 +122,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 Id = Guid.NewGuid(),
                 Started = clock.GetCurrentInstant(),
                 Status = JobStatus.Started,
-                Uri = url
+                Url = url
             };
 
             Process();
@@ -151,7 +151,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                         .WriteProperty("action", "restore")
                         .WriteProperty("status", "started")
                         .WriteProperty("operationId", CurrentJob.Id.ToString())
-                        .WriteProperty("url", CurrentJob.Uri.ToString()));
+                        .WriteProperty("url", CurrentJob.Url.ToString()));
 
                     using (Profiler.Trace("Download"))
                     {
@@ -195,7 +195,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                         w.WriteProperty("action", "restore");
                         w.WriteProperty("status", "completed");
                         w.WriteProperty("operationId", CurrentJob.Id.ToString());
-                        w.WriteProperty("url", CurrentJob.Uri.ToString());
+                        w.WriteProperty("url", CurrentJob.Url.ToString());
 
                         Profiler.Session?.Write(w);
                     });
@@ -220,7 +220,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                         w.WriteProperty("action", "retore");
                         w.WriteProperty("status", "failed");
                         w.WriteProperty("operationId", CurrentJob.Id.ToString());
-                        w.WriteProperty("url", CurrentJob.Uri.ToString());
+                        w.WriteProperty("url", CurrentJob.Url.ToString());
 
                         Profiler.Session?.Write(w);
                     });
@@ -253,13 +253,15 @@ namespace Squidex.Domain.Apps.Entities.Backup
         {
             Log("Downloading Backup");
 
-            await backupArchiveLocation.DownloadAsync(CurrentJob.Uri, CurrentJob.Id);
+            await backupArchiveLocation.DownloadAsync(CurrentJob.Url, CurrentJob.Id);
 
             Log("Downloaded Backup");
         }
 
         private async Task ReadEventsAsync(BackupReader reader)
         {
+            var isOwnerAdded = false;
+
             await reader.ReadEventsAsync(async (storedEvent) =>
             {
                 var @event = eventDataFormatter.Parse(storedEvent.Data);
@@ -275,13 +277,24 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
                     await CheckCleanupStatus();
                 }
+                else if (@event.Payload is AppContributorAssigned appContributorAssigned)
+                {
+                    if (!isOwnerAdded)
+                    {
+                        isOwnerAdded = true;
+
+                        appContributorAssigned.ContributorId = actor.Identifier;
+                    }
+                }
 
                 foreach (var handler in handlers)
                 {
                     await handler.RestoreEventAsync(@event, CurrentJob.AppId, reader);
                 }
 
-                await eventStore.AppendAsync(Guid.NewGuid(), storedEvent.StreamName, new List<EventData> { storedEvent.Data });
+                var eventData = eventDataFormatter.ToEventData(@event, @event.Headers.CommitId());
+
+                await eventStore.AppendAsync(Guid.NewGuid(), storedEvent.StreamName, new List<EventData> { eventData });
 
                 Log($"Read {reader.ReadEvents} events and {reader.ReadAttachments} attachments.", true);
             });

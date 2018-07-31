@@ -43,9 +43,11 @@ export class RestorePageComponent implements OnDestroy, OnInit {
 
     public ngOnInit() {
         this.timerSubscription =
-            timer(0, 1000).pipe(switchMap(() => this.backupsService.getRestore()))
+            timer(0, 2000).pipe(switchMap(() => this.backupsService.getRestore()))
                 .subscribe(dto => {
-                    this.restoreJob = dto;
+                    if (dto !== null) {
+                        this.restoreJob = dto;
+                    }
                 });
     }
 

@@ -35,7 +35,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         public BackupWriter(Stream stream)
         {
-            archive = new ZipArchive(stream, ZipArchiveMode.Update, true);
+            archive = new ZipArchive(stream, ZipArchiveMode.Create, false);
         }
 
         protected override void DisposeObject(bool disposing)

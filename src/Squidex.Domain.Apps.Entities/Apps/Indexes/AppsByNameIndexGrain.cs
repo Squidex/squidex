@@ -83,12 +83,23 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         {
             state.Apps[name] = appId;
 
+            reservedIds.Remove(appId);
+            reservedNames.Remove(name);
+
             return persistence.WriteSnapshotAsync(state);
         }
 
         public Task RemoveAppAsync(Guid appId)
         {
-            state.Apps.Remove(state.Apps.FirstOrDefault(x => x.Value == appId).Key ?? string.Empty);
+            var name = state.Apps.FirstOrDefault(x => x.Value == appId).Key;
+
+            if (!string.IsNullOrWhiteSpace(name))
+            {
+                state.Apps.Remove(name);
+
+                reservedIds.Remove(appId);
+                reservedNames.Remove(name);
+            }
 
             return persistence.WriteSnapshotAsync(state);
         }

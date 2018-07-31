@@ -20,7 +20,7 @@ namespace Squidex.Areas.Api.Controllers.Backups.Models
         /// The uri to load from.
         /// </summary>
         [Required]
-        public Uri Uri { get; set; }
+        public Uri Url { get; set; }
 
         /// <summary>
         /// The status log.
