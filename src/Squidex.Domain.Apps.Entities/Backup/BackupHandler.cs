@@ -50,10 +50,5 @@ namespace Squidex.Domain.Apps.Entities.Backup
         {
             return TaskHelper.Done;
         }
-
-        public virtual Task RemoveAsync(Guid appId)
-        {
-            return TaskHelper.Done;
-        }
     }
 }

@@ -52,13 +52,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
             this.tagService = tagService;
         }
 
-        public override async Task RemoveAsync(Guid appId)
-        {
-            await tagService.ClearAsync(appId, TagGroups.Assets);
-
-            await assetRepository.RemoveAsync(appId);
-        }
-
         public override Task BackupEventAsync(EventData @event, Guid appId, BackupWriter writer)
         {
             if (@event.Type == "AssetCreatedEvent" ||

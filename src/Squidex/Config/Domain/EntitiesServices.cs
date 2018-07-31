@@ -178,9 +178,6 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<CreateProfileCommandMiddleware>()
                 .As<ICommandMiddleware>();
-
-            services.AddSingletonAs<EnqueueAppToCleanerMiddleware>()
-                .As<ICommandMiddleware>();
         }
 
         private static void AddBackupHandlers(this IServiceCollection services)
@@ -192,9 +189,6 @@ namespace Squidex.Config.Domain
                 .As<BackupHandler>();
 
             services.AddTransientAs<BackupContents>()
-                .As<BackupHandler>();
-
-            services.AddTransientAs<BackupHistory>()
                 .As<BackupHandler>();
 
             services.AddTransientAs<BackupRules>()

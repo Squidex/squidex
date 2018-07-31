@@ -76,10 +76,6 @@
     </div>
 </div>
 
-<div class="apps-section">
-    <a class="restore-link" [routerLink]="['/app/restore']">Restore app from backup</a>
-</div>
-
 <ng-container *sqxModalView="addAppDialog;onRoot:true">
     <sqx-app-form [template]="addAppTemplate"
         (completed)="addAppDialog.hide()">

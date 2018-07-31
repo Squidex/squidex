@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Orleans;
 using Squidex.Domain.Apps.Entities.Apps.Indexes;
-using Squidex.Domain.Apps.Entities.Apps.State;
 using Squidex.Domain.Apps.Entities.Backup;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
@@ -35,11 +34,6 @@ namespace Squidex.Domain.Apps.Entities.Apps
             Guard.NotNull(grainFactory, nameof(grainFactory));
 
             this.grainFactory = grainFactory;
-        }
-
-        public override Task RemoveAsync(Guid appId)
-        {
-            return RemoveSnapshotAsync<AppState>(appId);
         }
 
         public async override Task RestoreEventAsync(Envelope<IEvent> @event, Guid appId, BackupReader reader)

@@ -40,20 +40,6 @@ namespace Squidex.Domain.Apps.Entities.Rules
             this.ruleEventRepository = ruleEventRepository;
         }
 
-        public override async Task RemoveAsync(Guid appId)
-        {
-            await grainFactory.GetGrain<IRulesByAppIndex>(appId).ClearAsync();
-
-            var idsToRemove = await grainFactory.GetGrain<IRulesByAppIndex>(appId).GetRuleIdsAsync();
-
-            foreach (var ruleId in idsToRemove)
-            {
-                await RemoveSnapshotAsync<RuleState>(ruleId);
-            }
-
-            await ruleEventRepository.RemoveAsync(appId);
-        }
-
         public override Task RestoreEventAsync(Envelope<IEvent> @event, Guid appId, BackupReader reader)
         {
             switch (@event.Payload)

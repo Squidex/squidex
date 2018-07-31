@@ -18,6 +18,7 @@ import {
     EventConsumersPageComponent,
     EventConsumersService,
     EventConsumersState,
+    RestorePageComponent,
     UnsetUserGuard,
     UserMustExistGuard,
     UserPageComponent,
@@ -37,6 +38,10 @@ const routes: Routes = [
                     {
                         path: 'event-consumers',
                         component: EventConsumersPageComponent
+                    },
+                    {
+                        path: 'restore',
+                        component: RestorePageComponent
                     },
                     {
                         path: 'users',
@@ -69,6 +74,7 @@ const routes: Routes = [
     declarations: [
         AdministrationAreaComponent,
         EventConsumersPageComponent,
+        RestorePageComponent,
         UserPageComponent,
         UsersPageComponent
     ],

@@ -30,7 +30,6 @@ namespace Squidex.Domain.Apps.Entities.Backup
         private readonly IAssetStore assetStore;
         private readonly IEventDataFormatter eventDataFormatter;
         private readonly IGrainFactory grainFactory;
-        private readonly IAppCleanerGrain appCleaner;
         private readonly ISemanticLog log;
         private readonly IEventStore eventStore;
         private readonly IBackupArchiveLocation backupArchiveLocation;
@@ -75,8 +74,6 @@ namespace Squidex.Domain.Apps.Entities.Backup
             this.handlers = handlers;
             this.store = store;
             this.log = log;
-
-            appCleaner = grainFactory.GetGrain<IAppCleanerGrain>(SingleGrain.Id);
         }
 
         public override async Task OnActivateAsync(string key)
@@ -244,8 +241,6 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 {
                     await Safe.CleanupRestoreAsync(handler, CurrentJob.AppId, CurrentJob.Id, log);
                 }
-
-                await appCleaner.EnqueueAppAsync(CurrentJob.AppId);
             }
         }
 
@@ -274,8 +269,6 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 if (@event.Payload is AppCreated appCreated)
                 {
                     CurrentJob.AppId = appCreated.AppId.Id;
-
-                    await CheckCleanupStatus();
                 }
                 else if (@event.Payload is AppContributorAssigned appContributorAssigned)
                 {
@@ -300,23 +293,6 @@ namespace Squidex.Domain.Apps.Entities.Backup
             });
 
             Log("Reading events completed.");
-        }
-
-        private async Task CheckCleanupStatus()
-        {
-            var cleaner = grainFactory.GetGrain<IAppCleanerGrain>(SingleGrain.Id);
-
-            var status = await cleaner.GetStatusAsync(CurrentJob.AppId);
-
-            if (status == CleanerStatus.Cleaning)
-            {
-                throw new BackupRestoreException("The app is removed in the background.");
-            }
-
-            if (status == CleanerStatus.Cleaning)
-            {
-                throw new BackupRestoreException("The app could not be cleaned.");
-            }
         }
 
         private void Log(string message, bool replace = false)

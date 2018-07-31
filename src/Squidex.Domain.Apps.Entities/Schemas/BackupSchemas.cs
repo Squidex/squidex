@@ -42,20 +42,6 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             this.grainFactory = grainFactory;
         }
 
-        public override async Task RemoveAsync(Guid appId)
-        {
-            var index = grainFactory.GetGrain<ISchemasByAppIndex>(appId);
-
-            var idsToRemove = await index.GetSchemaIdsAsync();
-
-            foreach (var schemaId in idsToRemove)
-            {
-                await RemoveSnapshotAsync<SchemaState>(schemaId);
-            }
-
-            await index.ClearAsync();
-        }
-
         public override Task RestoreEventAsync(Envelope<IEvent> @event, Guid appId, BackupReader reader)
         {
             switch (@event.Payload)

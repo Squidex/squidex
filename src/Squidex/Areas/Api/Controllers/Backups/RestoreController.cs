@@ -23,7 +23,8 @@ namespace Squidex.Areas.Api.Controllers.Backups
     [ApiAuthorize]
     [ApiExceptionFilter]
     [ApiModelValidation(true)]
-    [SwaggerTag(nameof(Backups))]
+    [MustBeAdministrator]
+    [SwaggerIgnore]
     public class RestoreController : ApiController
     {
         private readonly IGrainFactory grainFactory;
@@ -34,16 +35,8 @@ namespace Squidex.Areas.Api.Controllers.Backups
             this.grainFactory = grainFactory;
         }
 
-        /// <summary>
-        /// Get the restore jobs.
-        /// </summary>
-        /// <returns>
-        /// 200 => Restore job returned.
-        /// 404 => App not found.
-        /// </returns>
         [HttpGet]
         [Route("apps/restore/")]
-        [ProducesResponseType(typeof(RestoreJobDto), 200)]
         [ApiCosts(0)]
         public async Task<IActionResult> GetJob()
         {
@@ -63,13 +56,6 @@ namespace Squidex.Areas.Api.Controllers.Backups
             return Ok(response);
         }
 
-        /// <summary>
-        /// Start a new restore job.
-        /// </summary>
-        /// <param name="request">The request object.</param>
-        /// <returns>
-        /// 204 => Backup started.
-        /// </returns>
         [HttpPost]
         [Route("apps/restore/")]
         [ApiCosts(0)]

@@ -34,11 +34,6 @@ namespace Squidex.Domain.Apps.Entities.Contents
             this.contentRepository = contentRepository;
         }
 
-        public override Task RemoveAsync(Guid appId)
-        {
-            return contentRepository.RemoveAsync(appId);
-        }
-
         public override Task RestoreEventAsync(Envelope<IEvent> @event, Guid appId, BackupReader reader)
         {
             switch (@event.Payload)

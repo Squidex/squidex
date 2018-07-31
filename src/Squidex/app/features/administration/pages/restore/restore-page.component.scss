@@ -62,6 +62,7 @@ h3 {
     }
 
     &-url {
+        @include truncate;
         line-height: 30px;
     }
 }

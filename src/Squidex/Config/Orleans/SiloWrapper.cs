@@ -15,7 +15,6 @@ using Orleans;
 using Orleans.Configuration;
 using Orleans.Hosting;
 using Squidex.Config.Domain;
-using Squidex.Domain.Apps.Entities.Backup;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Infrastructure;
@@ -63,7 +62,6 @@ namespace Squidex.Config.Orleans
                     .EnableDirectClient()
                     .AddIncomingGrainCallFilter<LocalCacheFilter>()
                     .AddStartupTask<Bootstrap<IContentSchedulerGrain>>()
-                    .AddStartupTask<Bootstrap<IAppCleanerGrain>>()
                     .AddStartupTask<Bootstrap<IEventConsumerManagerGrain>>()
                     .AddStartupTask<Bootstrap<IRuleDequeuerGrain>>()
                     .AddStartupTask((services, ct) =>
