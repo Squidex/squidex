@@ -17,7 +17,7 @@
         <ng-container *ngIf="plansState.isLoaded | async">
             <ng-container *ngIf="plansState.plans | async; let plans">
                 <div class="panel-alert panel-alert-danger" *ngIf="(plansState.isOwner | async) === false">
-                    You have not created the subscription. Therefore you cannot change the planInfo.plan.
+                    You have not created the subscription. Therefore you cannot change the plan.
                 </div>
 
                 <div class="text-muted text-center empty" *ngIf="plans.length === 0">
