@@ -9,7 +9,6 @@ using System;
 using System.IO;
 using System.IO.Compression;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 using Squidex.Domain.Apps.Entities.Backup.Archive;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
@@ -18,7 +17,6 @@ namespace Squidex.Domain.Apps.Entities.Backup
 {
     public sealed class BackupWriter : DisposableObjectBase
     {
-        private static readonly JsonSerializer JsonSerializer = JsonSerializer.CreateDefault();
         private readonly ZipArchive archive;
         private int writtenEvents;
         private int writtenAttachments;
@@ -63,14 +61,13 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         public void WriteEvent(StoredEvent storedEvent)
         {
+            Guard.NotNull(storedEvent, nameof(storedEvent));
+
             var eventEntry = archive.CreateEntry(ArchiveHelper.GetEventPath(writtenEvents));
 
             using (var stream = eventEntry.Open())
             {
-                using (var textWriter = new StreamWriter(stream))
-                {
-                    JsonSerializer.Serialize(textWriter, storedEvent);
-                }
+                stream.SerializeAsJson(storedEvent);
             }
 
             writtenEvents++;

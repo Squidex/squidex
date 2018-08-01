@@ -30,18 +30,18 @@ namespace Squidex.Domain.Apps.Entities.Backup
     {
         private const int MaxBackups = 10;
         private static readonly Duration UpdateDuration = Duration.FromSeconds(1);
-        private readonly IClock clock;
         private readonly IAssetStore assetStore;
-        private readonly IEventDataFormatter eventDataFormatter;
-        private readonly IEnumerable<BackupHandler> handlers;
-        private readonly ISemanticLog log;
-        private readonly IEventStore eventStore;
         private readonly IBackupArchiveLocation backupArchiveLocation;
+        private readonly IClock clock;
+        private readonly IEnumerable<BackupHandler> handlers;
+        private readonly IEventDataFormatter eventDataFormatter;
+        private readonly IEventStore eventStore;
+        private readonly ISemanticLog log;
         private readonly IStore<Guid> store;
         private CancellationTokenSource currentTask;
         private BackupStateJob currentJob;
-        private Guid appId;
         private BackupState state = new BackupState();
+        private Guid appId;
         private IPersistence<BackupState> persistence;
 
         public BackupGrain(
@@ -141,15 +141,15 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 {
                     using (var writer = new BackupWriter(stream))
                     {
-                        await eventStore.QueryAsync(async @event =>
+                        await eventStore.QueryAsync(async storedEvent =>
                         {
-                            var eventData = @event.Data;
+                            var @event = eventDataFormatter.Parse(storedEvent.Data);
 
-                            writer.WriteEvent(@event);
+                            writer.WriteEvent(storedEvent);
 
                             foreach (var handler in handlers)
                             {
-                                await handler.BackupEventAsync(eventData, appId, writer);
+                                await handler.BackupEventAsync(@event, appId, writer);
                             }
 
                             job.HandledEvents = writer.WrittenEvents;

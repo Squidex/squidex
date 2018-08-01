@@ -106,7 +106,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public void Should_format_email_and_display_name_from_user()
         {
-            var @event = new EnrichedContentEvent { User = user, Actor = new RefToken("subject", "123") };
+            var @event = new EnrichedContentEvent { User = user, Actor = new RefToken(RefTokenType.Subject, "123") };
 
             var result = sut.Format("From $USER_NAME ($USER_EMAIL)", @event);
 
@@ -116,7 +116,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public void Should_return_undefined_if_user_is_not_found()
         {
-            var @event = new EnrichedContentEvent { Actor = new RefToken("subject", "123") };
+            var @event = new EnrichedContentEvent { Actor = new RefToken(RefTokenType.Subject, "123") };
 
             var result = sut.Format("From $USER_NAME ($USER_EMAIL)", @event);
 
@@ -126,7 +126,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public void Should_format_email_and_display_name_from_client()
         {
-            var @event = new EnrichedContentEvent { Actor = new RefToken("client", "android") };
+            var @event = new EnrichedContentEvent { Actor = new RefToken(RefTokenType.Client, "android") };
 
             var result = sut.Format("From $USER_NAME ($USER_EMAIL)", @event);
 

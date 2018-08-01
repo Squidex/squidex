@@ -7,6 +7,7 @@
 
 using System;
 using System.Threading.Tasks;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Tasks;
 
@@ -16,12 +17,12 @@ namespace Squidex.Domain.Apps.Entities.Backup
     {
         public abstract string Name { get; }
 
-        public virtual Task RestoreEventAsync(Envelope<IEvent> @event, Guid appId, BackupReader reader)
+        public virtual Task RestoreEventAsync(Envelope<IEvent> @event, Guid appId, BackupReader reader, RefToken actor)
         {
             return TaskHelper.Done;
         }
 
-        public virtual Task BackupEventAsync(EventData @event, Guid appId, BackupWriter writer)
+        public virtual Task BackupEventAsync(Envelope<IEvent> @event, Guid appId, BackupWriter writer)
         {
             return TaskHelper.Done;
         }

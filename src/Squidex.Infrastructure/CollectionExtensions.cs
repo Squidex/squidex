@@ -167,6 +167,18 @@ namespace Squidex.Infrastructure
             return result;
         }
 
+        public static TValue GetOrAdd<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, TValue fallback)
+        {
+            if (!dictionary.TryGetValue(key, out var result))
+            {
+                result = fallback;
+
+                dictionary.Add(key, result);
+            }
+
+            return result;
+        }
+
         public static TValue GetOrAdd<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, Func<TKey, TValue> creator)
         {
             if (!dictionary.TryGetValue(key, out var result))

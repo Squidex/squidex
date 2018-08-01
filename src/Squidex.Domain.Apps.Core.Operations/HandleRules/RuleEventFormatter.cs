@@ -209,7 +209,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
         {
             if (@event.Actor != null)
             {
-                if (@event.Actor.Type.Equals("client", StringComparison.OrdinalIgnoreCase))
+                if (@event.Actor.Type.Equals(RefTokenType.Client, StringComparison.OrdinalIgnoreCase))
                 {
                     return @event.Actor.ToString();
                 }
@@ -227,7 +227,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
         {
             if (@event.Actor != null)
             {
-                if (@event.Actor.Type.Equals("client", StringComparison.OrdinalIgnoreCase))
+                if (@event.Actor.Type.Equals(RefTokenType.Client, StringComparison.OrdinalIgnoreCase))
                 {
                     return @event.Actor.ToString();
                 }

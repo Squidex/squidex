@@ -66,7 +66,7 @@ namespace Squidex.Pipeline.CommandMiddlewares
 
             await sut.HandleAsync(context);
 
-            Assert.Equal(new RefToken("subject", "me"), command.Actor);
+            Assert.Equal(new RefToken(RefTokenType.Subject, "me"), command.Actor);
         }
 
         [Fact]
@@ -79,7 +79,7 @@ namespace Squidex.Pipeline.CommandMiddlewares
 
             await sut.HandleAsync(context);
 
-            Assert.Equal(new RefToken("client", "my-client"), command.Actor);
+            Assert.Equal(new RefToken(RefTokenType.Client, "my-client"), command.Actor);
         }
 
         [Fact]

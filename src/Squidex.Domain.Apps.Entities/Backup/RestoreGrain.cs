@@ -26,15 +26,15 @@ namespace Squidex.Domain.Apps.Entities.Backup
 {
     public sealed class RestoreGrain : GrainOfString, IRestoreGrain
     {
-        private readonly IClock clock;
         private readonly IAssetStore assetStore;
+        private readonly IBackupArchiveLocation backupArchiveLocation;
+        private readonly IClock clock;
+        private readonly IEnumerable<BackupHandler> handlers;
+        private readonly IEventStore eventStore;
         private readonly IEventDataFormatter eventDataFormatter;
         private readonly IGrainFactory grainFactory;
         private readonly ISemanticLog log;
-        private readonly IEventStore eventStore;
-        private readonly IBackupArchiveLocation backupArchiveLocation;
         private readonly IStore<string> store;
-        private readonly IEnumerable<BackupHandler> handlers;
         private RefToken actor;
         private RestoreState state = new RestoreState();
         private IPersistence<RestoreState> persistence;
@@ -78,7 +78,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         public override async Task OnActivateAsync(string key)
         {
-            actor = new RefToken("subject", key);
+            actor = new RefToken(RefTokenType.Subject, key);
 
             persistence = store.WithSnapshots<RestoreState, string>(GetType(), key, s => state = s);
 
@@ -255,8 +255,6 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         private async Task ReadEventsAsync(BackupReader reader)
         {
-            var isOwnerAdded = false;
-
             await reader.ReadEventsAsync(async (storedEvent) =>
             {
                 var @event = eventDataFormatter.Parse(storedEvent.Data);
@@ -270,24 +268,16 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 {
                     CurrentJob.AppId = appCreated.AppId.Id;
                 }
-                else if (@event.Payload is AppContributorAssigned appContributorAssigned)
-                {
-                    if (!isOwnerAdded)
-                    {
-                        isOwnerAdded = true;
-
-                        appContributorAssigned.ContributorId = actor.Identifier;
-                    }
-                }
 
                 foreach (var handler in handlers)
                 {
-                    await handler.RestoreEventAsync(@event, CurrentJob.AppId, reader);
+                    await handler.RestoreEventAsync(@event, CurrentJob.AppId, reader, actor);
                 }
 
                 var eventData = eventDataFormatter.ToEventData(@event, @event.Headers.CommitId());
+                var eventCommit = new List<EventData> { eventData };
 
-                await eventStore.AppendAsync(Guid.NewGuid(), storedEvent.StreamName, new List<EventData> { eventData });
+                await eventStore.AppendAsync(Guid.NewGuid(), storedEvent.StreamName, eventCommit);
 
                 Log($"Read {reader.ReadEvents} events and {reader.ReadAttachments} attachments.", true);
             });

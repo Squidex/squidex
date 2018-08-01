@@ -34,15 +34,6 @@ namespace Squidex.Infrastructure.States
         }
 
         [Fact]
-        public async Task Should_call_snapshot_store_on_clear()
-        {
-            await sut.ClearSnapshotsAsync<int>();
-
-            A.CallTo(() => snapshotStore.ClearAsync())
-                .MustHaveHappened();
-        }
-
-        [Fact]
         public async Task Should_read_from_store()
         {
             A.CallTo(() => snapshotStore.ReadAsync(key))
@@ -162,15 +153,35 @@ namespace Squidex.Infrastructure.States
         }
 
         [Fact]
+        public async Task Should_call_snapshot_store_on_clear()
+        {
+            await sut.ClearSnapshotsAsync<string, int>();
+
+            A.CallTo(() => snapshotStore.ClearAsync())
+                .MustHaveHappened();
+        }
+
+        [Fact]
         public async Task Should_delete_snapshot_but_not_events_when_deleted_from_store()
         {
-            await sut.RemoveSnapshotAsync<int>(key);
+            await sut.RemoveSnapshotAsync<string, int>(key);
 
             A.CallTo(() => eventStore.DeleteStreamAsync(A<string>.Ignored))
                 .MustNotHaveHappened();
 
             A.CallTo(() => snapshotStore.RemoveAsync(key))
                 .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_get_snapshot()
+        {
+            A.CallTo(() => snapshotStore.ReadAsync(key))
+                .Returns((123, -1));
+
+            var result = await sut.GetSnapshotAsync<string, int>(key);
+
+            Assert.Equal(123, result);
         }
     }
 }
