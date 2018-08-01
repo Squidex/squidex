@@ -40,7 +40,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
             this.ruleEventRepository = ruleEventRepository;
         }
 
-        public override Task RestoreEventAsync(Envelope<IEvent> @event, Guid appId, BackupReader reader)
+        public override Task RestoreEventAsync(Envelope<IEvent> @event, Guid appId, BackupReader reader, RefToken actor)
         {
             switch (@event.Payload)
             {

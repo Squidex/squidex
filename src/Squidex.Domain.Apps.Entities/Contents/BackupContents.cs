@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             this.contentRepository = contentRepository;
         }
 
-        public override Task RestoreEventAsync(Envelope<IEvent> @event, Guid appId, BackupReader reader)
+        public override Task RestoreEventAsync(Envelope<IEvent> @event, Guid appId, BackupReader reader, RefToken actor)
         {
             switch (@event.Payload)
             {

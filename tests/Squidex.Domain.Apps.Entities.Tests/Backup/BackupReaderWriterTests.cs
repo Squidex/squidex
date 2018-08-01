@@ -15,7 +15,7 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Backup
 {
-    public class EventStreamTests
+    public class BackupReaderWriterTests
     {
         [Fact]
         public async Task Should_write_and_read_events()
