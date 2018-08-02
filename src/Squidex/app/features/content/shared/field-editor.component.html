@@ -29,12 +29,12 @@
                         </select>
                     </ng-container>
                     <ng-container *ngSwitchCase="'Radio'">
-                        <ng-container class="form-check form-check-inline" *ngFor="let value of field.properties['allowedValues']">
+                        <div class="form-check form-check-inline" *ngFor="let value of field.properties['allowedValues']">
                             <input class="form-check-input" type="radio" [value]="value" [formControl]="control" />
                             <label class="form-check-label">
                                 {{value}}
                             </label>
-                        </ng-container>
+                        </div>
                     </ng-container>
                 </ng-container>
             </ng-container>
@@ -62,12 +62,12 @@
                         </select>
                     </ng-container>
                     <ng-container *ngSwitchCase="'Radio'">
-                        <ng-container class="form-check form-check-inline" *ngFor="let value of field.properties['allowedValues']">
+                        <div class="form-check form-check-inline" *ngFor="let value of field.properties['allowedValues']">
                             <input class="form-check-input" type="radio" value="{{value}}" [formControl]="control" />
                             <label class="form-check-label">
                                 {{value}}
                             </label>
-                        </ng-container>
+                        </div>
                     </ng-container>
                 </ng-container>
             </ng-container>
