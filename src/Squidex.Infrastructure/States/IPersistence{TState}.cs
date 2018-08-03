@@ -15,6 +15,8 @@ namespace Squidex.Infrastructure.States
     {
         long Version { get; }
 
+        Task DeleteAsync();
+
         Task WriteEventsAsync(IEnumerable<Envelope<IEvent>> @events);
 
         Task WriteSnapshotAsync(TState state);

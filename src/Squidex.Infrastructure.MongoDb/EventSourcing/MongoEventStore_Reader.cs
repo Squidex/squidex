@@ -124,8 +124,8 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             var filters = new List<FilterDefinition<MongoEventCommit>>();
 
-            AddPositionFilter(streamPosition, filters);
-            AddPropertyFitler(property, value, filters);
+            FilterByPosition(streamPosition, filters);
+            FilterByProperty(property, value, filters);
 
             return Filter.And(filters);
         }
@@ -134,18 +134,18 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             var filters = new List<FilterDefinition<MongoEventCommit>>();
 
-            AddPositionFilter(streamPosition, filters);
-            AddStreamFilter(streamFilter, filters);
+            FilterByPosition(streamPosition, filters);
+            FilterByStream(streamFilter, filters);
 
             return Filter.And(filters);
         }
 
-        private static void AddPropertyFitler(string property, object value, List<FilterDefinition<MongoEventCommit>> filters)
+        private static void FilterByProperty(string property, object value, List<FilterDefinition<MongoEventCommit>> filters)
         {
             filters.Add(Filter.Eq(CreateIndexPath(property), value));
         }
 
-        private static void AddStreamFilter(string streamFilter, List<FilterDefinition<MongoEventCommit>> filters)
+        private static void FilterByStream(string streamFilter, List<FilterDefinition<MongoEventCommit>> filters)
         {
             if (!string.IsNullOrWhiteSpace(streamFilter) && !string.Equals(streamFilter, ".*", StringComparison.OrdinalIgnoreCase))
             {
@@ -160,7 +160,7 @@ namespace Squidex.Infrastructure.EventSourcing
             }
         }
 
-        private static void AddPositionFilter(StreamPosition streamPosition, List<FilterDefinition<MongoEventCommit>> filters)
+        private static void FilterByPosition(StreamPosition streamPosition, List<FilterDefinition<MongoEventCommit>> filters)
         {
             if (streamPosition.IsEndOfCommit)
             {

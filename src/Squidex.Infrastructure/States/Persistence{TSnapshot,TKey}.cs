@@ -175,6 +175,19 @@ namespace Squidex.Infrastructure.States
             UpdateVersion();
         }
 
+        public async Task DeleteAsync()
+        {
+            if (UseEventSourcing())
+            {
+                await eventStore.DeleteStreamAsync(GetStreamName());
+            }
+
+            if (UseSnapshots())
+            {
+                await snapshotStore.RemoveAsync(ownerKey);
+            }
+        }
+
         private EventData[] GetEventData(Envelope<IEvent>[] events, Guid commitId)
         {
             return @events.Select(x => eventDataFormatter.ToEventData(x, commitId, true)).ToArray();

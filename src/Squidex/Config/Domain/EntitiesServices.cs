@@ -52,8 +52,7 @@ namespace Squidex.Config.Domain
                     c.GetRequiredService<IOptions<MyUrlsOptions>>(),
                     c.GetRequiredService<IAssetStore>(),
                     exposeSourceUrl))
-                .As<IGraphQLUrlGenerator>()
-                .As<IRuleUrlGenerator>();
+                .As<IGraphQLUrlGenerator>().As<IRuleUrlGenerator>();
 
             services.AddSingletonAs<CachingGraphQLService>()
                 .As<IGraphQLService>();
@@ -86,7 +85,7 @@ namespace Squidex.Config.Domain
                 .AsSelf();
 
             services.AddSingletonAs<GrainTagService>()
-                .As<ITagService>();
+                .As<ITagService>().As<ICleanableAppStorage>();
 
             services.AddSingletonAs<FileTypeTagGenerator>()
                 .As<ITagGenerator<CreateAsset>>();
@@ -94,6 +93,43 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<ImageTagGenerator>()
                 .As<ITagGenerator<CreateAsset>>();
 
+            services.AddSingletonAs<AppGrainCleaner<IBackupGrain>>()
+                .As<ICleanableAppStorage>();
+
+            services.AddSingletonAs<AppGrainCleaner<IRulesByAppIndex>>()
+                .As<ICleanableAppStorage>();
+
+            services.AddSingletonAs<AppGrainCleaner<ISchemasByAppIndex>>()
+                .As<ICleanableAppStorage>();
+
+            services.AddSingletonAs<JintScriptEngine>()
+                .As<IScriptEngine>();
+
+            AddCommandPipeline(services);
+
+            services.AddSingleton<Func<IGrainCallContext, string>>(DomainObjectGrainFormatter.Format);
+
+            services.AddSingleton(c =>
+            {
+                var uiOptions = c.GetRequiredService<IOptions<MyUIOptions>>();
+
+                var result = new InitialPatterns();
+
+                foreach (var pattern in uiOptions.Value.RegexSuggestions)
+                {
+                    if (!string.IsNullOrWhiteSpace(pattern.Key) &&
+                        !string.IsNullOrWhiteSpace(pattern.Value))
+                    {
+                        result[Guid.NewGuid()] = new AppPattern(pattern.Key, pattern.Value);
+                    }
+                }
+
+                return result;
+            });
+        }
+
+        private static void AddCommandPipeline(IServiceCollection services)
+        {
             services.AddSingletonAs<InMemoryCommandBus>()
                 .As<ICommandBus>();
 
@@ -151,28 +187,8 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<CreateProfileCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
-            services.AddSingletonAs<JintScriptEngine>()
-                .As<IScriptEngine>();
-
-            services.AddSingleton<Func<IGrainCallContext, string>>(DomainObjectGrainFormatter.Format);
-
-            services.AddSingleton(c =>
-            {
-                var uiOptions = c.GetRequiredService<IOptions<MyUIOptions>>();
-
-                var result = new InitialPatterns();
-
-                foreach (var pattern in uiOptions.Value.RegexSuggestions)
-                {
-                    if (!string.IsNullOrWhiteSpace(pattern.Key) &&
-                        !string.IsNullOrWhiteSpace(pattern.Value))
-                    {
-                        result[Guid.NewGuid()] = new AppPattern(pattern.Key, pattern.Value);
-                    }
-                }
-
-                return result;
-            });
+            services.AddSingletonAs<EnqueueAppToCleanerMiddleware>()
+                .As<ICommandMiddleware>();
         }
 
         public static void AddMyMigrationServices(this IServiceCollection services)

@@ -84,6 +84,19 @@ namespace Squidex.Domain.Apps.Entities.Backup
             await CleanupAsync();
         }
 
+        public async Task ClearAsync()
+        {
+            foreach (var job in state.Jobs)
+            {
+                await CleanupArchiveAsync(job);
+                await CleanupBackupAsync(job);
+            }
+
+            state = new BackupState();
+
+            await persistence.DeleteAsync();
+        }
+
         private async Task ReadAsync()
         {
             await persistence.ReadAsync();

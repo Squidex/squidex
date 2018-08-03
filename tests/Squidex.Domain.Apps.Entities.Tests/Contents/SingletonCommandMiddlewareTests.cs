@@ -14,7 +14,7 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents
 {
-    public sealed class SingletonCommandMiddlewareTests
+    public class SingletonCommandMiddlewareTests
     {
         private readonly ICommandBus commandBus = A.Fake<ICommandBus>();
         private readonly SingletonCommandMiddleware sut = new SingletonCommandMiddleware();

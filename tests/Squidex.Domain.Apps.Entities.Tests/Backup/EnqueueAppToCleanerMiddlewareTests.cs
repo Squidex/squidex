@@ -14,39 +14,26 @@ using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Orleans;
 using Xunit;
 
-namespace Squidex.Domain.Apps.Entities.Apps.Indexes
+namespace Squidex.Domain.Apps.Entities.Backup
 {
-    public class AppsByNameIndexCommandMiddlewareTests
+    public class EnqueueAppToCleanerMiddlewareTests
     {
         private readonly IGrainFactory grainFactory = A.Fake<IGrainFactory>();
         private readonly ICommandBus commandBus = A.Fake<ICommandBus>();
-        private readonly IAppsByNameIndex index = A.Fake<IAppsByNameIndex>();
+        private readonly IAppCleanerGrain index = A.Fake<IAppCleanerGrain>();
         private readonly Guid appId = Guid.NewGuid();
-        private readonly AppsByNameIndexCommandMiddleware sut;
+        private readonly EnqueueAppToCleanerMiddleware sut;
 
-        public AppsByNameIndexCommandMiddlewareTests()
+        public EnqueueAppToCleanerMiddlewareTests()
         {
-            A.CallTo(() => grainFactory.GetGrain<IAppsByNameIndex>(SingleGrain.Id, null))
+            A.CallTo(() => grainFactory.GetGrain<IAppCleanerGrain>(SingleGrain.Id, null))
                 .Returns(index);
 
-            sut = new AppsByNameIndexCommandMiddleware(grainFactory);
+            sut = new EnqueueAppToCleanerMiddleware(grainFactory);
         }
 
         [Fact]
-        public async Task Should_add_app_to_index_on_create()
-        {
-            var context =
-                new CommandContext(new CreateApp { AppId = appId, Name = "my-app" }, commandBus)
-                    .Complete();
-
-            await sut.HandleAsync(context);
-
-            A.CallTo(() => index.AddAppAsync(appId, "my-app"))
-                .MustHaveHappened();
-        }
-
-        [Fact]
-        public async Task Should_remove_app_from_index_on_archive()
+        public async Task Should_enqueue_for_cleanup_on_archive()
         {
             var context =
                 new CommandContext(new ArchiveApp { AppId = appId }, commandBus)
@@ -54,7 +41,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
             await sut.HandleAsync(context);
 
-            A.CallTo(() => index.RemoveAppAsync(appId))
+            A.CallTo(() => index.EnqueueAppAsync(appId))
                 .MustHaveHappened();
         }
     }

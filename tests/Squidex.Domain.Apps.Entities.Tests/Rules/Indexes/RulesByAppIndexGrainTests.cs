@@ -14,7 +14,7 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Rules.Indexes
 {
-    public sealed class RulesByAppIndexGrainTests
+    public class RulesByAppIndexGrainTests
     {
         private readonly IStore<Guid> store = A.Fake<IStore<Guid>>();
         private readonly IPersistence<RulesByAppIndexGrain.State> persistence = A.Fake<IPersistence<RulesByAppIndexGrain.State>>();
@@ -43,6 +43,21 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
 
             A.CallTo(() => persistence.WriteSnapshotAsync(A<RulesByAppIndexGrain.State>.Ignored))
                 .MustHaveHappenedTwiceExactly();
+        }
+
+        [Fact]
+        public async Task Should_delete_and_reset_state_when_cleaning()
+        {
+            await sut.AddRuleAsync(ruleId1);
+            await sut.AddRuleAsync(ruleId2);
+            await sut.ClearAsync();
+
+            var ids = await sut.GetRuleIdsAsync();
+
+            Assert.Empty(ids);
+
+            A.CallTo(() => persistence.DeleteAsync())
+                .MustHaveHappened();
         }
 
         [Fact]

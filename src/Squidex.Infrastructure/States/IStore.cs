@@ -22,5 +22,7 @@ namespace Squidex.Infrastructure.States
         ISnapshotStore<TState, TKey> GetSnapshotStore<TState>();
 
         Task ClearSnapshotsAsync<TState>();
+
+        Task RemoveSnapshotAsync<TState>(TKey key);
     }
 }

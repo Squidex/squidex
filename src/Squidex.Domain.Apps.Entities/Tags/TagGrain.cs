@@ -51,6 +51,13 @@ namespace Squidex.Domain.Apps.Entities.Tags
             return persistence.ReadAsync();
         }
 
+        public Task ClearAsync()
+        {
+            state = new State();
+
+            return persistence.DeleteAsync();
+        }
+
         public async Task<HashSet<string>> NormalizeTagsAsync(HashSet<string> names, HashSet<string> ids)
         {
             var result = new HashSet<string>();

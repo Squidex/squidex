@@ -83,6 +83,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             return schema;
         }
 
+        Task ISnapshotStore<ContentState, Guid>.RemoveAsync(Guid key)
+        {
+            throw new NotSupportedException();
+        }
+
         Task ISnapshotStore<ContentState, Guid>.ReadAllAsync(Func<ContentState, long, Task> callback)
         {
             throw new NotSupportedException();

@@ -18,11 +18,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 {
     public sealed partial class MongoAssetRepository : ISnapshotStore<AssetState, Guid>
     {
-        Task ISnapshotStore<AssetState, Guid>.ReadAllAsync(Func<AssetState, long, Task> callback)
-        {
-            throw new NotSupportedException();
-        }
-
         public async Task<(AssetState Value, long Version)> ReadAsync(Guid key)
         {
             using (Profiler.TraceMethod<MongoAssetRepository>())
@@ -51,6 +46,16 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 
                 await Collection.ReplaceOneAsync(x => x.Id == key && x.Version == oldVersion, entity, Upsert);
             }
+        }
+
+        Task ISnapshotStore<AssetState, Guid>.ReadAllAsync(Func<AssetState, long, Task> callback)
+        {
+            throw new NotSupportedException();
+        }
+
+        Task ISnapshotStore<AssetState, Guid>.RemoveAsync(Guid key)
+        {
+            throw new NotSupportedException();
         }
     }
 }
