@@ -14,7 +14,7 @@
     <ProjectReference Include="..\Squidex.Shared\Squidex.Shared.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="GraphQL" Version="2.0.0-alpha-912" />
+    <PackageReference Include="GraphQL" Version="2.0.0" />
     <PackageReference Include="Microsoft.Orleans.OrleansCodeGenerator.Build" Version="2.0.4-ci.20180622.3" />
     <PackageReference Include="Microsoft.Orleans.Core" Version="2.0.4-ci.20180622.3" />
     <PackageReference Include="NodaTime" Version="2.3.0" />
