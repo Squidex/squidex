@@ -60,7 +60,7 @@ namespace Squidex.Domain.Apps.Entities.Tags
         {
             await sut.GetExportableTagsAsync(appId, TagGroups.Assets);
 
-            A.CallTo(() => grain.GetTagsAsync())
+            A.CallTo(() => grain.GetExportableTagsAsync())
                 .MustHaveHappened();
         }
 
