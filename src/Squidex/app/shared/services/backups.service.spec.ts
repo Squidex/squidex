@@ -14,7 +14,8 @@ import {
     BackupDto,
     BackupsService,
     DateTime,
-    RestoreDto
+    RestoreDto,
+    StartRestoreDto
 } from './../';
 
 describe('BackupsService', () => {
@@ -169,7 +170,7 @@ describe('BackupsService', () => {
     it('should make post request to start restore',
         inject([BackupsService, HttpTestingController], (backupsService: BackupsService, httpMock: HttpTestingController) => {
 
-        backupsService.postRestore('http://url').subscribe();
+        backupsService.postRestore(new StartRestoreDto('http://url')).subscribe();
 
         const req = httpMock.expectOne('http://service/p/api/apps/restore');
 

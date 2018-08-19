@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using Orleans;
 using Squidex.Domain.Apps.Entities.Apps.Indexes;
+using Squidex.Domain.Apps.Entities.Apps.State;
 using Squidex.Domain.Apps.Entities.Backup;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Apps;
@@ -166,6 +167,8 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         public override async Task CompleteRestoreAsync(Guid appId, BackupReader reader)
         {
+            await RebuildAsync<AppState, AppGrain>(appId, (e, s) => s.Apply(e));
+
             await grainFactory.GetGrain<IAppsByNameIndex>(SingleGrain.Id).AddAppAsync(appCreated.AppId.Id, appCreated.AppId.Name);
 
             foreach (var user in activeUsers)

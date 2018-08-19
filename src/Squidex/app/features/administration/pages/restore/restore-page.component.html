@@ -55,6 +55,9 @@
                     <div class="col">
                         <input class="form-control" name="url" formControlName="url" placeholder="Url to backup" />
                     </div>
+                    <div class="col pl-1">
+                        <input class="form-control" name="name" formControlName="name" placeholder="Optional app name" />
+                    </div>
                     <div class="col col-auto pl-1">
                         <button type="submit" class="btn btn-success" [disabled]="restoreForm.hasNoUrl | async">Restore Backup</button>
                     </div>

@@ -139,7 +139,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             {
                 using (var stream = await backupArchiveLocation.OpenStreamAsync(job.Id))
                 {
-                    using (var writer = new BackupWriter(stream))
+                    using (var writer = new BackupWriter(stream, true))
                     {
                         await eventStore.QueryAsync(async storedEvent =>
                         {

@@ -38,7 +38,7 @@ namespace Squidex.Infrastructure.States
             Guard.NotNullOrEmpty(streamName, nameof(streamName));
             Guard.NotNull(idGenerator, nameof(idGenerator));
 
-            var positionOfDash = streamName.LastIndexOf('-');
+            var positionOfDash = streamName.IndexOf('-');
 
             if (positionOfDash >= 0)
             {

@@ -43,6 +43,14 @@ export class RestoreDto {
     }
 }
 
+export class StartRestoreDto {
+    constructor(
+        public readonly url: string,
+        public readonly newAppName?: string
+    ) {
+    }
+}
+
 @Injectable()
 export class BackupsService {
     constructor(
@@ -106,10 +114,10 @@ export class BackupsService {
                 pretifyError('Failed to start backup.'));
     }
 
-    public postRestore(downloadUrl: string): Observable<any> {
+    public postRestore(dto: StartRestoreDto): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/restore`);
 
-        return this.http.post(url, { url: downloadUrl }).pipe(
+        return this.http.post(url, dto).pipe(
                 tap(() => {
                     this.analytics.trackEvent('Restore', 'Started');
                 }),

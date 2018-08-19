@@ -57,7 +57,7 @@ export class RestorePageComponent implements OnDestroy, OnInit {
         if (value) {
             this.restoreForm.submitCompleted({});
 
-            this.backupsService.postRestore(value.url)
+            this.backupsService.postRestore(value)
                 .subscribe(() => {
                     this.dialogs.notifyInfo('Restore started, it can take several minutes to complete.');
                 }, error => {
