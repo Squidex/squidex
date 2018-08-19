@@ -12,6 +12,7 @@ using System.Reflection;
 using Microsoft.OData.UriParser;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
+using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.GenerateEdmSchema;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -26,6 +27,18 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors
         private static readonly Dictionary<string, string> PropertyMap =
             typeof(MongoContentEntity).GetProperties()
                 .ToDictionary(x => x.Name, x => x.GetCustomAttribute<BsonElementAttribute>()?.ElementName ?? x.Name, StringComparer.OrdinalIgnoreCase);
+
+        public static readonly ConvertValue ValueConverter = (field, value) =>
+        {
+            if (value is Instant instant &&
+                !string.Equals(field, "mt", StringComparison.OrdinalIgnoreCase) &&
+                !string.Equals(field, "ct", StringComparison.OrdinalIgnoreCase))
+            {
+                return instant.ToString();
+            }
+
+            return value;
+        };
 
         public static ConvertProperty CreatePropertyCalculator(Schema schema, bool useDraft)
         {
@@ -98,7 +111,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors
                 filters.Add(Filter.In(x => x.Status, status));
             }
 
-            var filter = query.BuildFilter<MongoContentEntity>(propertyCalculator);
+            var filter = query.BuildFilter<MongoContentEntity>(propertyCalculator, ValueConverter);
 
             if (filter.Filter != null)
             {

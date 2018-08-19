@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 using NodaTime;
@@ -51,7 +52,24 @@ namespace Squidex.Infrastructure.MongoDb.OData
                     return Instant.FromDateTimeOffset(dateTimeOffset);
                 }
 
-                return InstantPattern.General.Parse(Visit(nodeIn.Source).ToString()).Value;
+                if (value is DateTime dateTime)
+                {
+                    return Instant.FromDateTimeUtc(DateTime.SpecifyKind(dateTime, DateTimeKind.Utc));
+                }
+
+                if (value is Date date)
+                {
+                    return Instant.FromUtc(date.Year, date.Month, date.Day, 0, 0);
+                }
+
+                var parseResult = InstantPattern.General.Parse(Visit(nodeIn.Source).ToString());
+
+                if (!parseResult.Success)
+                {
+                    throw new ODataException("Datetime is not in a valid format. Use ISO 8601");
+                }
+
+                return parseResult.Value;
             }
 
             return base.Visit(nodeIn);

@@ -96,6 +96,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.OData
         }
 
         [Fact]
+        public void Should_make_query_with_created_and_date()
+        {
+            var i = F("$filter=created eq 1988-01-19");
+            var o = C("{ 'ct' : ISODate('1988-01-19T00:00:00Z') }");
+
+            Assert.Equal(o, i);
+        }
+
+        [Fact]
         public void Should_make_query_with_createdBy()
         {
             var i = F("$filter=createdBy eq 'Me'");
@@ -216,7 +225,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.OData
         public void Should_make_query_with_datetime_equals()
         {
             var i = F("$filter=data/birthday/iv eq 1988-01-19T12:00:00Z");
-            var o = C("{ 'do.5.iv' : ISODate('1988-01-19T12:00:00Z') }");
+            var o = C("{ 'do.5.iv' : '1988-01-19T12:00:00Z' }");
 
             Assert.Equal(o, i);
         }
@@ -430,7 +439,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.OData
             var parser = edmModel.ParseQuery(value);
 
             var query =
-                parser.BuildFilter<MongoContentEntity>(FindExtensions.CreatePropertyCalculator(schemaDef, false))
+                parser.BuildFilter<MongoContentEntity>(FindExtensions.CreatePropertyCalculator(schemaDef, false), FindExtensions.ValueConverter)
                     .Filter.Render(Serializer, Registry).ToString();
 
             return query;
