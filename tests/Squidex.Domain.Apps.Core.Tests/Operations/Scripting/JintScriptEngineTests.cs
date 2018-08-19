@@ -147,16 +147,16 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 new NamedContentData()
                     .AddField("title",
                         new ContentFieldData()
-                            .AddValue("iv", "Hello World"));
+                            .AddValue("iv", "4 Häuser"));
 
             var expected =
                 new NamedContentData()
                     .AddField("title",
                         new ContentFieldData()
-                            .AddValue("iv", "Hello World"))
+                            .AddValue("iv", "4 Häuser"))
                     .AddField("slug",
                         new ContentFieldData()
-                            .AddValue("iv", "hello-world"));
+                            .AddValue("iv", "4-haeuser"));
 
             var context = new ScriptContext { Data = content };
 
@@ -164,6 +164,36 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 var data = ctx.data;
 
                 data.slug = { iv: slugify(data.title.iv) };
+
+                replace(data);");
+
+            Assert.Equal(expected, result);
+        }
+
+        [Fact]
+        public void Should_slugify_value_with_single_char()
+        {
+            var content =
+                new NamedContentData()
+                    .AddField("title",
+                        new ContentFieldData()
+                            .AddValue("iv", "4 Häuser"));
+
+            var expected =
+                new NamedContentData()
+                    .AddField("title",
+                        new ContentFieldData()
+                            .AddValue("iv", "4 Häuser"))
+                    .AddField("slug",
+                        new ContentFieldData()
+                            .AddValue("iv", "4-hauser"));
+
+            var context = new ScriptContext { Data = content };
+
+            var result = scriptEngine.Transform(context, @"
+                var data = ctx.data;
+
+                data.slug = { iv: slugify(data.title.iv, true) };
 
                 replace(data);");
 
