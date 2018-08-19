@@ -105,9 +105,14 @@ namespace Squidex.Domain.Apps.Entities.Backup
             }
         }
 
-        public Task RestoreAsync(Uri url)
+        public Task RestoreAsync(Uri url, string newAppName)
         {
             Guard.NotNull(url, nameof(url));
+
+            if (newAppName != null)
+            {
+                Guard.ValidSlug(newAppName, nameof(newAppName));
+            }
 
             if (CurrentJob?.Status == JobStatus.Started)
             {
@@ -117,6 +122,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             state.Job = new RestoreStateJob
             {
                 Id = Guid.NewGuid(),
+                NewAppName = newAppName,
                 Started = clock.GetCurrentInstant(),
                 Status = JobStatus.Started,
                 Url = url
@@ -267,6 +273,16 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 if (@event.Payload is AppCreated appCreated)
                 {
                     CurrentJob.AppId = appCreated.AppId.Id;
+
+                    if (!string.IsNullOrWhiteSpace(CurrentJob.NewAppName))
+                    {
+                        appCreated.Name = CurrentJob.NewAppName;
+                    }
+                }
+
+                if (@event.Payload is AppEvent appEvent && !string.IsNullOrWhiteSpace(CurrentJob.NewAppName))
+                {
+                    appEvent.AppId = new NamedId<Guid>(appEvent.AppId.Id, CurrentJob.NewAppName);
                 }
 
                 foreach (var handler in handlers)

@@ -24,6 +24,9 @@ namespace Squidex.Domain.Apps.Entities.Backup.State
         public Uri Url { get; set; }
 
         [JsonProperty]
+        public string NewAppName { get; set; }
+
+        [JsonProperty]
         public Instant Started { get; set; }
 
         [JsonProperty]

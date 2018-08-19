@@ -17,5 +17,8 @@ namespace Squidex.Areas.Api.Controllers.Backups.Models
         /// </summary>
         [Required]
         public Uri Url { get; set; }
+
+        [RegularExpression("^[a-z0-9]+(\\-[a-z0-9]+)*$")]
+        public string Name { get; set; }
     }
 }

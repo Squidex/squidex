@@ -63,7 +63,7 @@ namespace Squidex.Areas.Api.Controllers.Backups
         {
             var restoreGrain = grainFactory.GetGrain<IRestoreGrain>(User.OpenIdSubject());
 
-            await restoreGrain.RestoreAsync(request.Url);
+            await restoreGrain.RestoreAsync(request.Url, request.Name);
 
             return NoContent();
         }
