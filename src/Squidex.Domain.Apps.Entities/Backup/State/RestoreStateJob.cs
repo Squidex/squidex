@@ -15,6 +15,9 @@ namespace Squidex.Domain.Apps.Entities.Backup.State
     public sealed class RestoreStateJob : IRestoreJob
     {
         [JsonProperty]
+        public string AppName { get; set; }
+
+        [JsonProperty]
         public Guid Id { get; set; }
 
         [JsonProperty]

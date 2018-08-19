@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 using Orleans;
 using Squidex.Domain.Apps.Entities.Apps.Indexes;
 using Squidex.Domain.Apps.Entities.Backup;
@@ -17,7 +18,6 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.States;
-using Squidex.Infrastructure.Tasks;
 using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Apps
@@ -28,8 +28,8 @@ namespace Squidex.Domain.Apps.Entities.Apps
         private readonly IGrainFactory grainFactory;
         private readonly IUserResolver userResolver;
         private readonly HashSet<string> activeUsers = new HashSet<string>();
-        private readonly Dictionary<string, string> usersWithEmail = new Dictionary<string, string>();
-        private readonly Dictionary<string, RefToken> userMapping = new Dictionary<string, RefToken>();
+        private Dictionary<string, string> usersWithEmail = new Dictionary<string, string>();
+        private Dictionary<string, RefToken> userMapping = new Dictionary<string, RefToken>();
         private bool isReserved;
         private bool isActorAssigned;
         private AppCreated appCreated;
@@ -152,22 +152,16 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         private async Task ReadUsersAsync(BackupReader reader)
         {
-            await reader.ReadAttachmentAsync(UsersFile, stream =>
-            {
-                stream.SerializeAsJson(usersWithEmail);
+            var json = await reader.ReadJsonAttachmentAsync(UsersFile);
 
-                return TaskHelper.Done;
-            });
+            usersWithEmail = json.ToObject<Dictionary<string, string>>();
         }
 
         private Task WriterUsersAsync(BackupWriter writer)
         {
-            return writer.WriteAttachmentAsync(UsersFile, stream =>
-            {
-                stream.SerializeAsJson(usersWithEmail);
+            var json = JObject.FromObject(usersWithEmail);
 
-                return TaskHelper.Done;
-            });
+            return writer.WriteJsonAsync(UsersFile, json);
         }
 
         public override async Task CompleteRestoreAsync(Guid appId, BackupReader reader)

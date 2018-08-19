@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Domain.Apps.Entities.Assets.State;
 using Squidex.Domain.Apps.Entities.Backup;
@@ -84,29 +85,23 @@ namespace Squidex.Domain.Apps.Entities.Assets
             await RebuildManyAsync(assetIds, id => RebuildAsync<AssetState, AssetGrain>(id, (e, s) => s.Apply(e)));
         }
 
-        private Task RestoreTagsAsync(Guid appId, BackupReader reader)
+        private async Task RestoreTagsAsync(Guid appId, BackupReader reader)
         {
-            return reader.ReadAttachmentAsync(TagsFile, stream =>
-            {
-                var tags = stream.DeserializeAsJson<TagSet>();
+            var tags = await reader.ReadJsonAttachmentAsync(TagsFile);
 
-                return tagService.RebuildTagsAsync(appId, TagGroups.Assets, tags);
-            });
+            await tagService.RebuildTagsAsync(appId, TagGroups.Assets, tags.ToObject<TagSet>());
         }
 
-        private Task BackupTagsAsync(Guid appId, BackupWriter writer)
+        private async Task BackupTagsAsync(Guid appId, BackupWriter writer)
         {
-            return writer.WriteAttachmentAsync(TagsFile, async stream =>
-            {
-                var tags = await tagService.GetExportableTagsAsync(appId, TagGroups.Assets);
+            var tags = await tagService.GetExportableTagsAsync(appId, TagGroups.Assets);
 
-                stream.SerializeAsJson(tags);
-            });
+            await writer.WriteJsonAsync(TagsFile, JObject.FromObject(tags));
         }
 
         private Task WriteAssetAsync(Guid assetId, long fileVersion, BackupWriter writer)
         {
-            return writer.WriteAttachmentAsync(GetName(assetId, fileVersion), stream =>
+            return writer.WriteBlobAsync(GetName(assetId, fileVersion), stream =>
             {
                 return assetStore.DownloadAsync(assetId.ToString(), fileVersion, null, stream);
             });
@@ -116,7 +111,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             assetIds.Add(assetId);
 
-            return reader.ReadAttachmentAsync(GetName(assetId, fileVersion), async stream =>
+            return reader.ReadBlobAsync(GetName(reader.OldGuid(assetId), fileVersion), async stream =>
             {
                 try
                 {

@@ -12,71 +12,159 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Backup
 {
-    public static class GuidMapper
+    public sealed class GuidMapper
     {
         private static readonly int GuidLength = Guid.Empty.ToString().Length;
+        private readonly List<(JObject Source, string NewKey, string OldKey)> mappings = new List<(JObject Source, string NewKey, string OldKey)>();
+        private readonly Dictionary<Guid, Guid> oldToNewGuid = new Dictionary<Guid, Guid>();
+        private readonly Dictionary<Guid, Guid> newToOldGuid = new Dictionary<Guid, Guid>();
 
-        public static void GenerateNewGuid(JToken jToken, Dictionary<Guid, Guid> guids)
+        public Guid NewGuid(Guid oldGuid)
         {
-            if (jToken.Type == JTokenType.Object)
+            return oldToNewGuid.GetOrDefault(oldGuid);
+        }
+
+        public Guid OldGuid(Guid newGuid)
+        {
+            return newToOldGuid.GetOrDefault(newGuid);
+        }
+
+        public string NewGuidString(string key)
+        {
+            if (Guid.TryParse(key, out var guid))
             {
-                GenerateNewGuid((JObject)jToken, guids);
+                return GenerateNewGuid(guid).ToString();
+            }
+
+            return null;
+        }
+
+        public JToken NewGuids(JToken jToken)
+        {
+            var result = NewGuidsCore(jToken);
+
+            if (mappings.Count > 0)
+            {
+                foreach (var mapping in mappings)
+                {
+                    if (mapping.Source.TryGetValue(mapping.OldKey, out var value))
+                    {
+                        mapping.Source.Remove(mapping.OldKey);
+                        mapping.Source[mapping.NewKey] = value;
+                    }
+                }
+
+                mappings.Clear();
+            }
+
+            return result;
+        }
+
+        private JToken NewGuidsCore(JToken jToken)
+        {
+            switch (jToken.Type)
+            {
+                case JTokenType.String:
+                    if (TryConvertString(jToken.ToString(), out var result))
+                    {
+                        return result;
+                    }
+
+                    break;
+                case JTokenType.Guid:
+                    return GenerateNewGuid((Guid)jToken);
+                case JTokenType.Object:
+                    NewGuidsCore((JObject)jToken);
+                    break;
+                case JTokenType.Array:
+                    NewGuidsCore((JArray)jToken);
+                    break;
+            }
+
+            return jToken;
+        }
+
+        private void NewGuidsCore(JArray jArray)
+        {
+            for (var i = 0; i < jArray.Count; i++)
+            {
+                jArray[i] = NewGuidsCore(jArray[i]);
             }
         }
 
-        private static void GenerateNewGuid(JObject jObject, Dictionary<Guid, Guid> guids)
+        private void NewGuidsCore(JObject jObject)
         {
-            foreach (var kvp in jObject)
+            foreach (var jProperty in jObject.Properties())
             {
-                switch (kvp.Value.Type)
+                var newValue = NewGuidsCore(jProperty.Value);
+
+                if (!ReferenceEquals(newValue, jProperty.Value))
                 {
-                    case JTokenType.String:
-                        ReplaceGuidString(jObject, guids, kvp);
-                        break;
-                    case JTokenType.Guid:
-                        ReplaceGuid(jObject, guids, kvp);
-                        break;
-                    case JTokenType.Object:
-                        GenerateNewGuid((JObject)kvp.Value, guids);
-                        break;
+                    jProperty.Value = newValue;
+                }
+
+                if (TryConvertString(jProperty.Name, out var newKey))
+                {
+                    mappings.Add((jObject, newKey, jProperty.Name));
                 }
             }
         }
 
-        private static void ReplaceGuidString(JObject jObject, Dictionary<Guid, Guid> guids, KeyValuePair<string, JToken> kvp)
+        private bool TryConvertString(string value, out string result)
         {
-            var value = kvp.Value.ToString();
+            return TryGenerateNewGuidString(value, out result) || TryGenerateNewNamedId(value, out result);
+        }
+
+        private bool TryGenerateNewGuidString(string value, out string result)
+        {
+            result = null;
 
             if (value.Length == GuidLength)
             {
                 if (Guid.TryParse(value, out var guid))
                 {
-                    var newGuid = guids.GetOrAdd(guid, GuidGenerator);
+                    var newGuid = GenerateNewGuid(guid);
 
-                    jObject.Property(kvp.Key).Value = newGuid.ToString();
+                    result = newGuid.ToString();
+
+                    return true;
                 }
             }
-            else if (value.Length > GuidLength && value[GuidLength] == ',')
+
+            return false;
+        }
+
+        private bool TryGenerateNewNamedId(string value, out string result)
+        {
+            result = null;
+
+            if (value.Length > GuidLength && value[GuidLength] == ',')
             {
                 if (Guid.TryParse(value.Substring(0, GuidLength), out var guid))
                 {
-                    var newGuid = guids.GetOrAdd(guid, GuidGenerator);
+                    var newGuid = GenerateNewGuid(guid);
 
-                    jObject.Property(kvp.Key).Value = newGuid + value.Substring(GuidLength);
+                    result = newGuid + value.Substring(GuidLength);
+
+                    return true;
                 }
             }
+
+            return false;
         }
 
-        private static void ReplaceGuid(JObject jObject, Dictionary<Guid, Guid> guids, KeyValuePair<string, JToken> kvp)
+        private Guid GenerateNewGuid(Guid oldGuid)
         {
-            var newGuid = guids.GetOrAdd((Guid)kvp.Value, GuidGenerator);
-
-            jObject.Property(kvp.Key).Value = newGuid;
+            return oldToNewGuid.GetOrAdd(oldGuid, GuidGenerator);
         }
 
-        private static Guid GuidGenerator(Guid key)
+        private Guid GuidGenerator(Guid oldGuid)
         {
-            return Guid.NewGuid();
+            var newGuid = Guid.NewGuid();
+
+            newToOldGuid[newGuid] = oldGuid;
+
+            return newGuid;
         }
     }
 }

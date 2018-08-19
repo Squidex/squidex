@@ -9,14 +9,19 @@ using System;
 using System.IO;
 using System.IO.Compression;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Entities.Backup.Archive;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Backup
 {
     public sealed class BackupReader : DisposableObjectBase
     {
+        private static readonly JsonSerializer Serializer = new JsonSerializer();
+        private readonly GuidMapper guidMapper = new GuidMapper();
         private readonly ZipArchive archive;
         private int readEvents;
         private int readAttachments;
@@ -44,7 +49,43 @@ namespace Squidex.Domain.Apps.Entities.Backup
             }
         }
 
-        public async Task ReadAttachmentAsync(string name, Func<Stream, Task> handler)
+        public Guid OldGuid(Guid newId)
+        {
+            return guidMapper.OldGuid(newId);
+        }
+
+        public async Task<JToken> ReadJsonAttachmentAsync(string name)
+        {
+            Guard.NotNullOrEmpty(name, nameof(name));
+
+            var attachmentEntry = archive.GetEntry(ArchiveHelper.GetAttachmentPath(name));
+
+            if (attachmentEntry == null)
+            {
+                throw new FileNotFoundException("Cannot find attachment.", name);
+            }
+
+            JToken result;
+
+            using (var stream = attachmentEntry.Open())
+            {
+                using (var textReader = new StreamReader(stream))
+                {
+                    using (var jsonReader = new JsonTextReader(textReader))
+                    {
+                        result = await JToken.ReadFromAsync(jsonReader);
+
+                        guidMapper.NewGuids(result);
+                    }
+                }
+            }
+
+            readAttachments++;
+
+            return result;
+        }
+
+        public async Task ReadBlobAsync(string name, Func<Stream, Task> handler)
         {
             Guard.NotNullOrEmpty(name, nameof(name));
             Guard.NotNull(handler, nameof(handler));
@@ -64,9 +105,10 @@ namespace Squidex.Domain.Apps.Entities.Backup
             readAttachments++;
         }
 
-        public async Task ReadEventsAsync(Func<StoredEvent, Task> handler)
+        public async Task ReadEventsAsync(IStreamNameResolver streamNameResolver, Func<StoredEvent, Task> handler)
         {
             Guard.NotNull(handler, nameof(handler));
+            Guard.NotNull(streamNameResolver, nameof(streamNameResolver));
 
             while (true)
             {
@@ -79,9 +121,25 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
                 using (var stream = eventEntry.Open())
                 {
-                    var storedEvent = stream.DeserializeAsJson<StoredEvent>();
+                    using (var textReader = new StreamReader(stream))
+                    {
+                        using (var jsonReader = new JsonTextReader(textReader))
+                        {
+                            var storedEvent = Serializer.Deserialize<StoredEvent>(jsonReader);
 
-                    await handler(storedEvent);
+                            storedEvent.Data.Payload = guidMapper.NewGuids(storedEvent.Data.Payload);
+                            storedEvent.Data.Metadata = guidMapper.NewGuids(storedEvent.Data.Metadata);
+
+                            var streamName = streamNameResolver.WithNewId(storedEvent.StreamName, guidMapper.NewGuidString);
+
+                            storedEvent = new StoredEvent(streamName,
+                                storedEvent.EventPosition,
+                                storedEvent.EventStreamNumber,
+                                storedEvent.Data);
+
+                            await handler(storedEvent);
+                        }
+                    }
                 }
 
                 readEvents++;
