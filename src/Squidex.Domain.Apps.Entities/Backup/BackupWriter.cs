@@ -9,6 +9,8 @@ using System;
 using System.IO;
 using System.IO.Compression;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Entities.Backup.Archive;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
@@ -17,6 +19,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 {
     public sealed class BackupWriter : DisposableObjectBase
     {
+        private static readonly JsonSerializer Serializer = new JsonSerializer();
         private readonly ZipArchive archive;
         private int writtenEvents;
         private int writtenAttachments;
@@ -31,9 +34,9 @@ namespace Squidex.Domain.Apps.Entities.Backup
             get { return writtenAttachments; }
         }
 
-        public BackupWriter(Stream stream)
+        public BackupWriter(Stream stream, bool keepOpen = false)
         {
-            archive = new ZipArchive(stream, ZipArchiveMode.Create, false);
+            archive = new ZipArchive(stream, ZipArchiveMode.Create, keepOpen);
         }
 
         protected override void DisposeObject(bool disposing)
@@ -44,7 +47,27 @@ namespace Squidex.Domain.Apps.Entities.Backup
             }
         }
 
-        public async Task WriteAttachmentAsync(string name, Func<Stream, Task> handler)
+        public async Task WriteJsonAsync(string name, JToken value)
+        {
+            Guard.NotNullOrEmpty(name, nameof(name));
+
+            var attachmentEntry = archive.CreateEntry(ArchiveHelper.GetAttachmentPath(name));
+
+            using (var stream = attachmentEntry.Open())
+            {
+                using (var textWriter = new StreamWriter(stream))
+                {
+                    using (var jsonWriter = new JsonTextWriter(textWriter))
+                    {
+                        await value.WriteToAsync(jsonWriter);
+                    }
+                }
+            }
+
+            writtenAttachments++;
+        }
+
+        public async Task WriteBlobAsync(string name, Func<Stream, Task> handler)
         {
             Guard.NotNullOrEmpty(name, nameof(name));
             Guard.NotNull(handler, nameof(handler));
@@ -67,7 +90,13 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             using (var stream = eventEntry.Open())
             {
-                stream.SerializeAsJson(storedEvent);
+                using (var textWriter = new StreamWriter(stream))
+                {
+                    using (var jsonWriter = new JsonTextWriter(textWriter))
+                    {
+                        Serializer.Serialize(jsonWriter, storedEvent);
+                    }
+                }
             }
 
             writtenEvents++;

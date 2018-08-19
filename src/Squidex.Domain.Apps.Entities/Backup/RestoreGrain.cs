@@ -34,6 +34,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
         private readonly IEventDataFormatter eventDataFormatter;
         private readonly IGrainFactory grainFactory;
         private readonly ISemanticLog log;
+        private readonly IStreamNameResolver streamNameResolver;
         private readonly IStore<string> store;
         private RefToken actor;
         private RestoreState state = new RestoreState();
@@ -53,6 +54,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             IGrainFactory grainFactory,
             IEnumerable<BackupHandler> handlers,
             ISemanticLog log,
+            IStreamNameResolver streamNameResolver,
             IStore<string> store)
         {
             Guard.NotNull(assetStore, nameof(assetStore));
@@ -63,6 +65,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             Guard.NotNull(grainFactory, nameof(grainFactory));
             Guard.NotNull(handlers, nameof(handlers));
             Guard.NotNull(store, nameof(store));
+            Guard.NotNull(streamNameResolver, nameof(streamNameResolver));
             Guard.NotNull(log, nameof(log));
 
             this.assetStore = assetStore;
@@ -73,6 +76,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             this.grainFactory = grainFactory;
             this.handlers = handlers;
             this.store = store;
+            this.streamNameResolver = streamNameResolver;
             this.log = log;
         }
 
@@ -261,7 +265,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         private async Task ReadEventsAsync(BackupReader reader)
         {
-            await reader.ReadEventsAsync(async (storedEvent) =>
+            await reader.ReadEventsAsync(streamNameResolver, async (storedEvent) =>
             {
                 var @event = eventDataFormatter.Parse(storedEvent.Data);
 
