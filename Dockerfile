@@ -28,21 +28,25 @@ RUN dotnet restore \
  && dotnet test tests/Squidex.Tests/Squidex.Tests.csproj
 
 # Publish
-RUN dotnet publish src/Squidex/Squidex.csproj --output /out/ --configuration Release
+RUN dotnet publish src/Squidex/Squidex.csproj --output /out/alpine --configuration Release -r alpine.3.7-x64
 
 #
 # Stage 2, Build runtime
 #
-FROM microsoft/dotnet:2.1.0-aspnetcore-runtime
+FROM microsoft/dotnet:2.1-runtime-deps-alpine
 
 # Default AspNetCore directory
 WORKDIR /app
 
+# add libuv
+RUN apk add --no-cache libuv \
+&& ln -s /usr/lib/libuv.so.1 /usr/lib/libuv.so
+
 # Copy from build stage
-COPY --from=builder /out/ .
+COPY --from=builder /out/alpine .
 
 EXPOSE 80
 EXPOSE 33333
 EXPOSE 40000
 
-ENTRYPOINT ["dotnet", "Squidex.dll"]
+ENTRYPOINT ["./Squidex"]
