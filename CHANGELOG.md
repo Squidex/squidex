@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.9.0 - 2018-08-19
+
+### Features
+
+* **Scripting**: Override for the slugify method to use single line characters when replacing diacritics.
+* **Docker**: Smaller image size.
+
 ## v1.8.0 - 2018-06-30
 
 ### Features
