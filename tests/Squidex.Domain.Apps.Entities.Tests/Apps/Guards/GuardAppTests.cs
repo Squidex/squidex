@@ -5,8 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
 using FakeItEasy;
+using Orleans;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Services;
@@ -19,18 +19,12 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 {
     public class GuardAppTests
     {
-        private readonly IAppProvider apps = A.Fake<IAppProvider>();
         private readonly IUserResolver users = A.Fake<IUserResolver>();
+        private readonly IGrainFactory grainFactory = A.Fake<IGrainFactory>();
         private readonly IAppPlansProvider appPlans = A.Fake<IAppPlansProvider>();
 
         public GuardAppTests()
         {
-            A.CallTo(() => apps.GetAppAsync(A<string>.Ignored))
-                .Returns(Task.FromResult<IAppEntity>(null));
-
-            A.CallTo(() => apps.GetAppAsync("existing"))
-                .Returns(A.Dummy<IAppEntity>());
-
             A.CallTo(() => users.FindByIdOrEmailAsync(A<string>.Ignored))
                 .Returns(A.Dummy<IUser>());
 
@@ -42,29 +36,20 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         }
 
         [Fact]
-        public Task CanCreate_should_throw_exception_if_name_already_in_use()
-        {
-            var command = new CreateApp { Name = "existing" };
-
-            return ValidationAssert.ThrowsAsync(() => GuardApp.CanCreate(command, apps),
-                new ValidationError("An app with the same name already exists.", "Name"));
-        }
-
-        [Fact]
-        public Task CanCreate_should_throw_exception_if_name_not_valid()
+        public void CanCreate_should_throw_exception_if_name_not_valid()
         {
             var command = new CreateApp { Name = "INVALID NAME" };
 
-            return ValidationAssert.ThrowsAsync(() => GuardApp.CanCreate(command, apps),
+            ValidationAssert.Throws(() => GuardApp.CanCreate(command),
                 new ValidationError("Name must be a valid slug.", "Name"));
         }
 
         [Fact]
-        public Task CanCreate_should_not_throw_exception_if_app_name_is_free()
+        public void CanCreate_should_not_throw_exception_if_app_name_is_valid()
         {
             var command = new CreateApp { Name = "new-app" };
 
-            return GuardApp.CanCreate(command, apps);
+            GuardApp.CanCreate(command);
         }
 
         [Fact]

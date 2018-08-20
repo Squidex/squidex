@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Orleans;
 
-namespace Squidex.Domain.Apps.Entities.Schemas
+namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 {
     public interface ISchemasByAppIndex : IGrainWithGuidKey
     {
@@ -19,6 +19,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         Task RemoveSchemaAsync(Guid schemaId);
 
         Task RebuildAsync(Dictionary<string, Guid> schemas);
+
+        Task ClearAsync();
 
         Task<Guid> GetSchemaIdAsync(string name);
 

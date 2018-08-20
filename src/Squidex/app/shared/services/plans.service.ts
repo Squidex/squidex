@@ -30,10 +30,6 @@ export class PlansDto extends Model {
     ) {
         super();
     }
-
-    public with(value: Partial<PlansDto>): PlansDto {
-        return this.clone(value);
-    }
 }
 
 export class PlanDto extends Model {
@@ -48,10 +44,6 @@ export class PlanDto extends Model {
         public readonly maxContributors: number
     ) {
         super();
-    }
-
-    public with(value: Partial<PlanDto>): PlanDto {
-        return this.clone(value);
     }
 }
 

@@ -173,7 +173,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         [Fact]
         public async Task Should_invoke_and_update_position_when_event_received()
         {
-            var @event = new StoredEvent(Guid.NewGuid().ToString(), 123, eventData);
+            var @event = new StoredEvent("Stream", Guid.NewGuid().ToString(), 123, eventData);
 
             await sut.OnActivateAsync(consumerName);
             await sut.ActivateAsync();
@@ -195,7 +195,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             A.CallTo(() => formatter.Parse(eventData, true))
                 .Throws(new TypeNameNotFoundException());
 
-            var @event = new StoredEvent(Guid.NewGuid().ToString(), 123, eventData);
+            var @event = new StoredEvent("Stream", Guid.NewGuid().ToString(), 123, eventData);
 
             await sut.OnActivateAsync(consumerName);
             await sut.ActivateAsync();
@@ -214,7 +214,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         [Fact]
         public async Task Should_not_invoke_and_update_position_when_event_is_from_another_subscription()
         {
-            var @event = new StoredEvent(Guid.NewGuid().ToString(), 123, eventData);
+            var @event = new StoredEvent("Stream", Guid.NewGuid().ToString(), 123, eventData);
 
             await sut.OnActivateAsync(consumerName);
             await sut.ActivateAsync();
@@ -302,7 +302,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             A.CallTo(() => eventConsumer.On(envelope))
                 .Throws(ex);
 
-            var @event = new StoredEvent(Guid.NewGuid().ToString(), 123, eventData);
+            var @event = new StoredEvent("Stream", Guid.NewGuid().ToString(), 123, eventData);
 
             await sut.OnActivateAsync(consumerName);
             await sut.ActivateAsync();
@@ -329,7 +329,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             A.CallTo(() => formatter.Parse(eventData, true))
                 .Throws(ex);
 
-            var @event = new StoredEvent(Guid.NewGuid().ToString(), 123, eventData);
+            var @event = new StoredEvent("Stream", Guid.NewGuid().ToString(), 123, eventData);
 
             await sut.OnActivateAsync(consumerName);
             await sut.ActivateAsync();
@@ -356,7 +356,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             A.CallTo(() => eventConsumer.On(envelope))
                 .Throws(exception);
 
-            var @event = new StoredEvent(Guid.NewGuid().ToString(), 123, eventData);
+            var @event = new StoredEvent("Stream", Guid.NewGuid().ToString(), 123, eventData);
 
             await sut.OnActivateAsync(consumerName);
             await sut.ActivateAsync();

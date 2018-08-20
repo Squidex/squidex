@@ -25,6 +25,8 @@ namespace Squidex.Domain.Apps.Entities.Rules.Repositories
 
         Task QueryPendingAsync(Instant now, Func<IRuleEventEntity, Task> callback, CancellationToken ct = default(CancellationToken));
 
+        Task RemoveAsync(Guid appId);
+
         Task<int> CountByAppAsync(Guid appId);
 
         Task<IReadOnlyList<IRuleEventEntity>> QueryByAppAsync(Guid appId, int skip = 0, int take = 20);

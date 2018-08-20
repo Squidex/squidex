@@ -5,17 +5,18 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+import { Observable, of, throwError } from 'rxjs';
+import { catchError, map, tap } from 'rxjs/operators';
 
 import {
     AnalyticsService,
     ApiUrlConfig,
     DateTime,
     Model,
-    pretifyError
+    pretifyError,
+    Types
 } from '@app/framework';
 
 export class BackupDto extends Model {
@@ -25,13 +26,28 @@ export class BackupDto extends Model {
         public readonly stopped: DateTime | null,
         public readonly handledEvents: number,
         public readonly handledAssets: number,
-        public readonly isFailed: boolean
+        public readonly status: string
     ) {
         super();
     }
+}
 
-    public with(value: Partial<BackupDto>): BackupDto {
-        return this.clone(value);
+export class RestoreDto {
+    constructor(
+        public readonly url: string,
+        public readonly started: DateTime,
+        public readonly stopped: DateTime | null,
+        public readonly status: string,
+        public readonly log: string[]
+    ) {
+    }
+}
+
+export class StartRestoreDto {
+    constructor(
+        public readonly url: string,
+        public readonly newAppName?: string
+    ) {
     }
 }
 
@@ -58,8 +74,32 @@ export class BackupsService {
                             item.stopped ? DateTime.parseISO_UTC(item.stopped) : null,
                             item.handledEvents,
                             item.handledAssets,
-                            item.isFailed);
+                            item.status);
                     });
+                }),
+                pretifyError('Failed to load backups.'));
+    }
+
+    public getRestore(): Observable<RestoreDto | null> {
+        const url = this.apiUrl.buildUrl(`api/apps/restore`);
+
+        return this.http.get(url).pipe(
+                map(response => {
+                    const body: any = response;
+
+                    return new RestoreDto(
+                        body.url,
+                        DateTime.parseISO_UTC(body.started),
+                        body.stopped ? DateTime.parseISO_UTC(body.stopped) : null,
+                        body.status,
+                        body.log);
+                }),
+                catchError(error => {
+                    if (Types.is(error, HttpErrorResponse) && error.status === 404) {
+                        return of(null);
+                    } else {
+                        return throwError(error);
+                    }
                 }),
                 pretifyError('Failed to load backups.'));
     }
@@ -72,6 +112,16 @@ export class BackupsService {
                     this.analytics.trackEvent('Backup', 'Started', appName);
                 }),
                 pretifyError('Failed to start backup.'));
+    }
+
+    public postRestore(dto: StartRestoreDto): Observable<any> {
+        const url = this.apiUrl.buildUrl(`api/apps/restore`);
+
+        return this.http.post(url, dto).pipe(
+                tap(() => {
+                    this.analytics.trackEvent('Restore', 'Started');
+                }),
+                pretifyError('Failed to start restore.'));
     }
 
     public deleteBackup(appName: string, id: string): Observable<any> {

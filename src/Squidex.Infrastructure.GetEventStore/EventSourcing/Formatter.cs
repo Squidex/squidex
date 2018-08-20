@@ -24,6 +24,7 @@ namespace Squidex.Infrastructure.EventSourcing
             var eventData = new EventData { Type = @event.EventType, Payload = body, Metadata = meta };
 
             return new StoredEvent(
+                @event.EventStreamId,
                 resolvedEvent.OriginalEventNumber.ToString(),
                 resolvedEvent.Event.EventNumber,
                 eventData);

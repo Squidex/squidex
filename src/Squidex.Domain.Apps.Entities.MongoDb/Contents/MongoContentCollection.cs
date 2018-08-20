@@ -117,5 +117,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                     Filter.AnyNe(x => x.ReferencedIdsDeleted, id)),
                 Update.AddToSet(x => x.ReferencedIdsDeleted, id));
         }
+
+        public Task RemoveAsync(Guid id)
+        {
+            return Collection.DeleteOneAsync(x => x.Id == id);
+        }
     }
 }

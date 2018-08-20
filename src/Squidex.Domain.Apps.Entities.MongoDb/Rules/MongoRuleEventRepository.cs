@@ -65,6 +65,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
             return ruleEvent;
         }
 
+        public Task RemoveAsync(Guid appId)
+        {
+            return Collection.DeleteManyAsync(x => x.AppId == appId);
+        }
+
         public async Task<int> CountByAppAsync(Guid appId)
         {
             return (int)await Collection.CountDocumentsAsync(x => x.AppId == appId);

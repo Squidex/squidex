@@ -40,9 +40,9 @@ namespace Squidex.Areas.Api.Controllers.Backups.Models
         public int HandledAssets { get; set; }
 
         /// <summary>
-        /// Indicates if the job has failed.
+        /// The status of the operation.
         /// </summary>
-        public bool IsFailed { get; set; }
+        public JobStatus Status { get; set; }
 
         public static BackupJobDto FromBackup(IBackupJob backup)
         {

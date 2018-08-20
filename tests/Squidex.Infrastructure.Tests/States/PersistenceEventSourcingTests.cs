@@ -56,7 +56,7 @@ namespace Squidex.Infrastructure.States
         [Fact]
         public async Task Should_ignore_old_events()
         {
-            var storedEvent = new StoredEvent("1", 0, new EventData());
+            var storedEvent = new StoredEvent("1", "1", 0, new EventData());
 
             A.CallTo(() => eventStore.QueryAsync(key, 0))
                 .Returns(new List<StoredEvent> { storedEvent });
@@ -205,6 +205,34 @@ namespace Squidex.Infrastructure.States
             await Assert.ThrowsAsync<DomainObjectVersionException>(() => persistence.WriteEventsAsync(new[] { new MyEvent(), new MyEvent() }.Select(Envelope.Create)));
         }
 
+        [Fact]
+        public async Task Should_delete_events_but_not_snapshot_when_deleted_snapshot_only()
+        {
+            var persistence = sut.WithEventSourcing<object, string>(key, x => { });
+
+            await persistence.DeleteAsync();
+
+            A.CallTo(() => eventStore.DeleteStreamAsync(key))
+                .MustHaveHappened();
+
+            A.CallTo(() => snapshotStore.RemoveAsync(key))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_delete_events_and_snapshot_when_deleted()
+        {
+            var persistence = sut.WithSnapshotsAndEventSourcing<object, object, string>(key, x => { }, x => { });
+
+            await persistence.DeleteAsync();
+
+            A.CallTo(() => eventStore.DeleteStreamAsync(key))
+                .MustHaveHappened();
+
+            A.CallTo(() => snapshotStore.RemoveAsync(key))
+                .MustHaveHappened();
+        }
+
         private void SetupEventStore(int count, int eventOffset = 0, int readPosition = 0)
         {
             SetupEventStore(Enumerable.Repeat(0, count).Select(x => new MyEvent()).ToArray(), eventOffset, readPosition);
@@ -224,7 +252,7 @@ namespace Squidex.Infrastructure.States
             foreach (var @event in events)
             {
                 var eventData = new EventData();
-                var eventStored = new StoredEvent(i.ToString(), i, eventData);
+                var eventStored = new StoredEvent(i.ToString(), i.ToString(), i, eventData);
 
                 eventsStored.Add(eventStored);
 

@@ -14,7 +14,7 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 {
-    public sealed class SchemasByAppIndexGrainTests
+    public class SchemasByAppIndexGrainTests
     {
         private readonly IStore<Guid> store = A.Fake<IStore<Guid>>();
         private readonly IPersistence<SchemasByAppIndexGrain.State> persistence = A.Fake<IPersistence<SchemasByAppIndexGrain.State>>();
@@ -43,6 +43,20 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             Assert.Equal(schemaId1, result);
 
             A.CallTo(() => persistence.WriteSnapshotAsync(A<SchemasByAppIndexGrain.State>.Ignored))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_delete_and_reset_state_when_cleaning()
+        {
+            await sut.AddSchemaAsync(schemaId1, schemaName1);
+            await sut.ClearAsync();
+
+            var id = await sut.GetSchemaIdAsync(schemaName1);
+
+            Assert.Equal(id, Guid.Empty);
+
+            A.CallTo(() => persistence.DeleteAsync())
                 .MustHaveHappened();
         }
 

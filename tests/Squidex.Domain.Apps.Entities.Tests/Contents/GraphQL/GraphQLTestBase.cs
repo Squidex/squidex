@@ -141,9 +141,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 Id = id,
                 Version = 1,
                 Created = now,
-                CreatedBy = new RefToken("subject", "user1"),
+                CreatedBy = new RefToken(RefTokenType.Subject, "user1"),
                 LastModified = now,
-                LastModifiedBy = new RefToken("subject", "user2"),
+                LastModifiedBy = new RefToken(RefTokenType.Subject, "user2"),
                 Data = data
             };
 
@@ -159,9 +159,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 Id = id,
                 Version = 1,
                 Created = now,
-                CreatedBy = new RefToken("subject", "user1"),
+                CreatedBy = new RefToken(RefTokenType.Subject, "user1"),
                 LastModified = now,
-                LastModifiedBy = new RefToken("subject", "user2"),
+                LastModifiedBy = new RefToken(RefTokenType.Subject, "user2"),
                 FileName = "MyFile.png",
                 FileSize = 1024,
                 FileVersion = 123,

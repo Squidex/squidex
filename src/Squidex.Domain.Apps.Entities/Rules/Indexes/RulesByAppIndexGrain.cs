@@ -44,6 +44,13 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
             return persistence.ReadAsync();
         }
 
+        public Task ClearAsync()
+        {
+            state = new State();
+
+            return persistence.DeleteAsync();
+        }
+
         public Task RebuildAsync(HashSet<Guid> rules)
         {
             state = new State { Rules = rules };

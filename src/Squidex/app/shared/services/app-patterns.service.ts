@@ -26,10 +26,6 @@ export class AppPatternsDto extends Model {
     ) {
         super();
     }
-
-    public with(value: Partial<AppPatternsDto>): AppPatternsDto {
-        return this.clone(value);
-    }
 }
 
 export class AppPatternDto extends Model {
@@ -40,10 +36,6 @@ export class AppPatternDto extends Model {
         public readonly message: string
     ) {
         super();
-    }
-
-    public with(value: Partial<AppPatternDto>): AppPatternDto {
-        return this.clone(value);
     }
 }
 

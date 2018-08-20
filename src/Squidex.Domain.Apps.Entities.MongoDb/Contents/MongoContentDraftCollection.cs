@@ -58,6 +58,15 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             return ids.Except(contentEntities.Select(x => Guid.Parse(x["_id"].AsString))).ToList();
         }
 
+        public async Task<IReadOnlyList<Guid>> QueryIdsAsync(Guid appId)
+        {
+            var contentEntities =
+                await Collection.Find(x => x.IndexedAppId == appId).Only(x => x.Id)
+                    .ToListAsync();
+
+            return contentEntities.Select(x => Guid.Parse(x["_id"].AsString)).ToList();
+        }
+
         public Task QueryScheduledWithoutDataAsync(Instant now, Func<IContentEntity, Task> callback)
         {
             return Collection.Find(x => x.ScheduledAt < now && x.IsDeleted != true)

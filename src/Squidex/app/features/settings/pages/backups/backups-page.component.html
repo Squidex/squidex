@@ -33,15 +33,15 @@
                 </div>
                 
                 <div class="table-items-row" *ngFor="let backup of backups; trackBy: trackByBackup">
-                    <div class="row no-gutter">
+                    <div class="row">
                         <div class="col col-auto">
-                            <div *ngIf="!backup.stopped" class="backup-status backup-status-pending spin">
+                            <div *ngIf="backup.status === 'Started'" class="backup-status backup-status-pending spin">
                                 <i class="icon-hour-glass"></i>
                             </div>
-                            <div *ngIf="backup.stopped && backup.isFailed" class="backup-status backup-status-failed">
+                            <div *ngIf="backup.status === 'Failed'" class="backup-status backup-status-failed">
                                 <i class="icon-exclamation"></i>
                             </div>
-                            <div *ngIf="backup.stopped && !backup.isFailed" class="backup-status backup-status-success">
+                            <div *ngIf="backup.status === 'Completed'" class="backup-status backup-status-success">
                                 <i class="icon-checkmark"></i>
                             </div>
                         </div>

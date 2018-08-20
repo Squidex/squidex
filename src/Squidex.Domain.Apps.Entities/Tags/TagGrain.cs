@@ -24,14 +24,7 @@ namespace Squidex.Domain.Apps.Entities.Tags
         [CollectionName("Index_Tags")]
         public sealed class State
         {
-            public Dictionary<string, TagInfo> Tags { get; set; } = new Dictionary<string, TagInfo>();
-        }
-
-        public sealed class TagInfo
-        {
-            public string Name { get; set; }
-
-            public int Count { get; set; } = 1;
+            public TagSet Tags { get; set; } = new TagSet();
         }
 
         public TagGrain(IStore<string> store)
@@ -49,6 +42,20 @@ namespace Squidex.Domain.Apps.Entities.Tags
             });
 
             return persistence.ReadAsync();
+        }
+
+        public Task ClearAsync()
+        {
+            state = new State();
+
+            return persistence.DeleteAsync();
+        }
+
+        public Task RebuildAsync(TagSet tags)
+        {
+            state.Tags = tags;
+
+            return persistence.WriteSnapshotAsync(state);
         }
 
         public async Task<HashSet<string>> NormalizeTagsAsync(HashSet<string> names, HashSet<string> ids)
@@ -79,7 +86,7 @@ namespace Squidex.Domain.Apps.Entities.Tags
                         {
                             tagId = Guid.NewGuid().ToString();
 
-                            state.Tags.Add(tagId, new TagInfo { Name = tagName });
+                            state.Tags.Add(tagId, new Tag { Name = tagName });
                         }
 
                         result.Add(tagId);
@@ -146,6 +153,11 @@ namespace Squidex.Domain.Apps.Entities.Tags
         public Task<Dictionary<string, int>> GetTagsAsync()
         {
             return Task.FromResult(state.Tags.Values.ToDictionary(x => x.Name, x => x.Count));
+        }
+
+        public Task<TagSet> GetExportableTagsAsync()
+        {
+            return Task.FromResult(state.Tags);
         }
     }
 }

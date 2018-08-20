@@ -30,7 +30,42 @@ namespace Squidex.Domain.Apps.Entities.Tags
         }
 
         [Fact]
-        public async Task Should_call_grain_when_retrieving_tas()
+        public void Should_provide_name()
+        {
+            Assert.Equal("Tags", sut.Name);
+        }
+
+        [Fact]
+        public async Task Should_call_grain_when_clearing()
+        {
+            await sut.ClearAsync(appId, TagGroups.Assets);
+
+            A.CallTo(() => grain.ClearAsync())
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_call_grain_when_rebuilding()
+        {
+            var tags = new TagSet();
+
+            await sut.RebuildTagsAsync(appId, TagGroups.Assets, tags);
+
+            A.CallTo(() => grain.RebuildAsync(tags))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_call_grain_when_retrieving_raw_tags()
+        {
+            await sut.GetExportableTagsAsync(appId, TagGroups.Assets);
+
+            A.CallTo(() => grain.GetExportableTagsAsync())
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_call_grain_when_retrieving_tags()
         {
             await sut.GetTagsAsync(appId, TagGroups.Assets);
 

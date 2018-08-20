@@ -72,6 +72,13 @@ namespace Squidex.Infrastructure
         [Fact]
         public void GetOrAdd_should_return_default_and_add_it_if_key_not_exists()
         {
+            Assert.Equal(24, valueDictionary.GetOrAdd(12, 24));
+            Assert.Equal(24, valueDictionary[12]);
+        }
+
+        [Fact]
+        public void GetOrAdd_should_return_default_and_add_it_with_fallback_if_key_not_exists()
+        {
             Assert.Equal(24, valueDictionary.GetOrAdd(12, x => 24));
             Assert.Equal(24, valueDictionary[12]);
         }

@@ -58,5 +58,22 @@ namespace Squidex.Infrastructure.States
         {
             return store.WithSnapshotsAndEventSourcing(typeof(TOwner), key, applySnapshot.ToAsync(), applyEvent.ToAsync());
         }
+
+        public static Task ClearSnapshotsAsync<TKey, TState>(this IStore<TKey> store)
+        {
+            return store.GetSnapshotStore<TState>().ClearAsync();
+        }
+
+        public static Task RemoveSnapshotAsync<TKey, TState>(this IStore<TKey> store, TKey key)
+        {
+            return store.GetSnapshotStore<TState>().RemoveAsync(key);
+        }
+
+        public static async Task<TState> GetSnapshotAsync<TKey, TState>(this IStore<TKey> store, TKey key)
+        {
+            var result = await store.GetSnapshotStore<TState>().ReadAsync(key);
+
+            return result.Value;
+        }
     }
 }

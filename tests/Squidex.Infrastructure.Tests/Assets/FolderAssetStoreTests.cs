@@ -39,19 +39,15 @@ namespace Squidex.Infrastructure.Assets
         [Fact]
         public void Should_create_directory_when_connecting()
         {
-            Sut.Initialize();
-
             Assert.True(Directory.Exists(testFolder));
         }
 
         [Fact]
         public void Should_calculate_source_url()
         {
-            Sut.Initialize();
+            var url = Sut.GenerateSourceUrl(AssetId, 1, null);
 
-            var id = Guid.NewGuid().ToString();
-
-            Assert.Equal(Path.Combine(testFolder, $"{id}_1"), Sut.GenerateSourceUrl(id, 1, null));
+            Assert.Equal(Path.Combine(testFolder, $"{AssetId}_1"), url);
         }
 
         private static string CreateInvalidPath()

@@ -22,8 +22,8 @@ describe('BackupsState', () => {
     const app = 'my-app';
 
     const oldBackups = [
-        new BackupDto('id1', DateTime.now(), null, 1, 1, false),
-        new BackupDto('id2', DateTime.now(), null, 2, 2, false)
+        new BackupDto('id1', DateTime.now(), null, 1, 1, 'Started'),
+        new BackupDto('id2', DateTime.now(), null, 2, 2, 'Started')
     ];
 
     let dialogs: IMock<DialogService>;
