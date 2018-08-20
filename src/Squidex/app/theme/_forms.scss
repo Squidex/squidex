@@ -197,20 +197,22 @@
         outline: none;
     }
 
-    &.ng-invalid.ng-dirty {
-        & {
-            @include box-shadow-none;
-            background: transparent;
-            border-color: transparent;
-            border-bottom-color: $color-theme-error;
-            outline: none;
-        }
+    &.ng-invalid {
+        &.ng-dirty {
+            & {
+                @include box-shadow-none;
+                background: transparent;
+                border-color: transparent;
+                border-bottom-color: $color-theme-error;
+                outline: none;
+            }
 
-        &:hover,
-        &:focus {
-            @include box-shadow-none;
-            border-color: transparent;
-            border-bottom-color: $color-theme-error-dark;
+            &:hover,
+            &:focus {
+                @include box-shadow-none;
+                border-color: transparent;
+                border-bottom-color: $color-theme-error-dark;
+            }
         }
     }
 }

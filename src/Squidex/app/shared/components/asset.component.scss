@@ -31,10 +31,6 @@
     color: $color-dark-foreground;
 }
 
-@mixin asset-link {
-    
-}
-
 .drop-overlay {
     & {
         @include overlay;
@@ -172,11 +168,11 @@
                 cursor: pointer;
                 color: darken($color-dark-foreground, 10%);
             }
-        
+
             &:hover {
                 color: $color-dark-foreground;
             }
-        
+
             &:focus,
             &:hover {
                 text-decoration: none;

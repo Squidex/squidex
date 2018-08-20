@@ -101,7 +101,7 @@ export class TagEditorComponent implements ControlValueAccessor, OnDestroy, OnIn
     public class: string;
 
     @Input()
-    public placeholder = '+Tag';
+    public placeholder = 'Press comma (,) to add tag';
 
     @Input()
     public inputName = 'tag-editor';

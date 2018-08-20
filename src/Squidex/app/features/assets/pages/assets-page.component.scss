@@ -14,13 +14,15 @@
     &.active {
         font-weight: bold;
     }
-    
+
     &.active,
     &:hover {
         background: $color-background;
     }
 }
 
-a.tag {
-    cursor: pointer !important;
+a {
+    &.tag {
+        cursor: pointer !important;
+    }
 }

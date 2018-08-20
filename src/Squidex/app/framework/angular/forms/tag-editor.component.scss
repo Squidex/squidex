@@ -1,6 +1,8 @@
 @import '_mixins';
 @import '_vars';
 
+$focus-color: #b3d3ff;
+
 .form-control {
     & {
         cursor: text;
@@ -9,10 +11,10 @@
     &.disabled {
         cursor: inherit;
     }
-    
+
     &.focus {
-        @include box-shadow-raw(0 0 0 0.2rem rgba(51, 137, 255, 0.25));
-        border-color: #b3d3ff;
+        @include box-shadow-raw(0 0 0 .2rem rgba(51, 137, 255, .25));
+        border-color: $focus-color;
     }
 }
 
@@ -21,7 +23,7 @@
         padding: 0;
         border: 0;
         background: transparent;
-        min-width: 40px;
+        min-width: 40%;
         max-width: 100%;
     }
 
@@ -50,7 +52,7 @@
         border: 0;
         font-size: .8rem;
         font-weight: normal;
-        margin: 0px 2px 2px 0;
+        margin: 0 2px 2px 0;
     }
 
     &,
