@@ -34,6 +34,11 @@ namespace Squidex.Infrastructure.Log
             return Cleaner;
         }
 
+        public static IDisposable TraceMethod(Type type, [CallerMemberName] string memberName = null)
+        {
+            return Trace($"{type.Name}/{memberName}");
+        }
+
         public static IDisposable TraceMethod<T>([CallerMemberName] string memberName = null)
         {
             return Trace($"{typeof(T).Name}/{memberName}");

@@ -27,10 +27,6 @@ export class AppLanguagesDto extends Model {
     ) {
         super();
     }
-
-    public with(value: Partial<AppLanguagesDto>): AppLanguagesDto {
-        return this.clone(value);
-    }
 }
 
 export class AppLanguageDto extends Model {
@@ -42,10 +38,6 @@ export class AppLanguageDto extends Model {
         public readonly fallback: string[]
     ) {
         super();
-    }
-
-    public with(value: Partial<AppLanguageDto>): AppLanguageDto {
-        return this.clone(value);
     }
 }
 

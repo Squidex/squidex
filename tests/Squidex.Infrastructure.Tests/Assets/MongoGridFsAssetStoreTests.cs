@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
 using Xunit;
@@ -43,9 +42,7 @@ namespace Squidex.Infrastructure.Assets
         [Fact]
         public void Should_not_calculate_source_url()
         {
-            Sut.Initialize();
-
-            Assert.Equal("UNSUPPORTED", Sut.GenerateSourceUrl(Guid.NewGuid().ToString(), 1, null));
+            Assert.Equal("UNSUPPORTED", Sut.GenerateSourceUrl(AssetId, 1, null));
         }
     }
 }

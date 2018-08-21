@@ -285,6 +285,19 @@ describe('ContentsService', () => {
         req.flush({});
     }));
 
+    it('should make put request to discard changes',
+        inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
+
+        contentsService.discardChanges('my-app', 'my-schema', 'content1', version).subscribe();
+
+        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema/content1/discard');
+
+        expect(req.request.method).toEqual('PUT');
+        expect(req.request.headers.get('If-Match')).toBe(version.value);
+
+        req.flush({});
+    }));
+
     it('should make put request to change content status',
         inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
 

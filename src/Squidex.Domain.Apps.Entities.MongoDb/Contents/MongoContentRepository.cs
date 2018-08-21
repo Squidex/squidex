@@ -99,12 +99,27 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
         }
 
+        public async Task<IReadOnlyList<Guid>> QueryIdsAsync(Guid appId)
+        {
+            using (Profiler.TraceMethod<MongoContentRepository>())
+            {
+                return await contentsDraft.QueryIdsAsync(appId);
+            }
+        }
+
         public async Task QueryScheduledWithoutDataAsync(Instant now, Func<IContentEntity, Task> callback)
         {
             using (Profiler.TraceMethod<MongoContentRepository>())
             {
                 await contentsDraft.QueryScheduledWithoutDataAsync(now, callback);
             }
+        }
+
+        public Task RemoveAsync(Guid appId)
+        {
+            return Task.WhenAll(
+                contentsDraft.RemoveAsync(appId),
+                contentsPublished.RemoveAsync(appId));
         }
 
         public Task ClearAsync()

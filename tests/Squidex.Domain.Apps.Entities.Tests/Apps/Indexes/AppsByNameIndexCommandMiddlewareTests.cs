@@ -10,13 +10,14 @@ using System.Threading.Tasks;
 using FakeItEasy;
 using Orleans;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Orleans;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 {
-    public sealed class AppsByNameIndexCommandMiddlewareTests
+    public class AppsByNameIndexCommandMiddlewareTests
     {
         private readonly IGrainFactory grainFactory = A.Fake<IGrainFactory>();
         private readonly ICommandBus commandBus = A.Fake<ICommandBus>();
@@ -35,14 +36,45 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         [Fact]
         public async Task Should_add_app_to_index_on_create()
         {
+            A.CallTo(() => index.ReserveAppAsync(appId, "my-app"))
+                .Returns(true);
+
             var context =
                 new CommandContext(new CreateApp { AppId = appId, Name = "my-app" }, commandBus)
                     .Complete();
 
             await sut.HandleAsync(context);
 
+            A.CallTo(() => index.ReserveAppAsync(appId, "my-app"))
+                .MustHaveHappened();
+
             A.CallTo(() => index.AddAppAsync(appId, "my-app"))
                 .MustHaveHappened();
+
+            A.CallTo(() => index.RemoveReservationAsync(appId, "my-app"))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_not_remove_reservation_when_not_reserved()
+        {
+            A.CallTo(() => index.ReserveAppAsync(appId, "my-app"))
+                .Returns(false);
+
+            var context =
+                new CommandContext(new CreateApp { AppId = appId, Name = "my-app" }, commandBus)
+                    .Complete();
+
+            await Assert.ThrowsAsync<ValidationException>(() => sut.HandleAsync(context));
+
+            A.CallTo(() => index.ReserveAppAsync(appId, "my-app"))
+                .MustHaveHappened();
+
+            A.CallTo(() => index.AddAppAsync(appId, "my-app"))
+                .MustNotHaveHappened();
+
+            A.CallTo(() => index.RemoveReservationAsync(appId, "my-app"))
+                .MustNotHaveHappened();
         }
 
         [Fact]

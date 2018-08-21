@@ -24,10 +24,6 @@ export class UsersDto extends Model {
     ) {
         super();
     }
-
-    public with(value: Partial<UsersDto>): UsersDto {
-        return this.clone(value);
-    }
 }
 
 export class UserDto extends Model {

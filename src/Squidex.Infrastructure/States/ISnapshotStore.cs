@@ -18,6 +18,8 @@ namespace Squidex.Infrastructure.States
 
         Task ClearAsync();
 
+        Task RemoveAsync(TKey key);
+
         Task ReadAllAsync(Func<T, long, Task> callback);
     }
 }

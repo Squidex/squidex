@@ -50,28 +50,28 @@ namespace Migrate_01
 
         public async Task RebuildAppsAsync()
         {
-            await store.ClearSnapshotsAsync<AppState>();
+            await store.GetSnapshotStore<AppState>().ClearAsync();
 
             await RebuildManyAsync("^app\\-", id => RebuildAsync<AppState, AppGrain>(id, (e, s) => s.Apply(e)));
         }
 
         public async Task RebuildSchemasAsync()
         {
-            await store.ClearSnapshotsAsync<SchemaState>();
+            await store.GetSnapshotStore<SchemaState>().ClearAsync();
 
             await RebuildManyAsync("^schema\\-", id => RebuildAsync<SchemaState, SchemaGrain>(id, (e, s) => s.Apply(e, fieldRegistry)));
         }
 
         public async Task RebuildRulesAsync()
         {
-            await store.ClearSnapshotsAsync<RuleState>();
+            await store.GetSnapshotStore<RuleState>().ClearAsync();
 
             await RebuildManyAsync("^rule\\-", id => RebuildAsync<RuleState, RuleGrain>(id, (e, s) => s.Apply(e)));
         }
 
         public async Task RebuildAssetsAsync()
         {
-            await store.ClearSnapshotsAsync<AssetState>();
+            await store.GetSnapshotStore<AssetState>().ClearAsync();
 
             await RebuildManyAsync("^asset\\-", id => RebuildAsync<AssetState, AssetGrain>(id, (e, s) => s.Apply(e)));
         }
@@ -80,7 +80,7 @@ namespace Migrate_01
         {
             using (localCache.StartContext())
             {
-                await store.ClearSnapshotsAsync<ContentState>();
+                await store.GetSnapshotStore<ContentState>().ClearAsync();
 
                 await RebuildManyAsync("^content\\-", async id =>
                 {

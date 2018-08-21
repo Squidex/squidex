@@ -28,20 +28,44 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
         public async Task HandleAsync(CommandContext context, Func<Task> next)
         {
-            if (context.IsCompleted)
+            var createApp = context.Command as CreateApp;
+
+            var isReserved = false;
+            try
             {
-                switch (context.Command)
+                if (createApp != null)
                 {
-                    case CreateApp createApp:
+                    isReserved = await index.ReserveAppAsync(createApp.AppId, createApp.Name);
+
+                    if (!isReserved)
+                    {
+                        var error = new ValidationError("An app with the same name already exists.", nameof(createApp.Name));
+
+                        throw new ValidationException("Cannot create app.", error);
+                    }
+                }
+
+                await next();
+
+                if (context.IsCompleted)
+                {
+                    if (createApp != null)
+                    {
                         await index.AddAppAsync(createApp.AppId, createApp.Name);
-                        break;
-                    case ArchiveApp archiveApp:
+                    }
+                    else if (context.Command is ArchiveApp archiveApp)
+                    {
                         await index.RemoveAppAsync(archiveApp.AppId);
-                        break;
+                    }
                 }
             }
-
-            await next();
+            finally
+            {
+                if (isReserved && createApp != null)
+                {
+                    await index.RemoveReservationAsync(createApp.AppId, createApp.Name);
+                }
+            }
         }
     }
 }

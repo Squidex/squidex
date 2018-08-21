@@ -22,6 +22,6 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         int HandledAssets { get; }
 
-        bool IsFailed { get; }
+        JobStatus Status { get; }
     }
 }

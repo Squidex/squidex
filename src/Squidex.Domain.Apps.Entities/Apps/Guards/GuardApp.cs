@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System;
-using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Services;
@@ -16,19 +15,15 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 {
     public static class GuardApp
     {
-        public static Task CanCreate(CreateApp command, IAppProvider appProvider)
+        public static void CanCreate(CreateApp command)
         {
             Guard.NotNull(command, nameof(command));
 
-            return Validate.It(() => "Cannot create app.", async e =>
+            Validate.It(() => "Cannot create app.", e =>
             {
                 if (!command.Name.IsSlug())
                 {
                     e("Name must be a valid slug.", nameof(command.Name));
-                }
-                else if (await appProvider.GetAppAsync(command.Name) != null)
-                {
-                    e("An app with the same name already exists.", nameof(command.Name));
                 }
             });
         }

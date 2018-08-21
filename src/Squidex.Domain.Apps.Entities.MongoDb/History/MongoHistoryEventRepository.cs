@@ -112,5 +112,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.History
                 }
             }
         }
+
+        public Task RemoveAsync(Guid appId)
+        {
+            return Collection.DeleteManyAsync(x => x.AppId == appId);
+        }
     }
 }

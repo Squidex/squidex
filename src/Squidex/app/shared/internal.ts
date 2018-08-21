@@ -44,6 +44,7 @@ export * from './state/apps.forms';
 export * from './state/apps.state';
 export * from './state/assets.forms';
 export * from './state/assets.state';
+export * from './state/backups.forms';
 export * from './state/backups.state';
 export * from './state/clients.forms';
 export * from './state/clients.state';

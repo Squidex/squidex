@@ -12,12 +12,15 @@ using System.Threading.Tasks;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.States;
+using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 {
     public sealed class AppsByNameIndexGrain : GrainOfString, IAppsByNameIndex
     {
         private readonly IStore<string> store;
+        private readonly HashSet<Guid> reservedIds = new HashSet<Guid>();
+        private readonly HashSet<string> reservedNames = new HashSet<string>();
         private IPersistence<State> persistence;
         private State state = new State();
 
@@ -51,16 +54,52 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             return persistence.WriteSnapshotAsync(state);
         }
 
+        public Task<bool> ReserveAppAsync(Guid appId, string name)
+        {
+            var canReserve =
+                !state.Apps.ContainsKey(name) &&
+                !state.Apps.Any(x => x.Value == appId) &&
+                !reservedIds.Contains(appId) &&
+                !reservedNames.Contains(name);
+
+            if (canReserve)
+            {
+                reservedIds.Add(appId);
+                reservedNames.Add(name);
+            }
+
+            return Task.FromResult(canReserve);
+        }
+
+        public Task RemoveReservationAsync(Guid appId, string name)
+        {
+            reservedIds.Remove(appId);
+            reservedNames.Remove(name);
+
+            return TaskHelper.Done;
+        }
+
         public Task AddAppAsync(Guid appId, string name)
         {
             state.Apps[name] = appId;
+
+            reservedIds.Remove(appId);
+            reservedNames.Remove(name);
 
             return persistence.WriteSnapshotAsync(state);
         }
 
         public Task RemoveAppAsync(Guid appId)
         {
-            state.Apps.Remove(state.Apps.FirstOrDefault(x => x.Value == appId).Key ?? string.Empty);
+            var name = state.Apps.FirstOrDefault(x => x.Value == appId).Key;
+
+            if (!string.IsNullOrWhiteSpace(name))
+            {
+                state.Apps.Remove(name);
+
+                reservedIds.Remove(appId);
+                reservedNames.Remove(name);
+            }
 
             return persistence.WriteSnapshotAsync(state);
         }

@@ -15,6 +15,9 @@ namespace Squidex.Infrastructure.States
 
         public string GetStreamName(Type aggregateType, string id)
         {
+            Guard.NotNullOrEmpty(id, nameof(id));
+            Guard.NotNull(aggregateType, nameof(aggregateType));
+
             var typeName = char.ToLower(aggregateType.Name[0]) + aggregateType.Name.Substring(1);
 
             foreach (var suffix in Suffixes)
@@ -28,6 +31,26 @@ namespace Squidex.Infrastructure.States
             }
 
             return $"{typeName}-{id}";
+        }
+
+        public string WithNewId(string streamName, Func<string, string> idGenerator)
+        {
+            Guard.NotNullOrEmpty(streamName, nameof(streamName));
+            Guard.NotNull(idGenerator, nameof(idGenerator));
+
+            var positionOfDash = streamName.IndexOf('-');
+
+            if (positionOfDash >= 0)
+            {
+                var newId = idGenerator(streamName.Substring(positionOfDash + 1));
+
+                if (!string.IsNullOrWhiteSpace(newId))
+                {
+                    streamName = $"{streamName.Substring(0, positionOfDash)}-{newId}";
+                }
+            }
+
+            return streamName;
         }
     }
 }

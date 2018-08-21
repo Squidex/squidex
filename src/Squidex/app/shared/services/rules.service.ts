@@ -83,10 +83,6 @@ export class RuleEventsDto extends Model {
     ) {
         super();
     }
-
-    public with(value: Partial<RuleEventsDto>): RuleEventsDto {
-        return this.clone(value);
-    }
 }
 
 export class RuleEventDto extends Model {
@@ -102,10 +98,6 @@ export class RuleEventDto extends Model {
         public readonly numCalls: number
     ) {
         super();
-    }
-
-    public with(value: Partial<RuleEventDto>): RuleEventDto {
-        return this.clone(value);
     }
 }
 
