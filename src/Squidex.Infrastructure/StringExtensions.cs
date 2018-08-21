@@ -327,7 +327,7 @@ namespace Squidex.Infrastructure
         {
             var sb = new StringBuilder();
 
-            foreach (var part in value.Split('-', '_', ' '))
+            foreach (var part in value.Split(new char[] { '-', '_', ' ' }, StringSplitOptions.RemoveEmptyEntries))
             {
                 if (part.Length < 2)
                 {
@@ -347,7 +347,7 @@ namespace Squidex.Infrastructure
         {
             var sb = new StringBuilder();
 
-            foreach (var part in value.Split('-', '_', ' '))
+            foreach (var part in value.Split(new char[] { '-', '_', ' ' }, StringSplitOptions.RemoveEmptyEntries))
             {
                 if (sb.Length > 0)
                 {
