@@ -74,6 +74,23 @@
             </div>
         </div>
     </div>
+
+    <div class="card card-template card-href" (click)="createNewApp('Identity')">
+        <div class="card-body">
+            <div class="card-image">
+                <img src="/images/add-identity.png" />
+            </div>
+
+            <h4 class="card-title">New Identity App</h4>
+
+            <div class="card-text">
+                <div>Create app for Squidex Identity.</div>
+                <div>
+                    <a href="https://github.com/Squidex/squidex-identity" (click)="$event.stopPropagation()" target="_blank">Project</a>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <ng-container *sqxModalView="addAppDialog;onRoot:true">

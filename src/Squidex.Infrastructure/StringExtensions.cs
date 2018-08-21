@@ -343,6 +343,23 @@ namespace Squidex.Infrastructure
             return sb.ToString();
         }
 
+        public static string ToKebabCase(this string value)
+        {
+            var sb = new StringBuilder();
+
+            foreach (var part in value.Split('-', '_', ' '))
+            {
+                if (sb.Length > 0)
+                {
+                    sb.Append("-");
+                }
+
+                sb.Append(part.ToLower());
+            }
+
+            return sb.ToString();
+        }
+
         public static string ToCamelCase(this string value)
         {
             value = value.ToPascalCase();

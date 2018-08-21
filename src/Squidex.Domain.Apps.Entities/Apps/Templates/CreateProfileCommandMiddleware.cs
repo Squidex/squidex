@@ -6,14 +6,11 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
+using Squidex.Domain.Apps.Entities.Apps.Templates.Builders;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
-using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 
@@ -41,11 +38,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
 
                 await Task.WhenAll(
                     CreateBasicsAsync(publish),
-                    CreateProjectsSchemaAsync(publish),
-                    CreateExperienceSchemaAsync(publish),
-                    CreateSkillsSchemaAsync(publish),
                     CreateEducationSchemaAsync(publish),
+                    CreateExperienceSchemaAsync(publish),
+                    CreateProjectsSchemaAsync(publish),
                     CreatePublicationsSchemaAsync(publish),
+                    CreateSkillsSchemaAsync(publish),
                     CreateClientAsync(publish, appId.Id));
             }
 
@@ -86,150 +83,40 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
 
         private async Task<NamedId<Guid>> CreateBasicsSchemaAsync(Func<ICommand, Task> publish)
         {
-            var command = new CreateSchema
-            {
-                Name = "basics",
-                Properties = new SchemaProperties
-                {
-                    Label = "Basics"
-                },
-                Fields = new List<CreateSchemaField>
-                {
-                    new CreateSchemaField
-                    {
-                        Name = "firstName",
-                        Properties = new StringFieldProperties
-                        {
-                            Editor = StringFieldEditor.Input,
-                            IsRequired = true,
-                            IsListField = true,
-                            Label = "First Name",
-                            Hints = "Your first name"
-                        }
-                    },
-                    new CreateSchemaField
-                    {
-                        Name = "lastName",
-                        Properties = new StringFieldProperties
-                        {
-                            Editor = StringFieldEditor.Input,
-                            IsRequired = true,
-                            IsListField = true,
-                            Label = "Last Name",
-                            Hints = "Your last name"
-                        }
-                    },
-                    new CreateSchemaField
-                    {
-                        Name = "profession",
-                        Properties = new StringFieldProperties
-                        {
-                            Editor = StringFieldEditor.TextArea,
-                            IsRequired = true,
-                            IsListField = false,
-                            Label = "Profession",
-                            Hints = "Define your profession"
-                        }
-                    },
-                    new CreateSchemaField
-                    {
-                        Name = "image",
-                        Properties = new AssetsFieldProperties
-                        {
-                            IsRequired = false,
-                            IsListField = false,
-                            MustBeImage = true,
-                            Label = "Image",
-                            Hints = "Your image"
-                        }
-                    },
-                    new CreateSchemaField
-                    {
-                        Name = "summary",
-                        Properties = new StringFieldProperties
-                        {
-                            Editor = StringFieldEditor.TextArea,
-                            IsRequired = false,
-                            IsListField = false,
-                            Label = "Summary",
-                            Hints = "Write a short summary about yourself"
-                        }
-                    },
-                    new CreateSchemaField
-                    {
-                        Name = "githubLink",
-                        Properties = new StringFieldProperties
-                        {
-                            Editor = StringFieldEditor.Input,
-                            IsRequired = false,
-                            IsListField = false,
-                            Label = "Github",
-                            Hints = "An optional link to your Github account"
-                        }
-                    },
-                    new CreateSchemaField
-                    {
-                        Name = "blogLink",
-                        Properties = new StringFieldProperties
-                        {
-                            Editor = StringFieldEditor.Input,
-                            IsRequired = false,
-                            IsListField = false,
-                            Label = "Blog",
-                            Hints = "An optional link to your blog"
-                        }
-                    },
-                    new CreateSchemaField
-                    {
-                        Name = "twitterLink",
-                        Properties = new StringFieldProperties
-                        {
-                            Editor = StringFieldEditor.Input,
-                            IsRequired = false,
-                            IsListField = false,
-                            Label = "Twitter",
-                            Hints = "An optional link to your twitter account"
-                        }
-                    },
-                    new CreateSchemaField
-                    {
-                        Name = "linkedInLink",
-                        Properties = new StringFieldProperties
-                        {
-                            Editor = StringFieldEditor.Input,
-                            IsRequired = false,
-                            IsListField = false,
-                            Label = "LinkedIn",
-                            Hints = "An optional link to your LinkedIn account"
-                        }
-                    },
-                    new CreateSchemaField
-                    {
-                        Name = "emailAddress",
-                        Properties = new StringFieldProperties
-                        {
-                            Editor = StringFieldEditor.Input,
-                            IsRequired = false,
-                            IsListField = false,
-                            Label = "Email Address",
-                            Hints = "An optional email address to contact you"
-                        }
-                    },
-                    new CreateSchemaField
-                    {
-                        Name = "legalTerms",
-                        Properties = new StringFieldProperties
-                        {
-                            Editor = StringFieldEditor.TextArea,
-                            IsRequired = false,
-                            IsListField = false,
-                            Label = "Legal terms",
-                            Hints = "The terms to fulfill legal requirements"
-                        }
-                    }
-                },
-                Publish = true
-            };
+            var command =
+                SchemaBuilder.Create("basics")
+                    .AddString("First Name", f => f
+                        .Required()
+                        .ShowInList()
+                        .Hints("Your first name."))
+                    .AddString("Last Name", f => f
+                        .Required()
+                        .ShowInList()
+                        .Hints("Your last name."))
+                    .AddAssets("Image", f => f
+                        .MustBeImage()
+                        .Hints("Your profile image."))
+                    .AddString("Profession", f => f
+                        .AsTextArea()
+                        .Required()
+                        .Hints("Describe your profession."))
+                    .AddString("Summary", f => f
+                        .AsTextArea()
+                        .Hints("Write a short summary about yourself."))
+                    .AddString("Legal Terms", f => f
+                        .AsTextArea()
+                        .Hints("The terms to fulfill legal requirements."))
+                    .AddString("Github Link", f => f
+                        .Hints("An optional link to your Github account."))
+                    .AddString("Blog Link", f => f
+                        .Hints("An optional link to your Blog."))
+                    .AddString("Twitter Link", f => f
+                        .Hints("An optional link to your Twitter account."))
+                    .AddString("LinkedIn Link", f => f
+                        .Hints("An optional link to your LinkedIn  account."))
+                    .AddString("Email Address", f => f
+                        .Hints("An optional email address to contact you."))
+                    .Build();
 
             await publish(command);
 
@@ -238,317 +125,104 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
 
         private async Task<NamedId<Guid>> CreateProjectsSchemaAsync(Func<ICommand, Task> publish)
         {
-            var command = new CreateSchema
-            {
-                Name = "projects",
-                Properties = new SchemaProperties
-                {
-                    Label = "Projects"
-                },
-                Fields = new List<CreateSchemaField>
-                {
-                    new CreateSchemaField
-                    {
-                        Name = "name",
-                        Properties = new StringFieldProperties
-                        {
-                            Editor = StringFieldEditor.Input,
-                            IsRequired = true,
-                            IsListField = true,
-                            Label = "Name",
-                            Hints = "The name of the projection"
-                        }
-                    },
-                    new CreateSchemaField
-                    {
-                        Name = "description",
-                        Properties = new StringFieldProperties
-                        {
-                            Editor = StringFieldEditor.TextArea,
-                            IsRequired = true,
-                            IsListField = false,
-                            Label = "Description",
-                            Hints = "Describe your project"
-                        }
-                    },
-                    new CreateSchemaField
-                    {
-                        Name = "image",
-                        Properties = new AssetsFieldProperties
-                        {
-                            IsRequired = true,
-                            IsListField = false,
-                            MustBeImage = true,
-                            Label = "Image",
-                            Hints = "An image or screenshot for your project"
-                        }
-                    },
-                    new CreateSchemaField
-                    {
-                        Name = "label",
-                        Properties = new StringFieldProperties
-                        {
-                            Editor = StringFieldEditor.Input,
-                            IsRequired = false,
-                            IsListField = false,
-                            Label = "Label",
-                            Hints = "An optional label to categorize your project, e.g. 'Open Source'"
-                        }
-                    },
-                    new CreateSchemaField
-                    {
-                        Name = "link",
-                        Properties = new StringFieldProperties
-                        {
-                            Editor = StringFieldEditor.Input,
-                            IsRequired = false,
-                            IsListField = false,
-                            Label = "link",
-                            Hints = "The logo of the company or organization you worked for"
-                        }
-                    },
-                    new CreateSchemaField
-                    {
-                        Name = "year",
-                        Properties = new NumberFieldProperties
-                        {
-                            IsRequired = false,
-                            IsListField = false,
-                            Label = "Year",
-                            Hints = "The year, when you realized the project, used for sorting only"
-                        }
-                    }
-                },
-                Publish = true
-            };
+            var schema =
+                SchemaBuilder.Create("projects")
+                    .AddString("Name", f => f
+                        .Required()
+                        .ShowInList()
+                        .Hints("The name of your project."))
+                    .AddString("Description", f => f
+                        .AsTextArea()
+                        .Required()
+                        .Hints("Describe your project."))
+                    .AddAssets("Image", f => f
+                        .MustBeImage()
+                        .Required()
+                        .Hints("An image or screenshot for your project."))
+                    .AddString("Label", f => f
+                        .AsTextArea()
+                        .Hints("An optional label to categorize your project, e.g. 'Open Source'."))
+                    .AddString("Link", f => f
+                        .Hints("An optional link to your project."))
+                    .AddNumber("Year", f => f
+                        .Hints("The year, when you realized the project, used for sorting only."))
+                    .Build();
 
-            await publish(command);
+            await publish(schema);
 
-            return NamedId.Of(command.SchemaId, command.Name);
+            return NamedId.Of(schema.SchemaId, schema.Name);
         }
 
         private async Task<NamedId<Guid>> CreateExperienceSchemaAsync(Func<ICommand, Task> publish)
         {
-            var command = new CreateSchema
-            {
-                Name = "experience",
-                Properties = new SchemaProperties
-                {
-                    Label = "Experience"
-                },
-                Fields = new List<CreateSchemaField>
-                {
-                    new CreateSchemaField
-                    {
-                        Name = "position",
-                        Properties = new StringFieldProperties
-                        {
-                            Editor = StringFieldEditor.Input,
-                            IsRequired = true,
-                            IsListField = true,
-                            Label = "Position",
-                            Hints = "Your position in this job"
-                        }
-                    },
-                    new CreateSchemaField
-                    {
-                        Name = "company",
-                        Properties = new StringFieldProperties
-                        {
-                            Editor = StringFieldEditor.Input,
-                            IsRequired = true,
-                            IsListField = true,
-                            Label = "Company",
-                            Hints = "The company or organization you worked for"
-                        }
-                    },
-                    new CreateSchemaField
-                    {
-                        Name = "logo",
-                        Properties = new AssetsFieldProperties
-                        {
-                            IsRequired = false,
-                            IsListField = false,
-                            MustBeImage = true,
-                            Label = "Logo",
-                            Hints = "The logo of the company or organization you worked for"
-                        }
-                    },
-                    new CreateSchemaField
-                    {
-                        Name = "from",
-                        Properties = new DateTimeFieldProperties
-                        {
-                            Editor = DateTimeFieldEditor.Date,
-                            IsRequired = true,
-                            IsListField = false,
-                            Label = "Start Date",
-                            Hints = "The start date"
-                        }
-                    },
-                    new CreateSchemaField
-                    {
-                        Name = "to",
-                        Properties = new DateTimeFieldProperties
-                        {
-                            Editor = DateTimeFieldEditor.Date,
-                            IsRequired = false,
-                            IsListField = false,
-                            Label = "End Date",
-                            Hints = "The end date, keep empty if you still work there"
-                        }
-                    }
-                },
-                Publish = true
-            };
+            var schema =
+                SchemaBuilder.Create("experience")
+                    .AddString("Position", f => f
+                        .Required()
+                        .ShowInList()
+                        .Hints("Your position in this job."))
+                    .AddString("Company", f => f
+                        .Required()
+                        .ShowInList()
+                        .Hints("The company or organization you worked for."))
+                    .AddAssets("Logo", f => f
+                        .MustBeImage()
+                        .Hints("The logo of the company or organization you worked for."))
+                    .AddDateTime("From", f => f
+                        .Required()
+                        .Hints("The start date."))
+                    .AddDateTime("To", f => f
+                        .Hints("The end date, keep empty if you still work there."))
+                    .Build();
 
-            await publish(command);
+            await publish(schema);
 
-            return NamedId.Of(command.SchemaId, command.Name);
+            return NamedId.Of(schema.SchemaId, schema.Name);
         }
 
         private async Task<NamedId<Guid>> CreateEducationSchemaAsync(Func<ICommand, Task> publish)
         {
-            var command = new CreateSchema
-            {
-                Name = "education",
-                Properties = new SchemaProperties
-                {
-                    Label = "Education"
-                },
-                Fields = new List<CreateSchemaField>
-                {
-                    new CreateSchemaField
-                    {
-                        Name = "degree",
-                        Properties = new StringFieldProperties
-                        {
-                            Editor = StringFieldEditor.Input,
-                            IsRequired = true,
-                            IsListField = true,
-                            Label = "Degree",
-                            Hints = "The degree you got or achieved"
-                        }
-                    },
-                    new CreateSchemaField
-                    {
-                        Name = "school",
-                        Properties = new StringFieldProperties
-                        {
-                            Editor = StringFieldEditor.Input,
-                            IsRequired = true,
-                            IsListField = true,
-                            Label = "School",
-                            Hints = "The school or university"
-                        }
-                    },
-                    new CreateSchemaField
-                    {
-                        Name = "logo",
-                        Properties = new AssetsFieldProperties
-                        {
-                            IsRequired = false,
-                            IsListField = false,
-                            MustBeImage = true,
-                            Label = "Logo",
-                            Hints = "The logo of the school"
-                        }
-                    },
-                    new CreateSchemaField
-                    {
-                        Name = "from",
-                        Properties = new DateTimeFieldProperties
-                        {
-                            Editor = DateTimeFieldEditor.Date,
-                            IsRequired = true,
-                            IsListField = false,
-                            Label = "Start Date",
-                            Hints = "The start date"
-                        }
-                    },
-                    new CreateSchemaField
-                    {
-                        Name = "to",
-                        Properties = new DateTimeFieldProperties
-                        {
-                            Editor = DateTimeFieldEditor.Date,
-                            IsRequired = false,
-                            IsListField = false,
-                            Label = "End Date",
-                            Hints = "The end date, keep empty if you still study there"
-                        }
-                    }
-                },
-                Publish = true
-            };
+            var schema =
+                SchemaBuilder.Create("Experience")
+                    .AddString("Degree", f => f
+                        .Required()
+                        .ShowInList()
+                        .Hints("The degree you got or achieved."))
+                    .AddString("School", f => f
+                        .Required()
+                        .ShowInList()
+                        .Hints("The school or university."))
+                    .AddAssets("Logo", f => f
+                        .MustBeImage()
+                        .Hints("The logo of the school or university."))
+                    .AddDateTime("From", f => f
+                        .Required()
+                        .Hints("The start date."))
+                    .AddDateTime("To", f => f
+                        .Hints("The end date, keep empty if you still study there."))
+                    .Build();
 
-            await publish(command);
+            await publish(schema);
 
-            return NamedId.Of(command.SchemaId, command.Name);
+            return NamedId.Of(schema.SchemaId, schema.Name);
         }
 
         private async Task<NamedId<Guid>> CreatePublicationsSchemaAsync(Func<ICommand, Task> publish)
         {
-            var command = new CreateSchema
-            {
-                Name = "publications",
-                Properties = new SchemaProperties
-                {
-                    Label = "Publications"
-                },
-                Fields = new List<CreateSchemaField>
-                {
-                    new CreateSchemaField
-                    {
-                        Name = "name",
-                        Properties = new StringFieldProperties
-                        {
-                            Editor = StringFieldEditor.Input,
-                            IsRequired = true,
-                            IsListField = true,
-                            Label = "Name",
-                            Hints = "The name or title of your publication"
-                        }
-                    },
-                    new CreateSchemaField
-                    {
-                        Name = "description",
-                        Properties = new StringFieldProperties
-                        {
-                            Editor = StringFieldEditor.TextArea,
-                            IsRequired = false,
-                            IsListField = false,
-                            Label = "Description",
-                            Hints = "Describe the content of your publication"
-                        }
-                    },
-                    new CreateSchemaField
-                    {
-                        Name = "cover",
-                        Properties = new AssetsFieldProperties
-                        {
-                            IsRequired = true,
-                            IsListField = false,
-                            MustBeImage = true,
-                            Label = "Cover",
-                            Hints = "The cover of your publication"
-                        }
-                    },
-                    new CreateSchemaField
-                    {
-                        Name = "link",
-                        Properties = new StringFieldProperties
-                        {
-                            Editor = StringFieldEditor.Input,
-                            IsRequired = false,
-                            IsListField = false,
-                            Label = "Link",
-                            Hints = "An optional link to your publication"
-                        }
-                    }
-                },
-                Publish = true
-            };
+            var command =
+                SchemaBuilder.Create("Publications")
+                    .AddString("Name", f => f
+                        .Required()
+                        .ShowInList()
+                        .Hints("The name or title of your publication."))
+                    .AddAssets("Cover", f => f
+                        .MustBeImage()
+                        .Hints("The cover of your publication."))
+                    .AddString("Description", f => f
+                        .Hints("Describe the content of your publication."))
+                    .AddString("Link", f => f
+                        .Hints("Optional link to your publication."))
+                    .Build();
 
             await publish(command);
 
@@ -557,43 +231,18 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
 
         private async Task<NamedId<Guid>> CreateSkillsSchemaAsync(Func<ICommand, Task> publish)
         {
-            var command = new CreateSchema
-            {
-                Name = "skills",
-                Properties = new SchemaProperties
-                {
-                    Label = "Skills"
-                },
-                Fields = new List<CreateSchemaField>
-                {
-                    new CreateSchemaField
-                    {
-                        Name = "name",
-                        Properties = new StringFieldProperties
-                        {
-                            Editor = StringFieldEditor.Input,
-                            IsRequired = true,
-                            IsListField = true,
-                            Label = "Name",
-                            Hints = "The name for your skill"
-                        }
-                    },
-                    new CreateSchemaField
-                    {
-                        Name = "experience",
-                        Properties = new StringFieldProperties
-                        {
-                            Editor = StringFieldEditor.Dropdown,
-                            IsRequired = true,
-                            IsListField = true,
-                            AllowedValues = ImmutableList.Create("Beginner", "Advanced", "Professional", "Expert"),
-                            Label = "Experience",
-                            Hints = "The level of experience"
-                        }
-                    }
-                },
-                Publish = true
-            };
+            var command =
+                SchemaBuilder.Create("Skills")
+                    .AddString("Name", f => f
+                        .Required()
+                        .ShowInList()
+                        .Hints("The name of the skill."))
+                    .AddString("Experience", f => f
+                        .AsDropDown("Beginner", "Advanced", "Professional", "Expert")
+                        .Required()
+                        .ShowInList()
+                        .Hints("The level of experience."))
+                    .Build();
 
             await publish(command);
 
