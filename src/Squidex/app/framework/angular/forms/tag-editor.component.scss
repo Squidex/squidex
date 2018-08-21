@@ -12,6 +12,11 @@ $focus-color: #b3d3ff;
         cursor: inherit;
     }
 
+    &.disabled,
+    &:disabled {
+        background: $color-input-disabled;
+    } 
+
     &.focus {
         @include box-shadow-raw(0 0 0 .2rem rgba(51, 137, 255, .25));
         border-color: $focus-color;

@@ -33,7 +33,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 var contentId = schemaId.Id;
                 var content = new CreateContent { Data = data, ContentId = contentId, SchemaId = schemaId, Publish = true };
 
-                SimpleMapper.Map(context.Command, content);
+                SimpleMapper.Map(createSchema, content);
 
                 await context.CommandBus.PublishAsync(content);
             }

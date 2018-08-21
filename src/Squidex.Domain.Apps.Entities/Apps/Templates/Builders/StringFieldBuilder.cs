@@ -5,9 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Collections.Immutable;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
-using System.Collections.Immutable;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
 {

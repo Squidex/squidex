@@ -52,7 +52,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
                 await Task.WhenAll(
                     CreateApiResourcesSchemaAsync(publish),
                     CreateAuthenticationSchemeSchemaAsync(publish),
-                    CreateClientSchemaAsync(publish),
+                    CreateClientsSchemaAsync(publish),
                     CreateIdentityResourcesSchemaAsync(publish),
                     CreateSettingsSchemaAsync(publish),
                     CreateUsersSchemaAsync(publish),
@@ -97,10 +97,10 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
             return NamedId.Of(schema.SchemaId, schema.Name);
         }
 
-        private Task CreateClientSchemaAsync(Func<ICommand, Task> publish)
+        private Task CreateClientsSchemaAsync(Func<ICommand, Task> publish)
         {
             var schema =
-                SchemaBuilder.Create("clients")
+                SchemaBuilder.Create("Clients")
                     .AddString("Client Id", f => f
                         .Required()
                         .Hints("Unique id of the client."))
@@ -208,7 +208,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
                         .Hints("The unique email to login."))
                     .AddString("Phone Number", f => f
                         .Hints("Phone number of the user."))
-                    .AddString("Roles", f => f
+                    .AddTags("Roles", f => f
                         .Hints("The roles of the user."))
                     .AddJson("Claims", f => f
                         .Hints("The claims of the user."))
@@ -225,13 +225,13 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
                         .AsDateTime()
                         .Disabled()
                         .Hints("Indicates when the lockout ends."))
-                    .AddJson("Login", f => f
+                    .AddTags("Login Keys", f => f
                         .Disabled()
                         .Hints("Login information for querying."))
-                    .AddJson("Logins ", f => f
+                    .AddJson("Logins", f => f
                         .Disabled()
                         .Hints("Login information."))
-                    .AddJson("Tokens ", f => f
+                    .AddJson("Tokens", f => f
                         .Disabled()
                         .Hints("Login tokens."))
                     .AddNumber("Access Failed Count", f => f

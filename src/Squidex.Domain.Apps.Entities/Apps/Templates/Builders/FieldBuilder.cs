@@ -41,7 +41,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
 
         public FieldBuilder Localizable()
         {
-            field.Partitioning = Partitioning.Invariant.Key;
+            field.Partitioning = Partitioning.Language.Key;
 
             return this;
         }

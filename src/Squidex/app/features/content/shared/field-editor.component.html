@@ -3,7 +3,7 @@
     {{field.displayName}} <span class="field-required" [class.hidden]="!field.properties.isRequired">*</span>
 </label> 
 
-<span class="field-disabled" *ngIf="field.isDisabled">Disabled</span>
+<span class="field-disabled pl-1" *ngIf="field.isDisabled">Disabled</span>
 
 <sqx-control-errors [for]="control" [fieldName]="field.displayName" [submitted]="form.submitted | async"></sqx-control-errors>
 

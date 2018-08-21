@@ -176,6 +176,9 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<CreateBlogCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
+            services.AddSingletonAs<CreateIdentityCommandMiddleware>()
+                .As<ICommandMiddleware>();
+
             services.AddSingletonAs<CreateProfileCommandMiddleware>()
                 .As<ICommandMiddleware>();
         }
