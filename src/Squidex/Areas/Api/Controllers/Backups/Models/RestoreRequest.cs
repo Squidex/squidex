@@ -15,7 +15,6 @@ namespace Squidex.Areas.Api.Controllers.Backups.Models
         /// <summary>
         /// The name of the app.
         /// </summary>
-        [Required]
         [RegularExpression("^[a-z0-9]+(\\-[a-z0-9]+)*$")]
         public string Name { get; set; }
 
