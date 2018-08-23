@@ -12,7 +12,7 @@ namespace Squidex.Config.Authentication
 {
     public static class GoogleAuthenticationServices
     {
-        public static AuthenticationBuilder AddMyGoogleAuthentication(this AuthenticationBuilder authBuilder, MyIdentityOptions identityOptions)
+        public static AuthenticationBuilder AddMyExternalGoogleAuthentication(this AuthenticationBuilder authBuilder, MyIdentityOptions identityOptions)
         {
             if (identityOptions.IsGoogleAuthConfigured())
             {

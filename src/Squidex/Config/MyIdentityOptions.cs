@@ -21,6 +21,14 @@ namespace Squidex.Config
 
         public string MicrosoftSecret { get; set; }
 
+        public string OidcName { get; set; }
+
+        public string OidcClient { get; set; }
+
+        public string OidcSecret { get; set; }
+
+        public string OidcAuthority { get; set; }
+
         public string AuthorityUrl { get; set; }
 
         public string PrivacyUrl { get; set; }
@@ -34,6 +42,11 @@ namespace Squidex.Config
         public bool IsAdminConfigured()
         {
             return !string.IsNullOrWhiteSpace(AdminEmail) && !string.IsNullOrWhiteSpace(AdminPassword);
+        }
+
+        public bool IsOidcConfigured()
+        {
+            return !string.IsNullOrWhiteSpace(OidcAuthority) && !string.IsNullOrWhiteSpace(OidcClient) && !string.IsNullOrWhiteSpace(OidcSecret);
         }
 
         public bool IsGoogleAuthConfigured()
