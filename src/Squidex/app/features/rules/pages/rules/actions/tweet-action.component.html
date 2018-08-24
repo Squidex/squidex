@@ -1,0 +1,31 @@
+<h3 class="wizard-title">Tweet a status update to your twitter feed</h3>
+
+<form [formGroup]="actionForm" class="form-horizontal">
+    <div class="form-group row">
+        <label class="col col-3 col-form-label" for="pinCode">Pin Code</label>
+
+        <div class="col col-9">
+            <sqx-control-errors for="pinCode" [submitted]="actionFormSubmitted"></sqx-control-errors>
+
+            <input type="pinCode" class="form-control" id="pinCode" formControlName="pinCode" />
+
+            <small class="form-text text-muted">
+                The pin code to authorize. Follow this link and add the pin code: <a href="/api/rules/twitter/auth" target="_blank">Login to twitter</a>.
+            </small>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label class="col col-3 col-form-label" for="text">Text</label>
+
+        <div class="col col-9">
+            <sqx-control-errors for="text" [submitted]="actionFormSubmitted"></sqx-control-errors>
+
+            <textarea class="form-control" id="text" formControlName="text"></textarea>
+
+            <small class="form-text text-muted">
+                The text to tweet. Read the <a routerLink="help">help</a> section for information about advanced formatting.
+            </small>
+        </div>
+    </div>
+</form>

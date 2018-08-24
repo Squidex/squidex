@@ -23,6 +23,8 @@ namespace Squidex.Domain.Apps.Core.Rules
 
         T Visit(SlackAction action);
 
+        T Visit(TweetAction action);
+
         T Visit(WebhookAction action);
     }
 }

@@ -10,6 +10,7 @@ using Microsoft.Extensions.Options;
 using NSwag.Annotations;
 using Squidex.Areas.Api.Controllers.UI.Models;
 using Squidex.Config;
+using Squidex.Domain.Apps.Core.Rules.Actions;
 using Squidex.Infrastructure.Commands;
 using Squidex.Pipeline;
 
@@ -23,10 +24,13 @@ namespace Squidex.Areas.Api.Controllers.UI
     public sealed class UIController : ApiController
     {
         private readonly MyUIOptions uiOptions;
+        private readonly TwitterOptions twitterOptions;
 
-        public UIController(ICommandBus commandBus, IOptions<MyUIOptions> uiOptions)
+        public UIController(ICommandBus commandBus, IOptions<MyUIOptions> uiOptions, IOptions<TwitterOptions> twitterOptions)
             : base(commandBus)
         {
+            this.twitterOptions = twitterOptions.Value;
+
             this.uiOptions = uiOptions.Value;
         }
 
@@ -42,7 +46,8 @@ namespace Squidex.Areas.Api.Controllers.UI
             var dto = new UISettingsDto
             {
                 MapType = uiOptions.Map?.Type ?? "OSM",
-                MapKey = uiOptions.Map?.GoogleMaps?.Key
+                MapKey = uiOptions.Map?.GoogleMaps?.Key,
+                SupportsTwitterActions = twitterOptions.IsConfigured()
             };
 
             return Ok(dto);

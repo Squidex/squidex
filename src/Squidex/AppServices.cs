@@ -14,6 +14,7 @@ using Squidex.Config;
 using Squidex.Config.Authentication;
 using Squidex.Config.Domain;
 using Squidex.Config.Web;
+using Squidex.Domain.Apps.Core.Rules.Actions;
 using Squidex.Infrastructure.Commands;
 
 namespace Squidex
@@ -44,7 +45,11 @@ namespace Squidex
 
             services.Configure<ReadonlyOptions>(
                 config.GetSection("mode"));
-            services.Configure<ContentsControllerOptions>(
+
+            services.Configure<TwitterOptions>(
+                config.GetSection("twitter"));
+
+            services.Configure<MyContentsControllerOptions>(
                 config.GetSection("contentsController"));
             services.Configure<MyUrlsOptions>(
                 config.GetSection("urls"));

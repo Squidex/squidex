@@ -27,6 +27,7 @@ import {
     RulesPageComponent,
     RuleWizardComponent,
     SlackActionComponent,
+    TweetActionComponent,
     WebhookActionComponent
 } from './declarations';
 
@@ -69,6 +70,7 @@ const routes: Routes = [
         RulesPageComponent,
         RuleWizardComponent,
         SlackActionComponent,
+        TweetActionComponent,
         WebhookActionComponent
     ]
 })

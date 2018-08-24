@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'icomoon';
-  src:  url('fonts/icomoon.eot?za0y3d');
-  src:  url('fonts/icomoon.eot?za0y3d#iefix') format('embedded-opentype'),
-    url('fonts/icomoon.ttf?za0y3d') format('truetype'),
-    url('fonts/icomoon.woff?za0y3d') format('woff'),
-    url('fonts/icomoon.svg?za0y3d#icomoon') format('svg');
+  src:  url('fonts/icomoon.eot?f9httd');
+  src:  url('fonts/icomoon.eot?f9httd#iefix') format('embedded-opentype'),
+    url('fonts/icomoon.ttf?f9httd') format('truetype'),
+    url('fonts/icomoon.woff?f9httd') format('woff'),
+    url('fonts/icomoon.svg?f9httd#icomoon') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -24,6 +24,60 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.icon-twitter:before {
+  content: "\e95c";
+}
+.icon-action-Tweet:before {
+  content: "\e95c";
+}
+.icon-hour-glass:before {
+  content: "\e954";
+}
+.icon-spinner:before {
+  content: "\e953";
+}
+.icon-clock:before {
+  content: "\e950";
+}
+.icon-bin2:before {
+  content: "\e902";
+}
+.icon-earth:before {
+  content: "\e9ca";
+}
+.icon-elapsed:before {
+  content: "\e943";
+}
+.icon-google:before {
+  content: "\e93b";
+}
+.icon-lock:before {
+  content: "\e934";
+}
+.icon-microsoft:before {
+  content: "\e940";
+}
+.icon-action-AzureQueue:before {
+  content: "\e940";
+}
+.icon-pause:before {
+  content: "\e92f";
+}
+.icon-play:before {
+  content: "\e930";
+}
+.icon-reset:before {
+  content: "\e92e";
+}
+.icon-settings2:before {
+  content: "\e92d";
+}
+.icon-timeout:before {
+  content: "\e944";
+}
+.icon-unlocked:before {
+  content: "\e933";
+}
 .icon-backup:before {
   content: "\e95b";
 }
@@ -35,6 +89,51 @@
 }
 .icon-download:before {
   content: "\e93e";
+}
+.icon-action-Algolia:before {
+  content: "\e94c";
+}
+.icon-type-Tags:before {
+  content: "\e94a";
+}
+.icon-activity:before {
+  content: "\e904";
+}
+.icon-history:before {
+  content: "\e904";
+}
+.icon-time:before {
+  content: "\e904";
+}
+.icon-add:before {
+  content: "\e905";
+}
+.icon-plus:before {
+  content: "\e905";
+}
+.icon-check-circle:before {
+  content: "\e906";
+}
+.icon-check-circle-filled:before {
+  content: "\e907";
+}
+.icon-close:before {
+  content: "\e908";
+}
+.icon-type-References:before {
+  content: "\e909";
+}
+.icon-control-Checkbox:before {
+  content: "\e90a";
+}
+.icon-control-Dropdown:before {
+  content: "\e90b";
+}
+.icon-control-Input:before {
+  content: "\e90c";
+}
+.icon-control-Radio:before {
+  content: "\e90d";
 }
 .icon-action-Medium:before {
   content: "\e959";
@@ -287,54 +386,6 @@
 }
 .icon-action-Webhook:before {
   content: "\e947";
-}
-.icon-hour-glass:before {
-  content: "\e954";
-}
-.icon-spinner:before {
-  content: "\e953";
-}
-.icon-clock:before {
-  content: "\e950";
-}
-.icon-bin2:before {
-  content: "\e902";
-}
-.icon-earth:before {
-  content: "\e9ca";
-}
-.icon-elapsed:before {
-  content: "\e943";
-}
-.icon-google:before {
-  content: "\e93b";
-}
-.icon-lock:before {
-  content: "\e934";
-}
-.icon-microsoft:before {
-  content: "\e940";
-}
-.icon-action-AzureQueue:before {
-  content: "\e940";
-}
-.icon-pause:before {
-  content: "\e92f";
-}
-.icon-play:before {
-  content: "\e930";
-}
-.icon-reset:before {
-  content: "\e92e";
-}
-.icon-settings2:before {
-  content: "\e92d";
-}
-.icon-timeout:before {
-  content: "\e944";
-}
-.icon-unlocked:before {
-  content: "\e933";
 }
 .icon-browser:before {
   content: "\e935";

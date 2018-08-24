@@ -22,5 +22,10 @@ namespace Squidex.Areas.Api.Controllers.UI.Models
         /// </summary>
         [Required]
         public string MapKey { get; set; }
+
+        /// <summary>
+        /// Indicates whether twitter actions are supported.
+        /// </summary>
+        public bool SupportsTwitterActions { get; set; }
     }
 }

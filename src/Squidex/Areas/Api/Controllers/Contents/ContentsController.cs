@@ -30,14 +30,14 @@ namespace Squidex.Areas.Api.Controllers.Contents
     [SwaggerIgnore]
     public sealed class ContentsController : ApiController
     {
-        private readonly IOptions<ContentsControllerOptions> controllerOptions;
+        private readonly IOptions<MyContentsControllerOptions> controllerOptions;
         private readonly IContentQueryService contentQuery;
         private readonly IGraphQLService graphQl;
 
         public ContentsController(ICommandBus commandBus,
             IContentQueryService contentQuery,
             IGraphQLService graphQl,
-            IOptions<ContentsControllerOptions> controllerOptions)
+            IOptions<MyContentsControllerOptions> controllerOptions)
             : base(commandBus)
         {
             this.contentQuery = contentQuery;

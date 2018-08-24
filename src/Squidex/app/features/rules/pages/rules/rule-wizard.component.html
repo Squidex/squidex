@@ -114,6 +114,13 @@
                             [actionFormSubmitted]="actionForm.submitted | async">
                         </sqx-slack-action>
                     </ng-container>
+                    <ng-container *ngSwitchCase="'Tweet'">
+                        <sqx-tweet-action
+                            [action]="action"
+                            [actionForm]="actionForm.form"
+                            [actionFormSubmitted]="actionForm.submitted | async">
+                        </sqx-tweet-action>
+                    </ng-container>
                     <ng-container *ngSwitchCase="'Webhook'">
                         <sqx-webhook-action        
                             [action]="action"
