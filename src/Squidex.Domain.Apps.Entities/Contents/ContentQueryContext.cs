@@ -38,6 +38,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return Clone(c => c.Base = c.Base.WithFlatten(flatten));
         }
 
+        public ContentQueryContext WithUnpublished(bool unpublished)
+        {
+            return Clone(c => c.Base = c.Base.WithUnpublished(unpublished));
+        }
+
         public ContentQueryContext WithSchemaId(Guid id)
         {
             return Clone(c => c.SchemaIdOrName = id.ToString());

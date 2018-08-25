@@ -23,6 +23,8 @@ namespace Squidex.Domain.Apps.Entities
 
         public bool Flatten { get; private set; }
 
+        public bool Unpublished { get; set; }
+
         public IEnumerable<Language> Languages { get; private set; }
 
         private QueryContext()
@@ -32,6 +34,11 @@ namespace Squidex.Domain.Apps.Entities
         public static QueryContext Create(IAppEntity app, ClaimsPrincipal user)
         {
             return new QueryContext { App = app, User = user };
+        }
+
+        public QueryContext WithUnpublished(bool unpublished)
+        {
+            return Clone(c => c.Unpublished = unpublished);
         }
 
         public QueryContext WithArchived(bool archived)

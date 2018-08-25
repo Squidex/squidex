@@ -71,7 +71,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
             {
                 QueueConnectionString = action.ConnectionString,
                 QueueName = queueName,
-                MessageBodyV2 = body,
+                MessageBodyV2 = body
             };
 
             return (ruleDescription, ruleJob);

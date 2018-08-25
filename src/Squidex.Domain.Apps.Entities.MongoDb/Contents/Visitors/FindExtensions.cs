@@ -102,7 +102,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors
         {
             var filters = new List<FilterDefinition<MongoContentEntity>>
             {
-                Filter.Eq(x => x.IndexedSchemaId, schemaId),
+                Filter.Eq(x => x.IndexedSchemaId, schemaId)
             };
 
             if (status != null)

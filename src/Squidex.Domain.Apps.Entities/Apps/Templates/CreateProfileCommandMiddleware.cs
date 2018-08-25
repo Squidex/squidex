@@ -77,7 +77,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
                         .AddField("profession",
                             new ContentFieldData()
                                 .AddValue("iv", "Software Developer")),
-                Publish = true,
+                Publish = true
             });
         }
 

@@ -482,7 +482,10 @@ namespace Squidex.Areas.Api.Controllers.Contents
 
         private ContentQueryContext Context()
         {
-            return new ContentQueryContext(QueryContext.Create(App, User).WithLanguages(Request.Headers["X-Languages"])).WithFlatten(Request.Headers.ContainsKey("X-Flatten"));
+            return new ContentQueryContext(QueryContext.Create(App, User)
+                .WithLanguages(Request.Headers["X-Languages"]))
+                .WithFlatten(Request.Headers.ContainsKey("X-Flatten"))
+                .WithUnpublished(Request.Headers.ContainsKey("X-Unpublished"));
         }
     }
 }

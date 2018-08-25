@@ -21,6 +21,8 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Reflection;
 
+#pragma warning disable RECS0147
+
 namespace Squidex.Domain.Apps.Entities.Contents
 {
     public sealed class ContentQueryService : IContentQueryService
@@ -242,11 +244,22 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 {
                     return StatusArchived;
                 }
-
-                return StatusDraftOrPublished;
+                else
+                {
+                    return StatusDraftOrPublished;
+                }
             }
-
-            return StatusPublished;
+            else
+            {
+                if (context.Unpublished)
+                {
+                    return StatusDraftOrPublished;
+                }
+                else
+                {
+                    return StatusPublished;
+                }
+            }
         }
 
         private Task<IContentEntity> FindContentByVersionAsync(Guid id, long version)
