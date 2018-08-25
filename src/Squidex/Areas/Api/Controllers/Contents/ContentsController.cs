@@ -50,7 +50,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// GraphQL endpoint.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="query">The graphql endpoint.</param>
+        /// <param name="query">The graphql query.</param>
         /// <returns>
         /// 200 => Contents retrieved or mutated.
         /// 404 => Schema or app not found.
@@ -67,13 +67,44 @@ namespace Squidex.Areas.Api.Controllers.Contents
         {
             var result = await graphQl.QueryAsync(Context().Base, query);
 
-            if (result.Errors?.Length > 0)
+            if (result.HasError)
             {
-                return BadRequest(new { result.Data, result.Errors });
+                return BadRequest(result.Response);
             }
             else
             {
-                return Ok(new { result.Data });
+                return Ok(result.Response);
+            }
+        }
+
+        /// <summary>
+        /// GraphQL endpoint with batch support.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <param name="batch">The graphql queries.</param>
+        /// <returns>
+        /// 200 => Contents retrieved or mutated.
+        /// 404 => Schema or app not found.
+        /// </returns>
+        /// <remarks>
+        /// You can read the generated documentation for your app at /api/content/{appName}/docs
+        /// </remarks>
+        [MustBeAppReader]
+        [HttpGet]
+        [HttpPost]
+        [Route("content/{app}/graphql/")]
+        [ApiCosts(2)]
+        public async Task<IActionResult> PostGraphQLBatch(string app, [FromBody] GraphQLQuery[] batch)
+        {
+            var result = await graphQl.QueryAsync(Context().Base, batch);
+
+            if (result.HasError)
+            {
+                return BadRequest(result.Response);
+            }
+            else
+            {
+                return Ok(result.Response);
             }
         }
 
