@@ -72,12 +72,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
             {
                 var isVersioned = version > EtagVersion.Empty;
 
-                var parsedStatus = context.Base.IsFrontendClient ? StatusAll : StatusPublished;
+                var status = GetFindStatus(context.Base);
 
                 var content =
                     isVersioned ?
                     await FindContentByVersionAsync(id, version) :
-                    await FindContentAsync(context.Base, id, parsedStatus, schema);
+                    await FindContentAsync(context.Base, id, status, schema);
 
                 if (content == null || (content.Status != Status.Published && !context.Base.IsFrontendClient) || content.SchemaId.Id != schema.Id)
                 {
@@ -96,20 +96,20 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             using (Profiler.TraceMethod<ContentQueryService>())
             {
-                var parsedStatus = ParseStatus(context.Base);
+                var status = GetQueryStatus(context.Base);
 
                 IResultList<IContentEntity> contents;
 
                 if (query.Ids?.Count > 0)
                 {
-                    contents = await contentRepository.QueryAsync(context.Base.App, schema, parsedStatus, new HashSet<Guid>(query.Ids));
+                    contents = await contentRepository.QueryAsync(context.Base.App, schema, status, new HashSet<Guid>(query.Ids));
                     contents = Sort(contents, query.Ids);
                 }
                 else
                 {
                     var parsedQuery = ParseQuery(context.Base, query.ODataQuery, schema);
 
-                    contents = await contentRepository.QueryAsync(context.Base.App, schema, parsedStatus, parsedQuery);
+                    contents = await contentRepository.QueryAsync(context.Base.App, schema, status, parsedQuery);
                 }
 
                 return Transform(context.Base, schema, true, contents);
@@ -236,7 +236,23 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return schema;
         }
 
-        private static Status[] ParseStatus(QueryContext context)
+        private static Status[] GetFindStatus(QueryContext context)
+        {
+            if (context.IsFrontendClient)
+            {
+                return StatusAll;
+            }
+            else if (context.Unpublished)
+            {
+                return StatusDraftOrPublished;
+            }
+            else
+            {
+                return StatusPublished;
+            }
+        }
+
+        private static Status[] GetQueryStatus(QueryContext context)
         {
             if (context.IsFrontendClient)
             {

@@ -105,13 +105,15 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public static IEnumerable<object[]> SingleRequestData = new[]
         {
-            new object[] { true,  new[] { Status.Archived, Status.Draft, Status.Published } },
-            new object[] { false, new[] { Status.Published } }
+            new object[] { true,  true,  new[] { Status.Archived, Status.Draft, Status.Published } },
+            new object[] { true,  false, new[] { Status.Archived, Status.Draft, Status.Published } },
+            new object[] { false, true,  new[] { Status.Draft, Status.Published } },
+            new object[] { false, false, new[] { Status.Published } }
         };
 
         [Theory]
         [MemberData(nameof(SingleRequestData))]
-        public async Task Should_return_content_from_repository_and_transform(bool isFrontend, params Status[] status)
+        public async Task Should_return_content_from_repository_and_transform(bool isFrontend, bool unpublished, params Status[] status)
         {
             var contentId = Guid.NewGuid();
             var content = CreateContent(contentId);
@@ -124,7 +126,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             A.CallTo(() => contentRepository.FindContentAsync(app, schema, A<Status[]>.That.IsSameSequenceAs(status), contentId))
                 .Returns(content);
 
-            var result = await sut.FindContentAsync(context.WithSchemaId(schemaId), contentId);
+            var ctx = context.WithSchemaId(schemaId).WithUnpublished(unpublished);
+
+            var result = await sut.FindContentAsync(ctx, contentId);
 
             Assert.Equal(contentTransformed, result.Data);
             Assert.Equal(content.Id, result.Id);
