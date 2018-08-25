@@ -42,7 +42,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             this.urlGenerator = urlGenerator;
         }
 
-        public async Task<(bool HasError, object[] Response)> QueryAsync(QueryContext context, GraphQLQuery[] queries)
+        public async Task<(bool HasError, object Response)> QueryAsync(QueryContext context, params GraphQLQuery[] queries)
         {
             Guard.NotNull(context, nameof(context));
             Guard.NotNull(queries, nameof(queries));
@@ -74,18 +74,18 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         {
             if (string.IsNullOrWhiteSpace(query.Query))
             {
-                return (false, new { Data = new object() });
+                return (false, new { data = new object() });
             }
 
             var result = await model.ExecuteAsync(ctx, query);
 
             if (result.Errors?.Any() == true)
             {
-                return (false, new { result.Data, result.Errors });
+                return (false, new { data = result.Data, errors = result.Errors });
             }
             else
             {
-                return (false, new { result.Data });
+                return (false, new { data = result.Data });
             }
         }
 

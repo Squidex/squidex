@@ -8,6 +8,7 @@
 using System;
 using System.Threading.Tasks;
 using FakeItEasy;
+using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
 using Xunit;
@@ -173,7 +174,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         public async Task Should_return_single_asset_when_finding_asset()
         {
             var assetId = Guid.NewGuid();
-            var asset = CreateAsset(Guid.NewGuid());
+            var asset = CreateAsset(assetId);
 
             var query = $@"
                 query {{
@@ -714,6 +715,61 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         }
 
         [Fact]
+        public async Task Should_make_multiple_queries()
+        {
+            var assetId1 = Guid.NewGuid();
+            var assetId2 = Guid.NewGuid();
+            var asset1 = CreateAsset(assetId1);
+            var asset2 = CreateAsset(assetId2);
+
+            var query1 = $@"
+                query {{
+                  findAsset(id: ""{assetId1}"") {{
+                    id
+                  }}
+                }}";
+            var query2 = $@"
+                query {{
+                  findAsset(id: ""{assetId2}"") {{
+                    id
+                  }}
+                }}";
+
+            A.CallTo(() => assetQuery.FindAssetAsync(MatchsAssetContext(), assetId1))
+                .Returns(asset1);
+            A.CallTo(() => assetQuery.FindAssetAsync(MatchsAssetContext(), assetId2))
+                .Returns(asset2);
+
+            var result = await sut.QueryAsync(context, new GraphQLQuery { Query = query1 }, new GraphQLQuery { Query = query2 });
+
+            var expected = new object[]
+            {
+                new
+                {
+                    data = new
+                    {
+                        findAsset = new
+                        {
+                            id = asset1.Id
+                        }
+                    }
+                },
+                new
+                {
+                    data = new
+                    {
+                        findAsset = new
+                        {
+                            id = asset2.Id
+                        }
+                    }
+                }
+            };
+
+            AssertResult(expected, result);
+        }
+
+        [Fact]
         public async Task Should_not_return_data_when_field_not_part_of_content()
         {
             var contentId = Guid.NewGuid();
@@ -742,12 +798,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             var result = await sut.QueryAsync(context, new GraphQLQuery { Query = query });
 
-            var expected = new
-            {
-                data = (object)null
-            };
+            var json = JToken.FromObject(result);
 
-            AssertResult(expected, result, false);
+            Assert.Null(json["data"]);
         }
 
         private QueryContext MatchsAssetContext()

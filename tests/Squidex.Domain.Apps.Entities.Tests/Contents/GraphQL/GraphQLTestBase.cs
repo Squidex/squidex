@@ -13,6 +13,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
 using NodaTime.Extensions;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Apps;
@@ -174,17 +175,22 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             return asset;
         }
 
-        protected static void AssertResult(object expected, (object Data, object[] Errors) result, bool checkErrors = true)
+        protected static void AssertResult(object expected, (bool HasErrors, object Response) result, bool checkErrors = true)
         {
-            if (checkErrors && (result.Errors != null && result.Errors.Length > 0))
+            if (checkErrors && result.HasErrors)
             {
-                throw new InvalidOperationException(result.Errors[0]?.ToString());
+                throw new InvalidOperationException(NewMethod(result));
             }
 
-            var resultJson = JsonConvert.SerializeObject(new { data = result.Data }, Formatting.Indented);
+            var resultJson = JsonConvert.SerializeObject(result.Response, Formatting.Indented);
             var expectJson = JsonConvert.SerializeObject(expected, Formatting.Indented);
 
             Assert.Equal(expectJson, resultJson);
+        }
+
+        private static string NewMethod((bool HasErrors, object Response) result)
+        {
+            return JsonConvert.SerializeObject(result).ToString();
         }
     }
 }
