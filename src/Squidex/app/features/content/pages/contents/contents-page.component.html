@@ -1,6 +1,6 @@
 <sqx-title message="{app} | {schema} | Contents" parameter1="app" parameter2="schema" [value1]="appsState.appName" [value2]="schema.displayName"></sqx-title>
 
-<sqx-panel desiredWidth="*" contentClass="grid">
+<sqx-panel desiredWidth="*" contentClass="grid" showSidebar="true" sidebarClass="wide">
     <ng-container title>
         <ng-container *ngIf="contentsState.isArchive | async; else noArchive">
             Archive
@@ -23,7 +23,8 @@
 
                 <sqx-search-form formClass="form"
                     (queryChanged)="search($event)" 
-                    [query]="contentsState.contentsQuery | async" 
+                    [query]="contentsState.contentsQuery | async"
+                    [queries]="schemaQueries"
                     (archivedChanged)="goArchive($event)"
                     [archived]="contentsState.isArchive | async"
                     enableShortcut="true">
@@ -118,6 +119,35 @@
         <div class="grid-footer">
             <sqx-pager [pager]="contentsState.contentsPager | async" (prev)="goPrev()" (next)="goNext()"></sqx-pager>
         </div>
+    </ng-container>    
+
+    <ng-container sidebar>
+        <ng-container *ngIf="schemaQueries.queries | async; let queries">
+            <div class="sidebar-section">
+                <h3>Queries</h3>
+
+                <a class="row sidebar-item" *ngFor="let query of schemaQueries.defaultQueries" (click)="search(query.filter)" [class.active]="isSelectedQuery(query.filter)">
+                    <div class="col truncate">
+                        {{query.name}}
+                    </div>
+                </a>
+            </div>
+
+            <div class="sidebar-section" *ngIf="queries.length > 0">
+                <h3>Bookmarks</h3>
+
+                <a class="row sidebar-item" *ngFor="let query of queries" (click)="search(query.filter)" [class.active]="isSelectedQuery(query.filter)">
+                    <div class="col truncate">
+                        {{query.name}}
+                    </div>
+                    <div class="col col-auto">
+                        <a class="sidebar-item-remove" (click)="schemaQueries.remove(query.name)">
+                            <i class="icon-close"></i>
+                        </a>
+                    </div>
+                </a>
+            </div>
+        </ng-container>
     </ng-container>
 </sqx-panel>
 

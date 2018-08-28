@@ -5,10 +5,12 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormControl } from '@angular/forms';
 
-import { ModalModel } from '@app/shared';
+import { ModalModel, SaveQueryForm, SchemaQueries } from '@app/shared';
+import { Observable } from 'rxjs';
+import { shareReplay } from 'rxjs/operators';
 
 @Component({
     selector: 'sqx-search-form',
@@ -16,7 +18,10 @@ import { ModalModel } from '@app/shared';
     templateUrl: './search-form.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class SearchFormComponent implements OnChanges {
+export class SearchFormComponent implements OnChanges, OnInit {
+    @Input()
+    public queries: SchemaQueries;
+
     @Input()
     public query = '';
 
@@ -30,6 +35,9 @@ export class SearchFormComponent implements OnChanges {
     public archivedChanged = new EventEmitter<boolean>();
 
     @Input()
+    public schemaName = '';
+
+    @Input()
     public canArchive = true;
 
     @Input()
@@ -39,6 +47,9 @@ export class SearchFormComponent implements OnChanges {
     public formClass = 'form-inline search-form';
 
     public contentsFilter = new FormControl();
+    public contentsFilterValue = this.contentsFilter.valueChanges.pipe(shareReplay(1));
+
+    public saveKey: Observable<string | null>;
 
     public searchModal = new ModalModel();
     public searchForm =
@@ -48,19 +59,42 @@ export class SearchFormComponent implements OnChanges {
             odataSearch: ''
         });
 
+    public saveQueryDialog = new ModalModel();
+    public saveQueryForm = new SaveQueryForm(this.formBuilder);
+
     constructor(
         private readonly formBuilder: FormBuilder
     ) {
+    }
+
+    public ngOnInit() {
+        this.saveKey = this.queries.getSaveKey(this.contentsFilter.valueChanges);
+    }
+
+    public ngOnChanges() {
+        this.invalidate(this.query);
+    }
+
+    public saveQuery() {
+        this.saveQueryDialog.show();
+    }
+
+    public saveQueryComplete() {
+        const value = this.saveQueryForm.submit();
+
+        if (value) {
+            this.queries.add(value.name, this.contentsFilter.value);
+
+            this.saveQueryForm.submitCompleted();
+        }
+
+        this.saveQueryDialog.hide();
     }
 
     public search() {
         this.invalidate(this.contentsFilter.value);
 
         this.queryChanged.emit(this.contentsFilter.value);
-    }
-
-    public ngOnChanges() {
-        this.invalidate(this.query);
     }
 
     private invalidate(query: string) {

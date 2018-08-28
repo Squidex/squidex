@@ -18,8 +18,14 @@ namespace Squidex.Domain.Apps.Entities.Apps
     public sealed class AppUISettingsGrain : GrainOfGuid, IAppUISettingsGrain
     {
         private readonly IStore<Guid> store;
-        private IPersistence<JObject> persistence;
-        private JObject state = new JObject();
+        private IPersistence<State> persistence;
+        private State state = new State();
+
+        [CollectionName("UISettings")]
+        public sealed class State
+        {
+            public JObject Settings { get; set; } = new JObject();
+        }
 
         public AppUISettingsGrain(IStore<Guid> store)
         {
@@ -30,19 +36,19 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         public override Task OnActivateAsync(Guid key)
         {
-            persistence = store.WithSnapshots<JObject, Guid>(GetType(), key, x => state = x);
+            persistence = store.WithSnapshots<State, Guid>(GetType(), key, x => state = x);
 
             return persistence.ReadAsync();
         }
 
         public Task<J<JObject>> GetAsync()
         {
-            return Task.FromResult(state.AsJ());
+            return Task.FromResult(state.Settings.AsJ());
         }
 
-        public Task SetAsync(J<JObject> setting)
+        public Task SetAsync(J<JObject> settings)
         {
-            state = setting;
+            state.Settings = settings;
 
             return persistence.WriteSnapshotAsync(state);
         }
@@ -81,7 +87,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             key = segments[segments.Length - 1];
 
-            var current = state;
+            var current = state.Settings;
 
             if (segments.Length > 1)
             {

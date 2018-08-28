@@ -8,7 +8,7 @@
 
 // tslint:disable:prefer-for-of
 
-import { FormArray, FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 
 import {
     DateTime,
@@ -35,6 +35,18 @@ import {
     StringFieldPropertiesDto,
     TagsFieldPropertiesDto
 } from './../services/schemas.types';
+
+export class SaveQueryForm extends Form<FormGroup> {
+    constructor(formBuilder: FormBuilder) {
+        super(formBuilder.group({
+            name: ['',
+                [
+                    Validators.required
+                ]
+            ]
+        }));
+    }
+}
 
 export class FieldFormatter implements FieldPropertiesVisitor<string> {
     constructor(

@@ -37,7 +37,7 @@ export class UIService {
     public putSetting(appName: string, key: string, value: any): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/ui/settings/${key}`);
 
-        return this.http.put(url, value);
+        return this.http.put(url, { value });
     }
 
     public deleteSetting(appName: string, key: string): Observable<any> {

@@ -6,8 +6,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { distinctUntilChanged, map, tap } from 'rxjs/operators';
+import { distinctUntilChanged, map } from 'rxjs/operators';
 
 import { State, Types } from '@app/framework';
 
@@ -47,19 +46,15 @@ export class UIState extends State<Snapshot> {
         }
     }
 
-    public load(reset = false): Observable<any> {
+    public load(reset = false) {
         if (!reset) {
             this.resetState();
         }
 
-        return this.loadInternal();
-    }
-
-    private loadInternal(): Observable<any> {
-        return this.uiService.getSettings(this.appName).pipe(
-            tap(dtos => {
+        this.uiService.getSettings(this.appName)
+            .subscribe(dtos => {
                 return this.next({ settings: dtos });
-            }));
+            });
     }
 
     public set(path: string, value: any) {

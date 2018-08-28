@@ -22,7 +22,9 @@ namespace Squidex.Areas.Api.Controllers.UI
     /// <summary>
     /// Manages ui settings and configs.
     /// </summary>
+    [ApiAuthorize]
     [ApiExceptionFilter]
+    [AppApi]
     [SwaggerTag(nameof(UI))]
     public sealed class UIController : ApiController
     {
@@ -71,9 +73,9 @@ namespace Squidex.Areas.Api.Controllers.UI
         [HttpPut]
         [Route("apps/{app}/ui/settings/{key}")]
         [ApiCosts(0)]
-        public async Task<IActionResult> PutSetting(string app, string key, [FromBody] JToken value)
+        public async Task<IActionResult> PutSetting(string app, string key, [FromBody] UpdateSettingDto request)
         {
-            await grainFactory.GetGrain<IAppUISettingsGrain>(App.Id).SetAsync(key, value);
+            await grainFactory.GetGrain<IAppUISettingsGrain>(App.Id).SetAsync(key, request.Value);
 
             return NoContent();
         }

@@ -23,18 +23,18 @@
     </ng-container>
 
     <ng-container sidebar>    
-        <div class="section">
-            <a class="row tag" (click)="resetTags()" [class.active]="assetsState.isTagSelectionEmpty()">
+        <div class="sidebar-section">
+            <a class="row sidebar-item" (click)="resetTags()" [class.active]="assetsState.isTagSelectionEmpty()">
                 <div class="col">
                     All Assets
                 </div>
             </a>
         </div>
         
-        <div class="section">
+        <div class="sidebar-section">
             <h3>Tags</h3>
     
-            <a class="row tag" *ngFor="let tag of assetsState.tags | async" (click)="toggleTag(tag.name)" [class.active]="assetsState.isTagSelected(tag.name)">
+            <a class="row sidebar-item" *ngFor="let tag of assetsState.tags | async" (click)="toggleTag(tag.name)" [class.active]="assetsState.isTagSelected(tag.name)">
                 <div class="col">
                     {{tag.name}}
                 </div>

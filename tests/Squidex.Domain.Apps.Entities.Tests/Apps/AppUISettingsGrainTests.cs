@@ -18,12 +18,12 @@ namespace Squidex.Domain.Apps.Entities.Apps
     public sealed class AppUISettingsGrainTests
     {
         private readonly IStore<Guid> store = A.Fake<IStore<Guid>>();
-        private readonly IPersistence<JObject> persistence = A.Fake<IPersistence<JObject>>();
+        private readonly IPersistence<AppUISettingsGrain.State> persistence = A.Fake<IPersistence<AppUISettingsGrain.State>>();
         private readonly AppUISettingsGrain sut;
 
         public AppUISettingsGrainTests()
         {
-            A.CallTo(() => store.WithSnapshots(A<Type>.Ignored, A<Guid>.Ignored, A<Func<JObject, Task>>.Ignored))
+            A.CallTo(() => store.WithSnapshots(A<Type>.Ignored, A<Guid>.Ignored, A<Func<AppUISettingsGrain.State, Task>>.Ignored))
                 .Returns(persistence);
 
             sut = new AppUISettingsGrain(store);
