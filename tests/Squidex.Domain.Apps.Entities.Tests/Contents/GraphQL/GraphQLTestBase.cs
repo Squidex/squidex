@@ -13,7 +13,6 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Newtonsoft.Json.Serialization;
 using NodaTime.Extensions;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Apps;

@@ -11,7 +11,7 @@ import { ControlValueAccessor, FormBuilder, NG_VALUE_ACCESSOR } from '@angular/f
 import {
     ResourceLoaderService,
     Types,
-    UIService,
+    UIState,
     ValidatorsEx
 } from '@app/shared/internal';
 
@@ -72,7 +72,7 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
     constructor(
         private readonly resourceLoader: ResourceLoaderService,
         private readonly formBuilder: FormBuilder,
-        private readonly uiService: UIService
+        private readonly uiState: UIState
     ) {
     }
 
@@ -158,7 +158,7 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
     }
 
     public ngAfterViewInit() {
-        this.uiService.getSettings()
+        this.uiState.settings
             .subscribe(settings => {
                 this.isGoogleMaps = settings.mapType === 'GoogleMaps';
 

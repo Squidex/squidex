@@ -61,6 +61,7 @@ export * from './state/rule-events.state';
 export * from './state/rules.state';
 export * from './state/schemas.forms';
 export * from './state/schemas.state';
+export * from './state/ui.state';
 
 export * from './utils/messages';
 

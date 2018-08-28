@@ -6,9 +6,7 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Templates.Builders;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
