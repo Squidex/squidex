@@ -22,7 +22,7 @@ export class SchemaQueries {
     public defaultQueries: Query[] = [{
         name: 'All (newest first)', filter: ''
     }, {
-        name: 'All (oldest first)', filter: '$orderby=lastModified desc'
+        name: 'All (oldest first)', filter: '$orderby=lastModified asc'
     }];
 
     constructor(
