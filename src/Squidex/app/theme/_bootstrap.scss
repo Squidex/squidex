@@ -264,6 +264,10 @@ a {
     &-microsoft {
         color: $color-extern-microsoft-icon;
     }
+
+    &-twitter {
+        color: $color-extern-twitter-icon;
+    }
 }
 
 //
@@ -300,6 +304,21 @@ a {
         &:focus {
             .icon-microsoft {
                 color: darken($color-extern-microsoft-icon, 5%);
+            }
+        }
+    }
+
+    &-twitter {
+        @include button-variant($color-extern-twitter, $color-extern-twitter);
+
+        & {
+            color: $color-dark-foreground;
+        }
+
+        &:hover,
+        &:focus {
+            .icon-twitter {
+                color: darken($color-extern-twitter-icon, 5%);
             }
         }
     }

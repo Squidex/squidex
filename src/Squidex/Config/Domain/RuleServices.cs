@@ -42,6 +42,9 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<MediumActionHandler>()
                 .As<IRuleActionHandler>();
 
+            services.AddSingletonAs<TweetActionHandler>()
+                .As<IRuleActionHandler>();
+
             services.AddSingletonAs<SlackActionHandler>()
                 .As<IRuleActionHandler>();
 

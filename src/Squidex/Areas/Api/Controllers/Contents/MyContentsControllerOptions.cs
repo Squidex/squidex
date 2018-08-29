@@ -7,7 +7,7 @@
 
 namespace Squidex.Areas.Api.Controllers.Contents
 {
-    public sealed class ContentsControllerOptions
+    public sealed class MyContentsControllerOptions
     {
         public bool EnableSurrogateKeys { get; set; }
 

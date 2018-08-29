@@ -55,6 +55,11 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models.Converters
             return SimpleMapper.Map(action, new SlackActionDto());
         }
 
+        public RuleActionDto Visit(TweetAction action)
+        {
+            return SimpleMapper.Map(action, new TweetActionDto());
+        }
+
         public RuleActionDto Visit(WebhookAction action)
         {
             return SimpleMapper.Map(action, new WebhookActionDto());

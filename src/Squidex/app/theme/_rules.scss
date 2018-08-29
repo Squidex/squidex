@@ -11,6 +11,7 @@ $action-slack:            #5c3a58;
 $action-azure:            #55b3ff;
 $action-fastly:           #e23335;
 $action-medium:           #00ab6c;
+$action-twitter:          #1da1f2;
 
 // sass-lint:disable class-name-format
 
@@ -86,6 +87,10 @@ $action-medium:           #00ab6c;
 
 .rule-element-Slack {
     @include build-element($action-slack);
+}
+
+.rule-element-Tweet {
+    @include build-element($action-twitter);
 }
 
 .rule-element-Webhook {

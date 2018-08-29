@@ -49,6 +49,9 @@ export const ruleActions: any = {
     'Slack': {
         name: 'Send to Slack'
     },
+    'Tweet': {
+        name: 'Tweet'
+    },
     'Webhook': {
         name: 'Send Webhook'
     }
