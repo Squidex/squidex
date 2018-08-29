@@ -67,7 +67,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
                     job.AccessToken,
                     job.AccessSecret);
 
-                var response = await tokens.Statuses.UpdateAsync(status => job.Text);
+                 var response = await tokens.Statuses.UpdateAsync(status => job.Text);
 
                 return ($"Tweeted: {job.Text}", null);
             }

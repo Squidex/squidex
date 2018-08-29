@@ -135,10 +135,10 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
 
             if (string.IsNullOrWhiteSpace(action.AccessToken))
             {
-                errors.Add(new ValidationError("Access Tokenis required.", nameof(action.AccessToken)));
+                errors.Add(new ValidationError("Access Token is required.", nameof(action.AccessToken)));
             }
 
-            if (string.IsNullOrWhiteSpace(action.AccessToken))
+            if (string.IsNullOrWhiteSpace(action.AccessSecret))
             {
                 errors.Add(new ValidationError("Access Secret is required.", nameof(action.AccessSecret)));
             }
