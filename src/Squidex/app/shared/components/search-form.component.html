@@ -6,9 +6,13 @@
     <input class="form-control form-control-expandable" #inputFind [formControl]="contentsFilter" [placeholder]="placeholder" />
 
     <ng-container *ngIf="expandable">
-        <a class="expand-search" (click)="searchModal.toggle()" #archive>
+        <a class="expand-search" (click)="searchModal.toggle()" #expand>
             <i class="icon-caret-down"></i>
         </a>
+
+        <sqx-onboarding-tooltip id="contentArchive" [for]="expand" position="bottomRight" after="60000">
+            Click this icon to show the advanced search menu and to show the archive!
+        </sqx-onboarding-tooltip>
     </ng-container>
 
     <ng-container *ngIf="queries">
@@ -25,10 +29,6 @@
         </ng-template>
     </ng-container>
 </form>
-
-<sqx-onboarding-tooltip id="contentArchive" [for]="archive" position="bottomRight" after="60000">
-    Click this icon to show the advanced search menu and to show the archive!
-</sqx-onboarding-tooltip>
 
 <sqx-onboarding-tooltip id="contentFind" [for]="inputFind" position="bottomRight" after="120000">
     Search for content using full text search over all fields and languages!
