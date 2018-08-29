@@ -17,23 +17,37 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards.Actions
     public class TweetActionTests
     {
         [Fact]
-        public async Task Should_add_error_if_pin_code_is_null()
+        public async Task Should_add_error_if_access_token_is_null()
         {
-            var action = new TweetAction { PinCode = null };
+            var action = new TweetAction { AccessToken = null, AccessSecret = "secret" };
 
             var errors = await RuleActionValidator.ValidateAsync(action);
 
             errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("Pin Code is required.", "PinCode")
+                    new ValidationError("Access Token is required.", "AccessToken")
                 });
         }
 
         [Fact]
-        public async Task Should_not_add_error_if_pin_code_is_absolute()
+        public async Task Should_add_error_if_access_secret_is_null()
         {
-            var action = new TweetAction { PinCode = "123" };
+            var action = new TweetAction { AccessToken = "token", AccessSecret = null };
+
+            var errors = await RuleActionValidator.ValidateAsync(action);
+
+            errors.Should().BeEquivalentTo(
+                new List<ValidationError>
+                {
+                    new ValidationError("Access Secret is required.", "AccessSecret")
+                });
+        }
+
+        [Fact]
+        public async Task Should_not_add_error_if_access_token_and_secret_defined()
+        {
+            var action = new TweetAction { AccessToken = "token", AccessSecret = "secret" };
 
             var errors = await RuleActionValidator.ValidateAsync(action);
 

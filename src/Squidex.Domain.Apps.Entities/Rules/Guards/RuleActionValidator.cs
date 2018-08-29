@@ -133,9 +133,14 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
         {
             var errors = new List<ValidationError>();
 
-            if (string.IsNullOrWhiteSpace(action.PinCode))
+            if (string.IsNullOrWhiteSpace(action.AccessToken))
             {
-                errors.Add(new ValidationError("Pin Code is required.", nameof(action.PinCode)));
+                errors.Add(new ValidationError("Access Tokenis required.", nameof(action.AccessToken)));
+            }
+
+            if (string.IsNullOrWhiteSpace(action.AccessToken))
+            {
+                errors.Add(new ValidationError("Access Secret is required.", nameof(action.AccessSecret)));
             }
 
             return Task.FromResult<IEnumerable<ValidationError>>(errors);

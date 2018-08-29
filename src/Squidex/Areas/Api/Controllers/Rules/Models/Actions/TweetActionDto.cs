@@ -17,10 +17,16 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models.Actions
     public sealed class TweetActionDto : RuleActionDto
     {
         /// <summary>
-        /// The pin code.
+        /// The access token.
         /// </summary>
         [Required]
-        public string PinCode { get; set; }
+        public string AccessToken { get; set; }
+
+        /// <summary>
+        /// The access secret.
+        /// </summary>
+        [Required]
+        public string AccessSecret { get; set; }
 
         /// <summary>
         /// The text that is sent as tweet to twitter.

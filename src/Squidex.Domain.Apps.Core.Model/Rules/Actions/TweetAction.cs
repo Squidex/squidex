@@ -12,7 +12,9 @@ namespace Squidex.Domain.Apps.Core.Rules.Actions
     [TypeName(nameof(TweetAction))]
     public sealed class TweetAction : RuleAction
     {
-        public string PinCode { get; set; }
+        public string AccessToken { get; set; }
+
+        public string AccessSecret { get; set; }
 
         public string Text { get; set; }
 

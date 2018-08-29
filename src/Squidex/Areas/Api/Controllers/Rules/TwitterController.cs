@@ -6,10 +6,10 @@
 // ==========================================================================
 
 using System.Threading.Tasks;
-using CoreTweet;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core.Rules.Actions;
+using static CoreTweet.OAuth;
 
 namespace Squidex.Areas.Api.Controllers.Rules
 {
@@ -22,12 +22,48 @@ namespace Squidex.Areas.Api.Controllers.Rules
             this.twitterOptions = twitterOptions.Value;
         }
 
+        public sealed class TokenRequest
+        {
+            public string PinCode { get; set; }
+
+            public string RequestToken { get; set; }
+
+            public string RequestTokenSecret { get; set; }
+        }
+
+        [HttpGet]
         [Route("rules/twitter/auth")]
         public async Task<IActionResult> Auth()
         {
-            var session = await OAuth.AuthorizeAsync(twitterOptions.ClientId, twitterOptions.ClientSecret);
+            var session = await AuthorizeAsync(twitterOptions.ClientId, twitterOptions.ClientSecret);
 
-            return Redirect(session.AuthorizeUri.ToString());
+            return Ok(new
+            {
+                session.AuthorizeUri,
+                session.RequestToken,
+                session.RequestTokenSecret
+            });
+        }
+
+        [HttpPost]
+        [Route("rules/twitter/token")]
+        public async Task<IActionResult> AuthComplete([FromBody] TokenRequest request)
+        {
+            var session = new OAuthSession
+            {
+                ConsumerKey = twitterOptions.ClientId,
+                ConsumerSecret = twitterOptions.ClientSecret,
+                RequestToken = request.RequestToken,
+                RequestTokenSecret = request.RequestTokenSecret
+            };
+
+            var tokens = await session.GetTokensAsync(request.PinCode);
+
+            return Ok(new
+            {
+                tokens.AccessToken,
+                tokens.AccessTokenSecret
+            });
         }
     }
 }

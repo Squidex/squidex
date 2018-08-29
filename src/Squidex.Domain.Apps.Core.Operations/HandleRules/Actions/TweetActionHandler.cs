@@ -19,7 +19,9 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
 {
     public sealed class TweetJob
     {
-        public string PinCode { get; set; }
+        public string AccessToken { get; set; }
+
+        public string AccessSecret { get; set; }
 
         public string Text { get; set; }
     }
@@ -29,7 +31,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
         private const string Description = "Send a tweet";
 
         private readonly RuleEventFormatter formatter;
-        private readonly ClientPool<string, Tokens> tokenPool;
+        private readonly TwitterOptions twitterOptions;
 
         public TweetActionHandler(RuleEventFormatter formatter, IOptions<TwitterOptions> twitterOptions)
         {
@@ -38,19 +40,19 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
 
             this.formatter = formatter;
 
-            tokenPool = new ClientPool<string, Tokens>(async key =>
-            {
-                var session = await OAuth.AuthorizeAsync(twitterOptions.Value.ClientId, twitterOptions.Value.ClientSecret);
-
-                return await session.GetTokensAsync(key);
-            });
+            this.twitterOptions = twitterOptions.Value;
         }
 
         protected override (string Description, TweetJob Data) CreateJob(EnrichedEvent @event, TweetAction action)
         {
             var text = formatter.Format(action.Text, @event);
 
-            var ruleJob = new TweetJob { Text = text, PinCode = action.PinCode };
+            var ruleJob = new TweetJob
+            {
+                Text = text,
+                AccessToken = action.AccessToken,
+                AccessSecret = action.AccessSecret
+            };
 
             return (Description, ruleJob);
         }
@@ -59,9 +61,13 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
         {
             try
             {
-                var tokens = await tokenPool.GetClientAsync(job.PinCode);
+                var tokens = Tokens.Create(
+                    twitterOptions.ClientId,
+                    twitterOptions.ClientSecret,
+                    job.AccessToken,
+                    job.AccessSecret);
 
-                var response = await tokens.Statuses.UpdateAsync(x => job.Text);
+                var response = await tokens.Statuses.UpdateAsync(status => job.Text);
 
                 return ($"Tweeted: {job.Text}", null);
             }
