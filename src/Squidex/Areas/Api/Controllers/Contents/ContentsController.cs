@@ -92,7 +92,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [MustBeAppReader]
         [HttpGet]
         [HttpPost]
-        [Route("content/{app}/graphql/")]
+        [Route("content/{app}/graphql/batch")]
         [ApiCosts(2)]
         public async Task<IActionResult> PostGraphQLBatch(string app, [FromBody] GraphQLQuery[] batch)
         {
