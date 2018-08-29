@@ -3,23 +3,27 @@
 </ng-container>
 
 <form [class]="formClass" (ngSubmit)="search()">
-    <input class="form-control form-control-expandable" #inputFind [formControl]="contentsFilter" placeholder="Search for content" />
+    <input class="form-control form-control-expandable" #inputFind [formControl]="contentsFilter" [placeholder]="placeholder" />
 
-    <a class="expand-search" (click)="searchModal.toggle()" #archive>
-        <i class="icon-caret-down"></i>
-    </a>
-
-    <ng-container *ngIf="saveKey | async; else notBookmarked; let key">
-        <a class="save-search" (click)="queries.remove(key)">
-            <i class="icon-star-full"></i>
+    <ng-container *ngIf="expandable">
+        <a class="expand-search" (click)="searchModal.toggle()" #archive>
+            <i class="icon-caret-down"></i>
         </a>
     </ng-container>
 
-    <ng-template #notBookmarked>
-        <a class="save-search" (click)="saveQuery()" *ngIf="contentsFilterValue | async">
-            <i class="icon-star-empty"></i>
-        </a>
-    </ng-template>
+    <ng-container *ngIf="queries">
+        <ng-container *ngIf="saveKey | async; else notBookmarked; let key">
+            <a class="save-search" (click)="queries.remove(key)">
+                <i class="icon-star-full"></i>
+            </a>
+        </ng-container>
+    
+        <ng-template #notBookmarked>
+            <a class="save-search" (click)="saveQuery()" *ngIf="contentsFilterValue | async">
+                <i class="icon-star-empty"></i>
+            </a>
+        </ng-template>
+    </ng-container>
 </form>
 
 <sqx-onboarding-tooltip id="contentArchive" [for]="archive" position="bottomRight" after="60000">
@@ -45,7 +49,7 @@
                 <label class="col col-2 col-form-label" for="filter">Filter</label>
 
                 <div class="col col-10">
-                    <input type="input" class="form-control" id="filter" (blur)="updateQuery()" formControlName="odataFilter" placeholder="data/[MY_FIELD]/iv eq 100" />
+                    <input type="input" class="form-control" id="filter" (blur)="updateQuery()" formControlName="odataFilter" placeholder="{{fieldExample}} eq [VALUE]" />
                 </div>
             </div>
 
@@ -53,12 +57,12 @@
                 <label class="col col-2 col-form-label" for="orderBy">Order</label>
                     
                 <div class="col col-10">
-                    <input type="input" class="form-control" id="orderBy" (blur)="updateQuery()" formControlName="odataOrderBy" placeholder="data/[MY_FIELD]/iv desc" />
+                    <input type="input" class="form-control" id="orderBy" (blur)="updateQuery()" formControlName="odataOrderBy" placeholder="{{fieldExample}} desc" />
                 </div>
             </div>
         </div>
         
-        <div class="form-check" *ngIf="canArchive">
+        <div class="form-check" *ngIf="enableArchive">
             <input class="form-check-input" type="checkbox" id="archivedItems" [ngModel]="archived" (ngModelChange)="archivedChanged.emit($event)" />
             <label class="form-check-label" for="archivedItems">
                 Archived items

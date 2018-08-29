@@ -66,6 +66,7 @@ import {
     SchemaMustExistPublishedGuard,
     SchemasService,
     SchemasState,
+    SearchFormComponent,
     UIService,
     UIState,
     UnsetAppGuard,
@@ -108,7 +109,8 @@ import {
         UserNameRefPipe,
         UserPicturePipe,
         UserPictureRefPipe,
-        RichEditorComponent
+        RichEditorComponent,
+        SearchFormComponent
     ],
     exports: [
         AppFormComponent,
@@ -126,6 +128,7 @@ import {
         MarkdownEditorComponent,
         RouterModule,
         SchemaCategoryComponent,
+        SearchFormComponent,
         UserDtoPicture,
         UserIdPicturePipe,
         UserNamePipe,

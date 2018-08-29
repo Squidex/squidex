@@ -17,8 +17,8 @@ import {
     ImmutableArray,
     LanguagesState,
     ModalModel,
+    Queries,
     SchemaDetailsDto,
-    SchemaQueries,
     SchemasState,
     UIState
 } from '@app/shared';
@@ -36,7 +36,7 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
     private selectedSchemaSubscription: Subscription;
 
     public schema: SchemaDetailsDto;
-    public schemaQueries: SchemaQueries;
+    public schemaQueries: Queries;
 
     public searchModal = new ModalModel();
 
@@ -76,7 +76,7 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
                     this.resetSelection();
 
                     this.schema = schema!;
-                    this.schemaQueries = new SchemaQueries(this.uiState, this.schema.name);
+                    this.schemaQueries = new Queries(this.uiState, `schemas.${this.schema.name}`);
 
                     this.contentsState.init().pipe(onErrorResumeNext()).subscribe();
                 });

@@ -8,7 +8,12 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormControl } from '@angular/forms';
 
-import { ModalModel, SaveQueryForm, SchemaQueries } from '@app/shared';
+import {
+    ModalModel,
+    Queries,
+    SaveQueryForm
+} from '@app/shared/internal';
+
 import { Observable } from 'rxjs';
 import { shareReplay } from 'rxjs/operators';
 
@@ -20,7 +25,16 @@ import { shareReplay } from 'rxjs/operators';
 })
 export class SearchFormComponent implements OnChanges, OnInit {
     @Input()
-    public queries: SchemaQueries;
+    public queries: Queries;
+
+    @Input()
+    public placeholder = '';
+
+    @Input()
+    public fieldExample = '[MY_FIELD]';
+
+    @Input()
+    public expandable = false;
 
     @Input()
     public query = '';
@@ -38,7 +52,7 @@ export class SearchFormComponent implements OnChanges, OnInit {
     public schemaName = '';
 
     @Input()
-    public canArchive = true;
+    public enableArchive = false;
 
     @Input()
     public enableShortcut = false;

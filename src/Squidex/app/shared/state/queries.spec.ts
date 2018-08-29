@@ -8,35 +8,35 @@
 import { BehaviorSubject } from 'rxjs';
 import { IMock,  Mock, Times } from 'typemoq';
 
-import { Query, SchemaQueries } from './schema-queries';
+import { Queries, Query } from './queries';
 import { UIState } from './ui.state';
 
-describe('SchemaQueries', () => {
-    const schema = 'my-schema';
+describe('Queries', () => {
+    const prefix = 'schemas.my-schema';
 
     let uiState: IMock<UIState>;
     let filter = new BehaviorSubject('');
-    let queries = new BehaviorSubject({});
-    let schemaQueries: SchemaQueries;
+    let queries$ = new BehaviorSubject({});
+    let queries: Queries;
 
     beforeEach(() => {
         uiState = Mock.ofType<UIState>();
 
         uiState.setup(x => x.get('schemas.my-schema.queries', {}))
-            .returns(() => queries);
+            .returns(() => queries$);
 
-        queries.next({
+        queries$.next({
             key1: 'query1',
             key2: 'query2'
         });
 
-        schemaQueries = new SchemaQueries(uiState.object, schema);
+        queries = new Queries(uiState.object, prefix);
     });
 
     it('should load queries', () => {
         let converted: Query[];
 
-        schemaQueries.queries.subscribe(x => {
+        queries.queries.subscribe(x => {
             converted = x;
         });
 
@@ -56,7 +56,7 @@ describe('SchemaQueries', () => {
     it('should provide key', () => {
         let key: string;
 
-        schemaQueries.getSaveKey(filter).subscribe(x => {
+        queries.getSaveKey(filter).subscribe(x => {
             key = x!;
         });
 
@@ -66,13 +66,13 @@ describe('SchemaQueries', () => {
     });
 
     it('should forward add call to state', () => {
-        schemaQueries.add('key3', 'filter3');
+        queries.add('key3', 'filter3');
 
         uiState.verify(x => x.set('schemas.my-schema.queries.key3', 'filter3'), Times.once());
     });
 
     it('should forward remove call to state', () => {
-        schemaQueries.remove('key3');
+        queries.remove('key3');
 
         uiState.verify(x => x.remove('schemas.my-schema.queries.key3'), Times.once());
     });

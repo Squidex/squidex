@@ -32,8 +32,7 @@ import {
     DueTimeSelectorComponent,
     FieldEditorComponent,
     ReferencesEditorComponent,
-    SchemasPageComponent,
-    SearchFormComponent
+    SchemasPageComponent
 } from './declarations';
 
 const routes: Routes = [
@@ -100,8 +99,7 @@ const routes: Routes = [
         DueTimeSelectorComponent,
         FieldEditorComponent,
         ReferencesEditorComponent,
-        SchemasPageComponent,
-        SearchFormComponent
+        SchemasPageComponent
     ]
 })
 export class SqxFeatureContentModule { }

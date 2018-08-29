@@ -14,19 +14,21 @@
     <ng-container menu>
         <div class="row no-gutters pl-1">
             <div class="col col-auto offset-xl-4">
+                <sqx-shortcut keys="ctrl+shift+r" (trigger)="reload()"></sqx-shortcut>
+
                 <button class="btn btn-link btn-secondary" (click)="reload()" title="Refresh Contents (CTRL + SHIFT + R)">
                     <i class="icon-reset"></i> Refresh
                 </button>
             </div>
             <div class="col pl-1">
-                <sqx-shortcut keys="ctrl+shift+r" (trigger)="reload()"></sqx-shortcut>
-
-                <sqx-search-form formClass="form"
+                <sqx-search-form formClass="form" placeholder="Search for content" fieldExample="data/[MY_FIELD]/iv"
                     (queryChanged)="search($event)" 
                     [query]="contentsState.contentsQuery | async"
                     [queries]="schemaQueries"
                     (archivedChanged)="goArchive($event)"
                     [archived]="contentsState.isArchive | async"
+                    expandable="true"
+                    enableArchive="true"
                     enableShortcut="true">
                 </sqx-search-form>
             </div>
@@ -122,32 +124,28 @@
     </ng-container>    
 
     <ng-container sidebar>
-        <ng-container *ngIf="schemaQueries.queries | async; let queries">
-            <div class="sidebar-section">
-                <h3>Queries</h3>
+        <div class="sidebar-section">
+            <a class="row sidebar-item" *ngFor="let query of schemaQueries.defaultQueries" (click)="search(query.filter)" [class.active]="isSelectedQuery(query.filter)">
+                <div class="col truncate">
+                    {{query.name}}
+                </div>
+            </a>
+        </div>
 
-                <a class="row sidebar-item" *ngFor="let query of schemaQueries.defaultQueries" (click)="search(query.filter)" [class.active]="isSelectedQuery(query.filter)">
-                    <div class="col truncate">
-                        {{query.name}}
-                    </div>
-                </a>
-            </div>
+        <div class="sidebar-section">
+            <h3>Saved queries</h3>
 
-            <div class="sidebar-section" *ngIf="queries.length > 0">
-                <h3>Bookmarks</h3>
-
-                <a class="row sidebar-item" *ngFor="let query of queries" (click)="search(query.filter)" [class.active]="isSelectedQuery(query.filter)">
-                    <div class="col truncate">
-                        {{query.name}}
-                    </div>
-                    <div class="col col-auto">
-                        <a class="sidebar-item-remove" (click)="schemaQueries.remove(query.name)">
-                            <i class="icon-close"></i>
-                        </a>
-                    </div>
-                </a>
-            </div>
-        </ng-container>
+            <a class="row sidebar-item" *ngFor="let query of schemaQueries.queries | async" (click)="search(query.filter)" [class.active]="isSelectedQuery(query.filter)">
+                <div class="col truncate">
+                    {{query.name}}
+                </div>
+                <div class="col col-auto">
+                    <a class="sidebar-item-remove" (click)="schemaQueries.remove(query.name)">
+                        <i class="icon-close"></i>
+                    </a>
+                </div>
+            </a>
+        </div>
     </ng-container>
 </sqx-panel>
 

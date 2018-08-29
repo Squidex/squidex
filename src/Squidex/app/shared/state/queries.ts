@@ -16,7 +16,7 @@ export interface Query {
     filter: string;
 }
 
-export class SchemaQueries {
+export class Queries {
     public queries: Observable<Query[]>;
 
     public defaultQueries: Query[] = [{
@@ -27,9 +27,9 @@ export class SchemaQueries {
 
     constructor(
         private readonly uiState: UIState,
-        private readonly schemaName: string
+        private readonly prefix: string
     ) {
-        this.queries = this.uiState.get(`schemas.${this.schemaName}.queries`, {}).pipe(
+        this.queries = this.uiState.get(`${this.prefix}.queries`, {}).pipe(
             map(x => {
                 let queries: Query[] = Object.keys(x).map(y => ({ name: y, filter: x[y] }));
 
@@ -53,11 +53,11 @@ export class SchemaQueries {
     }
 
     public add(key: string, filter: string) {
-        this.uiState.set(`schemas.${this.schemaName}.queries.${key}`, filter);
+        this.uiState.set(`${this.prefix}.queries.${key}`, filter);
     }
 
     public remove(key: string) {
-        this.uiState.remove(`schemas.${this.schemaName}.queries.${key}`);
+        this.uiState.remove(`${this.prefix}.queries.${key}`);
     }
 
     public getSaveKey(filter$: Observable<string>): Observable<string | null> {
