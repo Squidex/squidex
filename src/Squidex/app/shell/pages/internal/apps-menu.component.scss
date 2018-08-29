@@ -66,6 +66,8 @@ $color-apps-border: #65a6ff;
 .app-upgrade {
     & {
         margin-left: 2rem;
+        margin-right: 0;
+        vertical-align: top;
     }
 
     .btn {
