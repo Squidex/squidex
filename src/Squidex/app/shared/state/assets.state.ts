@@ -45,6 +45,10 @@ export class AssetsState extends State<Snapshot> {
         this.changes.pipe(map(x => x.assets),
             distinctUntilChanged());
 
+    public assetsQuery =
+        this.changes.pipe(map(x => x.assetsQuery),
+            distinctUntilChanged());
+
     public assetsPager =
         this.changes.pipe(map(x => x.assetsPager),
             distinctUntilChanged());

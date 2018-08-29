@@ -67,7 +67,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
             var ruleJob = new SlackJob
             {
                 RequestUrl = action.WebhookUrl.ToString(),
-                RequestBodyV2 = body.ToString(Formatting.Indented),
+                RequestBodyV2 = body.ToString(Formatting.Indented)
             };
 
             return (Description, ruleJob);

@@ -11,6 +11,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 {
     public interface IGraphQLService
     {
-        Task<(object Data, object[] Errors)> QueryAsync(QueryContext context, GraphQLQuery query);
+        Task<(bool HasError, object Response)> QueryAsync(QueryContext context, params GraphQLQuery[] queries);
+
+        Task<(bool HasError, object Response)> QueryAsync(QueryContext context, GraphQLQuery query);
     }
 }

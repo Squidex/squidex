@@ -14,8 +14,8 @@ import {
     AppsState,
     AssetDto,
     AssetsService,
+    DialogModel,
     ImmutableArray,
-    ModalModel,
     Types
 } from '@app/shared';
 
@@ -35,7 +35,7 @@ export class AssetsEditorComponent implements ControlValueAccessor {
     private callChange = (v: any) => { /* NOOP */ };
     private callTouched = () => { /* NOOP */ };
 
-    public assetsDialog = new ModalModel();
+    public assetsDialog = new DialogModel();
 
     public newAssets = ImmutableArray.empty<File>();
     public oldAssets = ImmutableArray.empty<AssetDto>();

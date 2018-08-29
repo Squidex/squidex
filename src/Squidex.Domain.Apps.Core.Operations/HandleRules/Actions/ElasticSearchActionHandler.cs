@@ -74,7 +74,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Actions
                     Password = action.Password,
                     ContentId = contentId,
                     IndexName = formatter.Format(action.IndexName, @event),
-                    IndexType = formatter.Format(action.IndexType, @event),
+                    IndexType = formatter.Format(action.IndexType, @event)
                 };
 
                 if (contentEvent.Type == EnrichedContentEventType.Deleted ||

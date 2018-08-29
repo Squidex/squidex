@@ -340,7 +340,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                 new List<ValidationError>
                 {
                     new ValidationError("my-field[1].my-nested: Field is required.", "my-field[1].my-nested"),
-                    new ValidationError("my-field[3].my-nested: Field is required.", "my-field[3].my-nested"),
+                    new ValidationError("my-field[3].my-nested: Field is required.", "my-field[3].my-nested")
                 });
         }
     }

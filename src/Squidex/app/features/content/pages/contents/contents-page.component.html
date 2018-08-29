@@ -1,6 +1,6 @@
 <sqx-title message="{app} | {schema} | Contents" parameter1="app" parameter2="schema" [value1]="appsState.appName" [value2]="schema.displayName"></sqx-title>
 
-<sqx-panel desiredWidth="*" contentClass="grid">
+<sqx-panel desiredWidth="*" contentClass="grid" showSidebar="true" sidebarClass="wide">
     <ng-container title>
         <ng-container *ngIf="contentsState.isArchive | async; else noArchive">
             Archive
@@ -14,18 +14,21 @@
     <ng-container menu>
         <div class="row no-gutters pl-1">
             <div class="col col-auto offset-xl-4">
+                <sqx-shortcut keys="ctrl+shift+r" (trigger)="reload()"></sqx-shortcut>
+
                 <button class="btn btn-link btn-secondary" (click)="reload()" title="Refresh Contents (CTRL + SHIFT + R)">
                     <i class="icon-reset"></i> Refresh
                 </button>
             </div>
             <div class="col pl-1">
-                <sqx-shortcut keys="ctrl+shift+r" (trigger)="reload()"></sqx-shortcut>
-
-                <sqx-search-form formClass="form"
+                <sqx-search-form formClass="form" placeholder="Search for content" fieldExample="data/[MY_FIELD]/iv"
                     (queryChanged)="search($event)" 
-                    [query]="contentsState.contentsQuery | async" 
+                    [query]="contentsState.contentsQuery | async"
+                    [queries]="schemaQueries"
                     (archivedChanged)="goArchive($event)"
                     [archived]="contentsState.isArchive | async"
+                    expandable="true"
+                    enableArchive="true"
                     enableShortcut="true">
                 </sqx-search-form>
             </div>
@@ -117,6 +120,31 @@
 
         <div class="grid-footer">
             <sqx-pager [pager]="contentsState.contentsPager | async" (prev)="goPrev()" (next)="goNext()"></sqx-pager>
+        </div>
+    </ng-container>    
+
+    <ng-container sidebar>
+        <div class="sidebar-section">
+            <a class="row sidebar-item" *ngFor="let query of schemaQueries.defaultQueries" (click)="search(query.filter)" [class.active]="isSelectedQuery(query.filter)">
+                <div class="col truncate">
+                    {{query.name}}
+                </div>
+            </a>
+        </div>
+
+        <div class="sidebar-section">
+            <h3>Saved queries</h3>
+
+            <a class="row sidebar-item" *ngFor="let query of schemaQueries.queries | async" (click)="search(query.filter)" [class.active]="isSelectedQuery(query.filter)">
+                <div class="col truncate">
+                    {{query.name}}
+                </div>
+                <div class="col col-auto">
+                    <a class="sidebar-item-remove" (click)="schemaQueries.remove(query.name)">
+                        <i class="icon-close"></i>
+                    </a>
+                </div>
+            </a>
         </div>
     </ng-container>
 </sqx-panel>

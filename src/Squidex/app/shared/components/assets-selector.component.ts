@@ -8,7 +8,6 @@
 // tslint:disable:prefer-for-of
 
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { FormControl } from '@angular/forms';
 import { onErrorResumeNext } from 'rxjs/operators';
 
 import {
@@ -32,8 +31,6 @@ export class AssetsSelectorComponent implements OnInit {
     @Output()
     public selected = new EventEmitter<AssetDto[]>();
 
-    public assetsFilter = new FormControl('');
-
     constructor(
         public readonly state: AssetsDialogState
     ) {
@@ -41,16 +38,14 @@ export class AssetsSelectorComponent implements OnInit {
 
     public ngOnInit() {
         this.state.load().pipe(onErrorResumeNext()).subscribe();
-
-        this.assetsFilter.setValue(this.state.snapshot.assetsQuery);
     }
 
     public reload() {
         this.state.load(true).pipe(onErrorResumeNext()).subscribe();
     }
 
-    public search() {
-        this.state.search(this.assetsFilter.value).pipe(onErrorResumeNext()).subscribe();
+    public search(query: string) {
+        this.state.search(query).pipe(onErrorResumeNext()).subscribe();
     }
 
     public complete() {

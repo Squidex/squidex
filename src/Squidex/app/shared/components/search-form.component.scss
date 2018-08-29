@@ -10,7 +10,7 @@
 }
 
 .form-control-expandable {
-    padding-right: 1.5rem;
+    padding-right: 3rem;
 }
 
 .form-horizontal {
@@ -24,6 +24,14 @@
     font-size: 1rem;
     font-weight: normal;
     text-align: right;
+}
+
+.save-search {
+    @include absolute(8px, 24px, auto, auto);
+    color: $color-border-dark !important;
+    font-size: .9rem;
+    font-weight: normal;
+    cursor: pointer !important;
 }
 
 .expand-search {

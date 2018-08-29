@@ -26,6 +26,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
     public sealed class BackupApps : BackupHandlerWithStore
     {
         private const string UsersFile = "Users.json";
+        private const string SettingsFile = "Settings.json";
         private readonly IGrainFactory grainFactory;
         private readonly IUserResolver userResolver;
         private readonly IAppsByNameIndex appsByNameIndex;
@@ -69,9 +70,10 @@ namespace Squidex.Domain.Apps.Entities.Apps
             }
         }
 
-        public override Task BackupAsync(Guid appId, BackupWriter writer)
+        public override async Task BackupAsync(Guid appId, BackupWriter writer)
         {
-            return WriterUsersAsync(writer);
+            await WriteUsersAsync(writer);
+            await WriteSettingsAsync(writer, appId);
         }
 
         public async override Task RestoreEventAsync(Envelope<IEvent> @event, Guid appId, BackupReader reader, RefToken actor)
@@ -118,6 +120,11 @@ namespace Squidex.Domain.Apps.Entities.Apps
             {
                 squidexEvent.Actor = MapUser(squidexEvent.Actor.Identifier, actor);
             }
+        }
+
+        public override Task RestoreAsync(Guid appId, BackupReader reader)
+        {
+            return ReadSettingsAsync(reader, appId);
         }
 
         private async Task ReserveAppAsync(Guid appId)
@@ -167,11 +174,25 @@ namespace Squidex.Domain.Apps.Entities.Apps
             usersWithEmail = json.ToObject<Dictionary<string, string>>();
         }
 
-        private Task WriterUsersAsync(BackupWriter writer)
+        private async Task WriteUsersAsync(BackupWriter writer)
         {
             var json = JObject.FromObject(usersWithEmail);
 
-            return writer.WriteJsonAsync(UsersFile, json);
+            await writer.WriteJsonAsync(UsersFile, json);
+        }
+
+        private async Task WriteSettingsAsync(BackupWriter writer, Guid appId)
+        {
+            var json = await grainFactory.GetGrain<IAppUISettingsGrain>(appId).GetAsync();
+
+            await writer.WriteJsonAsync(SettingsFile, json);
+        }
+
+        private async Task ReadSettingsAsync(BackupReader reader, Guid appId)
+        {
+            var json = await reader.ReadJsonAttachmentAsync(SettingsFile);
+
+            await grainFactory.GetGrain<IAppUISettingsGrain>(appId).SetAsync((JObject)json);
         }
 
         public override async Task CompleteRestoreAsync(Guid appId, BackupReader reader)

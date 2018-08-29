@@ -17,8 +17,10 @@ import {
     ImmutableArray,
     LanguagesState,
     ModalModel,
+    Queries,
     SchemaDetailsDto,
-    SchemasState
+    SchemasState,
+    UIState
 } from '@app/shared';
 
 import { DueTimeSelectorComponent } from './../../shared/due-time-selector.component';
@@ -34,6 +36,7 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
     private selectedSchemaSubscription: Subscription;
 
     public schema: SchemaDetailsDto;
+    public schemaQueries: Queries;
 
     public searchModal = new ModalModel();
 
@@ -55,7 +58,8 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
         public readonly appsState: AppsState,
         public readonly contentsState: ContentsState,
         private readonly languagesState: LanguagesState,
-        private readonly schemasState: SchemasState
+        private readonly schemasState: SchemasState,
+        private readonly uiState: UIState
     ) {
     }
 
@@ -72,6 +76,7 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
                     this.resetSelection();
 
                     this.schema = schema!;
+                    this.schemaQueries = new Queries(this.uiState, `schemas.${this.schema.name}`);
 
                     this.contentsState.init().pipe(onErrorResumeNext()).subscribe();
                 });
@@ -103,38 +108,42 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
     }
 
     public publish(content: ContentDto) {
-        this.changeContentItems([content], 'Publish', false);
+        this.changeContentItems([content], 'Publish');
     }
 
-    public publishSelected(scheduled: boolean) {
-        this.changeContentItems(this.select(c => c.status !== 'Published'), 'Publish', false);
+    public publishSelected() {
+        this.changeContentItems(this.select(c => c.status !== 'Published'), 'Publish');
     }
 
     public unpublish(content: ContentDto) {
-        this.changeContentItems([content], 'Unpublish', false);
+        this.changeContentItems([content], 'Unpublish');
     }
 
-    public unpublishSelected(scheduled: boolean) {
-        this.changeContentItems(this.select(c => c.status === 'Published'), 'Unpublish', false);
+    public unpublishSelected() {
+        this.changeContentItems(this.select(c => c.status === 'Published'), 'Unpublish');
     }
 
     public archive(content: ContentDto) {
-        this.changeContentItems([content], 'Archive', true);
+        this.changeContentItems([content], 'Archive');
     }
 
-    public archiveSelected(scheduled: boolean) {
-        this.changeContentItems(this.select(), 'Archive', true);
+    public archiveSelected() {
+        this.changeContentItems(this.select(), 'Archive');
     }
 
     public restore(content: ContentDto) {
-        this.changeContentItems([content], 'Restore', true);
+        this.changeContentItems([content], 'Restore');
     }
 
     public restoreSelected(scheduled: boolean) {
-        this.changeContentItems(this.select(), 'Restore', true);
+        this.changeContentItems(this.select(), 'Restore');
     }
 
-    private changeContentItems(contents: ContentDto[], action: string, reload: boolean) {
+    public isSelectedQuery(query: string) {
+        return query === this.contentsState.snapshot.contentsQuery || (!query && !this.contentsState.contentsQuery);
+    }
+
+    private changeContentItems(contents: ContentDto[], action: string) {
         if (contents.length === 0) {
             return;
         }

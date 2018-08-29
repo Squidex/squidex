@@ -66,7 +66,9 @@ import {
     SchemaMustExistPublishedGuard,
     SchemasService,
     SchemasState,
+    SearchFormComponent,
     UIService,
+    UIState,
     UnsetAppGuard,
     UnsetContentGuard,
     UsagesService,
@@ -107,7 +109,8 @@ import {
         UserNameRefPipe,
         UserPicturePipe,
         UserPictureRefPipe,
-        RichEditorComponent
+        RichEditorComponent,
+        SearchFormComponent
     ],
     exports: [
         AppFormComponent,
@@ -125,6 +128,7 @@ import {
         MarkdownEditorComponent,
         RouterModule,
         SchemaCategoryComponent,
+        SearchFormComponent,
         UserDtoPicture,
         UserIdPicturePipe,
         UserNamePipe,
@@ -179,6 +183,7 @@ export class SqxSharedModule {
                 SchemasService,
                 SchemasState,
                 UIService,
+                UIState,
                 UnsetAppGuard,
                 UnsetContentGuard,
                 UsagesService,

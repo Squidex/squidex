@@ -23,7 +23,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         private readonly IAssetQueryService assetQuery;
         private readonly IAppProvider appProvider;
 
-        public CachingGraphQLService(IMemoryCache cache,
+        public CachingGraphQLService(
+            IMemoryCache cache,
             IAppProvider appProvider,
             IAssetQueryService assetQuery,
             IContentQueryService contentQuery,
@@ -41,39 +42,65 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             this.urlGenerator = urlGenerator;
         }
 
-        public async Task<(object Data, object[] Errors)> QueryAsync(QueryContext context, GraphQLQuery query)
+        public async Task<(bool HasError, object Response)> QueryAsync(QueryContext context, params GraphQLQuery[] queries)
+        {
+            Guard.NotNull(context, nameof(context));
+            Guard.NotNull(queries, nameof(queries));
+
+            var model = await GetModelAsync(context.App);
+
+            var ctx = new GraphQLExecutionContext(context, assetQuery, contentQuery, urlGenerator);
+
+            var result = await Task.WhenAll(queries.Select(q => QueryInternalAsync(model, ctx, q)));
+
+            return (result.Any(x => x.HasError), result.Select(x => x.Response).ToArray());
+        }
+
+        public async Task<(bool HasError, object Response)> QueryAsync(QueryContext context, GraphQLQuery query)
         {
             Guard.NotNull(context, nameof(context));
             Guard.NotNull(query, nameof(query));
 
-            if (string.IsNullOrWhiteSpace(query.Query))
-            {
-                return (new object(), new object[0]);
-            }
-
-            var modelContext = await GetModelAsync(context.App);
+            var model = await GetModelAsync(context.App);
 
             var ctx = new GraphQLExecutionContext(context, assetQuery, contentQuery, urlGenerator);
 
-            return await modelContext.ExecuteAsync(ctx, query);
+            var result = await QueryInternalAsync(model, ctx, query);
+
+            return result;
         }
 
-        private async Task<GraphQLModel> GetModelAsync(IAppEntity app)
+        private static async Task<(bool HasError, object Response)> QueryInternalAsync(GraphQLModel model, GraphQLExecutionContext ctx, GraphQLQuery query)
+        {
+            if (string.IsNullOrWhiteSpace(query.Query))
+            {
+                return (false, new { data = new object() });
+            }
+
+            var result = await model.ExecuteAsync(ctx, query);
+
+            if (result.Errors?.Any() == true)
+            {
+                return (false, new { data = result.Data, errors = result.Errors });
+            }
+            else
+            {
+                return (false, new { data = result.Data });
+            }
+        }
+
+        private Task<GraphQLModel> GetModelAsync(IAppEntity app)
         {
             var cacheKey = CreateCacheKey(app.Id, app.Version.ToString());
 
-            var modelContext = Cache.Get<GraphQLModel>(cacheKey);
-
-            if (modelContext == null)
+            return Cache.GetOrCreateAsync(cacheKey, async entry =>
             {
+                entry.AbsoluteExpirationRelativeToNow = CacheDuration;
+
                 var allSchemas = await appProvider.GetSchemasAsync(app.Id);
 
-                modelContext = new GraphQLModel(app, allSchemas.Where(x => x.IsPublished), urlGenerator);
-
-                Cache.Set(cacheKey, modelContext, CacheDuration);
-            }
-
-            return modelContext;
+                return new GraphQLModel(app, allSchemas, urlGenerator);
+            });
         }
 
         private static object CreateCacheKey(Guid appId, string etag)

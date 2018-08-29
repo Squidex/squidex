@@ -8,38 +8,41 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { catchError, tap } from 'rxjs/operators';
+import { catchError } from 'rxjs/operators';
 
 import { ApiUrlConfig } from '@app/framework';
 
 export interface UISettingsDto {
     mapType: string;
-    mapKey: string;
+    mapKey?: string;
 }
 
 @Injectable()
 export class UIService {
-    private settings: UISettingsDto;
-
     constructor(
         private readonly http: HttpClient,
         private readonly apiUrl: ApiUrlConfig
     ) {
     }
 
-    public getSettings(): Observable<UISettingsDto> {
-        if (this.settings) {
-            return of(this.settings);
-        } else {
-            const url = this.apiUrl.buildUrl(`api/ui/settings`);
+    public getSettings(appName: string): Observable<UISettingsDto & object> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/ui/settings`);
 
-            return this.http.get<UISettingsDto>(url).pipe(
-                catchError(error => {
-                    return of({ regexSuggestions: [], mapType: 'OSM', mapKey: '' });
-                }),
-                tap(settings => {
-                    this.settings = settings;
-                }));
-        }
+        return this.http.get<UISettingsDto>(url).pipe(
+            catchError(_ => {
+                return of({ regexSuggestions: [], mapType: 'OSM', mapKey: '' });
+            }));
+    }
+
+    public putSetting(appName: string, key: string, value: any): Observable<any> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/ui/settings/${key}`);
+
+        return this.http.put(url, { value });
+    }
+
+    public deleteSetting(appName: string, key: string): Observable<any> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/ui/settings/${key}`);
+
+        return this.http.delete(url);
     }
 }

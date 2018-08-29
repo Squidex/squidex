@@ -1,5 +1,15 @@
 # Changelog
 
+## v1.10.0 - 2018-08-29
+
+### Featues
+
+* **Contents**: Introduce `X-Unpublished` header to also get unpublished content.
+* **UI**: General feature to store UI settings.
+* **UI**: Save content queries.
+* **UI**: Save assets queries.
+* **GraphQL**: Endpoint to run multiple queries in parallel with a single request.
+
 ## v1.9.0 - 2018-08-19
 
 ### Features

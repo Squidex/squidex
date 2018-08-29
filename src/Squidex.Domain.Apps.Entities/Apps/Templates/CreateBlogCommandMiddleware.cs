@@ -79,7 +79,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
                         .AddField("text",
                             new ContentFieldData()
                                 .AddValue("iv", "Just created a blog with Squidex. I love it!")),
-                Publish = true,
+                Publish = true
             });
         }
 

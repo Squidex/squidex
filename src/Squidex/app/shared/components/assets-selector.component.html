@@ -4,13 +4,19 @@
     </ng-container>
 
     <ng-container tabs>
-        <button class="float-right btn btn-link btn-secondary" (click)="reload()">
-            <i class="icon-reset"></i> Refresh
-        </button>
-
-        <form class="float-left form-inline" (ngSubmit)="search()">
-            <input class="form-control" [formControl]="assetsFilter" placeholder="Search for assets" />
-        </form>
+        <div class="row no-gutters">
+            <div class="col col-auto offset-lg-4">
+                <button class="btn btn-link btn-secondary" (click)="reload()">
+                    <i class="icon-reset"></i> Refresh
+                </button>
+            </div>
+            <div class="col pl-1">
+                <sqx-search-form formClass="form" placeholder="Search for assets" fieldExample="fileSize"
+                    [query]="state.assetsQuery | async" 
+                    (queryChanged)="search($event)">
+                </sqx-search-form>
+            </div>
+        </div>
     </ng-container>
 
     <ng-container content>

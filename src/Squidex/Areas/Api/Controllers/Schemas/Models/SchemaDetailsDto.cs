@@ -142,7 +142,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
                             new NestedFieldDto
                             {
                                 FieldId = nestedField.Id,
-                                Properties = nestedFieldPropertiesDto,
+                                Properties = nestedFieldPropertiesDto
                             });
 
                         fieldDto.Nested.Add(nestedFieldDto);

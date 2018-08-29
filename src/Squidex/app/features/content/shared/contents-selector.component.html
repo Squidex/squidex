@@ -11,10 +11,10 @@
                 </button>
             </div>
             <div class="col pl-1">
-                <sqx-search-form formClass="form"
+                <sqx-search-form formClass="form" placeholder="Search for content" fieldExample="data/[MY_FIELD]/iv"
                     [query]="contentsState.contentsQuery | async" 
                     (queryChanged)="search($event)"
-                    [canArchive]="false">
+                    expandable="true">
                 </sqx-search-form>
     
                 <ng-container *ngIf="languages.length > 1">

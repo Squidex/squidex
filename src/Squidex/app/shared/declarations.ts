@@ -18,5 +18,6 @@ export * from './components/markdown-editor.component';
 export * from './components/pipes';
 export * from './components/rich-editor.component';
 export * from './components/schema-category.component';
+export * from './components/search-form.component';
 
 export * from './internal';
