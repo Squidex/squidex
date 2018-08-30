@@ -52,7 +52,8 @@ export class TweetActionComponent implements OnInit {
 
         this.actionForm.setControl('text',
             new FormControl(this.action.text || '', [
-                Validators.required
+                Validators.required,
+                Validators.maxLength(280)
             ]));
     }
 
