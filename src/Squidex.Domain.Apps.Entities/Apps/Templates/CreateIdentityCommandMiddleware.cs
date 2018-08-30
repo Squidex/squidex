@@ -200,7 +200,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
                         .ShowInList()
                         .Hints("The unique username to login."))
                     .AddString("Email", f => f
-                        .Pattern(@"^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\\\\.[a-zA-Z0-9-]+)*$", "Must be an email address.")
+                        .Pattern(@"^[a-zA-Z0-9.!#$%&’*+\\/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:.[a-zA-Z0-9-]+)*$", "Must be an email address.")
                         .Required()
                         .ShowInList()
                         .Hints("The unique email to login."))
