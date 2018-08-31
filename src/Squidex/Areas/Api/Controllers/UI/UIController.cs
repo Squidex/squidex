@@ -12,8 +12,8 @@ using NSwag.Annotations;
 using Orleans;
 using Squidex.Areas.Api.Controllers.UI.Models;
 using Squidex.Config;
-using Squidex.Domain.Apps.Core.Rules.Actions;
 using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Rules.Action.Twitter;
 using Squidex.Infrastructure.Commands;
 using Squidex.Pipeline;
 
@@ -71,7 +71,7 @@ namespace Squidex.Areas.Api.Controllers.UI
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="key">The name of the setting.</param>
-        /// <param name="value">The name of the value.</param>
+        /// <param name="request">The request with the value to update.</param>
         /// <returns>
         /// 200 => UI setting set.
         /// 404 => App not found.

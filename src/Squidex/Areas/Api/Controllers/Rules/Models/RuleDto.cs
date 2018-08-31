@@ -7,8 +7,10 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
+using Newtonsoft.Json;
 using NodaTime;
 using Squidex.Areas.Api.Controllers.Rules.Models.Converters;
+using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
@@ -50,6 +52,11 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
         public int Version { get; set; }
 
         /// <summary>
+        /// Determines if the rule is enabled.
+        /// </summary>
+        public bool IsEnabled { get; set; }
+
+        /// <summary>
         /// The trigger properties.
         /// </summary>
         [Required]
@@ -59,12 +66,8 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
         /// The action properties.
         /// </summary>
         [Required]
-        public RuleActionDto Action { get; set; }
-
-        /// <summary>
-        /// Determines if the rule is enabled.
-        /// </summary>
-        public bool IsEnabled { get; set; }
+        [JsonConverter(typeof(JsonInheritanceConverter), "actionType", typeof(RuleAction))]
+        public RuleAction Action { get; set; }
 
         public static RuleDto FromRule(IRuleEntity rule)
         {
@@ -76,11 +79,6 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
             if (rule.RuleDef.Trigger != null)
             {
                 response.Trigger = RuleTriggerDtoFactory.Create(rule.RuleDef.Trigger);
-            }
-
-            if (rule.RuleDef.Action != null)
-            {
-                response.Action = RuleActionDtoFactory.Create(rule.RuleDef.Action);
             }
 
             return response;

@@ -6,9 +6,8 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using FluentAssertions;
-using Squidex.Domain.Apps.Core.Rules.Actions;
+using Squidex.Domain.Apps.Rules.Action.Twitter;
 using Squidex.Infrastructure;
 using Xunit;
 
@@ -17,39 +16,53 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards.Actions
     public class TweetActionTests
     {
         [Fact]
-        public async Task Should_add_error_if_access_token_is_null()
+        public void Should_add_error_if_access_token_is_null()
         {
-            var action = new TweetAction { AccessToken = null, AccessSecret = "secret" };
+            var action = new TweetAction { AccessToken = null, AccessSecret = "secret", Text = "text" };
 
-            var errors = await RuleActionValidator.ValidateAsync(action);
+            var errors = action.Validate();
 
             errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("Access Token is required.", "AccessToken")
+                    new ValidationError("The Access Token field is required.", "AccessToken")
                 });
         }
 
         [Fact]
-        public async Task Should_add_error_if_access_secret_is_null()
+        public void Should_add_error_if_access_secret_is_null()
         {
-            var action = new TweetAction { AccessToken = "token", AccessSecret = null };
+            var action = new TweetAction { AccessToken = "token", AccessSecret = null, Text = "text" };
 
-            var errors = await RuleActionValidator.ValidateAsync(action);
+            var errors = action.Validate();
 
             errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("Access Secret is required.", "AccessSecret")
+                    new ValidationError("The Access Secret field is required.", "AccessSecret")
                 });
         }
 
         [Fact]
-        public async Task Should_not_add_error_if_access_token_and_secret_defined()
+        public void Should_add_error_if_text_is_null()
         {
-            var action = new TweetAction { AccessToken = "token", AccessSecret = "secret" };
+            var action = new TweetAction { AccessToken = "token", AccessSecret = "secret", Text = null };
 
-            var errors = await RuleActionValidator.ValidateAsync(action);
+            var errors = action.Validate();
+
+            errors.Should().BeEquivalentTo(
+                new List<ValidationError>
+                {
+                    new ValidationError("The Text field is required.", "Text")
+                });
+        }
+
+        [Fact]
+        public void Should_not_add_error_if_access_token_and_secret_defined()
+        {
+            var action = new TweetAction { AccessToken = "token", AccessSecret = "secret", Text = "text" };
+
+            var errors = action.Validate();
 
             Assert.Empty(errors);
         }

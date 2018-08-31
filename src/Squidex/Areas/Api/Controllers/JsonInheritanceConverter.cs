@@ -29,6 +29,11 @@ namespace Squidex.Areas.Api.Controllers
         [ThreadStatic]
         private static bool IsWriting;
 
+        public string DiscriminatorName
+        {
+            get { return discriminator; }
+        }
+
         public override bool CanWrite
         {
             get
@@ -64,6 +69,7 @@ namespace Squidex.Areas.Api.Controllers
                 var name = type.GetTypeInfo().GetCustomAttribute<JsonSchemaAttribute>()?.Name ?? type.Name;
 
                 mapTypeToName[type] = name;
+
                 mapNameToType[name] = type;
             }
         }

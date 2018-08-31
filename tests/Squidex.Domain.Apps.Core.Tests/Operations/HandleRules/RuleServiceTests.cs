@@ -13,7 +13,6 @@ using NodaTime;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules;
-using Squidex.Domain.Apps.Core.Rules.Actions;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Contents;
@@ -38,12 +37,12 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
         }
 
+        public sealed class ValidAction : RuleAction
+        {
+        }
+
         public sealed class InvalidAction : RuleAction
         {
-            public override T Accept<T>(IRuleActionVisitor<T> visitor)
-            {
-                return default(T);
-            }
         }
 
         public sealed class InvalidTrigger : RuleTrigger
@@ -57,13 +56,13 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         public RuleServiceTests()
         {
             typeNameRegistry.Map(typeof(ContentCreated));
-            typeNameRegistry.Map(typeof(WebhookAction));
+            typeNameRegistry.Map(typeof(ValidAction), "ValidAction");
 
             A.CallTo(() => eventEnricher.EnrichAsync(A<Envelope<AppEvent>>.Ignored))
                 .Returns(new EnrichedContentEvent());
 
             A.CallTo(() => ruleActionHandler.ActionType)
-                .Returns(typeof(WebhookAction));
+                .Returns(typeof(ValidAction));
 
             A.CallTo(() => ruleTriggerHandler.TriggerType)
                 .Returns(typeof(ContentChangedTrigger));
@@ -74,7 +73,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public async Task Should_not_create_job_for_invalid_event()
         {
-            var ruleConfig = new Rule(new ContentChangedTrigger(), new WebhookAction());
+            var ruleConfig = new Rule(new ContentChangedTrigger(), new ValidAction());
             var ruleEnvelope = Envelope.Create(new InvalidEvent());
 
             var job = await sut.CreateJobAsync(ruleConfig, ruleEnvelope);
@@ -85,7 +84,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public async Task Should_not_create_job_if_no_trigger_handler_registered()
         {
-            var ruleConfig = new Rule(new InvalidTrigger(), new WebhookAction());
+            var ruleConfig = new Rule(new InvalidTrigger(), new ValidAction());
             var ruleEnvelope = Envelope.Create(new ContentCreated());
 
             var job = await sut.CreateJobAsync(ruleConfig, ruleEnvelope);
@@ -107,7 +106,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public async Task Should_not_create_if_not_triggered()
         {
-            var ruleConfig = new Rule(new ContentChangedTrigger(), new WebhookAction());
+            var ruleConfig = new Rule(new ContentChangedTrigger(), new ValidAction());
             var ruleEnvelope = Envelope.Create(new ContentCreated());
 
             A.CallTo(() => ruleTriggerHandler.Triggers(A<Envelope<AppEvent>>.Ignored, ruleConfig.Trigger))
@@ -125,7 +124,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
             var now = SystemClock.Instance.GetCurrentInstant();
 
-            var ruleConfig = new Rule(new ContentChangedTrigger(), new WebhookAction());
+            var ruleConfig = new Rule(new ContentChangedTrigger(), new ValidAction());
             var ruleEnvelope = Envelope.Create(e);
 
             ruleEnvelope.SetTimestamp(now.Minus(Duration.FromDays(3)));
@@ -154,12 +153,12 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
             var now = SystemClock.Instance.GetCurrentInstant();
 
-            var ruleConfig = new Rule(new ContentChangedTrigger(), new WebhookAction());
+            var ruleConfig = new Rule(new ContentChangedTrigger(), new ValidAction());
             var ruleEnvelope = Envelope.Create(e);
 
             ruleEnvelope.SetTimestamp(now);
 
-            var actionName = "WebhookAction";
+            var actionName = "ValidAction";
             var actionData = new JObject();
             var actionDescription = "MyDescription";
 
@@ -197,7 +196,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             A.CallTo(() => ruleActionHandler.ExecuteJobAsync(ruleJob))
                 .Returns((actionDump, null));
 
-            var result = await sut.InvokeAsync("WebhookAction", ruleJob);
+            var result = await sut.InvokeAsync("ValidAction", ruleJob);
 
             Assert.Equal(RuleResult.Success, result.Result);
 
@@ -216,7 +215,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             A.CallTo(() => ruleActionHandler.ExecuteJobAsync(ruleJob))
                 .Returns((actionDump, new InvalidOperationException()));
 
-            var result = await sut.InvokeAsync("WebhookAction", ruleJob);
+            var result = await sut.InvokeAsync("ValidAction", ruleJob);
 
             Assert.Equal(RuleResult.Failed, result.Result);
 
@@ -235,7 +234,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             A.CallTo(() => ruleActionHandler.ExecuteJobAsync(ruleJob))
                 .Returns((actionDump, new TimeoutException()));
 
-            var result = await sut.InvokeAsync("WebhookAction", ruleJob);
+            var result = await sut.InvokeAsync("ValidAction", ruleJob);
 
             Assert.Equal(RuleResult.Timeout, result.Result);
 
@@ -253,7 +252,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             A.CallTo(() => ruleActionHandler.ExecuteJobAsync(ruleJob))
                 .Throws(ruleEx);
 
-            var result = await sut.InvokeAsync("WebhookAction", ruleJob);
+            var result = await sut.InvokeAsync("ValidAction", ruleJob);
 
             Assert.Equal((ruleEx.ToString(), RuleResult.Failed, TimeSpan.Zero), result);
         }

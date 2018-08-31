@@ -38,7 +38,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
                 }
                 else
                 {
-                    var errors = await RuleActionValidator.ValidateAsync(command.Action);
+                    var errors = command.Action.Validate();
 
                     errors.Foreach(x => x.AddTo(e));
                 }
@@ -65,7 +65,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
 
                 if (command.Action != null)
                 {
-                    var errors = await RuleActionValidator.ValidateAsync(command.Action);
+                    var errors = command.Action.Validate();
 
                     errors.Foreach(x => x.AddTo(e));
                 }

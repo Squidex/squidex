@@ -7,9 +7,9 @@
 
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Core.HandleRules;
-using Squidex.Domain.Apps.Core.HandleRules.Actions;
 using Squidex.Domain.Apps.Core.HandleRules.Triggers;
 using Squidex.Domain.Apps.Entities.Rules;
+using Squidex.Domain.Apps.Rules.Actions;
 using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Config.Domain
@@ -27,30 +27,6 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<ContentChangedTriggerHandler>()
                 .As<IRuleTriggerHandler>();
 
-            services.AddSingletonAs<AlgoliaActionHandler>()
-                .As<IRuleActionHandler>();
-
-            services.AddSingletonAs<AzureQueueActionHandler>()
-                .As<IRuleActionHandler>();
-
-            services.AddSingletonAs<ElasticSearchActionHandler>()
-                .As<IRuleActionHandler>();
-
-            services.AddSingletonAs<FastlyActionHandler>()
-                .As<IRuleActionHandler>();
-
-            services.AddSingletonAs<MediumActionHandler>()
-                .As<IRuleActionHandler>();
-
-            services.AddSingletonAs<TweetActionHandler>()
-                .As<IRuleActionHandler>();
-
-            services.AddSingletonAs<SlackActionHandler>()
-                .As<IRuleActionHandler>();
-
-            services.AddSingletonAs<WebhookActionHandler>()
-                .As<IRuleActionHandler>();
-
             services.AddSingletonAs<RuleEnqueuer>()
                 .As<IEventConsumer>();
 
@@ -59,6 +35,11 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<RuleService>()
                 .AsSelf();
+
+            foreach (var actionHandler in RuleActionRegistry.ActionHandlers)
+            {
+                services.AddSingleton(typeof(IRuleActionHandler), actionHandler);
+            }
         }
     }
 }

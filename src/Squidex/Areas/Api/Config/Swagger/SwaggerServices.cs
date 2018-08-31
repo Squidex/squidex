@@ -15,6 +15,7 @@ using NSwag.AspNetCore;
 using NSwag.SwaggerGeneration;
 using NSwag.SwaggerGeneration.Processors.Security;
 using Squidex.Areas.Api.Controllers.Contents.Generator;
+using Squidex.Areas.Api.Controllers.Rules.Models;
 using Squidex.Config;
 using Squidex.Infrastructure;
 using Squidex.Pipeline.Swagger;
@@ -102,6 +103,7 @@ namespace Squidex.Areas.Api.Config.Swagger
                 new PrimitiveTypeMapper(typeof(RefToken), s => s.Type = JsonObjectType.String)
             };
 
+            settings.GeneratorSettings.DocumentProcessors.Add(new RuleActionProcessor());
             settings.GeneratorSettings.DocumentProcessors.Add(new XmlTagProcessor());
 
             settings.GeneratorSettings.OperationProcessors.Add(new XmlTagProcessor());

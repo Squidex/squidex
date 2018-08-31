@@ -6,6 +6,8 @@
 // ==========================================================================
 
 using System.ComponentModel.DataAnnotations;
+using Newtonsoft.Json;
+using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 
 namespace Squidex.Areas.Api.Controllers.Rules.Models
@@ -22,16 +24,12 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
         /// The action properties.
         /// </summary>
         [Required]
-        public RuleActionDto Action { get; set; }
+        [JsonConverter(typeof(JsonInheritanceConverter), "actionType", typeof(RuleAction))]
+        public RuleAction Action { get; set; }
 
         public CreateRule ToCommand()
         {
-            var command = new CreateRule();
-
-            if (Action != null)
-            {
-                command.Action = Action.ToAction();
-            }
+            var command = new CreateRule { Action = Action };
 
             if (Trigger != null)
             {

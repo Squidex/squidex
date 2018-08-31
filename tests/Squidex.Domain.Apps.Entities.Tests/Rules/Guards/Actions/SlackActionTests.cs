@@ -7,9 +7,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using FluentAssertions;
-using Squidex.Domain.Apps.Core.Rules.Actions;
+using Squidex.Domain.Apps.Rules.Action.Slack;
 using Squidex.Infrastructure;
 using Xunit;
 
@@ -18,39 +17,53 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards.Actions
     public class SlackActionTests
     {
         [Fact]
-        public async Task Should_add_error_if_webhook_url_is_null()
+        public void Should_add_error_if_webhook_url_is_null()
         {
-            var action = new SlackAction { WebhookUrl = null };
+            var action = new SlackAction { WebhookUrl = null, Text = "text" };
 
-            var errors = await RuleActionValidator.ValidateAsync(action);
+            var errors = action.Validate();
 
             errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("Webhook URL is required and must be an absolute URL.", "WebhookUrl")
+                    new ValidationError("The Webhook Url field is required.", "WebhookUrl")
                 });
         }
 
         [Fact]
-        public async Task Should_add_error_if_webhook_url_is_relative()
+        public void Should_add_error_if_webhook_url_is_relative()
         {
-            var action = new SlackAction { WebhookUrl = new Uri("/invalid", UriKind.Relative) };
+            var action = new SlackAction { WebhookUrl = new Uri("/invalid", UriKind.Relative), Text = "text" };
 
-            var errors = await RuleActionValidator.ValidateAsync(action);
+            var errors = action.Validate();
 
             errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("Webhook URL is required and must be an absolute URL.", "WebhookUrl")
+                    new ValidationError("The Webhook Url field must be an absolute URL.", "WebhookUrl")
                 });
         }
 
         [Fact]
-        public async Task Should_not_add_error_if_webhook_url_is_absolute()
+        public void Should_add_error_if_text_is_null()
         {
-            var action = new SlackAction { WebhookUrl = new Uri("https://squidex.io", UriKind.Absolute) };
+            var action = new SlackAction { WebhookUrl = new Uri("https://squidex.io", UriKind.Absolute), Text = null };
 
-            var errors = await RuleActionValidator.ValidateAsync(action);
+            var errors = action.Validate();
+
+            errors.Should().BeEquivalentTo(
+                new List<ValidationError>
+                {
+                    new ValidationError("The Text field is required.", "Text")
+                });
+        }
+
+        [Fact]
+        public void Should_not_add_error_if_webhook_url_is_absolute()
+        {
+            var action = new SlackAction { WebhookUrl = new Uri("https://squidex.io", UriKind.Absolute), Text = "text" };
+
+            var errors = action.Validate();
 
             Assert.Empty(errors);
         }
