@@ -24,7 +24,7 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
         /// The action properties.
         /// </summary>
         [Required]
-        [JsonConverter(typeof(JsonInheritanceConverter), "actionType", typeof(RuleAction))]
+        [JsonConverter(typeof(RuleActionSerializer))]
         public RuleAction Action { get; set; }
 
         public CreateRule ToCommand()

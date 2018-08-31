@@ -22,7 +22,7 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
         /// <summary>
         /// The action properties.
         /// </summary>
-        [JsonConverter(typeof(JsonInheritanceConverter), "actionType", typeof(RuleAction))]
+        [JsonConverter(typeof(RuleActionSerializer))]
         public RuleAction Action { get; set; }
 
         public UpdateRule ToCommand(Guid id)
