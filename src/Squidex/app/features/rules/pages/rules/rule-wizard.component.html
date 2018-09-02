@@ -1,4 +1,4 @@
-<sqx-modal-dialog large="true" fullHeight="true" (closed)="complete()">
+<sqx-modal-dialog large="true" fullHeight="true" (closed)="complete()" [showFooter]="step === 2 || step === 4">
     <ng-container title>
         <ng-container *ngIf="mode === 'EditTrigger'">
             Edit Trigger
@@ -22,14 +22,9 @@
 
     <ng-container content>
         <div class="row no-gutters" *ngIf="step === 1">
-            <div *ngFor="let trigger of ruleTriggers | sqxKeys" class="col-12 col-md-6 col-lg-4">
-                <div class="rule-element rule-element-{{trigger}} " (click)="selectTriggerType(trigger)">
-                    <span class="rule-element-icon">
-                        <i class="icon-trigger-{{trigger}}"></i>
-                    </span>
-                    <span class="rule-element-text">
-                        {{ruleTriggers[trigger].name}}
-                    </span>
+            <div *ngFor="let triggerType of ruleTriggers | sqxKeys" class="col-12 col-md-6">
+                <div class="rule-element" (click)="selectTriggerType(triggerType)">
+                    <sqx-rule-element [type]="triggerType" [isSmall]="false" [element]="ruleTriggers[triggerType]"></sqx-rule-element>
                 </div>
             </div>
         </div>
@@ -57,14 +52,9 @@
         </ng-container>
     
         <div class="row no-gutters" *ngIf="step === 3">
-            <div *ngFor="let action of ruleActions | sqxKeys" class="col-12 col-md-6 col-lg-4">
-                <div class="rule-element rule-element-{{action}} " (click)="selectActionType(action)">
-                    <span class="rule-element-icon">
-                        <i class="icon-action-{{action}}"></i>
-                    </span>
-                    <span class="rule-element-text">
-                            {{ruleActions[action].name}}
-                    </span>
+            <div *ngFor="let actionType of ruleActions | sqxKeys" class="col-12 col-md-6">
+                <div class="rule-element" (click)="selectActionType(actionType)">
+                    <sqx-rule-element [type]="actionType" [isSmall]="false" [element]="ruleActions[actionType]"></sqx-rule-element>
                 </div>
             </div>
         </div>

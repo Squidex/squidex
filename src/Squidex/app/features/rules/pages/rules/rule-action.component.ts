@@ -39,11 +39,7 @@ export class RuleActionComponent implements OnChanges, OnInit {
     }
 
     public ngOnChanges() {
-        if (this.component) {
-            this.component.instance.action = this.action;
-            this.component.instance.actionForm = this.actionForm;
-            this.component.instance.actionFormSubmitted = this.actionFormSubmitted;
-        }
+        this.updateInnerValues();
     }
 
     public ngOnInit() {
@@ -52,8 +48,14 @@ export class RuleActionComponent implements OnChanges, OnInit {
 
         this.component = this.viewContainer.createComponent(factory);
 
-        this.component.instance.action = this.action;
-        this.component.instance.actionForm = this.actionForm;
-        this.component.instance.actionFormSubmitted = this.actionFormSubmitted;
+        this.updateInnerValues();
+    }
+
+    private updateInnerValues() {
+        if (this.component) {
+            this.component.instance.action = this.action;
+            this.component.instance.actionForm = this.actionForm;
+            this.component.instance.actionFormSubmitted = this.actionFormSubmitted;
+        }
     }
 }

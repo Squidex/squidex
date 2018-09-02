@@ -11,22 +11,16 @@ namespace Squidex.Extensions.Actions
 {
     public sealed class RuleElement
     {
-        public Type Type { get; }
+        public Type Type { get; set; }
 
-        public string Link { get; set; }
+        public string ReadMore { get; set; }
 
-        public string Display { get; }
+        public string IconImage { get; set; }
 
-        public string Description { get; }
+        public string IconColor { get; set; }
 
-        public RuleElement(Type type, string color, string display, string description, string link = null)
-        {
-            Type = type;
+        public string Display { get; set; }
 
-            Display = display;
-            Description = description;
-
-            Link = link;
-        }
+        public string Description { get; set; }
     }
 }

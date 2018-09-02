@@ -14,7 +14,6 @@ using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.HandleRules.Actions.Utils;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Http;
 
 #pragma warning disable SA1649 // File name must match first type name

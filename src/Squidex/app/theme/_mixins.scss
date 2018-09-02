@@ -177,8 +177,10 @@
  
 @mixin circle($size) {
     @include border-radius($size * .5);
-     width: $size;
-    height: $size;
+    min-height: $size;
+    max-height: $size;
+    min-width: $size;
+    max-width: $size;
 }
 
 @mixin wrap() {

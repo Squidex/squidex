@@ -37,6 +37,7 @@ export * from './angular/modals/onboarding-tooltip.component';
 export * from './angular/modals/tooltip.component';
 export * from './angular/modals/root-view.component';
 
+export * from './angular/pipes/colors.pipes';
 export * from './angular/pipes/date-time.pipes';
 export * from './angular/pipes/keys.pipe';
 export * from './angular/pipes/money.pipe';
@@ -46,12 +47,14 @@ export * from './angular/pipes/numbers.pipes';
 export * from './angular/routers/can-deactivate.guard';
 export * from './angular/routers/parent-link.directive';
 
+export * from './angular/hover-background.directive';
 export * from './angular/ignore-scrollbar.directive';
 export * from './angular/image-source.directive';
 export * from './angular/panel.component';
 export * from './angular/panel-container.directive';
 export * from './angular/pager.component';
 export * from './angular/popup-link.directive';
+export * from './angular/safe-html.pipe';
 export * from './angular/scroll-active.directive';
 export * from './angular/shortcut.component';
 export * from './angular/sorted.directive';

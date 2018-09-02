@@ -24,8 +24,18 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
         public string Display { get; set; }
 
         /// <summary>
+        /// The color for the icon.
+        /// </summary>
+        public string IconColor { get; set; }
+
+        /// <summary>
+        /// The image for the icon.
+        /// </summary>
+        public string IconImage { get; set; }
+
+        /// <summary>
         /// The optional link to the product that is integrated.
         /// </summary>
-        public string Link { get; set; }
+        public string ReadMore { get; set; }
     }
 }

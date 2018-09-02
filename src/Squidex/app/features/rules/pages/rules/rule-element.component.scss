@@ -1,0 +1,76 @@
+@import '_vars';
+@import '_mixins';
+
+.rule-element {
+    &-small {
+        & {
+            @include truncate;
+            @include transition(background-color .4s ease);
+            color: $color-dark-foreground;
+            cursor: pointer;
+            line-height: 2.8rem;
+            font-size: 1rem;
+            font-weight: normal;
+            padding-right: .8rem;
+        }
+
+        &-icon {
+            height: 3rem;
+            display: inline-block;
+            line-height: 3rem;
+            font-size: 1.2rem;
+            font-weight: normal;
+            margin: 0;
+            margin-right: .5rem;
+            padding: 0 .8rem;
+        }
+
+        .svg-icon {
+            display: inline-block;
+            min-width: 20px;
+            max-width: 20px;
+            min-height: 20px;
+            max-height: 20px;
+            fill: $color-dark-foreground;
+        }
+    }
+
+    &-large {
+        & {
+            cursor: pointer;
+            min-height: 100px;
+            max-height: 100px;
+        }
+
+        &-title {
+            font-weight: bold;
+        }
+
+        &-link {
+            font-size: .8rem;
+        }
+
+        &-text {
+            font-size: .8rem;
+            margin-top: .25rem;
+            margin-bottom: .25rem;
+        }
+
+        &-icon {
+            display: inline-block;
+            margin-right: .5rem;
+            position: relative;
+            padding: 1rem;
+            line-height: 1px;
+        }
+
+        .svg-icon {
+            display: inline-block;
+            min-width: 30px;
+            max-width: 30px;
+            min-height: 30px;
+            max-height: 30px;
+            fill: $color-dark-foreground;
+        }
+    }
+}

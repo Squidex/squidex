@@ -13,7 +13,7 @@
                 </button>
             </div>
 
-            <div class="modal-tabs {{tabsClass}} clearfix" #tabsElement [hidden]="!showTabs">
+            <div class="modal-tabs {{tabsClass}} clearfix" #tabsElement [hidden]="!showTabs || !hasTabs">
                 <ng-content select=[tabs]></ng-content>
             </div>
 
@@ -21,7 +21,7 @@
                 <ng-content select=[content]></ng-content>
             </div>
 
-            <div class="modal-footer" [hidden]="!showFooter">
+            <div class="modal-footer" [hidden]="!showFooter || !hasFooter">
                 <div class="clearfix" #footerElement>
                     <ng-content select=[footer]></ng-content>
                 </div>

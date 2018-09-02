@@ -17,7 +17,6 @@ using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Entities.Rules.Repositories;
 using Squidex.Domain.Apps.Events.Contents;
-using Squidex.Domain.Apps.Rules.Action.Webhook;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Xunit;

@@ -26,6 +26,12 @@ export class ModalDialogComponent implements AfterViewInit {
     public showHeader = true;
 
     @Input()
+    public showFooter = true;
+
+    @Input()
+    public showTabs = true;
+
+    @Input()
     public large = false;
 
     @Input()
@@ -46,8 +52,8 @@ export class ModalDialogComponent implements AfterViewInit {
     @ViewChild('footerElement')
     public footerElement: ElementRef;
 
-    public showTabs = false;
-    public showFooter = false;
+    public hasTabs = false;
+    public hasFooter = false;
 
     constructor(
         private readonly changeDetector: ChangeDetectorRef
@@ -55,8 +61,8 @@ export class ModalDialogComponent implements AfterViewInit {
     }
 
     public ngAfterViewInit() {
-        this.showTabs = this.tabsElement.nativeElement.children.length > 0;
-        this.showFooter = this.footerElement.nativeElement.children.length > 0;
+        this.hasTabs = this.tabsElement.nativeElement.children.length > 0;
+        this.hasFooter = this.footerElement.nativeElement.children.length > 0;
 
         this.changeDetector.detectChanges();
     }

@@ -74,20 +74,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [ApiCosts(0)]
         public IActionResult GetTriggers()
         {
-            var response = new Dictionary<string, RuleElementDto>
-            {
-                ["ContentChanged"] = new RuleElementDto
-                {
-                    Display = "Content changed",
-                    Description = "Content changed like created, updated, published, unpublished..."
-                },
-
-                ["AssetChanged"] = new RuleElementDto
-                {
-                    Display = "Asset changed",
-                    Description = "Asset changed like created, updated, renamed..."
-                }
-            };
+            var response = RuleElementRegistry.Triggers.ToDictionary(x => x.Key, x => SimpleMapper.Map(x.Value, new RuleElementDto()));
 
             return Ok(response);
         }

@@ -4,3 +4,15 @@
 .rule-element {
     margin: .25rem;
 }
+
+:host /deep/ {
+    .wizard-title {
+        background: $color-border;
+        margin: -1rem;
+        margin-bottom: 1rem;
+        font-weight: 400;
+        font-size: 1.05rem;
+        padding: 1rem;
+    }
+}
+

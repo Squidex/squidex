@@ -41,7 +41,6 @@ export class RulesPageComponent implements OnInit {
     }
 
     public ngOnInit() {
-
         this.rulesState.load().pipe(onErrorResumeNext()).subscribe();
 
         this.rulesService.getActions()

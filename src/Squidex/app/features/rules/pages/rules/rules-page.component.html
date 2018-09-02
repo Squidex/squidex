@@ -36,26 +36,16 @@
                                 <h3>If</h3>
                             </td>
                             <td class="cell-auto">
-                                <span class="rule-element rule-element-{{rule.triggerType}}" (click)="editTrigger(rule)">
-                                    <span class="rule-element-icon">
-                                        <i class="icon-trigger-{{rule.triggerType}}"></i>
-                                    </span>
-                                    <span class="rule-element-text">
-                                        {{ruleTriggers[rule.triggerType].display}}
-                                    </span>
+                                <span (click)="editTrigger(rule)">
+                                    <sqx-rule-element [type]="rule.triggerType" [element]="ruleTriggers[rule.triggerType]"></sqx-rule-element>
                                 </span>
                             </td>
                             <td class="cell-separator">
                                 <h3>then</h3>
                             </td>
                             <td class="cell-auto">
-                                <span class="rule-element rule-element-{{rule.actionType}}" (click)="editAction(rule)">
-                                    <span class="rule-element-icon">
-                                        <i class="icon-action-{{rule.actionType}}"></i>
-                                    </span>
-                                    <span class="rule-element-text">
-                                        {{ruleActions[rule.actionType].display}}
-                                    </span>
+                                <span (click)="editAction(rule)">
+                                    <sqx-rule-element [type]="rule.actionType" [element]="ruleActions[rule.actionType]"></sqx-rule-element>
                                 </span>
                             </td>
                             <td class="cell-actions">

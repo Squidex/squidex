@@ -25,7 +25,9 @@ export class RuleElementDto {
     constructor(
         public readonly display: string,
         public readonly description: string,
-        public readonly link: string
+        public readonly iconColor: string,
+        public readonly iconImage: string,
+        public readonly readMore: string
     ) {
     }
 }
@@ -111,12 +113,10 @@ export class RulesService {
 
                 const result: { [name: string]: RuleElementDto } = {};
 
-                for (let key in items) {
-                    if (items.hasOwnProperty(key)) {
-                        const value = items[key];
+                for (let key of Object.keys(items).sort()) {
+                    const value = items[key];
 
-                        result[key] = new RuleElementDto(value.display, value.description, value.link);
-                    }
+                    result[key] = new RuleElementDto(value.display, value.description, value.iconColor, value.iconImage, value.readMore);
                 }
 
                 return result;
@@ -133,12 +133,10 @@ export class RulesService {
 
                 const result: { [name: string]: RuleElementDto } = {};
 
-                for (let key in items) {
-                    if (items.hasOwnProperty(key)) {
-                        const value = items[key];
+                for (let key of Object.keys(items).sort()) {
+                    const value = items[key];
 
-                        result[key] = new RuleElementDto(value.display, value.description, value.link);
-                    }
+                    result[key] = new RuleElementDto(value.display, value.description, value.iconColor, value.iconImage, value.readMore);
                 }
 
                 return result;
