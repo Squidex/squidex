@@ -103,7 +103,9 @@ export class RulesService {
     }
 
     public getActions(): Observable<{ [name: string]: RuleElementDto }> {
-        return HTTP.getVersioned<any>(this.http, 'rules/action').pipe(
+        const url = this.apiUrl.buildUrl('api/rules/actions');
+
+        return HTTP.getVersioned<any>(this.http, url).pipe(
             map(response => {
                 const items: { [name: string]: any } = response.payload.body;
 
@@ -123,7 +125,9 @@ export class RulesService {
     }
 
     public getTriggers(): Observable<{ [name: string]: RuleElementDto }> {
-        return HTTP.getVersioned<any>(this.http, 'rules/triggers').pipe(
+        const url = this.apiUrl.buildUrl('api/rules/triggers');
+
+        return HTTP.getVersioned<any>(this.http, url).pipe(
             map(response => {
                 const items: { [name: string]: any } = response.payload.body;
 

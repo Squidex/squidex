@@ -12,7 +12,9 @@ using Squidex.Domain.Apps.Core.Rules;
 namespace Squidex.Domain.Apps.Rules.Action.Algolia
 {
     [RuleActionHandler(typeof(AlgoliaActionHandler))]
-    [RuleAction(Description = "")]
+    [RuleAction(Link = "https://www.algolia.com/",
+        Display = "Populate Algolia index",
+        Description = "Populate and synchronize indices in Algolia for full text search.")]
     public sealed class AlgoliaAction : RuleAction
     {
         [Required]

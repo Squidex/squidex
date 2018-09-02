@@ -12,7 +12,9 @@ using Squidex.Domain.Apps.Core.Rules;
 namespace Squidex.Domain.Apps.Rules.Action.Twitter
 {
     [RuleActionHandler(typeof(TweetActionHandler))]
-    [RuleAction(Description = "")]
+    [RuleAction(Link = "https://twitter.com",
+        Display = "Tweet",
+        Description = "Create a status update at Tweet to a your user account.")]
     public sealed class TweetAction : RuleAction
     {
         [Required]

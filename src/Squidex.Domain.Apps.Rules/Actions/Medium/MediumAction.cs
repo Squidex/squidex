@@ -12,7 +12,9 @@ using Squidex.Domain.Apps.Core.Rules;
 namespace Squidex.Domain.Apps.Rules.Action.Medium
 {
     [RuleActionHandler(typeof(MediumActionHandler))]
-    [RuleAction(Description = "")]
+    [RuleAction(Link = "https://medium.com/",
+        Display = "Post to Medium",
+        Description = "Create a new story or post at medium.")]
     public sealed class MediumAction : RuleAction
     {
         [Required]

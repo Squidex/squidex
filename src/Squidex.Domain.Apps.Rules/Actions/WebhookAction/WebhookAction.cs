@@ -14,7 +14,9 @@ using Squidex.Infrastructure;
 namespace Squidex.Domain.Apps.Rules.Action.Webhook
 {
     [RuleActionHandler(typeof(WebhookActionHandler))]
-    [RuleAction(Description = "")]
+    [RuleAction(
+        Display = "Send Webhook",
+        Description = "Send events like ContentPublished to your webhook.")]
     public sealed class WebhookAction : RuleAction
     {
         [AbsoluteUrl]

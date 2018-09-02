@@ -14,8 +14,6 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
     templateUrl: './slack-action.component.html'
 })
 export class SlackActionComponent implements OnInit {
-    public static key = 'Slack';
-
     @Input()
     public action: any;
 

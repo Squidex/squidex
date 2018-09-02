@@ -14,7 +14,9 @@ using Squidex.Infrastructure;
 namespace Squidex.Domain.Apps.Rules.Action.ElasticSearch
 {
     [RuleActionHandler(typeof(ElasticSearchActionHandler))]
-    [RuleAction(Description = "")]
+    [RuleAction(Link = "https://www.elastic.co/",
+        Display = "Populate ElasticSearch index",
+        Description = "Populate and synchronize indices in ElasticSearch for full text search.")]
     public sealed class ElasticSearchAction : RuleAction
     {
         [AbsoluteUrl]

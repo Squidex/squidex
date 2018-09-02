@@ -14,8 +14,6 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
     templateUrl: './fastly-action.component.html'
 })
 export class FastlyActionComponent implements OnInit {
-    public static key = 'Fastly';
-
     @Input()
     public action: any;
 

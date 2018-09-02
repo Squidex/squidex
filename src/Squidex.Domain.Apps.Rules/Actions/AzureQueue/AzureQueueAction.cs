@@ -15,7 +15,9 @@ using Squidex.Infrastructure;
 namespace Squidex.Domain.Apps.Rules.Action.AzureQueue
 {
     [RuleActionHandler(typeof(AzureQueueActionHandler))]
-    [RuleAction(Description = "")]
+    [RuleAction(Link = "https://azure.microsoft.com/en-us/services/storage/queues/",
+        Display = "Send to Azure Queue",
+        Description = "Send an event to azure queue storage.")]
     public sealed class AzureQueueAction : RuleAction
     {
         [Required]

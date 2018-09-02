@@ -69,7 +69,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         /// 200 => Rule triggers returned.
         /// </returns>
         [HttpGet]
-        [Route("rules/actions/")]
+        [Route("rules/triggers/")]
         [ProducesResponseType(typeof(Dictionary<string, RuleElementDto>), 200)]
         [ApiCosts(0)]
         public IActionResult GetTriggers()

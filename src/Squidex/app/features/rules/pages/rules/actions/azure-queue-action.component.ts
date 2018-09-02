@@ -16,8 +16,6 @@ import { ValidatorsEx } from '@app/shared';
     templateUrl: './azure-queue-action.component.html'
 })
 export class AzureQueueActionComponent implements OnInit {
-    public static key = 'AzureQueue';
-
     @Input()
     public action: any;
 

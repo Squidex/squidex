@@ -8,7 +8,7 @@
 using System;
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Core.HandleRules
+namespace Squidex.Domain.Apps.Rules.Actions
 {
     [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
     public sealed class RuleActionHandlerAttribute : Attribute

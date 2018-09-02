@@ -21,16 +21,10 @@ namespace Squidex.Domain.Apps.Rules.Actions
         private const string Suffix = "Action";
         private static readonly HashSet<Type> ActionHandlerTypes = new HashSet<Type>();
         private static readonly Dictionary<string, RuleElement> ActionTypes = new Dictionary<string, RuleElement>();
-        private static readonly Dictionary<string, RuleElement> TriggerTypes = new Dictionary<string, RuleElement>();
 
         public static IReadOnlyDictionary<string, RuleElement> Actions
         {
             get { return ActionTypes; }
-        }
-
-        public static IReadOnlyDictionary<string, RuleElement> Triggers
-        {
-            get { return TriggerTypes; }
         }
 
         public static IReadOnlyCollection<Type> ActionHandlers
@@ -40,18 +34,6 @@ namespace Squidex.Domain.Apps.Rules.Actions
 
         static RuleElementRegistry()
         {
-            TriggerTypes["ContentChanged"] =
-                new RuleElement(
-                    typeof(ContentChangedTrigger),
-                    "Content changed",
-                    "Content changed like created, updated, published, unpublished...");
-
-            TriggerTypes["AssetChanged"] =
-                new RuleElement(
-                    typeof(AssetChangedTrigger),
-                    "Asset changed",
-                    "Asset changed like created, updated, renamed...");
-
             var actionTypes =
                 typeof(RuleElementRegistry).Assembly
                     .GetTypes()

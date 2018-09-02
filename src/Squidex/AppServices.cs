@@ -23,6 +23,7 @@ namespace Squidex
     {
         public static void AddAppServices(this IServiceCollection services, IConfiguration config)
         {
+            services.AddHttpClient();
             services.AddLogging();
             services.AddMemoryCache();
             services.AddOptions();

@@ -12,7 +12,9 @@ using Squidex.Domain.Apps.Core.Rules;
 namespace Squidex.Domain.Apps.Rules.Action.Fastly
 {
     [RuleActionHandler(typeof(FastlyActionHandler))]
-    [RuleAction(Description = "")]
+    [RuleAction(Link = "https://www.fastly.com/",
+        Display = "Purge fastly cache",
+        Description = "Remove entries from the fastly CDN cache.")]
     public sealed class FastlyAction : RuleAction
     {
         [Required]

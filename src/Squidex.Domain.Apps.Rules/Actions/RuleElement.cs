@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Rules.Actions
 
         public string Description { get; }
 
-        public RuleElement(Type type, string display, string description, string link = null)
+        public RuleElement(Type type, string color, string display, string description, string link = null)
         {
             Type = type;
 

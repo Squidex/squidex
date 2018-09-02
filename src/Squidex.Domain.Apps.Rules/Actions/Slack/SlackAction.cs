@@ -14,7 +14,9 @@ using Squidex.Infrastructure;
 namespace Squidex.Domain.Apps.Rules.Action.Slack
 {
     [RuleActionHandler(typeof(SlackActionHandler))]
-    [RuleAction(Description = "")]
+    [RuleAction(Link = "https://slack.com",
+        Display = "Send to Slack",
+        Description = "Create a status update at slack to a channel you define.")]
     public sealed class SlackAction : RuleAction
     {
         [AbsoluteUrl]
