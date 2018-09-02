@@ -11,7 +11,7 @@ using NJsonSchema;
 using NSwag.SwaggerGeneration.Processors;
 using NSwag.SwaggerGeneration.Processors.Contexts;
 using Squidex.Domain.Apps.Core.Rules;
-using Squidex.Domain.Apps.Rules.Actions;
+using Squidex.Extensions.Actions;
 
 namespace Squidex.Areas.Api.Controllers.Rules.Models
 {

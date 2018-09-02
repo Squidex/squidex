@@ -16,7 +16,7 @@ using Squidex.Areas.Api.Controllers.Rules.Models;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.Rules.Repositories;
-using Squidex.Domain.Apps.Rules.Actions;
+using Squidex.Extensions.Actions;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;

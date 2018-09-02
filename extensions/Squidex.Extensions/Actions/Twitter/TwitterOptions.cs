@@ -5,17 +5,17 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Linq;
-using Squidex.Domain.Apps.Core.Rules;
-using Squidex.Extensions.Actions;
-
-namespace Squidex.Areas.Api.Controllers.Rules.Models
+namespace Squidex.Extensions.Actions.Twitter
 {
-    public sealed class RuleActionSerializer : JsonInheritanceConverter
+    public sealed class TwitterOptions
     {
-        public RuleActionSerializer()
-            : base("actionType", typeof(RuleAction), RuleElementRegistry.Actions.ToDictionary(x => x.Key, x => x.Value.Type))
+        public string ClientId { get; set; }
+
+        public string ClientSecret { get; set; }
+
+        public bool IsConfigured()
         {
+            return !string.IsNullOrWhiteSpace(ClientId) && !string.IsNullOrWhiteSpace(ClientSecret);
         }
     }
 }

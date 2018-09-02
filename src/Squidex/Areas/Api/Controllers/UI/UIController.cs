@@ -13,7 +13,7 @@ using Orleans;
 using Squidex.Areas.Api.Controllers.UI.Models;
 using Squidex.Config;
 using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Domain.Apps.Rules.Action.Twitter;
+using Squidex.Extensions.Actions.Twitter;
 using Squidex.Infrastructure.Commands;
 using Squidex.Pipeline;
 

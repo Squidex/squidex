@@ -14,7 +14,7 @@ using Squidex.Config;
 using Squidex.Config.Authentication;
 using Squidex.Config.Domain;
 using Squidex.Config.Web;
-using Squidex.Domain.Apps.Rules.Action.Twitter;
+using Squidex.Extensions.Actions.Twitter;
 using Squidex.Infrastructure.Commands;
 
 namespace Squidex

@@ -9,7 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.HandleRules.Triggers;
 using Squidex.Domain.Apps.Entities.Rules;
-using Squidex.Domain.Apps.Rules.Actions;
+using Squidex.Extensions.Actions;
 using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Config.Domain

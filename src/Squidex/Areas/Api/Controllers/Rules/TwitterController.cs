@@ -8,7 +8,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using Squidex.Domain.Apps.Rules.Action.Twitter;
+using Squidex.Extensions.Actions.Twitter;
 using static CoreTweet.OAuth;
 
 namespace Squidex.Areas.Api.Controllers.Rules
