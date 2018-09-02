@@ -6,10 +6,13 @@
 // ==========================================================================
 
 using System.ComponentModel.DataAnnotations;
+using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
 
 namespace Squidex.Domain.Apps.Rules.Action.Algolia
 {
+    [RuleActionHandler(typeof(AlgoliaActionHandler))]
+    [RuleAction(Description = "")]
     public sealed class AlgoliaAction : RuleAction
     {
         [Required]

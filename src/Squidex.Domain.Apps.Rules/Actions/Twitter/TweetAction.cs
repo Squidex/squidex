@@ -6,10 +6,13 @@
 // ==========================================================================
 
 using System.ComponentModel.DataAnnotations;
+using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
 
 namespace Squidex.Domain.Apps.Rules.Action.Twitter
 {
+    [RuleActionHandler(typeof(TweetActionHandler))]
+    [RuleAction(Description = "")]
     public sealed class TweetAction : RuleAction
     {
         [Required]

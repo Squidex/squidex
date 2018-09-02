@@ -14,6 +14,8 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
     templateUrl: './elastic-search-action.component.html'
 })
 export class ElasticSearchActionComponent implements OnInit {
+    public static key = 'ElasticSearch';
+
     @Input()
     public action: any;
 

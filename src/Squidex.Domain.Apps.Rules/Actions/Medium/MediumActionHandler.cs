@@ -32,38 +32,22 @@ namespace Squidex.Domain.Apps.Rules.Action.Medium
     {
         private const string Description = "Post to medium";
 
-        private readonly RuleEventFormatter formatter;
-        private readonly ClientPool<string, HttpClient> clients;
+        private readonly IHttpClientFactory httpClientFactory;
 
-        public MediumActionHandler(RuleEventFormatter formatter)
+        public MediumActionHandler(RuleEventFormatter formatter, IHttpClientFactory httpClientFactory)
+            : base(formatter)
         {
-            Guard.NotNull(formatter, nameof(formatter));
-
-            this.formatter = formatter;
-
-            clients = new ClientPool<string, HttpClient>(key =>
-            {
-                var client = new HttpClient
-                {
-                    Timeout = TimeSpan.FromSeconds(4)
-                };
-
-                client.DefaultRequestHeaders.Add("Accept", "application/json");
-                client.DefaultRequestHeaders.Add("Accept-Charset", "utf-8");
-                client.DefaultRequestHeaders.Add("User-Agent", "Squidex Headless CMS");
-
-                return client;
-            });
+            this.httpClientFactory = httpClientFactory;
         }
 
         protected override (string Description, MediumJob Data) CreateJob(EnrichedEvent @event, MediumAction action)
         {
             var requestBody =
                 new JObject(
-                    new JProperty("title", formatter.Format(action.Title, @event)),
+                    new JProperty("title", Format(action.Title, @event)),
                     new JProperty("contentFormat", action.IsHtml ? "html" : "markdown"),
-                    new JProperty("content", formatter.Format(action.Content, @event)),
-                    new JProperty("canonicalUrl", formatter.Format(action.CanonicalUrl, @event)),
+                    new JProperty("content", Format(action.Content, @event)),
+                    new JProperty("canonicalUrl", Format(action.CanonicalUrl, @event)),
                     new JProperty("tags", ParseTags(@event, action)));
 
             var ruleJob = new MediumJob { AccessToken = action.AccessToken, RequestBody = requestBody.ToString(Formatting.Indented) };
@@ -81,7 +65,7 @@ namespace Squidex.Domain.Apps.Rules.Action.Medium
             string[] tags;
             try
             {
-                var jsonTags = formatter.Format(action.Tags, @event);
+                var jsonTags = Format(action.Tags, @event);
 
                 tags = JsonConvert.DeserializeObject<string[]>(jsonTags);
             }
@@ -95,30 +79,36 @@ namespace Squidex.Domain.Apps.Rules.Action.Medium
 
         protected override async Task<(string Dump, Exception Exception)> ExecuteJobAsync(MediumJob job)
         {
-            var httpClient = clients.GetClient(string.Empty);
-
-            string id;
-
-            HttpResponseMessage response = null;
-
-            var meRequest = BuildMeRequest(job);
-            try
+            using (var httpClient = httpClientFactory.CreateClient())
             {
-                response = await httpClient.SendAsync(meRequest);
+                httpClient.Timeout = TimeSpan.FromSeconds(4);
+                httpClient.DefaultRequestHeaders.Add("Accept", "application/json");
+                httpClient.DefaultRequestHeaders.Add("Accept-Charset", "utf-8");
+                httpClient.DefaultRequestHeaders.Add("User-Agent", "Squidex Headless CMS");
 
-                var responseString = await response.Content.ReadAsStringAsync();
-                var responseJson = JToken.Parse(responseString);
+                string id;
 
-                id = responseJson["data"]["id"].ToString();
+                HttpResponseMessage response = null;
+
+                var meRequest = BuildMeRequest(job);
+                try
+                {
+                    response = await httpClient.SendAsync(meRequest);
+
+                    var responseString = await response.Content.ReadAsStringAsync();
+                    var responseJson = JToken.Parse(responseString);
+
+                    id = responseJson["data"]["id"].ToString();
+                }
+                catch (Exception ex)
+                {
+                    var requestDump = DumpFormatter.BuildDump(meRequest, response, ex.ToString());
+
+                    return (requestDump, ex);
+                }
+
+                return await httpClient.OneWayRequestAsync(BuildPostRequest(job, id), job.RequestBody);
             }
-            catch (Exception ex)
-            {
-                var requestDump = DumpFormatter.BuildDump(meRequest, response, ex.ToString());
-
-                return (requestDump, ex);
-            }
-
-            return await httpClient.OneWayRequestAsync(BuildPostRequest(job, id), job.RequestBody);
         }
 
         private static HttpRequestMessage BuildPostRequest(MediumJob job, string id)

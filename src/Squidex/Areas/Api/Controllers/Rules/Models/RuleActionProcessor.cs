@@ -36,9 +36,9 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
                     IsRequired = true
                 };
 
-                foreach (var derived in RuleActionRegistry.Actions)
+                foreach (var derived in RuleElementRegistry.Actions)
                 {
-                    var derivedSchema = await context.SchemaGenerator.GenerateAsync(derived.Value, context.SchemaResolver);
+                    var derivedSchema = await context.SchemaGenerator.GenerateAsync(derived.Value.Type, context.SchemaResolver);
 
                     var oldName = context.Document.Definitions.FirstOrDefault(x => x.Value == derivedSchema).Key;
 

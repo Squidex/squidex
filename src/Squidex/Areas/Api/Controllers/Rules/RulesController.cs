@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -15,7 +16,9 @@ using Squidex.Areas.Api.Controllers.Rules.Models;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.Rules.Repositories;
+using Squidex.Domain.Apps.Rules.Actions;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
 
 namespace Squidex.Areas.Api.Controllers.Rules
@@ -40,6 +43,53 @@ namespace Squidex.Areas.Api.Controllers.Rules
             this.appProvider = appProvider;
 
             this.ruleEventsRepository = ruleEventsRepository;
+        }
+
+        /// <summary>
+        /// Get the supported rule actions.
+        /// </summary>
+        /// <returns>
+        /// 200 => Rule actions returned.
+        /// </returns>
+        [HttpGet]
+        [Route("rules/actions/")]
+        [ProducesResponseType(typeof(Dictionary<string, RuleElementDto>), 200)]
+        [ApiCosts(0)]
+        public IActionResult GetActions()
+        {
+            var response = RuleElementRegistry.Actions.ToDictionary(x => x.Key, x => SimpleMapper.Map(x.Value, new RuleElementDto()));
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Get the supported rule triggers.
+        /// </summary>
+        /// <returns>
+        /// 200 => Rule triggers returned.
+        /// </returns>
+        [HttpGet]
+        [Route("rules/actions/")]
+        [ProducesResponseType(typeof(Dictionary<string, RuleElementDto>), 200)]
+        [ApiCosts(0)]
+        public IActionResult GetTriggers()
+        {
+            var response = new Dictionary<string, RuleElementDto>
+            {
+                ["ContentChanged"] = new RuleElementDto
+                {
+                    Display = "Content changed",
+                    Description = "Content changed like created, updated, published, unpublished..."
+                },
+
+                ["AssetChanged"] = new RuleElementDto
+                {
+                    Display = "Asset changed",
+                    Description = "Asset changed like created, updated, renamed..."
+                }
+            };
+
+            return Ok(response);
         }
 
         /// <summary>

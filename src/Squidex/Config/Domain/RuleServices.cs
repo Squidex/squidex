@@ -36,7 +36,7 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<RuleService>()
                 .AsSelf();
 
-            foreach (var actionHandler in RuleActionRegistry.ActionHandlers)
+            foreach (var actionHandler in RuleElementRegistry.ActionHandlers)
             {
                 services.AddSingleton(typeof(IRuleActionHandler), actionHandler);
             }

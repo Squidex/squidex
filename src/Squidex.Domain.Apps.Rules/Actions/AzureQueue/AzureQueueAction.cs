@@ -8,11 +8,14 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
+using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Rules.Action.AzureQueue
 {
+    [RuleActionHandler(typeof(AzureQueueActionHandler))]
+    [RuleAction(Description = "")]
     public sealed class AzureQueueAction : RuleAction
     {
         [Required]

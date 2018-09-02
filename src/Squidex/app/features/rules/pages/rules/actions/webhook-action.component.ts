@@ -14,6 +14,8 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
     templateUrl: './webhook-action.component.html'
 })
 export class WebhookActionComponent implements OnInit {
+    public static key = 'Webhook';
+
     @Input()
     public action: any;
 

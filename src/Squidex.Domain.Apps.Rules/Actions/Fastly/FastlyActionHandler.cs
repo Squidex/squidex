@@ -11,35 +11,22 @@ using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.HandleRules.Actions.Utils;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
-
-#pragma warning disable SA1649 // File name must match first type name
+using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Rules.Action.Fastly
 {
-    public sealed class FastlyJob
-    {
-        public string FastlyApiKey { get; set; }
-
-        public string FastlyServiceID { get; set; }
-
-        public string Key { get; set; }
-    }
-
     public sealed class FastlyActionHandler : RuleActionHandler<FastlyAction, FastlyJob>
     {
         private const string Description = "Purge key in fastly";
 
-        private readonly ClientPool<string, HttpClient> clients;
+        private readonly IHttpClientFactory httpClientFactory;
 
-        public FastlyActionHandler()
+        public FastlyActionHandler(RuleEventFormatter formatter, IHttpClientFactory httpClientFactory)
+            : base(formatter)
         {
-            clients = new ClientPool<string, HttpClient>(key =>
-            {
-                return new HttpClient
-                {
-                    Timeout = TimeSpan.FromSeconds(2)
-                };
-            });
+            Guard.NotNull(httpClientFactory, nameof(httpClientFactory));
+
+            this.httpClientFactory = httpClientFactory;
         }
 
         protected override (string Description, FastlyJob Data) CreateJob(EnrichedEvent @event, FastlyAction action)
@@ -56,19 +43,26 @@ namespace Squidex.Domain.Apps.Rules.Action.Fastly
 
         protected override async Task<(string Dump, Exception Exception)> ExecuteJobAsync(FastlyJob job)
         {
-            var httpClient = clients.GetClient(string.Empty);
+            using (var httpClient = httpClientFactory.CreateClient())
+            {
+                httpClient.Timeout = TimeSpan.FromSeconds(2);
 
-            return await httpClient.OneWayRequestAsync(BuildRequest(job), null);
+                var requestUrl = $"https://api.fastly.com/service/{job.FastlyServiceID}/purge/{job.Key}";
+                var request = new HttpRequestMessage(HttpMethod.Post, requestUrl);
+
+                request.Headers.Add("Fastly-Key", job.FastlyApiKey);
+
+                return await httpClient.OneWayRequestAsync(request, null);
+            }
         }
+    }
 
-        private static HttpRequestMessage BuildRequest(FastlyJob job)
-        {
-            var requestUrl = $"https://api.fastly.com/service/{job.FastlyServiceID}/purge/{job.Key}";
-            var request = new HttpRequestMessage(HttpMethod.Post, requestUrl);
+    public sealed class FastlyJob
+    {
+        public string FastlyApiKey { get; set; }
 
-            request.Headers.Add("Fastly-Key", job.FastlyApiKey);
+        public string FastlyServiceID { get; set; }
 
-            return request;
-        }
+        public string Key { get; set; }
     }
 }

@@ -11,10 +11,10 @@ import { onErrorResumeNext } from 'rxjs/operators';
 import {
     AppsState,
     DialogModel,
-    ruleActions,
     RuleDto,
+    RuleElementDto,
+    RulesService,
     RulesState,
-    ruleTriggers,
     SchemasState
 } from '@app/shared';
 
@@ -24,25 +24,37 @@ import {
     templateUrl: './rules-page.component.html'
 })
 export class RulesPageComponent implements OnInit {
-    public ruleActions = ruleActions;
-    public ruleTriggers = ruleTriggers;
-
     public addRuleDialog = new DialogModel();
 
     public wizardMode = 'Wizard';
     public wizardRule: RuleDto | null;
 
+    public ruleActions: { [name: string]: RuleElementDto };
+    public ruleTriggers: { [name: string]: RuleElementDto };
+
     constructor(
         public readonly appsState: AppsState,
         public readonly rulesState: RulesState,
+        public readonly rulesService: RulesService,
         public readonly schemasState: SchemasState
     ) {
     }
 
     public ngOnInit() {
-        this.schemasState.load().pipe(onErrorResumeNext()).subscribe();
 
         this.rulesState.load().pipe(onErrorResumeNext()).subscribe();
+
+        this.rulesService.getActions()
+            .subscribe(actions => {
+                this.ruleActions = actions;
+            });
+
+        this.rulesService.getTriggers()
+            .subscribe(triggers => {
+                this.ruleTriggers = triggers;
+            });
+
+        this.schemasState.load().pipe(onErrorResumeNext()).subscribe();
     }
 
     public reload() {

@@ -17,6 +17,8 @@ import { DialogService } from '@app/shared';
     templateUrl: './tweet-action.component.html'
 })
 export class TweetActionComponent implements OnInit {
+    public static key = 'Tweet';
+
     private request: any;
 
     @Input()

@@ -12,10 +12,9 @@ import {
     CreateRuleDto,
     Form,
     ImmutableArray,
-    ruleActions,
     RuleDto,
+    RuleElementDto,
     RulesState,
-    ruleTriggers,
     SchemaDto
 } from '@app/shared';
 
@@ -29,9 +28,6 @@ export const MODE_EDIT_ACTION  = 'EditAction';
     templateUrl: './rule-wizard.component.html'
 })
 export class RuleWizardComponent implements OnInit {
-    public ruleActions = ruleActions;
-    public ruleTriggers = ruleTriggers;
-
     public actionForm = new Form<FormGroup>(new FormGroup({}));
     public actionType: string;
     public action: any = {};
@@ -44,6 +40,12 @@ export class RuleWizardComponent implements OnInit {
 
     @Output()
     public completed = new EventEmitter();
+
+    @Input()
+    public ruleActions: { [name: string]: RuleElementDto };
+
+    @Input()
+    public ruleTriggers: { [name: string]: RuleElementDto };
 
     @Input()
     public schemas: ImmutableArray<SchemaDto>;

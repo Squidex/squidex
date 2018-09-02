@@ -39,7 +39,7 @@ namespace Squidex.Config.Domain
 
         private static void ConfigureJson(JsonSerializerSettings settings, TypeNameHandling typeNameHandling)
         {
-            RuleActionRegistry.RegisterTypes(TypeNameRegistry);
+            RuleElementRegistry.RegisterTypes(TypeNameRegistry);
 
             settings.SerializationBinder = new TypeNameSerializationBinder(TypeNameRegistry);
 

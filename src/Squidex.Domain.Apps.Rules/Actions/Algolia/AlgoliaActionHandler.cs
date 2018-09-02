@@ -12,38 +12,18 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
-using Squidex.Infrastructure;
-
-#pragma warning disable SA1649 // File name must match first type name
 
 namespace Squidex.Domain.Apps.Rules.Action.Algolia
 {
-    public sealed class AlgoliaJob
-    {
-        public string AppId { get; set; }
-
-        public string ApiKey { get; set; }
-
-        public string ContentId { get; set; }
-
-        public string IndexName { get; set; }
-
-        public JObject Content { get; set; }
-    }
-
     public sealed class AlgoliaActionHandler : RuleActionHandler<AlgoliaAction, AlgoliaJob>
     {
         private const string DescriptionIgnore = "Ignore";
 
         private readonly ClientPool<(string AppId, string ApiKey, string IndexName), Index> clients;
-        private readonly RuleEventFormatter formatter;
 
         public AlgoliaActionHandler(RuleEventFormatter formatter)
+            : base(formatter)
         {
-            Guard.NotNull(formatter, nameof(formatter));
-
-            this.formatter = formatter;
-
             clients = new ClientPool<(string AppId, string ApiKey, string IndexName), Index>(key =>
             {
                 var client = new AlgoliaClient(key.AppId, key.ApiKey);
@@ -64,7 +44,7 @@ namespace Squidex.Domain.Apps.Rules.Action.Algolia
                     AppId = action.AppId,
                     ApiKey = action.ApiKey,
                     ContentId = contentId,
-                    IndexName = formatter.Format(action.IndexName, @event)
+                    IndexName = Format(action.IndexName, @event)
                 };
 
                 if (contentEvent.Type == EnrichedContentEventType.Deleted ||
@@ -76,7 +56,7 @@ namespace Squidex.Domain.Apps.Rules.Action.Algolia
                 {
                     ruleDescription = $"Add entry to Algolia index: {action.IndexName}";
 
-                    ruleJob.Content = formatter.ToPayload(contentEvent);
+                    ruleJob.Content = ToPayload(contentEvent);
                     ruleJob.Content["objectID"] = contentId;
                 }
 
@@ -115,5 +95,18 @@ namespace Squidex.Domain.Apps.Rules.Action.Algolia
                 return (ex.Message, ex);
             }
         }
+    }
+
+    public sealed class AlgoliaJob
+    {
+        public string AppId { get; set; }
+
+        public string ApiKey { get; set; }
+
+        public string ContentId { get; set; }
+
+        public string IndexName { get; set; }
+
+        public JObject Content { get; set; }
     }
 }

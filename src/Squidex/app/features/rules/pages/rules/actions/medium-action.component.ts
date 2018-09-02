@@ -14,6 +14,8 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
     templateUrl: './medium-action.component.html'
 })
 export class MediumActionComponent implements OnInit {
+    public static key = 'Medium';
+
     @Input()
     public action: any;
 

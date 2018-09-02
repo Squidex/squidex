@@ -21,41 +21,14 @@ import {
     Versioned
 } from '@app/framework';
 
-export const ruleTriggers: any = {
-    'AssetChanged': {
-        name: 'Asset changed'
-    },
-    'ContentChanged': {
-        name: 'Content changed'
+export class RuleElementDto {
+    constructor(
+        public readonly display: string,
+        public readonly description: string,
+        public readonly link: string
+    ) {
     }
-};
-
-export const ruleActions: any = {
-    'Algolia': {
-        name: 'Populate Algolia Index'
-    },
-    'AzureQueue': {
-        name: 'Send to Azure Queue'
-    },
-    'ElasticSearch': {
-        name: 'Populate ElasticSearch Index'
-    },
-    'Fastly': {
-        name: 'Purge fastly Cache'
-    },
-    'Medium': {
-        name: 'Post to Medium'
-    },
-    'Slack': {
-        name: 'Send to Slack'
-    },
-    'Tweet': {
-        name: 'Tweet'
-    },
-    'Webhook': {
-        name: 'Send Webhook'
-    }
-};
+}
 
 export class RuleDto extends Model {
     constructor(
@@ -127,6 +100,46 @@ export class RulesService {
         private readonly apiUrl: ApiUrlConfig,
         private readonly analytics: AnalyticsService
     ) {
+    }
+
+    public getActions(): Observable<{ [name: string]: RuleElementDto }> {
+        return HTTP.getVersioned<any>(this.http, 'rules/action').pipe(
+            map(response => {
+                const items: { [name: string]: any } = response.payload.body;
+
+                const result: { [name: string]: RuleElementDto } = {};
+
+                for (let key in items) {
+                    if (items.hasOwnProperty(key)) {
+                        const value = items[key];
+
+                        result[key] = new RuleElementDto(value.display, value.description, value.link);
+                    }
+                }
+
+                return result;
+            }),
+            pretifyError('Failed to load Rules. Please reload.'));
+    }
+
+    public getTriggers(): Observable<{ [name: string]: RuleElementDto }> {
+        return HTTP.getVersioned<any>(this.http, 'rules/triggers').pipe(
+            map(response => {
+                const items: { [name: string]: any } = response.payload.body;
+
+                const result: { [name: string]: RuleElementDto } = {};
+
+                for (let key in items) {
+                    if (items.hasOwnProperty(key)) {
+                        const value = items[key];
+
+                        result[key] = new RuleElementDto(value.display, value.description, value.link);
+                    }
+                }
+
+                return result;
+            }),
+            pretifyError('Failed to load Rules. Please reload.'));
     }
 
     public getRules(appName: string): Observable<RuleDto[]> {

@@ -14,6 +14,8 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
     templateUrl: './algolia-action.component.html'
 })
 export class AlgoliaActionComponent implements OnInit {
+    public static key = 'Algolia';
+
     @Input()
     public action: any;
 

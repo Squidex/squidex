@@ -11,42 +11,18 @@ using Elasticsearch.Net;
 using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
-using Squidex.Infrastructure;
-
-#pragma warning disable SA1649 // File name must match first type name
 
 namespace Squidex.Domain.Apps.Rules.Action.ElasticSearch
 {
-    public sealed class ElasticSearchJob
-    {
-        public string Host { get; set; }
-
-        public string Username { get; set; }
-
-        public string Password { get; set; }
-
-        public string ContentId { get; set; }
-
-        public string IndexName { get; set; }
-
-        public string IndexType { get; set; }
-
-        public JObject Content { get; set; }
-    }
-
     public sealed class ElasticSearchActionHandler : RuleActionHandler<ElasticSearchAction, ElasticSearchJob>
     {
         private const string DescriptionIgnore = "Ignore";
 
         private readonly ClientPool<(Uri Host, string Username, string Password), ElasticLowLevelClient> clients;
-        private readonly RuleEventFormatter formatter;
 
         public ElasticSearchActionHandler(RuleEventFormatter formatter)
+            : base(formatter)
         {
-            Guard.NotNull(formatter, nameof(formatter));
-
-            this.formatter = formatter;
-
             clients = new ClientPool<(Uri Host, string Username, string Password), ElasticLowLevelClient>(key =>
             {
                 var config = new ConnectionConfiguration(key.Host);
@@ -73,8 +49,8 @@ namespace Squidex.Domain.Apps.Rules.Action.ElasticSearch
                     Username = action.Username,
                     Password = action.Password,
                     ContentId = contentId,
-                    IndexName = formatter.Format(action.IndexName, @event),
-                    IndexType = formatter.Format(action.IndexType, @event)
+                    IndexName = Format(action.IndexName, @event),
+                    IndexType = Format(action.IndexType, @event)
                 };
 
                 if (contentEvent.Type == EnrichedContentEventType.Deleted ||
@@ -86,7 +62,7 @@ namespace Squidex.Domain.Apps.Rules.Action.ElasticSearch
                 {
                     ruleDescription = $"Upsert to index: {action.IndexName}";
 
-                    ruleJob.Content = formatter.ToPayload(contentEvent);
+                    ruleJob.Content = ToPayload(contentEvent);
                     ruleJob.Content["objectID"] = contentId;
                 }
             }
@@ -120,5 +96,22 @@ namespace Squidex.Domain.Apps.Rules.Action.ElasticSearch
                 return (ex.Message, ex);
             }
         }
+    }
+
+    public sealed class ElasticSearchJob
+    {
+        public string Host { get; set; }
+
+        public string Username { get; set; }
+
+        public string Password { get; set; }
+
+        public string ContentId { get; set; }
+
+        public string IndexName { get; set; }
+
+        public string IndexType { get; set; }
+
+        public JObject Content { get; set; }
     }
 }

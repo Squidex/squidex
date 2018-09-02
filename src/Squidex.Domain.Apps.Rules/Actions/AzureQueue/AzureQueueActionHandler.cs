@@ -9,46 +9,18 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Queue;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
-using Squidex.Infrastructure;
-
-#pragma warning disable SA1649 // File name must match first type name
 
 namespace Squidex.Domain.Apps.Rules.Action.AzureQueue
 {
-    public sealed class AzureQueueJob
-    {
-        public string QueueConnectionString { get; set; }
-
-        public string QueueName { get; set; }
-
-        public string MessageBodyV2 { get; set; }
-
-        public JObject MessageBody { get; set; }
-
-        public string Body
-        {
-            get
-            {
-                return MessageBodyV2 ?? MessageBody.ToString(Formatting.Indented);
-            }
-        }
-    }
-
     public sealed class AzureQueueActionHandler : RuleActionHandler<AzureQueueAction, AzureQueueJob>
     {
         private readonly ClientPool<(string ConnectionString, string QueueName), CloudQueue> clients;
-        private readonly RuleEventFormatter formatter;
 
         public AzureQueueActionHandler(RuleEventFormatter formatter)
+            : base(formatter)
         {
-            Guard.NotNull(formatter, nameof(formatter));
-
-            this.formatter = formatter;
-
             clients = new ClientPool<(string ConnectionString, string QueueName), CloudQueue>(key =>
             {
                 var storageAccount = CloudStorageAccount.Parse(key.ConnectionString);
@@ -62,16 +34,14 @@ namespace Squidex.Domain.Apps.Rules.Action.AzureQueue
 
         protected override (string Description, AzureQueueJob Data) CreateJob(EnrichedEvent @event, AzureQueueAction action)
         {
-            var body = formatter.ToEnvelope(@event).ToString(Formatting.Indented);
+            var queueName = Format(action.Queue, @event);
 
-            var queueName = formatter.Format(action.Queue, @event);
-
-            var ruleDescription = $"Send AzureQueueJob to azure queue '{action.Queue}'";
+            var ruleDescription = $"Send AzureQueueJob to azure queue '{queueName}'";
             var ruleJob = new AzureQueueJob
             {
                 QueueConnectionString = action.ConnectionString,
                 QueueName = queueName,
-                MessageBodyV2 = body
+                MessageBodyV2 = ToEnvelopeJson(@event)
             };
 
             return (ruleDescription, ruleJob);
@@ -81,9 +51,18 @@ namespace Squidex.Domain.Apps.Rules.Action.AzureQueue
         {
             var queue = clients.GetClient((job.QueueConnectionString, job.QueueName));
 
-            await queue.AddMessageAsync(new CloudQueueMessage(job.Body));
+            await queue.AddMessageAsync(new CloudQueueMessage(job.MessageBodyV2));
 
             return ("Completed", null);
         }
+    }
+
+    public sealed class AzureQueueJob
+    {
+        public string QueueConnectionString { get; set; }
+
+        public string QueueName { get; set; }
+
+        public string MessageBodyV2 { get; set; }
     }
 }

@@ -60,7 +60,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
 
         public static Type[] Subtypes()
         {
-            var type = typeof(SchemaPropertiesDto);
+            var type = typeof(FieldPropertiesDto);
 
             return type.Assembly.GetTypes().Where(type.IsAssignableFrom).ToArray();
         }
