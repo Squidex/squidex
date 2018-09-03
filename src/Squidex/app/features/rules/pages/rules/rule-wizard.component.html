@@ -31,6 +31,8 @@
         
         <ng-container *ngIf="step === 2 && schemas">
             <form [formGroup]="triggerForm.form" (submit)="saveTrigger()">  
+                <h3 class="wizard-title">{{ruleTriggers[triggerType].display}}</h3>
+
                 <ng-container [ngSwitch]="triggerType">
                     <ng-container *ngSwitchCase="'AssetChanged'">
                         <sqx-asset-changed-trigger
@@ -61,6 +63,8 @@
     
         <ng-container *ngIf="step === 4">
             <form [formGroup]="actionForm.form" (submit)="saveAction()">
+                    <h3 class="wizard-title">{{ruleActions[actionType].display}}</h3>
+
                 <ng-container [ngSwitch]="actionType">
                     <ng-container *ngSwitchCase="'Algolia'">
                         <sqx-algolia-action
@@ -75,6 +79,13 @@
                             [actionForm]="actionForm.form"
                             [actionFormSubmitted]="actionForm.submitted | async">
                         </sqx-azure-queue-action>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'Discourse'">
+                        <sqx-discourse-action
+                            [action]="action"
+                            [actionForm]="actionForm.form"
+                            [actionFormSubmitted]="actionForm.submitted | async">
+                        </sqx-discourse-action>
                     </ng-container>
                     <ng-container *ngSwitchCase="'ElasticSearch'">
                         <sqx-elastic-search-action

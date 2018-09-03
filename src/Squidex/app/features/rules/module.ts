@@ -14,18 +14,23 @@ import {
     SqxSharedModule
 } from '@app/shared';
 
-import * as actions from './pages/rules/actions';
-
-const actionTypes: any = Object.values(actions);
-
 import {
+    AlgoliaActionComponent,
     AssetChangedTriggerComponent,
+    AzureQueueActionComponent,
     ContentChangedTriggerComponent,
+    DiscourseActionComponent,
+    ElasticSearchActionComponent,
+    FastlyActionComponent,
+    MediumActionComponent,
     RuleElementComponent,
     RuleEventBadgeClassPipe,
     RuleEventsPageComponent,
     RulesPageComponent,
-    RuleWizardComponent
+    RuleWizardComponent,
+    SlackActionComponent,
+    TweetActionComponent,
+    WebhookActionComponent
 } from './declarations';
 
 const routes: Routes = [
@@ -55,14 +60,22 @@ const routes: Routes = [
         RouterModule.forChild(routes)
     ],
     declarations: [
-        ...actionTypes,
+        AlgoliaActionComponent,
         AssetChangedTriggerComponent,
+        AzureQueueActionComponent,
         ContentChangedTriggerComponent,
+        DiscourseActionComponent,
+        ElasticSearchActionComponent,
+        FastlyActionComponent,
+        MediumActionComponent,
         RuleElementComponent,
         RuleEventBadgeClassPipe,
         RuleEventsPageComponent,
         RulesPageComponent,
-        RuleWizardComponent
+        RuleWizardComponent,
+        SlackActionComponent,
+        TweetActionComponent,
+        WebhookActionComponent
     ]
 })
 export class SqxFeatureRulesModule { }

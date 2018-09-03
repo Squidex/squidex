@@ -7,14 +7,20 @@
 
 using System;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.HandleRules;
+using Squidex.Domain.Apps.Core.HandleRules.Actions.Utils;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 
 namespace Squidex.Extensions.Actions.Discourse
 {
     public sealed class DiscourseActionHandler : RuleActionHandler<DiscourseAction, DiscourseJob>
     {
+        private const string DescriptionCreatePost = "Create discourse Post";
+        private const string DescriptionCreateTopic = "Create discourse Topic";
+
         private readonly IHttpClientFactory httpClientFactory;
 
         public DiscourseActionHandler(RuleEventFormatter formatter, IHttpClientFactory httpClientFactory)
@@ -23,19 +29,50 @@ namespace Squidex.Extensions.Actions.Discourse
             this.httpClientFactory = httpClientFactory;
         }
 
-        protected override Task<(string Description, DiscourseJob Data)> CreateJobAsync(EnrichedEvent @event, DiscourseAction action)
+        protected override (string Description, DiscourseJob Data) CreateJob(EnrichedEvent @event, DiscourseAction action)
         {
-            return base.CreateJobAsync(@event, action);
-        }
+            var url = $"{action.Url.ToString().TrimEnd('/')}/posts.json?api_key={action.ApiKey}&api_username={action.ApiUsername}";
 
-        protected override Task<(string Dump, Exception Exception)> ExecuteJobAsync(DiscourseJob job)
-        {
-            using (var client = httpClientFactory.CreateClient())
+            var json =
+                new JObject(
+                    new JProperty("raw", Format(action.Text, @event)),
+                    new JProperty("title", Format(action.Title, @event)));
+
+            if (action.Topic.HasValue)
             {
-                // Foo
+                json.Add(new JProperty("topic_id", action.Topic.Value));
             }
 
-            return Task.FromResult<(string Dump, Exception Exception)>((string.Empty, null));
+            if (action.Category.HasValue)
+            {
+                json.Add(new JProperty("category", action.Category.Value));
+            }
+
+            var ruleJob = new DiscourseJob
+            {
+                RequestUrl = url,
+                RequestBody = json.ToString()
+            };
+
+            var description =
+                action.Topic.HasValue ?
+                DescriptionCreateTopic :
+                DescriptionCreatePost;
+
+            return (description, ruleJob);
+        }
+
+        protected override async Task<(string Dump, Exception Exception)> ExecuteJobAsync(DiscourseJob job)
+        {
+            using (var httpClient = httpClientFactory.CreateClient())
+            {
+                var request = new HttpRequestMessage(HttpMethod.Post, job.RequestUrl)
+                {
+                    Content = new StringContent(job.RequestBody, Encoding.UTF8, "application/json")
+                };
+
+                return await httpClient.OneWayRequestAsync(request, job.RequestBody);
+            }
         }
     }
 

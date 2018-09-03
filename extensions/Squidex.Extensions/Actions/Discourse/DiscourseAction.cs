@@ -27,8 +27,12 @@ namespace Squidex.Extensions.Actions.Discourse
         public Uri Url { get; set; }
 
         [Required]
-        [Display(Name = "Api Key", Description = "The api key.")]
+        [Display(Name = "Api Key", Description = "The api key to authenticate to your discourse server.")]
         public string ApiKey { get; set; }
+
+        [Required]
+        [Display(Name = "Api Username", Description = "The api username to authenticate to your discourse server.")]
+        public string ApiUsername { get; set; }
 
         [Required]
         [Display(Name = "Text", Description = "The text as markdown.")]
