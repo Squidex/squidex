@@ -8,7 +8,6 @@
 export * from './pages/rules/triggers/asset-changed-trigger.component';
 export * from './pages/rules/triggers/content-changed-trigger.component';
 
-export * from './pages/rules/rule-action.component';
 export * from './pages/rules/rule-element.component';
 export * from './pages/rules/rule-wizard.component';
 export * from './pages/rules/rules-page.component';

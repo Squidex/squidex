@@ -14,14 +14,13 @@ import {
     SqxSharedModule
 } from '@app/shared';
 
-import actions from './pages/rules/actions';
+import * as actions from './pages/rules/actions';
 
-const actionTypes: any[] = Object.values(actions);
+const actionTypes: any = Object.values(actions);
 
 import {
     AssetChangedTriggerComponent,
     ContentChangedTriggerComponent,
-    RuleActionComponent,
     RuleElementComponent,
     RuleEventBadgeClassPipe,
     RuleEventsPageComponent,
@@ -55,14 +54,10 @@ const routes: Routes = [
         SqxSharedModule,
         RouterModule.forChild(routes)
     ],
-    entryComponents: [
-        ...actionTypes
-    ],
     declarations: [
         ...actionTypes,
         AssetChangedTriggerComponent,
         ContentChangedTriggerComponent,
-        RuleActionComponent,
         RuleElementComponent,
         RuleEventBadgeClassPipe,
         RuleEventsPageComponent,

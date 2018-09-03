@@ -61,12 +61,64 @@
     
         <ng-container *ngIf="step === 4">
             <form [formGroup]="actionForm.form" (submit)="saveAction()">
-                <sqx-rule-action 
-                    [actionType]="actionType"
-                    [action]="action"
-                    [actionForm]="actionForm.form"
-                    [actionFormSubmitted]="actionForm.submitted | async">
-                </sqx-rule-action>
+                <ng-container [ngSwitch]="actionType">
+                    <ng-container *ngSwitchCase="'Algolia'">
+                        <sqx-algolia-action
+                            [action]="action"
+                            [actionForm]="actionForm.form"
+                            [actionFormSubmitted]="actionForm.submitted | async">
+                        </sqx-algolia-action>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'AzureQueue'">
+                        <sqx-azure-queue-action
+                            [action]="action"
+                            [actionForm]="actionForm.form"
+                            [actionFormSubmitted]="actionForm.submitted | async">
+                        </sqx-azure-queue-action>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'ElasticSearch'">
+                        <sqx-elastic-search-action
+                            [action]="action"
+                            [actionForm]="actionForm.form"
+                            [actionFormSubmitted]="actionForm.submitted | async">
+                        </sqx-elastic-search-action>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'Fastly'">
+                        <sqx-fastly-action
+                            [action]="action"
+                            [actionForm]="actionForm.form"
+                            [actionFormSubmitted]="actionForm.submitted | async">
+                        </sqx-fastly-action>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'Medium'">
+                        <sqx-medium-action
+                            [action]="action"
+                            [actionForm]="actionForm.form"
+                            [actionFormSubmitted]="actionForm.submitted | async">
+                        </sqx-medium-action>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'Slack'">
+                        <sqx-slack-action
+                            [action]="action"
+                            [actionForm]="actionForm.form"
+                            [actionFormSubmitted]="actionForm.submitted | async">
+                        </sqx-slack-action>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'Tweet'">
+                        <sqx-tweet-action
+                            [action]="action"
+                            [actionForm]="actionForm.form"
+                            [actionFormSubmitted]="actionForm.submitted | async">
+                        </sqx-tweet-action>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'Webhook'">
+                        <sqx-webhook-action        
+                            [action]="action"
+                            [actionForm]="actionForm.form"
+                            [actionFormSubmitted]="actionForm.submitted | async">
+                        </sqx-webhook-action>
+                    </ng-container>
+                </ng-container>
             </form>
         </ng-container>
     </ng-container>
