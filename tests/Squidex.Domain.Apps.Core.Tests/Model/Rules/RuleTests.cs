@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Core.Model.Rules
                 .Select(x => new object[] { x })
                 .ToList();
 
-        private readonly Rule rule_0 = new Rule(new ContentChangedTrigger(), new FirstAction());
+        private readonly Rule rule_0 = new Rule(new ContentChangedTrigger(), new TestAction1());
 
         public sealed class OtherTrigger : RuleTrigger
         {
@@ -40,12 +40,12 @@ namespace Squidex.Domain.Apps.Core.Model.Rules
             }
         }
 
-        public sealed class FirstAction : RuleAction
+        public sealed class TestAction1 : RuleAction
         {
             public string Property { get; set; }
         }
 
-        public sealed class OtherAction : RuleAction
+        public sealed class TestAction2 : RuleAction
         {
             public string Property { get; set; }
         }
@@ -54,7 +54,7 @@ namespace Squidex.Domain.Apps.Core.Model.Rules
         public void Should_create_with_trigger_and_action()
         {
             var ruleTrigger = new ContentChangedTrigger();
-            var ruleAction = new FirstAction();
+            var ruleAction = new TestAction1();
 
             var newRule = new Rule(ruleTrigger, ruleAction);
 
@@ -104,7 +104,7 @@ namespace Squidex.Domain.Apps.Core.Model.Rules
         [Fact]
         public void Should_replace_action_when_updating()
         {
-            var newAction = new FirstAction();
+            var newAction = new TestAction1();
 
             var rule_1 = rule_0.Update(newAction);
 
@@ -115,7 +115,7 @@ namespace Squidex.Domain.Apps.Core.Model.Rules
         [Fact]
         public void Should_throw_exception_when_new_action_has_other_type()
         {
-            Assert.Throws<ArgumentException>(() => rule_0.Update(new OtherAction()));
+            Assert.Throws<ArgumentException>(() => rule_0.Update(new TestAction2()));
         }
 
         [Fact]

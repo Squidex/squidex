@@ -9,6 +9,7 @@ using System;
 using System.Collections.Immutable;
 using System.Threading.Tasks;
 using FakeItEasy;
+using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.Rules.State;
@@ -30,6 +31,11 @@ namespace Squidex.Domain.Apps.Entities.Rules
         protected override Guid Id
         {
             get { return ruleId; }
+        }
+
+        public sealed class TestAction : RuleAction
+        {
+            public Uri Url { get; set; }
         }
 
         public RuleGrainTests()
@@ -188,7 +194,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
                 Schemas = ImmutableList<ContentChangedTriggerSchema>.Empty
             };
 
-            var newAction = new WebhookAction
+            var newAction = new TestAction
             {
                 Url = new Uri("https://squidex.io/v2")
             };
@@ -203,7 +209,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
                 Schemas = ImmutableList<ContentChangedTriggerSchema>.Empty
             };
 
-            var newAction = new WebhookAction
+            var newAction = new TestAction
             {
                 Url = new Uri("https://squidex.io/v2")
             };
