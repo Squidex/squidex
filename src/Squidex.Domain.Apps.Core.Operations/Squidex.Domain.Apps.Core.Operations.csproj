@@ -17,7 +17,7 @@
     <PackageReference Include="Jint" Version="2.11.58" />
     <PackageReference Include="Microsoft.OData.Core" Version="7.5.0" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
-    <PackageReference Include="NJsonSchema" Version="9.10.67" />
+    <PackageReference Include="NJsonSchema" Version="9.10.71" />
     <PackageReference Include="RefactoringEssentials" Version="5.6.0" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.0.2" />
     <PackageReference Include="System.Collections.Immutable" Version="1.4.0" />
