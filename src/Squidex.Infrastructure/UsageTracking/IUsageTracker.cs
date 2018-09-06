@@ -13,10 +13,10 @@ namespace Squidex.Infrastructure.UsageTracking
 {
     public interface IUsageTracker
     {
-        Task TrackAsync(string key, double weight, double elapsedMs);
+        Task TrackAsync(string key, string category, double weight, double elapsedMs);
 
         Task<long> GetMonthlyCallsAsync(string key, DateTime date);
 
-        Task<IReadOnlyList<StoredUsage>> QueryAsync(string key, DateTime fromDate, DateTime toDate);
+        Task<IReadOnlyDictionary<string, IReadOnlyList<DateUsage>>> QueryAsync(string key, DateTime fromDate, DateTime toDate);
     }
 }

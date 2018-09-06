@@ -19,11 +19,12 @@ namespace Squidex.Infrastructure.UsageTracking
 {
     public sealed class BackgroundUsageTracker : DisposableObjectBase, IUsageTracker
     {
+        private const string FallbackCategory = "*";
         private const int Intervall = 60 * 1000;
         private readonly IUsageStore usageStore;
         private readonly ISemanticLog log;
         private readonly CompletionTimer timer;
-        private ConcurrentDictionary<string, Usage> usages = new ConcurrentDictionary<string, Usage>();
+        private ConcurrentDictionary<(string Key, string Category), Usage> usages = new ConcurrentDictionary<(string Key, string Category), Usage>();
 
         public BackgroundUsageTracker(IUsageStore usageStore, ISemanticLog log)
         {
@@ -58,12 +59,13 @@ namespace Squidex.Infrastructure.UsageTracking
             {
                 var today = DateTime.Today;
 
-                var localUsages = Interlocked.Exchange(ref usages, new ConcurrentDictionary<string, Usage>());
+                var localUsages = Interlocked.Exchange(ref usages, new ConcurrentDictionary<(string Key, string Category), Usage>());
 
                 await Task.WhenAll(localUsages.Select(x =>
                     usageStore.TrackUsagesAsync(
                         today,
-                        x.Key,
+                        x.Key.Key,
+                        x.Key.Category,
                         x.Value.Count,
                         x.Value.ElapsedMs)));
             }
@@ -75,7 +77,7 @@ namespace Squidex.Infrastructure.UsageTracking
             }
         }
 
-        public Task TrackAsync(string key, double weight, double elapsedMs)
+        public Task TrackAsync(string key, string category, double weight, double elapsedMs)
         {
             Guard.NotNull(key, nameof(key));
 
@@ -83,29 +85,58 @@ namespace Squidex.Infrastructure.UsageTracking
 
             if (weight > 0)
             {
-                usages.AddOrUpdate(key, _ => new Usage(elapsedMs, weight), (k, x) => x.Add(elapsedMs, weight));
+                category = CleanCategory(category);
+
+                usages.AddOrUpdate((key, category), _ => new Usage(elapsedMs, weight), (k, x) => x.Add(elapsedMs, weight));
             }
 
             return TaskHelper.Done;
         }
 
-        public async Task<IReadOnlyList<StoredUsage>> QueryAsync(string key, DateTime fromDate, DateTime toDate)
+        public async Task<IReadOnlyDictionary<string, IReadOnlyList<DateUsage>>> QueryAsync(string key, DateTime fromDate, DateTime toDate)
         {
             Guard.NotNull(key, nameof(key));
 
             ThrowIfDisposed();
 
-            var originalUsages = await usageStore.QueryAsync(key, fromDate, toDate);
-            var enrichedUsages = new List<StoredUsage>();
+            var usagesFlat = await usageStore.QueryAsync(key, fromDate, toDate);
+            var usagesByCategory = usagesFlat.GroupBy(x => CleanCategory(x.Category)).ToDictionary(x => x.Key, x => x.ToList());
 
-            var usagesDictionary = originalUsages.ToDictionary(x => x.Date);
+            var result = new Dictionary<string, IReadOnlyList<DateUsage>>();
 
-            for (var date = fromDate; date <= toDate; date = date.AddDays(1))
+            IEnumerable<string> categories = usagesByCategory.Keys;
+
+            if (usagesByCategory.Count == 0)
             {
-                enrichedUsages.Add(usagesDictionary.GetOrDefault(date) ?? new StoredUsage(date, 0, 0));
+                var enriched = new List<DateUsage>();
+
+                for (var date = fromDate; date <= toDate; date = date.AddDays(1))
+                {
+                    enriched.Add(new DateUsage(date, 0, 0));
+                }
+
+                result[FallbackCategory] = enriched;
+            }
+            else
+            {
+                foreach (var category in categories)
+                {
+                    var enriched = new List<DateUsage>();
+
+                    var usagesDictionary = usagesByCategory[category].ToDictionary(x => x.Date);
+
+                    for (var date = fromDate; date <= toDate; date = date.AddDays(1))
+                    {
+                        var stored = usagesDictionary.GetOrDefault(date);
+
+                        enriched.Add(new DateUsage(date, stored?.TotalCount ?? 0, stored?.TotalElapsedMs ?? 0));
+                    }
+
+                    result[category] = enriched;
+                }
             }
 
-            return enrichedUsages;
+            return result;
         }
 
         public async Task<long> GetMonthlyCallsAsync(string key, DateTime date)
@@ -120,6 +151,11 @@ namespace Squidex.Infrastructure.UsageTracking
             var originalUsages = await usageStore.QueryAsync(key, dateFrom, dateTo);
 
             return originalUsages.Sum(x => x.TotalCount);
+        }
+
+        private static string CleanCategory(string category)
+        {
+            return !string.IsNullOrWhiteSpace(category) ? category.Trim() : "*";
         }
     }
 }

@@ -28,9 +28,9 @@ namespace Squidex.Infrastructure.UsageTracking
         [Fact]
         public async Task Should_forward_track_call()
         {
-            await sut.TrackAsync("MyKey", 123, 456);
+            await sut.TrackAsync("MyKey", "MyCategory", 123, 456);
 
-            A.CallTo(() => inner.TrackAsync("MyKey", 123, 456))
+            A.CallTo(() => inner.TrackAsync("MyKey", "MyCategory", 123, 456))
                 .MustHaveHappened();
         }
 

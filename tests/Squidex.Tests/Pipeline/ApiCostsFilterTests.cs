@@ -86,7 +86,7 @@ namespace Squidex.Tests.Pipeline
             Assert.Equal(429, (actionContext.Result as StatusCodeResult).StatusCode);
             Assert.False(isNextCalled);
 
-            A.CallTo(() => usageTracker.TrackAsync(A<string>.Ignored, A<double>.Ignored, A<double>.Ignored))
+            A.CallTo(() => usageTracker.TrackAsync(A<string>.Ignored, A<string>.Ignored, A<double>.Ignored, A<double>.Ignored))
                 .MustNotHaveHappened();
         }
 
@@ -104,7 +104,7 @@ namespace Squidex.Tests.Pipeline
 
             Assert.True(isNextCalled);
 
-            A.CallTo(() => usageTracker.TrackAsync(A<string>.Ignored, 13, A<double>.Ignored))
+            A.CallTo(() => usageTracker.TrackAsync(A<string>.Ignored, A<string>.Ignored, 13, A<double>.Ignored))
                 .MustHaveHappened();
         }
 
@@ -122,7 +122,7 @@ namespace Squidex.Tests.Pipeline
 
             Assert.True(isNextCalled);
 
-            A.CallTo(() => usageTracker.TrackAsync(A<string>.Ignored, 13, A<double>.Ignored))
+            A.CallTo(() => usageTracker.TrackAsync(A<string>.Ignored, A<string>.Ignored, 13, A<double>.Ignored))
                 .MustHaveHappened();
         }
 
@@ -140,7 +140,7 @@ namespace Squidex.Tests.Pipeline
 
             Assert.True(isNextCalled);
 
-            A.CallTo(() => usageTracker.TrackAsync(A<string>.Ignored, A<double>.Ignored, A<double>.Ignored))
+            A.CallTo(() => usageTracker.TrackAsync(A<string>.Ignored, A<string>.Ignored, A<double>.Ignored, A<double>.Ignored))
                 .MustNotHaveHappened();
         }
 
@@ -156,7 +156,7 @@ namespace Squidex.Tests.Pipeline
 
             Assert.True(isNextCalled);
 
-            A.CallTo(() => usageTracker.TrackAsync(A<string>.Ignored, A<double>.Ignored, A<double>.Ignored))
+            A.CallTo(() => usageTracker.TrackAsync(A<string>.Ignored, A<string>.Ignored, A<double>.Ignored, A<double>.Ignored))
                 .MustNotHaveHappened();
         }
 

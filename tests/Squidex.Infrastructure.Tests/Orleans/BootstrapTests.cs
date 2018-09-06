@@ -54,9 +54,6 @@ namespace Squidex.Infrastructure.Orleans
         public async Task Should_retry_after_rejection_exception()
         {
             A.CallTo(() => grain.ActivateAsync())
-                .Returns(TaskHelper.Done);
-
-            A.CallTo(() => grain.ActivateAsync())
                 .Throws(new OrleansException()).Once();
 
             await sut.Execute(CancellationToken.None);

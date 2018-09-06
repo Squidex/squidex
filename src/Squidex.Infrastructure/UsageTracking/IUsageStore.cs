@@ -13,7 +13,7 @@ namespace Squidex.Infrastructure.UsageTracking
 {
     public interface IUsageStore
     {
-        Task TrackUsagesAsync(DateTime date, string key, double count, double elapsedMs);
+        Task TrackUsagesAsync(DateTime date, string key, string category, double count, double elapsedMs);
 
         Task<IReadOnlyList<StoredUsage>> QueryAsync(string key, DateTime fromDate, DateTime toDate);
     }

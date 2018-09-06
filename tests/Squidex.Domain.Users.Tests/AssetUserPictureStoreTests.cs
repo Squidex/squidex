@@ -12,7 +12,6 @@ using System.Threading.Tasks;
 using FakeItEasy;
 using FakeItEasy.Core;
 using Squidex.Infrastructure.Assets;
-using Squidex.Infrastructure.Tasks;
 using Xunit;
 
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
@@ -34,9 +33,6 @@ namespace Squidex.Domain.Users
         public async Task Should_invoke_asset_store_to_upload_picture()
         {
             var stream = new MemoryStream();
-
-            A.CallTo(() => assetStore.UploadAsync(userId, 0, "picture", stream, CancellationToken.None))
-                .Returns(TaskHelper.Done);
 
             await sut.UploadAsync(userId, stream);
 

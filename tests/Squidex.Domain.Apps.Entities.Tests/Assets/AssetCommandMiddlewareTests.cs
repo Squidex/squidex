@@ -19,7 +19,6 @@ using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Log;
-using Squidex.Infrastructure.Tasks;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Assets
@@ -72,7 +71,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
                     tags.Add("tag2");
                 }));
 
-            SetupStore(0, context.ContextId);
             SetupImageInfo();
 
             await sut.HandleAsync(context);
@@ -92,7 +90,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             var context = CreateContextForCommand(new UpdateAsset { AssetId = assetId, File = file });
 
-            SetupStore(1, context.ContextId);
             SetupImageInfo();
 
             await ExecuteCreateAsync();
@@ -106,16 +103,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
         private Task ExecuteCreateAsync()
         {
             return asset.ExecuteAsync(CreateCommand(new CreateAsset { AssetId = Id, File = file }));
-        }
-
-        private void SetupStore(long version, Guid commitId)
-        {
-            A.CallTo(() => assetStore.UploadAsync(commitId.ToString(), stream, CancellationToken.None))
-                .Returns(TaskHelper.Done);
-            A.CallTo(() => assetStore.CopyAsync(commitId.ToString(), assetId.ToString(), version, null, CancellationToken.None))
-                .Returns(TaskHelper.Done);
-            A.CallTo(() => assetStore.DeleteAsync(commitId.ToString()))
-                .Returns(TaskHelper.Done);
         }
 
         private void AssertAssetHasBeenUploaded(long version, Guid commitId)
