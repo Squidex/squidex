@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -82,7 +83,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics
         /// </returns>
         [HttpGet]
         [Route("apps/{app}/usages/calls/{fromDate}/{toDate}/")]
-        [ProducesResponseType(typeof(CallsUsageDto[]), 200)]
+        [ProducesResponseType(typeof(Dictionary<string, CallsUsageDto[]>), 200)]
         [ApiCosts(0)]
         public async Task<IActionResult> GetUsages(string app, DateTime fromDate, DateTime toDate)
         {
@@ -93,7 +94,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics
 
             var entities = await usageTracker.QueryAsync(App.Id.ToString(), fromDate.Date, toDate.Date);
 
-            var response = entities.Select(CallsUsageDto.FromUsage);
+            var response = entities.ToDictionary(x => x.Key, x => x.Value.Select(CallsUsageDto.FromUsage).ToList());
 
             return Ok(response);
         }

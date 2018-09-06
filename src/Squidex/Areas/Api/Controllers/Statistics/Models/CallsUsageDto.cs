@@ -27,7 +27,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics.Models
         /// </summary>
         public long AverageMs { get; set; }
 
-        public static CallsUsageDto FromUsage(StoredUsage usage)
+        public static CallsUsageDto FromUsage(DateUsage usage)
         {
             var averageMs = usage.TotalCount == 0 ? 0 : usage.TotalElapsedMs / usage.TotalCount;
 

@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Squidex.Domain.Apps.Entities.Apps.Services;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
+using Squidex.Infrastructure.Security;
 using Squidex.Infrastructure.UsageTracking;
 
 namespace Squidex.Pipeline
@@ -71,7 +72,7 @@ namespace Squidex.Pipeline
                 {
                     var elapsedMs = watch.Stop();
 
-                    await usageTracker.TrackAsync(appFeature.App.Id.ToString(), FilterDefinition.Weight, elapsedMs);
+                    await usageTracker.TrackAsync(appFeature.App.Id.ToString(), context.HttpContext.User.OpenIdClientId(), FilterDefinition.Weight, elapsedMs);
                 }
             }
             else

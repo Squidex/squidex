@@ -20,6 +20,20 @@ import {
     UsagesService
 } from '@app/shared';
 
+const COLORS = [
+    ' 51, 137, 213',
+    '211,  50,  50',
+    '131, 211,  50',
+    ' 50, 211, 131',
+    ' 50, 211, 211',
+    ' 50, 131, 211',
+    ' 50,  50, 211',
+    ' 50, 211,  50',
+    '131,  50, 211',
+    '211,  50, 211',
+    '211,  50, 131'
+];
+
 @Component({
     selector: 'sqx-dashboard-page',
     styleUrls: ['./dashboard-page.component.scss'],
@@ -43,18 +57,16 @@ export class DashboardPageComponent implements OnDestroy, OnInit {
     public chartOptions = {
         responsive: true,
         scales: {
-            xAxes: [
-                {
-                    display: true
-                }
-            ],
-            yAxes: [
-                {
-                    ticks: {
-                        beginAtZero: true
-                    }
-                }
-            ]
+            xAxes: [{
+                display: true,
+                stacked: true
+            }],
+            yAxes: [{
+                ticks: {
+                    beginAtZero: true
+                },
+                stacked: true
+            }]
         },
         maintainAspectRatio: false
     };
@@ -111,15 +123,17 @@ export class DashboardPageComponent implements OnDestroy, OnInit {
             this.app.pipe(
                     switchMap(app => this.usagesService.getStorageUsages(app.name, DateTime.today().addDays(-20), DateTime.today())))
                 .subscribe(dtos => {
+                    const labels = createLabels(dtos);
+
                     this.chartStorageCount = {
-                        labels: createLabels(dtos),
+                        labels,
                         datasets: [
                             {
-                                label: 'Number of Assets',
+                                label: 'All',
                                 lineTension: 0,
                                 fill: false,
-                                backgroundColor: 'rgba(51, 137, 213, 0.6)',
-                                borderColor: 'rgba(51, 137, 213, 1)',
+                                backgroundColor: `rgba(${COLORS[0]}, 0.6)`,
+                                borderColor: `rgba(${COLORS[0]}, 1)`,
                                 borderWidth: 1,
                                 data: dtos.map(x => x.count)
                             }
@@ -127,14 +141,14 @@ export class DashboardPageComponent implements OnDestroy, OnInit {
                     };
 
                     this.chartStorageSize = {
-                        labels: createLabels(dtos),
+                        labels,
                         datasets: [
                             {
-                                label: 'Size of Assets (MB)',
+                                label: 'All',
                                 lineTension: 0,
                                 fill: false,
-                                backgroundColor: 'rgba(51, 137, 213, 0.6)',
-                                borderColor: 'rgba(51, 137, 213, 1)',
+                                backgroundColor: `rgba(${COLORS[0]}, 0.6)`,
+                                borderColor: `rgba(${COLORS[0]}, 1)`,
                                 borderWidth: 1,
                                 data: dtos.map(x => Math.round(10 * (x.size / (1024 * 1024))) / 10)
                             }
@@ -146,36 +160,44 @@ export class DashboardPageComponent implements OnDestroy, OnInit {
             this.app.pipe(
                     switchMap(app => this.usagesService.getCallsUsages(app.name, DateTime.today().addDays(-20), DateTime.today())))
                 .subscribe(dtos => {
+                    const labels = createLabelsFromSet(dtos);
+
                     this.chartCallsCount = {
-                        labels: createLabels(dtos),
-                        datasets: [
+                        labels,
+                        datasets: Object.keys(dtos).map((k, i) => (
                             {
-                                label: 'Number of API Calls',
-                                backgroundColor: 'rgba(51, 137, 213, 0.6)',
-                                borderColor: 'rgba(51, 137, 213, 1)',
+                                label: label(k),
+                                backgroundColor: `rgba(${COLORS[i]}, 0.6)`,
+                                borderColor: `rgba(${COLORS[i]}, 1)`,
                                 borderWidth: 1,
-                                data: dtos.map(x => x.count)
-                            }
-                        ]
+                                data: dtos[k].map(x => x.count)
+                            }))
                     };
 
                     this.chartCallsPerformance = {
-                        labels: createLabels(dtos),
-                        datasets: [
+                        labels,
+                        datasets: Object.keys(dtos).map((k, i) => (
                             {
-                                label: 'API Performance (Milliseconds)',
-                                backgroundColor: 'rgba(51, 137, 213, 0.6)',
-                                borderColor: 'rgba(51, 137, 213, 1)',
+                                label: label(k),
+                                backgroundColor: `rgba(${COLORS[i]}, 0.6)`,
+                                borderColor: `rgba(${COLORS[i]}, 1)`,
                                 borderWidth: 1,
-                                data: dtos.map(x => x.averageMs)
-                            }
-                        ]
+                                data: dtos[k].map(x => x.averageMs)
+                            }))
                     };
                 }));
     }
 }
 
+function label(category: string) {
+    return category === '*' ? 'All Clients' : category;
+}
+
 function createLabels(dtos: { date: DateTime }[]): string[] {
     return dtos.map(d => d.date.toStringFormat('M-DD'));
+}
+
+function createLabelsFromSet(dtos: { [category: string]: { date: DateTime }[] }): string[] {
+    return createLabels(dtos[Object.keys(dtos)[0]]);
 }
 

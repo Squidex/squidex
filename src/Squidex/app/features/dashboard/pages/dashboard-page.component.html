@@ -69,21 +69,24 @@
                 </a>
 
                 <div class="card card-lg">
+                    <div class="card-header">API Calls</div>
                     <div class="card-body">
                         <chart type="bar" [data]="chartCallsCount" [options]="chartOptions"></chart>
                     </div>
                 </div>
 
                 <div class="card card-lg">
+                    <div class="card-header">API Performance (ms)</div>
                     <div class="card-body">
                         <chart type="bar" [data]="chartCallsPerformance" [options]="chartOptions"></chart>
                     </div>
                 </div>
 
                 <div class="card card">
+                    <div class="card-header">API Calls</div>
                     <div class="card-body">
                         <div class="aggregation" *ngIf="callsCurrent >= 0">
-                            <div class="aggregation-label">API calls this month</div>
+                            <div class="aggregation-label">This month</div>
                             <div class="aggregation-value">{{callsCurrent | sqxKNumber}}</div>
                             <div class="aggregation-label" *ngIf="callsMax > 0">Monthly limit: {{callsMax | sqxKNumber}}</div>
                         </div>
@@ -91,15 +94,17 @@
                 </div>
 
                 <div class="card card-lg">
+                    <div class="card-header">Assets Count</div>
                     <div class="card-body">
                         <chart type="line" [data]="chartStorageCount" [options]="chartOptions"></chart>
                     </div>
                 </div>
 
                 <div class="card card">
+                    <div class="card-header">Assets Size (MB)</div>
                     <div class="card-body">
                         <div class="aggregation" *ngIf="assetsCurrent >= 0">
-                            <div class="aggregation-label">Asset size today</div>
+                            <div class="aggregation-label">Total Size</div>
                             <div class="aggregation-value">{{assetsCurrent | sqxFileSize}}</div>
                             <div class="aggregation-label" *ngIf="assetsMax > 0">Total limit: {{assetsMax | sqxFileSize}}</div>
                         </div>
@@ -107,15 +112,14 @@
                 </div>
 
                 <div class="card card-lg">
+                    <div class="card-header">Assets Size (MB)</div>
                     <div class="card-body">
                         <chart type="line" [data]="chartStorageSize" [options]="chartOptions"></chart>
                     </div>
                 </div>
 
                 <div class="card card-lg">
-                    <div class="card-header">
-                        History
-                    </div>
+                    <div class="card-header">History</div>
                     <div class="card-body card-history card-body-scroll">
                         <sqx-history-list [events]="history"></sqx-history-list>            
                     </div>

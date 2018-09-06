@@ -20,7 +20,9 @@
 }
 
 :host /deep/ canvas {
-    height: 13rem !important;
+    height: 12rem !important;
+    margin-top: -1rem;
+    margin-bottom: 0;
 }
 
 .subtext {
@@ -34,6 +36,8 @@
         margin-right: 1rem;
         margin-bottom: 1rem;
         width: 16rem;
+        min-height: 16rem;
+        max-height: 16rem;
         float: left;
     }
 
@@ -41,17 +45,11 @@
         width: 33rem;
     }
 
-    &-body {
-        min-height: 15.5rem;
-    }
-
     &-image {
         text-align: center;
     }
 
     &-history {
-        min-height: 12.4rem;
-        max-height: 12.4rem;
         overflow-y: auto;
     }
 
@@ -100,7 +98,7 @@
 
     &-value {
         font-size: 3rem;
-        margin-top: 2rem;
+        margin-top: 1rem;
         margin-bottom: .5rem;
     }
 }
