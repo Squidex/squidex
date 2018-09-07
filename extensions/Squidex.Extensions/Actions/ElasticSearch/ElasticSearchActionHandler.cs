@@ -65,6 +65,8 @@ namespace Squidex.Extensions.Actions.ElasticSearch
                     ruleJob.Content = ToPayload(contentEvent);
                     ruleJob.Content["objectID"] = contentId;
                 }
+
+                return (ruleDescription, ruleJob);
             }
 
             return (DescriptionIgnore, new ElasticSearchJob());
@@ -72,6 +74,11 @@ namespace Squidex.Extensions.Actions.ElasticSearch
 
         protected override async Task<(string Dump, Exception Exception)> ExecuteJobAsync(ElasticSearchJob job)
         {
+            if (string.IsNullOrWhiteSpace(job.Host))
+            {
+                return (DescriptionIgnore, null);
+            }
+
             var client = clients.GetClient((new Uri(job.Host, UriKind.Absolute), job.Username, job.Password));
 
             try

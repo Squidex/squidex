@@ -70,7 +70,7 @@ namespace Squidex.Extensions.Actions.Algolia
         {
             if (string.IsNullOrWhiteSpace(job.AppId))
             {
-                return (null, new InvalidOperationException("The action cannot handle this event."));
+                return (DescriptionIgnore, null);
             }
 
             var index = clients.GetClient((job.AppId, job.ApiKey, job.IndexName));
