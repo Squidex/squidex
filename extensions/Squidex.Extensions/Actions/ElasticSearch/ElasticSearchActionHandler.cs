@@ -46,8 +46,6 @@ namespace Squidex.Extensions.Actions.ElasticSearch
                 var ruleJob = new ElasticSearchJob
                 {
                     Host = action.Host.ToString(),
-                    Username = action.Username,
-                    Password = action.Password,
                     ContentId = contentId,
                     IndexName = Format(action.IndexName, @event),
                     IndexType = Format(action.IndexType, @event)
@@ -65,6 +63,9 @@ namespace Squidex.Extensions.Actions.ElasticSearch
                     ruleJob.Content = ToPayload(contentEvent);
                     ruleJob.Content["objectID"] = contentId;
                 }
+
+                ruleJob.Username = action.Username;
+                ruleJob.Password = action.Password;
 
                 return (ruleDescription, ruleJob);
             }
