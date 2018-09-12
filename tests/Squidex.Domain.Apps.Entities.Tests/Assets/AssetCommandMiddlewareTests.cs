@@ -12,6 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Orleans;
+using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.Assets.State;
 using Squidex.Domain.Apps.Entities.Tags;
@@ -50,7 +51,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             asset.OnActivateAsync(Id).Wait();
 
             A.CallTo(() => tagService.NormalizeTagsAsync(AppId, TagGroups.Assets, A<HashSet<string>>.Ignored, A<HashSet<string>>.Ignored))
-                .Returns(new HashSet<string>());
+                .Returns(new Dictionary<string, string>());
 
             A.CallTo(() => grainFactory.GetGrain<IAssetGrain>(Id, null))
                 .Returns(asset);

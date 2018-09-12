@@ -12,7 +12,6 @@ using System.Threading.Tasks;
 using FakeItEasy;
 using Orleans;
 using Orleans.Runtime;
-using Squidex.Infrastructure.Tasks;
 using Xunit;
 
 namespace Squidex.Infrastructure.Orleans

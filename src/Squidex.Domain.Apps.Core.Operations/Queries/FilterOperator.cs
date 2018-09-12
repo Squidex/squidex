@@ -5,12 +5,18 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Tags
+namespace Squidex.Domain.Apps.Core.Queries
 {
-    public sealed class Tag
+    public enum FilterOperator
     {
-        public string Name { get; set; }
-
-        public int Count { get; set; } = 1;
+        Contains,
+        EndsWith,
+        Equals,
+        GreaterThan,
+        GreaterThanOrEqual,
+        LessThan,
+        LessThanOrEqual,
+        NotEquals,
+        StartsWith
     }
 }

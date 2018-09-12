@@ -9,13 +9,13 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Squidex.Domain.Apps.Entities.Tags
+namespace Squidex.Domain.Apps.Core.Tags
 {
     public interface ITagService
     {
-        Task<HashSet<string>> NormalizeTagsAsync(Guid appId, string group, HashSet<string> names, HashSet<string> ids);
+        Task<Dictionary<string, string>> GetTagIdsAsync(Guid appId, string group, HashSet<string> names);
 
-        Task<HashSet<string>> GetTagIdsAsync(Guid appId, string group, HashSet<string> names);
+        Task<Dictionary<string, string>> NormalizeTagsAsync(Guid appId, string group, HashSet<string> names, HashSet<string> ids);
 
         Task<Dictionary<string, string>> DenormalizeTagsAsync(Guid appId, string group, HashSet<string> ids);
 

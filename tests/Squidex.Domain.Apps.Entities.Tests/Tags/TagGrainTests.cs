@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FakeItEasy;
+using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.States;
 using Xunit;
@@ -89,7 +90,7 @@ namespace Squidex.Domain.Apps.Entities.Tags
         public async Task Should_not_add_tags_if_already_added()
         {
             var result1 = await sut.NormalizeTagsAsync(HashSet.Of("tag1", "tag2"), null);
-            var result2 = await sut.NormalizeTagsAsync(HashSet.Of("tag1", "tag2", "tag3"), result1);
+            var result2 = await sut.NormalizeTagsAsync(HashSet.Of("tag1", "tag2", "tag3"), new HashSet<string>(result1.Values));
 
             var allTags = await sut.GetTagsAsync();
 
@@ -107,7 +108,7 @@ namespace Squidex.Domain.Apps.Entities.Tags
             var result1 = await sut.NormalizeTagsAsync(HashSet.Of("tag1", "tag2"), null);
             var result2 = await sut.NormalizeTagsAsync(HashSet.Of("tag2", "tag3"), null);
 
-            await sut.NormalizeTagsAsync(null, result1);
+            await sut.NormalizeTagsAsync(null, new HashSet<string>(result1.Values));
 
             var allTags = await sut.GetTagsAsync();
 

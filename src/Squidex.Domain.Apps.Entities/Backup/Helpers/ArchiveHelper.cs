@@ -36,7 +36,7 @@ namespace Squidex.Domain.Apps.Entities.Backup.Archive
         {
             var hash = 17;
 
-            foreach (char c in value)
+            foreach (var c in value)
             {
                 unchecked
                 {

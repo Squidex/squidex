@@ -142,7 +142,7 @@ namespace Squidex.Infrastructure
 
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void NotEmpty<TType>(ICollection<TType> enumerable, string parameterName)
+        public static void NotEmpty<TType>(IReadOnlyCollection<TType> enumerable, string parameterName)
         {
             NotNull(enumerable, parameterName);
 

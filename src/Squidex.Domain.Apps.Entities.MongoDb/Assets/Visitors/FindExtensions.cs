@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 using Microsoft.OData.UriParser;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using Squidex.Domain.Apps.Entities.Tags;
+using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb.OData;
 

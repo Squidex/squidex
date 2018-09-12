@@ -74,7 +74,7 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
 
         public Schema ToSchema(FieldRegistry registry)
         {
-            RootField[] fields = Empty;
+            var fields = Empty;
 
             if (Fields != null)
             {

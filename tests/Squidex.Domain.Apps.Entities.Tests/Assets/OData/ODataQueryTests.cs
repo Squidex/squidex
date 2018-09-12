@@ -11,10 +11,10 @@ using FakeItEasy;
 using Microsoft.OData.Edm;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
+using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Domain.Apps.Entities.Assets.Edm;
 using Squidex.Domain.Apps.Entities.MongoDb.Assets;
 using Squidex.Domain.Apps.Entities.MongoDb.Assets.Visitors;
-using Squidex.Domain.Apps.Entities.Tags;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.MongoDb.OData;
@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.OData
         public ODataQueryTests()
         {
             A.CallTo(() => tagService.GetTagIdsAsync(appId, TagGroups.Assets, A<HashSet<string>>.That.Contains("tag1")))
-                .Returns(HashSet.Of("normalized1"));
+                .Returns(new Dictionary<string, string> { ["tag1"] = "normalized1" });
 
             valueConverter = FindExtensions.CreateValueConverter(appId, tagService);
         }

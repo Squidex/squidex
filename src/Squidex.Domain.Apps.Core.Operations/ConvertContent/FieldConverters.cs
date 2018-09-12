@@ -26,8 +26,10 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
     {
         private static readonly Func<IField, string> KeyNameResolver = f => f.Name;
         private static readonly Func<IField, string> KeyIdResolver = f => f.Id.ToString();
+
         private static readonly Func<IArrayField, string, IField> FieldByIdResolver =
             (f, k) => long.TryParse(k, out var id) ? f.FieldsById.GetOrDefault(id) : null;
+
         private static readonly Func<IArrayField, string, IField> FieldByNameResolver =
             (f, k) => f.FieldsByName.GetOrDefault(k);
 
@@ -251,7 +253,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 
                         var newArray = new JArray();
 
-                        foreach (JObject item in jArray.OfType<JObject>())
+                        foreach (var item in jArray.OfType<JObject>())
                         {
                             var newItem = new JObject();
 
