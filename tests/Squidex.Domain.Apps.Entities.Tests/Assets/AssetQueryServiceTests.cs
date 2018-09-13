@@ -15,6 +15,7 @@ using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Queries;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Assets
@@ -87,24 +88,49 @@ namespace Squidex.Domain.Apps.Entities.Assets
             Assert.Empty(result[1].Tags);
         }
 
-        /*
-         *  TODO
         [Fact]
         public async Task Should_load_assets_with_query_and_resolve_tags()
         {
-            A.CallTo(() => assetRepository.QueryAsync(appId, "my-query"))
+            A.CallTo(() => assetRepository.QueryAsync(appId, A<Query>.Ignored))
                 .Returns(ResultList.Create(8,
                     CreateAsset(Guid.NewGuid(), "id1", "id2"),
                     CreateAsset(Guid.NewGuid(), "id2", "id3")));
 
-            var result = await sut.QueryAsync(context, Q.Empty.WithODataQuery("my-query"));
+            var result = await sut.QueryAsync(context, Q.Empty);
 
             Assert.Equal(8, result.Total);
             Assert.Equal(2, result.Count);
 
             Assert.Equal(HashSet.Of("name1", "name2"), result[0].Tags);
             Assert.Equal(HashSet.Of("name2", "name3"), result[1].Tags);
-        } */
+        }
+
+        [Fact]
+        public async Task Should_transform_odata_query()
+        {
+            await sut.QueryAsync(context, Q.Empty.WithODataQuery("$top=100&$orderby=fileName asc&$search=Hello World"));
+
+            A.CallTo(() => assetRepository.QueryAsync(appId, A<Query>.That.Matches(x => x.ToString() == "FullText: Hello World; Take: 100; Sort: fileName Ascending")))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_transform_odata_query_and_enrich_with_defaults()
+        {
+            await sut.QueryAsync(context, Q.Empty.WithODataQuery("$filter=fileName eq 'ABC'"));
+
+            A.CallTo(() => assetRepository.QueryAsync(appId, A<Query>.That.Matches(x => x.ToString() == "Filter: fileName == ABC; Take: 200; Sort: lastModified Descending")))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_limit_number_of_assets()
+        {
+            await sut.QueryAsync(context, Q.Empty.WithODataQuery("$top=300&$skip=20"));
+
+            A.CallTo(() => assetRepository.QueryAsync(appId, A<Query>.That.Matches(x => x.ToString() == "Skip: 20; Take: 200; Sort: lastModified Descending")))
+                .MustHaveHappened();
+        }
 
         private IAssetEntity CreateAsset(Guid id, params string[] tags)
         {

@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using Microsoft.OData;
 using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Domain.Apps.Entities.Assets.Edm;
+using Squidex.Domain.Apps.Entities.Assets.Queries;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Queries;
@@ -21,7 +22,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 {
     public sealed class AssetQueryService : IAssetQueryService
     {
-        private const int MaxResults = 20;
+        private const int MaxResults = 200;
         private readonly ITagService tagService;
         private readonly IAssetRepository assetRepository;
 
@@ -85,6 +86,11 @@ namespace Squidex.Domain.Apps.Entities.Assets
             try
             {
                 var result = EdmAssetModel.Edm.ParseQuery(query).ToQuery();
+
+                if (result.Filter != null)
+                {
+                    result.Filter = QueryTagVisitor.Transform(result.Filter, context.App.Id, tagService);
+                }
 
                 if (result.Sort.Count == 0)
                 {
