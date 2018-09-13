@@ -1,5 +1,5 @@
 <td class="cell-select" *ngIf="!isReference" (click)="shouldStop($event)">
-    <input type="checkbox" class="form-control"
+    <input type="checkbox" class="form-check"
         [ngModel]="selected" 
         (ngModelChange)="selectedChange.emit($event);"
         (click)="$event.stopPropagation()" />

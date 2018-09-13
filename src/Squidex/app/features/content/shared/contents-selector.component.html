@@ -30,7 +30,7 @@
                 <thead>
                     <tr>
                         <th class="cell-select">
-                            <input type="checkbox" class="form-control" [ngModel]="isAllSelected" (ngModelChange)="selectAll($event)" />
+                            <input type="checkbox" class="form-check" [ngModel]="isAllSelected" (ngModelChange)="selectAll($event)" />
                         </th>
                         <th class="cell-auto" *ngFor="let field of schema.listFields">
                             <span class="field">{{field.displayName}}</span>
