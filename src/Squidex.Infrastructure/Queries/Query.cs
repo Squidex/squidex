@@ -15,11 +15,11 @@ namespace Squidex.Infrastructure.Queries
 
         public string FullText { get; set; }
 
-        public long? Skip { get; set; }
+        public long Skip { get; set; }
 
-        public long? Take { get; set; }
+        public long Take { get; set; } = long.MaxValue;
 
-        public List<SortNode> Sort { get; } = new List<SortNode>();
+        public List<SortNode> Sort { get; set; } = new List<SortNode>();
 
         public override string ToString()
         {
@@ -35,12 +35,12 @@ namespace Squidex.Infrastructure.Queries
                 parts.Add($"FullText: {FullText}");
             }
 
-            if (Skip != null)
+            if (Skip > 0)
             {
                 parts.Add($"Skip: {Skip}");
             }
 
-            if (Take != null)
+            if (Take < long.MaxValue)
             {
                 parts.Add($"Take: {Take}");
             }

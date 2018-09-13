@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.OData.UriParser;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Apps;
@@ -18,6 +17,7 @@ using Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
+using Squidex.Infrastructure.Queries;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 {
@@ -42,20 +42,20 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             return collectionName;
         }
 
-        public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, ODataUriParser odataQuery, Status[] status = null, bool useDraft = false)
+        public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, Query query, Status[] status = null, bool useDraft = false)
         {
             try
             {
-                var propertyCalculator = FindExtensions.CreatePropertyCalculator(schema.SchemaDef, useDraft);
+                query = query.AdjustToModel(schema.SchemaDef, useDraft);
 
-                var filter = FindExtensions.BuildQuery(odataQuery, schema.Id, status, propertyCalculator);
+                var filter = FindExtensions.BuildQuery(query, schema.Id, status);
 
                 var contentCount = Collection.Find(filter).CountDocumentsAsync();
                 var contentItems =
                     Collection.Find(filter)
-                        .ContentTake(odataQuery)
-                        .ContentSkip(odataQuery)
-                        .ContentSort(odataQuery, propertyCalculator)
+                        .ContentTake(query)
+                        .ContentSkip(query)
+                        .ContentSort(query)
                         .Not(x => x.DataText)
                         .ToListAsync();
 
@@ -67,14 +67,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                 }
 
                 return ResultList.Create<IContentEntity>(contentCount.Result, contentItems.Result);
-            }
-            catch (NotSupportedException)
-            {
-                throw new ValidationException("This odata operation is not supported.");
-            }
-            catch (NotImplementedException)
-            {
-                throw new ValidationException("This odata operation is not supported.");
             }
             catch (MongoQueryException ex)
             {

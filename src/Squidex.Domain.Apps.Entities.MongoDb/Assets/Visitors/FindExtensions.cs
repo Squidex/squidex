@@ -8,59 +8,59 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.OData.UriParser;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb.OData;
+using Squidex.Infrastructure.Queries;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Assets.Visitors
 {
     public static class FindExtensions
     {
         private static readonly FilterDefinitionBuilder<MongoAssetEntity> Filter = Builders<MongoAssetEntity>.Filter;
-        private static readonly ConvertProperty PropertyCalculator = propertyNames =>
+
+        public static Query AdjustToModel(this Query query)
         {
-            if (propertyNames.Length > 0)
+            if (query.Filter != null)
             {
-                propertyNames[0] = propertyNames[0].ToPascalCase();
+                query.Filter = PascalCasePathConverter.Transform(query.Filter);
             }
 
-            var propertyName = string.Join(".", propertyNames);
+            query.Sort = query.Sort
+                .Select(x =>
+                    new SortNode(
+                        x.Path.Select(p => p.ToPascalCase()).ToList(),
+                        x.SortOrder))
+                    .ToList();
 
-            return propertyName;
-        };
-
-        public static IFindFluent<MongoAssetEntity, MongoAssetEntity> AssetSort(this IFindFluent<MongoAssetEntity, MongoAssetEntity> cursor, ODataUriParser query)
-        {
-            var sort = query.BuildSort<MongoAssetEntity>(PropertyCalculator);
-
-            return sort != null ? cursor.Sort(sort) : cursor.SortByDescending(x => x.LastModified);
+            return query;
         }
 
-        public static IFindFluent<MongoAssetEntity, MongoAssetEntity> AssetTake(this IFindFluent<MongoAssetEntity, MongoAssetEntity> cursor, ODataUriParser query)
+        public static IFindFluent<MongoAssetEntity, MongoAssetEntity> AssetSort(this IFindFluent<MongoAssetEntity, MongoAssetEntity> cursor, Query query)
         {
-            return cursor.Take(query, 200, 20);
+            return cursor.Sort(query.BuildSort<MongoAssetEntity>());
         }
 
-        public static IFindFluent<MongoAssetEntity, MongoAssetEntity> AssetSkip(this IFindFluent<MongoAssetEntity, MongoAssetEntity> cursor, ODataUriParser query)
+        public static IFindFluent<MongoAssetEntity, MongoAssetEntity> AssetTake(this IFindFluent<MongoAssetEntity, MongoAssetEntity> cursor, Query query)
+        {
+            return cursor.Take(query);
+        }
+
+        public static IFindFluent<MongoAssetEntity, MongoAssetEntity> AssetSkip(this IFindFluent<MongoAssetEntity, MongoAssetEntity> cursor, Query query)
         {
             return cursor.Skip(query);
         }
 
-        public static FilterDefinition<MongoAssetEntity> BuildQuery(ODataUriParser query, Guid appId, ITagService tagService)
+        public static FilterDefinition<MongoAssetEntity> BuildFilter(this Query query, Guid appId)
         {
-            var convertValue = CreateValueConverter(appId, tagService);
-
             var filters = new List<FilterDefinition<MongoAssetEntity>>
             {
                 Filter.Eq(x => x.IndexedAppId, appId),
                 Filter.Eq(x => x.IsDeleted, false)
             };
 
-            var filter = query.BuildFilter<MongoAssetEntity>(PropertyCalculator, convertValue, false);
+            var filter = query.BuildFilter<MongoAssetEntity>(false);
 
             if (filter.Filter != null)
             {
@@ -86,21 +86,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets.Visitors
             {
                 return new BsonDocument();
             }
-        }
-
-        public static ConvertValue CreateValueConverter(Guid appId, ITagService tagService)
-        {
-            return new ConvertValue((field, value) =>
-            {
-                if (string.Equals(field, nameof(MongoAssetEntity.Tags), StringComparison.OrdinalIgnoreCase))
-                {
-                    var tagNames = Task.Run(() => tagService.GetTagIdsAsync(appId, TagGroups.Assets, HashSet.Of(value.ToString()))).Result;
-
-                    return tagNames?.FirstOrDefault() ?? value;
-                }
-
-                return value;
-            });
         }
     }
 }

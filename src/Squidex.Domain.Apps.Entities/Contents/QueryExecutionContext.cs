@@ -70,7 +70,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public async Task<IResultList<IAssetEntity>> QueryAssetsAsync(string query)
         {
-            var assets = await assetQuery.QueryAsync(context, Query.Empty.WithODataQuery(query));
+            var assets = await assetQuery.QueryAsync(context, Q.Empty.WithODataQuery(query));
 
             foreach (var asset in assets)
             {
@@ -82,7 +82,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public async Task<IResultList<IContentEntity>> QueryContentsAsync(string schemaIdOrName, string query)
         {
-            var result = await contentQuery.QueryAsync(new ContentQueryContext(context).WithSchemaName(schemaIdOrName), Query.Empty.WithODataQuery(query));
+            var result = await contentQuery.QueryAsync(new ContentQueryContext(context).WithSchemaName(schemaIdOrName), Q.Empty.WithODataQuery(query));
 
             foreach (var content in result)
             {
@@ -100,7 +100,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             if (notLoadedAssets.Count > 0)
             {
-                var assets = await assetQuery.QueryAsync(context, Query.Empty.WithIds(notLoadedAssets));
+                var assets = await assetQuery.QueryAsync(context, Q.Empty.WithIds(notLoadedAssets));
 
                 foreach (var asset in assets)
                 {
@@ -119,7 +119,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             if (notLoadedContents.Count > 0)
             {
-                var result = await contentQuery.QueryAsync(new ContentQueryContext(context).WithSchemaId(schemaId), Query.Empty.WithIds(notLoadedContents));
+                var result = await contentQuery.QueryAsync(new ContentQueryContext(context).WithSchemaId(schemaId), Q.Empty.WithIds(notLoadedContents));
 
                 foreach (var content in result)
                 {

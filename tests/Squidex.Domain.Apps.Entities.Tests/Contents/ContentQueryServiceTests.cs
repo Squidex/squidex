@@ -12,7 +12,6 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.OData;
-using Microsoft.OData.UriParser;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -22,6 +21,7 @@ using Squidex.Domain.Apps.Entities.Contents.Edm;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Queries;
 using Squidex.Infrastructure.Security;
 using Xunit;
 
@@ -194,12 +194,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
             A.CallTo(() => appProvider.GetSchemaAsync(appId, schemaId, false))
                 .Returns(schema);
 
-            A.CallTo(() => contentRepository.QueryAsync(app, schema, A<Status[]>.That.IsSameSequenceAs(status), A<ODataUriParser>.Ignored))
+            A.CallTo(() => contentRepository.QueryAsync(app, schema, A<Status[]>.That.IsSameSequenceAs(status), A<Query>.Ignored))
                 .Returns(ResultList.Create(total, Enumerable.Repeat(content, count)));
 
             var ctx = context.WithSchemaId(schemaId).WithArchived(archive).WithUnpublished(unpublished);
 
-            var result = await sut.QueryAsync(ctx, Query.Empty);
+            var result = await sut.QueryAsync(ctx, Q.Empty);
 
             Assert.Equal(contentData, result[0].Data);
             Assert.Equal(content.Id, result[0].Id);
@@ -227,7 +227,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             A.CallTo(() => modelBuilder.BuildEdmModel(schema, app))
                 .Throws(new ODataException());
 
-            return Assert.ThrowsAsync<ValidationException>(() => sut.QueryAsync(context.WithSchemaId(schemaId), Query.Empty.WithODataQuery("query")));
+            return Assert.ThrowsAsync<ValidationException>(() => sut.QueryAsync(context.WithSchemaId(schemaId), Q.Empty.WithODataQuery("query")));
         }
 
         public static IEnumerable<object[]> ManyIdRequestData = new[]
@@ -261,7 +261,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var ctx = context.WithSchemaId(schemaId).WithArchived(archive).WithUnpublished(unpublished);
 
-            var result = await sut.QueryAsync(ctx, Query.Empty.WithIds(ids));
+            var result = await sut.QueryAsync(ctx, Q.Empty.WithIds(ids));
 
             Assert.Equal(ids, result.Select(x => x.Id).ToList());
             Assert.Equal(total, result.Total);

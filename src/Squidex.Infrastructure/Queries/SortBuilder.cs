@@ -5,20 +5,20 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.MongoDb.OData
+using System.Linq;
+
+namespace Squidex.Infrastructure.Queries
 {
-    public delegate object ConvertValue(string field, object value);
-
-    public static class ValueConversion
+    public static class SortBuilder
     {
-        public static object Convert(string field, object value, ConvertValue converter = null)
+        public static SortNode Ascending(string path)
         {
-            if (converter == null)
-            {
-                return value;
-            }
+            return new SortNode(path.Split('.', '/').ToList(), SortOrder.Ascending);
+        }
 
-            return converter(field, value);
+        public static SortNode Descending(string path)
+        {
+            return new SortNode(path.Split('.', '/').ToList(), SortOrder.Descending);
         }
     }
 }

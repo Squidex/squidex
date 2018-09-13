@@ -17,7 +17,7 @@ namespace Squidex.Infrastructure.Queries.OData
 
             if (top.HasValue)
             {
-                result.Take = top;
+                result.Take = top.Value;
             }
         }
 
@@ -27,7 +27,7 @@ namespace Squidex.Infrastructure.Queries.OData
 
             if (skip.HasValue)
             {
-                result.Skip = skip;
+                result.Skip = skip.Value;
             }
         }
     }

@@ -130,7 +130,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         {
             var context = Context().WithArchived(archived).WithSchemaName(name);
 
-            var result = await contentQuery.QueryAsync(context, Query.Empty.WithIds(ids).WithODataQuery(Request.QueryString.ToString()));
+            var result = await contentQuery.QueryAsync(context, Q.Empty.WithIds(ids).WithODataQuery(Request.QueryString.ToString()));
 
             var response = new ContentsDto
             {

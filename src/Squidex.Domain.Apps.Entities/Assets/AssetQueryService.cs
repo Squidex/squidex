@@ -9,14 +9,19 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.OData;
 using Squidex.Domain.Apps.Core.Tags;
+using Squidex.Domain.Apps.Entities.Assets.Edm;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Queries;
+using Squidex.Infrastructure.Queries.OData;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
     public sealed class AssetQueryService : IAssetQueryService
     {
+        private const int MaxResults = 20;
         private readonly ITagService tagService;
         private readonly IAssetRepository assetRepository;
 
@@ -44,7 +49,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             return asset;
         }
 
-        public async Task<IResultList<IAssetEntity>> QueryAsync(QueryContext context, Query query)
+        public async Task<IResultList<IAssetEntity>> QueryAsync(QueryContext context, Q query)
         {
             Guard.NotNull(context, nameof(context));
             Guard.NotNull(query, nameof(query));
@@ -58,7 +63,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
             }
             else
             {
-                assets = await assetRepository.QueryAsync(context.App.Id, query.ODataQuery);
+                var parsedQuery = ParseQuery(context, query.ODataQuery);
+
+                assets = await assetRepository.QueryAsync(context.App.Id, parsedQuery);
             }
 
             await DenormalizeTagsAsync(context.App.Id, assets);
@@ -66,11 +73,39 @@ namespace Squidex.Domain.Apps.Entities.Assets
             return assets;
         }
 
-        private IResultList<IAssetEntity> Sort(IResultList<IAssetEntity> assets, IList<Guid> ids)
+        private IResultList<IAssetEntity> Sort(IResultList<IAssetEntity> assets, IReadOnlyList<Guid> ids)
         {
             var sorted = ids.Select(id => assets.FirstOrDefault(x => x.Id == id)).Where(x => x != null);
 
             return ResultList.Create(assets.Total, sorted);
+        }
+
+        private Query ParseQuery(QueryContext context, string query)
+        {
+            try
+            {
+                var result = EdmAssetModel.Edm.ParseQuery(query).ToQuery();
+
+                if (result.Sort.Count == 0)
+                {
+                    result.Sort.Add(new SortNode(new List<string> { "lastModified" }, SortOrder.Descending));
+                }
+
+                if (result.Take > MaxResults)
+                {
+                    result.Take = MaxResults;
+                }
+
+                return result;
+            }
+            catch (NotSupportedException)
+            {
+                throw new ValidationException($"OData operation is not supported.");
+            }
+            catch (ODataException ex)
+            {
+                throw new ValidationException($"Failed to parse query: {ex.Message}", ex);
+            }
         }
 
         private async Task DenormalizeTagsAsync(Guid appId, IEnumerable<IAssetEntity> assets)

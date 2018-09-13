@@ -102,7 +102,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         {
             var context = Context();
 
-            var assets = await assetQuery.QueryAsync(context, Query.Empty.WithODataQuery(Request.QueryString.ToString()).WithIds(ids));
+            var assets = await assetQuery.QueryAsync(context, Q.Empty.WithODataQuery(Request.QueryString.ToString()).WithIds(ids));
 
             var response = AssetsDto.FromAssets(assets);
 

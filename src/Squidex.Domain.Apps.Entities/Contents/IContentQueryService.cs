@@ -13,7 +13,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 {
     public interface IContentQueryService
     {
-        Task<IResultList<IContentEntity>> QueryAsync(ContentQueryContext context, Query query);
+        Task<IResultList<IContentEntity>> QueryAsync(ContentQueryContext context, Q query);
 
         Task<IContentEntity> FindContentAsync(ContentQueryContext context, Guid id, long version = EtagVersion.Any);
 

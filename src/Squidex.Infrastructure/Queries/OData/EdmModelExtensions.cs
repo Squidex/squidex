@@ -39,10 +39,13 @@ namespace Squidex.Infrastructure.Queries.OData
         {
             var query = new Query();
 
-            parser.ParseTake(query);
-            parser.ParseSkip(query);
-            parser.ParseFilter(query);
-            parser.ParseSort(query);
+            if (parser != null)
+            {
+                parser.ParseTake(query);
+                parser.ParseSkip(query);
+                parser.ParseFilter(query);
+                parser.ParseSort(query);
+            }
 
             return query;
         }
