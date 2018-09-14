@@ -24,7 +24,7 @@ namespace Squidex.Infrastructure.Tasks
 
         public Task<IDisposable> LockAsync()
         {
-            Task wait = semaphore.WaitAsync();
+            var wait = semaphore.WaitAsync();
 
             if (wait.IsCompleted)
             {
@@ -50,7 +50,7 @@ namespace Squidex.Infrastructure.Tasks
 
             public void Dispose()
             {
-                AsyncLock current = target;
+                var current = target;
 
                 if (current == null)
                 {

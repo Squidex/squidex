@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Orleans;
+using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Tags
@@ -29,12 +30,12 @@ namespace Squidex.Domain.Apps.Entities.Tags
             this.grainFactory = grainFactory;
         }
 
-        public Task<HashSet<string>> NormalizeTagsAsync(Guid appId, string group, HashSet<string> names, HashSet<string> ids)
+        public Task<Dictionary<string, string>> NormalizeTagsAsync(Guid appId, string group, HashSet<string> names, HashSet<string> ids)
         {
             return GetGrain(appId, group).NormalizeTagsAsync(names, ids);
         }
 
-        public Task<HashSet<string>> GetTagIdsAsync(Guid appId, string group, HashSet<string> names)
+        public Task<Dictionary<string, string>> GetTagIdsAsync(Guid appId, string group, HashSet<string> names)
         {
             return GetGrain(appId, group).GetTagIdsAsync(names);
         }

@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.States;
@@ -58,9 +59,9 @@ namespace Squidex.Domain.Apps.Entities.Tags
             return persistence.WriteSnapshotAsync(state);
         }
 
-        public async Task<HashSet<string>> NormalizeTagsAsync(HashSet<string> names, HashSet<string> ids)
+        public async Task<Dictionary<string, string>> NormalizeTagsAsync(HashSet<string> names, HashSet<string> ids)
         {
-            var result = new HashSet<string>();
+            var result = new Dictionary<string, string>();
 
             if (names != null)
             {
@@ -89,7 +90,7 @@ namespace Squidex.Domain.Apps.Entities.Tags
                             state.Tags.Add(tagId, new Tag { Name = tagName });
                         }
 
-                        result.Add(tagId);
+                        result.Add(tagName, tagId);
                     }
                 }
             }
@@ -98,7 +99,7 @@ namespace Squidex.Domain.Apps.Entities.Tags
             {
                 foreach (var id in ids)
                 {
-                    if (!result.Contains(id))
+                    if (!result.ContainsValue(id))
                     {
                         if (state.Tags.TryGetValue(id, out var tagInfo))
                         {
@@ -118,9 +119,9 @@ namespace Squidex.Domain.Apps.Entities.Tags
             return result;
         }
 
-        public Task<HashSet<string>> GetTagIdsAsync(HashSet<string> names)
+        public Task<Dictionary<string, string>> GetTagIdsAsync(HashSet<string> names)
         {
-            var result = new HashSet<string>();
+            var result = new Dictionary<string, string>();
 
             foreach (var name in names)
             {
@@ -128,7 +129,7 @@ namespace Squidex.Domain.Apps.Entities.Tags
 
                 if (!string.IsNullOrWhiteSpace(id))
                 {
-                    result.Add(id);
+                    result.Add(name, id);
                 }
             }
 

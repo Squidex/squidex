@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Microsoft.OData.UriParser;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
 using NodaTime;
@@ -17,6 +16,7 @@ using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.GenerateEdmSchema;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure.MongoDb.OData;
+using Squidex.Infrastructure.Queries;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors
 {
@@ -28,77 +28,98 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors
             typeof(MongoContentEntity).GetProperties()
                 .ToDictionary(x => x.Name, x => x.GetCustomAttribute<BsonElementAttribute>()?.ElementName ?? x.Name, StringComparer.OrdinalIgnoreCase);
 
-        public static readonly ConvertValue ValueConverter = (field, value) =>
+        private sealed class AdaptionVisitor : TransformVisitor
         {
-            if (value is Instant instant &&
-                !string.Equals(field, "mt", StringComparison.OrdinalIgnoreCase) &&
-                !string.Equals(field, "ct", StringComparison.OrdinalIgnoreCase))
+            private readonly Func<IReadOnlyList<string>, IReadOnlyList<string>> pathConverter;
+
+            public AdaptionVisitor(Func<IReadOnlyList<string>, IReadOnlyList<string>> pathConverter)
             {
-                return instant.ToString();
+                this.pathConverter = pathConverter;
             }
 
-            return value;
-        };
-
-        public static ConvertProperty CreatePropertyCalculator(Schema schema, bool useDraft)
-        {
-            return propertyNames =>
+            public override FilterNode Visit(FilterComparison nodeIn)
             {
-                if (propertyNames.Length > 1)
+                var value = nodeIn.Value;
+
+                if (value is Instant instant &&
+                    !string.Equals(nodeIn.Path[0], "mt", StringComparison.OrdinalIgnoreCase) &&
+                    !string.Equals(nodeIn.Path[0], "ct", StringComparison.OrdinalIgnoreCase))
                 {
-                    var edmName = propertyNames[1].UnescapeEdmField();
+                    value = instant.ToString();
+                }
+
+                return new FilterComparison(pathConverter(nodeIn.Path), nodeIn.Operator, value, nodeIn.ValueType);
+            }
+        }
+
+        public static Query AdjustToModel(this Query query, Schema schema, bool useDraft)
+        {
+            var pathConverter = new Func<IReadOnlyList<string>, IReadOnlyList<string>>(propertyNames =>
+            {
+                var result = new List<string>(propertyNames);
+
+                if (result.Count > 1)
+                {
+                    var edmName = result[1].UnescapeEdmField();
 
                     if (!schema.FieldsByName.TryGetValue(edmName, out var field))
                     {
                         throw new NotSupportedException();
                     }
 
-                    propertyNames[1] = field.Id.ToString();
+                    result[1] = field.Id.ToString();
                 }
 
-                if (propertyNames.Length > 0)
+                if (result.Count > 0)
                 {
-                    if (propertyNames[0].Equals("Data", StringComparison.CurrentCultureIgnoreCase))
+                    if (result[0].Equals("Data", StringComparison.CurrentCultureIgnoreCase))
                     {
                         if (useDraft)
                         {
-                            propertyNames[0] = "dd";
+                            result[0] = "dd";
                         }
                         else
                         {
-                            propertyNames[0] = "do";
+                            result[0] = "do";
                         }
                     }
                     else
                     {
-                        propertyNames[0] = PropertyMap[propertyNames[0]];
+                        result[0] = PropertyMap[propertyNames[0]];
                     }
                 }
 
                 var propertyName = string.Join(".", propertyNames);
 
-                return propertyName;
-            };
+                return result;
+            });
+
+            if (query.Filter != null)
+            {
+                query.Filter = query.Filter.Accept(new AdaptionVisitor(pathConverter));
+            }
+
+            query.Sort = query.Sort.Select(x => new SortNode(pathConverter(x.Path), x.SortOrder)).ToList();
+
+            return query;
         }
 
-        public static IFindFluent<MongoContentEntity, MongoContentEntity> ContentSort(this IFindFluent<MongoContentEntity, MongoContentEntity> cursor, ODataUriParser query, ConvertProperty propertyCalculator)
+        public static IFindFluent<MongoContentEntity, MongoContentEntity> ContentSort(this IFindFluent<MongoContentEntity, MongoContentEntity> cursor, Query query)
         {
-            var sort = query.BuildSort<MongoContentEntity>(propertyCalculator);
-
-            return sort != null ? cursor.Sort(sort) : cursor.SortByDescending(x => x.LastModified);
+            return cursor.Sort(query.BuildSort<MongoContentEntity>());
         }
 
-        public static IFindFluent<MongoContentEntity, MongoContentEntity> ContentTake(this IFindFluent<MongoContentEntity, MongoContentEntity> cursor, ODataUriParser query)
+        public static IFindFluent<MongoContentEntity, MongoContentEntity> ContentTake(this IFindFluent<MongoContentEntity, MongoContentEntity> cursor, Query query)
         {
-            return cursor.Take(query, 200, 20);
+            return cursor.Take(query);
         }
 
-        public static IFindFluent<MongoContentEntity, MongoContentEntity> ContentSkip(this IFindFluent<MongoContentEntity, MongoContentEntity> cursor, ODataUriParser query)
+        public static IFindFluent<MongoContentEntity, MongoContentEntity> ContentSkip(this IFindFluent<MongoContentEntity, MongoContentEntity> cursor, Query query)
         {
             return cursor.Skip(query);
         }
 
-        public static FilterDefinition<MongoContentEntity> BuildQuery(ODataUriParser query, Guid schemaId, Status[] status, ConvertProperty propertyCalculator)
+        public static FilterDefinition<MongoContentEntity> BuildQuery(Query query, Guid schemaId, Status[] status)
         {
             var filters = new List<FilterDefinition<MongoContentEntity>>
             {
@@ -111,7 +132,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors
                 filters.Add(Filter.In(x => x.Status, status));
             }
 
-            var filter = query.BuildFilter<MongoContentEntity>(propertyCalculator, ValueConverter);
+            var filter = query.BuildFilter<MongoContentEntity>();
 
             if (filter.Filter != null)
             {

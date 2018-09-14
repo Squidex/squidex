@@ -6,16 +6,22 @@
 // ==========================================================================
 
 using System.Collections.Immutable;
+using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 
-namespace Squidex.Infrastructure.MongoDb.OData
+namespace Squidex.Infrastructure.Queries.OData
 {
-    public sealed class PropertyNameVisitor : QueryNodeVisitor<ImmutableList<string>>
+    public sealed class PropertyPathVisitor : QueryNodeVisitor<ImmutableList<string>>
     {
-        public static readonly PropertyNameVisitor Instance = new PropertyNameVisitor();
+        private static readonly PropertyPathVisitor Instance = new PropertyPathVisitor();
 
-        private PropertyNameVisitor()
+        private PropertyPathVisitor()
         {
+        }
+
+        public static ImmutableList<string> Visit(QueryNode node)
+        {
+            return node.Accept(Instance);
         }
 
         public override ImmutableList<string> Visit(ConvertNode nodeIn)
@@ -27,11 +33,11 @@ namespace Squidex.Infrastructure.MongoDb.OData
         {
             if (nodeIn.Source is SingleComplexNode)
             {
-                return nodeIn.Source.Accept(this).Add(nodeIn.Property.Name);
+                return nodeIn.Source.Accept(this).Add(UnescapeEdmField(nodeIn.Property));
             }
             else
             {
-                return ImmutableList.Create(nodeIn.Property.Name);
+                return ImmutableList.Create(UnescapeEdmField(nodeIn.Property));
             }
         }
 
@@ -39,12 +45,17 @@ namespace Squidex.Infrastructure.MongoDb.OData
         {
             if (nodeIn.Source is SingleComplexNode)
             {
-                return nodeIn.Source.Accept(this).Add(nodeIn.Property.Name);
+                return nodeIn.Source.Accept(this).Add(UnescapeEdmField(nodeIn.Property));
             }
             else
             {
-                return ImmutableList.Create(nodeIn.Property.Name);
+                return ImmutableList.Create(UnescapeEdmField(nodeIn.Property));
             }
+        }
+
+        private static string UnescapeEdmField(IEdmProperty property)
+        {
+            return property.Name;
         }
     }
 }

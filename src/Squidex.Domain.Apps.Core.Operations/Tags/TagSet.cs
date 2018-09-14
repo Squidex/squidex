@@ -5,12 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Tags
-{
-    public sealed class Tag
-    {
-        public string Name { get; set; }
+using System.Collections.Generic;
 
-        public int Count { get; set; } = 1;
+namespace Squidex.Domain.Apps.Core.Tags
+{
+    public sealed class TagSet : Dictionary<string, Tag>
+    {
     }
 }

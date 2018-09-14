@@ -6,11 +6,12 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.Assets.Guards;
 using Squidex.Domain.Apps.Entities.Assets.State;
-using Squidex.Domain.Apps.Entities.Tags;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
@@ -46,7 +47,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                     {
                         GuardAsset.CanCreate(c);
 
-                        c.Tags = await tagService.NormalizeTagsAsync(c.AppId.Id, TagGroups.Assets, c.Tags, Snapshot.Tags);
+                        c.Tags = await NormalizeTagsAsync(c.AppId.Id, c.Tags);
 
                         Create(c);
 
@@ -66,7 +67,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                     {
                         GuardAsset.CanTag(c);
 
-                        c.Tags = await tagService.NormalizeTagsAsync(Snapshot.AppId.Id, TagGroups.Assets, c.Tags, Snapshot.Tags);
+                        c.Tags = await NormalizeTagsAsync(Snapshot.AppId.Id, c.Tags);
 
                         Tag(c);
                     });
@@ -89,6 +90,13 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 default:
                     throw new NotSupportedException();
             }
+        }
+
+        private async Task<HashSet<string>> NormalizeTagsAsync(Guid appId, HashSet<string> tags)
+        {
+            var normalized = await tagService.NormalizeTagsAsync(appId, TagGroups.Assets, tags, Snapshot.Tags);
+
+            return new HashSet<string>(normalized.Values);
         }
 
         public void Create(CreateAsset command)

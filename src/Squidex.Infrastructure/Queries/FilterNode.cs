@@ -5,10 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Tags
+namespace Squidex.Infrastructure.Queries
 {
-    public static class TagGroups
+    public abstract class FilterNode
     {
-        public const string Assets = "Assets";
+        public abstract T Accept<T>(FilterNodeVisitor<T> visitor);
     }
 }

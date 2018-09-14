@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.OData;
-using Microsoft.OData.UriParser;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.ConvertContent;
 using Squidex.Domain.Apps.Core.Scripting;
@@ -19,6 +18,8 @@ using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
+using Squidex.Infrastructure.Queries;
+using Squidex.Infrastructure.Queries.OData;
 using Squidex.Infrastructure.Reflection;
 
 #pragma warning disable RECS0147
@@ -27,6 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 {
     public sealed class ContentQueryService : IContentQueryService
     {
+        private const int MaxResults = 20;
         private static readonly Status[] StatusAll = { Status.Archived, Status.Draft, Status.Published };
         private static readonly Status[] StatusArchived = { Status.Archived };
         private static readonly Status[] StatusPublished = { Status.Published };
@@ -88,7 +90,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             }
         }
 
-        public async Task<IResultList<IContentEntity>> QueryAsync(ContentQueryContext context, Query query)
+        public async Task<IResultList<IContentEntity>> QueryAsync(ContentQueryContext context, Q query)
         {
             Guard.NotNull(context, nameof(context));
 
@@ -128,7 +130,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return ResultList.Create(contents.Total, transformed);
         }
 
-        private IResultList<IContentEntity> Sort(IResultList<IContentEntity> contents, IList<Guid> ids)
+        private IResultList<IContentEntity> Sort(IResultList<IContentEntity> contents, IReadOnlyList<Guid> ids)
         {
             var sorted = ids.Select(id => contents.FirstOrDefault(x => x.Id == id)).Where(x => x != null);
 
@@ -197,7 +199,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             }
         }
 
-        private ODataUriParser ParseQuery(QueryContext context, string query, ISchemaEntity schema)
+        private Query ParseQuery(QueryContext context, string query, ISchemaEntity schema)
         {
             using (Profiler.TraceMethod<ContentQueryService>())
             {
@@ -205,7 +207,23 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 {
                     var model = modelBuilder.BuildEdmModel(schema, context.App);
 
-                    return model.ParseQuery(query);
+                    var result = model.ParseQuery(query).ToQuery();
+
+                    if (result.Sort.Count == 0)
+                    {
+                        result.Sort.Add(new SortNode(new List<string> { "lastModified" }, SortOrder.Descending));
+                    }
+
+                    if (result.Take > MaxResults)
+                    {
+                        result.Take = MaxResults;
+                    }
+
+                    return result;
+                }
+                catch (NotSupportedException)
+                {
+                    throw new ValidationException($"OData operation is not supported.");
                 }
                 catch (ODataException ex)
                 {

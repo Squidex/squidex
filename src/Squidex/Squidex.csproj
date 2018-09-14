@@ -80,7 +80,7 @@
     <PackageReference Include="MongoDB.Driver" Version="2.7.0" />
     <PackageReference Include="NJsonSchema" Version="9.10.72" />
     <PackageReference Include="NodaTime.Serialization.JsonNet" Version="2.0.0" />
-    <PackageReference Include="NSwag.AspNetCore" Version="11.19.0" />
+    <PackageReference Include="NSwag.AspNetCore" Version="11.19.1" />
     <PackageReference Include="OpenCover" Version="4.6.519" />
     <PackageReference Include="Orleans.Providers.MongoDB" Version="2.0.0" />
     <PackageReference Include="OrleansDashboard" Version="2.0.9" />

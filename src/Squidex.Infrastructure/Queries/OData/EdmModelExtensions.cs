@@ -10,7 +10,7 @@ using System.Linq;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 
-namespace Squidex.Domain.Apps.Entities
+namespace Squidex.Infrastructure.Queries.OData
 {
     public static class EdmModelExtensions
     {
@@ -33,6 +33,21 @@ namespace Squidex.Domain.Apps.Entities
             var parser = new ODataUriParser(model, new Uri($"{path}?{query}", UriKind.Relative));
 
             return parser;
+        }
+
+        public static Query ToQuery(this ODataUriParser parser)
+        {
+            var query = new Query();
+
+            if (parser != null)
+            {
+                parser.ParseTake(query);
+                parser.ParseSkip(query);
+                parser.ParseFilter(query);
+                parser.ParseSort(query);
+            }
+
+            return query;
         }
     }
 }

@@ -8,7 +8,7 @@
 using System;
 using Microsoft.OData.UriParser;
 
-namespace Squidex.Infrastructure.MongoDb.OData
+namespace Squidex.Infrastructure.Queries.OData
 {
     public class SearchTermVisitor : QueryNodeVisitor<string>
     {

@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Orleans;
+using Squidex.Domain.Apps.Core.Tags;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Tags
