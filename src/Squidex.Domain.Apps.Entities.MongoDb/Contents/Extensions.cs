@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using Newtonsoft.Json.Linq;
@@ -54,7 +55,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             {
                 if (text.Type == JTokenType.String)
                 {
-                    var value = text.ToString();
+                    var value = text.ToString(CultureInfo.InvariantCulture);
 
                     if (value.Length < 1000)
                     {

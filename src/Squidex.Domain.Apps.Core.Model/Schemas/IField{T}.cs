@@ -7,7 +7,7 @@
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    public interface IField<T> : IField
+    public interface IField<out T> : IField
     {
         T Properties { get; }
     }

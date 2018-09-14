@@ -70,7 +70,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
             await publish(new AttachClient { Id = "default", AppId = appId });
         }
 
-        private async Task<NamedId<Guid>> CreateAuthenticationSchemeSchemaAsync(Func<ICommand, Task> publish)
+        private static async Task<NamedId<Guid>> CreateAuthenticationSchemeSchemaAsync(Func<ICommand, Task> publish)
         {
             var schema =
                 SchemaBuilder.Create("Authentication Schemes")
@@ -95,7 +95,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
             return NamedId.Of(schema.SchemaId, schema.Name);
         }
 
-        private Task CreateClientsSchemaAsync(Func<ICommand, Task> publish)
+        private static Task CreateClientsSchemaAsync(Func<ICommand, Task> publish)
         {
             var schema =
                 SchemaBuilder.Create("Clients")
@@ -134,7 +134,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
             return publish(schema);
         }
 
-        private Task CreateSettingsSchemaAsync(Func<ICommand, Task> publish)
+        private static Task CreateSettingsSchemaAsync(Func<ICommand, Task> publish)
         {
             var schema =
                 SchemaBuilder.Create("Settings").Singleton()
@@ -191,7 +191,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
             return publish(schema);
         }
 
-        private async Task CreateUsersSchemaAsync(Func<ICommand, Task> publish)
+        private static async Task CreateUsersSchemaAsync(Func<ICommand, Task> publish)
         {
             var schema =
                 SchemaBuilder.Create("Users")
@@ -261,7 +261,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
             });
         }
 
-        private Task CreateApiResourcesSchemaAsync(Func<ICommand, Task> publish)
+        private static Task CreateApiResourcesSchemaAsync(Func<ICommand, Task> publish)
         {
             var schema =
                 SchemaBuilder.Create("API Resources")
@@ -282,7 +282,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
             return publish(schema);
         }
 
-        private Task CreateIdentityResourcesSchemaAsync(Func<ICommand, Task> publish)
+        private static Task CreateIdentityResourcesSchemaAsync(Func<ICommand, Task> publish)
         {
             var schema =
                 SchemaBuilder.Create("Identity Resources")

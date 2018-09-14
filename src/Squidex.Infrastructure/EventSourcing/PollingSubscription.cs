@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Squidex.Infrastructure.Timers;
 
@@ -14,12 +13,7 @@ namespace Squidex.Infrastructure.EventSourcing
 {
     public sealed class PollingSubscription : IEventSubscription
     {
-        private readonly IEventStore eventStore;
-        private readonly IEventSubscriber eventSubscriber;
         private readonly CompletionTimer timer;
-        private readonly Regex streamRegex;
-        private readonly string streamFilter;
-        private string position;
 
         public PollingSubscription(
             IEventStore eventStore,
@@ -29,13 +23,6 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             Guard.NotNull(eventStore, nameof(eventStore));
             Guard.NotNull(eventSubscriber, nameof(eventSubscriber));
-
-            this.position = position;
-            this.eventStore = eventStore;
-            this.eventSubscriber = eventSubscriber;
-            this.streamFilter = streamFilter;
-
-            streamRegex = new Regex(streamFilter);
 
             timer = new CompletionTimer(5000, async ct =>
             {

@@ -99,22 +99,14 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return TaskHelper.Done;
         }
 
-        private ScriptContext CreateScriptContext(object operation, ContentCommand command, NamedContentData data, NamedContentData oldData)
+        private static ScriptContext CreateScriptContext(object operation, ContentCommand command, NamedContentData data, NamedContentData oldData)
         {
             return new ScriptContext { ContentId = command.ContentId, OldData = oldData, Data = data, User = command.User, Operation = operation.ToString() };
         }
 
         private ValidationContext CreateValidationContext()
         {
-            return new ValidationContext(
-                (contentIds, schemaId) =>
-                {
-                    return QueryContentsAsync(schemaId, contentIds);
-                },
-                assetIds =>
-                {
-                    return QueryAssetsAsync(assetIds);
-                });
+            return new ValidationContext((contentIds, schemaId) => QueryContentsAsync(schemaId, contentIds), QueryAssetsAsync);
         }
 
         private async Task<IReadOnlyList<IAssetInfo>> QueryAssetsAsync(IEnumerable<Guid> assetIds)

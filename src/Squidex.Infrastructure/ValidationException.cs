@@ -38,7 +38,7 @@ namespace Squidex.Infrastructure
         }
 
         public ValidationException(string summary, Exception inner, params ValidationError[] errors)
-            : this(summary, null, errors?.ToList())
+            : this(summary, inner, errors?.ToList())
         {
         }
 

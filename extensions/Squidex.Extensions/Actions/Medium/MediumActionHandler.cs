@@ -12,7 +12,6 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.HandleRules;
-using Squidex.Domain.Apps.Core.HandleRules.Actions.Utils;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 using Squidex.Infrastructure.Http;
 

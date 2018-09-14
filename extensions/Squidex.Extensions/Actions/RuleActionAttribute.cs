@@ -9,7 +9,7 @@ using System;
 
 namespace Squidex.Extensions.Actions
 {
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
+    [AttributeUsage(AttributeTargets.Class, Inherited = false)]
     public sealed class RuleActionAttribute : Attribute
     {
         public string ReadMore { get; set; }

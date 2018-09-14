@@ -187,7 +187,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
             return CreateCommand(command);
         }
 
-        private CreateRule MakeCreateCommand()
+        private static CreateRule MakeCreateCommand()
         {
             var newTrigger = new ContentChangedTrigger
             {

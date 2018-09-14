@@ -16,8 +16,6 @@ namespace Squidex.Infrastructure.Assets
 {
     public class AzureBlobAssetStore : IAssetStore, IInitializable
     {
-        private const string AssetVersion = "AssetVersion";
-        private const string AssetId = "AssetId";
         private readonly string containerName;
         private readonly string connectionString;
         private CloudBlobContainer blobContainer;
@@ -72,7 +70,7 @@ namespace Squidex.Infrastructure.Assets
                 {
                     ct.ThrowIfCancellationRequested();
 
-                    await Task.Delay(50);
+                    await Task.Delay(50, ct);
                     await targetBlob.FetchAttributesAsync(null, null, null, ct);
                 }
 

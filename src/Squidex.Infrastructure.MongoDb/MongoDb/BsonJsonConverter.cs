@@ -85,11 +85,11 @@ namespace Squidex.Infrastructure.MongoDb
                 case JTokenType.Bytes:
                     return BsonValue.Create(((JValue)source).Value);
                 case JTokenType.Guid:
-                    return BsonValue.Create(((JValue)source).ToString());
+                    return BsonValue.Create(((JValue)source).ToString(CultureInfo.InvariantCulture));
                 case JTokenType.Uri:
-                    return BsonValue.Create(((JValue)source).ToString());
+                    return BsonValue.Create(((JValue)source).ToString(CultureInfo.InvariantCulture));
                 case JTokenType.TimeSpan:
-                    return BsonValue.Create(((JValue)source).ToString());
+                    return BsonValue.Create(((JValue)source).ToString(CultureInfo.InvariantCulture));
                 case JTokenType.Date:
                     {
                         var value = ((JValue)source).Value;

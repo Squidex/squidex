@@ -8,7 +8,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Newtonsoft.Json;
 using Squidex.Domain.Apps.Core.Schemas;
 using Xunit;
 
@@ -18,7 +17,6 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
 {
     public class ArrayfieldTests
     {
-        private readonly JsonSerializer serializer = TestData.DefaultSerializer();
         private readonly ArrayField parent_0 = Fields.Array(100, "root", Partitioning.Invariant);
 
         [Fact]

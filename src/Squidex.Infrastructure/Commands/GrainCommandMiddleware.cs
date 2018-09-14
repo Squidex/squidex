@@ -22,7 +22,7 @@ namespace Squidex.Infrastructure.Commands
             this.grainFactory = grainFactory;
         }
 
-        public async virtual Task HandleAsync(CommandContext context, Func<Task> next)
+        public virtual async Task HandleAsync(CommandContext context, Func<Task> next)
         {
             if (context.Command is TCommand typedCommand)
             {

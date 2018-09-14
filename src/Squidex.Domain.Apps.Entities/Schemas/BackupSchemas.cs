@@ -55,7 +55,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             return TaskHelper.Done;
         }
 
-        public async override Task RestoreAsync(Guid appId, BackupReader reader)
+        public override async Task RestoreAsync(Guid appId, BackupReader reader)
         {
             await RebuildManyAsync(schemaIds.Select(x => x.Id), id => RebuildAsync<SchemaState, SchemaGrain>(id, (e, s) => s.Apply(e, fieldRegistry)));
 

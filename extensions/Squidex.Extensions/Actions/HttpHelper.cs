@@ -10,7 +10,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Squidex.Infrastructure.Http;
 
-namespace Squidex.Domain.Apps.Core.HandleRules.Actions.Utils
+namespace Squidex.Extensions.Actions
 {
     public static class HttpHelper
     {

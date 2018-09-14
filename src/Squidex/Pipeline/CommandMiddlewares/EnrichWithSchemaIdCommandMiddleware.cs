@@ -66,7 +66,7 @@ namespace Squidex.Pipeline.CommandMiddlewares
             {
                 var appFeature = actionContextAccessor.ActionContext.HttpContext.Features.Get<IAppFeature>();
 
-                if (appFeature != null && appFeature.App != null)
+                if (appFeature?.App != null)
                 {
                     appId = NamedId.Of(appFeature.App.Id, appFeature.App.Name);
                 }

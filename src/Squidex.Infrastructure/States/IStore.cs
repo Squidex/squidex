@@ -11,7 +11,7 @@ using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Infrastructure.States
 {
-    public interface IStore<TKey>
+    public interface IStore<in TKey>
     {
         IPersistence WithEventSourcing(Type owner, TKey key, Func<Envelope<IEvent>, Task> applyEvent);
 

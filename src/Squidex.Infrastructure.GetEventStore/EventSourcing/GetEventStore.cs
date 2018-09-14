@@ -21,7 +21,7 @@ namespace Squidex.Infrastructure.EventSourcing
         private const int ReadPageSize = 500;
         private readonly IEventStoreConnection connection;
         private readonly string prefix;
-        private ProjectionClient projectionClient;
+        private readonly ProjectionClient projectionClient;
 
         public GetEventStore(IEventStoreConnection connection, string prefix, string projectionHost)
         {
@@ -50,7 +50,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public IEventSubscription CreateSubscription(IEventSubscriber subscriber, string streamFilter, string position = null)
         {
-            return new GetEventStoreSubscription(connection, subscriber, projectionClient, prefix, position, streamFilter);
+            return new GetEventStoreSubscription(connection, subscriber, projectionClient, position, streamFilter);
         }
 
         public Task CreateIndexAsync(string property)
@@ -82,9 +82,26 @@ namespace Squidex.Infrastructure.EventSourcing
             }
         }
 
-        private Task QueryAsync(Func<StoredEvent, Task> callback, string streamName, long sliceStart, CancellationToken ct)
+        private async Task QueryAsync(Func<StoredEvent, Task> callback, string streamName, long sliceStart, CancellationToken ct)
         {
-            return QueryAsync(callback, GetStreamName(streamName), sliceStart, ct);
+            StreamEventsSlice currentSlice;
+            do
+            {
+                currentSlice = await connection.ReadStreamEventsForwardAsync(streamName, sliceStart, ReadPageSize, false);
+
+                if (currentSlice.Status == SliceReadStatus.Success)
+                {
+                    sliceStart = currentSlice.NextEventNumber;
+
+                    foreach (var resolved in currentSlice.Events)
+                    {
+                        var storedEvent = Formatter.Read(resolved);
+
+                        await callback(storedEvent);
+                    }
+                }
+            }
+            while (!currentSlice.IsEndOfStream && !ct.IsCancellationRequested);
         }
 
         public async Task<IReadOnlyList<StoredEvent>> QueryAsync(string streamName, long streamPosition = 0)

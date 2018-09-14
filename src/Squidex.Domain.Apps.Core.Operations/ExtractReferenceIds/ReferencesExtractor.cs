@@ -33,13 +33,13 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 
             if (value is JArray items)
             {
-                foreach (JObject item in value)
+                foreach (JObject item in items)
                 {
                     foreach (var nestedField in field.Fields)
                     {
-                        if (item.TryGetValue(nestedField.Name, out var value))
+                        if (item.TryGetValue(nestedField.Name, out var nestedValue))
                         {
-                            result.AddRange(nestedField.Accept(new ReferencesExtractor(value)));
+                            result.AddRange(nestedField.Accept(new ReferencesExtractor(nestedValue)));
                         }
                     }
                 }

@@ -7,7 +7,7 @@
 
 using System;
 
-namespace Squidex.Domain.Apps.Entities.Backup.Archive
+namespace Squidex.Domain.Apps.Entities.Backup.Helpers
 {
     public static class ArchiveHelper
     {

@@ -23,7 +23,7 @@ namespace Squidex.Infrastructure
             "TB"
         };
 
-        private static readonly Dictionary<string, string> UnifiedExtensions = new Dictionary<string, string>()
+        private static readonly Dictionary<string, string> UnifiedExtensions = new Dictionary<string, string>
         {
             ["jpeg"] = "jpg"
         };

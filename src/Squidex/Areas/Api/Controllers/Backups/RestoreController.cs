@@ -49,8 +49,6 @@ namespace Squidex.Areas.Api.Controllers.Backups
                 return NotFound();
             }
 
-            var jobs = await restoreGrain.GetJobAsync();
-
             var response = RestoreJobDto.FromJob(job.Value);
 
             return Ok(response);

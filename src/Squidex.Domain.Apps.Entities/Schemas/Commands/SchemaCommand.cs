@@ -8,7 +8,7 @@
 using System;
 using Squidex.Infrastructure.Commands;
 
-namespace Squidex.Domain.Apps.Entities
+namespace Squidex.Domain.Apps.Entities.Schemas.Commands
 {
     public abstract class SchemaCommand : SquidexCommand, IAggregateCommand
     {

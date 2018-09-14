@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                 }
                 else if (clients.ContainsKey(command.Id))
                 {
-                    e($"A client with the same id already exists.");
+                    e("A client with the same id already exists.");
                 }
             });
         }

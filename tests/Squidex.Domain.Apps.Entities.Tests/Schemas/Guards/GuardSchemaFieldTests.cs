@@ -37,12 +37,12 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
         private static Action<Schema, T> A<T>(Action<Schema, T> method) where T : FieldCommand
         {
-            return new Action<Schema, T>(method);
+            return method;
         }
 
         private static Func<Schema, Schema> S(Func<Schema, Schema> method)
         {
-            return new Func<Schema, Schema>(method);
+            return method;
         }
 
         public static IEnumerable<object[]> FieldCommandData = new[]

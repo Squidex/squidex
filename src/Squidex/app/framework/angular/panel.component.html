@@ -1,17 +1,17 @@
 <div #panel>
     <div class="panel panel-{{theme}}" [@slideRight]>
-        <ng-content select=[inner] *ngIf="isFullSize"></ng-content>
+        <ng-content select="[inner]" *ngIf="isFullSize"></ng-content>
 
         <div class="panel-header" [class.large]="showSecondHeader" *ngIf="!isFullSize">
             <div class="panel-title-row">
                 <div class="row">
                     <div class="col col-auto">
                         <h3 class="panel-title">
-                            <ng-content select=[title]></ng-content>
+                            <ng-content select="[title]"></ng-content>
                         </h3>
                     </div>
                     <div class="col text-right">
-                        <ng-content select=[menu]></ng-content>
+                        <ng-content select="[menu]"></ng-content>
                     </div>
                 </div>
             </div>
@@ -21,17 +21,17 @@
             </a>
 
             <div class="panel-header-row" *ngIf="showSecondHeader">
-                <ng-content select=[secondHeader]></ng-content>
+                <ng-content select="[secondHeader]"></ng-content>
             </div>
         </div>
 
         <div class="panel-main">
             <div class="panel-content {{contentClass}}" [class.panel-content-scroll]="showScrollbar" [class.panel-content-blank]="isBlank">
-                <ng-content select=[content]></ng-content>
+                <ng-content select="[content]"></ng-content>
             </div>
 
             <div class="panel-sidebar {{sidebarClass}}" *ngIf="showSidebar">
-                <ng-content select=[sidebar]></ng-content>
+                <ng-content select="[sidebar]"></ng-content>
             </div>
         </div>
     </div>

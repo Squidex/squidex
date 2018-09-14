@@ -25,7 +25,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
             var deserialized = value.SerializeAndDeserializeAndReturn(new PropertiesBagConverter<EnvelopeHeaders>());
 
-            Assert.Equal(1, value.To<MyEvent>().Payload.Value);
+            Assert.Equal(1, deserialized.To<MyEvent>().Payload.Value);
         }
     }
 }

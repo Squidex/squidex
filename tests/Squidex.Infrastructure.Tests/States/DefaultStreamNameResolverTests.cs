@@ -27,8 +27,6 @@ namespace Squidex.Infrastructure.States
         [Fact]
         public void Should_calculate_name()
         {
-            var user = new MyUser();
-
             var name = sut.GetStreamName(typeof(MyUser), id);
 
             Assert.Equal($"myUser-{id}", name);
@@ -37,8 +35,6 @@ namespace Squidex.Infrastructure.States
         [Fact]
         public void Should_calculate_name_and_remove_suffix()
         {
-            var user = new MyUserDomainObject();
-
             var name = sut.GetStreamName(typeof(MyUserDomainObject), id);
 
             Assert.Equal($"myUser-{id}", name);

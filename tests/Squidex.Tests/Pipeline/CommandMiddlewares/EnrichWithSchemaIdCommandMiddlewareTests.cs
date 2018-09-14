@@ -46,8 +46,8 @@ namespace Squidex.Pipeline.CommandMiddlewares
         [Fact]
         public async Task Should_throw_exception_if_app_not_found()
         {
-            SetupApp(out var appId, out var appName);
-            SetupSchema(appId, out var schemaId, out var schemaName);
+            SetupApp(out var appId, out _);
+            SetupSchema(appId, out _, out _);
 
             A.CallTo(() => appProvider.GetSchemaAsync(appId, "other-schema"))
                 .Returns(Task.FromResult<ISchemaEntity>(null));
@@ -77,8 +77,8 @@ namespace Squidex.Pipeline.CommandMiddlewares
         [Fact]
         public async Task Should_do_nothing_when_route_has_no_parameter()
         {
-            SetupApp(out var appId, out var appName);
-            SetupSchema(appId, out var schemaId, out var schemaName);
+            SetupApp(out var appId, out _);
+            SetupSchema(appId, out _, out _);
 
             var command = new CreateContent();
             var context = new CommandContext(command, commandBus);
@@ -91,7 +91,7 @@ namespace Squidex.Pipeline.CommandMiddlewares
         [Fact]
         public async Task Should_assign_schema_id_and_name_from_name()
         {
-            SetupApp(out var appId, out var appName);
+            SetupApp(out var appId, out _);
             SetupSchema(appId, out var schemaId, out var schemaName);
 
             actionContext.RouteData.Values["name"] = schemaName;
@@ -107,7 +107,7 @@ namespace Squidex.Pipeline.CommandMiddlewares
         [Fact]
         public async Task Should_assign_schema_id_and_name_from_id()
         {
-            SetupApp(out var appId, out var appName);
+            SetupApp(out var appId, out _);
             SetupSchema(appId, out var schemaId, out var schemaName);
 
             actionContext.RouteData.Values["name"] = schemaId.ToString();
@@ -123,8 +123,8 @@ namespace Squidex.Pipeline.CommandMiddlewares
         [Fact]
         public async Task Should_assign_schema_id_from_id()
         {
-            SetupApp(out var appId, out var appName);
-            SetupSchema(appId, out var schemaId, out var schemaName);
+            SetupApp(out var appId, out _);
+            SetupSchema(appId, out var schemaId, out _);
 
             actionContext.RouteData.Values["name"] = schemaId.ToString();
 
@@ -156,8 +156,8 @@ namespace Squidex.Pipeline.CommandMiddlewares
         [Fact]
         public async Task Should_not_override_schema_id()
         {
-            SetupApp(out var appId, out var appName);
-            SetupSchema(appId, out var schemaId, out var schemaName);
+            SetupApp(out var appId, out _);
+            SetupSchema(appId, out var schemaId, out _);
 
             var command = new CreateSchema { SchemaId = Guid.NewGuid() };
             var context = new CommandContext(command, commandBus);
@@ -171,7 +171,7 @@ namespace Squidex.Pipeline.CommandMiddlewares
         public async Task Should_not_override_schema_id_and_name()
         {
             SetupApp(out var appId, out var appName);
-            SetupSchema(appId, out var schemaId, out var schemaName);
+            SetupSchema(appId, out _, out _);
 
             var command = new CreateContent { SchemaId = NamedId.Of(Guid.NewGuid(), "other-schema") };
             var context = new CommandContext(command, commandBus);

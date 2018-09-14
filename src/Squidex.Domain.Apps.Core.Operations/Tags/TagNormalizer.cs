@@ -95,7 +95,7 @@ namespace Squidex.Domain.Apps.Core.Tags
                                                 {
                                                     var nestedObject = (JObject)value;
 
-                                                    if (nestedObject.TryGetValue(nestedField.Name, out var nestedArray))
+                                                    if (nestedObject.TryGetValue(nestedField.Name, out _))
                                                     {
                                                         ExtractTags(partition.Value, values, arrays);
                                                     }
@@ -111,7 +111,7 @@ namespace Squidex.Domain.Apps.Core.Tags
             }
         }
 
-        private static void ExtractTags(JToken token, HashSet<string> values, List<JArray> arrays)
+        private static void ExtractTags(JToken token, ISet<string> values, ICollection<JArray> arrays)
         {
             if (token is JArray jArray)
             {

@@ -61,7 +61,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             }
             finally
             {
-                if (isReserved && createApp != null)
+                if (isReserved)
                 {
                     await index.RemoveReservationAsync(createApp.AppId, createApp.Name);
                 }

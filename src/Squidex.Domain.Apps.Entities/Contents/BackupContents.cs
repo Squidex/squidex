@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Backup;
-using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.Contents.State;
 using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
@@ -22,16 +21,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
     public sealed class BackupContents : BackupHandlerWithStore
     {
         private readonly HashSet<Guid> contentIds = new HashSet<Guid>();
-        private readonly IContentRepository contentRepository;
 
         public override string Name { get; } = "Contents";
 
-        public BackupContents(IStore<Guid> store, IContentRepository contentRepository)
+        public BackupContents(IStore<Guid> store)
             : base(store)
         {
-            Guard.NotNull(contentRepository, nameof(contentRepository));
-
-            this.contentRepository = contentRepository;
         }
 
         public override Task RestoreEventAsync(Envelope<IEvent> @event, Guid appId, BackupReader reader, RefToken actor)

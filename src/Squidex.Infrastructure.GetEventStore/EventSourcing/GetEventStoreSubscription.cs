@@ -23,7 +23,6 @@ namespace Squidex.Infrastructure.EventSourcing
             IEventStoreConnection connection,
             IEventSubscriber subscriber,
             ProjectionClient projectionClient,
-            string prefix,
             string position,
             string streamFilter)
         {

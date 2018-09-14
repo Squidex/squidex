@@ -87,6 +87,11 @@ namespace Squidex.Infrastructure.Queries.OData
                 return (nodeIn.Value, FilterValueType.Boolean);
             }
 
+            if (nodeIn.TypeReference.Definition == SingleType)
+            {
+                return (nodeIn.Value, FilterValueType.Single);
+            }
+
             if (nodeIn.TypeReference.Definition == DoubleType)
             {
                 return (nodeIn.Value, FilterValueType.Double);

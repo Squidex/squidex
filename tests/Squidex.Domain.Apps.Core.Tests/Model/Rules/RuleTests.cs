@@ -27,7 +27,7 @@ namespace Squidex.Domain.Apps.Core.Model.Rules
             typeof(Rule).Assembly.GetTypes()
                 .Where(x => x.BaseType == typeof(RuleTrigger))
                 .Select(Activator.CreateInstance)
-                .Select(x => new object[] { x })
+                .Select(x => new[] { x })
                 .ToList();
 
         private readonly Rule rule_0 = new Rule(new ContentChangedTrigger(), new TestAction1());

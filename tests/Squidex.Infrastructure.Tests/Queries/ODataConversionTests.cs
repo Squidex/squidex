@@ -306,7 +306,7 @@ namespace Squidex.Infrastructure.Queries
             return value.Replace('\'', '"');
         }
 
-        private string Q(string value)
+        private static string Q(string value)
         {
             var parser = EdmModel.ParseQuery(value);
 

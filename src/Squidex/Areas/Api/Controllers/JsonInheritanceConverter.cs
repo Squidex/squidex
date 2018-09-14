@@ -125,7 +125,7 @@ namespace Squidex.Areas.Api.Controllers
                     return null;
                 }
 
-                if (subName == null || !mapTypeToName.TryGetValue(subName, out var subType))
+                if (!mapTypeToName.TryGetValue(subName, out var subType))
                 {
                     throw new InvalidOperationException($"Could not find subtype of '{objectType.Name}' with discriminator '{subName}'.");
                 }

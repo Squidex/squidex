@@ -42,8 +42,6 @@ namespace Squidex.Infrastructure.MongoDb.OData
             {
                 return Filter.Or(nodeIn.Operands.Select(x => x.Accept(this)));
             }
-
-            throw new NotSupportedException();
         }
 
         public override FilterDefinition<T> Visit(FilterComparison nodeIn)
@@ -75,7 +73,7 @@ namespace Squidex.Infrastructure.MongoDb.OData
             throw new NotSupportedException();
         }
 
-        private BsonRegularExpression BuildRegex(FilterComparison node, Func<string, string> formatter)
+        private static BsonRegularExpression BuildRegex(FilterComparison node, Func<string, string> formatter)
         {
             return new BsonRegularExpression(formatter(node.Value.ToString()), "i");
         }

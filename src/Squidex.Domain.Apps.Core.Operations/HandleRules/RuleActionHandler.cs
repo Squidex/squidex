@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
         protected virtual string ToPayloadJson<T>(T @event)
         {
-            return formatter.ToPayload<T>(@event).ToString();
+            return formatter.ToPayload(@event).ToString();
         }
 
         protected virtual string ToEnvelopeJson(EnrichedEvent @event)
@@ -44,7 +44,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
         protected virtual JObject ToPayload<T>(T @event)
         {
-            return formatter.ToPayload<T>(@event);
+            return formatter.ToPayload(@event);
         }
 
         protected virtual JObject ToEnvelope(EnrichedEvent @event)

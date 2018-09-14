@@ -386,7 +386,8 @@ namespace Squidex.Domain.Apps.Entities.Apps
                     CreateEvent(new AppArchived())
                 );
 
-            A.CallTo(() => appPlansBillingManager.ChangePlanAsync(command.Actor.Identifier, AppId, AppName, null));
+            A.CallTo(() => appPlansBillingManager.ChangePlanAsync(command.Actor.Identifier, AppId, AppName, null))
+                .MustHaveHappened();
         }
 
         private Task ExecuteAddPatternAsync()

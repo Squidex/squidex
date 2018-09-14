@@ -49,7 +49,7 @@ namespace Squidex.Extensions.Actions.Twitter
                 job.AccessToken,
                 job.AccessSecret);
 
-                var response = await tokens.Statuses.UpdateAsync(status => job.Text);
+             await tokens.Statuses.UpdateAsync(status => job.Text);
 
             return ($"Tweeted: {job.Text}", null);
         }

@@ -113,7 +113,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
             }
             finally
             {
-                executing.TryRemove(@event.Id, out var value);
+                executing.TryRemove(@event.Id, out _);
             }
         }
 

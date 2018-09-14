@@ -84,7 +84,7 @@ namespace Squidex.Infrastructure.Queries.OData
             {
                 var regexFilter = Visit(functionNode);
 
-                var (value, valueType) = ConstantWithTypeVisitor.Visit(nodeIn.Right);
+                var (value, _) = ConstantWithTypeVisitor.Visit(nodeIn.Right);
 
                 if (value is bool booleanRight)
                 {

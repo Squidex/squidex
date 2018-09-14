@@ -97,13 +97,13 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
                     for (var j = 0; j < patterns.Count; j++)
                     {
-                        var (Pattern, Replacer) = patterns[j];
+                        var (pattern, replacer) = patterns[j];
 
-                        if (test.StartsWith(Pattern, StringComparison.OrdinalIgnoreCase))
+                        if (test.StartsWith(pattern, StringComparison.OrdinalIgnoreCase))
                         {
-                            sb.Append(Replacer(@event));
+                            sb.Append(replacer(@event));
 
-                            current = current.Slice(Pattern.Length + 1);
+                            current = current.Slice(pattern.Length + 1);
                             i = 0;
 
                             tested = true;
@@ -284,12 +284,12 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                 return Undefined;
             }
 
-            if (value is JValue jValue && jValue != null)
+            if (value is JValue jValue)
             {
                 return jValue.Value.ToString();
             }
 
-            return value?.ToString(Formatting.Indented) ?? Undefined;
+            return value.ToString(Formatting.Indented) ?? Undefined;
         }
     }
 }

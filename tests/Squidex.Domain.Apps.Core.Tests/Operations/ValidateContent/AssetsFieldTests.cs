@@ -168,7 +168,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             await sut.ValidateAsync(CreateValue(document.AssetId, image.AssetId), errors, ctx);
 
             errors.Should().BeEquivalentTo(
-                new[] { $"[1]: '4 kB' less than minimum of '5 kB'." });
+                new[] { "[1]: \'4 kB\' less than minimum of \'5 kB\'." });
         }
 
         [Fact]
@@ -179,7 +179,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             await sut.ValidateAsync(CreateValue(document.AssetId, image.AssetId), errors, ctx);
 
             errors.Should().BeEquivalentTo(
-                new[] { $"[2]: '8 kB' greater than maximum of '5 kB'." });
+                new[] { "[2]: \'8 kB\' greater than maximum of \'5 kB\'." });
         }
 
         [Fact]
@@ -190,7 +190,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             await sut.ValidateAsync(CreateValue(document.AssetId, image.AssetId), errors, ctx);
 
             errors.Should().BeEquivalentTo(
-                new[] { $"[1]: Not an image." });
+                new[] { "[1]: Not an image." });
         }
 
         [Fact]
@@ -201,7 +201,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             await sut.ValidateAsync(CreateValue(document.AssetId, image.AssetId), errors, ctx);
 
             errors.Should().BeEquivalentTo(
-                new[] { $"[2]: Width '800px' less than minimum of '1000px'." });
+                new[] { "[2]: Width \'800px\' less than minimum of \'1000px\'." });
         }
 
         [Fact]
@@ -212,7 +212,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             await sut.ValidateAsync(CreateValue(document.AssetId, image.AssetId), errors, ctx);
 
             errors.Should().BeEquivalentTo(
-                new[] { $"[2]: Width '800px' greater than maximum of '700px'." });
+                new[] { "[2]: Width \'800px\' greater than maximum of \'700px\'." });
         }
 
         [Fact]
@@ -223,7 +223,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             await sut.ValidateAsync(CreateValue(document.AssetId, image.AssetId), errors, ctx);
 
             errors.Should().BeEquivalentTo(
-                new[] { $"[2]: Height '600px' less than minimum of '800px'." });
+                new[] { "[2]: Height \'600px\' less than minimum of \'800px\'." });
         }
 
         [Fact]
@@ -234,7 +234,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             await sut.ValidateAsync(CreateValue(document.AssetId, image.AssetId), errors, ctx);
 
             errors.Should().BeEquivalentTo(
-                new[] { $"[2]: Height '600px' greater than maximum of '500px'." });
+                new[] { "[2]: Height \'600px\' greater than maximum of \'500px\'." });
         }
 
         [Fact]
@@ -258,8 +258,8 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             errors.Should().BeEquivalentTo(
                 new[]
                 {
-                    $"[1]: Invalid file extension.",
-                    $"[2]: Invalid file extension."
+                    "[1]: Invalid file extension.",
+                    "[2]: Invalid file extension."
                 });
         }
 

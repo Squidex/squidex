@@ -11,7 +11,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Extensions.Actions
 {
-    [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
+    [AttributeUsage(AttributeTargets.Class, Inherited = false)]
     public sealed class RuleActionHandlerAttribute : Attribute
     {
         public Type HandlerType { get; }

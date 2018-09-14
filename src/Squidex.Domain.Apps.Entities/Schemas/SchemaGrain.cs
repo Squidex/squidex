@@ -53,7 +53,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
                         Add(c);
 
-                        var id = 0L;
+                        long id;
 
                         if (c.ParentFieldId == null)
                         {

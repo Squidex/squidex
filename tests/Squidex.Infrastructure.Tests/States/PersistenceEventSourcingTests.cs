@@ -243,7 +243,7 @@ namespace Squidex.Infrastructure.States
             SetupEventStore(events, 0, 0);
         }
 
-        private void SetupEventStore(MyEvent[] events, int eventOffset = 0, int readPosition = 0)
+        private void SetupEventStore(MyEvent[] events, int eventOffset, int readPosition = 0)
         {
             var eventsStored = new List<StoredEvent>();
 

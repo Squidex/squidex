@@ -15,16 +15,14 @@ namespace Squidex.Infrastructure.Assets
 {
     internal class MongoGridFSAssetStoreTests : AssetStoreTests<MongoGridFsAssetStore>
     {
-        private static readonly IMongoClient MongoClient;
-        private static readonly IMongoDatabase MongoDatabase;
         private static readonly IGridFSBucket<string> GridFSBucket;
 
         static MongoGridFSAssetStoreTests()
         {
-            MongoClient = new MongoClient("mongodb://localhost");
-            MongoDatabase = MongoClient.GetDatabase("Test");
+            var mongoClient = new MongoClient("mongodb://localhost");
+            var mongoDatabase = mongoClient.GetDatabase("Test");
 
-            GridFSBucket = new GridFSBucket<string>(MongoDatabase, new GridFSBucketOptions
+            GridFSBucket = new GridFSBucket<string>(mongoDatabase, new GridFSBucketOptions
             {
                 BucketName = "fs"
             });

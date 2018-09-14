@@ -9,7 +9,6 @@ using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.HandleRules;
-using Squidex.Domain.Apps.Core.HandleRules.Actions.Utils;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 using Squidex.Infrastructure;
 
@@ -52,7 +51,7 @@ namespace Squidex.Extensions.Actions.Fastly
 
                 request.Headers.Add("Fastly-Key", job.FastlyApiKey);
 
-                return await httpClient.OneWayRequestAsync(request, null);
+                return await httpClient.OneWayRequestAsync(request);
             }
         }
     }

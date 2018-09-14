@@ -19,7 +19,7 @@
         <div class="col col-9">
             <sqx-control-errors for="apiKey" [submitted]="actionFormSubmitted"></sqx-control-errors>
 
-            <input type="apiKey" class="form-control" id="apiKey" formControlName="apiKey" />
+            <input type="text" class="form-control" id="apiKey" formControlName="apiKey" />
 
             <small class="form-text text-muted">
                 The api key to authenticate to your discourse server.
@@ -33,7 +33,7 @@
         <div class="col col-9">
             <sqx-control-errors for="apiUsername" [submitted]="actionFormSubmitted"></sqx-control-errors>
 
-            <input type="apiUsername" class="form-control" id="apiUsername" formControlName="apiUsername" />
+            <input type="text" class="form-control" id="apiUsername" formControlName="apiUsername" />
 
             <small class="form-text text-muted">
                 The api username to authenticate to your discourse server.
@@ -61,7 +61,7 @@
         <div class="col col-9">
             <sqx-control-errors for="title" [submitted]="actionFormSubmitted"></sqx-control-errors>
 
-            <input type="title" class="form-control" id="title" formControlName="title" />
+            <input type="text" class="form-control" id="title" formControlName="title" />
 
             <small class="form-text text-muted">
                 The optional title, when you want to create a topic. Read the <a routerLink="help">help</a> section for information about advanced formatting.

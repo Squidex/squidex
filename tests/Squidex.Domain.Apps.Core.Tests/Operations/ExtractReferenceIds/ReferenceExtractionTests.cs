@@ -8,7 +8,6 @@
 using System;
 using System.Linq;
 using Newtonsoft.Json.Linq;
-using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.ConvertContent;
 using Squidex.Domain.Apps.Core.ExtractReferenceIds;
@@ -24,7 +23,6 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
     {
         private readonly Guid schemaId = Guid.NewGuid();
         private readonly Schema schema;
-        private readonly LanguagesConfig languagesConfig = LanguagesConfig.Build(Language.EN, Language.DE);
 
         public ReferenceExtractionTests()
         {

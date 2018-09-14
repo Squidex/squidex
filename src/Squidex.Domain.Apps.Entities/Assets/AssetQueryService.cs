@@ -74,7 +74,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             return assets;
         }
 
-        private IResultList<IAssetEntity> Sort(IResultList<IAssetEntity> assets, IReadOnlyList<Guid> ids)
+        private static IResultList<IAssetEntity> Sort(IResultList<IAssetEntity> assets, IReadOnlyList<Guid> ids)
         {
             var sorted = ids.Select(id => assets.FirstOrDefault(x => x.Id == id)).Where(x => x != null);
 
@@ -106,7 +106,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             }
             catch (NotSupportedException)
             {
-                throw new ValidationException($"OData operation is not supported.");
+                throw new ValidationException("OData operation is not supported.");
             }
             catch (ODataException ex)
             {

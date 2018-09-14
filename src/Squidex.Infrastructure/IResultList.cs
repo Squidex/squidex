@@ -9,7 +9,7 @@ using System.Collections.Generic;
 
 namespace Squidex.Infrastructure
 {
-    public interface IResultList<T> : IReadOnlyList<T>
+    public interface IResultList<out T> : IReadOnlyList<T>
     {
         long Total { get; }
     }

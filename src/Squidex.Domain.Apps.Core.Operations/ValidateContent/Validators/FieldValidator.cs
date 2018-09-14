@@ -37,7 +37,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
                 var tasks = new List<Task>();
 
-                foreach (var validator in ValidatorsFactory.CreateValidators(field))
+                foreach (var validator in validators)
                 {
                     tasks.Add(validator.ValidateAsync(typedValue, context, addError));
                 }

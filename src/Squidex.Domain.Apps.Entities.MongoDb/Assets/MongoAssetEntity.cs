@@ -7,7 +7,6 @@
 
 using System;
 using System.Collections.Generic;
-using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using Squidex.Domain.Apps.Core.ValidateContent;
 using Squidex.Domain.Apps.Entities.Assets;

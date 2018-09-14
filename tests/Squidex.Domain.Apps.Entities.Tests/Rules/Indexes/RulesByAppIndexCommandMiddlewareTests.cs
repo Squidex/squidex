@@ -23,7 +23,6 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
         private readonly ICommandBus commandBus = A.Fake<ICommandBus>();
         private readonly IRulesByAppIndex index = A.Fake<IRulesByAppIndex>();
         private readonly Guid appId = Guid.NewGuid();
-        private readonly Guid ruleId = Guid.NewGuid();
         private readonly RulesByAppIndexCommandMiddleware sut;
 
         public RulesByAppIndexCommandMiddlewareTests()

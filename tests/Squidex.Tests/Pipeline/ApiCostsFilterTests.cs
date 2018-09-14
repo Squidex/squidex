@@ -18,10 +18,9 @@ using Microsoft.AspNetCore.Routing;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Services;
 using Squidex.Infrastructure.UsageTracking;
-using Squidex.Pipeline;
 using Xunit;
 
-namespace Squidex.Tests.Pipeline
+namespace Squidex.Pipeline
 {
     public class ApiCostsFilterTests
     {

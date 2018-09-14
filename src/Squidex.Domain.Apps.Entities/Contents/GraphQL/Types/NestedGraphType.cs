@@ -22,7 +22,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             var schemaType = schema.TypeName();
             var schemaName = schema.DisplayName();
 
-            var fieldType = field.TypeName();
             var fieldName = field.DisplayName();
 
             Name = $"{schemaType}{fieldName}ChildDto";

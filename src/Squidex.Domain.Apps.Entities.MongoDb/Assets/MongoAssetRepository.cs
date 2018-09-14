@@ -52,7 +52,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                 {
                     query = query.AdjustToModel();
 
-                    var filter = FindExtensions.BuildFilter(query, appId);
+                    var filter = query.BuildFilter(appId);
 
                     var contentCount = Collection.Find(filter).CountDocumentsAsync();
                     var contentItems =

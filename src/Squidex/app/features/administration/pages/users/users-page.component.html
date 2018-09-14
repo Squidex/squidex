@@ -51,7 +51,7 @@
                     <tbody *ngFor="let userInfo of usersState.users | async; trackBy: trackByUser">
                         <tr [routerLink]="userInfo.user.id" routerLinkActive="active">
                             <td class="cell-user">
-                                <img class="user-picture" [attr.title]="userInfo.user.name" [attr.src]="userInfo.user | sqxUserDtoPicture" />
+                                <img class="user-picture" [attr.alt]="userInfo.user.name" [attr.title]="userInfo.user.name" [attr.src]="userInfo.user | sqxUserDtoPicture" />
                             </td>
                             <td class="cell-auto">
                                 <span class="user-name table-cell">{{userInfo.user.displayName}}</span>

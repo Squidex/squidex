@@ -10,7 +10,6 @@ using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.ConvertContent;
-using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Xunit;
 
@@ -20,21 +19,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
 {
     public class ContentConversionFlatTests
     {
-        private readonly Schema schema;
         private readonly LanguagesConfig languagesConfig = LanguagesConfig.Build(Language.EN, Language.DE);
-
-        public ContentConversionFlatTests()
-        {
-            schema =
-                new Schema("my-schema")
-                    .AddNumber(1, "field1", Partitioning.Language)
-                    .AddNumber(2, "field2", Partitioning.Invariant)
-                    .AddNumber(3, "field3", Partitioning.Invariant)
-                    .AddAssets(5, "assets1", Partitioning.Invariant)
-                    .AddAssets(6, "assets2", Partitioning.Invariant)
-                    .AddJson(4, "json", Partitioning.Language)
-                    .UpdateField(3, f => f.Hide());
-        }
 
         [Fact]
         public void Should_return_original_when_no_language_preferences_defined()
