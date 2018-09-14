@@ -87,9 +87,8 @@
     "ordered-imports": [
       true
     ],
-    "pipe-naming": [
+    "pipe-prefix": [
       true,
-      "camelCase",
       "sqx"
     ],
     "prefer-for-of": true,
