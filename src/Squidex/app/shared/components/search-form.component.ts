@@ -90,6 +90,7 @@ export class SearchFormComponent implements OnChanges, OnInit {
     }
 
     public saveQuery() {
+        this.saveQueryForm.form.reset();
         this.saveQueryDialog.show();
     }
 
