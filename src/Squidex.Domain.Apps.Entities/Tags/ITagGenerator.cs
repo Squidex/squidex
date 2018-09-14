@@ -9,7 +9,7 @@ using System.Collections.Generic;
 
 namespace Squidex.Domain.Apps.Entities.Tags
 {
-    public interface ITagGenerator<T>
+    public interface ITagGenerator<in T>
     {
         void GenerateTags(T source, HashSet<string> tags);
     }

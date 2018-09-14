@@ -486,10 +486,5 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             return new StringFieldProperties { MinLength = 10, MaxLength = 20 };
         }
-
-        private static StringFieldProperties InvalidProperties()
-        {
-            return new StringFieldProperties { MinLength = 20, MaxLength = 10 };
-        }
     }
 }

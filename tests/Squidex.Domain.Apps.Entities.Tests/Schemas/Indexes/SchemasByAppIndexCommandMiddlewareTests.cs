@@ -23,7 +23,6 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         private readonly ICommandBus commandBus = A.Fake<ICommandBus>();
         private readonly ISchemasByAppIndex index = A.Fake<ISchemasByAppIndex>();
         private readonly Guid appId = Guid.NewGuid();
-        private readonly Guid schemaId = Guid.NewGuid();
         private readonly SchemasByAppIndexCommandMiddleware sut;
 
         public SchemasByAppIndexCommandMiddlewareTests()

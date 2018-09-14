@@ -9,7 +9,6 @@ using System;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Orleans;
-using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Orleans;
 using Xunit;
@@ -20,7 +19,6 @@ namespace Squidex.Domain.Apps.Entities.Contents
     {
         private readonly IGrainFactory grainFactory = A.Fake<IGrainFactory>();
         private readonly IContentGrain grain = A.Fake<IContentGrain>();
-        private readonly FieldRegistry fieldRegistry = new FieldRegistry(new TypeNameRegistry());
         private readonly Guid id = Guid.NewGuid();
         private readonly ContentVersionLoader sut;
 

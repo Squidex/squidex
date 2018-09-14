@@ -49,7 +49,7 @@ namespace Squidex.Infrastructure.Caching
 
             if (cache != null)
             {
-                cache.TryRemove(cacheKey, out var value);
+                cache.TryRemove(cacheKey, out _);
             }
         }
 

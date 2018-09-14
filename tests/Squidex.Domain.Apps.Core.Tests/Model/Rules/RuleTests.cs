@@ -27,7 +27,7 @@ namespace Squidex.Domain.Apps.Core.Model.Rules
             typeof(Rule).Assembly.GetTypes()
                 .Where(x => x.BaseType == typeof(RuleTrigger))
                 .Select(Activator.CreateInstance)
-                .Select(x => new object[] { x })
+                .Select(x => new[] { x })
                 .ToList();
 
         private readonly Rule rule_0 = new Rule(new ContentChangedTrigger(), new TestAction1());
@@ -125,7 +125,7 @@ namespace Squidex.Domain.Apps.Core.Model.Rules
 
             var appClients = JToken.FromObject(rule_1, serializer).ToObject<Rule>(serializer);
 
-            appClients.Should().BeEquivalentTo(rule_0);
+            appClients.Should().BeEquivalentTo(rule_1);
         }
 
         [Theory]

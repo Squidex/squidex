@@ -32,7 +32,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.State
         public string Category { get; set; }
 
         [JsonProperty]
-        public int TotalFields { get; set; } = 0;
+        public int TotalFields { get; set; }
 
         [JsonProperty]
         public bool IsDeleted { get; set; }

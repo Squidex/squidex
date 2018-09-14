@@ -89,8 +89,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors
                     }
                 }
 
-                var propertyName = string.Join(".", propertyNames);
-
                 return result;
             });
 

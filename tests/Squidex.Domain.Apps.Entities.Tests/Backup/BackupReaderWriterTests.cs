@@ -45,9 +45,11 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
                     if (i % 17 == 0)
                     {
+                        var localI = i;
+
                         await writer.WriteBlobAsync(eventData.Type, innerStream =>
                         {
-                            innerStream.WriteByte((byte)i);
+                            innerStream.WriteByte((byte)localI);
 
                             return TaskHelper.Done;
                         });

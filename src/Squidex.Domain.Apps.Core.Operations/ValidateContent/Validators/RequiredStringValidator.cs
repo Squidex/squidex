@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
             var valueAsString = (string)value;
 
-            if (valueAsString == null || (validateEmptyStrings && string.IsNullOrWhiteSpace(valueAsString)))
+            if (valueAsString == null || validateEmptyStrings && string.IsNullOrWhiteSpace(valueAsString))
             {
                 addError(context.Path, "Field is required.");
             }

@@ -69,7 +69,7 @@ namespace Squidex.Infrastructure.Assets
 
                 using (var readStream = await bucket.OpenDownloadStreamAsync(name, cancellationToken: ct))
                 {
-                    await readStream.CopyToAsync(stream, BufferSize);
+                    await readStream.CopyToAsync(stream, BufferSize, ct);
                 }
             }
             catch (GridFSFileNotFoundException ex)

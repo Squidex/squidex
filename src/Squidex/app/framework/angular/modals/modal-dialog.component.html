@@ -5,7 +5,7 @@
         <div class="modal-content">
             <div class="modal-header" *ngIf="showHeader">
                 <h4 class="modal-title">
-                    <ng-content select=[title]></ng-content>
+                    <ng-content select="[title]"></ng-content>
                 </h4>
 
                 <button type="button" class="close" (click)="closed.emit()">
@@ -14,16 +14,16 @@
             </div>
 
             <div class="modal-tabs {{tabsClass}} clearfix" #tabsElement [hidden]="!showTabs || !hasTabs">
-                <ng-content select=[tabs]></ng-content>
+                <ng-content select="[tabs]"></ng-content>
             </div>
 
             <div class="modal-body {{contentClass}}">
-                <ng-content select=[content]></ng-content>
+                <ng-content select="[content]"></ng-content>
             </div>
 
             <div class="modal-footer" [hidden]="!showFooter || !hasFooter">
                 <div class="clearfix" #footerElement>
-                    <ng-content select=[footer]></ng-content>
+                    <ng-content select="[footer]"></ng-content>
                 </div>
             </div>
         </div>

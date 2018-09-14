@@ -178,7 +178,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         {
             if (checkErrors && result.HasErrors)
             {
-                throw new InvalidOperationException(NewMethod(result));
+                throw new InvalidOperationException(Serialize(result));
             }
 
             var resultJson = JsonConvert.SerializeObject(result.Response, Formatting.Indented);
@@ -187,9 +187,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             Assert.Equal(expectJson, resultJson);
         }
 
-        private static string NewMethod((bool HasErrors, object Response) result)
+        private static string Serialize((bool HasErrors, object Response) result)
         {
-            return JsonConvert.SerializeObject(result).ToString();
+            return JsonConvert.SerializeObject(result);
         }
     }
 }

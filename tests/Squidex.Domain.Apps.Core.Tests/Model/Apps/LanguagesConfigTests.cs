@@ -85,7 +85,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
                     new LanguageConfig(Language.IT)
                 });
 
-            Assert.True(config_1.TryGetConfig(Language.IT, out var _));
+            Assert.True(config_1.TryGetConfig(Language.IT, out _));
             Assert.True(config_1.Contains(Language.IT));
         }
 

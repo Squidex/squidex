@@ -6,17 +6,14 @@
 // ==========================================================================
 
 using Newtonsoft.Json.Linq;
-using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.ConvertContent;
 using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Infrastructure;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
 {
     public class ValueConvertersTests
     {
-        private readonly LanguagesConfig languagesConfig = LanguagesConfig.Build(Language.EN, Language.DE);
         private readonly RootField<StringFieldProperties> stringField = Fields.String(1, "1", Partitioning.Invariant);
         private readonly RootField<JsonFieldProperties> jsonField = Fields.Json(1, "1", Partitioning.Invariant);
         private readonly RootField<NumberFieldProperties> numberField = Fields.Number(1, "1", Partitioning.Invariant);

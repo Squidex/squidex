@@ -36,8 +36,6 @@ namespace Squidex.Infrastructure.Commands
         {
             var newVersion = Version + 1;
 
-            var snapshotNew = OnEvent(@event);
-
             snapshot = OnEvent(@event);
             snapshot.Version = newVersion;
         }

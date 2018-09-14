@@ -40,7 +40,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             this.tagGenerators = tagGenerators;
         }
 
-        public async override Task HandleAsync(CommandContext context, Func<Task> next)
+        public override async Task HandleAsync(CommandContext context, Func<Task> next)
         {
             switch (context.Command)
             {

@@ -11,7 +11,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.HandleRules;
-using Squidex.Domain.Apps.Core.HandleRules.Actions.Utils;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 
 namespace Squidex.Extensions.Actions.Discourse

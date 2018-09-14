@@ -35,10 +35,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 
         public static FieldConverter ExcludeHidden()
         {
-            return (data, field) =>
-            {
-                return field.IsHidden ? null : data;
-            };
+            return (data, field) => field.IsHidden ? null : data;
         }
 
         public static FieldConverter ExcludeChangedTypes()
@@ -100,7 +97,6 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
         public static FieldConverter ResolveLanguages(LanguagesConfig config)
         {
             var codeForInvariant = InvariantPartitioning.Instance.Master.Key;
-            var codeForMasterLanguage = config.Master.Language.Iso2Code;
 
             return (data, field) =>
             {

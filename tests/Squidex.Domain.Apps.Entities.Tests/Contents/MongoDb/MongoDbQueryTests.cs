@@ -9,9 +9,6 @@ using System;
 using System.Collections.Immutable;
 using System.Linq;
 using FakeItEasy;
-using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Options;
-using Microsoft.OData.Edm;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using NodaTime.Text;
@@ -19,7 +16,6 @@ using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Domain.Apps.Entities.Contents.Edm;
 using Squidex.Domain.Apps.Entities.MongoDb.Contents;
 using Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors;
 using Squidex.Domain.Apps.Entities.Schemas;
@@ -38,7 +34,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         private static readonly IBsonSerializerRegistry Registry = BsonSerializer.SerializerRegistry;
         private static readonly IBsonSerializer<MongoContentEntity> Serializer = BsonSerializer.SerializerRegistry.GetSerializer<MongoContentEntity>();
         private readonly Schema schemaDef;
-        private readonly IEdmModel edmModel;
         private readonly LanguagesConfig languagesConfig = LanguagesConfig.Build(Language.EN, Language.DE);
 
         static MongoDbQueryTests()
@@ -68,8 +63,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
                         new StringFieldProperties())
                     .Update(new SchemaProperties { Hints = "The User" });
 
-            var builder = new EdmModelBuilder(new MemoryCache(Options.Create(new MemoryCacheOptions())));
-
             var schema = A.Dummy<ISchemaEntity>();
             A.CallTo(() => schema.Id).Returns(Guid.NewGuid());
             A.CallTo(() => schema.Version).Returns(3);
@@ -79,8 +72,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
             A.CallTo(() => app.Id).Returns(Guid.NewGuid());
             A.CallTo(() => app.Version).Returns(3);
             A.CallTo(() => app.LanguagesConfig).Returns(languagesConfig);
-
-            edmModel = builder.BuildEdmModel(schema, app);
         }
 
         [Fact]

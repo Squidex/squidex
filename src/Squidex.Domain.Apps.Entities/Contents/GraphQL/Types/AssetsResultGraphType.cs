@@ -17,14 +17,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
     {
         public AssetsResultGraphType(IGraphType assetType)
         {
-            Name = $"AssetResultDto";
+            Name = "AssetResultDto";
 
             AddField(new FieldType
             {
                 Name = "total",
                 ResolvedType = AllTypes.Int,
                 Resolver = Resolve(x => x.Total),
-                Description = $"The total count of assets."
+                Description = "The total count of assets."
             });
 
             AddField(new FieldType
@@ -32,7 +32,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 Name = "items",
                 Resolver = Resolve(x => x),
                 ResolvedType = new ListGraphType(new NonNullGraphType(assetType)),
-                Description = $"The assets."
+                Description = "The assets."
             });
 
             Description = "List of assets and total count of assets.";

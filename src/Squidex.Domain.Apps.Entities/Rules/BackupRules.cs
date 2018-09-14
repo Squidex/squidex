@@ -25,7 +25,6 @@ namespace Squidex.Domain.Apps.Entities.Rules
     {
         private readonly HashSet<Guid> ruleIds = new HashSet<Guid>();
         private readonly IGrainFactory grainFactory;
-        private readonly IRuleEventRepository ruleEventRepository;
 
         public override string Name { get; } = "Rules";
 
@@ -36,8 +35,6 @@ namespace Squidex.Domain.Apps.Entities.Rules
             Guard.NotNull(ruleEventRepository, nameof(ruleEventRepository));
 
             this.grainFactory = grainFactory;
-
-            this.ruleEventRepository = ruleEventRepository;
         }
 
         public override Task RestoreEventAsync(Envelope<IEvent> @event, Guid appId, BackupReader reader, RefToken actor)
@@ -55,7 +52,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
             return TaskHelper.Done;
         }
 
-        public async override Task RestoreAsync(Guid appId, BackupReader reader)
+        public override async Task RestoreAsync(Guid appId, BackupReader reader)
         {
             await RebuildManyAsync(ruleIds, id => RebuildAsync<RuleState, RuleGrain>(id, (e, s) => s.Apply(e)));
 

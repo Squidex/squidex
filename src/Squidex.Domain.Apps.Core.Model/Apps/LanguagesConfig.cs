@@ -110,13 +110,10 @@ namespace Squidex.Domain.Apps.Core.Apps
 
             var newLanguages =
                 languages.Values.Where(x => x.Language != language)
-                    .Select(config =>
-                    {
-                        return new LanguageConfig(
-                            config.Language,
-                            config.IsOptional,
-                            config.LanguageFallbacks.Except(new[] { language }));
-                    })
+                    .Select(config => new LanguageConfig(
+                        config.Language,
+                        config.IsOptional,
+                        config.LanguageFallbacks.Except(new[] { language })))
                     .ToImmutableDictionary(x => x.Language);
 
             var newMaster =

@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Linq;
 using FakeItEasy;
 using MongoDB.Bson.Serialization;
@@ -27,7 +26,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
     {
         private static readonly IBsonSerializerRegistry Registry = BsonSerializer.SerializerRegistry;
         private static readonly IBsonSerializer<MongoAssetEntity> Serializer = BsonSerializer.SerializerRegistry.GetSerializer<MongoAssetEntity>();
-        private readonly Guid appId = Guid.NewGuid();
 
         static MongoDbQueryTests()
         {
@@ -202,12 +200,12 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
             return value.Replace('\'', '"');
         }
 
-        private string F(FilterNode filter)
+        private static string F(FilterNode filter)
         {
             return Q(new Query { Filter = filter });
         }
 
-        private string S(params SortNode[] sorts)
+        private static string S(params SortNode[] sorts)
         {
             var cursor = A.Fake<IFindFluent<MongoAssetEntity, MongoAssetEntity>>();
 
@@ -224,7 +222,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
             return i;
         }
 
-        private string Q(Query query)
+        private static string Q(Query query)
         {
             var rendered =
                 query.AdjustToModel().BuildFilter<MongoAssetEntity>(false).Filter

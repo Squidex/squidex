@@ -76,7 +76,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             await WriteSettingsAsync(writer, appId);
         }
 
-        public async override Task RestoreEventAsync(Envelope<IEvent> @event, Guid appId, BackupReader reader, RefToken actor)
+        public override async Task RestoreEventAsync(Envelope<IEvent> @event, Guid appId, BackupReader reader, RefToken actor)
         {
             switch (@event.Payload)
             {

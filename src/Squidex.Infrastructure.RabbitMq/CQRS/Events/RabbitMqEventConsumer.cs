@@ -10,9 +10,10 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
+using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Tasks;
 
-namespace Squidex.Infrastructure.EventSourcing
+namespace Squidex.Infrastructure.CQRS.Events
 {
     public sealed class RabbitMqEventConsumer : DisposableObjectBase, IInitializable, IEventConsumer
     {

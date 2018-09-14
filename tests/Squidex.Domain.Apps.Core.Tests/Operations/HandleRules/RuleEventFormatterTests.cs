@@ -110,7 +110,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
             var result = sut.Format("From $USER_NAME ($USER_EMAIL)", @event);
 
-            Assert.Equal($"From me (me@email.com)", result);
+            Assert.Equal("From me (me@email.com)", result);
         }
 
         [Fact]
@@ -120,7 +120,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
             var result = sut.Format("From $USER_NAME ($USER_EMAIL)", @event);
 
-            Assert.Equal($"From UNDEFINED (UNDEFINED)", result);
+            Assert.Equal("From UNDEFINED (UNDEFINED)", result);
         }
 
         [Fact]
@@ -130,7 +130,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
             var result = sut.Format("From $USER_NAME ($USER_EMAIL)", @event);
 
-            Assert.Equal($"From client:android (client:android)", result);
+            Assert.Equal("From client:android (client:android)", result);
         }
 
         [Fact]

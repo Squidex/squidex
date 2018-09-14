@@ -6,11 +6,10 @@
 // ==========================================================================
 
 using System;
-using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Commands
 {
-    public sealed class CreateApp : AppCommand, IAggregateCommand
+    public sealed class CreateApp : AppCommand
     {
         public string Name { get; set; }
 

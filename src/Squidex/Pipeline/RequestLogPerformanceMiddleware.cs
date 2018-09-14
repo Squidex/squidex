@@ -14,7 +14,6 @@ namespace Squidex.Pipeline
 {
     public sealed class RequestLogPerformanceMiddleware : IMiddleware
     {
-        private const int LongOperationsMs = 1000;
         private readonly ISemanticLog log;
 
         public RequestLogPerformanceMiddleware(ISemanticLog log)

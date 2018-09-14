@@ -36,7 +36,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
         private Task Dispatch(Func<Task> task)
         {
-            return Task<Task>.Factory.StartNew(() => task(), CancellationToken.None, TaskCreationOptions.None, scheduler).Unwrap();
+            return Task<Task>.Factory.StartNew(task, CancellationToken.None, TaskCreationOptions.None, scheduler).Unwrap();
         }
     }
 }

@@ -36,7 +36,7 @@ namespace Squidex.Domain.Apps.Core.Rules.Json
 
             if (!IsEnabled)
             {
-                rule.Disable();
+                rule = rule.Disable();
             }
 
             return rule;

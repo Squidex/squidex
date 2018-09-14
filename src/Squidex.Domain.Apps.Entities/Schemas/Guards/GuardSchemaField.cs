@@ -42,7 +42,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
                     if (arrayField.FieldsByName.ContainsKey(command.Name))
                     {
-                        e($"A field with the same name already exists.");
+                        e("A field with the same name already exists.");
                     }
                 }
                 else
@@ -54,7 +54,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
                     if (schema.FieldsByName.ContainsKey(command.Name))
                     {
-                        e($"A field with the same name already exists.");
+                        e("A field with the same name already exists.");
                     }
                 }
             });

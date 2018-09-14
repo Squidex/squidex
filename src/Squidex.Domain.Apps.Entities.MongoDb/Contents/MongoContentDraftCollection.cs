@@ -100,7 +100,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             {
                 var schema = await getSchema(contentEntity.IndexedAppId, contentEntity.IndexedSchemaId);
 
-                contentEntity?.ParseData(schema.SchemaDef);
+                contentEntity.ParseData(schema.SchemaDef);
 
                 return (SimpleMapper.Map(contentEntity, new ContentState()), contentEntity.Version);
             }

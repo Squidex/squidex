@@ -73,8 +73,8 @@ namespace Squidex.Domain.Apps.Entities.Tags
         [Fact]
         public async Task Should_add_tags_to_grain()
         {
-            var result1 = await sut.NormalizeTagsAsync(HashSet.Of("tag1", "tag2"), null);
-            var result2 = await sut.NormalizeTagsAsync(HashSet.Of("tag2", "tag3"), null);
+            await sut.NormalizeTagsAsync(HashSet.Of("tag1", "tag2"), null);
+            await sut.NormalizeTagsAsync(HashSet.Of("tag2", "tag3"), null);
 
             var allTags = await sut.GetTagsAsync();
 

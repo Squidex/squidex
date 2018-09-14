@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             await sut.HandleAsync(context);
 
-            A.CallTo(() => commandBus.PublishAsync(A<CreateContent>.That.Matches(x => x.Publish == true)))
+            A.CallTo(() => commandBus.PublishAsync(A<CreateContent>.That.Matches(x => x.Publish)))
                 .MustHaveHappened();
         }
 

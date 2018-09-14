@@ -38,7 +38,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         private static string GetTempFile(Guid backupId)
         {
-            return Path.Combine(Path.GetTempPath(), backupId.ToString() + ".zip");
+            return Path.Combine(Path.GetTempPath(), backupId + ".zip");
         }
     }
 }

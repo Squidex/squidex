@@ -64,7 +64,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
             await publish(new AttachClient { Id = "sample-client", AppId = appId });
         }
 
-        private async Task CreatePostsAsync(Func<ICommand, Task> publish)
+        private static async Task CreatePostsAsync(Func<ICommand, Task> publish)
         {
             var postsId = await CreatePostsSchemaAsync(publish);
 
@@ -83,7 +83,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
             });
         }
 
-        private async Task CreatePagesAsync(Func<ICommand, Task> publish)
+        private static async Task CreatePagesAsync(Func<ICommand, Task> publish)
         {
             var pagesId = await CreatePagesSchemaAsync(publish);
 
@@ -102,7 +102,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
             });
         }
 
-        private async Task<NamedId<Guid>> CreatePostsSchemaAsync(Func<ICommand, Task> publish)
+        private static async Task<NamedId<Guid>> CreatePostsSchemaAsync(Func<ICommand, Task> publish)
         {
             var schema =
                 SchemaBuilder.Create("Posts")
@@ -136,7 +136,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
             return schemaId;
         }
 
-        private async Task<NamedId<Guid>> CreatePagesSchemaAsync(Func<ICommand, Task> publish)
+        private static async Task<NamedId<Guid>> CreatePagesSchemaAsync(Func<ICommand, Task> publish)
         {
             var schema =
                 SchemaBuilder.Create("Pages")

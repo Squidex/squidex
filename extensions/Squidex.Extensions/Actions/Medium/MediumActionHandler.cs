@@ -12,21 +12,11 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.HandleRules;
-using Squidex.Domain.Apps.Core.HandleRules.Actions.Utils;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 using Squidex.Infrastructure.Http;
 
-#pragma warning disable SA1649 // File name must match first type name
-
 namespace Squidex.Extensions.Actions.Medium
 {
-    public sealed class MediumJob
-    {
-        public string RequestBody { get; set; }
-
-        public string AccessToken { get; set; }
-    }
-
     public sealed class MediumActionHandler : RuleActionHandler<MediumAction, MediumJob>
     {
         private const string Description = "Post to medium";
@@ -130,5 +120,12 @@ namespace Squidex.Extensions.Actions.Medium
 
             return request;
         }
+    }
+
+    public sealed class MediumJob
+    {
+        public string RequestBody { get; set; }
+
+        public string AccessToken { get; set; }
     }
 }

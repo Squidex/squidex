@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using FakeItEasy;
 using NodaTime;
@@ -36,7 +35,6 @@ namespace Squidex.Domain.Apps.Entities.Contents
         private readonly IScriptEngine scriptEngine = A.Fake<IScriptEngine>();
         private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
         private readonly IAppEntity app = A.Fake<IAppEntity>();
-        private readonly ClaimsPrincipal user = new ClaimsPrincipal();
         private readonly LanguagesConfig languagesConfig = LanguagesConfig.Build(Language.DE);
 
         private readonly NamedContentData invalidData =
@@ -440,8 +438,6 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task ChangeStatus_should_refresh_properties_and_revert_scheduling_when_invoked_by_scheduler()
         {
-            var dueTime = Instant.MaxValue;
-
             await ExecuteCreateAsync();
             await ExecuteScheduledAsync();
 

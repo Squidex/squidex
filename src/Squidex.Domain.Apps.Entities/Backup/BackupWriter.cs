@@ -11,7 +11,7 @@ using System.IO.Compression;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Squidex.Domain.Apps.Entities.Backup.Archive;
+using Squidex.Domain.Apps.Entities.Backup.Helpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 

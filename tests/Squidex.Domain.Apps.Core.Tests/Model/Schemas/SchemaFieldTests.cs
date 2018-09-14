@@ -21,7 +21,7 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
             typeof(Schema).Assembly.GetTypes()
                 .Where(x => x.BaseType == typeof(FieldProperties))
                 .Select(Activator.CreateInstance)
-                .Select(x => new object[] { x })
+                .Select(x => new[] { x })
                 .ToList();
 
         private readonly RootField<NumberFieldProperties> field_0 = Fields.Number(1, "my-field", Partitioning.Invariant);

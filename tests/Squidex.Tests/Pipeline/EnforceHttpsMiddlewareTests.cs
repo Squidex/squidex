@@ -23,7 +23,7 @@ namespace Squidex.Pipeline
 
         public EnforceHttpsMiddlewareTests()
         {
-            next = (context) =>
+            next = context =>
             {
                 isNextCalled = true;
 

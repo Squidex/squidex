@@ -390,7 +390,7 @@ namespace Squidex.Domain.Users.MongoDb
 
         public async Task<IUser> FindByIdOrEmailAsync(string id)
         {
-            if (ObjectId.TryParse(id, out var parsed))
+            if (ObjectId.TryParse(id, out _))
             {
                 return await Collection.Find(x => x.Id == id).FirstOrDefaultAsync();
             }

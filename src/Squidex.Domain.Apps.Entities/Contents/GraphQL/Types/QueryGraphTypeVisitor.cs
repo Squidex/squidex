@@ -17,7 +17,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
     public sealed class QueryGraphTypeVisitor : IFieldVisitor<(IGraphType ResolveType, ValueResolver Resolver)>
     {
-        private static readonly ValueResolver NoopResolver = new ValueResolver((value, c) => value);
+        private static readonly ValueResolver NoopResolver = (value, c) => value;
         private readonly ISchemaEntity schema;
         private readonly Func<Guid, IGraphType> schemaResolver;
         private readonly IGraphModel model;

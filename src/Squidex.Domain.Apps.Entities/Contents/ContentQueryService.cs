@@ -130,7 +130,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return ResultList.Create(contents.Total, transformed);
         }
 
-        private IResultList<IContentEntity> Sort(IResultList<IContentEntity> contents, IReadOnlyList<Guid> ids)
+        private static IResultList<IContentEntity> Sort(IResultList<IContentEntity> contents, IReadOnlyList<Guid> ids)
         {
             var sorted = ids.Select(id => contents.FirstOrDefault(x => x.Id == id)).Where(x => x != null);
 
@@ -171,7 +171,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             }
         }
 
-        private IEnumerable<FieldConverter> GenerateConverters(QueryContext context, bool checkType)
+        private static IEnumerable<FieldConverter> GenerateConverters(QueryContext context, bool checkType)
         {
             if (!context.IsFrontendClient)
             {
@@ -223,7 +223,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 }
                 catch (NotSupportedException)
                 {
-                    throw new ValidationException($"OData operation is not supported.");
+                    throw new ValidationException("OData operation is not supported.");
                 }
                 catch (ODataException ex)
                 {

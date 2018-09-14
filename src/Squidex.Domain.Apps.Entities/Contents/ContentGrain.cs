@@ -66,13 +66,13 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                         GuardContent.CanCreate(ctx.Schema, c);
 
-                        await ctx.ExecuteScriptAndTransformAsync(x => x.ScriptCreate, "Create", c, c.Data, null);
+                        await ctx.ExecuteScriptAndTransformAsync(x => x.ScriptCreate, "Create", c, c.Data);
                         await ctx.EnrichAsync(c.Data);
                         await ctx.ValidateAsync(c.Data);
 
                         if (c.Publish)
                         {
-                            await ctx.ExecuteScriptAsync(x => x.ScriptChange, "Published", c, c.Data, null);
+                            await ctx.ExecuteScriptAsync(x => x.ScriptChange, "Published", c, c.Data);
                         }
 
                         Create(c);
@@ -117,7 +117,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                                 }
                                 else
                                 {
-                                    var reason = StatusChange.Published;
+                                    StatusChange reason;
 
                                     if (c.Status == Status.Published)
                                     {

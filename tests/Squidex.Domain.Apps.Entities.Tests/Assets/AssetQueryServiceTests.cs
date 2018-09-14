@@ -27,14 +27,13 @@ namespace Squidex.Domain.Apps.Entities.Assets
         private readonly IAppEntity app = A.Fake<IAppEntity>();
         private readonly Guid appId = Guid.NewGuid();
         private readonly string appName = "my-app";
-        private readonly ClaimsPrincipal user;
         private readonly ClaimsIdentity identity = new ClaimsIdentity();
         private readonly QueryContext context;
         private readonly AssetQueryService sut;
 
         public AssetQueryServiceTests()
         {
-            user = new ClaimsPrincipal(identity);
+            var user = new ClaimsPrincipal(identity);
 
             A.CallTo(() => app.Id).Returns(appId);
             A.CallTo(() => app.Name).Returns(appName);
@@ -132,7 +131,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 .MustHaveHappened();
         }
 
-        private IAssetEntity CreateAsset(Guid id, params string[] tags)
+        private static IAssetEntity CreateAsset(Guid id, params string[] tags)
         {
             var asset = A.Fake<IAssetEntity>();
 

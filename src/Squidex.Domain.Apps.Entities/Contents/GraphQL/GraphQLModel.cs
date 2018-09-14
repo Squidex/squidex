@@ -12,7 +12,6 @@ using System.Threading.Tasks;
 using GraphQL;
 using GraphQL.Resolvers;
 using GraphQL.Types;
-using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Apps;
@@ -38,7 +37,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         private readonly IGraphType assetListType;
         private readonly GraphQLSchema graphQLSchema;
 
-        public bool CanGenerateAssetSourceUrl { get; private set; }
+        public bool CanGenerateAssetSourceUrl { get; }
 
         public GraphQLModel(IAppEntity app, IEnumerable<ISchemaEntity> schemas, IGraphQLUrlGenerator urlGenerator)
         {
@@ -77,11 +76,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             {
                 kvp.Value.Initialize(this, kvp.Key, contentDataTypes[kvp.Key]);
             }
-        }
-
-        private static (IGraphType ResolveType, IFieldResolver Resolver) ResolveDefault(IGraphType type)
-        {
-            return (type, new FuncFieldResolver<IReadOnlyDictionary<string, JToken>, object>(c => c.Source.GetOrDefault(c.FieldName)));
         }
 
         public IFieldResolver ResolveAssetUrl()
@@ -156,7 +150,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 return null;
             }
 
-            return schema != null ? contentDataTypes.GetOrAddNew(schema) : null;
+            return contentDataTypes.GetOrAddNew(schema);
         }
 
         public IGraphType GetContentType(Guid schemaId)

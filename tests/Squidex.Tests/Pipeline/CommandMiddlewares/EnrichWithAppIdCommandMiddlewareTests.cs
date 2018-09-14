@@ -72,7 +72,7 @@ namespace Squidex.Pipeline.CommandMiddlewares
         [Fact]
         public async Task Should_assign_app_id_to_app_self_command()
         {
-            SetupApp(out var appId, out var appName);
+            SetupApp(out var appId, out _);
 
             var command = new AddPattern();
             var context = new CommandContext(command, commandBus);
@@ -85,7 +85,7 @@ namespace Squidex.Pipeline.CommandMiddlewares
         [Fact]
         public async Task Should_not_override_app_id()
         {
-            SetupApp(out var appId, out var appName);
+            SetupApp(out var appId, out _);
 
             var command = new AddPattern { AppId = Guid.NewGuid() };
             var context = new CommandContext(command, commandBus);

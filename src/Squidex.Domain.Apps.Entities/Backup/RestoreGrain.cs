@@ -9,13 +9,11 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using NodaTime;
-using Orleans;
 using Squidex.Domain.Apps.Entities.Backup.Helpers;
 using Squidex.Domain.Apps.Entities.Backup.State;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Orleans;
@@ -26,13 +24,11 @@ namespace Squidex.Domain.Apps.Entities.Backup
 {
     public sealed class RestoreGrain : GrainOfString, IRestoreGrain
     {
-        private readonly IAssetStore assetStore;
         private readonly IBackupArchiveLocation backupArchiveLocation;
         private readonly IClock clock;
         private readonly IEnumerable<BackupHandler> handlers;
         private readonly IEventStore eventStore;
         private readonly IEventDataFormatter eventDataFormatter;
-        private readonly IGrainFactory grainFactory;
         private readonly ISemanticLog log;
         private readonly IStreamNameResolver streamNameResolver;
         private readonly IStore<string> store;
@@ -45,35 +41,28 @@ namespace Squidex.Domain.Apps.Entities.Backup
             get { return state.Job; }
         }
 
-        public RestoreGrain(
-            IAssetStore assetStore,
-            IBackupArchiveLocation backupArchiveLocation,
+        public RestoreGrain(IBackupArchiveLocation backupArchiveLocation,
             IClock clock,
             IEventStore eventStore,
             IEventDataFormatter eventDataFormatter,
-            IGrainFactory grainFactory,
             IEnumerable<BackupHandler> handlers,
             ISemanticLog log,
             IStreamNameResolver streamNameResolver,
             IStore<string> store)
         {
-            Guard.NotNull(assetStore, nameof(assetStore));
             Guard.NotNull(backupArchiveLocation, nameof(backupArchiveLocation));
             Guard.NotNull(clock, nameof(clock));
             Guard.NotNull(eventStore, nameof(eventStore));
             Guard.NotNull(eventDataFormatter, nameof(eventDataFormatter));
-            Guard.NotNull(grainFactory, nameof(grainFactory));
             Guard.NotNull(handlers, nameof(handlers));
             Guard.NotNull(store, nameof(store));
             Guard.NotNull(streamNameResolver, nameof(streamNameResolver));
             Guard.NotNull(log, nameof(log));
 
-            this.assetStore = assetStore;
             this.backupArchiveLocation = backupArchiveLocation;
             this.clock = clock;
             this.eventStore = eventStore;
             this.eventDataFormatter = eventDataFormatter;
-            this.grainFactory = grainFactory;
             this.handlers = handlers;
             this.store = store;
             this.streamNameResolver = streamNameResolver;
@@ -218,7 +207,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                         Log("Failed with internal error");
                     }
 
-                    await CleanupAsync(ex);
+                    await CleanupAsync();
 
                     CurrentJob.Status = JobStatus.Failed;
 
@@ -241,7 +230,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             }
         }
 
-        private async Task CleanupAsync(Exception exception = null)
+        private async Task CleanupAsync()
         {
             await Safe.DeleteAsync(backupArchiveLocation, CurrentJob.Id, log);
 
@@ -265,7 +254,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         private async Task ReadEventsAsync(BackupReader reader)
         {
-            await reader.ReadEventsAsync(streamNameResolver, async (storedEvent) =>
+            await reader.ReadEventsAsync(streamNameResolver, async storedEvent =>
             {
                 var @event = eventDataFormatter.Parse(storedEvent.Data);
 

@@ -10,7 +10,6 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.HandleRules;
-using Squidex.Domain.Apps.Core.HandleRules.Actions.Utils;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 using Squidex.Infrastructure;
 

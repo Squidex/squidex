@@ -46,12 +46,14 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
 
         public static AppCreatedDto FromResult(EntityCreatedResult<Guid> result, IAppPlansProvider apps)
         {
-            var response = new AppCreatedDto { Id = result.IdOrValue.ToString(), Version = result.Version };
-
-            response.Permission = AppContributorPermission.Owner;
-
-            response.PlanName = apps.GetPlan(null)?.Name;
-            response.PlanUpgrade = apps.GetPlanUpgrade(null)?.Name;
+            var response = new AppCreatedDto
+            {
+                Id = result.IdOrValue.ToString(),
+                Permission = AppContributorPermission.Owner,
+                PlanName = apps.GetPlan(null)?.Name,
+                PlanUpgrade = apps.GetPlanUpgrade(null)?.Name,
+                Version = result.Version
+            };
 
             return response;
         }

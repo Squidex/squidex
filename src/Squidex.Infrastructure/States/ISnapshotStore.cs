@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Squidex.Infrastructure.States
 {
-    public interface ISnapshotStore<T, TKey>
+    public interface ISnapshotStore<T, in TKey>
     {
         Task WriteAsync(TKey key, T value, long oldVersion, long newVersion);
 

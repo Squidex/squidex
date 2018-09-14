@@ -125,7 +125,7 @@ namespace Squidex.Infrastructure.Assets
             return TaskHelper.Done;
         }
 
-        private async Task UploadCoreAsync(FileInfo file, Stream stream, CancellationToken ct)
+        private static async Task UploadCoreAsync(FileInfo file, Stream stream, CancellationToken ct)
         {
             try
             {

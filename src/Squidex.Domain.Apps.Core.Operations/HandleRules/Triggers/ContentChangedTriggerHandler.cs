@@ -89,7 +89,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Triggers
 
         private static bool IsDelete(ContentChangedTriggerSchema schema, SchemaEvent @event)
         {
-            return (schema.SendDelete && @event is ContentDeleted);
+            return schema.SendDelete && @event is ContentDeleted;
         }
     }
 }

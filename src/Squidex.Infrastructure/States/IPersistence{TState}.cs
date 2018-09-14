@@ -11,13 +11,13 @@ using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Infrastructure.States
 {
-    public interface IPersistence<TState>
+    public interface IPersistence<in TState>
     {
         long Version { get; }
 
         Task DeleteAsync();
 
-        Task WriteEventsAsync(IEnumerable<Envelope<IEvent>> @events);
+        Task WriteEventsAsync(IEnumerable<Envelope<IEvent>> events);
 
         Task WriteSnapshotAsync(TState state);
 

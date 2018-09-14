@@ -83,7 +83,7 @@ namespace Squidex.Infrastructure.UsageTracking
                 new StoredUsage("MyCategory1", f.AddDays(3), 13, 18),
                 new StoredUsage("MyCategory1", f.AddDays(4), 15, 20),
                 new StoredUsage(null, f.AddDays(0), 17, 22),
-                new StoredUsage(null, f.AddDays(2), 11, 14),
+                new StoredUsage(null, f.AddDays(2), 11, 14)
             };
 
             A.CallTo(() => usageStore.QueryAsync("MyKey1", f, t))
@@ -99,7 +99,7 @@ namespace Squidex.Infrastructure.UsageTracking
                     new DateUsage(f.AddDays(1), 10, 15),
                     new DateUsage(f.AddDays(2), 00, 00),
                     new DateUsage(f.AddDays(3), 13, 18),
-                    new DateUsage(f.AddDays(4), 15, 20),
+                    new DateUsage(f.AddDays(4), 15, 20)
                 },
                 ["*"] = new List<DateUsage>
                 {
@@ -107,7 +107,7 @@ namespace Squidex.Infrastructure.UsageTracking
                     new DateUsage(f.AddDays(1), 00, 00),
                     new DateUsage(f.AddDays(2), 11, 14),
                     new DateUsage(f.AddDays(3), 00, 00),
-                    new DateUsage(f.AddDays(4), 00, 00),
+                    new DateUsage(f.AddDays(4), 00, 00)
                 }
             };
 
@@ -133,7 +133,7 @@ namespace Squidex.Infrastructure.UsageTracking
                     new DateUsage(f.AddDays(1), 00, 00),
                     new DateUsage(f.AddDays(2), 00, 00),
                     new DateUsage(f.AddDays(3), 00, 00),
-                    new DateUsage(f.AddDays(4), 00, 00),
+                    new DateUsage(f.AddDays(4), 00, 00)
                 }
             };
 

@@ -120,12 +120,12 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public async Task Should_not_create_job_if_too_old()
         {
-            var e = new ContentCreated { SchemaId = NamedId.Of(Guid.NewGuid(), "my-schema"), AppId = NamedId.Of(Guid.NewGuid(), "my-event") };
+            var @event = new ContentCreated { SchemaId = NamedId.Of(Guid.NewGuid(), "my-schema"), AppId = NamedId.Of(Guid.NewGuid(), "my-event") };
 
             var now = SystemClock.Instance.GetCurrentInstant();
 
             var ruleConfig = new Rule(new ContentChangedTrigger(), new ValidAction());
-            var ruleEnvelope = Envelope.Create(e);
+            var ruleEnvelope = Envelope.Create(@event);
 
             ruleEnvelope.SetTimestamp(now.Minus(Duration.FromDays(3)));
 
@@ -149,12 +149,12 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public async Task Should_create_job_if_triggered()
         {
-            var e = new ContentCreated { SchemaId = NamedId.Of(Guid.NewGuid(), "my-schema"), AppId = NamedId.Of(Guid.NewGuid(), "my-event") };
+            var @event = new ContentCreated { SchemaId = NamedId.Of(Guid.NewGuid(), "my-schema"), AppId = NamedId.Of(Guid.NewGuid(), "my-event") };
 
             var now = SystemClock.Instance.GetCurrentInstant();
 
             var ruleConfig = new Rule(new ContentChangedTrigger(), new ValidAction());
-            var ruleEnvelope = Envelope.Create(e);
+            var ruleEnvelope = Envelope.Create(@event);
 
             ruleEnvelope.SetTimestamp(now);
 
@@ -180,7 +180,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             Assert.Equal(now, job.Created);
             Assert.Equal(now.Plus(Duration.FromDays(2)), job.Expires);
 
-            Assert.Equal(e.AppId.Id, job.AppId);
+            Assert.Equal(@event.AppId.Id, job.AppId);
 
             Assert.NotEqual(Guid.Empty, job.JobId);
         }
@@ -189,7 +189,6 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         public async Task Should_return_succeeded_job_with_full_dump_when_handler_returns_no_exception()
         {
             var ruleJob = new JObject();
-            var ruleEx = new InvalidOperationException();
 
             var actionDump = "MyDump";
 
@@ -208,7 +207,6 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         public async Task Should_return_failed_job_with_full_dump_when_handler_returns_exception()
         {
             var ruleJob = new JObject();
-            var ruleEx = new InvalidOperationException();
 
             var actionDump = "MyDump";
 
@@ -227,7 +225,6 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         public async Task Should_return_timedout_job_with_full_dump_when_exception_from_handler_indicates_timeout()
         {
             var ruleJob = new JObject();
-            var ruleEx = new InvalidOperationException();
 
             var actionDump = "MyDump";
 
@@ -247,14 +244,14 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         public async Task Should_create_exception_details_when_job_to_execute_failed()
         {
             var ruleJob = new JObject();
-            var ruleEx = new InvalidOperationException();
+            var ruleError = new InvalidOperationException();
 
             A.CallTo(() => ruleActionHandler.ExecuteJobAsync(ruleJob))
-                .Throws(ruleEx);
+                .Throws(ruleError);
 
             var result = await sut.InvokeAsync("ValidAction", ruleJob);
 
-            Assert.Equal((ruleEx.ToString(), RuleResult.Failed, TimeSpan.Zero), result);
+            Assert.Equal((ruleError.ToString(), RuleResult.Failed, TimeSpan.Zero), result);
         }
     }
 }

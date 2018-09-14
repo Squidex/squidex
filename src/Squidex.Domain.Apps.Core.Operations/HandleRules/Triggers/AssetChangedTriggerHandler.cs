@@ -22,10 +22,10 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Triggers
         private static bool MatchsType(AssetChangedTrigger trigger, AssetEvent @event)
         {
             return
-                (trigger.SendCreate && @event is AssetCreated) ||
-                (trigger.SendUpdate && @event is AssetUpdated) ||
-                (trigger.SendDelete && @event is AssetDeleted) ||
-                (trigger.SendRename && @event is AssetRenamed);
+                trigger.SendCreate && @event is AssetCreated ||
+                trigger.SendUpdate && @event is AssetUpdated ||
+                trigger.SendDelete && @event is AssetDeleted ||
+                trigger.SendRename && @event is AssetRenamed;
         }
     }
 }

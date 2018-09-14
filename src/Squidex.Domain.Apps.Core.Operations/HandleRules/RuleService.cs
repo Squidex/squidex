@@ -22,7 +22,6 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 {
     public class RuleService
     {
-        private const string ContentPrefix = "Content";
         private readonly Dictionary<Type, IRuleActionHandler> ruleActionHandlers;
         private readonly Dictionary<Type, IRuleTriggerHandler> ruleTriggerHandlers;
         private readonly TypeNameRegistry typeNameRegistry;
