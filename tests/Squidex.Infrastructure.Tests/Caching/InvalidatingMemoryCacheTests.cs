@@ -95,7 +95,7 @@ namespace Squidex.Infrastructure.Caching
         [Fact]
         public void Should_use_inner_cache_to_get_value()
         {
-            object outValue;
+            object outValue = 123;
 
             A.CallTo(() => cache.TryGetValue("a-key", out outValue))
                 .Returns(true);
