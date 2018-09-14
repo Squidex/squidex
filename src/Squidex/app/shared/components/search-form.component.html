@@ -91,7 +91,7 @@
             </ng-container>
         
             <ng-container footer>
-                <button type="reset" class="float-left btn btn-secondary" (click)="saveQueryComplete()" [disabled]="saveQueryForm.submitted | async">Cancel</button>
+                <button type="reset" class="float-left btn btn-secondary" (click)="saveQueryDialog.hide()" [disabled]="saveQueryForm.submitted | async">Cancel</button>
                 <button type="submit" class="float-right btn btn-success">Create</button>
             </ng-container>
         </sqx-modal-dialog>
