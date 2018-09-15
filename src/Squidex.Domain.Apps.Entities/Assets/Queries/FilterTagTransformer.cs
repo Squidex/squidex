@@ -13,12 +13,12 @@ using Squidex.Infrastructure.Queries;
 
 namespace Squidex.Domain.Apps.Entities.Assets.Queries
 {
-    public sealed class QueryTagVisitor : TransformVisitor
+    public sealed class FilterTagTransformer : TransformVisitor
     {
         private readonly ITagService tagService;
         private readonly Guid appId;
 
-        private QueryTagVisitor(Guid appId, ITagService tagService)
+        private FilterTagTransformer(Guid appId, ITagService tagService)
         {
             this.appId = appId;
 
@@ -29,7 +29,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         {
             Guard.NotNull(tagService, nameof(tagService));
 
-            return nodeIn.Accept(new QueryTagVisitor(appId, tagService));
+            return nodeIn.Accept(new FilterTagTransformer(appId, tagService));
         }
 
         public override FilterNode Visit(FilterComparison nodeIn)

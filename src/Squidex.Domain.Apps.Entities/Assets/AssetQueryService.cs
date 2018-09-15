@@ -89,7 +89,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                 if (result.Filter != null)
                 {
-                    result.Filter = QueryTagVisitor.Transform(result.Filter, context.App.Id, tagService);
+                    result.Filter = FilterTagTransformer.Transform(result.Filter, context.App.Id, tagService);
                 }
 
                 if (result.Sort.Count == 0)

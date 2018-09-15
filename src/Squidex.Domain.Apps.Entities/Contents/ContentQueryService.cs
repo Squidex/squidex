@@ -13,6 +13,8 @@ using Microsoft.OData;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.ConvertContent;
 using Squidex.Domain.Apps.Core.Scripting;
+using Squidex.Domain.Apps.Core.Tags;
+using Squidex.Domain.Apps.Entities.Assets.Queries;
 using Squidex.Domain.Apps.Entities.Contents.Edm;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.Schemas;
@@ -37,13 +39,15 @@ namespace Squidex.Domain.Apps.Entities.Contents
         private readonly IContentVersionLoader contentVersionLoader;
         private readonly IAppProvider appProvider;
         private readonly IScriptEngine scriptEngine;
+        private readonly ITagService tagService;
         private readonly EdmModelBuilder modelBuilder;
 
         public ContentQueryService(
+            IAppProvider appProvider,
             IContentRepository contentRepository,
             IContentVersionLoader contentVersionLoader,
-            IAppProvider appProvider,
             IScriptEngine scriptEngine,
+            ITagService tagService,
             EdmModelBuilder modelBuilder)
         {
             Guard.NotNull(appProvider, nameof(appProvider));
@@ -51,12 +55,14 @@ namespace Squidex.Domain.Apps.Entities.Contents
             Guard.NotNull(contentVersionLoader, nameof(contentVersionLoader));
             Guard.NotNull(modelBuilder, nameof(modelBuilder));
             Guard.NotNull(scriptEngine, nameof(scriptEngine));
+            Guard.NotNull(tagService, nameof(tagService));
 
             this.appProvider = appProvider;
             this.contentRepository = contentRepository;
             this.contentVersionLoader = contentVersionLoader;
             this.modelBuilder = modelBuilder;
             this.scriptEngine = scriptEngine;
+            this.tagService = tagService;
         }
 
         public Task ThrowIfSchemaNotExistsAsync(ContentQueryContext context)
@@ -208,6 +214,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     var model = modelBuilder.BuildEdmModel(schema, context.App);
 
                     var result = model.ParseQuery(query).ToQuery();
+
+                    if (result.Filter != null)
+                    {
+                        result.Filter = FilterTagTransformer.Transform(result.Filter, context.App.Id, tagService);
+                    }
 
                     if (result.Sort.Count == 0)
                     {
