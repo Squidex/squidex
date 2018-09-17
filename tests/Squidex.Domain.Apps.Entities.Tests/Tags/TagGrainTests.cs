@@ -34,8 +34,8 @@ namespace Squidex.Domain.Apps.Entities.Tags
         [Fact]
         public async Task Should_delete_and_reset_state_when_cleaning()
         {
-            await sut.NormalizeTagsAsync(HashSet.Of("tag1", "tag2"), null);
-            await sut.NormalizeTagsAsync(HashSet.Of("tag2", "tag3"), null);
+            await sut.NormalizeTagsAsync(HashSet.Of("name1", "name2"), null);
+            await sut.NormalizeTagsAsync(HashSet.Of("name2", "name3"), null);
             await sut.ClearAsync();
 
             var allTags = await sut.GetTagsAsync();
@@ -51,9 +51,9 @@ namespace Squidex.Domain.Apps.Entities.Tags
         {
             var tags = new TagSet
             {
-                ["1"] = new Tag { Name = "tag1", Count = 1 },
-                ["2"] = new Tag { Name = "tag2", Count = 2 },
-                ["3"] = new Tag { Name = "tag3", Count = 6 }
+                ["id1"] = new Tag { Name = "name1", Count = 1 },
+                ["id2"] = new Tag { Name = "name2", Count = 2 },
+                ["id3"] = new Tag { Name = "name3", Count = 6 }
             };
 
             await sut.RebuildAsync(tags);
@@ -62,9 +62,9 @@ namespace Squidex.Domain.Apps.Entities.Tags
 
             Assert.Equal(new Dictionary<string, int>
             {
-                ["tag1"] = 1,
-                ["tag2"] = 2,
-                ["tag3"] = 6
+                ["name1"] = 1,
+                ["name2"] = 2,
+                ["name3"] = 6
             }, allTags);
 
             Assert.Same(tags, await sut.GetExportableTagsAsync());
@@ -73,40 +73,40 @@ namespace Squidex.Domain.Apps.Entities.Tags
         [Fact]
         public async Task Should_add_tags_to_grain()
         {
-            await sut.NormalizeTagsAsync(HashSet.Of("tag1", "tag2"), null);
-            await sut.NormalizeTagsAsync(HashSet.Of("tag2", "tag3"), null);
+            await sut.NormalizeTagsAsync(HashSet.Of("name1", "name2"), null);
+            await sut.NormalizeTagsAsync(HashSet.Of("name2", "name3"), null);
 
             var allTags = await sut.GetTagsAsync();
 
             Assert.Equal(new Dictionary<string, int>
             {
-                ["tag1"] = 1,
-                ["tag2"] = 2,
-                ["tag3"] = 1
+                ["name1"] = 1,
+                ["name2"] = 2,
+                ["name3"] = 1
             }, allTags);
         }
 
         [Fact]
         public async Task Should_not_add_tags_if_already_added()
         {
-            var result1 = await sut.NormalizeTagsAsync(HashSet.Of("tag1", "tag2"), null);
-            var result2 = await sut.NormalizeTagsAsync(HashSet.Of("tag1", "tag2", "tag3"), new HashSet<string>(result1.Values));
+            var result1 = await sut.NormalizeTagsAsync(HashSet.Of("name1", "name2"), null);
+            var result2 = await sut.NormalizeTagsAsync(HashSet.Of("name1", "name2", "name3"), new HashSet<string>(result1.Values));
 
             var allTags = await sut.GetTagsAsync();
 
             Assert.Equal(new Dictionary<string, int>
             {
-                ["tag1"] = 1,
-                ["tag2"] = 1,
-                ["tag3"] = 1
+                ["name1"] = 1,
+                ["name2"] = 1,
+                ["name3"] = 1
             }, allTags);
         }
 
         [Fact]
         public async Task Should_remove_tags_from_grain()
         {
-            var result1 = await sut.NormalizeTagsAsync(HashSet.Of("tag1", "tag2"), null);
-            var result2 = await sut.NormalizeTagsAsync(HashSet.Of("tag2", "tag3"), null);
+            var result1 = await sut.NormalizeTagsAsync(HashSet.Of("name1", "name2"), null);
+            var result2 = await sut.NormalizeTagsAsync(HashSet.Of("name2", "name3"), null);
 
             await sut.NormalizeTagsAsync(null, new HashSet<string>(result1.Values));
 
@@ -114,16 +114,16 @@ namespace Squidex.Domain.Apps.Entities.Tags
 
             Assert.Equal(new Dictionary<string, int>
             {
-                ["tag2"] = 1,
-                ["tag3"] = 1
+                ["name2"] = 1,
+                ["name3"] = 1
             }, allTags);
         }
 
         [Fact]
         public async Task Should_resolve_tag_names()
         {
-            var tagIds = await sut.NormalizeTagsAsync(HashSet.Of("tag1", "tag2"), null);
-            var tagNames = await sut.GetTagIdsAsync(HashSet.Of("tag1", "tag2", "invalid1"));
+            var tagIds = await sut.NormalizeTagsAsync(HashSet.Of("name1", "name2"), null);
+            var tagNames = await sut.GetTagIdsAsync(HashSet.Of("name1", "name2", "invalid1"));
 
             Assert.Equal(tagIds, tagNames);
         }

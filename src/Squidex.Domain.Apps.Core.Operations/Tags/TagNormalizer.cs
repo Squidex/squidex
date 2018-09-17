@@ -11,34 +11,53 @@ using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Tags
 {
     public static class TagNormalizer
     {
-        public static async Task NormalizeAsync(ITagService service, Guid appId, Guid schemaId, Schema schema, params NamedContentData[] datas)
+        public static async Task NormalizeAsync(this ITagService tagService, Guid appId, Guid schemaId, Schema schema, NamedContentData newData, NamedContentData oldData)
         {
-            var tagsValues = new HashSet<string>();
-            var tagsArrays = new List<JArray>();
+            Guard.NotNull(tagService, nameof(tagService));
+            Guard.NotNull(schema, nameof(schema));
+            Guard.NotNull(newData, nameof(newData));
 
-            GetValues(schema, tagsValues, tagsArrays, datas);
+            var newValues = new HashSet<string>();
+            var newArrays = new List<JArray>();
 
-            if (tagsValues.Count > 0)
+            var oldValues = new HashSet<string>();
+            var oldArrays = new List<JArray>();
+
+            GetValues(schema, newValues, newArrays, newData);
+
+            if (oldData != null)
             {
-                var normalized = await service.NormalizeTagsAsync(appId, $"Schemas_{schemaId}", tagsValues, null);
+                GetValues(schema, oldValues, oldArrays, oldData);
+            }
 
-                foreach (var array in tagsArrays)
+            if (newValues.Count > 0)
+            {
+                var normalized = await tagService.NormalizeTagsAsync(appId, TagGroups.Schemas(schemaId), newValues, oldValues);
+
+                foreach (var array in newArrays)
                 {
                     for (var i = 0; i < array.Count; i++)
                     {
-                        array[i] = normalized[array[i].ToString()];
+                        if (normalized.TryGetValue(array[i].ToString(), out var result))
+                        {
+                            array[i] = result;
+                        }
                     }
                 }
             }
         }
 
-        public static async Task DeNormalizeAsync(ITagService service, Guid appId, Guid schemaId, Schema schema, params NamedContentData[] datas)
+        public static async Task DenormalizeAsync(this ITagService tagService, Guid appId, Guid schemaId, Schema schema, params NamedContentData[] datas)
         {
+            Guard.NotNull(tagService, nameof(tagService));
+            Guard.NotNull(schema, nameof(schema));
+
             var tagsValues = new HashSet<string>();
             var tagsArrays = new List<JArray>();
 
@@ -46,13 +65,16 @@ namespace Squidex.Domain.Apps.Core.Tags
 
             if (tagsValues.Count > 0)
             {
-                var denormalized = await service.DenormalizeTagsAsync(appId, $"Schemas_{schemaId}", tagsValues);
+                var denormalized = await tagService.DenormalizeTagsAsync(appId, TagGroups.Schemas(schemaId), tagsValues);
 
                 foreach (var array in tagsArrays)
                 {
                     for (var i = 0; i < array.Count; i++)
                     {
-                        array[i] = denormalized[array[i].ToString()];
+                        if (denormalized.TryGetValue(array[i].ToString(), out var result))
+                        {
+                            array[i] = result;
+                        }
                     }
                 }
             }
@@ -62,7 +84,7 @@ namespace Squidex.Domain.Apps.Core.Tags
         {
             foreach (var field in schema.Fields)
             {
-                if (field.RawProperties is TagsFieldProperties tags && tags.Normalize)
+                if (field is IField<TagsFieldProperties> tags && tags.Properties.Normalization == TagsFieldNormalization.Schema)
                 {
                     foreach (var data in datas)
                     {
@@ -79,7 +101,7 @@ namespace Squidex.Domain.Apps.Core.Tags
                 {
                     foreach (var nestedField in arrayField.Fields)
                     {
-                        if (field.RawProperties is TagsFieldProperties nestedTags && nestedTags.Normalize)
+                        if (nestedField is IField<TagsFieldProperties> nestedTags && nestedTags.Properties.Normalization == TagsFieldNormalization.Schema)
                         {
                             foreach (var data in datas)
                             {
@@ -95,9 +117,9 @@ namespace Squidex.Domain.Apps.Core.Tags
                                                 {
                                                     var nestedObject = (JObject)value;
 
-                                                    if (nestedObject.TryGetValue(nestedField.Name, out _))
+                                                    if (nestedObject.TryGetValue(nestedField.Name, out var nestedValue))
                                                     {
-                                                        ExtractTags(partition.Value, values, arrays);
+                                                        ExtractTags(nestedValue, values, arrays);
                                                     }
                                                 }
                                             }

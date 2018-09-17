@@ -29,7 +29,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             var schemaDef =
                 new Schema("schema")
                     .AddTags(1, "tags1", Partitioning.Invariant)
-                    .AddTags(2, "tags2", Partitioning.Invariant, new TagsFieldProperties { Normalize = true })
+                    .AddTags(2, "tags2", Partitioning.Invariant, new TagsFieldProperties { Normalization = TagsFieldNormalization.Schema })
                     .AddString(3, "string", Partitioning.Invariant);
 
             A.CallTo(() => schema.Id).Returns(schemaId);
@@ -39,25 +39,25 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         [Fact]
         public void Should_normalize_tags()
         {
-            A.CallTo(() => tagService.GetTagIdsAsync(appId, TagGroups.Schemas(schemaId), A<HashSet<string>>.That.Contains("tag1")))
-                .Returns(new Dictionary<string, string> { ["tag1"] = "normalized1" });
+            A.CallTo(() => tagService.GetTagIdsAsync(appId, TagGroups.Schemas(schemaId), A<HashSet<string>>.That.Contains("name1")))
+                .Returns(new Dictionary<string, string> { ["name1"] = "id1" });
 
-            var source = FilterBuilder.Eq("data.tags2.iv", "tag1");
+            var source = FilterBuilder.Eq("data.tags2.iv", "name1");
             var result = FilterTagTransformer.Transform(source, appId, schema, tagService);
 
-            Assert.Equal("data.tags2.iv == normalized1", result.ToString());
+            Assert.Equal("data.tags2.iv == id1", result.ToString());
         }
 
         [Fact]
         public void Should_not_fail_when_tags_not_found()
         {
-            A.CallTo(() => tagService.GetTagIdsAsync(appId, TagGroups.Assets, A<HashSet<string>>.That.Contains("tag1")))
+            A.CallTo(() => tagService.GetTagIdsAsync(appId, TagGroups.Assets, A<HashSet<string>>.That.Contains("name1")))
                 .Returns(new Dictionary<string, string>());
 
-            var source = FilterBuilder.Eq("data.tags2.iv", "tag1");
+            var source = FilterBuilder.Eq("data.tags2.iv", "name1");
             var result = FilterTagTransformer.Transform(source, appId, schema, tagService);
 
-            Assert.Equal("data.tags2.iv == tag1", result.ToString());
+            Assert.Equal("data.tags2.iv == name1", result.ToString());
         }
 
         [Fact]

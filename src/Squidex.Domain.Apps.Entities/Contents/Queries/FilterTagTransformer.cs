@@ -59,7 +59,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
         private bool IsTagField(IReadOnlyList<string> path)
         {
-            return schema.SchemaDef.FieldsByName.TryGetValue(path[1], out var field) && field is IField<TagsFieldProperties> tags && tags.Properties.Normalize;
+            return schema.SchemaDef.FieldsByName.TryGetValue(path[1], out var field) &&
+                field is IField<TagsFieldProperties> fieldTags &&
+                fieldTags.Properties.Normalization == TagsFieldNormalization.Schema;
         }
     }
 }

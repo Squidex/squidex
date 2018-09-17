@@ -22,25 +22,25 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         [Fact]
         public void Should_normalize_tags()
         {
-            A.CallTo(() => tagService.GetTagIdsAsync(appId, TagGroups.Assets, A<HashSet<string>>.That.Contains("tag1")))
-                .Returns(new Dictionary<string, string> { ["tag1"] = "normalized1" });
+            A.CallTo(() => tagService.GetTagIdsAsync(appId, TagGroups.Assets, A<HashSet<string>>.That.Contains("name1")))
+                .Returns(new Dictionary<string, string> { ["name1"] = "id1" });
 
-            var source = FilterBuilder.Eq("tags", "tag1");
+            var source = FilterBuilder.Eq("tags", "name1");
             var result = FilterTagTransformer.Transform(source, appId, tagService);
 
-            Assert.Equal("tags == normalized1", result.ToString());
+            Assert.Equal("tags == id1", result.ToString());
         }
 
         [Fact]
         public void Should_not_fail_when_tags_not_found()
         {
-            A.CallTo(() => tagService.GetTagIdsAsync(appId, TagGroups.Assets, A<HashSet<string>>.That.Contains("tag1")))
+            A.CallTo(() => tagService.GetTagIdsAsync(appId, TagGroups.Assets, A<HashSet<string>>.That.Contains("name1")))
                 .Returns(new Dictionary<string, string>());
 
-            var source = FilterBuilder.Eq("tags", "tag1");
+            var source = FilterBuilder.Eq("tags", "name1");
             var result = FilterTagTransformer.Transform(source, appId, tagService);
 
-            Assert.Equal("tags == tag1", result.ToString());
+            Assert.Equal("tags == name1", result.ToString());
         }
 
         [Fact]
