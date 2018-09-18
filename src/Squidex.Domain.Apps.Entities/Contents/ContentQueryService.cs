@@ -13,8 +13,6 @@ using Microsoft.OData;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.ConvertContent;
 using Squidex.Domain.Apps.Core.Scripting;
-using Squidex.Domain.Apps.Core.Tags;
-using Squidex.Domain.Apps.Entities.Assets.Queries;
 using Squidex.Domain.Apps.Entities.Contents.Edm;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.Schemas;
@@ -30,7 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 {
     public sealed class ContentQueryService : IContentQueryService
     {
-        private const int MaxResults = 20;
+        private const int MaxResults = 200;
         private static readonly Status[] StatusAll = { Status.Archived, Status.Draft, Status.Published };
         private static readonly Status[] StatusArchived = { Status.Archived };
         private static readonly Status[] StatusPublished = { Status.Published };

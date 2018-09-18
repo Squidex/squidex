@@ -139,6 +139,10 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
         this.changeContentItems(this.select(), 'Restore');
     }
 
+    public clone(content: ContentDto) {
+        this.contentsState.create(content.dataDraft, false).pipe(onErrorResumeNext()).subscribe();
+    }
+
     public isSelectedQuery(query: string) {
         return query === this.contentsState.snapshot.contentsQuery || (!query && !this.contentsState.contentsQuery);
     }

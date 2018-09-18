@@ -33,6 +33,9 @@ import {
 })
 export class ContentItemComponent implements OnChanges {
     @Output()
+    public cloning = new EventEmitter();
+
+    @Output()
     public deleting = new EventEmitter();
 
     @Output()

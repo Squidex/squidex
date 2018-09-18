@@ -99,6 +99,9 @@
             <a class="dropdown-item" (click)="restoring.emit(); $event.stopPropagation()" *ngIf="content.status === 'Archived'">
                 Restore
             </a>
+            <a class="dropdown-item" (click)="cloning.emit(); dropdown.hide(); $event.stopPropagation()" *ngIf="content.status !== 'Archived'">
+                Clone
+            </a>
             
             <div class="dropdown-divider"></div>
 
