@@ -38,7 +38,6 @@ namespace Squidex.Domain.Apps.Entities.Contents
         private readonly ISchemaEntity schema = A.Fake<ISchemaEntity>();
         private readonly IAppEntity app = A.Fake<IAppEntity>();
         private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
-        private readonly ITagService tagService = A.Fake<ITagService>();
         private readonly Guid appId = Guid.NewGuid();
         private readonly Guid schemaId = Guid.NewGuid();
         private readonly string appName = "my-app";
@@ -62,7 +61,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             context = new ContentQueryContext(QueryContext.Create(app, user));
 
-            sut = new ContentQueryService(appProvider, contentRepository, contentVersionLoader, scriptEngine, tagService, modelBuilder);
+            sut = new ContentQueryService(appProvider, contentRepository, contentVersionLoader, scriptEngine, modelBuilder);
         }
 
         [Fact]

@@ -35,13 +35,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.State
         public ScheduleJob ScheduleJob { get; set; }
 
         [JsonProperty]
-        public Status Status { get; set; }
-
-        [JsonProperty]
         public bool IsPending { get; set; }
 
         [JsonProperty]
         public bool IsDeleted { get; set; }
+
+        [JsonProperty]
+        public Status Status { get; set; }
 
         protected void On(ContentCreated @event)
         {
