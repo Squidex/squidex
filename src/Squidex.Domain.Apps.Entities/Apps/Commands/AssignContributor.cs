@@ -13,6 +13,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Commands
     {
         public string ContributorId { get; set; }
 
+        public bool FromRestore { get; set; }
+
         public AppContributorPermission Permission { get; set; }
     }
 }

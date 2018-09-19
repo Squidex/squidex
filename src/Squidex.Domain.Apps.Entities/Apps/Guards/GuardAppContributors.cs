@@ -45,7 +45,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
                 command.ContributorId = user.Id;
 
-                if (string.Equals(command.ContributorId, command.Actor?.Identifier, StringComparison.OrdinalIgnoreCase))
+                if (string.Equals(command.ContributorId, command.Actor?.Identifier, StringComparison.OrdinalIgnoreCase) && !command.FromRestore)
                 {
                     throw new SecurityException("You cannot change your own permission.");
                 }

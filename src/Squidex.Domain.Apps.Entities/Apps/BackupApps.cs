@@ -11,19 +11,17 @@ using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using Orleans;
 using Squidex.Domain.Apps.Entities.Apps.Indexes;
-using Squidex.Domain.Apps.Entities.Apps.State;
 using Squidex.Domain.Apps.Entities.Backup;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Orleans;
-using Squidex.Infrastructure.States;
 using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Apps
 {
-    public sealed class BackupApps : BackupHandlerWithStore
+    public sealed class BackupApps : BackupHandler
     {
         private const string UsersFile = "Users.json";
         private const string SettingsFile = "Settings.json";
@@ -38,8 +36,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         public override string Name { get; } = "Apps";
 
-        public BackupApps(IStore<Guid> store, IGrainFactory grainFactory, IUserResolver userResolver)
-            : base(store)
+        public BackupApps(IGrainFactory grainFactory, IUserResolver userResolver)
         {
             Guard.NotNull(grainFactory, nameof(grainFactory));
             Guard.NotNull(userResolver, nameof(userResolver));
@@ -160,10 +157,6 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 {
                     userMapping[kvp.Key] = new RefToken(RefTokenType.Subject, user.Id);
                 }
-                else
-                {
-                    userMapping[kvp.Key] = actor;
-                }
             }
         }
 
@@ -197,8 +190,6 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         public override async Task CompleteRestoreAsync(Guid appId, BackupReader reader)
         {
-            await RebuildAsync<AppState, AppGrain>(appId, (e, s) => s.Apply(e));
-
             await appsByNameIndex.AddAppAsync(appId, appName);
 
             foreach (var user in contributors)
