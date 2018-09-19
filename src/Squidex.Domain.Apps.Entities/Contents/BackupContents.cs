@@ -29,7 +29,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
         }
 
-        public override Task RestoreEventAsync(Envelope<IEvent> @event, Guid appId, BackupReader reader, RefToken actor)
+        public override Task<bool> RestoreEventAsync(Envelope<IEvent> @event, Guid appId, BackupReader reader, RefToken actor)
         {
             switch (@event.Payload)
             {
@@ -38,7 +38,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     break;
             }
 
-            return TaskHelper.Done;
+            return TaskHelper.True;
         }
 
         public override Task RestoreAsync(Guid appId, BackupReader reader)

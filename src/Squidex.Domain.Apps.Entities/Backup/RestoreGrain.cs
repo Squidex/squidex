@@ -9,11 +9,14 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using NodaTime;
+using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Backup.Helpers;
 using Squidex.Domain.Apps.Entities.Backup.State;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Orleans;
@@ -26,6 +29,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
     {
         private readonly IBackupArchiveLocation backupArchiveLocation;
         private readonly IClock clock;
+        private readonly ICommandBus commandBus;
         private readonly IEnumerable<BackupHandler> handlers;
         private readonly IEventStore eventStore;
         private readonly IEventDataFormatter eventDataFormatter;
@@ -43,6 +47,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         public RestoreGrain(IBackupArchiveLocation backupArchiveLocation,
             IClock clock,
+            ICommandBus commandBus,
             IEventStore eventStore,
             IEventDataFormatter eventDataFormatter,
             IEnumerable<BackupHandler> handlers,
@@ -52,6 +57,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
         {
             Guard.NotNull(backupArchiveLocation, nameof(backupArchiveLocation));
             Guard.NotNull(clock, nameof(clock));
+            Guard.NotNull(commandBus, nameof(commandBus));
             Guard.NotNull(eventStore, nameof(eventStore));
             Guard.NotNull(eventDataFormatter, nameof(eventDataFormatter));
             Guard.NotNull(handlers, nameof(handlers));
@@ -61,6 +67,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             this.backupArchiveLocation = backupArchiveLocation;
             this.clock = clock;
+            this.commandBus = commandBus;
             this.eventStore = eventStore;
             this.eventDataFormatter = eventDataFormatter;
             this.handlers = handlers;
@@ -182,6 +189,13 @@ namespace Squidex.Domain.Apps.Entities.Backup
                         }
                     }
 
+                    using (Profiler.Trace("AssignContributor"))
+                    {
+                        await AssignContributorAsync();
+
+                        Log("Assigned current user as owner");
+                    }
+
                     CurrentJob.Status = JobStatus.Completed;
 
                     Log("Completed, Yeah!");
@@ -230,6 +244,17 @@ namespace Squidex.Domain.Apps.Entities.Backup
             }
         }
 
+        private async Task AssignContributorAsync()
+        {
+            await commandBus.PublishAsync(new AssignContributor
+            {
+                Actor = actor,
+                AppId = CurrentJob.AppId,
+                ContributorId = actor.Identifier,
+                Permission = AppContributorPermission.Developer
+            });
+        }
+
         private async Task CleanupAsync()
         {
             await Safe.DeleteAsync(backupArchiveLocation, CurrentJob.Id, log);
@@ -258,40 +283,48 @@ namespace Squidex.Domain.Apps.Entities.Backup
             {
                 var @event = eventDataFormatter.Parse(storedEvent.Data);
 
-                if (@event.Payload is SquidexEvent squidexEvent)
-                {
-                    squidexEvent.Actor = actor;
-                }
-
-                if (@event.Payload is AppCreated appCreated)
-                {
-                    CurrentJob.AppId = appCreated.AppId.Id;
-
-                    if (!string.IsNullOrWhiteSpace(CurrentJob.NewAppName))
-                    {
-                        appCreated.Name = CurrentJob.NewAppName;
-                    }
-                }
-
-                if (@event.Payload is AppEvent appEvent && !string.IsNullOrWhiteSpace(CurrentJob.NewAppName))
-                {
-                    appEvent.AppId = new NamedId<Guid>(appEvent.AppId.Id, CurrentJob.NewAppName);
-                }
-
-                foreach (var handler in handlers)
-                {
-                    await handler.RestoreEventAsync(@event, CurrentJob.AppId, reader, actor);
-                }
-
-                var eventData = eventDataFormatter.ToEventData(@event, @event.Headers.CommitId());
-                var eventCommit = new List<EventData> { eventData };
-
-                await eventStore.AppendAsync(Guid.NewGuid(), storedEvent.StreamName, eventCommit);
-
-                Log($"Read {reader.ReadEvents} events and {reader.ReadAttachments} attachments.", true);
+                await HandleEventAsync(reader, storedEvent, @event);
             });
 
             Log("Reading events completed.");
+        }
+
+        private async Task HandleEventAsync(BackupReader reader, StoredEvent storedEvent, Envelope<IEvent> @event)
+        {
+            if (@event.Payload is SquidexEvent squidexEvent)
+            {
+                squidexEvent.Actor = actor;
+            }
+
+            if (@event.Payload is AppCreated appCreated)
+            {
+                CurrentJob.AppId = appCreated.AppId.Id;
+
+                if (!string.IsNullOrWhiteSpace(CurrentJob.NewAppName))
+                {
+                    appCreated.Name = CurrentJob.NewAppName;
+                }
+            }
+
+            if (@event.Payload is AppEvent appEvent && !string.IsNullOrWhiteSpace(CurrentJob.NewAppName))
+            {
+                appEvent.AppId = new NamedId<Guid>(appEvent.AppId.Id, CurrentJob.NewAppName);
+            }
+
+            foreach (var handler in handlers)
+            {
+                if (!await handler.RestoreEventAsync(@event, CurrentJob.AppId, reader, actor))
+                {
+                    return;
+                }
+            }
+
+            var eventData = eventDataFormatter.ToEventData(@event, @event.Headers.CommitId());
+            var eventCommit = new List<EventData> { eventData };
+
+            await eventStore.AppendAsync(Guid.NewGuid(), storedEvent.StreamName, eventCommit);
+
+            Log($"Read {reader.ReadEvents} events and {reader.ReadAttachments} attachments.", true);
         }
 
         private void Log(string message, bool replace = false)

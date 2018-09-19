@@ -65,17 +65,19 @@ namespace Squidex.Domain.Apps.Entities.Assets
             return TaskHelper.Done;
         }
 
-        public override Task RestoreEventAsync(Envelope<IEvent> @event, Guid appId, BackupReader reader, RefToken actor)
+        public override async Task<bool> RestoreEventAsync(Envelope<IEvent> @event, Guid appId, BackupReader reader, RefToken actor)
         {
             switch (@event.Payload)
             {
                 case AssetCreated assetCreated:
-                    return ReadAssetAsync(assetCreated.AssetId, assetCreated.FileVersion, reader);
+                    await ReadAssetAsync(assetCreated.AssetId, assetCreated.FileVersion, reader);
+                    break;
                 case AssetUpdated assetUpdated:
-                    return ReadAssetAsync(assetUpdated.AssetId, assetUpdated.FileVersion, reader);
+                    await ReadAssetAsync(assetUpdated.AssetId, assetUpdated.FileVersion, reader);
+                    break;
             }
 
-            return TaskHelper.Done;
+            return true;
         }
 
         public override async Task RestoreAsync(Guid appId, BackupReader reader)
