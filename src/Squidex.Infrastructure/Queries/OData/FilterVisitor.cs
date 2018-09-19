@@ -39,6 +39,13 @@ namespace Squidex.Infrastructure.Queries.OData
             throw new NotSupportedException();
         }
 
+        public override FilterNode Visit(InNode nodeIn)
+        {
+            var value = ConstantWithTypeVisitor.Visit(nodeIn.Right);
+
+            return new FilterComparison(PropertyPathVisitor.Visit(nodeIn.Left), FilterOperator.In, value);
+        }
+
         public override FilterNode Visit(SingleValueFunctionCallNode nodeIn)
         {
             var fieldNode = nodeIn.Parameters.ElementAt(0);
@@ -46,23 +53,23 @@ namespace Squidex.Infrastructure.Queries.OData
 
             if (string.Equals(nodeIn.Name, "endswith", StringComparison.OrdinalIgnoreCase))
             {
-                var (value, valueType) = ConstantWithTypeVisitor.Visit(valueNode);
+                var value = ConstantWithTypeVisitor.Visit(valueNode);
 
-                return new FilterComparison(PropertyPathVisitor.Visit(fieldNode), FilterOperator.EndsWith, value, valueType);
+                return new FilterComparison(PropertyPathVisitor.Visit(fieldNode), FilterOperator.EndsWith, value);
             }
 
             if (string.Equals(nodeIn.Name, "startswith", StringComparison.OrdinalIgnoreCase))
             {
-                var (value, valueType) = ConstantWithTypeVisitor.Visit(valueNode);
+                var value = ConstantWithTypeVisitor.Visit(valueNode);
 
-                return new FilterComparison(PropertyPathVisitor.Visit(fieldNode), FilterOperator.StartsWith, value, valueType);
+                return new FilterComparison(PropertyPathVisitor.Visit(fieldNode), FilterOperator.StartsWith, value);
             }
 
             if (string.Equals(nodeIn.Name, "contains", StringComparison.OrdinalIgnoreCase))
             {
-                var (value, valueType) = ConstantWithTypeVisitor.Visit(valueNode);
+                var value = ConstantWithTypeVisitor.Visit(valueNode);
 
-                return new FilterComparison(PropertyPathVisitor.Visit(fieldNode), FilterOperator.Contains, value, valueType);
+                return new FilterComparison(PropertyPathVisitor.Visit(fieldNode), FilterOperator.Contains, value);
             }
 
             throw new NotSupportedException();
@@ -84,9 +91,9 @@ namespace Squidex.Infrastructure.Queries.OData
             {
                 var regexFilter = Visit(functionNode);
 
-                var (value, _) = ConstantWithTypeVisitor.Visit(nodeIn.Right);
+                var value = ConstantWithTypeVisitor.Visit(nodeIn.Right);
 
-                if (value is bool booleanRight)
+                if (value.ValueType == FilterValueType.Boolean && value.Value is bool booleanRight)
                 {
                     if ((nodeIn.OperatorKind == BinaryOperatorKind.Equal && !booleanRight) ||
                         (nodeIn.OperatorKind == BinaryOperatorKind.NotEqual && booleanRight))
@@ -101,44 +108,44 @@ namespace Squidex.Infrastructure.Queries.OData
             {
                 if (nodeIn.OperatorKind == BinaryOperatorKind.NotEqual)
                 {
-                    var (value, valueType) = ConstantWithTypeVisitor.Visit(nodeIn.Right);
+                    var value = ConstantWithTypeVisitor.Visit(nodeIn.Right);
 
-                    return new FilterComparison(PropertyPathVisitor.Visit(nodeIn.Left), FilterOperator.NotEquals, value, valueType);
+                    return new FilterComparison(PropertyPathVisitor.Visit(nodeIn.Left), FilterOperator.NotEquals, value);
                 }
 
                 if (nodeIn.OperatorKind == BinaryOperatorKind.Equal)
                 {
-                    var (value, valueType) = ConstantWithTypeVisitor.Visit(nodeIn.Right);
+                    var value = ConstantWithTypeVisitor.Visit(nodeIn.Right);
 
-                    return new FilterComparison(PropertyPathVisitor.Visit(nodeIn.Left), FilterOperator.Equals, value, valueType);
+                    return new FilterComparison(PropertyPathVisitor.Visit(nodeIn.Left), FilterOperator.Equals, value);
                 }
 
                 if (nodeIn.OperatorKind == BinaryOperatorKind.LessThan)
                 {
-                    var (value, valueType) = ConstantWithTypeVisitor.Visit(nodeIn.Right);
+                    var value = ConstantWithTypeVisitor.Visit(nodeIn.Right);
 
-                    return new FilterComparison(PropertyPathVisitor.Visit(nodeIn.Left), FilterOperator.LessThan, value, valueType);
+                    return new FilterComparison(PropertyPathVisitor.Visit(nodeIn.Left), FilterOperator.LessThan, value);
                 }
 
                 if (nodeIn.OperatorKind == BinaryOperatorKind.LessThanOrEqual)
                 {
-                    var (value, valueType) = ConstantWithTypeVisitor.Visit(nodeIn.Right);
+                    var value = ConstantWithTypeVisitor.Visit(nodeIn.Right);
 
-                    return new FilterComparison(PropertyPathVisitor.Visit(nodeIn.Left), FilterOperator.LessThanOrEqual, value, valueType);
+                    return new FilterComparison(PropertyPathVisitor.Visit(nodeIn.Left), FilterOperator.LessThanOrEqual, value);
                 }
 
                 if (nodeIn.OperatorKind == BinaryOperatorKind.GreaterThan)
                 {
-                    var (value, valueType) = ConstantWithTypeVisitor.Visit(nodeIn.Right);
+                    var value = ConstantWithTypeVisitor.Visit(nodeIn.Right);
 
-                    return new FilterComparison(PropertyPathVisitor.Visit(nodeIn.Left), FilterOperator.GreaterThan, value, valueType);
+                    return new FilterComparison(PropertyPathVisitor.Visit(nodeIn.Left), FilterOperator.GreaterThan, value);
                 }
 
                 if (nodeIn.OperatorKind == BinaryOperatorKind.GreaterThanOrEqual)
                 {
-                    var (value, valueType) = ConstantWithTypeVisitor.Visit(nodeIn.Right);
+                    var value = ConstantWithTypeVisitor.Visit(nodeIn.Right);
 
-                    return new FilterComparison(PropertyPathVisitor.Visit(nodeIn.Left), FilterOperator.GreaterThanOrEqual, value, valueType);
+                    return new FilterComparison(PropertyPathVisitor.Visit(nodeIn.Left), FilterOperator.GreaterThanOrEqual, value);
                 }
             }
 

@@ -39,16 +39,16 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors
 
             public override FilterNode Visit(FilterComparison nodeIn)
             {
-                var value = nodeIn.Value;
+                var value = nodeIn.Rhs.Value;
 
                 if (value is Instant instant &&
-                    !string.Equals(nodeIn.Path[0], "mt", StringComparison.OrdinalIgnoreCase) &&
-                    !string.Equals(nodeIn.Path[0], "ct", StringComparison.OrdinalIgnoreCase))
+                    !string.Equals(nodeIn.Lhs[0], "mt", StringComparison.OrdinalIgnoreCase) &&
+                    !string.Equals(nodeIn.Lhs[0], "ct", StringComparison.OrdinalIgnoreCase))
                 {
-                    value = instant.ToString();
+                    return new FilterComparison(pathConverter(nodeIn.Lhs), nodeIn.Operator, new FilterValue(value.ToString()));
                 }
 
-                return new FilterComparison(pathConverter(nodeIn.Path), nodeIn.Operator, value, nodeIn.ValueType);
+                return new FilterComparison(pathConverter(nodeIn.Lhs), nodeIn.Operator, nodeIn.Rhs);
             }
         }
 

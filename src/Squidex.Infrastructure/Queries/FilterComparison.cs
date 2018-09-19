@@ -11,25 +11,20 @@ namespace Squidex.Infrastructure.Queries
 {
     public sealed class FilterComparison : FilterNode
     {
-        public IReadOnlyList<string> Path { get; }
+        public IReadOnlyList<string> Lhs { get; }
 
         public FilterOperator Operator { get; }
 
-        public FilterValueType ValueType { get; }
+        public FilterValue Rhs { get; }
 
-        public object Value { get; }
-
-        public FilterComparison(IReadOnlyList<string> path, FilterOperator @operator, object value, FilterValueType valueType)
+        public FilterComparison(IReadOnlyList<string> lhs, FilterOperator @operator, FilterValue rhs)
         {
-            Guard.NotNull(path, nameof(path));
-            Guard.NotEmpty(path, nameof(path));
+            Guard.NotNull(lhs, nameof(lhs));
+            Guard.NotEmpty(lhs, nameof(lhs));
             Guard.Enum(@operator, nameof(@operator));
-            Guard.Enum(valueType, nameof(valueType));
 
-            Path = path;
-
-            Value = value;
-            ValueType = valueType;
+            Lhs = lhs;
+            Rhs = rhs;
 
             Operator = @operator;
         }
@@ -41,28 +36,30 @@ namespace Squidex.Infrastructure.Queries
 
         public override string ToString()
         {
-            var path = string.Join(".", Path);
+            var path = string.Join(".", Lhs);
 
             switch (Operator)
             {
                 case FilterOperator.Contains:
-                    return $"contains({path}, {Value})";
+                    return $"contains({path}, {Rhs})";
                 case FilterOperator.EndsWith:
-                    return $"endsWith({path}, {Value})";
+                    return $"endsWith({path}, {Rhs})";
                 case FilterOperator.StartsWith:
-                    return $"startsWith({path}, {Value})";
+                    return $"startsWith({path}, {Rhs})";
                 case FilterOperator.Equals:
-                    return $"{path} == {Value}";
+                    return $"{path} == {Rhs}";
                 case FilterOperator.NotEquals:
-                    return $"{path} != {Value}";
+                    return $"{path} != {Rhs}";
                 case FilterOperator.GreaterThan:
-                    return $"{path} > {Value}";
+                    return $"{path} > {Rhs}";
                 case FilterOperator.GreaterThanOrEqual:
-                    return $"{path} >= {Value}";
+                    return $"{path} >= {Rhs}";
                 case FilterOperator.LessThan:
-                    return $"{path} < {Value}";
+                    return $"{path} < {Rhs}";
                 case FilterOperator.LessThanOrEqual:
-                    return $"{path} <= {Value}";
+                    return $"{path} <= {Rhs}";
+                case FilterOperator.In:
+                    return $"{path} in {Rhs}";
                 default:
                     return string.Empty;
             }

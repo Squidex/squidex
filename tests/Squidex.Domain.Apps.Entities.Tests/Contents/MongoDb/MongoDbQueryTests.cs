@@ -126,6 +126,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         }
 
         [Fact]
+        public void Should_make_query_with_version_and_list()
+        {
+            var i = F(FilterBuilder.In("version", 0L, 2L, 5L));
+            var o = C("{ 'vs' : { '$in' : [NumberLong(0), NumberLong(2), NumberLong(5)] } }");
+
+            Assert.Equal(o, i);
+        }
+
+        [Fact]
         public void Should_make_query_from_draft()
         {
             var i = F(FilterBuilder.Eq("data/dashed_field/iv", "Value"), true);

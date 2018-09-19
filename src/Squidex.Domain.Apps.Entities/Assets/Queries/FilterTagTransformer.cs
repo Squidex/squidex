@@ -34,13 +34,13 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 
         public override FilterNode Visit(FilterComparison nodeIn)
         {
-            if (string.Equals(nodeIn.Path[0], nameof(IAssetEntity.Tags), StringComparison.OrdinalIgnoreCase) && nodeIn.Value is string stringValue)
+            if (string.Equals(nodeIn.Lhs[0], nameof(IAssetEntity.Tags), StringComparison.OrdinalIgnoreCase) && nodeIn.Rhs.Value is string stringValue)
             {
                 var tagNames = Task.Run(() => tagService.GetTagIdsAsync(appId, TagGroups.Assets, HashSet.Of(stringValue))).Result;
 
                 if (tagNames.TryGetValue(stringValue, out var normalized))
                 {
-                    return new FilterComparison(nodeIn.Path, nodeIn.Operator, normalized, FilterValueType.String);
+                    return new FilterComparison(nodeIn.Lhs, nodeIn.Operator, new FilterValue(normalized));
                 }
             }
 

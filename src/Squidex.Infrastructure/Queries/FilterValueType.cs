@@ -16,6 +16,7 @@ namespace Squidex.Infrastructure.Queries
         Int32,
         Int64,
         Single,
-        String
+        String,
+        Null
     }
 }

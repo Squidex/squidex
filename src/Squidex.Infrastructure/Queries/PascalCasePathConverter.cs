@@ -24,7 +24,7 @@ namespace Squidex.Infrastructure.Queries
 
         public override FilterNode Visit(FilterComparison nodeIn)
         {
-            return new FilterComparison(nodeIn.Path.Select(x => x.ToPascalCase()).ToList(), nodeIn.Operator, nodeIn.Value, nodeIn.ValueType);
+            return new FilterComparison(nodeIn.Lhs.Select(x => x.ToPascalCase()).ToList(), nodeIn.Operator, nodeIn.Rhs);
         }
     }
 }

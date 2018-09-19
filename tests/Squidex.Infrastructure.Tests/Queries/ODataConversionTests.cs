@@ -59,10 +59,28 @@ namespace Squidex.Infrastructure.Queries
         }
 
         [Fact]
+        public void Should_parse_filter_when_type_is_datetime_list()
+        {
+            var i = Q("$filter=created in ('1988-01-19T12:00:00Z')");
+            var o = C("Filter: created in [1988-01-19T12:00:00Z]");
+
+            Assert.Equal(o, i);
+        }
+
+        [Fact]
         public void Should_parse_filter_when_type_is_date()
         {
             var i = Q("$filter=created eq 1988-01-19");
             var o = C("Filter: created == 1988-01-19T00:00:00Z");
+
+            Assert.Equal(o, i);
+        }
+
+        [Fact]
+        public void Should_parse_filter_when_type_is_date_list()
+        {
+            var i = Q("$filter=created in ('1988-01-19')");
+            var o = C("Filter: created in [1988-01-19T00:00:00Z]");
 
             Assert.Equal(o, i);
         }
@@ -77,10 +95,28 @@ namespace Squidex.Infrastructure.Queries
         }
 
         [Fact]
+        public void Should_parse_filter_when_type_is_guid_list()
+        {
+            var i = Q("$filter=id in ('B5FE25E3-B262-4B17-91EF-B3772A6B62BB')");
+            var o = C("Filter: id in [b5fe25e3-b262-4b17-91ef-b3772a6b62bb]");
+
+            Assert.Equal(o, i);
+        }
+
+        [Fact]
         public void Should_parse_filter_when_type_is_string()
         {
             var i = Q("$filter=firstName eq 'Dagobert'");
             var o = C("Filter: firstName == Dagobert");
+
+            Assert.Equal(o, i);
+        }
+
+        [Fact]
+        public void Should_parse_filter_when_type_is_string_list()
+        {
+            var i = Q("$filter=firstName in ('Dagobert')");
+            var o = C("Filter: firstName in [Dagobert]");
 
             Assert.Equal(o, i);
         }
@@ -95,10 +131,28 @@ namespace Squidex.Infrastructure.Queries
         }
 
         [Fact]
+        public void Should_parse_filter_when_type_is_boolean_list()
+        {
+            var i = Q("$filter=isComicFigure in (true)");
+            var o = C("Filter: isComicFigure in [True]");
+
+            Assert.Equal(o, i);
+        }
+
+        [Fact]
         public void Should_parse_filter_when_type_is_int32()
         {
             var i = Q("$filter=age eq 60");
             var o = C("Filter: age == 60");
+
+            Assert.Equal(o, i);
+        }
+
+        [Fact]
+        public void Should_parse_filter_when_type_is_int32_list()
+        {
+            var i = Q("$filter=age in (60)");
+            var o = C("Filter: age in [60]");
 
             Assert.Equal(o, i);
         }
@@ -113,10 +167,28 @@ namespace Squidex.Infrastructure.Queries
         }
 
         [Fact]
+        public void Should_parse_filter_when_type_is_int64_list()
+        {
+            var i = Q("$filter=incomeCents in (31543143513456789)");
+            var o = C("Filter: incomeCents in [31543143513456789]");
+
+            Assert.Equal(o, i);
+        }
+
+        [Fact]
         public void Should_parse_filter_when_type_is_double()
         {
             var i = Q("$filter=incomeMio eq 5634474356.1233");
             var o = C("Filter: incomeMio == 5634474356.1233");
+
+            Assert.Equal(o, i);
+        }
+
+        [Fact]
+        public void Should_parse_filter_when_type_is_double_list()
+        {
+            var i = Q("$filter=incomeMio in (5634474356.1233)");
+            var o = C("Filter: incomeMio in [5634474356.1233]");
 
             Assert.Equal(o, i);
         }

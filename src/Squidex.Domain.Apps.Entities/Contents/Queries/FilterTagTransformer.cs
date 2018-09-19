@@ -39,13 +39,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
         public override FilterNode Visit(FilterComparison nodeIn)
         {
-            if (nodeIn.Value is string stringValue && IsDataPath(nodeIn.Path) && IsTagField(nodeIn.Path))
+            if (nodeIn.Rhs.Value is string stringValue && IsDataPath(nodeIn.Lhs) && IsTagField(nodeIn.Lhs))
             {
                 var tagNames = Task.Run(() => tagService.GetTagIdsAsync(appId, TagGroups.Schemas(schema.Id), HashSet.Of(stringValue))).Result;
 
                 if (tagNames.TryGetValue(stringValue, out var normalized))
                 {
-                    return new FilterComparison(nodeIn.Path, nodeIn.Operator, normalized, FilterValueType.String);
+                    return new FilterComparison(nodeIn.Lhs, nodeIn.Operator, new FilterValue(normalized));
                 }
             }
 

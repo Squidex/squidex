@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Collections;
 using System.Linq;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -46,7 +47,7 @@ namespace Squidex.Infrastructure.MongoDb.OData
 
         public override FilterDefinition<T> Visit(FilterComparison nodeIn)
         {
-            var propertyName = string.Join(".", nodeIn.Path);
+            var propertyName = string.Join(".", nodeIn.Lhs);
 
             switch (nodeIn.Operator)
             {
@@ -57,17 +58,19 @@ namespace Squidex.Infrastructure.MongoDb.OData
                 case FilterOperator.EndsWith:
                     return Filter.Regex(propertyName, BuildRegex(nodeIn, s => s + "$"));
                 case FilterOperator.Equals:
-                    return Filter.Eq(propertyName, nodeIn.Value);
+                    return Filter.Eq(propertyName, nodeIn.Rhs.Value);
                 case FilterOperator.GreaterThan:
-                    return Filter.Gt(propertyName, nodeIn.Value);
+                    return Filter.Gt(propertyName, nodeIn.Rhs.Value);
                 case FilterOperator.GreaterThanOrEqual:
-                    return Filter.Gte(propertyName, nodeIn.Value);
+                    return Filter.Gte(propertyName, nodeIn.Rhs.Value);
                 case FilterOperator.LessThan:
-                    return Filter.Lt(propertyName, nodeIn.Value);
+                    return Filter.Lt(propertyName, nodeIn.Rhs.Value);
                 case FilterOperator.LessThanOrEqual:
-                    return Filter.Lte(propertyName, nodeIn.Value);
+                    return Filter.Lte(propertyName, nodeIn.Rhs.Value);
                 case FilterOperator.NotEquals:
-                    return Filter.Ne(propertyName, nodeIn.Value);
+                    return Filter.Ne(propertyName, nodeIn.Rhs.Value);
+                case FilterOperator.In:
+                    return Filter.In(propertyName, ((IList)nodeIn.Rhs.Value).OfType<object>());
             }
 
             throw new NotSupportedException();
@@ -75,7 +78,7 @@ namespace Squidex.Infrastructure.MongoDb.OData
 
         private static BsonRegularExpression BuildRegex(FilterComparison node, Func<string, string> formatter)
         {
-            return new BsonRegularExpression(formatter(node.Value.ToString()), "i");
+            return new BsonRegularExpression(formatter(node.Rhs.Value.ToString()), "i");
         }
     }
 }

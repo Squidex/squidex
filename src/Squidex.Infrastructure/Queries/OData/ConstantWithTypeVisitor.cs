@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Linq;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
@@ -14,7 +15,7 @@ using NodaTime.Text;
 
 namespace Squidex.Infrastructure.Queries.OData
 {
-    public sealed class ConstantWithTypeVisitor : QueryNodeVisitor<(object Value, FilterValueType ValueType)>
+    public sealed class ConstantWithTypeVisitor : QueryNodeVisitor<FilterValue>
     {
         private static readonly IEdmPrimitiveType BooleanType = EdmCoreModel.Instance.GetPrimitiveType(EdmPrimitiveTypeKind.Boolean);
         private static readonly IEdmPrimitiveType DateTimeType = EdmCoreModel.Instance.GetPrimitiveType(EdmPrimitiveTypeKind.DateTimeOffset);
@@ -31,88 +32,142 @@ namespace Squidex.Infrastructure.Queries.OData
         {
         }
 
-        public static (object Value, FilterValueType ValueType) Visit(QueryNode node)
+        public static FilterValue Visit(QueryNode node)
         {
             return node.Accept(Instance);
         }
 
-        public override (object Value, FilterValueType ValueType) Visit(ConvertNode nodeIn)
+        public override FilterValue Visit(ConvertNode nodeIn)
         {
             if (nodeIn.TypeReference.Definition == BooleanType)
             {
-                return (bool.Parse(ConstantVisitor.Visit(nodeIn.Source).ToString()), FilterValueType.Boolean);
+                var value = ConstantVisitor.Visit(nodeIn.Source);
+
+                return new FilterValue(bool.Parse(value.ToString()));
             }
 
             if (nodeIn.TypeReference.Definition == GuidType)
             {
-                return (Guid.Parse(ConstantVisitor.Visit(nodeIn.Source).ToString()), FilterValueType.Guid);
+                var value = ConstantVisitor.Visit(nodeIn.Source);
+
+                return new FilterValue(Guid.Parse(value.ToString()));
             }
 
             if (nodeIn.TypeReference.Definition == DateTimeType)
             {
                 var value = ConstantVisitor.Visit(nodeIn.Source);
 
-                if (value is DateTimeOffset dateTimeOffset)
-                {
-                    return (Instant.FromDateTimeOffset(dateTimeOffset), FilterValueType.Instant);
-                }
-
-                if (value is DateTime dateTime)
-                {
-                    return (Instant.FromDateTimeUtc(DateTime.SpecifyKind(dateTime, DateTimeKind.Utc)), FilterValueType.Instant);
-                }
-
-                if (value is Date date)
-                {
-                    return (Instant.FromUtc(date.Year, date.Month, date.Day, 0, 0), FilterValueType.Instant);
-                }
-
-                var parseResult = InstantPattern.General.Parse(Visit(nodeIn.Source).ToString());
-
-                if (!parseResult.Success)
-                {
-                    throw new ODataException("Datetime is not in a valid format. Use ISO 8601");
-                }
-
-                return (parseResult.Value, FilterValueType.Instant);
+                return new FilterValue(ParseInstant(value));
             }
 
-            return base.Visit(nodeIn);
+            throw new NotSupportedException();
         }
 
-        public override (object Value, FilterValueType ValueType) Visit(ConstantNode nodeIn)
+        public override FilterValue Visit(CollectionConstantNode nodeIn)
+        {
+            if (nodeIn.ItemType.Definition == DateTimeType)
+            {
+                return new FilterValue(nodeIn.Collection.Select(x => ParseInstant(x.Value)).ToList());
+            }
+
+            if (nodeIn.ItemType.Definition == GuidType)
+            {
+                return new FilterValue(nodeIn.Collection.Select(x => (Guid)x.Value).ToList());
+            }
+
+            if (nodeIn.ItemType.Definition == BooleanType)
+            {
+                return new FilterValue(nodeIn.Collection.Select(x => (bool)x.Value).ToList());
+            }
+
+            if (nodeIn.ItemType.Definition == SingleType)
+            {
+                return new FilterValue(nodeIn.Collection.Select(x => (float)x.Value).ToList());
+            }
+
+            if (nodeIn.ItemType.Definition == DoubleType)
+            {
+                return new FilterValue(nodeIn.Collection.Select(x => (double)x.Value).ToList());
+            }
+
+            if (nodeIn.ItemType.Definition == Int32Type)
+            {
+                return new FilterValue(nodeIn.Collection.Select(x => (int)x.Value).ToList());
+            }
+
+            if (nodeIn.ItemType.Definition == Int64Type)
+            {
+                return new FilterValue(nodeIn.Collection.Select(x => (long)x.Value).ToList());
+            }
+
+            if (nodeIn.ItemType.Definition == StringType)
+            {
+                return new FilterValue(nodeIn.Collection.Select(x => (string)x.Value).ToList());
+            }
+
+            throw new NotSupportedException();
+        }
+
+        public override FilterValue Visit(ConstantNode nodeIn)
         {
             if (nodeIn.TypeReference.Definition == BooleanType)
             {
-                return (nodeIn.Value, FilterValueType.Boolean);
+                return new FilterValue((bool)nodeIn.Value);
             }
 
             if (nodeIn.TypeReference.Definition == SingleType)
             {
-                return (nodeIn.Value, FilterValueType.Single);
+                return new FilterValue((float)nodeIn.Value);
             }
 
             if (nodeIn.TypeReference.Definition == DoubleType)
             {
-                return (nodeIn.Value, FilterValueType.Double);
+                return new FilterValue((double)nodeIn.Value);
             }
 
             if (nodeIn.TypeReference.Definition == Int32Type)
             {
-                return (nodeIn.Value, FilterValueType.Int32);
+                return new FilterValue((int)nodeIn.Value);
             }
 
             if (nodeIn.TypeReference.Definition == Int64Type)
             {
-                return (nodeIn.Value, FilterValueType.Int64);
+                return new FilterValue((long)nodeIn.Value);
             }
 
             if (nodeIn.TypeReference.Definition == StringType)
             {
-                return (nodeIn.Value, FilterValueType.String);
+                return new FilterValue((string)nodeIn.Value);
             }
 
             throw new NotSupportedException();
+        }
+
+        private Instant ParseInstant(object value)
+        {
+            if (value is DateTimeOffset dateTimeOffset)
+            {
+                return Instant.FromDateTimeOffset(dateTimeOffset.Add(dateTimeOffset.Offset));
+            }
+
+            if (value is DateTime dateTime)
+            {
+                return Instant.FromDateTimeUtc(DateTime.SpecifyKind(dateTime, DateTimeKind.Utc));
+            }
+
+            if (value is Date date)
+            {
+                return Instant.FromUtc(date.Year, date.Month, date.Day, 0, 0);
+            }
+
+            var parseResult = InstantPattern.General.Parse(value.ToString());
+
+            if (!parseResult.Success)
+            {
+                throw new ODataException("Datetime is not in a valid format. Use ISO 8601");
+            }
+
+            return parseResult.Value;
         }
     }
 }

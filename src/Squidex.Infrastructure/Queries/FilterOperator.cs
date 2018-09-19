@@ -14,6 +14,7 @@ namespace Squidex.Infrastructure.Queries
         Equals,
         GreaterThan,
         GreaterThanOrEqual,
+        In,
         LessThan,
         LessThanOrEqual,
         NotEquals,
