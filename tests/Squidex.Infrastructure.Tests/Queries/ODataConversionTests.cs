@@ -104,10 +104,19 @@ namespace Squidex.Infrastructure.Queries
         }
 
         [Fact]
+        public void Should_parse_filter_when_type_is_null()
+        {
+            var i = Q("$filter=firstName eq null");
+            var o = C("Filter: firstName == null");
+
+            Assert.Equal(o, i);
+        }
+
+        [Fact]
         public void Should_parse_filter_when_type_is_string()
         {
             var i = Q("$filter=firstName eq 'Dagobert'");
-            var o = C("Filter: firstName == Dagobert");
+            var o = C("Filter: firstName == 'Dagobert'");
 
             Assert.Equal(o, i);
         }
@@ -116,7 +125,7 @@ namespace Squidex.Infrastructure.Queries
         public void Should_parse_filter_when_type_is_string_list()
         {
             var i = Q("$filter=firstName in ('Dagobert')");
-            var o = C("Filter: firstName in [Dagobert]");
+            var o = C("Filter: firstName in ['Dagobert']");
 
             Assert.Equal(o, i);
         }
@@ -197,7 +206,7 @@ namespace Squidex.Infrastructure.Queries
         public void Should_parse_filter_with_negation()
         {
             var i = Q("$filter=not endswith(lastName, 'Duck')");
-            var o = C("Filter: !(endsWith(lastName, Duck))");
+            var o = C("Filter: !(endsWith(lastName, 'Duck'))");
 
             Assert.Equal(o, i);
         }
@@ -206,7 +215,7 @@ namespace Squidex.Infrastructure.Queries
         public void Should_parse_filter_with_startswith()
         {
             var i = Q("$filter=startswith(lastName, 'Duck')");
-            var o = C("Filter: startsWith(lastName, Duck)");
+            var o = C("Filter: startsWith(lastName, 'Duck')");
 
             Assert.Equal(o, i);
         }
@@ -215,7 +224,7 @@ namespace Squidex.Infrastructure.Queries
         public void Should_parse_filter_with_endswith()
         {
             var i = Q("$filter=endswith(lastName, 'Duck')");
-            var o = C("Filter: endsWith(lastName, Duck)");
+            var o = C("Filter: endsWith(lastName, 'Duck')");
 
             Assert.Equal(o, i);
         }
@@ -224,7 +233,7 @@ namespace Squidex.Infrastructure.Queries
         public void Should_parse_filter_with_contains()
         {
             var i = Q("$filter=contains(lastName, 'Duck')");
-            var o = C("Filter: contains(lastName, Duck)");
+            var o = C("Filter: contains(lastName, 'Duck')");
 
             Assert.Equal(o, i);
         }
@@ -233,7 +242,7 @@ namespace Squidex.Infrastructure.Queries
         public void Should_parse_filter_with_contains_to_true()
         {
             var i = Q("$filter=contains(lastName, 'Duck') eq true");
-            var o = C("Filter: contains(lastName, Duck)");
+            var o = C("Filter: contains(lastName, 'Duck')");
 
             Assert.Equal(o, i);
         }
@@ -242,7 +251,7 @@ namespace Squidex.Infrastructure.Queries
         public void Should_parse_filter_with_contains_to_false()
         {
             var i = Q("$filter=contains(lastName, 'Duck') eq false");
-            var o = C("Filter: !(contains(lastName, Duck))");
+            var o = C("Filter: !(contains(lastName, 'Duck'))");
 
             Assert.Equal(o, i);
         }
@@ -305,7 +314,7 @@ namespace Squidex.Infrastructure.Queries
         public void Should_parse_filter_with_conjunction_and_contains()
         {
             var i = Q("$filter=contains(firstName, 'Sebastian') eq false and isComicFigure eq true");
-            var o = C("Filter: (!(contains(firstName, Sebastian)) && isComicFigure == True)");
+            var o = C("Filter: (!(contains(firstName, 'Sebastian')) && isComicFigure == True)");
 
             Assert.Equal(o, i);
         }
@@ -332,7 +341,7 @@ namespace Squidex.Infrastructure.Queries
         public void Should_parse_filter_with_full_text()
         {
             var i = Q("$search=Duck");
-            var o = C("FullText: Duck");
+            var o = C("FullText: 'Duck'");
 
             Assert.Equal(o, i);
         }
@@ -341,7 +350,7 @@ namespace Squidex.Infrastructure.Queries
         public void Should_parse_filter_with_full_text_and_multiple_terms()
         {
             var i = Q("$search=Dagobert or Donald");
-            var o = C("FullText: Dagobert or Donald");
+            var o = C("FullText: 'Dagobert or Donald'");
 
             Assert.Equal(o, i);
         }
@@ -375,7 +384,7 @@ namespace Squidex.Infrastructure.Queries
 
         private static string C(string value)
         {
-            return value.Replace('\'', '"');
+            return value;
         }
 
         private static string Q(string value)

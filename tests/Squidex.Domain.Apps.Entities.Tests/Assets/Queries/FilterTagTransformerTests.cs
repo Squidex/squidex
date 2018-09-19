@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             var source = FilterBuilder.Eq("tags", "name1");
             var result = FilterTagTransformer.Transform(source, appId, tagService);
 
-            Assert.Equal("tags == id1", result.ToString());
+            Assert.Equal("tags == 'id1'", result.ToString());
         }
 
         [Fact]
@@ -40,7 +40,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             var source = FilterBuilder.Eq("tags", "name1");
             var result = FilterTagTransformer.Transform(source, appId, tagService);
 
-            Assert.Equal("tags == name1", result.ToString());
+            Assert.Equal("tags == 'name1'", result.ToString());
         }
 
         [Fact]
@@ -49,7 +49,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             var source = FilterBuilder.Eq("other", "value");
             var result = FilterTagTransformer.Transform(source, appId, tagService);
 
-            Assert.Equal("other == value", result.ToString());
+            Assert.Equal("other == 'value'", result.ToString());
 
             A.CallTo(() => tagService.GetTagIdsAsync(appId, A<string>.Ignored, A<HashSet<string>>.Ignored))
                 .MustNotHaveHappened();

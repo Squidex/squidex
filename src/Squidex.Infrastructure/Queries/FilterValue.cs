@@ -123,15 +123,27 @@ namespace Squidex.Infrastructure.Queries
         {
             if (Value is IList list)
             {
-                return $"[{string.Join(", ", list.OfType<object>().ToArray())}]";
-            }
-            else if (Value == null)
-            {
-                return "<Null>";
+                return $"[{string.Join(", ", list.OfType<object>().Select(ToString).ToArray())}]";
             }
             else
             {
-                return Value.ToString();
+                return ToString(Value);
+            }
+        }
+
+        private string ToString(object value)
+        {
+            if (ValueType == FilterValueType.String)
+            {
+                return $"'{value.ToString().Replace("'", "\\'")}'";
+            }
+            else if (value == null)
+            {
+                return "null";
+            }
+            else
+            {
+                return value.ToString();
             }
         }
     }

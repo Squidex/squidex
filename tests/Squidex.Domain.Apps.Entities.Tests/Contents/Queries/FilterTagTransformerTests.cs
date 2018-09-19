@@ -45,7 +45,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             var source = FilterBuilder.Eq("data.tags2.iv", "name1");
             var result = FilterTagTransformer.Transform(source, appId, schema, tagService);
 
-            Assert.Equal("data.tags2.iv == id1", result.ToString());
+            Assert.Equal("data.tags2.iv == 'id1'", result.ToString());
         }
 
         [Fact]
@@ -57,7 +57,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             var source = FilterBuilder.Eq("data.tags2.iv", "name1");
             var result = FilterTagTransformer.Transform(source, appId, schema, tagService);
 
-            Assert.Equal("data.tags2.iv == name1", result.ToString());
+            Assert.Equal("data.tags2.iv == 'name1'", result.ToString());
         }
 
         [Fact]
@@ -66,7 +66,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             var source = FilterBuilder.Eq("data.tags1.iv", "value");
             var result = FilterTagTransformer.Transform(source, appId, schema, tagService);
 
-            Assert.Equal("data.tags1.iv == value", result.ToString());
+            Assert.Equal("data.tags1.iv == 'value'", result.ToString());
 
             A.CallTo(() => tagService.GetTagIdsAsync(appId, A<string>.Ignored, A<HashSet<string>>.Ignored))
                 .MustNotHaveHappened();
@@ -78,7 +78,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             var source = FilterBuilder.Eq("data.string.iv", "value");
             var result = FilterTagTransformer.Transform(source, appId, schema, tagService);
 
-            Assert.Equal("data.string.iv == value", result.ToString());
+            Assert.Equal("data.string.iv == 'value'", result.ToString());
 
             A.CallTo(() => tagService.GetTagIdsAsync(appId, A<string>.Ignored, A<HashSet<string>>.Ignored))
                 .MustNotHaveHappened();
@@ -90,7 +90,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             var source = FilterBuilder.Eq("no.data", "value");
             var result = FilterTagTransformer.Transform(source, appId, schema, tagService);
 
-            Assert.Equal("no.data == value", result.ToString());
+            Assert.Equal("no.data == 'value'", result.ToString());
 
             A.CallTo(() => tagService.GetTagIdsAsync(appId, A<string>.Ignored, A<HashSet<string>>.Ignored))
                 .MustNotHaveHappened();

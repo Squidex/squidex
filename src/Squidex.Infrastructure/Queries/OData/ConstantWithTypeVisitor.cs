@@ -60,6 +60,11 @@ namespace Squidex.Infrastructure.Queries.OData
                 return new FilterValue(ParseInstant(value));
             }
 
+            if (ConstantVisitor.Visit(nodeIn.Source) == null)
+            {
+                return FilterValue.Null;
+            }
+
             throw new NotSupportedException();
         }
 

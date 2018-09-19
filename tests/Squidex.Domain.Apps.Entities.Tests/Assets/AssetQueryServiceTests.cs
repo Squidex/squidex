@@ -109,7 +109,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             await sut.QueryAsync(context, Q.Empty.WithODataQuery("$top=100&$orderby=fileName asc&$search=Hello World"));
 
-            A.CallTo(() => assetRepository.QueryAsync(appId, A<Query>.That.Matches(x => x.ToString() == "FullText: Hello World; Take: 100; Sort: fileName Ascending")))
+            A.CallTo(() => assetRepository.QueryAsync(appId, A<Query>.That.Matches(x => x.ToString() == "FullText: 'Hello World'; Take: 100; Sort: fileName Ascending")))
                 .MustHaveHappened();
         }
 
@@ -118,7 +118,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             await sut.QueryAsync(context, Q.Empty.WithODataQuery("$filter=fileName eq 'ABC'"));
 
-            A.CallTo(() => assetRepository.QueryAsync(appId, A<Query>.That.Matches(x => x.ToString() == "Filter: fileName == ABC; Take: 200; Sort: lastModified Descending")))
+            A.CallTo(() => assetRepository.QueryAsync(appId, A<Query>.That.Matches(x => x.ToString() == "Filter: fileName == 'ABC'; Take: 200; Sort: lastModified Descending")))
                 .MustHaveHappened();
         }
 

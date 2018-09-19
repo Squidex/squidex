@@ -32,7 +32,7 @@ namespace Squidex.Infrastructure.Queries
 
             if (FullText != null)
             {
-                parts.Add($"FullText: {FullText}");
+                parts.Add($"FullText: '{FullText.Replace("'", "\'")}'");
             }
 
             if (Skip > 0)
