@@ -15,7 +15,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="GraphQL" Version="2.0.0" />
-    <PackageReference Include="Microsoft.Orleans.OrleansCodeGenerator.Build.MSBuild" Version="2.1.0-ci.20180919.3 ">
+    <PackageReference Include="Microsoft.Orleans.CodeGenerator.MSBuild" Version="2.1.0-ci.20180919.3 ">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
