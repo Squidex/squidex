@@ -37,6 +37,17 @@ namespace Squidex.Infrastructure
         protected DomainObjectException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
+            id = info.GetString(nameof(id));
+
+            typeName = info.GetString(nameof(typeName));
+        }
+
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            info.AddValue(nameof(id), id);
+            info.AddValue(nameof(typeName), typeName);
+
+            base.GetObjectData(info, context);
         }
     }
 }

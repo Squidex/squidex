@@ -53,6 +53,17 @@ namespace Squidex.Infrastructure
         protected ValidationException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
+            Summary = info.GetString(nameof(Summary));
+
+            errors = (List<ValidationError>)info.GetValue(nameof(errors), typeof(List<ValidationError>));
+        }
+
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            info.AddValue(nameof(Summary), Summary);
+            info.AddValue(nameof(errors), errors.ToList());
+
+            base.GetObjectData(info, context);
         }
 
         private static string FormatMessage(string summary, IReadOnlyList<ValidationError> errors)

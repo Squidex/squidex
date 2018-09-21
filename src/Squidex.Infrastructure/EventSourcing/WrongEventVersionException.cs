@@ -37,6 +37,17 @@ namespace Squidex.Infrastructure.EventSourcing
         protected WrongEventVersionException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
+            currentVersion = info.GetInt64(nameof(currentVersion));
+
+            expectedVersion = info.GetInt64(nameof(expectedVersion));
+        }
+
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            info.AddValue(nameof(currentVersion), currentVersion);
+            info.AddValue(nameof(expectedVersion), expectedVersion);
+
+            base.GetObjectData(info, context);
         }
 
         private static string FormatMessage(long currentVersion, long expectedVersion)

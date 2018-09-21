@@ -5,11 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Squidex.Infrastructure
 {
+    [Serializable]
     public sealed class ValidationError
     {
         private static readonly string[] FallbackProperties = new string[0];
