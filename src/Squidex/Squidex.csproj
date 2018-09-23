@@ -72,17 +72,17 @@
     <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="2.1.0" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="2.1.1" />
     <PackageReference Include="Microsoft.Data.Edm" Version="5.8.4" />
-    <PackageReference Include="Microsoft.OData.Core" Version="7.5.0" />
-    <PackageReference Include="Microsoft.Orleans.Client" Version="2.1.0-rc1 " />
-    <PackageReference Include="Microsoft.Orleans.Core" Version="2.1.0-rc1 " />
-    <PackageReference Include="Microsoft.Orleans.Core.Abstractions" Version="2.1.0-rc1 " />
-    <PackageReference Include="Microsoft.Orleans.OrleansRuntime" Version="2.1.0-rc1 " />
+    <PackageReference Include="Microsoft.OData.Core" Version="7.5.1" />
+    <PackageReference Include="Microsoft.Orleans.Client" Version="2.1.0-rc2" />
+    <PackageReference Include="Microsoft.Orleans.Core" Version="2.1.0-rc2" />
+    <PackageReference Include="Microsoft.Orleans.Core.Abstractions" Version="2.1.0-rc2" />
+    <PackageReference Include="Microsoft.Orleans.OrleansRuntime" Version="2.1.0-rc2" />
     <PackageReference Include="MongoDB.Driver" Version="2.7.0" />
-    <PackageReference Include="NJsonSchema" Version="9.10.72" />
+    <PackageReference Include="NJsonSchema" Version="9.10.75" />
     <PackageReference Include="NodaTime.Serialization.JsonNet" Version="2.0.0" />
-    <PackageReference Include="NSwag.AspNetCore" Version="11.19.1" />
+    <PackageReference Include="NSwag.AspNetCore" Version="11.19.2" />
     <PackageReference Include="OpenCover" Version="4.6.519" />
-    <PackageReference Include="Orleans.Providers.MongoDB" Version="2.0.0" />
+    <PackageReference Include="Orleans.Providers.MongoDB" Version="2.0.1" />
     <PackageReference Include="OrleansDashboard" Version="2.0.9" />
     <PackageReference Include="RefactoringEssentials" Version="5.6.0" PrivateAssets="all" />
     <PackageReference Include="ReportGenerator" Version="3.1.2" />

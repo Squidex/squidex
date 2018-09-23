@@ -8,6 +8,8 @@
 using System;
 using Xunit;
 
+#pragma warning disable RECS0002 // Convert anonymous method to method group
+
 namespace Squidex.Infrastructure
 {
     public class DisposableObjectBaseTests
