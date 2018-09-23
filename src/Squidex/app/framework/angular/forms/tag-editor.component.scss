@@ -15,11 +15,17 @@ $focus-color: #b3d3ff;
     &.disabled,
     &:disabled {
         background: $color-input-disabled;
-    } 
+    }
 
     &.focus {
         @include box-shadow-raw(0 0 0 .2rem rgba(51, 137, 255, .25));
         border-color: $focus-color;
+    }
+}
+
+div {
+    &.form-control {
+        height: auto;
     }
 }
 
@@ -28,7 +34,7 @@ $focus-color: #b3d3ff;
         padding: 0;
         border: 0;
         background: transparent;
-        min-width: 40%;
+        min-width: 50px;
         max-width: 100%;
         height: auto !important;
     }
@@ -59,6 +65,7 @@ $focus-color: #b3d3ff;
         font-size: .8rem;
         font-weight: normal;
         margin: 0 2px 2px 0;
+        white-space: nowrap;
     }
 
     &,

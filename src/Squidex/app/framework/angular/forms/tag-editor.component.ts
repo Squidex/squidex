@@ -204,7 +204,12 @@ export class TagEditorComponent implements ControlValueAccessor, OnDestroy, OnIn
             if (ctx) {
                 ctx.font = `${style.getPropertyValue('font-size')} ${style.getPropertyValue('font-family')}`;
 
-                this.inputElement.nativeElement.style.width = <any>((ctx.measureText(this.inputElement.nativeElement.value).width + 20) + 'px');
+                const widthText = ctx.measureText(this.inputElement.nativeElement.value).width;
+                const widthPlaceholder = ctx.measureText(this.placeholder).width;
+
+                const width = Math.max(widthText, widthPlaceholder);
+
+                this.inputElement.nativeElement.style.width = <any>((width + 20) + 'px');
             }
         }
     }
