@@ -17,7 +17,8 @@
             [disabled]="addInput.disabled"
             autocomplete="off" 
             autocorrect="off"
-            autocapitalize="off">
+            autocapitalize="off"
+            spellcheck="false">
     </div>
 
     <div *ngIf="suggestedItems.length > 0" [sqxModalTarget]="form" class="control-dropdown" #container position="bottomLeft">
