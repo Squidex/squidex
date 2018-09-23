@@ -146,6 +146,17 @@ describe('AssetsState', () => {
         assetsService.verify(x => x.getAssets(app, 30, 0, undefined, ['tag1']), Times.once());
     });
 
+    it('should load with tags when tags selected', () => {
+        assetsService.setup(x => x.getAssets(app, 30, 0, undefined, ['tag1', 'tag2']))
+            .returns(() => of(new AssetsDto(0, [])));
+
+        assetsState.selectTags(['tag1', 'tag2']).subscribe();
+
+        expect(assetsState.isTagSelected('tag1')).toBeTruthy();
+
+        assetsService.verify(x => x.getAssets(app, 30, 0, undefined, ['tag1', 'tag2']), Times.once());
+    });
+
     it('should load without tags when tags reset', () => {
         assetsService.setup(x => x.getAssets(app, 30, 0, undefined, []))
             .returns(() => of(new AssetsDto(0, [])));
