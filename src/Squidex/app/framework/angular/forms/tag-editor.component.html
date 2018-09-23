@@ -1,5 +1,8 @@
 <ng-container>
-    <div class="form-control {{class}}" #form (click)="input.focus()" [class.focus]="hasFocus" [class.disabled]="addInput.disabled">
+    <div class="form-control {{class}}" #form (click)="input.focus()" 
+        [class.single-line]="singleLine"
+        [class.focus]="hasFocus" 
+        [class.disabled]="addInput.disabled">
         <span class="item" *ngFor="let item of items; let i = index" [class.disabled]="addInput.disabled">
             {{item}} <i class="icon-close" (click)="remove(i)"></i>
         </span>

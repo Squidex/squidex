@@ -21,6 +21,12 @@ $focus-color: #b3d3ff;
         @include box-shadow-raw(0 0 0 .2rem rgba(51, 137, 255, .25));
         border-color: $focus-color;
     }
+
+    &.single-line {
+        overflow-x: hidden;
+        overflow-y: hidden;
+        white-space: nowrap;
+    }
 }
 
 div {
