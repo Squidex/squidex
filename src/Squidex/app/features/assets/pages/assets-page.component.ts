@@ -51,6 +51,10 @@ export class AssetsPageComponent implements OnInit {
         this.assetsState.toggleTag(tag).pipe(onErrorResumeNext()).subscribe();
     }
 
+    public selectTags(tags: string[]) {
+        this.assetsState.selectTags(tags).pipe(onErrorResumeNext()).subscribe();
+    }
+
     public resetTags() {
         this.assetsState.resetTags().pipe(onErrorResumeNext()).subscribe();
     }

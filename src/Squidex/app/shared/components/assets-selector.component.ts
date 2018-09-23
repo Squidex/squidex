@@ -56,6 +56,10 @@ export class AssetsSelectorComponent implements OnInit {
         this.selected.emit(Object.values(this.selectedAssets));
     }
 
+    public selectTags(tags: string[]) {
+        this.state.selectTags(tags).pipe(onErrorResumeNext()).subscribe();
+    }
+
     public selectAsset(asset: AssetDto) {
         if (this.selectedAssets[asset.id]) {
             delete this.selectedAssets[asset.id];

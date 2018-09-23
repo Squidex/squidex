@@ -41,6 +41,10 @@ export class AssetsState extends State<Snapshot> {
         this.tags.pipe(
             distinctUntilChanged(), map(x => x.map(t => t.name)));
 
+    public selectedTagNames =
+        this.changes.pipe(
+            distinctUntilChanged(), map(x => Object.keys(x.tagsSelected)));
+
     public assets =
         this.changes.pipe(map(x => x.assets),
             distinctUntilChanged());
@@ -156,6 +160,20 @@ export class AssetsState extends State<Snapshot> {
             if (tagsSelected[tag]) {
                 delete tagsSelected[tag];
             } else {
+                tagsSelected[tag] = true;
+            }
+
+            return { ...s, assetsPager: new Pager(0, 0, 30), tagsSelected };
+        });
+
+        return this.loadInternal();
+    }
+
+    public selectTags(tags: string[]): Observable<any> {
+        this.next(s => {
+            const tagsSelected = {};
+
+            for (let tag of tags) {
                 tagsSelected[tag] = true;
             }
 

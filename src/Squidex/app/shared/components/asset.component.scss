@@ -51,6 +51,15 @@
     padding-right: 8px;
 }
 
+:host /deep/ {
+    .form-control {
+        &.disabled,
+        &:disabled {
+            background: transparent;
+        }
+    }
+}
+
 .card {
     & {
         @include overlay-container;

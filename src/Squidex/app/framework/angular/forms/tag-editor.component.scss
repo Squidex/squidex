@@ -3,6 +3,10 @@
 
 $focus-color: #b3d3ff;
 
+:host {
+    text-align: left;
+}
+
 .form-control {
     & {
         cursor: text;
@@ -32,6 +36,9 @@ $focus-color: #b3d3ff;
 div {
     &.form-control {
         height: auto;
+        text-align: left;
+        text-decoration: none;
+        position: relative;
     }
 }
 

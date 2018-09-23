@@ -14,15 +14,25 @@
                     <i class="icon-reset"></i> Refresh
                 </button>
             </div>
-            <div class="col pl-1">
-                <sqx-shortcut keys="ctrl+shift+r" (trigger)="reload()"></sqx-shortcut>
-
-                <sqx-search-form formClass="form" placeholder="Search for assets" fieldExample="fileSize"
-                    (queryChanged)="search($event)" 
-                    [query]="assetsState.assetsQuery | async"
-                    [queries]="queries"
-                    enableShortcut="true">
-                </sqx-search-form>
+            <div class="col pl-1" style="width: 300px">
+                <div class="row no-gutters search">
+                    <div class="col col-6">
+                        <sqx-tag-editor class="tags" singleLine="true" placeholder="Search by tags"
+                            [suggestions]="assetsState.tagsNames | async"
+                            [ngModel]="assetsState.selectedTagNames | async"
+                            (ngModelChange)="selectTags($event)"
+                            [undefinedWhenEmpty]="false">
+                        </sqx-tag-editor>
+                    </div>
+                    <div class="col col-6">
+                        <sqx-search-form formClass="form" placeholder="Search by asset name" fieldExample="fileSize"
+                            (queryChanged)="search($event)" 
+                            [query]="assetsState.assetsQuery | async"
+                            [queries]="queries"
+                            enableShortcut="true">
+                        </sqx-search-form>
+                    </div>
+                </div>
             </div>
         </div>
     </ng-container>

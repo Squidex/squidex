@@ -1,2 +1,20 @@
 @import '_vars';
 @import '_mixins';
+
+:host /deep/ {
+    .search {
+        .form-control {
+            @include border-radius-right;
+        }
+
+        .tags {
+            @include border-radius-left;
+            border-right: 0;
+
+            &:focus,
+            &.focus {
+                z-index: 1000;
+            }
+        }
+    }
+}

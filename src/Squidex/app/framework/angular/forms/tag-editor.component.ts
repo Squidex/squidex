@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, ElementRef, forwardRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, forwardRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { distinctUntilChanged, map, tap } from 'rxjs/operators';
@@ -77,7 +77,7 @@ export const SQX_TAG_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     templateUrl: './tag-editor.component.html',
     providers: [SQX_TAG_EDITOR_CONTROL_VALUE_ACCESSOR]
 })
-export class TagEditorComponent implements ControlValueAccessor, OnDestroy, OnInit {
+export class TagEditorComponent implements AfterViewInit, ControlValueAccessor, OnDestroy, OnInit {
     private subscription: Subscription;
     private callChange = (v: any) => { /* NOOP */ };
     private callTouched = () => { /* NOOP */ };
@@ -104,7 +104,7 @@ export class TagEditorComponent implements ControlValueAccessor, OnDestroy, OnIn
     public class: string;
 
     @Input()
-    public placeholder = 'Press comma (,) to add tag';
+    public placeholder = ', to add tag';
 
     @Input()
     public inputName = 'tag-editor';
@@ -126,6 +126,10 @@ export class TagEditorComponent implements ControlValueAccessor, OnDestroy, OnIn
 
     public ngOnDestroy() {
         this.subscription.unsubscribe();
+    }
+
+    public ngAfterViewInit() {
+        this.resetSize();
     }
 
     public ngOnInit() {
@@ -211,18 +215,12 @@ export class TagEditorComponent implements ControlValueAccessor, OnDestroy, OnIn
             if (ctx) {
                 ctx.font = `${style.getPropertyValue('font-size')} ${style.getPropertyValue('font-family')}`;
 
-                let width = 0;
+                const widthText = ctx.measureText(this.inputElement.nativeElement.value).width;
+                const widthPlaceholder = ctx.measureText(this.placeholder).width;
 
-                if (this.singleLine) {
-                    width = ctx.measureText(this.inputElement.nativeElement.value || this.placeholder).width;
-                } else {
-                    const widthText = ctx.measureText(this.inputElement.nativeElement.value).width;
-                    const widthPlaceholder = ctx.measureText(this.placeholder).width;
+                const width = Math.max(widthText, widthPlaceholder);
 
-                    width = Math.max(widthText, widthPlaceholder);
-                }
-
-                this.inputElement.nativeElement.style.width = <any>((width + 20) + 'px');
+                this.inputElement.nativeElement.style.width = <any>((width + 5) + 'px');
             }
         }
 
@@ -291,8 +289,8 @@ export class TagEditorComponent implements ControlValueAccessor, OnDestroy, OnIn
             selection = 0;
         }
 
-        if (selection >= this.items.length) {
-            selection = this.items.length - 1;
+        if (selection >= this.suggestedItems.length) {
+            selection = this.suggestedItems.length - 1;
         }
 
         this.suggestedIndex = selection;
