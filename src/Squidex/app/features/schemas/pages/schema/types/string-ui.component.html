@@ -74,6 +74,13 @@
 
                 <span class="radio-label">Radio</span>
             </label>
+            <label class="btn btn-radio" [class.active]="editForm.controls['editor'].value === 'Color'">
+                <input type="radio" class="radio-input" formControlName="editor" value="Color" />
+
+                <i class="icon-control-Color"></i>
+
+                <span class="radio-label">Color</span>
+            </label>
         </div>
     </div>
     <div class="form-group row" [class.hidden]="hideAllowedValues | async">
