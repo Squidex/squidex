@@ -16,10 +16,11 @@ using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Pipeline;
 
 namespace Squidex.Areas.Api.Controllers.Contents.Models
 {
-    public sealed class ContentDto
+    public sealed class ContentDto : IGenerateEtag
     {
         /// <summary>
         /// The if of the content item.
@@ -78,6 +79,11 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         /// The version of the content.
         /// </summary>
         public long Version { get; set; }
+
+        public string GenerateETag()
+        {
+            return $"{Id}{Version}";
+        }
 
         public static ContentDto FromCommand(CreateContent command, EntityCreatedResult<NamedContentData> result)
         {

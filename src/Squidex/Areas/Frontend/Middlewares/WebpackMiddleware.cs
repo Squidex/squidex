@@ -27,18 +27,18 @@ namespace Squidex.Areas.Frontend.Middlewares
 
         public async Task Invoke(HttpContext context)
         {
-            var buffer = new MemoryStream();
-            var body = context.Response.Body;
+            var responseBuffer = new MemoryStream();
+            var responseBody = context.Response.Body;
 
-            context.Response.Body = buffer;
+            context.Response.Body = responseBuffer;
 
             await next(context);
 
-            buffer.Seek(0, SeekOrigin.Begin);
+            responseBuffer.Seek(0, SeekOrigin.Begin);
 
             if (context.Response.StatusCode == 200 && IsIndex(context) && IsHtml(context))
             {
-                using (var reader = new StreamReader(buffer))
+                using (var reader = new StreamReader(responseBuffer))
                 {
                     var response = await reader.ReadToEndAsync();
 
@@ -56,17 +56,17 @@ namespace Squidex.Areas.Frontend.Middlewares
 
                             context.Response.Headers["Content-Length"] = memoryStream.Length.ToString();
 
-                            await memoryStream.CopyToAsync(body);
+                            await memoryStream.CopyToAsync(responseBody);
                         }
                     }
                 }
             }
             else if (context.Response.StatusCode != 304)
             {
-                await buffer.CopyToAsync(body);
+                await responseBuffer.CopyToAsync(responseBody);
             }
 
-            context.Response.Body = body;
+            context.Response.Body = responseBody;
         }
 
         private static string InjectStyles(string response)

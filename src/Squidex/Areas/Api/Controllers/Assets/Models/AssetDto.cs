@@ -12,10 +12,11 @@ using NodaTime;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Pipeline;
 
 namespace Squidex.Areas.Api.Controllers.Assets.Models
 {
-    public sealed class AssetDto
+    public sealed class AssetDto : IGenerateEtag
     {
         /// <summary>
         /// The id of the asset.
@@ -96,6 +97,11 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         /// The version of the asset.
         /// </summary>
         public long Version { get; set; }
+
+        public string GenerateETag()
+        {
+            return $"{Id}{Version}";
+        }
 
         public static AssetDto FromAsset(IAssetEntity asset)
         {

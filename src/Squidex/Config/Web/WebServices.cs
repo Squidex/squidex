@@ -33,7 +33,11 @@ namespace Squidex.Config.Web
             services.AddSingletonAs<RequestLogPerformanceMiddleware>()
                 .AsSelf();
 
-            services.AddMvc().AddMySerializers();
+            services.AddMvc(options =>
+            {
+                options.Filters.Add<ETagFilter>();
+            }).AddMySerializers();
+
             services.AddCors();
             services.AddRouting();
         }
