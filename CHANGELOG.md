@@ -1,5 +1,25 @@
 # Changelog
 
+## v1.11.0 - 2018-09-24
+
+### Features
+
+* **API**: Correct handling of `If-None-Match` header to support caching.
+* **Rules**: Major refactoring of action handlers to add new actions with less code.
+* **Rules**: Twitter action to post status update.
+* **Rules**: Prerender.io action to invalidate cache entries for SPA sites.
+* **Contents**: Support IN-queries, like `fileName in ['Logo.jpg', 'Logo.png']`
+* **UI**: Cloning content items.
+* **UI**: Tag input in header to filter by tags when assigning assets to content.
+* **Schemas**: Color picker as additional editor for string fields.
+
+### Bugfixes
+
+* **Clustering / Orleans**: Fixed correct serialization of exceptions, e.g. as validation errors.
+* **Backups**: Always assign the user who started the restore operation as Owner to the app.
+* **UI**: Reset name when a asset or content query is saved.
+* **UI**: Disable spellchecking for tag editor.
+
 ## v1.10.0 - 2018-08-29
 
 ### Featues
