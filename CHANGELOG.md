@@ -12,6 +12,7 @@
 * **UI**: Cloning content items.
 * **UI**: Tag input in header to filter by tags when assigning assets to content.
 * **Schemas**: Color picker as additional editor for string fields.
+* **Statistics**: Report api usage and performance per client.
 
 ### Bugfixes
 
