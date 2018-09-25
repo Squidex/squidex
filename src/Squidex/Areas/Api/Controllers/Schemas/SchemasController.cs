@@ -55,6 +55,8 @@ namespace Squidex.Areas.Api.Controllers.Schemas
 
             var response = schemas.Select(SchemaDto.FromSchema).ToList();
 
+            Response.Headers["ETag"] = response.ToManyEtag();
+
             return Ok(response);
         }
 

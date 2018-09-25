@@ -138,12 +138,12 @@ namespace Squidex.Areas.Api.Controllers.Contents
                 Items = result.Take(200).Select(x => ContentDto.FromContent(x, context.Base)).ToArray()
             };
 
-            var options = controllerOptions.Value;
-
-            if (options.EnableSurrogateKeys && response.Items.Length <= options.MaxItemsForSurrogateKeys)
+            if (controllerOptions.Value.EnableSurrogateKeys && response.Items.Length <= controllerOptions.Value.MaxItemsForSurrogateKeys)
             {
-                Response.Headers["Surrogate-Key"] = string.Join(" ", response.Items.Select(x => x.Id));
+                Response.Headers["Surrogate-Key"] = response.Items.ToSurrogateKeys();
             }
+
+            Response.Headers["ETag"] = response.Items.ToManyEtag(response.Total);
 
             return Ok(response);
         }
@@ -172,12 +172,12 @@ namespace Squidex.Areas.Api.Controllers.Contents
 
             var response = ContentDto.FromContent(content, context.Base);
 
-            Response.Headers["ETag"] = content.Version.ToString();
-
             if (controllerOptions.Value.EnableSurrogateKeys)
             {
                 Response.Headers["Surrogate-Key"] = content.Id.ToString();
             }
+
+            Response.Headers["ETag"] = content.Version.ToString();
 
             return Ok(response);
         }
@@ -208,12 +208,12 @@ namespace Squidex.Areas.Api.Controllers.Contents
 
             var response = ContentDto.FromContent(content, context.Base);
 
-            Response.Headers["ETag"] = content.Version.ToString();
-
             if (controllerOptions.Value.EnableSurrogateKeys)
             {
                 Response.Headers["Surrogate-Key"] = content.Id.ToString();
             }
+
+            Response.Headers["ETag"] = content.Version.ToString();
 
             return Ok(response.Data);
         }

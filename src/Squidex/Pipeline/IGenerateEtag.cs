@@ -5,10 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
+
 namespace Squidex.Pipeline
 {
     public interface IGenerateEtag
     {
-        string GenerateETag();
+        Guid Id { get; }
+
+        long Version { get; }
     }
 }

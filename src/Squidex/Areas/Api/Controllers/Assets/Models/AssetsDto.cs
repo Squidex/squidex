@@ -9,11 +9,10 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Infrastructure;
-using Squidex.Pipeline;
 
 namespace Squidex.Areas.Api.Controllers.Assets.Models
 {
-    public sealed class AssetsDto : IGenerateEtag
+    public sealed class AssetsDto
     {
         /// <summary>
         /// The assets.
@@ -25,11 +24,6 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         /// The total number of assets.
         /// </summary>
         public long Total { get; set; }
-
-        public string GenerateETag()
-        {
-            return string.Join(";", Items?.Select(x => x.GenerateETag()) ?? Enumerable.Empty<string>()).Sha256Base64();
-        }
 
         public static AssetsDto FromAssets(IResultList<IAssetEntity> assets)
         {

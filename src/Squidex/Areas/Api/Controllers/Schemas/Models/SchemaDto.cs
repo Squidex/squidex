@@ -11,10 +11,11 @@ using NodaTime;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Pipeline;
 
 namespace Squidex.Areas.Api.Controllers.Schemas.Models
 {
-    public sealed class SchemaDto
+    public sealed class SchemaDto : IGenerateEtag
     {
         /// <summary>
         /// The id of the schema.
@@ -74,7 +75,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// <summary>
         /// The version of the schema.
         /// </summary>
-        public int Version { get; set; }
+        public long Version { get; set; }
 
         public static SchemaDto FromSchema(ISchemaEntity schema)
         {

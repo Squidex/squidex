@@ -7,13 +7,13 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using NSwag.Annotations;
 using Squidex.Areas.Api.Controllers.Assets.Models;
+using Squidex.Areas.Api.Controllers.Contents;
 using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps.Services;
@@ -39,6 +39,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         private readonly IAssetQueryService assetQuery;
         private readonly IAssetStatsRepository assetStatsRepository;
         private readonly IAppPlansProvider appPlanProvider;
+        private readonly IOptions<MyContentsControllerOptions> controllerOptions;
         private readonly ITagService tagService;
         private readonly AssetConfig assetsConfig;
 
@@ -48,6 +49,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
             IAssetStatsRepository assetStatsRepository,
             IAppPlansProvider appPlanProvider,
             IOptions<AssetConfig> assetsConfig,
+            IOptions<MyContentsControllerOptions> controllerOptions,
             ITagService tagService)
             : base(commandBus)
         {
@@ -55,6 +57,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
             this.assetQuery = assetQuery;
             this.assetStatsRepository = assetStatsRepository;
             this.appPlanProvider = appPlanProvider;
+            this.controllerOptions = controllerOptions;
             this.tagService = tagService;
         }
 
@@ -106,7 +109,12 @@ namespace Squidex.Areas.Api.Controllers.Assets
 
             var response = AssetsDto.FromAssets(assets);
 
-            Response.Headers["Surrogate-Key"] = string.Join(" ", response.Items.Select(x => x.Id));
+            if (controllerOptions.Value.EnableSurrogateKeys && response.Items.Length <= controllerOptions.Value.MaxItemsForSurrogateKeys)
+            {
+                Response.Headers["Surrogate-Key"] = response.Items.ToSurrogateKeys();
+            }
+
+            Response.Headers["ETag"] = response.Items.ToManyEtag(response.Total);
 
             return Ok(response);
         }
@@ -138,8 +146,12 @@ namespace Squidex.Areas.Api.Controllers.Assets
 
             var response = AssetDto.FromAsset(entity);
 
+            if (controllerOptions.Value.EnableSurrogateKeys)
+            {
+                Response.Headers["Surrogate-Key"] = entity.Id.ToString();
+            }
+
             Response.Headers["ETag"] = entity.Version.ToString();
-            Response.Headers["Surrogate-Key"] = entity.Id.ToString();
 
             return Ok(response);
         }

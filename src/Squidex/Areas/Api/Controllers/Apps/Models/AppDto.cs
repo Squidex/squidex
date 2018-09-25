@@ -14,10 +14,11 @@ using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Services;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Pipeline;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models
 {
-    public sealed class AppDto
+    public sealed class AppDto : IGenerateEtag
     {
         /// <summary>
         /// The name of the app.

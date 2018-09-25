@@ -19,20 +19,10 @@ namespace Squidex.Pipeline
 
             var httpContext = context.HttpContext;
 
-            if (!httpContext.Response.Headers.TryGetValue("Etag", out _) && resultContext.Result is ObjectResult obj && obj.Value is IGenerateEtag g)
-            {
-                var calculatedEtag = g.GenerateETag();
-
-                if (!string.IsNullOrWhiteSpace(calculatedEtag))
-                {
-                    httpContext.Response.Headers.Add("Etag", calculatedEtag);
-                }
-            }
-
             if (httpContext.Request.Method == "GET" &&
                 httpContext.Request.Headers.TryGetValue("If-None-Match", out var noneMatch) &&
                 httpContext.Response.StatusCode == 200 &&
-                httpContext.Response.Headers.TryGetValue("Etag", out var etag) &&
+                httpContext.Response.Headers.TryGetValue("ETag", out var etag) &&
                 !string.IsNullOrWhiteSpace(noneMatch) &&
                 !string.IsNullOrWhiteSpace(etag) &&
                 string.Equals(etag, noneMatch, System.StringComparison.Ordinal))

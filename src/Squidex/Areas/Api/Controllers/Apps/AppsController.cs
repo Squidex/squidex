@@ -14,7 +14,6 @@ using Squidex.Areas.Api.Controllers.Apps.Models;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Services;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Security;
 using Squidex.Pipeline;
@@ -63,7 +62,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
 
             var response = entities.Select(a => AppDto.FromApp(a, subject, appPlansProvider)).ToList();
 
-            Response.Headers["Etag"] = string.Join(";", response.Select(x => $"{x.Id}{x.Version}")).Sha256Base64();
+            Response.Headers["ETag"] = response.ToManyEtag();
 
             return Ok(response);
         }

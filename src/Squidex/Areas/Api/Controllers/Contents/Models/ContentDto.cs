@@ -80,11 +80,6 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         /// </summary>
         public long Version { get; set; }
 
-        public string GenerateETag()
-        {
-            return $"{Id}{Version}";
-        }
-
         public static ContentDto FromCommand(CreateContent command, EntityCreatedResult<NamedContentData> result)
         {
             var now = SystemClock.Instance.GetCurrentInstant();

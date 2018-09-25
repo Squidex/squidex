@@ -98,11 +98,6 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         /// </summary>
         public long Version { get; set; }
 
-        public string GenerateETag()
-        {
-            return $"{Id}{Version}";
-        }
-
         public static AssetDto FromAsset(IAssetEntity asset)
         {
             return SimpleMapper.Map(asset, new AssetDto { FileType = asset.FileName.FileType() });
