@@ -56,7 +56,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             await sut.ValidateAsync(CreateValue(5), errors);
 
             errors.Should().BeEquivalentTo(
-                new[] { "Must be greater or equals than '10'." });
+                new[] { "Must be greater than or equal to '10'." });
         }
 
         [Fact]
@@ -67,7 +67,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             await sut.ValidateAsync(CreateValue(20), errors);
 
             errors.Should().BeEquivalentTo(
-                new[] { "Must be less or equals than '10'." });
+                new[] { "Must be less than or equal to '10'." });
         }
 
         [Fact]

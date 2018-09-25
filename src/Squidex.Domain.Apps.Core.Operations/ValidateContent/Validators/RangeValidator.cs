@@ -38,12 +38,12 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
             if (min.HasValue && typedValue.CompareTo(min.Value) < 0)
             {
-                addError(context.Path, $"Must be greater or equals than '{min}'.");
+                addError(context.Path, $"Must be greater than or equal to '{min}'.");
             }
 
             if (max.HasValue && typedValue.CompareTo(max.Value) > 0)
             {
-                addError(context.Path, $"Must be less or equals than '{max}'.");
+                addError(context.Path, $"Must be less than or equal to '{max}'.");
             }
 
             return TaskHelper.Done;

@@ -57,7 +57,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             await sut.ValidateAsync(CreateValue(FutureDays(0)), errors);
 
             errors.Should().BeEquivalentTo(
-                new[] { $"Must be greater or equals than '{FutureDays(10)}'." });
+                new[] { $"Must be greater than or equal to '{FutureDays(10)}'." });
         }
 
         [Fact]
@@ -68,7 +68,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             await sut.ValidateAsync(CreateValue(FutureDays(20)), errors);
 
             errors.Should().BeEquivalentTo(
-                new[] { $"Must be less or equals than '{FutureDays(10)}'." });
+                new[] { $"Must be less than or equal to '{FutureDays(10)}'." });
         }
 
         [Fact]
