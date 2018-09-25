@@ -58,7 +58,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
             await sut.ValidateAsync(1500, errors);
 
             errors.Should().BeEquivalentTo(
-                new[] { "Must be greater or equals than '2000'." });
+                new[] { "Must be greater than or equal to '2000'." });
         }
 
         [Fact]
@@ -69,7 +69,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
             await sut.ValidateAsync(1500, errors);
 
             errors.Should().BeEquivalentTo(
-                new[] { "Must be less or equals than '1000'." });
+                new[] { "Must be less than or equal to '1000'." });
         }
     }
 }
