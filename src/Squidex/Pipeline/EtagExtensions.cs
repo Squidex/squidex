@@ -11,7 +11,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Pipeline
 {
-    public static class EtagExtensions
+    public static class ETagExtensions
     {
         public static string ToManyEtag<T>(this IEnumerable<T> items, long total = 0) where T : IGenerateEtag
         {
