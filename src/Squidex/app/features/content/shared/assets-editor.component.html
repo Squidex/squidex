@@ -19,16 +19,31 @@
         </div>
     </div>
 
-    <div class="row no-gutters" [class.unrow]="isListView">
-        <sqx-asset *ngFor="let file of newAssets" [initFile]="file"
-            [isListView]="isListView"
-            (failed)="onAssetFailed(file)" 
-            (loaded)="onAssetLoaded(file, $event)">
-        </sqx-asset>
-        <sqx-asset *ngFor="let asset of oldAssets" [asset]="asset" removeMode="true" isDisabled="true"
-            [isListView]="isListView"
-            (removing)="onAssetRemoving($event)">
-        </sqx-asset>
+    <div class="body">
+        <ng-container *ngIf="!isListView; else listTemplate">
+            <div class="row no-gutters">
+                <sqx-asset *ngFor="let file of newAssets" [initFile]="file" 
+                    (failed)="onAssetFailed(file)" (loaded)="onAssetLoaded(file, $event)">
+                </sqx-asset>
+                <sqx-asset *ngFor="let asset of oldAssets" [asset]="asset" removeMode="true" isDisabled="true"
+                    (removing)="onAssetRemoving($event)">
+                </sqx-asset>
+            </div>
+        </ng-container>
+    
+        <ng-template #listTemplate>
+            <sqx-asset *ngFor="let file of newAssets" [initFile]="file"
+                [isListView]="true" (failed)="onAssetFailed(file)" (loaded)="onAssetLoaded(file, $event)">
+            </sqx-asset>
+            
+            <div [sqxSortModel]="oldAssets.values" (sqxSorted)="sort($event)">
+                <div *ngFor="let asset of oldAssets">
+                    <sqx-asset [asset]="asset" removeMode="true" isDisabled="true"
+                        [isListView]="true" (removing)="onAssetRemoving($event)">
+                    </sqx-asset>
+                </div>
+            </div>
+        </ng-template>
     </div>
 </div>
 

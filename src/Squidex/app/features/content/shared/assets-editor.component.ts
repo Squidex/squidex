@@ -133,6 +133,14 @@ export class AssetsEditorComponent implements ControlValueAccessor {
         this.callChange(ids);
     }
 
+    public sort(assets: AssetDto[]) {
+        if (assets) {
+            this.oldAssets = ImmutableArray.of(assets);
+
+            this.updateValue();
+        }
+    }
+
     public changeView(isListView: boolean) {
         this.localStore.set('assetView', isListView ? 'List' : 'Grid');
 
