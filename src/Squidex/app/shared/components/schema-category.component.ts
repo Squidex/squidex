@@ -60,13 +60,13 @@ export class SchemaCategoryComponent implements OnInit, OnChanges {
     }
 
     public ngOnInit() {
-        this.isOpen = this.localStore.get(`schema-category.${name}`) !== 'false';
+        this.isOpen = this.localStore.get(`schema-category.${this.name}`) !== 'false';
     }
 
     public toggle() {
         this.isOpen = !this.isOpen;
 
-        this.localStore.set(`schema-category.${name}`, this.isOpen + '');
+        this.localStore.set(`schema-category.${this.name}`, this.isOpen + '');
     }
 
     public ngOnChanges(changes: SimpleChanges): void {
