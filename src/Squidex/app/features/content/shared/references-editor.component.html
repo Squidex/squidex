@@ -2,7 +2,7 @@
     <ng-container *ngIf="schema">
         <div class="drop-area-container">
             <div class="drop-area" (click)="selectorDialog.show()">
-                Click here to link a content.
+                Click here to link content items.
             </div>
         </div>
         
@@ -12,10 +12,10 @@
             <tbody *ngFor="let content of contentItems">
                 <tr [sqxContent]="content"
                     [language]="language"
+                    [isReadOnly]="true"
+                    [isReference]="true"
                     [schema]="schema"
-                    (deleting)="remove(content)"
-                    isReadOnly="true"
-                    isReference="true"></tr>
+                    (deleting)="remove(content)"></tr>
                 <tr class="spacer"></tr>
             </tbody>
         </table>

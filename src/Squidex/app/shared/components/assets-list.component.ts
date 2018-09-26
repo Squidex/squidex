@@ -28,7 +28,10 @@ export class AssetsListComponent {
     public state: AssetsState;
 
     @Input()
-    public isDisabled: false;
+    public isDisabled = false;
+
+    @Input()
+    public isListView = false;
 
     @Input()
     public selectedIds: object;

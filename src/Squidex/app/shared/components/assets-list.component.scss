@@ -1,6 +1,13 @@
 @import '_vars';
 @import '_mixins';
 
+.unrow {
+    display: block;
+    padding-left: 8px;
+    padding-right: 8px;
+    margin: 0;
+}
+
 .file-drop {
     & {
         @include transition(border-color .4s ease);

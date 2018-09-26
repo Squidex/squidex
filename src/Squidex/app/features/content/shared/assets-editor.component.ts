@@ -16,6 +16,7 @@ import {
     AssetsService,
     DialogModel,
     ImmutableArray,
+    LocalStoreService,
     Types
 } from '@app/shared';
 
@@ -40,12 +41,15 @@ export class AssetsEditorComponent implements ControlValueAccessor {
     public newAssets = ImmutableArray.empty<File>();
     public oldAssets = ImmutableArray.empty<AssetDto>();
 
+    public isListView = false;
     public isDisabled = false;
 
     constructor(
         private readonly appsState: AppsState,
-        private readonly assetsService: AssetsService
+        private readonly assetsService: AssetsService,
+        private readonly localStore: LocalStoreService
     ) {
+        this.isListView = this.localStore.get('assetView') === 'List';
     }
 
     public writeValue(obj: any) {
@@ -127,5 +131,19 @@ export class AssetsEditorComponent implements ControlValueAccessor {
 
         this.callTouched();
         this.callChange(ids);
+    }
+
+    public sort(assets: AssetDto[]) {
+        if (assets) {
+            this.oldAssets = ImmutableArray.of(assets);
+
+            this.updateValue();
+        }
+    }
+
+    public changeView(isListView: boolean) {
+        this.localStore.set('assetView', isListView ? 'List' : 'Grid');
+
+        this.isListView = isListView;
     }
 }

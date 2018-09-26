@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, HostBinding, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormControl } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
@@ -20,10 +20,10 @@ import {
     fadeAnimation,
     RenameAssetDto,
     RenameAssetForm,
+    TagAssetDto,
     Types,
     Versioned
 } from '@app/shared/internal';
-import { TagAssetDto } from '@appshared/services/assets.service';
 
 @Component({
     selector: 'sqx-asset',
@@ -54,6 +54,9 @@ export class AssetComponent implements OnDestroy, OnInit {
     @Input()
     public isSelectable = false;
 
+    @Input() @HostBinding('class.isListView')
+    public isListView = false;
+
     @Input()
     public allTags: string[];
 
@@ -75,9 +78,9 @@ export class AssetComponent implements OnDestroy, OnInit {
     @Output()
     public failed = new EventEmitter();
 
-    public renaming = false;
     public isTagging = false;
 
+    public renaming = false;
     public renameForm = new RenameAssetForm(this.formBuilder);
 
     public tagInput = new FormControl();

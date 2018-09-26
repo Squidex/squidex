@@ -34,11 +34,21 @@
                     </div>
                 </div>
             </div>
+            <div class="col col-auto pl-1">
+                <div class="btn-group" data-toggle="buttons">
+                    <button type="button" class="btn btn-secondary btn-toggle" [class.btn-primary]="isListView" [disabled]="isListView" (click)="changeView(true)">
+                        <i class="icon-list"></i>
+                    </button>
+                    <button type="button" class="btn btn-secondary btn-toggle" [class.btn-primary]="!isListView" [disabled]="!isListView" (click)="changeView(false)">
+                        <i class="icon-grid"></i>
+                    </button>
+                </div>
+            </div>
         </div>
     </ng-container>
 
     <ng-container content>
-        <sqx-assets-list [state]="assetsState"></sqx-assets-list>
+        <sqx-assets-list [state]="assetsState" [isListView]="isListView"></sqx-assets-list>
     </ng-container>
 
     <ng-container sidebar>    
