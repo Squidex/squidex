@@ -27,6 +27,13 @@
     margin-right: 8px;
 }
 
+.unrow {
+    display: block;
+    padding-left: 8px;
+    padding-right: 8px;
+    margin: 0;
+}
+
 .drop-area {
     & {
         @include transition(border-color .4s ease);
