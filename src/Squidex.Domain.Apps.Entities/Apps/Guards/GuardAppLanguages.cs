@@ -17,15 +17,15 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            Validate.It(() => "Cannot add language.", error =>
+            Validate.It(() => "Cannot add language.", e =>
             {
                 if (command.Language == null)
                 {
-                    error(new ValidationError("Language cannot be null.", nameof(command.Language)));
+                    e("Language code is required.", nameof(command.Language));
                 }
                 else if (languages.Contains(command.Language))
                 {
-                    error(new ValidationError("Language already added.", nameof(command.Language)));
+                    e("Language has already been added.");
                 }
             });
         }
@@ -34,18 +34,18 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            var languageConfig = GetLanguageConfigOrThrow(languages, command.Language);
+            var config = GetConfigOrThrow(languages, command.Language);
 
-            Validate.It(() => "Cannot remove language.", error =>
+            Validate.It(() => "Cannot remove language.", e =>
             {
                 if (command.Language == null)
                 {
-                    error(new ValidationError("Language cannot be null.", nameof(command.Language)));
+                    e("Language code is required.", nameof(command.Language));
                 }
 
-                if (languages.Master == languageConfig)
+                if (languages.Master == config)
                 {
-                    error(new ValidationError("Language config is master.", nameof(command.Language)));
+                    e("Master language cannot be removed.");
                 }
             });
         }
@@ -54,34 +54,36 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            var languageConfig = GetLanguageConfigOrThrow(languages, command.Language);
+            var config = GetConfigOrThrow(languages, command.Language);
 
-            Validate.It(() => "Cannot update language.", error =>
+            Validate.It(() => "Cannot update language.", e =>
             {
                 if (command.Language == null)
                 {
-                    error(new ValidationError("Language cannot be null.", nameof(command.Language)));
+                    e("Language is required.", nameof(command.Language));
                 }
 
-                if ((languages.Master == languageConfig || command.IsMaster) && command.IsOptional)
+                if ((languages.Master == config || command.IsMaster) && command.IsOptional)
                 {
-                    error(new ValidationError("Cannot make master language optional.", nameof(command.IsMaster)));
+                    e("Master language cannot be made optional.", nameof(command.IsMaster));
                 }
 
-                if (command.Fallback != null)
+                if (command.Fallback == null)
                 {
-                    foreach (var fallback in command.Fallback)
+                    return;
+                }
+
+                foreach (var fallback in command.Fallback)
+                {
+                    if (!languages.Contains(fallback))
                     {
-                        if (!languages.Contains(fallback))
-                        {
-                            error(new ValidationError($"Config does not contain fallback language {fallback}.", nameof(command.Fallback)));
-                        }
+                        e($"App does not have fallback language '{fallback}'.", nameof(command.Fallback));
                     }
                 }
             });
         }
 
-        private static LanguageConfig GetLanguageConfigOrThrow(LanguagesConfig languages, Language language)
+        private static LanguageConfig GetConfigOrThrow(LanguagesConfig languages, Language language)
         {
             if (language == null)
             {

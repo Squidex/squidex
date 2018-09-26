@@ -4,31 +4,3 @@
 .truncate {
     @include truncate;
 }
-
-.content-status {
-    & {
-        vertical-align: middle;
-    }
-
-    &-published {
-        color: $color-theme-green;
-    }
-
-    &-draft {
-        color: $color-text-decent;
-    }
-
-    &-archived {
-        color: $color-theme-error;
-    }
-
-    &-tooltip {
-        @include border-radius;
-        background: $color-tooltip;
-        border: 0;
-        font-size: .9rem;
-        font-weight: normal;
-        color: $color-dark-foreground;
-        padding: .75rem;
-    }
-}

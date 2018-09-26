@@ -36,7 +36,7 @@ namespace Squidex.Domain.Users.MongoDb
 
         public void StoreElement(XElement element, string friendlyName)
         {
-            Collection.UpdateOne(Filter.Eq(x => x.Id, friendlyName),
+            Collection.UpdateOne(x => x.Id == friendlyName,
                 Update.Set(x => x.Xml, element.ToString()),
                 Upsert);
         }

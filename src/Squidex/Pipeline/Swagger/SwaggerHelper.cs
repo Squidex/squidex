@@ -79,7 +79,7 @@ namespace Squidex.Pipeline.Swagger
 
         public static SwaggerSecurityScheme CreateOAuthSchema(MyUrlsOptions urlOptions)
         {
-            var tokenUrl = urlOptions.BuildUrl($"{Constants.IdentityServerPrefix}/connect/token");
+            var tokenUrl = urlOptions.BuildUrl($"{Constants.IdentityServerPrefix}/connect/token", false);
 
             var securityDocs = LoadDocs("security");
             var securityText = securityDocs.Replace("<TOKEN_URL>", tokenUrl);
@@ -108,7 +108,7 @@ namespace Squidex.Pipeline.Swagger
         {
             var errorType = typeof(ErrorDto);
 
-            return await schemaGenerator.GenerateWithReference<JsonSchema4>(errorType, Enumerable.Empty<Attribute>(), resolver);
+            return await schemaGenerator.GenerateWithReferenceAsync<JsonSchema4>(errorType, Enumerable.Empty<Attribute>(), resolver);
         }
 
         public static void AddQueryParameter(this SwaggerOperation operation, string name, JsonObjectType type, string description = null)

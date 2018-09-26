@@ -1,0 +1,102 @@
+@import '_mixins';
+@import '_vars';
+
+$focus-color: #b3d3ff;
+
+:host {
+    text-align: left;
+}
+
+.form-control {
+    & {
+        cursor: text;
+    }
+
+    &.disabled {
+        cursor: inherit;
+    }
+
+    &.disabled,
+    &:disabled {
+        background: $color-input-disabled;
+    }
+
+    &.focus {
+        @include box-shadow-raw(0 0 0 .2rem rgba(51, 137, 255, .25));
+        border-color: $focus-color;
+    }
+
+    &.single-line {
+        overflow-x: hidden;
+        overflow-y: hidden;
+        white-space: nowrap;
+    }
+}
+
+div {
+    &.form-control {
+        height: auto;
+        text-align: left;
+        text-decoration: none;
+        position: relative;
+    }
+}
+
+.blank {
+    & {
+        padding: 0;
+        border: 0;
+        background: transparent;
+        min-width: 50px;
+        max-width: 100%;
+        height: auto !important;
+    }
+
+    &:focus,
+    &.focus {
+        @include box-shadow-none;
+        outline: none;
+    }
+
+    &:hover {
+        background: transparent;
+    }
+}
+
+.icon-close {
+    font-size: .6rem;
+}
+
+.item {
+    & {
+        @include border-radius(10px);
+        color: $color-dark-foreground;
+        cursor: default;
+        padding: 0 .6rem;
+        background: $color-theme-blue;
+        border: 0;
+        font-size: .8rem;
+        font-weight: normal;
+        margin: 0 2px 2px 0;
+        white-space: nowrap;
+    }
+
+    &,
+    &-container {
+        display: inline-block;
+    }
+
+    &-container {
+        height: 24px;
+        padding: 2px;
+        padding-left: 0;
+    }
+
+    &.disabled {
+        pointer-events: none;
+    }
+
+    &:hover {
+        background: $color-theme-blue-dark;
+    }
+}

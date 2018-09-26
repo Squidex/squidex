@@ -9,7 +9,11 @@ using Squidex.Domain.Apps.Core.Apps;
 
 namespace Squidex.Domain.Apps.Entities.Apps
 {
-    public interface IAppEntity : IEntity, IEntityWithVersion
+    public interface IAppEntity :
+        IEntity,
+        IEntityWithCreatedBy,
+        IEntityWithLastModifiedBy,
+        IEntityWithVersion
     {
         string Name { get; }
 
@@ -22,5 +26,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         AppContributors Contributors { get; }
 
         LanguagesConfig LanguagesConfig { get; }
+
+        bool IsArchived { get; }
     }
 }

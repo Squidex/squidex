@@ -17,20 +17,6 @@
     }
 }
 
-.app {
-    & {
-        margin: .625rem;
-    }
-
-    &-content {
-        width: 20rem;
-    }
-
-    &-title {
-        @include truncate;
-    }
-}
-
 .card {
     & {
         margin-right: 1rem;
@@ -61,6 +47,7 @@
     }
 
     &-title {
+        @include truncate;
         color: $color-title;
         font-weight: light;
         font-size: 1.2rem;

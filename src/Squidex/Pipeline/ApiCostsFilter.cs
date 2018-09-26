@@ -6,11 +6,13 @@
 // ==========================================================================
 
 using System;
-using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Squidex.Domain.Apps.Entities.Apps.Services;
+using Squidex.Infrastructure;
+using Squidex.Infrastructure.Log;
+using Squidex.Infrastructure.Security;
 using Squidex.Infrastructure.UsageTracking;
 
 namespace Squidex.Pipeline
@@ -47,27 +49,30 @@ namespace Squidex.Pipeline
 
             if (appFeature?.App != null && FilterDefinition.Weight > 0)
             {
-                var stopWatch = Stopwatch.StartNew();
-
-                try
+                using (Profiler.Trace("CheckUsage"))
                 {
                     var plan = appPlanProvider.GetPlanForApp(appFeature.App);
 
-                    var usage = await usageTracker.GetMonthlyCalls(appFeature.App.Id.ToString(), DateTime.Today);
+                    var usage = await usageTracker.GetMonthlyCallsAsync(appFeature.App.Id.ToString(), DateTime.Today);
 
-                    if (plan.MaxApiCalls >= 0 && (usage * 1.1) > plan.MaxApiCalls)
+                    if (plan.MaxApiCalls >= 0 && usage > plan.MaxApiCalls * 1.1)
                     {
                         context.Result = new StatusCodeResult(429);
                         return;
                     }
+                }
 
+                var watch = ValueStopwatch.StartNew();
+
+                try
+                {
                     await next();
                 }
                 finally
                 {
-                    stopWatch.Stop();
+                    var elapsedMs = watch.Stop();
 
-                    await usageTracker.TrackAsync(appFeature.App.Id.ToString(), FilterDefinition.Weight, stopWatch.ElapsedMilliseconds);
+                    await usageTracker.TrackAsync(appFeature.App.Id.ToString(), context.HttpContext.User.OpenIdClientId(), FilterDefinition.Weight, elapsedMs);
                 }
             }
             else

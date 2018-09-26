@@ -6,156 +6,79 @@
 // ==========================================================================
 
 using System;
+using System.Collections;
 using System.Linq;
-using Microsoft.OData.UriParser;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using Squidex.Infrastructure.Queries;
 
 namespace Squidex.Infrastructure.MongoDb.OData
 {
-    public sealed class FilterVisitor<T> : QueryNodeVisitor<FilterDefinition<T>>
+    public sealed class FilterVisitor<T> : FilterNodeVisitor<FilterDefinition<T>>
     {
         private static readonly FilterDefinitionBuilder<T> Filter = Builders<T>.Filter;
-        private readonly PropertyCalculator propertyCalculator;
+        private static readonly FilterVisitor<T> Instance = new FilterVisitor<T>();
 
-        private FilterVisitor(PropertyCalculator propertyCalculator)
+        private FilterVisitor()
         {
-            this.propertyCalculator = propertyCalculator;
         }
 
-        public static FilterDefinition<T> Visit(QueryNode node, PropertyCalculator propertyCalculator)
+        public static FilterDefinition<T> Visit(FilterNode node)
         {
-            var visitor = new FilterVisitor<T>(propertyCalculator);
-
-            return node.Accept(visitor);
+            return node.Accept(Instance);
         }
 
-        public override FilterDefinition<T> Visit(ConvertNode nodeIn)
+        public override FilterDefinition<T> Visit(FilterNegate nodeIn)
         {
-            return nodeIn.Source.Accept(this);
+            return Filter.Not(nodeIn.Operand.Accept(this));
         }
 
-        public override FilterDefinition<T> Visit(UnaryOperatorNode nodeIn)
+        public override FilterDefinition<T> Visit(FilterJunction nodeIn)
         {
-            if (nodeIn.OperatorKind == UnaryOperatorKind.Not)
+            if (nodeIn.JunctionType == FilterJunctionType.And)
             {
-                return Filter.Not(nodeIn.Operand.Accept(this));
-            }
-
-            throw new NotSupportedException();
-        }
-
-        public override FilterDefinition<T> Visit(SingleValueFunctionCallNode nodeIn)
-        {
-            var fieldNode = nodeIn.Parameters.ElementAt(0);
-            var valueNode = nodeIn.Parameters.ElementAt(1);
-
-            if (string.Equals(nodeIn.Name, "endswith", StringComparison.OrdinalIgnoreCase))
-            {
-                var value = BuildRegex(valueNode, v => v + "$");
-
-                return Filter.Regex(BuildFieldDefinition(fieldNode), value);
-            }
-
-            if (string.Equals(nodeIn.Name, "startswith", StringComparison.OrdinalIgnoreCase))
-            {
-                var value = BuildRegex(valueNode, v => "^" + v);
-
-                return Filter.Regex(BuildFieldDefinition(fieldNode), value);
-            }
-
-            if (string.Equals(nodeIn.Name, "contains", StringComparison.OrdinalIgnoreCase))
-            {
-                var value = BuildRegex(valueNode, v => v);
-
-                return Filter.Regex(BuildFieldDefinition(fieldNode), value);
-            }
-
-            throw new NotSupportedException();
-        }
-
-        public override FilterDefinition<T> Visit(BinaryOperatorNode nodeIn)
-        {
-            if (nodeIn.OperatorKind == BinaryOperatorKind.And)
-            {
-                return Filter.And(nodeIn.Left.Accept(this), nodeIn.Right.Accept(this));
-            }
-
-            if (nodeIn.OperatorKind == BinaryOperatorKind.Or)
-            {
-                return Filter.Or(nodeIn.Left.Accept(this), nodeIn.Right.Accept(this));
-            }
-
-            if (nodeIn.Left is SingleValueFunctionCallNode functionNode)
-            {
-                var regexFilter = Visit(functionNode);
-
-                var value = BuildValue(nodeIn.Right);
-
-                if (value is bool booleanRight)
-                {
-                    if ((nodeIn.OperatorKind == BinaryOperatorKind.Equal && !booleanRight) ||
-                        (nodeIn.OperatorKind == BinaryOperatorKind.NotEqual && booleanRight))
-                    {
-                        regexFilter = Filter.Not(regexFilter);
-                    }
-
-                    return regexFilter;
-                }
+                return Filter.And(nodeIn.Operands.Select(x => x.Accept(this)));
             }
             else
             {
-                if (nodeIn.OperatorKind == BinaryOperatorKind.NotEqual)
-                {
-                    var field = BuildFieldDefinition(nodeIn.Left);
+                return Filter.Or(nodeIn.Operands.Select(x => x.Accept(this)));
+            }
+        }
 
-                    return Filter.Or(
-                        Filter.Not(Filter.Exists(field)),
-                        Filter.Ne(field, BuildValue(nodeIn.Right)));
-                }
+        public override FilterDefinition<T> Visit(FilterComparison nodeIn)
+        {
+            var propertyName = string.Join(".", nodeIn.Lhs);
 
-                if (nodeIn.OperatorKind == BinaryOperatorKind.Equal)
-                {
-                    return Filter.Eq(BuildFieldDefinition(nodeIn.Left), BuildValue(nodeIn.Right));
-                }
-
-                if (nodeIn.OperatorKind == BinaryOperatorKind.LessThan)
-                {
-                    return Filter.Lt(BuildFieldDefinition(nodeIn.Left), BuildValue(nodeIn.Right));
-                }
-
-                if (nodeIn.OperatorKind == BinaryOperatorKind.LessThanOrEqual)
-                {
-                    return Filter.Lte(BuildFieldDefinition(nodeIn.Left), BuildValue(nodeIn.Right));
-                }
-
-                if (nodeIn.OperatorKind == BinaryOperatorKind.GreaterThan)
-                {
-                    return Filter.Gt(BuildFieldDefinition(nodeIn.Left), BuildValue(nodeIn.Right));
-                }
-
-                if (nodeIn.OperatorKind == BinaryOperatorKind.GreaterThanOrEqual)
-                {
-                    return Filter.Gte(BuildFieldDefinition(nodeIn.Left), BuildValue(nodeIn.Right));
-                }
+            switch (nodeIn.Operator)
+            {
+                case FilterOperator.StartsWith:
+                    return Filter.Regex(propertyName, BuildRegex(nodeIn, s => "$" + s));
+                case FilterOperator.Contains:
+                    return Filter.Regex(propertyName, BuildRegex(nodeIn, s => s));
+                case FilterOperator.EndsWith:
+                    return Filter.Regex(propertyName, BuildRegex(nodeIn, s => s + "$"));
+                case FilterOperator.Equals:
+                    return Filter.Eq(propertyName, nodeIn.Rhs.Value);
+                case FilterOperator.GreaterThan:
+                    return Filter.Gt(propertyName, nodeIn.Rhs.Value);
+                case FilterOperator.GreaterThanOrEqual:
+                    return Filter.Gte(propertyName, nodeIn.Rhs.Value);
+                case FilterOperator.LessThan:
+                    return Filter.Lt(propertyName, nodeIn.Rhs.Value);
+                case FilterOperator.LessThanOrEqual:
+                    return Filter.Lte(propertyName, nodeIn.Rhs.Value);
+                case FilterOperator.NotEquals:
+                    return Filter.Ne(propertyName, nodeIn.Rhs.Value);
+                case FilterOperator.In:
+                    return Filter.In(propertyName, ((IList)nodeIn.Rhs.Value).OfType<object>());
             }
 
             throw new NotSupportedException();
         }
 
-        private static BsonRegularExpression BuildRegex(QueryNode node, Func<string, string> formatter)
+        private static BsonRegularExpression BuildRegex(FilterComparison node, Func<string, string> formatter)
         {
-            return new BsonRegularExpression(formatter(BuildValue(node).ToString()), "i");
-        }
-
-        private FieldDefinition<T, object> BuildFieldDefinition(QueryNode nodeIn)
-        {
-            return nodeIn.BuildFieldDefinition<T>(propertyCalculator);
-        }
-
-        private static object BuildValue(QueryNode nodeIn)
-        {
-            return ConstantVisitor.Visit(nodeIn);
+            return new BsonRegularExpression(formatter(node.Rhs.Value.ToString()), "i");
         }
     }
 }

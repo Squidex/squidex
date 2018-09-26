@@ -15,7 +15,7 @@ namespace Squidex.Config.Domain
 {
     public static class SystemExtensions
     {
-        public static void InitializeAll(this IServiceProvider services)
+        public static void RunInitialization(this IServiceProvider services)
         {
             var systems = services.GetRequiredService<IEnumerable<IInitializable>>();
 
@@ -25,7 +25,7 @@ namespace Squidex.Config.Domain
             }
         }
 
-        public static void RunAll(this IServiceProvider services)
+        public static void RunRunnables(this IServiceProvider services)
         {
             var systems = services.GetRequiredService<IEnumerable<IRunnable>>();
 
@@ -35,7 +35,7 @@ namespace Squidex.Config.Domain
             }
         }
 
-        public static void Migrate(this IServiceProvider services)
+        public static void RunMigrate(this IServiceProvider services)
         {
             var migrator = services.GetRequiredService<Migrator>();
 

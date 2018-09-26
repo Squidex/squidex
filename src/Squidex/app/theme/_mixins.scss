@@ -177,8 +177,10 @@
  
 @mixin circle($size) {
     @include border-radius($size * .5);
-     width: $size;
-    height: $size;
+    min-height: $size;
+    max-height: $size;
+    min-width: $size;
+    max-width: $size;
 }
 
 @mixin wrap() {
@@ -291,6 +293,21 @@
     -webkit-border-radius: $radius $radius 0 0;
        -moz-border-radius: $radius $radius 0 0;
 	        border-radius: $radius $radius 0 0;
+}
+
+@mixin keyframes($name) {
+    @-webkit-keyframes #{$name} {
+        @content; 
+    }
+    @-moz-keyframes #{$name} {
+        @content;
+    }
+    @keyframes #{$name} {
+        @content;
+    }
+    @-ms-keyframes #{$name} {
+        @content;
+    }
 }
 
 @mixin animation($animation...) {

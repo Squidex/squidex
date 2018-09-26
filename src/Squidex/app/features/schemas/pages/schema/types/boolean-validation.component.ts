@@ -8,8 +8,9 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
+import { map, startWith } from 'rxjs/operators';
 
-import { BooleanFieldPropertiesDto } from 'shared';
+import { BooleanFieldPropertiesDto, FieldDto } from '@app/shared';
 
 @Component({
     selector: 'sqx-boolean-validation',
@@ -19,6 +20,9 @@ import { BooleanFieldPropertiesDto } from 'shared';
 export class BooleanValidationComponent implements OnInit {
     @Input()
     public editForm: FormGroup;
+
+    @Input()
+    public field: FieldDto;
 
     @Input()
     public properties: BooleanFieldPropertiesDto;
@@ -33,8 +37,7 @@ export class BooleanValidationComponent implements OnInit {
             new FormControl(this.properties.inlineEditable));
 
         this.showDefaultValue =
-            this.editForm.controls['isRequired'].valueChanges
-                .startWith(this.properties.isRequired)
-                .map(x => !x);
+            this.editForm.controls['isRequired'].valueChanges.pipe(
+                startWith(this.properties.isRequired), map(x => !x));
     }
 }

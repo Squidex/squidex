@@ -5,20 +5,22 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
-import { AssetsFieldPropertiesDto } from 'shared';
+import { AssetsFieldPropertiesDto, FieldDto } from '@app/shared';
 
 @Component({
     selector: 'sqx-assets-ui',
     styleUrls: ['assets-ui.component.scss'],
-    templateUrl: 'assets-ui.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    templateUrl: 'assets-ui.component.html'
 })
 export class AssetsUIComponent {
     @Input()
     public editForm: FormGroup;
+
+    @Input()
+    public field: FieldDto;
 
     @Input()
     public properties: AssetsFieldPropertiesDto;

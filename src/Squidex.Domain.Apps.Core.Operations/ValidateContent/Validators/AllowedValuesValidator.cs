@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Infrastructure;
@@ -24,7 +23,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
             this.allowedValues = allowedValues;
         }
 
-        public Task ValidateAsync(object value, ValidationContext context, Action<string> addError)
+        public Task ValidateAsync(object value, ValidationContext context, AddError addError)
         {
             if (value == null)
             {
@@ -35,7 +34,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
             if (!allowedValues.Contains(typedValue))
             {
-                addError("<FIELD> is not an allowed value.");
+                addError(context.Path, "Not an allowed value.");
             }
 
             return TaskHelper.Done;

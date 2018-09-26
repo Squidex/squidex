@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Entities.Assets.State;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
 
@@ -19,26 +20,42 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
     {
         public async Task<(AssetState Value, long Version)> ReadAsync(Guid key)
         {
-            var existing =
-                await Collection.Find(x => x.Id == key)
-                    .FirstOrDefaultAsync();
-
-            if (existing != null)
+            using (Profiler.TraceMethod<MongoAssetRepository>())
             {
-                return (SimpleMapper.Map(existing, new AssetState()), existing.Version);
-            }
+                var existing =
+                    await Collection.Find(x => x.Id == key)
+                        .FirstOrDefaultAsync();
 
-            return (null, EtagVersion.NotFound);
+                if (existing != null)
+                {
+                    return (SimpleMapper.Map(existing, new AssetState()), existing.Version);
+                }
+
+                return (null, EtagVersion.NotFound);
+            }
         }
 
         public async Task WriteAsync(Guid key, AssetState value, long oldVersion, long newVersion)
         {
-            var entity = SimpleMapper.Map(value, new MongoAssetEntity());
+            using (Profiler.TraceMethod<MongoAssetRepository>())
+            {
+                var entity = SimpleMapper.Map(value, new MongoAssetEntity());
 
-            entity.Version = newVersion;
-            entity.AppIdId = value.AppId.Id;
+                entity.Version = newVersion;
+                entity.IndexedAppId = value.AppId.Id;
 
-            await Collection.ReplaceOneAsync(x => x.Id == key && x.Version == oldVersion, entity, Upsert);
+                await Collection.ReplaceOneAsync(x => x.Id == key && x.Version == oldVersion, entity, Upsert);
+            }
+        }
+
+        Task ISnapshotStore<AssetState, Guid>.ReadAllAsync(Func<AssetState, long, Task> callback)
+        {
+            throw new NotSupportedException();
+        }
+
+        Task ISnapshotStore<AssetState, Guid>.RemoveAsync(Guid key)
+        {
+            throw new NotSupportedException();
         }
     }
 }

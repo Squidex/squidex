@@ -17,7 +17,6 @@ namespace Squidex.Domain.Apps.Core.Apps
 {
     public sealed class LanguagesConfig : IFieldPartitioning
     {
-        public static readonly LanguagesConfig Empty = new LanguagesConfig(ImmutableDictionary<Language, LanguageConfig>.Empty, null, false);
         public static readonly LanguagesConfig English = Build(Language.EN);
 
         private readonly ImmutableDictionary<Language, LanguageConfig> languages;
@@ -111,13 +110,10 @@ namespace Squidex.Domain.Apps.Core.Apps
 
             var newLanguages =
                 languages.Values.Where(x => x.Language != language)
-                    .Select(config =>
-                    {
-                        return new LanguageConfig(
-                            config.Language,
-                            config.IsOptional,
-                            config.LanguageFallbacks.Except(new[] { language }));
-                    })
+                    .Select(config => new LanguageConfig(
+                        config.Language,
+                        config.IsOptional,
+                        config.LanguageFallbacks.Except(new[] { language })))
                     .ToImmutableDictionary(x => x.Language);
 
             var newMaster =

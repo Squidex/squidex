@@ -23,15 +23,23 @@ namespace Squidex.Domain.Apps.Entities.Apps.Services.Implementations
             MaxContributors = -1
         };
 
-        private readonly Dictionary<string, ConfigAppLimitsPlan> plansById;
-        private readonly List<ConfigAppLimitsPlan> plansList;
+        private readonly Dictionary<string, ConfigAppLimitsPlan> plansById = new Dictionary<string, ConfigAppLimitsPlan>(StringComparer.OrdinalIgnoreCase);
+        private readonly List<ConfigAppLimitsPlan> plansList = new List<ConfigAppLimitsPlan>();
 
         public ConfigAppPlansProvider(IEnumerable<ConfigAppLimitsPlan> config)
         {
             Guard.NotNull(config, nameof(config));
 
-            plansList = config.Select(c => c.Clone()).OrderBy(x => x.MaxApiCalls).ToList();
-            plansById = plansList.ToDictionary(c => c.Id, StringComparer.OrdinalIgnoreCase);
+            foreach (var plan in config.OrderBy(x => x.MaxApiCalls).Select(x => x.Clone()))
+            {
+                plansList.Add(plan);
+                plansById[plan.Id] = plan;
+
+                if (!string.IsNullOrWhiteSpace(plan.YearlyId) && !string.IsNullOrWhiteSpace(plan.YearlyCosts))
+                {
+                    plansById[plan.YearlyId] = plan;
+                }
+            }
         }
 
         public IEnumerable<IAppLimitsPlan> GetAvailablePlans()

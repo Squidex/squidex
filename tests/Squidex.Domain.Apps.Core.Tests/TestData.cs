@@ -54,49 +54,47 @@ namespace Squidex.Domain.Apps.Core
 
         public static Schema MixedSchema()
         {
-            var inv = Partitioning.Invariant;
-
-            var schema = new Schema("user");
-
-            schema = schema.Publish();
-            schema = schema.Update(new SchemaProperties { Hints = "The User" });
-
-            schema = schema.AddField(new JsonField(1, "my-json", inv,
-                new JsonFieldProperties()));
-
-            schema = schema.AddField(new AssetsField(2, "my-assets", inv,
-                new AssetsFieldProperties()));
-
-            schema = schema.AddField(new StringField(3, "my-string1", inv,
-                new StringFieldProperties { Label = "My String1", IsRequired = true, AllowedValues = ImmutableList.Create("a", "b") }));
-
-            schema = schema.AddField(new StringField(4, "my-string2", inv,
-                new StringFieldProperties { Hints = "My String1" }));
-
-            schema = schema.AddField(new NumberField(5, "my-number", inv,
-                new NumberFieldProperties { MinValue = 1, MaxValue = 10 }));
-
-            schema = schema.AddField(new BooleanField(6, "my-boolean", inv,
-                new BooleanFieldProperties()));
-
-            schema = schema.AddField(new DateTimeField(7, "my-datetime", inv,
-                new DateTimeFieldProperties { Editor = DateTimeFieldEditor.DateTime }));
-
-            schema = schema.AddField(new DateTimeField(8, "my-date", inv,
-                new DateTimeFieldProperties { Editor = DateTimeFieldEditor.Date }));
-
-            schema = schema.AddField(new GeolocationField(9, "my-geolocation", inv,
-                new GeolocationFieldProperties()));
-
-            schema = schema.AddField(new ReferencesField(10, "my-references", inv,
-                new ReferencesFieldProperties()));
-
-            schema = schema.AddField(new TagsField(11, "my-tags", Partitioning.Language,
-                new TagsFieldProperties()));
-
-            schema = schema.HideField(7);
-            schema = schema.LockField(8);
-            schema = schema.DisableField(9);
+            var schema = new Schema("user")
+                .Publish()
+                .AddArray(101, "root-array", Partitioning.Language, f => f
+                    .AddAssets(201, "nested-assets")
+                    .AddBoolean(202, "nested-boolean")
+                    .AddDateTime(203, "nested-datetime")
+                    .AddGeolocation(204, "nested-geolocation")
+                    .AddJson(205, "nested-json")
+                    .AddJson(211, "nested-json2")
+                    .AddNumber(206, "nested-number")
+                    .AddReferences(207, "nested-references")
+                    .AddString(208, "nested-string")
+                    .AddTags(209, "nested-tags"))
+                .AddAssets(102, "root-assets", Partitioning.Invariant,
+                    new AssetsFieldProperties())
+                .AddBoolean(103, "root-boolean", Partitioning.Invariant,
+                    new BooleanFieldProperties())
+                .AddDateTime(104, "root-datetime", Partitioning.Invariant,
+                    new DateTimeFieldProperties { Editor = DateTimeFieldEditor.DateTime })
+                .AddDateTime(105, "root-date", Partitioning.Invariant,
+                    new DateTimeFieldProperties { Editor = DateTimeFieldEditor.Date })
+                .AddGeolocation(106, "root-geolocation", Partitioning.Invariant,
+                    new GeolocationFieldProperties())
+                .AddJson(107, "root-json", Partitioning.Invariant,
+                    new JsonFieldProperties())
+                .AddNumber(108, "root-number", Partitioning.Invariant,
+                    new NumberFieldProperties { MinValue = 1, MaxValue = 10 })
+                .AddReferences(109, "root-references", Partitioning.Invariant,
+                    new ReferencesFieldProperties())
+                .AddString(110, "root-string1", Partitioning.Invariant,
+                    new StringFieldProperties { Label = "My String1", IsRequired = true, AllowedValues = ImmutableList.Create("a", "b") })
+                .AddString(111, "root-string2", Partitioning.Invariant,
+                    new StringFieldProperties { Hints = "My String1" })
+                .AddTags(112, "root-tags", Partitioning.Language,
+                    new TagsFieldProperties())
+                .Update(new SchemaProperties { Hints = "The User" })
+                .HideField(104)
+                .HideField(211, 101)
+                .DisableField(109)
+                .DisableField(212, 101)
+                .LockField(105);
 
             return schema;
         }

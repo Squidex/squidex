@@ -11,12 +11,13 @@ import { inject, TestBed } from '@angular/core/testing';
 import {
     AnalyticsService,
     ApiUrlConfig,
-    AssetsDto,
     AssetDto,
     AssetReplacedDto,
+    AssetsDto,
     AssetsService,
     DateTime,
-    UpdateAssetDto,
+    RenameAssetDto,
+    TagAssetDto,
     Version,
     Versioned
 } from './../';
@@ -30,7 +31,7 @@ describe('AssetDto', () => {
     const newVersion = new Version('2');
 
     it('should update name property and user info when renaming', () => {
-        const asset_1 = new AssetDto('1', creator, creator, creation, creation, 'name.png', 'png', 1, 1, 'image/png', false, 1, 1, 'url', version);
+        const asset_1 = new AssetDto('1', creator, creator, creation, creation, 'name.png', 'png', 1, 1, 'image/png', false, 1, 1, [], 'url', version);
         const asset_2 = asset_1.rename('new-name.png', modifier, newVersion, modified);
 
         expect(asset_2.fileName).toEqual('new-name.png');
@@ -39,10 +40,20 @@ describe('AssetDto', () => {
         expect(asset_2.version).toEqual(newVersion);
     });
 
+    it('should update tag property and user info when tagged', () => {
+        const asset_1 = new AssetDto('1', creator, creator, creation, creation, 'name.png', 'png', 1, 1, 'image/png', false, 1, 1, [], 'url', version);
+        const asset_2 = asset_1.tag(['tag1', 'tag2'], modifier, newVersion, modified);
+
+        expect(asset_2.tags).toEqual(['tag1', 'tag2']);
+        expect(asset_2.lastModified).toEqual(modified);
+        expect(asset_2.lastModifiedBy).toEqual(modifier);
+        expect(asset_2.version).toEqual(newVersion);
+    });
+
     it('should update file properties when uploading', () => {
         const update = new AssetReplacedDto(2, 2, 'image/jpeg', true, 2, 2);
 
-        const asset_1 = new AssetDto('1', creator, creator, creation, creation, 'name.png', 'png', 1, 1, 'image/png', false, 1, 1, 'url', version);
+        const asset_1 = new AssetDto('1', creator, creator, creation, creation, 'name.png', 'png', 1, 1, 'image/png', false, 1, 1, [], 'url', version);
         const asset_2 = asset_1.update(update, modifier, newVersion, modified);
 
         expect(asset_2.fileSize).toEqual(2);
@@ -79,10 +90,35 @@ describe('AssetsService', () => {
         httpMock.verify();
     }));
 
+    it('should make get request to get asset tags',
+        inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
+
+        let tags: any;
+
+        assetsService.getTags('my-app').subscribe(result => {
+            tags = result;
+        });
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets/tags');
+
+        expect(req.request.method).toEqual('GET');
+        expect(req.request.headers.get('If-Match')).toBeNull();
+
+        req.flush({
+            tag1: 1,
+            tag2: 4
+        });
+
+        expect(tags!).toEqual({
+            tag1: 1,
+            tag2: 4
+        });
+    }));
+
     it('should make get request to get assets',
         inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
 
-        let assets: AssetsDto | null = null;
+        let assets: AssetsDto;
 
         assetsService.getAssets('my-app', 17, 13).subscribe(result => {
             assets = result;
@@ -110,6 +146,7 @@ describe('AssetsService', () => {
                     isImage: true,
                     pixelWidth: 1024,
                     pixelHeight: 2048,
+                    tags: undefined,
                     version: 11
                 },
                 {
@@ -126,12 +163,13 @@ describe('AssetsService', () => {
                     isImage: true,
                     pixelWidth: 1024,
                     pixelHeight: 2048,
+                    tags: ['tag1', 'tag2'],
                     version: 22
                 }
             ]
         });
 
-        expect(assets).toEqual(
+        expect(assets!).toEqual(
             new AssetsDto(10, [
                 new AssetDto(
                     'id1', 'Created1', 'LastModifiedBy1',
@@ -145,6 +183,7 @@ describe('AssetsService', () => {
                     true,
                     1024,
                     2048,
+                    [],
                     'http://service/p/api/assets/id1',
                     new Version('11')),
                 new AssetDto('id2', 'Created2', 'LastModifiedBy2',
@@ -158,6 +197,7 @@ describe('AssetsService', () => {
                     true,
                     1024,
                     2048,
+                    ['tag1', 'tag2'],
                     'http://service/p/api/assets/id2',
                     new Version('22'))
         ]));
@@ -166,7 +206,7 @@ describe('AssetsService', () => {
     it('should make get request to get asset',
         inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
 
-        let asset: AssetDto | null = null;
+        let asset: AssetDto;
 
         assetsService.getAsset('my-app', '123').subscribe(result => {
             asset = result;
@@ -190,14 +230,15 @@ describe('AssetsService', () => {
             mimeType: 'image/png',
             isImage: true,
             pixelWidth: 1024,
-            pixelHeight: 2048
+            pixelHeight: 2048,
+            tags: ['tag1', 'tag2']
         }, {
             headers: {
                 etag: '2'
             }
         });
 
-        expect(asset).toEqual(
+        expect(asset!).toEqual(
             new AssetDto(
                 'id1', 'Created1', 'LastModifiedBy1',
                 DateTime.parseISO_UTC('2016-12-12T10:10'),
@@ -210,6 +251,7 @@ describe('AssetsService', () => {
                 true,
                 1024,
                 2048,
+                ['tag1', 'tag2'],
                 'http://service/p/api/assets/id1',
                 new Version('2')));
     }));
@@ -227,10 +269,23 @@ describe('AssetsService', () => {
         req.flush({ total: 10, items: [] });
     }));
 
+    it('should append query to find by name and tag',
+        inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
+
+        assetsService.getAssets('my-app', 17, 13, 'my-query', ['tag1', 'tag2']).subscribe();
+
+        const req = httpMock.expectOne(`http://service/p/api/apps/my-app/assets?$filter=contains(fileName,'my-query') and tags eq 'tag1' and tags eq 'tag2'&$top=17&$skip=13`);
+
+        expect(req.request.method).toEqual('GET');
+        expect(req.request.headers.get('If-Match')).toBeNull();
+
+        req.flush({ total: 10, items: [] });
+    }));
+
     it('should append ids query to find by ids',
         inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
 
-        assetsService.getAssets('my-app', 0, 0, undefined, ['12', '23']).subscribe();
+        assetsService.getAssets('my-app', 0, 0, undefined, undefined, ['12', '23']).subscribe();
 
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets?ids=12,23');
 
@@ -243,7 +298,7 @@ describe('AssetsService', () => {
     it('should make post request to create asset',
         inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
 
-        let asset: AssetDto | null = null;
+        let asset: AssetDto;
 
         assetsService.uploadFile('my-app', null!, user, now).subscribe(result => {
             asset = <AssetDto>result;
@@ -263,14 +318,15 @@ describe('AssetsService', () => {
             mimeType: 'image/png',
             isImage: true,
             pixelWidth: 1024,
-            pixelHeight: 2048
+            pixelHeight: 2048,
+            tags: ['tag1', 'tag2']
         }, {
             headers: {
                 etag: '2'
             }
         });
 
-        expect(asset).toEqual(
+        expect(asset!).toEqual(
             new AssetDto(
                 'id1',
                 user,
@@ -284,6 +340,7 @@ describe('AssetsService', () => {
                 true,
                 1024,
                 2048,
+                ['tag1', 'tag2'],
                 'http://service/p/api/assets/id1',
                 new Version('2')));
     }));
@@ -291,7 +348,7 @@ describe('AssetsService', () => {
     it('should make put request to replace asset content',
         inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
 
-        let asset: AssetReplacedDto | null = null;
+        let asset: AssetReplacedDto;
 
         assetsService.replaceFile('my-app', '123', null!, version).subscribe(result => {
             asset = (<Versioned<AssetReplacedDto>>result).payload;
@@ -311,7 +368,7 @@ describe('AssetsService', () => {
             pixelHeight: 2048
         });
 
-        expect(asset).toEqual(
+        expect(asset!).toEqual(
             new AssetReplacedDto(
                 1024, 2,
                 'image/png',
@@ -323,7 +380,22 @@ describe('AssetsService', () => {
     it('should make put request to update asset',
         inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
 
-        const dto = new UpdateAssetDto('My-Asset.pdf');
+        const dto = new RenameAssetDto('My-Asset.pdf');
+
+        assetsService.putAsset('my-app', '123', dto, version).subscribe();
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets/123');
+
+        expect(req.request.method).toEqual('PUT');
+        expect(req.request.headers.get('If-Match')).toEqual(version.value);
+
+        req.flush({});
+    }));
+
+    it('should make put request to update asset',
+        inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
+
+        const dto = new TagAssetDto(['tag1', 'tag2']);
 
         assetsService.putAsset('my-app', '123', dto, version).subscribe();
 

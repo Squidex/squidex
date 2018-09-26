@@ -8,12 +8,12 @@
 import { AfterViewInit, Component, ElementRef, forwardRef, ViewChild } from '@angular/core';
 import { ControlValueAccessor, FormBuilder, NG_VALUE_ACCESSOR } from '@angular/forms';
 
-import { Types } from './../../framework/utils/types';
-
-import { ResourceLoaderService } from './../../framework/services/resource-loader.service';
-import { ValidatorsEx } from './../../framework/angular/validators';
-
-import { UIService } from './../services/ui.service';
+import {
+    ResourceLoaderService,
+    Types,
+    UIState,
+    ValidatorsEx
+} from '@app/shared/internal';
 
 declare var L: any;
 declare var google: any;
@@ -72,13 +72,13 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
     constructor(
         private readonly resourceLoader: ResourceLoaderService,
         private readonly formBuilder: FormBuilder,
-        private readonly uiService: UIService
+        private readonly uiState: UIState
     ) {
     }
 
-    public writeValue(value: Geolocation) {
-        if (Types.isObject(value) && Types.isNumber(value.latitude) && Types.isNumber(value.longitude)) {
-            this.value = value;
+    public writeValue(obj: any) {
+        if (Types.isObject(obj) && Types.isNumber(obj.latitude) && Types.isNumber(obj.longitude)) {
+            this.value = obj;
         } else {
             this.value = null;
         }
@@ -158,7 +158,7 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
     }
 
     public ngAfterViewInit() {
-        this.uiService.getSettings()
+        this.uiState.settings
             .subscribe(settings => {
                 this.isGoogleMaps = settings.mapType === 'GoogleMaps';
 

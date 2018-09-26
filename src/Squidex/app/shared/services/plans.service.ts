@@ -8,18 +8,19 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-
-import 'framework/angular/http-extensions';
+import { map, tap } from 'rxjs/operators';
 
 import {
     AnalyticsService,
     ApiUrlConfig,
     HTTP,
+    Model,
+    pretifyError,
     Version,
     Versioned
-} from 'framework';
+} from '@app/framework';
 
-export class AppPlansDto {
+export class PlansDto extends Model {
     constructor(
         public readonly currentPlanId: string,
         public readonly planOwner: string,
@@ -27,27 +28,22 @@ export class AppPlansDto {
         public readonly plans: PlanDto[],
         public readonly version: Version
     ) {
-    }
-
-    public changePlanId(planId: string, version?: Version): AppPlansDto {
-        return new AppPlansDto(
-            planId,
-            this.planOwner,
-            this.hasPortal,
-            this.plans,
-            version || this.version);
+        super();
     }
 }
 
-export class PlanDto {
+export class PlanDto extends Model {
     constructor(
         public readonly id: string,
         public readonly name: string,
         public readonly costs: string,
+        public readonly yearlyId: string,
+        public readonly yearlyCosts: string,
         public readonly maxApiCalls: number,
         public readonly maxAssetSize: number,
         public readonly maxContributors: number
     ) {
+        super();
     }
 }
 
@@ -74,16 +70,16 @@ export class PlansService {
     ) {
     }
 
-    public getPlans(appName: string): Observable<AppPlansDto> {
+    public getPlans(appName: string): Observable<PlansDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/plans`);
 
-        return HTTP.getVersioned<any>(this.http, url)
-                .map(response => {
+        return HTTP.getVersioned<any>(this.http, url).pipe(
+                map(response => {
                     const body = response.payload.body;
 
                     const items: any[] = body.plans;
 
-                    return new AppPlansDto(
+                    return new PlansDto(
                         body.currentPlanId,
                         body.planOwner,
                         body.hasPortal,
@@ -92,27 +88,29 @@ export class PlansService {
                                 item.id,
                                 item.name,
                                 item.costs,
+                                item.yearlyId,
+                                item.yearlyCosts,
                                 item.maxApiCalls,
                                 item.maxAssetSize,
                                 item.maxContributors);
                         }),
                         response.version);
-                })
-                .pretifyError('Failed to load plans. Please reload.');
+                }),
+                pretifyError('Failed to load plans. Please reload.'));
     }
 
     public putPlan(appName: string, dto: ChangePlanDto, version: Version): Observable<Versioned<PlanChangedDto>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/plan`);
 
-        return HTTP.putVersioned<any>(this.http, url, dto, version)
-                .map(response => {
+        return HTTP.putVersioned<any>(this.http, url, dto, version).pipe(
+                map(response => {
                     const body = response.payload.body;
 
                     return new Versioned(response.version, new PlanChangedDto(body.redirectUri));
-                })
-                .do(() => {
+                }),
+                tap(() => {
                     this.analytics.trackEvent('Plan', 'Changed', appName);
-                })
-                .pretifyError('Failed to change plan. Please reload.');
+                }),
+                pretifyError('Failed to change plan. Please reload.'));
     }
 }

@@ -8,7 +8,7 @@
 import { Component, Input } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
-import { GeolocationFieldPropertiesDto } from 'shared';
+import { FieldDto, GeolocationFieldPropertiesDto } from '@app/shared';
 
 @Component({
     selector: 'sqx-geolocation-validation',
@@ -18,6 +18,9 @@ import { GeolocationFieldPropertiesDto } from 'shared';
 export class GeolocationValidationComponent {
     @Input()
     public editForm: FormGroup;
+
+    @Input()
+    public field: FieldDto;
 
     @Input()
     public properties: GeolocationFieldPropertiesDto;

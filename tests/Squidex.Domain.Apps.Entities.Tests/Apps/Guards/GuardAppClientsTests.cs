@@ -7,6 +7,7 @@
 
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
+using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Xunit;
 
@@ -23,7 +24,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             var command = new AttachClient();
 
-            Assert.Throws<ValidationException>(() => GuardAppClients.CanAttach(clients_0, command));
+            ValidationAssert.Throws(() => GuardAppClients.CanAttach(clients_0, command),
+                new ValidationError("Client id is required.", "Id"));
         }
 
         [Fact]
@@ -33,7 +35,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             var clients_1 = clients_0.Add("android", "secret");
 
-            Assert.Throws<ValidationException>(() => GuardAppClients.CanAttach(clients_1, command));
+            ValidationAssert.Throws(() => GuardAppClients.CanAttach(clients_1, command),
+                new ValidationError("A client with the same id already exists."));
         }
 
         [Fact]
@@ -51,7 +54,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             var command = new RevokeClient();
 
-            Assert.Throws<ValidationException>(() => GuardAppClients.CanRevoke(clients_0, command));
+            ValidationAssert.Throws(() => GuardAppClients.CanRevoke(clients_0, command),
+                new ValidationError("Client id is required.", "Id"));
         }
 
         [Fact]
@@ -75,9 +79,10 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         [Fact]
         public void CanUpdate_should_throw_execption_if_client_id_is_null()
         {
-            var command = new UpdateClient();
+            var command = new UpdateClient { Name = "iOS" };
 
-            Assert.Throws<ValidationException>(() => GuardAppClients.CanUpdate(clients_0, command));
+            ValidationAssert.Throws(() => GuardAppClients.CanUpdate(clients_0, command),
+                new ValidationError("Client id is required.", "Id"));
         }
 
         [Fact]
@@ -95,7 +100,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             var clients_1 = clients_0.Add("ios", "secret");
 
-            Assert.Throws<ValidationException>(() => GuardAppClients.CanUpdate(clients_1, command));
+            ValidationAssert.Throws(() => GuardAppClients.CanUpdate(clients_1, command),
+                new ValidationError("Either name or permission must be defined.", "Name", "Permission"));
         }
 
         [Fact]
@@ -105,7 +111,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             var clients_1 = clients_0.Add("ios", "secret");
 
-            Assert.Throws<ValidationException>(() => GuardAppClients.CanUpdate(clients_1, command));
+            ValidationAssert.Throws(() => GuardAppClients.CanUpdate(clients_1, command),
+                new ValidationError("Permission is not valid.", "Permission"));
         }
 
         [Fact]
@@ -115,7 +122,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             var clients_1 = clients_0.Add("ios", "secret");
 
-            Assert.Throws<ValidationException>(() => GuardAppClients.CanUpdate(clients_1, command));
+            ValidationAssert.Throws(() => GuardAppClients.CanUpdate(clients_1, command),
+                new ValidationError("Client has already this name.", "Name"));
         }
 
         [Fact]
@@ -125,7 +133,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             var clients_1 = clients_0.Add("ios", "secret");
 
-            Assert.Throws<ValidationException>(() => GuardAppClients.CanUpdate(clients_1, command));
+            ValidationAssert.Throws(() => GuardAppClients.CanUpdate(clients_1, command),
+                new ValidationError("Client has already this permission.", "Permission"));
         }
 
         [Fact]

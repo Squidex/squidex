@@ -14,6 +14,13 @@ namespace Squidex.Infrastructure
 {
     public static class CollectionExtensions
     {
+        public static IEnumerable<T> Shuffle<T>(this IEnumerable<T> enumerable)
+        {
+            var random = new Random();
+
+            return enumerable.OrderBy(x => random.Next()).ToList();
+        }
+
         public static ImmutableDictionary<TKey, TValue> SetItem<TKey, TValue>(this ImmutableDictionary<TKey, TValue> dictionary, TKey key, Func<TValue, TValue> updater)
         {
             if (dictionary.TryGetValue(key, out var value))
@@ -160,11 +167,35 @@ namespace Squidex.Infrastructure
             return result;
         }
 
+        public static TValue GetOrAdd<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, TValue fallback)
+        {
+            if (!dictionary.TryGetValue(key, out var result))
+            {
+                result = fallback;
+
+                dictionary.Add(key, result);
+            }
+
+            return result;
+        }
+
         public static TValue GetOrAdd<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, Func<TKey, TValue> creator)
         {
             if (!dictionary.TryGetValue(key, out var result))
             {
                 result = creator(key);
+
+                dictionary.Add(key, result);
+            }
+
+            return result;
+        }
+
+        public static TValue GetOrAdd<TKey, TContext, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, TContext context, Func<TKey, TContext, TValue> creator)
+        {
+            if (!dictionary.TryGetValue(key, out var result))
+            {
+                result = creator(key, context);
 
                 dictionary.Add(key, result);
             }

@@ -22,12 +22,16 @@
     & {
         @include transition(border-color .4s ease);
         @include border-radius;
+        @include flex-box;
         border: 2px dashed $color-border;
         height: $asset-height;
+        width: $asset-width;
+        margin-left: 8px;
         font-size: 1.2rem;
         font-weight: normal;
         text-align: center;
-        padding: 3rem 2rem;
+        padding: 0 2rem;
+        cursor: pointer;
         color: darken($color-border, 30%);
     }
 
@@ -39,9 +43,7 @@
         padding-bottom: 1rem;
     }
 
-    &.drag,
-    &.dnd-drag-over,
-    &.dnd-drag-enter {
+    &.drag {
         border-color: darken($color-border, 10%);
         cursor: copy;
         color: darken($color-border, 40%);

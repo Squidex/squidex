@@ -15,16 +15,6 @@ body {
     }
 }
 
-// User ref for history panel. Must be placed here, because element is created dynamically.
-.user-ref {
-    color: $color-theme-blue-dark;
-}
-
-// Marker ref for history panel. Must be placed here, because element is created dynamically.
-.marker-ref {
-    font-weight: bolder;
-}
-
 // Common style for user email.
 .user-email {
     font-style: italic;
@@ -123,7 +113,9 @@ body {
 // Drop area for drag and drop features.
 //
 .drop-container {
-    position: relative;
+    & {
+        position: relative;
+    }
 
     .drop-area {
         & {
@@ -144,9 +136,7 @@ body {
             @include flex-box;
         }
 
-        &.drag,
-        &.dnd-drag-over,
-        &.dnd-drag-enter {
+        &.drag {
             border-color: darken($color-border, 10%);
             cursor: copy;
             color: darken($color-border, 40%);
@@ -156,5 +146,41 @@ body {
 
     .drop-text {
         background: $color-dark-foreground;
+    }
+}
+
+.sorting {
+    &,
+    & > * {
+        @include opacity(.5);
+    }
+}
+
+//
+// Animations
+//
+.spin {
+    @include animation(spin 3s infinite linear);
+}
+
+@include keyframes (spin) {
+    20% {
+        @include rotate(0deg);
+    }
+
+    30% {
+        @include rotate(180deg);
+    }
+
+    70% {
+        @include rotate(180deg);
+    }
+
+    80% {
+        @include rotate(360deg);
+    }
+
+    100% {
+        @include rotate(360deg);
     }
 }

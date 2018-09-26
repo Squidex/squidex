@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ImmutableArray } from './../';
+import { ImmutableArray } from './immutable-array';
 
 describe('ImmutableArray', () => {
     it('should create empty instance', () => {
@@ -20,9 +20,9 @@ describe('ImmutableArray', () => {
         const array_c = ImmutableArray.of([]);
         const array_d = ImmutableArray.empty();
 
-        expect(array_b).toBe(array_a);
-        expect(array_c).toBe(array_a);
-        expect(array_d).toBe(array_a);
+        expect(array_b).toBe(<any>array_a);
+        expect(array_c).toBe(<any>array_a);
+        expect(array_d).toBe(<any>array_a);
     });
 
     it('should create non empty instance', () => {
@@ -193,6 +193,12 @@ describe('ImmutableArray', () => {
         const array_1 = ImmutableArray.of([3, 1, 4, 2]);
 
         expect(array_1.mutableValues).toBe(array_1.mutableValues);
+    });
+
+    it('should provider value at index', () => {
+        const array_1 = ImmutableArray.of([3, 1, 4, 2]);
+
+        expect(array_1.at(2)).toBe(4);
     });
 
     it('should iterate over array items', () => {

@@ -6,7 +6,9 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models
 {
@@ -26,5 +28,10 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// Optional fallback languages.
         /// </summary>
         public List<Language> Fallback { get; set; }
+
+        public UpdateLanguage ToCommand(Language language)
+        {
+            return SimpleMapper.Map(this, new UpdateLanguage { Language = language });
+        }
     }
 }

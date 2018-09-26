@@ -1,34 +1,16 @@
 @import '_vars';
 @import '_mixins';
 
-.modal {
-    &-dialog {
-        height: 70%;
-    }
-
-    &-content {
-        min-height: 100%;
-        max-height: 100%;
-    }
-
-    &-body {
-        overflow-y: auto;
-    }
-
-    &-header {
-        @include flex-shrink(0);
-    }
-
-    &-footer {
-        @include flex-shrink(0);
-    }
-
-    &-form {
-        padding-top: 1em;
-        padding-bottom: 0;
-    }
-}
-
 .rule-element {
-    margin-right: .5rem;
+    margin: .25rem;
 }
+
+.wizard-title {
+    background: $color-border;
+    margin: -1rem;
+    margin-bottom: 1rem;
+    font-weight: 400;
+    font-size: 1.05rem;
+    padding: 1rem;
+}
+

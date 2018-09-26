@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
@@ -13,7 +12,6 @@ using Squidex.Areas.Api.Controllers.Apps.Models;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Services;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
 
 namespace Squidex.Areas.Api.Controllers.Apps
@@ -50,9 +48,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [ApiCosts(0)]
         public IActionResult GetContributors(string app)
         {
-            var contributors = App.Contributors.Select(x => new ContributorDto { ContributorId = x.Key, Permission = x.Value }).ToArray();
-
-            var response = new ContributorsDto { Contributors = contributors, MaxContributors = appPlansProvider.GetPlanForApp(App).MaxContributors };
+            var response = ContributorsDto.FromApp(App, appPlansProvider);
 
             Response.Headers["ETag"] = App.Version.ToString();
 
@@ -65,19 +61,24 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// <param name="app">The name of the app.</param>
         /// <param name="request">Contributor object that needs to be added to the app.</param>
         /// <returns>
-        /// 204 => User assigned to app.
+        /// 200 => User assigned to app.
         /// 400 => User is already assigned to the app or not found.
         /// 404 => App not found.
         /// </returns>
         [HttpPost]
         [Route("apps/{app}/contributors/")]
+        [ProducesResponseType(typeof(ContributorAssignedDto), 201)]
         [ProducesResponseType(typeof(ErrorDto), 400)]
         [ApiCosts(1)]
         public async Task<IActionResult> PostContributor(string app, [FromBody] AssignAppContributorDto request)
         {
-            await CommandBus.PublishAsync(SimpleMapper.Map(request, new AssignContributor()));
+            var command = request.ToCommand();
+            var context = await CommandBus.PublishAsync(command);
 
-            return NoContent();
+            var result = context.Result<EntityCreatedResult<string>>();
+            var response = ContributorAssignedDto.FromId(result.IdOrValue);
+
+            return Ok(response);
         }
 
         /// <summary>
@@ -88,7 +89,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// <returns>
         /// 204 => User removed from app.
         /// 400 => User is not assigned to the app.
-        /// 404 => App not found.
+        /// 404 => Contributor or app not found.
         /// </returns>
         [HttpDelete]
         [Route("apps/{app}/contributors/{id}/")]

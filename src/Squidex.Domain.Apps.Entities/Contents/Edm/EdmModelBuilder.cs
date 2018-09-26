@@ -19,6 +19,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Edm
 {
     public class EdmModelBuilder : CachingProviderBase
     {
+        private static readonly TimeSpan CacheTime = TimeSpan.FromMinutes(60);
+
         public EdmModelBuilder(IMemoryCache cache)
             : base(cache)
         {
@@ -32,7 +34,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Edm
 
             var result = Cache.GetOrCreate<IEdmModel>(cacheKey, entry =>
             {
-                entry.AbsoluteExpiration = DateTimeOffset.UtcNow.AddMinutes(60);
+                entry.AbsoluteExpirationRelativeToNow = CacheTime;
 
                 return BuildEdmModel(schema.SchemaDef, app.PartitionResolver());
             });

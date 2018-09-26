@@ -40,7 +40,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards.FieldProperties
 
             var errors = FieldPropertiesValidator.Validate(sut).ToList();
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
                     new ValidationError("Default value must be greater than min value.", "DefaultValue")
@@ -54,7 +54,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards.FieldProperties
 
             var errors = FieldPropertiesValidator.Validate(sut).ToList();
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
                     new ValidationError("Default value must be less than max value.", "DefaultValue")
@@ -68,7 +68,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards.FieldProperties
 
             var errors = FieldPropertiesValidator.Validate(sut).ToList();
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
                     new ValidationError("Max value must be greater than min value.", "MinValue", "MaxValue")
@@ -82,7 +82,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards.FieldProperties
 
             var errors = FieldPropertiesValidator.Validate(sut).ToList();
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
                     new ValidationError("Editor is not a valid value.", "Editor")
@@ -96,7 +96,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards.FieldProperties
 
             var errors = FieldPropertiesValidator.Validate(sut).ToList();
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
                     new ValidationError("Calculated default value is not valid.", "CalculatedDefaultValue")
@@ -110,7 +110,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards.FieldProperties
 
             var errors = FieldPropertiesValidator.Validate(sut).ToList();
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
                     new ValidationError("Calculated default value and default value cannot be used together.", "CalculatedDefaultValue", "DefaultValue")

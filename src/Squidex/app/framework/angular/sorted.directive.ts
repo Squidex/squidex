@@ -1,4 +1,3 @@
-
 /*
  * Squidex Headless CMS
  *
@@ -6,56 +5,48 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Directive, EventEmitter, Output } from '@angular/core';
+import { Directive, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 
-import {
-    SortableComponent,
-    SortableContainer,
-    DragDropSortableService
-} from 'ng2-dnd';
+import Sortable = require('sortablejs');
 
 @Directive({
-    selector: '[sqxSorted]'
+    selector: '[sqxSortModel]'
 })
-export class SortedDirective {
-    private oldArray: any[];
+export class SortedDirective implements OnDestroy, OnInit {
+    private sortable: Sortable;
+
+    @Input('sqxSortModel')
+    public sortModel: any[];
 
     @Output('sqxSorted')
-    public sorted = new EventEmitter<Array<any>>();
+    public sorted = new EventEmitter<any[]>();
 
     constructor(
-        sortableComponent: SortableComponent,
-        sortableContainer: SortableContainer,
-        sortableDragDropService: DragDropSortableService
+        private readonly elementRef: ElementRef
     ) {
-        const oldDragStartCallback = sortableComponent._onDragStartCallback.bind(sortableComponent);
+    }
 
-        if (Array.isArray(sortableContainer.sortableData)) {
-            sortableComponent._onDragStartCallback = () => {
-                oldDragStartCallback();
+    public ngOnDestroy() {
+        this.sortable.destroy();
+    }
 
-                this.oldArray = [...<any>sortableContainer.sortableData];
-            };
+    public ngOnInit() {
+        this.sortable = Sortable.create(this.elementRef.nativeElement, {
+            sort: true,
+            animation: 150,
 
-            const oldDropCallback = sortableComponent._onDropCallback.bind(sortableComponent);
+            onSort: (event: { oldIndex: number, newIndex: number }) => {
+                if (this.sortModel && event.newIndex !== event.oldIndex) {
+                    const newModel = [...this.sortModel];
 
-            sortableComponent._onDropCallback = (event: Event) => {
-                oldDropCallback(event);
+                    const item = this.sortModel[event.oldIndex];
 
-                if (sortableDragDropService.isDragged) {
-                    const newArray: any[] = <any>sortableContainer.sortableData;
-                    const oldArray = this.oldArray;
+                    newModel.splice(event.oldIndex, 1);
+                    newModel.splice(event.newIndex, 0, item);
 
-                    if (newArray && oldArray && newArray.length === oldArray.length) {
-                        for (let i = 0; i < oldArray.length; i++) {
-                            if (oldArray[i] !== newArray[i]) {
-                                this.sorted.emit(newArray);
-                                break;
-                            }
-                        }
-                    }
+                    this.sorted.emit(newModel);
                 }
-            };
-        }
+            }
+        });
     }
 }

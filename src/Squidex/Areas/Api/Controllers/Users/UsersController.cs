@@ -5,18 +5,18 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using Squidex.Areas.Api.Controllers.Users.Models;
 using Squidex.Domain.Users;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Reflection;
+using Squidex.Infrastructure.Log;
 using Squidex.Pipeline;
 using Squidex.Shared.Users;
 
@@ -30,8 +30,9 @@ namespace Squidex.Areas.Api.Controllers.Users
     public sealed class UsersController : ApiController
     {
         private static readonly byte[] AvatarBytes;
-        private readonly UserManager<IUser> userManager;
         private readonly IUserPictureStore userPictureStore;
+        private readonly IUserResolver userResolver;
+        private readonly ISemanticLog log;
 
         static UsersController()
         {
@@ -45,11 +46,17 @@ namespace Squidex.Areas.Api.Controllers.Users
             }
         }
 
-        public UsersController(ICommandBus commandBus, UserManager<IUser> userManager, IUserPictureStore userPictureStore)
+        public UsersController(
+            ICommandBus commandBus,
+            IUserPictureStore userPictureStore,
+            IUserResolver userResolver,
+            ISemanticLog log)
             : base(commandBus)
         {
-            this.userManager = userManager;
             this.userPictureStore = userPictureStore;
+            this.userResolver = userResolver;
+
+            this.log = log;
         }
 
         /// <summary>
@@ -65,14 +72,25 @@ namespace Squidex.Areas.Api.Controllers.Users
         [ApiAuthorize]
         [HttpGet]
         [Route("users/")]
-        [ProducesResponseType(typeof(UserDto[]), 200)]
+        [ProducesResponseType(typeof(PublicUserDto[]), 200)]
         public async Task<IActionResult> GetUsers(string query)
         {
-            var entities = await userManager.QueryByEmailAsync(query ?? string.Empty);
+            try
+            {
+                var entities = await userResolver.QueryByEmailAsync(query);
 
-            var models = entities.Select(x => SimpleMapper.Map(x, new UserDto { DisplayName = x.DisplayName(), PictureUrl = x.PictureUrl() })).ToArray();
+                var models = entities.Where(x => !x.IsHidden()).Select(UserDto.FromUser).ToArray();
 
-            return Ok(models);
+                return Ok(models);
+            }
+            catch (Exception ex)
+            {
+                log.LogError(ex, w => w
+                    .WriteProperty("action", nameof(GetUsers))
+                    .WriteProperty("status", "Failed"));
+            }
+
+            return Ok(new UserDto[0]);
         }
 
         /// <summary>
@@ -86,19 +104,28 @@ namespace Squidex.Areas.Api.Controllers.Users
         [ApiAuthorize]
         [HttpGet]
         [Route("users/{id}/")]
-        [ProducesResponseType(typeof(UserDto), 200)]
+        [ProducesResponseType(typeof(PublicUserDto), 200)]
         public async Task<IActionResult> GetUser(string id)
         {
-            var entity = await userManager.FindByIdAsync(id);
-
-            if (entity == null)
+            try
             {
-                return NotFound();
+                var entity = await userResolver.FindByIdOrEmailAsync(id);
+
+                if (entity != null)
+                {
+                    var response = UserDto.FromUser(entity);
+
+                    return Ok(response);
+                }
+            }
+            catch (Exception ex)
+            {
+                log.LogError(ex, w => w
+                    .WriteProperty("action", nameof(GetUser))
+                    .WriteProperty("status", "Failed"));
             }
 
-            var response = SimpleMapper.Map(entity, new UserDto { DisplayName = entity.DisplayName(), PictureUrl = entity.PictureUrl() });
-
-            return Ok(response);
+            return NotFound();
         }
 
         /// <summary>
@@ -112,42 +139,43 @@ namespace Squidex.Areas.Api.Controllers.Users
         [HttpGet]
         [Route("users/{id}/picture/")]
         [ProducesResponseType(200)]
+        [ResponseCache(Duration = 3600)]
         public async Task<IActionResult> GetUserPicture(string id)
         {
-            var entity = await userManager.FindByIdAsync(id);
-
-            if (entity == null)
-            {
-                return NotFound();
-            }
-
             try
             {
-                if (entity.IsPictureUrlStored())
+                var entity = await userResolver.FindByIdOrEmailAsync(id);
+
+                if (entity != null)
                 {
-                    return new FileStreamResult(await userPictureStore.DownloadAsync(entity.Id), "image/png");
-                }
-            }
-            catch
-            {
-                return new FileStreamResult(new MemoryStream(AvatarBytes), "image/png");
-            }
-
-            using (var client = new HttpClient())
-            {
-                var url = entity.PictureNormalizedUrl();
-
-                if (!string.IsNullOrWhiteSpace(url))
-                {
-                    var response = await client.GetAsync(url);
-
-                    if (response.IsSuccessStatusCode)
+                    if (entity.IsPictureUrlStored())
                     {
-                        var contentType = response.Content.Headers.ContentType.ToString();
+                        return new FileStreamResult(await userPictureStore.DownloadAsync(entity.Id), "image/png");
+                    }
 
-                        return new FileStreamResult(await response.Content.ReadAsStreamAsync(), contentType);
+                    using (var client = new HttpClient())
+                    {
+                        var url = entity.PictureNormalizedUrl();
+
+                        if (!string.IsNullOrWhiteSpace(url))
+                        {
+                            var response = await client.GetAsync(url);
+
+                            if (response.IsSuccessStatusCode)
+                            {
+                                var contentType = response.Content.Headers.ContentType.ToString();
+
+                                return new FileStreamResult(await response.Content.ReadAsStreamAsync(), contentType);
+                            }
+                        }
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                log.LogError(ex, w => w
+                    .WriteProperty("action", nameof(GetUser))
+                    .WriteProperty("status", "Failed"));
             }
 
             return new FileStreamResult(new MemoryStream(AvatarBytes), "image/png");

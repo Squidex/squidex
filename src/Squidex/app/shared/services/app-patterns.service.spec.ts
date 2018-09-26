@@ -13,52 +13,9 @@ import {
     AppPatternDto,
     AppPatternsDto,
     AppPatternsService,
-    UpdatePatternDto,
+    EditAppPatternDto,
     Version
 } from './../';
-
-describe('ApppatternsDto', () => {
-    const pattern1 = new AppPatternDto('1', 'Any', '.*', 'Message1');
-    const pattern2 = new AppPatternDto('2', 'Number', '[0-9]', 'Message2');
-    const pattern2_new = new AppPatternDto('2', 'Numbers', '[0-9]*', 'Message2_1');
-    const version = new Version('1');
-    const newVersion = new Version('2');
-
-    it('should update patterns when adding pattern', () => {
-        const patterns_1 = new AppPatternsDto([pattern1], version);
-        const patterns_2 = patterns_1.addPattern(pattern2, newVersion);
-
-        expect(patterns_2.patterns).toEqual([pattern1, pattern2]);
-        expect(patterns_2.version).toEqual(newVersion);
-    });
-
-    it('should update patterns when removing pattern', () => {
-        const patterns_1 = new AppPatternsDto([pattern1, pattern2], version);
-        const patterns_2 = patterns_1.deletePattern(pattern1, newVersion);
-
-        expect(patterns_2.patterns).toEqual([pattern2]);
-        expect(patterns_2.version).toEqual(newVersion);
-    });
-
-    it('should update patterns when updating pattern', () => {
-        const patterns_1 = new AppPatternsDto([pattern1, pattern2], version);
-        const patterns_2 = patterns_1.updatePattern(pattern2_new, newVersion);
-
-        expect(patterns_2.patterns).toEqual([pattern1, pattern2_new]);
-        expect(patterns_2.version).toEqual(newVersion);
-    });
-});
-
-describe('AppPatternDto', () => {
-    it('should update properties when updating', () => {
-        const pattern_1 = new AppPatternDto('1', 'Number', '[0-9]', 'Message1');
-        const pattern_2 = pattern_1.update(new UpdatePatternDto('Numbers', '[0-9]*', 'Message2'));
-
-        expect(pattern_2.name).toBe('Numbers');
-        expect(pattern_2.pattern).toBe('[0-9]*');
-        expect(pattern_2.message).toBe('Message2');
-    });
-});
 
 describe('AppPatternsService', () => {
     const version = new Version('1');
@@ -82,7 +39,7 @@ describe('AppPatternsService', () => {
     it('should make get request to get patterns',
         inject([AppPatternsService, HttpTestingController], (patternService: AppPatternsService, httpMock: HttpTestingController) => {
 
-        let patterns: AppPatternsDto | null = null;
+        let patterns: AppPatternsDto;
 
         patternService.getPatterns('my-app').subscribe(result => {
             patterns = result;
@@ -111,7 +68,7 @@ describe('AppPatternsService', () => {
             }
         });
 
-        expect(patterns).toEqual(
+        expect(patterns!).toEqual(
             new AppPatternsDto([
                 new AppPatternDto('1', 'Number', '[0-9]', 'Message1'),
                 new AppPatternDto('2', 'Numbers', '[0-9]*', 'Message2')
@@ -121,9 +78,9 @@ describe('AppPatternsService', () => {
     it('should make post request to add pattern',
         inject([AppPatternsService, HttpTestingController], (patternService: AppPatternsService, httpMock: HttpTestingController) => {
 
-        const dto = new UpdatePatternDto('Number', '[0-9]', 'Message1');
+        const dto = new EditAppPatternDto('Number', '[0-9]', 'Message1');
 
-        let pattern: AppPatternDto | null = null;
+        let pattern: AppPatternDto;
 
         patternService.postPattern('my-app', dto, version).subscribe(result => {
             pattern = result.payload;
@@ -141,13 +98,13 @@ describe('AppPatternsService', () => {
             message: 'Message1'
         });
 
-        expect(pattern).toEqual(new AppPatternDto('1', 'Number', '[0-9]', 'Message1'));
+        expect(pattern!).toEqual(new AppPatternDto('1', 'Number', '[0-9]', 'Message1'));
     }));
 
     it('should make put request to update pattern',
         inject([AppPatternsService, HttpTestingController], (patternService: AppPatternsService, httpMock: HttpTestingController) => {
 
-        const dto = new UpdatePatternDto('Number', '[0-9]', 'Message1');
+        const dto = new EditAppPatternDto('Number', '[0-9]', 'Message1');
 
         patternService.putPattern('my-app', '1', dto, version).subscribe();
 

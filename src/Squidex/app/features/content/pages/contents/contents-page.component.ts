@@ -5,59 +5,40 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { FormControl } from '@angular/forms';
-import { Observable, Subscription } from 'rxjs';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Subscription } from 'rxjs';
+import { onErrorResumeNext, switchMap, tap } from 'rxjs/operators';
 
 import {
-    ContentCreated,
-    ContentRemoved,
-    ContentStatusChanged,
-    ContentUpdated
-} from './../messages';
-
-import {
-    allData,
-    AppContext,
     AppLanguageDto,
+    AppsState,
     ContentDto,
-    ContentsService,
-    DateTime,
-    FieldDto,
+    ContentsState,
     ImmutableArray,
-    ModalView,
-    Pager,
+    LanguagesState,
+    ModalModel,
+    Queries,
     SchemaDetailsDto,
-    Versioned
-} from 'shared';
+    SchemasState,
+    UIState
+} from '@app/shared';
+
+import { DueTimeSelectorComponent } from './../../shared/due-time-selector.component';
 
 @Component({
     selector: 'sqx-contents-page',
     styleUrls: ['./contents-page.component.scss'],
-    templateUrl: './contents-page.component.html',
-    providers: [
-        AppContext
-    ]
+    templateUrl: './contents-page.component.html'
 })
 export class ContentsPageComponent implements OnDestroy, OnInit {
-    private contentCreatedSubscription: Subscription;
-    private contentUpdatedSubscription: Subscription;
+    private contentsSubscription: Subscription;
+    private languagesSubscription: Subscription;
+    private selectedSchemaSubscription: Subscription;
 
     public schema: SchemaDetailsDto;
+    public schemaQueries: Queries;
 
-    public searchModal = new ModalView();
-
-    public contentItems: ImmutableArray<ContentDto>;
-    public contentFields: FieldDto[];
-    public contentsFilter = new FormControl();
-    public contentsQuery = '';
-    public contentsPager = new Pager(0);
-
-    public dueTimeDialog = new ModalView();
-    public dueTime: string | null = '';
-    public dueTimeFunction: Function | null;
-    public dueTimeAction: string | null = '';
-    public dueTimeMode = 'Immediately';
+    public searchModal = new ModalModel();
 
     public selectedItems:  { [id: string]: boolean; } = {};
     public selectionCount = 0;
@@ -65,243 +46,151 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
     public canUnpublish = false;
     public canPublish = false;
 
-    public languages: AppLanguageDto[] = [];
-    public languageSelected: AppLanguageDto;
-    public languageParameter: string;
+    public language: AppLanguageDto;
+    public languages: ImmutableArray<AppLanguageDto>;
 
     public isAllSelected = false;
-    public isReadOnly = false;
-    public isArchive = false;
 
-    constructor(public readonly ctx: AppContext,
-        private readonly contentsService: ContentsService
+    @ViewChild('dueTimeSelector')
+    public dueTimeSelector: DueTimeSelectorComponent;
+
+    constructor(
+        public readonly appsState: AppsState,
+        public readonly contentsState: ContentsState,
+        private readonly languagesState: LanguagesState,
+        private readonly schemasState: SchemasState,
+        private readonly uiState: UIState
     ) {
     }
 
     public ngOnDestroy() {
-        this.contentCreatedSubscription.unsubscribe();
-        this.contentUpdatedSubscription.unsubscribe();
+        this.contentsSubscription.unsubscribe();
+        this.languagesSubscription.unsubscribe();
+        this.selectedSchemaSubscription.unsubscribe();
     }
 
     public ngOnInit() {
-        this.contentCreatedSubscription =
-            this.ctx.bus.of(ContentCreated)
-                .subscribe(message => {
-                    this.contentItems = this.contentItems.pushFront(message.content);
-                    this.contentsPager = this.contentsPager.incrementCount();
+        this.selectedSchemaSubscription =
+            this.schemasState.selectedSchema
+                .subscribe(schema => {
+                    this.resetSelection();
+
+                    this.schema = schema!;
+                    this.schemaQueries = new Queries(this.uiState, `schemas.${this.schema.name}`);
+
+                    this.contentsState.init().pipe(onErrorResumeNext()).subscribe();
                 });
 
-        this.contentUpdatedSubscription =
-            this.ctx.bus.of(ContentUpdated)
-                .subscribe(message => {
-                    this.contentItems = this.contentItems.replaceBy('id', message.content, (o, n) => o.update(n.data, n.lastModifiedBy, n.version, n.lastModified));
+        this.contentsSubscription =
+            this.contentsState.contents
+                .subscribe(() => {
+                    this.updateSelectionSummary();
                 });
 
-        const routeData = allData(this.ctx.route);
-
-        this.languages = routeData.appLanguages;
-
-        this.ctx.route.data.map(p => p.isReadOnly)
-            .subscribe(isReadOnly => {
-                this.isReadOnly = isReadOnly;
-            });
-
-        this.ctx.route.params.map(p => p.language)
-            .subscribe(language => {
-                this.languageSelected = this.languages.find(l => l.iso2Code === language) || this.languages.find(l => l.isMaster) || this.languages[0];
-            });
-
-        this.ctx.route.data.map(d => d.schema)
-            .subscribe(schema => {
-                this.schema = schema;
-
-                this.resetContents();
-                this.load();
-            });
+        this.languagesSubscription =
+            this.languagesState.languages
+                .subscribe(languages => {
+                    this.languages = languages.map(x => x.language);
+                    this.language = this.languages.at(0);
+                });
     }
 
-    public dropData(content: ContentDto) {
-        return { content, schemaId: this.schema.id };
+    public reload() {
+        this.contentsState.load(true).pipe(onErrorResumeNext()).subscribe();
     }
 
-    public publishContent(content: ContentDto) {
-        this.changeContentItems([content], 'Publish', 'Published', false);
+    public deleteSelected() {
+        this.contentsState.deleteMany(this.select()).pipe(onErrorResumeNext()).subscribe();
     }
 
-    public publishSelected(scheduled: boolean) {
-        const contents = this.contentItems.filter(c => c.status !== 'Published' && this.selectedItems[c.id]).values;
-
-        this.changeContentItems(contents, 'Publish', 'Published', false);
+    public delete(content: ContentDto) {
+        this.contentsState.deleteMany([content]).pipe(onErrorResumeNext()).subscribe();
     }
 
-    public unpublishContent(content: ContentDto) {
-        this.changeContentItems([content], 'Unpublish', 'Draft', false);
+    public publish(content: ContentDto) {
+        this.changeContentItems([content], 'Publish');
     }
 
-    public unpublishSelected(scheduled: boolean) {
-        const contents = this.contentItems.filter(c => c.status === 'Published' && this.selectedItems[c.id]).values;
-
-        this.changeContentItems(contents, 'Unpublish', 'Draft', false);
+    public publishSelected() {
+        this.changeContentItems(this.select(c => c.status !== 'Published'), 'Publish');
     }
 
-    public archiveContent(content: ContentDto) {
-        this.changeContentItems([content], 'Archive', 'Archived', true);
+    public unpublish(content: ContentDto) {
+        this.changeContentItems([content], 'Unpublish');
     }
 
-    public archiveSelected(scheduled: boolean) {
-        const contents = this.contentItems.filter(c => this.selectedItems[c.id]).values;
-
-        this.changeContentItems(contents, 'Archive', 'Archived', true);
+    public unpublishSelected() {
+        this.changeContentItems(this.select(c => c.status === 'Published'), 'Unpublish');
     }
 
-    public restoreContent(content: ContentDto) {
-        this.changeContentItems([content], 'Restore', 'Draft', true);
+    public archive(content: ContentDto) {
+        this.changeContentItems([content], 'Archive');
+    }
+
+    public archiveSelected() {
+        this.changeContentItems(this.select(), 'Archive');
+    }
+
+    public restore(content: ContentDto) {
+        this.changeContentItems([content], 'Restore');
     }
 
     public restoreSelected(scheduled: boolean) {
-        const contents = this.contentItems.filter(c => this.selectedItems[c.id]).values;
-
-        this.changeContentItems(contents, 'Restore', 'Draft', true);
+        this.changeContentItems(this.select(), 'Restore');
     }
 
-    private changeContentItems(contents: ContentDto[], action: string, status: string, reload: boolean) {
+    public clone(content: ContentDto) {
+        this.contentsState.create(content.dataDraft, false).pipe(onErrorResumeNext()).subscribe();
+    }
+
+    public isSelectedQuery(query: string) {
+        return query === this.contentsState.snapshot.contentsQuery || (!query && !this.contentsState.contentsQuery);
+    }
+
+    private changeContentItems(contents: ContentDto[], action: string) {
         if (contents.length === 0) {
             return;
         }
 
-        this.dueTimeFunction = () => {
-            if (this.dueTime) {
-                reload = false;
-            }
-            Observable.forkJoin(
-                contents
-                    .map(c => this.changeContentItem(c, action, status, this.dueTime, reload)))
-                .finally(() => {
-                    if (reload) {
-                        this.load();
-                    } else {
-                        this.updateSelectionSummary();
-                    }
-                })
-                .subscribe();
-        };
-
-        this.dueTimeAction = action;
-        this.dueTimeDialog.show();
-    }
-
-    private changeContentItem(content: ContentDto, action: string, status: string, dueTime: string | null, reload: boolean): Observable<any> {
-        return this.contentsService.changeContentStatus(this.ctx.appName, this.schema.name, content.id, action, dueTime, content.version)
-            .catch(error => {
-                this.ctx.notifyError(error);
-
-                return Observable.throw(error);
-            })
-            .do(dto => {
-                if (!reload) {
-                    const dt =
-                        dueTime ?
-                            DateTime.parseISO_UTC(dueTime) :
-                            null;
-
-                    content = content.changeStatus(status, dt, this.ctx.userToken, dto.version);
-
-                    this.contentItems = this.contentItems.replaceBy('id', content);
-
-                    this.emitContentStatusChanged(content);
-                }
-            });
-    }
-
-    public deleteSelected(content: ContentDto) {
-        Observable.forkJoin(
-            this.contentItems.values.filter(c => this.selectedItems[c.id])
-                .map(c => this.deleteContentItem(c)))
-            .finally(() => {
-                this.load();
-            })
+        this.dueTimeSelector.selectDueTime(action).pipe(
+                tap(() => {
+                    this.resetSelection();
+                }),
+                switchMap(d => this.contentsState.changeManyStatus(contents, action, d)),
+                onErrorResumeNext())
             .subscribe();
     }
 
-    public deleteContent(content: ContentDto) {
-        this.deleteContentItem(content)
-            .finally(() => {
-                this.load();
-            })
-            .subscribe();
-    }
+    public goArchive(isArchive: boolean) {
+        this.resetSelection();
 
-    public deleteContentItem(content: ContentDto): Observable<any> {
-        return this.contentsService.deleteContent(this.ctx.appName, this.schema.name, content.id, content.version)
-            .do(() => {
-                this.emitContentRemoved(content);
-            })
-            .catch(error => {
-                this.ctx.notifyError(error);
-
-                return Observable.throw(error);
-            });
-    }
-
-    public onContentSaved(content: ContentDto, update: Versioned<any>) {
-        content = content.update(update.payload, this.ctx.userToken, update.version);
-
-        this.contentItems = this.contentItems.replaceBy('id', content);
-
-        this.emitContentUpdated(content);
-    }
-
-    public load(showInfo = false) {
-        this.contentsService.getContents(this.ctx.appName, this.schema.name, this.contentsPager.pageSize, this.contentsPager.skip, this.contentsQuery, undefined, this.isArchive)
-            .finally(() => {
-                this.selectedItems = {};
-
-                this.updateSelectionSummary();
-            })
-            .subscribe(dtos => {
-                this.contentItems = ImmutableArray.of(dtos.items);
-                this.contentsPager = this.contentsPager.setCount(dtos.total);
-
-                if (showInfo) {
-                    this.ctx.notifyInfo('Contents reloaded.');
-                }
-            }, error => {
-                this.ctx.notifyError(error);
-            });
-    }
-
-    public updateArchive(isArchive: boolean) {
-        this.contentsQuery = this.contentsFilter.value;
-        this.contentsPager = new Pager(0);
-
-        this.isArchive = isArchive;
-
-        this.searchModal.hide();
-
-        this.load();
-    }
-
-    public search() {
-        this.contentsQuery = this.contentsFilter.value;
-        this.contentsPager = new Pager(0);
-
-        this.load();
-    }
-
-    public goNext() {
-        this.contentsPager = this.contentsPager.goNext();
-
-        this.load();
+        this.contentsState.goArchive(isArchive).pipe(onErrorResumeNext()).subscribe();
     }
 
     public goPrev() {
-        this.contentsPager = this.contentsPager.goPrev();
+        this.resetSelection();
 
-        this.load();
+        this.contentsState.goPrev().pipe(onErrorResumeNext()).subscribe();
+    }
+
+    public goNext() {
+        this.resetSelection();
+
+        this.contentsState.goNext().pipe(onErrorResumeNext()).subscribe();
+    }
+
+    public search(query: string) {
+        this.resetSelection();
+
+        this.contentsState.search(query).pipe(onErrorResumeNext()).subscribe();
     }
 
     public isItemSelected(content: ContentDto): boolean {
         return !!this.selectedItems[content.id];
+    }
+
+    public selectLanguage(language: AppLanguageDto) {
+        this.language = language;
     }
 
     public selectItem(content: ContentDto, isSelected: boolean) {
@@ -314,91 +203,51 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
         this.selectedItems = {};
 
         if (isSelected) {
-            for (let c of this.contentItems.values) {
-                this.selectedItems[c.id] = true;
+            for (let content of this.contentsState.snapshot.contents.values) {
+                this.selectedItems[content.id] = true;
             }
         }
 
         this.updateSelectionSummary();
     }
 
+    public trackByContent(content: ContentDto): string {
+        return content.id;
+    }
+
+    private select(predicate?: (content: ContentDto) => boolean) {
+        return this.contentsState.snapshot.contents.values.filter(c => this.selectedItems[c.id] && (!predicate || predicate(c)));
+    }
+
+    private resetSelection() {
+        this.selectedItems = {};
+
+        this.updateSelectionSummary();
+    }
+
     private updateSelectionSummary() {
-        this.isAllSelected = this.contentItems.length > 0;
+        this.isAllSelected = this.contentsState.snapshot.contents.length > 0;
+
         this.selectionCount = 0;
+
         this.canPublish = true;
         this.canUnpublish = true;
 
-        for (let c of this.contentItems.values) {
-            if (this.selectedItems[c.id]) {
+        for (let content of this.contentsState.snapshot.contents.values) {
+            if (this.selectedItems[content.id]) {
                 this.selectionCount++;
 
-                if (c.status !== 'Published') {
+                if (content.status !== 'Published') {
                     this.canUnpublish = false;
                 }
 
-                if (c.status === 'Published') {
+                if (content.status === 'Published') {
                     this.canPublish = false;
                 }
             } else {
                 this.isAllSelected = false;
             }
         }
-    }
-
-    public selectLanguage(language: AppLanguageDto) {
-        this.languageSelected = language;
-    }
-
-    private emitContentStatusChanged(content: ContentDto) {
-        this.ctx.bus.emit(new ContentStatusChanged(content));
-    }
-
-    private emitContentUpdated(content: ContentDto) {
-        this.ctx.bus.emit(new ContentUpdated(content));
-    }
-
-    private emitContentRemoved(content: ContentDto) {
-        this.ctx.bus.emit(new ContentRemoved(content));
-    }
-
-    public trackBy(content: ContentDto): string {
-        return content.id;
-    }
-
-    private resetContents() {
-        this.contentItems = ImmutableArray.empty<ContentDto>();
-        this.contentsQuery = '';
-        this.contentsFilter.setValue('');
-        this.contentsPager = new Pager(0);
-        this.selectedItems = {};
-
-        this.updateSelectionSummary();
-        this.loadFields();
-    }
-
-    private loadFields() {
-        this.contentFields = this.schema.fields.filter(x => x.properties.isListField);
-
-        if (this.contentFields.length === 0 && this.schema.fields.length > 0) {
-            this.contentFields = [this.schema.fields[0]];
-        }
-
-        if (this.contentFields.length === 0) {
-            this.contentFields = [<any>{}];
-        }
-    }
-
-    public confirmStatusChange() {
-        this.dueTimeFunction!();
-
-        this.cancelStatusChange();
-    }
-
-    public cancelStatusChange() {
-        this.dueTimeMode = 'Immediately';
-        this.dueTimeDialog.hide();
-        this.dueTimeFunction = null;
-        this.dueTime = null;
     }
 }
 

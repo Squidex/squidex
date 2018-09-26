@@ -6,9 +6,9 @@
  */
 
 import { Component, Input, OnInit } from '@angular/core';
-import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 
-import { GeolocationFieldPropertiesDto } from 'shared';
+import { FieldDto, GeolocationFieldPropertiesDto } from '@app/shared';
 
 @Component({
     selector: 'sqx-geolocation-ui',
@@ -18,6 +18,9 @@ import { GeolocationFieldPropertiesDto } from 'shared';
 export class GeolocationUIComponent implements OnInit {
     @Input()
     public editForm: FormGroup;
+
+    @Input()
+    public field: FieldDto;
 
     @Input()
     public properties: GeolocationFieldPropertiesDto;

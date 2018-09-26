@@ -1,71 +1,136 @@
-<sqx-title message="{app} | {schema} | Content" parameter1="app" parameter2="schema" [value1]="ctx.appName" [value2]="schema?.displayName"></sqx-title>
+<sqx-title message="{app} | {schema} | Content" parameter1="app" parameter2="schema" [value1]="appsState.appName" [value2]="schema.displayName"></sqx-title>
 
-<form [formGroup]="contentForm" (ngSubmit)="saveAndPublish()">
-    <sqx-panel desiredWidth="53rem">
-        <div class="panel-header">
-            <div class="panel-title-row">
-                <div class="float-right" *ngIf="!content || content.status !== 'Archived'">
-                    <span *ngIf="isNewMode">
-                        <button type="button" class="btn btn-secondary" (click)="saveAsDraft()" title="CTRL + S">
-                            Save as Draft
-                        </button>
+<form [formGroup]="contentForm.form" (ngSubmit)="saveAndPublish()">
+    <sqx-panel desiredWidth="*" [showSidebar]="content">
+        <ng-container title>
+            <a class="btn btn-link" (click)="back()" *ngIf="!schema.isSingleton">
+                <i class="icon-angle-left"></i>
+            </a>
 
-                        <button type="submit" class="btn btn-primary">
-                            Save and Publish
-                        </button>
-                    </span>
-                    <span *ngIf="!isNewMode">
-                        <button type="submit" class="btn btn-primary" title="CTRL + S">
-                            Save
-                        </button>
-                    </span>
-                    
-                    <sqx-shortcut keys="ctrl+s" (trigger)="saveAndPublish()"></sqx-shortcut>
+            <ng-container *ngIf="!content">
+                New Content
+            </ng-container>
+            <ng-container *ngIf="content && content.status !== 'Archived'">
+                Edit Content
+            </ng-container>
+            <ng-container *ngIf="content && content.status === 'Archived'">
+                Show Content
+            </ng-container>
+        </ng-container>
+
+        <ng-container menu>
+            <ng-container *ngIf="!content; else notNew">
+                <button type="button" class="btn btn-secondary" (click)="save()">
+                    Save as Draft
+                </button>
+
+                <button type="submit" class="btn btn-primary ml-1" title="CTRL + S">
+                    Save and Publish
+                </button>
+
+                <sqx-shortcut keys="ctrl+s" (trigger)="saveAndPublish()"></sqx-shortcut>
+            </ng-container>
+            <ng-template #notNew>
+                <div class="dropdown dropdown-options ml-1" *ngIf="content">
+                    <button type="button" class="btn btn-outline-secondary" (click)="dropdown.toggle()" [disabled]="schema.isSingleton && !content.isPending" 
+                        [class.active]="dropdown.isOpen | async" #optionsButton>
+                        <sqx-content-status 
+                            [status]="content.status"
+                            [scheduledTo]="content.scheduleJob?.status"
+                            [scheduledAt]="content.scheduleJob?.dueTime"
+                            [isPending]="content.isPending"
+                            showLabel="true">
+                        </sqx-content-status>
+                    </button>
+
+                    <ng-container *ngIf="content.isPending || !schema.isSingleton">
+                        <div class="dropdown-menu" *sqxModalView="dropdown;closeAlways:true" [sqxModalTarget]="optionsButton" @fade>
+                            <ng-container *ngIf="content.isPending">
+                                <a class="dropdown-item" (click)="discardChanges()">
+                                    Discard changes
+                                </a>
+
+                                <div class="dropdown-divider"></div>
+                                
+                                <a class="dropdown-item" (click)="publishChanges()">
+                                    Publish changes
+                                </a>
+                            </ng-container>
+
+                            <ng-container *ngIf="!schema.isSingleton">
+                                <a class="dropdown-item" (click)="publish()" *ngIf="content.status === 'Draft'">
+                                    Publish
+                                </a>
+                                <a class="dropdown-item" (click)="unpublish()" *ngIf="content.status === 'Published'">
+                                    Unpublish
+                                </a>
+                                <a class="dropdown-item" (click)="archive()" *ngIf="content.status !== 'Archived'">
+                                    Archive
+                                </a>
+                                <a class="dropdown-item" (click)="restore()" *ngIf="content.status === 'Archived'">
+                                    Restore
+                                </a>
+
+                                <div class="dropdown-divider"></div>
+
+                                <a class="dropdown-item dropdown-item-delete"
+                                    (sqxConfirmClick)="delete()"
+                                    confirmTitle="Delete content" 
+                                    confirmText="Do you really want to delete the content?">
+                                    Delete
+                                </a>
+                            </ng-container>
+                        </div>
+                    </ng-container>
                 </div>
                 
-                <h3 class="panel-title" *ngIf="isNewMode">
-                    New Content
-                </h3>
-                <h3 class="panel-title" *ngIf="!isNewMode && content.status !== 'Archived'">
-                    Edit Content
-                </h3>
-                <h3 class="panel-title" *ngIf="!isNewMode && content.status === 'Archived'">
-                    Show Content
-                </h3>
+
+                <ng-container *ngIf="content.status !== 'Archived'">
+                    <button type="button" class="btn btn-secondary ml-1" (click)="saveAsProposal()" *ngIf="content.status === 'Published'">
+                        Save as Draft
+                    </button>
+                    
+                    <button type="submit" class="btn btn-primary ml-1" title="CTRL + S">
+                        Save
+                    </button>
+
+                    <sqx-shortcut keys="ctrl+s" (trigger)="saveAndPublish()"></sqx-shortcut>
+                </ng-container>
+            </ng-template>
+        </ng-container>
+
+        <ng-container content>
+            <div class="panel-alert panel-alert-danger" *ngIf="contentVersion; let version">
+                <div class="float-right">
+                    <a class="force" (click)="showLatest()">View latest</a>
+                </div>
+
+                Viewing <strong>version {{version.value}}</strong>.
             </div>
 
-            <a class="panel-close" sqxParentLink>
-                <i class="icon-close"></i>
+            <div *ngFor="let field of schema.fields">
+                <sqx-content-field 
+                    [form]="contentForm"
+                    [field]="field"
+                    [fieldForm]="contentForm.form.get(field.name)" 
+                    [(language)]="language"
+                    [languages]="languages">
+                </sqx-content-field>
+            </div>
+        </ng-container>
+
+        <ng-container sidebar>
+            <a class="panel-link" routerLink="history" routerLinkActive="active" #linkHistory>
+                <i class="icon-time"></i>
             </a>
-        </div>
 
-        <div class="panel-main">
-            <div class="panel-content panel-content-scroll">
-                <div class="panel-alert panel-alert-danger" *ngIf="contentOld">
-                    <div class="float-right">
-                        <a class="force" (click)="showLatest()">View latest</a>
-                    </div>
-                    Viewing <strong>{{content.lastModifiedBy | sqxUserNameRef:null}}'s</strong> changes of {{content.lastModified | sqxShortDate}}.
-                </div>
-
-                <div *ngFor="let field of schema.fields">
-                    <sqx-content-field [field]="field" [fieldForm]="contentForm.controls[field.name]" [languages]="languages" [contentFormSubmitted]="contentFormSubmitted"></sqx-content-field>
-                </div>
-            </div>
-            <div class="panel-sidebar">
-                <a class="panel-link" routerLink="history" routerLinkActive="active" #linkHistory *ngIf="!isNewMode">
-                    <i class="icon-time"></i>
-                </a>
-                <a class="panel-link" routerLink="assets" routerLinkActive="active">
-                    <i class="icon-media"></i>
-                </a>
-
-                <sqx-onboarding-tooltip id="history" [for]="linkHistory" position="leftTop" after="120000" *ngIf="!isNewMode">
-                    The sidebar navigation contains useful context specific links. Here you can view the history how this schema has changed over time.
-                </sqx-onboarding-tooltip>
-            </div>
-        </div>
+            <sqx-onboarding-tooltip id="history" [for]="linkHistory" position="leftTop" after="120000">
+                The sidebar navigation contains useful context specific links. Here you can view the history how this schema has changed over time.
+            </sqx-onboarding-tooltip>
+        </ng-container>
     </sqx-panel>
 </form>
 
 <router-outlet></router-outlet>
+
+<sqx-due-time-selector #dueTimeSelector></sqx-due-time-selector>

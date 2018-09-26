@@ -5,39 +5,42 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, Validators } from '@angular/forms';
+import { Component, Injectable, OnInit } from '@angular/core';
+import { FormBuilder } from '@angular/forms';
 import { Observable } from 'rxjs';
+import { filter, onErrorResumeNext, withLatestFrom } from 'rxjs/operators';
 
 import {
-    AppContext,
     AppContributorDto,
-    AppContributorsDto,
-    AppContributorsService,
+    AppsState,
+    AssignContributorForm,
     AutocompleteSource,
-    HistoryChannelUpdated,
+    ContributorsState,
+    Types,
+    UserDto,
     UsersService
-} from 'shared';
+} from '@app/shared';
 
+@Injectable()
 export class UsersDataSource implements AutocompleteSource {
     constructor(
-        private readonly usersService: UsersService,
-        private readonly component: ContributorsPageComponent
+        private readonly contributorsState: ContributorsState,
+        private readonly usersService: UsersService
     ) {
     }
 
     public find(query: string): Observable<any[]> {
-        return this.usersService.getUsers(query)
-            .map(users => {
+        return this.usersService.getUsers(query).pipe(
+            withLatestFrom(this.contributorsState.contributors.pipe(filter(x => !!x)), (users, contributors) => {
                 const results: any[] = [];
 
                 for (let user of users) {
-                    if (!this.component.appContributors || !this.component.appContributors.contributors.find(t => t.contributorId === user.id)) {
+                    if (!contributors!.find(t => t.contributor.contributorId === user.id)) {
                         results.push(user);
                     }
                 }
                 return results;
-            });
+            }));
     }
 }
 
@@ -46,96 +49,60 @@ export class UsersDataSource implements AutocompleteSource {
     styleUrls: ['./contributors-page.component.scss'],
     templateUrl: './contributors-page.component.html',
     providers: [
-        AppContext
+        UsersDataSource
     ]
 })
 export class ContributorsPageComponent implements OnInit {
-    public appContributors: AppContributorsDto;
-
-    public maxContributors = -1;
-
-    public usersDataSource: UsersDataSource;
     public usersPermissions = [ 'Owner', 'Developer', 'Editor' ];
 
-    public get canAddContributor() {
-        return this.addContributorForm.valid && (this.maxContributors <= -1 || this.appContributors.contributors.length < this.maxContributors);
-    }
+    public assignContributorForm = new AssignContributorForm(this.formBuilder);
 
-    public addContributorForm =
-        this.formBuilder.group({
-            user: [null,
-                [
-                    Validators.required
-                ]]
-        });
-
-    constructor(public readonly ctx: AppContext, usersService: UsersService,
-        private readonly appContributorsService: AppContributorsService,
+    constructor(
+        public readonly appsState: AppsState,
+        public readonly contributorsState: ContributorsState,
+        public readonly usersDataSource: UsersDataSource,
         private readonly formBuilder: FormBuilder
     ) {
-        this.usersDataSource = new UsersDataSource(usersService, this);
     }
 
     public ngOnInit() {
-        this.load();
+        this.contributorsState.load().pipe(onErrorResumeNext()).subscribe();
     }
 
-    public load() {
-        this.appContributorsService.getContributors(this.ctx.appName)
-            .subscribe(dto => {
-                this.updateContributorsFromDto(dto);
-            }, error => {
-                this.ctx.notifyError(error);
-            });
+    public reload() {
+        this.contributorsState.load(true).pipe(onErrorResumeNext()).subscribe();
     }
 
-    public removeContributor(contributor: AppContributorDto) {
-        this.appContributorsService.deleteContributor(this.ctx.appName, contributor.contributorId, this.appContributors.version)
-            .subscribe(dto => {
-                this.updateContributors(this.appContributors.removeContributor(contributor, dto.version));
-            }, error => {
-                this.ctx.notifyError(error);
-            });
+    public remove(contributor: AppContributorDto) {
+        this.contributorsState.revoke(contributor).pipe(onErrorResumeNext()).subscribe();
     }
 
     public changePermission(contributor: AppContributorDto, permission: string) {
-        const requestDto = contributor.changePermission(permission);
-
-        this.appContributorsService.postContributor(this.ctx.appName, requestDto, this.appContributors.version)
-            .subscribe(dto => {
-                this.updateContributors(this.appContributors.updateContributor(contributor, dto.version));
-            }, error => {
-                this.ctx.notifyError(error);
-            });
+        this.contributorsState.assign(new AppContributorDto(contributor.contributorId, permission)).pipe(onErrorResumeNext()).subscribe();
     }
 
     public assignContributor() {
-        const requestDto = new AppContributorDto(this.addContributorForm.controls['user'].value.id, 'Editor');
+        const value = this.assignContributorForm.submit();
 
-        this.appContributorsService.postContributor(this.ctx.appName, requestDto, this.appContributors.version)
-            .subscribe(dto => {
-                this.updateContributors(this.appContributors.addContributor(requestDto, dto.version));
-                this.resetContributorForm();
-            }, error => {
-                this.ctx.notifyError(error);
+        if (value) {
+            let user = value.user;
 
-                this.resetContributorForm();
-            });
+            if (Types.is(user, UserDto)) {
+                user = user.id;
+            }
+
+            const requestDto = new AppContributorDto(user, 'Editor');
+
+            this.contributorsState.assign(requestDto)
+                .subscribe(dto => {
+                    this.assignContributorForm.submitCompleted();
+                }, error => {
+                    this.assignContributorForm.submitFailed(error);
+                });
+        }
     }
 
-    private resetContributorForm() {
-        this.addContributorForm.reset();
-    }
-
-    private updateContributorsFromDto(appContributors: AppContributorsDto) {
-        this.updateContributors(appContributors);
-
-        this.maxContributors = appContributors.maxContributors;
-    }
-
-    private updateContributors(appContributors: AppContributorsDto) {
-        this.appContributors = appContributors;
-
-        this.ctx.bus.emit(new HistoryChannelUpdated());
+    public trackByContributor(index: number, contributorInfo: { contributor: AppContributorDto }) {
+        return contributorInfo.contributor.contributorId;
     }
 }

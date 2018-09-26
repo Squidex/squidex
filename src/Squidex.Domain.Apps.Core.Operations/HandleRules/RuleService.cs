@@ -11,6 +11,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Events;
@@ -21,21 +22,23 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 {
     public class RuleService
     {
-        private const string ContentPrefix = "Content";
         private readonly Dictionary<Type, IRuleActionHandler> ruleActionHandlers;
         private readonly Dictionary<Type, IRuleTriggerHandler> ruleTriggerHandlers;
         private readonly TypeNameRegistry typeNameRegistry;
+        private readonly IEventEnricher eventEnricher;
         private readonly IClock clock;
 
         public RuleService(
             IEnumerable<IRuleTriggerHandler> ruleTriggerHandlers,
             IEnumerable<IRuleActionHandler> ruleActionHandlers,
+            IEventEnricher eventEnricher,
             IClock clock,
             TypeNameRegistry typeNameRegistry)
         {
             Guard.NotNull(ruleTriggerHandlers, nameof(ruleTriggerHandlers));
             Guard.NotNull(ruleActionHandlers, nameof(ruleActionHandlers));
             Guard.NotNull(typeNameRegistry, nameof(typeNameRegistry));
+            Guard.NotNull(eventEnricher, nameof(eventEnricher));
             Guard.NotNull(clock, nameof(clock));
 
             this.typeNameRegistry = typeNameRegistry;
@@ -43,10 +46,12 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             this.ruleTriggerHandlers = ruleTriggerHandlers.ToDictionary(x => x.TriggerType);
             this.ruleActionHandlers = ruleActionHandlers.ToDictionary(x => x.ActionType);
 
+            this.eventEnricher = eventEnricher;
+
             this.clock = clock;
         }
 
-        public virtual RuleJob CreateJob(Rule rule, Envelope<IEvent> @event)
+        public virtual async Task<RuleJob> CreateJobAsync(Rule rule, Envelope<IEvent> @event)
         {
             Guard.NotNull(rule, nameof(rule));
             Guard.NotNull(@event, nameof(@event));
@@ -75,45 +80,42 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                 return null;
             }
 
-            var eventName = CreateEventName(appEvent);
-
             var now = clock.GetCurrentInstant();
-
-            var actionName = typeNameRegistry.GetName(actionType);
-            var actionData = actionHandler.CreateJob(appEventEnvelope, eventName, rule.Action);
 
             var eventTime =
                 @event.Headers.Contains(CommonHeaders.Timestamp) ?
                 @event.Headers.Timestamp() :
                 now;
 
-            var aggregateId =
-                @event.Headers.Contains(CommonHeaders.AggregateId) ?
-                @event.Headers.AggregateId() :
-                Guid.NewGuid();
+            var expires = eventTime.Plus(Constants.ExpirationTime);
+
+            if (expires < now)
+            {
+                return null;
+            }
+
+            var enrichedEvent = await eventEnricher.EnrichAsync(appEventEnvelope);
+
+            var actionName = typeNameRegistry.GetName(actionType);
+            var actionData = await actionHandler.CreateJobAsync(enrichedEvent, rule.Action);
 
             var job = new RuleJob
             {
                 JobId = Guid.NewGuid(),
                 ActionName = actionName,
                 ActionData = actionData.Data,
-                AggregateId = aggregateId,
+                AggregateId = enrichedEvent.AggregateId,
                 AppId = appEvent.AppId.Id,
                 Created = now,
-                EventName = eventName,
-                Expires = eventTime.Plus(Constants.ExpirationTime),
+                EventName = enrichedEvent.Name,
+                Expires = expires,
                 Description = actionData.Description
             };
-
-            if (job.Expires < now)
-            {
-                return null;
-            }
 
             return job;
         }
 
-        public virtual async Task<(string Dump, RuleResult Result, TimeSpan Elapsed)> InvokeAsync(string actionName, RuleJobData job)
+        public virtual async Task<(string Dump, RuleResult Result, TimeSpan Elapsed)> InvokeAsync(string actionName, JObject job)
         {
             try
             {
@@ -150,23 +152,6 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             {
                 return (ex.ToString(), RuleResult.Failed, TimeSpan.Zero);
             }
-        }
-
-        private string CreateEventName(AppEvent appEvent)
-        {
-            var eventName = typeNameRegistry.GetName(appEvent.GetType());
-
-            if (appEvent is SchemaEvent schemaEvent)
-            {
-                if (eventName.StartsWith(ContentPrefix, StringComparison.Ordinal))
-                {
-                    eventName = eventName.Substring(ContentPrefix.Length);
-                }
-
-                return $"{schemaEvent.SchemaId.Name.ToPascalCase()}{eventName}";
-            }
-
-            return eventName;
         }
     }
 }

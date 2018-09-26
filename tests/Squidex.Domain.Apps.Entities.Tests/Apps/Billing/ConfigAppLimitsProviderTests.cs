@@ -41,7 +41,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.Billing
             Name = "Basic",
             MaxApiCalls = 150000,
             MaxAssetSize = 1024 * 1024 * 2,
-            MaxContributors = 5
+            MaxContributors = 5,
+            YearlyCosts = "100€",
+            YearlyId = "basic_yearly"
         };
 
         private static readonly ConfigAppLimitsPlan[] Plans = { BasicPlan, FreePlan };
@@ -51,7 +53,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Billing
         {
             var sut = new ConfigAppPlansProvider(Plans);
 
-            Plans.OrderBy(x => x.MaxApiCalls).ShouldBeEquivalentTo(sut.GetAvailablePlans());
+            Plans.OrderBy(x => x.MaxApiCalls).Should().BeEquivalentTo(sut.GetAvailablePlans());
         }
 
         [Theory]
@@ -63,7 +65,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Billing
 
             var plan = sut.GetPlanForApp(CreateApp(planId));
 
-            plan.ShouldBeEquivalentTo(InfinitePlan);
+            plan.Should().BeEquivalentTo(InfinitePlan);
         }
 
         [Fact]
@@ -73,7 +75,17 @@ namespace Squidex.Domain.Apps.Entities.Apps.Billing
 
             var plan = sut.GetPlanForApp(CreateApp("basic"));
 
-            plan.ShouldBeEquivalentTo(BasicPlan);
+            plan.Should().BeEquivalentTo(BasicPlan);
+        }
+
+        [Fact]
+        public void Should_return_fitting_yearly_app_plan()
+        {
+            var sut = new ConfigAppPlansProvider(Plans);
+
+            var plan = sut.GetPlanForApp(CreateApp("basic_yearly"));
+
+            plan.Should().BeEquivalentTo(BasicPlan);
         }
 
         [Fact]
@@ -83,7 +95,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Billing
 
             var plan = sut.GetPlanForApp(CreateApp("enterprise"));
 
-            plan.ShouldBeEquivalentTo(FreePlan);
+            plan.Should().BeEquivalentTo(FreePlan);
         }
 
         [Fact]
@@ -93,7 +105,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Billing
 
             var upgradePlan = sut.GetPlanUpgrade(null);
 
-            upgradePlan.ShouldBeEquivalentTo(BasicPlan);
+            upgradePlan.Should().BeEquivalentTo(BasicPlan);
         }
 
         [Fact]
@@ -103,7 +115,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Billing
 
             var upgradePlan = sut.GetPlanUpgradeForApp(CreateApp("enterprise"));
 
-            upgradePlan.ShouldBeEquivalentTo(BasicPlan);
+            upgradePlan.Should().BeEquivalentTo(BasicPlan);
         }
 
         [Fact]
@@ -123,7 +135,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Billing
 
             var upgradePlan = sut.GetPlanUpgradeForApp(CreateApp("free"));
 
-            upgradePlan.ShouldBeEquivalentTo(BasicPlan);
+            upgradePlan.Should().BeEquivalentTo(BasicPlan);
         }
 
         [Fact]

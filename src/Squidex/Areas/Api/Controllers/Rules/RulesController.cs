@@ -6,16 +6,17 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using NodaTime;
 using NSwag.Annotations;
 using Squidex.Areas.Api.Controllers.Rules.Models;
-using Squidex.Areas.Api.Controllers.Rules.Models.Converters;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.Rules.Repositories;
+using Squidex.Extensions.Actions;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
@@ -45,6 +46,40 @@ namespace Squidex.Areas.Api.Controllers.Rules
         }
 
         /// <summary>
+        /// Get the supported rule actions.
+        /// </summary>
+        /// <returns>
+        /// 200 => Rule actions returned.
+        /// </returns>
+        [HttpGet]
+        [Route("rules/actions/")]
+        [ProducesResponseType(typeof(Dictionary<string, RuleElementDto>), 200)]
+        [ApiCosts(0)]
+        public IActionResult GetActions()
+        {
+            var response = RuleElementRegistry.Actions.ToDictionary(x => x.Key, x => SimpleMapper.Map(x.Value, new RuleElementDto()));
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Get the supported rule triggers.
+        /// </summary>
+        /// <returns>
+        /// 200 => Rule triggers returned.
+        /// </returns>
+        [HttpGet]
+        [Route("rules/triggers/")]
+        [ProducesResponseType(typeof(Dictionary<string, RuleElementDto>), 200)]
+        [ApiCosts(0)]
+        public IActionResult GetTriggers()
+        {
+            var response = RuleElementRegistry.Triggers.ToDictionary(x => x.Key, x => SimpleMapper.Map(x.Value, new RuleElementDto()));
+
+            return Ok(response);
+        }
+
+        /// <summary>
         /// Get rules.
         /// </summary>
         /// <param name="app">The name of the app.</param>
@@ -58,9 +93,9 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [ApiCosts(1)]
         public async Task<IActionResult> GetRules(string app)
         {
-            var rules = await appProvider.GetRulesAsync(AppId);
+            var entities = await appProvider.GetRulesAsync(AppId);
 
-            var response = rules.Select(r => r.ToModel());
+            var response = entities.Select(RuleDto.FromRule);
 
             return Ok(response);
         }
@@ -82,12 +117,10 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [ApiCosts(1)]
         public async Task<IActionResult> PostRule(string app, [FromBody] CreateRuleDto request)
         {
-            var command = request.ToCommand();
-
-            var context = await CommandBus.PublishAsync(command);
+            var context = await CommandBus.PublishAsync(request.ToCommand());
 
             var result = context.Result<EntityCreatedResult<Guid>>();
-            var response = new EntityCreatedDto { Id = result.IdOrValue.ToString(), Version = result.Version };
+            var response = EntityCreatedDto.FromResult(result);
 
             return CreatedAtAction(nameof(GetRules), new { app }, response);
         }
@@ -112,9 +145,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [ApiCosts(1)]
         public async Task<IActionResult> PutRule(string app, Guid id, [FromBody] UpdateRuleDto request)
         {
-            var command = request.ToCommand(id);
-
-            await CommandBus.PublishAsync(command);
+            await CommandBus.PublishAsync(request.ToCommand(id));
 
             return NoContent();
         }
@@ -199,19 +230,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
 
             await Task.WhenAll(taskForItems, taskForCount);
 
-            var response = new RuleEventsDto
-            {
-                Total = taskForCount.Result,
-                Items = taskForItems.Result.Select(x =>
-                {
-                    var itemModel = new RuleEventDto();
-
-                    SimpleMapper.Map(x, itemModel);
-                    SimpleMapper.Map(x.Job, itemModel);
-
-                    return itemModel;
-                }).ToArray()
-            };
+            var response = RuleEventsDto.FromRuleEvents(taskForItems.Result, taskForCount.Result);
 
             return Ok(response);
         }

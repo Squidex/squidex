@@ -7,64 +7,95 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Infrastructure.Json;
 
 namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 {
-    public static class ReferencesCleaner
+    public sealed class ReferencesCleaner : IFieldVisitor<JToken>
     {
-        private static readonly List<Guid> EmptyIds = new List<Guid>();
-        public static JToken CleanReferences(this Field field, JToken value, ISet<Guid> oldReferences)
+        private readonly JToken value;
+        private readonly ICollection<Guid> oldReferences;
+
+        private ReferencesCleaner(JToken value, ICollection<Guid> oldReferences)
         {
-            if ((field is AssetsField || field is ReferencesField) && !value.IsNull())
-            {
-                switch (field)
-                {
-                    case AssetsField assetsField:
-                        return Visit(assetsField, value, oldReferences);
+            this.value = value;
 
-                    case ReferencesField referencesField:
-                        return Visit(referencesField, value, oldReferences);
-                }
-            }
-
-            return value;
+            this.oldReferences = oldReferences;
         }
 
-        private static JToken Visit(AssetsField field, JToken value, IEnumerable<Guid> oldReferences)
+        public static JToken CleanReferences(IField field, JToken value, ICollection<Guid> oldReferences)
         {
-            var oldIds = GetIds(value);
-            var newIds = oldIds.Except(oldReferences).ToList();
-
-            return oldIds.Count != newIds.Count ? JToken.FromObject(newIds) : value;
+            return field.Accept(new ReferencesCleaner(value, oldReferences));
         }
 
-        private static JToken Visit(ReferencesField field, JToken value, ICollection<Guid> oldReferences)
+        public JToken Visit(IField<AssetsFieldProperties> field)
+        {
+            return CleanIds();
+        }
+
+        public JToken Visit(IField<ReferencesFieldProperties> field)
         {
             if (oldReferences.Contains(field.Properties.SchemaId))
             {
                 return new JArray();
             }
 
-            var oldIds = GetIds(value);
-            var newIds = oldIds.Except(oldReferences).ToList();
-
-            return oldIds.Count != newIds.Count ? JToken.FromObject(newIds) : value;
+            return CleanIds();
         }
 
-        private static List<Guid> GetIds(JToken value)
+        private JToken CleanIds()
         {
-            try
+            var ids = value.ToGuidSet();
+
+            var isRemoved = false;
+
+            foreach (var oldReference in oldReferences)
             {
-                return value?.ToObject<List<Guid>>() ?? EmptyIds;
+                isRemoved |= ids.Remove(oldReference);
             }
-            catch
-            {
-                return EmptyIds;
-            }
+
+            return isRemoved ? ids.ToJToken() : value;
+        }
+
+        public JToken Visit(IField<BooleanFieldProperties> field)
+        {
+            return value;
+        }
+
+        public JToken Visit(IField<DateTimeFieldProperties> field)
+        {
+            return value;
+        }
+
+        public JToken Visit(IField<GeolocationFieldProperties> field)
+        {
+            return value;
+        }
+
+        public JToken Visit(IField<JsonFieldProperties> field)
+        {
+            return value;
+        }
+
+        public JToken Visit(IField<NumberFieldProperties> field)
+        {
+            return value;
+        }
+
+        public JToken Visit(IField<StringFieldProperties> field)
+        {
+            return value;
+        }
+
+        public JToken Visit(IField<TagsFieldProperties> field)
+        {
+            return value;
+        }
+
+        public JToken Visit(IArrayField field)
+        {
+            return value;
         }
     }
 }

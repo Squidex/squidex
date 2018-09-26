@@ -17,33 +17,6 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 {
     public static class ContentReferencesExtensions
     {
-        public static IdContentData ToCleanedReferences(this IdContentData source, Schema schema, ISet<Guid> deletedReferencedIds)
-        {
-            Guard.NotNull(schema, nameof(schema));
-            Guard.NotNull(deletedReferencedIds, nameof(deletedReferencedIds));
-
-            var result = new IdContentData(source);
-
-            foreach (var field in schema.Fields)
-            {
-                var fieldData = source.GetOrDefault(field.Id);
-
-                if (fieldData == null)
-                {
-                    continue;
-                }
-
-                foreach (var partitionValue in fieldData.Where(x => !x.Value.IsNull()).ToList())
-                {
-                    var newValue = field.CleanReferences(partitionValue.Value, deletedReferencedIds);
-
-                    fieldData[partitionValue.Key] = newValue;
-                }
-            }
-
-            return result;
-        }
-
         public static IEnumerable<Guid> GetReferencedIds(this IdContentData source, Schema schema)
         {
             Guard.NotNull(schema, nameof(schema));

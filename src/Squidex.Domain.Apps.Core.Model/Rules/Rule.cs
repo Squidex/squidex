@@ -38,7 +38,10 @@ namespace Squidex.Domain.Apps.Core.Rules
             Guard.NotNull(action, nameof(action));
 
             this.trigger = trigger;
+            this.trigger.Freeze();
+
             this.action = action;
+            this.action.Freeze();
         }
 
         [Pure]
@@ -69,6 +72,8 @@ namespace Squidex.Domain.Apps.Core.Rules
                 throw new ArgumentException("New trigger has another type.", nameof(newTrigger));
             }
 
+            newTrigger.Freeze();
+
             return Clone(clone =>
             {
                 clone.trigger = newTrigger;
@@ -84,6 +89,8 @@ namespace Squidex.Domain.Apps.Core.Rules
             {
                 throw new ArgumentException("New action has another type.", nameof(newAction));
             }
+
+            newAction.Freeze();
 
             return Clone(clone =>
             {

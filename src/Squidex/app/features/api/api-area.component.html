@@ -1,33 +1,25 @@
-<sqx-title message="{app} | Settings" parameter1="app" [value1]="ctx.appName"></sqx-title>
+<sqx-title message="{app} | Settings" parameter1="app" [value1]="appsState.appName"></sqx-title>
 
 <sqx-panel theme="dark" desiredWidth="12rem">
-    <div class="panel-header">
-        <div class="panel-title-row">
-            <h3 class="panel-title">API</h3>
-        </div>
+    <ng-container title>
+        API
+    </ng-container>
 
-        <a class="panel-close" sqxParentLink isLazyLoaded="true">
-            <i class="icon-close"></i>
-        </a>
-    </div>
-
-    <div class="panel-main">
-        <div class="panel-content">
-            <ul class="nav nav-panel nav-dark flex-column">
-                <li class="nav-item">
-                    <a class="nav-link" routerLink="graphql" routerLinkActive="active">
-                        GraphQL
-                        <i class="icon-angle-right"></i>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/api/content/{{ctx.appName}}/docs" target="_blank">
-                        Swagger
-                    </a>
-                </li>
-            </ul>
-        </div>
-    </div>
+    <ng-container content>
+        <ul class="nav nav-panel nav-dark flex-column">
+            <li class="nav-item">
+                <a class="nav-link" routerLink="graphql" routerLinkActive="active">
+                    GraphQL
+                    <i class="icon-angle-right"></i>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/api/content/{{appsState.appName}}/docs" target="_blank">
+                    Swagger
+                </a>
+            </li>
+        </ul>
+    </ng-container>
 </sqx-panel>
 
 <router-outlet></router-outlet>

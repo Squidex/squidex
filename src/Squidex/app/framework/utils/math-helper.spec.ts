@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { MathHelper } from './../';
+import { MathHelper } from './math-helper';
 
 describe('MathHelper', () => {
     it('should calculate same crc32 for same input', () => {

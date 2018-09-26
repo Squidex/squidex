@@ -2,8 +2,8 @@
     <div class="form-group row">
         <div class="col col-9 offset-3">
             <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="fieldRequired" formControlName="isRequired" />
-                <label class="form-check-label" for="fieldRequired">
+                <input class="form-check-input" type="checkbox" id="{{field.fieldId}}_fieldRequired" formControlName="isRequired" />
+                <label class="form-check-label" for="{{field.fieldId}}_fieldRequired">
                     Required
                 </label>
             </div>
@@ -24,10 +24,10 @@
     </div>
 
     <div class="form-group row" *ngIf="showDefaultValue | async">
-        <label class="col col-3 col-form-label" for="fieldDefaultValue">Default Value</label>
+        <label class="col col-3 col-form-label" for="{{field.fieldId}}_fieldDefaultValue">Default Value</label>
 
         <div class="col col-6">
-            <input type="number" class="form-control" id="fieldDefaultValue" formControlName="defaultValue" />
+            <input type="number" class="form-control" id="{{field.fieldId}}_fieldDefaultValue" formControlName="defaultValue" />
         </div>
     </div>
 </div>

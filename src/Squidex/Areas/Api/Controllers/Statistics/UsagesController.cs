@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -60,11 +61,13 @@ namespace Squidex.Areas.Api.Controllers.Statistics
         [ApiCosts(0)]
         public async Task<IActionResult> GetMonthlyCalls(string app)
         {
-            var count = await usageTracker.GetMonthlyCalls(App.Id.ToString(), DateTime.Today);
+            var count = await usageTracker.GetMonthlyCallsAsync(App.Id.ToString(), DateTime.Today);
 
             var plan = appPlanProvider.GetPlanForApp(App);
 
-            return Ok(new CurrentCallsDto { Count = count, MaxAllowed = plan.MaxApiCalls });
+            var response = new CurrentCallsDto { Count = count, MaxAllowed = plan.MaxApiCalls };
+
+            return Ok(response);
         }
 
         /// <summary>
@@ -80,7 +83,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics
         /// </returns>
         [HttpGet]
         [Route("apps/{app}/usages/calls/{fromDate}/{toDate}/")]
-        [ProducesResponseType(typeof(CallsUsageDto[]), 200)]
+        [ProducesResponseType(typeof(Dictionary<string, CallsUsageDto[]>), 200)]
         [ApiCosts(0)]
         public async Task<IActionResult> GetUsages(string app, DateTime fromDate, DateTime toDate)
         {
@@ -91,14 +94,9 @@ namespace Squidex.Areas.Api.Controllers.Statistics
 
             var entities = await usageTracker.QueryAsync(App.Id.ToString(), fromDate.Date, toDate.Date);
 
-            var models = entities.Select(x =>
-            {
-                var averageMs = x.TotalCount == 0 ? 0 : x.TotalElapsedMs / x.TotalCount;
+            var response = entities.ToDictionary(x => x.Key, x => x.Value.Select(CallsUsageDto.FromUsage).ToList());
 
-                return new CallsUsageDto { Date = x.Date, Count = x.TotalCount, AverageMs = averageMs };
-            }).ToList();
-
-            return Ok(models);
+            return Ok(response);
         }
 
         /// <summary>
@@ -119,7 +117,9 @@ namespace Squidex.Areas.Api.Controllers.Statistics
 
             var plan = appPlanProvider.GetPlanForApp(App);
 
-            return Ok(new CurrentStorageDto { Size = size, MaxAllowed = plan.MaxAssetSize });
+            var response = new CurrentStorageDto { Size = size, MaxAllowed = plan.MaxAssetSize };
+
+            return Ok(response);
         }
 
         /// <summary>
@@ -130,8 +130,8 @@ namespace Squidex.Areas.Api.Controllers.Statistics
         /// <param name="toDate">The to date.</param>
         /// <returns>
         /// 200 => Storage usage returned.
-        /// 404 => App not found.
         /// 400 => Range between from date and to date is not valid or has more than 100 days.
+        /// 404 => App not found.
         /// </returns>
         [HttpGet]
         [Route("apps/{app}/usages/storage/{fromDate}/{toDate}/")]
@@ -146,7 +146,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics
 
             var entities = await assetStatsRepository.QueryAsync(App.Id, fromDate.Date, toDate.Date);
 
-            var models = entities.Select(x => new StorageUsageDto { Date = x.Date, Count = x.TotalCount, Size = x.TotalSize }).ToList();
+            var models = entities.Select(StorageUsageDto.FromStats).ToList();
 
             return Ok(models);
         }

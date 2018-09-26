@@ -6,6 +6,8 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 
 namespace Squidex.Infrastructure
@@ -21,13 +23,26 @@ namespace Squidex.Infrastructure
             "TB"
         };
 
+        private static readonly Dictionary<string, string> UnifiedExtensions = new Dictionary<string, string>
+        {
+            ["jpeg"] = "jpg"
+        };
+
         public static string FileType(this string fileName)
         {
             try
             {
                 var fileInfo = new FileInfo(fileName);
+                var fileType = fileInfo.Extension.Substring(1).ToLowerInvariant();
 
-                return fileInfo.Extension.Substring(1).ToLowerInvariant();
+                if (UnifiedExtensions.TryGetValue(fileType, out var unified))
+                {
+                    return unified;
+                }
+                else
+                {
+                    return fileType;
+                }
             }
             catch
             {
@@ -62,7 +77,7 @@ namespace Squidex.Infrastructure
                 u = Extensions.Length - 1;
             }
 
-            return $"{Math.Round(d, 1)} {Extensions[u]}";
+            return $"{Math.Round(d, 1).ToString(CultureInfo.InvariantCulture)} {Extensions[u]}";
         }
     }
 }

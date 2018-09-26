@@ -9,110 +9,55 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 
 import {
-    AppContext,
+    EditScriptsForm,
     SchemaDetailsDto,
-    SchemasService,
-    UpdateSchemaScriptsDto
-} from 'shared';
+    SchemasState
+} from '@app/shared';
 
 @Component({
     selector: 'sqx-schema-scripts-form',
     styleUrls: ['./schema-scripts-form.component.scss'],
-    templateUrl: './schema-scripts-form.component.html',
-    providers: [
-        AppContext
-    ]
+    templateUrl: './schema-scripts-form.component.html'
 })
 export class SchemaScriptsFormComponent implements OnInit {
     @Output()
-    public saved = new EventEmitter<UpdateSchemaScriptsDto>();
-
-    @Output()
-    public cancelled = new EventEmitter();
+    public completed = new EventEmitter();
 
     @Input()
     public schema: SchemaDetailsDto;
 
     public selectedField = 'scriptQuery';
 
-    public scripts = [
-        'Query',
-        'Create',
-        'Update',
-        'Delete',
-        'Change'
-    ];
+    public editForm = new EditScriptsForm(this.formBuilder);
 
-    public editFormSubmitted = false;
-    public editForm =
-        this.formBuilder.group({
-            scriptQuery: '',
-            scriptCreate: '',
-            scriptUpdate: '',
-            scriptDelete: '',
-            scriptChange: ''
-        });
-
-    constructor(public readonly ctx: AppContext,
-        private readonly schemas: SchemasService,
-        private readonly formBuilder: FormBuilder
+    constructor(
+        private readonly formBuilder: FormBuilder,
+        private readonly schemasState: SchemasState
     ) {
     }
 
     public ngOnInit() {
-        this.editForm.patchValue(this.schema);
+        this.editForm.load(this.schema);
     }
 
-    public cancel() {
-        this.emitCancelled();
-        this.resetEditForm();
-    }
-
-    public saveSchema() {
-        this.editFormSubmitted = true;
-
-        if (this.editForm.valid) {
-            this.editForm.disable();
-
-            const requestDto =
-                new UpdateSchemaScriptsDto(
-                    this.editForm.controls['scriptQuery'].value,
-                    this.editForm.controls['scriptCreate'].value,
-                    this.editForm.controls['scriptUpdate'].value,
-                    this.editForm.controls['scriptDelete'].value,
-                    this.editForm.controls['scriptChange'].value);
-
-            this.schemas.putSchemaScripts(this.ctx.appName, this.schema.name, requestDto, this.schema.version)
-                .subscribe(dto => {
-                    this.emitSaved(requestDto);
-                    this.resetEditForm();
-                }, error => {
-                    this.ctx.notifyError(error);
-                    this.enableEditForm();
-                });
-        }
-    }
-
-    private emitCancelled() {
-        this.cancelled.emit();
-    }
-
-    private emitSaved(requestDto: UpdateSchemaScriptsDto) {
-        this.saved.emit(requestDto);
+    public complete() {
+        this.completed.emit();
     }
 
     public selectField(field: string) {
         this.selectedField = field;
     }
 
-    private enableEditForm() {
-        this.editForm.enable();
-        this.editFormSubmitted = false;
-    }
+    public saveSchema() {
+        const value = this.editForm.submit();
 
-    private resetEditForm() {
-        this.editForm.reset();
-        this.editForm.enable();
-        this.editFormSubmitted = false;
+        if (value) {
+            this.schemasState.configureScripts(this.schema, value)
+                .subscribe(dto => {
+                    this.complete();
+                }, error => {
+                    this.editForm.submitFailed(error);
+                });
+        }
     }
 }

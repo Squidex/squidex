@@ -54,8 +54,8 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
 
             await sut.ValidateAsync("foo", errors);
 
-            errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> is not valid." });
+            errors.Should().BeEquivalentTo(
+                new[] { "Not valid." });
         }
 
         [Fact]
@@ -65,7 +65,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
 
             await sut.ValidateAsync("foo", errors);
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new[] { "Custom Error Message." });
         }
 
@@ -76,8 +76,8 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
 
             await sut.ValidateAsync("https://archiverbx.blob.core.windows.net/static/C:/Users/USR/Documents/Projects/PROJ/static/images/full/1234567890.jpg", errors);
 
-            errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> has a regex that is too slow." });
+            errors.Should().BeEquivalentTo(
+                new[] { "Regex is too slow." });
         }
     }
 }

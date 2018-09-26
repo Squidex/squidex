@@ -12,7 +12,6 @@ using FluentAssertions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Rules;
-using Squidex.Domain.Apps.Core.Rules.Actions;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Xunit;
 
@@ -24,21 +23,14 @@ namespace Squidex.Domain.Apps.Core.Model.Rules
     {
         private readonly JsonSerializer serializer = TestData.DefaultSerializer();
 
-        public static readonly List<object[]> Actions =
-            typeof(Rule).Assembly.GetTypes()
-                .Where(x => x.BaseType == typeof(RuleAction))
-                .Select(Activator.CreateInstance)
-                .Select(x => new object[] { x })
-                .ToList();
-
         public static readonly List<object[]> Triggers =
             typeof(Rule).Assembly.GetTypes()
                 .Where(x => x.BaseType == typeof(RuleTrigger))
                 .Select(Activator.CreateInstance)
-                .Select(x => new object[] { x })
+                .Select(x => new[] { x })
                 .ToList();
 
-        private readonly Rule rule_0 = new Rule(new ContentChangedTrigger(), new WebhookAction());
+        private readonly Rule rule_0 = new Rule(new ContentChangedTrigger(), new TestAction1());
 
         public sealed class OtherTrigger : RuleTrigger
         {
@@ -48,19 +40,21 @@ namespace Squidex.Domain.Apps.Core.Model.Rules
             }
         }
 
-        public sealed class OtherAction : RuleAction
+        public sealed class TestAction1 : RuleAction
         {
-            public override T Accept<T>(IRuleActionVisitor<T> visitor)
-            {
-                throw new NotSupportedException();
-            }
+            public string Property { get; set; }
+        }
+
+        public sealed class TestAction2 : RuleAction
+        {
+            public string Property { get; set; }
         }
 
         [Fact]
         public void Should_create_with_trigger_and_action()
         {
             var ruleTrigger = new ContentChangedTrigger();
-            var ruleAction = new WebhookAction();
+            var ruleAction = new TestAction1();
 
             var newRule = new Rule(ruleTrigger, ruleAction);
 
@@ -110,7 +104,7 @@ namespace Squidex.Domain.Apps.Core.Model.Rules
         [Fact]
         public void Should_replace_action_when_updating()
         {
-            var newAction = new WebhookAction();
+            var newAction = new TestAction1();
 
             var rule_1 = rule_0.Update(newAction);
 
@@ -121,7 +115,7 @@ namespace Squidex.Domain.Apps.Core.Model.Rules
         [Fact]
         public void Should_throw_exception_when_new_action_has_other_type()
         {
-            Assert.Throws<ArgumentException>(() => rule_0.Update(new OtherAction()));
+            Assert.Throws<ArgumentException>(() => rule_0.Update(new TestAction2()));
         }
 
         [Fact]
@@ -131,14 +125,7 @@ namespace Squidex.Domain.Apps.Core.Model.Rules
 
             var appClients = JToken.FromObject(rule_1, serializer).ToObject<Rule>(serializer);
 
-            appClients.ShouldBeEquivalentTo(rule_0);
-        }
-
-        [Theory]
-        [MemberData(nameof(Actions))]
-        public void Should_freeze_actions(RuleAction action)
-        {
-            TestData.TestFreeze(action);
+            appClients.Should().BeEquivalentTo(rule_1);
         }
 
         [Theory]

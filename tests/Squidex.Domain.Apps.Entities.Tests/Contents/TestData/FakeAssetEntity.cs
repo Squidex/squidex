@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using NodaTime;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Infrastructure;
@@ -27,6 +28,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.TestData
         public RefToken CreatedBy { get; set; }
 
         public RefToken LastModifiedBy { get; set; }
+
+        public HashSet<string> Tags { get; set; }
 
         public long Version { get; set; }
 

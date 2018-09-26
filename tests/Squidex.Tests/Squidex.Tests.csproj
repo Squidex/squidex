@@ -1,39 +1,33 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
-  <PropertyGroup>    
-    <TargetFramework>netcoreapp2.0</TargetFramework>
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <RuntimeFrameworkVersion>2.1.1</RuntimeFrameworkVersion>
+    <RootNamespace>Squidex</RootNamespace>
+    <NoWarn>$(NoWarn);NU1605</NoWarn>
   </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="FakeItEasy" Version="4.3.0" />
-    <PackageReference Include="IdentityServer4" Version="2.1.1" />
-    <PackageReference Include="IdentityServer4.AspNetIdentity" Version="2.1.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.5.0" />
-    <PackageReference Include="Moq" Version="4.7.145" />
-    <PackageReference Include="NJsonSchema" Version="9.10.19" />
-    <PackageReference Include="xunit" Version="2.3.1" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
-  </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\src\Squidex.Domain.Users\Squidex.Domain.Users.csproj" />
     <ProjectReference Include="..\..\src\Squidex\Squidex.csproj" />
   </ItemGroup>
-
   <ItemGroup>
-    <Reference Include="CivicPlusIdentityServer.SDK.NetCore">
-      <HintPath>..\..\..\identityserver\CivicPlusIdentityServer.SDK.NetCore\bin\Debug\netcoreapp2.0\CivicPlusIdentityServer.SDK.NetCore.dll</HintPath>
-    </Reference>
-    <Reference Include="RestSharp">
-      <HintPath>..\..\..\restsharp_core\RestSharp\bin\Debug\netstandard2.0\RestSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="RestSharp.NetCore">
-      <HintPath>..\..\..\..\Desktop\RestSharp.NetCore.dll</HintPath>
-    </Reference>
+    <PackageReference Include="FakeItEasy" Version="4.8.1" />
+    <PackageReference Include="IdentityServer4" Version="2.2.0" />
+    <PackageReference Include="IdentityServer4.AspNetIdentity" Version="2.1.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.8.0" />
+    <PackageReference Include="NJsonSchema" Version="9.10.75" />
+    <PackageReference Include="RefactoringEssentials" Version="5.6.0" PrivateAssets="all" />
+    <PackageReference Include="StyleCop.Analyzers" Version="1.0.2" PrivateAssets="all" />
+    <PackageReference Include="xunit" Version="2.4.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
-
+  <PropertyGroup>
+    <CodeAnalysisRuleSet>..\..\Squidex.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
-    <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
+    <AdditionalFiles Include="..\..\stylecop.json" Link="stylecop.json" />
   </ItemGroup>
-
 </Project>

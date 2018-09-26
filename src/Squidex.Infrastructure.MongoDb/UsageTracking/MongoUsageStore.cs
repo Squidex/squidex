@@ -28,20 +28,22 @@ namespace Squidex.Infrastructure.UsageTracking
 
         protected override Task SetupCollectionAsync(IMongoCollection<MongoUsage> collection)
         {
-            return collection.Indexes.CreateOneAsync(Index.Ascending(x => x.Key).Ascending(x => x.Date));
+            return collection.Indexes.CreateOneAsync(
+                new CreateIndexModel<MongoUsage>(Index.Ascending(x => x.Key).Ascending(x => x.Category).Ascending(x => x.Date)));
         }
 
-        public Task TrackUsagesAsync(DateTime date, string key, double count, double elapsedMs)
+        public Task TrackUsagesAsync(DateTime date, string key, string category, double count, double elapsedMs)
         {
-            var id = $"{key}_{date:yyyy-MM-dd}";
+            var id = $"{key}_{date:yyyy-MM-dd}_{category}";
 
-            return Collection.UpdateOneAsync(x => x.Id == id,
+            return Collection.UpdateOneAsync(x => x.Id == id && x.Category == category,
                 Update
                     .Inc(x => x.TotalCount, count)
                     .Inc(x => x.TotalElapsedMs, elapsedMs)
                     .SetOnInsert(x => x.Id, id)
                     .SetOnInsert(x => x.Key, key)
-                    .SetOnInsert(x => x.Date, date),
+                    .SetOnInsert(x => x.Date, date)
+                    .SetOnInsert(x => x.Category, category),
                 Upsert);
         }
 
@@ -49,7 +51,7 @@ namespace Squidex.Infrastructure.UsageTracking
         {
             var entities = await Collection.Find(x => x.Key == key && x.Date >= fromDate && x.Date <= toDate).ToListAsync();
 
-            return entities.Select(x => new StoredUsage(x.Date, (long)x.TotalCount, (long)x.TotalElapsedMs)).ToList();
+            return entities.Select(x => new StoredUsage(x.Category, x.Date, (long)x.TotalCount, (long)x.TotalElapsedMs)).ToList();
         }
     }
 }

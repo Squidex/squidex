@@ -57,6 +57,8 @@ namespace Squidex.Areas.IdentityServer.Config
 
             services.AddIdentity<IUser, IRole>()
                 .AddDefaultTokenProviders();
+            services.AddSingleton<IPasswordValidator<IUser>,
+                PwnedPasswordValidator>();
             services.AddSingleton<IUserClaimsPrincipalFactory<IUser>,
                 UserClaimsPrincipalFactoryWithEmail>();
             services.AddSingleton<IClientStore,

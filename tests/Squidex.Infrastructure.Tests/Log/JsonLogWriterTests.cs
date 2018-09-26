@@ -136,7 +136,7 @@ namespace Squidex.Infrastructure.Log
             var value = DateTime.UtcNow;
             var result = sut.WriteArray("property", a => a.WriteValue(value)).ToString();
 
-            Assert.Equal($"{{\"property\":[\"{value:o}\"]}}", result);
+            Assert.Equal($"{{\"property\":[\"{value:yyyy-MM-ddTHH:mm:ssZ}\"]}}", result);
         }
 
         [Fact]

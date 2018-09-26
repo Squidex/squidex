@@ -7,13 +7,14 @@
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
+import { filter } from 'rxjs/operators';
 
 import {
     ApiUrlConfig,
     AuthService,
     fadeAnimation,
-    ModalView
-} from 'shared';
+    ModalModel
+} from '@app/shared';
 
 @Component({
     selector: 'sqx-profile-menu',
@@ -26,7 +27,7 @@ import {
 export class ProfileMenuComponent implements OnDestroy, OnInit {
     private authenticationSubscription: Subscription;
 
-    public modalMenu = new ModalView(false, true);
+    public modalMenu = new ModalModel();
 
     public profileDisplayName = '';
     public profileId = '';
@@ -47,7 +48,7 @@ export class ProfileMenuComponent implements OnDestroy, OnInit {
 
     public ngOnInit() {
         this.authenticationSubscription =
-            this.authService.userChanges.filter(user => !!user)
+            this.authService.userChanges.pipe(filter(user => !!user))
                 .subscribe(user => {
                     this.profileId = user!.id;
                     this.profileDisplayName = user!.displayName;

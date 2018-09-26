@@ -5,49 +5,28 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Microsoft.OData;
-using Microsoft.OData.UriParser;
 using MongoDB.Driver;
+using Squidex.Infrastructure.Queries;
 
 namespace Squidex.Infrastructure.MongoDb.OData
 {
     public static class FilterBuilder
     {
-        public static (FilterDefinition<T> Filter, bool Last) BuildFilter<T>(this ODataUriParser query, PropertyCalculator propertyCalculator = null, bool supportsSearch = true)
+        public static (FilterDefinition<T> Filter, bool Last) BuildFilter<T>(this Query query, bool supportsSearch = true)
         {
-            SearchClause search;
-            try
-            {
-                search = query.ParseSearch();
-            }
-            catch (ODataException ex)
-            {
-                throw new ValidationException("Query $search clause not valid.", new ValidationError(ex.Message));
-            }
-
-            if (search != null)
+            if (query.FullText != null)
             {
                 if (!supportsSearch)
                 {
                     throw new ValidationException("Query $search clause not supported.");
                 }
 
-                return (Builders<T>.Filter.Text(SearchTermVisitor.Visit(search.Expression).ToString()), false);
+                return (Builders<T>.Filter.Text(query.FullText), false);
             }
 
-            FilterClause filter;
-            try
+            if (query.Filter != null)
             {
-                filter = query.ParseFilter();
-            }
-            catch (ODataException ex)
-            {
-                throw new ValidationException("Query $filter clause not valid.", new ValidationError(ex.Message));
-            }
-
-            if (filter != null)
-            {
-                return (FilterVisitor<T>.Visit(filter.Expression, propertyCalculator), true);
+                return (FilterVisitor<T>.Visit(query.Filter), true);
             }
 
             return (null, false);

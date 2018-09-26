@@ -7,8 +7,10 @@
 
 import { Injectable } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
+import { filter } from 'rxjs/operators';
 
 import { AnalyticsIdConfig } from '../configurations';
+import { Types } from './../utils/types';
 import { ResourceLoaderService } from './resource-loader.service';
 
 // tslint:disable:only-arrow-functions
@@ -29,14 +31,17 @@ export class AnalyticsService {
         };
 
         if (analyticsId && router && resourceLoader && window.location.hostname !== 'localhost') {
-            this.gtag('config', analyticsId.value);
+            this.gtag('config', analyticsId.value, { anonymize_ip: true });
 
-            router.events.filter(e => e instanceof NavigationEnd)
+            router.events.pipe(
+                    filter(e => Types.is(e, NavigationEnd)))
                 .subscribe(() => {
-                    this.gtag('config', analyticsId.value, { page_path: window.location.pathname });
+                    this.gtag('config', analyticsId.value, { page_path: window.location.pathname, anonymize_ip: true });
                 });
 
-            resourceLoader.loadScript(`https://www.googletagmanager.com/gtag/js?id=${analyticsId.value}`);
+            if (document.cookie.indexOf('ga-disable') < 0) {
+                resourceLoader.loadScript(`https://www.googletagmanager.com/gtag/js?id=${analyticsId.value}`);
+            }
         }
     }
 

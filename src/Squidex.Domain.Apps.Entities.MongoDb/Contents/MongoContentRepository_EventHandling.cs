@@ -33,20 +33,16 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         protected Task On(AssetDeleted @event)
         {
-            return Collection.UpdateManyAsync(
-                Filter.And(
-                    Filter.AnyEq(x => x.ReferencedIds, @event.AssetId),
-                    Filter.AnyNe(x => x.ReferencedIdsDeleted, @event.AssetId)),
-                Update.AddToSet(x => x.ReferencedIdsDeleted, @event.AssetId));
+            return Task.WhenAll(
+                contentsDraft.CleanupAsync(@event.AssetId),
+                contentsPublished.CleanupAsync(@event.AssetId));
         }
 
         protected Task On(ContentDeleted @event)
         {
-            return Collection.UpdateManyAsync(
-                Filter.And(
-                    Filter.AnyEq(x => x.ReferencedIds, @event.ContentId),
-                    Filter.AnyNe(x => x.ReferencedIdsDeleted, @event.ContentId)),
-                Update.AddToSet(x => x.ReferencedIdsDeleted, @event.ContentId));
+            return Task.WhenAll(
+                contentsDraft.CleanupAsync(@event.ContentId),
+                contentsPublished.CleanupAsync(@event.ContentId));
         }
 
         Task IEventConsumer.ClearAsync()

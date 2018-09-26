@@ -1,0 +1,99 @@
+<ng-container *ngIf="enableShortcut">
+    <sqx-shortcut keys="ctrl+shift+f" (trigger)="inputFind.focus()"></sqx-shortcut>
+</ng-container>
+
+<form [class]="formClass" (ngSubmit)="search()">
+    <input class="form-control form-control-expandable" #inputFind [formControl]="contentsFilter" [placeholder]="placeholder" />
+
+    <ng-container *ngIf="expandable">
+        <a class="expand-search" (click)="searchModal.toggle()" #expand>
+            <i class="icon-caret-down"></i>
+        </a>
+
+        <sqx-onboarding-tooltip id="contentArchive" [for]="expand" position="bottomRight" after="60000">
+            Click this icon to show the advanced search menu and to show the archive!
+        </sqx-onboarding-tooltip>
+    </ng-container>
+
+    <ng-container *ngIf="queries">
+        <ng-container *ngIf="saveKey | async; else notBookmarked; let key">
+            <a class="save-search" (click)="queries.remove(key)">
+                <i class="icon-star-full"></i>
+            </a>
+        </ng-container>
+    
+        <ng-template #notBookmarked>
+            <a class="save-search" (click)="saveQuery()" *ngIf="contentsFilterValue | async">
+                <i class="icon-star-empty"></i>
+            </a>
+        </ng-template>
+    </ng-container>
+</form>
+
+<sqx-onboarding-tooltip id="contentFind" [for]="inputFind" position="bottomRight" after="120000">
+    Search for content using full text search over all fields and languages!
+</sqx-onboarding-tooltip>
+
+<div class="dropdown-menu" *sqxModalView="searchModal" [sqxModalTarget]="inputFind">
+    <div class="form-horizontal">
+        <div [formGroup]="searchForm">
+            <div class="form-group row">
+                <label class="col col-2 col-form-label" for="search">Text</label>
+
+                <div class="col col-10">
+                    <input type="text" class="form-control" id="search" (blur)="updateQuery()" formControlName="odataSearch" placeholder="Fulltext search" />
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col col-2 col-form-label" for="filter">Filter</label>
+
+                <div class="col col-10">
+                    <input type="text" class="form-control" id="filter" (blur)="updateQuery()" formControlName="odataFilter" placeholder="{{fieldExample}} eq [VALUE]" />
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col col-2 col-form-label" for="orderBy">Order</label>
+                    
+                <div class="col col-10">
+                    <input type="text" class="form-control" id="orderBy" (blur)="updateQuery()" formControlName="odataOrderBy" placeholder="{{fieldExample}} desc" />
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-check" *ngIf="enableArchive">
+            <input class="form-check-input" type="checkbox" id="archivedItems" [ngModel]="archived" (ngModelChange)="archivedChanged.emit($event)" />
+            <label class="form-check-label" for="archivedItems">
+                Archived items
+            </label>
+        </div>
+
+        <div class="link">
+            Read more about filtering in the <a href="https://docs.squidex.io/04-guides/02-api.html" target="_blank">Documentation</a>.
+        </div>
+    </div>
+</div>
+
+<ng-container *sqxModalView="saveQueryDialog;onRoot:true">
+    <form [formGroup]="saveQueryForm.form" (ngSubmit)="saveQueryComplete()">
+        <sqx-modal-dialog (closed)="saveQueryDialog.hide()">
+            <ng-container title>
+                Name your query
+            </ng-container>
+        
+            <ng-container content>    
+                <div class="form-group">            
+                    <sqx-control-errors for="name" submitOnly="true" [submitted]="saveQueryForm.submitted | async"></sqx-control-errors>
+            
+                    <input type="text" class="form-control" id="appName" formControlName="name" autocomplete="off" sqxFocusOnInit />
+                </div>
+            </ng-container>
+        
+            <ng-container footer>
+                <button type="reset" class="float-left btn btn-secondary" (click)="saveQueryDialog.hide()" [disabled]="saveQueryForm.submitted | async">Cancel</button>
+                <button type="submit" class="float-right btn btn-success">Create</button>
+            </ng-container>
+        </sqx-modal-dialog>
+    </form>
+</ng-container>

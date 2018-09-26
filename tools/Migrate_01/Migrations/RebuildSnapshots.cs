@@ -21,7 +21,9 @@ namespace Migrate_01.Migrations
 
         public async Task UpdateAsync()
         {
-            await rebuilder.RebuildConfigAsync();
+            await rebuilder.RebuildAppsAsync();
+            await rebuilder.RebuildSchemasAsync();
+            await rebuilder.RebuildRulesAsync();
             await rebuilder.RebuildContentAsync();
             await rebuilder.RebuildAssetsAsync();
         }

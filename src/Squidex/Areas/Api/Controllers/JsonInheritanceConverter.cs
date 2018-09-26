@@ -17,17 +17,22 @@ using NJsonSchema.Annotations;
 
 namespace Squidex.Areas.Api.Controllers
 {
-    public sealed class JsonInheritanceConverter : JsonConverter
+    public class JsonInheritanceConverter : JsonConverter
     {
         private readonly string discriminator;
-        private readonly Dictionary<string, Type> mapNameToType = new Dictionary<string, Type>(StringComparer.OrdinalIgnoreCase);
-        private readonly Dictionary<Type, string> mapTypeToName = new Dictionary<Type, string>();
+        private readonly Dictionary<string, Type> mapTypeToName = new Dictionary<string, Type>(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<Type, string> mapNameToType = new Dictionary<Type, string>();
 
         [ThreadStatic]
         private static bool IsReading;
 
         [ThreadStatic]
         private static bool IsWriting;
+
+        public string DiscriminatorName
+        {
+            get { return discriminator; }
+        }
 
         public override bool CanWrite
         {
@@ -56,15 +61,31 @@ namespace Squidex.Areas.Api.Controllers
         }
 
         public JsonInheritanceConverter(string discriminator, Type baseType)
+            : this(discriminator, baseType, null)
+        {
+        }
+
+        protected JsonInheritanceConverter(string discriminator, Type baseType,  IReadOnlyDictionary<string, Type> subTypes = null)
         {
             this.discriminator = discriminator;
 
-            foreach (var type in baseType.Assembly.GetTypes().Where(x => x != baseType && baseType.IsAssignableFrom(x)))
+            if (subTypes != null)
             {
-                var name = type.GetTypeInfo().GetCustomAttribute<JsonSchemaAttribute>()?.Name ?? type.Name;
+                foreach (var subType in subTypes)
+                {
+                    mapNameToType[subType.Value] = subType.Key;
+                    mapTypeToName[subType.Key] = subType.Value;
+                }
+            }
+            else
+            {
+                foreach (var type in baseType.Assembly.GetTypes().Where(x => x != baseType && baseType.IsAssignableFrom(x)))
+                {
+                    var name = type.GetTypeInfo().GetCustomAttribute<JsonSchemaAttribute>()?.Name ?? type.Name;
 
-                mapTypeToName[type] = name;
-                mapNameToType[name] = type;
+                    mapNameToType[type] = name;
+                    mapTypeToName[name] = type;
+                }
             }
         }
 
@@ -80,7 +101,7 @@ namespace Squidex.Areas.Api.Controllers
             {
                 var jsonObject = JObject.FromObject(value, serializer);
 
-                jsonObject.AddFirst(new JProperty(discriminator, mapTypeToName[value.GetType()]));
+                jsonObject.AddFirst(new JProperty(discriminator, mapNameToType[value.GetType()]));
 
                 writer.WriteToken(jsonObject.CreateReader());
             }
@@ -104,7 +125,7 @@ namespace Squidex.Areas.Api.Controllers
                     return null;
                 }
 
-                if (subName == null || !mapNameToType.TryGetValue(subName, out var subType))
+                if (!mapTypeToName.TryGetValue(subName, out var subType))
                 {
                     throw new InvalidOperationException($"Could not find subtype of '{objectType.Name}' with discriminator '{subName}'.");
                 }

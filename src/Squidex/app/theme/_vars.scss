@@ -7,6 +7,7 @@ $color-title:               #000;
 $color-text:                #373a3c;
 $color-text-decent:         #a9b2bb;
 $color-tooltip:             #1a2129;
+$color-history:             #7f858c;
 
 $color-input:               #dbe4eb;
 $color-input-background:    #fff;
@@ -18,6 +19,8 @@ $color-extern-microsoft:        #004185;
 $color-extern-microsoft-icon:   #1b67b7;
 $color-extern-github:           #191919;
 $color-extern-github-icon:      #4a4a4a;
+$color-extern-twitter:          #1da1f2;
+$color-extern-twitter-icon:     #1681bf;
 
 $color-theme-blue:          #3389ff;
 $color-theme-blue-dark:     #297ff6;
@@ -96,4 +99,8 @@ $panel-header:              5.4rem;
 $panel-sidebar:             3.75rem;
 $panel-light-background:    #fff;
 
-$asset-height:              13rem;
+$asset-width:               16rem;
+$asset-height:              19rem;
+$asset-header:              12rem;
+$asset-image:               12rem;
+$asset-footer:              7rem;

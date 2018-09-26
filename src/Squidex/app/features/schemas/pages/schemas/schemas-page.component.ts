@@ -6,137 +6,100 @@
  */
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { FormControl } from '@angular/forms';
+import { FormBuilder, FormControl } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { map, onErrorResumeNext } from 'rxjs/operators';
 
 import {
-    AppContext,
-    fadeAnimation,
-    ImmutableArray,
-    ModalView,
+    AppsState,
+    CreateCategoryForm,
+    DialogModel,
+    MessageBus,
     SchemaDto,
-    SchemasService
-} from 'shared';
+    SchemasState
+} from '@app/shared';
 
-import {
-    SchemaCloning,
-    SchemaCreated,
-    SchemaDeleted,
-    SchemaUpdated
-} from './../messages';
+import { SchemaCloning } from './../messages';
 
 @Component({
     selector: 'sqx-schemas-page',
     styleUrls: ['./schemas-page.component.scss'],
-    templateUrl: './schemas-page.component.html',
-    providers: [
-        AppContext
-    ],
-    animations: [
-        fadeAnimation
-    ]
+    templateUrl: './schemas-page.component.html'
 })
 export class SchemasPageComponent implements OnDestroy, OnInit {
-    private schemaUpdatedSubscription: Subscription;
-    private schemaDeletedSubscription: Subscription;
     private schemaCloningSubscription: Subscription;
 
-    public addSchemaDialog = new ModalView();
+    public addSchemaDialog = new DialogModel();
+    public addCategoryForm = new CreateCategoryForm(this.formBuilder);
 
-    public schemas = ImmutableArray.empty<SchemaDto>();
-    public schemaQuery: string;
     public schemasFilter = new FormControl();
-    public schemasFiltered = ImmutableArray.empty<SchemaDto>();
 
     public import: any;
 
-    constructor(public readonly ctx: AppContext,
-        private readonly router: Router,
-        private readonly schemasService: SchemasService
+    constructor(
+        public readonly appsState: AppsState,
+        public readonly schemasState: SchemasState,
+        private readonly formBuilder: FormBuilder,
+        private readonly messageBus: MessageBus,
+        private readonly route: ActivatedRoute,
+        private readonly router: Router
     ) {
     }
 
     public ngOnDestroy() {
-        this.schemaUpdatedSubscription.unsubscribe();
-        this.schemaDeletedSubscription.unsubscribe();
         this.schemaCloningSubscription.unsubscribe();
     }
 
     public ngOnInit() {
-        this.schemasFilter.valueChanges
-            .distinctUntilChanged()
-            .debounceTime(100)
-            .subscribe(q => {
-                this.updateSchemas(this.schemas, this.schemaQuery = q);
-            });
+        this.schemaCloningSubscription =
+            this.messageBus.of(SchemaCloning)
+                .subscribe(m => {
+                    this.import = m.schema;
 
-        this.ctx.route.params.map(q => q['showDialog'])
+                    this.addSchemaDialog.show();
+                });
+
+        this.route.params.pipe(map(q => q['showDialog']))
             .subscribe(showDialog => {
                 if (showDialog) {
                     this.addSchemaDialog.show();
                 }
             });
 
-        this.schemaCloningSubscription =
-            this.ctx.bus.of(SchemaCloning)
-                .subscribe(m => {
-                    this.createSchema(m.importing);
-                });
-
-        this.schemaUpdatedSubscription =
-            this.ctx.bus.of(SchemaUpdated)
-                .subscribe(m => {
-                    this.updateSchemas(this.schemas.replaceBy('id', m.schema));
-                });
-
-        this.schemaDeletedSubscription =
-            this.ctx.bus.of(SchemaDeleted)
-                .subscribe(m => {
-                    this.updateSchemas(this.schemas.filter(s => s.id !== m.schema.id));
-                });
-
-        this.load();
+        this.schemasState.load().pipe(onErrorResumeNext()).subscribe();
     }
 
-    public createSchema(importing: any) {
+    public removeCategory(name: string) {
+        this.schemasState.removeCategory(name);
+    }
+
+    public addCategory() {
+        const value = this.addCategoryForm.submit();
+
+        if (value) {
+            try {
+               this.schemasState.addCategory(value.name);
+            } finally {
+                this.addCategoryForm.submitCompleted({});
+            }
+        }
+    }
+
+    public onSchemaCreated(schema: SchemaDto) {
+        this.router.navigate([schema.name], { relativeTo: this.route });
+
+        this.addSchemaDialog.hide();
+    }
+
+    public createSchema(importing: any = null) {
         this.import = importing;
 
         this.addSchemaDialog.show();
     }
 
-    private load() {
-        this.schemasService.getSchemas(this.ctx.appName)
-            .subscribe(dtos => {
-                this.updateSchemas(ImmutableArray.of(dtos));
-            }, error => {
-                this.ctx.notifyError(error);
-            });
-    }
-
-    public onSchemaCreated(schema: SchemaDto) {
-        this.updateSchemas(this.schemas.push(schema), this.schemaQuery);
-        this.emitSchemaCreated(schema);
-
-        this.addSchemaDialog.hide();
-
-        this.router.navigate([ schema.name ], { relativeTo: this.ctx.route });
-    }
-
-    private emitSchemaCreated(schema: SchemaDto) {
-        this.ctx.bus.emit(new SchemaCreated(schema));
-    }
-
-    private updateSchemas(schemas: ImmutableArray<SchemaDto>, query?: string) {
-        this.schemas = schemas;
-
-        query = query || this.schemaQuery;
-
-        if (query && query.length > 0) {
-            schemas = schemas.filter(t => t.name.indexOf(query!) >= 0);
-        }
-
-        this.schemasFiltered = schemas.sortByStringAsc(x => x.name);
+    public trackByCategory(index: number, category: string) {
+        return category;
     }
 }
 

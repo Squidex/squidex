@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Contents
@@ -18,8 +17,8 @@ namespace Squidex.Domain.Apps.Core.Contents
         {
         }
 
-        public NamedContentData(NamedContentData copy)
-            : base(copy, EqualityComparer<string>.Default)
+        public NamedContentData(int capacity)
+            : base(capacity, StringComparer.OrdinalIgnoreCase)
         {
         }
 

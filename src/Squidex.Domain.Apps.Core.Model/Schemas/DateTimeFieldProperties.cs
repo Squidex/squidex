@@ -10,7 +10,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    [TypeName(nameof(DateTimeField))]
+    [TypeName("DateTimeField")]
     public sealed class DateTimeFieldProperties : FieldProperties
     {
         public Instant? MaxValue { get; set; }
@@ -28,9 +28,19 @@ namespace Squidex.Domain.Apps.Core.Schemas
             return visitor.Visit(this);
         }
 
-        public override Field CreateField(long id, string name, Partitioning partitioning)
+        public override T Accept<T>(IFieldVisitor<T> visitor, IField field)
         {
-            return new DateTimeField(id, name, partitioning, this);
+            return visitor.Visit((IField<DateTimeFieldProperties>)field);
+        }
+
+        public override RootField CreateRootField(long id, string name, Partitioning partitioning)
+        {
+            return Fields.DateTime(id, name, partitioning, this);
+        }
+
+        public override NestedField CreateNestedField(long id, string name)
+        {
+            return Fields.DateTime(id, name, this);
         }
     }
 }

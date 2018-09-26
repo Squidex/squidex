@@ -99,8 +99,8 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
             await sut.ValidateAsync(CreateValue(null), errors, ctx);
 
-            errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> is required." });
+            errors.Should().BeEquivalentTo(
+                new[] { "Field is required." });
         }
 
         [Fact]
@@ -110,8 +110,8 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
             await sut.ValidateAsync(CreateValue(), errors, ctx);
 
-            errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> is required." });
+            errors.Should().BeEquivalentTo(
+                new[] { "Field is required." });
         }
 
         [Fact]
@@ -121,8 +121,8 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
             await sut.ValidateAsync("invalid", errors);
 
-            errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> is not a valid value." });
+            errors.Should().BeEquivalentTo(
+                new[] { "Not a valid value." });
         }
 
         [Fact]
@@ -132,8 +132,8 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
             await sut.ValidateAsync(CreateValue(document.AssetId, document.AssetId), errors, ctx);
 
-            errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> must have at least 3 item(s)." });
+            errors.Should().BeEquivalentTo(
+                new[] { "Must have at least 3 item(s)." });
         }
 
         [Fact]
@@ -143,8 +143,8 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
             await sut.ValidateAsync(CreateValue(document.AssetId, document.AssetId), errors, ctx);
 
-            errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> must have not more than 1 item(s)." });
+            errors.Should().BeEquivalentTo(
+                new[] { "Must have not more than 1 item(s)." });
         }
 
         [Fact]
@@ -156,8 +156,8 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
             await sut.ValidateAsync(CreateValue(assetId), errors, ctx);
 
-            errors.ShouldBeEquivalentTo(
-                new[] { $"<FIELD> has invalid asset #1: Id '{assetId}' not found." });
+            errors.Should().BeEquivalentTo(
+                new[] { $"[1]: Id '{assetId}' not found." });
         }
 
         [Fact]
@@ -167,8 +167,8 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
             await sut.ValidateAsync(CreateValue(document.AssetId, image.AssetId), errors, ctx);
 
-            errors.ShouldBeEquivalentTo(
-                new[] { $"<FIELD> has invalid asset #1: '4 kB' less than minimum of '5 kB'." });
+            errors.Should().BeEquivalentTo(
+                new[] { "[1]: \'4 kB\' less than minimum of \'5 kB\'." });
         }
 
         [Fact]
@@ -178,8 +178,8 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
             await sut.ValidateAsync(CreateValue(document.AssetId, image.AssetId), errors, ctx);
 
-            errors.ShouldBeEquivalentTo(
-                new[] { $"<FIELD> has invalid asset #2: '8 kB' greater than maximum of '5 kB'." });
+            errors.Should().BeEquivalentTo(
+                new[] { "[2]: \'8 kB\' greater than maximum of \'5 kB\'." });
         }
 
         [Fact]
@@ -189,8 +189,8 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
             await sut.ValidateAsync(CreateValue(document.AssetId, image.AssetId), errors, ctx);
 
-            errors.ShouldBeEquivalentTo(
-                new[] { $"<FIELD> has invalid asset #1: Not an image." });
+            errors.Should().BeEquivalentTo(
+                new[] { "[1]: Not an image." });
         }
 
         [Fact]
@@ -200,8 +200,8 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
             await sut.ValidateAsync(CreateValue(document.AssetId, image.AssetId), errors, ctx);
 
-            errors.ShouldBeEquivalentTo(
-                new[] { $"<FIELD> has invalid asset #2: Width '800px' less than minimum of '1000px'." });
+            errors.Should().BeEquivalentTo(
+                new[] { "[2]: Width \'800px\' less than minimum of \'1000px\'." });
         }
 
         [Fact]
@@ -211,8 +211,8 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
             await sut.ValidateAsync(CreateValue(document.AssetId, image.AssetId), errors, ctx);
 
-            errors.ShouldBeEquivalentTo(
-                new[] { $"<FIELD> has invalid asset #2: Width '800px' greater than maximum of '700px'." });
+            errors.Should().BeEquivalentTo(
+                new[] { "[2]: Width \'800px\' greater than maximum of \'700px\'." });
         }
 
         [Fact]
@@ -222,8 +222,8 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
             await sut.ValidateAsync(CreateValue(document.AssetId, image.AssetId), errors, ctx);
 
-            errors.ShouldBeEquivalentTo(
-                new[] { $"<FIELD> has invalid asset #2: Height '600px' less than minimum of '800px'." });
+            errors.Should().BeEquivalentTo(
+                new[] { "[2]: Height \'600px\' less than minimum of \'800px\'." });
         }
 
         [Fact]
@@ -233,8 +233,8 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
             await sut.ValidateAsync(CreateValue(document.AssetId, image.AssetId), errors, ctx);
 
-            errors.ShouldBeEquivalentTo(
-                new[] { $"<FIELD> has invalid asset #2: Height '600px' greater than maximum of '500px'." });
+            errors.Should().BeEquivalentTo(
+                new[] { "[2]: Height \'600px\' greater than maximum of \'500px\'." });
         }
 
         [Fact]
@@ -244,8 +244,8 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
             await sut.ValidateAsync(CreateValue(document.AssetId, image.AssetId), errors, ctx);
 
-            errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> has invalid asset #2: Aspect ratio not '1:1'." });
+            errors.Should().BeEquivalentTo(
+                new[] { "[2]: Aspect ratio not '1:1'." });
         }
 
         [Fact]
@@ -255,11 +255,11 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
             await sut.ValidateAsync(CreateValue(document.AssetId, image.AssetId), errors, ctx);
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new[]
                 {
-                    $"<FIELD> has invalid asset #1: Invalid file extension.",
-                    $"<FIELD> has invalid asset #2: Invalid file extension."
+                    "[1]: Invalid file extension.",
+                    "[2]: Invalid file extension."
                 });
         }
 
@@ -268,9 +268,9 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             return ids == null ? JValue.CreateNull() : (JToken)new JArray(ids.OfType<object>().ToArray());
         }
 
-        private static AssetsField Field(AssetsFieldProperties properties)
+        private static RootField<AssetsFieldProperties> Field(AssetsFieldProperties properties)
         {
-            return new AssetsField(1, "my-assets", Partitioning.Invariant, properties);
+            return Fields.Assets(1, "my-assets", Partitioning.Invariant, properties);
         }
     }
 }

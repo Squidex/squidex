@@ -10,8 +10,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FakeItEasy;
-using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Options;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.TestHelpers;
 using Xunit;
@@ -23,8 +21,6 @@ namespace Squidex.Infrastructure.States
         private readonly string key = Guid.NewGuid().ToString();
         private readonly IEventDataFormatter eventDataFormatter = A.Fake<IEventDataFormatter>();
         private readonly IEventStore eventStore = A.Fake<IEventStore>();
-        private readonly IMemoryCache cache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
-        private readonly IPubSub pubSub = new InMemoryPubSub(true);
         private readonly IServiceProvider services = A.Fake<IServiceProvider>();
         private readonly ISnapshotStore<object, string> snapshotStore = A.Fake<ISnapshotStore<object, string>>();
         private readonly IStreamNameResolver streamNameResolver = A.Fake<IStreamNameResolver>();
@@ -60,7 +56,7 @@ namespace Squidex.Infrastructure.States
         [Fact]
         public async Task Should_ignore_old_events()
         {
-            var storedEvent = new StoredEvent("1", 0, new EventData());
+            var storedEvent = new StoredEvent("1", "1", 0, new EventData());
 
             A.CallTo(() => eventStore.QueryAsync(key, 0))
                 .Returns(new List<StoredEvent> { storedEvent });
@@ -209,6 +205,34 @@ namespace Squidex.Infrastructure.States
             await Assert.ThrowsAsync<DomainObjectVersionException>(() => persistence.WriteEventsAsync(new[] { new MyEvent(), new MyEvent() }.Select(Envelope.Create)));
         }
 
+        [Fact]
+        public async Task Should_delete_events_but_not_snapshot_when_deleted_snapshot_only()
+        {
+            var persistence = sut.WithEventSourcing<object, string>(key, x => { });
+
+            await persistence.DeleteAsync();
+
+            A.CallTo(() => eventStore.DeleteStreamAsync(key))
+                .MustHaveHappened();
+
+            A.CallTo(() => snapshotStore.RemoveAsync(key))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_delete_events_and_snapshot_when_deleted()
+        {
+            var persistence = sut.WithSnapshotsAndEventSourcing<object, object, string>(key, x => { }, x => { });
+
+            await persistence.DeleteAsync();
+
+            A.CallTo(() => eventStore.DeleteStreamAsync(key))
+                .MustHaveHappened();
+
+            A.CallTo(() => snapshotStore.RemoveAsync(key))
+                .MustHaveHappened();
+        }
+
         private void SetupEventStore(int count, int eventOffset = 0, int readPosition = 0)
         {
             SetupEventStore(Enumerable.Repeat(0, count).Select(x => new MyEvent()).ToArray(), eventOffset, readPosition);
@@ -219,7 +243,7 @@ namespace Squidex.Infrastructure.States
             SetupEventStore(events, 0, 0);
         }
 
-        private void SetupEventStore(MyEvent[] events, int eventOffset = 0, int readPosition = 0)
+        private void SetupEventStore(MyEvent[] events, int eventOffset, int readPosition = 0)
         {
             var eventsStored = new List<StoredEvent>();
 
@@ -228,7 +252,7 @@ namespace Squidex.Infrastructure.States
             foreach (var @event in events)
             {
                 var eventData = new EventData();
-                var eventStored = new StoredEvent(i.ToString(), i, eventData);
+                var eventStored = new StoredEvent(i.ToString(), i.ToString(), i, eventData);
 
                 eventsStored.Add(eventStored);
 

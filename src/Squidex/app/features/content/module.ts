@@ -8,71 +8,63 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { DndModule } from 'ng2-dnd';
+import { ColorPickerModule  } from 'ngx-color-picker';
 
 import {
     CanDeactivateGuard,
-    ResolveAppLanguagesGuard,
-    ResolveContentGuard,
-    ResolvePublishedSchemaGuard,
+    ContentMustExistGuard,
+    LoadLanguagesGuard,
+    SchemaMustExistPublishedGuard,
     SqxFrameworkModule,
-    SqxSharedModule
-} from 'shared';
+    SqxSharedModule,
+    UnsetContentGuard
+} from '@app/shared';
 
 import {
+    ArrayEditorComponent,
     AssetsEditorComponent,
     ContentFieldComponent,
     ContentHistoryComponent,
-    ContentPageComponent,
     ContentItemComponent,
+    ContentPageComponent,
     ContentsPageComponent,
+    ContentsSelectorComponent,
+    ContentStatusComponent,
+    DueTimeSelectorComponent,
+    FieldEditorComponent,
     ReferencesEditorComponent,
-    SchemasPageComponent,
-    SearchFormComponent
+    SchemasPageComponent
 } from './declarations';
 
 const routes: Routes = [
     {
         path: '',
         component: SchemasPageComponent,
+        canActivate: [LoadLanguagesGuard],
         children: [
             {
                 path: ''
             },
             {
                 path: ':schemaName',
-                component: ContentsPageComponent,
-                resolve: {
-                    schema: ResolvePublishedSchemaGuard, appLanguages: ResolveAppLanguagesGuard
-                },
+                canActivate: [SchemaMustExistPublishedGuard],
                 children: [
+                    {
+                        path: '',
+                        component: ContentsPageComponent,
+                        canDeactivate: [CanDeactivateGuard]
+                    },
                     {
                         path: 'new',
                         component: ContentPageComponent,
-                        canDeactivate: [CanDeactivateGuard],
-                        children: [
-                            {
-                                path: 'assets',
-                                loadChildren: './../assets/module#SqxFeatureAssetsModule'
-                            },
-                            {
-                                path: 'references/:schemaName/:language',
-                                component: ContentsPageComponent,
-                                data: {
-                                    isReadOnly: true
-                                },
-                                resolve: {
-                                    schema: ResolvePublishedSchemaGuard
-                                }
-                            }
-                        ]
+                        canActivate: [UnsetContentGuard],
+                        canDeactivate: [CanDeactivateGuard]
                     },
                     {
                         path: ':contentId',
                         component: ContentPageComponent,
+                        canActivate: [ContentMustExistGuard],
                         canDeactivate: [CanDeactivateGuard],
-                        resolve: {
-                            content: ResolveContentGuard
-                        },
                         children: [
                              {
                                 path: 'history',
@@ -80,20 +72,6 @@ const routes: Routes = [
                                 data: {
                                     channel: 'contents.{contentId}'
                                 }
-                            },
-                            {
-                                path: 'references/:schemaName/:language',
-                                component: ContentsPageComponent,
-                                data: {
-                                    isReadOnly: true
-                                },
-                                resolve: {
-                                    schema: ResolvePublishedSchemaGuard
-                                }
-                            },
-                            {
-                                path: 'assets',
-                                loadChildren: './../assets/module#SqxFeatureAssetsModule'
                             }
                         ]
                     }
@@ -104,21 +82,26 @@ const routes: Routes = [
 
 @NgModule({
     imports: [
+        ColorPickerModule,
+        DndModule,
         SqxFrameworkModule,
         SqxSharedModule,
-        DndModule,
         RouterModule.forChild(routes)
     ],
     declarations: [
+        ArrayEditorComponent,
         AssetsEditorComponent,
         ContentFieldComponent,
         ContentHistoryComponent,
         ContentItemComponent,
         ContentPageComponent,
+        ContentStatusComponent,
         ContentsPageComponent,
+        ContentsSelectorComponent,
+        DueTimeSelectorComponent,
+        FieldEditorComponent,
         ReferencesEditorComponent,
-        SchemasPageComponent,
-        SearchFormComponent
+        SchemasPageComponent
     ]
 })
 export class SqxFeatureContentModule { }

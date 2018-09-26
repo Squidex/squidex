@@ -13,6 +13,12 @@ namespace Squidex.Infrastructure.Log
     public sealed class ConsoleLogChannel : ILogChannel, IDisposable
     {
         private readonly ConsoleLogProcessor processor = new ConsoleLogProcessor();
+        private readonly bool useColors;
+
+        public ConsoleLogChannel(bool useColors = false)
+        {
+            this.useColors = useColors;
+        }
 
         public void Dispose()
         {
@@ -23,13 +29,16 @@ namespace Squidex.Infrastructure.Log
         {
             var color = 0;
 
-            if (logLevel == SemanticLogLevel.Warning)
+            if (useColors)
             {
-                color = 0xffff00;
-            }
-            else if (logLevel >= SemanticLogLevel.Error)
-            {
-                color = 0xff0000;
+                if (logLevel == SemanticLogLevel.Warning)
+                {
+                    color = 0xffff00;
+                }
+                else if (logLevel >= SemanticLogLevel.Error)
+                {
+                    color = 0xff0000;
+                }
             }
 
             processor.EnqueueMessage(new LogMessageEntry { Message = message, Color = color });

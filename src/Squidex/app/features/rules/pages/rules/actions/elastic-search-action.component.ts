@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FormBuilder, Validators } from '@angular/forms';
+import { Component, Input, OnInit } from '@angular/core';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 @Component({
     selector: 'sqx-elastic-search-action',
@@ -17,54 +17,30 @@ export class ElasticSearchActionComponent implements OnInit {
     @Input()
     public action: any;
 
-    @Output()
-    public actionChanged = new EventEmitter<object>();
+    @Input()
+    public actionForm: FormGroup;
 
+    @Input()
     public actionFormSubmitted = false;
-    public actionForm =
-        this.formBuilder.group({
-            host: ['',
-                [
-                    Validators.required
-                ]],
-            indexName: ['$APP_NAME',
-                [
-                    Validators.required
-                ]],
-            indexType: ['$SCHEMA_NAME',
-                [
-                    // Validators.required
-                ]],
-            username: '',
-            password: ''
-        });
-
-    constructor(
-        private readonly formBuilder: FormBuilder
-    ) {
-    }
 
     public ngOnInit() {
-        this.action = Object.assign({}, {
-            host: '',
-            indexName: '$APP_NAME',
-            indexType: '$SCHEMA_NAME',
-            username: '',
-            password: ''
-        }, this.action || {});
+        this.actionForm.setControl('host',
+            new FormControl(this.action.host || '', [
+                Validators.required
+            ]));
 
-        this.actionFormSubmitted = false;
-        this.actionForm.reset();
-        this.actionForm.setValue(this.action);
-    }
+        this.actionForm.setControl('indexName',
+            new FormControl(this.action.indexName || '$APP_NAME', [
+                Validators.required
+            ]));
 
-    public save() {
-        this.actionFormSubmitted = true;
+        this.actionForm.setControl('indexType',
+            new FormControl(this.action.indexType || '$SCHEMA_NAME'));
 
-        if (this.actionForm.valid) {
-            const action = this.actionForm.value;
+        this.actionForm.setControl('username',
+            new FormControl(this.action.username));
 
-            this.actionChanged.emit(action);
-        }
+        this.actionForm.setControl('password',
+            new FormControl(this.action.password));
     }
 }

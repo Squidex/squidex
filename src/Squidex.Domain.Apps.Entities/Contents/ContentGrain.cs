@@ -19,12 +19,14 @@ using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Log;
+using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Contents
 {
-    public class ContentGrain : DomainObjectGrain<ContentState>
+    public sealed class ContentGrain : SquidexDomainObjectGrainLogSnapshots<ContentState>, IContentGrain
     {
         private readonly IAppProvider appProvider;
         private readonly IAssetRepository assetRepository;
@@ -33,11 +35,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public ContentGrain(
             IStore<Guid> store,
+            ISemanticLog log,
             IAppProvider appProvider,
             IAssetRepository assetRepository,
             IScriptEngine scriptEngine,
             IContentRepository contentRepository)
-            : base(store)
+            : base(store, log)
         {
             Guard.NotNull(appProvider, nameof(appProvider));
             Guard.NotNull(scriptEngine, nameof(scriptEngine));
@@ -50,7 +53,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             this.contentRepository = contentRepository;
         }
 
-        public override Task<object> ExecuteAsync(IAggregateCommand command)
+        protected override Task<object> ExecuteAsync(IAggregateCommand command)
         {
             VerifyNotDeleted();
 
@@ -59,84 +62,161 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 case CreateContent createContent:
                     return CreateReturnAsync(createContent, async c =>
                     {
-                        GuardContent.CanCreate(c);
+                        var ctx = await CreateContext(c.AppId.Id, c.SchemaId.Id, () => "Failed to create content.");
 
-                        var operationContext = await CreateContext(c, () => "Failed to create content.");
+                        GuardContent.CanCreate(ctx.Schema, c);
+
+                        await ctx.ExecuteScriptAndTransformAsync(x => x.ScriptCreate, "Create", c, c.Data);
+                        await ctx.EnrichAsync(c.Data);
+                        await ctx.ValidateAsync(c.Data);
 
                         if (c.Publish)
                         {
-                            await operationContext.ExecuteScriptAsync(x => x.ScriptChange, "Published");
+                            await ctx.ExecuteScriptAsync(x => x.ScriptChange, "Published", c, c.Data);
                         }
-
-                        await operationContext.ExecuteScriptAndTransformAsync(x => x.ScriptCreate, "Create");
-                        await operationContext.EnrichAsync();
-                        await operationContext.ValidateAsync();
 
                         Create(c);
 
-                        return EntityCreatedResult.Create(c.Data, NewVersion);
+                        return EntityCreatedResult.Create(c.Data, Version);
                     });
 
                 case UpdateContent updateContent:
-                    return UpdateReturnAsync(updateContent, async c =>
+                    return UpdateReturnAsync(updateContent, c =>
                     {
                         GuardContent.CanUpdate(c);
 
-                        var operationContext = await CreateContext(c, () => "Failed to update content.");
-
-                        await operationContext.ValidateAsync();
-                        await operationContext.ExecuteScriptAndTransformAsync(x => x.ScriptUpdate, "Update");
-
-                        Update(c);
-
-                        return new ContentDataChangedResult(Snapshot.Data, NewVersion);
+                        return UpdateAsync(c, x => c.Data, false);
                     });
 
                 case PatchContent patchContent:
-                    return UpdateReturnAsync(patchContent, async c =>
+                    return UpdateReturnAsync(patchContent, c =>
                     {
                         GuardContent.CanPatch(c);
 
-                        var operationContext = await CreateContext(c, () => "Failed to patch content.");
-
-                        await operationContext.ValidatePartialAsync();
-                        await operationContext.ExecuteScriptAndTransformAsync(x => x.ScriptUpdate, "Patch");
-
-                        Patch(c);
-
-                        return new ContentDataChangedResult(Snapshot.Data, NewVersion);
+                        return UpdateAsync(c, c.Data.MergeInto, true);
                     });
 
-                case ChangeContentStatus patchContent:
-                    return UpdateAsync(patchContent, async c =>
+                case ChangeContentStatus changeContentStatus:
+                    return UpdateAsync(changeContentStatus, async c =>
                     {
-                        GuardContent.CanChangeContentStatus(Snapshot.Status, c);
-
-                        if (!c.DueTime.HasValue)
+                        try
                         {
-                            var operationContext = await CreateContext(c, () => "Failed to patch content.");
+                            var ctx = await CreateContext(Snapshot.AppId.Id, Snapshot.SchemaId.Id, () => "Failed to change content.");
 
-                            await operationContext.ExecuteScriptAsync(x => x.ScriptChange, c.Status);
+                            GuardContent.CanChangeContentStatus(ctx.Schema, Snapshot.IsPending, Snapshot.Status, c);
+
+                            if (c.DueTime.HasValue)
+                            {
+                                ScheduleStatus(c);
+                            }
+                            else
+                            {
+                                if (Snapshot.IsPending && Snapshot.Status == Status.Published && c.Status == Status.Published)
+                                {
+                                    ConfirmChanges(c);
+                                }
+                                else
+                                {
+                                    StatusChange reason;
+
+                                    if (c.Status == Status.Published)
+                                    {
+                                        reason = StatusChange.Published;
+                                    }
+                                    else if (c.Status == Status.Archived)
+                                    {
+                                        reason = StatusChange.Archived;
+                                    }
+                                    else if (Snapshot.Status == Status.Published)
+                                    {
+                                        reason = StatusChange.Unpublished;
+                                    }
+                                    else
+                                    {
+                                        reason = StatusChange.Restored;
+                                    }
+
+                                    await ctx.ExecuteScriptAsync(x => x.ScriptChange, reason, c, Snapshot.Data);
+
+                                    ChangeStatus(c, reason);
+                                }
+                            }
                         }
-
-                        ChangeStatus(c);
+                        catch (Exception)
+                        {
+                            if (c.JobId.HasValue && Snapshot?.ScheduleJob.Id == c.JobId)
+                            {
+                                CancelScheduling(c);
+                            }
+                            else
+                            {
+                                throw;
+                            }
+                        }
                     });
 
                 case DeleteContent deleteContent:
                     return UpdateAsync(deleteContent, async c =>
                     {
-                        GuardContent.CanDelete(c);
+                        var ctx = await CreateContext(Snapshot.AppId.Id, Snapshot.SchemaId.Id, () => "Failed to delete content.");
 
-                        var operationContext = await CreateContext(c, () => "Failed to delete content.");
+                        GuardContent.CanDelete(ctx.Schema, c);
 
-                        await operationContext.ExecuteScriptAsync(x => x.ScriptDelete, "Delete");
+                        await ctx.ExecuteScriptAsync(x => x.ScriptDelete, "Delete", c, Snapshot.Data);
 
                         Delete(c);
+                    });
+
+                case DiscardChanges discardChanges:
+                    return UpdateAsync(discardChanges, c =>
+                    {
+                        GuardContent.CanDiscardChanges(Snapshot.IsPending, c);
+
+                        DiscardChanges(c);
                     });
 
                 default:
                     throw new NotSupportedException();
             }
+        }
+
+        private async Task<object> UpdateAsync(ContentDataCommand c, Func<NamedContentData, NamedContentData> newDataFunc, bool partial)
+        {
+            var isProposal = c.AsDraft && Snapshot.Status == Status.Published;
+
+            var currentData =
+                isProposal ?
+                Snapshot.DataDraft :
+                Snapshot.Data;
+
+            var newData = newDataFunc(currentData);
+
+            if (!currentData.Equals(newData))
+            {
+                var ctx = await CreateContext(Snapshot.AppId.Id, Snapshot.SchemaId.Id, () => "Failed to update content.");
+
+                if (partial)
+                {
+                    await ctx.ValidatePartialAsync(c.Data);
+                }
+                else
+                {
+                    await ctx.ValidateAsync(c.Data);
+                }
+
+                newData = await ctx.ExecuteScriptAndTransformAsync(x => x.ScriptUpdate, "Update", c, newData, Snapshot.Data);
+
+                if (isProposal)
+                {
+                    ProposeUpdate(c, newData);
+                }
+                else
+                {
+                    Update(c, newData);
+                }
+            }
+
+            return new ContentDataChangedResult(newData, Version);
         }
 
         public void Create(CreateContent command)
@@ -145,47 +225,48 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             if (command.Publish)
             {
-                RaiseEvent(SimpleMapper.Map(command, new ContentStatusChanged { Status = Status.Published }));
+                RaiseEvent(SimpleMapper.Map(command, new ContentStatusChanged { Status = Status.Published, Change = StatusChange.Published }));
             }
         }
 
-        public void Update(UpdateContent command)
+        public void ConfirmChanges(ChangeContentStatus command)
         {
-            if (!command.Data.Equals(Snapshot.Data))
-            {
-                RaiseEvent(SimpleMapper.Map(command, new ContentUpdated()));
-            }
+            RaiseEvent(SimpleMapper.Map(command, new ContentChangesPublished()));
         }
 
-        public void ChangeStatus(ChangeContentStatus command)
+        public void DiscardChanges(DiscardChanges command)
         {
-            if (command.DueTime.HasValue)
-            {
-                RaiseEvent(SimpleMapper.Map(command, new ContentStatusScheduled { DueTime = command.DueTime.Value }));
-            }
-            else
-            {
-                RaiseEvent(SimpleMapper.Map(command, new ContentStatusChanged()));
-            }
-        }
-
-        public void Patch(PatchContent command)
-        {
-            var newData = command.Data.MergeInto(Snapshot.Data);
-
-            if (!newData.Equals(Snapshot.Data))
-            {
-                var @event = SimpleMapper.Map(command, new ContentUpdated());
-
-                @event.Data = newData;
-
-                RaiseEvent(@event);
-            }
+            RaiseEvent(SimpleMapper.Map(command, new ContentChangesDiscarded()));
         }
 
         public void Delete(DeleteContent command)
         {
             RaiseEvent(SimpleMapper.Map(command, new ContentDeleted()));
+        }
+
+        public void Update(ContentCommand command, NamedContentData data)
+        {
+            RaiseEvent(SimpleMapper.Map(command, new ContentUpdated { Data = data }));
+        }
+
+        public void ProposeUpdate(ContentCommand command, NamedContentData data)
+        {
+            RaiseEvent(SimpleMapper.Map(command, new ContentUpdateProposed { Data = data }));
+        }
+
+        public void CancelScheduling(ChangeContentStatus command)
+        {
+            RaiseEvent(SimpleMapper.Map(command, new ContentSchedulingCancelled()));
+        }
+
+        public void ScheduleStatus(ChangeContentStatus command)
+        {
+            RaiseEvent(SimpleMapper.Map(command, new ContentStatusScheduled { DueTime = command.DueTime.Value }));
+        }
+
+        public void ChangeStatus(ChangeContentStatus command, StatusChange reason)
+        {
+            RaiseEvent(SimpleMapper.Map(command, new ContentStatusChanged { Change = reason }));
         }
 
         private void RaiseEvent(SchemaEvent @event)
@@ -211,22 +292,24 @@ namespace Squidex.Domain.Apps.Entities.Contents
             }
         }
 
-        public override void ApplyEvent(Envelope<IEvent> @event)
+        protected override ContentState OnEvent(Envelope<IEvent> @event)
         {
-            ApplySnapshot(Snapshot.Apply(@event));
+            return Snapshot.Apply(@event);
         }
 
-        private async Task<ContentOperationContext> CreateContext(ContentCommand command, Func<string> message)
+        private async Task<ContentOperationContext> CreateContext(Guid appId, Guid schemaId, Func<string> message)
         {
             var operationContext =
-                await ContentOperationContext.CreateAsync(command, Snapshot,
-                    contentRepository,
-                    appProvider,
-                    assetRepository,
-                    scriptEngine,
-                    message);
+                await ContentOperationContext.CreateAsync(
+                    appId, schemaId,
+                    appProvider, assetRepository, contentRepository, scriptEngine, message);
 
             return operationContext;
+        }
+
+        public Task<J<IContentEntity>> GetStateAsync(long version = EtagVersion.Any)
+        {
+            return J.AsTask<IContentEntity>(GetSnapshot(version));
         }
     }
 }

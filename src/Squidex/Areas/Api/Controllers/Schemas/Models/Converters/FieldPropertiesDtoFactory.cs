@@ -25,6 +25,11 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Converters
             return properties.Accept(Instance);
         }
 
+        public FieldPropertiesDto Visit(ArrayFieldProperties properties)
+        {
+            return SimpleMapper.Map(properties, new ArrayFieldPropertiesDto());
+        }
+
         public FieldPropertiesDto Visit(BooleanFieldProperties properties)
         {
             return SimpleMapper.Map(properties, new BooleanFieldPropertiesDto());

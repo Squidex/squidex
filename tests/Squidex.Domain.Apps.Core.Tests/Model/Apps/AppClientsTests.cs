@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         {
             var clients_1 = clients_0.Add("2", "my-secret");
 
-            clients_1["2"].ShouldBeEquivalentTo(new AppClient("2", "my-secret", AppClientPermission.Editor));
+            clients_1["2"].Should().BeEquivalentTo(new AppClient("2", "my-secret", AppClientPermission.Editor));
         }
 
         [Fact]
@@ -31,7 +31,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         {
             var clients_1 = clients_0.Add("2", new AppClient("my-name", "my-secret", AppClientPermission.Reader));
 
-            clients_1["2"].ShouldBeEquivalentTo(new AppClient("my-name", "my-secret", AppClientPermission.Reader));
+            clients_1["2"].Should().BeEquivalentTo(new AppClient("my-name", "my-secret", AppClientPermission.Reader));
         }
 
         [Fact]
@@ -47,7 +47,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         {
             var clients_1 = clients_0.Rename("1", "new-name");
 
-            clients_1["1"].ShouldBeEquivalentTo(new AppClient("new-name", "my-secret", AppClientPermission.Editor));
+            clients_1["1"].Should().BeEquivalentTo(new AppClient("new-name", "my-secret", AppClientPermission.Editor));
         }
 
         [Fact]
@@ -63,7 +63,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         {
             var client_1 = clients_0.Update("1", AppClientPermission.Reader);
 
-            client_1["1"].ShouldBeEquivalentTo(new AppClient("1", "my-secret", AppClientPermission.Reader));
+            client_1["1"].Should().BeEquivalentTo(new AppClient("1", "my-secret", AppClientPermission.Reader));
         }
 
         [Fact]

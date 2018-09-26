@@ -17,6 +17,6 @@ namespace Squidex.Domain.Apps.Entities
 
         public ClaimsPrincipal User { get; set; }
 
-        public long ExpectedVersion { get; set; }
+        public long ExpectedVersion { get; set; } = EtagVersion.Any;
     }
 }

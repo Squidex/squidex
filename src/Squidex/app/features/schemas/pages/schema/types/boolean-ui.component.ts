@@ -8,7 +8,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 
-import { BooleanFieldPropertiesDto } from 'shared';
+import { BooleanFieldPropertiesDto, FieldDto } from '@app/shared';
 
 @Component({
     selector: 'sqx-boolean-ui',
@@ -20,17 +20,15 @@ export class BooleanUIComponent implements OnInit {
     public editForm: FormGroup;
 
     @Input()
+    public field: FieldDto;
+
+    @Input()
     public properties: BooleanFieldPropertiesDto;
 
     public ngOnInit() {
         this.editForm.setControl('editor',
             new FormControl(this.properties.editor, [
                 Validators.required
-            ]));
-
-        this.editForm.setControl('placeholder',
-            new FormControl(this.properties.placeholder, [
-                Validators.maxLength(100)
             ]));
 
         this.editForm.setControl('inlineEditable',

@@ -11,13 +11,10 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using Squidex.Areas.Api.Controllers.Schemas.Models;
-using Squidex.Areas.Api.Controllers.Schemas.Models.Converters;
-using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
 
 namespace Squidex.Areas.Api.Controllers.Schemas
@@ -56,7 +53,9 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         {
             var schemas = await appProvider.GetSchemasAsync(AppId);
 
-            var response = schemas.Select(s => s.ToModel()).ToList();
+            var response = schemas.Select(SchemaDto.FromSchema).ToList();
+
+            Response.Headers["ETag"] = response.ToManyEtag();
 
             return Ok(response);
         }
@@ -93,7 +92,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
                 return NotFound();
             }
 
-            var response = entity.ToDetailsModel();
+            var response = SchemaDetailsDto.FromSchema(entity);
 
             Response.Headers["ETag"] = entity.Version.ToString();
 
@@ -120,7 +119,6 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         public async Task<IActionResult> PostSchema(string app, [FromBody] CreateSchemaDto request)
         {
             var command = request.ToCommand();
-
             var context = await CommandBus.PublishAsync(command);
 
             var result = context.Result<EntityCreatedResult<Guid>>();
@@ -146,9 +144,29 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         [ApiCosts(1)]
         public async Task<IActionResult> PutSchema(string app, string name, [FromBody] UpdateSchemaDto request)
         {
-            var properties = SimpleMapper.Map(request, new SchemaProperties());
+            await CommandBus.PublishAsync(request.ToCommand());
 
-            await CommandBus.PublishAsync(new UpdateSchema { Properties = properties });
+            return NoContent();
+        }
+
+        /// <summary>
+        /// Update a schema category.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <param name="name">The name of the schema.</param>
+        /// <param name="request">The schema object that needs to updated.</param>
+        /// <returns>
+        /// 204 => Schema has been updated.
+        /// 400 => Schema properties are not valid.
+        /// 404 => Schema or app not found.
+        /// </returns>
+        [MustBeAppDeveloper]
+        [HttpPut]
+        [Route("apps/{app}/schemas/{name}/category")]
+        [ApiCosts(1)]
+        public async Task<IActionResult> PutCategory(string app, string name, [FromBody] ChangeCategoryDto request)
+        {
+            await CommandBus.PublishAsync(request.ToCommand());
 
             return NoContent();
         }
@@ -170,9 +188,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         [ApiCosts(1)]
         public async Task<IActionResult> PutSchemaScripts(string app, string name, [FromBody] ConfigureScriptsDto request)
         {
-            var command = SimpleMapper.Map(request, new ConfigureScripts());
-
-            await CommandBus.PublishAsync(command);
+            await CommandBus.PublishAsync(request.ToCommand());
 
             return NoContent();
         }

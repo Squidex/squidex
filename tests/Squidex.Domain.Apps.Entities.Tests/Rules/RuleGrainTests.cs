@@ -9,7 +9,7 @@ using System;
 using System.Collections.Immutable;
 using System.Threading.Tasks;
 using FakeItEasy;
-using Squidex.Domain.Apps.Core.Rules.Actions;
+using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.Rules.State;
@@ -17,6 +17,7 @@ using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Rules;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.Log;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Rules
@@ -32,10 +33,15 @@ namespace Squidex.Domain.Apps.Entities.Rules
             get { return ruleId; }
         }
 
+        public sealed class TestAction : RuleAction
+        {
+            public Uri Url { get; set; }
+        }
+
         public RuleGrainTests()
         {
-            sut = new RuleGrain(Store, appProvider);
-            sut.ActivateAsync(Id).Wait();
+            sut = new RuleGrain(Store, A.Dummy<ISemanticLog>(), appProvider);
+            sut.OnActivateAsync(Id).Wait();
         }
 
         [Fact]
@@ -181,14 +187,14 @@ namespace Squidex.Domain.Apps.Entities.Rules
             return CreateCommand(command);
         }
 
-        private CreateRule MakeCreateCommand()
+        private static CreateRule MakeCreateCommand()
         {
             var newTrigger = new ContentChangedTrigger
             {
                 Schemas = ImmutableList<ContentChangedTriggerSchema>.Empty
             };
 
-            var newAction = new WebhookAction
+            var newAction = new TestAction
             {
                 Url = new Uri("https://squidex.io/v2")
             };
@@ -203,7 +209,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
                 Schemas = ImmutableList<ContentChangedTriggerSchema>.Empty
             };
 
-            var newAction = new WebhookAction
+            var newAction = new TestAction
             {
                 Url = new Uri("https://squidex.io/v2")
             };

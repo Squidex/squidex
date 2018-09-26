@@ -1,0 +1,20 @@
+<span>
+    <input type="text" class="form-control" (blur)="blur()" [attr.name]="inputName" (keydown)="onKeyDown($event)" [attr.placeholder]="placeholder" #input
+        [formControl]="queryInput"
+        autocomplete="off" 
+        autocorrect="off"
+        autocapitalize="off">
+
+    <div *ngIf="suggestedItems.length > 0" [sqxModalTarget]="input" class="control-dropdown" #container position="bottomLeft">
+        <div *ngFor="let item of suggestedItems; let i = index;" class="control-dropdown-item control-dropdown-item-selectable"
+            [class.active]="i === suggestedIndex"
+            [container]="container"
+            (mousedown)="selectItem(item)"
+            (mouseover)="selectIndex(i)"
+            [sqxScrollActive]="i === suggestedIndex">
+            <ng-container *ngIf="!itemTemplate">{{item}}</ng-container>
+
+            <ng-template *ngIf="itemTemplate" [sqxTemplateWrapper]="itemTemplate" [item]="item" [index]="i"></ng-template>
+        </div>
+    </div>
+</span>

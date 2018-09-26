@@ -1,0 +1,82 @@
+<div [formGroup]="actionForm" class="form-horizontal">
+    <div class="form-group row">
+        <label class="col col-3 col-form-label" for="accessToken">Access Token</label>
+
+        <div class="col col-9">
+            <sqx-control-errors for="accessToken" [submitted]="actionFormSubmitted"></sqx-control-errors>
+
+            <input type="text" class="form-control" id="accessToken" formControlName="accessToken" />
+
+            <small class="form-text text-muted">
+                The self issued access token. Can be created under <a target="_blank" href="https://medium.com/me/settings">https://medium.com/me/settings</a>.
+            </small>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label class="col col-3 col-form-label" for="title">Title</label>
+
+        <div class="col col-9">
+            <sqx-control-errors for="title" [submitted]="actionFormSubmitted"></sqx-control-errors>
+
+            <input type="text" class="form-control" id="title" formControlName="title" />
+
+            <small class="form-text text-muted">
+                The title of the post. Note that this title is used for SEO and when rendering the post as a listing.
+            </small>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label class="col col-3 col-form-label" for="content">Content</label>
+
+        <div class="col col-9">
+            <sqx-control-errors for="content" [submitted]="actionFormSubmitted"></sqx-control-errors>
+
+            <textarea class="form-control" id="content" formControlName="content"></textarea>
+
+            <small class="form-text text-muted">
+                The body of the post, in a valid, semantic, HTML fragment, or Markdown. 
+            </small>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <div class="col col-9 offset-3">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="isHtml" formControlName="isHtml" />
+                <label class="form-check-label" for="isHtml">
+                    Is Html content
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label class="col col-3 col-form-label" for="canonicalUrl">Canonical URL</label>
+
+        <div class="col col-9">
+            <sqx-control-errors for="canonicalUrl" [submitted]="actionFormSubmitted"></sqx-control-errors>
+
+            <input type="text" class="form-control" id="canonicalUrl" formControlName="canonicalUrl" />
+
+            <small class="form-text text-muted">
+                The original home of this content, if it was originally published elsewhere.
+            </small>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label class="col col-3 col-form-label" for="tags">Tags</label>
+
+        <div class="col col-9">
+            <sqx-control-errors for="tags" [submitted]="actionFormSubmitted"></sqx-control-errors>
+
+            <input type="text" class="form-control" id="tags" formControlName="tags" />
+
+            <small class="form-text text-muted">
+                Comma-separated list of tags.
+            </small>
+        </div>
+    </div>
+</div>

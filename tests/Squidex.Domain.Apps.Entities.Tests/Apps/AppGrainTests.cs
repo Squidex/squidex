@@ -17,6 +17,7 @@ using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.Log;
 using Squidex.Shared.Users;
 using Xunit;
 
@@ -24,9 +25,9 @@ namespace Squidex.Domain.Apps.Entities.Apps
 {
     public class AppGrainTests : HandlerTestBase<AppGrain, AppState>
     {
-        private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
         private readonly IAppPlansProvider appPlansProvider = A.Fake<IAppPlansProvider>();
         private readonly IAppPlanBillingManager appPlansBillingManager = A.Fake<IAppPlanBillingManager>();
+        private readonly IUser user = A.Fake<IUser>();
         private readonly IUserResolver userResolver = A.Fake<IUserResolver>();
         private readonly string contributorId = Guid.NewGuid().ToString();
         private readonly string clientId = "client";
@@ -45,11 +46,11 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         public AppGrainTests()
         {
-            A.CallTo(() => appProvider.GetAppAsync(AppName))
-             .Returns((IAppEntity)null);
+            A.CallTo(() => user.Id)
+                .Returns(contributorId);
 
-            A.CallTo(() => userResolver.FindByIdAsync(contributorId))
-                .Returns(A.Fake<IUser>());
+            A.CallTo(() => userResolver.FindByIdOrEmailAsync(contributorId))
+                .Returns(user);
 
             initialPatterns = new InitialPatterns
             {
@@ -57,8 +58,17 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 { patternId2, new AppPattern("Numbers", "[0-9]*") }
             };
 
-            sut = new AppGrain(initialPatterns, Store, appProvider, appPlansProvider, appPlansBillingManager, userResolver);
-            sut.ActivateAsync(Id).Wait();
+            sut = new AppGrain(initialPatterns, Store, A.Dummy<ISemanticLog>(), appPlansProvider, appPlansBillingManager, userResolver);
+            sut.OnActivateAsync(Id).Wait();
+        }
+
+        [Fact]
+        public async Task Command_should_throw_exception_if_app_is_archived()
+        {
+            await ExecuteCreateAsync();
+            await ExecuteArchiveAsync();
+
+            await Assert.ThrowsAsync<DomainException>(ExecuteAttachClientAsync);
         }
 
         [Fact]
@@ -97,7 +107,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             var result = await sut.ExecuteAsync(CreateCommand(command));
 
-            Assert.True(result is PlanChangedResult);
+            Assert.True(result.Value is PlanChangedResult);
 
             Assert.Equal(planId, sut.Snapshot.Plan.PlanId);
 
@@ -154,7 +164,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             var result = await sut.ExecuteAsync(CreateCommand(command));
 
-            result.ShouldBeEquivalent(new EntitySavedResult(5));
+            result.ShouldBeEquivalent(EntityCreatedResult.Create(contributorId, 5));
 
             Assert.Equal(AppContributorPermission.Editor, sut.Snapshot.Contributors[contributorId]);
 
@@ -360,6 +370,26 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 );
         }
 
+        [Fact]
+        public async Task ArchiveApp_should_create_events_and_update_state()
+        {
+            var command = new ArchiveApp();
+
+            await ExecuteCreateAsync();
+
+            var result = await sut.ExecuteAsync(CreateCommand(command));
+
+            result.ShouldBeEquivalent(new EntitySavedResult(5));
+
+            LastEvents
+                .ShouldHaveSameEvents(
+                    CreateEvent(new AppArchived())
+                );
+
+            A.CallTo(() => appPlansBillingManager.ChangePlanAsync(command.Actor.Identifier, AppId, AppName, null))
+                .MustHaveHappened();
+        }
+
         private Task ExecuteAddPatternAsync()
         {
             return sut.ExecuteAsync(CreateCommand(new AddPattern { PatternId = patternId3, Name = "Name", Pattern = ".*" }));
@@ -383,6 +413,11 @@ namespace Squidex.Domain.Apps.Entities.Apps
         private Task ExecuteAddLanguageAsync(Language language)
         {
             return sut.ExecuteAsync(CreateCommand(new AddLanguage { Language = language }));
+        }
+
+        private Task ExecuteArchiveAsync()
+        {
+            return sut.ExecuteAsync(CreateCommand(new ArchiveApp()));
         }
     }
 }

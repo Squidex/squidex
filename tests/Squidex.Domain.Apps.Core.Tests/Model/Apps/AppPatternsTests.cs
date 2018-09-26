@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         {
             var patterns_2 = patterns_1.Add(id, "NewPattern", "New Pattern", "Message");
 
-            patterns_2[id].ShouldBeEquivalentTo(new AppPattern("NewPattern", "New Pattern", "Message"));
+            patterns_2[id].Should().BeEquivalentTo(new AppPattern("NewPattern", "New Pattern", "Message"));
         }
 
         [Fact]
@@ -46,7 +46,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         {
             var patterns_2 = patterns_1.Update(firstId, "UpdatePattern", "Update Pattern", "Message");
 
-            patterns_2[firstId].ShouldBeEquivalentTo(new AppPattern("UpdatePattern", "Update Pattern", "Message"));
+            patterns_2[firstId].Should().BeEquivalentTo(new AppPattern("UpdatePattern", "Update Pattern", "Message"));
         }
 
         [Fact]

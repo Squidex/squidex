@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
 
 namespace Squidex.Areas.Api.Controllers.Languages
@@ -43,7 +42,7 @@ namespace Squidex.Areas.Api.Controllers.Languages
         [ApiCosts(0)]
         public IActionResult GetLanguages()
         {
-            var response = Language.AllLanguages.Select(x => SimpleMapper.Map(x, new LanguageDto())).ToList();
+            var response = Language.AllLanguages.Select(LanguageDto.FromLanguage).ToList();
 
             return Ok(response);
         }

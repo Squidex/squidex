@@ -9,6 +9,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using Google;
 using Google.Cloud.Storage.V1;
@@ -17,6 +18,8 @@ namespace Squidex.Infrastructure.Assets
 {
     public sealed class GoogleCloudAssetStore : IAssetStore, IInitializable
     {
+        private static readonly UploadObjectOptions IfNotExists = new UploadObjectOptions { IfGenerationMatch = 0 };
+        private static readonly CopyObjectOptions IfNotExistsCopy = new CopyObjectOptions { IfGenerationMatch = 0 };
         private readonly string bucketName;
         private StorageClient storageClient;
 
@@ -48,58 +51,79 @@ namespace Squidex.Infrastructure.Assets
             return $"https://storage.cloud.google.com/{bucketName}/{objectName}";
         }
 
-        public Task UploadTemporaryAsync(string name, Stream stream)
-        {
-            return storageClient.UploadObjectAsync(bucketName, name, "application/octet-stream", stream);
-        }
-
-        public async Task UploadAsync(string id, long version, string suffix, Stream stream)
-        {
-            var objectName = GetObjectName(id, version, suffix);
-
-            await storageClient.UploadObjectAsync(bucketName, objectName, "application/octet-stream", stream);
-        }
-
-        public async Task CopyTemporaryAsync(string name, string id, long version, string suffix)
+        public async Task CopyAsync(string sourceFileName, string id, long version, string suffix, CancellationToken ct = default(CancellationToken))
         {
             var objectName = GetObjectName(id, version, suffix);
 
             try
             {
-                await storageClient.CopyObjectAsync(bucketName, name, bucketName, objectName);
+                await storageClient.CopyObjectAsync(bucketName, sourceFileName, bucketName, objectName, IfNotExistsCopy, ct);
             }
             catch (GoogleApiException ex) when (ex.HttpStatusCode == HttpStatusCode.NotFound)
             {
-                throw new AssetNotFoundException($"Asset {name} not found.", ex);
+                throw new AssetNotFoundException(sourceFileName, ex);
+            }
+            catch (GoogleApiException ex) when (ex.HttpStatusCode == HttpStatusCode.PreconditionFailed)
+            {
+                throw new AssetAlreadyExistsException(objectName);
             }
         }
 
-        public async Task DownloadAsync(string id, long version, string suffix, Stream stream)
+        public async Task DownloadAsync(string id, long version, string suffix, Stream stream, CancellationToken ct = default(CancellationToken))
         {
             var objectName = GetObjectName(id, version, suffix);
 
             try
             {
-                await storageClient.DownloadObjectAsync(bucketName, objectName, stream);
+                await storageClient.DownloadObjectAsync(bucketName, objectName, stream, cancellationToken: ct);
             }
             catch (GoogleApiException ex) when (ex.HttpStatusCode == HttpStatusCode.NotFound)
             {
-                throw new AssetNotFoundException($"Asset {id}, {version} not found.", ex);
+                throw new AssetNotFoundException($"Id={id}, Version={version}", ex);
             }
         }
 
-        public async Task DeleteTemporaryAsync(string name)
+        public Task UploadAsync(string id, long version, string suffix, Stream stream, CancellationToken ct = default(CancellationToken))
+        {
+            return UploadCoreAsync(GetObjectName(id, version, suffix), stream, ct);
+        }
+
+        public Task UploadAsync(string fileName, Stream stream, CancellationToken ct = default(CancellationToken))
+        {
+            return UploadCoreAsync(fileName, stream, ct);
+        }
+
+        public Task DeleteAsync(string id, long version, string suffix)
+        {
+            return DeleteCoreAsync(GetObjectName(id, version, suffix));
+        }
+
+        public Task DeleteAsync(string fileName)
+        {
+            return DeleteCoreAsync(fileName);
+        }
+
+        private async Task UploadCoreAsync(string objectName, Stream stream, CancellationToken ct)
         {
             try
             {
-                await storageClient.DeleteObjectAsync(bucketName, name);
+                await storageClient.UploadObjectAsync(bucketName, objectName, "application/octet-stream", stream, IfNotExists, ct);
             }
-            catch (GoogleApiException ex)
+            catch (GoogleApiException ex) when (ex.HttpStatusCode == HttpStatusCode.PreconditionFailed)
             {
-                if (ex.HttpStatusCode != HttpStatusCode.NotFound)
-                {
-                    throw;
-                }
+                throw new AssetAlreadyExistsException(objectName);
+            }
+        }
+
+        private async Task DeleteCoreAsync(string objectName)
+        {
+            try
+            {
+                await storageClient.DeleteObjectAsync(bucketName, objectName);
+            }
+            catch (GoogleApiException ex) when (ex.HttpStatusCode == HttpStatusCode.NotFound)
+            {
+                return;
             }
         }
 

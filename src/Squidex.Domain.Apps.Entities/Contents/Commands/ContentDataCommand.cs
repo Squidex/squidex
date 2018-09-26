@@ -12,5 +12,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Commands
     public abstract class ContentDataCommand : ContentCommand
     {
         public NamedContentData Data { get; set; }
+
+        public bool AsDraft { get; set; }
     }
 }

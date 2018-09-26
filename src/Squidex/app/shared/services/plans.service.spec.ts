@@ -10,11 +10,11 @@ import { inject, TestBed } from '@angular/core/testing';
 
 import {
     AnalyticsService,
-    AppPlansDto,
     ApiUrlConfig,
     ChangePlanDto,
     PlanChangedDto,
     PlanDto,
+    PlansDto,
     PlansService,
     Version
 } from './../';
@@ -42,7 +42,7 @@ describe('PlansService', () => {
     it('should make get request to get app plans',
         inject([PlansService, HttpTestingController], (plansService: PlansService, httpMock: HttpTestingController) => {
 
-        let plans: AppPlansDto | null = null;
+        let plans: PlansDto;
 
         plansService.getPlans('my-app').subscribe(result => {
             plans = result;
@@ -62,6 +62,8 @@ describe('PlansService', () => {
                     id: 'free',
                     name: 'Free',
                     costs: '14 €',
+                    yearlyId: 'free_yearly',
+                    yearlyCosts: '12 €',
                     maxApiCalls: 1000,
                     maxAssetSize: 1500,
                     maxContributors: 2500
@@ -70,6 +72,8 @@ describe('PlansService', () => {
                     id: 'prof',
                     name: 'Prof',
                     costs: '18 €',
+                    yearlyId: 'prof_yearly',
+                    yearlyCosts: '16 €',
                     maxApiCalls: 4000,
                     maxAssetSize: 5500,
                     maxContributors: 6500
@@ -81,14 +85,14 @@ describe('PlansService', () => {
             }
         });
 
-        expect(plans).toEqual(
-            new AppPlansDto(
+        expect(plans!).toEqual(
+            new PlansDto(
                 '123',
                 '456',
                 true,
                 [
-                    new PlanDto('free', 'Free', '14 €', 1000, 1500, 2500),
-                    new PlanDto('prof', 'Prof', '18 €', 4000, 5500, 6500)
+                    new PlanDto('free', 'Free', '14 €', 'free_yearly', '12 €', 1000, 1500, 2500),
+                    new PlanDto('prof', 'Prof', '18 €', 'prof_yearly', '16 €', 4000, 5500, 6500)
                 ],
                 new Version('2')
             ));
@@ -99,7 +103,7 @@ describe('PlansService', () => {
 
         const dto = new ChangePlanDto('enterprise');
 
-        let planChanged: PlanChangedDto | null = null;
+        let planChanged: PlanChangedDto;
 
         plansService.putPlan('my-app', dto, version).subscribe(result => {
             planChanged = result.payload;
@@ -112,6 +116,6 @@ describe('PlansService', () => {
         expect(req.request.method).toEqual('PUT');
         expect(req.request.headers.get('If-Match')).toBe(version.value);
 
-        expect(planChanged).toEqual(new PlanChangedDto('my-url'));
+        expect(planChanged!).toEqual(new PlanChangedDto('my-url'));
     }));
 });

@@ -15,8 +15,14 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public string Placeholder { get; set; }
 
+        public string EditorUrl { get; set; }
+
         public abstract T Accept<T>(IFieldPropertiesVisitor<T> visitor);
 
-        public abstract Field CreateField(long id, string name, Partitioning partitioning);
+        public abstract T Accept<T>(IFieldVisitor<T> visitor, IField field);
+
+        public abstract RootField CreateRootField(long id, string name, Partitioning partitioning);
+
+        public abstract NestedField CreateNestedField(long id, string name);
     }
 }

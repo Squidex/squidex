@@ -5,10 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Squidex.Infrastructure
 {
+    [Serializable]
     public sealed class ValidationError
     {
         private static readonly string[] FallbackProperties = new string[0];
@@ -32,6 +35,23 @@ namespace Squidex.Infrastructure
             this.message = message;
 
             this.propertyNames = propertyNames ?? FallbackProperties;
+        }
+
+        public ValidationError WithPrefix(string prefix)
+        {
+            if (propertyNames.Length > 0)
+            {
+                return new ValidationError(Message, propertyNames.Select(x => $"{prefix}.{x}").ToArray());
+            }
+            else
+            {
+                return new ValidationError(Message, prefix);
+            }
+        }
+
+        public void AddTo(AddValidation e)
+        {
+            e(Message, propertyNames);
         }
     }
 }

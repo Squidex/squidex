@@ -6,23 +6,17 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
-using System.Security.Claims;
 using System.Threading.Tasks;
-using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents
 {
     public interface IContentQueryService
     {
-        Task<(ISchemaEntity Schema, IResultList<IContentEntity> Contents)> QueryAsync(IAppEntity app, string schemaIdOrName, ClaimsPrincipal user, bool archived, HashSet<Guid> ids);
+        Task<IResultList<IContentEntity>> QueryAsync(ContentQueryContext context, Q query);
 
-        Task<(ISchemaEntity Schema, IResultList<IContentEntity> Contents)> QueryAsync(IAppEntity app, string schemaIdOrName, ClaimsPrincipal user, bool archived, string query);
+        Task<IContentEntity> FindContentAsync(ContentQueryContext context, Guid id, long version = EtagVersion.Any);
 
-        Task<(ISchemaEntity Schema, IContentEntity Content)> FindContentAsync(IAppEntity app, string schemaIdOrName, ClaimsPrincipal user, Guid id, long version = EtagVersion.Any);
-
-        Task<ISchemaEntity> FindSchemaAsync(IAppEntity app, string schemaIdOrName);
+        Task ThrowIfSchemaNotExistsAsync(ContentQueryContext context);
     }
 }

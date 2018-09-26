@@ -7,13 +7,15 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using NSwag.Annotations;
 using Squidex.Areas.Api.Controllers.Assets.Models;
+using Squidex.Areas.Api.Controllers.Contents;
+using Squidex.Domain.Apps.Core.Tags;
+using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps.Services;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
@@ -21,7 +23,6 @@ using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
 
 namespace Squidex.Areas.Api.Controllers.Assets
@@ -35,23 +36,52 @@ namespace Squidex.Areas.Api.Controllers.Assets
     [SwaggerTag(nameof(Assets))]
     public sealed class AssetsController : ApiController
     {
-        private readonly IAssetRepository assetRepository;
+        private readonly IAssetQueryService assetQuery;
         private readonly IAssetStatsRepository assetStatsRepository;
         private readonly IAppPlansProvider appPlanProvider;
+        private readonly IOptions<MyContentsControllerOptions> controllerOptions;
+        private readonly ITagService tagService;
         private readonly AssetConfig assetsConfig;
 
         public AssetsController(
             ICommandBus commandBus,
-            IAssetRepository assetRepository,
+            IAssetQueryService assetQuery,
             IAssetStatsRepository assetStatsRepository,
             IAppPlansProvider appPlanProvider,
-            IOptions<AssetConfig> assetsConfig)
+            IOptions<AssetConfig> assetsConfig,
+            IOptions<MyContentsControllerOptions> controllerOptions,
+            ITagService tagService)
             : base(commandBus)
         {
             this.assetsConfig = assetsConfig.Value;
-            this.assetRepository = assetRepository;
+            this.assetQuery = assetQuery;
             this.assetStatsRepository = assetStatsRepository;
             this.appPlanProvider = appPlanProvider;
+            this.controllerOptions = controllerOptions;
+            this.tagService = tagService;
+        }
+
+        /// <summary>
+        /// Get assets tags.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <returns>
+        /// 200 => Assets returned.
+        /// 404 => App not found.
+        /// </returns>
+        /// <remarks>
+        /// Get all tags for assets.
+        /// </remarks>
+        [MustBeAppReader]
+        [HttpGet]
+        [Route("apps/{app}/assets/tags")]
+        [ProducesResponseType(typeof(Dictionary<string, int>), 200)]
+        [ApiCosts(1)]
+        public async Task<IActionResult> GetTags(string app)
+        {
+            var response = await tagService.GetTagsAsync(App.Id, TagGroups.Assets);
+
+            return Ok(response);
         }
 
         /// <summary>
@@ -73,33 +103,18 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [ApiCosts(1)]
         public async Task<IActionResult> GetAssets(string app, [FromQuery] string ids = null)
         {
-            HashSet<Guid> idsList = null;
+            var context = Context();
 
-            if (!string.IsNullOrWhiteSpace(ids))
+            var assets = await assetQuery.QueryAsync(context, Q.Empty.WithODataQuery(Request.QueryString.ToString()).WithIds(ids));
+
+            var response = AssetsDto.FromAssets(assets);
+
+            if (controllerOptions.Value.EnableSurrogateKeys && response.Items.Length <= controllerOptions.Value.MaxItemsForSurrogateKeys)
             {
-                idsList = new HashSet<Guid>();
-
-                foreach (var id in ids.Split(','))
-                {
-                    if (Guid.TryParse(id, out var guid))
-                    {
-                        idsList.Add(guid);
-                    }
-                }
+                Response.Headers["Surrogate-Key"] = response.Items.ToSurrogateKeys();
             }
 
-            var assets =
-                idsList?.Count > 0 ?
-                    await assetRepository.QueryAsync(App.Id, idsList) :
-                    await assetRepository.QueryAsync(App.Id, Request.QueryString.ToString());
-
-            var response = new AssetsDto
-            {
-                Total = assets.Total,
-                Items = assets.Select(x => SimpleMapper.Map(x, new AssetDto { FileType = x.FileName.FileType() })).ToArray()
-            };
-
-            Response.Headers["Surrogate-Key"] = string.Join(" ", response.Items.Select(x => x.Id));
+            Response.Headers["ETag"] = response.Items.ToManyEtag(response.Total);
 
             return Ok(response);
         }
@@ -120,17 +135,23 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [ApiCosts(1)]
         public async Task<IActionResult> GetAsset(string app, Guid id)
         {
-            var entity = await assetRepository.FindAssetAsync(id);
+            var context = Context();
+
+            var entity = await assetQuery.FindAssetAsync(context, id);
 
             if (entity == null)
             {
                 return NotFound();
             }
 
-            var response = SimpleMapper.Map(entity, new AssetDto { FileType = entity.FileName.FileType() });
+            var response = AssetDto.FromAsset(entity);
+
+            if (controllerOptions.Value.EnableSurrogateKeys)
+            {
+                Response.Headers["Surrogate-Key"] = entity.Id.ToString();
+            }
 
             Response.Headers["ETag"] = entity.Version.ToString();
-            Response.Headers["Surrogate-Key"] = entity.Id.ToString();
 
             return Ok(response);
         }
@@ -160,8 +181,8 @@ namespace Squidex.Areas.Api.Controllers.Assets
             var command = new CreateAsset { File = assetFile };
             var context = await CommandBus.PublishAsync(command);
 
-            var result = context.Result<EntityCreatedResult<Guid>>();
-            var response = AssetCreatedDto.Create(command, result);
+            var result = context.Result<AssetCreatedResult>();
+            var response = AssetCreatedDto.FromCommand(command, result);
 
             return StatusCode(201, response);
         }
@@ -217,9 +238,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [ApiCosts(1)]
         public async Task<IActionResult> PutAsset(string app, Guid id, [FromBody] AssetUpdateDto request)
         {
-            var command = SimpleMapper.Map(request, new RenameAsset { AssetId = id });
-
-            await CommandBus.PublishAsync(command);
+            await CommandBus.PublishAsync(request.ToCommand(id));
 
             return NoContent();
         }
@@ -276,6 +295,11 @@ namespace Squidex.Areas.Api.Controllers.Assets
             var assetFile = new AssetFile(formFile.FileName, formFile.ContentType, formFile.Length, formFile.OpenReadStream);
 
             return assetFile;
+        }
+
+        private QueryContext Context()
+        {
+            return QueryContext.Create(App, User);
         }
     }
 }

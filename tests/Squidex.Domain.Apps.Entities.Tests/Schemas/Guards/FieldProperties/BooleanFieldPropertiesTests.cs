@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards.FieldProperties
 
             var errors = FieldPropertiesValidator.Validate(sut).ToList();
 
-            errors.ShouldBeEquivalentTo(
+            errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
                     new ValidationError("Editor is not a valid value.", "Editor")

@@ -5,22 +5,21 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 
 import {
-    AppContext,
     AppLanguageDto,
     ContentDto,
-    ContentsService,
+    ContentsState,
     fadeAnimation,
-    FieldDto,
+    FieldFormatter,
     fieldInvariant,
-    ModalView,
-    SchemaDto,
-    Types,
-    Versioned
-} from 'shared';
+    ModalModel,
+    PatchContentForm,
+    RootFieldDto,
+    SchemaDetailsDto,
+    Types
+} from '@app/shared';
 
 /* tslint:disable:component-selector */
 
@@ -28,19 +27,16 @@ import {
     selector: '[sqxContent]',
     styleUrls: ['./content-item.component.scss'],
     templateUrl: './content-item.component.html',
-    providers: [
-        AppContext
-    ],
     animations: [
         fadeAnimation
     ]
 })
-export class ContentItemComponent implements OnInit, OnChanges {
+export class ContentItemComponent implements OnChanges {
     @Output()
-    public publishing = new EventEmitter();
+    public cloning = new EventEmitter();
 
     @Output()
-    public unpublishing = new EventEmitter();
+    public deleting = new EventEmitter();
 
     @Output()
     public archiving = new EventEmitter();
@@ -49,10 +45,10 @@ export class ContentItemComponent implements OnInit, OnChanges {
     public restoring = new EventEmitter();
 
     @Output()
-    public deleting = new EventEmitter();
+    public publishing = new EventEmitter();
 
     @Output()
-    public saved = new EventEmitter<Versioned<any>>();
+    public unpublishing = new EventEmitter();
 
     @Output()
     public selectedChange = new EventEmitter();
@@ -64,10 +60,7 @@ export class ContentItemComponent implements OnInit, OnChanges {
     public language: AppLanguageDto;
 
     @Input()
-    public schemaFields: FieldDto[];
-
-    @Input()
-    public schema: SchemaDto;
+    public schema: SchemaDetailsDto;
 
     @Input()
     public isReadOnly = false;
@@ -78,103 +71,77 @@ export class ContentItemComponent implements OnInit, OnChanges {
     @Input('sqxContent')
     public content: ContentDto;
 
-    public formSubmitted = false;
-    public form: FormGroup = new FormGroup({});
+    public patchForm: PatchContentForm;
 
-    public dropdown = new ModalView(false, true);
+    public dropdown = new ModalModel();
 
     public values: any[] = [];
 
-    constructor(public readonly ctx: AppContext,
-        private readonly contentsService: ContentsService
+    constructor(
+        private readonly contentsState: ContentsState
     ) {
     }
 
-    public ngOnChanges() {
-        this.updateValues();
-    }
-
-    public ngOnInit() {
-        for (let field of this.schemaFields) {
-            if (field.properties['inlineEditable']) {
-                this.form.setControl(field.name, new FormControl(undefined, field.createValidators(this.language.isOptional)));
-            }
+    public ngOnChanges(changes: SimpleChanges) {
+        if (changes['schema'] || changes['language']) {
+            this.patchForm = new PatchContentForm(this.schema, this.language);
         }
 
-        this.updateValues();
+        if (changes['content'] || changes['language']) {
+            this.updateValues();
+        }
     }
 
     public shouldStop(event: Event) {
-        if (this.form.dirty) {
+        if (this.patchForm.form.dirty) {
             event.stopPropagation();
             event.stopImmediatePropagation();
         }
     }
 
     public save() {
-        this.formSubmitted = true;
+        const value = this.patchForm.submit();
 
-        if (this.form.dirty && this.form.valid) {
-            this.form.disable();
-
-            const request = {};
-
-            for (let field of this.schemaFields) {
-                if (field.properties['inlineEditable']) {
-                    const value = this.form.controls[field.name].value;
-
-                    if (field.isLocalizable) {
-                        request[field.name] = { [this.language.iso2Code]: value };
-                    } else {
-                        request[field.name] = { iv: value };
-                    }
-                }
-            }
-
-            this.contentsService.patchContent(this.ctx.appName, this.schema.name, this.content.id, request, this.content.version)
-                .finally(() => {
-                    this.form.enable();
-                })
-                .subscribe(dto => {
-                    this.form.markAsPristine();
-
-                    this.emitSaved(dto);
+        if (value) {
+            this.contentsState.patch(this.content, value)
+                .subscribe(() => {
+                    this.patchForm.submitCompleted();
                 }, error => {
-                    this.ctx.notifyError(error);
+                    this.patchForm.submitFailed(error);
                 });
         }
     }
 
-    private emitSaved(data: Versioned<any>) {
-        this.saved.emit(data);
+    public cancel() {
+        this.patchForm.submitCompleted();
+
+        this.updateValues();
     }
 
     private updateValues() {
         this.values = [];
 
-        if (this.schemaFields) {
-            for (let field of this.schemaFields) {
-                const value = this.getRawValue(field);
+        for (let field of this.schema.listFields) {
+            const value = this.getRawValue(field);
 
-                if (Types.isUndefined(value)) {
-                    this.values.push('');
-                } else {
-                    this.values.push(field.formatValue(value));
-                }
+            if (Types.isUndefined(value)) {
+                this.values.push('');
+            } else {
+                this.values.push(FieldFormatter.format(field, value));
+            }
 
-                if (this.form) {
-                    const formControl = this.form.controls[field.name];
+            if (this.patchForm) {
+                const formControl = this.patchForm.form.controls[field.name];
 
-                    if (formControl) {
-                        formControl.setValue(value);
-                    }
+                if (formControl) {
+                    formControl.setValue(value);
                 }
             }
         }
     }
 
-    private getRawValue(field: FieldDto): any {
-        const contentField = this.content.data[field.name];
+    private getRawValue(field: RootFieldDto): any {
+        const contentField = this.content.dataDraft[field.name];
 
         if (contentField) {
             if (field.isLocalizable) {

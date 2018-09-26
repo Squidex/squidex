@@ -44,8 +44,8 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
             await sut.ValidateAsync(CreateValue(null), errors);
 
-            errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> is required." });
+            errors.Should().BeEquivalentTo(
+                new[] { "Field is required." });
         }
 
         [Fact]
@@ -55,8 +55,8 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
             await sut.ValidateAsync(CreateValue(5), errors);
 
-            errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> must be greater or equals than '10'." });
+            errors.Should().BeEquivalentTo(
+                new[] { "Must be greater than or equal to '10'." });
         }
 
         [Fact]
@@ -66,8 +66,8 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
             await sut.ValidateAsync(CreateValue(20), errors);
 
-            errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> must be less or equals than '10'." });
+            errors.Should().BeEquivalentTo(
+                new[] { "Must be less than or equal to '10'." });
         }
 
         [Fact]
@@ -77,8 +77,8 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
             await sut.ValidateAsync(CreateValue(20), errors);
 
-            errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> is not an allowed value." });
+            errors.Should().BeEquivalentTo(
+                new[] { "Not an allowed value." });
         }
 
         [Fact]
@@ -88,8 +88,8 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
             await sut.ValidateAsync(CreateValue("Invalid"), errors);
 
-            errors.ShouldBeEquivalentTo(
-                new[] { "<FIELD> is not a valid value." });
+            errors.Should().BeEquivalentTo(
+                new[] { "Not a valid value." });
         }
 
         private static JValue CreateValue(object v)
@@ -97,9 +97,9 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             return new JValue(v);
         }
 
-        private static NumberField Field(NumberFieldProperties properties)
+        private static RootField<NumberFieldProperties> Field(NumberFieldProperties properties)
         {
-            return new NumberField(1, "my-number", Partitioning.Invariant, properties);
+            return Fields.Number(1, "my-number", Partitioning.Invariant, properties);
         }
     }
 }

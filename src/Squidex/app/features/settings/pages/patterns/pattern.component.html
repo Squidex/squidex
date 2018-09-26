@@ -1,31 +1,31 @@
 <div class="table-items-row" [class.table-items-footer]="!pattern">
-    <form [formGroup]="editForm" (ngSubmit)="save()" class="row no-gutters">
+    <form [formGroup]="editForm.form" (ngSubmit)="save()" class="row no-gutters">
         <div class="col col-name">
-            <sqx-control-errors for="name" [submitted]="editFormSubmitted"></sqx-control-errors>
+            <sqx-control-errors for="name" [submitted]="editForm.submitted | async"></sqx-control-errors>
 
             <input type="text" class="form-control" id="pattern-name" maxlength="100" formControlName="name" placeholder="Name" />
             
         </div>
 
         <div class="col pl-2 pr-2">
-            <sqx-control-errors for="pattern" [submitted]="editFormSubmitted"></sqx-control-errors>
+            <sqx-control-errors for="pattern" [submitted]="editForm.submitted | async"></sqx-control-errors>
 
             <input type="text" class="form-control" id="pattern-pattern" maxlength="1000" formControlName="pattern" placeholder="Pattern" />
         </div>
 
         <div class="col col-message">
-            <sqx-control-errors for="message" [submitted]="editFormSubmitted"></sqx-control-errors>
+            <sqx-control-errors for="message" [submitted]="editForm.submitted | async"></sqx-control-errors>
 
             <input type="text" class="form-control" id="pattern-message" maxlength="1000" formControlName="message" placeholder="Message" />
         </div>
 
         <div class="col col-auto pl-2 col-options" *ngIf="pattern">
-            <button type="submit" class="btn btn-primary" [class.disabled]="!editForm.dirty">
+            <button type="submit" class="btn btn-primary" [class.disabled]="!editForm.form.dirty">
                 <i class="icon-checkmark"></i>
             </button>
 
             <button type="button" class="btn btn-link btn-danger"
-                (sqxConfirmClick)="removing.emit(pattern)"
+                (sqxConfirmClick)="delete()"
                 confirmTitle="Remove pattern" 
                 confirmText="Do you really want to remove this pattern?">
                 <i class="icon-bin2"></i>

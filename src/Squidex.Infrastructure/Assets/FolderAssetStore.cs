@@ -7,6 +7,7 @@
 
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Tasks;
@@ -15,6 +16,7 @@ namespace Squidex.Infrastructure.Assets
 {
     public sealed class FolderAssetStore : IAssetStore, IInitializable
     {
+        private const int BufferSize = 81920;
         private readonly ISemanticLog log;
         private readonly DirectoryInfo directory;
 
@@ -57,27 +59,7 @@ namespace Squidex.Infrastructure.Assets
             return file.FullName;
         }
 
-        public async Task UploadTemporaryAsync(string name, Stream stream)
-        {
-            var file = GetFile(name);
-
-            using (var fileStream = file.OpenWrite())
-            {
-                await stream.CopyToAsync(fileStream);
-            }
-        }
-
-        public async Task UploadAsync(string id, long version, string suffix, Stream stream)
-        {
-            var file = GetFile(id, version, suffix);
-
-            using (var fileStream = file.OpenWrite())
-            {
-                await stream.CopyToAsync(fileStream);
-            }
-        }
-
-        public async Task DownloadAsync(string id, long version, string suffix, Stream stream)
+        public async Task DownloadAsync(string id, long version, string suffix, Stream stream, CancellationToken ct = default(CancellationToken))
         {
             var file = GetFile(id, version, suffix);
 
@@ -85,44 +67,76 @@ namespace Squidex.Infrastructure.Assets
             {
                 using (var fileStream = file.OpenRead())
                 {
-                    await fileStream.CopyToAsync(stream);
+                    await fileStream.CopyToAsync(stream, BufferSize, ct);
                 }
             }
             catch (FileNotFoundException ex)
             {
-                throw new AssetNotFoundException($"Asset {id}, {version} not found.", ex);
+                throw new AssetNotFoundException($"Id={id}, Version={version}", ex);
             }
         }
 
-        public Task CopyTemporaryAsync(string name, string id, long version, string suffix)
+        public Task CopyAsync(string sourceFileName, string id, long version, string suffix, CancellationToken ct = default(CancellationToken))
         {
+            var targetFile = GetFile(id, version, suffix);
+
             try
             {
-                var file = GetFile(name);
+                var file = GetFile(sourceFileName);
 
-                file.CopyTo(GetPath(id, version, suffix));
+                file.CopyTo(targetFile.FullName);
 
                 return TaskHelper.Done;
             }
+            catch (IOException) when (targetFile.Exists)
+            {
+                throw new AssetAlreadyExistsException(targetFile.Name);
+            }
             catch (FileNotFoundException ex)
             {
-                throw new AssetNotFoundException($"Asset {name} not found.", ex);
+                throw new AssetNotFoundException(sourceFileName, ex);
             }
         }
 
-        public Task DeleteTemporaryAsync(string name)
+        public Task UploadAsync(string id, long version, string suffix, Stream stream, CancellationToken ct = default(CancellationToken))
+        {
+            return UploadCoreAsync(GetFile(id, version, suffix), stream, ct);
+        }
+
+        public Task UploadAsync(string fileName, Stream stream, CancellationToken ct = default(CancellationToken))
+        {
+            return UploadCoreAsync(GetFile(fileName), stream, ct);
+        }
+
+        public Task DeleteAsync(string id, long version, string suffix)
+        {
+            return DeleteFileCoreAsync(GetFile(id, version, suffix));
+        }
+
+        public Task DeleteAsync(string fileName)
+        {
+            return DeleteFileCoreAsync(GetFile(fileName));
+        }
+
+        private static Task DeleteFileCoreAsync(FileInfo file)
+        {
+            file.Delete();
+
+            return TaskHelper.Done;
+        }
+
+        private static async Task UploadCoreAsync(FileInfo file, Stream stream, CancellationToken ct)
         {
             try
             {
-                var file = GetFile(name);
-
-                file.Delete();
-
-                return TaskHelper.Done;
+                using (var fileStream = file.Open(FileMode.CreateNew, FileAccess.Write))
+                {
+                    await stream.CopyToAsync(fileStream, BufferSize, ct);
+                }
             }
-            catch (FileNotFoundException ex)
+            catch (IOException) when (file.Exists)
             {
-                throw new AssetNotFoundException($"Asset {name} not found.", ex);
+                throw new AssetAlreadyExistsException(file.Name);
             }
         }
 
@@ -133,11 +147,11 @@ namespace Squidex.Infrastructure.Assets
             return GetFile(GetPath(id, version, suffix));
         }
 
-        private FileInfo GetFile(string name)
+        private FileInfo GetFile(string fileName)
         {
-            Guard.NotNullOrEmpty(name, nameof(name));
+            Guard.NotNullOrEmpty(fileName, nameof(fileName));
 
-            return new FileInfo(GetPath(name));
+            return new FileInfo(GetPath(fileName));
         }
 
         private string GetPath(string name)

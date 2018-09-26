@@ -13,14 +13,9 @@ $field-header: #e7ebef;
     }
 }
 
-.btn-danger {
-    width: 3.2rem;
-}
-
 .fallback {
     &-languages {
         @include border-radius;
-        min-height: 2rem;
         background: $color-border;
         border: 0;
         padding: .5rem;
@@ -33,6 +28,7 @@ $field-header: #e7ebef;
             background: $color-dark-foreground;
             border: 0;
             margin-bottom: .5rem;
+            line-height: 2rem;
         }
 
         &:last-child {
@@ -47,8 +43,10 @@ $field-header: #e7ebef;
     &-form {
         margin-top: .5rem;
     }
+}
 
-    &-select {
-        width: 14rem;
+.table-items-row-details {
+    &::before {
+        right: 4.6rem;
     }
 }

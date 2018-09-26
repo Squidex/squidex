@@ -21,26 +21,22 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
     public sealed class MongoContentEntity : IContentEntity
     {
         private NamedContentData data;
+        private NamedContentData dataDraft;
 
         [BsonId]
-        [BsonRequired]
         [BsonElement]
-        public string DocumentId { get; set; }
-
-        [BsonRequired]
-        [BsonElement("id")]
         [BsonRepresentation(BsonType.String)]
         public Guid Id { get; set; }
 
         [BsonRequired]
-        [BsonElement("ai")]
+        [BsonElement("_ai")]
         [BsonRepresentation(BsonType.String)]
-        public Guid AppIdId { get; set; }
+        public Guid IndexedAppId { get; set; }
 
         [BsonRequired]
-        [BsonElement("si")]
+        [BsonElement("_si")]
         [BsonRepresentation(BsonType.String)]
-        public Guid SchemaIdId { get; set; }
+        public Guid IndexedSchemaId { get; set; }
 
         [BsonRequired]
         [BsonElement("rf")]
@@ -53,34 +49,40 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         public List<Guid> ReferencedIdsDeleted { get; set; } = new List<Guid>();
 
         [BsonRequired]
-        [BsonElement("st")]
+        [BsonElement("ss")]
         [BsonRepresentation(BsonType.String)]
         public Status Status { get; set; }
 
-        [BsonRequired]
+        [BsonIgnoreIfNull]
         [BsonElement("do")]
         [BsonJson]
         public IdContentData DataByIds { get; set; }
 
+        [BsonIgnoreIfNull]
+        [BsonElement("dd")]
+        [BsonJson]
+        public IdContentData DataDraftByIds { get; set; }
+
+        [BsonIgnoreIfNull]
+        [BsonElement("sj")]
+        [BsonJson]
+        public ScheduleJob ScheduleJob { get; set; }
+
+        [BsonIgnoreIfDefault]
+        [BsonElement("dt")]
+        public string DataText { get; set; }
+
         [BsonRequired]
-        [BsonElement("ai2")]
+        [BsonElement("ai")]
         public NamedId<Guid> AppId { get; set; }
 
         [BsonRequired]
-        [BsonElement("si2")]
+        [BsonElement("si")]
         public NamedId<Guid> SchemaId { get; set; }
 
         [BsonIgnoreIfNull]
-        [BsonElement("sdt")]
-        public Status? ScheduledTo { get; set; }
-
-        [BsonIgnoreIfNull]
-        [BsonElement("sda")]
+        [BsonElement("sa")]
         public Instant? ScheduledAt { get; set; }
-
-        [BsonIgnoreIfNull]
-        [BsonElement("sdb")]
-        public RefToken ScheduledBy { get; set; }
 
         [BsonRequired]
         [BsonElement("ct")]
@@ -91,16 +93,16 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         public Instant LastModified { get; set; }
 
         [BsonRequired]
-        [BsonElement("dt")]
-        public string DataText { get; set; }
-
-        [BsonRequired]
         [BsonElement("vs")]
         public long Version { get; set; }
 
-        [BsonRequired]
+        [BsonIgnoreIfDefault]
         [BsonElement("dl")]
         public bool IsDeleted { get; set; }
+
+        [BsonIgnoreIfDefault]
+        [BsonElement("pd")]
+        public bool IsPending { get; set; }
 
         [BsonRequired]
         [BsonElement("cb")]
@@ -116,9 +118,20 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             get { return data; }
         }
 
+        [BsonIgnore]
+        public NamedContentData DataDraft
+        {
+            get { return dataDraft; }
+        }
+
         public void ParseData(Schema schema)
         {
-            data = DataByIds.ToData(schema, ReferencedIdsDeleted);
+            data = DataByIds.FromMongoModel(schema, ReferencedIdsDeleted);
+
+            if (DataDraftByIds != null)
+            {
+                dataDraft = DataDraftByIds.FromMongoModel(schema, ReferencedIdsDeleted);
+            }
         }
     }
 }

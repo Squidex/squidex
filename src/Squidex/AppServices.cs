@@ -8,11 +8,14 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Areas.Api.Config.Swagger;
+using Squidex.Areas.Api.Controllers.Contents;
 using Squidex.Areas.IdentityServer.Config;
 using Squidex.Config;
 using Squidex.Config.Authentication;
 using Squidex.Config.Domain;
 using Squidex.Config.Web;
+using Squidex.Extensions.Actions.Twitter;
+using Squidex.Infrastructure.Commands;
 
 namespace Squidex
 {
@@ -20,24 +23,35 @@ namespace Squidex
     {
         public static void AddAppServices(this IServiceCollection services, IConfiguration config)
         {
+            services.AddHttpClient();
             services.AddLogging();
             services.AddMemoryCache();
             services.AddOptions();
 
             services.AddMyAssetServices(config);
             services.AddMyAuthentication(config);
+            services.AddMyEntitiesServices(config);
             services.AddMyEventPublishersServices(config);
             services.AddMyEventStoreServices(config);
             services.AddMyIdentityServer();
-            services.AddMyInfrastructureServices(config);
+            services.AddMyInfrastructureServices();
+            services.AddMyLoggingServices(config);
+            services.AddMyMigrationServices();
             services.AddMyMvc();
-            services.AddMyPubSubServices(config);
-            services.AddMyReadServices(config);
+            services.AddMyRuleServices();
             services.AddMySerializers();
             services.AddMyStoreServices(config);
             services.AddMySwaggerSettings();
-            services.AddMyWriteServices();
+            services.AddMySubscriptionServices(config);
 
+            services.Configure<ReadonlyOptions>(
+                config.GetSection("mode"));
+
+            services.Configure<TwitterOptions>(
+                config.GetSection("twitter"));
+
+            services.Configure<MyContentsControllerOptions>(
+                config.GetSection("contentsController"));
             services.Configure<MyUrlsOptions>(
                 config.GetSection("urls"));
             services.Configure<MyIdentityOptions>(

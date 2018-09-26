@@ -16,21 +16,26 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            Validate.It(() => "Cannot rename asset.", error =>
+            Validate.It(() => "Cannot rename asset.", e =>
             {
                 if (string.IsNullOrWhiteSpace(command.FileName))
                 {
-                    error(new ValidationError("Name is required.", nameof(command.FileName)));
+                    e("Name is required.", nameof(command.FileName));
                 }
 
                 if (string.Equals(command.FileName, oldName))
                 {
-                    error(new ValidationError("Name is equal to old name.", nameof(command.FileName)));
+                    e("Asset has already this name.", nameof(command.FileName));
                 }
             });
         }
 
         public static void CanCreate(CreateAsset command)
+        {
+            Guard.NotNull(command, nameof(command));
+        }
+
+        public static void CanTag(TagAsset command)
         {
             Guard.NotNull(command, nameof(command));
         }

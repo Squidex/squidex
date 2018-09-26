@@ -1,0 +1,68 @@
+<sqx-title message="Restore Backup"></sqx-title>
+
+<sqx-panel theme="light" desiredWidth="70rem">
+    <ng-container title>
+        Restore Backup (BETA)
+    </ng-container>
+
+    <ng-container content>
+        <ng-container *ngIf="restoreJob; let job">
+            <div class="card section">
+                <div class="card-header">
+                    <div class="row no-gutters">
+                        <div class="col col-auto pr-2">
+                            <div *ngIf="job.status === 'Started'" class="restore-status restore-status-pending spin">
+                                <i class="icon-hour-glass"></i>
+                            </div>
+                            <div *ngIf="job.status === 'Failed'" class="restore-status restore-status-failed">
+                                <i class="icon-exclamation"></i>
+                            </div>
+                            <div *ngIf="job.status === 'Completed'" class="restore-status restore-status-success">
+                                <i class="icon-checkmark"></i>
+                            </div>
+                        </div>
+                            
+                        <div class="col">
+                            <h3>Last Restore Operation</h3>
+                        </div>
+
+                        <div class="col text-right restore-url">
+                            {{job.url}}
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div *ngFor="let row of job.log">
+                        {{row}}
+                    </div>
+                </div>
+                <div class="card-footer text-muted">
+                    <div class="row">
+                        <div class="col">
+                            Started: {{job.started | sqxISODate}}
+                        </div>
+                        <div class="col text-right" *ngIf="job.stopped">
+                            Stopped: {{job.stopped | sqxISODate}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </ng-container>
+        
+        <div class="table-items-row">
+            <form [formGroup]="restoreForm.form" (submit)="restore()">
+                <div class="row no-gutters">
+                    <div class="col">
+                        <input class="form-control" name="url" formControlName="url" placeholder="Url to backup" />
+                    </div>
+                    <div class="col pl-1">
+                        <input class="form-control" name="name" formControlName="name" placeholder="Optional app name" />
+                    </div>
+                    <div class="col col-auto pl-1">
+                        <button type="submit" class="btn btn-success" [disabled]="restoreForm.hasNoUrl | async">Restore Backup</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </ng-container>
+</sqx-panel>

@@ -40,7 +40,7 @@ namespace Squidex.Domain.Apps.Entities
         public Instant LastModified { get; set; }
 
         [JsonProperty]
-        public long Version { get; set; }
+        public long Version { get; set; } = EtagVersion.Empty;
 
         public T Clone()
         {

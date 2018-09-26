@@ -116,7 +116,7 @@ namespace Squidex.Infrastructure
         {
             if (target.CompareTo(lower) < 0)
             {
-                throw new ArgumentException($"Value must be greater or equals than {lower}", parameterName);
+                throw new ArgumentException($"Value must be greater than or equal to {lower}", parameterName);
             }
         }
 
@@ -136,13 +136,13 @@ namespace Squidex.Infrastructure
         {
             if (target.CompareTo(upper) > 0)
             {
-                throw new ArgumentException($"Value must be less or equals than {upper}", parameterName);
+                throw new ArgumentException($"Value must be less than or equal to {upper}", parameterName);
             }
         }
 
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void NotEmpty<TType>(ICollection<TType> enumerable, string parameterName)
+        public static void NotEmpty<TType>(IReadOnlyCollection<TType> enumerable, string parameterName)
         {
             NotNull(enumerable, parameterName);
 

@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using System.Linq;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 
@@ -22,7 +21,17 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
         public static IEnumerable<ValidationError> Validate(FieldProperties properties)
         {
-            return properties?.Accept(Instance) ?? Enumerable.Empty<ValidationError>();
+            return properties?.Accept(Instance);
+        }
+
+        public IEnumerable<ValidationError> Visit(ArrayFieldProperties properties)
+        {
+            if (properties.MaxItems.HasValue && properties.MinItems.HasValue && properties.MinItems.Value >= properties.MaxItems.Value)
+            {
+                yield return new ValidationError("Max items must be greater than min items.",
+                    nameof(properties.MinItems),
+                    nameof(properties.MaxItems));
+            }
         }
 
         public IEnumerable<ValidationError> Visit(AssetsFieldProperties properties)

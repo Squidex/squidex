@@ -56,7 +56,7 @@
     }
 
     .alert-link {
-        color: $color-dark-foreground;
+        color: $color-dark-foreground !important;
         font-size: inherit;
         font-weight: normal;
         text-decoration: underline;
@@ -95,6 +95,10 @@ a {
     }
 
     &.force {
+        & {
+            color: $color-theme-blue !important;
+        }
+
         &:hover {
             text-decoration: underline !important;
             cursor: pointer;
@@ -260,6 +264,10 @@ a {
     &-microsoft {
         color: $color-extern-microsoft-icon;
     }
+
+    &-twitter {
+        color: $color-extern-twitter-icon;
+    }
 }
 
 //
@@ -300,9 +308,25 @@ a {
         }
     }
 
+    &-twitter {
+        @include button-variant($color-extern-twitter, $color-extern-twitter);
+
+        & {
+            color: $color-dark-foreground;
+        }
+
+        &:hover,
+        &:focus {
+            .icon-twitter {
+                color: darken($color-extern-twitter-icon, 5%);
+            }
+        }
+    }
+
     // Special radio button.
     &-radio {
         & {
+            @include border-radius;
             color: $color-border-dark;
             cursor: pointer;
             border: 1px solid $color-border;
@@ -420,15 +444,25 @@ a {
         @include opacity(.5);
     }
 
-    &-header {
-        @include border-radius-top(.25rem);
-        background: $color-modal-header-background;
-        font-size: 1rem;
-        font-weight: normal;
-        color: $color-modal-header-foreground;
+    &-header,
+    &-footer {
+        @include flex-shrink(0);
+    }
 
-        h4,
-        h5 {
+    &-body {
+        overflow-y: auto;
+    }
+
+    &-header {
+        & {
+            @include border-radius-top(.25rem);
+            background: $color-modal-header-background;
+            font-size: 1rem;
+            font-weight: normal;
+            color: $color-modal-header-foreground;
+        }
+
+        h4 {
             font-size: 1rem;
             font-weight: normal;
         }
@@ -451,16 +485,33 @@ a {
     &-content {
         @include box-shadow(0, 6px, 16px, .4);
         @include border-radiusn(.4rem, .35rem, .35rem, .4rem);
+        max-height: 100%;
+    }
+
+    &-fh {
+        .modal-content {
+            min-height: 100%;
+        }
+    }
+
+    &-lg {
+        @media (min-width: 992px) {
+            max-width: 854px;
+        }
     }
 
     &-dialog {
         & {
+            @include absolute(0, 0, 0, 0);
             z-index: 1100;
         }
+    }
 
-        @media (min-width: 576px) {
-            margin-top: 4.5rem;
-        }
+    &-tabs {
+        background: $color-border;
+        position: relative;
+        padding: 1rem 1.25rem;
+        height: 70px;
     }
 
     &-footer {
@@ -504,5 +555,9 @@ a {
                 padding-right: 0;
             }
         }
+    }
+
+    tbody + tbody {
+        border: 0;
     }
 }

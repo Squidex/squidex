@@ -6,7 +6,11 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Domain.Apps.Entities.Apps.Commands;
+using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models
 {
@@ -33,5 +37,15 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// The regex message.
         /// </summary>
         public string Message { get; set; }
+
+        public static AppPatternDto FromKvp(KeyValuePair<Guid, AppPattern> kvp)
+        {
+            return SimpleMapper.Map(kvp.Value, new AppPatternDto { PatternId = kvp.Key });
+        }
+
+        public static AppPatternDto FromCommand(AddPattern command)
+        {
+            return SimpleMapper.Map(command, new AppPatternDto());
+        }
     }
 }

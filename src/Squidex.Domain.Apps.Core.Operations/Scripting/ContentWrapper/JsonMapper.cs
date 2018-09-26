@@ -43,18 +43,18 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
                 case JTokenType.Object:
                     return FromObject(value, engine);
                 case JTokenType.Array:
-                {
-                    var arr = (JArray)value;
-
-                    var target = new JsValue[arr.Count];
-
-                    for (var i = 0; i < arr.Count; i++)
                     {
-                        target[i] = Map(arr[i], engine);
-                    }
+                        var arr = (JArray)value;
 
-                    return engine.Array.Construct(target);
-                }
+                        var target = new JsValue[arr.Count];
+
+                        for (var i = 0; i < arr.Count; i++)
+                        {
+                            target[i] = Map(arr[i], engine);
+                        }
+
+                        return engine.Array.Construct(target);
+                    }
             }
 
             throw new ArgumentException("Invalid json type.", nameof(value));

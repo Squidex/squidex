@@ -8,9 +8,9 @@
 using System.Threading.Tasks;
 using Squidex.Infrastructure.Migrations;
 
-namespace Migrate_01
+namespace Migrate_01.Migrations
 {
-    public class RebuildAssets : IMigration
+    public sealed class RebuildAssets : IMigration
     {
         private readonly Rebuilder rebuilder;
 

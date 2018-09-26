@@ -5,58 +5,45 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, ElementRef, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
-import { Observable } from 'rxjs';
+import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
+import { of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
 const GraphiQL = require('graphiql');
 
-/* tslint:disable:use-view-encapsulation */
-
-import {
-    AppContext,
-    GraphQlService,
-    LocalStoreService
-} from 'shared';
+import { AppsState, GraphQlService } from '@app/shared';
 
 @Component({
     selector: 'sqx-graphql-page',
     styleUrls: ['./graphql-page.component.scss'],
-    templateUrl: './graphql-page.component.html',
-    providers: [
-        AppContext
-    ],
-    encapsulation: ViewEncapsulation.None
+    templateUrl: './graphql-page.component.html'
 })
-export class GraphQLPageComponent implements OnInit {
+export class GraphQLPageComponent implements AfterViewInit {
     @ViewChild('graphiQLContainer')
     public graphiQLContainer: ElementRef;
 
-    constructor(public readonly ctx: AppContext,
-        private readonly graphQlService: GraphQlService,
-        private readonly localStoreService: LocalStoreService
+    constructor(
+        public readonly appsState: AppsState,
+        private readonly graphQlService: GraphQlService
     ) {
     }
 
-    public ngOnInit() {
+    public ngAfterViewInit() {
         ReactDOM.render(
             React.createElement(GraphiQL, {
                 fetcher: (params: any) => {
                     return this.request(params);
-                },
-                onEditQuery: (query: string) => {
-                    this.localStoreService.set('graphiQlQuery', query);
-                },
-                query: this.localStoreService.get('graphiQlQuery')
+                }
             }),
             this.graphiQLContainer.nativeElement
         );
     }
 
     private request(params: any) {
-        return this.graphQlService.query(this.ctx.appName, params).catch(response => Observable.of(response.error)).toPromise();
+        return this.graphQlService.query(this.appsState.appName, params).pipe(catchError(response => of(response.error))).toPromise();
     }
 }
 

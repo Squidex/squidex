@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System;
-using System.Diagnostics;
 
 namespace Squidex.Infrastructure.Log
 {
@@ -17,29 +16,14 @@ namespace Squidex.Infrastructure.Log
             log.Log(SemanticLogLevel.Trace, objectWriter);
         }
 
-        public static IDisposable MeasureTrace(this ISemanticLog log, Action<IObjectWriter> objectWriter)
-        {
-            return new TimeMeasurer(log, SemanticLogLevel.Trace, objectWriter);
-        }
-
         public static void LogDebug(this ISemanticLog log, Action<IObjectWriter> objectWriter)
         {
             log.Log(SemanticLogLevel.Debug, objectWriter);
         }
 
-        public static IDisposable MeasureDebug(this ISemanticLog log, Action<IObjectWriter> objectWriter)
-        {
-            return new TimeMeasurer(log, SemanticLogLevel.Debug, objectWriter);
-        }
-
         public static void LogInformation(this ISemanticLog log, Action<IObjectWriter> objectWriter)
         {
             log.Log(SemanticLogLevel.Information, objectWriter);
-        }
-
-        public static IDisposable MeasureInformation(this ISemanticLog log, Action<IObjectWriter> objectWriter)
-        {
-            return new TimeMeasurer(log, SemanticLogLevel.Information, objectWriter);
         }
 
         public static void LogWarning(this ISemanticLog log, Action<IObjectWriter> objectWriter)
@@ -92,32 +76,36 @@ namespace Squidex.Infrastructure.Log
             });
         }
 
-        private sealed class TimeMeasurer : IDisposable
+        public static IDisposable MeasureTrace(this ISemanticLog log, Action<IObjectWriter> objectWriter)
         {
-            private readonly Stopwatch watch = Stopwatch.StartNew();
-            private readonly SemanticLogLevel logLevel;
-            private readonly Action<IObjectWriter> objectWriter;
-            private readonly ISemanticLog log;
+            return log.Measure(SemanticLogLevel.Trace, objectWriter);
+        }
 
-            public TimeMeasurer(ISemanticLog log, SemanticLogLevel logLevel, Action<IObjectWriter> objectWriter)
+        public static IDisposable MeasureDebug(this ISemanticLog log, Action<IObjectWriter> objectWriter)
+        {
+            return log.Measure(SemanticLogLevel.Debug, objectWriter);
+        }
+
+        public static IDisposable MeasureInformation(this ISemanticLog log, Action<IObjectWriter> objectWriter)
+        {
+            return log.Measure(SemanticLogLevel.Information, objectWriter);
+        }
+
+        private static IDisposable Measure(this ISemanticLog log, SemanticLogLevel logLevel, Action<IObjectWriter> objectWriter)
+        {
+            var watch = ValueStopwatch.StartNew();
+
+            return new DelegateDisposable(() =>
             {
-                this.logLevel = logLevel;
-                this.log = log;
-
-                this.objectWriter = objectWriter;
-            }
-
-            public void Dispose()
-            {
-                watch.Stop();
+                var elapsedMs = watch.Stop();
 
                 log.Log(logLevel, writer =>
                 {
                     objectWriter?.Invoke(writer);
 
-                    writer.WriteProperty("elapsedMs", watch.ElapsedMilliseconds);
+                    writer.WriteProperty("elapsedMs", elapsedMs);
                 });
-            }
+            });
         }
     }
 }

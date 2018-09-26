@@ -7,185 +7,136 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.OData.UriParser;
 using MongoDB.Driver;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
-using Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.MongoDb;
+using Squidex.Infrastructure.Log;
+using Squidex.Infrastructure.Queries;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 {
-    public partial class MongoContentRepository : MongoRepositoryBase<MongoContentEntity>, IContentRepository
+    public partial class MongoContentRepository : IContentRepository, IInitializable
     {
+        private readonly IMongoDatabase database;
         private readonly IAppProvider appProvider;
-        private readonly IMongoCollection<MongoContentEntity> archiveCollection;
-
-        protected IMongoCollection<MongoContentEntity> ArchiveCollection
-        {
-            get { return archiveCollection; }
-        }
+        private readonly MongoContentDraftCollection contentsDraft;
+        private readonly MongoContentPublishedCollection contentsPublished;
 
         public MongoContentRepository(IMongoDatabase database, IAppProvider appProvider)
-            : base(database)
         {
             Guard.NotNull(appProvider, nameof(appProvider));
 
             this.appProvider = appProvider;
 
-            archiveCollection = database.GetCollection<MongoContentEntity>("States_Contents_Archive");
+            contentsDraft = new MongoContentDraftCollection(database);
+            contentsPublished = new MongoContentPublishedCollection(database);
+
+            this.database = database;
         }
 
-        protected override string CollectionName()
+        public void Initialize()
         {
-            return "States_Contents";
+            contentsDraft.Initialize();
+            contentsPublished.Initialize();
         }
 
-        protected override async Task SetupCollectionAsync(IMongoCollection<MongoContentEntity> collection)
+        public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, Status[] status, Query query)
         {
-            await collection.Indexes.TryDropOneAsync("si_1_st_1_dl_1_dt_text");
-
-            await archiveCollection.Indexes.CreateOneAsync(
-                Index
-                    .Ascending(x => x.ScheduledTo));
-
-            await archiveCollection.Indexes.CreateOneAsync(
-                Index
-                    .Ascending(x => x.Id)
-                    .Ascending(x => x.Version));
-
-            await collection.Indexes.CreateOneAsync(
-                Index
-                    .Text(x => x.DataText)
-                    .Ascending(x => x.SchemaIdId)
-                    .Ascending(x => x.Status)
-                    .Ascending(x => x.IsDeleted));
-
-            await collection.Indexes.CreateOneAsync(
-                Index
-                    .Ascending(x => x.SchemaIdId)
-                    .Ascending(x => x.Id)
-                    .Ascending(x => x.IsDeleted)
-                    .Ascending(x => x.Status));
-
-            await collection.Indexes.CreateOneAsync(Index.Ascending(x => x.ReferencedIds));
-        }
-
-        public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, Status[] status, ODataUriParser odataQuery)
-        {
-            try
+            using (Profiler.TraceMethod<MongoContentRepository>("QueryAsyncByQuery"))
             {
-                var propertyCalculator = FindExtensions.CreatePropertyCalculator(schema.SchemaDef);
-
-                var filter = FindExtensions.BuildQuery(odataQuery, schema.Id, status, propertyCalculator);
-
-                var contentCount = Collection.Find(filter).CountAsync();
-                var contentItems =
-                    Collection.Find(filter)
-                        .ContentTake(odataQuery)
-                        .ContentSkip(odataQuery)
-                        .ContentSort(odataQuery, propertyCalculator)
-                        .ToListAsync();
-
-                await Task.WhenAll(contentItems, contentCount);
-
-                foreach (var entity in contentItems.Result)
+                if (RequiresPublished(status))
                 {
-                    entity.ParseData(schema.SchemaDef);
-                }
-
-                return ResultList.Create<IContentEntity>(contentItems.Result, contentCount.Result);
-            }
-            catch (NotSupportedException)
-            {
-                throw new ValidationException("This odata operation is not supported.");
-            }
-            catch (NotImplementedException)
-            {
-                throw new ValidationException("This odata operation is not supported.");
-            }
-            catch (MongoQueryException ex)
-            {
-                if (ex.Message.Contains("17406"))
-                {
-                    throw new DomainException("Result set is too large to be retrieved. Use $top parameter to reduce the number of items.");
+                    return await contentsPublished.QueryAsync(app, schema, query);
                 }
                 else
                 {
-                    throw;
+                    return await contentsDraft.QueryAsync(app, schema, query, status, true);
                 }
             }
         }
 
         public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, Status[] status, HashSet<Guid> ids)
         {
-            var find = Collection.Find(x => x.SchemaIdId == schema.Id && ids.Contains(x.Id) && x.IsDeleted == false && status.Contains(x.Status));
-
-            var contentItems = find.ToListAsync();
-            var contentCount = find.CountAsync();
-
-            await Task.WhenAll(contentItems, contentCount);
-
-            foreach (var entity in contentItems.Result)
+            using (Profiler.TraceMethod<MongoContentRepository>("QueryAsyncByIds"))
             {
-                entity.ParseData(schema.SchemaDef);
+                if (RequiresPublished(status))
+                {
+                    return await contentsPublished.QueryAsync(app, schema, ids);
+                }
+                else
+                {
+                    return await contentsDraft.QueryAsync(app, schema, ids, status);
+                }
             }
+        }
 
-            return ResultList.Create<IContentEntity>(contentItems.Result, contentCount.Result);
+        public async Task<IContentEntity> FindContentAsync(IAppEntity app, ISchemaEntity schema, Status[] status, Guid id)
+        {
+            using (Profiler.TraceMethod<MongoContentRepository>())
+            {
+                if (RequiresPublished(status))
+                {
+                    return await contentsPublished.FindContentAsync(app, schema, id);
+                }
+                else
+                {
+                    return await contentsDraft.FindContentAsync(app, schema, id);
+                }
+            }
         }
 
         public async Task<IReadOnlyList<Guid>> QueryNotFoundAsync(Guid appId, Guid schemaId, IList<Guid> ids)
         {
-            var contentEntities =
-                await Collection.Find(x => x.SchemaIdId == schemaId && ids.Contains(x.Id) && x.IsDeleted == false).Only(x => x.Id)
-                    .ToListAsync();
-
-            return ids.Except(contentEntities.Select(x => Guid.Parse(x["id"].AsString))).ToList();
+            using (Profiler.TraceMethod<MongoContentRepository>())
+            {
+                return await contentsDraft.QueryNotFoundAsync(appId, schemaId, ids);
+            }
         }
 
-        public async Task<IContentEntity> FindContentAsync(IAppEntity app, ISchemaEntity schema, Guid id, long version)
+        public async Task<IReadOnlyList<Guid>> QueryIdsAsync(Guid appId)
         {
-            var contentEntity =
-                await ArchiveCollection.Find(x => x.Id == id && x.Version >= version).SortBy(x => x.Version)
-                    .FirstOrDefaultAsync();
-
-            contentEntity?.ParseData(schema.SchemaDef);
-
-            return contentEntity;
+            using (Profiler.TraceMethod<MongoContentRepository>())
+            {
+                return await contentsDraft.QueryIdsAsync(appId);
+            }
         }
 
-        public async Task<IContentEntity> FindContentAsync(IAppEntity app, ISchemaEntity schema, Guid id)
+        public async Task QueryScheduledWithoutDataAsync(Instant now, Func<IContentEntity, Task> callback)
         {
-            var contentEntity =
-                await Collection.Find(x => x.SchemaIdId == schema.Id && x.Id == id && x.IsDeleted == false)
-                    .FirstOrDefaultAsync();
-
-            contentEntity?.ParseData(schema.SchemaDef);
-
-            return contentEntity;
+            using (Profiler.TraceMethod<MongoContentRepository>())
+            {
+                await contentsDraft.QueryScheduledWithoutDataAsync(now, callback);
+            }
         }
 
-        public Task QueryScheduledWithoutDataAsync(Instant now, Func<IContentEntity, Task> callback)
+        public Task RemoveAsync(Guid appId)
         {
-            return Collection.Find(x => x.ScheduledAt < now && x.IsDeleted == false)
-                .ForEachAsync(c =>
-                {
-                    callback(c);
-                });
+            return Task.WhenAll(
+                contentsDraft.RemoveAsync(appId),
+                contentsPublished.RemoveAsync(appId));
         }
 
-        public override async Task ClearAsync()
+        public Task ClearAsync()
         {
-            await Database.DropCollectionAsync("States_Contents_Archive");
+            return Task.WhenAll(
+                contentsDraft.ClearAsync(),
+                contentsPublished.ClearAsync());
+        }
 
-            await base.ClearAsync();
+        public Task DeleteArchiveAsync()
+        {
+            return database.DropCollectionAsync("States_Contents_Archive");
+        }
+
+        private static bool RequiresPublished(Status[] status)
+        {
+            return status?.Length == 1 && status[0] == Status.Published;
         }
     }
 }

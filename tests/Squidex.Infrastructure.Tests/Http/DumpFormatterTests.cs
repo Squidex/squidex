@@ -27,7 +27,7 @@ namespace Squidex.Infrastructure.Http
 
             var expected = CreateExpectedDump(
                 "Request:",
-                "POST: https://cloud.squidex.io/ HTTP/1.1",
+                "POST: https://cloud.squidex.io/ HTTP/2.0",
                 "User-Agent: Squidex/1.0",
                 "Accept-Language: de; en",
                 "Accept-Encoding: UTF-8",
@@ -49,7 +49,7 @@ namespace Squidex.Infrastructure.Http
 
             var expected = CreateExpectedDump(
                 "Request:",
-                "POST: https://cloud.squidex.io/ HTTP/1.1",
+                "POST: https://cloud.squidex.io/ HTTP/2.0",
                 "User-Agent: Squidex/1.0",
                 "Accept-Language: de; en",
                 "Accept-Encoding: UTF-8",
@@ -75,7 +75,7 @@ namespace Squidex.Infrastructure.Http
 
             var expected = CreateExpectedDump(
                 "Request:",
-                "POST: https://cloud.squidex.io/ HTTP/1.1",
+                "POST: https://cloud.squidex.io/ HTTP/2.0",
                 "User-Agent: Squidex/1.0",
                 "Accept-Language: de; en",
                 "Accept-Encoding: UTF-8",

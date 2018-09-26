@@ -57,6 +57,11 @@ namespace Squidex.Infrastructure.EventSourcing
             currentSubscription = null;
         }
 
+        public void WakeUp()
+        {
+            currentSubscription?.WakeUp();
+        }
+
         private async Task HandleEventAsync(IEventSubscription subscription, StoredEvent storedEvent)
         {
             if (subscription == currentSubscription)

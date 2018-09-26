@@ -53,6 +53,10 @@ export class ImmutableArray<T> implements Iterable<T> {
         }
     }
 
+    public at(index: number) {
+        return this.values[index];
+    }
+
     public map<R>(projection: (item: T) => R): ImmutableArray<R> {
         return new ImmutableArray<R>(freeze(this.items.map(v => projection(v!))));
     }

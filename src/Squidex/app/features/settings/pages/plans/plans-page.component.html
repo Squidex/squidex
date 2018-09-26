@@ -1,70 +1,88 @@
-<sqx-title message="{app} | Plans | Settings" parameter1="app" [value1]="ctx.appName"></sqx-title>
+<sqx-title message="{app} | Plans | Settings" parameter1="app" [value1]="appsState.appName"></sqx-title>
 
-<sqx-panel desiredWidth="61rem">
-    <div class="panel-header">
-        <div class="panel-title-row">
-            <div class="float-right">
-                <button class="btn btn-link btn-secondary" (click)="load(true)" title="Refresh Plans (CTRL + SHIFT + R)">
-                    <i class="icon-reset"></i> Refresh
-                </button>
+<sqx-panel desiredWidth="63rem" [showSidebar]="true">
+    <ng-container title>
+        Update Plan
+    </ng-container>
 
-                <sqx-shortcut keys="ctrl+shift+r" (trigger)="load(true)"></sqx-shortcut>
-            </div>
-            
-            <h3 class="panel-title">Update Plan</h3>
-        </div>
+    <ng-container menu>
+        <button class="btn btn-link btn-secondary" (click)="reload()" title="Refresh Plans (CTRL + SHIFT + R)">
+            <i class="icon-reset"></i> Refresh
+        </button>
 
-        <a class="panel-close" sqxParentLink>
-            <i class="icon-close"></i>
-        </a>
-    </div>
+        <sqx-shortcut keys="ctrl+shift+r" (trigger)="reload()"></sqx-shortcut>
+    </ng-container>
 
-    <div class="panel-main">
-        <div class="panel-content">
-            <div *ngIf="plans">
-                <div class="panel-alert panel-alert-danger" *ngIf="!planOwned">
+    <ng-container content>
+        <ng-container *ngIf="plansState.isLoaded | async">
+            <ng-container *ngIf="plansState.plans | async; let plans">
+                <div class="panel-alert panel-alert-danger" *ngIf="(plansState.isOwner | async) === false">
                     You have not created the subscription. Therefore you cannot change the plan.
                 </div>
 
-                <div class="text-muted text-center empty" *ngIf="plans.plans.length === 0">
+                <div class="text-muted text-center empty" *ngIf="plans.length === 0">
                     No plan configured, this app has unlimited usage.
                 </div>
 
                 <div class="clearfix">
-                    <div class="card plan float-left" *ngFor="let plan of plans.plans">
-                        <div class="card-body plan-header text-center">
-                            <h4 class="card-title">{{plan.name}}</h4>
-                            <h5 class="plan-price">{{plan.costs}}</h5>
+                    <div class="card plan float-left" *ngFor="let planInfo of plans; trackBy: trackByPlan">
+                        <div class="card-header text-center">
+                            <h4 class="card-title">{{planInfo.plan.name}}</h4>
+                            <h5 class="plan-price">{{planInfo.plan.costs}}</h5>
 
                             <small class="text-muted">Per Month</small>
                         </div>
                         <div class="card-body">
-                            <div class="plan-fact">
-                                {{plan.maxApiCalls | sqxKNumber}} API Calls
+                            <div class="plan-fact text-center">
+                                <div>
+                                    <strong>{{planInfo.plan.maxApiCalls | sqxKNumber}}</strong> API Calls
+                                </div>
+                                <div>
+                                    {{planInfo.plan.maxAssetSize | sqxFileSize}} Storage
+                                </div>
+                                <div>
+                                    {{planInfo.plan.maxContributors}} Contributors
+                                </div>
                             </div>
-                            <div class="plan-fact">
-                                {{plan.maxAssetSize | sqxFileSize}} Storage
-                            </div>
-                            <div class="plan-fact">
-                                {{plan.maxContributors}} Contributors
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <button *ngIf="plan.id === plans.currentPlanId" class="btn btn-block btn-link btn-success plan-selected">
+                        
+                            <button *ngIf="planInfo.isSelected" class="btn btn-block btn-link btn-success plan-selected">
                                 &#10003; Selected
                             </button>
                             
-                            <button *ngIf="plan.id !== plans.currentPlanId" class="btn btn-block btn-success" [disabled]="isDisabled || !planOwned" (click)="changePlan(plan.id)">
+                            <button *ngIf="!planInfo.isSelected" class="btn btn-block btn-success" [disabled]="plansState.isDisabled | async" (click)="change(planInfo.plan.id)">
+                                Change
+                            </button>
+                        </div>
+                        <div class="card-footer" *ngIf="planInfo.plan.yearlyId">
+                            <div class="text-center">
+                                <h5 class="plan-price">{{planInfo.plan.yearlyCosts}}</h5>
+
+                                <small class="text-muted">Per Year</small>
+                            </div>
+
+                            <button *ngIf="planInfo.isYearlySelected" class="btn btn-block btn-link btn-success plan-selected">
+                                &#10003; Selected
+                            </button>
+                            
+                            <button *ngIf="!planInfo.isYearlySelected" class="btn btn-block btn-success" [disabled]="plansState.isDisabled | async" (click)="change(planInfo.plan.yearlyId)">
                                 Change
                             </button>
                         </div>
                     </div>
                 </div>
 
-                <div *ngIf="plans.hasPortal" class="billing-portal-link">
+                <div *ngIf="plansState.hasPortal | async" class="billing-portal-link">
                     Go to <a target="_blank" href="{{portalUrl}}">Billing Portal</a> for payment history and subscription overview.
                 </div>
-            </div>
-        </div>
-    </div>
+            </ng-container>
+        </ng-container>
+    </ng-container>
+
+    <ng-container sidebar>
+        <a class="panel-link" routerLink="help" routerLinkActive="active">
+            <i class="icon-help"></i>
+        </a>
+    </ng-container>
 </sqx-panel>
+
+<router-outlet></router-outlet>

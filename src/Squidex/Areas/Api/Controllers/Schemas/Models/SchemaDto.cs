@@ -8,11 +8,14 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using NodaTime;
+using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Reflection;
+using Squidex.Pipeline;
 
 namespace Squidex.Areas.Api.Controllers.Schemas.Models
 {
-    public sealed class SchemaDto
+    public sealed class SchemaDto : IGenerateEtag
     {
         /// <summary>
         /// The id of the schema.
@@ -27,10 +30,20 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         public string Name { get; set; }
 
         /// <summary>
+        /// The name of the category.
+        /// </summary>
+        public string Category { get; set; }
+
+        /// <summary>
         /// The schema properties.
         /// </summary>
         [Required]
         public SchemaPropertiesDto Properties { get; set; }
+
+        /// <summary>
+        /// Indicates if the schema is a singleton.
+        /// </summary>
+        public bool IsSingleton { get; set; }
 
         /// <summary>
         /// Indicates if the schema is published.
@@ -62,6 +75,17 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// <summary>
         /// The version of the schema.
         /// </summary>
-        public int Version { get; set; }
+        public long Version { get; set; }
+
+        public static SchemaDto FromSchema(ISchemaEntity schema)
+        {
+            var response = new SchemaDto { Properties = new SchemaPropertiesDto() };
+
+            SimpleMapper.Map(schema, response);
+            SimpleMapper.Map(schema.SchemaDef, response);
+            SimpleMapper.Map(schema.SchemaDef.Properties, response.Properties);
+
+            return response;
+        }
     }
 }

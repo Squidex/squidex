@@ -1,0 +1,55 @@
+<form [formGroup]="actionForm" class="form-horizontal">
+    <div class="form-group row">
+        <div class="col col-9 offset-3">
+            <ng-container *ngIf="!isRedirected">
+                <button class="btn btn-twitter" [disabled]="isAuthenticating" (click)="auth()">
+                    Request access token with twitter
+                </button>
+            </ng-container>
+
+            <ng-container *ngIf="isRedirected">
+                <form class="form-inline" (ngSubmit)="complete()">
+                    <input class="form-control mr-1" [(ngModel)]="pinCode" [ngModelOptions]="{ standalone: true }" placeholder="Pin" />
+
+                    <button type="submit" class="btn btn-secondary" [disabled]="!pinCode">
+                        Complete
+                    </button>
+                </form>
+            </ng-container>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label class="col col-3 col-form-label" for="accessToken">Access Token</label>
+
+        <div class="col col-9">
+            <sqx-control-errors for="accessToken" submitOnly="true" [submitted]="actionFormSubmitted"></sqx-control-errors>
+
+            <input type="text" readonly class="form-control" id="accessToken" formControlName="accessToken" />
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label class="col col-3 col-form-label" for="accessToken">Access Secret</label>
+
+        <div class="col col-9">
+            <sqx-control-errors for="accessSecret" submitOnly="true" [submitted]="actionFormSubmitted"></sqx-control-errors>
+
+            <input type="text" readonly class="form-control" id="accessSecret" formControlName="accessSecret" />
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label class="col col-3 col-form-label" for="text">Text</label>
+
+        <div class="col col-9">
+            <sqx-control-errors for="text" [submitted]="actionFormSubmitted"></sqx-control-errors>
+
+            <textarea class="form-control" id="text" formControlName="text"></textarea>
+
+            <small class="form-text text-muted">
+                The text to tweet. Read the <a routerLink="help">help</a> section for information about advanced formatting.
+            </small>
+        </div>
+    </div>
+</form>

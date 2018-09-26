@@ -17,8 +17,9 @@ namespace Squidex.Config.Authentication
             var identityOptions = config.GetSection("identity").Get<MyIdentityOptions>();
 
             services.AddAuthentication()
-                .AddMyGoogleAuthentication(identityOptions)
-                .AddMyMicrosoftAuthentication(identityOptions)
+                .AddMyExternalGoogleAuthentication(identityOptions)
+                .AddMyExternalMicrosoftAuthentication(identityOptions)
+                .AddMyExternalOdic(identityOptions)
                 .AddMyIdentityServerAuthentication(identityOptions, config)
                 .AddCookie();
         }

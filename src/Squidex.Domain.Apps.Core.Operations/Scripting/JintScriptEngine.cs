@@ -7,9 +7,11 @@
 
 using System;
 using Jint;
+using Jint.Native;
 using Jint.Native.Object;
 using Jint.Parser;
 using Jint.Runtime;
+using Jint.Runtime.Interop;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Scripting.ContentWrapper;
 using Squidex.Infrastructure;
@@ -150,9 +152,30 @@ namespace Squidex.Domain.Apps.Core.Scripting
             }
 
             engine.SetValue("ctx", contextInstance);
-            engine.SetValue("slugify", new Func<string, string>(x => x.Slugify()));
+
+            engine.SetValue("slugify", new ClrFunctionInstance(engine, Slugify));
 
             return engine;
+        }
+
+        private static JsValue Slugify(JsValue thisObject, JsValue[] arguments)
+        {
+            try
+            {
+                var stringInput = TypeConverter.ToString(arguments.At(0));
+                var single = false;
+
+                if (arguments.Length > 1)
+                {
+                    single = TypeConverter.ToBoolean(arguments.At(1));
+                }
+
+                return stringInput.Slugify(null, single);
+            }
+            catch
+            {
+                return JsValue.Undefined;
+            }
         }
 
         private static void EnableDisallow(Engine engine)

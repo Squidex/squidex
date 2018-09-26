@@ -9,10 +9,11 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FakeItEasy;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 using NodaTime;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
-using Squidex.Domain.Apps.Core.Rules.Actions;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Entities.Rules.Repositories;
 using Squidex.Domain.Apps.Events.Contents;
@@ -25,16 +26,23 @@ namespace Squidex.Domain.Apps.Entities.Rules
     public class RuleEnqueuerTests
     {
         private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
+        private readonly IMemoryCache cache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
         private readonly IRuleEventRepository ruleEventRepository = A.Fake<IRuleEventRepository>();
         private readonly RuleService ruleService = A.Fake<RuleService>();
         private readonly Instant now = SystemClock.Instance.GetCurrentInstant();
-        private readonly NamedId<Guid> appId = new NamedId<Guid>(Guid.NewGuid(), "my-app");
+        private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
         private readonly RuleEnqueuer sut;
+
+        public sealed class TestAction : RuleAction
+        {
+            public Uri Url { get; set; }
+        }
 
         public RuleEnqueuerTests()
         {
             sut = new RuleEnqueuer(
                 appProvider,
+                cache,
                 ruleEventRepository,
                 ruleService);
         }
@@ -62,9 +70,9 @@ namespace Squidex.Domain.Apps.Entities.Rules
         {
             var @event = Envelope.Create(new ContentCreated { AppId = appId });
 
-            var rule1 = new Rule(new ContentChangedTrigger(), new WebhookAction { Url = new Uri("https://squidex.io") });
-            var rule2 = new Rule(new ContentChangedTrigger(), new WebhookAction { Url = new Uri("https://squidex.io") });
-            var rule3 = new Rule(new ContentChangedTrigger(), new WebhookAction { Url = new Uri("https://squidex.io") });
+            var rule1 = new Rule(new ContentChangedTrigger(), new TestAction { Url = new Uri("https://squidex.io") });
+            var rule2 = new Rule(new ContentChangedTrigger(), new TestAction { Url = new Uri("https://squidex.io") });
+            var rule3 = new Rule(new ContentChangedTrigger(), new TestAction { Url = new Uri("https://squidex.io") });
 
             var job1 = new RuleJob { Created = now };
             var job2 = new RuleJob { Created = now };
@@ -80,14 +88,14 @@ namespace Squidex.Domain.Apps.Entities.Rules
             A.CallTo(() => appProvider.GetRulesAsync(appId.Id))
                 .Returns(new List<IRuleEntity> { ruleEntity1, ruleEntity2, ruleEntity3 });
 
-            A.CallTo(() => ruleService.CreateJob(rule1, @event))
+            A.CallTo(() => ruleService.CreateJobAsync(rule1, @event))
                 .Returns(job1);
 
-            A.CallTo(() => ruleService.CreateJob(rule2, @event))
+            A.CallTo(() => ruleService.CreateJobAsync(rule2, @event))
                 .Returns(job2);
 
-            A.CallTo(() => ruleService.CreateJob(rule3, @event))
-                .Returns(null);
+            A.CallTo(() => ruleService.CreateJobAsync(rule3, @event))
+                .Returns(Task.FromResult<RuleJob>(null));
 
             await sut.On(@event);
 

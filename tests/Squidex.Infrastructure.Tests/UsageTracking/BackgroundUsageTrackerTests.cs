@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 using FakeItEasy;
 using FluentAssertions;
 using Squidex.Infrastructure.Log;
-using Squidex.Infrastructure.Tasks;
 using Xunit;
 
 namespace Squidex.Infrastructure.UsageTracking
@@ -32,7 +31,7 @@ namespace Squidex.Infrastructure.UsageTracking
         {
             sut.Dispose();
 
-            return Assert.ThrowsAsync<ObjectDisposedException>(() => sut.TrackAsync("key1", 1, 1000));
+            return Assert.ThrowsAsync<ObjectDisposedException>(() => sut.TrackAsync("MyKey1", "category1", 1, 1000));
         }
 
         [Fact]
@@ -40,7 +39,7 @@ namespace Squidex.Infrastructure.UsageTracking
         {
             sut.Dispose();
 
-            return Assert.ThrowsAsync<ObjectDisposedException>(() => sut.QueryAsync("key1", DateTime.Today, DateTime.Today.AddDays(1)));
+            return Assert.ThrowsAsync<ObjectDisposedException>(() => sut.QueryAsync("MyKey1", DateTime.Today, DateTime.Today.AddDays(1)));
         }
 
         [Fact]
@@ -48,7 +47,7 @@ namespace Squidex.Infrastructure.UsageTracking
         {
             sut.Dispose();
 
-            return Assert.ThrowsAsync<ObjectDisposedException>(() => sut.GetMonthlyCalls("key1", DateTime.Today));
+            return Assert.ThrowsAsync<ObjectDisposedException>(() => sut.GetMonthlyCallsAsync("MyKey1", DateTime.Today));
         }
 
         [Fact]
@@ -58,16 +57,16 @@ namespace Squidex.Infrastructure.UsageTracking
 
             IReadOnlyList<StoredUsage> originalData = new List<StoredUsage>
             {
-                new StoredUsage(date.AddDays(1), 10, 15),
-                new StoredUsage(date.AddDays(3), 13, 18),
-                new StoredUsage(date.AddDays(5), 15, 20),
-                new StoredUsage(date.AddDays(7), 17, 22)
+                new StoredUsage("category1", date.AddDays(1), 10, 15),
+                new StoredUsage("category1", date.AddDays(3), 13, 18),
+                new StoredUsage("category1", date.AddDays(5), 15, 20),
+                new StoredUsage("category1", date.AddDays(7), 17, 22)
             };
 
-            A.CallTo(() => usageStore.QueryAsync("key", new DateTime(2016, 1, 1), new DateTime(2016, 1, 31)))
+            A.CallTo(() => usageStore.QueryAsync("MyKey1", new DateTime(2016, 1, 1), new DateTime(2016, 1, 31)))
                 .Returns(originalData);
 
-            var result = await sut.GetMonthlyCalls("key", date);
+            var result = await sut.GetMonthlyCallsAsync("MyKey1", date);
 
             Assert.Equal(55, result);
         }
@@ -75,45 +74,82 @@ namespace Squidex.Infrastructure.UsageTracking
         [Fact]
         public async Task Should_fill_missing_days()
         {
-            var dateFrom = DateTime.Today;
-            var dateTo = DateTime.Today.AddDays(7);
+            var f = DateTime.Today;
+            var t = DateTime.Today.AddDays(4);
 
-            IReadOnlyList<StoredUsage> originalData = new List<StoredUsage>
+            var originalData = new List<StoredUsage>
             {
-                new StoredUsage(dateFrom.AddDays(1), 10, 15),
-                new StoredUsage(dateFrom.AddDays(3), 13, 18),
-                new StoredUsage(dateFrom.AddDays(5), 15, 20),
-                new StoredUsage(dateFrom.AddDays(7), 17, 22)
+                new StoredUsage("MyCategory1", f.AddDays(1), 10, 15),
+                new StoredUsage("MyCategory1", f.AddDays(3), 13, 18),
+                new StoredUsage("MyCategory1", f.AddDays(4), 15, 20),
+                new StoredUsage(null, f.AddDays(0), 17, 22),
+                new StoredUsage(null, f.AddDays(2), 11, 14)
             };
 
-            A.CallTo(() => usageStore.QueryAsync("key", dateFrom, dateTo))
+            A.CallTo(() => usageStore.QueryAsync("MyKey1", f, t))
                 .Returns(originalData);
 
-            var result = await sut.QueryAsync("key", dateFrom, dateTo);
+            var result = await sut.QueryAsync("MyKey1", f, t);
 
-            result.ShouldBeEquivalentTo(new List<StoredUsage>
+            var expected = new Dictionary<string, List<DateUsage>>
             {
-                new StoredUsage(dateFrom.AddDays(0), 00, 00),
-                new StoredUsage(dateFrom.AddDays(1), 10, 15),
-                new StoredUsage(dateFrom.AddDays(2), 00, 00),
-                new StoredUsage(dateFrom.AddDays(3), 13, 18),
-                new StoredUsage(dateFrom.AddDays(4), 00, 00),
-                new StoredUsage(dateFrom.AddDays(5), 15, 20),
-                new StoredUsage(dateFrom.AddDays(6), 00, 00),
-                new StoredUsage(dateFrom.AddDays(7), 17, 22)
-            });
+                ["MyCategory1"] = new List<DateUsage>
+                {
+                    new DateUsage(f.AddDays(0), 00, 00),
+                    new DateUsage(f.AddDays(1), 10, 15),
+                    new DateUsage(f.AddDays(2), 00, 00),
+                    new DateUsage(f.AddDays(3), 13, 18),
+                    new DateUsage(f.AddDays(4), 15, 20)
+                },
+                ["*"] = new List<DateUsage>
+                {
+                    new DateUsage(f.AddDays(0), 17, 22),
+                    new DateUsage(f.AddDays(1), 00, 00),
+                    new DateUsage(f.AddDays(2), 11, 14),
+                    new DateUsage(f.AddDays(3), 00, 00),
+                    new DateUsage(f.AddDays(4), 00, 00)
+                }
+            };
+
+            result.Should().BeEquivalentTo(expected);
+        }
+
+        [Fact]
+        public async Task Should_fill_missing_days_with_star()
+        {
+            var f = DateTime.Today;
+            var t = DateTime.Today.AddDays(4);
+
+            A.CallTo(() => usageStore.QueryAsync("MyKey1", f, t))
+                .Returns(new List<StoredUsage>());
+
+            var result = await sut.QueryAsync("MyKey1", f, t);
+
+            var expected = new Dictionary<string, List<DateUsage>>
+            {
+                ["*"] = new List<DateUsage>
+                {
+                    new DateUsage(f.AddDays(0), 00, 00),
+                    new DateUsage(f.AddDays(1), 00, 00),
+                    new DateUsage(f.AddDays(2), 00, 00),
+                    new DateUsage(f.AddDays(3), 00, 00),
+                    new DateUsage(f.AddDays(4), 00, 00)
+                }
+            };
+
+            result.Should().BeEquivalentTo(expected);
         }
 
         [Fact]
         public async Task Should_not_track_if_weight_less_than_zero()
         {
-            await sut.TrackAsync("key1", -1, 1000);
-            await sut.TrackAsync("key1", 0, 1000);
+            await sut.TrackAsync("MyKey1", "MyCategory", -1, 1000);
+            await sut.TrackAsync("MyKey1", "MyCategory", 0, 1000);
 
             sut.Next();
             sut.Dispose();
 
-            A.CallTo(() => usageStore.TrackUsagesAsync(A<DateTime>.Ignored, A<string>.Ignored, A<double>.Ignored, A<double>.Ignored)).MustNotHaveHappened();
+            A.CallTo(() => usageStore.TrackUsagesAsync(A<DateTime>.Ignored, A<string>.Ignored, A<string>.Ignored, A<double>.Ignored, A<double>.Ignored)).MustNotHaveHappened();
         }
 
         [Fact]
@@ -121,30 +157,24 @@ namespace Squidex.Infrastructure.UsageTracking
         {
             var today = DateTime.Today;
 
-            A.CallTo(() => usageStore.TrackUsagesAsync(today, "key1", 1.0, 1000))
-                .Returns(TaskHelper.Done);
+            await sut.TrackAsync("MyKey1", "MyCategory1", 1, 1000);
 
-            A.CallTo(() => usageStore.TrackUsagesAsync(today, "key2", 1.5, 5000))
-                .Returns(TaskHelper.Done);
+            await sut.TrackAsync("MyKey2", "MyCategory1", 1.0, 2000);
+            await sut.TrackAsync("MyKey2", "MyCategory1", 0.5, 3000);
 
-            A.CallTo(() => usageStore.TrackUsagesAsync(today, "key3", 0.9, 15000))
-                .Returns(TaskHelper.Done);
-
-            await sut.TrackAsync("key1", 1, 1000);
-
-            await sut.TrackAsync("key2", 1.0, 2000);
-            await sut.TrackAsync("key2", 0.5, 3000);
-
-            await sut.TrackAsync("key3", 0.3, 4000);
-            await sut.TrackAsync("key3", 0.1, 5000);
-            await sut.TrackAsync("key3", 0.5, 6000);
+            await sut.TrackAsync("MyKey3", "MyCategory1", 0.3, 4000);
+            await sut.TrackAsync("MyKey3", "MyCategory1", 0.1, 5000);
+            await sut.TrackAsync("MyKey3", null, 0.5, 2000);
+            await sut.TrackAsync("MyKey3", null, 0.5, 6000);
 
             sut.Next();
             sut.Dispose();
 
-            A.CallTo(() => usageStore.TrackUsagesAsync(today, "key1", 1.0, 1000)).MustHaveHappened();
-            A.CallTo(() => usageStore.TrackUsagesAsync(today, "key2", 1.5, 5000)).MustHaveHappened();
-            A.CallTo(() => usageStore.TrackUsagesAsync(today, "key3", 0.9, 15000)).MustHaveHappened();
+            A.CallTo(() => usageStore.TrackUsagesAsync(today, "MyKey1", "MyCategory1", 1.0, 1000)).MustHaveHappened();
+            A.CallTo(() => usageStore.TrackUsagesAsync(today, "MyKey2", "MyCategory1", 1.5, 5000)).MustHaveHappened();
+            A.CallTo(() => usageStore.TrackUsagesAsync(today, "MyKey3", "MyCategory1", 0.4, 9000)).MustHaveHappened();
+
+            A.CallTo(() => usageStore.TrackUsagesAsync(today, "MyKey3", "*", 1.0, 8000)).MustHaveHappened();
         }
     }
 }

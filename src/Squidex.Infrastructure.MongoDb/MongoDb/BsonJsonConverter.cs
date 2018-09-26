@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Globalization;
 using MongoDB.Bson;
 using Newtonsoft.Json.Linq;
 
@@ -84,22 +85,29 @@ namespace Squidex.Infrastructure.MongoDb
                 case JTokenType.Bytes:
                     return BsonValue.Create(((JValue)source).Value);
                 case JTokenType.Guid:
-                    return BsonValue.Create(((JValue)source).ToString());
+                    return BsonValue.Create(((JValue)source).ToString(CultureInfo.InvariantCulture));
                 case JTokenType.Uri:
-                    return BsonValue.Create(((JValue)source).ToString());
+                    return BsonValue.Create(((JValue)source).ToString(CultureInfo.InvariantCulture));
                 case JTokenType.TimeSpan:
-                    return BsonValue.Create(((JValue)source).ToString());
+                    return BsonValue.Create(((JValue)source).ToString(CultureInfo.InvariantCulture));
                 case JTokenType.Date:
                     {
                         var value = ((JValue)source).Value;
 
                         if (value is DateTime dateTime)
                         {
-                            return dateTime.ToString("yyyy-MM-ddTHH:mm:ssK");
+                            return dateTime.ToString("yyyy-MM-ddTHH:mm:ssK", CultureInfo.InvariantCulture);
                         }
                         else if (value is DateTimeOffset dateTimeOffset)
                         {
-                            return dateTimeOffset.UtcDateTime.ToString("yyyy-MM-ddTHH:mm:ssK");
+                            if (dateTimeOffset.Offset == TimeSpan.Zero)
+                            {
+                                return dateTimeOffset.UtcDateTime.ToString("yyyy-MM-ddTHH:mm:ssK", CultureInfo.InvariantCulture);
+                            }
+                            else
+                            {
+                                return dateTimeOffset.ToString("yyyy-MM-ddTHH:mm:ssK", CultureInfo.InvariantCulture);
+                            }
                         }
                         else
                         {

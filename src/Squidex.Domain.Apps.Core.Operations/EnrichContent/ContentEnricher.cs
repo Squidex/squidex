@@ -50,7 +50,7 @@ namespace Squidex.Domain.Apps.Core.EnrichContent
             }
         }
 
-        private static void Enrich(Field field, ContentFieldData fieldData, IFieldPartitionItem partitionItem)
+        private static void Enrich(IField field, ContentFieldData fieldData, IFieldPartitionItem partitionItem)
         {
             Guard.NotNull(fieldData, nameof(fieldData));
 
@@ -69,9 +69,9 @@ namespace Squidex.Domain.Apps.Core.EnrichContent
             }
         }
 
-        private static bool ShouldApplyDefaultValue(Field field, JToken value)
+        private static bool ShouldApplyDefaultValue(IField field, JToken value)
         {
-            return value.IsNull() || (field is StringField && value is JValue jValue && Equals(jValue.Value, string.Empty));
+            return value.IsNull() || (field is IField<StringFieldProperties> && value is JValue jValue && Equals(jValue.Value, string.Empty));
         }
     }
 }

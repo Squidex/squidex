@@ -9,7 +9,11 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using NodaTime;
+using Squidex.Areas.Api.Controllers.Schemas.Models.Converters;
+using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Areas.Api.Controllers.Schemas.Models
 {
@@ -26,6 +30,16 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         [Required]
         [RegularExpression("^[a-z0-9]+(\\-[a-z0-9]+)*$")]
         public string Name { get; set; }
+
+        /// <summary>
+        /// The name of the category.
+        /// </summary>
+        public string Category { get; set; }
+
+        /// <summary>
+        /// Indicates if the schema is a singleton.
+        /// </summary>
+        public bool IsSingleton { get; set; }
 
         /// <summary>
         /// Indicates if the schema is published.
@@ -95,5 +109,50 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// The version of the schema.
         /// </summary>
         public int Version { get; set; }
+
+        public static SchemaDetailsDto FromSchema(ISchemaEntity schema)
+        {
+            var response = new SchemaDetailsDto { Properties = new SchemaPropertiesDto() };
+
+            SimpleMapper.Map(schema, response);
+            SimpleMapper.Map(schema.SchemaDef, response);
+            SimpleMapper.Map(schema.SchemaDef.Properties, response.Properties);
+
+            response.Fields = new List<FieldDto>();
+
+            foreach (var field in schema.SchemaDef.Fields)
+            {
+                var fieldPropertiesDto = FieldPropertiesDtoFactory.Create(field.RawProperties);
+                var fieldDto = SimpleMapper.Map(field,
+                    new FieldDto
+                    {
+                        FieldId = field.Id,
+                        Properties = fieldPropertiesDto,
+                        Partitioning = field.Partitioning.Key
+                    });
+
+                if (field is IArrayField arrayField)
+                {
+                    fieldDto.Nested = new List<NestedFieldDto>();
+
+                    foreach (var nestedField in arrayField.Fields)
+                    {
+                        var nestedFieldPropertiesDto = FieldPropertiesDtoFactory.Create(nestedField.RawProperties);
+                        var nestedFieldDto = SimpleMapper.Map(nestedField,
+                            new NestedFieldDto
+                            {
+                                FieldId = nestedField.Id,
+                                Properties = nestedFieldPropertiesDto
+                            });
+
+                        fieldDto.Nested.Add(nestedFieldDto);
+                    }
+                }
+
+                response.Fields.Add(fieldDto);
+            }
+
+            return response;
+        }
     }
 }

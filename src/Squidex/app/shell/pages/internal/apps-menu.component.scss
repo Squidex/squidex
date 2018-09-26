@@ -37,12 +37,12 @@ $color-apps-border: #65a6ff;
     }
 }
 
-.drodown-button {
+.dropdown-button {
     padding: 1rem 1.5rem;
 }
 
 .dropdown-menu {
-    top: 2.65rem;
+    @include absolute(2.65rem, auto, auto, auto);
 }
 
 .icon-plus {
@@ -66,6 +66,8 @@ $color-apps-border: #65a6ff;
 .app-upgrade {
     & {
         margin-left: 2rem;
+        margin-right: 0;
+        vertical-align: top;
     }
 
     .btn {

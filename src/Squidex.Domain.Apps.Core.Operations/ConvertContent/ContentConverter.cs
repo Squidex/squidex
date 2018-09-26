@@ -7,195 +7,90 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Newtonsoft.Json.Linq;
-using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Json;
 
 namespace Squidex.Domain.Apps.Core.ConvertContent
 {
     public static class ContentConverter
     {
-        public static NamedContentData ToNameModel(this IdContentData source, Schema schema, bool decodeJsonField)
+        private static readonly Func<IRootField, string> KeyNameResolver = f => f.Name;
+        private static readonly Func<IRootField, long> KeyIdResolver = f => f.Id;
+
+        public static NamedContentData ConvertId2Name(this IdContentData content, Schema schema, params FieldConverter[] converters)
         {
             Guard.NotNull(schema, nameof(schema));
 
-            var result = new NamedContentData();
+            var result = new NamedContentData(content.Count);
 
-            foreach (var fieldValue in source)
+            return ConvertInternal(content, result, schema.FieldsById, KeyNameResolver, converters);
+        }
+
+        public static IdContentData ConvertId2Id(this IdContentData content, Schema schema, params FieldConverter[] converters)
+        {
+            Guard.NotNull(schema, nameof(schema));
+
+            var result = new IdContentData(content.Count);
+
+            return ConvertInternal(content, result, schema.FieldsById, KeyIdResolver, converters);
+        }
+
+        public static NamedContentData ConvertName2Name(this NamedContentData content, Schema schema, params FieldConverter[] converters)
+        {
+            Guard.NotNull(schema, nameof(schema));
+
+            var result = new NamedContentData(content.Count);
+
+            return ConvertInternal(content, result, schema.FieldsByName, KeyNameResolver, converters);
+        }
+
+        public static IdContentData ConvertName2Id(this NamedContentData content, Schema schema, params FieldConverter[] converters)
+        {
+            Guard.NotNull(schema, nameof(schema));
+
+            var result = new IdContentData(content.Count);
+
+            return ConvertInternal(content, result, schema.FieldsByName, KeyIdResolver, converters);
+        }
+
+        private static TDict2 ConvertInternal<TKey1, TKey2, TDict1, TDict2>(
+            TDict1 source,
+            TDict2 target,
+            IReadOnlyDictionary<TKey1, RootField> fields,
+            Func<IRootField, TKey2> targetKey, params FieldConverter[] converters)
+            where TDict1 : IDictionary<TKey1, ContentFieldData>
+            where TDict2 : IDictionary<TKey2, ContentFieldData>
+        {
+            foreach (var fieldKvp in source)
             {
-                if (!schema.FieldsById.TryGetValue(fieldValue.Key, out var field))
+                if (!fields.TryGetValue(fieldKvp.Key, out var field))
                 {
                     continue;
                 }
 
-                if (decodeJsonField && field is JsonField)
-                {
-                    var encodedValue = new ContentFieldData();
+                var newvalue = fieldKvp.Value;
 
-                    foreach (var partitionValue in fieldValue.Value)
+                if (converters != null)
+                {
+                    foreach (var converter in converters)
                     {
-                        if (partitionValue.Value.IsNull())
+                        newvalue = converter(newvalue, field);
+
+                        if (newvalue == null)
                         {
-                            encodedValue[partitionValue.Key] = null;
-                        }
-                        else
-                        {
-                            var value = Encoding.UTF8.GetString(Convert.FromBase64String(partitionValue.Value.ToString()));
-
-                            encodedValue[partitionValue.Key] = JToken.Parse(value);
-                        }
-                    }
-
-                    result[field.Name] = encodedValue;
-                }
-                else
-                {
-                    result[field.Name] = fieldValue.Value;
-                }
-            }
-
-            return result;
-        }
-
-        public static IdContentData ToIdModel(this NamedContentData content, Schema schema, bool encodeJsonField)
-        {
-            Guard.NotNull(schema, nameof(schema));
-
-            var result = new IdContentData();
-
-            foreach (var fieldValue in content)
-            {
-                if (!schema.FieldsByName.TryGetValue(fieldValue.Key, out var field))
-                {
-                    continue;
-                }
-
-                var fieldId = field.Id;
-
-                if (encodeJsonField && field is JsonField)
-                {
-                    var encodedValue = new ContentFieldData();
-
-                    foreach (var partitionValue in fieldValue.Value)
-                    {
-                        if (partitionValue.Value.IsNull())
-                        {
-                            encodedValue[partitionValue.Key] = null;
-                        }
-                        else
-                        {
-                            var value = Convert.ToBase64String(Encoding.UTF8.GetBytes(partitionValue.Value.ToString()));
-
-                            encodedValue[partitionValue.Key] = value;
-                        }
-                    }
-
-                    result[fieldId] = encodedValue;
-                }
-                else
-                {
-                    result[fieldId] = fieldValue.Value;
-                }
-            }
-
-            return result;
-        }
-
-        public static NamedContentData ToApiModel(this NamedContentData content, Schema schema, LanguagesConfig languagesConfig, bool excludeHidden = true)
-        {
-            Guard.NotNull(schema, nameof(schema));
-            Guard.NotNull(languagesConfig, nameof(languagesConfig));
-
-            var codeForInvariant = InvariantPartitioning.Instance.Master.Key;
-            var codeForMasterLanguage = languagesConfig.Master.Language.Iso2Code;
-
-            var result = new NamedContentData();
-
-            foreach (var fieldValue in content)
-            {
-                if (!schema.FieldsByName.TryGetValue(fieldValue.Key, out var field) || (excludeHidden && field.IsHidden))
-                {
-                    continue;
-                }
-
-                var fieldResult = new ContentFieldData();
-                var fieldValues = fieldValue.Value;
-
-                if (field.Partitioning.Equals(Partitioning.Language))
-                {
-                    foreach (var languageConfig in languagesConfig)
-                    {
-                        var languageCode = languageConfig.Key;
-
-                        if (fieldValues.TryGetValue(languageCode, out var value))
-                        {
-                            fieldResult.Add(languageCode, value);
-                        }
-                        else if (languageConfig == languagesConfig.Master && fieldValues.TryGetValue(codeForInvariant, out value))
-                        {
-                            fieldResult.Add(languageCode, value);
+                            break;
                         }
                     }
                 }
-                else
+
+                if (newvalue != null)
                 {
-                    if (fieldValues.TryGetValue(codeForInvariant, out var value))
-                    {
-                        fieldResult.Add(codeForInvariant, value);
-                    }
-                    else if (fieldValues.TryGetValue(codeForMasterLanguage, out value))
-                    {
-                        fieldResult.Add(codeForInvariant, value);
-                    }
-                    else if (fieldValues.Count > 0)
-                    {
-                        fieldResult.Add(codeForInvariant, fieldValues.Values.First());
-                    }
-                }
-
-                result.Add(field.Name, fieldResult);
-            }
-
-            return result;
-        }
-
-        public static object ToLanguageModel(this NamedContentData content, LanguagesConfig languagesConfig, IReadOnlyCollection<Language> languagePreferences = null)
-        {
-            Guard.NotNull(languagesConfig, nameof(languagesConfig));
-
-            if (languagePreferences == null || languagePreferences.Count == 0)
-            {
-                return content;
-            }
-
-            if (languagePreferences.Count == 1 && languagesConfig.TryGetConfig(languagePreferences.First(), out var languageConfig))
-            {
-                languagePreferences = languagePreferences.Union(languageConfig.LanguageFallbacks).ToList();
-            }
-
-            var result = new Dictionary<string, JToken>();
-
-            foreach (var fieldValue in content)
-            {
-                var fieldValues = fieldValue.Value;
-
-                foreach (var language in languagePreferences)
-                {
-                    if (fieldValues.TryGetValue(language, out var value) && value != null)
-                    {
-                        result[fieldValue.Key] = value;
-
-                        break;
-                    }
+                    target.Add(targetKey(field), newvalue);
                 }
             }
 
-            return result;
+            return target;
         }
     }
 }

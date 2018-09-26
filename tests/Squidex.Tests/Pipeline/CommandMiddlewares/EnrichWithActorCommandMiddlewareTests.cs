@@ -5,81 +5,105 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Security;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.AspNetCore.Http;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Security;
-using Squidex.Pipeline.CommandMiddlewares;
 using Xunit;
 
-namespace Squidex.Tests.Pipeline.CommandMiddlewares
+namespace Squidex.Pipeline.CommandMiddlewares
 {
     public class EnrichWithActorCommandMiddlewareTests
     {
         private readonly IHttpContextAccessor httpContextAccessor = A.Fake<IHttpContextAccessor>();
         private readonly ICommandBus commandBus = A.Fake<ICommandBus>();
-        private readonly CreateContent command = new CreateContent { Actor = null };
+        private readonly HttpContext httpContext = new DefaultHttpContext();
+        private readonly EnrichWithActorCommandMiddleware sut;
 
-        [Fact]
-        public async Task HandleAsync_should_throw_security_exception()
+        public EnrichWithActorCommandMiddlewareTests()
         {
-            var context = new CommandContext(command, commandBus);
-            var sut = SetupSystem(null, out string claimValue);
+            A.CallTo(() => httpContextAccessor.HttpContext)
+                .Returns(httpContext);
 
-            await Assert.ThrowsAsync<SecurityException>(() =>
-            {
-                return sut.HandleAsync(context);
-            });
+            sut = new EnrichWithActorCommandMiddleware(httpContextAccessor);
         }
 
         [Fact]
-        public async Task HandleAsync_should_find_actor_from_subject()
+        public async Task Should_throw_security_exception_when_no_subject_or_client_is_found()
         {
+            var command = new CreateContent();
             var context = new CommandContext(command, commandBus);
-            var sut = SetupSystem("subject", out string claimValue);
+
+            await Assert.ThrowsAsync<SecurityException>(() => sut.HandleAsync(context));
+        }
+
+        [Fact]
+        public async Task Should_do_nothing_when_context_is_null()
+        {
+            A.CallTo(() => httpContextAccessor.HttpContext)
+                .Returns(null);
+
+            var command = new CreateContent();
+            var context = new CommandContext(command, commandBus);
 
             await sut.HandleAsync(context);
 
-            Assert.Equal(claimValue, command.Actor.Identifier);
+            Assert.Null(command.Actor);
         }
 
         [Fact]
-        public async Task HandleAsync_should_find_actor_from_client()
+        public async Task Should_assign_actor_from_subject()
         {
+            httpContext.User = CreatePrincipal(OpenIdClaims.Subject, "me");
+
+            var command = new CreateContent();
             var context = new CommandContext(command, commandBus);
-            var sut = SetupSystem("client", out string claimValue);
 
             await sut.HandleAsync(context);
 
-            Assert.Equal(claimValue, command.Actor.Identifier);
+            Assert.Equal(new RefToken(RefTokenType.Subject, "me"), command.Actor);
         }
 
-        private EnrichWithActorCommandMiddleware SetupSystem(string refTokenType, out string claimValue)
+        [Fact]
+        public async Task Should_assign_actor_from_client()
         {
-            Claim actorClaim;
-            claimValue = Guid.NewGuid().ToString();
-            var user = new ClaimsPrincipal();
+            httpContext.User = CreatePrincipal(OpenIdClaims.ClientId, "my-client");
+
+            var command = new CreateContent();
+            var context = new CommandContext(command, commandBus);
+
+            await sut.HandleAsync(context);
+
+            Assert.Equal(new RefToken(RefTokenType.Client, "my-client"), command.Actor);
+        }
+
+        [Fact]
+        public async Task Should_not_override_actor()
+        {
+            httpContext.User = CreatePrincipal(OpenIdClaims.ClientId, "my-client");
+
+            var command = new CreateContent { Actor = new RefToken("subject", "me") };
+            var context = new CommandContext(command, commandBus);
+
+            await sut.HandleAsync(context);
+
+            Assert.Equal(new RefToken("subject", "me"), command.Actor);
+        }
+
+        private static ClaimsPrincipal CreatePrincipal(string claimType, string claimValue)
+        {
+            var claimsPrincipal = new ClaimsPrincipal();
             var claimsIdentity = new ClaimsIdentity();
-            switch (refTokenType)
-            {
-                case "subject":
-                    actorClaim = new Claim(OpenIdClaims.Subject, claimValue);
-                    claimsIdentity.AddClaim(actorClaim);
-                    break;
-                case "client":
-                    actorClaim = new Claim(OpenIdClaims.ClientId, claimValue);
-                    claimsIdentity.AddClaim(actorClaim);
-                    break;
-            }
 
-            user.AddIdentity(claimsIdentity);
-            A.CallTo(() => httpContextAccessor.HttpContext.User).Returns(user);
-            return new EnrichWithActorCommandMiddleware(httpContextAccessor);
+            claimsIdentity.AddClaim(new Claim(claimType, claimValue));
+            claimsPrincipal.AddIdentity(claimsIdentity);
+
+            return claimsPrincipal;
         }
     }
 }

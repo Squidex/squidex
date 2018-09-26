@@ -7,8 +7,8 @@
 
 import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 
-import { ResourceLoaderService } from './../services/resource-loader.service';
 import { UserReportConfig } from './../configurations';
+import { ResourceLoaderService } from './../services/resource-loader.service';
 
 @Component({
     selector: 'sqx-user-report',

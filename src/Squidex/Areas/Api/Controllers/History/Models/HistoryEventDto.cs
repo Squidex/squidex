@@ -8,6 +8,8 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using NodaTime;
+using Squidex.Domain.Apps.Entities.History;
+using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Areas.Api.Controllers.History.Models
 {
@@ -26,6 +28,12 @@ namespace Squidex.Areas.Api.Controllers.History.Models
         public string Actor { get; set; }
 
         /// <summary>
+        /// The type of the event.
+        /// </summary>
+        [Required]
+        public string EventType { get; set; }
+
+        /// <summary>
         /// Gets a unique id for the event.
         /// </summary>
         public Guid EventId { get; set; }
@@ -39,5 +47,10 @@ namespace Squidex.Areas.Api.Controllers.History.Models
         /// The version identifier.
         /// </summary>
         public long Version { get; set; }
+
+        public static HistoryEventDto FromHistoryEvent(IHistoryEventEntity x)
+        {
+            return SimpleMapper.Map(x, new HistoryEventDto());
+        }
     }
 }

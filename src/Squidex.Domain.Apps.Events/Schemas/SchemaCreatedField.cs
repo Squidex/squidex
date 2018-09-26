@@ -5,22 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Core.Schemas;
+using System.Collections.Generic;
 
 namespace Squidex.Domain.Apps.Events.Schemas
 {
-    public sealed class SchemaCreatedField
+    public sealed class SchemaCreatedField : SchemaCreatedFieldBase
     {
         public string Partitioning { get; set; }
 
-        public string Name { get; set; }
-
-        public bool IsHidden { get; set; }
-
-        public bool IsLocked { get; set; }
-
-        public bool IsDisabled { get; set; }
-
-        public FieldProperties Properties { get; set; }
+        public List<SchemaCreatedNestedField> Nested { get; set; }
     }
 }

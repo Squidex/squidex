@@ -9,22 +9,24 @@ namespace Squidex.Domain.Apps.Core.Schemas
 {
     public interface IFieldVisitor<out T>
     {
-        T Visit(AssetsField field);
+        T Visit(IArrayField field);
 
-        T Visit(BooleanField field);
+        T Visit(IField<AssetsFieldProperties> field);
 
-        T Visit(DateTimeField field);
+        T Visit(IField<BooleanFieldProperties> field);
 
-        T Visit(GeolocationField field);
+        T Visit(IField<DateTimeFieldProperties> field);
 
-        T Visit(JsonField field);
+        T Visit(IField<GeolocationFieldProperties> field);
 
-        T Visit(NumberField field);
+        T Visit(IField<JsonFieldProperties> field);
 
-        T Visit(ReferencesField field);
+        T Visit(IField<NumberFieldProperties> field);
 
-        T Visit(StringField field);
+        T Visit(IField<ReferencesFieldProperties> field);
 
-        T Visit(TagsField field);
+        T Visit(IField<StringFieldProperties> field);
+
+        T Visit(IField<TagsFieldProperties> field);
     }
 }

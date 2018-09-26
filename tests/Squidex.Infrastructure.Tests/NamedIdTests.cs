@@ -19,7 +19,7 @@ namespace Squidex.Infrastructure
         {
             var id = Guid.NewGuid();
 
-            var namedId = new NamedId<Guid>(id, "my-name");
+            var namedId = NamedId.Of(id, "my-name");
 
             Assert.Equal(id, namedId.Id);
             Assert.Equal("my-name", namedId.Name);
@@ -30,7 +30,7 @@ namespace Squidex.Infrastructure
         {
             var id = Guid.NewGuid();
 
-            var namedId = new NamedId<Guid>(id, "my-name");
+            var namedId = NamedId.Of(id, "my-name");
 
             Assert.Equal($"{id},my-name", namedId.ToString());
         }
@@ -41,10 +41,10 @@ namespace Squidex.Infrastructure
             var id1 = Guid.NewGuid();
             var id2 = Guid.NewGuid();
 
-            var token1a = new NamedId<Guid>(id1, "my-name1");
-            var token1b = new NamedId<Guid>(id1, "my-name1");
-            var token1c = new NamedId<Guid>(id1, "my-name2");
-            var token2a = new NamedId<Guid>(id2, "my-name1");
+            var token1a = NamedId.Of(id1, "my-name1");
+            var token1b = NamedId.Of(id1, "my-name1");
+            var token1c = NamedId.Of(id1, "my-name2");
+            var token2a = NamedId.Of(id2, "my-name1");
 
             Assert.True(token1a.Equals(token1b));
 
@@ -58,10 +58,10 @@ namespace Squidex.Infrastructure
             var id1 = Guid.NewGuid();
             var id2 = Guid.NewGuid();
 
-            object token1a = new NamedId<Guid>(id1, "my-name1");
-            object token1b = new NamedId<Guid>(id1, "my-name1");
-            object token1c = new NamedId<Guid>(id1, "my-name2");
-            object token2a = new NamedId<Guid>(id2, "my-name1");
+            object token1a = NamedId.Of(id1, "my-name1");
+            object token1b = NamedId.Of(id1, "my-name1");
+            object token1c = NamedId.Of(id1, "my-name2");
+            object token2a = NamedId.Of(id2, "my-name1");
 
             Assert.True(token1a.Equals(token1b));
 
@@ -75,10 +75,10 @@ namespace Squidex.Infrastructure
             var id1 = Guid.NewGuid();
             var id2 = Guid.NewGuid();
 
-            object token1a = new NamedId<Guid>(id1, "my-name1");
-            object token1b = new NamedId<Guid>(id1, "my-name1");
-            object token1c = new NamedId<Guid>(id1, "my-name2");
-            object token2a = new NamedId<Guid>(id2, "my-name1");
+            object token1a = NamedId.Of(id1, "my-name1");
+            object token1b = NamedId.Of(id1, "my-name1");
+            object token1c = NamedId.Of(id1, "my-name2");
+            object token2a = NamedId.Of(id2, "my-name1");
 
             Assert.Equal(token1a.GetHashCode(), token1b.GetHashCode());
 
@@ -97,7 +97,7 @@ namespace Squidex.Infrastructure
         [Fact]
         public void Should_serialize_and_deserialize_valid_guid_token()
         {
-            var value = new NamedId<Guid>(Guid.NewGuid(), "my-name");
+            var value = NamedId.Of(Guid.NewGuid(), "my-name");
 
             value.SerializeAndDeserialize(new NamedGuidIdConverter());
         }
@@ -113,7 +113,7 @@ namespace Squidex.Infrastructure
         [Fact]
         public void Should_serialize_and_deserialize_valid_long_token()
         {
-            var value = new NamedId<long>(123, "my-name");
+            var value = NamedId.Of(123L, "my-name");
 
             value.SerializeAndDeserialize(new NamedLongIdConverter());
         }
@@ -129,7 +129,7 @@ namespace Squidex.Infrastructure
         [Fact]
         public void Should_serialize_and_deserialize_valid_string_token()
         {
-            var value = new NamedId<string>(Guid.NewGuid().ToString(), "my-name");
+            var value = NamedId.Of(Guid.NewGuid().ToString(), "my-name");
 
             value.SerializeAndDeserialize(new NamedStringIdConverter());
         }

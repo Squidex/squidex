@@ -32,8 +32,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 
         protected override async Task SetupCollectionAsync(IMongoCollection<MongoAssetStatsEntity> collection)
         {
-            await collection.Indexes.CreateOneAsync(Index.Ascending(x => x.AssetId).Ascending(x => x.Date));
-            await collection.Indexes.CreateOneAsync(Index.Ascending(x => x.AssetId).Descending(x => x.Date));
+            await collection.Indexes.CreateOneAsync(
+                new CreateIndexModel<MongoAssetStatsEntity>(Index.Ascending(x => x.AssetId).Ascending(x => x.Date)));
+            await collection.Indexes.CreateOneAsync(
+                new CreateIndexModel<MongoAssetStatsEntity>(Index.Ascending(x => x.AssetId).Descending(x => x.Date)));
         }
 
         public async Task<IReadOnlyList<IAssetStatsEntity>> QueryAsync(Guid appId, DateTime fromDate, DateTime toDate)

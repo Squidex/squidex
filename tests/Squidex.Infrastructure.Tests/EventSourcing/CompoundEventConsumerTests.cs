@@ -7,7 +7,6 @@
 
 using System.Threading.Tasks;
 using FakeItEasy;
-using Squidex.Infrastructure.Tasks;
 using Squidex.Infrastructure.TestHelpers;
 using Xunit;
 
@@ -72,12 +71,6 @@ namespace Squidex.Infrastructure.EventSourcing
         [Fact]
         public async Task Should_clear_all_consumers()
         {
-            A.CallTo(() => consumer1.ClearAsync()).
-                Returns(TaskHelper.Done);
-
-            A.CallTo(() => consumer2.ClearAsync())
-                .Returns(TaskHelper.Done);
-
             var sut = new CompoundEventConsumer("consumer-name", consumer1, consumer2);
 
             await sut.ClearAsync();
@@ -90,12 +83,6 @@ namespace Squidex.Infrastructure.EventSourcing
         public async Task Should_invoke_all_consumers()
         {
             var @event = Envelope.Create(new MyEvent());
-
-            A.CallTo(() => consumer1.On(@event))
-                .Returns(TaskHelper.Done);
-
-            A.CallTo(() => consumer2.On(@event))
-                .Returns(TaskHelper.Done);
 
             var sut = new CompoundEventConsumer("consumer-name", consumer1, consumer2);
 

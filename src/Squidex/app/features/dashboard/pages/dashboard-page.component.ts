@@ -6,29 +6,38 @@
  */
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Observable, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
+import { filter, map, switchMap } from 'rxjs/operators';
 
 import {
-    AppContext,
     AppDto,
+    AppsState,
+    AuthService,
     DateTime,
     fadeAnimation,
-    formatHistoryMessage,
     HistoryEventDto,
     HistoryService,
-    UsagesService,
-    UsersProviderService
-} from 'shared';
+    UsagesService
+} from '@app/shared';
 
-declare var _urq: any;
+const COLORS = [
+    ' 51, 137, 213',
+    '211,  50,  50',
+    '131, 211,  50',
+    ' 50, 211, 131',
+    ' 50, 211, 211',
+    ' 50, 131, 211',
+    ' 50,  50, 211',
+    ' 50, 211,  50',
+    '131,  50, 211',
+    '211,  50, 211',
+    '211,  50, 131'
+];
 
 @Component({
     selector: 'sqx-dashboard-page',
     styleUrls: ['./dashboard-page.component.scss'],
     templateUrl: './dashboard-page.component.html',
-    providers: [
-        AppContext
-    ],
     animations: [
         fadeAnimation
     ]
@@ -43,23 +52,21 @@ export class DashboardPageComponent implements OnDestroy, OnInit {
     public chartCallsCount: any;
     public chartCallsPerformance: any;
 
-    public app = this.ctx.appChanges.filter(x => !!x).map(x => <AppDto>x);
+    public app = this.appsState.selectedApp.pipe(filter(x => !!x), map(x => <AppDto>x));
 
     public chartOptions = {
         responsive: true,
         scales: {
-            xAxes: [
-                {
-                    display: true
-                }
-            ],
-            yAxes: [
-                {
-                    ticks: {
-                        beginAtZero: true
-                    }
-                }
-            ]
+            xAxes: [{
+                display: true,
+                stacked: true
+            }],
+            yAxes: [{
+                ticks: {
+                    beginAtZero: true
+                },
+                stacked: true
+            }]
         },
         maintainAspectRatio: false
     };
@@ -72,9 +79,10 @@ export class DashboardPageComponent implements OnDestroy, OnInit {
     public callsCurrent = 0;
     public callsMax = 0;
 
-    constructor(public readonly ctx: AppContext,
+    constructor(
+        public readonly appsState: AppsState,
+        public readonly authState: AuthService,
         private readonly historyService: HistoryService,
-        private readonly users: UsersProviderService,
         private readonly usagesService: UsagesService
     ) {
     }
@@ -89,41 +97,43 @@ export class DashboardPageComponent implements OnDestroy, OnInit {
 
     public ngOnInit() {
         this.subscriptions.push(
-            this.app
-                .switchMap(app => this.usagesService.getTodayStorage(app.name))
+            this.app.pipe(
+                    switchMap(app => this.usagesService.getTodayStorage(app.name)))
                 .subscribe(dto => {
                     this.assetsCurrent = dto.size;
                     this.assetsMax = dto.maxAllowed;
                 }));
 
         this.subscriptions.push(
-            this.app
-                .switchMap(app => this.usagesService.getMonthCalls(app.name))
+            this.app.pipe(
+                    switchMap(app => this.usagesService.getMonthCalls(app.name)))
                 .subscribe(dto => {
                     this.callsCurrent = dto.count;
                     this.callsMax = dto.maxAllowed;
                 }));
 
         this.subscriptions.push(
-            this.app
-                .switchMap(app => this.historyService.getHistory(app.name, ''))
+            this.app.pipe(
+                    switchMap(app => this.historyService.getHistory(app.name, '')))
                 .subscribe(dto => {
                     this.history = dto;
                 }));
 
         this.subscriptions.push(
-            this.app
-                .switchMap(app => this.usagesService.getStorageUsages(app.name, DateTime.today().addDays(-20), DateTime.today()))
+            this.app.pipe(
+                    switchMap(app => this.usagesService.getStorageUsages(app.name, DateTime.today().addDays(-20), DateTime.today())))
                 .subscribe(dtos => {
+                    const labels = createLabels(dtos);
+
                     this.chartStorageCount = {
-                        labels: createLabels(dtos),
+                        labels,
                         datasets: [
                             {
-                                label: 'Number of Assets',
+                                label: 'All',
                                 lineTension: 0,
                                 fill: false,
-                                backgroundColor: 'rgba(51, 137, 213, 0.6)',
-                                borderColor: 'rgba(51, 137, 213, 1)',
+                                backgroundColor: `rgba(${COLORS[0]}, 0.6)`,
+                                borderColor: `rgba(${COLORS[0]}, 1)`,
                                 borderWidth: 1,
                                 data: dtos.map(x => x.count)
                             }
@@ -131,14 +141,14 @@ export class DashboardPageComponent implements OnDestroy, OnInit {
                     };
 
                     this.chartStorageSize = {
-                        labels: createLabels(dtos),
+                        labels,
                         datasets: [
                             {
-                                label: 'Size of Assets (MB)',
+                                label: 'All',
                                 lineTension: 0,
                                 fill: false,
-                                backgroundColor: 'rgba(51, 137, 213, 0.6)',
-                                borderColor: 'rgba(51, 137, 213, 1)',
+                                backgroundColor: `rgba(${COLORS[0]}, 0.6)`,
+                                borderColor: `rgba(${COLORS[0]}, 1)`,
                                 borderWidth: 1,
                                 data: dtos.map(x => Math.round(10 * (x.size / (1024 * 1024))) / 10)
                             }
@@ -147,47 +157,47 @@ export class DashboardPageComponent implements OnDestroy, OnInit {
                 }));
 
         this.subscriptions.push(
-            this.app
-                .switchMap(app => this.usagesService.getCallsUsages(app.name, DateTime.today().addDays(-20), DateTime.today()))
+            this.app.pipe(
+                    switchMap(app => this.usagesService.getCallsUsages(app.name, DateTime.today().addDays(-20), DateTime.today())))
                 .subscribe(dtos => {
+                    const labels = createLabelsFromSet(dtos);
+
                     this.chartCallsCount = {
-                        labels: createLabels(dtos),
-                        datasets: [
+                        labels,
+                        datasets: Object.keys(dtos).map((k, i) => (
                             {
-                                label: 'Number of API Calls',
-                                backgroundColor: 'rgba(51, 137, 213, 0.6)',
-                                borderColor: 'rgba(51, 137, 213, 1)',
+                                label: label(k),
+                                backgroundColor: `rgba(${COLORS[i]}, 0.6)`,
+                                borderColor: `rgba(${COLORS[i]}, 1)`,
                                 borderWidth: 1,
-                                data: dtos.map(x => x.count)
-                            }
-                        ]
+                                data: dtos[k].map(x => x.count)
+                            }))
                     };
 
                     this.chartCallsPerformance = {
-                        labels: createLabels(dtos),
-                        datasets: [
+                        labels,
+                        datasets: Object.keys(dtos).map((k, i) => (
                             {
-                                label: 'API Performance (Milliseconds)',
-                                backgroundColor: 'rgba(51, 137, 213, 0.6)',
-                                borderColor: 'rgba(51, 137, 213, 1)',
+                                label: label(k),
+                                backgroundColor: `rgba(${COLORS[i]}, 0.6)`,
+                                borderColor: `rgba(${COLORS[i]}, 1)`,
                                 borderWidth: 1,
-                                data: dtos.map(x => x.averageMs)
-                            }
-                        ]
+                                data: dtos[k].map(x => x.averageMs)
+                            }))
                     };
                 }));
     }
+}
 
-    public format(message: string): Observable<string> {
-        return formatHistoryMessage(message, this.users);
-    }
-
-    public showForum() {
-        _urq.push(['Feedback_Open']);
-    }
+function label(category: string) {
+    return category === '*' ? 'All Clients' : category;
 }
 
 function createLabels(dtos: { date: DateTime }[]): string[] {
     return dtos.map(d => d.date.toStringFormat('M-DD'));
+}
+
+function createLabelsFromSet(dtos: { [category: string]: { date: DateTime }[] }): string[] {
+    return createLabels(dtos[Object.keys(dtos)[0]]);
 }
 

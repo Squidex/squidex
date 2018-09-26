@@ -5,41 +5,28 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using Microsoft.OData.UriParser;
 using MongoDB.Driver;
+using Squidex.Infrastructure.Queries;
 
 namespace Squidex.Infrastructure.MongoDb.OData
 {
     public static class LimitExtensions
     {
-        public static IFindFluent<T, T> Take<T>(this IFindFluent<T, T> cursor, ODataUriParser query, int maxValue = 200, int defaultValue = 20)
+        public static IFindFluent<T, T> Take<T>(this IFindFluent<T, T> cursor, Query query)
         {
-            var top = query.ParseTop();
-
-            if (top.HasValue)
+            if (query.Take < long.MaxValue)
             {
-                cursor = cursor.Limit(Math.Min((int)top.Value, maxValue));
-            }
-            else
-            {
-                cursor = cursor.Limit(defaultValue);
+                cursor = cursor.Limit((int)query.Take);
             }
 
             return cursor;
         }
 
-        public static IFindFluent<T, T> Skip<T>(this IFindFluent<T, T> cursor, ODataUriParser query)
+        public static IFindFluent<T, T> Skip<T>(this IFindFluent<T, T> cursor, Query query)
         {
-            var skip = query.ParseSkip();
-
-            if (skip.HasValue)
+            if (query.Skip > 0)
             {
-                cursor = cursor.Skip((int)skip.Value);
-            }
-            else
-            {
-                cursor = cursor.Skip(null);
+                cursor = cursor.Skip((int)query.Skip);
             }
 
             return cursor;

@@ -1,0 +1,29 @@
+<div [formGroup]="actionForm" class="form-horizontal">
+    <div class="form-group row">
+        <label class="col col-3 col-form-label" for="token">Token</label>
+
+        <div class="col col-9">
+            <sqx-control-errors for="token" [submitted]="actionFormSubmitted"></sqx-control-errors>
+
+            <input type="text" class="form-control" id="token" formControlName="token" />
+
+            <small class="form-text text-muted">
+                The prerender token from your account.
+            </small>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label class="col col-3 col-form-label" for="url">Url</label>
+
+        <div class="col col-9">
+            <sqx-control-errors for="url" [submitted]="actionFormSubmitted"></sqx-control-errors>
+
+            <input type="url" class="form-control" id="url" formControlName="url" />
+
+            <small class="form-text text-muted">
+                The url to recache. Read the <a routerLink="help">help</a> section for information about advanced formatting.
+            </small>
+        </div>
+    </div>
+</div>

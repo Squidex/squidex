@@ -1,50 +1,25 @@
 @import '_vars';
 @import '_mixins';
 
-.file-drop {
-    & {
-        @include transition(border-color .4s ease);
-        border: 2px dashed $color-border;
-        background: transparent;
-        padding: 1rem;
-        text-align: center;
-        margin-bottom: 1rem;
-        margin-right: 0;
-    }
-
-    &.drag {
-        border-color: darken($color-border, 10%);
-        border-style: dashed;
-        cursor: copy;
-    }
-
-    &-button-input {
-        @include hidden;
-    }
-
-    &-button {
-        margin: .5rem 0;
-    }
-
-    &-or {
-        font-size: .8rem;
-    }
-
-    &-info {
-        color: darken($color-border, 30%);
-    }
+.section {
+    border-top: 1px solid $color-border;
+    padding: 1rem;
 }
 
-.btn {
-    cursor: default;
-}
+:host /deep/ {
+    .search {
+        .form-control {
+            @include border-radius-right;
+        }
 
-.row {
-    margin-left: -8px;
-    margin-right: -8px;
-}
+        .tags {
+            @include border-radius-left;
+            border-right: 0;
 
-.col-3 {
-    padding-left: 8px;
-    padding-right: 8px;
+            &:focus,
+            &.focus {
+                z-index: 1000;
+            }
+        }
+    }
 }

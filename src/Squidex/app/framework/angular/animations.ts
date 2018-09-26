@@ -7,14 +7,14 @@
 
 import {
     animate,
-    AnimationEntryMetadata,
+    AnimationTriggerMetadata,
     state,
     style,
     transition,
     trigger
-} from '@angular/core';
+} from '@angular/animations';
 
-export function buildSlideRightAnimation(name = 'slideRight', timing = '150ms'): AnimationEntryMetadata {
+export function buildSlideRightAnimation(name = 'slideRight', timing = '150ms'): AnimationTriggerMetadata {
     return trigger(
         name, [
             transition(':enter', [
@@ -37,7 +37,7 @@ export function buildSlideRightAnimation(name = 'slideRight', timing = '150ms'):
     );
 }
 
-export function buildSlideAnimation(name = 'slide', timing = '400ms'): AnimationEntryMetadata {
+export function buildSlideAnimation(name = 'slide', timing = '400ms'): AnimationTriggerMetadata {
     return trigger(
         name, [
             transition(':enter', [
@@ -60,7 +60,7 @@ export function buildSlideAnimation(name = 'slide', timing = '400ms'): Animation
     );
 }
 
-export function buildFadeAnimation(name = 'fade', timing = '150ms'): AnimationEntryMetadata {
+export function buildFadeAnimation(name = 'fade', timing = '150ms'): AnimationTriggerMetadata {
     return trigger(
         name, [
             transition(':enter', [
@@ -83,7 +83,7 @@ export function buildFadeAnimation(name = 'fade', timing = '150ms'): AnimationEn
     );
 }
 
-export function buildHeightAnimation(name = 'height', timing = '200ms'): AnimationEntryMetadata {
+export function buildHeightAnimation(name = 'height', timing = '200ms'): AnimationTriggerMetadata {
     return trigger(
         name, [
             transition(':enter', [

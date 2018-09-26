@@ -1,88 +1,83 @@
-<sqx-title message="{app} | Contributors | Settings" parameter1="app" [value1]="ctx.appName"></sqx-title>
+<sqx-title message="{app} | Contributors | Settings" parameter1="app" [value1]="appsState.appName"></sqx-title>
 
-<sqx-panel desiredWidth="50rem">
-    <div class="panel-header">
-        <div class="panel-title-row">
-            <h3 class="panel-title">Contributors</h3>
-        </div>
+<sqx-panel desiredWidth="50rem" [showSidebar]="true">
+    <ng-container title>
+        Contributors
+    </ng-container>
 
-        <a class="panel-close" sqxParentLink>
-            <i class="icon-close"></i>
-        </a>
-    </div>
+    <ng-container menu>
+        <button class="btn btn-link btn-secondary" (click)="reload()" title="Refresh contributors (CTRL + SHIFT + R)">
+            <i class="icon-reset"></i> Refresh
+        </button>
 
-    <div class="panel-main">
-        <div class="panel-content panel-content-scroll">
-            <div class="panel-alert panel-alert-success" *ngIf="maxContributors > 0">
-                Your plan allows up to {{maxContributors}} contributors.
-            </div>
+        <sqx-shortcut keys="ctrl+shift+r" (trigger)="reload()"></sqx-shortcut>
+    </ng-container>
+
+    <ng-container content>
+        <ng-container *ngIf="contributorsState.isLoaded | async">
+            <ng-container *ngIf="contributorsState.maxContributors | async; let maxContributors">
+                <div class="panel-alert panel-alert-success" *ngIf="maxContributors > 0">
+                    Your plan allows up to {{maxContributors}} contributors.
+                </div>
+            </ng-container>
             
-            <table class="table table-items table-fixed">
-                <tbody>
-                    <ng-template ngFor let-contributor [ngForOf]="appContributors?.contributors">
+            <ng-container *ngIf="contributorsState.contributors | async; let contributors">
+                <table class="table table-items table-fixed">
+                    <tbody *ngFor="let contributorInfo of contributors; trackBy: trackByContributor">
                         <tr>
                             <td class="cell-user">
-                                <img class="user-picture" [attr.title]="contributor.contributorId | sqxUserName" [attr.src]="contributor.contributorId | sqxUserPicture" />
+                                <img class="user-picture" [attr.title]="contributorInfo.contributor.contributorId | sqxUserName" [attr.src]="contributorInfo.contributor.contributorId | sqxUserPicture" />
                             </td>
                             <td class="cell-auto">
-                                <span class="user-name table-cell">{{contributor.contributorId | sqxUserName}}</span>
-                            </td>
-                            <td class="cell-auto">
-                                <span class="user-email table-cell">{{contributor.contributorId | sqxUserEmail}}</span>
+                                <span class="user-name table-cell">{{contributorInfo.contributor.contributorId | sqxUserName}}</span>
                             </td>
                             <td class="cell-time">
-                                <select class="form-control" [ngModel]="contributor.permission" (ngModelChange)="changePermission(contributor, $event)" [disabled]="userId === contributor.contributorId">
+                                <select class="form-control" [ngModel]="contributorInfo.contributor.permission" (ngModelChange)="changePermission(contributorInfo.contributor, $event)" [disabled]="contributorInfo.isCurrentUser">
                                     <option *ngFor="let permission of usersPermissions" [ngValue]="permission">{{permission}}</option>
                                 </select>
                             </td>
                             <td class="cell-actions">
-                                <button type="button" class="btn btn-link btn-danger" [disabled]="userId === contributor.contributorId" (click)="removeContributor(contributor)">
+                                <button *ngIf="!contributorInfo.isCurrentUser" type="button" class="btn btn-link btn-danger" (click)="remove(contributorInfo.contributor)">
                                     <i class="icon-bin2"></i>
                                 </button>
                             </td>
                         </tr>
                         <tr class="spacer"></tr>
-                    </ng-template>
-                </tbody>
-            </table>
-            
-            <div class="table-items-footer" *ngIf="appContributors">
-                <form [formGroup]="addContributorForm" (ngSubmit)="assignContributor()">
-                    <div class="row no-gutters">
-                        <div class="col">
-                            <sqx-autocomplete [source]="usersDataSource" formControlName="user" [inputName]="'contributor'" placeholder="Find existing user" displayProperty="email">
-                                <ng-template let-user="$implicit">
-                                    <img class="user-picture autocomplete-user-picture" [attr.src]="user | sqxUserDtoPicture" />
+                    </tbody>
+                </table>
+                
+                <div class="table-items-footer" *ngIf="(contributorsState.isMaxReached | async) === false">
+                    <form [formGroup]="assignContributorForm.form" (ngSubmit)="assignContributor()">
+                        <div class="row no-gutters">
+                            <div class="col">
+                                <sqx-autocomplete [source]="usersDataSource" formControlName="user" [inputName]="'contributor'" placeholder="Find existing user" displayProperty="displayName">
+                                    <ng-template let-user="$implicit">
+                                        <span class="autocomplete-user">
+                                            <img class="user-picture autocomplete-user-picture" [attr.src]="user | sqxUserDtoPicture" />
 
-                                    <span class="user-name autocomplete-user-name">{{user.displayName}}</span>
-                                    <span class="user-email autocomplete-user-email">{{user.email}}</span>
-                                </ng-template>
-                            </sqx-autocomplete>
+                                            <span class="user-name autocomplete-user-name">{{user.displayName}}</span>
+                                        </span>
+                                    </ng-template>
+                                </sqx-autocomplete>
+                            </div>
+                            <div class="col col-auto pl-1">
+                                <button type="submit" class="btn btn-success" [disabled]="assignContributorForm.hasNoUser | async">Add Contributor</button>
+                            </div>
                         </div>
-                        <div class="col col-auto pl-1">
-                            <button type="submit" class="btn btn-success" [disabled]="!canAddContributor">Add Contributor</button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-        <div class="panel-sidebar">
-            <a class="panel-link" routerLink="history" routerLinkActive="active" #linkHistory>
-                <i class="icon-time"></i>
-            </a>
-            <a class="panel-link" routerLink="help" routerLinkActive="active" #linkHelp>
-                <i class="icon-help"></i>
-            </a>
-            
-            <sqx-onboarding-tooltip id="history" [for]="linkHistory" position="leftTop" after="120000">
-                The sidebar navigation contains useful context specific links. Here you can view the history how this schema has changed over time.
-            </sqx-onboarding-tooltip>
-            
-            <sqx-onboarding-tooltip id="help" [for]="linkHelp" position="leftTop" after="180000">
-                Click the help icon to show a context specific help page. Go to <a href="https://docs.squidex.io" target="_blank">https://docs.squidex.io</a> for the full documentation.
-            </sqx-onboarding-tooltip>
-        </div>
-    </div>
+                    </form>
+                </div>
+            </ng-container>
+        </ng-container>
+    </ng-container>
+
+    <ng-container sidebar>
+        <a class="panel-link" routerLink="history" routerLinkActive="active">
+            <i class="icon-time"></i>
+        </a>
+        <a class="panel-link" routerLink="help" routerLinkActive="active">
+            <i class="icon-help"></i>
+        </a>
+    </ng-container>
 </sqx-panel>
 
 <router-outlet></router-outlet>

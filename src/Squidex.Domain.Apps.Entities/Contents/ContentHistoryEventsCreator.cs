@@ -20,16 +20,31 @@ namespace Squidex.Domain.Apps.Entities.Contents
             : base(typeNameRegistry)
         {
             AddEventMessage<ContentCreated>(
-                "created {[Schema]} content item.");
+                "created {[Schema]} content.");
 
             AddEventMessage<ContentUpdated>(
-                "updated {[Schema]} content item.");
+                "updated {[Schema]} content.");
 
             AddEventMessage<ContentDeleted>(
-                "deleted {[Schema]} content item.");
+                "deleted {[Schema]} content.");
+
+            AddEventMessage<ContentChangesDiscarded>(
+                "discarded pending changes of {[Schema]} content.");
+
+            AddEventMessage<ContentChangesPublished>(
+                "published changes of {[Schema]} content.");
+
+            AddEventMessage<ContentUpdateProposed>(
+                "proposed update for {[Schema]} content.");
+
+            AddEventMessage<ContentSchedulingCancelled>(
+                "failed to schedule status change for {[Schema]} content.");
 
             AddEventMessage<ContentStatusChanged>(
-                "changed status of {[Schema]} content item to {[Status]}.");
+                "changed status of {[Schema]} content to {[Status]}.");
+
+            AddEventMessage<ContentStatusScheduled>(
+                "scheduled to change status of {[Schema]} content to {[Status]}.");
         }
 
         protected override Task<HistoryEventToStore> CreateEventCoreAsync(Envelope<IEvent> @event)
@@ -46,6 +61,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
             if (@event.Payload is ContentStatusChanged contentStatusChanged)
             {
                 result = result.AddParameter("Status", contentStatusChanged.Status);
+            }
+
+            if (@event.Payload is ContentStatusScheduled contentStatusScheduled)
+            {
+                result = result.AddParameter("Status", contentStatusScheduled.Status);
             }
 
             return Task.FromResult(result);

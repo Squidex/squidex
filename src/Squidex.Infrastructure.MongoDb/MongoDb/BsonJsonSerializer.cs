@@ -12,7 +12,7 @@ using Newtonsoft.Json;
 
 namespace Squidex.Infrastructure.MongoDb
 {
-    public class BsonJsonSerializer<T> : ClassSerializerBase<T> where T : class
+    public sealed class BsonJsonSerializer<T> : ClassSerializerBase<T> where T : class
     {
         private readonly JsonSerializer serializer;
 

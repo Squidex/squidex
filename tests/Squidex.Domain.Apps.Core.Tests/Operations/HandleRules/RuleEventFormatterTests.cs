@@ -6,15 +6,18 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
+using System.Security.Claims;
+using FakeItEasy;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.HandleRules;
-using Squidex.Domain.Apps.Events;
-using Squidex.Domain.Apps.Events.Contents;
+using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.EventSourcing;
+using Squidex.Shared.Identity;
+using Squidex.Shared.Users;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.HandleRules
@@ -22,49 +25,70 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
     public class RuleEventFormatterTests
     {
         private readonly JsonSerializer serializer = JsonSerializer.CreateDefault();
+        private readonly IUser user = A.Fake<IUser>();
+        private readonly IRuleUrlGenerator urlGenerator = A.Fake<IRuleUrlGenerator>();
+        private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
+        private readonly NamedId<Guid> schemaId = NamedId.Of(Guid.NewGuid(), "my-schema");
+        private readonly Guid contentId = Guid.NewGuid();
         private readonly RuleEventFormatter sut;
 
         public RuleEventFormatterTests()
         {
-            sut = new RuleEventFormatter(serializer);
+            A.CallTo(() => user.Email)
+                .Returns("me@email.com");
+
+            A.CallTo(() => user.Claims)
+                .Returns(new List<Claim> { new Claim(SquidexClaimTypes.SquidexDisplayName, "me") });
+
+            sut = new RuleEventFormatter(serializer, urlGenerator);
         }
 
         [Fact]
         public void Should_serialize_object_to_json()
         {
-            var result = sut.ToRouteData(new { Value = 1 });
+            var result = sut.ToPayload(new { Value = 1 });
 
             Assert.True(result is JObject);
         }
 
         [Fact]
+        public void Should_create_payload()
+        {
+            var @event = new EnrichedContentEvent { AppId = appId };
+
+            var result = sut.ToPayload(@event);
+
+            Assert.True(result is JObject);
+        }
+
+        [Fact]
+        public void Should_create_envelope_data_from_event()
+        {
+            var @event = new EnrichedContentEvent { AppId = appId, Name = "MyEventName" };
+
+            var result = sut.ToEnvelope(@event);
+
+            Assert.Equal("MyEventName", result["type"]);
+        }
+
+        [Fact]
         public void Should_replace_app_information_from_event()
         {
-            var appId = Guid.NewGuid();
+            var @event = new EnrichedContentEvent { AppId = appId };
 
-            var @event = new ContentCreated
-            {
-                AppId = new NamedId<Guid>(appId, "my-app")
-            };
+            var result = sut.Format("Name $APP_NAME has id $APP_ID", @event);
 
-            var result = sut.FormatString("Name $APP_NAME has id $APP_ID", AsEnvelope(@event));
-
-            Assert.Equal($"Name my-app has id {appId}", result);
+            Assert.Equal($"Name my-app has id {appId.Id}", result);
         }
 
         [Fact]
         public void Should_replace_schema_information_from_event()
         {
-            var schemaId = Guid.NewGuid();
+            var @event = new EnrichedContentEvent { SchemaId = schemaId };
 
-            var @event = new ContentCreated
-            {
-                SchemaId = new NamedId<Guid>(schemaId, "my-schema")
-            };
+            var result = sut.Format("Name $SCHEMA_NAME has id $SCHEMA_ID", @event);
 
-            var result = sut.FormatString("Name $SCHEMA_NAME has id $SCHEMA_ID", AsEnvelope(@event));
-
-            Assert.Equal($"Name my-schema has id {schemaId}", result);
+            Assert.Equal($"Name my-schema has id {schemaId.Id}", result);
         }
 
         [Fact]
@@ -72,25 +96,77 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
             var now = DateTime.UtcNow;
 
-            var envelope = Envelope.Create(new ContentCreated()).To<AppEvent>().SetTimestamp(Instant.FromDateTimeUtc(now));
+            var envelope = new EnrichedContentEvent { Timestamp = Instant.FromDateTimeUtc(now) };
 
-            var result = sut.FormatString("Date: $TIMESTAMP_DATE, Full: $TIMESTAMP_DATETIME", envelope);
+            var result = sut.Format("Date: $TIMESTAMP_DATE, Full: $TIMESTAMP_DATETIME", envelope);
 
             Assert.Equal($"Date: {now:yyyy-MM-dd}, Full: {now:yyyy-MM-dd-hh-mm-ss}", result);
         }
 
         [Fact]
+        public void Should_format_email_and_display_name_from_user()
+        {
+            var @event = new EnrichedContentEvent { User = user, Actor = new RefToken(RefTokenType.Subject, "123") };
+
+            var result = sut.Format("From $USER_NAME ($USER_EMAIL)", @event);
+
+            Assert.Equal("From me (me@email.com)", result);
+        }
+
+        [Fact]
+        public void Should_return_undefined_if_user_is_not_found()
+        {
+            var @event = new EnrichedContentEvent { Actor = new RefToken(RefTokenType.Subject, "123") };
+
+            var result = sut.Format("From $USER_NAME ($USER_EMAIL)", @event);
+
+            Assert.Equal("From UNDEFINED (UNDEFINED)", result);
+        }
+
+        [Fact]
+        public void Should_format_email_and_display_name_from_client()
+        {
+            var @event = new EnrichedContentEvent { Actor = new RefToken(RefTokenType.Client, "android") };
+
+            var result = sut.Format("From $USER_NAME ($USER_EMAIL)", @event);
+
+            Assert.Equal("From client:android (client:android)", result);
+        }
+
+        [Fact]
+        public void Should_replace_content_url_from_event()
+        {
+            var url = "http://content";
+
+            A.CallTo(() => urlGenerator.GenerateContentUIUrl(appId, schemaId, contentId))
+                .Returns(url);
+
+            var @event = new EnrichedContentEvent { AppId = appId, Id = contentId, SchemaId = schemaId };
+
+            var result = sut.Format("Go to $CONTENT_URL", @event);
+
+            Assert.Equal($"Go to {url}", result);
+        }
+
+        [Fact]
+        public void Should_format_content_url_when_not_found()
+        {
+            Assert.Equal("UNDEFINED", sut.Format("$CONTENT_URL", new EnrichedAssetEvent()));
+        }
+
+        [Fact]
         public void Should_return_undefined_when_field_not_found()
         {
-            var @event = new ContentCreated
+            var @event = new EnrichedContentEvent
             {
                 Data =
                     new NamedContentData()
-                        .AddField("city", new ContentFieldData()
-                            .AddValue("iv", "Berlin"))
+                        .AddField("city",
+                            new ContentFieldData()
+                                .AddValue("iv", "Berlin"))
             };
 
-            var result = sut.FormatString("$CONTENT_DATA.country.iv", AsEnvelope(@event));
+            var result = sut.Format("$CONTENT_DATA.country.iv", @event);
 
             Assert.Equal("UNDEFINED", result);
         }
@@ -98,15 +174,16 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public void Should_return_undefined_when_partition_not_found()
         {
-            var @event = new ContentCreated
+            var @event = new EnrichedContentEvent
             {
                 Data =
                     new NamedContentData()
-                        .AddField("city", new ContentFieldData()
-                            .AddValue("iv", "Berlin"))
+                        .AddField("city",
+                            new ContentFieldData()
+                                .AddValue("iv", "Berlin"))
             };
 
-            var result = sut.FormatString("$CONTENT_DATA.city.de", AsEnvelope(@event));
+            var result = sut.Format("$CONTENT_DATA.city.de", @event);
 
             Assert.Equal("UNDEFINED", result);
         }
@@ -114,15 +191,16 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public void Should_return_undefined_when_array_item_not_found()
         {
-            var @event = new ContentCreated
+            var @event = new EnrichedContentEvent
             {
                 Data =
                     new NamedContentData()
-                        .AddField("city", new ContentFieldData()
-                            .AddValue("iv", new JArray()))
+                        .AddField("city",
+                            new ContentFieldData()
+                                .AddValue("iv", new JArray()))
             };
 
-            var result = sut.FormatString("$CONTENT_DATA.city.de.10", AsEnvelope(@event));
+            var result = sut.Format("$CONTENT_DATA.city.de.10", @event);
 
             Assert.Equal("UNDEFINED", result);
         }
@@ -130,16 +208,17 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public void Should_return_undefined_when_property_not_found()
         {
-            var @event = new ContentCreated
+            var @event = new EnrichedContentEvent
             {
                 Data =
                     new NamedContentData()
-                        .AddField("city", new ContentFieldData()
-                            .AddValue("iv", new JObject(
-                                new JProperty("name", "Berlin"))))
+                        .AddField("city",
+                            new ContentFieldData()
+                                .AddValue("iv", new JObject(
+                                    new JProperty("name", "Berlin"))))
             };
 
-            var result = sut.FormatString("$CONTENT_DATA.city.de.Name", AsEnvelope(@event));
+            var result = sut.Format("$CONTENT_DATA.city.de.Name", @event);
 
             Assert.Equal("UNDEFINED", result);
         }
@@ -147,15 +226,33 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public void Should_return_plain_value_when_found()
         {
-            var @event = new ContentCreated
+            var @event = new EnrichedContentEvent
             {
                 Data =
                     new NamedContentData()
-                        .AddField("city", new ContentFieldData()
-                            .AddValue("iv", "Berlin"))
+                        .AddField("city",
+                            new ContentFieldData()
+                                .AddValue("iv", "Berlin"))
             };
 
-            var result = sut.FormatString("$CONTENT_DATA.city.iv", AsEnvelope(@event));
+            var result = sut.Format("$CONTENT_DATA.city.iv", @event);
+
+            Assert.Equal("Berlin", result);
+        }
+
+        [Fact]
+        public void Should_return_plain_value_when_found_from_update_event()
+        {
+            var @event = new EnrichedContentEvent
+            {
+                Data =
+                    new NamedContentData()
+                        .AddField("city",
+                            new ContentFieldData()
+                                .AddValue("iv", "Berlin"))
+            };
+
+            var result = sut.Format("$CONTENT_DATA.city.iv", @event);
 
             Assert.Equal("Berlin", result);
         }
@@ -163,15 +260,16 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public void Should_return_undefined_when_null()
         {
-            var @event = new ContentCreated
+            var @event = new EnrichedContentEvent
             {
                 Data =
                     new NamedContentData()
-                        .AddField("city", new ContentFieldData()
-                            .AddValue("iv", JValue.CreateNull()))
+                        .AddField("city",
+                            new ContentFieldData()
+                                .AddValue("iv", JValue.CreateNull()))
             };
 
-            var result = sut.FormatString("$CONTENT_DATA.city.iv", AsEnvelope(@event));
+            var result = sut.Format("$CONTENT_DATA.city.iv", @event);
 
             Assert.Equal("UNDEFINED", result);
         }
@@ -179,15 +277,16 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public void Should_return_undefined_when_undefined()
         {
-            var @event = new ContentCreated
+            var @event = new EnrichedContentEvent
             {
                 Data =
                     new NamedContentData()
-                        .AddField("city", new ContentFieldData()
-                            .AddValue("iv", JValue.CreateUndefined()))
+                        .AddField("city",
+                            new ContentFieldData()
+                                .AddValue("iv", JValue.CreateUndefined()))
             };
 
-            var result = sut.FormatString("$CONTENT_DATA.city.iv", AsEnvelope(@event));
+            var result = sut.Format("$CONTENT_DATA.city.iv", @event);
 
             Assert.Equal("UNDEFINED", result);
         }
@@ -195,16 +294,17 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public void Should_return_string_when_object()
         {
-            var @event = new ContentCreated
+            var @event = new EnrichedContentEvent
             {
                 Data =
                     new NamedContentData()
-                        .AddField("city", new ContentFieldData()
-                            .AddValue("iv", new JObject(
-                                new JProperty("name", "Berlin"))))
+                        .AddField("city",
+                            new ContentFieldData()
+                                .AddValue("iv", new JObject(
+                                    new JProperty("name", "Berlin"))))
             };
 
-            var result = sut.FormatString("$CONTENT_DATA.city.iv", AsEnvelope(@event));
+            var result = sut.Format("$CONTENT_DATA.city.iv", @event);
 
             Assert.Equal(JObject.FromObject(new { name = "Berlin" }).ToString(Formatting.Indented), result);
         }
@@ -212,16 +312,17 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public void Should_return_plain_value_from_array_when_found()
         {
-            var @event = new ContentCreated
+            var @event = new EnrichedContentEvent
             {
                 Data =
                     new NamedContentData()
-                        .AddField("city", new ContentFieldData()
-                            .AddValue("iv", new JArray(
-                                "Berlin")))
+                        .AddField("city",
+                            new ContentFieldData()
+                                .AddValue("iv", new JArray(
+                                    "Berlin")))
             };
 
-            var result = sut.FormatString("$CONTENT_DATA.city.iv.0", AsEnvelope(@event));
+            var result = sut.Format("$CONTENT_DATA.city.iv.0", @event);
 
             Assert.Equal("Berlin", result);
         }
@@ -229,33 +330,31 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public void Should_return_plain_value_from_object_when_found()
         {
-            var @event = new ContentCreated
+            var @event = new EnrichedContentEvent
             {
                 Data =
                     new NamedContentData()
-                        .AddField("city", new ContentFieldData()
-                            .AddValue("iv", new JObject(
-                                new JProperty("name", "Berlin"))))
+                        .AddField("city",
+                            new ContentFieldData()
+                                .AddValue("iv", new JObject(
+                                    new JProperty("name", "Berlin"))))
             };
 
-            var result = sut.FormatString("$CONTENT_DATA.city.iv.name", AsEnvelope(@event));
+            var result = sut.Format("$CONTENT_DATA.city.iv.name", @event);
 
             Assert.Equal("Berlin", result);
         }
 
         [Fact]
-        public void Should_format_content_action_for_created_when_found()
+        public void Should_format_content_actions_when_found()
         {
-            Assert.Equal("created", sut.FormatString("$CONTENT_ACTION", AsEnvelope(new ContentCreated())));
-            Assert.Equal("updated", sut.FormatString("$CONTENT_ACTION", AsEnvelope(new ContentUpdated())));
-            Assert.Equal("deleted", sut.FormatString("$CONTENT_ACTION", AsEnvelope(new ContentDeleted())));
-
-            Assert.Equal("set to archived", sut.FormatString("$CONTENT_ACTION", AsEnvelope(new ContentStatusChanged { Status = Status.Archived })));
+            Assert.Equal("created", sut.Format("$CONTENT_ACTION", new EnrichedContentEvent { Type = EnrichedContentEventType.Created }));
         }
 
-        private static Envelope<AppEvent> AsEnvelope<T>(T @event) where T : AppEvent
+        [Fact]
+        public void Should_format_content_actions_when_not_found()
         {
-            return Envelope.Create<AppEvent>(@event).To<AppEvent>();
+            Assert.Equal("UNDEFINED", sut.Format("$CONTENT_ACTION", new EnrichedAssetEvent()));
         }
     }
 }

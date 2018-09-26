@@ -36,7 +36,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
 
             var appClients = JToken.FromObject(clients, serializer).ToObject<AppClients>(serializer);
 
-            appClients.ShouldBeEquivalentTo(clients);
+            appClients.Should().BeEquivalentTo(clients);
         }
     }
 }

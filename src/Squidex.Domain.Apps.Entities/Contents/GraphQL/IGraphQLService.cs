@@ -5,14 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Security.Claims;
 using System.Threading.Tasks;
-using Squidex.Domain.Apps.Entities.Apps;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 {
     public interface IGraphQLService
     {
-        Task<(object Data, object[] Errors)> QueryAsync(IAppEntity app, ClaimsPrincipal user, GraphQLQuery query);
+        Task<(bool HasError, object Response)> QueryAsync(QueryContext context, params GraphQLQuery[] queries);
+
+        Task<(bool HasError, object Response)> QueryAsync(QueryContext context, GraphQLQuery query);
     }
 }

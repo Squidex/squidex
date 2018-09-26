@@ -23,7 +23,17 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
                 return default(T);
             }
 
-            public override Field CreateField(long id, string name, Partitioning partitioning)
+            public override T Accept<T>(IFieldVisitor<T> visitor, IField field)
+            {
+                return default(T);
+            }
+
+            public override RootField CreateRootField(long id, string name, Partitioning partitioning)
+            {
+                return null;
+            }
+
+            public override NestedField CreateNestedField(long id, string name)
             {
                 return null;
             }
@@ -32,45 +42,26 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
         [Fact]
         public void Should_throw_exception_if_creating_field_and_field_is_not_registered()
         {
-            Assert.Throws<InvalidOperationException>(() => sut.CreateField(1, "name", Partitioning.Invariant, new InvalidProperties()));
+            Assert.Throws<InvalidOperationException>(() => sut.CreateRootField(1, "name", Partitioning.Invariant, new InvalidProperties()));
         }
 
         [Theory]
-        [InlineData(
-            typeof(AssetsFieldProperties),
-            typeof(AssetsField))]
-        [InlineData(
-            typeof(BooleanFieldProperties),
-            typeof(BooleanField))]
-        [InlineData(
-            typeof(DateTimeFieldProperties),
-            typeof(DateTimeField))]
-        [InlineData(
-            typeof(GeolocationFieldProperties),
-            typeof(GeolocationField))]
-        [InlineData(
-            typeof(JsonFieldProperties),
-            typeof(JsonField))]
-        [InlineData(
-            typeof(NumberFieldProperties),
-            typeof(NumberField))]
-        [InlineData(
-            typeof(ReferencesFieldProperties),
-            typeof(ReferencesField))]
-        [InlineData(
-            typeof(StringFieldProperties),
-            typeof(StringField))]
-        [InlineData(
-            typeof(TagsFieldProperties),
-            typeof(TagsField))]
-        public void Should_create_field_by_properties(Type propertyType, Type fieldType)
+        [InlineData(typeof(AssetsFieldProperties))]
+        [InlineData(typeof(BooleanFieldProperties))]
+        [InlineData(typeof(DateTimeFieldProperties))]
+        [InlineData(typeof(GeolocationFieldProperties))]
+        [InlineData(typeof(JsonFieldProperties))]
+        [InlineData(typeof(NumberFieldProperties))]
+        [InlineData(typeof(ReferencesFieldProperties))]
+        [InlineData(typeof(StringFieldProperties))]
+        [InlineData(typeof(TagsFieldProperties))]
+        public void Should_create_field_by_properties(Type propertyType)
         {
             var properties = (FieldProperties)Activator.CreateInstance(propertyType);
 
-            var field = sut.CreateField(1, "name", Partitioning.Invariant, properties);
+            var field = sut.CreateRootField(1, "name", Partitioning.Invariant, properties);
 
             Assert.Equal(properties, field.RawProperties);
-            Assert.Equal(fieldType, field.GetType());
         }
     }
 }

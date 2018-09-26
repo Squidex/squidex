@@ -11,12 +11,10 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using Squidex.Areas.Api.Controllers.Apps.Models;
-using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Services;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Security;
 using Squidex.Pipeline;
 
@@ -60,19 +58,11 @@ namespace Squidex.Areas.Api.Controllers.Apps
         {
             var subject = HttpContext.User.OpenIdSubject();
 
-            var apps = await appProvider.GetUserApps(subject);
+            var entities = await appProvider.GetUserApps(subject);
 
-            var response = apps.Select(a =>
-            {
-                var dto = SimpleMapper.Map(a, new AppDto());
+            var response = entities.Select(a => AppDto.FromApp(a, subject, appPlansProvider)).ToList();
 
-                dto.Permission = a.Contributors[subject];
-
-                dto.PlanName = appPlansProvider.GetPlanForApp(a)?.Name;
-                dto.PlanUpgrade = appPlansProvider.GetPlanUpgradeForApp(a)?.Name;
-
-                return dto;
-            }).ToList();
+            Response.Headers["ETag"] = response.ToManyEtag();
 
             return Ok(response);
         }
@@ -83,7 +73,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// <param name="request">The app object that needs to be added to squidex.</param>
         /// <returns>
         /// 201 => App created.
-        /// 400 => App object is not valid.
+        /// 400 => App request not valid.
         /// 409 => App name is already in use.
         /// </returns>
         /// <remarks>
@@ -98,19 +88,32 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [ApiCosts(1)]
         public async Task<IActionResult> PostApp([FromBody] CreateAppDto request)
         {
-            var command = SimpleMapper.Map(request, new CreateApp());
-
-            var context = await CommandBus.PublishAsync(command);
+            var context = await CommandBus.PublishAsync(request.ToCommand());
 
             var result = context.Result<EntityCreatedResult<Guid>>();
-            var response = new AppCreatedDto { Id = result.IdOrValue.ToString(), Version = result.Version };
-
-            response.Permission = AppContributorPermission.Owner;
-
-            response.PlanName = appPlansProvider.GetPlan(null)?.Name;
-            response.PlanUpgrade = appPlansProvider.GetPlanUpgrade(null)?.Name;
+            var response = AppCreatedDto.FromResult(result, appPlansProvider);
 
             return CreatedAtAction(nameof(GetApps), response);
+        }
+
+        /// <summary>
+        /// Archive the app.
+        /// /// </summary>
+        /// <param name="app">The name of the app to archive.</param>
+        /// <returns>
+        /// 204 => App archived.
+        /// 404 => App not found.
+        /// </returns>
+        [HttpDelete]
+        [Route("apps/{app}/")]
+        [AppApi]
+        [ApiCosts(1)]
+        [MustBeAppOwner]
+        public async Task<IActionResult> DeleteApp(string app)
+        {
+            await CommandBus.PublishAsync(new ArchiveApp());
+
+            return NoContent();
         }
     }
 }

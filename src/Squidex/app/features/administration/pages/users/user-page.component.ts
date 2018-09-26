@@ -5,148 +5,73 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, OnInit } from '@angular/core';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { FormBuilder } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 
-import {
-    AppContext,
-    UserDto,
-    UserManagementService,
-    ValidatorsEx
-} from 'shared';
-
-import { UserCreated, UserUpdated } from './../messages';
+import { UserDto } from './../../services/users.service';
+import { UserForm, UsersState } from './../../state/users.state';
 
 @Component({
     selector: 'sqx-user-page',
     styleUrls: ['./user-page.component.scss'],
-    templateUrl: './user-page.component.html',
-    providers: [
-        AppContext
-    ]
+    templateUrl: './user-page.component.html'
 })
-export class UserPageComponent  implements OnInit {
-    public user: UserDto;
+export class UserPageComponent implements OnDestroy, OnInit {
+    private selectedUserSubscription: Subscription;
 
-    public userFormSubmitted = false;
-    public userForm: FormGroup;
-    public userFormError = '';
+    public user?: { user: UserDto, isCurrentUser: boolean };
 
-    public isCurrentUser = false;
-    public isNewMode = false;
+    public userForm = new UserForm(this.formBuilder);
 
-    constructor(public readonly ctx: AppContext,
+    constructor(
+        public readonly usersState: UsersState,
         private readonly formBuilder: FormBuilder,
-        private readonly router: Router,
-        private readonly userManagementService: UserManagementService
+        private readonly route: ActivatedRoute,
+        private readonly router: Router
     ) {
     }
 
-    public ngOnInit() {
-        this.ctx.route.data.map(d => d.user)
-            .subscribe((user: UserDto) => {
-                this.user = user;
+    public ngOnDestroy() {
+        this.selectedUserSubscription.unsubscribe();
+    }
 
-                this.setupAndPopulateForm();
-            });
+    public ngOnInit() {
+        this.selectedUserSubscription =
+            this.usersState.selectedUser
+                .subscribe(selectedUser => {
+                    this.user = selectedUser;
+
+                    if (selectedUser) {
+                        this.userForm.load(selectedUser.user);
+                    }
+                });
     }
 
     public save() {
-        this.userFormSubmitted = true;
+        const value = this.userForm.submit();
 
-        if (this.userForm.valid) {
-            this.userForm.disable();
-
-            const requestDto = this.userForm.value;
-
-            if (this.isNewMode) {
-                this.userManagementService.postUser(requestDto)
-                    .subscribe(created => {
-                        this.user =
-                            new UserDto(
-                                created.id,
-                                requestDto.email,
-                                requestDto.displayName,
-                                created.pictureUrl!,
-                                false);
-
-                        this.ctx.notifyInfo('User created successfully.');
-
-                        this.emitUserCreated(this.user);
-                        this.back();
+        if (value) {
+            if (this.user) {
+                this.usersState.update(this.user.user, value)
+                    .subscribe(user => {
+                        this.userForm.submitCompleted();
                     }, error => {
-                        this.resetUserForm(error.displayMessage);
+                        this.userForm.submitFailed(error);
                     });
             } else {
-                this.userManagementService.putUser(this.user.id, requestDto)
-                    .subscribe(() => {
-                        this.user =
-                            this.user.update(
-                                requestDto.email,
-                                requestDto.displayMessage);
-
-                        this.ctx.notifyInfo('User saved successfully.');
-
-                        this.emitUserUpdated(this.user);
-                        this.resetUserForm();
+                this.usersState.create(value)
+                    .subscribe(user => {
+                        this.back();
                     }, error => {
-                        this.resetUserForm(error.displayMessage);
+                        this.userForm.submitFailed(error);
                     });
             }
         }
     }
 
     private back() {
-        this.router.navigate(['../'], { relativeTo: this.ctx.route, replaceUrl: true });
-    }
-
-    private emitUserCreated(user: UserDto) {
-        this.ctx.bus.emit(new UserCreated(user));
-    }
-
-    private emitUserUpdated(user: UserDto) {
-        this.ctx.bus.emit(new UserUpdated(user));
-    }
-
-    private setupAndPopulateForm() {
-        const input = this.user || {};
-
-        this.isNewMode = !this.user;
-        this.userForm =
-            this.formBuilder.group({
-                email: [input['email'],
-                    [
-                        Validators.email,
-                        Validators.required,
-                        Validators.maxLength(100)
-                    ]],
-                displayName: [input['displayName'],
-                    [
-                        Validators.required,
-                        Validators.maxLength(100)
-                    ]],
-                password: ['',
-                    [
-                        this.isNewMode ? Validators.required : Validators.nullValidator
-                    ]],
-                passwordConfirm: ['',
-                    [
-                        ValidatorsEx.match('password', 'Passwords must be the same.')
-                    ]]
-            });
-
-        this.isCurrentUser = this.user && this.user.id === this.ctx.userId;
-
-        this.resetUserForm();
-    }
-
-    private resetUserForm(message: string = '') {
-        this.userForm.enable();
-        this.userForm.controls['password'].reset();
-        this.userForm.controls['passwordConfirm'].reset();
-        this.userFormSubmitted = false;
-        this.userFormError = message;
+        this.router.navigate(['../'], { relativeTo: this.route, replaceUrl: true });
     }
 }
-

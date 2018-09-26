@@ -1,0 +1,99 @@
+<div [formGroup]="actionForm" class="form-horizontal">
+    <div class="form-group row">
+        <label class="col col-3 col-form-label" for="url">Url</label>
+
+        <div class="col col-9">
+            <sqx-control-errors for="url" [submitted]="actionFormSubmitted"></sqx-control-errors>
+
+            <input type="url" class="form-control" id="url" formControlName="url" />
+
+            <small class="form-text text-muted">
+                The url where the events will be sent to.
+            </small>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label class="col col-3 col-form-label" for="apiKey">Api Key</label>
+
+        <div class="col col-9">
+            <sqx-control-errors for="apiKey" [submitted]="actionFormSubmitted"></sqx-control-errors>
+
+            <input type="text" class="form-control" id="apiKey" formControlName="apiKey" />
+
+            <small class="form-text text-muted">
+                The api key to authenticate to your discourse server.
+            </small>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label class="col col-3 col-form-label" for="apiUsername">Api Username</label>
+
+        <div class="col col-9">
+            <sqx-control-errors for="apiUsername" [submitted]="actionFormSubmitted"></sqx-control-errors>
+
+            <input type="text" class="form-control" id="apiUsername" formControlName="apiUsername" />
+
+            <small class="form-text text-muted">
+                The api username to authenticate to your discourse server.
+            </small>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label class="col col-3 col-form-label" for="text">Text</label>
+
+        <div class="col col-9">
+            <sqx-control-errors for="text" [submitted]="actionFormSubmitted"></sqx-control-errors>
+
+            <textarea class="form-control" id="text" formControlName="text"></textarea>
+
+            <small class="form-text text-muted">
+                The text for your topic or post. Read the <a routerLink="help">help</a> section for information about advanced formatting.
+            </small>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label class="col col-3 col-form-label" for="title">Title</label>
+
+        <div class="col col-9">
+            <sqx-control-errors for="title" [submitted]="actionFormSubmitted"></sqx-control-errors>
+
+            <input type="text" class="form-control" id="title" formControlName="title" />
+
+            <small class="form-text text-muted">
+                The optional title, when you want to create a topic. Read the <a routerLink="help">help</a> section for information about advanced formatting.
+            </small>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label class="col col-3 col-form-label" for="topic">Topic</label>
+
+        <div class="col col-9">
+            <sqx-control-errors for="topic" [submitted]="actionFormSubmitted"></sqx-control-errors>
+
+            <input type="number" class="form-control" id="topic" formControlName="topic" />
+
+            <small class="form-text text-muted">
+                The topic id when you want to create a post.
+            </small>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label class="col col-3 col-form-label" for="category">Category</label>
+
+        <div class="col col-9">
+            <sqx-control-errors for="category" [submitted]="actionFormSubmitted"></sqx-control-errors>
+
+            <input type="number" class="form-control" id="category" formControlName="category" />
+
+            <small class="form-text text-muted">
+                The category id when you create a topic.
+            </small>
+        </div>
+    </div>
+</div>

@@ -23,19 +23,19 @@ namespace Squidex.Infrastructure.EventSourcing
             IEventStoreConnection connection,
             IEventSubscriber subscriber,
             ProjectionClient projectionClient,
-            string prefix,
             string position,
             string streamFilter)
         {
             Guard.NotNull(subscriber, nameof(subscriber));
 
             this.connection = connection;
+
             this.position = projectionClient.ParsePositionOrNull(position);
-            this.subscriber = subscriber;
 
             var streamName = projectionClient.CreateProjectionAsync(streamFilter).Result;
 
-            subscription = SubscribeToStream(streamName);
+            this.subscriber = subscriber;
+            this.subscription = SubscribeToStream(streamName);
         }
 
         public Task StopAsync()
@@ -43,6 +43,10 @@ namespace Squidex.Infrastructure.EventSourcing
             subscription.Stop();
 
             return TaskHelper.Done;
+        }
+
+        public void WakeUp()
+        {
         }
 
         private EventStoreCatchUpSubscription SubscribeToStream(string streamName)

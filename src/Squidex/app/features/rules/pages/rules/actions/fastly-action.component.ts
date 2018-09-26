@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FormBuilder, Validators } from '@angular/forms';
+import { Component, Input, OnInit } from '@angular/core';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 @Component({
     selector: 'sqx-fastly-action',
@@ -17,42 +17,21 @@ export class FastlyActionComponent implements OnInit {
     @Input()
     public action: any;
 
-    @Output()
-    public actionChanged = new EventEmitter<object>();
+    @Input()
+    public actionForm: FormGroup;
 
+    @Input()
     public actionFormSubmitted = false;
-    public actionForm =
-        this.formBuilder.group({
-            serviceId: ['',
-                [
-                    Validators.required
-                ]],
-            apiKey: ['',
-                [
-                    Validators.required
-                ]]
-        });
-
-    constructor(
-        private readonly formBuilder: FormBuilder
-    ) {
-    }
 
     public ngOnInit() {
-        this.action = Object.assign({}, { serviceId: '', apiKey: '' }, this.action || {});
+        this.actionForm.setControl('serviceId',
+            new FormControl(this.action.serviceId || '', [
+                Validators.required
+            ]));
 
-        this.actionFormSubmitted = false;
-        this.actionForm.reset();
-        this.actionForm.setValue(this.action);
-    }
-
-    public save() {
-        this.actionFormSubmitted = true;
-
-        if (this.actionForm.valid) {
-            const action = this.actionForm.value;
-
-            this.actionChanged.emit(action);
-        }
+        this.actionForm.setControl('apiKey',
+            new FormControl(this.action.apiKey || '', [
+                Validators.required
+            ]));
     }
 }

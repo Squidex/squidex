@@ -44,7 +44,7 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             await OnErrorAsync(eventSubscription, new InvalidOperationException());
 
-            await Task.Delay(200);
+            await Task.Delay(400);
 
             await sut.StopAsync();
 
@@ -90,7 +90,7 @@ namespace Squidex.Infrastructure.EventSourcing
         [Fact]
         public async Task Should_forward_event_from_inner_subscription()
         {
-            var ev = new StoredEvent("1", 2, new EventData());
+            var ev = new StoredEvent("Stream", "1", 2, new EventData());
 
             await OnEventAsync(eventSubscription, ev);
             await sut.StopAsync();
@@ -102,7 +102,7 @@ namespace Squidex.Infrastructure.EventSourcing
         [Fact]
         public async Task Should_not_forward_event_when_message_is_from_another_subscription()
         {
-            var ev = new StoredEvent("1", 2, new EventData());
+            var ev = new StoredEvent("Stream", "1", 2, new EventData());
 
             await OnEventAsync(A.Fake<IEventSubscription>(), ev);
             await sut.StopAsync();

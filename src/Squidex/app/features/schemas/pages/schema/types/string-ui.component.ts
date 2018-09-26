@@ -8,8 +8,9 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
+import { map, startWith } from 'rxjs/operators';
 
-import { StringFieldPropertiesDto } from 'shared';
+import { FieldDto, StringFieldPropertiesDto } from '@app/shared';
 
 @Component({
     selector: 'sqx-string-ui',
@@ -22,6 +23,9 @@ export class StringUIComponent implements OnDestroy, OnInit {
 
     @Input()
     public editForm: FormGroup;
+
+    @Input()
+    public field: FieldDto;
 
     @Input()
     public properties: StringFieldPropertiesDto;
@@ -40,11 +44,6 @@ export class StringUIComponent implements OnDestroy, OnInit {
                 Validators.required
             ]));
 
-        this.editForm.setControl('placeholder',
-            new FormControl(this.properties.placeholder, [
-                Validators.maxLength(100)
-            ]));
-
         this.editForm.setControl('allowedValues',
             new FormControl(this.properties.allowedValues));
 
@@ -52,14 +51,12 @@ export class StringUIComponent implements OnDestroy, OnInit {
             new FormControl(this.properties.inlineEditable));
 
         this.hideAllowedValues =
-            this.editForm.controls['editor'].valueChanges
-                .startWith(this.properties.editor)
-                .map(x => !(x && (x === 'Radio' || x === 'Dropdown')));
+            this.editForm.controls['editor'].valueChanges.pipe(
+                startWith(this.properties.editor), map(x => !(x && (x === 'Radio' || x === 'Dropdown'))));
 
         this.hideInlineEditable =
-            this.editForm.controls['editor'].valueChanges
-                .startWith(this.properties.editor)
-                .map(x => !(x && (x === 'Input' || x === 'Dropdown' || x === 'Slug')));
+            this.editForm.controls['editor'].valueChanges.pipe(
+                startWith(this.properties.editor), map(x => !(x && (x === 'Input' || x === 'Dropdown' || x === 'Slug'))));
 
         this.hideAllowedValuesSubscription =
             this.hideAllowedValues.subscribe(isSelection => {

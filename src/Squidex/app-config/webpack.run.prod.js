@@ -1,16 +1,22 @@
-﻿      var webpack = require('webpack'),
-     webpackMerge = require('webpack-merge'),
-ExtractTextPlugin = require('extract-text-webpack-plugin'),
-   ngToolsWebpack = require('@ngtools/webpack'),
-        runConfig = require('./webpack.run.base.js'),
-          helpers = require('./helpers');
+﻿const webpack = require('webpack'),
+ webpackMerge = require('webpack-merge'),
+         path = require('path'),
+      helpers = require('./helpers'),
+    runConfig = require('./webpack.run.base.js');
 
-var ENV = process.env.NODE_ENV = process.env.ENV = 'production';
-
+const plugins = {
+    // https://github.com/mishoo/UglifyJS2/tree/harmony
+    UglifyJsPlugin: require('uglifyjs-webpack-plugin'),
+    // https://www.npmjs.com/package/@ngtools/webpack
+    NgToolsWebpack: require('@ngtools/webpack'),
+    // https://github.com/webpack-contrib/mini-css-extract-plugin
+    MiniCssExtractPlugin: require('mini-css-extract-plugin')
+};
+            
 helpers.removeLoaders(runConfig, ['scss', 'ts']);
 
 module.exports = webpackMerge(runConfig, {
-    devtool: 'source-map',
+    mode: 'production',
 
     output: {
         /**
@@ -50,65 +56,62 @@ module.exports = webpackMerge(runConfig, {
          *
          * See: https://webpack.js.org/configuration/module/#module-rules
          */
-        rules: [
+        rules: [{
+            test: /\.scss$/,
+            /*
+             * Extract the content from a bundle to a file
+             * 
+             * See: https://github.com/webpack-contrib/extract-text-webpack-plugin
+             */
+            use: [
+                plugins.MiniCssExtractPlugin.loader,
             {
-                test: /\.scss$/,
-                /*
-                 * Extract the content from a bundle to a file
-                 * 
-                 * See: https://github.com/webpack-contrib/extract-text-webpack-plugin
-                 */
-                use: ExtractTextPlugin.extract({ fallback: 'style-loader', use: 'css-loader?minimize!sass-loader?sourceMap' }),
-                /*
-                 * Do not include component styles
-                 */
-                include: helpers.root('app', 'theme'),
+                loader: 'css-loader', options: { minimize: true },
             }, {
-                test: /\.scss$/,
-                use: [{
-                    loader: 'raw-loader'
-                }, {
-                    loader: 'sass-loader',
-                    options: {
-                        includePaths: [helpers.root('app', 'theme')]
-                    }
-                }],
-                exclude: helpers.root('app', 'theme'),
-            }, { 
-                test: /\.ts/, 
-                use: [{
-                    loader: '@ngtools/webpack'
-                }]
-            }
-        ]
+                loader: 'sass-loader'
+            }],
+            /*
+             * Do not include component styles
+             */
+            include: helpers.root('app', 'theme'),
+        }, {
+            test: /\.scss$/,
+            use: [{
+                loader: 'raw-loader'
+            }, {
+                loader: 'sass-loader', options: { includePaths: [helpers.root('app', 'theme')] }
+            }],
+            exclude: helpers.root('app', 'theme'),
+        }, { 
+            test: /(?:\.ngfactory\.js|\.ngstyle\.js|\.ts)$/,
+            use: [{
+                loader: '@ngtools/webpack'
+            }]
+        }]
     },
 
     plugins: [
-        new webpack.NoEmitOnErrorsPlugin(),
-        new webpack.DefinePlugin({ 'process.env': { 'ENV': JSON.stringify(ENV) } }),
-        new webpack.optimize.ModuleConcatenationPlugin(),
+        new plugins.NgToolsWebpack.AngularCompilerPlugin({
+            entryModule: 'app/app.module#AppModule',
+            sourceMap: false,
+            skipSourceGeneration: false,
+            tsConfigPath: './tsconfig.json'
+        }),  
+    ],
 
-        /*
-         * Puts each bundle into a file and appends the hash of the file to the path.
-         * 
-         * See: https://github.com/webpack/extract-text-webpack-plugin
-         */
-        new ExtractTextPlugin('[name].css'),
-        
-        new webpack.optimize.UglifyJsPlugin({
-            beautify: false,
-            mangle: {
-                screw_ie8: true, keep_fnames: true
-            },
-            compress: {
-                screw_ie8: true, warnings: false
-            },
-            comments: false
-        }),
+    optimization: {
+        minimizer: [
+            new plugins.UglifyJsPlugin({
+                uglifyOptions: {
+                    compress: false,
+                    ecma: 6,
+                    mangle: true
+                }
+            })
+        ]
+    },
 
-        new ngToolsWebpack.AngularCompilerPlugin({
-            tsConfigPath: './tsconfig.json',
-            entryModule: 'app/app.module#AppModule'
-        }),
-    ]
+    performance: {
+        hints: false 
+    }
 });

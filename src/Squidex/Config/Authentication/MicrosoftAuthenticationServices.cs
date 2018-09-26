@@ -12,7 +12,7 @@ namespace Squidex.Config.Authentication
 {
     public static class MicrosoftAuthenticationServices
     {
-        public static AuthenticationBuilder AddMyMicrosoftAuthentication(this AuthenticationBuilder authBuilder, MyIdentityOptions identityOptions)
+        public static AuthenticationBuilder AddMyExternalMicrosoftAuthentication(this AuthenticationBuilder authBuilder, MyIdentityOptions identityOptions)
         {
             if (identityOptions.IsMicrosoftAuthConfigured())
             {

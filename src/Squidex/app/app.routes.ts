@@ -6,7 +6,7 @@
  */
 
 import { ModuleWithProviders } from '@angular/core';
-import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
+import { RouterModule, Routes } from '@angular/router';
 
 import {
     AppAreaComponent,
@@ -19,6 +19,7 @@ import {
 
 import {
     AppMustExistGuard,
+    LoadAppsGuard,
     MustBeAuthenticatedGuard,
     MustBeNotAuthenticatedGuard,
     UnsetAppGuard
@@ -33,7 +34,7 @@ export const routes: Routes = [
     {
         path: 'app',
         component: InternalAreaComponent,
-        canActivate: [MustBeAuthenticatedGuard],
+        canActivate: [MustBeAuthenticatedGuard, LoadAppsGuard],
         children: [
             {
                 path: '',
@@ -96,4 +97,4 @@ export const routes: Routes = [
     }
 ];
 
-export const routing: ModuleWithProviders = RouterModule.forRoot(routes, { useHash: false, preloadingStrategy: PreloadAllModules });
+export const routing: ModuleWithProviders = RouterModule.forRoot(routes, { useHash: false });

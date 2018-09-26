@@ -6,6 +6,8 @@
 // ==========================================================================
 
 using System.ComponentModel.DataAnnotations;
+using Squidex.Domain.Apps.Entities.Apps.Commands;
+using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Areas.Api.Controllers.Plans.Models
 {
@@ -16,5 +18,10 @@ namespace Squidex.Areas.Api.Controllers.Plans.Models
         /// </summary>
         [Required]
         public string PlanId { get; set; }
+
+        public ChangePlan ToCommand()
+        {
+            return SimpleMapper.Map(this, new ChangePlan());
+        }
     }
 }

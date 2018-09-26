@@ -1,0 +1,32 @@
+<ng-container *ngIf="isSmall; else large">
+    <div class="row no-gutters align-items-center small" *ngIf="element" [style.background]="element.iconColor" [sqxHoverBackground]="element.iconColor | sqxDarken:5">
+        <div class="col col-auto small-icon" [style.background]="element.iconColor | sqxDarken:5">
+            <i class="svg-icon" [innerHtml]="element.iconImage | sqxSafeHtml"></i>
+        </div>
+        <div class="col align-items-center">
+            <div class="small-text">
+                {{element.display}}
+            </div>
+        </div>
+    </div>
+</ng-container>
+<ng-template #large>
+    <div class="row no-gutters large">
+        <div class="col col-auto">
+            <div class="large-icon" [style.background]="element.iconColor | sqxDarken:5">
+                <div class="svg-icon" [innerHtml]="element.iconImage | sqxSafeHtml"></div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="large-title">{{type}}</div>
+
+            <div class="large-text text-muted">
+                {{element.description}}
+            </div>
+
+            <div class="large-link" *ngIf="element.readMore">
+                <a [href]="element.readMore" target="_blank">Read More</a>
+            </div>
+        </div>
+    </div>
+</ng-template>

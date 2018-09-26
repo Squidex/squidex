@@ -28,11 +28,9 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
                 new LanguageConfig(Language.IT, false, Language.DE))
                 .MakeMaster(Language.IT);
 
-            sut.MakeMaster(Language.IT);
-
             var serialized = JToken.FromObject(sut, serializer).ToObject<LanguagesConfig>(serializer);
 
-            serialized.ShouldBeEquivalentTo(sut);
+            serialized.Should().BeEquivalentTo(sut);
 
             Assert.Same(serialized.FirstOrDefault(x => x.Key == "it"), serialized.Master);
         }

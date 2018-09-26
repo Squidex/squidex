@@ -8,6 +8,7 @@
 using System;
 using System.Threading.Tasks;
 using FakeItEasy;
+using Newtonsoft.Json.Linq;
 using NodaTime;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
@@ -22,18 +23,17 @@ namespace Squidex.Domain.Apps.Entities.Rules
     public class RuleDequeuerTests
     {
         private readonly IClock clock = A.Fake<IClock>();
-        private readonly ISemanticLog log = A.Fake<ISemanticLog>();
-        private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
+        private readonly ISemanticLog log = A.Dummy<ISemanticLog>();
         private readonly IRuleEventRepository ruleEventRepository = A.Fake<IRuleEventRepository>();
         private readonly Instant now = SystemClock.Instance.GetCurrentInstant();
         private readonly RuleService ruleService = A.Fake<RuleService>();
-        private readonly RuleDequeuer sut;
+        private readonly RuleDequeuerGrain sut;
 
         public RuleDequeuerTests()
         {
             A.CallTo(() => clock.GetCurrentInstant()).Returns(now);
 
-            sut = new RuleDequeuer(
+            sut = new RuleDequeuerGrain(
                 ruleService,
                 ruleEventRepository,
                 log,
@@ -49,7 +49,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
         [InlineData(4, 0,   RuleResult.Failed,  RuleJobResult.Failed)]
         public async Task Should_set_next_attempt_based_on_num_calls(int calls, int minutes, RuleResult result, RuleJobResult jobResult)
         {
-            var actionData = new RuleJobData();
+            var actionData = new JObject();
             var actionName = "MyAction";
 
             var @event = CreateEvent(calls, actionName, actionData);
@@ -69,13 +69,11 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
             await sut.HandleAsync(@event);
 
-            sut.Dispose();
-
             A.CallTo(() => ruleEventRepository.MarkSentAsync(@event.Id, requestDump, result, jobResult, requestElapsed, nextCall))
                 .MustHaveHappened();
         }
 
-        private IRuleEventEntity CreateEvent(int numCalls, string actionName, RuleJobData actionData)
+        private IRuleEventEntity CreateEvent(int numCalls, string actionName, JObject actionData)
         {
             var @event = A.Fake<IRuleEventEntity>();
 

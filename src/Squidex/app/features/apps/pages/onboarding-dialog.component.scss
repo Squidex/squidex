@@ -19,7 +19,7 @@ p {
     max-width: 489px;
 }
 
-.modal {
+:host /deep/ .modal {
     &-content,
     &-dialog {
         min-height: $size-height;
@@ -32,8 +32,12 @@ p {
         color: $color-dark-foreground;
         background-color: $color-dark-onboarding;
         background-image: url('/images/onboarding-background.png');
-        overflow: hidden;
         position: relative;
+    }
+
+    &-body,
+    &-content {
+        overflow: hidden;
     }
 
     &-close {

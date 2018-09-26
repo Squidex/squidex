@@ -23,6 +23,18 @@ namespace Squidex.Infrastructure
 
         [Theory]
         [InlineData("", "")]
+        [InlineData("m", "m")]
+        [InlineData("m y", "m-y")]
+        [InlineData("M Y", "m-y")]
+        [InlineData("M_Y", "m-y")]
+        [InlineData("M_Y ", "m-y")]
+        public void Should_convert_to_kebap_case(string input, string output)
+        {
+            Assert.Equal(output, input.ToKebabCase());
+        }
+
+        [Theory]
+        [InlineData("", "")]
         [InlineData("m", "M")]
         [InlineData("m-y", "MY")]
         [InlineData("my", "My")]

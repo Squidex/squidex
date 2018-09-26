@@ -1,9 +1,6 @@
-<div class="card" (sqxFileDrop)="updateFile($event)" dnd-draggable [dragEnabled]="!!asset" 
-     [dragData]="asset"
-     (onDragStart)="onAssetDragStart($event)"
-     (onDragEnd)="onAssetDragEnd($event)">
+ <div class="card" [class.selectable]="isSelectable" [class.border-primary]="isSelected" (click)="selected.emit(asset)" (sqxFileDrop)="updateFile($event)">
     <div class="card-body">
-        <div class="file-preview" *ngIf="asset && progress == 0" @fade>
+        <div class="file-preview" *ngIf="asset && progress === 0" @fade>
             <span class="file-type" *ngIf="asset.fileType">
                 {{asset.fileType}}
             </span>
@@ -11,87 +8,77 @@
             <div *ngIf="asset.isImage" class="file-image">
                 <img [sqxImageSource]="asset | sqxAssetPreviewUrl">
             </div>
-            <div *ngIf="!asset.isImage" class="file-icon-container">
-                <img class="file-icon" [attr.src]="asset | sqxFileIcon">
+            <div *ngIf="!asset.isImage" class="file-icon">
+                <img [attr.src]="asset | sqxFileIcon">
             </div>
 
-            <div class="file-overlay">
-                <div class="file-overlay-background"></div>
+            <div class="overlay">
+                <div class="overlay-background"></div>
                 
-                <a class="file-edit" (click)="renameDialog.show()">
-                    <i class="icon-pencil"></i>
-                </a>
-                <a class="file-download" [attr.href]="asset | sqxAssetUrl" target="_blank">
-                    <i class="icon-download"></i>
-                </a>
+                <div class="overlay-menu">
+                    <a class="file-download" [attr.href]="asset | sqxAssetUrl" target="_blank" (click)="$event.stopPropagation()">
+                        <i class="icon-download"></i>
+                    </a>
+    
+                    <a class="file-delete ml-2" (click)="deleting.emit(asset); $event.stopPropagation()" *ngIf="!isDisabled && !removeMode">
+                        <i class="icon-delete"></i>
+                    </a>
+                    <a class="file-delete ml-2" (click)="removing.emit(asset); $event.stopPropagation()" *ngIf="removeMode">
+                        <i class="icon-close"></i>
+                    </a>
+                </div>
 
-                <a class="file-delete" (click)="deleting.emit(asset)" *ngIf="!closeMode">
-                    <i class="icon-delete"></i>
-                </a>
-                <a class="file-delete" (click)="closing.emit(asset)" *ngIf="closeMode">
-                    <i class="icon-close"></i>
-                </a>
-
-                <span class="file-overlay-type" *ngIf="asset.fileType">
+                <span class="overlay-type" *ngIf="asset.fileType">
                     {{asset.fileType}}
                 </span>
-                <span class="file-user">
-                    <i class="icon-user"></i> {{asset.lastModifiedBy | sqxUserNameRef}}
-                </span>
-                <span class="file-modified">
-                    {{asset.lastModified | sqxFromNow}}
-                </span>
-            </div>
-        </div>
-    </div>
-    <div class="card-footer" dnd-draggable-handle *ngIf="asset && progress == 0">
-        <div class="file-name" [attr.title]="asset.fileName">
-            {{asset.fileName}}
-        </div>
-        <div class="file-info">
-            <span *ngIf="asset.pixelWidth">{{asset.pixelWidth}}x{{asset.pixelHeight}}px, </span> {{asset.fileSize | sqxFileSize}}
-        </div>
-    </div>
 
-    <div class="upload-progress" *ngIf="progress > 0">
-        <sqx-progress-bar mode="Circle" [value]="progress"></sqx-progress-bar>
-    </div>
-
-    <div class="drop-overlay" *ngIf="asset && progress == 0">
-        <div class="drop-overlay-background"></div>
-
-        <span class="drop-overlay-text">Drop to update</span>
-    </div>
-</div>
-
-<div class="modal" *sqxModalView="renameDialog;onRoot:true" @fade>
-    <div class="modal-backdrop"></div>
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">Rename asset</h4>
-
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="cancelRenameAsset()">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-
-            <div class="modal-body">
-                <form [formGroup]="renameForm" (ngSubmit)="renameAsset()">
-                    <div class="form-group">
-                        <label for="assetName">Name</label>
-                        
-                        <sqx-control-errors for="name" [submitted]="renameFormSubmitted"></sqx-control-errors>
-
-                        <input type="text" class="form-control" id="assetName" formControlName="name" autocomplete="off" sqxFocusOnInit />
+                <div class="overlay-user">
+                    <div>
+                        <i class="icon-user"></i> {{asset.lastModifiedBy | sqxUserNameRef}}
                     </div>
-
-                    <div class="form-group clearfix">
-                        <button type="reset" class="float-left btn btn-secondary" (click)="cancelRenameAsset()">Cancel</button>
-                        <button type="submit" class="float-right btn btn-success">Rename</button>
+                    <div>
+                        {{asset.lastModified | sqxFromNow}}
                     </div>
-                </form>
+                </div>
             </div>
         </div>
+
+        <div class="upload-progress" *ngIf="progress > 0">
+            <sqx-progress-bar mode="Circle" [value]="progress"></sqx-progress-bar>
+        </div>
+    
+        <div class="drop-overlay" *ngIf="asset && progress === 0">
+            <div class="drop-overlay-background"></div>
+    
+            <span class="drop-overlay-text">Drop to update</span>
+        </div>
+    </div>
+    <div class="card-footer">
+        <ng-container *ngIf="asset">
+            <div>
+                <div *ngIf="!renaming" class="file-name editable" [attr.title]="asset.fileName" (dblclick)="renameStart()">
+                    {{asset.fileName}}
+                </div>
+                <div *ngIf="renaming">
+                    <form [formGroup]="renameForm.form" (ngSubmit)="renameAsset()">                   
+                        <sqx-control-errors for="name" [submitted]="renameForm.submitted | async"></sqx-control-errors>
+
+                        <input type="text" class="form-control form-underlined editable" id="assetName" formControlName="name" autocomplete="off" sqxFocusOnInit (blur)="renameCancel()" />
+                    </form>
+                </div>
+            </div>
+            <div class="file-tags tags">
+                <sqx-tag-editor
+                    [suggestions]="allTags" 
+                    [acceptEnter]="true"
+                    [allowDuplicates]="false"
+                    [undefinedWhenEmpty]="false" 
+                    [formControl]="tagInput" class="blank" placeholder="+Tag">
+                </sqx-tag-editor>
+            </div>
+            <div class="file-info">
+                <ng-container *ngIf="asset.pixelWidth">{{asset.pixelWidth}}x{{asset.pixelHeight}}px, </ng-container> {{asset.fileSize | sqxFileSize}}
+            </div>
+        </ng-container>
     </div>
 </div>

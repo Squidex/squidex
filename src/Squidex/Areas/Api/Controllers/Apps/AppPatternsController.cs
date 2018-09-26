@@ -13,7 +13,6 @@ using NSwag.Annotations;
 using Squidex.Areas.Api.Controllers.Apps.Models;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
 
 namespace Squidex.Areas.Api.Controllers.Apps
@@ -50,9 +49,9 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [ApiCosts(0)]
         public IActionResult GetPatterns(string app)
         {
-            var response =
-                App.Patterns.Select(x => SimpleMapper.Map(x.Value, new AppPatternDto { PatternId = x.Key }))
-                    .OrderBy(x => x.Name).ToList();
+            var response = App.Patterns.Select(AppPatternDto.FromKvp).OrderBy(x => x.Name).ToList();
+
+            Response.Headers["ETag"] = App.Version.ToString();
 
             return Ok(response);
         }
@@ -64,6 +63,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// <param name="request">Pattern to be added to the app.</param>
         /// <returns>
         /// 201 => Pattern generated.
+        /// 400 => Pattern request not valid.
         /// 404 => App not found.
         /// </returns>
         [HttpPost]
@@ -72,11 +72,11 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [ApiCosts(1)]
         public async Task<IActionResult> PostPattern(string app, [FromBody] UpdatePatternDto request)
         {
-            var command = SimpleMapper.Map(request, new AddPattern());
+            var command = request.ToAddCommand();
 
             await CommandBus.PublishAsync(command);
 
-            var response = SimpleMapper.Map(request, new AppPatternDto { PatternId = command.PatternId });
+            var response = AppPatternDto.FromCommand(command);
 
             return CreatedAtAction(nameof(GetPatterns), new { app }, response);
         }
@@ -89,7 +89,8 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// <param name="request">Pattern to be updated for the app.</param>
         /// <returns>
         /// 204 => Pattern updated.
-        /// 404 => App not found or pattern not found.
+        /// 400 => Pattern request not valid.
+        /// 404 => Pattern or app not found.
         /// </returns>
         [HttpPut]
         [Route("apps/{app}/patterns/{id}/")]
@@ -97,21 +98,19 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [ApiCosts(1)]
         public async Task<IActionResult> UpdatePattern(string app, Guid id, [FromBody] UpdatePatternDto request)
         {
-            var command = SimpleMapper.Map(request, new UpdatePattern { PatternId = id });
-
-            await CommandBus.PublishAsync(command);
+            await CommandBus.PublishAsync(request.ToUpdateCommand(id));
 
             return NoContent();
         }
 
         /// <summary>
-        /// Revoke an app client
+        /// Revoke an app client.
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="id">The id of the pattern to be deleted.</param>
         /// <returns>
         /// 204 => Pattern removed.
-        /// 404 => App or pattern not found.
+        /// 404 => Pattern or app not found.
         /// </returns>
         /// <remarks>
         /// Schemas using this pattern will still function using the same Regular Expression

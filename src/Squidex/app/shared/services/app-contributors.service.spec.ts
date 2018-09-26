@@ -14,49 +14,9 @@ import {
     AppContributorDto,
     AppContributorsDto,
     AppContributorsService,
+    ContributorAssignedDto,
     Version
 } from './../';
-
-describe('AppContributorsDto', () => {
-    const contributor1 = new AppContributorDto('1', 'Owner');
-    const contributor2 = new AppContributorDto('2', 'Developer');
-    const contributor2_new = new AppContributorDto('2', 'Editor');
-    const version = new Version('1');
-    const newVersion = new Version('2');
-
-    it('should update contributors when adding contributor', () => {
-        const contributors_1 = new AppContributorsDto([contributor1], 4, version);
-        const contributors_2 = contributors_1.addContributor(contributor2, newVersion);
-
-        expect(contributors_2.contributors).toEqual([contributor1, contributor2]);
-        expect(contributors_2.version).toEqual(newVersion);
-    });
-
-    it('should update contributors when removing contributor', () => {
-        const contributors_1 = new AppContributorsDto([contributor1, contributor2], 4, version);
-        const contributors_2 = contributors_1.removeContributor(contributor1, newVersion);
-
-        expect(contributors_2.contributors).toEqual([contributor2]);
-        expect(contributors_2.version).toEqual(newVersion);
-    });
-
-    it('should update contributors when updating contributor', () => {
-        const contributors_1 = new AppContributorsDto([contributor1, contributor2], 4, version);
-        const contributors_2 = contributors_1.updateContributor(contributor2_new, newVersion);
-
-        expect(contributors_2.contributors).toEqual([contributor1, contributor2_new]);
-        expect(contributors_2.version).toEqual(newVersion);
-    });
-});
-
-describe('AppContributorDto', () => {
-    it('should update permission property when changing', () => {
-        const contributor_1 = new AppContributorDto('1', 'Owner');
-        const contributor_2 = contributor_1.changePermission('Editor');
-
-        expect(contributor_2.permission).toBe('Editor');
-    });
-});
 
 describe('AppContributorsService', () => {
     const version = new Version('1');
@@ -81,7 +41,7 @@ describe('AppContributorsService', () => {
     it('should make get request to get app contributors',
         inject([AppContributorsService, HttpTestingController], (appContributorsService: AppContributorsService, httpMock: HttpTestingController) => {
 
-        let contributors: AppContributorsDto | null = null;
+        let contributors: AppContributorsDto;
 
         appContributorsService.getContributors('my-app').subscribe(result => {
             contributors = result;
@@ -110,7 +70,7 @@ describe('AppContributorsService', () => {
             }
         });
 
-        expect(contributors).toEqual(
+        expect(contributors!).toEqual(
             new AppContributorsDto([
                 new AppContributorDto('123', 'Owner'),
                 new AppContributorDto('456', 'Owner')
@@ -122,14 +82,20 @@ describe('AppContributorsService', () => {
 
         const dto = new AppContributorDto('123', 'Owner');
 
-        appContributorsService.postContributor('my-app', dto, version).subscribe();
+        let contributorAssignedDto: ContributorAssignedDto;
+
+        appContributorsService.postContributor('my-app', dto, version).subscribe(result => {
+            contributorAssignedDto = result.payload;
+        });
 
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/contributors');
 
         expect(req.request.method).toEqual('POST');
         expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
-        req.flush({});
+        req.flush({ contributorId: '123' });
+
+        expect(contributorAssignedDto!.contributorId).toEqual('123');
     }));
 
     it('should make delete request to remove contributor',

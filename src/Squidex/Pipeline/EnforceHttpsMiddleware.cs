@@ -13,18 +13,16 @@ using Squidex.Config;
 
 namespace Squidex.Pipeline
 {
-    public sealed class EnforceHttpsMiddleware
+    public sealed class EnforceHttpsMiddleware : IMiddleware
     {
-        private readonly RequestDelegate next;
         private readonly IOptions<MyUrlsOptions> urls;
 
-        public EnforceHttpsMiddleware(RequestDelegate next, IOptions<MyUrlsOptions> urls)
+        public EnforceHttpsMiddleware(IOptions<MyUrlsOptions> urls)
         {
-            this.next = next;
             this.urls = urls;
         }
 
-        public async Task Invoke(HttpContext context)
+        public async Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
             if (!urls.Value.EnforceHTTPS)
             {
@@ -36,9 +34,9 @@ namespace Squidex.Pipeline
 
                 if (!string.Equals(context.Request.Scheme, "https", StringComparison.OrdinalIgnoreCase))
                 {
-                    var newUrl = string.Concat("https://", hostName, context.Request.Path);
+                    var newUrl = string.Concat("https://", hostName, context.Request.Path, context.Request.QueryString);
 
-                    context.Response.Redirect(newUrl + context.Request.QueryString, true);
+                    context.Response.Redirect(newUrl, true);
                 }
                 else
                 {

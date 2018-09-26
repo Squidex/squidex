@@ -8,7 +8,7 @@
 import { Component, Input } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
-import { JsonFieldPropertiesDto } from 'shared';
+import { FieldDto, JsonFieldPropertiesDto } from '@app/shared';
 
 @Component({
     selector: 'sqx-json-validation',
@@ -18,6 +18,9 @@ import { JsonFieldPropertiesDto } from 'shared';
 export class JsonValidationComponent {
     @Input()
     public editForm: FormGroup;
+
+    @Input()
+    public field: FieldDto;
 
     @Input()
     public properties: JsonFieldPropertiesDto;

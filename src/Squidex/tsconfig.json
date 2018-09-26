@@ -3,8 +3,10 @@
     "baseUrl": ".",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
+    "importHelpers": true,
     "lib": ["es6", "esnext", "dom"],
     "moduleResolution": "node",
+    "noEmitHelpers": true,
     "noImplicitAny": true,
     "noUnusedLocals": true,
     "noUnusedParameters": false,
@@ -14,15 +16,12 @@
     "suppressImplicitAnyIndexErrors": true,
     "target": "es5",
     "paths": {
-      "framework": [
-        "app/framework"
-      ],
-      "features": [
-        "app/features"
-      ],
-      "shared": [
-        "app/shared"
+      "@app*": [
+        "app/*"
       ]
     }
+  },
+  "angularCompilerOptions": { 
+    "preserveWhitespaces": true 
   }
 }

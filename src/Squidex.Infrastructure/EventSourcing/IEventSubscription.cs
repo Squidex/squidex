@@ -11,6 +11,8 @@ namespace Squidex.Infrastructure.EventSourcing
 {
     public interface IEventSubscription
     {
+        void WakeUp();
+
         Task StopAsync();
     }
 }

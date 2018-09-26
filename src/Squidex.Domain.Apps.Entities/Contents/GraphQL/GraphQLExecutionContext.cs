@@ -7,28 +7,21 @@
 
 using System;
 using System.Collections.Generic;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
-using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Assets;
-using Squidex.Domain.Apps.Entities.Assets.Repositories;
-using Squidex.Infrastructure.Commands;
-
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 {
-    public sealed class GraphQLExecutionContext : QueryContext
+    public sealed class GraphQLExecutionContext : QueryExecutionContext
     {
-        public ICommandBus CommandBus { get; }
-
         public IGraphQLUrlGenerator UrlGenerator { get; }
 
-        public GraphQLExecutionContext(IAppEntity app, IAssetRepository assetRepository, ICommandBus commandBus, IContentQueryService contentQuery, ClaimsPrincipal user,
+        public GraphQLExecutionContext(QueryContext context,
+            IAssetQueryService assetQueryService,
+            IContentQueryService contentQuery,
             IGraphQLUrlGenerator urlGenerator)
-            : base(app, assetRepository, contentQuery, user)
+            : base(context, assetQueryService, contentQuery)
         {
-            CommandBus = commandBus;
-
             UrlGenerator = urlGenerator;
         }
 

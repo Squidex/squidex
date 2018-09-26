@@ -8,10 +8,11 @@
 using System;
 using System.Threading.Tasks;
 using FakeItEasy;
+using Newtonsoft.Json.Linq;
 using NodaTime;
 using Squidex.Domain.Apps.Core.HandleRules;
+using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules;
-using Squidex.Domain.Apps.Core.Rules.Actions;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Contents;
@@ -27,6 +28,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
     {
         private readonly IRuleTriggerHandler ruleTriggerHandler = A.Fake<IRuleTriggerHandler>();
         private readonly IRuleActionHandler ruleActionHandler = A.Fake<IRuleActionHandler>();
+        private readonly IEventEnricher eventEnricher = A.Fake<IEventEnricher>();
         private readonly IClock clock = A.Fake<IClock>();
         private readonly TypeNameRegistry typeNameRegistry = new TypeNameRegistry();
         private readonly RuleService sut;
@@ -35,12 +37,12 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
         }
 
+        public sealed class ValidAction : RuleAction
+        {
+        }
+
         public sealed class InvalidAction : RuleAction
         {
-            public override T Accept<T>(IRuleActionVisitor<T> visitor)
-            {
-                return default(T);
-            }
         }
 
         public sealed class InvalidTrigger : RuleTrigger
@@ -54,80 +56,81 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         public RuleServiceTests()
         {
             typeNameRegistry.Map(typeof(ContentCreated));
-            typeNameRegistry.Map(typeof(WebhookAction));
+            typeNameRegistry.Map(typeof(ValidAction), "ValidAction");
+
+            A.CallTo(() => eventEnricher.EnrichAsync(A<Envelope<AppEvent>>.Ignored))
+                .Returns(new EnrichedContentEvent());
 
             A.CallTo(() => ruleActionHandler.ActionType)
-                .Returns(typeof(WebhookAction));
+                .Returns(typeof(ValidAction));
 
             A.CallTo(() => ruleTriggerHandler.TriggerType)
                 .Returns(typeof(ContentChangedTrigger));
 
-            sut = new RuleService(new[] { ruleTriggerHandler }, new[] { ruleActionHandler }, clock, typeNameRegistry);
+            sut = new RuleService(new[] { ruleTriggerHandler }, new[] { ruleActionHandler }, eventEnricher, clock, typeNameRegistry);
         }
 
         [Fact]
-        public void Should_not_create_job_for_invalid_event()
+        public async Task Should_not_create_job_for_invalid_event()
         {
-            var ruleConfig = new Rule(new ContentChangedTrigger(), new WebhookAction());
+            var ruleConfig = new Rule(new ContentChangedTrigger(), new ValidAction());
             var ruleEnvelope = Envelope.Create(new InvalidEvent());
 
-            var job = sut.CreateJob(ruleConfig, ruleEnvelope);
+            var job = await sut.CreateJobAsync(ruleConfig, ruleEnvelope);
 
             Assert.Null(job);
         }
 
         [Fact]
-        public void Should_not_create_trigger_if_no_trigger_handler_registered()
+        public async Task Should_not_create_job_if_no_trigger_handler_registered()
         {
-            var ruleConfig = new Rule(new InvalidTrigger(), new WebhookAction());
+            var ruleConfig = new Rule(new InvalidTrigger(), new ValidAction());
             var ruleEnvelope = Envelope.Create(new ContentCreated());
 
-            var job = sut.CreateJob(ruleConfig, ruleEnvelope);
+            var job = await sut.CreateJobAsync(ruleConfig, ruleEnvelope);
 
             Assert.Null(job);
         }
 
         [Fact]
-        public void Should_not_create_trigger_if_no_action_handler_registered()
+        public async Task Should_not_create_job_if_no_action_handler_registered()
         {
             var ruleConfig = new Rule(new ContentChangedTrigger(), new InvalidAction());
             var ruleEnvelope = Envelope.Create(new ContentCreated());
 
-            var job = sut.CreateJob(ruleConfig, ruleEnvelope);
+            var job = await sut.CreateJobAsync(ruleConfig, ruleEnvelope);
 
             Assert.Null(job);
         }
 
         [Fact]
-        public void Should_not_create_if_not_triggered()
+        public async Task Should_not_create_if_not_triggered()
         {
-            var ruleConfig = new Rule(new ContentChangedTrigger(), new InvalidAction());
+            var ruleConfig = new Rule(new ContentChangedTrigger(), new ValidAction());
             var ruleEnvelope = Envelope.Create(new ContentCreated());
 
             A.CallTo(() => ruleTriggerHandler.Triggers(A<Envelope<AppEvent>>.Ignored, ruleConfig.Trigger))
                 .Returns(false);
 
-            var job = sut.CreateJob(ruleConfig, ruleEnvelope);
+            var job = await sut.CreateJobAsync(ruleConfig, ruleEnvelope);
 
             Assert.Null(job);
         }
 
         [Fact]
-        public void Should_not_create_job_if_too_old()
+        public async Task Should_not_create_job_if_too_old()
         {
-            var e = new ContentCreated { SchemaId = new NamedId<Guid>(Guid.NewGuid(), "my-schema"), AppId = new NamedId<Guid>(Guid.NewGuid(), "my-event") };
+            var @event = new ContentCreated { SchemaId = NamedId.Of(Guid.NewGuid(), "my-schema"), AppId = NamedId.Of(Guid.NewGuid(), "my-event") };
 
             var now = SystemClock.Instance.GetCurrentInstant();
 
-            var ruleConfig = new Rule(new ContentChangedTrigger(), new WebhookAction());
-            var ruleEnvelope = Envelope.Create(e);
+            var ruleConfig = new Rule(new ContentChangedTrigger(), new ValidAction());
+            var ruleEnvelope = Envelope.Create(@event);
 
             ruleEnvelope.SetTimestamp(now.Minus(Duration.FromDays(3)));
 
-            var actionData = new RuleJobData();
+            var actionData = new JObject();
             var actionDescription = "MyDescription";
-
-            var eventName = "MySchemaCreatedEvent";
 
             A.CallTo(() => clock.GetCurrentInstant())
                 .Returns(now);
@@ -135,31 +138,29 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             A.CallTo(() => ruleTriggerHandler.Triggers(A<Envelope<AppEvent>>.Ignored, ruleConfig.Trigger))
                 .Returns(true);
 
-            A.CallTo(() => ruleActionHandler.CreateJob(A<Envelope<AppEvent>>.Ignored, eventName, ruleConfig.Action))
+            A.CallTo(() => ruleActionHandler.CreateJobAsync(A<EnrichedEvent>.Ignored, ruleConfig.Action))
                 .Returns((actionDescription, actionData));
 
-            var job = sut.CreateJob(ruleConfig, ruleEnvelope);
+            var job = await sut.CreateJobAsync(ruleConfig, ruleEnvelope);
 
             Assert.Null(job);
         }
 
         [Fact]
-        public void Should_create_job_if_triggered()
+        public async Task Should_create_job_if_triggered()
         {
-            var e = new ContentCreated { SchemaId = new NamedId<Guid>(Guid.NewGuid(), "my-schema"), AppId = new NamedId<Guid>(Guid.NewGuid(), "my-event") };
+            var @event = new ContentCreated { SchemaId = NamedId.Of(Guid.NewGuid(), "my-schema"), AppId = NamedId.Of(Guid.NewGuid(), "my-event") };
 
             var now = SystemClock.Instance.GetCurrentInstant();
 
-            var ruleConfig = new Rule(new ContentChangedTrigger(), new WebhookAction());
-            var ruleEnvelope = Envelope.Create(e);
+            var ruleConfig = new Rule(new ContentChangedTrigger(), new ValidAction());
+            var ruleEnvelope = Envelope.Create(@event);
 
             ruleEnvelope.SetTimestamp(now);
 
-            var actionName = "WebhookAction";
-            var actionData = new RuleJobData();
+            var actionName = "ValidAction";
+            var actionData = new JObject();
             var actionDescription = "MyDescription";
-
-            var eventName = "MySchemaCreatedEvent";
 
             A.CallTo(() => clock.GetCurrentInstant())
                 .Returns(now);
@@ -167,12 +168,10 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             A.CallTo(() => ruleTriggerHandler.Triggers(A<Envelope<AppEvent>>.Ignored, ruleConfig.Trigger))
                 .Returns(true);
 
-            A.CallTo(() => ruleActionHandler.CreateJob(A<Envelope<AppEvent>>.Ignored, eventName, ruleConfig.Action))
+            A.CallTo(() => ruleActionHandler.CreateJobAsync(A<EnrichedEvent>.Ignored, ruleConfig.Action))
                 .Returns((actionDescription, actionData));
 
-            var job = sut.CreateJob(ruleConfig, ruleEnvelope);
-
-            Assert.Equal(eventName, job.EventName);
+            var job = await sut.CreateJobAsync(ruleConfig, ruleEnvelope);
 
             Assert.Equal(actionData, job.ActionData);
             Assert.Equal(actionName, job.ActionName);
@@ -181,7 +180,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             Assert.Equal(now, job.Created);
             Assert.Equal(now.Plus(Duration.FromDays(2)), job.Expires);
 
-            Assert.Equal(e.AppId.Id, job.AppId);
+            Assert.Equal(@event.AppId.Id, job.AppId);
 
             Assert.NotEqual(Guid.Empty, job.JobId);
         }
@@ -189,15 +188,14 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public async Task Should_return_succeeded_job_with_full_dump_when_handler_returns_no_exception()
         {
-            var ruleJob = new RuleJobData();
-            var ruleEx = new InvalidOperationException();
+            var ruleJob = new JObject();
 
             var actionDump = "MyDump";
 
             A.CallTo(() => ruleActionHandler.ExecuteJobAsync(ruleJob))
                 .Returns((actionDump, null));
 
-            var result = await sut.InvokeAsync("WebhookAction", ruleJob);
+            var result = await sut.InvokeAsync("ValidAction", ruleJob);
 
             Assert.Equal(RuleResult.Success, result.Result);
 
@@ -208,15 +206,14 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public async Task Should_return_failed_job_with_full_dump_when_handler_returns_exception()
         {
-            var ruleJob = new RuleJobData();
-            var ruleEx = new InvalidOperationException();
+            var ruleJob = new JObject();
 
             var actionDump = "MyDump";
 
             A.CallTo(() => ruleActionHandler.ExecuteJobAsync(ruleJob))
                 .Returns((actionDump, new InvalidOperationException()));
 
-            var result = await sut.InvokeAsync("WebhookAction", ruleJob);
+            var result = await sut.InvokeAsync("ValidAction", ruleJob);
 
             Assert.Equal(RuleResult.Failed, result.Result);
 
@@ -227,15 +224,14 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public async Task Should_return_timedout_job_with_full_dump_when_exception_from_handler_indicates_timeout()
         {
-            var ruleJob = new RuleJobData();
-            var ruleEx = new InvalidOperationException();
+            var ruleJob = new JObject();
 
             var actionDump = "MyDump";
 
             A.CallTo(() => ruleActionHandler.ExecuteJobAsync(ruleJob))
                 .Returns((actionDump, new TimeoutException()));
 
-            var result = await sut.InvokeAsync("WebhookAction", ruleJob);
+            var result = await sut.InvokeAsync("ValidAction", ruleJob);
 
             Assert.Equal(RuleResult.Timeout, result.Result);
 
@@ -247,15 +243,15 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public async Task Should_create_exception_details_when_job_to_execute_failed()
         {
-            var ruleJob = new RuleJobData();
-            var ruleEx = new InvalidOperationException();
+            var ruleJob = new JObject();
+            var ruleError = new InvalidOperationException();
 
             A.CallTo(() => ruleActionHandler.ExecuteJobAsync(ruleJob))
-                .Throws(ruleEx);
+                .Throws(ruleError);
 
-            var result = await sut.InvokeAsync("WebhookAction", ruleJob);
+            var result = await sut.InvokeAsync("ValidAction", ruleJob);
 
-            Assert.Equal((ruleEx.ToString(), RuleResult.Failed, TimeSpan.Zero), result);
+            Assert.Equal((ruleError.ToString(), RuleResult.Failed, TimeSpan.Zero), result);
         }
     }
 }

@@ -24,7 +24,7 @@ namespace Squidex.Infrastructure.Tasks
         }
 
         public PartitionedActionBlock(Action<TInput> action, Func<TInput, int> partitioner)
-            : this (ToAsync(action), partitioner, new ExecutionDataflowBlockOptions())
+            : this (action?.ToAsync(), partitioner, new ExecutionDataflowBlockOptions())
         {
         }
 
@@ -34,7 +34,7 @@ namespace Squidex.Infrastructure.Tasks
         }
 
         public PartitionedActionBlock(Action<TInput> action, Func<TInput, int> partitioner, ExecutionDataflowBlockOptions dataflowBlockOptions)
-            : this(ToAsync(action), partitioner, dataflowBlockOptions)
+            : this(action?.ToAsync(), partitioner, dataflowBlockOptions)
         {
         }
 
@@ -93,18 +93,6 @@ namespace Squidex.Infrastructure.Tasks
         public void Fault(Exception exception)
         {
             distributor.Fault(exception);
-        }
-
-        private static Func<TInput, Task> ToAsync(Action<TInput> action)
-        {
-            Guard.NotNull(action, nameof(action));
-
-            return x =>
-            {
-                action(x);
-
-                return TaskHelper.Done;
-            };
         }
     }
 }

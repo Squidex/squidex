@@ -7,6 +7,7 @@
 
 using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
@@ -15,8 +16,6 @@ namespace Squidex.Infrastructure.Assets
 {
     public class AzureBlobAssetStore : IAssetStore, IInitializable
     {
-        private const string AssetVersion = "AssetVersion";
-        private const string AssetId = "AssetId";
         private readonly string containerName;
         private readonly string connectionString;
         private CloudBlobContainer blobContainer;
@@ -56,73 +55,93 @@ namespace Squidex.Infrastructure.Assets
             return new Uri(blobContainer.StorageUri.PrimaryUri, $"/{containerName}/{blobName}").ToString();
         }
 
-        public async Task CopyTemporaryAsync(string name, string id, long version, string suffix)
+        public async Task CopyAsync(string sourceFileName, string id, long version, string suffix, CancellationToken ct = default(CancellationToken))
         {
-            var blobName = GetObjectName(id, version, suffix);
-            var blobRef = blobContainer.GetBlobReference(blobName);
+            var targetName = GetObjectName(id, version, suffix);
+            var targetBlob = blobContainer.GetBlobReference(targetName);
 
-            var tempBlob = blobContainer.GetBlockBlobReference(name);
+            var sourceBlob = blobContainer.GetBlockBlobReference(sourceFileName);
 
             try
             {
-                await blobRef.StartCopyAsync(tempBlob.Uri);
+                await targetBlob.StartCopyAsync(sourceBlob.Uri, null, AccessCondition.GenerateIfNotExistsCondition(), null, null, ct);
 
-                while (blobRef.CopyState.Status == CopyStatus.Pending)
+                while (targetBlob.CopyState.Status == CopyStatus.Pending)
                 {
-                    await Task.Delay(50);
-                    await blobRef.FetchAttributesAsync();
+                    ct.ThrowIfCancellationRequested();
+
+                    await Task.Delay(50, ct);
+                    await targetBlob.FetchAttributesAsync(null, null, null, ct);
                 }
 
-                if (blobRef.CopyState.Status != CopyStatus.Success)
+                if (targetBlob.CopyState.Status != CopyStatus.Success)
                 {
-                    throw new StorageException($"Copy of temporary file failed: {blobRef.CopyState.Status}");
+                    throw new StorageException($"Copy of temporary file failed: {targetBlob.CopyState.Status}");
                 }
+            }
+            catch (StorageException ex) when (ex.RequestInformation.HttpStatusCode == 409)
+            {
+                throw new AssetAlreadyExistsException(targetName);
             }
             catch (StorageException ex) when (ex.RequestInformation.HttpStatusCode == 404)
             {
-                throw new AssetNotFoundException($"Asset {name} not found.", ex);
+                throw new AssetNotFoundException(sourceFileName, ex);
             }
         }
 
-        public async Task DownloadAsync(string id, long version, string suffix, Stream stream)
+        public async Task DownloadAsync(string id, long version, string suffix, Stream stream, CancellationToken ct = default(CancellationToken))
         {
-            var blobName = GetObjectName(id, version, suffix);
-            var blobRef = blobContainer.GetBlockBlobReference(blobName);
+            var blob = blobContainer.GetBlockBlobReference(GetObjectName(id, version, suffix));
 
             try
             {
-                await blobRef.DownloadToStreamAsync(stream);
+                await blob.DownloadToStreamAsync(stream, null, null, null, ct);
             }
             catch (StorageException ex) when (ex.RequestInformation.HttpStatusCode == 404)
             {
-                throw new AssetNotFoundException($"Asset {id}, {version} not found.", ex);
+                throw new AssetNotFoundException($"Id={id}, Version={version}", ex);
             }
         }
 
-        public async Task UploadAsync(string id, long version, string suffix, Stream stream)
+        public Task UploadAsync(string id, long version, string suffix, Stream stream, CancellationToken ct = default(CancellationToken))
         {
-            var blobName = GetObjectName(id, version, suffix);
-            var blobRef = blobContainer.GetBlockBlobReference(blobName);
-
-            blobRef.Metadata[AssetVersion] = version.ToString();
-            blobRef.Metadata[AssetId] = id;
-
-            await blobRef.UploadFromStreamAsync(stream);
-            await blobRef.SetMetadataAsync();
+            return UploadCoreAsync(GetObjectName(id, version, suffix), stream, ct);
         }
 
-        public async Task UploadTemporaryAsync(string name, Stream stream)
+        public Task UploadAsync(string fileName, Stream stream, CancellationToken ct = default(CancellationToken))
         {
-            var tempBlob = blobContainer.GetBlockBlobReference(name);
-
-            await tempBlob.UploadFromStreamAsync(stream);
+            return UploadCoreAsync(fileName, stream, ct);
         }
 
-        public async Task DeleteTemporaryAsync(string name)
+        public Task DeleteAsync(string id, long version, string suffix)
         {
-            var tempBlob = blobContainer.GetBlockBlobReference(name);
+            return DeleteCoreAsync(GetObjectName(id, version, suffix));
+        }
 
-            await tempBlob.DeleteIfExistsAsync();
+        public Task DeleteAsync(string fileName)
+        {
+            return DeleteCoreAsync(fileName);
+        }
+
+        private Task DeleteCoreAsync(string blobName)
+        {
+            var blob = blobContainer.GetBlockBlobReference(blobName);
+
+            return blob.DeleteIfExistsAsync();
+        }
+
+        private async Task UploadCoreAsync(string blobName, Stream stream, CancellationToken ct)
+        {
+            try
+            {
+                var tempBlob = blobContainer.GetBlockBlobReference(blobName);
+
+                await tempBlob.UploadFromStreamAsync(stream, AccessCondition.GenerateIfNotExistsCondition(), null, null, ct);
+            }
+            catch (StorageException ex) when (ex.RequestInformation.HttpStatusCode == 409)
+            {
+                throw new AssetAlreadyExistsException(blobName);
+            }
         }
 
         private string GetObjectName(string id, long version, string suffix)

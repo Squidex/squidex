@@ -147,7 +147,7 @@ namespace Squidex.Infrastructure.States
 
         public async Task WriteEventsAsync(IEnumerable<Envelope<IEvent>> events)
         {
-            Guard.NotNull(events, nameof(@events));
+            Guard.NotNull(events, nameof(events));
 
             var eventArray = events.ToArray();
 
@@ -162,7 +162,7 @@ namespace Squidex.Infrastructure.States
 
                 try
                 {
-                    await eventStore.AppendAsync(commitId, GetStreamName(), expectedVersion, eventData);
+                    await eventStore.AppendAsync(commitId, eventStream, expectedVersion, eventData);
                 }
                 catch (WrongEventVersionException ex)
                 {
@@ -175,9 +175,22 @@ namespace Squidex.Infrastructure.States
             UpdateVersion();
         }
 
+        public async Task DeleteAsync()
+        {
+            if (UseEventSourcing())
+            {
+                await eventStore.DeleteStreamAsync(GetStreamName());
+            }
+
+            if (UseSnapshots())
+            {
+                await snapshotStore.RemoveAsync(ownerKey);
+            }
+        }
+
         private EventData[] GetEventData(Envelope<IEvent>[] events, Guid commitId)
         {
-            return @events.Select(x => eventDataFormatter.ToEventData(x, commitId, true)).ToArray();
+            return events.Select(x => eventDataFormatter.ToEventData(x, commitId, true)).ToArray();
         }
 
         private string GetStreamName()

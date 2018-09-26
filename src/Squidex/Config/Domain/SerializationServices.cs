@@ -17,26 +17,30 @@ using Squidex.Domain.Apps.Core.Rules.Json;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Schemas.Json;
 using Squidex.Domain.Apps.Events;
+using Squidex.Extensions.Actions;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Json;
-using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Config.Domain
 {
     public static class SerializationServices
     {
         private static readonly TypeNameRegistry TypeNameRegistry =
-            new TypeNameRegistry()
-                .MapUnmapped(SquidexCoreModel.Assembly)
-                .MapUnmapped(SquidexEvents.Assembly)
-                .MapUnmapped(SquidexInfrastructure.Assembly)
-                .MapUnmapped(SquidexMigrations.Assembly);
-
+             new TypeNameRegistry()
+                 .MapUnmapped(SquidexCoreModel.Assembly)
+                 .MapUnmapped(SquidexEvents.Assembly)
+                 .MapUnmapped(SquidexInfrastructure.Assembly)
+                 .MapUnmapped(SquidexMigrations.Assembly);
         private static readonly FieldRegistry FieldRegistry = new FieldRegistry(TypeNameRegistry);
 
-        private static JsonSerializerSettings ConfigureJson(JsonSerializerSettings settings, TypeNameHandling typeNameHandling)
+        public static readonly JsonSerializerSettings DefaultJsonSettings = new JsonSerializerSettings();
+        public static readonly JsonSerializer DefaultJsonSerializer;
+
+        private static void ConfigureJson(JsonSerializerSettings settings, TypeNameHandling typeNameHandling)
         {
+            RuleElementRegistry.RegisterTypes(TypeNameRegistry);
+
             settings.SerializationBinder = new TypeNameSerializationBinder(TypeNameRegistry);
 
             settings.ContractResolver = new ConverterContractResolver(
@@ -65,21 +69,21 @@ namespace Squidex.Config.Domain
             settings.TypeNameHandling = typeNameHandling;
 
             settings.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
+        }
 
-            return settings;
+        static SerializationServices()
+        {
+            ConfigureJson(DefaultJsonSettings, TypeNameHandling.Auto);
+
+            DefaultJsonSerializer = JsonSerializer.Create(DefaultJsonSettings);
         }
 
         public static IServiceCollection AddMySerializers(this IServiceCollection services)
         {
-            var serializerSettings = ConfigureJson(new JsonSerializerSettings(), TypeNameHandling.Auto);
-            var serializerInstance = JsonSerializer.Create(serializerSettings);
-
-            services.AddSingletonAs(t => FieldRegistry);
-            services.AddSingletonAs(t => serializerSettings);
-            services.AddSingletonAs(t => serializerInstance);
-            services.AddSingletonAs(t => TypeNameRegistry);
-
-            BsonJsonConvention.Register(serializerInstance);
+            services.AddSingleton(FieldRegistry);
+            services.AddSingleton(DefaultJsonSettings);
+            services.AddSingleton(DefaultJsonSerializer);
+            services.AddSingleton(TypeNameRegistry);
 
             return services;
         }

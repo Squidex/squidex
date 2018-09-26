@@ -4,62 +4,120 @@
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
+
 using System;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.AspNetCore.Http;
 using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Domain.Apps.Entities.Apps.State;
+using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
-using Squidex.Pipeline;
-using Squidex.Pipeline.CommandMiddlewares;
 using Xunit;
-using static Squidex.Pipeline.AppApiFilter;
 
-namespace Squidex.Tests.Pipeline.CommandMiddlewares
+namespace Squidex.Pipeline.CommandMiddlewares
 {
     public class EnrichWithAppIdCommandMiddlewareTests
     {
         private readonly IHttpContextAccessor httpContextAccessor = A.Fake<IHttpContextAccessor>();
         private readonly ICommandBus commandBus = A.Fake<ICommandBus>();
-        private readonly CreateContent command = new CreateContent { AppId = null };
+        private readonly HttpContext httpContext = new DefaultHttpContext();
+        private readonly EnrichWithAppIdCommandMiddleware sut;
 
-        [Fact]
-        public async Task HandleAsync_should_throw_exception_if_app_id_not_found()
+        public EnrichWithAppIdCommandMiddlewareTests()
         {
-            var context = new CommandContext(command, commandBus);
-            var sut = SetupSystem(null);
+            A.CallTo(() => httpContextAccessor.HttpContext)
+                .Returns(httpContext);
 
-            await Assert.ThrowsAsync<InvalidOperationException>(() =>
-            {
-                return sut.HandleAsync(context);
-            });
+            sut = new EnrichWithAppIdCommandMiddleware(httpContextAccessor);
         }
 
         [Fact]
-        public async Task HandleAsync_should_find_app_id_from_features()
+        public async Task Should_throw_exception_if_app_not_found()
         {
+            var command = new CreateContent();
             var context = new CommandContext(command, commandBus);
-            var app = new AppState
-            {
-                Name = "app",
-                Id = Guid.NewGuid()
-            };
-            var sut = SetupSystem(app);
+
+            await Assert.ThrowsAsync<InvalidOperationException>(() => sut.HandleAsync(context));
+        }
+
+        [Fact]
+        public async Task Should_do_nothing_when_context_is_null()
+        {
+            A.CallTo(() => httpContextAccessor.HttpContext)
+                .Returns(null);
+
+            var command = new CreateContent();
+            var context = new CommandContext(command, commandBus);
 
             await sut.HandleAsync(context);
 
-            Assert.Equal(new NamedId<Guid>(app.Id, app.Name), command.AppId);
+            Assert.Null(command.Actor);
         }
 
-        private EnrichWithAppIdCommandMiddleware SetupSystem(IAppEntity app)
+        [Fact]
+        public async Task Should_assign_app_id_and_name_to_app_command()
         {
-            var appFeature = app == null ? null : new AppFeature(app);
-            A.CallTo(() => httpContextAccessor.HttpContext.Features.Get<IAppFeature>()).Returns(appFeature);
+            SetupApp(out var appId, out var appName);
 
-            return new EnrichWithAppIdCommandMiddleware(httpContextAccessor);
+            var command = new CreateContent();
+            var context = new CommandContext(command, commandBus);
+
+            await sut.HandleAsync(context);
+
+            Assert.Equal(NamedId.Of(appId, appName), command.AppId);
+        }
+
+        [Fact]
+        public async Task Should_assign_app_id_to_app_self_command()
+        {
+            SetupApp(out var appId, out _);
+
+            var command = new AddPattern();
+            var context = new CommandContext(command, commandBus);
+
+            await sut.HandleAsync(context);
+
+            Assert.Equal(appId, command.AppId);
+        }
+
+        [Fact]
+        public async Task Should_not_override_app_id()
+        {
+            SetupApp(out var appId, out _);
+
+            var command = new AddPattern { AppId = Guid.NewGuid() };
+            var context = new CommandContext(command, commandBus);
+
+            await sut.HandleAsync(context);
+
+            Assert.NotEqual(appId, command.AppId);
+        }
+
+        [Fact]
+        public async Task Should_not_override_app_id_and_name()
+        {
+            SetupApp(out var appId, out var appName);
+
+            var command = new CreateContent { AppId = NamedId.Of(Guid.NewGuid(), "other-app") };
+            var context = new CommandContext(command, commandBus);
+
+            await sut.HandleAsync(context);
+
+            Assert.NotEqual(NamedId.Of(appId, appName), command.AppId);
+        }
+
+        private void SetupApp(out Guid appId, out string appName)
+        {
+            appId = Guid.NewGuid();
+            appName = "my-app";
+
+            var appEntity = A.Fake<IAppEntity>();
+            A.CallTo(() => appEntity.Id).Returns(appId);
+            A.CallTo(() => appEntity.Name).Returns(appName);
+
+            httpContext.Features.Set<IAppFeature>(new AppApiFilter.AppFeature(appEntity));
         }
     }
 }

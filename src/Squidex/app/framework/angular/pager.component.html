@@ -1,0 +1,12 @@
+<div class="clearfix" *ngIf="pager && pager.numberOfItems > 0 && (!hideWhenButtonsDisabled || pager.canGoPrev || pager.canGoNext)">
+    <div class="float-right pagination">
+        <span class="pagination-text">{{pager.itemFirst}}-{{pager.itemLast}} of {{pager.numberOfItems}}</span>
+
+        <button class="btn btn-link btn-secondary pagination-button" [disabled]="!pager.canGoPrev" (click)="prev.emit()">
+            <i class="icon-angle-left"></i>
+        </button>
+        <button class="btn btn-link btn-secondary pagination-button" [disabled]="!pager.canGoNext" (click)="next.emit()">
+            <i class="icon-angle-right"></i>
+        </button>
+    </div>
+</div>

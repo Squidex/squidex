@@ -17,6 +17,8 @@ namespace Squidex.Shared.Identity
 
         public static readonly string SquidexConsentForEmails = "urn:squidex:consent:emails";
 
+        public static readonly string SquidexHidden = "urn:squidex:hidden";
+
         public static readonly string Prefix = "urn:squidex:";
     }
 }

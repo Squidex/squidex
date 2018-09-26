@@ -7,21 +7,24 @@
 
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { DndModule } from 'ng2-dnd';
 
 import {
     HelpComponent,
     HistoryComponent,
     SqxFrameworkModule,
     SqxSharedModule
-} from 'shared';
+} from '@app/shared';
 
 import {
+    BackupDownloadUrlPipe,
+    BackupDurationPipe,
+    BackupsPageComponent,
     ClientComponent,
     ClientsPageComponent,
     ContributorsPageComponent,
     LanguageComponent,
     LanguagesPageComponent,
+    MorePageComponent,
     PatternComponent,
     PatternsPageComponent,
     PlansPageComponent,
@@ -37,8 +40,54 @@ const routes: Routes = [
                 path: ''
             },
             {
+                path: 'more',
+                component: MorePageComponent
+            },
+            {
+                path: 'backups',
+                component: BackupsPageComponent,
+                children: [
+                    {
+                        path: 'help',
+                        component: HelpComponent,
+                        data: {
+                            helpPage: '05-integrated/backups'
+                        }
+                    }
+                ]
+            },
+            {
                 path: 'plans',
-                component: PlansPageComponent
+                component: PlansPageComponent,
+                children: [
+                    {
+                        path: 'history',
+                        component: HistoryComponent,
+                        data: {
+                            channel: 'settings.plans'
+                        }
+                    }
+                ]
+            },
+            {
+                path: 'patterns',
+                component: PatternsPageComponent,
+                children: [
+                    {
+                        path: 'history',
+                        component: HistoryComponent,
+                        data: {
+                            channel: 'settings.patterns'
+                        }
+                    },
+                    {
+                        path: 'help',
+                        component: HelpComponent,
+                        data: {
+                            helpPage: '05-integrated/patterns'
+                        }
+                    }
+                ]
             },
             {
                 path: 'clients',
@@ -99,26 +148,6 @@ const routes: Routes = [
                         }
                     }
                 ]
-            },
-            {
-                path: 'patterns',
-                component: PatternsPageComponent,
-                children: [
-                    {
-                        path: 'history',
-                        component: HistoryComponent,
-                        data: {
-                            channel: 'settings.patterns'
-                        }
-                    },
-                    {
-                        path: 'help',
-                        component: HelpComponent,
-                        data: {
-                            helpPage: '05-integrated/patterns'
-                        }
-                    }
-                ]
             }
         ]
     }
@@ -126,17 +155,20 @@ const routes: Routes = [
 
 @NgModule({
     imports: [
-        DndModule,
         SqxFrameworkModule,
         SqxSharedModule,
         RouterModule.forChild(routes)
     ],
     declarations: [
+        BackupDownloadUrlPipe,
+        BackupDurationPipe,
+        BackupsPageComponent,
         ClientComponent,
         ClientsPageComponent,
         ContributorsPageComponent,
         LanguageComponent,
         LanguagesPageComponent,
+        MorePageComponent,
         PatternComponent,
         PatternsPageComponent,
         PlansPageComponent,

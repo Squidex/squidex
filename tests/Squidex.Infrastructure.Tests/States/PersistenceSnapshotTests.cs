@@ -8,8 +8,6 @@
 using System;
 using System.Threading.Tasks;
 using FakeItEasy;
-using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Options;
 using Squidex.Infrastructure.EventSourcing;
 using Xunit;
 
@@ -22,8 +20,6 @@ namespace Squidex.Infrastructure.States
         private readonly string key = Guid.NewGuid().ToString();
         private readonly IEventDataFormatter eventDataFormatter = A.Fake<IEventDataFormatter>();
         private readonly IEventStore eventStore = A.Fake<IEventStore>();
-        private readonly IMemoryCache cache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
-        private readonly IPubSub pubSub = new InMemoryPubSub(true);
         private readonly IServiceProvider services = A.Fake<IServiceProvider>();
         private readonly ISnapshotStore<int, string> snapshotStore = A.Fake<ISnapshotStore<int, string>>();
         private readonly IStreamNameResolver streamNameResolver = A.Fake<IStreamNameResolver>();
@@ -140,6 +136,52 @@ namespace Squidex.Infrastructure.States
             await persistence.ReadAsync();
 
             await Assert.ThrowsAsync<DomainObjectVersionException>(() => persistence.WriteSnapshotAsync(100));
+        }
+
+        [Fact]
+        public async Task Should_delete_snapshot_but_not_events_when_deleted()
+        {
+            var persistence = sut.WithSnapshots<object, int, string>(key, x => { });
+
+            await persistence.DeleteAsync();
+
+            A.CallTo(() => eventStore.DeleteStreamAsync(A<string>.Ignored))
+                .MustNotHaveHappened();
+
+            A.CallTo(() => snapshotStore.RemoveAsync(key))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_call_snapshot_store_on_clear()
+        {
+            await sut.ClearSnapshotsAsync<string, int>();
+
+            A.CallTo(() => snapshotStore.ClearAsync())
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_delete_snapshot_but_not_events_when_deleted_from_store()
+        {
+            await sut.RemoveSnapshotAsync<string, int>(key);
+
+            A.CallTo(() => eventStore.DeleteStreamAsync(A<string>.Ignored))
+                .MustNotHaveHappened();
+
+            A.CallTo(() => snapshotStore.RemoveAsync(key))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_get_snapshot()
+        {
+            A.CallTo(() => snapshotStore.ReadAsync(key))
+                .Returns((123, -1));
+
+            var result = await sut.GetSnapshotAsync<string, int>(key);
+
+            Assert.Equal(123, result);
         }
     }
 }

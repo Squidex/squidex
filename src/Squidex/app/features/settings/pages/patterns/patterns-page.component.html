@@ -1,41 +1,37 @@
-﻿<sqx-title message="{app} | Patterns | Settings" parameter1="app" [value1]="ctx.appName"></sqx-title>
+﻿<sqx-title message="{app} | Patterns | Settings" parameter1="app" [value1]="appsState.appName"></sqx-title>
 
-<sqx-panel desiredWidth="60rem">
-    <div class="panel-header">
-        <div class="panel-title-row">
-            <h3 class="panel-title">Patterns</h3>
-        </div>
+<sqx-panel desiredWidth="63rem" [showSidebar]="true">
+    <ng-container title>
+        Patterns
+    </ng-container>
 
-        <a class="panel-close" sqxParentLink>
-            <i class="icon-close"></i>
-        </a>
-    </div>
+    <ng-container menu>
+        <button class="btn btn-link btn-secondary" (click)="reload()" title="Refresh patterns (CTRL + SHIFT + R)">
+            <i class="icon-reset"></i> Refresh
+        </button>
 
-    <div class="panel-main">
-        <div class="panel-content panel-content-scroll">
-            <div *ngIf="appPatterns">
-                <div *ngFor="let pattern of appPatterns.patterns">
-                    <sqx-pattern [pattern]="pattern"
-                        (removing)="removePattern(pattern)"
-                        (updating)="updatePattern(pattern, $event)">
-                    </sqx-pattern>
-                </div>
-                <sqx-pattern [isNew]="true"
-                    (updating)="addPattern($event)">
-                </sqx-pattern>
+        <sqx-shortcut keys="ctrl+shift+r" (trigger)="reload()"></sqx-shortcut>
+    </ng-container>
+
+    <ng-container content>
+        <ng-container *ngIf="patternsState.patterns | async; let patterns">
+            <div class="table-items-row table-items-row-empty" *ngIf="patterns.length === 0">
+                No pattern created yet.
             </div>
-        </div>
+            
+            <sqx-pattern *ngFor="let pattern of patterns; trackBy: trackByPattern" [pattern]="pattern"></sqx-pattern>
+            <sqx-pattern></sqx-pattern>
+        </ng-container>
+    </ng-container>
 
-        
-        <div class="panel-sidebar">
-            <a class="panel-link" routerLink="history" routerLinkActive="active">
-                <i class="icon-time"></i>
-            </a>
-            <a class="panel-link" routerLink="help" routerLinkActive="active">
-                <i class="icon-help"></i>
-            </a>
-        </div>
-    </div>
+    <ng-container sidebar>
+        <a class="panel-link" routerLink="history" routerLinkActive="active">
+            <i class="icon-time"></i>
+        </a>
+        <a class="panel-link" routerLink="help" routerLinkActive="active">
+            <i class="icon-help"></i>
+        </a>
+    </ng-container>
 </sqx-panel>
 
 <router-outlet></router-outlet>

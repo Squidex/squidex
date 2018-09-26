@@ -1,0 +1,31 @@
+<sqx-title message="{app} | More | Settings" parameter1="app" [value1]="appsState.appName"></sqx-title>
+
+<sqx-panel desiredWidth="50rem">
+    <ng-container title>
+        More
+    </ng-container>
+
+    <ng-container content>
+        <div class="card border-danger">
+            <h3 class="card-header">Danger Zone</h3>
+
+            <div class="card-body">
+                <div class="row">
+                    <div class="col">
+                        <h4>Archive App</h4>
+
+                        <div>Once you archive an app, there is no going back. Please be certain.</div>
+                    </div>
+                    <div class="col-auto">
+                        <button class="btn btn-danger"
+                            (sqxConfirmClick)="archiveApp()"
+                            confirmTitle="Archive App" 
+                            confirmText="Do you really want to archive this app?">
+                            Archive App
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ng-container>
+</sqx-panel>

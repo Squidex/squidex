@@ -8,94 +8,62 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-
-import 'framework/angular/http-extensions';
+import { map, tap } from 'rxjs/operators';
 
 import {
     AnalyticsService,
     ApiUrlConfig,
     DateTime,
     HTTP,
+    Model,
+    pretifyError,
     Version,
     Versioned
-} from 'framework';
+} from '@app/framework';
 
-export class ContentsDto {
+export class ContentsDto extends Model {
     constructor(
         public readonly total: number,
         public readonly items: ContentDto[]
     ) {
+
+        super();
+    }
+
+    public with(value: Partial<ContentsDto>): ContentsDto {
+        return this.clone(value);
+    }}
+
+
+export class ScheduleDto extends Model {
+    constructor(
+        public readonly status: string,
+        public readonly scheduledBy: string,
+        public readonly dueTime: DateTime
+    ) {
+        super();
     }
 }
 
-export class ContentDto {
+export class ContentDto extends Model {
     constructor(
         public readonly id: string,
         public readonly status: string,
-        public readonly createdBy: string,
-        public readonly lastModifiedBy: string,
         public readonly created: DateTime,
+        public readonly createdBy: string,
         public readonly lastModified: DateTime,
-        public readonly scheduledTo: string | null,
-        public readonly scheduledBy: string | null,
-        public readonly scheduledAt: DateTime | null,
-        public readonly data: any,
+        public readonly lastModifiedBy: string,
+        public readonly scheduleJob: ScheduleDto | null,
+        public readonly isPending: boolean,
+        public readonly data: object | any,
+        public readonly dataDraft: object,
         public readonly version: Version
     ) {
+        super();
     }
 
-    public setData(data: any): ContentDto {
-        return new ContentDto(
-            this.id,
-            this.status,
-            this.createdBy,
-            this.lastModifiedBy,
-            this.created,
-            this.lastModified,
-            this.scheduledTo,
-            this.scheduledBy,
-            this.scheduledAt,
-            data,
-            this.version);
-    }
-
-    public changeStatus(status: string, dueTime: DateTime | null, user: string, version: Version, now?: DateTime): ContentDto {
-        if (dueTime) {
-            return new ContentDto(
-                this.id,
-                this.status,
-                this.createdBy, user,
-                this.created, now || DateTime.now(),
-                status,
-                user,
-                dueTime,
-                this.data,
-                version);
-        } else {
-            return new ContentDto(
-                this.id,
-                status,
-                this.createdBy, user,
-                this.created, now || DateTime.now(),
-                null,
-                null,
-                null,
-                this.data,
-                version);
-        }
-    }
-
-    public update(data: any, user: string, version: Version, now?: DateTime): ContentDto {
-        return new ContentDto(
-            this.id,
-            this.status,
-            this.createdBy, user,
-            this.created, now || DateTime.now(),
-            this.scheduledTo,
-            this.scheduledBy,
-            this.scheduledAt,
-            data,
-            version);
+    public with(value: Partial<ContentDto>): ContentDto {
+        return this.clone(value);
     }
 }
 
@@ -141,8 +109,8 @@ export class ContentsService {
 
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}?${fullQuery}`);
 
-        return HTTP.getVersioned<any>(this.http, url)
-                .map(response => {
+        return HTTP.getVersioned<any>(this.http, url).pipe(
+                map(response => {
                     const body = response.payload.body;
 
                     const items: any[] = body.items;
@@ -151,117 +119,131 @@ export class ContentsService {
                         return new ContentDto(
                             item.id,
                             item.status,
-                            item.createdBy,
-                            item.lastModifiedBy,
-                            DateTime.parseISO_UTC(item.created),
-                            DateTime.parseISO_UTC(item.lastModified),
-                            item.scheduledTo || null,
-                            item.scheduledBy || null,
-                            item.scheduledAt ? DateTime.parseISO_UTC(item.scheduledAt) : null,
+                            DateTime.parseISO_UTC(item.created), item.createdBy,
+                            DateTime.parseISO_UTC(item.lastModified), item.lastModifiedBy,
+                            item.scheduleJob
+                                ? new ScheduleDto(
+                                    item.scheduleJob.status,
+                                    item.scheduleJob.scheduledBy,
+                                    DateTime.parseISO_UTC(item.scheduleJob.dueTime))
+                                : null,
+                            item.isPending === true,
                             item.data,
+                            item.dataDraft,
                             new Version(item.version.toString()));
                     }));
-                })
-                .pretifyError('Failed to load contents. Please reload.');
+                }),
+                pretifyError('Failed to load contents. Please reload.'));
     }
 
     public getContent(appName: string, schemaName: string, id: string): Observable<ContentDto> {
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}`);
 
-        return HTTP.getVersioned<any>(this.http, url)
-                .map(response => {
+        return HTTP.getVersioned<any>(this.http, url).pipe(
+                map(response => {
                     const body = response.payload.body;
 
                     return new ContentDto(
                         body.id,
                         body.status,
-                        body.createdBy,
-                        body.lastModifiedBy,
-                        DateTime.parseISO_UTC(body.created),
-                        DateTime.parseISO_UTC(body.lastModified),
-                        body.scheduledTo || null,
-                        body.scheduledBy || null,
-                        body.scheduledAt || null ? DateTime.parseISO_UTC(body.scheduledAt) : null,
+                        DateTime.parseISO_UTC(body.created), body.createdBy,
+                        DateTime.parseISO_UTC(body.lastModified), body.lastModifiedBy,
+                        body.scheduleJob
+                            ? new ScheduleDto(
+                                body.scheduleJob.status,
+                                body.scheduleJob.scheduledBy,
+                                DateTime.parseISO_UTC(body.scheduleJob.dueTime))
+                            : null,
+                        body.isPending === true,
                         body.data,
+                        body.dataDraft,
                         response.version);
-                })
-                .pretifyError('Failed to load content. Please reload.');
+                }),
+                pretifyError('Failed to load content. Please reload.'));
     }
 
     public getVersionData(appName: string, schemaName: string, id: string, version: Version): Observable<any> {
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}/${version.value}`);
 
-        return HTTP.getVersioned<any>(this.http, url)
-                .map(response => {
+        return HTTP.getVersioned<any>(this.http, url).pipe(
+                map(response => {
                     return response.payload.body;
-                })
-                .pretifyError('Failed to load data. Please reload.');
+                }),
+                pretifyError('Failed to load data. Please reload.'));
     }
 
     public postContent(appName: string, schemaName: string, dto: any, publish: boolean): Observable<ContentDto> {
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}?publish=${publish}`);
 
-        return HTTP.postVersioned<any>(this.http, url, dto)
-                .map(response => {
+        return HTTP.postVersioned<any>(this.http, url, dto).pipe(
+                map(response => {
                     const body = response.payload.body;
 
                     return new ContentDto(
                         body.id,
                         body.status,
-                        body.createdBy,
-                        body.lastModifiedBy,
-                        DateTime.parseISO_UTC(body.created),
-                        DateTime.parseISO_UTC(body.lastModified),
+                        DateTime.parseISO_UTC(body.created), body.createdBy,
+                        DateTime.parseISO_UTC(body.lastModified), body.lastModifiedBy,
                         null,
-                        null,
+                        true,
                         null,
                         body.data,
                         response.version);
-                })
-                .do(content => {
+                }),
+                tap(content => {
                     this.analytics.trackEvent('Content', 'Created', appName);
-                })
-                .pretifyError('Failed to create content. Please reload.');
+                }),
+                pretifyError('Failed to create content. Please reload.'));
     }
 
-    public putContent(appName: string, schemaName: string, id: string, dto: any, version: Version): Observable<Versioned<any>> {
-        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}`);
+    public putContent(appName: string, schemaName: string, id: string, dto: any, asDraft: boolean, version: Version): Observable<Versioned<any>> {
+        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}?asDraft=${asDraft}`);
 
-        return HTTP.putVersioned(this.http, url, dto, version)
-                .map(response => {
+        return HTTP.putVersioned(this.http, url, dto, version).pipe(
+                map(response => {
                     const body = response.payload.body;
 
                     return new Versioned(response.version, body);
-                })
-                .do(() => {
+                }),
+                tap(() => {
                     this.analytics.trackEvent('Content', 'Updated', appName);
-                })
-                .pretifyError('Failed to update content. Please reload.');
+                }),
+                pretifyError('Failed to update content. Please reload.'));
     }
 
     public patchContent(appName: string, schemaName: string, id: string, dto: any, version: Version): Observable<Versioned<any>> {
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}`);
 
-        return HTTP.patchVersioned(this.http, url, dto, version)
-                .map(response => {
+        return HTTP.patchVersioned(this.http, url, dto, version).pipe(
+                map(response => {
                     const body = response.payload.body;
 
                     return new Versioned(response.version, body);
-                })
-                .do(() => {
+                }),
+                tap(() => {
                     this.analytics.trackEvent('Content', 'Updated', appName);
-                })
-                .pretifyError('Failed to update content. Please reload.');
+                }),
+                pretifyError('Failed to update content. Please reload.'));
+    }
+
+    public discardChanges(appName: string, schemaName: string, id: string, version: Version): Observable<Versioned<any>> {
+        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}/discard`);
+
+        return HTTP.putVersioned(this.http, url, {}, version).pipe(
+                tap(() => {
+                    this.analytics.trackEvent('Content', 'Discarded', appName);
+                }),
+                pretifyError('Failed to discard changes. Please reload.'));
     }
 
     public deleteContent(appName: string, schemaName: string, id: string, version: Version): Observable<Versioned<any>> {
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}`);
 
-        return HTTP.deleteVersioned(this.http, url, version)
-                .do(() => {
+        return HTTP.deleteVersioned(this.http, url, version).pipe(
+                tap(() => {
                     this.analytics.trackEvent('Content', 'Deleted', appName);
-                })
-                .pretifyError('Failed to delete content. Please reload.');
+                }),
+                pretifyError('Failed to delete content. Please reload.'));
     }
 
     public changeContentStatus(appName: string, schemaName: string, id: string, action: string, dueTime: string | null, version: Version): Observable<Versioned<any>> {
@@ -271,10 +253,10 @@ export class ContentsService {
             url += `?dueTime=${dueTime}`;
         }
 
-        return HTTP.putVersioned(this.http, url, {}, version)
-                .do(() => {
+        return HTTP.putVersioned(this.http, url, {}, version).pipe(
+                tap(() => {
                     this.analytics.trackEvent('Content', 'Archived', appName);
-                })
-                .pretifyError(`Failed to ${action} content. Please reload.`);
+                }),
+                pretifyError(`Failed to ${action} content. Please reload.`));
     }
 }

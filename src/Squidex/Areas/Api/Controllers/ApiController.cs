@@ -16,6 +16,7 @@ using Squidex.Pipeline;
 namespace Squidex.Areas.Api.Controllers
 {
     [Area("Api")]
+    [ApiModelValidation(false)]
     public abstract class ApiController : Controller
     {
         protected ICommandBus CommandBus { get; }

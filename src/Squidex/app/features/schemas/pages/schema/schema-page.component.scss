@@ -16,8 +16,16 @@
     margin-top: .25rem;
 }
 
+.btn-success {
+    margin: 0;
+}
+
 .btn-export {
     margin-right: 1rem;
+}
+
+.schemas {
+    padding-bottom: 7rem;
 }
 
 .schema {
@@ -36,11 +44,18 @@
     color: $color-border-dark;
 }
 
-.form-check {
-    margin-top: .4rem;
-    margin-bottom: -.2rem;
-}
+.field-button {
+    & {
+        @include circle(5.25rem);
+        @include box-shadow(0, 8px, 16px, .3);
+        @include absolute(auto, 6rem, 1rem, auto);
+    }
 
-.dnd-sortable-drag {
-    border: 0;
+    &-icon {
+        font-weight: bold;
+    }
+
+    &-text {
+        font-size: .9rem;
+    }
 }

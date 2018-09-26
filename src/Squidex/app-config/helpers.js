@@ -1,8 +1,4 @@
-﻿// ReSharper disable InconsistentNaming
-// ReSharper disable PossiblyUnassignedProperty
-// ReSharper disable InconsistentNaming
-
-var path = require('path');
+﻿var path = require('path');
 
 var appRoot = path.resolve(__dirname, '..');
 

@@ -5,8 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using Xunit;
+
+#pragma warning disable xUnit1000 // Test classes must be public
 
 namespace Squidex.Infrastructure.Assets
 {
@@ -21,14 +22,12 @@ namespace Squidex.Infrastructure.Assets
         {
         }
 
-        // [Fact]
+        [Fact]
         public void Should_calculate_source_url()
         {
-            Sut.Initialize();
+            var url = Sut.GenerateSourceUrl(AssetId, 1, null);
 
-            var id = Guid.NewGuid().ToString();
-
-            Assert.Equal($"https://storage.cloud.google.com/squidex-test/{id}_1", Sut.GenerateSourceUrl(id, 1, null));
+            Assert.Equal($"https://storage.cloud.google.com/squidex-test/{AssetId}_1", url);
         }
     }
 }

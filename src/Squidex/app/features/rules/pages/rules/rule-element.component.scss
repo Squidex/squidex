@@ -1,0 +1,78 @@
+@import '_vars';
+@import '_mixins';
+
+.small {
+    & {
+        @include transition(background-color .4s ease);
+        cursor: pointer;
+    }
+
+    &-text {
+        @include truncate;
+        color: $color-dark-foreground;
+        line-height: 3rem;
+        font-size: 1rem;
+        font-weight: normal;
+        padding: 0 .8rem;
+    }
+
+    &-icon {
+        line-height: 3.2rem;
+        font-size: 1.2rem;
+        font-weight: normal;
+        padding: 0 .8rem;
+    }
+
+    .col {
+        height: 3rem;
+    }
+
+    .svg-icon {
+        width: 20px;
+    }
+}
+
+.large {
+    & {
+        cursor: pointer;
+        min-height: 100px;
+        max-height: 100px;
+    }
+
+    &-link {
+        font-size: .8rem;
+    }
+
+    &-title {
+        font-weight: bold;
+        font-size: 1rem;
+        line-height: 1;
+    }
+
+    &-text {
+        font-size: .8rem;
+        margin-top: .25rem;
+        margin-bottom: .25rem;
+    }
+
+    &-icon {
+        display: inline-block;
+        margin-right: .5rem;
+        position: relative;
+        padding: 1rem;
+        line-height: 1px;
+    }
+
+    .svg-icon {
+        width: 30px;
+    }
+}
+
+.svg-icon {
+    display: inline-block;
+}
+
+/deep/ svg {
+    fill: $color-dark-foreground;
+    display: block;
+}

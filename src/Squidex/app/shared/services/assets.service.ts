@@ -8,25 +8,30 @@
 import { HttpClient, HttpEventType, HttpHeaders, HttpRequest, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { filter, map, tap } from 'rxjs/operators';
 
 import {
     AnalyticsService,
     ApiUrlConfig,
     DateTime,
     HTTP,
+    Model,
+    pretifyError,
+    Types,
     Version,
     Versioned
-} from 'framework';
+} from '@app/framework';
 
-export class AssetsDto {
+export class AssetsDto extends Model {
     constructor(
         public readonly total: number,
         public readonly items: AssetDto[]
     ) {
+        super();
     }
 }
 
-export class AssetDto {
+export class AssetDto extends Model {
     constructor(
         public readonly id: string,
         public readonly createdBy: string,
@@ -41,49 +46,55 @@ export class AssetDto {
         public readonly isImage: boolean,
         public readonly pixelWidth: number | null,
         public readonly pixelHeight: number | null,
+        public readonly tags: string[],
         public readonly url: string,
         public readonly version: Version
     ) {
+        super();
+    }
+
+    public with(value: Partial<AssetDto>): AssetDto {
+        return this.clone(value);
     }
 
     public update(update: AssetReplacedDto, user: string, version: Version, now?: DateTime): AssetDto {
-        return new AssetDto(
-            this.id,
-            this.createdBy, user,
-            this.created, now || DateTime.now(),
-            this.fileName,
-            this.fileType,
-            update.fileSize,
-            update.fileVersion,
-            update.mimeType,
-            update.isImage,
-            update.pixelWidth,
-            update.pixelHeight,
-            this.url,
-            version);
+        return this.with({
+            ...update,
+            lastModified: now || DateTime.now(),
+            lastModifiedBy: user,
+            version
+        });
     }
 
-    public rename(name: string, user: string, version: Version, now?: DateTime): AssetDto {
-        return new AssetDto(
-            this.id,
-            this.createdBy, user,
-            this.created, now || DateTime.now(),
-            name,
-            this.fileType,
-            this.fileSize,
-            this.fileVersion,
-            this.mimeType,
-            this.isImage,
-            this.pixelWidth,
-            this.pixelHeight,
-            this.url,
-            version);
+    public tag(tags: string[], user: string, version: Version, now?: DateTime): AssetDto {
+        return this.with({
+            tags,
+            lastModified: now || DateTime.now(),
+            lastModifiedBy: user,
+            version
+        });
+    }
+
+    public rename(fileName: string, user: string, version: Version, now?: DateTime): AssetDto {
+        return this.with({
+            fileName,
+            lastModified: now || DateTime.now(),
+            lastModifiedBy: user,
+            version
+        });
     }
 }
 
-export class UpdateAssetDto {
+export class RenameAssetDto {
     constructor(
         public readonly fileName: string
+    ) {
+    }
+}
+
+export class TagAssetDto {
+    constructor(
+        public readonly tags: string[]
     ) {
     }
 }
@@ -109,7 +120,14 @@ export class AssetsService {
     ) {
     }
 
-    public getAssets(appName: string, take: number, skip: number, query?: string, ids?: string[]): Observable<AssetsDto> {
+    public getTags(appName: string): Observable<{ [name: string]: number }> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/tags`);
+
+        return this.http.get(url).pipe(
+                map(response => <any>response));
+    }
+
+    public getAssets(appName: string, take: number, skip: number, query?: string, tags?: string[], ids?: string[]): Observable<AssetsDto> {
         let fullQuery = '';
 
         if (ids) {
@@ -117,8 +135,22 @@ export class AssetsService {
         } else {
             const queries: string[] = [];
 
+            const filters: string[] = [];
+
             if (query && query.length > 0) {
-                queries.push(`$filter=contains(fileName,'${encodeURIComponent(query)}')`);
+                filters.push(`contains(fileName,'${encodeURIComponent(query)}')`);
+            }
+
+            if (tags) {
+                for (let tag of tags) {
+                    if (tag && tag.length > 0) {
+                        filters.push(`tags eq '${encodeURIComponent(tag)}'`);
+                    }
+                }
+            }
+
+            if (filters.length > 0) {
+                queries.push(`$filter=${filters.join(' and ')}`);
             }
 
             queries.push(`$top=${take}`);
@@ -127,11 +159,10 @@ export class AssetsService {
             fullQuery = queries.join('&');
         }
 
-
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets?${fullQuery}`);
 
-        return HTTP.getVersioned<any>(this.http, url)
-                .map(response => {
+        return HTTP.getVersioned<any>(this.http, url).pipe(
+                map(response => {
                     const body = response.payload.body;
 
                     const items: any[] = body.items;
@@ -153,11 +184,12 @@ export class AssetsService {
                             item.isImage,
                             item.pixelWidth,
                             item.pixelHeight,
+                            item.tags || [],
                             assetUrl,
                             new Version(item.version.toString()));
                     }));
-                })
-                .pretifyError('Failed to load assets. Please reload.');
+                }),
+                pretifyError('Failed to load assets. Please reload.'));
     }
 
     public uploadFile(appName: string, file: File, user: string, now: DateTime): Observable<number | AssetDto> {
@@ -167,16 +199,16 @@ export class AssetsService {
             reportProgress: true
         });
 
-        return this.http.request<any>(req)
-                .filter(event =>
+        return this.http.request<any>(req).pipe(
+                filter(event =>
                      event.type === HttpEventType.UploadProgress ||
-                     event.type === HttpEventType.Response)
-                .map(event => {
+                     event.type === HttpEventType.Response),
+                map(event => {
                     if (event.type === HttpEventType.UploadProgress) {
                         const percentDone = event.total ? Math.round(100 * event.loaded / event.total) : 0;
 
                         return percentDone;
-                    } else if (event instanceof HttpResponse) {
+                    } else if (Types.is(event, HttpResponse)) {
                         const response: any = event.body;
                         const assetUrl = this.apiUrl.buildUrl(`api/assets/${response.id}`);
 
@@ -196,23 +228,26 @@ export class AssetsService {
                             response.isImage,
                             response.pixelWidth,
                             response.pixelHeight,
+                            response.tags || [],
                             assetUrl,
                             new Version(event.headers.get('etag')!));
 
                         return dto;
+                    } else {
+                        throw 'Invalid';
                     }
-                })
-                .do(dto => {
+                }),
+                tap(dto => {
                     this.analytics.trackEvent('Asset', 'Uploaded', appName);
-                })
-                .pretifyError('Failed to upload asset. Please reload.');
+                }),
+                pretifyError('Failed to upload asset. Please reload.'));
     }
 
     public getAsset(appName: string, id: string): Observable<AssetDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/${id}`);
 
-        return HTTP.getVersioned<any>(this.http, url)
-                .map(response => {
+        return HTTP.getVersioned<any>(this.http, url).pipe(
+                map(response => {
                     const body = response.payload.body;
 
                     const assetUrl = this.apiUrl.buildUrl(`api/assets/${body.id}`);
@@ -231,10 +266,11 @@ export class AssetsService {
                         body.isImage,
                         body.pixelWidth,
                         body.pixelHeight,
+                        body.tags || [],
                         assetUrl,
                         response.version);
-                })
-                .pretifyError('Failed to load assets. Please reload.');
+                }),
+                pretifyError('Failed to load assets. Please reload.'));
     }
 
     public replaceFile(appName: string, id: string, file: File, version: Version): Observable<number | Versioned<AssetReplacedDto>> {
@@ -247,16 +283,16 @@ export class AssetsService {
             reportProgress: true
         });
 
-        return this.http.request(req)
-                .filter(event =>
+        return this.http.request(req).pipe(
+                filter(event =>
                     event.type === HttpEventType.UploadProgress ||
-                    event.type === HttpEventType.Response)
-                .map(event => {
+                    event.type === HttpEventType.Response),
+                map(event => {
                     if (event.type === HttpEventType.UploadProgress) {
                         const percentDone = event.total ? Math.round(100 * event.loaded / event.total) : 0;
 
                         return percentDone;
-                    } else if (event instanceof HttpResponse) {
+                    } else if (Types.is(event, HttpResponse)) {
                         const response: any = event.body;
 
                         const replaced =  new AssetReplacedDto(
@@ -268,32 +304,34 @@ export class AssetsService {
                             response.pixelHeight);
 
                         return new Versioned(new Version(event.headers.get('etag')!), replaced);
+                    } else {
+                        throw 'Invalid';
                     }
-                })
-                .do(() => {
+                }),
+                tap(() => {
                     this.analytics.trackEvent('Analytics', 'Replaced', appName);
-                })
-                .pretifyError('Failed to replace asset. Please reload.');
+                }),
+                pretifyError('Failed to replace asset. Please reload.'));
     }
 
     public deleteAsset(appName: string, id: string, version: Version): Observable<Versioned<any>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/${id}`);
 
-        return HTTP.deleteVersioned(this.http, url, version)
-                .do(() => {
+        return HTTP.deleteVersioned(this.http, url, version).pipe(
+                tap(() => {
                     this.analytics.trackEvent('Analytics', 'Deleted', appName);
-                })
-                .pretifyError('Failed to delete asset. Please reload.');
+                }),
+                pretifyError('Failed to delete asset. Please reload.'));
     }
 
-    public putAsset(appName: string, id: string, dto: UpdateAssetDto, version: Version): Observable<Versioned<any>> {
+    public putAsset(appName: string, id: string, dto: RenameAssetDto | TagAssetDto, version: Version): Observable<Versioned<any>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/${id}`);
 
-        return HTTP.putVersioned(this.http, url, dto, version)
-                .do(() => {
+        return HTTP.putVersioned(this.http, url, dto, version).pipe(
+                tap(() => {
                     this.analytics.trackEvent('Analytics', 'Updated', appName);
-                })
-                .pretifyError('Failed to delete asset. Please reload.');
+                }),
+                pretifyError('Failed to delete asset. Please reload.'));
     }
 }
 

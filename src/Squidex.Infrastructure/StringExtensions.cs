@@ -327,7 +327,7 @@ namespace Squidex.Infrastructure
         {
             var sb = new StringBuilder();
 
-            foreach (var part in value.Split('-', '_', ' '))
+            foreach (var part in value.Split(new[] { '-', '_', ' ' }, StringSplitOptions.RemoveEmptyEntries))
             {
                 if (part.Length < 2)
                 {
@@ -338,6 +338,23 @@ namespace Squidex.Infrastructure
                     sb.Append(char.ToUpper(part[0]));
                     sb.Append(part.Substring(1));
                 }
+            }
+
+            return sb.ToString();
+        }
+
+        public static string ToKebabCase(this string value)
+        {
+            var sb = new StringBuilder();
+
+            foreach (var part in value.Split(new[] { '-', '_', ' ' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                if (sb.Length > 0)
+                {
+                    sb.Append("-");
+                }
+
+                sb.Append(part.ToLower());
             }
 
             return sb.ToString();

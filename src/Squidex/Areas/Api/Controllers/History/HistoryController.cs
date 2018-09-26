@@ -12,7 +12,6 @@ using NSwag.Annotations;
 using Squidex.Areas.Api.Controllers.History.Models;
 using Squidex.Domain.Apps.Entities.History.Repositories;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
 
 namespace Squidex.Areas.Api.Controllers.History
@@ -52,7 +51,7 @@ namespace Squidex.Areas.Api.Controllers.History
         {
             var entities = await historyEventRepository.QueryByChannelAsync(App.Id, channel, 100);
 
-            var response = entities.Select(x => SimpleMapper.Map(x, new HistoryEventDto())).ToList();
+            var response = entities.Select(HistoryEventDto.FromHistoryEvent).ToList();
 
             return Ok(response);
         }

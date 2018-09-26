@@ -6,87 +6,54 @@
  */
 
 import { Component, OnInit } from '@angular/core';
+import { onErrorResumeNext } from 'rxjs/operators';
 
 import {
-    AppContext,
-    ImmutableArray,
-    Pager,
+    AppsState,
     RuleEventDto,
-    RulesService
-} from 'shared';
+    RuleEventsState
+} from '@app/shared';
 
 @Component({
     selector: 'sqx-rule-events-page',
     styleUrls: ['./rule-events-page.component.scss'],
-    templateUrl: './rule-events-page.component.html',
-    providers: [
-        AppContext
-    ]
+    templateUrl: './rule-events-page.component.html'
 })
 export class RuleEventsPageComponent implements OnInit {
-    public eventsItems = ImmutableArray.empty<RuleEventDto>();
-    public eventsPager = new Pager(0);
-
     public selectedEventId: string | null = null;
 
-    constructor(public readonly ctx: AppContext,
-        private readonly rulesService: RulesService
+    constructor(
+        public readonly appsState: AppsState,
+        public readonly ruleEventsState: RuleEventsState
     ) {
     }
 
     public ngOnInit() {
-        this.load();
+        this.ruleEventsState.load().pipe(onErrorResumeNext()).subscribe();
     }
 
-    public load(showInfo = false) {
-        this.rulesService.getEvents(this.ctx.appName, this.eventsPager.pageSize, this.eventsPager.skip)
-            .subscribe(dtos => {
-                this.eventsItems = ImmutableArray.of(dtos.items);
-                this.eventsPager = this.eventsPager.setCount(dtos.total);
-
-                if (showInfo) {
-                    this.ctx.notifyInfo('Events reloaded.');
-                }
-            }, error => {
-                this.ctx.notifyError(error);
-            });
+    public reload() {
+        this.ruleEventsState.load(true).pipe(onErrorResumeNext()).subscribe();
     }
 
-    public enqueueEvent(event: RuleEventDto) {
-        this.rulesService.enqueueEvent(this.ctx.appName, event.id)
-            .subscribe(() => {
-                this.ctx.notifyInfo('Events enqueued. Will be resend in a few seconds.');
-            }, error => {
-                this.ctx.notifyError(error);
-            });
+    public goNext() {
+        this.ruleEventsState.goNext().pipe(onErrorResumeNext()).subscribe();
+    }
+
+    public goPrev() {
+        this.ruleEventsState.goPrev().pipe(onErrorResumeNext()).subscribe();
+    }
+
+    public enqueue(event: RuleEventDto) {
+        this.ruleEventsState.enqueue(event).pipe(onErrorResumeNext()).subscribe();
     }
 
     public selectEvent(id: string) {
         this.selectedEventId = this.selectedEventId !== id ? id : null;
     }
 
-    public goNext() {
-        this.eventsPager = this.eventsPager.goNext();
-
-        this.load();
-    }
-
-    public goPrev() {
-        this.eventsPager = this.eventsPager.goPrev();
-
-        this.load();
-    }
-
-    public getBadgeClass(status: string) {
-        if (status === 'Retry') {
-            return 'warning';
-        } else if (status === 'Failed') {
-            return 'danger';
-        } else if (status === 'Pending') {
-            return 'default';
-        } else {
-            return status.toLowerCase();
-        }
+    public trackByRuleEvent(index: number, ruleEvent: RuleEventDto) {
+        return ruleEvent.id;
     }
 }
 

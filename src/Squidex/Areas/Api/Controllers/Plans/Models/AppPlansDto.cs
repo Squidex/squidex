@@ -6,6 +6,10 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Entities.Apps.Services;
 
 namespace Squidex.Areas.Api.Controllers.Plans.Models
 {
@@ -14,6 +18,7 @@ namespace Squidex.Areas.Api.Controllers.Plans.Models
         /// <summary>
         /// The available plans.
         /// </summary>
+        [Required]
         public List<PlanDto> Plans { get; set; }
 
         /// <summary>
@@ -30,5 +35,20 @@ namespace Squidex.Areas.Api.Controllers.Plans.Models
         /// Indicates if there is a billing portal.
         /// </summary>
         public bool HasPortal { get; set; }
+
+        public static AppPlansDto FromApp(IAppEntity app, IAppPlansProvider plans, bool hasPortal)
+        {
+            var planId = plans.GetPlanForApp(app).Id;
+
+            var response = new AppPlansDto
+            {
+                CurrentPlanId = planId,
+                Plans = plans.GetAvailablePlans().Select(PlanDto.FromPlan).ToList(),
+                PlanOwner = app.Plan?.Owner.Identifier,
+                HasPortal = hasPortal
+            };
+
+            return response;
+        }
     }
 }

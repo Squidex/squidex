@@ -10,7 +10,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    [TypeName(nameof(ReferencesField))]
+    [TypeName("ReferencesField")]
     public sealed class ReferencesFieldProperties : FieldProperties
     {
         public int? MinItems { get; set; }
@@ -24,9 +24,19 @@ namespace Squidex.Domain.Apps.Core.Schemas
             return visitor.Visit(this);
         }
 
-        public override Field CreateField(long id, string name, Partitioning partitioning)
+        public override T Accept<T>(IFieldVisitor<T> visitor, IField field)
         {
-            return new ReferencesField(id, name, partitioning, this);
+            return visitor.Visit((IField<ReferencesFieldProperties>)field);
+        }
+
+        public override RootField CreateRootField(long id, string name, Partitioning partitioning)
+        {
+            return Fields.References(id, name, partitioning, this);
+        }
+
+        public override NestedField CreateNestedField(long id, string name)
+        {
+            return Fields.References(id, name, this);
         }
     }
 }

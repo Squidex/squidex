@@ -8,13 +8,13 @@
 using System;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
-using Squidex.Domain.Apps.Entities.Apps.Guards;
+using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Xunit;
 
 #pragma warning disable SA1310 // Field names must not contain underscore
 
-namespace Squidex.Domain.Apps.Write.Apps.Guards
+namespace Squidex.Domain.Apps.Entities.Apps.Guards
 {
     public class GuardAppPatternsTests
     {
@@ -26,15 +26,8 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
         {
             var command = new AddPattern { PatternId = patternId, Name = string.Empty, Pattern = ".*" };
 
-            Assert.Throws<ValidationException>(() => GuardAppPattern.CanAdd(patterns_0, command));
-        }
-
-        [Fact]
-        public void CanAdd_should_throw_exception_if_id_empty_guid()
-        {
-            var command = new AddPattern { Name = string.Empty, Pattern = ".*" };
-
-            Assert.Throws<ValidationException>(() => GuardAppPattern.CanAdd(patterns_0, command));
+            ValidationAssert.Throws(() => GuardAppPattern.CanAdd(patterns_0, command),
+                new ValidationError("Name is required.", "Name"));
         }
 
         [Fact]
@@ -42,7 +35,8 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
         {
             var command = new AddPattern { PatternId = patternId, Name = "any", Pattern = string.Empty };
 
-            Assert.Throws<ValidationException>(() => GuardAppPattern.CanAdd(patterns_0, command));
+            ValidationAssert.Throws(() => GuardAppPattern.CanAdd(patterns_0, command),
+                new ValidationError("Pattern is required.", "Pattern"));
         }
 
         [Fact]
@@ -50,7 +44,8 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
         {
             var command = new AddPattern { PatternId = patternId, Name = "any", Pattern = "[0-9{1}" };
 
-            Assert.Throws<ValidationException>(() => GuardAppPattern.CanAdd(patterns_0, command));
+            ValidationAssert.Throws(() => GuardAppPattern.CanAdd(patterns_0, command),
+                new ValidationError("Pattern is not a valid regular expression.", "Pattern"));
         }
 
         [Fact]
@@ -60,7 +55,19 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
 
             var command = new AddPattern { PatternId = patternId, Name = "any", Pattern = ".*" };
 
-            Assert.Throws<ValidationException>(() => GuardAppPattern.CanAdd(patterns_1, command));
+            ValidationAssert.Throws(() => GuardAppPattern.CanAdd(patterns_1, command),
+                new ValidationError("A pattern with the same name already exists."));
+        }
+
+        [Fact]
+        public void CanAdd_should_throw_exception_if_pattern_exists()
+        {
+            var patterns_1 = patterns_0.Add(Guid.NewGuid(), "any", "[a-z]", "Message");
+
+            var command = new AddPattern { PatternId = patternId, Name = "other", Pattern = "[a-z]" };
+
+            ValidationAssert.Throws(() => GuardAppPattern.CanAdd(patterns_1, command),
+                new ValidationError("This pattern already exists but with another name."));
         }
 
         [Fact]
@@ -96,7 +103,8 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
 
             var command = new UpdatePattern { PatternId = patternId, Name = string.Empty, Pattern = ".*" };
 
-            Assert.Throws<ValidationException>(() => GuardAppPattern.CanUpdate(patterns_1, command));
+            ValidationAssert.Throws(() => GuardAppPattern.CanUpdate(patterns_1, command),
+                new ValidationError("Name is required.", "Name"));
         }
 
         [Fact]
@@ -106,7 +114,8 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
 
             var command = new UpdatePattern { PatternId = patternId, Name = "any", Pattern = string.Empty };
 
-            Assert.Throws<ValidationException>(() => GuardAppPattern.CanUpdate(patterns_1, command));
+            ValidationAssert.Throws(() => GuardAppPattern.CanUpdate(patterns_1, command),
+                new ValidationError("Pattern is required.", "Pattern"));
         }
 
         [Fact]
@@ -116,7 +125,8 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
 
             var command = new UpdatePattern { PatternId = patternId, Name = "any", Pattern = "[0-9{1}" };
 
-            Assert.Throws<ValidationException>(() => GuardAppPattern.CanUpdate(patterns_1, command));
+            ValidationAssert.Throws(() => GuardAppPattern.CanUpdate(patterns_1, command),
+                new ValidationError("Pattern is not a valid regular expression.", "Pattern"));
         }
 
         [Fact]
@@ -130,7 +140,8 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
 
             var command = new UpdatePattern { PatternId = id2, Name = "Pattern1", Pattern = "[0-4]" };
 
-            Assert.Throws<ValidationException>(() => GuardAppPattern.CanUpdate(patterns_2, command));
+            ValidationAssert.Throws(() => GuardAppPattern.CanUpdate(patterns_2, command),
+                new ValidationError("A pattern with the same name already exists."));
         }
 
         [Fact]
@@ -144,7 +155,8 @@ namespace Squidex.Domain.Apps.Write.Apps.Guards
 
             var command = new UpdatePattern { PatternId = id2, Name = "Pattern2", Pattern = "[0-5]" };
 
-            Assert.Throws<ValidationException>(() => GuardAppPattern.CanUpdate(patterns_2, command));
+            ValidationAssert.Throws(() => GuardAppPattern.CanUpdate(patterns_2, command),
+                new ValidationError("This pattern already exists but with another name."));
         }
 
         [Fact]

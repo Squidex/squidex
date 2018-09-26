@@ -1,0 +1,40 @@
+<div *ngIf="!isReadonly || (schemasForCategory && schemasForCategory.length > 0)" dnd-droppable class="droppable category" [allowDrop]="allowDrop" (onDropSuccess)="changeCategory($event.dragData)">
+    <div class="drop-indicator"></div>
+
+    <div class="header clearfix">
+        <a class="btn btn-sm btn-link" (click)="toggle()">
+            <i [class.icon-caret-right]="!isOpen" [class.icon-caret-down]="isOpen"></i> 
+        </a>
+
+        <h3>{{displayName}} ({{schemasForCategory.length}})</h3>
+        
+        
+        <a class="btn btn-sm btn-link float-right" *ngIf="schemasForCategory.length === 0 && !isReadonly" (click)="removing.emit()">
+            <i class="icon-bin"></i> 
+        </a>
+    </div>
+
+    <ul class="nav nav-panel nav-dark nav-dark-bordered flex-column" *ngIf="isOpen" @fade>
+        <li class="nav-item" *ngFor="let schema of schemasFiltered; trackBy: trackBySchema" dnd-draggable [dragEnabled]="!isReadonly" [dragData]="schema">
+            <a class="nav-link" [routerLink]="[schema.name]" routerLinkActive="active">
+                <div class="row" *ngIf="!isReadonly">
+                    <div class="col col-4">
+                        <span class="schema-name schema-name-accent">{{schema.displayName}}</span> 
+                    </div>
+                    <div class="col col-4">
+                        <span class="schema-user">
+                            <i class="icon-user"></i> {{schema.lastModifiedBy | sqxUserNameRef}}
+                        </span>
+                    </div>
+                    <div class="col col-4 schema-modified">
+                        <small class="item-modified">{{schema.lastModified | sqxFromNow}}</small>
+                        
+                        <span class="item-published" [class.unpublished]="!schema.isPublished"></span>
+                    </div>
+                </div>
+
+                <span class="schema-name" *ngIf="isReadonly">{{schema.displayName}}</span>
+            </a>
+        </li>
+    </ul>
+</div>

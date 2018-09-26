@@ -6,7 +6,8 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Observable, Observer, ReplaySubject, TimeoutError } from 'rxjs';
+import { Observable, Observer, of, ReplaySubject, throwError, TimeoutError } from 'rxjs';
+import { concat, delay, mergeMap, retryWhen, take } from 'rxjs/operators';
 
 import {
     Log,
@@ -15,7 +16,8 @@ import {
     WebStorageStateStore
 } from 'oidc-client';
 
-import { ApiUrlConfig } from 'framework';
+import { ApiUrlConfig, Types } from '@app/framework';
+import { timeout } from 'rxjs/internal/operators/timeout';
 
 export class Profile {
     public get id(): string {
@@ -161,12 +163,13 @@ export class AuthService {
                     });
             });
 
-        return observable.timeout(2000)
-            .retryWhen(errors => errors
-                .mergeMap(e => e instanceof TimeoutError ? Observable.of(e) : Observable.throw(e))
-                .delay(500)
-                .take(5)
-                .concat(Observable.throw(new Error('Retry limit exceeded.'))));
+        return observable.pipe(
+            timeout(2000),
+            retryWhen(errors => errors.pipe(
+                mergeMap(e => Types.is(e, TimeoutError) ? of(e) : throwError(e)),
+                delay(500),
+                take(5),
+                concat(throwError(new Error('Retry limit exceeded.'))))));
     }
 
     private createProfile(user: User): Profile {

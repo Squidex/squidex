@@ -19,28 +19,28 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            return Validate.It(() => "Cannot create rule.", async error =>
+            return Validate.It(() => "Cannot create rule.", async e =>
             {
                 if (command.Trigger == null)
                 {
-                    error(new ValidationError("Trigger is required.", nameof(command.Trigger)));
+                    e("Trigger is required.", nameof(command.Trigger));
                 }
                 else
                 {
                     var errors = await RuleTriggerValidator.ValidateAsync(command.AppId.Id, command.Trigger, appProvider);
 
-                    errors.Foreach(error);
+                    errors.Foreach(x => x.AddTo(e));
                 }
 
                 if (command.Action == null)
                 {
-                    error(new ValidationError("Trigger is required.", nameof(command.Action)));
+                    e("Action is required.", nameof(command.Action));
                 }
                 else
                 {
-                    var errors = await RuleActionValidator.ValidateAsync(command.Action);
+                    var errors = command.Action.Validate();
 
-                    errors.Foreach(error);
+                    errors.Foreach(x => x.AddTo(e));
                 }
             });
         }
@@ -49,25 +49,25 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            return Validate.It(() => "Cannot update rule.", async error =>
+            return Validate.It(() => "Cannot update rule.", async e =>
             {
                 if (command.Trigger == null && command.Action == null)
                 {
-                    error(new ValidationError("Either trigger or action is required.", nameof(command.Trigger), nameof(command.Action)));
+                    e("Either trigger or action is required.", nameof(command.Trigger), nameof(command.Action));
                 }
 
                 if (command.Trigger != null)
                 {
                     var errors = await RuleTriggerValidator.ValidateAsync(appId, command.Trigger, appProvider);
 
-                    errors.Foreach(error);
+                    errors.Foreach(x => x.AddTo(e));
                 }
 
                 if (command.Action != null)
                 {
-                    var errors = await RuleActionValidator.ValidateAsync(command.Action);
+                    var errors = command.Action.Validate();
 
-                    errors.Foreach(error);
+                    errors.Foreach(x => x.AddTo(e));
                 }
             });
         }
@@ -76,26 +76,20 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            Validate.It(() => "Cannot enable rule.", error =>
+            if (rule.IsEnabled)
             {
-                if (rule.IsEnabled)
-                {
-                    error(new ValidationError("Rule is already enabled."));
-                }
-            });
+                throw new DomainException("Rule is already enabled.");
+            }
         }
 
         public static void CanDisable(DisableRule command, Rule rule)
         {
             Guard.NotNull(command, nameof(command));
 
-            Validate.It(() => "Cannot disable rule.", error =>
+            if (!rule.IsEnabled)
             {
-                if (!rule.IsEnabled)
-                {
-                    error(new ValidationError("Rule is already disabled."));
-                }
-            });
+                throw new DomainException("Rule is already disabled.");
+            }
         }
 
         public static void CanDelete(DeleteRule command)

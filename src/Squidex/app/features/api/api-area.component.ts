@@ -7,19 +7,16 @@
 
 import { Component } from '@angular/core';
 
-import { AppContext } from 'shared';
+import { AppsState } from '@app/shared';
 
 @Component({
     selector: 'sqx-api-area',
     styleUrls: ['./api-area.component.scss'],
-    templateUrl: './api-area.component.html',
-    providers: [
-        AppContext
-    ]
+    templateUrl: './api-area.component.html'
 })
 export class ApiAreaComponent {
     constructor(
-        public readonly ctx: AppContext
+        public readonly appsState: AppsState
     ) {
     }
 }

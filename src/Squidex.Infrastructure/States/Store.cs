@@ -32,30 +32,45 @@ namespace Squidex.Infrastructure.States
 
         public IPersistence<TState> WithSnapshots<TState>(Type owner, TKey key, Func<TState, Task> applySnapshot)
         {
-            return CreatePersistence<TState>(owner, key, PersistenceMode.Snapshots, applySnapshot, null);
+            return CreatePersistence(owner, key, PersistenceMode.Snapshots, applySnapshot, null);
         }
 
         public IPersistence<TState> WithSnapshotsAndEventSourcing<TState>(Type owner, TKey key, Func<TState, Task> applySnapshot, Func<Envelope<IEvent>, Task> applyEvent)
         {
-            return CreatePersistence<TState>(owner, key, PersistenceMode.SnapshotsAndEventSourcing, applySnapshot, applyEvent);
+            return CreatePersistence(owner, key, PersistenceMode.SnapshotsAndEventSourcing, applySnapshot, applyEvent);
         }
 
         public IPersistence WithEventSourcing(Type owner, TKey key, Func<Envelope<IEvent>, Task> applyEvent)
         {
-            Guard.NotDefault(key, nameof(key));
+            Guard.NotNull(key, nameof(key));
 
-            var snapshotStore = (ISnapshotStore<object, TKey>)services.GetService(typeof(ISnapshotStore<object, TKey>));
+            var snapshotStore = GetSnapshotStore<object>();
 
             return new Persistence<TKey>(key, owner, eventStore, eventDataFormatter, snapshotStore, streamNameResolver, applyEvent);
         }
 
         private IPersistence<TState> CreatePersistence<TState>(Type owner, TKey key, PersistenceMode mode, Func<TState, Task> applySnapshot, Func<Envelope<IEvent>, Task> applyEvent)
         {
-            Guard.NotDefault(key, nameof(key));
+            Guard.NotNull(key, nameof(key));
 
-            var snapshotStore = (ISnapshotStore<TState, TKey>)services.GetService(typeof(ISnapshotStore<TState, TKey>));
+            var snapshotStore = GetSnapshotStore<TState>();
 
             return new Persistence<TState, TKey>(key, owner, eventStore, eventDataFormatter, snapshotStore, streamNameResolver, mode, applySnapshot, applyEvent);
+        }
+
+        public Task ClearSnapshotsAsync<TState>()
+        {
+            return GetSnapshotStore<TState>().ClearAsync();
+        }
+
+        public Task RemoveSnapshotAsync<TState>(TKey key)
+        {
+            return GetSnapshotStore<TState>().RemoveAsync(key);
+        }
+
+        public ISnapshotStore<TState, TKey> GetSnapshotStore<TState>()
+        {
+            return (ISnapshotStore<TState, TKey>)services.GetService(typeof(ISnapshotStore<TState, TKey>));
         }
     }
 }

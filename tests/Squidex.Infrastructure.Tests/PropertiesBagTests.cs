@@ -346,7 +346,7 @@ namespace Squidex.Infrastructure
 
         private void AssertNumber()
         {
-            AssertInt64(123);
+            AssertInt32(123);
             AssertInt64(123);
             AssertSingle(123);
             AssertDouble(123);
@@ -410,7 +410,7 @@ namespace Squidex.Infrastructure
             Assert.Equal(expected, (float?)dynamicBag.Key);
         }
 
-        private void AssertInt64(long expected)
+        private void AssertInt32(long expected)
         {
             Assert.Equal(expected, bag["Key"].ToInt64(c));
             Assert.Equal(expected, bag["Key"].ToNullableInt64(c));

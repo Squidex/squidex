@@ -6,26 +6,22 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using Microsoft.OData.UriParser;
 using MongoDB.Driver;
+using Squidex.Infrastructure.Queries;
 
 namespace Squidex.Infrastructure.MongoDb.OData
 {
     public static class SortBuilder
     {
-        public static SortDefinition<T> BuildSort<T>(this ODataUriParser query, PropertyCalculator propertyCalculator = null)
+        public static SortDefinition<T> BuildSort<T>(this Query query)
         {
-            var orderBy = query.ParseOrderBy();
-
-            if (orderBy != null)
+            if (query.Sort.Count > 0)
             {
                 var sorts = new List<SortDefinition<T>>();
 
-                while (orderBy != null)
+                foreach (var sort in query.Sort)
                 {
-                    sorts.Add(OrderBy<T>(orderBy, propertyCalculator));
-
-                    orderBy = orderBy.ThenBy;
+                    sorts.Add(OrderBy<T>(sort));
                 }
 
                 if (sorts.Count > 1)
@@ -41,11 +37,11 @@ namespace Squidex.Infrastructure.MongoDb.OData
             return null;
         }
 
-        public static SortDefinition<T> OrderBy<T>(OrderByClause clause, PropertyCalculator propertyCalculator = null)
+        public static SortDefinition<T> OrderBy<T>(SortNode sort)
         {
-            var propertyName = clause.Expression.BuildFieldDefinition<T>(propertyCalculator);
+            var propertyName = string.Join(".", sort.Path);
 
-            if (clause.Direction == OrderByDirection.Ascending)
+            if (sort.SortOrder == SortOrder.Ascending)
             {
                 return Builders<T>.Sort.Ascending(propertyName);
             }

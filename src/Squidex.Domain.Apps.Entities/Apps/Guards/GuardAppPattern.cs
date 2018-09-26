@@ -18,30 +18,35 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             Guard.NotNull(command, nameof(command));
 
-            Validate.It(() => "Cannot add pattern.", error =>
+            Validate.It(() => "Cannot add pattern.", e =>
             {
+                if (command.PatternId == Guid.Empty)
+                {
+                    e("Id is required.", nameof(command.PatternId));
+                }
+
                 if (string.IsNullOrWhiteSpace(command.Name))
                 {
-                    error(new ValidationError("Pattern name can not be empty.", nameof(command.Name)));
+                    e("Name is required.", nameof(command.Name));
                 }
 
                 if (patterns.Values.Any(x => x.Name.Equals(command.Name, StringComparison.OrdinalIgnoreCase)))
                 {
-                    error(new ValidationError("Pattern name is already assigned.", nameof(command.Name)));
+                    e("A pattern with the same name already exists.");
                 }
 
                 if (string.IsNullOrWhiteSpace(command.Pattern))
                 {
-                    error(new ValidationError("Pattern can not be empty.", nameof(command.Pattern)));
+                    e("Pattern is required.", nameof(command.Pattern));
                 }
                 else if (!command.Pattern.IsValidRegex())
                 {
-                    error(new ValidationError("Pattern is not a valid regular expression.", nameof(command.Pattern)));
+                    e("Pattern is not a valid regular expression.", nameof(command.Pattern));
                 }
 
                 if (patterns.Values.Any(x => x.Pattern == command.Pattern))
                 {
-                    error(new ValidationError("Pattern already exists.", nameof(command.Pattern)));
+                    e("This pattern already exists but with another name.");
                 }
             });
         }
@@ -65,30 +70,30 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                 throw new DomainObjectNotFoundException(command.PatternId.ToString(), typeof(AppPattern));
             }
 
-            Validate.It(() => "Cannot update pattern.", error =>
+            Validate.It(() => "Cannot update pattern.", e =>
             {
                 if (string.IsNullOrWhiteSpace(command.Name))
                 {
-                    error(new ValidationError("Pattern name can not be empty.", nameof(command.Name)));
+                    e("Name is required.", nameof(command.Name));
                 }
 
                 if (patterns.Any(x => x.Key != command.PatternId && x.Value.Name.Equals(command.Name, StringComparison.OrdinalIgnoreCase)))
                 {
-                    error(new ValidationError("Pattern name is already assigned.", nameof(command.Name)));
+                    e("A pattern with the same name already exists.");
                 }
 
                 if (string.IsNullOrWhiteSpace(command.Pattern))
                 {
-                    error(new ValidationError("Pattern can not be empty.", nameof(command.Pattern)));
+                    e("Pattern is required.", nameof(command.Pattern));
                 }
                 else if (!command.Pattern.IsValidRegex())
                 {
-                    error(new ValidationError("Pattern is not a valid regular expression.", nameof(command.Pattern)));
+                    e("Pattern is not a valid regular expression.", nameof(command.Pattern));
                 }
 
                 if (patterns.Any(x => x.Key != command.PatternId && x.Value.Pattern == command.Pattern))
                 {
-                    error(new ValidationError("Pattern already exists.", nameof(command.Pattern)));
+                    e("This pattern already exists but with another name.");
                 }
             });
         }

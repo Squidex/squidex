@@ -11,6 +11,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using EventStore.ClientAPI;
+using Squidex.Infrastructure.Log;
 
 namespace Squidex.Infrastructure.EventSourcing
 {
@@ -20,7 +21,7 @@ namespace Squidex.Infrastructure.EventSourcing
         private const int ReadPageSize = 500;
         private readonly IEventStoreConnection connection;
         private readonly string prefix;
-        private ProjectionClient projectionClient;
+        private readonly ProjectionClient projectionClient;
 
         public GetEventStore(IEventStoreConnection connection, string prefix, string projectionHost)
         {
@@ -49,7 +50,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public IEventSubscription CreateSubscription(IEventSubscriber subscriber, string streamFilter, string position = null)
         {
-            return new GetEventStoreSubscription(connection, subscriber, projectionClient, prefix, position, streamFilter);
+            return new GetEventStoreSubscription(connection, subscriber, projectionClient, position, streamFilter);
         }
 
         public Task CreateIndexAsync(string property)
@@ -59,33 +60,30 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public async Task QueryAsync(Func<StoredEvent, Task> callback, string property, object value, string position = null, CancellationToken ct = default(CancellationToken))
         {
-            var streamName = await projectionClient.CreateProjectionAsync(property, value);
+            using (Profiler.TraceMethod<GetEventStore>())
+            {
+                var streamName = await projectionClient.CreateProjectionAsync(property, value);
 
-            var sliceStart = projectionClient.ParsePosition(position);
+                var sliceStart = projectionClient.ParsePosition(position);
 
-            await QueryAsync(callback, streamName, sliceStart, ct);
+                await QueryAsync(callback, streamName, sliceStart, ct);
+            }
         }
 
         public async Task QueryAsync(Func<StoredEvent, Task> callback, string streamFilter = null, string position = null, CancellationToken ct = default(CancellationToken))
         {
-            var streamName = await projectionClient.CreateProjectionAsync(streamFilter);
+            using (Profiler.TraceMethod<GetEventStore>())
+            {
+                var streamName = await projectionClient.CreateProjectionAsync(streamFilter);
 
-            var sliceStart = projectionClient.ParsePosition(position);
+                var sliceStart = projectionClient.ParsePosition(position);
 
-            await QueryAsync(callback, streamName, sliceStart, ct);
+                await QueryAsync(callback, streamName, sliceStart, ct);
+            }
         }
 
-        private Task QueryAsync(Func<StoredEvent, Task> callback, string streamName, long sliceStart, CancellationToken ct)
+        private async Task QueryAsync(Func<StoredEvent, Task> callback, string streamName, long sliceStart, CancellationToken ct)
         {
-            return QueryAsync(callback, GetStreamName(streamName), sliceStart, ct);
-        }
-
-        public async Task<IReadOnlyList<StoredEvent>> QueryAsync(string streamName, long streamPosition = 0)
-        {
-            var result = new List<StoredEvent>();
-
-            var sliceStart = streamPosition;
-
             StreamEventsSlice currentSlice;
             do
             {
@@ -99,13 +97,47 @@ namespace Squidex.Infrastructure.EventSourcing
                     {
                         var storedEvent = Formatter.Read(resolved);
 
-                        result.Add(storedEvent);
+                        await callback(storedEvent);
                     }
                 }
             }
-            while (!currentSlice.IsEndOfStream);
+            while (!currentSlice.IsEndOfStream && !ct.IsCancellationRequested);
+        }
 
-            return result;
+        public async Task<IReadOnlyList<StoredEvent>> QueryAsync(string streamName, long streamPosition = 0)
+        {
+            using (Profiler.TraceMethod<GetEventStore>())
+            {
+                var result = new List<StoredEvent>();
+
+                var sliceStart = streamPosition;
+
+                StreamEventsSlice currentSlice;
+                do
+                {
+                    currentSlice = await connection.ReadStreamEventsForwardAsync(streamName, sliceStart, ReadPageSize, false);
+
+                    if (currentSlice.Status == SliceReadStatus.Success)
+                    {
+                        sliceStart = currentSlice.NextEventNumber;
+
+                        foreach (var resolved in currentSlice.Events)
+                        {
+                            var storedEvent = Formatter.Read(resolved);
+
+                            result.Add(storedEvent);
+                        }
+                    }
+                }
+                while (!currentSlice.IsEndOfStream);
+
+                return result;
+            }
+        }
+
+        public Task DeleteStreamAsync(string streamName)
+        {
+            return connection.DeleteStreamAsync(streamName, ExpectedVersion.Any);
         }
 
         public Task AppendAsync(Guid commitId, string streamName, ICollection<EventData> events)
@@ -122,32 +154,40 @@ namespace Squidex.Infrastructure.EventSourcing
 
         private async Task AppendEventsInternalAsync(string streamName, long expectedVersion, ICollection<EventData> events)
         {
-            Guard.NotNullOrEmpty(streamName, nameof(streamName));
-            Guard.NotNull(events, nameof(events));
-
-            if (events.Count == 0)
+            using (Profiler.TraceMethod<GetEventStore>(nameof(AppendAsync)))
             {
-                return;
-            }
+                Guard.NotNullOrEmpty(streamName, nameof(streamName));
+                Guard.NotNull(events, nameof(events));
 
-            var eventsToSave = events.Select(Formatter.Write).ToList();
-
-            if (eventsToSave.Count < WritePageSize)
-            {
-                await connection.AppendToStreamAsync(GetStreamName(streamName), expectedVersion, eventsToSave);
-            }
-            else
-            {
-                using (var transaction = await connection.StartTransactionAsync(GetStreamName(streamName), expectedVersion))
+                if (events.Count == 0)
                 {
-                    for (var p = 0; p < eventsToSave.Count; p += WritePageSize)
-                    {
-                        await transaction.WriteAsync(eventsToSave.Skip(p).Take(WritePageSize));
-                    }
+                    return;
+                }
 
-                    await transaction.CommitAsync();
+                var eventsToSave = events.Select(Formatter.Write).ToList();
+
+                if (eventsToSave.Count < WritePageSize)
+                {
+                    await connection.AppendToStreamAsync(GetStreamName(streamName), expectedVersion, eventsToSave);
+                }
+                else
+                {
+                    using (var transaction = await connection.StartTransactionAsync(GetStreamName(streamName), expectedVersion))
+                    {
+                        for (var p = 0; p < eventsToSave.Count; p += WritePageSize)
+                        {
+                            await transaction.WriteAsync(eventsToSave.Skip(p).Take(WritePageSize));
+                        }
+
+                        await transaction.CommitAsync();
+                    }
                 }
             }
+        }
+
+        public Task DeleteManyAsync(string property, object value)
+        {
+            throw new NotSupportedException();
         }
 
         private string GetStreamName(string streamName)

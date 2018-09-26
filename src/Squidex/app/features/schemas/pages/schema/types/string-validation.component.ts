@@ -8,12 +8,15 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
+import { map, startWith } from 'rxjs/operators';
 
 import {
     AppPatternDto,
-    ModalView,
+    FieldDto,
+    ImmutableArray,
+    ModalModel,
     StringFieldPropertiesDto
-} from 'shared';
+} from '@app/shared';
 
 @Component({
     selector: 'sqx-string-validation',
@@ -27,17 +30,20 @@ export class StringValidationComponent implements OnDestroy, OnInit {
     public editForm: FormGroup;
 
     @Input()
+    public field: FieldDto;
+
+    @Input()
     public properties: StringFieldPropertiesDto;
 
     @Input()
-    public regexSuggestions: AppPatternDto[] = [];
+    public patterns: ImmutableArray<AppPatternDto>;
 
     public showDefaultValue: Observable<boolean>;
     public showPatternMessage: boolean;
     public showPatternSuggestions: Observable<boolean>;
-    public patternName: string;
 
-    public regexSuggestionsModal = new ModalView(false, false);
+    public patternName: string;
+    public patternsModal = new ModalModel();
 
     public ngOnDestroy() {
         this.patternSubscription.unsubscribe();
@@ -60,14 +66,12 @@ export class StringValidationComponent implements OnDestroy, OnInit {
             new FormControl(this.properties.defaultValue));
 
         this.showDefaultValue =
-            this.editForm.controls['isRequired'].valueChanges
-                .startWith(this.properties.isRequired)
-                .map(x => !x);
+            this.editForm.controls['isRequired'].valueChanges.pipe(
+                startWith(this.properties.isRequired), map(x => !x));
 
         this.showPatternSuggestions =
-            this.editForm.controls['pattern'].valueChanges
-                .startWith('')
-                .map(x => !x || x.trim().length === 0);
+            this.editForm.controls['pattern'].valueChanges.pipe(
+                startWith(''), map(x => !x || x.trim().length === 0));
 
         this.showPatternMessage =
             this.editForm.controls['pattern'].value && this.editForm.controls['pattern'].value.trim().length > 0;
@@ -92,7 +96,7 @@ export class StringValidationComponent implements OnDestroy, OnInit {
     }
 
     private setPatternName() {
-        const matchingPattern = this.regexSuggestions.find(x => x.pattern === this.editForm.controls['pattern'].value);
+        const matchingPattern = this.patterns.find(x => x.pattern === this.editForm.controls['pattern'].value);
 
         if (matchingPattern) {
             this.patternName = matchingPattern.name;
