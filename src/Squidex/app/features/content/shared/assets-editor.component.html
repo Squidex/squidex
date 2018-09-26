@@ -1,18 +1,50 @@
 <div class="assets-container" [class.disabled]="isDisabled">
-    <div class="row">
-        <div class="drop-area align-items-center" (sqxFileDrop)="addFiles($event)" (click)="assetsDialog.show()">
-            Drop files here to add them.
+    <div class="header list">
+        <div class="row no-gutters">
+            <div class="col">
+                <div class="drop-area align-items-center" (sqxFileDrop)="addFiles($event)" (click)="assetsDialog.show()">
+                    Drop files or click here to add assets.
+                </div>
+            </div>
+            <div class="col col-auto pl-1">
+                <div class="btn-group" data-toggle="buttons">
+                    <button type="button" class="btn btn-secondary btn-toggle" [class.btn-primary]="isListView" [disabled]="isListView" (click)="changeView(true)">
+                        <i class="icon-list"></i>
+                    </button>
+                    <button type="button" class="btn btn-secondary btn-toggle" [class.btn-primary]="!isListView" [disabled]="!isListView" (click)="changeView(false)">
+                        <i class="icon-grid"></i>
+                    </button>
+                </div>
+            </div>
         </div>
-            
-        <sqx-asset *ngFor="let file of newAssets" [initFile]="file"
-            [isListView]="true"
-            (failed)="onAssetFailed(file)" 
-            (loaded)="onAssetLoaded(file, $event)">
-        </sqx-asset>
-        <sqx-asset *ngFor="let asset of oldAssets" [asset]="asset" removeMode="true" isDisabled="true"
-            [isListView]="true"
-            (removing)="onAssetRemoving($event)">
-        </sqx-asset>
+    </div>
+
+    <div class="row no-gutters">
+        <ng-container *ngIf="!isListView; else listTemplate">
+            <sqx-asset *ngFor="let file of newAssets" [initFile]="file"
+                (failed)="onAssetFailed(file)" 
+                (loaded)="onAssetLoaded(file, $event)">
+            </sqx-asset>
+            <sqx-asset *ngFor="let asset of oldAssets" [asset]="asset" removeMode="true" isDisabled="true"
+                (removing)="onAssetRemoving($event)">
+            </sqx-asset>
+        </ng-container>
+
+        <ng-template #listTemplate>
+            <div class="col">
+                <div class="list">
+                    <sqx-asset *ngFor="let file of newAssets" [initFile]="file"
+                        [isListView]="true"
+                        (failed)="onAssetFailed(file)" 
+                        (loaded)="onAssetLoaded(file, $event)">
+                    </sqx-asset>
+                    <sqx-asset *ngFor="let asset of oldAssets" [asset]="asset" removeMode="true" isDisabled="true"
+                        [isListView]="true"
+                        (removing)="onAssetRemoving($event)">
+                    </sqx-asset>
+                </div>
+            </div>
+        </ng-template>    
     </div>
 </div>
 
