@@ -75,6 +75,12 @@ export class SchemaCategoryComponent implements OnInit, OnChanges {
 
             this.schemasForCategory = this.schemas.filter(x => this.isSameCategory(x));
             this.schemasFiltered = this.schemasForCategory.filter(x => !query || x.name.indexOf(query) >= 0);
+
+            if (query) {
+                this.isOpen = true;
+            } else {
+                this.isOpen = this.localStore.get(`schema-category.${this.name}`) !== 'false';
+            }
         }
 
         if (changes['name']) {
