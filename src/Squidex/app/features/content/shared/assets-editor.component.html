@@ -4,11 +4,13 @@
             Drop files here to add them.
         </div>
             
-        <sqx-asset *ngFor="let file of newAssets" [initFile]="file" 
+        <sqx-asset *ngFor="let file of newAssets" [initFile]="file"
+            [isListView]="true"
             (failed)="onAssetFailed(file)" 
             (loaded)="onAssetLoaded(file, $event)">
         </sqx-asset>
         <sqx-asset *ngFor="let asset of oldAssets" [asset]="asset" removeMode="true" isDisabled="true"
+            [isListView]="true"
             (removing)="onAssetRemoving($event)">
         </sqx-asset>
     </div>

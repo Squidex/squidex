@@ -13,7 +13,8 @@ import { onErrorResumeNext } from 'rxjs/operators';
 import {
     AssetDto,
     AssetsDialogState,
-    fadeAnimation
+    fadeAnimation,
+    LocalStoreService
 } from '@app/shared/internal';
 
 @Component({
@@ -28,12 +29,16 @@ export class AssetsSelectorComponent implements OnInit {
     public selectedAssets: { [id: string]: AssetDto } = {};
     public selectionCount = 0;
 
+    public isListView = false;
+
     @Output()
     public selected = new EventEmitter<AssetDto[]>();
 
     constructor(
-        public readonly state: AssetsDialogState
+        public readonly state: AssetsDialogState,
+        private readonly localStore: LocalStoreService
     ) {
+        this.isListView = this.localStore.get('assetView') === 'List';
     }
 
     public ngOnInit() {
@@ -68,6 +73,12 @@ export class AssetsSelectorComponent implements OnInit {
         }
 
         this.selectionCount = Object.keys(this.selectedAssets).length;
+    }
+
+    public changeView(isListView: boolean) {
+        this.localStore.set('assetView', isListView ? 'List' : 'Grid');
+
+        this.isListView = isListView;
     }
 }
 

@@ -1,6 +1,8 @@
 @import '_vars';
 @import '_mixins';
 
+$list-height: 2.375rem;
+
 @mixin overlay-container {
     position: relative;
     padding: 0;
@@ -51,6 +53,10 @@
     padding-right: 8px;
 }
 
+:host(.isListView) {
+    padding: 0;
+}
+
 :host /deep/ {
     .form-control {
         &.disabled,
@@ -82,20 +88,6 @@
         padding-top: .5rem;
         min-height: $asset-footer;
         max-height: auto;
-    }
-
-    &.drag {
-        .drop-overlay {
-            @include opacity(1);
-        }
-
-        .file-type {
-            @include opacity(0);
-        }
-    }
-
-    &.selectable {
-        cursor: pointer;
     }
 }
 
@@ -136,6 +128,11 @@
     &-image,
     &-icon {
         height: $asset-image;
+    }
+
+    &-image-small,
+    &-icon-small {
+        height: 2.375rem;
     }
 
     &-name {
@@ -201,6 +198,113 @@
 
 .editable {
     height: 2rem;
+    border-top: none;
+    border-bottom: 1px solid transparent;
+}
+
+.table-items-row {
+    & {
+        position: relative;
+        padding-left: $list-height + 2rem;
+        height: $list-height + 2rem;
+    }
+
+    .image {
+        @include absolute(0, auto, auto, 4px);
+        height: $list-height + 2rem;
+        padding: 1rem;
+        border: 0;
+        background: $color-border;
+        width: $list-height + 2rem;
+    }
+
+    .left-border {
+        & {
+            @include absolute(0, auto, auto, 0);
+            height: $list-height + 2rem;
+            border: 0;
+            background: $color-border;
+            width: 4px;
+        }
+
+        &.selected {
+            background: $color-theme-blue;
+        }
+    }
+
+    .icon {
+        max-width: 100%;
+    }
+
+    .col {
+        & {
+            height: $list-height;
+        }
+
+        &-user {
+            padding-top: .2rem;
+        }
+
+        &-actions {
+            text-align: right;
+            line-height: $list-height;
+        }
+
+        &-name,
+        &-info {
+            @include truncate;
+            padding-right: 1rem;
+            padding-left: 1rem;
+            line-height: $list-height;
+        }
+
+        &-actions,
+        &-user {
+            max-width: 3rem;
+            min-width: 3rem;
+        }
+
+        &-info {
+            color: $color-text-decent;
+            font-size: .9rem;
+            max-width: 12rem;
+            min-width: 12rem;
+        }
+    }
+
+    .drop-overlay-text {
+        top: 1.4rem;
+    }
+}
+
+.drag {
+    .drop-overlay {
+        @include opacity(1);
+    }
+
+    .file-type {
+        @include opacity(0);
+    }
+}
+
+.progress {
+    &-background {
+        background: $color-border;
+        margin: (($list-height - .25rem) / 2) 0;
+    }
+
+    &-bar {
+        background: $color-theme-blue;
+    }
+
+    &-background,
+    &-bar {
+        height: .25rem;
+    }
+}
+
+.selectable {
+    cursor: pointer;
 }
 
 .tags {
