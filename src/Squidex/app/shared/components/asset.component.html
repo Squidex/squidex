@@ -48,10 +48,9 @@
                 <sqx-progress-bar mode="Circle" [value]="progress"></sqx-progress-bar>
             </div>
         
-            <div class="drop-overlay" *ngIf="asset && progress === 0">
+            <div class="drop-overlay align-items-center justify-content-center" *ngIf="asset && progress === 0">
                 <div class="drop-overlay-background"></div>
-        
-                <span class="drop-overlay-text">Drop to update</span>
+                <div class="drop-overlay-text">Drop to update</div>
             </div>
         </div>
         <div class="card-footer">
@@ -89,13 +88,11 @@
     <div class="table-items-row" [class.selectable]="isSelectable" (click)="selected.emit(asset)" (sqxFileDrop)="updateFile($event)">
         <div class="left-border" [class.selected]="isSelected" ></div>
 
-        <div class="image" *ngIf="asset && progress === 0" @fade>
-            <div *ngIf="asset.isImage" class="file-image-small">
-                <img [sqxImageSource]="asset | sqxAssetPreviewUrl">
-            </div>
-            <div *ngIf="!asset.isImage" class="file-icon-small">
-                <img class="icon" [attr.src]="asset | sqxFileIcon">
-            </div>
+        <div *ngIf="asset && asset.isImage && progress === 0" class="image" @fade>
+            <img [sqxImageSource]="asset | sqxAssetPreviewUrl">
+        </div>
+        <div *ngIf="asset && !asset.isImage && progress === 0" class="image image-padded" @fade>
+            <img class="icon" [attr.src]="asset | sqxFileIcon">
         </div>
 
         <div class="row no-gutters" *ngIf="asset && progress === 0" @fade>
@@ -117,12 +114,12 @@
             <div class="col col-user">
                 <img class="user-picture" [attr.title]="asset.lastModifiedBy | sqxUserNameRef" [attr.src]="asset.lastModifiedBy | sqxUserPictureRef" />
             </div>
-            <div class="col col-actions">
+            <div class="col col-actions text-right">
                 <a class="btn btn-link btn-secondary" [attr.href]="asset | sqxAssetUrl" target="_blank" (click)="$event.stopPropagation()">
                     <i class="icon-download"></i>
                 </a>
             </div>
-            <div class="col col-actions" *ngIf="!isDisabled || removeMode">
+            <div class="col col-actions text-right" *ngIf="!isDisabled || removeMode">
                 <button class="btn btn-link btn-danger" (click)="deleting.emit(asset); $event.stopPropagation()" *ngIf="!isDisabled && !removeMode">
                     <i class="icon-bin2"></i>
                 </button>
@@ -138,10 +135,9 @@
             </div>
         </div>
 
-        <div class="drop-overlay" *ngIf="asset && progress === 0">
+        <div class="drop-overlay align-items-center justify-content-center" *ngIf="asset && progress === 0">
             <div class="drop-overlay-background"></div>
-    
-            <span class="drop-overlay-text">Drop to update</span>
+            <div class="drop-overlay-text">Drop to update</div>
         </div>
     </div>
 </ng-template>

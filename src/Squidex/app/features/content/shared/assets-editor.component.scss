@@ -18,6 +18,10 @@
     }
 }
 
+.list-view {
+    margin-bottom: 1rem;
+}
+
 .list {
     margin-left: 8px;
     margin-right: 8px;
@@ -47,8 +51,8 @@
         font-weight: normal;
         text-align: center;
         padding: 0 2rem;
-        cursor: pointer;
         color: darken($color-border, 30%);
+        cursor: pointer;
     }
 
     &:hover {

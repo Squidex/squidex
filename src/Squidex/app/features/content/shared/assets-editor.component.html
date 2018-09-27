@@ -32,15 +32,17 @@
         </ng-container>
     
         <ng-template #listTemplate>
-            <sqx-asset *ngFor="let file of newAssets" [initFile]="file"
-                [isListView]="true" (failed)="onAssetFailed(file)" (loaded)="onAssetLoaded(file, $event)">
-            </sqx-asset>
-            
-            <div [sqxSortModel]="oldAssets.values" (sqxSorted)="sort($event)">
-                <div *ngFor="let asset of oldAssets">
-                    <sqx-asset [asset]="asset" removeMode="true" isDisabled="true"
-                        [isListView]="true" (removing)="onAssetRemoving($event)">
-                    </sqx-asset>
+            <div class="list-view">
+                <sqx-asset *ngFor="let file of newAssets" [initFile]="file"
+                    [isListView]="true" (failed)="onAssetFailed(file)" (loaded)="onAssetLoaded(file, $event)">
+                </sqx-asset>
+                
+                <div [sqxSortModel]="oldAssets.values" (sqxSorted)="sort($event)">
+                    <div *ngFor="let asset of oldAssets">
+                        <sqx-asset [asset]="asset" removeMode="true" isDisabled="true"
+                            [isListView]="true" (removing)="onAssetRemoving($event)">
+                        </sqx-asset>
+                    </div>
                 </div>
             </div>
         </ng-template>
