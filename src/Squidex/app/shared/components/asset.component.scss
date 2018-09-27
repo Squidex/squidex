@@ -14,6 +14,7 @@ $list-height: 2.375rem;
         @include transition(opacity .4s ease);
         @include absolute(0, 0, 0, 0);
         @include opacity(0);
+        @include flex-box;
         color: $color-dark-foreground;
     }
 
@@ -31,20 +32,6 @@ $list-height: 2.375rem;
     font-weight: normal;
     cursor: none;
     color: $color-dark-foreground;
-}
-
-.drop-overlay {
-    & {
-        @include overlay;
-        pointer-events: none;
-    }
-
-    &-text {
-        @include absolute(40%, 0, 0, 0);
-        text-align: center;
-        font-size: 1.25rem;
-        font-weight: lighter;
-    }
 }
 
 :host {
@@ -125,14 +112,8 @@ $list-height: 2.375rem;
         @include truncate;
     }
 
-    &-image,
-    &-icon {
+    &-image {
         height: $asset-image;
-    }
-
-    &-image-small,
-    &-icon-small {
-        height: 2.375rem;
     }
 
     &-name {
@@ -150,6 +131,7 @@ $list-height: 2.375rem;
     &-icon {
         line-height: $asset-image;
         background: $color-border;
+        height: $asset-image;
         border: 0;
         text-align: center;
     }
@@ -198,7 +180,7 @@ $list-height: 2.375rem;
 
 .editable {
     height: 2rem;
-    border-top: none;
+    border-top: 0;
     border-bottom: 1px solid transparent;
 }
 
@@ -207,15 +189,6 @@ $list-height: 2.375rem;
         position: relative;
         padding-left: $list-height + 2rem;
         height: $list-height + 2rem;
-    }
-
-    .image {
-        @include absolute(0, auto, auto, 4px);
-        height: $list-height + 2rem;
-        padding: 1rem;
-        border: 0;
-        background: $color-border;
-        width: $list-height + 2rem;
     }
 
     .left-border {
@@ -232,6 +205,17 @@ $list-height: 2.375rem;
         }
     }
 
+    .image {
+        @include absolute(0, auto, 0, 4px);
+        border: 0;
+        background: $color-border;
+        width: $list-height + 2rem;
+    }
+
+    .image-padded {
+        padding: 1rem;
+    }
+
     .icon {
         max-width: 100%;
     }
@@ -246,7 +230,6 @@ $list-height: 2.375rem;
         }
 
         &-actions {
-            text-align: right;
             line-height: $list-height;
         }
 
@@ -271,9 +254,18 @@ $list-height: 2.375rem;
             min-width: 12rem;
         }
     }
+}
 
-    .drop-overlay-text {
-        top: 1.4rem;
+.drop-overlay {
+    & {
+        @include overlay;
+        pointer-events: none;
+    }
+
+    &-text {
+        position: absolute;
+        font-size: 1.25rem;
+        font-weight: lighter;
     }
 }
 
