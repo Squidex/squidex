@@ -7,19 +7,19 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace GenerateLanguages
 {
-    public class Program
+    public static class Program
     {
         public static void Main()
         {
-            var languageCodesFile = new FileInfo("../../src/Squidex.Infrastructure/language-codes.csv");
+            var languageCodesFile = new FileInfo("../../../../../src/Squidex.Infrastructure/language-codes.csv");
             var languageFile = Path.Combine(languageCodesFile.DirectoryName, "Languages.cs");
-
-            var resourceStream = new FileStream(languageCodesFile.FullName, FileMode.Open);
 
             var writer = new StringWriter();
             writer.WriteLine("// ==========================================================================");
@@ -39,31 +39,82 @@ namespace GenerateLanguages
             writer.WriteLine("    partial class Language");
             writer.WriteLine("    {");
 
-            var uniqueCodes = new HashSet<string>(new [] { "iv" });
-            
-            using (var reader = new StreamReader(resourceStream, Encoding.UTF8))
+            var languages = GetLanguages(languageCodesFile).ToList();
+
+            foreach (var language in languages)
             {
-                reader.ReadLine();
+                var fieldName = language.Iso2Code.ToUpperInvariant();
 
-                while (!reader.EndOfStream)
-                {
-                    var languageLine = reader.ReadLine();
-                    var languageIso2Code = languageLine.Substring(1, 2);
-                    var languageEnglishName = languageLine.Substring(6, languageLine.Length - 7);
+                writer.WriteLine($"        public static readonly Language {fieldName} = AddLanguage(\"{language.Iso2Code}\", \"{language.EnglishName}\");");
+            }
 
-                    if (!uniqueCodes.Add(languageIso2Code))
-                    {
-                        Console.WriteLine("Languages contains duplicate {0}", languageIso2Code);
-                    } 
+            writer.WriteLine();
 
-                    writer.WriteLine("        public static readonly Language {0} = AddLanguage(\"{1}\", \"{2}\");", languageIso2Code.ToUpperInvariant(), languageIso2Code, languageEnglishName);
-                }
+            foreach (var culture in GetCultures(languages))
+            {
+                var fieldName = culture.EnglishName.ToFieldName();
+
+                writer.WriteLine($"        public static readonly Language {fieldName} = AddLanguage(\"{culture.Code}\", \"{culture.EnglishName}\");");
             }
 
             writer.WriteLine("    }");
             writer.WriteLine("}");
 
             File.WriteAllText(languageFile, writer.ToString());
+        }
+
+        private static string ToFieldName(this string name)
+        {
+            var sb = new StringBuilder();
+
+            foreach (var c in name)
+            {
+                if (char.IsLetterOrDigit(c))
+                {
+                    sb.Append(c);
+                }
+            }
+
+            return sb.ToString();
+        }
+
+        private static IEnumerable<(string Code, string EnglishName)> GetCultures(List<(string Iso2Code, string EnglishName)> languages)
+        {
+            return CultureInfo.GetCultures(CultureTypes.SpecificCultures)
+                .Where(x => x.ToString().Length == 5)
+                .Where(x => languages.Any(l => l.Iso2Code.Equals(x.TwoLetterISOLanguageName, StringComparison.OrdinalIgnoreCase)))
+                .GroupBy(x => x.TwoLetterISOLanguageName)
+                .Where(x => x.Count() > 1)
+                .SelectMany(x => x)
+                .Select(x => (x.ToString(), x.EnglishName));
+        }
+
+        private static IEnumerable<(string Iso2Code, string EnglishName)> GetLanguages(FileInfo file)
+        {
+            var uniqueCodes = new HashSet<string>(new[] { "iv" });
+
+            var resourceStream = file.OpenRead();
+
+            using (var reader = new StreamReader(resourceStream, Encoding.UTF8))
+            {
+                reader.ReadLine();
+
+                while (!reader.EndOfStream)
+                {
+                    var line = reader.ReadLine();
+
+                    var iso2Code = line.Substring(1, 2);
+
+                    if (uniqueCodes.Add(iso2Code))
+                    {
+                        yield return (iso2Code, line.Substring(6, line.Length - 7));
+                    }
+                    else
+                    {
+                        Console.WriteLine("Languages contains duplicate {0}", iso2Code);
+                    }
+                }
+            }
         }
     }
 }
