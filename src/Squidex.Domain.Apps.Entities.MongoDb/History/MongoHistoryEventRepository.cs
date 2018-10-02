@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Entities.History;
@@ -52,18 +53,20 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.History
             return "Projections_History";
         }
 
-        protected override async Task SetupCollectionAsync(IMongoCollection<MongoHistoryEventEntity> collection)
+        protected override Task SetupCollectionAsync(IMongoCollection<MongoHistoryEventEntity> collection, CancellationToken ct = default(CancellationToken))
         {
-            await collection.Indexes.CreateOneAsync(
-                new CreateIndexModel<MongoHistoryEventEntity>(
-                    Index
-                        .Ascending(x => x.AppId)
-                        .Ascending(x => x.Channel)
-                        .Descending(x => x.Created)
-                        .Descending(x => x.Version)));
-
-            await collection.Indexes.CreateOneAsync(
-                new CreateIndexModel<MongoHistoryEventEntity>(Index.Ascending(x => x.Created), new CreateIndexOptions { ExpireAfter = TimeSpan.FromDays(365) }));
+            return collection.Indexes.CreateManyAsync(
+                new[]
+                {
+                    new CreateIndexModel<MongoHistoryEventEntity>(
+                        Index
+                            .Ascending(x => x.AppId)
+                            .Ascending(x => x.Channel)
+                            .Descending(x => x.Created)
+                            .Descending(x => x.Version)),
+                    new CreateIndexModel<MongoHistoryEventEntity>(Index.Ascending(x => x.Created),
+                        new CreateIndexOptions { ExpireAfter = TimeSpan.FromDays(365) })
+                }, ct);
         }
 
         public async Task<IReadOnlyList<IHistoryEventEntity>> QueryByChannelAsync(Guid appId, string channelPrefix, int count)

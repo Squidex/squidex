@@ -7,6 +7,7 @@
 
 using System;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
@@ -61,7 +62,7 @@ namespace Squidex.Infrastructure.CQRS.Events
             }
         }
 
-        public void Initialize()
+        public Task InitializeAsync(CancellationToken ct = default(CancellationToken))
         {
             try
             {
@@ -71,6 +72,8 @@ namespace Squidex.Infrastructure.CQRS.Events
                 {
                     throw new ConfigurationException($"RabbitMq event bus failed to connect to {connectionFactory.Endpoint}");
                 }
+
+                return TaskHelper.Done;
             }
             catch (Exception e)
             {

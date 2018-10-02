@@ -7,9 +7,11 @@
 
 using System;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Orleans;
 using Orleans.Configuration;
@@ -26,7 +28,7 @@ using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Config.Orleans
 {
-    public sealed class SiloWrapper : DisposableObjectBase, IInitializable, IDisposable
+    public sealed class SiloWrapper : IHostedService
     {
         private readonly Lazy<ISiloHost> silo;
         private readonly ISemanticLog log;
@@ -61,15 +63,10 @@ namespace Squidex.Config.Orleans
                     .UseDashboard(options => options.HostSelf = false)
                     .EnableDirectClient()
                     .AddIncomingGrainCallFilter<LocalCacheFilter>()
+                    .AddStartupTask<InitializerStartup>()
                     .AddStartupTask<Bootstrap<IContentSchedulerGrain>>()
                     .AddStartupTask<Bootstrap<IEventConsumerManagerGrain>>()
                     .AddStartupTask<Bootstrap<IRuleDequeuerGrain>>()
-                    .AddStartupTask((services, ct) =>
-                    {
-                        services.RunInitialization();
-
-                        return TaskHelper.Done;
-                    })
                     .Configure<ClusterOptions>(options =>
                     {
                         options.Configure();
@@ -145,12 +142,12 @@ namespace Squidex.Config.Orleans
             });
         }
 
-        public void Initialize()
+        public async Task StartAsync(CancellationToken cancellationToken)
         {
             var watch = ValueStopwatch.StartNew();
             try
             {
-                silo.Value.StartAsync().Wait();
+                await silo.Value.StartAsync(cancellationToken);
             }
             finally
             {
@@ -162,14 +159,11 @@ namespace Squidex.Config.Orleans
             }
         }
 
-        protected override void DisposeObject(bool disposing)
+        public async Task StopAsync(CancellationToken cancellationToken)
         {
-            if (disposing)
+            if (!silo.IsValueCreated)
             {
-                if (silo.IsValueCreated)
-                {
-                    Task.Run(() => silo.Value.StopAsync()).Wait();
-                }
+                await silo.Value.StopAsync(cancellationToken);
             }
         }
     }

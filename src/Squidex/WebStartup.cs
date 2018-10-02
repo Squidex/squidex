@@ -32,14 +32,14 @@ namespace Squidex
         {
             services.AddOrleansSilo();
             services.AddAppServices(configuration);
+
+            services.AddHostedService<SystemExtensions.InitializeHostedService>();
+            services.AddHostedService<SystemExtensions.MigratorHostedService>();
         }
 
         public void Configure(IApplicationBuilder app)
         {
             app.ApplicationServices.LogConfiguration();
-            app.ApplicationServices.RunInitialization();
-            app.ApplicationServices.RunMigrate();
-            app.ApplicationServices.RunRunnables();
 
             app.UseMyLocalCache();
             app.UseMyCors();

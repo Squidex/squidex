@@ -29,7 +29,7 @@ namespace Squidex.Infrastructure.Assets
             this.containerName = containerName;
         }
 
-        public void Initialize()
+        public async Task InitializeAsync(CancellationToken ct = default(CancellationToken))
         {
             try
             {
@@ -38,7 +38,7 @@ namespace Squidex.Infrastructure.Assets
                 var blobClient = storageAccount.CreateCloudBlobClient();
                 var blobReference = blobClient.GetContainerReference(containerName);
 
-                blobReference.CreateIfNotExistsAsync().Wait();
+                await blobReference.CreateIfNotExistsAsync();
 
                 blobContainer = blobReference;
             }
@@ -130,7 +130,7 @@ namespace Squidex.Infrastructure.Assets
             return blob.DeleteIfExistsAsync();
         }
 
-        private async Task UploadCoreAsync(string blobName, Stream stream, CancellationToken ct)
+        private async Task UploadCoreAsync(string blobName, Stream stream, CancellationToken ct = default(CancellationToken))
         {
             try
             {

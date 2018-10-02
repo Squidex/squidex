@@ -91,7 +91,7 @@ namespace Squidex.Infrastructure.EventSourcing
             return QueryAsync(callback, lastPosition, filter, ct);
         }
 
-        private async Task QueryAsync(Func<StoredEvent, Task> callback, StreamPosition lastPosition, FilterDefinition<MongoEventCommit> filter, CancellationToken ct)
+        private async Task QueryAsync(Func<StoredEvent, Task> callback, StreamPosition lastPosition, FilterDefinition<MongoEventCommit> filter, CancellationToken ct = default(CancellationToken))
         {
             using (Profiler.TraceMethod<MongoEventStore>())
             {

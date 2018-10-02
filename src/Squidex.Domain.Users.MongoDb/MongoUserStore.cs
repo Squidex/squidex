@@ -46,15 +46,15 @@ namespace Squidex.Domain.Users.MongoDb
             return "Identity_Users";
         }
 
-        protected override Task SetupCollectionAsync(IMongoCollection<MongoUser> collection)
+        protected override Task SetupCollectionAsync(IMongoCollection<MongoUser> collection, CancellationToken ct = default(CancellationToken))
         {
-            return Task.WhenAll(
-                collection.Indexes.CreateOneAsync(
-                    new CreateIndexModel<MongoUser>(Index.Ascending("Logins.LoginProvider").Ascending("Logins.ProviderKey"))),
-                collection.Indexes.CreateOneAsync(
-                    new CreateIndexModel<MongoUser>(Index.Ascending(x => x.NormalizedUserName), new CreateIndexOptions { Unique = true })),
-                collection.Indexes.CreateOneAsync(
-                    new CreateIndexModel<MongoUser>(Index.Ascending(x => x.NormalizedEmail), new CreateIndexOptions { Unique = true })));
+            return collection.Indexes.CreateManyAsync(
+                new[]
+                {
+                    new CreateIndexModel<MongoUser>(Index.Ascending("Logins.LoginProvider").Ascending("Logins.ProviderKey")),
+                    new CreateIndexModel<MongoUser>(Index.Ascending(x => x.NormalizedUserName), new CreateIndexOptions { Unique = true }),
+                    new CreateIndexModel<MongoUser>(Index.Ascending(x => x.NormalizedEmail), new CreateIndexOptions { Unique = true })
+                }, ct);
         }
 
         protected override MongoCollectionSettings CollectionSettings()

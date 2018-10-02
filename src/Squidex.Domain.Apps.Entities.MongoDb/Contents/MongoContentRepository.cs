@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 using NodaTime;
@@ -40,10 +41,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             this.database = database;
         }
 
-        public void Initialize()
+        public Task InitializeAsync(CancellationToken ct = default(CancellationToken))
         {
-            contentsDraft.Initialize();
-            contentsPublished.Initialize();
+            return Task.WhenAll(contentsDraft.InitializeAsync(ct), contentsPublished.InitializeAsync(ct));
         }
 
         public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, Status[] status, Query query)

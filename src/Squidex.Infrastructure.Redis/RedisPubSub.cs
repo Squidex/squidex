@@ -7,7 +7,10 @@
 
 using System;
 using System.Collections.Concurrent;
+using System.Threading;
+using System.Threading.Tasks;
 using Squidex.Infrastructure.Log;
+using Squidex.Infrastructure.Tasks;
 using StackExchange.Redis;
 
 namespace Squidex.Infrastructure
@@ -30,11 +33,13 @@ namespace Squidex.Infrastructure
             redisSubscriber = new Lazy<ISubscriber>(() => redis.Value.GetSubscriber());
         }
 
-        public void Initialize()
+        public Task InitializeAsync(CancellationToken ct = default(CancellationToken))
         {
             try
             {
                 redisClient.Value.GetStatus();
+
+                return TaskHelper.Done;
             }
             catch (Exception ex)
             {

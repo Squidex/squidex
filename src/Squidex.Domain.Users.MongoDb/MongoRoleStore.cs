@@ -26,10 +26,10 @@ namespace Squidex.Domain.Users.MongoDb
             return "Identity_Roles";
         }
 
-        protected override Task SetupCollectionAsync(IMongoCollection<MongoRole> collection)
+        protected override Task SetupCollectionAsync(IMongoCollection<MongoRole> collection, CancellationToken ct = default(CancellationToken))
         {
             return collection.Indexes.CreateOneAsync(
-                new CreateIndexModel<MongoRole>(Index.Ascending(x => x.NormalizedName), new CreateIndexOptions { Unique = true }));
+                new CreateIndexModel<MongoRole>(Index.Ascending(x => x.NormalizedName), new CreateIndexOptions { Unique = true }), cancellationToken: ct);
         }
 
         protected override MongoCollectionSettings CollectionSettings()

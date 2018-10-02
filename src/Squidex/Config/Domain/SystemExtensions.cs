@@ -5,9 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
-using Microsoft.Extensions.DependencyInjection;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Hosting;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Migrations;
 
@@ -15,31 +16,47 @@ namespace Squidex.Config.Domain
 {
     public static class SystemExtensions
     {
-        public static void RunInitialization(this IServiceProvider services)
+        public sealed class InitializeHostedService : IHostedService
         {
-            var systems = services.GetRequiredService<IEnumerable<IInitializable>>();
+            private readonly IEnumerable<IInitializable> targets;
 
-            foreach (var system in systems)
+            public InitializeHostedService(IEnumerable<IInitializable> targets)
             {
-                system.Initialize();
+                this.targets = targets;
+            }
+
+            public async Task StartAsync(CancellationToken cancellationToken)
+            {
+                foreach (var target in targets)
+                {
+                    await target.InitializeAsync(cancellationToken);
+                }
+            }
+
+            public Task StopAsync(CancellationToken cancellationToken)
+            {
+                return Task.CompletedTask;
             }
         }
 
-        public static void RunRunnables(this IServiceProvider services)
+        public sealed class MigratorHostedService : IHostedService
         {
-            var systems = services.GetRequiredService<IEnumerable<IRunnable>>();
+            private readonly Migrator migrator;
 
-            foreach (var system in systems)
+            public MigratorHostedService(Migrator migrator)
             {
-                system.Run();
+                this.migrator = migrator;
             }
-        }
 
-        public static void RunMigrate(this IServiceProvider services)
-        {
-            var migrator = services.GetRequiredService<Migrator>();
+            public Task StartAsync(CancellationToken cancellationToken)
+            {
+                return migrator.MigrateAsync();
+            }
 
-            migrator.MigrateAsync().Wait();
+            public Task StopAsync(CancellationToken cancellationToken)
+            {
+                return Task.CompletedTask;
+            }
         }
     }
 }
