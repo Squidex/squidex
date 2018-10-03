@@ -37,6 +37,9 @@ export class SchemaCategoryComponent implements OnInit, OnChanges {
     public isReadonly: boolean;
 
     @Input()
+    public routeSingletonToContent = false;
+
+    @Input()
     public schemasFilter: string;
 
     @Input()
@@ -98,6 +101,10 @@ export class SchemaCategoryComponent implements OnInit, OnChanges {
 
     public changeCategory(schema: SchemaDto) {
         this.schemasState.changeCategory(schema, this.name).pipe(onErrorResumeNext()).subscribe();
+    }
+
+    public schemaRoute(schema: SchemaDto) {
+        return schema.isSingleton && this.routeSingletonToContent ? [schema.name, schema.id] : [schema.name];
     }
 
     public trackBySchema(index: number, schema: SchemaDto) {

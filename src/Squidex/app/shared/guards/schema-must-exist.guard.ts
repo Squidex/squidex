@@ -32,7 +32,7 @@ export class SchemaMustExistGuard implements CanActivate {
                         this.router.navigate(['/404']);
                     }
                 }),
-                map(s => s !== null));
+                map(s => !!s));
 
         return result;
     }

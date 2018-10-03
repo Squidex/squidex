@@ -32,7 +32,7 @@ export class UserMustExistGuard implements CanActivate {
                         this.router.navigate(['/404']);
                     }
                 }),
-                map(u => u !== null));
+                map(u => !!u));
 
         return result;
     }

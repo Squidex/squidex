@@ -41,8 +41,6 @@ describe('SchemaMustExistGuard', () => {
         }).unsubscribe();
 
         expect(result!).toBeTruthy();
-
-        schemasState.verify(x => x.select('123'), Times.once());
     });
 
     it('should load schema and return false when not found', () => {

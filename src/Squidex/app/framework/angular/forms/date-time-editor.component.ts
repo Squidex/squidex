@@ -52,7 +52,7 @@ export class DateTimeEditorComponent implements ControlValueAccessor, OnDestroy,
     }
 
     public get hasValue() {
-        return this.dateValue !== null;
+        return !!this.dateValue;
     }
 
     @ViewChild('dateInput')

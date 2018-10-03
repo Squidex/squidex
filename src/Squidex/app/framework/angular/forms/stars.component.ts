@@ -88,7 +88,7 @@ export class StarsComponent implements ControlValueAccessor {
             return false;
         }
 
-        if (this.value !== null) {
+        if (this.value) {
             this.value = null;
             this.stars = 0;
 

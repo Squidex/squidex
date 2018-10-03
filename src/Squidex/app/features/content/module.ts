@@ -15,6 +15,7 @@ import {
     ContentMustExistGuard,
     LoadLanguagesGuard,
     SchemaMustExistPublishedGuard,
+    SchemaMustNotBeSingletonGuard,
     SqxFrameworkModule,
     SqxSharedModule,
     UnsetContentGuard
@@ -52,12 +53,13 @@ const routes: Routes = [
                     {
                         path: '',
                         component: ContentsPageComponent,
+                        canActivate: [SchemaMustNotBeSingletonGuard],
                         canDeactivate: [CanDeactivateGuard]
                     },
                     {
                         path: 'new',
                         component: ContentPageComponent,
-                        canActivate: [UnsetContentGuard],
+                        canActivate: [SchemaMustNotBeSingletonGuard, UnsetContentGuard],
                         canDeactivate: [CanDeactivateGuard]
                     },
                     {

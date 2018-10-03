@@ -96,7 +96,7 @@ export class ImageSourceDirective implements OnChanges, OnDestroy, OnInit, After
         if (w > 0 && h > 0) {
             let source = `${this.imageSource}&width=${w}&height=${h}&mode=Crop`;
 
-            if (this.loadQuery !== null) {
+            if (this.loadQuery) {
                 source += `&q=${this.loadQuery}`;
             }
 

@@ -71,7 +71,7 @@ export class ModalViewDirective implements OnChanges, OnDestroy {
     }
 
     private update(isOpen: boolean) {
-        if (isOpen === (this.renderedView !== null)) {
+        if (isOpen === (!!this.renderedView)) {
             return;
         }
 

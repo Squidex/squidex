@@ -379,7 +379,7 @@ export class EditContentForm extends Form<FormGroup> {
     private addArrayItem(field: RootFieldDto, language: AppLanguageDto | null, partitionForm: FormArray) {
         const itemForm = new FormGroup({});
 
-        let isOptional = field.isLocalizable && language !== null && language.isOptional;
+        let isOptional = field.isLocalizable && !!language && language.isOptional;
 
         for (let nested of field.nested) {
             const nestedValidators = FieldValidatorsFactory.createValidators(nested, isOptional);
