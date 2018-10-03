@@ -144,13 +144,12 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
     }
 
     public updateValueByInput() {
-        let updateMap =
-            !!this.geolocationForm.controls['latitude'].value &&
-            !!this.geolocationForm.controls['longitude'].value;
+        const lat = this.geolocationForm.controls['latitude'].value;
+        const lng = this.geolocationForm.controls['longitude'].value;
 
-        this.value = this.geolocationForm.value;
+        this.updateValue(lat, lng);
 
-        if (updateMap) {
+        if (lat && lng) {
             this.updateMarker(true, true);
         } else {
             this.callChange(this.value);
@@ -189,11 +188,7 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
                         if (!this.marker && !this.isDisabled) {
                             const latlng = event.latlng.wrap();
 
-                            this.value = {
-                                latitude:  latlng.lat,
-                                longitude: latlng.lng
-                            };
-
+                            this.updateValue(latlng.lat, latlng.lng);
                             this.updateMarker(false, true);
                         }
                     });
@@ -226,11 +221,7 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
                 this.map.addListener('click',
                     (event: any) => {
                         if (!this.isDisabled) {
-                            this.value = {
-                                latitude: event.latLng.lat(),
-                                longitude: event.latLng.lng()
-                            };
-
+                            this.updateValue(event.latLng.lat(), event.latLng.lng());
                             this.updateMarker(false, true);
                         }
                     });
@@ -253,8 +244,7 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
                             let lat = place.geometry.location.lat();
                             let lng = place.geometry.location.lng();
 
-                            this.value = { latitude: lat, longitude: lng };
-
+                            this.updateValue(lat, lng);
                             this.updateMarker(false, true);
                         }
                     }
@@ -275,6 +265,10 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
         this.updateMarker(true, true);
     }
 
+    private updateValue(lat: number, lng: number) {
+        this.value = { latitude: lat, longitude: lng };
+    }
+
     private updateMarker(zoom: boolean, fireEvent: boolean) {
         if (!this.isGoogleMaps) {
             this.updateMarkerOSM(zoom, fireEvent);
@@ -291,10 +285,7 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
                 this.marker.on('drag', (event: any) => {
                     const latlng = event.latlng.wrap();
 
-                    this.value = {
-                        latitude:  latlng.lat,
-                        longitude: latlng.lng
-                    };
+                    this.updateValue(latlng.lat, latlng.lng);
                 });
 
                 this.marker.on('dragend', () => {
@@ -348,19 +339,12 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
 
                 this.marker.addListener('drag', (event: any) => {
                     if (!this.isDisabled) {
-                        this.value = {
-                            latitude:  event.latLng.lat(),
-                            longitude: event.latLng.lng()
-                        };
+                        this.updateValue(event.latLng.lat(), event.LatLng.lng());
                     }
                 });
                 this.marker.addListener('dragend', (event: any) => {
                     if (!this.isDisabled) {
-                        this.value = {
-                            latitude:  event.latLng.lat(),
-                            longitude: event.latLng.lng()
-                        };
-
+                        this.updateValue(event.latLng.lat(), event.LatLng.lng());
                         this.updateMarker(false, true);
                     }
                 });
