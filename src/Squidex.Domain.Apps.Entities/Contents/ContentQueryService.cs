@@ -120,12 +120,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         private IContentEntity Transform(QueryContext context, ISchemaEntity schema, bool checkType, IContentEntity content)
         {
-            return TansformCore(context, schema, checkType, Enumerable.Repeat(content, 1)).FirstOrDefault();
+            return TransformCore(context, schema, checkType, Enumerable.Repeat(content, 1)).FirstOrDefault();
         }
 
         private IResultList<IContentEntity> Transform(QueryContext context, ISchemaEntity schema, bool checkType, IResultList<IContentEntity> contents)
         {
-            var transformed = TansformCore(context, schema, checkType, contents);
+            var transformed = TransformCore(context, schema, checkType, contents);
 
             return ResultList.Create(contents.Total, transformed);
         }
@@ -137,7 +137,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return ResultList.Create(contents.Total, sorted);
         }
 
-        private IEnumerable<IContentEntity> TansformCore(QueryContext context, ISchemaEntity schema, bool checkType, IEnumerable<IContentEntity> contents)
+        private IEnumerable<IContentEntity> TransformCore(QueryContext context, ISchemaEntity schema, bool checkType, IEnumerable<IContentEntity> contents)
         {
             using (Profiler.TraceMethod<ContentQueryService>())
             {
