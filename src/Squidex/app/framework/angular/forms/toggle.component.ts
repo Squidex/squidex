@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, forwardRef } from '@angular/core';
+import { ChangeDetectionStrategy, Component, forwardRef } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import { Types } from '@app/framework/internal';
@@ -18,7 +18,8 @@ export const SQX_TOGGLE_CONTROL_VALUE_ACCESSOR: any = {
     selector: 'sqx-toggle',
     styleUrls: ['./toggle.component.scss'],
     templateUrl: './toggle.component.html',
-    providers: [SQX_TOGGLE_CONTROL_VALUE_ACCESSOR]
+    providers: [SQX_TOGGLE_CONTROL_VALUE_ACCESSOR],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ToggleComponent implements ControlValueAccessor {
     private callChange = (v: any) => { /* NOOP */ };

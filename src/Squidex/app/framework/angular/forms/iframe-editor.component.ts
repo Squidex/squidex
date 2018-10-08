@@ -19,8 +19,8 @@ export const SQX_IFRAME_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     selector: 'sqx-iframe-editor',
     styleUrls: ['./iframe-editor.component.scss'],
     templateUrl: './iframe-editor.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    providers: [SQX_IFRAME_EDITOR_CONTROL_VALUE_ACCESSOR]
+    providers: [SQX_IFRAME_EDITOR_CONTROL_VALUE_ACCESSOR],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class IFrameEditorComponent implements ControlValueAccessor, AfterViewInit,  OnInit, OnDestroy {
     private windowMessageListener: Function;

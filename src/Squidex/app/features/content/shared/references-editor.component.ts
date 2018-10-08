@@ -7,7 +7,7 @@
 
 // tslint:disable:prefer-for-of
 
-import { Component, forwardRef, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input, OnInit } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import {
@@ -31,9 +31,8 @@ export const SQX_REFERENCES_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     selector: 'sqx-references-editor',
     styleUrls: ['./references-editor.component.scss'],
     templateUrl: './references-editor.component.html',
-    providers: [
-        SQX_REFERENCES_EDITOR_CONTROL_VALUE_ACCESSOR
-    ]
+    providers: [SQX_REFERENCES_EDITOR_CONTROL_VALUE_ACCESSOR],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ReferencesEditorComponent implements ControlValueAccessor, OnInit {
     private callChange = (v: any) => { /* NOOP */ };
@@ -59,6 +58,7 @@ export class ReferencesEditorComponent implements ControlValueAccessor, OnInit {
 
     constructor(
         private readonly appsState: AppsState,
+        private readonly changeDetector: ChangeDetectorRef,
         private readonly contentsService: ContentsService,
         private readonly schemasService: SchemasService
     ) {
@@ -73,8 +73,12 @@ export class ReferencesEditorComponent implements ControlValueAccessor, OnInit {
         this.schemasService.getSchema(this.appsState.appName, this.schemaId)
             .subscribe(dto => {
                 this.schema = dto;
-            }, error => {
+
+                this.changeDetector.markForCheck();
+            }, () => {
                 this.isInvalidSchema = true;
+
+                this.changeDetector.markForCheck();
             });
     }
 
@@ -90,8 +94,12 @@ export class ReferencesEditorComponent implements ControlValueAccessor, OnInit {
                         if (this.contentItems.length !== contentIds.length) {
                             this.updateValue();
                         }
+
+                        this.changeDetector.markForCheck();
                     }, () => {
                         this.contentItems = ImmutableArray.empty();
+
+                        this.changeDetector.markForCheck();
                     });
             }
         } else {
@@ -148,5 +156,7 @@ export class ReferencesEditorComponent implements ControlValueAccessor, OnInit {
 
         this.callTouched();
         this.callChange(ids);
+
+        this.changeDetector.markForCheck();
     }
 }

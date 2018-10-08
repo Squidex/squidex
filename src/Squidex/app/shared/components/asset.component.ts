@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, EventEmitter, HostBinding, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, HostBinding, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormControl } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
@@ -31,7 +31,8 @@ import {
     templateUrl: './asset.component.html',
     animations: [
         fadeAnimation
-    ]
+    ],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AssetComponent implements OnDestroy, OnInit {
     private tagSubscription: Subscription;
@@ -91,6 +92,7 @@ export class AssetComponent implements OnDestroy, OnInit {
         private readonly appsState: AppsState,
         private readonly assetsService: AssetsService,
         private readonly authState: AuthService,
+        private readonly changeDetector: ChangeDetectorRef,
         private readonly dialogs: DialogService,
         private readonly formBuilder: FormBuilder
     ) {
@@ -105,7 +107,7 @@ export class AssetComponent implements OnDestroy, OnInit {
                     if (Types.is(dto, AssetDto)) {
                         this.emitLoaded(dto);
                     } else {
-                        this.progress = dto;
+                        this.setProgress(dto);
                     }
                 }, error => {
                     this.dialogs.notifyError(error);
@@ -145,7 +147,7 @@ export class AssetComponent implements OnDestroy, OnInit {
                 }, error => {
                     this.dialogs.notifyError(error);
 
-                    this.setProgress();
+                    this.setProgress(0);
                 });
         }
     }
@@ -159,8 +161,6 @@ export class AssetComponent implements OnDestroy, OnInit {
             this.assetsService.putAsset(this.appsState.appName, this.asset.id, requestDto, this.asset.version)
                 .subscribe(dto => {
                     this.updateAsset(this.asset.rename(requestDto.fileName, this.authState.user!.token, dto.version), true);
-
-                    this.renameCancel();
                 }, error => {
                     this.dialogs.notifyError(error);
 
@@ -194,10 +194,6 @@ export class AssetComponent implements OnDestroy, OnInit {
         this.renaming = false;
     }
 
-    private setProgress(progress = 0) {
-        this.progress = progress;
-    }
-
     private emitFailed(error: any) {
         this.failed.emit(error);
     }
@@ -208,6 +204,12 @@ export class AssetComponent implements OnDestroy, OnInit {
 
     private emitUpdated(asset: AssetDto) {
         this.updated.emit(asset);
+    }
+
+    private setProgress(progress: number) {
+        this.progress = progress;
+
+        this.changeDetector.markForCheck();
     }
 
     private updateAsset(asset: AssetDto, emitEvent: boolean) {
@@ -221,5 +223,7 @@ export class AssetComponent implements OnDestroy, OnInit {
         }
 
         this.renameCancel();
+
+        this.changeDetector.markForCheck();
     }
 }

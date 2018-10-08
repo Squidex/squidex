@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, Component, ElementRef, forwardRef, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, forwardRef, ViewChild } from '@angular/core';
 import { ControlValueAccessor, FormBuilder, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import {
@@ -31,7 +31,8 @@ interface Geolocation {
     selector: 'sqx-geolocation-editor',
     styleUrls: ['./geolocation-editor.component.scss'],
     templateUrl: './geolocation-editor.component.html',
-    providers: [SQX_GEOLOCATION_EDITOR_CONTROL_VALUE_ACCESSOR]
+    providers: [SQX_GEOLOCATION_EDITOR_CONTROL_VALUE_ACCESSOR],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class GeolocationEditorComponent implements ControlValueAccessor, AfterViewInit {
     private callChange = (v: any) => { /* NOOP */ };

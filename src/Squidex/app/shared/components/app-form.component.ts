@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 
 import {
@@ -18,7 +18,8 @@ import {
 @Component({
     selector: 'sqx-app-form',
     styleUrls: ['./app-form.component.scss'],
-    templateUrl: './app-form.component.html'
+    templateUrl: './app-form.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppFormComponent {
     @Output()
@@ -46,7 +47,7 @@ export class AppFormComponent {
             const request = new CreateAppDto(value.name, this.template);
 
             this.appsStore.create(request)
-                .subscribe(dto => {
+                .subscribe(() => {
                     this.complete();
                 }, error => {
                     this.createForm.submitFailed(error);

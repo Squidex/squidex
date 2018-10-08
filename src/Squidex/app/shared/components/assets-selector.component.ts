@@ -7,7 +7,7 @@
 
 // tslint:disable:prefer-for-of
 
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { onErrorResumeNext } from 'rxjs/operators';
 
 import {
@@ -23,7 +23,8 @@ import {
     templateUrl: './assets-selector.component.html',
     animations: [
         fadeAnimation
-    ]
+    ],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AssetsSelectorComponent implements OnInit {
     public selectedAssets: { [id: string]: AssetDto } = {};

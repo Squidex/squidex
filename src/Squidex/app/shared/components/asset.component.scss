@@ -254,6 +254,10 @@ $list-height: 2.375rem;
             min-width: 12rem;
         }
     }
+
+    .upload-progress {
+        padding: .25rem 0;
+    }
 }
 
 .drop-overlay {
@@ -276,22 +280,6 @@ $list-height: 2.375rem;
 
     .file-type {
         @include opacity(0);
-    }
-}
-
-.progress {
-    &-background {
-        background: $color-border;
-        margin: (($list-height - .25rem) / 2) 0;
-    }
-
-    &-bar {
-        background: $color-theme-blue;
-    }
-
-    &-background,
-    &-bar {
-        height: .25rem;
     }
 }
 

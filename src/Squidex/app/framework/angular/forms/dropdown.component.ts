@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterContentInit, Component, ContentChildren, forwardRef, Input, QueryList, TemplateRef } from '@angular/core';
+import { AfterContentInit, ChangeDetectionStrategy, Component, ContentChildren, forwardRef, Input, QueryList, TemplateRef } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 const KEY_ENTER = 13;
@@ -23,7 +23,8 @@ export const SQX_DROPDOWN_CONTROL_VALUE_ACCESSOR: any = {
     selector: 'sqx-dropdown',
     styleUrls: ['./dropdown.component.scss'],
     templateUrl: './dropdown.component.html',
-    providers: [SQX_DROPDOWN_CONTROL_VALUE_ACCESSOR]
+    providers: [SQX_DROPDOWN_CONTROL_VALUE_ACCESSOR],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DropdownComponent implements AfterContentInit, ControlValueAccessor {
     private callChange = (v: any) => { /* NOOP */ };

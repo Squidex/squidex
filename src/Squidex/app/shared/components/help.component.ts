@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 import { HelpService } from '@app/shared/internal';
@@ -13,7 +13,8 @@ import { HelpService } from '@app/shared/internal';
 @Component({
     selector: 'sqx-help',
     styleUrls: ['./help.component.scss'],
-    templateUrl: './help.component.html'
+    templateUrl: './help.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class HelpComponent {
     public helpSections =

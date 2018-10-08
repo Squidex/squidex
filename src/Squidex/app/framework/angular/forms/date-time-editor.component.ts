@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, Component, ElementRef, forwardRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 import * as moment from 'moment';
 import { Subscription } from 'rxjs';
@@ -22,7 +22,8 @@ export const SQX_DATE_TIME_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     selector: 'sqx-date-time-editor',
     styleUrls: ['./date-time-editor.component.scss'],
     templateUrl: './date-time-editor.component.html',
-    providers: [SQX_DATE_TIME_EDITOR_CONTROL_VALUE_ACCESSOR]
+    providers: [SQX_DATE_TIME_EDITOR_CONTROL_VALUE_ACCESSOR],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DateTimeEditorComponent implements ControlValueAccessor, OnDestroy, OnInit, AfterViewInit {
     private timeSubscription: Subscription;
@@ -59,6 +60,11 @@ export class DateTimeEditorComponent implements ControlValueAccessor, OnDestroy,
     public dateInput: ElementRef;
 
     public isDisabled = false;
+
+    constructor(
+        private readonly changeDetector: ChangeDetectorRef
+    ) {
+    }
 
     public ngOnDestroy() {
         this.dateSubscription.unsubscribe();
@@ -136,6 +142,10 @@ export class DateTimeEditorComponent implements ControlValueAccessor, OnDestroy,
 
                 this.updateValue();
                 this.touched();
+
+                if (false) {
+                    this.changeDetector.markForCheck();
+                }
             }
         });
 

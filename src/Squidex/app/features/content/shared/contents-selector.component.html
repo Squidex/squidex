@@ -16,10 +16,10 @@
                     (queryChanged)="search($event)"
                     expandable="true">
                 </sqx-search-form>
-    
-                <ng-container *ngIf="languages.length > 1">
-                    <sqx-language-selector class="languages-buttons" (selectedLanguageChange)="selectLanguage($event)" [languages]="languages.values"></sqx-language-selector>
-                </ng-container>
+            </div>
+                
+            <div class="col pl-1" *ngIf="languages.length > 1">
+                <sqx-language-selector class="languages-buttons" (selectedLanguageChange)="selectLanguage($event)" [languages]="languages.values"></sqx-language-selector>
             </div>
         </div>
     </ng-container>

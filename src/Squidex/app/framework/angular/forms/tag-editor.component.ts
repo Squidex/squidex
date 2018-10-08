@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, Component, ElementRef, forwardRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, forwardRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { distinctUntilChanged, map, tap } from 'rxjs/operators';
@@ -75,7 +75,8 @@ export const SQX_TAG_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     selector: 'sqx-tag-editor',
     styleUrls: ['./tag-editor.component.scss'],
     templateUrl: './tag-editor.component.html',
-    providers: [SQX_TAG_EDITOR_CONTROL_VALUE_ACCESSOR]
+    providers: [SQX_TAG_EDITOR_CONTROL_VALUE_ACCESSOR],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TagEditorComponent implements AfterViewInit, ControlValueAccessor, OnDestroy, OnInit {
     private subscription: Subscription;

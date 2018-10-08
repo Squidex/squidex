@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import {
@@ -17,7 +17,8 @@ import {
 @Component({
     selector: 'sqx-history-list',
     styleUrls: ['./history-list.component.scss'],
-    templateUrl: './history-list.component.html'
+    templateUrl: './history-list.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class HistoryListComponent {
     @Input()
