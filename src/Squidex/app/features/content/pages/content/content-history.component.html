@@ -11,7 +11,7 @@
             <div class="col pl-2">
                 <div class="event-message">
                     <span class="event-actor user-ref mr-1">{{event.actor | sqxUserNameRef:null}}</span> 
-                    <span [innerHTML]="format(event.message) | async"></span>
+                    <span [innerHTML]="event | sqxHistoryMessage"></span>
                 </div>
                 <div class="event-created">{{event.created | sqxFromNow}}</div>
 

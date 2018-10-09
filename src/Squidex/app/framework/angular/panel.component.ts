@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input, OnDestroy, OnInit, Renderer2, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Input, OnDestroy, OnInit, Renderer2, ViewChild } from '@angular/core';
 
 import { slideRightAnimation } from './animations';
 
@@ -63,7 +63,6 @@ export class PanelComponent implements AfterViewInit, OnDestroy, OnInit {
 
     constructor(
         private readonly container: PanelContainerDirective,
-        private readonly changeDetector: ChangeDetectorRef,
         private readonly renderer: Renderer2
     ) {
     }
@@ -86,8 +85,6 @@ export class PanelComponent implements AfterViewInit, OnDestroy, OnInit {
 
             this.renderer.setStyle(this.panel.nativeElement, 'width', size);
             this.renderWidth = this.panel.nativeElement.offsetWidth;
-
-            this.changeDetector.detectChanges();
         }
     }
 
