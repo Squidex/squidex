@@ -132,7 +132,7 @@ export class AssetsEditorComponent implements ControlValueAccessor {
         this.callTouched();
         this.callChange(ids);
 
-        this.changeDetector.markForCheck();
+        this.changeDetector.detectChanges();
     }
 
     public sort(assets: AssetDto[]) {

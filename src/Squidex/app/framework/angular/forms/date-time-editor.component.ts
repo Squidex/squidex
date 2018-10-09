@@ -144,7 +144,7 @@ export class DateTimeEditorComponent implements ControlValueAccessor, OnDestroy,
                 this.touched();
 
                 if (false) {
-                    this.changeDetector.markForCheck();
+                    this.changeDetector.detectChanges();
                 }
             }
         });

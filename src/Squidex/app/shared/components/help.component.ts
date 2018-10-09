@@ -17,8 +17,7 @@ import { HelpService } from '@app/shared/internal';
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class HelpComponent {
-    public helpSections =
-        this.helpService.getHelp(this.route.snapshot.data['helpPage']);
+    public helpSections = this.helpService.getHelp(this.route.snapshot.data['helpPage']);
 
     constructor(
         private readonly helpService: HelpService,

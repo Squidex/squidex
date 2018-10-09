@@ -272,13 +272,24 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
 
     private updateMarker(zoom: boolean, fireEvent: boolean) {
         if (!this.isGoogleMaps) {
-            this.updateMarkerOSM(zoom, fireEvent);
+            this.updateMarkerOSM(zoom);
         } else {
-            this.updateMarkerGoogle(zoom, fireEvent);
+            this.updateMarkerGoogle(zoom);
+        }
+
+        if (this.value) {
+            this.geolocationForm.setValue(this.value, { emitEvent: true, onlySelf: false });
+        } else {
+            this.geolocationForm.reset(undefined, { emitEvent: true, onlySelf: false });
+        }
+
+        if (fireEvent) {
+            this.callChange(this.value);
+            this.callTouched();
         }
     }
 
-    private updateMarkerOSM(zoom: boolean, fireEvent: boolean) {
+    private updateMarkerOSM(zoom: boolean) {
         if (this.value) {
             if (!this.marker) {
                 this.marker = L.marker([0, 90], { draggable: true }).addTo(this.map);
@@ -307,8 +318,6 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
             }
 
             this.marker.setLatLng(latLng);
-
-            this.geolocationForm.setValue(this.value, { emitEvent: false, onlySelf: false });
         } else {
             if (this.marker) {
                 this.marker.removeFrom(this.map);
@@ -316,17 +325,10 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
             }
 
             this.map.fitWorld();
-
-            this.geolocationForm.reset(undefined, { emitEvent: false, onlySelf: false });
-        }
-
-        if (fireEvent) {
-            this.callChange(this.value);
-            this.callTouched();
         }
     }
 
-    private updateMarkerGoogle(zoom: boolean, fireEvent: boolean) {
+    private updateMarkerGoogle(zoom: boolean) {
         if (this.value) {
             if (!this.marker) {
                 this.marker =  new google.maps.Marker({
@@ -361,8 +363,6 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
 
             this.marker.setPosition(latLng);
             this.map.setZoom(12);
-
-            this.geolocationForm.setValue(this.value, { emitEvent: false, onlySelf: false });
         } else {
             if (this.marker) {
                 this.marker.setMap(null);
@@ -370,13 +370,6 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
             }
 
             this.map.setCenter({ lat: 0, lng: 0 });
-
-            this.geolocationForm.reset(undefined, { emitEvent: false, onlySelf: false });
-        }
-
-        if (fireEvent) {
-            this.callChange(this.value);
-            this.callTouched();
         }
     }
 }

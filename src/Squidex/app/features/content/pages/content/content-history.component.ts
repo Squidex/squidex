@@ -71,4 +71,8 @@ export class ContentHistoryComponent {
     public format(message: string): Observable<string> {
         return formatHistoryMessage(message, this.users);
     }
+
+    public trackByEvent(index: number, event: HistoryEventDto) {
+        return event.eventId;
+    }
 }

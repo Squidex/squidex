@@ -1,6 +1,12 @@
 <nav class="navbar fixed-top navbar-dark bg-primary bg-faded">
     <span class="navbar-brand" routerLink="/app">
-        <i class="icon-logo"></i>
+        <ng-container *ngIf="loadingService.loading | async; else noLoading">
+            <img class="loader" src="/images/loader-white.gif" @fade />
+        </ng-container>
+
+        <ng-template #noLoading>
+            <i class="icon-logo" @fade></i>
+        </ng-template>
     </span>
 
     <div class="float-left apps-menu">

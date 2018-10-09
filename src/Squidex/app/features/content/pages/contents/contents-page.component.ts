@@ -149,7 +149,7 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
     }
 
     public isSelectedQuery(query: string) {
-        return query === this.contentsState.snapshot.contentsQuery || (!query && !this.contentsState.contentsQuery);
+        return query === this.contentsState.snapshot.contentsQuery || (!query && !this.contentsState.snapshot.contentsQuery);
     }
 
     private changeContentItems(contents: ContentDto[], action: string) {
@@ -208,6 +208,12 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
         this.updateSelectionSummary();
     }
 
+    private resetSelection() {
+        this.selectedItems = {};
+
+        this.updateSelectionSummary();
+    }
+
     public selectAll(isSelected: boolean) {
         this.selectedItems = {};
 
@@ -222,12 +228,6 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
 
     public trackByContent(content: ContentDto): string {
         return content.id;
-    }
-
-    private resetSelection() {
-        this.selectedItems = {};
-
-        this.updateSelectionSummary();
     }
 
     private updateSelectionSummary() {

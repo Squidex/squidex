@@ -44,7 +44,7 @@ class UserAsyncPipe implements OnDestroy {
             this.subscription = transform(this.users).subscribe(value => {
                 this.lastValue = value;
 
-                this.changeDetector.markForCheck();
+                this.changeDetector.detectChanges();
             });
         }
 

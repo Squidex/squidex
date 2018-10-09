@@ -5,7 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights r vbeserved
  */
 
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 
 import {
@@ -22,7 +22,8 @@ import {
     templateUrl: './dialog-renderer.component.html',
     animations: [
         fadeAnimation
-    ]
+    ],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DialogRendererComponent implements OnDestroy, OnInit {
     private dialogSubscription: Subscription;
@@ -38,6 +39,7 @@ export class DialogRendererComponent implements OnDestroy, OnInit {
     public position = 'bottomright';
 
     constructor(
+        private readonly changeDetector: ChangeDetectorRef,
         private readonly dialogs: DialogService
     ) {
     }
@@ -53,6 +55,8 @@ export class DialogRendererComponent implements OnDestroy, OnInit {
             this.dialogView.isOpen.subscribe(isOpen => {
                 if (!isOpen) {
                     this.cancel();
+
+                    this.changeDetector.detectChanges();
                 }
             });
 
@@ -65,6 +69,8 @@ export class DialogRendererComponent implements OnDestroy, OnInit {
                         this.close(notification);
                     }, notification.displayTime);
                 }
+
+                this.changeDetector.detectChanges();
             });
 
         this.dialogsSubscription =
@@ -74,6 +80,8 @@ export class DialogRendererComponent implements OnDestroy, OnInit {
 
                     this.dialogRequest = request;
                     this.dialogView.show();
+
+                    this.changeDetector.detectChanges();
                 });
     }
 
@@ -94,6 +102,12 @@ export class DialogRendererComponent implements OnDestroy, OnInit {
     }
 
     public close(notification: Notification) {
-        this.notifications.splice(this.notifications.indexOf(notification), 1);
+        const index = this.notifications.indexOf(notification);
+
+        if (index >= 0) {
+            this.notifications.splice(index, 1);
+
+            this.changeDetector.detectChanges();
+        }
     }
 }

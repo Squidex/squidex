@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input, OnDestroy, OnInit, Renderer2 } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnDestroy, OnInit, Renderer2 } from '@angular/core';
 
 import {
     fadeAnimation,
@@ -20,7 +20,8 @@ import {
     templateUrl: './onboarding-tooltip.component.html',
     animations: [
         fadeAnimation
-    ]
+    ],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class OnboardingTooltipComponent implements OnDestroy, OnInit {
     private showTimer: any;

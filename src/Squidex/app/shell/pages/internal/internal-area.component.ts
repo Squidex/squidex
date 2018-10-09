@@ -11,13 +11,18 @@ import { Subscription } from 'rxjs';
 
 import {
     DialogService,
+    fadeAnimation,
+    LoadingService,
     Notification
 } from '@app/shared';
 
 @Component({
     selector: 'sqx-internal-area',
     styleUrls: ['./internal-area.component.scss'],
-    templateUrl: './internal-area.component.html'
+    templateUrl: './internal-area.component.html',
+    animations: [
+        fadeAnimation
+    ]
 })
 export class InternalAreaComponent implements OnDestroy, OnInit {
     private queryParamsSubscription: Subscription;
@@ -25,6 +30,7 @@ export class InternalAreaComponent implements OnDestroy, OnInit {
     public notifications: Notification[] = [];
 
     constructor(
+        public readonly loadingService: LoadingService,
         private readonly dialogs: DialogService,
         private readonly route: ActivatedRoute
     ) {

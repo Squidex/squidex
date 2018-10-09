@@ -74,11 +74,11 @@ export class ReferencesEditorComponent implements ControlValueAccessor, OnInit {
             .subscribe(dto => {
                 this.schema = dto;
 
-                this.changeDetector.markForCheck();
+                this.changeDetector.detectChanges();
             }, () => {
                 this.isInvalidSchema = true;
 
-                this.changeDetector.markForCheck();
+                this.changeDetector.detectChanges();
             });
     }
 
@@ -95,11 +95,11 @@ export class ReferencesEditorComponent implements ControlValueAccessor, OnInit {
                             this.updateValue();
                         }
 
-                        this.changeDetector.markForCheck();
+                        this.changeDetector.detectChanges();
                     }, () => {
                         this.contentItems = ImmutableArray.empty();
 
-                        this.changeDetector.markForCheck();
+                        this.changeDetector.detectChanges();
                     });
             }
         } else {
@@ -157,6 +157,6 @@ export class ReferencesEditorComponent implements ControlValueAccessor, OnInit {
         this.callTouched();
         this.callChange(ids);
 
-        this.changeDetector.markForCheck();
+        this.changeDetector.detectChanges();
     }
 }

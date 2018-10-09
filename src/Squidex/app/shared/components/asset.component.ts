@@ -209,7 +209,7 @@ export class AssetComponent implements OnDestroy, OnInit {
     private setProgress(progress: number) {
         this.progress = progress;
 
-        this.changeDetector.markForCheck();
+        this.changeDetector.detectChanges();
     }
 
     private updateAsset(asset: AssetDto, emitEvent: boolean) {
@@ -224,6 +224,6 @@ export class AssetComponent implements OnDestroy, OnInit {
 
         this.renameCancel();
 
-        this.changeDetector.markForCheck();
+        this.changeDetector.detectChanges();
     }
 }
