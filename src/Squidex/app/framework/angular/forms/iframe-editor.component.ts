@@ -7,7 +7,7 @@
 
 import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, forwardRef, Input, OnDestroy, OnInit, Renderer2, ViewChild } from '@angular/core';
 import { ControlValueAccessor,  NG_VALUE_ACCESSOR } from '@angular/forms';
-import { DomSanitizer } from '@angular/platform-browser';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 import { Types } from '@app/framework/internal';
 
@@ -35,7 +35,11 @@ export class IFrameEditorComponent implements ControlValueAccessor, AfterViewIni
     public iframe: ElementRef;
 
     @Input()
-    public url: string;
+    public set url(value: string) {
+        this.sanitizedUrl = this.sanitizer.bypassSecurityTrustResourceUrl(value);
+    }
+
+    public sanitizedUrl: SafeResourceUrl;
 
     constructor(
         private readonly sanitizer: DomSanitizer,
@@ -81,10 +85,6 @@ export class IFrameEditorComponent implements ControlValueAccessor, AfterViewIni
                     }
                 }
             });
-    }
-
-    public sanitizedUrl() {
-        return this.sanitizer.bypassSecurityTrustResourceUrl(this.url);
     }
 
     public writeValue(obj: any) {
