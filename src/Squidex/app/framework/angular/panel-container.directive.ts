@@ -45,7 +45,7 @@ export class PanelContainerDirective implements AfterViewInit {
 
     public invalidate(resize = false) {
         if (resize) {
-            this.containerWidth = this.element.nativeElement.getBoundingClientRect().width;
+            this.containerWidth = this.element.nativeElement.offsetWidth;
         }
 
         const panels = this.panels;

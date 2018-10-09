@@ -71,6 +71,8 @@ export const SQX_TAG_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => TagEditorComponent), multi: true
 };
 
+const SIZE_CACHE: { [key: string]: number } = {};
+
 @Component({
     selector: 'sqx-tag-editor',
     styleUrls: ['./tag-editor.component.scss'],
@@ -205,7 +207,6 @@ export class TagEditorComponent implements AfterViewInit, ControlValueAccessor, 
     }
 
     public resetSize() {
-        const style = window.getComputedStyle(this.inputElement.nativeElement);
 
         if (!canvas) {
             canvas = document.createElement('canvas');
@@ -215,20 +216,32 @@ export class TagEditorComponent implements AfterViewInit, ControlValueAccessor, 
             const ctx = canvas.getContext('2d');
 
             if (ctx) {
-                ctx.font = `${style.getPropertyValue('font-size')} ${style.getPropertyValue('font-family')}`;
+                const text = this.inputElement.nativeElement.value;
 
-                const widthText = ctx.measureText(this.inputElement.nativeElement.value).width;
-                const widthPlaceholder = ctx.measureText(this.placeholder).width;
+                let width = SIZE_CACHE[text];
 
-                const width = Math.max(widthText, widthPlaceholder);
+                if (!width) {
+                    const style = window.getComputedStyle(this.inputElement.nativeElement);
+
+                    ctx.font = `${style.getPropertyValue('font-size')} ${style.getPropertyValue('font-family')}`;
+
+                    const widthText = ctx.measureText(text).width;
+                    const widthPlaceholder = ctx.measureText(this.placeholder).width;
+
+                    width = Math.max(widthText, widthPlaceholder);
+
+                    SIZE_CACHE[text] = width;
+                }
 
                 this.inputElement.nativeElement.style.width = <any>((width + 5) + 'px');
             }
         }
 
-        setTimeout(() => {
-            this.formElement.nativeElement.scrollLeft = this.formElement.nativeElement.scrollWidth;
-        }, 0);
+        if (this.singleLine) {
+            setTimeout(() => {
+                this.formElement.nativeElement.scrollLeft = this.formElement.nativeElement.scrollWidth;
+            }, 0);
+        }
     }
 
     public onKeyDown(event: KeyboardEvent) {

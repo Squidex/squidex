@@ -7,7 +7,7 @@
                 </span>
                 
                 <div *ngIf="asset.isImage" class="file-image">
-                    <img [sqxImageSource]="asset | sqxAssetPreviewUrl" class="bg">
+                    <img [sqxImageSource]="asset | sqxAssetPreviewUrl" class="bg" layoutKey="asset-large">
                 </div>
                 <div *ngIf="!asset.isImage" class="file-icon">
                     <img [attr.src]="asset | sqxFileIcon">
@@ -89,7 +89,7 @@
         <div class="left-border" [class.selected]="isSelected" ></div>
 
         <div *ngIf="asset && asset.isImage && progress === 0" class="image" @fade>
-            <img [sqxImageSource]="asset | sqxAssetPreviewUrl" class="bg2">
+            <img [sqxImageSource]="asset | sqxAssetPreviewUrl" class="bg2" layoutKey="asset-small">
         </div>
         <div *ngIf="asset && !asset.isImage && progress === 0" class="image image-padded" @fade>
             <img class="icon" [attr.src]="asset | sqxFileIcon">

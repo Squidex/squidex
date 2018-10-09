@@ -9,6 +9,8 @@ import { AfterViewInit, Directive, ElementRef, HostListener, Input, OnChanges, O
 
 import { MathHelper } from './../utils/math-helper';
 
+const LAYOUT_CACHE: { [key: string]: { width: number, height: number } } = {};
+
 @Directive({
     selector: '[sqxImageSource]'
 })
@@ -25,6 +27,9 @@ export class ImageSourceDirective implements OnChanges, OnDestroy, OnInit, After
 
     @Input()
     public retryCount = 10;
+
+    @Input()
+    public layoutKey: string;
 
     @Input()
     public parent: any = null;
@@ -76,7 +81,21 @@ export class ImageSourceDirective implements OnChanges, OnDestroy, OnInit, After
     }
 
     private resize() {
-        this.size = this.parent.getBoundingClientRect();
+        let size: { width: number, height: number } = null!;
+
+        if (this.layoutKey) {
+            size = LAYOUT_CACHE[this.layoutKey];
+        }
+
+        if (!size) {
+            size = { width: this.parent.offsetWidth, height: this.parent.offsetHeight };
+        }
+
+        this.size = size;
+
+        if (this.layoutKey) {
+            LAYOUT_CACHE[this.layoutKey] = size;
+        }
 
         this.renderer.setStyle(this.element.nativeElement, 'display', 'inline-block');
         this.renderer.setStyle(this.element.nativeElement, 'width', this.size.width + 'px');

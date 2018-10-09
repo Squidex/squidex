@@ -85,7 +85,7 @@ export class PanelComponent implements AfterViewInit, OnDestroy, OnInit {
             this.styleWidth = size;
 
             this.renderer.setStyle(this.panel.nativeElement, 'width', size);
-            this.renderWidth = this.panel.nativeElement.getBoundingClientRect().width;
+            this.renderWidth = this.panel.nativeElement.offsetWidth;
 
             this.changeDetector.detectChanges();
         }
