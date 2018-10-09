@@ -106,7 +106,7 @@ export class RichEditorComponent implements ControlValueAccessor, AfterViewInit,
                 self.tinyInitTimer =
                     setTimeout(() => {
                         self.tinyEditor.setContent(this.value || '');
-                    }, 500);
+                    }, 1000);
             },
 
             target: this.editor.nativeElement
