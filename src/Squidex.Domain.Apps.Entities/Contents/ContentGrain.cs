@@ -68,7 +68,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                         await ctx.ExecuteScriptAndTransformAsync(x => x.ScriptCreate, "Create", c, c.Data);
                         await ctx.EnrichAsync(c.Data);
-                        await ctx.ValidateAsync(c.Data);
+
+                        if (!c.DoNotValidate)
+                        {
+                            await ctx.ValidateAsync(c.Data);
+                        }
 
                         if (c.Publish)
                         {
