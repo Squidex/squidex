@@ -54,7 +54,7 @@ export class HistoryMessagePipe implements OnDestroy, PipeTransform {
             this.subscription =  formatHistoryMessage(event.message, this.users).subscribe(value => {
                 this.lastValue = value;
 
-                this.changeDetector.detectChanges();
+                this.changeDetector.markForCheck();
             });
         }
 
@@ -90,7 +90,7 @@ class UserAsyncPipe implements OnDestroy {
             this.subscription = transform(this.users).subscribe(value => {
                 this.lastValue = value;
 
-                this.changeDetector.detectChanges();
+                this.changeDetector.markForCheck();
             });
         }
 
