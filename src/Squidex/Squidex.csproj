@@ -54,7 +54,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Algolia.Search" Version="5.1.0" />
+    <PackageReference Include="Algolia.Search" Version="5.2.0" />
     <PackageReference Include="Ben.BlockingDetector" Version="0.0.3" />
     <PackageReference Include="EventStore.ClientAPI.NetCore" Version="4.1.0.23" />
     <PackageReference Include="IdentityServer4" Version="2.2.0" />
@@ -83,7 +83,7 @@
     <PackageReference Include="NSwag.AspNetCore" Version="11.20.1" />
     <PackageReference Include="OpenCover" Version="4.6.519" />
     <PackageReference Include="Orleans.Providers.MongoDB" Version="2.0.1" />
-    <PackageReference Include="OrleansDashboard" Version="2.0.9" />
+    <PackageReference Include="OrleansDashboard" Version="2.1.2" />
     <PackageReference Include="RefactoringEssentials" Version="5.6.0" PrivateAssets="all" />
     <PackageReference Include="ReportGenerator" Version="3.1.2" />
     <PackageReference Include="StackExchange.Redis.StrongName" Version="1.2.6" />
