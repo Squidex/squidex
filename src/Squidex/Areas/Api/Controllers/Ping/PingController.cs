@@ -15,16 +15,29 @@ namespace Squidex.Areas.Api.Controllers.Ping
     /// <summary>
     /// Makes a ping request.
     /// </summary>
-    [ApiAuthorize]
     [ApiExceptionFilter]
-    [AppApi]
-    [MustBeAppReader]
     [SwaggerTag(nameof(Ping))]
     public sealed class PingController : ApiController
     {
         public PingController(ICommandBus commandBus)
             : base(commandBus)
         {
+        }
+
+        /// <summary>
+        /// Get ping status of the API.
+        /// </summary>
+        /// <returns>
+        /// 204 => Service ping successful.
+        /// </returns>
+        /// <remarks>
+        /// Can be used to test, if the Squidex API is alive and responding.
+        /// </remarks>
+        [HttpGet]
+        [Route("ping/")]
+        public IActionResult GetPing()
+        {
+            return NoContent();
         }
 
         /// <summary>
@@ -37,9 +50,12 @@ namespace Squidex.Areas.Api.Controllers.Ping
         /// <remarks>
         /// Can be used to test, if the Squidex API is alive and responding.
         /// </remarks>
+        [ApiAuthorize]
+        [ApiCosts(0)]
+        [AppApi]
+        [MustBeAppReader]
         [HttpGet]
         [Route("ping/{app}/")]
-        [ApiCosts(0)]
         public IActionResult GetPing(string app)
         {
             return NoContent();
