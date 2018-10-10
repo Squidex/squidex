@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, Input, OnDestroy, OnInit, Renderer2 } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy, OnInit, Renderer2 } from '@angular/core';
 
 import {
     fadeAnimation,
@@ -43,6 +43,7 @@ export class OnboardingTooltipComponent implements OnDestroy, OnInit {
     public position = 'left';
 
     constructor(
+        private readonly changeDetector: ChangeDetectorRef,
         private readonly onboardingService: OnboardingService,
         private readonly renderer: Renderer2
     ) {
@@ -73,6 +74,8 @@ export class OnboardingTooltipComponent implements OnDestroy, OnInit {
 
                     if (this.isSameOrParent(fromPoint)) {
                         this.tooltipModal.show();
+
+                        this.changeDetector.detectChanges();
 
                         this.closeTimer = setTimeout(() => {
                             this.hideThis();

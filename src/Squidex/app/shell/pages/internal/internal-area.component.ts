@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 
@@ -22,8 +22,7 @@ import {
     templateUrl: './internal-area.component.html',
     animations: [
         fadeAnimation
-    ],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    ]
 })
 export class InternalAreaComponent implements OnDestroy, OnInit {
     private queryParamsSubscription: Subscription;

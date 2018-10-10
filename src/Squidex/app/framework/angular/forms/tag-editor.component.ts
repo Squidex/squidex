@@ -71,7 +71,9 @@ export const SQX_TAG_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => TagEditorComponent), multi: true
 };
 
-const SIZE_CACHE: { [key: string]: number } = {};
+const CACHED_SIZES: { [key: string]: number } = {};
+
+let CACHED_FONT: string;
 
 @Component({
     selector: 'sqx-tag-editor',
@@ -132,6 +134,12 @@ export class TagEditorComponent implements AfterViewInit, ControlValueAccessor, 
     }
 
     public ngAfterViewInit() {
+        if (!CACHED_FONT) {
+            const style = window.getComputedStyle(this.inputElement.nativeElement);
+
+            CACHED_FONT = `${style.getPropertyValue('font-size')} ${style.getPropertyValue('font-family')}`;
+        }
+
         this.resetSize();
     }
 
@@ -207,6 +215,9 @@ export class TagEditorComponent implements AfterViewInit, ControlValueAccessor, 
     }
 
     public resetSize() {
+        if (!CACHED_FONT) {
+            return;
+        }
 
         if (!canvas) {
             canvas = document.createElement('canvas');
@@ -216,21 +227,20 @@ export class TagEditorComponent implements AfterViewInit, ControlValueAccessor, 
             const ctx = canvas.getContext('2d');
 
             if (ctx) {
-                const text = this.inputElement.nativeElement.value;
+                ctx.font = CACHED_FONT;
 
-                let width = SIZE_CACHE[text];
+                const text = this.inputElement.nativeElement.value;
+                const textKey = `${text}§${this.placeholder}§${ctx.font}`;
+
+                let width = CACHED_SIZES[textKey];
 
                 if (!width) {
-                    const style = window.getComputedStyle(this.inputElement.nativeElement);
-
-                    ctx.font = `${style.getPropertyValue('font-size')} ${style.getPropertyValue('font-family')}`;
-
                     const widthText = ctx.measureText(text).width;
                     const widthPlaceholder = ctx.measureText(this.placeholder).width;
 
                     width = Math.max(widthText, widthPlaceholder);
 
-                    SIZE_CACHE[text] = width;
+                    CACHED_SIZES[textKey] = width;
                 }
 
                 this.inputElement.nativeElement.style.width = <any>((width + 5) + 'px');
