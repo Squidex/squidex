@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -20,7 +19,7 @@ namespace Squidex.Areas.Api.Config.Swagger
         {
             var urlOptions = app.ApplicationServices.GetService<IOptions<MyUrlsOptions>>().Value;
 
-            app.UseSwagger(typeof(SwaggerExtensions).GetTypeInfo().Assembly, settings =>
+            app.UseSwaggerWithApiExplorer(settings =>
             {
                 settings.AddAssetODataParams();
                 settings.ConfigureNames();

@@ -8,7 +8,6 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using NSwag.Annotations;
 using Orleans;
 using Squidex.Areas.Api.Controllers.UI.Models;
 using Squidex.Config;
@@ -25,7 +24,7 @@ namespace Squidex.Areas.Api.Controllers.UI
     [ApiAuthorize]
     [ApiExceptionFilter]
     [AppApi]
-    [SwaggerTag(nameof(UI))]
+    [ApiExplorerSettings(GroupName = nameof(UI))]
     public sealed class UIController : ApiController
     {
         private readonly MyUIOptions uiOptions;

@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using NSwag.Annotations;
 using Squidex.Areas.Api.Controllers.Statistics.Models;
 using Squidex.Domain.Apps.Entities.Apps.Services;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
@@ -27,7 +26,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics
     [ApiExceptionFilter]
     [AppApi]
     [MustBeAppEditor]
-    [SwaggerTag(nameof(Statistics))]
+    [ApiExplorerSettings(GroupName = nameof(Statistics))]
     public sealed class UsagesController : ApiController
     {
         private readonly IUsageTracker usageTracker;

@@ -12,7 +12,6 @@ using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using NSwag.Annotations;
 using Squidex.Areas.Api.Controllers.Users.Models;
 using Squidex.Domain.Users;
 using Squidex.Infrastructure.Commands;
@@ -26,7 +25,7 @@ namespace Squidex.Areas.Api.Controllers.Users
     /// Readonly API to retrieve information about squidex users.
     /// </summary>
     [ApiExceptionFilter]
-    [SwaggerTag(nameof(Users))]
+    [ApiExplorerSettings(GroupName = nameof(Users))]
     public sealed class UsersController : ApiController
     {
         private static readonly byte[] AvatarBytes;

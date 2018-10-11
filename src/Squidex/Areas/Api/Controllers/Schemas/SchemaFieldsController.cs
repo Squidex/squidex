@@ -7,7 +7,6 @@
 
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using NSwag.Annotations;
 using Squidex.Areas.Api.Controllers.Schemas.Models;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Infrastructure.Commands;
@@ -22,7 +21,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
     [ApiExceptionFilter]
     [AppApi]
     [MustBeAppDeveloper]
-    [SwaggerTag(nameof(Schemas))]
+    [ApiExplorerSettings(GroupName = nameof(Schemas))]
     public sealed class SchemaFieldsController : ApiController
     {
         public SchemaFieldsController(ICommandBus commandBus)

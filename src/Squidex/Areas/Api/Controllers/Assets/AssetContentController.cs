@@ -9,7 +9,6 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using NSwag.Annotations;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;
@@ -24,7 +23,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
     /// </summary>
     [ApiExceptionFilter]
     [AppApi]
-    [SwaggerTag(nameof(Assets))]
+    [ApiExplorerSettings(GroupName = nameof(Assets))]
     public sealed class AssetContentController : ApiController
     {
         private readonly IAssetStore assetStore;

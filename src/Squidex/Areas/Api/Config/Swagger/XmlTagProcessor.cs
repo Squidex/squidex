@@ -16,7 +16,7 @@ using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Areas.Api.Config.Swagger
 {
-    public sealed class XmlTagProcessor : IOperationProcessor, IDocumentProcessor
+    public sealed class XmlTagProcessor : IDocumentProcessor
     {
         public Task ProcessAsync(DocumentProcessorContext context)
         {
@@ -46,19 +46,6 @@ namespace Squidex.Areas.Api.Config.Swagger
             }
 
             return TaskHelper.Done;
-        }
-
-        public Task<bool> ProcessAsync(OperationProcessorContext context)
-        {
-            var tagAttribute = context.MethodInfo.DeclaringType.GetTypeInfo().GetCustomAttribute<SwaggerTagAttribute>();
-
-            if (tagAttribute != null)
-            {
-                context.OperationDescription.Operation.Tags.Clear();
-                context.OperationDescription.Operation.Tags.Add(tagAttribute.Name);
-            }
-
-            return TaskHelper.True;
         }
     }
 }

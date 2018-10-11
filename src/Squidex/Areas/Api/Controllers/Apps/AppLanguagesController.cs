@@ -8,7 +8,6 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using NSwag.Annotations;
 using Squidex.Areas.Api.Controllers.Apps.Models;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure;
@@ -23,7 +22,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
     [ApiAuthorize]
     [ApiExceptionFilter]
     [AppApi]
-    [SwaggerTag(nameof(Apps))]
+    [ApiExplorerSettings(GroupName = nameof(Apps))]
     public sealed class AppLanguagesController : ApiController
     {
         public AppLanguagesController(ICommandBus commandBus)

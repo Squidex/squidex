@@ -33,7 +33,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
     [ApiAuthorize]
     [ApiExceptionFilter]
     [AppApi]
-    [SwaggerTag(nameof(Assets))]
+    [ApiExplorerSettings(GroupName = nameof(Assets))]
     public sealed class AssetsController : ApiController
     {
         private readonly IAssetQueryService assetQuery;

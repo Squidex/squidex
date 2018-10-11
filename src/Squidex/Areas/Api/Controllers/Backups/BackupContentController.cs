@@ -7,7 +7,6 @@
 
 using System;
 using Microsoft.AspNetCore.Mvc;
-using NSwag.Annotations;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;
 using Squidex.Pipeline;
@@ -19,7 +18,7 @@ namespace Squidex.Areas.Api.Controllers.Backups
     /// </summary>
     [ApiExceptionFilter]
     [AppApi]
-    [SwaggerTag(nameof(Backups))]
+    [ApiExplorerSettings(GroupName = nameof(Backups))]
     public class BackupContentController : ApiController
     {
         private readonly IAssetStore assetStore;

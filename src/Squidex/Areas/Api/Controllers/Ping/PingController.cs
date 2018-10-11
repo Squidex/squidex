@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using Microsoft.AspNetCore.Mvc;
-using NSwag.Annotations;
 using Squidex.Infrastructure.Commands;
 using Squidex.Pipeline;
 
@@ -16,7 +15,7 @@ namespace Squidex.Areas.Api.Controllers.Ping
     /// Makes a ping request.
     /// </summary>
     [ApiExceptionFilter]
-    [SwaggerTag(nameof(Ping))]
+    [ApiExplorerSettings(GroupName = nameof(Ping))]
     public sealed class PingController : ApiController
     {
         public PingController(ICommandBus commandBus)

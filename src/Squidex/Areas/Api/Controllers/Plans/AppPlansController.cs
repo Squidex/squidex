@@ -7,7 +7,6 @@
 
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using NSwag.Annotations;
 using Squidex.Areas.Api.Controllers.Plans.Models;
 using Squidex.Domain.Apps.Entities.Apps.Services;
 using Squidex.Infrastructure.Commands;
@@ -21,7 +20,7 @@ namespace Squidex.Areas.Api.Controllers.Plans
     [ApiAuthorize]
     [ApiExceptionFilter]
     [AppApi]
-    [SwaggerTag(nameof(Plans))]
+    [ApiExplorerSettings(GroupName = nameof(Plans))]
     public sealed class AppPlansController : ApiController
     {
         private readonly IAppPlansProvider appPlansProvider;
@@ -66,8 +65,7 @@ namespace Squidex.Areas.Api.Controllers.Plans
         /// <param name="app">The name of the app.</param>
         /// <param name="request">Plan object that needs to be changed.</param>
         /// <returns>
-        /// 201 => Redirected to checkout page.
-        /// 204 => Plan changed.
+        /// 200 => Plan changed or redirect url returned.
         /// 400 => Plan not owned by user.
         /// 404 => App not found.
         /// </returns>
