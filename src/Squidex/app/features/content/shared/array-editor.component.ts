@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { FormArray } from '@angular/forms';
 
 import {
@@ -18,7 +18,8 @@ import {
 @Component({
     selector: 'sqx-array-editor',
     styleUrls: ['./array-editor.component.scss'],
-    templateUrl: './array-editor.component.html'
+    templateUrl: './array-editor.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ArrayEditorComponent {
     @Input()

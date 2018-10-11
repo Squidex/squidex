@@ -8,6 +8,7 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { AbstractControl, FormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
+import { map, startWith } from 'rxjs/operators';
 
 import {
     AppLanguageDto,
@@ -17,7 +18,6 @@ import {
     RootFieldDto,
     Types
 } from '@app/shared';
-import { map, startWith } from 'rxjs/operators';
 
 @Component({
     selector: 'sqx-content-field',

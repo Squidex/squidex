@@ -1,0 +1,15 @@
+<div class="item" [class.invalid]="isInvalid | async">
+    <button type="button" class="btn btn-link btn-danger item-remove" (click)="removing.emit(); $event.preventDefault()">
+        <i class="icon-bin2"></i>
+    </button>
+    
+    <div class="form-group" *ngFor="let fieldControl of fieldControls">
+        <sqx-field-editor
+            [form]="form"
+            [field]="fieldControl.field"
+            [language]="language"
+            [languages]="languages"
+            [control]="fieldControl.control">
+        </sqx-field-editor>
+    </div>
+</div>

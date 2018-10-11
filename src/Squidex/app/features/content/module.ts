@@ -23,6 +23,7 @@ import {
 
 import {
     ArrayEditorComponent,
+    ArrayItemComponent,
     AssetsEditorComponent,
     ContentFieldComponent,
     ContentHistoryComponent,
@@ -92,6 +93,7 @@ const routes: Routes = [
     ],
     declarations: [
         ArrayEditorComponent,
+        ArrayItemComponent,
         AssetsEditorComponent,
         ContentFieldComponent,
         ContentHistoryComponent,
