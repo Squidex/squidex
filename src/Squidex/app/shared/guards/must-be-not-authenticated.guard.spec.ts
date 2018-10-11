@@ -7,7 +7,7 @@
 
 import { Router } from '@angular/router';
 import { of } from 'rxjs';
-import { IMock, Mock, Times } from 'typemoq';
+import { IMock, It, Mock, Times } from 'typemoq';
 
 import { AuthService } from '@app/shared';
 
@@ -52,5 +52,7 @@ describe('MustNotBeAuthenticatedGuard', () => {
         });
 
         expect(result!).toBeTruthy();
+
+        router.verify(x => x.navigate(It.isAny()), Times.never());
     });
 });

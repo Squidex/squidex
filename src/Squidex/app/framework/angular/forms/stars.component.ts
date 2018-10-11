@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, forwardRef, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, forwardRef, Input } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import { Types } from '@app/framework/internal';
@@ -18,7 +18,8 @@ export const SQX_STARS_CONTROL_VALUE_ACCESSOR: any = {
     selector: 'sqx-stars',
     styleUrls: ['./stars.component.scss'],
     templateUrl: './stars.component.html',
-    providers: [SQX_STARS_CONTROL_VALUE_ACCESSOR]
+    providers: [SQX_STARS_CONTROL_VALUE_ACCESSOR],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class StarsComponent implements ControlValueAccessor {
     private callChange = (v: any) => { /* NOOP */ };
@@ -88,7 +89,7 @@ export class StarsComponent implements ControlValueAccessor {
             return false;
         }
 
-        if (this.value !== null) {
+        if (this.value) {
             this.value = null;
             this.stars = 0;
 

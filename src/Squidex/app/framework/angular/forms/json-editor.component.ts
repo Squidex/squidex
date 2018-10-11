@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, Component, ElementRef, forwardRef, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, forwardRef, ViewChild } from '@angular/core';
 import { ControlValueAccessor,  NG_VALUE_ACCESSOR } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
@@ -22,7 +22,8 @@ export const SQX_JSON_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     selector: 'sqx-json-editor',
     styleUrls: ['./json-editor.component.scss'],
     templateUrl: './json-editor.component.html',
-    providers: [SQX_JSON_EDITOR_CONTROL_VALUE_ACCESSOR]
+    providers: [SQX_JSON_EDITOR_CONTROL_VALUE_ACCESSOR],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class JsonEditorComponent implements ControlValueAccessor, AfterViewInit {
     private callChange = (v: any) => { /* NOOP */ };

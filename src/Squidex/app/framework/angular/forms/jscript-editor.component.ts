@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, Component, ElementRef, forwardRef, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, forwardRef, ViewChild } from '@angular/core';
 import { ControlValueAccessor,  NG_VALUE_ACCESSOR } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
@@ -22,7 +22,8 @@ export const SQX_JSCRIPT_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     selector: 'sqx-jscript-editor',
     styleUrls: ['./jscript-editor.component.scss'],
     templateUrl: './jscript-editor.component.html',
-    providers: [SQX_JSCRIPT_EDITOR_CONTROL_VALUE_ACCESSOR]
+    providers: [SQX_JSCRIPT_EDITOR_CONTROL_VALUE_ACCESSOR],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class JscriptEditorComponent implements ControlValueAccessor, AfterViewInit {
     private callChange = (v: any) => { /* NOOP */ };

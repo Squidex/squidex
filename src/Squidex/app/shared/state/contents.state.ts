@@ -273,7 +273,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     }
 
     public init(): Observable<any> {
-        this.next(s => ({ ...s, contentsPager: new Pager(0), contentsQuery: '', isArchive: false, isLoaded: false }));
+        this.next(s => ({ contents: ImmutableArray.of(), contentsPager: new Pager(0) }));
 
         return this.loadInternal();
     }

@@ -5,13 +5,14 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, ElementRef, Input, OnChanges, OnInit, Renderer2, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, Input, OnChanges, OnInit, Renderer2, SimpleChanges } from '@angular/core';
 
 const ProgressBar = require('progressbar.js');
 
 @Component({
     selector: 'sqx-progress-bar',
-    template: ''
+    template: '',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ProgressBarComponent implements OnChanges, OnInit {
     private progressBar: any;
@@ -32,6 +33,9 @@ export class ProgressBarComponent implements OnChanges, OnInit {
     public strokeWidth = 4;
 
     @Input()
+    public showText = true;
+
+    @Input()
     public value = 0;
 
     constructor(
@@ -45,7 +49,8 @@ export class ProgressBarComponent implements OnChanges, OnInit {
             color: this.color,
             trailColor: this.trailColor,
             trailWidth: this.trailWidth,
-            strokeWidth: this.strokeWidth
+            strokeWidth: this.strokeWidth,
+            svgStyle: { width: '100%', height: '100%' }
         };
 
         this.renderer.setStyle(this.element.nativeElement, 'display', 'block');
@@ -70,7 +75,7 @@ export class ProgressBarComponent implements OnChanges, OnInit {
 
         this.progressBar.animate(value / 100);
 
-        if (value > 0) {
+        if (value > 0 && this.showText) {
             this.progressBar.setText(Math.round(value) + '%');
         }
     }

@@ -7,7 +7,7 @@
 
 // tslint:disable:prefer-for-of
 
-import { Component, forwardRef } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import {
@@ -28,9 +28,8 @@ export const SQX_ASSETS_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     selector: 'sqx-assets-editor',
     styleUrls: ['./assets-editor.component.scss'],
     templateUrl: './assets-editor.component.html',
-    providers: [
-        SQX_ASSETS_EDITOR_CONTROL_VALUE_ACCESSOR
-    ]
+    providers: [SQX_ASSETS_EDITOR_CONTROL_VALUE_ACCESSOR],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AssetsEditorComponent implements ControlValueAccessor {
     private callChange = (v: any) => { /* NOOP */ };
@@ -47,6 +46,7 @@ export class AssetsEditorComponent implements ControlValueAccessor {
     constructor(
         private readonly appsState: AppsState,
         private readonly assetsService: AssetsService,
+        private readonly changeDetector: ChangeDetectorRef,
         private readonly localStore: LocalStoreService
     ) {
         this.isListView = this.localStore.get('assetView') === 'List';
@@ -131,6 +131,8 @@ export class AssetsEditorComponent implements ControlValueAccessor {
 
         this.callTouched();
         this.callChange(ids);
+
+        this.changeDetector.detectChanges();
     }
 
     public sort(assets: AssetDto[]) {

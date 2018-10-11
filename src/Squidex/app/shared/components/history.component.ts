@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { merge, Observable, timer } from 'rxjs';
 import { delay, switchMap } from 'rxjs/operators';
@@ -22,7 +22,8 @@ import {
 @Component({
     selector: 'sqx-history',
     styleUrls: ['./history.component.scss'],
-    templateUrl: './history.component.html'
+    templateUrl: './history.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class HistoryComponent {
     private readonly channel = this.calculateChannel();
@@ -32,7 +33,7 @@ export class HistoryComponent {
             timer(0, 10000),
             this.messageBus.of(HistoryChannelUpdated).pipe(delay(1000))
         ).pipe(
-            switchMap(app => this.historyService.getHistory(this.appsState.appName, this.channel)));
+            switchMap(() => this.historyService.getHistory(this.appsState.appName, this.channel)));
 
     constructor(
         private readonly appsState: AppsState,

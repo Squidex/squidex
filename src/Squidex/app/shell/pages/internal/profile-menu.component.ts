@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
 
@@ -22,7 +22,8 @@ import {
     templateUrl: './profile-menu.component.html',
     animations: [
         fadeAnimation
-    ]
+    ],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ProfileMenuComponent implements OnDestroy, OnInit {
     private authenticationSubscription: Subscription;
@@ -38,7 +39,8 @@ export class ProfileMenuComponent implements OnDestroy, OnInit {
 
     constructor(
         private readonly authService: AuthService,
-        private readonly apiUrl: ApiUrlConfig
+        private readonly apiUrl: ApiUrlConfig,
+        private readonly changeDetector: ChangeDetectorRef
     ) {
     }
 
@@ -54,6 +56,8 @@ export class ProfileMenuComponent implements OnDestroy, OnInit {
                     this.profileDisplayName = user!.displayName;
 
                     this.isAdmin = user!.isAdmin;
+
+                    this.changeDetector.detectChanges();
                 });
     }
 

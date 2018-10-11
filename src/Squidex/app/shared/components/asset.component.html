@@ -7,7 +7,7 @@
                 </span>
                 
                 <div *ngIf="asset.isImage" class="file-image">
-                    <img [sqxImageSource]="asset | sqxAssetPreviewUrl">
+                    <img [sqxImageSource]="asset | sqxAssetPreviewUrl" class="bg" layoutKey="asset-large">
                 </div>
                 <div *ngIf="!asset.isImage" class="file-icon">
                     <img [attr.src]="asset | sqxFileIcon">
@@ -89,7 +89,7 @@
         <div class="left-border" [class.selected]="isSelected" ></div>
 
         <div *ngIf="asset && asset.isImage && progress === 0" class="image" @fade>
-            <img [sqxImageSource]="asset | sqxAssetPreviewUrl">
+            <img [sqxImageSource]="asset | sqxAssetPreviewUrl" class="bg2" layoutKey="asset-small">
         </div>
         <div *ngIf="asset && !asset.isImage && progress === 0" class="image image-padded" @fade>
             <img class="icon" [attr.src]="asset | sqxFileIcon">
@@ -130,9 +130,7 @@
         </div>
 
         <div class="upload-progress" *ngIf="progress > 0">
-            <div class="progress-background">
-                <div class="progress-bar" [style.width]="(progress + 40) + '%'"></div>
-            </div>
+            <sqx-progress-bar [value]="50" [trailWidth]="0.8" [strokeWidth]="0.8" [showText]="false"></sqx-progress-bar>
         </div>
 
         <div class="drop-overlay align-items-center justify-content-center" *ngIf="asset && progress === 0">

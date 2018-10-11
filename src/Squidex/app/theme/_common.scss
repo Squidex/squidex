@@ -163,6 +163,20 @@ body {
     @include animation(spin 3s infinite linear);
 }
 
+.spin2 {
+    @include animation(spin2 5s infinite linear);
+}
+
+@include keyframes (spin2) {
+    50% {
+        @include rotate(180deg);
+    }
+
+    100% {
+        @include rotate(360deg);
+    }
+}
+
 @include keyframes (spin) {
     20% {
         @include rotate(0deg);

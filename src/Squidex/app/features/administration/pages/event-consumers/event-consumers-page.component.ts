@@ -38,8 +38,7 @@ export class EventConsumersPageComponent implements OnDestroy, OnInit {
         this.eventConsumersState.load(false, true).pipe(onErrorResumeNext()).subscribe();
 
         this.timerSubscription =
-            timer(2000, 2000).pipe(
-                    switchMap(x => this.eventConsumersState.load(true, true)), onErrorResumeNext())
+            timer(2000, 2000).pipe(switchMap(x => this.eventConsumersState.load(true, true)), onErrorResumeNext())
                 .subscribe();
     }
 

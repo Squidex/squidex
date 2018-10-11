@@ -73,19 +73,19 @@
         <div class="selection" *ngIf="selectionCount > 0">
             {{selectionCount}} items selected:&nbsp;&nbsp;
 
-            <button class="btn btn-secondary" (click)="publishSelected()" *ngIf="canPublish">
+            <button class="btn btn-secondary mr-1" (click)="publishSelected()" *ngIf="canPublish">
                 Publish
             </button>
             
-            <button class="btn btn-secondary" (click)="unpublishSelected()" *ngIf="canUnpublish">
+            <button class="btn btn-secondary mr-1" (click)="unpublishSelected()" *ngIf="canUnpublish">
                 Unpublish
             </button>
             
-            <button class="btn btn-secondary" (click)="archiveSelected()" *ngIf="(contentsState.isArchive | async) === false">
+            <button class="btn btn-secondary mr-1" (click)="archiveSelected()" *ngIf="(contentsState.isArchive | async) === false">
                 Archive
             </button>
             
-            <button class="btn btn-secondary" (click)="restoreSelected()" *ngIf="contentsState.isArchive | async">
+            <button class="btn btn-secondary mr-1" (click)="restoreSelected()" *ngIf="contentsState.isArchive | async">
                 Restore
             </button>
             

@@ -5,14 +5,15 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 
 import { UserReportConfig } from './../configurations';
 import { ResourceLoaderService } from './../services/resource-loader.service';
 
 @Component({
     selector: 'sqx-user-report',
-    template: ''
+    template: '',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class UserReportComponent implements OnDestroy, OnInit {
     private loadingTimer: any;

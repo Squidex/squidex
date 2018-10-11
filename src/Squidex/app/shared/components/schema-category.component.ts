@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { onErrorResumeNext } from 'rxjs/operators';
 
 import {
@@ -24,7 +24,8 @@ import {
     templateUrl: './schema-category.component.html',
     animations: [
         fadeAnimation
-    ]
+    ],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SchemaCategoryComponent implements OnInit, OnChanges {
     @Output()
@@ -35,6 +36,9 @@ export class SchemaCategoryComponent implements OnInit, OnChanges {
 
     @Input()
     public isReadonly: boolean;
+
+    @Input()
+    public routeSingletonToContent = false;
 
     @Input()
     public schemasFilter: string;
@@ -98,6 +102,10 @@ export class SchemaCategoryComponent implements OnInit, OnChanges {
 
     public changeCategory(schema: SchemaDto) {
         this.schemasState.changeCategory(schema, this.name).pipe(onErrorResumeNext()).subscribe();
+    }
+
+    public schemaRoute(schema: SchemaDto) {
+        return schema.isSingleton && this.routeSingletonToContent ? [schema.name, schema.id] : [schema.name];
     }
 
     public trackBySchema(index: number, schema: SchemaDto) {

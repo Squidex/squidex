@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, Component, ElementRef, forwardRef, Renderer2, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, forwardRef, Renderer2, ViewChild } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import {
@@ -25,7 +25,8 @@ export const SQX_MARKDOWN_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     selector: 'sqx-markdown-editor',
     styleUrls: ['./markdown-editor.component.scss'],
     templateUrl: './markdown-editor.component.html',
-    providers: [SQX_MARKDOWN_EDITOR_CONTROL_VALUE_ACCESSOR]
+    providers: [SQX_MARKDOWN_EDITOR_CONTROL_VALUE_ACCESSOR],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MarkdownEditorComponent implements ControlValueAccessor, AfterViewInit {
     private callChange = (v: any) => { /* NOOP */ };

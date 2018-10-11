@@ -82,7 +82,7 @@ export class ContentChangedTriggerComponent implements OnInit {
                     } else {
                         return null;
                     }
-                }).filter(s => s !== null).map(s => s!)).sortByStringAsc(s => s.schema.name);
+                }).filter(s => !!s).map(s => s!)).sortByStringAsc(s => s.schema.name);
 
         this.schemasToAdd =
                 this.schemas.filter(schema =>

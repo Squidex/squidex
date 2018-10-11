@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'icomoon';
-  src:  url('fonts/icomoon.eot?sfm7f7');
-  src:  url('fonts/icomoon.eot?sfm7f7#iefix') format('embedded-opentype'),
-    url('fonts/icomoon.ttf?sfm7f7') format('truetype'),
-    url('fonts/icomoon.woff?sfm7f7') format('woff'),
-    url('fonts/icomoon.svg?sfm7f7#icomoon') format('svg');
+  src:  url('fonts/icomoon.eot?z1dhmx');
+  src:  url('fonts/icomoon.eot?z1dhmx#iefix') format('embedded-opentype'),
+    url('fonts/icomoon.ttf?z1dhmx') format('truetype'),
+    url('fonts/icomoon.woff?z1dhmx') format('woff'),
+    url('fonts/icomoon.svg?z1dhmx#icomoon') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -24,6 +24,63 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.icon-spinner2:before {
+  content: "\e959";
+}
+.icon-star-full:before {
+  content: "\e95d";
+}
+.icon-star-empty:before {
+  content: "\e95e";
+}
+.icon-twitter:before {
+  content: "\e95c";
+}
+.icon-hour-glass:before {
+  content: "\e954";
+}
+.icon-spinner:before {
+  content: "\e953";
+}
+.icon-clock:before {
+  content: "\e950";
+}
+.icon-bin2:before {
+  content: "\e902";
+}
+.icon-earth:before {
+  content: "\e9ca";
+}
+.icon-elapsed:before {
+  content: "\e943";
+}
+.icon-google:before {
+  content: "\e93b";
+}
+.icon-lock:before {
+  content: "\e934";
+}
+.icon-microsoft:before {
+  content: "\e940";
+}
+.icon-pause:before {
+  content: "\e92f";
+}
+.icon-play:before {
+  content: "\e930";
+}
+.icon-reset:before {
+  content: "\e92e";
+}
+.icon-settings2:before {
+  content: "\e92d";
+}
+.icon-timeout:before {
+  content: "\e944";
+}
+.icon-unlocked:before {
+  content: "\e933";
+}
 .icon-grid1:before {
   content: "\e952";
 }
@@ -32,6 +89,9 @@
 }
 .icon-info:before {
   content: "\e93c";
+}
+.icon-control-Stars:before {
+  content: "\e93a";
 }
 .icon-control-Color:before {
   content: "\e94d";
@@ -200,60 +260,6 @@
 }
 .icon-user:before {
   content: "\e928";
-}
-.icon-star-full:before {
-  content: "\e95d";
-}
-.icon-star-empty:before {
-  content: "\e95e";
-}
-.icon-twitter:before {
-  content: "\e95c";
-}
-.icon-hour-glass:before {
-  content: "\e954";
-}
-.icon-spinner:before {
-  content: "\e953";
-}
-.icon-clock:before {
-  content: "\e950";
-}
-.icon-bin2:before {
-  content: "\e902";
-}
-.icon-earth:before {
-  content: "\e9ca";
-}
-.icon-elapsed:before {
-  content: "\e943";
-}
-.icon-google:before {
-  content: "\e93b";
-}
-.icon-lock:before {
-  content: "\e934";
-}
-.icon-microsoft:before {
-  content: "\e940";
-}
-.icon-pause:before {
-  content: "\e92f";
-}
-.icon-play:before {
-  content: "\e930";
-}
-.icon-reset:before {
-  content: "\e92e";
-}
-.icon-settings2:before {
-  content: "\e92d";
-}
-.icon-timeout:before {
-  content: "\e944";
-}
-.icon-unlocked:before {
-  content: "\e933";
 }
 .icon-backup:before {
   content: "\e95b";
