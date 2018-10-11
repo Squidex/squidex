@@ -16,7 +16,6 @@ using Microsoft.Extensions.Logging;
 using Orleans;
 using Orleans.Configuration;
 using Orleans.Hosting;
-using Squidex.Config.Domain;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Infrastructure;
@@ -24,14 +23,14 @@ using Squidex.Infrastructure.EventSourcing.Grains;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Log.Adapter;
 using Squidex.Infrastructure.Orleans;
-using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Config.Orleans
 {
     public sealed class SiloWrapper : IHostedService
     {
-        private readonly Lazy<ISiloHost> silo;
+        private readonly Lazy<ISiloHost> lazySilo;
         private readonly ISemanticLog log;
+        private bool isStopping;
 
         internal sealed class Source : IConfigurationSource
         {
@@ -50,14 +49,14 @@ namespace Squidex.Config.Orleans
 
         public IClusterClient Client
         {
-            get { return silo.Value.Services.GetRequiredService<IClusterClient>(); }
+            get { return lazySilo.Value.Services.GetRequiredService<IClusterClient>(); }
         }
 
-        public SiloWrapper(IConfiguration config, ISemanticLog log)
+        public SiloWrapper(IConfiguration config, ISemanticLog log, IApplicationLifetime lifetime)
         {
             this.log = log;
 
-            silo = new Lazy<ISiloHost>(() =>
+            lazySilo = new Lazy<ISiloHost>(() =>
             {
                 var hostBuilder = new SiloHostBuilder()
                     .UseDashboard(options => options.HostSelf = false)
@@ -138,7 +137,17 @@ namespace Squidex.Config.Orleans
                     }
                 });
 
-                return hostBuilder.Build();
+                var silo = hostBuilder.Build();
+
+                silo.Stopped.ContinueWith(x =>
+                {
+                    if (!isStopping)
+                    {
+                        lifetime.StopApplication();
+                    }
+                });
+
+                return silo;
             });
         }
 
@@ -147,7 +156,7 @@ namespace Squidex.Config.Orleans
             var watch = ValueStopwatch.StartNew();
             try
             {
-                await silo.Value.StartAsync(cancellationToken);
+                await lazySilo.Value.StartAsync(cancellationToken);
             }
             finally
             {
@@ -161,9 +170,11 @@ namespace Squidex.Config.Orleans
 
         public async Task StopAsync(CancellationToken cancellationToken)
         {
-            if (!silo.IsValueCreated)
+            if (!lazySilo.IsValueCreated)
             {
-                await silo.Value.StopAsync(cancellationToken);
+                isStopping = true;
+
+                await lazySilo.Value.StopAsync(cancellationToken);
             }
         }
     }

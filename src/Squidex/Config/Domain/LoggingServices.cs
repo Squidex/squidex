@@ -9,7 +9,6 @@ using System;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
 using Squidex.Pipeline;
 
