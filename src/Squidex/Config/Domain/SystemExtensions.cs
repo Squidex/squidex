@@ -10,6 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Migrations;
 
 namespace Squidex.Config.Domain
@@ -19,10 +20,13 @@ namespace Squidex.Config.Domain
         public sealed class InitializeHostedService : IHostedService
         {
             private readonly IEnumerable<IInitializable> targets;
+            private readonly ISemanticLog log;
 
-            public InitializeHostedService(IEnumerable<IInitializable> targets)
+            public InitializeHostedService(IEnumerable<IInitializable> targets, ISemanticLog log)
             {
                 this.targets = targets;
+
+                this.log = log;
             }
 
             public async Task StartAsync(CancellationToken cancellationToken)
@@ -30,6 +34,8 @@ namespace Squidex.Config.Domain
                 foreach (var target in targets)
                 {
                     await target.InitializeAsync(cancellationToken);
+
+                    log.LogInformation(w => w.WriteProperty("initializedSystem", target.GetType().Name));
                 }
             }
 

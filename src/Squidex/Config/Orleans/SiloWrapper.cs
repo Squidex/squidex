@@ -170,7 +170,7 @@ namespace Squidex.Config.Orleans
 
         public async Task StopAsync(CancellationToken cancellationToken)
         {
-            if (!lazySilo.IsValueCreated)
+            if (lazySilo.IsValueCreated)
             {
                 isStopping = true;
 
