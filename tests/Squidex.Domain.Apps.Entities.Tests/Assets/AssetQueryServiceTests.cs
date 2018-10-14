@@ -49,7 +49,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                     ["id3"] = "name3"
                 });
 
-            sut = new AssetQueryService(tagService, assetRepository);
+            sut = new AssetQueryService(tagService, assetRepository, new AssetOptions());
         }
 
         [Fact]

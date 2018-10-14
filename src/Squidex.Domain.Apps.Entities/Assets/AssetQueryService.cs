@@ -22,18 +22,19 @@ namespace Squidex.Domain.Apps.Entities.Assets
 {
     public sealed class AssetQueryService : IAssetQueryService
     {
-        private const int MaxResults = 200;
         private readonly ITagService tagService;
         private readonly IAssetRepository assetRepository;
+        private readonly AssetOptions options;
 
-        public AssetQueryService(ITagService tagService, IAssetRepository assetRepository)
+        public AssetQueryService(ITagService tagService, IAssetRepository assetRepository, AssetOptions options)
         {
             Guard.NotNull(tagService, nameof(tagService));
+            Guard.NotNull(options, nameof(options));
             Guard.NotNull(assetRepository, nameof(assetRepository));
 
-            this.tagService = tagService;
-
             this.assetRepository = assetRepository;
+            this.options = options;
+            this.tagService = tagService;
         }
 
         public async Task<IAssetEntity> FindAssetAsync(QueryContext context, Guid id)
@@ -97,9 +98,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
                     result.Sort.Add(new SortNode(new List<string> { "lastModified" }, SortOrder.Descending));
                 }
 
-                if (result.Take > MaxResults)
+                if (result.Take > options.MaxResults)
                 {
-                    result.Take = MaxResults;
+                    result.Take = options.MaxResults;
                 }
 
                 return result;

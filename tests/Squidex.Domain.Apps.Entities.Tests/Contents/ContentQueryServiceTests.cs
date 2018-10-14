@@ -60,7 +60,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             context = new ContentQueryContext(QueryContext.Create(app, user));
 
-            sut = new ContentQueryService(appProvider, contentRepository, contentVersionLoader, scriptEngine, modelBuilder);
+            sut = new ContentQueryService(appProvider, contentRepository, contentVersionLoader, scriptEngine, new ContentOptions(), modelBuilder);
         }
 
         [Fact]
