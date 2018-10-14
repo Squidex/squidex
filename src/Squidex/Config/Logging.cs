@@ -16,6 +16,16 @@ namespace Squidex.Config
         {
             builder.AddFilter((category, level) =>
             {
+                if (category.StartsWith("Orleans.Runtime.NoOpHostEnvironmentStatistics", StringComparison.OrdinalIgnoreCase))
+                {
+                    return level >= LogLevel.Error;
+                }
+
+                if (category.StartsWith("Orleans.Runtime.Scheduler", StringComparison.OrdinalIgnoreCase))
+                {
+                    return level >= LogLevel.Error;
+                }
+
                 if (category.StartsWith("Orleans.", StringComparison.OrdinalIgnoreCase))
                 {
                     return level >= LogLevel.Warning;

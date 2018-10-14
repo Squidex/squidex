@@ -9,6 +9,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
 {
     public sealed class AssetOptions
     {
-        public int MaxResults { get; set; } = 100;
+        public int MaxResults { get; set; } = 200;
     }
 }
