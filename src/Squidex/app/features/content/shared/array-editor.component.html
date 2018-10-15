@@ -1,4 +1,4 @@
-<div class="container" *ngIf="arrayControl.controls.length > 0">
+<div class="array-container" *ngIf="arrayControl.controls.length > 0">
     <div class="item" *ngFor="let itemForm of arrayControl.controls; let i = index">
         <sqx-array-item
             [form]="form"

@@ -86,12 +86,12 @@
 
 <ng-template #listTemplate>
     <div class="table-items-row" [class.selectable]="isSelectable" (click)="selected.emit(asset)" (sqxFileDrop)="updateFile($event)">
-        <div class="left-border" [class.selected]="isSelected" ></div>
+        <div class="left-border" [class.hidden]="!isSelectable" [class.selected]="isSelected" ></div>
 
-        <div *ngIf="asset && asset.isImage && progress === 0" class="image" @fade>
+        <div *ngIf="asset && asset.isImage && progress === 0" class="image" [class.image-left]="!isSelectable" @fade>
             <img [sqxImageSource]="asset | sqxAssetPreviewUrl" class="bg2" layoutKey="asset-small">
         </div>
-        <div *ngIf="asset && !asset.isImage && progress === 0" class="image image-padded" @fade>
+        <div *ngIf="asset && !asset.isImage && progress === 0" class="image image-padded" [class.image-left]="!isSelectable" @fade>
             <img class="icon" [attr.src]="asset | sqxFileIcon">
         </div>
 

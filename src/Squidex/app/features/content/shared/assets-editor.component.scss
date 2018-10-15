@@ -45,12 +45,10 @@
         @include border-radius;
         @include flex-box;
         @include truncate;
-        border: 2px dashed $color-border;
-        height: 2.5rem;
-        font-size: 1.2rem;
+        border: 2px dashed darken($color-border, 10%);
         font-weight: normal;
         text-align: center;
-        padding: 0 2rem;
+        padding: 5px 2rem;
         color: darken($color-border, 30%);
         cursor: pointer;
     }
