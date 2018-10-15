@@ -64,8 +64,12 @@ export class AssetsEditorComponent implements ControlValueAccessor {
                         if (this.oldAssets.length !== assetIds.length) {
                             this.updateValue();
                         }
+
+                        this.changeDetector.detectChanges();
                     }, () => {
                         this.oldAssets = ImmutableArray.empty();
+
+                        this.changeDetector.detectChanges();
                     });
             }
         } else {
