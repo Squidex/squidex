@@ -282,8 +282,15 @@
     }
 
     &-section {
-        border-top: 1px solid $color-border;
-        padding: 15px;
+        & {
+            border-top: 1px solid $color-border;
+            padding: 15px;
+            padding-bottom: 30px;
+        }
+
+        &:first-child {
+            padding-top: 45px;
+        }
     }
 
     &-item {
