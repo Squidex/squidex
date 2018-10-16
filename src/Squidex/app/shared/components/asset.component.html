@@ -130,7 +130,7 @@
         </div>
 
         <div class="upload-progress" *ngIf="progress > 0">
-            <sqx-progress-bar [value]="50" [trailWidth]="0.8" [strokeWidth]="0.8" [showText]="false"></sqx-progress-bar>
+            <sqx-progress-bar [value]="progress" [trailWidth]="0.8" [strokeWidth]="0.8" [showText]="false"></sqx-progress-bar>
         </div>
 
         <div class="drop-overlay align-items-center justify-content-center" *ngIf="asset && progress === 0">
