@@ -71,6 +71,11 @@ export class FieldComponent implements OnInit {
 
     public toggleEditing() {
         this.isEditing = !this.isEditing;
+
+        // Reload the defaults if they were set in the wizard
+        if (this.isEditing) {
+            this.editForm.load(this.field.properties);
+        }
     }
 
     public selectTab(tab: number) {

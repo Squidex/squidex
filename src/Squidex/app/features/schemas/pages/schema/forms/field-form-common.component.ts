@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { Component, Input, OnChanges } from '@angular/core';
+import { FormControl, FormGroup } from '@angular/forms';
 
 import { FieldDto } from '@app/shared';
 
@@ -15,7 +15,7 @@ import { FieldDto } from '@app/shared';
     styleUrls: ['field-form-common.component.scss'],
     templateUrl: 'field-form-common.component.html'
 })
-export class FieldFormCommonComponent {
+export class FieldFormCommonComponent implements OnChanges {
     @Input()
     public editForm: FormGroup;
 
@@ -27,4 +27,24 @@ export class FieldFormCommonComponent {
 
     @Input()
     public field: FieldDto;
+
+    public ngOnChanges() {
+        this.editForm.setControl('isRequired',
+            new FormControl(this.field.properties.isRequired));
+
+        this.editForm.setControl('isListField',
+            new FormControl(this.field.properties.isListField));
+
+        this.editForm.setControl('editorUrl',
+            new FormControl(this.field.properties.editorUrl));
+
+        this.editForm.setControl('hints',
+            new FormControl(this.field.properties.hints));
+
+        this.editForm.setControl('placeholder',
+            new FormControl(this.field.properties.placeholder));
+
+        this.editForm.setControl('label',
+            new FormControl(this.field.properties.label));
+    }
 }
