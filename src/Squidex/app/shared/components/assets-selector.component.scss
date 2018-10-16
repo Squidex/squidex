@@ -8,8 +8,10 @@
         }
 
         .tags {
-            @include border-radius-left;
-            border-right: 0;
+            & {
+                @include border-radius-left;
+                border-right: 0;
+            }
 
             &:focus,
             &.focus {

@@ -11,7 +11,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using NodaTime;
-using NSwag.Annotations;
 using Squidex.Areas.Api.Controllers.Rules.Models;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
@@ -29,7 +28,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
     [ApiAuthorize]
     [ApiExceptionFilter]
     [AppApi]
-    [SwaggerTag(nameof(Rules))]
+    [ApiExplorerSettings(GroupName = nameof(Rules))]
     [MustBeAppDeveloper]
     public sealed class RulesController : ApiController
     {

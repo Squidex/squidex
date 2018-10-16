@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Entities.Assets;
@@ -32,7 +33,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             return "States_Assets";
         }
 
-        protected override Task SetupCollectionAsync(IMongoCollection<MongoAssetEntity> collection)
+        protected override Task SetupCollectionAsync(IMongoCollection<MongoAssetEntity> collection, CancellationToken ct = default(CancellationToken))
         {
             return collection.Indexes.CreateOneAsync(
                 new CreateIndexModel<MongoAssetEntity>(
@@ -41,7 +42,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                         .Ascending(x => x.IsDeleted)
                         .Ascending(x => x.FileName)
                         .Ascending(x => x.Tags)
-                        .Descending(x => x.LastModified)));
+                        .Descending(x => x.LastModified)),
+                cancellationToken: ct);
         }
 
         public async Task<IResultList<IAssetEntity>> QueryAsync(Guid appId, Query query)

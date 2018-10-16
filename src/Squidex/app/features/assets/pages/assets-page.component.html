@@ -34,18 +34,30 @@
                     </div>
                 </div>
             </div>
+            <div class="col col-auto pl-1">
+                <div class="btn-group" data-toggle="buttons">
+                    <button type="button" class="btn btn-secondary btn-toggle" [class.btn-primary]="isListView" [disabled]="isListView" (click)="changeView(true)">
+                        <i class="icon-list"></i>
+                    </button>
+                    <button type="button" class="btn btn-secondary btn-toggle" [class.btn-primary]="!isListView" [disabled]="!isListView" (click)="changeView(false)">
+                        <i class="icon-grid"></i>
+                    </button>
+                </div>
+            </div>
         </div>
     </ng-container>
 
     <ng-container content>
-        <sqx-assets-list [state]="assetsState"></sqx-assets-list>
+        <sqx-assets-list [state]="assetsState" [isListView]="isListView"></sqx-assets-list>
     </ng-container>
 
     <ng-container sidebar>    
         <div class="sidebar-section">
-            <a class="row sidebar-item" (click)="resetTags()" [class.active]="assetsState.isTagSelectionEmpty()">
-                <div class="col">
-                    All tags
+            <a class="sidebar-item" (click)="resetTags()" [class.active]="assetsState.isTagSelectionEmpty()">
+                <div class="row">
+                    <div class="col">
+                        All tags
+                    </div>
                 </div>
             </a>
         </div>
@@ -53,12 +65,14 @@
         <div class="sidebar-section">
             <h3>Tags</h3>
     
-            <a class="row sidebar-item" *ngFor="let tag of assetsState.tags | async" (click)="toggleTag(tag.name)" [class.active]="assetsState.isTagSelected(tag.name)">
-                <div class="col">
-                    {{tag.name}}
-                </div>
-                <div class="col col-auto">
-                    {{tag.count}}
+            <a class="sidebar-item" *ngFor="let tag of assetsState.tags | async" (click)="toggleTag(tag.name)" [class.active]="assetsState.isTagSelected(tag.name)">
+                <div class="row">
+                    <div class="col">
+                        {{tag.name}}
+                    </div>
+                    <div class="col col-auto">
+                        {{tag.count}}
+                    </div>
                 </div>
             </a>
         </div>
@@ -66,14 +80,16 @@
         <div class="sidebar-section">
             <h3>Saved queries</h3>
 
-            <a class="row sidebar-item" *ngFor="let query of queries.queries | async" (click)="search(query.filter)" [class.active]="isSelectedQuery(query.filter)">
-                <div class="col truncate">
-                    {{query.name}}
-                </div>
-                <div class="col col-auto">
-                    <a class="sidebar-item-remove" (click)="queries.remove(query.name)">
-                        <i class="icon-close"></i>
-                    </a>
+            <a class="sidebar-item" *ngFor="let query of queries.queries | async" (click)="search(query.filter)" [class.active]="isSelectedQuery(query.filter)">
+                <div class="row">
+                    <div class="col truncate">
+                        {{query.name}}
+                    </div>
+                    <div class="col col-auto">
+                        <a class="sidebar-item-remove" (click)="queries.remove(query.name)">
+                            <i class="icon-close"></i>
+                        </a>
+                    </div>
                 </div>
             </a>
         </div>

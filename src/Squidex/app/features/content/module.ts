@@ -15,6 +15,7 @@ import {
     ContentMustExistGuard,
     LoadLanguagesGuard,
     SchemaMustExistPublishedGuard,
+    SchemaMustNotBeSingletonGuard,
     SqxFrameworkModule,
     SqxSharedModule,
     UnsetContentGuard
@@ -22,6 +23,7 @@ import {
 
 import {
     ArrayEditorComponent,
+    ArrayItemComponent,
     AssetsEditorComponent,
     ContentFieldComponent,
     ContentHistoryComponent,
@@ -52,12 +54,13 @@ const routes: Routes = [
                     {
                         path: '',
                         component: ContentsPageComponent,
+                        canActivate: [SchemaMustNotBeSingletonGuard],
                         canDeactivate: [CanDeactivateGuard]
                     },
                     {
                         path: 'new',
                         component: ContentPageComponent,
-                        canActivate: [UnsetContentGuard],
+                        canActivate: [SchemaMustNotBeSingletonGuard, UnsetContentGuard],
                         canDeactivate: [CanDeactivateGuard]
                     },
                     {
@@ -90,6 +93,7 @@ const routes: Routes = [
     ],
     declarations: [
         ArrayEditorComponent,
+        ArrayItemComponent,
         AssetsEditorComponent,
         ContentFieldComponent,
         ContentHistoryComponent,

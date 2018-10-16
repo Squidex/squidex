@@ -10,6 +10,7 @@ using System.Collections.Concurrent;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading;
 using System.Threading.Tasks;
 using EventStore.ClientAPI;
 using EventStore.ClientAPI.Exceptions;
@@ -103,7 +104,7 @@ namespace Squidex.Infrastructure.EventSourcing
             }
         }
 
-        public async Task ConnectAsync()
+        public async Task ConnectAsync(CancellationToken ct = default(CancellationToken))
         {
             var addressParts = projectionHost.Split(':');
 

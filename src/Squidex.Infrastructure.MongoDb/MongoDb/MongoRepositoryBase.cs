@@ -7,6 +7,7 @@
 
 using System;
 using System.Globalization;
+using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 using Squidex.Infrastructure.Tasks;
@@ -67,21 +68,12 @@ namespace Squidex.Infrastructure.MongoDb
         private Lazy<IMongoCollection<TEntity>> CreateCollection()
         {
             return new Lazy<IMongoCollection<TEntity>>(() =>
-            {
-                return Task.Run(async () =>
-                {
-                    var databaseCollection = mongoDatabase.GetCollection<TEntity>(
-                        CollectionName(),
-                        CollectionSettings() ?? new MongoCollectionSettings());
-
-                    await SetupCollectionAsync(databaseCollection).ConfigureAwait(false);
-
-                    return databaseCollection;
-                }).Result;
-            });
+                mongoDatabase.GetCollection<TEntity>(
+                    CollectionName(),
+                    CollectionSettings() ?? new MongoCollectionSettings()));
         }
 
-        protected virtual Task SetupCollectionAsync(IMongoCollection<TEntity> collection)
+        protected virtual Task SetupCollectionAsync(IMongoCollection<TEntity> collection, CancellationToken ct = default(CancellationToken))
         {
             return TaskHelper.Done;
         }
@@ -93,13 +85,15 @@ namespace Squidex.Infrastructure.MongoDb
             await SetupCollectionAsync(Collection);
         }
 
-        public async Task<bool> DropCollectionIfExistsAsync()
+        public async Task<bool> DropCollectionIfExistsAsync(CancellationToken ct = default(CancellationToken))
         {
             try
             {
                 await mongoDatabase.DropCollectionAsync(CollectionName());
 
                 mongoCollection = CreateCollection();
+
+                await SetupCollectionAsync(Collection, ct);
 
                 return true;
             }
@@ -109,11 +103,11 @@ namespace Squidex.Infrastructure.MongoDb
             }
         }
 
-        public void Initialize()
+        public async Task InitializeAsync(CancellationToken ct = default(CancellationToken))
         {
             try
             {
-                Database.ListCollections();
+                await SetupCollectionAsync(Collection, ct);
             }
             catch (Exception ex)
             {

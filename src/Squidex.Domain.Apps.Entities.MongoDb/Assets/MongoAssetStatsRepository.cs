@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Entities.Assets;
@@ -30,12 +31,14 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             return "Projections_AssetStats";
         }
 
-        protected override async Task SetupCollectionAsync(IMongoCollection<MongoAssetStatsEntity> collection)
+        protected override Task SetupCollectionAsync(IMongoCollection<MongoAssetStatsEntity> collection, CancellationToken ct = default(CancellationToken))
         {
-            await collection.Indexes.CreateOneAsync(
-                new CreateIndexModel<MongoAssetStatsEntity>(Index.Ascending(x => x.AssetId).Ascending(x => x.Date)));
-            await collection.Indexes.CreateOneAsync(
-                new CreateIndexModel<MongoAssetStatsEntity>(Index.Ascending(x => x.AssetId).Descending(x => x.Date)));
+            return collection.Indexes.CreateManyAsync(
+                new[]
+                {
+                    new CreateIndexModel<MongoAssetStatsEntity>(Index.Ascending(x => x.AssetId).Ascending(x => x.Date)),
+                    new CreateIndexModel<MongoAssetStatsEntity>(Index.Ascending(x => x.AssetId).Descending(x => x.Date))
+                }, ct);
         }
 
         public async Task<IReadOnlyList<IAssetStatsEntity>> QueryAsync(Guid appId, DateTime fromDate, DateTime toDate)

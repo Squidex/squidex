@@ -1,4 +1,4 @@
-<div class="table-items-row" [class.invalid]="fieldForm.invalid">
+<div class="table-items-row" [class.invalid]="isInvalid | async">
     <ng-container *ngIf="field.isLocalizable && languages.length > 1">
         <div class="languages-buttons" #buttonLanguages>
             <sqx-language-selector size="sm"

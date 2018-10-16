@@ -12,6 +12,7 @@ import { catchError, distinctUntilChanged, map, switchMap, tap } from 'rxjs/oper
 import {
     DateTime,
     DialogService,
+    ErrorDto,
     ImmutableArray,
     notify,
     Pager,
@@ -152,7 +153,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                 this.contentsService.changeContentStatus(this.appName, this.schemaName, c.id, action, dueTime, c.version).pipe(
                     catchError(error => of(error))))).pipe(
             tap(results => {
-                const error = results.find(x => !!x.error);
+                const error = results.find(x => x instanceof ErrorDto);
 
                 if (error) {
                     this.dialogs.notifyError(error);
@@ -169,7 +170,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                 this.contentsService.deleteContent(this.appName, this.schemaName, c.id, c.version).pipe(
                     catchError(error => of(error))))).pipe(
             tap(results => {
-                const error = results.find(x => !!x.error);
+                const error = results.find(x => x instanceof ErrorDto);
 
                 if (error) {
                     this.dialogs.notifyError(error);
@@ -272,7 +273,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     }
 
     public init(): Observable<any> {
-        this.next(s => ({ ...s, contentsPager: new Pager(0), contentsQuery: '', isArchive: false, isLoaded: false }));
+        this.next(s => ({ contents: ImmutableArray.of(), contentsPager: new Pager(0) }));
 
         return this.loadInternal();
     }

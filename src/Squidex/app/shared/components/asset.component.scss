@@ -1,6 +1,8 @@
 @import '_vars';
 @import '_mixins';
 
+$list-height: 2.375rem;
+
 @mixin overlay-container {
     position: relative;
     padding: 0;
@@ -12,6 +14,7 @@
         @include transition(opacity .4s ease);
         @include absolute(0, 0, 0, 0);
         @include opacity(0);
+        @include flex-box;
         color: $color-dark-foreground;
     }
 
@@ -31,24 +34,14 @@
     color: $color-dark-foreground;
 }
 
-.drop-overlay {
-    & {
-        @include overlay;
-        pointer-events: none;
-    }
-
-    &-text {
-        @include absolute(40%, 0, 0, 0);
-        text-align: center;
-        font-size: 1.25rem;
-        font-weight: lighter;
-    }
-}
-
 :host {
     padding-bottom: 1rem;
     padding-left: 8px;
     padding-right: 8px;
+}
+
+:host(.isListView) {
+    padding: 0;
 }
 
 :host /deep/ {
@@ -82,20 +75,6 @@
         padding-top: .5rem;
         min-height: $asset-footer;
         max-height: auto;
-    }
-
-    &.drag {
-        .drop-overlay {
-            @include opacity(1);
-        }
-
-        .file-type {
-            @include opacity(0);
-        }
-    }
-
-    &.selectable {
-        cursor: pointer;
     }
 }
 
@@ -133,8 +112,7 @@
         @include truncate;
     }
 
-    &-image,
-    &-icon {
+    &-image {
         height: $asset-image;
     }
 
@@ -153,6 +131,7 @@
     &-icon {
         line-height: $asset-image;
         background: $color-border;
+        height: $asset-image;
         border: 0;
         text-align: center;
     }
@@ -201,6 +180,123 @@
 
 .editable {
     height: 2rem;
+    border-top: 0;
+    border-bottom: 1px solid transparent;
+}
+
+.table-items-row {
+    & {
+        position: relative;
+        padding-left: $list-height + 2rem;
+        height: $list-height + 2rem;
+    }
+
+    .left-border {
+        & {
+            @include absolute(0, auto, auto, 0);
+            height: $list-height + 2rem;
+            border: 0;
+            background: $color-border;
+            width: 4px;
+        }
+
+        &.selected {
+            background: $color-theme-blue;
+        }
+    }
+
+    .image {
+        @include absolute(0, auto, 0, 4px);
+        border: 0;
+        background: $color-border;
+        width: $list-height + 2rem;
+    }
+
+    .image-padded {
+        padding: 1rem;
+    }
+
+    .image-left {
+        left: 0;
+    }
+
+    .icon {
+        max-width: 100%;
+    }
+
+    .col {
+        & {
+            height: $list-height;
+        }
+
+        &-user {
+            padding-top: .2rem;
+        }
+
+        &-actions {
+            line-height: $list-height;
+        }
+
+        &-name,
+        &-info {
+            @include truncate;
+            padding-right: 1rem;
+            padding-left: 1rem;
+            line-height: $list-height;
+        }
+
+        &-actions,
+        &-user {
+            max-width: 3rem;
+            min-width: 3rem;
+        }
+
+        &-info {
+            color: $color-text-decent;
+            font-size: .9rem;
+            max-width: 12rem;
+            min-width: 12rem;
+        }
+    }
+
+    .upload-progress {
+        padding: .25rem 0;
+    }
+}
+
+.drop-overlay {
+    & {
+        @include overlay;
+        pointer-events: none;
+    }
+
+    &-text {
+        position: absolute;
+        font-size: 1.25rem;
+        font-weight: lighter;
+    }
+}
+
+.drag {
+    .drop-overlay {
+        @include opacity(1);
+    }
+
+    .file-type {
+        @include opacity(0);
+    }
+}
+
+.selectable {
+    cursor: pointer;
+}
+
+.bg {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAA8CAIAAAC1nk4lAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAYdEVYdFNvZnR3YXJlAHBhaW50Lm5ldCA0LjEuMWMqnEsAAACbSURBVGhD7c6hDQAxAMPA33+m7vYlJh7AoFKOBMbfyfyZRRsPgUUbD4FFGw+BRRsPgUUbD4FFGw+BRRsPgUUbD4FFGw+BRRsPgUUbD4FFGw+BRRsPgUUbD4E3o9kA7YFFGw+BRRsPgUUbD4FFGw+BRRsPgUUbD4FFGw+BRRsPgUUbD4FFGw+BRRsPgUUbD4FFGw+BRRsPgQejz7nPYYKl8IqSfgAAAABJRU5ErkJggg==');
+}
+
+.bg2 {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAIAAAAC64paAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAYdEVYdFNvZnR3YXJlAHBhaW50Lm5ldCA0LjEuMWMqnEsAAAAsSURBVDhPY9iDF/zHC0Y1YwCoKhxgRGqG0jgA1AwcYFQzBoCqwgFGnuY9ewCdSg6FRg4gMAAAAABJRU5ErkJggg==');
 }
 
 .tags {

@@ -9,7 +9,6 @@ using System;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
 using Squidex.Pipeline;
 
@@ -38,8 +37,7 @@ namespace Squidex.Config.Domain
             if (!string.IsNullOrWhiteSpace(loggingFile))
             {
                 services.AddSingletonAs(file ?? (file = new FileChannel(loggingFile)))
-                    .As<ILogChannel>()
-                    .As<IInitializable>();
+                    .As<ILogChannel>();
             }
 
             var useColors = config.GetValue<bool>("logging:colors");

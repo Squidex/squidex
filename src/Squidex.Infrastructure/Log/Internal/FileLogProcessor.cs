@@ -20,6 +20,7 @@ namespace Squidex.Infrastructure.Log.Internal
         private readonly BlockingCollection<LogMessageEntry> messageQueue = new BlockingCollection<LogMessageEntry>(MaxQueuedMessages);
         private readonly Task outputTask;
         private readonly string path;
+        private StreamWriter writer;
 
         public FileLogProcessor(string path)
         {
@@ -45,16 +46,33 @@ namespace Squidex.Infrastructure.Log.Internal
                         throw;
                     }
                 }
+                finally
+                {
+                    writer.Dispose();
+                }
             }
         }
 
-        public void Connect()
+        public void Initialize()
         {
             var fileInfo = new FileInfo(path);
-
-            if (!fileInfo.Directory.Exists)
+            try
             {
-                throw new ConfigurationException($"Log directory '{fileInfo.Directory.FullName}' does not exist.");
+                if (!fileInfo.Directory.Exists)
+                {
+                    fileInfo.Directory.Create();
+                }
+
+                var fs = new FileStream(fileInfo.FullName, FileMode.Append, FileAccess.Write, FileShare.ReadWrite);
+
+                writer = new StreamWriter(fs, Encoding.UTF8);
+                writer.AutoFlush = true;
+
+                writer.WriteLine($"--- Started Logging {DateTime.UtcNow} ---", 1);
+            }
+            catch (Exception ex)
+            {
+                throw new ConfigurationException($"Log directory '{fileInfo.Directory.FullName}' does not exist or cannot be created.", ex);
             }
         }
 
@@ -71,8 +89,7 @@ namespace Squidex.Infrastructure.Log.Internal
                 {
                     try
                     {
-                        File.AppendAllText(path, entry.Message + Environment.NewLine, Encoding.UTF8);
-
+                        writer.WriteLine(entry.Message);
                         break;
                     }
                     catch (Exception ex)

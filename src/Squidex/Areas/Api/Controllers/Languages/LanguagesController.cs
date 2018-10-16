@@ -7,7 +7,6 @@
 
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
-using NSwag.Annotations;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Pipeline;
@@ -19,7 +18,7 @@ namespace Squidex.Areas.Api.Controllers.Languages
     /// </summary>
     [ApiAuthorize]
     [ApiExceptionFilter]
-    [SwaggerTag(nameof(Languages))]
+    [ApiExplorerSettings(GroupName = nameof(Languages))]
     public sealed class LanguagesController : ApiController
     {
         public LanguagesController(ICommandBus commandBus)

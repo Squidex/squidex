@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, Input, OnDestroy, OnInit, Renderer2 } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy, OnInit, Renderer2 } from '@angular/core';
 
 import { ModalModel } from './../../utils/modal-view';
 
@@ -33,6 +33,7 @@ export class TooltipComponent implements OnDestroy, OnInit {
     public modal = new ModalModel();
 
     constructor(
+        private readonly changeDetector: ChangeDetectorRef,
         private readonly renderer: Renderer2
     ) {
     }
@@ -52,6 +53,8 @@ export class TooltipComponent implements OnDestroy, OnInit {
             this.targetMouseEnterListener =
                 this.renderer.listen(this.target, 'mouseenter', () => {
                     this.modal.show();
+
+                    this.changeDetector.detectChanges();
                 });
 
             this.targetMouseLeaveListener =

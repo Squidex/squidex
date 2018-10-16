@@ -72,3 +72,7 @@ $support-text-size: 200px;
         width: $support-icon-size;
     }
 }
+
+.loader {
+    @include absolute(12px, auto, auto, 40px);
+}

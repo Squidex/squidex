@@ -6,7 +6,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from '@angular/router';
+import { ActivatedRouteSnapshot, CanActivate, Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 
@@ -22,7 +22,7 @@ export class SchemaMustExistPublishedGuard implements CanActivate {
     ) {
     }
 
-    public canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> {
+    public canActivate(route: ActivatedRouteSnapshot): Observable<boolean> {
         const schemaName = allParams(route)['schemaName'];
 
         const result =
@@ -31,12 +31,8 @@ export class SchemaMustExistPublishedGuard implements CanActivate {
                     if (!dto || !dto.isPublished) {
                         this.router.navigate(['/404']);
                     }
-
-                    if (dto && dto.isSingleton && state.url.indexOf(dto.id) < 0) {
-                        this.router.navigate([state.url, dto.id]);
-                    }
                 }),
-                map(s => s !== null && s.isPublished));
+                map(s => !!s && s.isPublished));
 
         return result;
     }

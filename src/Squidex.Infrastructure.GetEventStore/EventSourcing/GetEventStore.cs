@@ -34,18 +34,18 @@ namespace Squidex.Infrastructure.EventSourcing
             projectionClient = new ProjectionClient(connection, prefix, projectionHost);
         }
 
-        public void Initialize()
+        public async Task InitializeAsync(CancellationToken ct = default(CancellationToken))
         {
             try
             {
-                connection.ConnectAsync().Wait();
+                await connection.ConnectAsync();
             }
             catch (Exception ex)
             {
                 throw new ConfigurationException("Cannot connect to event store.", ex);
             }
 
-            projectionClient.ConnectAsync().Wait();
+            await projectionClient.ConnectAsync();
         }
 
         public IEventSubscription CreateSubscription(IEventSubscriber subscriber, string streamFilter, string position = null)
@@ -82,7 +82,7 @@ namespace Squidex.Infrastructure.EventSourcing
             }
         }
 
-        private async Task QueryAsync(Func<StoredEvent, Task> callback, string streamName, long sliceStart, CancellationToken ct)
+        private async Task QueryAsync(Func<StoredEvent, Task> callback, string streamName, long sliceStart, CancellationToken ct = default(CancellationToken))
         {
             StreamEventsSlice currentSlice;
             do

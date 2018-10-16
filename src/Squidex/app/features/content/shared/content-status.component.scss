@@ -2,10 +2,6 @@
 @import '_mixins';
 
 .content-status {
-    & {
-        vertical-align: middle;
-    }
-
     &-published {
         color: $color-theme-green;
     }
@@ -35,4 +31,8 @@
         color: $color-dark-foreground;
         padding: .75rem;
     }
+}
+
+.middle {
+    vertical-align: middle;
 }

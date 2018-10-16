@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, ContentChild, forwardRef, Input, OnDestroy, OnInit, TemplateRef } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ContentChild, forwardRef, Input, OnDestroy, OnInit, TemplateRef } from '@angular/core';
 import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { Observable, of, Subscription } from 'rxjs';
 import { catchError, debounceTime, distinctUntilChanged, filter, map, switchMap, tap } from 'rxjs/operators';
@@ -27,7 +27,8 @@ export const SQX_AUTOCOMPLETE_CONTROL_VALUE_ACCESSOR: any = {
     selector: 'sqx-autocomplete',
     styleUrls: ['./autocomplete.component.scss'],
     templateUrl: './autocomplete.component.html',
-    providers: [SQX_AUTOCOMPLETE_CONTROL_VALUE_ACCESSOR]
+    providers: [SQX_AUTOCOMPLETE_CONTROL_VALUE_ACCESSOR],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, OnInit {
     private subscription: Subscription;

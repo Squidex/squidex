@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, ElementRef, forwardRef, Input, Renderer2, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, forwardRef, Input, Renderer2, ViewChild } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import { Types } from '@app/framework/internal';
@@ -18,7 +18,8 @@ export const SQX_SLIDER_CONTROL_VALUE_ACCESSOR: any = {
     selector: 'sqx-slider',
     styleUrls: ['./slider.component.scss'],
     templateUrl: './slider.component.html',
-    providers: [SQX_SLIDER_CONTROL_VALUE_ACCESSOR]
+    providers: [SQX_SLIDER_CONTROL_VALUE_ACCESSOR],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SliderComponent implements ControlValueAccessor {
     private callChange = (v: any) => { /* NOOP */ };

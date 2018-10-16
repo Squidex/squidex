@@ -27,11 +27,11 @@ namespace Squidex.Infrastructure.Assets
             this.bucket = bucket;
         }
 
-        public void Initialize()
+        public async Task InitializeAsync(CancellationToken ct = default(CancellationToken))
         {
             try
             {
-                bucket.Database.ListCollections();
+                await bucket.Database.ListCollectionsAsync(cancellationToken: ct);
             }
             catch (MongoException ex)
             {

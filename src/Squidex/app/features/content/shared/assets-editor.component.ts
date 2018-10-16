@@ -7,7 +7,7 @@
 
 // tslint:disable:prefer-for-of
 
-import { Component, forwardRef } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import {
@@ -16,6 +16,7 @@ import {
     AssetsService,
     DialogModel,
     ImmutableArray,
+    LocalStoreService,
     Types
 } from '@app/shared';
 
@@ -27,9 +28,8 @@ export const SQX_ASSETS_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     selector: 'sqx-assets-editor',
     styleUrls: ['./assets-editor.component.scss'],
     templateUrl: './assets-editor.component.html',
-    providers: [
-        SQX_ASSETS_EDITOR_CONTROL_VALUE_ACCESSOR
-    ]
+    providers: [SQX_ASSETS_EDITOR_CONTROL_VALUE_ACCESSOR],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AssetsEditorComponent implements ControlValueAccessor {
     private callChange = (v: any) => { /* NOOP */ };
@@ -40,12 +40,16 @@ export class AssetsEditorComponent implements ControlValueAccessor {
     public newAssets = ImmutableArray.empty<File>();
     public oldAssets = ImmutableArray.empty<AssetDto>();
 
+    public isListView = false;
     public isDisabled = false;
 
     constructor(
         private readonly appsState: AppsState,
-        private readonly assetsService: AssetsService
+        private readonly assetsService: AssetsService,
+        private readonly changeDetector: ChangeDetectorRef,
+        private readonly localStore: LocalStoreService
     ) {
+        this.isListView = this.localStore.get('assetView') === 'List';
     }
 
     public writeValue(obj: any) {
@@ -60,8 +64,12 @@ export class AssetsEditorComponent implements ControlValueAccessor {
                         if (this.oldAssets.length !== assetIds.length) {
                             this.updateValue();
                         }
+
+                        this.changeDetector.detectChanges();
                     }, () => {
                         this.oldAssets = ImmutableArray.empty();
+
+                        this.changeDetector.detectChanges();
                     });
             }
         } else {
@@ -127,5 +135,21 @@ export class AssetsEditorComponent implements ControlValueAccessor {
 
         this.callTouched();
         this.callChange(ids);
+
+        this.changeDetector.detectChanges();
+    }
+
+    public sort(assets: AssetDto[]) {
+        if (assets) {
+            this.oldAssets = ImmutableArray.of(assets);
+
+            this.updateValue();
+        }
+    }
+
+    public changeView(isListView: boolean) {
+        this.localStore.set('assetView', isListView ? 'List' : 'Grid');
+
+        this.isListView = isListView;
     }
 }

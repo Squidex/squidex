@@ -9,7 +9,6 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using NSwag.Annotations;
 using Squidex.Areas.Api.Controllers.Schemas.Models;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Schemas;
@@ -25,7 +24,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
     [ApiAuthorize]
     [ApiExceptionFilter]
     [AppApi]
-    [SwaggerTag(nameof(Schemas))]
+    [ApiExplorerSettings(GroupName = nameof(Schemas))]
     public sealed class SchemasController : ApiController
     {
         private readonly IAppProvider appProvider;

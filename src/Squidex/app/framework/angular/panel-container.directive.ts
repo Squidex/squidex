@@ -14,6 +14,7 @@ import { PanelComponent } from './panel.component';
 })
 export class PanelContainerDirective implements AfterViewInit {
     private readonly panels: PanelComponent[] = [];
+    private isViewInit = false;
     private containerWidth = 0;
 
     constructor(
@@ -27,14 +28,14 @@ export class PanelContainerDirective implements AfterViewInit {
         this.invalidate(true);
     }
 
-    public ngAfterViewInit() {
-        this.invalidate(true);
-    }
-
     public push(panel: PanelComponent) {
         this.panels.push(panel);
+    }
 
-        this.invalidate();
+    public ngAfterViewInit() {
+        this.isViewInit = true;
+
+        this.invalidate(true);
     }
 
     public pop() {
@@ -44,8 +45,12 @@ export class PanelContainerDirective implements AfterViewInit {
     }
 
     public invalidate(resize = false) {
+        if (!this.isViewInit) {
+            return;
+        }
+
         if (resize) {
-            this.containerWidth = this.element.nativeElement.getBoundingClientRect().width;
+            this.containerWidth = this.element.nativeElement.offsetWidth;
         }
 
         const panels = this.panels;

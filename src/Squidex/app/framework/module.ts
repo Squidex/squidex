@@ -6,6 +6,7 @@
  */
 
 import { CommonModule } from '@angular/common';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { ModuleWithProviders, NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
@@ -44,6 +45,8 @@ import {
     KeysPipe,
     KNumberPipe,
     LightenPipe,
+    LoadingInterceptor,
+    LoadingService,
     LocalStoreService,
     MessageBus,
     ModalDialogComponent,
@@ -220,11 +223,17 @@ export class SqxFrameworkModule {
                 ClipboardService,
                 DialogService,
                 LocalStoreService,
+                LoadingService,
                 MessageBus,
                 OnboardingService,
                 ResourceLoaderService,
                 ShortcutService,
-                TitleService
+                TitleService,
+                {
+                    provide: HTTP_INTERCEPTORS,
+                    useClass: LoadingInterceptor,
+                    multi: true
+                }
             ]
         };
     }

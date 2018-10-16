@@ -10,13 +10,13 @@
         
         
         <a class="btn btn-sm btn-link float-right" *ngIf="schemasForCategory.length === 0 && !isReadonly" (click)="removing.emit()">
-            <i class="icon-bin"></i> 
+            <i class="icon-bin2"></i> 
         </a>
     </div>
 
     <ul class="nav nav-panel nav-dark nav-dark-bordered flex-column" *ngIf="isOpen" @fade>
         <li class="nav-item" *ngFor="let schema of schemasFiltered; trackBy: trackBySchema" dnd-draggable [dragEnabled]="!isReadonly" [dragData]="schema">
-            <a class="nav-link" [routerLink]="[schema.name]" routerLinkActive="active">
+            <a class="nav-link" [routerLink]="schemaRoute(schema)" routerLinkActive="active">
                 <div class="row" *ngIf="!isReadonly">
                     <div class="col col-4">
                         <span class="schema-name schema-name-accent">{{schema.displayName}}</span> 

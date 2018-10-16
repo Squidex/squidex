@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
 
 import { fadeAnimation, ModalModel } from '@app/shared/internal';
 
@@ -17,7 +17,8 @@ export interface Language { iso2Code: string; englishName: string; isMasterLangu
     templateUrl: './language-selector.component.html',
     animations: [
         fadeAnimation
-    ]
+    ],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LanguageSelectorComponent implements OnChanges, OnInit {
     public dropdown = new ModalModel();

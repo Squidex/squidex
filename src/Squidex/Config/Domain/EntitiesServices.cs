@@ -65,8 +65,14 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<AppProvider>()
                 .As<IAppProvider>();
 
+            services.AddSingletonAs(c => c.GetRequiredService<IOptions<AssetOptions>>().Value)
+                .AsSelf();
+
             services.AddSingletonAs<AssetQueryService>()
                 .As<IAssetQueryService>();
+
+            services.AddSingletonAs(c => c.GetRequiredService<IOptions<ContentOptions>>().Value)
+                .AsSelf();
 
             services.AddSingletonAs<ContentQueryService>()
                 .As<IContentQueryService>();

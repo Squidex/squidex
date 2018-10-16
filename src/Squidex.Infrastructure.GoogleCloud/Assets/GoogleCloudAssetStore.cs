@@ -30,13 +30,13 @@ namespace Squidex.Infrastructure.Assets
             this.bucketName = bucketName;
         }
 
-        public void Initialize()
+        public async Task InitializeAsync(CancellationToken ct = default(CancellationToken))
         {
             try
             {
                 storageClient = StorageClient.Create();
 
-                storageClient.GetBucket(bucketName);
+                await storageClient.GetBucketAsync(bucketName, cancellationToken: ct);
             }
             catch (Exception ex)
             {
@@ -103,7 +103,7 @@ namespace Squidex.Infrastructure.Assets
             return DeleteCoreAsync(fileName);
         }
 
-        private async Task UploadCoreAsync(string objectName, Stream stream, CancellationToken ct)
+        private async Task UploadCoreAsync(string objectName, Stream stream, CancellationToken ct = default(CancellationToken))
         {
             try
             {

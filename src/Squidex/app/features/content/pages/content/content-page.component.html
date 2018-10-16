@@ -34,7 +34,8 @@
                 <div class="dropdown dropdown-options ml-1" *ngIf="content">
                     <button type="button" class="btn btn-outline-secondary" (click)="dropdown.toggle()" [disabled]="schema.isSingleton && !content.isPending" 
                         [class.active]="dropdown.isOpen | async" #optionsButton>
-                        <sqx-content-status 
+                        <sqx-content-status
+                            [alignMiddle]="false"
                             [status]="content.status"
                             [scheduledTo]="content.scheduleJob?.status"
                             [scheduledAt]="content.scheduleJob?.dueTime"

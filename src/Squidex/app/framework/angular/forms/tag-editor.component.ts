@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, Component, ElementRef, forwardRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, forwardRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { distinctUntilChanged, map, tap } from 'rxjs/operators';
@@ -71,11 +71,16 @@ export const SQX_TAG_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => TagEditorComponent), multi: true
 };
 
+const CACHED_SIZES: { [key: string]: number } = {};
+
+let CACHED_FONT: string;
+
 @Component({
     selector: 'sqx-tag-editor',
     styleUrls: ['./tag-editor.component.scss'],
     templateUrl: './tag-editor.component.html',
-    providers: [SQX_TAG_EDITOR_CONTROL_VALUE_ACCESSOR]
+    providers: [SQX_TAG_EDITOR_CONTROL_VALUE_ACCESSOR],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TagEditorComponent implements AfterViewInit, ControlValueAccessor, OnDestroy, OnInit {
     private subscription: Subscription;
@@ -129,6 +134,12 @@ export class TagEditorComponent implements AfterViewInit, ControlValueAccessor, 
     }
 
     public ngAfterViewInit() {
+        if (!CACHED_FONT) {
+            const style = window.getComputedStyle(this.inputElement.nativeElement);
+
+            CACHED_FONT = `${style.getPropertyValue('font-size')} ${style.getPropertyValue('font-family')}`;
+        }
+
         this.resetSize();
     }
 
@@ -204,7 +215,9 @@ export class TagEditorComponent implements AfterViewInit, ControlValueAccessor, 
     }
 
     public resetSize() {
-        const style = window.getComputedStyle(this.inputElement.nativeElement);
+        if (!CACHED_FONT) {
+            return;
+        }
 
         if (!canvas) {
             canvas = document.createElement('canvas');
@@ -214,20 +227,31 @@ export class TagEditorComponent implements AfterViewInit, ControlValueAccessor, 
             const ctx = canvas.getContext('2d');
 
             if (ctx) {
-                ctx.font = `${style.getPropertyValue('font-size')} ${style.getPropertyValue('font-family')}`;
+                ctx.font = CACHED_FONT;
 
-                const widthText = ctx.measureText(this.inputElement.nativeElement.value).width;
-                const widthPlaceholder = ctx.measureText(this.placeholder).width;
+                const text = this.inputElement.nativeElement.value;
+                const textKey = `${text}§${this.placeholder}§${ctx.font}`;
 
-                const width = Math.max(widthText, widthPlaceholder);
+                let width = CACHED_SIZES[textKey];
+
+                if (!width) {
+                    const widthText = ctx.measureText(text).width;
+                    const widthPlaceholder = ctx.measureText(this.placeholder).width;
+
+                    width = Math.max(widthText, widthPlaceholder);
+
+                    CACHED_SIZES[textKey] = width;
+                }
 
                 this.inputElement.nativeElement.style.width = <any>((width + 5) + 'px');
             }
         }
 
-        setTimeout(() => {
-            this.formElement.nativeElement.scrollLeft = this.formElement.nativeElement.scrollWidth;
-        }, 0);
+        if (this.singleLine) {
+            setTimeout(() => {
+                this.formElement.nativeElement.scrollLeft = this.formElement.nativeElement.scrollWidth;
+            }, 0);
+        }
     }
 
     public onKeyDown(event: KeyboardEvent) {

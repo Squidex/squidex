@@ -31,6 +31,9 @@ export class ContentStatusComponent {
     @Input()
     public showLabel = false;
 
+    @Input()
+    public alignMiddle = true;
+
     public get displayStatus() {
         return !!this.isPending ? 'Pending' : this.status;
     }

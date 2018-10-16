@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, Component, ElementRef, EventEmitter, forwardRef, OnDestroy, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, forwardRef, OnDestroy, Output, ViewChild } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import {
@@ -25,7 +25,8 @@ export const SQX_RICH_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     selector: 'sqx-rich-editor',
     styleUrls: ['./rich-editor.component.scss'],
     templateUrl: './rich-editor.component.html',
-    providers: [SQX_RICH_EDITOR_CONTROL_VALUE_ACCESSOR]
+    providers: [SQX_RICH_EDITOR_CONTROL_VALUE_ACCESSOR],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class RichEditorComponent implements ControlValueAccessor, AfterViewInit, OnDestroy {
     private callChange = (v: any) => { /* NOOP */ };
@@ -105,7 +106,7 @@ export class RichEditorComponent implements ControlValueAccessor, AfterViewInit,
                 self.tinyInitTimer =
                     setTimeout(() => {
                         self.tinyEditor.setContent(this.value || '');
-                    }, 500);
+                    }, 1000);
             },
 
             target: this.editor.nativeElement

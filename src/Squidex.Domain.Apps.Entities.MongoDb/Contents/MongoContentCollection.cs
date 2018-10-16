@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Core.Contents;
@@ -31,10 +32,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             this.collectionName = collectionName;
         }
 
-        protected override async Task SetupCollectionAsync(IMongoCollection<MongoContentEntity> collection)
+        protected override async Task SetupCollectionAsync(IMongoCollection<MongoContentEntity> collection, CancellationToken ct = default(CancellationToken))
         {
             await collection.Indexes.CreateOneAsync(
-                new CreateIndexModel<MongoContentEntity>(Index.Ascending(x => x.ReferencedIds)));
+                new CreateIndexModel<MongoContentEntity>(Index.Ascending(x => x.ReferencedIds)), cancellationToken: ct);
         }
 
         protected override string CollectionName()

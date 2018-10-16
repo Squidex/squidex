@@ -10,7 +10,7 @@
     <ProjectReference Include="..\..\src\Squidex.Domain.Apps.Core.Operations\Squidex.Domain.Apps.Core.Operations.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Algolia.Search" Version="5.1.0" />
+    <PackageReference Include="Algolia.Search" Version="5.2.0" />
     <PackageReference Include="CoreTweet" Version="0.9.0.415" />
     <PackageReference Include="Elasticsearch.Net" Version="6.3.1" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="2.1.1" />

@@ -26,7 +26,7 @@
     & {
         @include transition(border-color .4s ease);
         @include border-radius;
-        border: 2px dashed $color-border;
+        border: 2px dashed darken($color-border, 10%);
         font-size: 1.2rem;
         font-weight: normal;
         text-align: center;

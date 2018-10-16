@@ -7,7 +7,7 @@
 
 import { Router } from '@angular/router';
 import { of } from 'rxjs';
-import { IMock, Mock, Times } from 'typemoq';
+import { IMock, It, Mock, Times } from 'typemoq';
 
 import { ContentDto } from './../services/contents.service';
 import { ContentsState } from './../state/contents.state';
@@ -42,7 +42,7 @@ describe('ContentMustExistGuard', () => {
 
         expect(result!).toBeTruthy();
 
-        contentsState.verify(x => x.select('123'), Times.once());
+        router.verify(x => x.navigate(It.isAny()), Times.never());
     });
 
     it('should load content and return false when not found', () => {

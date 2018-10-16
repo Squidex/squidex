@@ -8,7 +8,7 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, of, Subscription } from 'rxjs';
-import { filter, map, onErrorResumeNext, switchMap } from 'rxjs/operators';
+import { filter, onErrorResumeNext, switchMap } from 'rxjs/operators';
 
 import { ContentVersionSelected } from './../messages';
 
@@ -88,19 +88,19 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
                 });
 
         this.selectedSchemaSubscription =
-            this.schemasState.selectedSchema.pipe(filter(s => !!s), map(s => s!))
+            this.schemasState.selectedSchema.pipe(filter(s => !!s))
                 .subscribe(schema => {
-                    this.schema = schema;
+                    this.schema = schema!;
 
                     this.contentForm = new EditContentForm(this.schema, this.languages);
                 });
 
         this.contentSubscription =
-            this.contentsState.selectedContent.pipe(filter(c => !!c), map(c => c!))
+            this.contentsState.selectedContent.pipe(filter(c => !!c))
                 .subscribe(content => {
-                    this.content = content;
+                    this.content = content!;
 
-                    this.loadContent(content.dataDraft);
+                    this.loadContent(this.content.dataDraft);
                 });
 
         this.contentVersionSelectedSubscription =

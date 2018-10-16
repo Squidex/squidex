@@ -68,11 +68,15 @@ describe('Queries', () => {
     it('should forward add call to state', () => {
         queries.add('key3', 'filter3');
 
+        expect(true).toBeTruthy();
+
         uiState.verify(x => x.set('schemas.my-schema.queries.key3', 'filter3'), Times.once());
     });
 
     it('should forward remove call to state', () => {
         queries.remove('key3');
+
+        expect(true).toBeTruthy();
 
         uiState.verify(x => x.remove('schemas.my-schema.queries.key3'), Times.once());
     });

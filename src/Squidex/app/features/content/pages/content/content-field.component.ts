@@ -5,8 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { AbstractControl, FormGroup } from '@angular/forms';
+import { Observable } from 'rxjs';
+import { map, startWith } from 'rxjs/operators';
 
 import {
     AppLanguageDto,
@@ -20,7 +22,8 @@ import {
 @Component({
     selector: 'sqx-content-field',
     styleUrls: ['./content-field.component.scss'],
-    templateUrl: './content-field.component.html'
+    templateUrl: './content-field.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ContentFieldComponent implements OnChanges {
     @Input()
@@ -43,6 +46,8 @@ export class ContentFieldComponent implements OnChanges {
 
     public selectedFormControl: AbstractControl;
 
+    public isInvalid: Observable<boolean>;
+
     public ngOnChanges(changes: SimpleChanges) {
         if (this.field.isLocalizable) {
             this.selectedFormControl = this.fieldForm.controls[this.language.iso2Code];
@@ -54,6 +59,10 @@ export class ContentFieldComponent implements OnChanges {
             if (Types.isFunction(this.selectedFormControl['_clearChangeFns'])) {
                 this.selectedFormControl['_clearChangeFns']();
             }
+        }
+
+        if (changes['fieldForm']) {
+            this.isInvalid = this.fieldForm.statusChanges.pipe(startWith(this.fieldForm.invalid), map(x => this.fieldForm.invalid));
         }
     }
 }

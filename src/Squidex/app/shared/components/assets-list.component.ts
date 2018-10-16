@@ -7,7 +7,7 @@
 
 // tslint:disable:prefer-for-of
 
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { onErrorResumeNext } from 'rxjs/operators';
 
 import {
@@ -19,7 +19,8 @@ import {
 @Component({
     selector: 'sqx-assets-list',
     styleUrls: ['./assets-list.component.scss'],
-    templateUrl: './assets-list.component.html'
+    templateUrl: './assets-list.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AssetsListComponent {
     public newFiles = ImmutableArray.empty<File>();
@@ -28,7 +29,10 @@ export class AssetsListComponent {
     public state: AssetsState;
 
     @Input()
-    public isDisabled: false;
+    public isDisabled = false;
+
+    @Input()
+    public isListView = false;
 
     @Input()
     public selectedIds: object;

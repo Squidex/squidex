@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,15 +20,20 @@ namespace Squidex.Config.Domain
         {
             var log = services.GetRequiredService<ISemanticLog>();
 
-            var config = services.GetRequiredService<IConfiguration>();
-
             log.LogInformation(w => w
                 .WriteProperty("message", "Application started")
                 .WriteObject("environment", c =>
                 {
-                    foreach (var kvp in config.AsEnumerable().Where(kvp => kvp.Value != null))
+                    var config = services.GetRequiredService<IConfiguration>();
+
+                    var logged = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+                    foreach (var kvp in config.AsEnumerable().Where(kvp => kvp.Value != null).Select(x => new { Key = x.Key.ToLowerInvariant(), x.Value }).OrderBy(x => x.Key))
                     {
-                        c.WriteProperty(kvp.Key, kvp.Value);
+                        if (logged.Add(kvp.Key))
+                        {
+                            c.WriteProperty(kvp.Key, kvp.Value);
+                        }
                     }
                 }));
         }

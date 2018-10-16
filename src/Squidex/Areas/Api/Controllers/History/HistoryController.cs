@@ -8,7 +8,6 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using NSwag.Annotations;
 using Squidex.Areas.Api.Controllers.History.Models;
 using Squidex.Domain.Apps.Entities.History.Repositories;
 using Squidex.Infrastructure.Commands;
@@ -23,7 +22,7 @@ namespace Squidex.Areas.Api.Controllers.History
     [ApiExceptionFilter]
     [AppApi]
     [MustBeAppEditor]
-    [SwaggerTag(nameof(History))]
+    [ApiExplorerSettings(GroupName = nameof(History))]
     public sealed class HistoryController : ApiController
     {
         private readonly IHistoryEventRepository historyEventRepository;

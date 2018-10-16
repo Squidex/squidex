@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, Component, ElementRef, forwardRef, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, forwardRef, ViewChild } from '@angular/core';
 import { ControlValueAccessor, FormBuilder, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import {
@@ -31,7 +31,8 @@ interface Geolocation {
     selector: 'sqx-geolocation-editor',
     styleUrls: ['./geolocation-editor.component.scss'],
     templateUrl: './geolocation-editor.component.html',
-    providers: [SQX_GEOLOCATION_EDITOR_CONTROL_VALUE_ACCESSOR]
+    providers: [SQX_GEOLOCATION_EDITOR_CONTROL_VALUE_ACCESSOR],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class GeolocationEditorComponent implements ControlValueAccessor, AfterViewInit {
     private callChange = (v: any) => { /* NOOP */ };
@@ -144,12 +145,12 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
     }
 
     public updateValueByInput() {
-        let updateMap = this.geolocationForm.controls['latitude'].value !== null &&
-            this.geolocationForm.controls['longitude'].value !== null;
+        const lat = this.geolocationForm.controls['latitude'].value;
+        const lng = this.geolocationForm.controls['longitude'].value;
 
-        this.value = this.geolocationForm.value;
+        this.updateValue(lat, lng);
 
-        if (updateMap) {
+        if (lat && lng) {
             this.updateMarker(true, true);
         } else {
             this.callChange(this.value);
@@ -188,11 +189,7 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
                         if (!this.marker && !this.isDisabled) {
                             const latlng = event.latlng.wrap();
 
-                            this.value = {
-                                latitude:  latlng.lat,
-                                longitude: latlng.lng
-                            };
-
+                            this.updateValue(latlng.lat, latlng.lng);
                             this.updateMarker(false, true);
                         }
                     });
@@ -225,11 +222,7 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
                 this.map.addListener('click',
                     (event: any) => {
                         if (!this.isDisabled) {
-                            this.value = {
-                                latitude: event.latLng.lat(),
-                                longitude: event.latLng.lng()
-                            };
-
+                            this.updateValue(event.latLng.lat(), event.latLng.lng());
                             this.updateMarker(false, true);
                         }
                     });
@@ -252,8 +245,7 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
                             let lat = place.geometry.location.lat();
                             let lng = place.geometry.location.lng();
 
-                            this.value = { latitude: lat, longitude: lng };
-
+                            this.updateValue(lat, lng);
                             this.updateMarker(false, true);
                         }
                     }
@@ -274,15 +266,30 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
         this.updateMarker(true, true);
     }
 
+    private updateValue(lat: number, lng: number) {
+        this.value = { latitude: lat, longitude: lng };
+    }
+
     private updateMarker(zoom: boolean, fireEvent: boolean) {
         if (!this.isGoogleMaps) {
-            this.updateMarkerOSM(zoom, fireEvent);
+            this.updateMarkerOSM(zoom);
         } else {
-            this.updateMarkerGoogle(zoom, fireEvent);
+            this.updateMarkerGoogle(zoom);
+        }
+
+        if (this.value) {
+            this.geolocationForm.setValue(this.value, { emitEvent: true, onlySelf: false });
+        } else {
+            this.geolocationForm.reset(undefined, { emitEvent: true, onlySelf: false });
+        }
+
+        if (fireEvent) {
+            this.callChange(this.value);
+            this.callTouched();
         }
     }
 
-    private updateMarkerOSM(zoom: boolean, fireEvent: boolean) {
+    private updateMarkerOSM(zoom: boolean) {
         if (this.value) {
             if (!this.marker) {
                 this.marker = L.marker([0, 90], { draggable: true }).addTo(this.map);
@@ -290,10 +297,7 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
                 this.marker.on('drag', (event: any) => {
                     const latlng = event.latlng.wrap();
 
-                    this.value = {
-                        latitude:  latlng.lat,
-                        longitude: latlng.lng
-                    };
+                    this.updateValue(latlng.lat, latlng.lng);
                 });
 
                 this.marker.on('dragend', () => {
@@ -314,8 +318,6 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
             }
 
             this.marker.setLatLng(latLng);
-
-            this.geolocationForm.setValue(this.value, { emitEvent: false, onlySelf: false });
         } else {
             if (this.marker) {
                 this.marker.removeFrom(this.map);
@@ -323,17 +325,10 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
             }
 
             this.map.fitWorld();
-
-            this.geolocationForm.reset(undefined, { emitEvent: false, onlySelf: false });
-        }
-
-        if (fireEvent) {
-            this.callChange(this.value);
-            this.callTouched();
         }
     }
 
-    private updateMarkerGoogle(zoom: boolean, fireEvent: boolean) {
+    private updateMarkerGoogle(zoom: boolean) {
         if (this.value) {
             if (!this.marker) {
                 this.marker =  new google.maps.Marker({
@@ -347,19 +342,12 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
 
                 this.marker.addListener('drag', (event: any) => {
                     if (!this.isDisabled) {
-                        this.value = {
-                            latitude:  event.latLng.lat(),
-                            longitude: event.latLng.lng()
-                        };
+                        this.updateValue(event.latLng.lat(), event.LatLng.lng());
                     }
                 });
                 this.marker.addListener('dragend', (event: any) => {
                     if (!this.isDisabled) {
-                        this.value = {
-                            latitude:  event.latLng.lat(),
-                            longitude: event.latLng.lng()
-                        };
-
+                        this.updateValue(event.latLng.lat(), event.LatLng.lng());
                         this.updateMarker(false, true);
                     }
                 });
@@ -375,8 +363,6 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
 
             this.marker.setPosition(latLng);
             this.map.setZoom(12);
-
-            this.geolocationForm.setValue(this.value, { emitEvent: false, onlySelf: false });
         } else {
             if (this.marker) {
                 this.marker.setMap(null);
@@ -384,13 +370,6 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
             }
 
             this.map.setCenter({ lat: 0, lng: 0 });
-
-            this.geolocationForm.reset(undefined, { emitEvent: false, onlySelf: false });
-        }
-
-        if (fireEvent) {
-            this.callChange(this.value);
-            this.callTouched();
         }
     }
 }

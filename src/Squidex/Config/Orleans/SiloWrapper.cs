@@ -7,14 +7,15 @@
 
 using System;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Orleans;
 using Orleans.Configuration;
 using Orleans.Hosting;
-using Squidex.Config.Domain;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Infrastructure;
@@ -22,14 +23,14 @@ using Squidex.Infrastructure.EventSourcing.Grains;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Log.Adapter;
 using Squidex.Infrastructure.Orleans;
-using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Config.Orleans
 {
-    public sealed class SiloWrapper : DisposableObjectBase, IInitializable, IDisposable
+    public sealed class SiloWrapper : IHostedService
     {
-        private readonly Lazy<ISiloHost> silo;
+        private readonly Lazy<ISiloHost> lazySilo;
         private readonly ISemanticLog log;
+        private bool isStopping;
 
         internal sealed class Source : IConfigurationSource
         {
@@ -48,28 +49,23 @@ namespace Squidex.Config.Orleans
 
         public IClusterClient Client
         {
-            get { return silo.Value.Services.GetRequiredService<IClusterClient>(); }
+            get { return lazySilo.Value.Services.GetRequiredService<IClusterClient>(); }
         }
 
-        public SiloWrapper(IConfiguration config, ISemanticLog log)
+        public SiloWrapper(IConfiguration config, ISemanticLog log, IApplicationLifetime lifetime)
         {
             this.log = log;
 
-            silo = new Lazy<ISiloHost>(() =>
+            lazySilo = new Lazy<ISiloHost>(() =>
             {
                 var hostBuilder = new SiloHostBuilder()
                     .UseDashboard(options => options.HostSelf = false)
                     .EnableDirectClient()
                     .AddIncomingGrainCallFilter<LocalCacheFilter>()
+                    .AddStartupTask<InitializerStartup>()
                     .AddStartupTask<Bootstrap<IContentSchedulerGrain>>()
                     .AddStartupTask<Bootstrap<IEventConsumerManagerGrain>>()
                     .AddStartupTask<Bootstrap<IRuleDequeuerGrain>>()
-                    .AddStartupTask((services, ct) =>
-                    {
-                        services.RunInitialization();
-
-                        return TaskHelper.Done;
-                    })
                     .Configure<ClusterOptions>(options =>
                     {
                         options.Configure();
@@ -141,16 +137,26 @@ namespace Squidex.Config.Orleans
                     }
                 });
 
-                return hostBuilder.Build();
+                var silo = hostBuilder.Build();
+
+                silo.Stopped.ContinueWith(x =>
+                {
+                    if (!isStopping)
+                    {
+                        lifetime.StopApplication();
+                    }
+                });
+
+                return silo;
             });
         }
 
-        public void Initialize()
+        public async Task StartAsync(CancellationToken cancellationToken)
         {
             var watch = ValueStopwatch.StartNew();
             try
             {
-                silo.Value.StartAsync().Wait();
+                await lazySilo.Value.StartAsync(cancellationToken);
             }
             finally
             {
@@ -162,14 +168,13 @@ namespace Squidex.Config.Orleans
             }
         }
 
-        protected override void DisposeObject(bool disposing)
+        public async Task StopAsync(CancellationToken cancellationToken)
         {
-            if (disposing)
+            if (lazySilo.IsValueCreated)
             {
-                if (silo.IsValueCreated)
-                {
-                    Task.Run(() => silo.Value.StopAsync()).Wait();
-                }
+                isStopping = true;
+
+                await lazySilo.Value.StopAsync(cancellationToken);
             }
         }
     }

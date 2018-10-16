@@ -13,12 +13,10 @@ import { delay, switchMap } from 'rxjs/operators';
 import {
     allParams,
     AppsState,
-    formatHistoryMessage,
     HistoryChannelUpdated,
     HistoryEventDto,
     HistoryService,
     MessageBus,
-    UsersProviderService,
     Version
 } from '@app/shared';
 
@@ -59,8 +57,7 @@ export class ContentHistoryComponent {
         private readonly appsState: AppsState,
         private readonly historyService: HistoryService,
         private readonly messageBus: MessageBus,
-        private readonly route: ActivatedRoute,
-        private readonly users: UsersProviderService
+        private readonly route: ActivatedRoute
     ) {
     }
 
@@ -68,7 +65,7 @@ export class ContentHistoryComponent {
         this.messageBus.emit(new ContentVersionSelected(new Version(version.toString())));
     }
 
-    public format(message: string): Observable<string> {
-        return formatHistoryMessage(message, this.users);
+    public trackByEvent(index: number, event: HistoryEventDto) {
+        return event.eventId;
     }
 }

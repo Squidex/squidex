@@ -6,8 +6,8 @@
 // ==========================================================================
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Orleans;
-using Squidex.Infrastructure;
 
 namespace Squidex.Config.Orleans
 {
@@ -16,7 +16,7 @@ namespace Squidex.Config.Orleans
         public static void AddOrleansSilo(this IServiceCollection services)
         {
             services.AddSingletonAs<SiloWrapper>()
-                .As<IInitializable>()
+                .As<IHostedService>()
                 .AsSelf();
 
             services.AddServicesForSelfHostedDashboard(null, options =>
@@ -24,7 +24,7 @@ namespace Squidex.Config.Orleans
                 options.HideTrace = true;
             });
 
-            services.AddSingletonAs(c => c.GetRequiredService<SiloWrapper>().Client)
+            services.AddSingletonAs(c => c.GetRequiredService<IClusterClient>())
                 .As<IClusterClient>();
 
             services.AddSingletonAs(c => c.GetRequiredService<SiloWrapper>().Client)

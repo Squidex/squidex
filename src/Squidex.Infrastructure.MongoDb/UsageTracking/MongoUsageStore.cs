@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 using Squidex.Infrastructure.MongoDb;
@@ -26,10 +27,10 @@ namespace Squidex.Infrastructure.UsageTracking
             return "Usages";
         }
 
-        protected override Task SetupCollectionAsync(IMongoCollection<MongoUsage> collection)
+        protected override Task SetupCollectionAsync(IMongoCollection<MongoUsage> collection, CancellationToken ct = default(CancellationToken))
         {
             return collection.Indexes.CreateOneAsync(
-                new CreateIndexModel<MongoUsage>(Index.Ascending(x => x.Key).Ascending(x => x.Category).Ascending(x => x.Date)));
+                new CreateIndexModel<MongoUsage>(Index.Ascending(x => x.Key).Ascending(x => x.Category).Ascending(x => x.Date)), cancellationToken: ct);
         }
 
         public Task TrackUsagesAsync(DateTime date, string key, string category, double count, double elapsedMs)

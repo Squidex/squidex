@@ -1,14 +1,14 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure
+namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public interface IRunnable
+    public sealed class AssetOptions
     {
-        void Run();
+        public int MaxResults { get; set; } = 200;
     }
 }

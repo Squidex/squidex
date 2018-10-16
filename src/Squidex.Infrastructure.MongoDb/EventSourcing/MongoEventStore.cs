@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -43,13 +44,14 @@ namespace Squidex.Infrastructure.EventSourcing
             return new MongoCollectionSettings { ReadPreference = ReadPreference.Primary, WriteConcern = WriteConcern.WMajority };
         }
 
-        protected override Task SetupCollectionAsync(IMongoCollection<MongoEventCommit> collection)
+        protected override Task SetupCollectionAsync(IMongoCollection<MongoEventCommit> collection, CancellationToken ct = default(CancellationToken))
         {
-            return Task.WhenAll(
-                collection.Indexes.CreateOneAsync(
-                    new CreateIndexModel<MongoEventCommit>(Index.Ascending(x => x.Timestamp).Ascending(x => x.EventStream))),
-                collection.Indexes.CreateOneAsync(
-                    new CreateIndexModel<MongoEventCommit>(Index.Ascending(x => x.EventStream).Descending(x => x.EventStreamOffset), new CreateIndexOptions { Unique = true })));
+            return collection.Indexes.CreateManyAsync(
+                new[]
+                {
+                    new CreateIndexModel<MongoEventCommit>(Index.Ascending(x => x.Timestamp).Ascending(x => x.EventStream)),
+                    new CreateIndexModel<MongoEventCommit>(Index.Ascending(x => x.EventStream).Descending(x => x.EventStreamOffset), new CreateIndexOptions { Unique = true })
+                }, ct);
         }
     }
 }

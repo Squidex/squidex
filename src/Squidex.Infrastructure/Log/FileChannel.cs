@@ -9,9 +9,11 @@ using Squidex.Infrastructure.Log.Internal;
 
 namespace Squidex.Infrastructure.Log
 {
-    public sealed class FileChannel : DisposableObjectBase, ILogChannel, IInitializable
+    public sealed class FileChannel : DisposableObjectBase, ILogChannel
     {
         private readonly FileLogProcessor processor;
+        private readonly object lockObject = new object();
+        private bool isInitialized;
 
         public FileChannel(string path)
         {
@@ -30,12 +32,20 @@ namespace Squidex.Infrastructure.Log
 
         public void Log(SemanticLogLevel logLevel, string message)
         {
-            processor.EnqueueMessage(new LogMessageEntry { Message = message });
-        }
+            if (!isInitialized)
+            {
+                lock (lockObject)
+                {
+                    if (!isInitialized)
+                    {
+                        processor.Initialize();
 
-        public void Initialize()
-        {
-            processor.Connect();
+                        isInitialized = true;
+                    }
+                }
+            }
+
+            processor.EnqueueMessage(new LogMessageEntry { Message = message });
         }
     }
 }

@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using NJsonSchema.Infrastructure;
@@ -43,7 +42,7 @@ namespace Squidex.Areas.Api.Config.Swagger
 
                 response.Description = match.Groups["Description"].Value;
 
-                if (string.Equals(statusCode, "200", StringComparison.OrdinalIgnoreCase))
+                if (statusCode == "200" || statusCode == "204")
                 {
                     hasOkResponse = true;
                 }
@@ -72,8 +71,7 @@ namespace Squidex.Areas.Api.Config.Swagger
         private static void RemoveOkResponse(SwaggerOperation operation)
         {
             if (operation.Responses.TryGetValue("200", out var response) &&
-                response.Description != null &&
-                response.Description.Contains("=>"))
+                response.Description?.Contains("=>") == true)
             {
                 operation.Responses.Remove("200");
             }

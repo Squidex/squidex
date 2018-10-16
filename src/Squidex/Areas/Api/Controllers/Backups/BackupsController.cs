@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using NSwag.Annotations;
 using Orleans;
 using Squidex.Areas.Api.Controllers.Backups.Models;
 using Squidex.Domain.Apps.Entities.Backup;
@@ -27,7 +26,7 @@ namespace Squidex.Areas.Api.Controllers.Backups
     [ApiExceptionFilter]
     [AppApi]
     [MustBeAppOwner]
-    [SwaggerTag(nameof(Backups))]
+    [ApiExplorerSettings(GroupName = nameof(Backups))]
     public class BackupsController : ApiController
     {
         private readonly IGrainFactory grainFactory;

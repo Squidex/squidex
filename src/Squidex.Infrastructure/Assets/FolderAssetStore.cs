@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -30,7 +31,7 @@ namespace Squidex.Infrastructure.Assets
             directory = new DirectoryInfo(path);
         }
 
-        public void Initialize()
+        public Task InitializeAsync(CancellationToken ct = default(CancellationToken))
         {
             try
             {
@@ -42,13 +43,12 @@ namespace Squidex.Infrastructure.Assets
                 log.LogInformation(w => w
                     .WriteProperty("action", "FolderAssetStoreConfigured")
                     .WriteProperty("path", directory.FullName));
+
+                return TaskHelper.Done;
             }
-            catch
+            catch (Exception ex)
             {
-                if (!directory.Exists)
-                {
-                    throw new ConfigurationException($"Cannot access directory {directory.FullName}");
-                }
+                throw new ConfigurationException($"Cannot access directory {directory.FullName}", ex);
             }
         }
 
@@ -125,7 +125,7 @@ namespace Squidex.Infrastructure.Assets
             return TaskHelper.Done;
         }
 
-        private static async Task UploadCoreAsync(FileInfo file, Stream stream, CancellationToken ct)
+        private static async Task UploadCoreAsync(FileInfo file, Stream stream, CancellationToken ct = default(CancellationToken))
         {
             try
             {

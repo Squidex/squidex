@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Entities.Apps;
@@ -22,18 +23,16 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
         }
 
-        protected override async Task SetupCollectionAsync(IMongoCollection<MongoContentEntity> collection)
+        protected override async Task SetupCollectionAsync(IMongoCollection<MongoContentEntity> collection, CancellationToken ct = default(CancellationToken))
         {
-            await collection.Indexes.CreateOneAsync(
-                new CreateIndexModel<MongoContentEntity>(Index.Text(x => x.DataText).Ascending(x => x.IndexedSchemaId)));
+            await collection.Indexes.CreateManyAsync(
+                new[]
+                {
+                    new CreateIndexModel<MongoContentEntity>(Index.Text(x => x.DataText).Ascending(x => x.IndexedSchemaId)),
+                    new CreateIndexModel<MongoContentEntity>(Index.Ascending(x => x.IndexedSchemaId).Ascending(x => x.Id))
+                }, ct);
 
-            await collection.Indexes.CreateOneAsync(
-                new CreateIndexModel<MongoContentEntity>(
-                    Index
-                        .Ascending(x => x.IndexedSchemaId)
-                        .Ascending(x => x.Id)));
-
-            await base.SetupCollectionAsync(collection);
+            await base.SetupCollectionAsync(collection, ct);
         }
 
         public async Task<IContentEntity> FindContentAsync(IAppEntity app, ISchemaEntity schema, Guid id)

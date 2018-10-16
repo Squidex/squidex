@@ -13,6 +13,7 @@ export * from './guards/must-be-authenticated.guard';
 export * from './guards/must-be-not-authenticated.guard';
 export * from './guards/schema-must-exist-published.guard';
 export * from './guards/schema-must-exist.guard';
+export * from './guards/schema-must-not-be-singleton.guard';
 export * from './guards/unset-app.guard';
 export * from './guards/unset-content.guard';
 

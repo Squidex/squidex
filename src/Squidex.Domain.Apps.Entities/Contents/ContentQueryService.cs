@@ -28,7 +28,6 @@ namespace Squidex.Domain.Apps.Entities.Contents
 {
     public sealed class ContentQueryService : IContentQueryService
     {
-        private const int MaxResults = 200;
         private static readonly Status[] StatusAll = { Status.Archived, Status.Draft, Status.Published };
         private static readonly Status[] StatusArchived = { Status.Archived };
         private static readonly Status[] StatusPublished = { Status.Published };
@@ -37,6 +36,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         private readonly IContentVersionLoader contentVersionLoader;
         private readonly IAppProvider appProvider;
         private readonly IScriptEngine scriptEngine;
+        private readonly ContentOptions options;
         private readonly EdmModelBuilder modelBuilder;
 
         public ContentQueryService(
@@ -44,18 +44,21 @@ namespace Squidex.Domain.Apps.Entities.Contents
             IContentRepository contentRepository,
             IContentVersionLoader contentVersionLoader,
             IScriptEngine scriptEngine,
+            ContentOptions options,
             EdmModelBuilder modelBuilder)
         {
             Guard.NotNull(appProvider, nameof(appProvider));
             Guard.NotNull(contentRepository, nameof(contentRepository));
             Guard.NotNull(contentVersionLoader, nameof(contentVersionLoader));
             Guard.NotNull(modelBuilder, nameof(modelBuilder));
+            Guard.NotNull(options, nameof(options));
             Guard.NotNull(scriptEngine, nameof(scriptEngine));
 
             this.appProvider = appProvider;
             this.contentRepository = contentRepository;
             this.contentVersionLoader = contentVersionLoader;
             this.modelBuilder = modelBuilder;
+            this.options = options;
             this.scriptEngine = scriptEngine;
         }
 
@@ -120,12 +123,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         private IContentEntity Transform(QueryContext context, ISchemaEntity schema, bool checkType, IContentEntity content)
         {
-            return TansformCore(context, schema, checkType, Enumerable.Repeat(content, 1)).FirstOrDefault();
+            return TransformCore(context, schema, checkType, Enumerable.Repeat(content, 1)).FirstOrDefault();
         }
 
         private IResultList<IContentEntity> Transform(QueryContext context, ISchemaEntity schema, bool checkType, IResultList<IContentEntity> contents)
         {
-            var transformed = TansformCore(context, schema, checkType, contents);
+            var transformed = TransformCore(context, schema, checkType, contents);
 
             return ResultList.Create(contents.Total, transformed);
         }
@@ -137,7 +140,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return ResultList.Create(contents.Total, sorted);
         }
 
-        private IEnumerable<IContentEntity> TansformCore(QueryContext context, ISchemaEntity schema, bool checkType, IEnumerable<IContentEntity> contents)
+        private IEnumerable<IContentEntity> TransformCore(QueryContext context, ISchemaEntity schema, bool checkType, IEnumerable<IContentEntity> contents)
         {
             using (Profiler.TraceMethod<ContentQueryService>())
             {
@@ -214,9 +217,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
                         result.Sort.Add(new SortNode(new List<string> { "lastModified" }, SortOrder.Descending));
                     }
 
-                    if (result.Take > MaxResults)
+                    if (result.Take > options.MaxResults)
                     {
-                        result.Take = MaxResults;
+                        result.Take = options.MaxResults;
                     }
 
                     return result;
