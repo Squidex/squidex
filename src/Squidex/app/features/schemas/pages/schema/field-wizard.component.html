@@ -1,68 +1,111 @@
-<form [formGroup]="addFieldForm.form" (ngSubmit)="addField(false)">
-    <sqx-modal-dialog (closed)="complete()" large="true">
-        <ng-container title>
-            <ng-container *ngIf="parent; else noParent">
-                Add Nested Field
-            </ng-container>
-
-            <ng-template #noParent>
-                Add Field
-            </ng-template>
+<sqx-modal-dialog (closed)="complete()" large="true">
+    <ng-container title>
+        <ng-container *ngIf="parent; else noParent">
+            Add Nested Field
         </ng-container>
 
-        <ng-container content>
-            <sqx-form-error [error]="addFieldForm.error | async"></sqx-form-error>
+        <ng-template #noParent>
+            {{step === 1 ? 'Add' : 'Edit'}} Field
+        </ng-template>
+    </ng-container>
 
-            <div class="form-group">
-                <div class="row">
-                    <div class="col-4 type" *ngFor="let fieldType of fieldTypes">
-                        <label>
-                            <input type="radio" class="radio-input" formControlName="type" value="{{fieldType.type}}" />
-                        
-                            <div class="row no-gutters">
-                                <div class="col col-auto">
-                                    <div class="type-icon" [class.active]="addFieldForm.form.controls['type'].value === fieldType.type">
-                                        <i class="icon-type-{{fieldType.type}}"></i>
+    <ng-container content>
+        <ng-container *ngIf="step === 1">
+            <form [formGroup]="addFieldForm.form" (ngSubmit)="addField(false)">
+                <sqx-form-error [error]="addFieldForm.error | async"></sqx-form-error>
+
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-4 type" *ngFor="let fieldType of fieldTypes">
+                            <label>
+                                <input type="radio" class="radio-input" formControlName="type" value="{{fieldType.type}}" />
+
+                                <div class="row no-gutters">
+                                    <div class="col col-auto">
+                                        <div class="type-icon" [class.active]="addFieldForm.form.controls['type'].value === fieldType.type">
+                                            <i class="icon-type-{{fieldType.type}}"></i>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg">
+                                        <div class="type-title">{{fieldType.type}}</div>
+                                        <div class="type-text text-muted">{{fieldType.description}}</div>
                                     </div>
                                 </div>
-                                <div class="col-lg">
-                                    <div class="type-title">{{fieldType.type}}</div>
-                                    <div class="type-text text-muted">{{fieldType.description}}</div>
-                                </div>
-                            </div>
 
-                        </label>
+                            </label>
+                        </div>
                     </div>
                 </div>
-            </div>
-                
-            <div class="form-group">
-                <sqx-control-errors for="name" submitOnly="true" [submitted]="addFieldForm.submitted | async"></sqx-control-errors>
 
-                <input type="text" class="form-control" formControlName="name" maxlength="40" #nameInput placeholder="Enter field name" sqxFocusOnInit />
-            </div>
+                <div class="form-group">
+                    <sqx-control-errors for="name" submitOnly="true" [submitted]="addFieldForm.submitted | async"></sqx-control-errors>
 
-            <div class="form-group" *ngIf="!parent">
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="isLocalizable" formControlName="isLocalizable" />
-                    <label class="form-check-label" for="isLocalizable">
-                        Localizable
-                    </label>
+                    <input type="text" class="form-control" formControlName="name" maxlength="40" #nameInput
+                        placeholder="Enter field name" sqxFocusOnInit />
                 </div>
 
-                <small class="form-text text-muted">
-                    You can the field as localizable. It means that is dependent on the language, for example a city name.
-                </small>
-            </div>
+                <div class="form-group" *ngIf="!parent">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="isLocalizable" formControlName="isLocalizable" />
+                        <label class="form-check-label" for="isLocalizable">
+                            Localizable
+                        </label>
+                    </div>
+
+                    <small class="form-text text-muted">
+                        You can the field as localizable. It means that is dependent on the language, for example a
+                        city name.
+                    </small>
+                </div>
+            </form>
         </ng-container>
 
-        <ng-container footer>
-            <button type="reset" class="float-left btn btn-secondary" (click)="complete()">Cancel</button>
+        <div class="table-items-row-details" *ngIf="step === 2">
+            <form [formGroup]="editForm.form" (ngSubmit)="save()">
+                <div class="table-items-row-details-tabs clearfix">
+                    <ul class="nav nav-tabs2">
+                        <li class="nav-item">
+                            <a class="nav-link" (click)="selectTab(0)" [class.active]="selectedTab === 0">Common</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" (click)="selectTab(1)" [class.active]="selectedTab === 1">Validation</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" (click)="selectTab(2)" [class.active]="selectedTab === 2">Editing</a>
+                        </li>
+                    </ul>
+                </div>
 
-            <div class="float-right">
-                <button class="btn btn-success mr-1" (click)="addField(false)">Create and close</button>
-                <button class="btn btn-success" (click)="addField(true)">Create and new field</button>
-            </div>
-        </ng-container>
-    </sqx-modal-dialog>
-</form>
+                <ng-container *ngIf="patternsState.patterns | async; let patterns">
+                    <div class="table-items-row-details-tab" [class.hidden]="selectedTab !== 0">
+                        <sqx-field-form-common [editForm]="editForm.form" [editFormSubmitted]="editForm.submitted | async"
+                            [field]="field"></sqx-field-form-common>
+                    </div>
+
+                    <div class="table-items-row-details-tab" [class.hidden]="selectedTab !== 1">
+                        <sqx-field-form-validation [patterns]="patterns" [editForm]="editForm.form" [field]="field"></sqx-field-form-validation>
+                    </div>
+
+                    <div class="table-items-row-details-tab" [class.hidden]="selectedTab !== 2">
+                        <sqx-field-form-ui [editForm]="editForm.form" [field]="field"></sqx-field-form-ui>
+                    </div>
+                </ng-container>
+            </form>
+        </div>
+    </ng-container>
+
+    <ng-container footer>
+        <button type="reset" class="float-left btn btn-secondary" (click)="complete()">Cancel</button>
+
+        <div class="float-right" *ngIf="step === 1">
+            <button class="btn btn-success mr-1" (click)="addField(false, false)">Create and close</button>
+            <button class="btn btn-success mr-1" (click)="addField(true, false)">Create and new field</button>
+            <button class="btn btn-success" (click)="addField(false, true)">Create and edit field</button>
+        </div>
+
+        <div class="float-right" *ngIf="step === 2">
+            <button class="btn btn-success mr-1" (click)="save(true)">Save and add field</button>
+            <button (click)="save()" class="btn btn-primary ml-1">Save and close</button>
+        </div>
+    </ng-container>
+</sqx-modal-dialog>
