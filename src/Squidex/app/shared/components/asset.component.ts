@@ -102,6 +102,8 @@ export class AssetComponent implements OnDestroy, OnInit {
         const initFile = this.initFile;
 
         if (initFile) {
+            this.setProgress(1);
+
             this.assetsService.uploadFile(this.appsState.appName, initFile, this.authState.user!.token, DateTime.now())
                 .subscribe(dto => {
                     if (Types.is(dto, AssetDto)) {
@@ -137,6 +139,8 @@ export class AssetComponent implements OnDestroy, OnInit {
 
     public updateFile(files: FileList) {
         if (files.length === 1) {
+            this.setProgress(1);
+
             this.assetsService.replaceFile(this.appsState.appName, this.asset.id, files[0], this.asset.version)
                 .subscribe(dto => {
                     if (Types.is(dto, Versioned)) {
