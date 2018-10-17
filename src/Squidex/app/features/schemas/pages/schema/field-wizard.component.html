@@ -5,12 +5,12 @@
         </ng-container>
 
         <ng-template #noParent>
-            {{step === 1 ? 'Add' : 'Edit'}} Field
+            {{isEditing ? 'Edit' : 'Add'}} Field
         </ng-template>
     </ng-container>
 
     <ng-container content>
-        <ng-container *ngIf="step === 1">
+        <ng-container *ngIf="!isEditing; else notEditing">
             <form [formGroup]="addFieldForm.form" (ngSubmit)="addField(false)">
                 <sqx-form-error [error]="addFieldForm.error | async"></sqx-form-error>
 
@@ -60,7 +60,7 @@
             </form>
         </ng-container>
 
-        <div class="table-items-row-details" *ngIf="step === 2">
+        <ng-template #notEditing>
             <form [formGroup]="editForm.form" (ngSubmit)="save()">
                 <div class="table-items-row-details-tabs clearfix">
                     <ul class="nav nav-tabs2">
@@ -91,19 +91,19 @@
                     </div>
                 </ng-container>
             </form>
-        </div>
+        </ng-template>
     </ng-container>
 
     <ng-container footer>
         <button type="reset" class="float-left btn btn-secondary" (click)="complete()">Cancel</button>
 
-        <div class="float-right" *ngIf="step === 1">
+        <div class="float-right" *ngIf="!isEditing">
             <button class="btn btn-success mr-1" (click)="addField(false, false)">Create and close</button>
             <button class="btn btn-success mr-1" (click)="addField(true, false)">Create and new field</button>
             <button class="btn btn-success" (click)="addField(false, true)">Create and edit field</button>
         </div>
 
-        <div class="float-right" *ngIf="step === 2">
+        <div class="float-right" *ngIf="isEditing">
             <button class="btn btn-success mr-1" (click)="save(true)">Save and add field</button>
             <button (click)="save()" class="btn btn-primary ml-1">Save and close</button>
         </div>
