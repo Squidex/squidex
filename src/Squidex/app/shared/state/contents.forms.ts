@@ -413,24 +413,18 @@ export class EditContentForm extends Form<FormGroup> {
                 const fieldValue = value ? value[field.name] || {} : {};
 
                 const addControls = (key: string, language: AppLanguageDto | null) => {
+                    const partitionValidators = FieldValidatorsFactory.createValidators(field, language !== null && language.isOptional);
+                    const partitionForm = new FormArray([], partitionValidators);
+
                     const partitionValue = fieldValue[key];
 
-                    let partitionForm = <FormArray>fieldForm.controls[key];
-
-                    if (!partitionForm) {
-                        partitionForm = new FormArray([]);
-
-                        fieldForm.setControl(key, partitionForm);
+                    if (Types.isArray(partitionValue)) {
+                        for (let i = 0; i < partitionValue.length; i++) {
+                            this.addArrayItem(field, language, partitionForm);
+                        }
                     }
 
-                    const length = Types.isArray(partitionValue) ? partitionValue.length : 0;
-
-                    while (partitionForm.controls.length < length) {
-                        this.addArrayItem(field, language, partitionForm);
-                    }
-                    while (partitionForm.controls.length > length) {
-                        partitionForm.removeAt(partitionForm.length - 1);
-                    }
+                    fieldForm.setControl(key, partitionForm);
                 };
 
                 if (field.isLocalizable) {

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { Component, DoCheck, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { AbstractControl, FormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
@@ -22,10 +22,9 @@ import {
 @Component({
     selector: 'sqx-content-field',
     styleUrls: ['./content-field.component.scss'],
-    templateUrl: './content-field.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    templateUrl: './content-field.component.html'
 })
-export class ContentFieldComponent implements OnChanges {
+export class ContentFieldComponent implements DoCheck, OnChanges {
     @Input()
     public form: EditContentForm;
 
@@ -49,20 +48,26 @@ export class ContentFieldComponent implements OnChanges {
     public isInvalid: Observable<boolean>;
 
     public ngOnChanges(changes: SimpleChanges) {
-        if (this.field.isLocalizable) {
-            this.selectedFormControl = this.fieldForm.controls[this.language.iso2Code];
-        } else {
-            this.selectedFormControl = this.fieldForm.controls[fieldInvariant];
-        }
-
-        if (changes['language']) {
-            if (Types.isFunction(this.selectedFormControl['_clearChangeFns'])) {
-                this.selectedFormControl['_clearChangeFns']();
-            }
-        }
-
         if (changes['fieldForm']) {
             this.isInvalid = this.fieldForm.statusChanges.pipe(startWith(this.fieldForm.invalid), map(x => this.fieldForm.invalid));
+        }
+    }
+
+    public ngDoCheck() {
+        let control: AbstractControl;
+
+        if (this.field.isLocalizable) {
+            control = this.fieldForm.controls[this.language.iso2Code];
+        } else {
+            control = this.fieldForm.controls[fieldInvariant];
+        }
+
+        if (this.selectedFormControl !== control) {
+            if (this.selectedFormControl && Types.isFunction(this.selectedFormControl['_clearChangeFns'])) {
+                this.selectedFormControl['_clearChangeFns']();
+            }
+
+            this.selectedFormControl = control;
         }
     }
 }
