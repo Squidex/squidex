@@ -74,11 +74,15 @@ export class AssetsEditorComponent implements ControlValueAccessor {
             }
         } else {
             this.oldAssets = ImmutableArray.empty();
+
+            this.changeDetector.detectChanges();
         }
     }
 
     public setDisabledState(isDisabled: boolean): void {
         this.isDisabled = isDisabled;
+
+        this.changeDetector.detectChanges();
     }
 
     public registerOnChange(fn: any) {

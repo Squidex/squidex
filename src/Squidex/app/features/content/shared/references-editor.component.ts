@@ -104,11 +104,15 @@ export class ReferencesEditorComponent implements ControlValueAccessor, OnInit {
             }
         } else {
             this.contentItems = ImmutableArray.empty();
+
+            this.changeDetector.detectChanges();
         }
     }
 
     public setDisabledState(isDisabled: boolean): void {
         this.isDisabled = isDisabled;
+
+        this.changeDetector.detectChanges();
     }
 
     public registerOnChange(fn: any) {

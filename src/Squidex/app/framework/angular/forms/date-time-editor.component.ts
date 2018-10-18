@@ -44,8 +44,12 @@ export class DateTimeEditorComponent implements ControlValueAccessor, OnDestroy,
     @Input()
     public hideClear: boolean;
 
-    public timeControl = new FormControl();
+    @ViewChild('dateInput')
+    public dateInput: ElementRef;
 
+    public isDisabled = false;
+
+    public timeControl = new FormControl();
     public dateControl = new FormControl();
 
     public get showTime() {
@@ -55,11 +59,6 @@ export class DateTimeEditorComponent implements ControlValueAccessor, OnDestroy,
     public get hasValue() {
         return !!this.dateValue;
     }
-
-    @ViewChild('dateInput')
-    public dateInput: ElementRef;
-
-    public isDisabled = false;
 
     constructor(
         private readonly changeDetector: ChangeDetectorRef
@@ -122,6 +121,8 @@ export class DateTimeEditorComponent implements ControlValueAccessor, OnDestroy,
             this.dateControl.enable({ emitEvent: false });
             this.timeControl.enable({ emitEvent: false });
         }
+
+        this.changeDetector.detectChanges();
     }
 
     public registerOnChange(fn: any) {

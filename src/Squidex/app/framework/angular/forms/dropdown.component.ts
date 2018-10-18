@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterContentInit, ChangeDetectionStrategy, Component, ContentChildren, forwardRef, Input, QueryList, TemplateRef } from '@angular/core';
+import { AfterContentInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ContentChildren, forwardRef, Input, QueryList, TemplateRef } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 const KEY_ENTER = 13;
@@ -46,6 +46,11 @@ export class DropdownComponent implements AfterContentInit, ControlValueAccessor
 
     public isDisabled = false;
 
+    constructor(
+        private readonly changeDetector: ChangeDetectorRef
+    ) {
+    }
+
     public ngAfterContentInit() {
         if (this.templates.length === 1) {
             this.itemTemplate = this.selectionTemplate = this.templates.first;
@@ -62,10 +67,14 @@ export class DropdownComponent implements AfterContentInit, ControlValueAccessor
 
     public writeValue(obj: any) {
         this.selectIndex(this.items && obj ? this.items.indexOf(obj) : 0);
+
+        this.changeDetector.detectChanges();
     }
 
     public setDisabledState(isDisabled: boolean): void {
         this.isDisabled = isDisabled;
+
+        this.changeDetector.detectChanges();
     }
 
     public registerOnChange(fn: any) {

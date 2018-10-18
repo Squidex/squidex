@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, forwardRef, Input } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import { Types } from '@app/framework/internal';
@@ -52,12 +52,21 @@ export class StarsComponent implements ControlValueAccessor {
 
     public value: number | null = 1;
 
+    constructor(
+        private readonly changeDetector: ChangeDetectorRef
+    ) {
+    }
+
     public writeValue(obj: any) {
         this.value = this.stars = Types.isNumber(obj) ? obj : 0;
+
+        this.changeDetector.markForCheck();
     }
 
     public setDisabledState(isDisabled: boolean): void {
         this.isDisabled = isDisabled;
+
+        this.changeDetector.markForCheck();
     }
 
     public registerOnChange(fn: any) {

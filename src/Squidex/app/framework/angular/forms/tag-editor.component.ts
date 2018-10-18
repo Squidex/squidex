@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, forwardRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { distinctUntilChanged, map, tap } from 'rxjs/operators';
@@ -129,6 +129,11 @@ export class TagEditorComponent implements AfterViewInit, ControlValueAccessor, 
 
     public addInput = new FormControl();
 
+    constructor(
+        private readonly changeDetector: ChangeDetectorRef
+    ) {
+    }
+
     public ngOnDestroy() {
         this.subscription.unsubscribe();
     }
@@ -179,6 +184,8 @@ export class TagEditorComponent implements AfterViewInit, ControlValueAccessor, 
         } else {
             this.items = [];
         }
+
+        this.changeDetector.detectChanges();
     }
 
     public setDisabledState(isDisabled: boolean): void {
