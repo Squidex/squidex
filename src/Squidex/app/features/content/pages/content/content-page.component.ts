@@ -114,7 +114,7 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
         if (!this.contentForm.form.dirty || !this.content) {
             return of(true);
         } else {
-            return this.dialogs.confirmUnsavedChanges();
+            return this.dialogs.confirm('Unsaved changes', 'You have unsaved changes, do you want to close the current content view and discard your changes?');
         }
     }
 

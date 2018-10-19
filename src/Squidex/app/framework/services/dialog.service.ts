@@ -82,10 +82,6 @@ export class DialogService {
         this.notificationsStream$.next(notification);
     }
 
-    public confirmUnsavedChanges(): Observable<boolean> {
-        return this.confirm('Unsaved changes', 'You have unsaved changes, do you want to close the current content view?');
-    }
-
     public confirm(title: string, text: string): Observable<boolean> {
         const request = new DialogRequest(title, text);
 
