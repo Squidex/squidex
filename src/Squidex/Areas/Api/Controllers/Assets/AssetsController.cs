@@ -215,7 +215,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
             var context = await CommandBus.PublishAsync(command);
 
             var result = context.Result<AssetSavedResult>();
-            var response = AssetReplacedDto.Create(command, result);
+            var response = AssetReplacedDto.FromCommand(command, result);
 
             return StatusCode(201, response);
         }
@@ -236,7 +236,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [Route("apps/{app}/assets/{id}/")]
         [ProducesResponseType(typeof(ErrorDto), 400)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PutAsset(string app, Guid id, [FromBody] AssetUpdateDto request)
+        public async Task<IActionResult> PutAsset(string app, Guid id, [FromBody] UpdateAssetDto request)
         {
             await CommandBus.PublishAsync(request.ToCommand(id));
 

@@ -237,7 +237,7 @@ export class AssetsService {
                         throw 'Invalid';
                     }
                 }),
-                tap(dto => {
+                tap(() => {
                     this.analytics.trackEvent('Asset', 'Uploaded', appName);
                 }),
                 pretifyError('Failed to upload asset. Please reload.'));
