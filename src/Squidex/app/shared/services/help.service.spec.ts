@@ -58,7 +58,7 @@ describe('AppClientsService', () => {
             [
                 'A test content with',
                 'A test content with a <a href="https://squidex.io">A Link</a>',
-                'A test content with a <a target="_blank" href="https://docs.squidex.io/GLOSSARY.html#content">Glossary Link</a>'
+                'A test content with a <a target="_blank" rel="noopener" href="https://docs.squidex.io/GLOSSARY.html#content">Glossary Link</a>'
             ]);
     }));
 

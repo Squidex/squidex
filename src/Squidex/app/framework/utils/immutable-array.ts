@@ -138,21 +138,21 @@ export class ImmutableArray<T> implements Iterable<T> {
     }
 
     public pushFront(...items: T[]): ImmutableArray<T> {
-        if (!items || items.length === 0) {
+        if (items.length === 0) {
             return this;
         }
         return new ImmutableArray<T>([...freeze(items), ...this.items]);
     }
 
     public push(...items: T[]): ImmutableArray<T> {
-        if (!items || items.length === 0) {
+        if (items.length === 0) {
             return this;
         }
         return new ImmutableArray<T>([...this.items, ...freeze(items)]);
     }
 
     public remove(...items: T[]): ImmutableArray<T> {
-        if (!items || items.length === 0) {
+        if (items.length === 0) {
             return this;
         }
 

@@ -41,7 +41,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors
             {
                 var value = nodeIn.Rhs.Value;
 
-                if (value is Instant instant &&
+                if (value is Instant &&
                     !string.Equals(nodeIn.Lhs[0], "mt", StringComparison.OrdinalIgnoreCase) &&
                     !string.Equals(nodeIn.Lhs[0], "ct", StringComparison.OrdinalIgnoreCase))
                 {

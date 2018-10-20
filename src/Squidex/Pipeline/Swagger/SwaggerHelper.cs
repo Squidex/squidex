@@ -28,9 +28,10 @@ namespace Squidex.Pipeline.Swagger
 
             using (var resourceStream = assembly.GetManifestResourceStream($"Squidex.Docs.{name}.md"))
             {
-                var streamReader = new StreamReader(resourceStream);
-
-                return streamReader.ReadToEnd();
+                using (var streamReader = new StreamReader(resourceStream))
+                {
+                    return streamReader.ReadToEnd();
+                }
             }
         }
 
