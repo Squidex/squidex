@@ -12,6 +12,7 @@ using Orleans;
 using Squidex.Areas.Api.Controllers.Comments.Models;
 using Squidex.Domain.Apps.Entities.Comments;
 using Squidex.Domain.Apps.Entities.Comments.Commands;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Pipeline;
 
@@ -45,9 +46,9 @@ namespace Squidex.Areas.Api.Controllers.Comments
         [ApiCosts(0)]
         public async Task<IActionResult> GetComments(Guid commentsId)
         {
-            if (!int.TryParse(Request.Headers["X-Since"], out var version))
+            if (!long.TryParse(Request.Headers["X-Since"], out var version))
             {
-                version = -1;
+                version = EtagVersion.Any;
             }
 
             var result = await grainFactory.GetGrain<ICommentGrain>(commentsId).GetCommentsAsync(version);

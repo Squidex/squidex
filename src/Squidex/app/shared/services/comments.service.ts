@@ -58,7 +58,7 @@ export class CommentsService {
     public getComments(commentsId: string, version: Version): Observable<CommentsDto> {
         const url = this.apiUrl.buildUrl(`api/comments/${commentsId}`);
 
-        return this.http.get(url, { headers: { 'Since': version.value } }).pipe(
+        return this.http.get(url, { headers: { 'X-Since': version.value } }).pipe(
                 map(response => {
                     const body: any = response;
 

@@ -71,7 +71,7 @@ describe('CommentsService', () => {
         expect(comments!).toEqual(
             new CommentsDto(
                 [
-                    new CommentDto('123', DateTime.parseISO_UTC('2016-12-12T10:10'), 'text1', user)
+                    new CommentDto('123', DateTime.parseISO_UTC('2016-10-12T10:10'), 'text1', user)
                 ], [
                     new CommentDto('456', DateTime.parseISO_UTC('2017-11-12T12:12'), 'text2', user)
                 ], [
@@ -96,13 +96,13 @@ describe('CommentsService', () => {
         expect(req.request.headers.get('If-Match')).toBeNull();
 
         req.flush({
-            id: '456',
-            text: 'text2',
-            time: '2017-11-12T12:12',
+            id: '123',
+            text: 'text1',
+            time: '2016-10-12T10:10',
             user: user
         });
 
-        expect(comment!).toEqual(new CommentDto('123', DateTime.parseISO_UTC('2016-12-12T10:10'), 'text1', user));
+        expect(comment!).toEqual(new CommentDto('123', DateTime.parseISO_UTC('2016-10-12T10:10'), 'text1', user));
     }));
 
     it('should make put request to replace comment content',

@@ -27,6 +27,7 @@ export * from './services/apps.service';
 export * from './services/assets.service';
 export * from './services/auth.service';
 export * from './services/backups.service';
+export * from './services/comments.service';
 export * from './services/contents.service';
 export * from './services/graphql.service';
 export * from './services/help.service';
