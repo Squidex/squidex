@@ -21,7 +21,6 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 {
     public sealed class BackupSchemas : BackupHandler
     {
-        private readonly HashSet<NamedId<Guid>> schemaIds = new HashSet<NamedId<Guid>>();
         private readonly Dictionary<string, Guid> schemasByName = new Dictionary<string, Guid>();
         private readonly FieldRegistry fieldRegistry;
         private readonly IGrainFactory grainFactory;
@@ -43,7 +42,6 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             switch (@event.Payload)
             {
                 case SchemaCreated schemaCreated:
-                    schemaIds.Add(schemaCreated.SchemaId);
                     schemasByName[schemaCreated.SchemaId.Name] = schemaCreated.SchemaId.Id;
                     break;
             }
