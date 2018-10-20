@@ -38,6 +38,10 @@ export class CommentDto extends Model {
     ) {
         super();
     }
+
+    public with(value: Partial<CommentDto>): CommentDto {
+        return this.clone(value);
+    }
 }
 
 export class UpsertCommentDto {

@@ -51,7 +51,7 @@ export class ContentHistoryComponent {
             timer(0, 10000),
             this.messageBus.of(HistoryChannelUpdated).pipe(delay(1000))
         ).pipe(
-            switchMap(app => this.historyService.getHistory(this.appsState.appName, this.channel)));
+            switchMap(() => this.historyService.getHistory(this.appsState.appName, this.channel)));
 
     constructor(
         private readonly appsState: AppsState,

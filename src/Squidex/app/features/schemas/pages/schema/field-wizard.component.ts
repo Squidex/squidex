@@ -60,7 +60,7 @@ export class FieldWizardComponent implements OnInit {
 
         if (value) {
             this.schemasState.addField(this.schema, value, this.parent)
-                .subscribe(dto => {
+                .subscribe(() => {
                     this.addFieldForm.submitCompleted({ type: fieldTypes[0].type });
 
                     if (next) {

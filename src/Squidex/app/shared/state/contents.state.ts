@@ -132,7 +132,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
             notify(this.dialogs));
     }
 
-    public create(request: any, publish: boolean, now?: DateTime) {
+    public create(request: any, publish: boolean) {
         return this.contentsService.postContent(this.appName, this.schemaName, request, publish).pipe(
             tap(dto => {
                 this.dialogs.notifyInfo('Contents created successfully.');

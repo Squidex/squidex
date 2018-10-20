@@ -121,7 +121,7 @@ export class RuleWizardComponent implements OnInit {
         const requestDto = new CreateRuleDto(this.trigger, this.action);
 
         this.rulesState.create(requestDto)
-            .subscribe(dto => {
+            .subscribe(() => {
                 this.complete();
 
                 this.actionForm.submitCompleted();
@@ -134,7 +134,7 @@ export class RuleWizardComponent implements OnInit {
 
     private updateTrigger() {
         this.rulesState.updateTrigger(this.rule, this.trigger)
-            .subscribe(dto => {
+            .subscribe(() => {
                 this.complete();
 
                 this.triggerForm.submitCompleted();
@@ -145,7 +145,7 @@ export class RuleWizardComponent implements OnInit {
 
     private updateAction() {
         this.rulesState.updateAction(this.rule, this.action)
-            .subscribe(dto => {
+            .subscribe(() => {
                 this.complete();
 
                 this.actionForm.submitCompleted();

@@ -94,7 +94,7 @@ export class ContributorsPageComponent implements OnInit {
             const requestDto = new AppContributorDto(user, 'Editor');
 
             this.contributorsState.assign(requestDto)
-                .subscribe(dto => {
+                .subscribe(() => {
                     this.assignContributorForm.submitCompleted();
                 }, error => {
                     this.assignContributorForm.submitFailed(error);

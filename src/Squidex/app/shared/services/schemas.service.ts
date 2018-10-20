@@ -344,7 +344,7 @@ export class SchemasService {
                     body.scriptDelete,
                     body.scriptChange);
             }),
-            tap(schema => {
+            tap(() => {
                 this.analytics.trackEvent('Schema', 'Created', appName);
             }),
             pretifyError('Failed to create schema. Please reload.'));
