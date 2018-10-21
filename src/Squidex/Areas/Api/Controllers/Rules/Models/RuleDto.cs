@@ -14,10 +14,11 @@ using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Pipeline;
 
 namespace Squidex.Areas.Api.Controllers.Rules.Models
 {
-    public sealed class RuleDto
+    public sealed class RuleDto : IGenerateEtag
     {
         /// <summary>
         /// The id of the rule.
@@ -49,7 +50,7 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
         /// <summary>
         /// The version of the rule.
         /// </summary>
-        public int Version { get; set; }
+        public long Version { get; set; }
 
         /// <summary>
         /// Determines if the rule is enabled.

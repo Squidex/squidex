@@ -43,6 +43,8 @@ namespace Squidex.Areas.Api.Controllers.Languages
         {
             var response = Language.AllLanguages.Select(LanguageDto.FromLanguage).ToList();
 
+            Response.Headers["Etag"] = "1";
+
             return Ok(response);
         }
     }

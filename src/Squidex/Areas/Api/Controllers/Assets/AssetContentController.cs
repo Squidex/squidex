@@ -67,10 +67,12 @@ namespace Squidex.Areas.Api.Controllers.Assets
                 return NotFound();
             }
 
-            var assetId = entity.Id.ToString();
+            Response.Headers["ETag"] = $"{entity.FileVersion};{width};{height};{mode}";
 
             return new FileCallbackResult(entity.MimeType, entity.FileName, async bodyStream =>
             {
+                var assetId = entity.Id.ToString();
+
                 if (entity.IsImage && (width.HasValue || height.HasValue))
                 {
                     var assetSuffix = $"{width}_{height}_{mode}";

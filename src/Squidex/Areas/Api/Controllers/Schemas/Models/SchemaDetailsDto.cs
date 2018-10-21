@@ -108,7 +108,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// <summary>
         /// The version of the schema.
         /// </summary>
-        public int Version { get; set; }
+        public long Version { get; set; }
 
         public static SchemaDetailsDto FromSchema(ISchemaEntity schema)
         {
