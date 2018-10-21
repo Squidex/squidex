@@ -172,7 +172,6 @@ export class SqxSharedModule {
                 BackupsState,
                 ClientsState,
                 CommentsService,
-                CommentsState,
                 ContentMustExistGuard,
                 ContentsService,
                 ContentsState,
