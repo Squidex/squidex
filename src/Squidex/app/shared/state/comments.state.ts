@@ -24,6 +24,8 @@ import {
     UpsertCommentDto
 } from './../services/comments.service';
 
+import { AppsState } from './apps.state';
+
 interface Snapshot {
     comments: ImmutableArray<CommentDto>;
 
@@ -43,6 +45,7 @@ export class CommentsState extends State<Snapshot> {
             distinctUntilChanged());
 
     constructor(
+        private readonly appsState: AppsState,
         private readonly commentsId: string,
         private readonly commentsService: CommentsService,
         private readonly dialogs: DialogService
@@ -51,13 +54,15 @@ export class CommentsState extends State<Snapshot> {
     }
 
     public load(): Observable<any> {
-        return this.commentsService.getComments(this.commentsId, this.version).pipe(
+        return this.commentsService.getComments(this.appName, this.commentsId, this.version).pipe(
             tap(dtos => {
                 this.next(s => {
                     let comments = s.comments;
 
                     for (let created of dtos.createdComments) {
-                        comments = comments.push(created);
+                        if (!comments.find(x => x.id === created.id)) {
+                            comments = comments.push(created);
+                        }
                     }
 
                     for (let updated of dtos.updatedComments) {
@@ -74,8 +79,8 @@ export class CommentsState extends State<Snapshot> {
             notify(this.dialogs));
     }
 
-    public create(request: UpsertCommentDto): Observable<any> {
-        return this.commentsService.postComment(this.commentsId, request).pipe(
+    public create(text: string): Observable<any> {
+        return this.commentsService.postComment(this.appName, this.commentsId, new UpsertCommentDto(text)).pipe(
             tap(dto => {
                 this.next(s => {
                     const comments = s.comments.push(dto);
@@ -86,11 +91,11 @@ export class CommentsState extends State<Snapshot> {
             notify(this.dialogs));
     }
 
-    public update(commentId: string, request: UpsertCommentDto, now?: DateTime): Observable<any> {
-        return this.commentsService.putComment(this.commentsId, commentId, request).pipe(
+    public update(commentId: string, text: string, now?: DateTime): Observable<any> {
+        return this.commentsService.putComment(this.appName, this.commentsId, commentId, new UpsertCommentDto(text)).pipe(
             tap(() => {
                 this.next(s => {
-                    const comments = s.comments.map(c => c.id === commentId ? update(c, request, now || DateTime.now()) : c);
+                    const comments = s.comments.map(c => c.id === commentId ? update(c, text, now || DateTime.now()) : c);
 
                     return { ...s, comments };
                 });
@@ -99,12 +104,12 @@ export class CommentsState extends State<Snapshot> {
     }
 
     public delete(commentId: string): Observable<any> {
-        return this.commentsService.deleteComment(this.commentsId, commentId).pipe(
-            tap(dto => {
+        return this.commentsService.deleteComment(this.appName, this.commentsId, commentId).pipe(
+            tap(() => {
                 this.next(s => {
                     const comments = s.comments.filter(c => c.id !== commentId);
 
-                    return { ...s, comments, version: dto.version };
+                    return { ...s, comments };
                 });
             }),
             notify(this.dialogs));
@@ -113,7 +118,11 @@ export class CommentsState extends State<Snapshot> {
     private get version() {
         return this.snapshot.version;
     }
+
+    private get appName() {
+        return this.appsState.appName;
+    }
 }
 
-const update = (comment: CommentDto, request: UpsertCommentDto, now: DateTime) =>
-    comment.with({ text: request.text, time: now });
+const update = (comment: CommentDto, text: string, time: DateTime) =>
+    comment.with({ text, time });

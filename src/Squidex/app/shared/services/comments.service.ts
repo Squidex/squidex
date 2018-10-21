@@ -5,16 +5,17 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Observable, of, throwError } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 
 import {
     ApiUrlConfig,
     DateTime,
     Model,
     pretifyError,
+    Types,
     Version
 } from '@app/framework';
 
@@ -59,11 +60,26 @@ export class CommentsService {
     ) {
     }
 
-    public getComments(commentsId: string, version: Version): Observable<CommentsDto> {
-        const url = this.apiUrl.buildUrl(`api/comments/${commentsId}`);
+    public getComments(appName: string, commentsId: string, version: Version): Observable<CommentsDto> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/comments/${commentsId}`);
 
-        return this.http.get(url, { headers: { 'X-Since': version.value } }).pipe(
+        const options = {
+            headers: new HttpHeaders().set('If-None-Match', version.value)
+        };
+
+        return this.http.get(url, options).pipe(
+                catchError(err => {
+                    if (err.status === 304) {
+                        return of(new CommentsDto([], [], [], version));
+                    }
+
+                    return throwError(err);
+                }),
                 map(response => {
+                    if (Types.is(response, CommentsDto)) {
+                        return response;
+                    }
+
                     const body: any = response;
 
                     return new CommentsDto(
@@ -88,8 +104,8 @@ export class CommentsService {
                 pretifyError('Failed to load comments.'));
     }
 
-    public postComment(commentsId: string, dto: UpsertCommentDto): Observable<CommentDto> {
-        const url = this.apiUrl.buildUrl(`api/comments/${commentsId}`);
+    public postComment(appName: string, commentsId: string, dto: UpsertCommentDto): Observable<CommentDto> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/comments/${commentsId}`);
 
         return this.http.post(url, dto).pipe(
                 map(response => {
@@ -104,8 +120,8 @@ export class CommentsService {
                 pretifyError('Failed to create comment.'));
     }
 
-    public putComment(commentsId: string, commentId: string, dto: UpsertCommentDto): Observable<any> {
-        const url = this.apiUrl.buildUrl(`api/comments/${commentsId}/${commentId}`);
+    public putComment(appName: string, commentsId: string, commentId: string, dto: UpsertCommentDto): Observable<any> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/comments/${commentsId}/${commentId}`);
 
         return this.http.put(url, dto).pipe(
                 map(response => {
@@ -120,8 +136,8 @@ export class CommentsService {
                 pretifyError('Failed to update comment.'));
     }
 
-    public deleteComment(commentsId: string, commentId: string): Observable<any> {
-        const url = this.apiUrl.buildUrl(`api/comments/${commentsId}/${commentId}`);
+    public deleteComment(appName: string, commentsId: string, commentId: string): Observable<any> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/comments/${commentsId}/${commentId}`);
 
         return this.http.delete(url).pipe(
                 pretifyError('Failed to delete comment.'));

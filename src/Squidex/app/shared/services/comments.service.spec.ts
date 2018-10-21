@@ -42,14 +42,14 @@ describe('CommentsService', () => {
 
         let comments: CommentsDto;
 
-        commentsService.getComments('my-comments', new Version('123')).subscribe(result => {
+        commentsService.getComments('my-app', 'my-comments', new Version('123')).subscribe(result => {
             comments = result;
         });
 
-        const req = httpMock.expectOne('http://service/p/api/comments/my-comments');
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/comments/my-comments');
 
         expect(req.request.method).toEqual('GET');
-        expect(req.request.headers.get('X-Since')).toBe('123');
+        expect(req.request.headers.get('If-None-Match')).toBe('123');
 
         req.flush({
             createdComments: [{
@@ -86,11 +86,11 @@ describe('CommentsService', () => {
 
         let comment: CommentDto;
 
-        commentsService.postComment('my-comments', new UpsertCommentDto('text1')).subscribe(result => {
+        commentsService.postComment('my-app', 'my-comments', new UpsertCommentDto('text1')).subscribe(result => {
             comment = <CommentDto>result;
         });
 
-        const req = httpMock.expectOne('http://service/p/api/comments/my-comments');
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/comments/my-comments');
 
         expect(req.request.method).toEqual('POST');
         expect(req.request.headers.get('If-Match')).toBeNull();
@@ -108,9 +108,9 @@ describe('CommentsService', () => {
     it('should make put request to replace comment content',
         inject([CommentsService, HttpTestingController], (commentsService: CommentsService, httpMock: HttpTestingController) => {
 
-        commentsService.putComment('my-comments', '123', new UpsertCommentDto('text1')).subscribe();
+        commentsService.putComment('my-app', 'my-comments', '123', new UpsertCommentDto('text1')).subscribe();
 
-        const req = httpMock.expectOne('http://service/p/api/comments/my-comments/123');
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/comments/my-comments/123');
 
         expect(req.request.method).toEqual('PUT');
         expect(req.request.headers.get('If-Match')).toBeNull();
@@ -121,9 +121,9 @@ describe('CommentsService', () => {
     it('should make delete request to delete comment',
         inject([CommentsService, HttpTestingController], (commentsService: CommentsService, httpMock: HttpTestingController) => {
 
-        commentsService.deleteComment('my-comments', '123').subscribe();
+        commentsService.deleteComment('my-app', 'my-comments', '123').subscribe();
 
-        const req = httpMock.expectOne('http://service/p/api/comments/my-comments/123');
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/comments/my-comments/123');
 
         expect(req.request.method).toEqual('DELETE');
         expect(req.request.headers.get('If-Match')).toBeNull();

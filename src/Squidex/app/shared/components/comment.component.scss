@@ -1,0 +1,43 @@
+@import '_vars';
+@import '_mixins';
+
+.user-ref {
+    font-weight: bold;
+}
+
+.item-remove {
+    @include absolute(-5px, -15px, auto, auto);
+    display: none;
+}
+
+.user-row {
+    & {
+        position: relative;
+    }
+
+    &:hover {
+        .item-remove {
+            display: block;
+        }
+    }
+}
+
+.comment {
+    & {
+        font-size: .9rem;
+        font-weight: normal;
+        margin-bottom: .75rem;
+    }
+
+    &-message {
+        margin-bottom: .375rem;
+    }
+
+    &-created {
+        font-size: .75rem;
+    }
+}
+
+.text-muted {
+    color: $color-history;
+}

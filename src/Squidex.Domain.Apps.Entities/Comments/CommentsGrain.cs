@@ -65,7 +65,6 @@ namespace Squidex.Domain.Apps.Entities.Comments
             if (events.Length > 0)
             {
                 await persistence.WriteEventsAsync(events);
-                await persistence.WriteSnapshotAsync(Snapshot);
             }
         }
 

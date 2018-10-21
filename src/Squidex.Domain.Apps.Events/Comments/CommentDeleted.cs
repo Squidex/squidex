@@ -10,7 +10,7 @@ using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Events.Comments
 {
-    [EventType(nameof(CommentCreated))]
+    [EventType(nameof(CommentDeleted))]
     public sealed class CommentDeleted : CommentsEvent
     {
         public Guid CommentId { get; set; }

@@ -1,0 +1,19 @@
+<div class="comment row no-gutters">
+    <div class="col col-auto">
+        <img class="user-picture" [attr.title]="comment.user | sqxUserNameRef:null" [attr.src]="comment.user | sqxUserPictureRef" />
+    </div>
+    <div class="col pl-2">            
+        <div class="comment-message">
+            <div class="user-row">
+                <div class="user-ref">{{comment.user | sqxUserNameRef:null}}</div>
+
+                <button *ngIf="comment.user === userId" type="button" class="btn btn-sm btn-link btn-danger item-remove" (click)="deleting.emit()!">
+                    <i class="icon-bin2"></i>
+                </button>
+            </div>
+
+            <div>{{comment.text}}</div>
+            <div class="comment-created text-muted">{{comment.time | sqxFromNow}}</div>
+        </div>
+    </div>
+</div>
