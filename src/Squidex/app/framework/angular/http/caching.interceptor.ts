@@ -1,0 +1,46 @@
+/*
+ * Squidex Headless CMS
+ *
+ * @license
+ * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
+ */
+
+import { HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest, HttpResponse } from '@angular/common/http';
+import { Injectable} from '@angular/core';
+import { Observable, of, throwError } from 'rxjs';
+import { catchError, tap } from 'rxjs/operators';
+
+import { Types } from './../../internal';
+
+@Injectable()
+export class CachingInterceptor implements HttpInterceptor {
+    private readonly cache: { [url: string]: HttpResponse<any> } = {};
+
+    public intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+        if (req.method === 'GET' && req.reportProgress === false) {
+            const cacheEntry = this.cache[req.url];
+
+            if (cacheEntry) {
+                req = req.clone({ headers: req.headers.set('If-None-Match', cacheEntry.headers.get('Etag')!) });
+            }
+
+            return next.handle(req).pipe(
+                tap(response => {
+                    if (Types.is(response, HttpResponse)) {
+                        if (response.headers.get('Etag')) {
+                            this.cache[req.url] = response;
+                        }
+                    }
+                }),
+                catchError(error => {
+                    if (Types.is(error, HttpErrorResponse) && error.status === 304 && cacheEntry) {
+                        return of(cacheEntry);
+                    } else {
+                        return throwError(error);
+                    }
+                }));
+        } else {
+            return next.handle(req);
+        }
+    }
+}
