@@ -81,6 +81,25 @@ describe('CommentsService', () => {
         );
     }));
 
+    it('should make get request to get comments and return empty result for 304',
+        inject([CommentsService, HttpTestingController], (commentsService: CommentsService, httpMock: HttpTestingController) => {
+
+        let comments: CommentsDto;
+
+        commentsService.getComments('my-app', 'my-comments', new Version('123')).subscribe(result => {
+            comments = result;
+        });
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/comments/my-comments');
+
+        expect(req.request.method).toEqual('GET');
+        expect(req.request.headers.get('If-None-Match')).toBe('123');
+
+        req.flush({}, { status: 304, statusText: 'NotModified' });
+
+        expect(comments!).toEqual(new CommentsDto([], [], [], new Version('123')));
+    }));
+
     it('should make post request to create comment',
         inject([CommentsService, HttpTestingController], (commentsService: CommentsService, httpMock: HttpTestingController) => {
 

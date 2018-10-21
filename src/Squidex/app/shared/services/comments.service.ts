@@ -124,15 +124,6 @@ export class CommentsService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/comments/${commentsId}/${commentId}`);
 
         return this.http.put(url, dto).pipe(
-                map(response => {
-                    const body: any = response;
-
-                    return new CommentDto(
-                        body.id,
-                        DateTime.parseISO_UTC(body.time),
-                        body.text,
-                        body.user);
-                }),
                 pretifyError('Failed to update comment.'));
     }
 
