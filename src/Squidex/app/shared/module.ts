@@ -37,7 +37,6 @@ import {
     CommentComponent,
     CommentsComponent,
     CommentsService,
-    CommentsState,
     ContentMustExistGuard,
     ContentsService,
     ContentsState,
