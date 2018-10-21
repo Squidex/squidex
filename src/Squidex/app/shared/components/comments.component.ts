@@ -17,17 +17,13 @@ import {
     CommentsService,
     CommentsState,
     DialogService,
-    fadeAnimation,
     UpsertCommentForm
 } from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-comments',
     styleUrls: ['./comments.component.scss'],
-    templateUrl: './comments.component.html',
-    animations: [
-        fadeAnimation
-    ]
+    templateUrl: './comments.component.html'
 })
 export class CommentsComponent implements OnDestroy, OnInit {
     private timer: Subscription;
