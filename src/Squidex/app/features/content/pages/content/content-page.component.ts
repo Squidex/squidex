@@ -141,14 +141,14 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
             if (this.content) {
                 if (asProposal) {
                     this.contentsState.proposeUpdate(this.content, value)
-                        .subscribe(dto => {
+                        .subscribe(() => {
                             this.contentForm.submitCompleted();
                         }, error => {
                             this.contentForm.submitFailed(error);
                         });
                 } else {
                     this.contentsState.update(this.content, value)
-                        .subscribe(dto => {
+                        .subscribe(() => {
                             this.contentForm.submitCompleted();
                         }, error => {
                             this.contentForm.submitFailed(error);
@@ -156,7 +156,7 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
                 }
             } else {
                 this.contentsState.create(value, publish)
-                    .subscribe(dto => {
+                    .subscribe(() => {
                         this.back();
                     }, error => {
                         this.contentForm.submitFailed(error);

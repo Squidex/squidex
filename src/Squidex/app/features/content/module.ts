@@ -25,6 +25,7 @@ import {
     ArrayEditorComponent,
     ArrayItemComponent,
     AssetsEditorComponent,
+    CommentsPageComponent,
     ContentFieldComponent,
     ContentHistoryComponent,
     ContentItemComponent,
@@ -75,7 +76,11 @@ const routes: Routes = [
                                 data: {
                                     channel: 'contents.{contentId}'
                                 }
-                            }
+                            },
+                            {
+                               path: 'comments',
+                               component: CommentsPageComponent
+                           }
                         ]
                     }
                 ]
@@ -95,6 +100,7 @@ const routes: Routes = [
         ArrayEditorComponent,
         ArrayItemComponent,
         AssetsEditorComponent,
+        CommentsPageComponent,
         ContentFieldComponent,
         ContentHistoryComponent,
         ContentItemComponent,

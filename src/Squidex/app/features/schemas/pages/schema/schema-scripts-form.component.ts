@@ -53,7 +53,7 @@ export class SchemaScriptsFormComponent implements OnInit {
 
         if (value) {
             this.schemasState.configureScripts(this.schema, value)
-                .subscribe(dto => {
+                .subscribe(() => {
                     this.complete();
                 }, error => {
                     this.editForm.submitFailed(error);

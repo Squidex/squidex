@@ -12,7 +12,7 @@ using Squidex.Domain.Apps.Entities.Assets.Commands;
 
 namespace Squidex.Areas.Api.Controllers.Assets.Models
 {
-    public sealed class AssetUpdateDto
+    public sealed class UpdateAssetDto
     {
         /// <summary>
         /// The new name of the asset.

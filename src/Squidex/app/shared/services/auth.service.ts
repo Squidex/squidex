@@ -185,7 +185,7 @@ export class AuthService {
             }
 
             return true;
-        }, err => {
+        }, error => {
             this.user$.next(null);
 
             return false;

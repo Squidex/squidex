@@ -126,7 +126,7 @@ export module ValidatorsEx {
     }
 
     export function noop(): ValidatorFn {
-        return (control: AbstractControl) => {
+        return () => {
             return null;
         };
     }

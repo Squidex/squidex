@@ -55,14 +55,14 @@ export class UserPageComponent implements OnDestroy, OnInit {
         if (value) {
             if (this.user) {
                 this.usersState.update(this.user.user, value)
-                    .subscribe(user => {
+                    .subscribe(() => {
                         this.userForm.submitCompleted();
                     }, error => {
                         this.userForm.submitFailed(error);
                     });
             } else {
                 this.usersState.create(value)
-                    .subscribe(user => {
+                    .subscribe(() => {
                         this.back();
                     }, error => {
                         this.userForm.submitFailed(error);

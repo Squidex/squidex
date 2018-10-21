@@ -190,7 +190,7 @@ export class ContentsService {
                         body.data,
                         response.version);
                 }),
-                tap(content => {
+                tap(() => {
                     this.analytics.trackEvent('Content', 'Created', appName);
                 }),
                 pretifyError('Failed to create content. Please reload.'));
