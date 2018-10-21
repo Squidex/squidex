@@ -185,7 +185,7 @@ namespace Squidex.Infrastructure.Commands
 
                 if (result == null)
                 {
-                    if (Version > 0)
+                    if (mode == Mode.Update || (mode == Mode.Upsert && Version == 0))
                     {
                         result = new EntitySavedResult(Version);
                     }
