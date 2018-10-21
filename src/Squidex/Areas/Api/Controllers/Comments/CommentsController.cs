@@ -40,6 +40,10 @@ namespace Squidex.Areas.Api.Controllers.Comments
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="commentsId">The id of the comments.</param>
+        /// <param name="version">The current version.</param>
+        /// <remarks>
+        /// When passing in a version you can retrieve all updates since then.
+        /// </remarks>
         /// <returns>
         /// 200 => All comments returned.
         /// 404 => App not found.
@@ -48,13 +52,8 @@ namespace Squidex.Areas.Api.Controllers.Comments
         [Route("apps/{app}/comments/{commentsId}")]
         [ProducesResponseType(typeof(CommentsDto), 200)]
         [ApiCosts(0)]
-        public async Task<IActionResult> GetComments(string app, Guid commentsId)
+        public async Task<IActionResult> GetComments(string app, Guid commentsId, [FromQuery] long version = EtagVersion.Any)
         {
-            if (!long.TryParse(Request.Headers["If-None-Match"], out var version))
-            {
-                version = EtagVersion.Any;
-            }
-
             var result = await grainFactory.GetGrain<ICommentGrain>(commentsId).GetCommentsAsync(version);
             var response = CommentsDto.FromResult(result);
 

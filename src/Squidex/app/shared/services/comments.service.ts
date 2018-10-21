@@ -5,17 +5,16 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, of, throwError } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 import {
     ApiUrlConfig,
     DateTime,
     Model,
     pretifyError,
-    Types,
     Version
 } from '@app/framework';
 
@@ -61,25 +60,10 @@ export class CommentsService {
     }
 
     public getComments(appName: string, commentsId: string, version: Version): Observable<CommentsDto> {
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/comments/${commentsId}`);
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/comments/${commentsId}?version=${version.value}`);
 
-        const options = {
-            headers: new HttpHeaders().set('If-None-Match', version.value)
-        };
-
-        return this.http.get(url, options).pipe(
-                catchError(err => {
-                    if (err.status === 304) {
-                        return of(new CommentsDto([], [], [], version));
-                    }
-
-                    return throwError(err);
-                }),
+        return this.http.get(url).pipe(
                 map(response => {
-                    if (Types.is(response, CommentsDto)) {
-                        return response;
-                    }
-
                     const body: any = response;
 
                     return new CommentsDto(
