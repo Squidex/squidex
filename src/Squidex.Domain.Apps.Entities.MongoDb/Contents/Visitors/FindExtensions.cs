@@ -70,6 +70,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors
                     result[1] = field.Id.ToString();
                 }
 
+                if (result.Count > 2)
+                {
+                    result[2] = result[2].UnescapeEdmField();
+                }
+
                 if (result.Count > 0)
                 {
                     if (result[0].Equals("Data", StringComparison.CurrentCultureIgnoreCase))
