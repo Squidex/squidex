@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Squidex.Infrastructure.Security;
+using Squidex.Shared.Identity;
 
 namespace Squidex.Pipeline
 {
@@ -38,13 +39,13 @@ namespace Squidex.Pipeline
                 }
 
                 var set = new PermissionSet(
-                    context.HttpContext.User.FindAll("Permission")
+                    context.HttpContext.User.FindAll(SquidexClaimTypes.Permission)
                         .Select(x => x.Value)
                         .Select(x => new Permission(x)));
 
                 if (!set.GivesPermissionTo(new Permission(id)))
                 {
-                    // context.Result = new StatusCodeResult(403);
+                    context.Result = new StatusCodeResult(403);
                 }
             }
 

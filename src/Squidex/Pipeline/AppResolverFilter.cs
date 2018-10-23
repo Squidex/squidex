@@ -10,10 +10,12 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Infrastructure.Security;
+using Squidex.Shared.Identity;
 
 namespace Squidex.Pipeline
 {
@@ -38,6 +40,15 @@ namespace Squidex.Pipeline
 
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
+            var user = context.HttpContext.User;
+
+            var identity = user.Identities.First();
+
+            if (string.Equals(identity.FindFirst(identity.RoleClaimType)?.Value, SquidexRoles.Administrator))
+            {
+                identity.AddClaim(new Claim(SquidexClaimTypes.Permission, Permissions.Admin));
+            }
+
             var appName = context.RouteData.Values["app"]?.ToString();
 
             if (!string.IsNullOrWhiteSpace(appName))
@@ -50,8 +61,6 @@ namespace Squidex.Pipeline
                     return;
                 }
 
-                var user = context.HttpContext.User;
-
                 var permissions =
                     FindByOpenIdSubject(app, user) ??
                     FindByOpenIdClient(app, user);
@@ -62,11 +71,9 @@ namespace Squidex.Pipeline
                     return;
                 }
 
-                var identity = user.Identities.First();
-
                 foreach (var permission in permissions)
                 {
-                    identity.AddClaim(new Claim("Permission", permission.Id));
+                    identity.AddClaim(new Claim(SquidexClaimTypes.Permission, permission.Id));
                 }
 
                 context.HttpContext.Features.Set<IAppFeature>(new AppFeature(app));

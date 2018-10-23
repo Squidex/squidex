@@ -12,8 +12,6 @@ namespace Squidex.Domain.Apps.Core
 {
     public sealed class Permissions
     {
-        public const string ClaimType = "Permission";
-
         public const string All = "squidex.*";
 
         public const string Admin = "squidex.admin*";

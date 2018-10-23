@@ -93,11 +93,7 @@ namespace Squidex.Pipeline.Swagger
                     Flow = SwaggerOAuth2Flow.Application,
                     Scopes = new Dictionary<string, string>
                     {
-                        { Constants.ApiScope, "Read and write access to the API" },
-                        { SquidexRoles.AppOwner, "App contributor with Owner permission." },
-                        { SquidexRoles.AppEditor, "Client (writer) or App contributor with Editor permission." },
-                        { SquidexRoles.AppReader, "Client (readonly) or App contributor with Editor permission." },
-                        { SquidexRoles.AppDeveloper, "App contributor with Developer permission." }
+                        { Constants.ApiScope, "Read and write access to the API" }
                     },
                     Description = securityText
                 };
