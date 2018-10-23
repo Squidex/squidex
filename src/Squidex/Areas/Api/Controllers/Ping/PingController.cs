@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Microsoft.AspNetCore.Mvc;
+using Squidex.Domain.Apps.Core;
 using Squidex.Infrastructure.Commands;
 using Squidex.Pipeline;
 
@@ -14,7 +15,6 @@ namespace Squidex.Areas.Api.Controllers.Ping
     /// <summary>
     /// Makes a ping request.
     /// </summary>
-    [ApiExceptionFilter]
     [ApiExplorerSettings(GroupName = nameof(Ping))]
     public sealed class PingController : ApiController
     {
@@ -49,12 +49,10 @@ namespace Squidex.Areas.Api.Controllers.Ping
         /// <remarks>
         /// Can be used to test, if the Squidex API is alive and responding.
         /// </remarks>
-        [ApiAuthorize]
-        [ApiCosts(0)]
-        [AppApi]
-        [MustBeAppReader]
         [HttpGet]
         [Route("ping/{app}/")]
+        [ApiPermission(Permissions.AppCommon)]
+        [ApiCosts(0)]
         public IActionResult GetPing(string app)
         {
             return NoContent();

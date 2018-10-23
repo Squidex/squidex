@@ -18,7 +18,7 @@ namespace Squidex.Config.Web
             services.AddSingletonAs<FileCallbackResultExecutor>()
                 .AsSelf();
 
-            services.AddSingletonAs<AppApiFilter>()
+            services.AddSingletonAs<AppResolverFilter>()
                 .AsSelf();
 
             services.AddSingletonAs<ApiCostsFilter>()
@@ -36,6 +36,7 @@ namespace Squidex.Config.Web
             services.AddMvc(options =>
             {
                 options.Filters.Add<ETagFilter>();
+                options.Filters.Add<AppResolverFilter>();
             }).AddMySerializers();
 
             services.AddCors();

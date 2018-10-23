@@ -24,8 +24,10 @@ namespace Squidex.Domain.Apps.Core.Comments
         public Comment(Guid id, Instant time, RefToken user, string text)
         {
             Id = id;
+
             Time = time;
             Text = text;
+
             User = user;
         }
     }

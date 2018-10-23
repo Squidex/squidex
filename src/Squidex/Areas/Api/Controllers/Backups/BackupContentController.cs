@@ -16,8 +16,6 @@ namespace Squidex.Areas.Api.Controllers.Backups
     /// <summary>
     /// Manages backups for app.
     /// </summary>
-    [ApiExceptionFilter]
-    [AppApi]
     [ApiExplorerSettings(GroupName = nameof(Backups))]
     public class BackupContentController : ApiController
     {

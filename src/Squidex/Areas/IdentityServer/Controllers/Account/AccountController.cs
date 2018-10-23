@@ -17,7 +17,6 @@ using IdentityServer4.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using NSwag.Annotations;
 using Squidex.Config;
 using Squidex.Domain.Users;
 using Squidex.Infrastructure;
@@ -28,7 +27,6 @@ using Squidex.Shared.Users;
 
 namespace Squidex.Areas.IdentityServer.Controllers.Account
 {
-    [SwaggerIgnore]
     public sealed class AccountController : IdentityServerController
     {
         private readonly SignInManager<IUser> signInManager;

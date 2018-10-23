@@ -5,14 +5,15 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using Squidex.Domain.Apps.Core.Apps;
-using Xunit;
+// using System;
+// using Squidex.Domain.Apps.Core.Apps;
+// using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Model.Apps
 {
     public class RoleExtensionTests
     {
+        /*
         [Fact]
         public void Should_convert_from_client_permission_to_app_permission()
         {
@@ -40,5 +41,6 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         {
             Assert.Throws<ArgumentException>(() => ((AppContributorPermission)10).ToAppPermission());
         }
+        */
     }
 }

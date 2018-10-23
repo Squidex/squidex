@@ -7,9 +7,9 @@
 
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using NSwag.Annotations;
 using Orleans;
 using Squidex.Areas.Api.Controllers.Backups.Models;
+using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Entities.Backup;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Security;
@@ -20,11 +20,7 @@ namespace Squidex.Areas.Api.Controllers.Backups
     /// <summary>
     /// Restores backups.
     /// </summary>
-    [ApiAuthorize]
-    [ApiExceptionFilter]
     [ApiModelValidation(true)]
-    [MustBeAdministrator]
-    [SwaggerIgnore]
     public class RestoreController : ApiController
     {
         private readonly IGrainFactory grainFactory;
@@ -37,7 +33,7 @@ namespace Squidex.Areas.Api.Controllers.Backups
 
         [HttpGet]
         [Route("apps/restore/")]
-        [ApiCosts(0)]
+        [ApiPermission(Permissions.AdminRestoreRead)]
         public async Task<IActionResult> GetJob()
         {
             var restoreGrain = grainFactory.GetGrain<IRestoreGrain>(User.OpenIdSubject());
@@ -56,7 +52,7 @@ namespace Squidex.Areas.Api.Controllers.Backups
 
         [HttpPost]
         [Route("apps/restore/")]
-        [ApiCosts(0)]
+        [ApiPermission(Permissions.AdminRestoreCreate)]
         public async Task<IActionResult> PostRestore([FromBody] RestoreRequest request)
         {
             var restoreGrain = grainFactory.GetGrain<IRestoreGrain>(User.OpenIdSubject());

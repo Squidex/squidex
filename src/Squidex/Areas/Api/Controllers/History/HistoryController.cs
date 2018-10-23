@@ -9,6 +9,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Areas.Api.Controllers.History.Models;
+using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Entities.History.Repositories;
 using Squidex.Infrastructure.Commands;
 using Squidex.Pipeline;
@@ -18,10 +19,6 @@ namespace Squidex.Areas.Api.Controllers.History
     /// <summary>
     /// Readonly API to get an event stream.
     /// </summary>
-    [ApiAuthorize]
-    [ApiExceptionFilter]
-    [AppApi]
-    [MustBeAppEditor]
     [ApiExplorerSettings(GroupName = nameof(History))]
     public sealed class HistoryController : ApiController
     {
@@ -45,6 +42,7 @@ namespace Squidex.Areas.Api.Controllers.History
         [HttpGet]
         [Route("apps/{app}/history/")]
         [ProducesResponseType(typeof(HistoryEventDto), 200)]
+        [ApiPermission(Permissions.AppCommon)]
         [ApiCosts(0.1)]
         public async Task<IActionResult> GetHistory(string app, string channel)
         {

@@ -9,6 +9,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Areas.Api.Controllers.Apps.Models;
+using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure.Commands;
 using Squidex.Pipeline;
@@ -18,10 +19,6 @@ namespace Squidex.Areas.Api.Controllers.Apps
     /// <summary>
     /// Manages and configures apps.
     /// </summary>
-    [ApiAuthorize]
-    [ApiExceptionFilter]
-    [AppApi]
-    [MustBeAppEditor]
     [ApiExplorerSettings(GroupName = nameof(Apps))]
     public sealed class AppClientsController : ApiController
     {
@@ -44,6 +41,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [HttpGet]
         [Route("apps/{app}/clients/")]
         [ProducesResponseType(typeof(ClientDto[]), 200)]
+        [ApiPermission(Permissions.AppClientsRead)]
         [ApiCosts(0)]
         public IActionResult GetClients(string app)
         {
@@ -70,6 +68,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [HttpPost]
         [Route("apps/{app}/clients/")]
         [ProducesResponseType(typeof(ClientDto), 201)]
+        [ApiPermission(Permissions.AppClientsCreate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PostClient(string app, [FromBody] CreateAppClientDto request)
         {
@@ -98,6 +97,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// </remarks>
         [HttpPut]
         [Route("apps/{app}/clients/{clientId}/")]
+        [ApiPermission(Permissions.AppClientsUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutClient(string app, string clientId, [FromBody] UpdateAppClientDto request)
         {
@@ -120,6 +120,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// </remarks>
         [HttpDelete]
         [Route("apps/{app}/clients/{clientId}/")]
+        [ApiPermission(Permissions.AppClientsDelete)]
         [ApiCosts(1)]
         public async Task<IActionResult> DeleteClient(string app, string clientId)
         {

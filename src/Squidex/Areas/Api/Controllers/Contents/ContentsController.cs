@@ -12,8 +12,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using NodaTime;
 using NodaTime.Text;
-using NSwag.Annotations;
 using Squidex.Areas.Api.Controllers.Contents.Models;
+using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Contents;
@@ -24,10 +24,6 @@ using Squidex.Pipeline;
 
 namespace Squidex.Areas.Api.Controllers.Contents
 {
-    [ApiAuthorize]
-    [ApiExceptionFilter]
-    [AppApi]
-    [SwaggerIgnore]
     public sealed class ContentsController : ApiController
     {
         private readonly IOptions<MyContentsControllerOptions> controllerOptions;
@@ -58,10 +54,10 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// <remarks>
         /// You can read the generated documentation for your app at /api/content/{appName}/docs
         /// </remarks>
-        [MustBeAppReader]
         [HttpGet]
         [HttpPost]
         [Route("content/{app}/graphql/")]
+        [ApiPermission(Permissions.AppContentsGraphQL)]
         [ApiCosts(2)]
         public async Task<IActionResult> PostGraphQL(string app, [FromBody] GraphQLQuery query)
         {
@@ -89,10 +85,10 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// <remarks>
         /// You can read the generated documentation for your app at /api/content/{appName}/docs
         /// </remarks>
-        [MustBeAppReader]
         [HttpGet]
         [HttpPost]
         [Route("content/{app}/graphql/batch")]
+        [ApiPermission(Permissions.AppContentsGraphQL)]
         [ApiCosts(2)]
         public async Task<IActionResult> PostGraphQLBatch(string app, [FromBody] GraphQLQuery[] batch)
         {
@@ -122,9 +118,9 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// <remarks>
         /// You can read the generated documentation for your app at /api/content/{appName}/docs
         /// </remarks>
-        [MustBeAppReader]
         [HttpGet]
         [Route("content/{app}/{name}/")]
+        [ApiPermission(Permissions.AppContentsRead)]
         [ApiCosts(2)]
         public async Task<IActionResult> GetContents(string app, string name, [FromQuery] bool archived = false, [FromQuery] string ids = null)
         {
@@ -161,9 +157,9 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// <remarks>
         /// You can read the generated documentation for your app at /api/content/{appName}/docs
         /// </remarks>
-        [MustBeAppReader]
         [HttpGet]
         [Route("content/{app}/{name}/{id}/")]
+        [ApiPermission(Permissions.AppContentsRead)]
         [ApiCosts(1)]
         public async Task<IActionResult> GetContent(string app, string name, Guid id)
         {
@@ -197,9 +193,9 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// <remarks>
         /// You can read the generated documentation for your app at /api/content/{appName}/docs
         /// </remarks>
-        [MustBeAppReader]
         [HttpGet]
         [Route("content/{app}/{name}/{id}/{version}/")]
+        [ApiPermission(Permissions.AppContentsRead)]
         [ApiCosts(1)]
         public async Task<IActionResult> GetContentVersion(string app, string name, Guid id, int version)
         {
@@ -233,9 +229,9 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// <remarks>
         /// You can read the generated documentation for your app at /api/content/{appName}/docs
         /// </remarks>
-        [MustBeAppEditor]
         [HttpPost]
         [Route("content/{app}/{name}/")]
+        [ApiPermission(Permissions.AppContentsCreate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PostContent(string app, string name, [FromBody] NamedContentData request, [FromQuery] bool publish = false)
         {
@@ -267,9 +263,9 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// <remarks>
         /// You can read the generated documentation for your app at /api/content/{appName}/docs
         /// </remarks>
-        [MustBeAppEditor]
         [HttpPut]
         [Route("content/{app}/{name}/{id}/")]
+        [ApiPermission(Permissions.AppContentsUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutContent(string app, string name, Guid id, [FromBody] NamedContentData request, [FromQuery] bool asDraft = false)
         {
@@ -300,9 +296,9 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// <remarks>
         /// You can read the generated documentation for your app at /api/content/{appName}/docs
         /// </remarks>
-        [MustBeAppEditor]
         [HttpPatch]
         [Route("content/{app}/{name}/{id}/")]
+        [ApiPermission(Permissions.AppContentsUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PatchContent(string app, string name, Guid id, [FromBody] NamedContentData request, [FromQuery] bool asDraft = false)
         {
@@ -332,9 +328,9 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// <remarks>
         /// You can read the generated documentation for your app at /api/content/{appName}/docs
         /// </remarks>
-        [MustBeAppEditor]
         [HttpPut]
         [Route("content/{app}/{name}/{id}/publish/")]
+        [ApiPermission(Permissions.AppContentsPublish)]
         [ApiCosts(1)]
         public async Task<IActionResult> PublishContent(string app, string name, Guid id, string dueTime = null)
         {
@@ -362,9 +358,9 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// <remarks>
         /// You can read the generated documentation for your app at /api/content/{appName}/docs
         /// </remarks>
-        [MustBeAppEditor]
         [HttpPut]
         [Route("content/{app}/{name}/{id}/unpublish/")]
+        [ApiPermission(Permissions.AppContentsUnpublish)]
         [ApiCosts(1)]
         public async Task<IActionResult> UnpublishContent(string app, string name, Guid id, string dueTime = null)
         {
@@ -392,9 +388,9 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// <remarks>
         /// You can read the generated documentation for your app at /api/content/{appName}/docs
         /// </remarks>
-        [MustBeAppEditor]
         [HttpPut]
         [Route("content/{app}/{name}/{id}/archive/")]
+        [ApiPermission(Permissions.AppContentsArchive)]
         [ApiCosts(1)]
         public async Task<IActionResult> ArchiveContent(string app, string name, Guid id, string dueTime = null)
         {
@@ -422,9 +418,9 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// <remarks>
         /// You can read the generated documentation for your app at /api/content/{appName}/docs
         /// </remarks>
-        [MustBeAppEditor]
         [HttpPut]
         [Route("content/{app}/{name}/{id}/restore/")]
+        [ApiPermission(Permissions.AppContentsRestore)]
         [ApiCosts(1)]
         public async Task<IActionResult> RestoreContent(string app, string name, Guid id, string dueTime = null)
         {
@@ -451,9 +447,9 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// <remarks>
         /// You can read the generated documentation for your app at /api/content/{appName}/docs
         /// </remarks>
-        [MustBeAppEditor]
         [HttpPut]
         [Route("content/{app}/{name}/{id}/discard/")]
+        [ApiPermission(Permissions.AppContentsDiscard)]
         [ApiCosts(1)]
         public async Task<IActionResult> DiscardChanges(string app, string name, Guid id)
         {
@@ -479,9 +475,9 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// <remarks>
         /// You can create an generated documentation for your app at /api/content/{appName}/docs
         /// </remarks>
-        [MustBeAppEditor]
         [HttpDelete]
         [Route("content/{app}/{name}/{id}/")]
+        [ApiPermission(Permissions.AppContentsDelete)]
         [ApiCosts(1)]
         public async Task<IActionResult> DeleteContent(string app, string name, Guid id)
         {

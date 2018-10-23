@@ -16,6 +16,7 @@ using Squidex.Pipeline;
 namespace Squidex.Areas.Api.Controllers
 {
     [Area("Api")]
+    [ApiExceptionFilter]
     [ApiModelValidation(false)]
     public abstract class ApiController : Controller
     {

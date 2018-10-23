@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Areas.Api.Controllers.Apps.Models;
+using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure.Commands;
 using Squidex.Pipeline;
@@ -19,10 +20,6 @@ namespace Squidex.Areas.Api.Controllers.Apps
     /// <summary>
     /// Manages and configures app patterns.
     /// </summary>
-    [ApiAuthorize]
-    [MustBeAppDeveloper]
-    [ApiExceptionFilter]
-    [AppApi]
     [ApiExplorerSettings(GroupName = nameof(Apps))]
     public sealed class AppPatternsController : ApiController
     {
@@ -45,6 +42,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [HttpGet]
         [Route("apps/{app}/patterns/")]
         [ProducesResponseType(typeof(AppPatternDto[]), 200)]
+        [ApiPermission(Permissions.AppPatternsRead)]
         [ApiCosts(0)]
         public IActionResult GetPatterns(string app)
         {
@@ -68,6 +66,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [HttpPost]
         [Route("apps/{app}/patterns/")]
         [ProducesResponseType(typeof(AppPatternDto), 201)]
+        [ApiPermission(Permissions.AppPatternsCreate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PostPattern(string app, [FromBody] UpdatePatternDto request)
         {
@@ -94,6 +93,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [HttpPut]
         [Route("apps/{app}/patterns/{id}/")]
         [ProducesResponseType(typeof(AppPatternDto), 201)]
+        [ApiPermission(Permissions.AppPatternsUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> UpdatePattern(string app, Guid id, [FromBody] UpdatePatternDto request)
         {
@@ -116,6 +116,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// </remarks>
         [HttpDelete]
         [Route("apps/{app}/patterns/{id}/")]
+        [ApiPermission(Permissions.AppPatternsDelete)]
         [ApiCosts(1)]
         public async Task<IActionResult> DeletePattern(string app, Guid id)
         {

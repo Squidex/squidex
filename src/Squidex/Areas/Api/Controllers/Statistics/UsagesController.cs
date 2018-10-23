@@ -11,6 +11,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Areas.Api.Controllers.Statistics.Models;
+using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Entities.Apps.Services;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Infrastructure.Commands;
@@ -22,10 +23,6 @@ namespace Squidex.Areas.Api.Controllers.Statistics
     /// <summary>
     /// Retrieves usage information for apps.
     /// </summary>
-    [ApiAuthorize]
-    [ApiExceptionFilter]
-    [AppApi]
-    [MustBeAppEditor]
     [ApiExplorerSettings(GroupName = nameof(Statistics))]
     public sealed class UsagesController : ApiController
     {
@@ -57,6 +54,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics
         [HttpGet]
         [Route("apps/{app}/usages/calls/month/")]
         [ProducesResponseType(typeof(CurrentCallsDto), 200)]
+        [ApiPermission(Permissions.AppCommon)]
         [ApiCosts(0)]
         public async Task<IActionResult> GetMonthlyCalls(string app)
         {
@@ -83,6 +81,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics
         [HttpGet]
         [Route("apps/{app}/usages/calls/{fromDate}/{toDate}/")]
         [ProducesResponseType(typeof(Dictionary<string, CallsUsageDto[]>), 200)]
+        [ApiPermission(Permissions.AppCommon)]
         [ApiCosts(0)]
         public async Task<IActionResult> GetUsages(string app, DateTime fromDate, DateTime toDate)
         {
@@ -109,6 +108,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics
         [HttpGet]
         [Route("apps/{app}/usages/storage/today/")]
         [ProducesResponseType(typeof(CurrentStorageDto), 200)]
+        [ApiPermission(Permissions.AppCommon)]
         [ApiCosts(0)]
         public async Task<IActionResult> GetCurrentStorageSize(string app)
         {
@@ -135,6 +135,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics
         [HttpGet]
         [Route("apps/{app}/usages/storage/{fromDate}/{toDate}/")]
         [ProducesResponseType(typeof(StorageUsageDto[]), 200)]
+        [ApiPermission(Permissions.AppCommon)]
         [ApiCosts(0)]
         public async Task<IActionResult> GetStorageSizes(string app, DateTime fromDate, DateTime toDate)
         {

@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Orleans;
 using Squidex.Areas.Api.Controllers.Backups.Models;
+using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Entities.Backup;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Tasks;
@@ -22,10 +23,6 @@ namespace Squidex.Areas.Api.Controllers.Backups
     /// <summary>
     /// Manages backups for app.
     /// </summary>
-    [ApiAuthorize]
-    [ApiExceptionFilter]
-    [AppApi]
-    [MustBeAppOwner]
     [ApiExplorerSettings(GroupName = nameof(Backups))]
     public class BackupsController : ApiController
     {
@@ -48,6 +45,7 @@ namespace Squidex.Areas.Api.Controllers.Backups
         [HttpGet]
         [Route("apps/{app}/backups/")]
         [ProducesResponseType(typeof(List<BackupJobDto>), 200)]
+        [ApiPermission(Permissions.AppBackupsRead)]
         [ApiCosts(0)]
         public async Task<IActionResult> GetJobs(string app)
         {
@@ -71,6 +69,7 @@ namespace Squidex.Areas.Api.Controllers.Backups
         [HttpPost]
         [Route("apps/{app}/backups/")]
         [ProducesResponseType(typeof(List<BackupJobDto>), 200)]
+        [ApiPermission(Permissions.AppBackupsCreate)]
         [ApiCosts(0)]
         public IActionResult PostBackup(string app)
         {
@@ -93,6 +92,7 @@ namespace Squidex.Areas.Api.Controllers.Backups
         [HttpDelete]
         [Route("apps/{app}/backups/{id}")]
         [ProducesResponseType(typeof(List<BackupJobDto>), 200)]
+        [ApiPermission(Permissions.AppBackupsDelete)]
         [ApiCosts(0)]
         public async Task<IActionResult> DeleteBackup(string app, Guid id)
         {

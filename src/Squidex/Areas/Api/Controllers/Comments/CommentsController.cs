@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Orleans;
 using Squidex.Areas.Api.Controllers.Comments.Models;
+using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Entities.Comments;
 using Squidex.Domain.Apps.Entities.Comments.Commands;
 using Squidex.Infrastructure;
@@ -21,9 +22,6 @@ namespace Squidex.Areas.Api.Controllers.Comments
     /// <summary>
     /// Manages comments for any kind of resource.
     /// </summary>
-    [ApiAuthorize]
-    [ApiExceptionFilter]
-    [AppApi]
     [ApiExplorerSettings(GroupName = nameof(Comments))]
     public sealed class CommentsController : ApiController
     {
@@ -51,6 +49,7 @@ namespace Squidex.Areas.Api.Controllers.Comments
         [HttpGet]
         [Route("apps/{app}/comments/{commentsId}")]
         [ProducesResponseType(typeof(CommentsDto), 200)]
+        [ApiPermission(Permissions.AppCommon)]
         [ApiCosts(0)]
         public async Task<IActionResult> GetComments(string app, Guid commentsId, [FromQuery] long version = EtagVersion.Any)
         {
@@ -77,6 +76,7 @@ namespace Squidex.Areas.Api.Controllers.Comments
         [Route("apps/{app}/comments/{commentsId}")]
         [ProducesResponseType(typeof(EntityCreatedDto), 201)]
         [ProducesResponseType(typeof(ErrorDto), 400)]
+        [ApiPermission(Permissions.AppCommon)]
         [ApiCosts(0)]
         public async Task<IActionResult> PostComment(string app, Guid commentsId, [FromBody] UpsertCommentDto request)
         {
@@ -100,10 +100,10 @@ namespace Squidex.Areas.Api.Controllers.Comments
         /// 400 => Comment text not valid.
         /// 404 => Comment or app not found.
         /// </returns>
-        [MustBeAppReader]
         [HttpPut]
         [Route("apps/{app}/comments/{commentsId}/{commentId}")]
         [ProducesResponseType(typeof(ErrorDto), 400)]
+        [ApiPermission(Permissions.AppCommon)]
         [ApiCosts(0)]
         public async Task<IActionResult> PutComment(string app, Guid commentsId, Guid commentId, [FromBody] UpsertCommentDto request)
         {
@@ -125,6 +125,7 @@ namespace Squidex.Areas.Api.Controllers.Comments
         [HttpDelete]
         [Route("apps/{app}/comments/{commentsId}/{commentId}")]
         [ProducesResponseType(typeof(ErrorDto), 400)]
+        [ApiPermission(Permissions.AppCommon)]
         [ApiCosts(0)]
         public async Task<IActionResult> DeleteComment(string app, Guid commentsId, Guid commentId)
         {

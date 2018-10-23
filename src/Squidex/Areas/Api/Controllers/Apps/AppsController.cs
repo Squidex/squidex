@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Areas.Api.Controllers.Apps.Models;
+using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Services;
@@ -22,8 +23,6 @@ namespace Squidex.Areas.Api.Controllers.Apps
     /// <summary>
     /// Manages and configures apps.
     /// </summary>
-    [ApiAuthorize]
-    [ApiExceptionFilter]
     [ApiExplorerSettings(GroupName = nameof(Apps))]
     public sealed class AppsController : ApiController
     {
@@ -52,6 +51,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [HttpGet]
         [Route("apps/")]
         [ProducesResponseType(typeof(AppDto[]), 200)]
+        [ApiPermission]
         [ApiCosts(0)]
         public async Task<IActionResult> GetApps()
         {
@@ -84,6 +84,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [ProducesResponseType(typeof(AppCreatedDto), 201)]
         [ProducesResponseType(typeof(ErrorDto), 400)]
         [ProducesResponseType(typeof(ErrorDto), 409)]
+        [ApiPermission]
         [ApiCosts(1)]
         public async Task<IActionResult> PostApp([FromBody] CreateAppDto request)
         {
@@ -105,9 +106,8 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// </returns>
         [HttpDelete]
         [Route("apps/{app}/")]
-        [AppApi]
+        [ApiPermission(Permissions.AppDelete)]
         [ApiCosts(1)]
-        [MustBeAppOwner]
         public async Task<IActionResult> DeleteApp(string app)
         {
             await CommandBus.PublishAsync(new ArchiveApp());

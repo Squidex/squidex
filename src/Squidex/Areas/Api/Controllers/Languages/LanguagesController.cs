@@ -16,8 +16,6 @@ namespace Squidex.Areas.Api.Controllers.Languages
     /// <summary>
     /// Readonly API to the supported langauges.
     /// </summary>
-    [ApiAuthorize]
-    [ApiExceptionFilter]
     [ApiExplorerSettings(GroupName = nameof(Languages))]
     public sealed class LanguagesController : ApiController
     {
@@ -38,7 +36,7 @@ namespace Squidex.Areas.Api.Controllers.Languages
         [HttpGet]
         [Route("languages/")]
         [ProducesResponseType(typeof(string[]), 200)]
-        [ApiCosts(0)]
+        [ApiPermission]
         public IActionResult GetLanguages()
         {
             var response = Language.AllLanguages.Select(LanguageDto.FromLanguage).ToList();
