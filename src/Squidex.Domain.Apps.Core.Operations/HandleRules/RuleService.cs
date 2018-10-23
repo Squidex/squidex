@@ -56,6 +56,11 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             Guard.NotNull(rule, nameof(rule));
             Guard.NotNull(@event, nameof(@event));
 
+            if (!rule.IsEnabled)
+            {
+                return null;
+            }
+            
             if (!(@event.Payload is AppEvent appEvent))
             {
                 return null;
