@@ -5,21 +5,33 @@
 
     <sqx-panel desiredWidth="26rem" isBlank="true">
         <ng-container title>
-            <ng-container *ngIf="usersState.selectedUser | async; else noUser">
+            <ng-container *ngIf="usersState.selectedUser | async; else noUserTitle">
                 Edit User
             </ng-container>
 
-            <ng-template #noUser>
+            <ng-template #noUserTitle>
                 New User
             </ng-template>
         </ng-container>
 
         <ng-container menu>
-            <button type="submit" class="btn btn-primary" title="CTRL + S">
-                Save
-            </button>
-            
-            <sqx-shortcut keys="ctrl+s" (trigger)="save()"></sqx-shortcut>
+            <ng-container *ngIf="usersState.selectedUser | async; else noUserMenu">
+                <ng-container *ngIf="canUpdate">
+                    <button type="submit" class="btn btn-primary" title="CTRL + S">
+                        Save
+                    </button>
+                    
+                    <sqx-shortcut keys="ctrl+s" (trigger)="save()"></sqx-shortcut>
+                </ng-container>
+            </ng-container>
+
+            <ng-template #noUserMenu>
+                <button type="submit" class="btn btn-primary" title="CTRL + S">
+                    Save
+                </button>
+                
+                <sqx-shortcut keys="ctrl+s" (trigger)="save()"></sqx-shortcut>
+            </ng-template>
         </ng-container>
 
         <ng-container content>

@@ -45,7 +45,7 @@ namespace Squidex.Infrastructure.Security
 
             foreach (var permission in permissions)
             {
-                if (permission.GivesPermissionTo(other))
+                if (permission.Allows(other))
                 {
                     return true;
                 }

@@ -14,7 +14,8 @@ import {
     AppDto,
     AppsService,
     CreateAppDto,
-    DateTime
+    DateTime,
+    Permission
 } from './../';
 
 describe('AppsService', () => {
@@ -55,7 +56,7 @@ describe('AppsService', () => {
             {
                 id: '123',
                 name: 'name1',
-                permission: 'Owner',
+                permissions: ['Owner'],
                 created: '2016-01-01',
                 lastModified: '2016-02-02',
                 planName: 'Free',
@@ -64,7 +65,7 @@ describe('AppsService', () => {
             {
                 id: '456',
                 name: 'name2',
-                permission: 'Owner',
+                permissions: ['Owner'],
                 created: '2017-01-01',
                 lastModified: '2017-02-02',
                 planName: 'Basic',
@@ -74,8 +75,8 @@ describe('AppsService', () => {
 
         expect(apps!).toEqual(
             [
-                new AppDto('123', 'name1', 'Owner', DateTime.parseISO('2016-01-01'), DateTime.parseISO('2016-02-02'), 'Free', 'Basic'),
-                new AppDto('456', 'name2', 'Owner', DateTime.parseISO('2017-01-01'), DateTime.parseISO('2017-02-02'), 'Basic', 'Enterprise')
+                new AppDto('123', 'name1', [new Permission('Owner')], DateTime.parseISO('2016-01-01'), DateTime.parseISO('2016-02-02'), 'Free', 'Basic'),
+                new AppDto('456', 'name2', [new Permission('Owner')], DateTime.parseISO('2017-01-01'), DateTime.parseISO('2017-02-02'), 'Basic', 'Enterprise')
             ]);
     }));
 
@@ -97,12 +98,12 @@ describe('AppsService', () => {
 
         req.flush({
             id: '123',
-            permission: 'Reader',
+            permissions: ['Reader'],
             planName: 'Basic',
             planUpgrade: 'Enterprise'
         });
 
-        expect(app!).toEqual(new AppDto('123', dto.name, 'Reader', now, now, 'Basic', 'Enterprise'));
+        expect(app!).toEqual(new AppDto('123', dto.name, [new Permission('Reader')], now, now, 'Basic', 'Enterprise'));
     }));
 
     it('should make delete request to archive app',

@@ -98,6 +98,11 @@ namespace Squidex.Areas.IdentityServer.Config
                 {
                     JwtClaimTypes.Role
                 });
+            yield return new IdentityResource(Constants.PermissionsScope,
+                new[]
+                {
+                    SquidexClaimTypes.SquidexPermissions
+                });
             yield return new IdentityResource(Constants.ProfileScope,
                 new[]
                 {

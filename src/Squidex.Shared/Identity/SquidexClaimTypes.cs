@@ -19,7 +19,7 @@ namespace Squidex.Shared.Identity
 
         public static readonly string SquidexHidden = "urn:squidex:hidden";
 
-        public static readonly string Permission = "urn:squidex:permission";
+        public static readonly string SquidexPermissions = "urn:squidex:permissions";
 
         public static readonly string Prefix = "urn:squidex:";
     }

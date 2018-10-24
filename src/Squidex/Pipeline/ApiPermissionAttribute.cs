@@ -12,40 +12,53 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Squidex.Infrastructure.Security;
+using Squidex.Infrastructure.Tasks;
 using Squidex.Shared.Identity;
 
 namespace Squidex.Pipeline
 {
     public sealed class ApiPermissionAttribute : AuthorizeAttribute, IAsyncActionFilter
     {
-        private readonly string permissionId;
+        private readonly string[] permissionIds;
 
-        public ApiPermissionAttribute(string id = null)
+        public ApiPermissionAttribute(params string[] ids)
         {
             AuthenticationSchemes = IdentityServerAuthenticationDefaults.AuthenticationScheme;
 
-            permissionId = id;
+            permissionIds = ids;
         }
 
         public Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
-            if (permissionId != null)
+            if (permissionIds.Length > 0)
             {
-                var id = permissionId;
+                var hasPermission = false;
 
-                foreach (var routeParam in context.RouteData.Values)
+                foreach (var permissionId in permissionIds)
                 {
-                    id = id.Replace($"{{{routeParam.Key}}}", routeParam.Value?.ToString());
+                    var id = permissionId;
+
+                    foreach (var routeParam in context.RouteData.Values)
+                    {
+                        id = id.Replace($"{{{routeParam.Key}}}", routeParam.Value?.ToString());
+                    }
+
+                    var set = new PermissionSet(
+                        context.HttpContext.User.FindAll(SquidexClaimTypes.SquidexPermissions)
+                            .Select(x => x.Value)
+                            .Select(x => new Permission(x)));
+
+                    if (set.GivesPermissionTo(new Permission(id)))
+                    {
+                        hasPermission = true;
+                    }
                 }
 
-                var set = new PermissionSet(
-                    context.HttpContext.User.FindAll(SquidexClaimTypes.Permission)
-                        .Select(x => x.Value)
-                        .Select(x => new Permission(x)));
-
-                if (!set.GivesPermissionTo(new Permission(id)))
+                if (!hasPermission)
                 {
                     context.Result = new StatusCodeResult(403);
+
+                    return TaskHelper.Done;
                 }
             }
 

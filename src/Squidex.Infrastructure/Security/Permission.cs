@@ -6,16 +6,19 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Squidex.Infrastructure.Security
 {
     public sealed class Permission : IComparable<Permission>, IEquatable<Permission>
     {
         private const string Any = "*";
-        private static readonly char[] Separators = { '.' };
+        private static readonly char[] MainSeparators = { '.' };
+        private static readonly char[] AlternativeSeparators = { '|' };
         private readonly string description;
         private readonly string id;
-        private readonly string[] idParts;
+        private readonly HashSet<string>[] idParts;
 
         public string Id
         {
@@ -34,10 +37,22 @@ namespace Squidex.Infrastructure.Security
             this.description = description;
 
             this.id = id;
-            this.idParts = id.Split(Separators, StringSplitOptions.RemoveEmptyEntries);
+
+            idParts = id
+                .Split(MainSeparators, StringSplitOptions.RemoveEmptyEntries)
+                .Select(x =>
+                {
+                    if (x == Any)
+                    {
+                        return null;
+                    }
+
+                    return new HashSet<string>(x.Split(AlternativeSeparators, StringSplitOptions.RemoveEmptyEntries), StringComparer.OrdinalIgnoreCase);
+                })
+                .ToArray();
         }
 
-        public bool GivesPermissionTo(Permission permission)
+        public bool Allows(Permission permission)
         {
             if (permission == null)
             {
@@ -54,8 +69,33 @@ namespace Squidex.Infrastructure.Security
                 var lhs = idParts[i];
                 var rhs = permission.idParts[i];
 
-                if (!string.Equals(lhs, Any, StringComparison.OrdinalIgnoreCase) &&
-                    !string.Equals(lhs, rhs, StringComparison.OrdinalIgnoreCase))
+                if (lhs != null && (rhs == null || !lhs.Intersect(rhs).Any()))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        public bool Includes(Permission permission)
+        {
+            if (permission == null)
+            {
+                return false;
+            }
+
+            if (idParts.Length < permission.idParts.Length)
+            {
+                return false;
+            }
+
+            for (var i = 0; i < permission.idParts.Length; i++)
+            {
+                var lhs = idParts[i];
+                var rhs = permission.idParts[i];
+
+                if (lhs != null && rhs != null && !lhs.Intersect(rhs).Any())
                 {
                     return false;
                 }

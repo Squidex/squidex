@@ -76,7 +76,8 @@ namespace Squidex.Areas.IdentityServer.Config
                 AllowedScopes = new List<string>
                 {
                     Constants.ApiScope,
-                    Constants.RoleScope
+                    Constants.RoleScope,
+                    Constants.PermissionsScope
                 }
             };
         }
@@ -115,6 +116,7 @@ namespace Squidex.Areas.IdentityServer.Config
                     IdentityServerConstants.StandardScopes.Profile,
                     IdentityServerConstants.StandardScopes.Email,
                     Constants.ApiScope,
+                    Constants.PermissionsScope,
                     Constants.ProfileScope,
                     Constants.RoleScope
                 },
@@ -141,6 +143,7 @@ namespace Squidex.Areas.IdentityServer.Config
                     IdentityServerConstants.StandardScopes.Profile,
                     IdentityServerConstants.StandardScopes.Email,
                     Constants.ApiScope,
+                    Constants.PermissionsScope,
                     Constants.ProfileScope,
                     Constants.RoleScope
                 },

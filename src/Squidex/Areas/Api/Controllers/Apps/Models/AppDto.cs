@@ -7,8 +7,8 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps;
@@ -50,8 +50,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// <summary>
         /// The permission level of the user.
         /// </summary>
-        [JsonConverter(typeof(StringEnumConverter))]
-        public AppContributorPermission Permission { get; set; }
+        public string[] Permissions { get; set; }
 
         /// <summary>
         /// Gets the current plan name.
@@ -67,7 +66,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         {
             var response = SimpleMapper.Map(app, new AppDto());
 
-            response.Permission = app.Contributors[subject];
+            response.Permissions = app.Contributors[subject].ToPermissions(app.Name).Select(x => x.Id).ToArray();
 
             response.PlanName = plans.GetPlanForApp(app)?.Name;
             response.PlanUpgrade = plans.GetPlanUpgradeForApp(app)?.Name;

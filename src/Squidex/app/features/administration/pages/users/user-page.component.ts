@@ -10,8 +10,12 @@ import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 
+import { AuthService, Permission, permissionsAllow } from '@app/shared';
+
 import { UserDto } from './../../services/users.service';
 import { UserForm, UsersState } from './../../state/users.state';
+
+const UserUpdatePermission =  new Permission('squidex.admin.users.update');
 
 @Component({
     selector: 'sqx-user-page',
@@ -21,16 +25,18 @@ import { UserForm, UsersState } from './../../state/users.state';
 export class UserPageComponent implements OnDestroy, OnInit {
     private selectedUserSubscription: Subscription;
 
-    public user?: { user: UserDto, isCurrentUser: boolean };
+    public canUpdate = false;
 
+    public user?: { user: UserDto, isCurrentUser: boolean };
     public userForm = new UserForm(this.formBuilder);
 
-    constructor(
+    constructor(authService: AuthService,
         public readonly usersState: UsersState,
         private readonly formBuilder: FormBuilder,
         private readonly route: ActivatedRoute,
         private readonly router: Router
     ) {
+        this.canUpdate = permissionsAllow(authService.user!.permissions, UserUpdatePermission);
     }
 
     public ngOnDestroy() {
@@ -45,6 +51,10 @@ export class UserPageComponent implements OnDestroy, OnInit {
 
                     if (selectedUser) {
                         this.userForm.load(selectedUser.user);
+                    }
+
+                    if (!this.canUpdate && selectedUser) {
+                        this.userForm.form.disable();
                     }
                 });
     }

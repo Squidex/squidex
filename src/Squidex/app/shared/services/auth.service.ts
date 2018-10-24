@@ -7,7 +7,7 @@
 
 import { Injectable } from '@angular/core';
 import { Observable, Observer, of, ReplaySubject, throwError, TimeoutError } from 'rxjs';
-import { concat, delay, mergeMap, retryWhen, take } from 'rxjs/operators';
+import { concat, delay, mergeMap, retryWhen, take, timeout } from 'rxjs/operators';
 
 import {
     Log,
@@ -16,10 +16,15 @@ import {
     WebStorageStateStore
 } from 'oidc-client';
 
-import { ApiUrlConfig, Types } from '@app/framework';
-import { timeout } from 'rxjs/internal/operators/timeout';
+import {
+    ApiUrlConfig,
+    Permission,
+    Types
+} from '@app/framework';
 
 export class Profile {
+    public readonly permissions: Permission[];
+
     public get id(): string {
         return this.user.profile['sub'];
     }
@@ -30,10 +35,6 @@ export class Profile {
 
     public get pictureUrl(): string {
         return this.user.profile['urn:squidex:picture'];
-    }
-
-    public get isAdmin(): boolean {
-        return this.user.profile['role'] && this.user.profile['role'].toUpperCase() === 'ADMINISTRATOR';
     }
 
     public get isExpired(): boolean {
@@ -51,6 +52,17 @@ export class Profile {
     constructor(
         public readonly user: User
     ) {
+        const permissions = this.user.profile['uri:squidex:permissions'];
+
+        if (Types.isArrayOfString(permissions)) {
+            this.permissions = permissions.map(x => new Permission(x));
+        } else {
+            this.permissions = [];
+        }
+
+        if (this.user.profile['role'] === 'ADMINISTRATOR') {
+            this.permissions.push( new Permission('squidex.admin'));
+        }
     }
 }
 
@@ -77,7 +89,7 @@ export class AuthService {
 
         this.userManager = new UserManager({
                        client_id: 'squidex-frontend',
-                           scope: 'squidex-api openid profile email squidex-profile role',
+                           scope: 'squidex-api openid profile email squidex-profile role permissions',
                    response_type: 'id_token token',
                     redirect_uri: apiUrl.buildUrl('login;'),
         post_logout_redirect_uri: apiUrl.buildUrl('logout'),

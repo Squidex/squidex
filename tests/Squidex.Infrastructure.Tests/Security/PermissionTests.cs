@@ -24,57 +24,102 @@ namespace Squidex.Infrastructure.Security
         }
 
         [Fact]
-        public void Should_return_true_if_given_and_requested_permission_have_wildcards()
-        {
-            var g = new Permission("app.*");
-            var r = new Permission("app.*");
-
-            Assert.True(g.GivesPermissionTo(r));
-        }
-
-        [Fact]
-        public void Should_return_true_if_given_permission_equals_requested_permission()
-        {
-            var g = new Permission("app.contents");
-            var r = new Permission("app.contents");
-
-            Assert.True(g.GivesPermissionTo(r));
-        }
-
-        [Fact]
-        public void Should_return_true_if_given_permission_is_parent_of_requested_permission()
-        {
-            var g = new Permission("app");
-            var r = new Permission("app.contents");
-
-            Assert.True(g.GivesPermissionTo(r));
-        }
-
-        [Fact]
-        public void Should_return_true_if_given_permission_has_wildcard_for_requested_permission()
-        {
-            var g = new Permission("app.*");
-            var r = new Permission("app.contents");
-
-            Assert.True(g.GivesPermissionTo(r));
-        }
-
-        [Fact]
-        public void Should_return_false_if_given_permission_not_equals_requested_permission()
+        public void Should_check_for_non_equal_wildcard_permissions()
         {
             var g = new Permission("app.contents");
             var r = new Permission("app.assets");
 
-            Assert.False(g.GivesPermissionTo(r));
+            Assert.False(g.Allows(r));
+
+            Assert.False(g.Includes(r));
         }
 
         [Fact]
-        public void Should_return_false_if_given_permission_is_child_of_requested_permission()
+        public void Should_check_for_equal_wildcard_permissions()
+        {
+            var g = new Permission("app.*");
+            var r = new Permission("app.*");
+
+            Assert.True(g.Allows(r));
+
+            Assert.True(g.Includes(r));
+        }
+
+        [Fact]
+        public void Should_check_for_equal_permissions()
+        {
+            var g = new Permission("app.contents");
+            var r = new Permission("app.contents");
+
+            Assert.True(g.Allows(r));
+
+            Assert.True(g.Includes(r));
+        }
+
+        [Fact]
+        public void Should_check_for_given_parent_of_requested()
+        {
+            var g = new Permission("app");
+            var r = new Permission("app.contents");
+
+            Assert.True(g.Allows(r));
+
+            Assert.False(g.Includes(r));
+        }
+
+        [Fact]
+        public void Should_check_for_requested_parent_of_given()
         {
             var g = new Permission("app.contents");
             var r = new Permission("app");
 
-            Assert.False(g.GivesPermissionTo(r));
+            Assert.False(g.Allows(r));
+
+            Assert.True(g.Includes(r));
+        }
+
+        [Fact]
+        public void Should_check_for_given_wildcard_of_requested()
+        {
+            var g = new Permission("app.*");
+            var r = new Permission("app.contents");
+
+            Assert.True(g.Allows(r));
+
+            Assert.True(g.Includes(r));
+        }
+
+        [Fact]
+        public void Should_check_for_requested_wildcard_of_given()
+        {
+            var g = new Permission("app.contents");
+            var r = new Permission("app.*");
+
+            Assert.False(g.Allows(r));
+
+            Assert.True(g.Includes(r));
+        }
+
+        [Fact]
+        public void Should_check_for_given_has_alternatives_of_requested()
+        {
+            var g = new Permission("app.contents|schemas");
+            var r = new Permission("app.contents");
+
+            Assert.True(g.Allows(r));
+
+            Assert.True(g.Includes(r));
+        }
+
+        [Fact]
+        public void Should_check_for_requested_has_alternatives_of_given()
+        {
+            var g = new Permission("app.contents");
+            var r = new Permission("app.contents|schemas");
+
+            Assert.True(g.Allows(r));
+
+            Assert.True(g.Includes(r));
         }
 
         [Fact]
@@ -83,15 +128,19 @@ namespace Squidex.Infrastructure.Security
             var g = new Permission("app.contents");
             var r = new Permission("app.*");
 
-            Assert.False(g.GivesPermissionTo(r));
+            Assert.False(g.Allows(r));
+
+            Assert.True(g.Includes(r));
         }
 
         [Fact]
-        public void Should_return_false_if_given_requested_permission_is_null()
+        public void Should_check_for_requested_is_null()
         {
             var g = new Permission("app.contents");
 
-            Assert.False(g.GivesPermissionTo(null));
+            Assert.False(g.Allows(null));
+
+            Assert.False(g.Includes(null));
         }
 
         [Fact]

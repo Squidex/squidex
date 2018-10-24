@@ -46,7 +46,7 @@ namespace Squidex.Pipeline
 
             if (string.Equals(identity.FindFirst(identity.RoleClaimType)?.Value, SquidexRoles.Administrator))
             {
-                identity.AddClaim(new Claim(SquidexClaimTypes.Permission, Permissions.Admin));
+                identity.AddClaim(new Claim(SquidexClaimTypes.SquidexPermissions, Permissions.Admin));
             }
 
             var appName = context.RouteData.Values["app"]?.ToString();
@@ -73,7 +73,7 @@ namespace Squidex.Pipeline
 
                 foreach (var permission in permissions)
                 {
-                    identity.AddClaim(new Claim(SquidexClaimTypes.Permission, permission.Id));
+                    identity.AddClaim(new Claim(SquidexClaimTypes.SquidexPermissions, permission.Id));
                 }
 
                 context.HttpContext.Features.Set<IAppFeature>(new AppFeature(app));

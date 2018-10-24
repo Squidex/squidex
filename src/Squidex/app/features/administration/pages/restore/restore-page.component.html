@@ -49,7 +49,7 @@
             </div>
         </ng-container>
         
-        <div class="table-items-row">
+        <div class="table-items-row" *sqxPermission="'squidex.admin.restore.create'">
             <form [formGroup]="restoreForm.form" (submit)="restore()">
                 <div class="row no-gutters">
                     <div class="col">

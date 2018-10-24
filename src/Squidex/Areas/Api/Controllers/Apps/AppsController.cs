@@ -91,7 +91,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
             var context = await CommandBus.PublishAsync(request.ToCommand());
 
             var result = context.Result<EntityCreatedResult<Guid>>();
-            var response = AppCreatedDto.FromResult(result, appPlansProvider);
+            var response = AppCreatedDto.FromResult(request.Name, result, appPlansProvider);
 
             return CreatedAtAction(nameof(GetApps), response);
         }

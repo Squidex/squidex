@@ -14,7 +14,7 @@ namespace Squidex.Domain.Apps.Core
     {
         public const string All = "squidex.*";
 
-        public const string Admin = "squidex.admin*";
+        public const string Admin = "squidex.admin.*";
 
         public const string AdminRestore = "squidex.admin.restore";
         public const string AdminRestoreRead = "squidex.admin.restore.read";
