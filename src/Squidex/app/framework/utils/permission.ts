@@ -28,6 +28,47 @@ export class Permission {
         });
     }
 
+    public includedIn(permissions: Permission[]) {
+        for (let permission of permissions) {
+            if (permission.includes(this)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public allowedBy(permissions: Permission[]) {
+        for (let permission of permissions) {
+            if (permission.allows(this)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public includes(permission?: Permission | string) {
+        if (!permission) {
+            return false;
+        }
+
+        if (Types.isString(permission)) {
+            permission = new Permission(permission);
+        }
+
+        for (let i = 0; i < Math.min(permission.parts.length, this.parts.length); i++) {
+            const lhs = this.parts[i];
+            const rhs = permission.parts[i];
+
+            if (lhs != null && rhs != null && !Permission.intersects(lhs, rhs)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public allows(permission?: Permission | string) {
         if (!permission) {
             return false;
@@ -42,10 +83,10 @@ export class Permission {
         }
 
         for (let i = 0; i < this.parts.length; i++) {
-            let lhs = this.parts[i];
-            let rhs = permission.parts[i];
+            const lhs = this.parts[i];
+            const rhs = permission.parts[i];
 
-            if (lhs !== null && (rhs === null || !Permission.any(lhs, rhs))) {
+            if (lhs !== null && (rhs === null || !Permission.intersects(lhs, rhs))) {
                 return false;
             }
         }
@@ -53,7 +94,7 @@ export class Permission {
         return true;
     }
 
-    private static any(lhs: { [key: string]: true }, rhs: { [key: string]: true }) {
+    private static intersects(lhs: { [key: string]: true }, rhs: { [key: string]: true }) {
         for (let key in lhs) {
             if (rhs[key]) {
                 return true;
@@ -68,18 +109,4 @@ export class Permission {
 
         return false;
     }
-}
-
-export function permissionsAllow(permissions: Permission[], other: Permission) {
-    if (!other) {
-        return false;
-    }
-
-    for (let permission of permissions) {
-        if (permission.allows(other)) {
-            return true;
-        }
-    }
-
-    return false;
 }

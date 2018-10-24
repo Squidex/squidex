@@ -24,7 +24,7 @@ namespace Squidex.Infrastructure.Security
         }
 
         [Fact]
-        public void Should_check_for_non_equal_wildcard_permissions()
+        public void Should_check_when_permissions_are_not_equal()
         {
             var g = new Permission("app.contents");
             var r = new Permission("app.assets");
@@ -35,7 +35,7 @@ namespace Squidex.Infrastructure.Security
         }
 
         [Fact]
-        public void Should_check_for_equal_wildcard_permissions()
+        public void Should_check_when_permissions_are_equal_with_wildcards()
         {
             var g = new Permission("app.*");
             var r = new Permission("app.*");
@@ -46,7 +46,7 @@ namespace Squidex.Infrastructure.Security
         }
 
         [Fact]
-        public void Should_check_for_equal_permissions()
+        public void Should_check_when_equal_permissions()
         {
             var g = new Permission("app.contents");
             var r = new Permission("app.contents");
@@ -57,18 +57,18 @@ namespace Squidex.Infrastructure.Security
         }
 
         [Fact]
-        public void Should_check_for_given_parent_of_requested()
+        public void Should_check_when_given_is_parent_of_requested()
         {
             var g = new Permission("app");
             var r = new Permission("app.contents");
 
             Assert.True(g.Allows(r));
 
-            Assert.False(g.Includes(r));
+            Assert.True(g.Includes(r));
         }
 
         [Fact]
-        public void Should_check_for_requested_parent_of_given()
+        public void Should_check_when_requested_is_parent_of_given()
         {
             var g = new Permission("app.contents");
             var r = new Permission("app");
@@ -79,7 +79,7 @@ namespace Squidex.Infrastructure.Security
         }
 
         [Fact]
-        public void Should_check_for_given_wildcard_of_requested()
+        public void Should_check_when_given_is_wildcard_of_requested()
         {
             var g = new Permission("app.*");
             var r = new Permission("app.contents");
@@ -90,7 +90,7 @@ namespace Squidex.Infrastructure.Security
         }
 
         [Fact]
-        public void Should_check_for_requested_wildcard_of_given()
+        public void Should_check_when_requested_is_wildcard_of_given()
         {
             var g = new Permission("app.contents");
             var r = new Permission("app.*");
@@ -101,7 +101,7 @@ namespace Squidex.Infrastructure.Security
         }
 
         [Fact]
-        public void Should_check_for_given_has_alternatives_of_requested()
+        public void Should_check_when_given_is_has_alternatives_of_requested()
         {
             var g = new Permission("app.contents|schemas");
             var r = new Permission("app.contents");
@@ -112,7 +112,7 @@ namespace Squidex.Infrastructure.Security
         }
 
         [Fact]
-        public void Should_check_for_requested_has_alternatives_of_given()
+        public void Should_check_when_requested_is_has_alternatives_of_given()
         {
             var g = new Permission("app.contents");
             var r = new Permission("app.contents|schemas");
@@ -123,18 +123,7 @@ namespace Squidex.Infrastructure.Security
         }
 
         [Fact]
-        public void Should_return_false_if_given_permission_has_no_wildcard_but_requested_has()
-        {
-            var g = new Permission("app.contents");
-            var r = new Permission("app.*");
-
-            Assert.False(g.Allows(r));
-
-            Assert.True(g.Includes(r));
-        }
-
-        [Fact]
-        public void Should_check_for_requested_is_null()
+        public void Should_check_when_requested_is_null()
         {
             var g = new Permission("app.contents");
 

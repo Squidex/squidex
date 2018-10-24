@@ -12,7 +12,6 @@ import {
     AppsState,
     AuthService,
     Permission,
-    permissionsAllow,
     SchemaDto,
     SchemasState
 } from '@app/shared/internal';
@@ -42,10 +41,19 @@ export class PermissionDirective implements OnChanges {
     }
 
     public ngOnChanges() {
+        let permissions = this.permissions;
         let show = false;
 
-        if (this.permissions) {
-            for (let id of this.permissions.split(';')) {
+        if (permissions) {
+            let include = permissions[0] === '?';
+
+            if (include) {
+                permissions = permissions.substr(1);
+            }
+
+            const array = permissions.split(';');
+
+            for (let id of array) {
                 const app = this.app || this.appsState.snapshot.selectedApp;
 
                 if (app) {
@@ -60,12 +68,22 @@ export class PermissionDirective implements OnChanges {
 
                 const permission = new Permission(id);
 
-                if (app && permissionsAllow(app.permissions, permission)) {
-                    show = true;
-                }
+                if (include) {
+                    if (app && permission.includedIn(app.permissions)) {
+                        show = true;
+                    }
 
-                if (!show) {
-                    show = permissionsAllow(this.authService.user!.permissions, permission);
+                    if (!show) {
+                        show = permission.includedIn(this.authService.user!.permissions);
+                    }
+                } else {
+                    if (app && permission.allowedBy(app.permissions)) {
+                        show = true;
+                    }
+
+                    if (!show) {
+                        show = permission.allowedBy(this.authService.user!.permissions);
+                    }
                 }
 
                 if (show) {
@@ -81,6 +99,5 @@ export class PermissionDirective implements OnChanges {
             this.viewContainer.clear();
             this.viewCreated = false;
         }
-
     }
 }

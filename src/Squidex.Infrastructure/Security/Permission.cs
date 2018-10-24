@@ -87,12 +87,7 @@ namespace Squidex.Infrastructure.Security
                 return false;
             }
 
-            if (idParts.Length < permission.idParts.Length)
-            {
-                return false;
-            }
-
-            for (var i = 0; i < permission.idParts.Length; i++)
+            for (var i = 0; i < Math.Min(idParts.Length, permission.idParts.Length); i++)
             {
                 var lhs = idParts[i];
                 var rhs = permission.idParts[i];
