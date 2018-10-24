@@ -11,12 +11,12 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Areas.Api.Controllers.Users.Models;
-using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Users;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Security;
 using Squidex.Pipeline;
+using Squidex.Shared;
 using Squidex.Shared.Users;
 
 namespace Squidex.Areas.Api.Controllers.Users
@@ -75,7 +75,7 @@ namespace Squidex.Areas.Api.Controllers.Users
         [ApiPermission(Permissions.AdminUsersCreate)]
         public async Task<IActionResult> PostUser([FromBody] CreateUserDto request)
         {
-            var user = await userManager.CreateAsync(userFactory, request.Email, request.DisplayName, request.Password);
+            var user = await userManager.CreateAsync(userFactory, request.Email, request.DisplayName, request.Password, request.Permissions);
 
             var response = new UserCreatedDto { Id = user.Id };
 
@@ -87,7 +87,7 @@ namespace Squidex.Areas.Api.Controllers.Users
         [ApiPermission(Permissions.AdminUsersUpdate)]
         public async Task<IActionResult> PutUser(string id, [FromBody] UpdateUserDto request)
         {
-            await userManager.UpdateAsync(id, request.Email, request.DisplayName, request.Password);
+            await userManager.UpdateAsync(id, request.Email, request.DisplayName, request.Password, request.Permissions);
 
             return NoContent();
         }

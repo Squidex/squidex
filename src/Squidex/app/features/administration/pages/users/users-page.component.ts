@@ -9,16 +9,8 @@ import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { onErrorResumeNext } from 'rxjs/operators';
 
-import {
-    AuthService,
-    Permission,
-    permissionsAllow
-} from '@app/shared';
-
 import { UserDto } from './../../services/users.service';
 import { UsersState } from './../../state/users.state';
-
-const UserLockPermission =  new Permission('squidex.admin.users.lock');
 
 @Component({
     selector: 'sqx-users-page',
@@ -28,12 +20,9 @@ const UserLockPermission =  new Permission('squidex.admin.users.lock');
 export class UsersPageComponent implements OnInit {
     public usersFilter = new FormControl();
 
-    public canLock: boolean;
-
-    constructor(authService: AuthService,
+    constructor(
         public readonly usersState: UsersState
     ) {
-        this.canLock = permissionsAllow(authService.user!.permissions, UserLockPermission);
     }
 
     public ngOnInit() {

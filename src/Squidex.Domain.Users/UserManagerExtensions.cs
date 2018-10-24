@@ -45,7 +45,7 @@ namespace Squidex.Domain.Users
             return result;
         }
 
-        public static async Task<IUser> CreateAsync(this UserManager<IUser> userManager, IUserFactory factory, string email, string displayName, string password)
+        public static async Task<IUser> CreateAsync(this UserManager<IUser> userManager, IUserFactory factory, string email, string displayName, string password, string[] permissions = null)
         {
             var user = factory.Create(email);
 
@@ -53,6 +53,11 @@ namespace Squidex.Domain.Users
             {
                 user.SetDisplayName(displayName);
                 user.SetPictureUrlFromGravatar(email);
+
+                if (permissions != null)
+                {
+                    user.SetPermissions(permissions);
+                }
 
                 await DoChecked(() => userManager.CreateAsync(user), "Cannot create user.");
 
@@ -80,7 +85,7 @@ namespace Squidex.Domain.Users
             return userManager.UpdateAsync(user);
         }
 
-        public static async Task UpdateAsync(this UserManager<IUser> userManager, string id, string email, string displayName, string password)
+        public static async Task UpdateAsync(this UserManager<IUser> userManager, string id, string email, string displayName, string password, string[] permissions = null)
         {
             var user = await userManager.FindByIdAsync(id);
 
@@ -98,6 +103,11 @@ namespace Squidex.Domain.Users
             if (!string.IsNullOrWhiteSpace(displayName))
             {
                 user.SetDisplayName(displayName);
+            }
+
+            if (permissions != null)
+            {
+                user.SetPermissions(permissions);
             }
 
             await DoChecked(() => userManager.UpdateAsync(user), "Cannot update user.");

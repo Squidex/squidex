@@ -16,5 +16,11 @@ namespace Squidex.Areas.Api.Controllers.Users.Models
         /// </summary>
         [Required]
         public string Id { get; set; }
+
+        /// <summary>
+        /// Additional permissions for the user.
+        /// </summary>
+        [Required]
+        public string[] Permissions { get; set; }
     }
 }

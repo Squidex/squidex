@@ -24,6 +24,8 @@ namespace Squidex.Shared.Users
 
         IReadOnlyList<ExternalLogin> Logins { get; }
 
+        void RemoveClaims(string type);
+
         void SetEmail(string email);
 
         void SetClaim(string type, string value);

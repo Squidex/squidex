@@ -37,9 +37,15 @@ namespace Squidex.Areas.Api.Controllers.Users.Models
         [Required]
         public bool IsLocked { get; set; }
 
+        /// <summary>
+        /// Additional permissions for the user.
+        /// </summary>
+        [Required]
+        public string[] Permissions { get; set; }
+
         public static UserDto FromUser(IUser user)
         {
-            return SimpleMapper.Map(user, new UserDto { DisplayName = user.DisplayName() });
+            return SimpleMapper.Map(user, new UserDto { DisplayName = user.DisplayName(), Permissions = user.Permissions() });
         }
     }
 }

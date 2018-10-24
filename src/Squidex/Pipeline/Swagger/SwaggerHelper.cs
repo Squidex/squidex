@@ -16,7 +16,6 @@ using NJsonSchema;
 using NJsonSchema.Generation;
 using NSwag;
 using Squidex.Config;
-using Squidex.Shared.Identity;
 
 namespace Squidex.Pipeline.Swagger
 {

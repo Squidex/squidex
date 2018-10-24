@@ -104,6 +104,21 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             return persistence.WriteSnapshotAsync(state);
         }
 
+        public Task<List<Guid>> GetAppIdsAsync(params string[] names)
+        {
+            var appIds = new List<Guid>();
+
+            foreach (var appName in names)
+            {
+                if (state.Apps.TryGetValue(appName, out var appId))
+                {
+                    appIds.Add(appId);
+                }
+            }
+
+            return Task.FromResult(appIds);
+        }
+
         public Task<Guid> GetAppIdAsync(string appName)
         {
             state.Apps.TryGetValue(appName, out var appId);

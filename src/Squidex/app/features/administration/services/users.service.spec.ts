@@ -56,12 +56,14 @@ describe('UsersService', () => {
                     id: '123',
                     email: 'mail1@domain.com',
                     displayName: 'User1',
+                    permissions: ['Permission1'],
                     isLocked: true
                 },
                 {
                     id: '456',
                     email: 'mail2@domain.com',
                     displayName: 'User2',
+                    permissions: ['Permission2'],
                     isLocked: true
                 }
             ]
@@ -69,8 +71,8 @@ describe('UsersService', () => {
 
         expect(users!).toEqual(
             new UsersDto(100, [
-                new UserDto('123', 'mail1@domain.com', 'User1', true),
-                new UserDto('456', 'mail2@domain.com', 'User2', true)
+                new UserDto('123', 'mail1@domain.com', 'User1', ['Permission1'], true),
+                new UserDto('456', 'mail2@domain.com', 'User2', ['Permission2'], true)
             ]));
     }));
 
@@ -95,12 +97,14 @@ describe('UsersService', () => {
                     id: '123',
                     email: 'mail1@domain.com',
                     displayName: 'User1',
+                    permissions: ['Permission1'],
                     isLocked: true
                 },
                 {
                     id: '456',
                     email: 'mail2@domain.com',
                     displayName: 'User2',
+                    permissions: ['Permission2'],
                     isLocked: true
                 }
             ]
@@ -108,8 +112,8 @@ describe('UsersService', () => {
 
         expect(users!).toEqual(
             new UsersDto(100, [
-                new UserDto('123', 'mail1@domain.com', 'User1', true),
-                new UserDto('456', 'mail2@domain.com', 'User2', true)
+                new UserDto('123', 'mail1@domain.com', 'User1', ['Permission1'], true),
+                new UserDto('456', 'mail2@domain.com', 'User2', ['Permission2'], true)
             ]));
     }));
 
@@ -131,17 +135,17 @@ describe('UsersService', () => {
             id: '123',
             email: 'mail1@domain.com',
             displayName: 'User1',
-            pictureUrl: 'path/to/image1',
+            permissions: ['Permission1'],
             isLocked: true
         });
 
-        expect(user!).toEqual(new UserDto('123', 'mail1@domain.com', 'User1', true));
+        expect(user!).toEqual(new UserDto('123', 'mail1@domain.com', 'User1', ['Permission1'], true));
     }));
 
     it('should make post request to create user',
         inject([UsersService, HttpTestingController], (userManagementService: UsersService, httpMock: HttpTestingController) => {
 
-        const dto = new CreateUserDto('mail@squidex.io', 'Squidex User', 'password');
+        const dto = new CreateUserDto('mail@squidex.io', 'Squidex User', ['Permission1'], 'password');
 
         let user: UserDto;
 
@@ -156,13 +160,13 @@ describe('UsersService', () => {
 
         req.flush({ id: '123', pictureUrl: 'path/to/image1' });
 
-        expect(user!).toEqual(new UserDto('123', dto.email, dto.displayName, false));
+        expect(user!).toEqual(new UserDto('123', dto.email, dto.displayName, dto.permissions, false));
     }));
 
     it('should make put request to update user',
         inject([UsersService, HttpTestingController], (userManagementService: UsersService, httpMock: HttpTestingController) => {
 
-        const dto = new UpdateUserDto('mail@squidex.io', 'Squidex User', 'password');
+        const dto = new UpdateUserDto('mail@squidex.io', 'Squidex User', ['Permission1'], 'password');
 
         userManagementService.putUser('123', dto).subscribe();
 

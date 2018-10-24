@@ -6,9 +6,9 @@
 // ==========================================================================
 
 using Microsoft.AspNetCore.Mvc;
-using Squidex.Domain.Apps.Core;
 using Squidex.Infrastructure.Commands;
 using Squidex.Pipeline;
+using Squidex.Shared;
 
 namespace Squidex.Areas.Api.Controllers.Ping
 {

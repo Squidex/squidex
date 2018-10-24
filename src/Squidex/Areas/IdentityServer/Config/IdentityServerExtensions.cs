@@ -15,6 +15,7 @@ using Microsoft.Extensions.Options;
 using Squidex.Config;
 using Squidex.Domain.Users;
 using Squidex.Infrastructure.Log;
+using Squidex.Shared;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
 
@@ -66,9 +67,7 @@ namespace Squidex.Areas.IdentityServer.Config
                     {
                         try
                         {
-                            var user = await userManager.CreateAsync(userFactory, adminEmail, adminEmail, adminPass);
-
-                            await userManager.AddToRoleAsync(user, SquidexRoles.Administrator);
+                            await userManager.CreateAsync(userFactory, adminEmail, adminEmail, adminPass, new[] { Permissions.Admin });
                         }
                         catch (Exception ex)
                         {

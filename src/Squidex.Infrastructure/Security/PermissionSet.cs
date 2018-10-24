@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,10 +17,16 @@ namespace Squidex.Infrastructure.Security
         public static readonly PermissionSet Empty = new PermissionSet();
 
         private readonly List<Permission> permissions;
+        private readonly Lazy<string> display;
 
         public int Count
         {
             get { return permissions.Count; }
+        }
+
+        public PermissionSet(params Permission[] permissions)
+            : this((IEnumerable<Permission>)permissions)
+        {
         }
 
         public PermissionSet(IEnumerable<Permission> permissions)
@@ -27,31 +34,38 @@ namespace Squidex.Infrastructure.Security
             Guard.NotNull(permissions, nameof(permissions));
 
             this.permissions = permissions.ToList();
+
+            display = new Lazy<string>(() => string.Join(";", this.permissions));
         }
 
-        public PermissionSet(params Permission[] permissions)
-        {
-            Guard.NotNull(permissions, nameof(permissions));
-
-            this.permissions = permissions.ToList();
-        }
-
-        public bool GivesPermissionTo(Permission other)
+        public bool Allows(Permission other)
         {
             if (other == null)
             {
                 return false;
             }
 
-            foreach (var permission in permissions)
+            return permissions.Any(x => x.Allows(other));
+        }
+
+        public bool Includes(Permission other)
+        {
+            if (other == null)
             {
-                if (permission.Allows(other))
-                {
-                    return true;
-                }
+                return false;
             }
 
-            return false;
+            return permissions.Any(x => x.Includes(other));
+        }
+
+        public override string ToString()
+        {
+            return display.Value;
+        }
+
+        public IEnumerable<string> ToIds()
+        {
+            return permissions.Select(x => x.Id);
         }
 
         public IEnumerator<Permission> GetEnumerator()

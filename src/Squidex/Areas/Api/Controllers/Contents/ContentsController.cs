@@ -13,7 +13,6 @@ using Microsoft.Extensions.Options;
 using NodaTime;
 using NodaTime.Text;
 using Squidex.Areas.Api.Controllers.Contents.Models;
-using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Contents;
@@ -21,6 +20,7 @@ using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL;
 using Squidex.Infrastructure.Commands;
 using Squidex.Pipeline;
+using Squidex.Shared;
 
 namespace Squidex.Areas.Api.Controllers.Contents
 {

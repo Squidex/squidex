@@ -14,7 +14,6 @@ using Microsoft.Extensions.Options;
 using NSwag.Annotations;
 using Squidex.Areas.Api.Controllers.Assets.Models;
 using Squidex.Areas.Api.Controllers.Contents;
-using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps.Services;
@@ -25,6 +24,7 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;
 using Squidex.Pipeline;
+using Squidex.Shared;
 
 namespace Squidex.Areas.Api.Controllers.Assets
 {

@@ -10,16 +10,17 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Infrastructure.Security;
+using Squidex.Shared;
 using Squidex.Shared.Identity;
+using Squidex.Shared.Users;
 
 namespace Squidex.Pipeline
 {
-    public sealed class AppResolverFilter : IAsyncActionFilter
+    public sealed class AppResolver : IAsyncActionFilter
     {
         private readonly IAppProvider appProvider;
 
@@ -33,7 +34,7 @@ namespace Squidex.Pipeline
             }
         }
 
-        public AppResolverFilter(IAppProvider appProvider)
+        public AppResolver(IAppProvider appProvider)
         {
             this.appProvider = appProvider;
         }
@@ -41,13 +42,6 @@ namespace Squidex.Pipeline
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
             var user = context.HttpContext.User;
-
-            var identity = user.Identities.First();
-
-            if (string.Equals(identity.FindFirst(identity.RoleClaimType)?.Value, SquidexRoles.Administrator))
-            {
-                identity.AddClaim(new Claim(SquidexClaimTypes.SquidexPermissions, Permissions.Admin));
-            }
 
             var appName = context.RouteData.Values["app"]?.ToString();
 
@@ -67,13 +61,20 @@ namespace Squidex.Pipeline
 
                 if (permissions.Count == 0)
                 {
-                    context.Result = new NotFoundResult();
-                    return;
+                    var set = new PermissionSet(user.Permissions().Select(x => new Permission(x)));
+
+                    if (!set.Includes(Permissions.ForApp(Permissions.App, appName)))
+                    {
+                        context.Result = new NotFoundResult();
+                        return;
+                    }
                 }
+
+                var identity = user.Identities.First();
 
                 foreach (var permission in permissions)
                 {
-                    identity.AddClaim(new Claim(SquidexClaimTypes.SquidexPermissions, permission.Id));
+                    identity.AddClaim(new Claim(SquidexClaimTypes.Permissions, permission.Id));
                 }
 
                 context.HttpContext.Features.Set<IAppFeature>(new AppFeature(app));
@@ -96,7 +97,7 @@ namespace Squidex.Pipeline
 
         private static PermissionSet FindByOpenIdSubject(IAppEntity app, ClaimsPrincipal user)
         {
-            var subjectId = user.FindFirst(OpenIdClaims.Subject)?.Value;
+            var subjectId = user.OpenIdSubject();
 
             if (subjectId != null && app.Contributors.TryGetValue(subjectId, out var permission))
             {

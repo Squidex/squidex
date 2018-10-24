@@ -16,12 +16,12 @@ namespace Squidex.Shared.Identity
     {
         public static void SetDisplayName(this ClaimsIdentity identity, string displayName)
         {
-            identity.AddClaim(new Claim(SquidexClaimTypes.SquidexDisplayName, displayName));
+            identity.AddClaim(new Claim(SquidexClaimTypes.DisplayName, displayName));
         }
 
         public static void SetPictureUrl(this ClaimsIdentity identity, string pictureUrl)
         {
-            identity.AddClaim(new Claim(SquidexClaimTypes.SquidexPictureUrl, pictureUrl));
+            identity.AddClaim(new Claim(SquidexClaimTypes.PictureUrl, pictureUrl));
         }
 
         public static IEnumerable<Claim> GetSquidexClaims(this ClaimsPrincipal principal)

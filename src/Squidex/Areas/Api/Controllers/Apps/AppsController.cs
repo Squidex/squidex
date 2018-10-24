@@ -10,13 +10,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Areas.Api.Controllers.Apps.Models;
-using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Services;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Security;
 using Squidex.Pipeline;
+using Squidex.Shared;
+using Squidex.Shared.Users;
 
 namespace Squidex.Areas.Api.Controllers.Apps
 {
@@ -55,11 +56,12 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [ApiCosts(0)]
         public async Task<IActionResult> GetApps()
         {
-            var subject = HttpContext.User.OpenIdSubject();
+            var userId = HttpContext.User.OpenIdSubject();
+            var userPermissions = HttpContext.User.Permissions();
 
-            var entities = await appProvider.GetUserApps(subject);
+            var entities = await appProvider.GetUserApps(userId, userPermissions);
 
-            var response = entities.Select(a => AppDto.FromApp(a, subject, appPlansProvider)).ToList();
+            var response = entities.Select(a => AppDto.FromApp(a, userId, userPermissions, appPlansProvider)).ToList();
 
             Response.Headers["ETag"] = response.ToManyEtag();
 

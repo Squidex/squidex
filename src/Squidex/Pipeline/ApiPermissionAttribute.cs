@@ -32,6 +32,11 @@ namespace Squidex.Pipeline
         {
             if (permissionIds.Length > 0)
             {
+                var set = new PermissionSet(
+                    context.HttpContext.User.FindAll(SquidexClaimTypes.Permissions)
+                        .Select(x => x.Value)
+                        .Select(x => new Permission(x)));
+
                 var hasPermission = false;
 
                 foreach (var permissionId in permissionIds)
@@ -43,15 +48,7 @@ namespace Squidex.Pipeline
                         id = id.Replace($"{{{routeParam.Key}}}", routeParam.Value?.ToString());
                     }
 
-                    var set = new PermissionSet(
-                        context.HttpContext.User.FindAll(SquidexClaimTypes.SquidexPermissions)
-                            .Select(x => x.Value)
-                            .Select(x => new Permission(x)));
-
-                    if (set.GivesPermissionTo(new Permission(id)))
-                    {
-                        hasPermission = true;
-                    }
+                    hasPermission |= set.Allows(new Permission(id));
                 }
 
                 if (!hasPermission)

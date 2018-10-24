@@ -16,7 +16,7 @@
 
         <ng-container menu>
             <ng-container *ngIf="usersState.selectedUser | async; else noUserMenu">
-                <ng-container *ngIf="canUpdate">
+                <ng-container>
                     <button type="submit" class="btn btn-primary" title="CTRL + S">
                         Save
                     </button>
@@ -49,7 +49,7 @@
 
                 <sqx-control-errors for="displayName" [submitted]="userForm.submitted | async"></sqx-control-errors>
 
-                <input type="text" class="form-control" id="displayName" maxlength="100" formControlName="displayName" autocomplete="false"  />
+                <input type="text" class="form-control" id="displayName" maxlength="100" formControlName="displayName" autocomplete="false" spellcheck="false" />
             </div>
 
             <div class="form-group form-group-password" [class.hidden]="user?.isCurrentUser">
@@ -68,6 +68,14 @@
 
                     <input type="password" class="form-control" id="passwordConfirm" maxlength="100" formControlName="passwordConfirm" autocomplete="false" />
                 </div>
+            </div>
+
+            <div class="form-group">
+                <label for="permissions">Permissions</label>
+
+                <sqx-control-errors for="permissions" [submitted]="userForm.submitted | async"></sqx-control-errors>
+
+                <textarea class="form-control" id="permissions" formControlName="permissions" placeholder="Separate by line" autocomplete="false" spellcheck="false"></textarea>
             </div>
         </ng-container>
     </sqx-panel>

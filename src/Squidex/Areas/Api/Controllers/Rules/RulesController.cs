@@ -13,7 +13,6 @@ using IdentityServer4.Models;
 using Microsoft.AspNetCore.Mvc;
 using NodaTime;
 using Squidex.Areas.Api.Controllers.Rules.Models;
-using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.Rules.Repositories;
@@ -21,6 +20,7 @@ using Squidex.Extensions.Actions;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
+using Squidex.Shared;
 
 namespace Squidex.Areas.Api.Controllers.Rules
 {
@@ -53,7 +53,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [HttpGet]
         [Route("rules/actions/")]
         [ProducesResponseType(typeof(Dictionary<string, RuleElementDto>), 200)]
-        [ApiPermission(Permissions.AppRulesRead)]
+        [ApiPermission]
         [ApiCosts(0)]
         public IActionResult GetActions()
         {
@@ -73,7 +73,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [HttpGet]
         [Route("rules/triggers/")]
         [ProducesResponseType(typeof(Dictionary<string, RuleElementDto>), 200)]
-        [ApiPermission(Permissions.AppRulesRead)]
+        [ApiPermission]
         [ApiCosts(0)]
         public IActionResult GetTriggers()
         {

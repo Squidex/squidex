@@ -208,7 +208,7 @@ namespace Squidex.Pipeline.CommandMiddlewares
             A.CallTo(() => appEntity.Id).Returns(appId);
             A.CallTo(() => appEntity.Name).Returns(appName);
 
-            httpContext.Features.Set<IAppFeature>(new AppResolverFilter.AppFeature(appEntity));
+            httpContext.Features.Set<IAppFeature>(new AppResolver.AppFeature(appEntity));
         }
     }
 }

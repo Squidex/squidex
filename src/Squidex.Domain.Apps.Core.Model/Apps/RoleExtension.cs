@@ -7,11 +7,23 @@
 
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
+using Squidex.Shared;
+using System.Linq;
 
 namespace Squidex.Domain.Apps.Core.Apps
 {
     public static class RoleExtension
     {
+        public static string[] ToPermissionIds(this AppClientPermission clientPermission, string app)
+        {
+            return clientPermission.ToPermissions(app).ToIds().ToArray();
+        }
+
+        public static string[] ToPermissionIds(this AppContributorPermission contributorPermission, string app)
+        {
+            return contributorPermission.ToPermissions(app).ToIds().ToArray();
+        }
+
         public static PermissionSet ToPermissions(this AppClientPermission clientPermission, string app)
         {
             Guard.Enum(clientPermission, nameof(clientPermission));

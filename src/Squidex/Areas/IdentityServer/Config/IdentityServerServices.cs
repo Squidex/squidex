@@ -83,7 +83,8 @@ namespace Squidex.Areas.IdentityServer.Config
                 UserClaims = new List<string>
                 {
                     JwtClaimTypes.Email,
-                    JwtClaimTypes.Role
+                    JwtClaimTypes.Role,
+                    SquidexClaimTypes.Permissions
                 }
             };
         }
@@ -101,13 +102,13 @@ namespace Squidex.Areas.IdentityServer.Config
             yield return new IdentityResource(Constants.PermissionsScope,
                 new[]
                 {
-                    SquidexClaimTypes.SquidexPermissions
+                    SquidexClaimTypes.Permissions
                 });
             yield return new IdentityResource(Constants.ProfileScope,
                 new[]
                 {
-                    SquidexClaimTypes.SquidexDisplayName,
-                    SquidexClaimTypes.SquidexPictureUrl
+                    SquidexClaimTypes.DisplayName,
+                    SquidexClaimTypes.PictureUrl
                 });
         }
     }

@@ -136,6 +136,11 @@ namespace Squidex.Domain.Users.MongoDb
             Logins.RemoveAll(l => l.LoginProvider == loginProvider && l.ProviderKey == providerKey);
         }
 
+        public void RemoveClaims(string type)
+        {
+            Claims.RemoveAll(x => string.Equals(x.Type, type, StringComparison.OrdinalIgnoreCase));
+        }
+
         public void AddClaim(Claim claim)
         {
             Claims.Add(claim);
@@ -173,7 +178,7 @@ namespace Squidex.Domain.Users.MongoDb
 
         public void SetClaim(string type, string value)
         {
-            Claims.RemoveAll(x => string.Equals(x.Type, type, StringComparison.OrdinalIgnoreCase));
+            RemoveClaims(type);
 
             AddClaim(new Claim(type, value));
         }

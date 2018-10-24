@@ -47,7 +47,9 @@ namespace Squidex.Infrastructure.Security
                         return null;
                     }
 
-                    return new HashSet<string>(x.Split(AlternativeSeparators, StringSplitOptions.RemoveEmptyEntries), StringComparer.OrdinalIgnoreCase);
+                    var alternatives = x.Split(AlternativeSeparators, StringSplitOptions.RemoveEmptyEntries);
+
+                    return new HashSet<string>(alternatives, StringComparer.OrdinalIgnoreCase);
                 })
                 .ToArray();
         }

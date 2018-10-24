@@ -7,7 +7,6 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using Newtonsoft.Json;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Apps;
@@ -15,6 +14,7 @@ using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Services;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
+using Squidex.Shared;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models
 {
@@ -62,11 +62,18 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// </summary>
         public string PlanUpgrade { get; set; }
 
-        public static AppDto FromApp(IAppEntity app, string subject, IAppPlansProvider plans)
+        public static AppDto FromApp(IAppEntity app, string userId, string[] permissions, IAppPlansProvider plans)
         {
             var response = SimpleMapper.Map(app, new AppDto());
 
-            response.Permissions = app.Contributors[subject].ToPermissions(app.Name).Select(x => x.Id).ToArray();
+            if (app.Contributors.TryGetValue(userId, out var role))
+            {
+                response.Permissions = role.ToPermissionIds(app.Name);
+            }
+            else
+            {
+                response.Permissions = permissions.ToAppPermissionIds(app.Name);
+            }
 
             response.PlanName = plans.GetPlanForApp(app)?.Name;
             response.PlanUpgrade = plans.GetPlanUpgradeForApp(app)?.Name;

@@ -23,7 +23,7 @@
                     <th class="cell-auto-right">
                         Position
                     </th>
-                    <th class="cell-actions-lg" *sqxPermission="'squidex.admin.events.manage'">
+                    <th class="cell-actions-lg">
                         Actions
                     </th>
                 </tr>
@@ -41,7 +41,7 @@
                     <td class="cell-auto-right">
                         <span>{{eventConsumer.position}}</span>
                     </td>
-                    <td class="cell-actions-lg" *sqxPermission="'squidex.admin.events.manage'">
+                    <td class="cell-actions-lg">
                         <button class="btn btn-link" (click)="reset(eventConsumer)" *ngIf="!eventConsumer.isResetting" title="Reset Event Consumer">
                             <i class="icon icon-reset"></i>
                         </button>

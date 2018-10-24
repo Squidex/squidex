@@ -18,7 +18,7 @@
             <input class="form-control" #inputFind [formControl]="usersFilter" placeholder="Search for user" />
         </form>
 
-        <button class="btn btn-success" #buttonNew routerLink="new" title="New User (CTRL + N)" *sqxPermission="'squidex.admin.users.create'">
+        <button class="btn btn-success" #buttonNew routerLink="new" title="New User (CTRL + N)">
             <i class="icon-plus"></i> New
         </button>
     </ng-container>
@@ -37,7 +37,7 @@
                         <th class="cell-auto">
                             Email
                         </th>
-                        <th class="cell-actions" *ngIf="canLock">
+                        <th class="cell-actions">
                             Actions
                         </th>
                     </tr>
@@ -59,7 +59,7 @@
                             <td class="cell-auto">
                                 <span class="user-email table-cell">{{userInfo.user.email}}</span>
                             </td>
-                            <td class="cell-actions" *ngIf="canLock">
+                            <td class="cell-actions">
                                 <ng-container *ngIf="!userInfo.isCurrentUser">
                                     <button class="btn btn-link" (click)="lock(userInfo.user); $event.stopPropagation();" *ngIf="!userInfo.user.isLocked" title="Lock User">
                                         <i class="icon icon-unlocked"></i>

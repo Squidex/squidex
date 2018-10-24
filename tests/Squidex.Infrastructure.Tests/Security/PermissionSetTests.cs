@@ -30,6 +30,8 @@ namespace Squidex.Infrastructure.Security
             Assert.Equal(((IEnumerable)sut).OfType<Permission>().ToList(), source);
 
             Assert.Equal(3, source.Count);
+
+            Assert.Equal("c;b;a", sut.ToString());
         }
 
         [Fact]
@@ -39,7 +41,17 @@ namespace Squidex.Infrastructure.Security
                 new Permission("app.contents"),
                 new Permission("app.assets"));
 
-            Assert.True(sut.GivesPermissionTo(new Permission("app.contents")));
+            Assert.True(sut.Allows(new Permission("app.contents")));
+        }
+
+        [Fact]
+        public void Should_return_true_if_any_permission_includes_given()
+        {
+            var sut = new PermissionSet(
+                new Permission("app.contents"),
+                new Permission("app.assets"));
+
+            Assert.True(sut.Includes(new Permission("app")));
         }
 
         [Fact]
@@ -49,7 +61,17 @@ namespace Squidex.Infrastructure.Security
                 new Permission("app.contents"),
                 new Permission("app.assets"));
 
-            Assert.False(sut.GivesPermissionTo(new Permission("app.schemas")));
+            Assert.False(sut.Allows(new Permission("app.schemas")));
+        }
+
+        [Fact]
+        public void Should_return_false_if_none_permission_includes_given()
+        {
+            var sut = new PermissionSet(
+                new Permission("app.contents"),
+                new Permission("app.assets"));
+
+            Assert.False(sut.Includes(new Permission("other")));
         }
 
         [Fact]
@@ -59,7 +81,17 @@ namespace Squidex.Infrastructure.Security
                 new Permission("app.contents"),
                 new Permission("app.assets"));
 
-            Assert.False(sut.GivesPermissionTo(null));
+            Assert.False(sut.Allows(null));
+        }
+
+        [Fact]
+        public void Should_return_false_if_permission_to_include_is_null()
+        {
+            var sut = new PermissionSet(
+                new Permission("app.contents"),
+                new Permission("app.assets"));
+
+            Assert.False(sut.Includes(null));
         }
     }
 }

@@ -5,12 +5,15 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
 
-namespace Squidex.Domain.Apps.Core
+namespace Squidex.Shared
 {
-    public sealed class Permissions
+    public static class Permissions
     {
         public const string All = "squidex.*";
 
@@ -112,6 +115,26 @@ namespace Squidex.Domain.Apps.Core
             Guard.NotNull(id, nameof(id));
 
             return new Permission(id.Replace("{app}", app ?? "*").Replace("{name}", schema ?? "*"));
+        }
+
+        public static string[] ToAppPermissionIds(this IEnumerable<string> permissions, string app)
+        {
+            var result = permissions.Where(x => x.StartsWith($"squidex.apps.{app}", StringComparison.OrdinalIgnoreCase)).ToArray();
+
+            return result;
+        }
+
+        public static string[] ToAppNames(this IEnumerable<string> permissions)
+        {
+            var result =
+                permissions
+                    .Where(x => x.StartsWith("squidex.apps.", StringComparison.OrdinalIgnoreCase))
+                    .Select(x => x.Split('.'))
+                    .Select(x => x[2])
+                    .Distinct()
+                    .ToArray();
+
+            return result;
         }
     }
 }

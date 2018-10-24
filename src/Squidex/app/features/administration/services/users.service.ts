@@ -31,6 +31,7 @@ export class UserDto extends Model {
         public readonly id: string,
         public readonly email: string,
         public readonly displayName: string,
+        public readonly permissions: string[],
         public readonly isLocked: boolean
     ) {
         super();
@@ -45,6 +46,7 @@ export class CreateUserDto {
     constructor(
         public readonly email: string,
         public readonly displayName: string,
+        public readonly permissions: string[],
         public readonly password: string
     ) {
     }
@@ -54,6 +56,7 @@ export class UpdateUserDto {
     constructor(
         public readonly email: string,
         public readonly displayName: string,
+        public readonly permissions: string[],
         public readonly password?: string
     ) {
     }
@@ -81,6 +84,7 @@ export class UsersService {
                             item.id,
                             item.email,
                             item.displayName,
+                            item.permissions,
                             item.isLocked);
                     });
 
@@ -100,6 +104,7 @@ export class UsersService {
                         body.id,
                         body.email,
                         body.displayName,
+                        body.permissions,
                         body.isLocked);
                 }),
                 pretifyError('Failed to load user. Please reload.'));
@@ -116,6 +121,7 @@ export class UsersService {
                         body.id,
                         dto.email,
                         dto.displayName,
+                        dto.permissions,
                         false);
                 }),
                 pretifyError('Failed to create user. Please reload.'));

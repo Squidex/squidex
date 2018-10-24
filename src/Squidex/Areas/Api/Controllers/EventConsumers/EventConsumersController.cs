@@ -10,11 +10,11 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Orleans;
 using Squidex.Areas.Api.Controllers.EventConsumers.Models;
-using Squidex.Domain.Apps.Core;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing.Grains;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Pipeline;
+using Squidex.Shared;
 
 namespace Squidex.Areas.Api.Controllers.EventConsumers
 {
