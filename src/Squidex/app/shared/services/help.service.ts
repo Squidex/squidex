@@ -25,7 +25,7 @@ export class HelpService {
                 const result: string[] = [];
 
                 for (let section of response.sections) {
-                    const content = section.content.replace(/href="\.\.\/GLOSSARY\.html/g, 'target="_blank" href="https://docs.squidex.io/GLOSSARY.html');
+                    const content = section.content.replace(/href="\.\.\/GLOSSARY\.html/g, 'target="_blank" rel="noopener" href="https://docs.squidex.io/GLOSSARY.html');
 
                     result.push(content);
                 }

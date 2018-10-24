@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using IdentityServer4.Models;
 using Microsoft.AspNetCore.Mvc;
 using NodaTime;
 using Squidex.Areas.Api.Controllers.Rules.Models;
@@ -32,6 +33,8 @@ namespace Squidex.Areas.Api.Controllers.Rules
     [MustBeAppDeveloper]
     public sealed class RulesController : ApiController
     {
+        private static readonly string RuleActionsEtag = string.Join(";", RuleElementRegistry.Actions.Select(x => x.Key)).Sha256();
+        private static readonly string RuleTriggersEtag = string.Join(";", RuleElementRegistry.Triggers.Select(x => x.Key)).Sha256();
         private readonly IAppProvider appProvider;
         private readonly IRuleEventRepository ruleEventsRepository;
 
@@ -58,6 +61,8 @@ namespace Squidex.Areas.Api.Controllers.Rules
         {
             var response = RuleElementRegistry.Actions.ToDictionary(x => x.Key, x => SimpleMapper.Map(x.Value, new RuleElementDto()));
 
+            Response.Headers["Etag"] = RuleActionsEtag;
+
             return Ok(response);
         }
 
@@ -74,6 +79,8 @@ namespace Squidex.Areas.Api.Controllers.Rules
         public IActionResult GetTriggers()
         {
             var response = RuleElementRegistry.Triggers.ToDictionary(x => x.Key, x => SimpleMapper.Map(x.Value, new RuleElementDto()));
+
+            Response.Headers["Etag"] = RuleTriggersEtag;
 
             return Ok(response);
         }
@@ -95,6 +102,8 @@ namespace Squidex.Areas.Api.Controllers.Rules
             var entities = await appProvider.GetRulesAsync(AppId);
 
             var response = entities.Select(RuleDto.FromRule);
+
+            Response.Headers["ETag"] = response.ToManyEtag(0);
 
             return Ok(response);
         }

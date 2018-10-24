@@ -41,7 +41,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors
             {
                 var value = nodeIn.Rhs.Value;
 
-                if (value is Instant instant &&
+                if (value is Instant &&
                     !string.Equals(nodeIn.Lhs[0], "mt", StringComparison.OrdinalIgnoreCase) &&
                     !string.Equals(nodeIn.Lhs[0], "ct", StringComparison.OrdinalIgnoreCase))
                 {
@@ -68,6 +68,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors
                     }
 
                     result[1] = field.Id.ToString();
+                }
+
+                if (result.Count > 2)
+                {
+                    result[2] = result[2].UnescapeEdmField();
                 }
 
                 if (result.Count > 0)

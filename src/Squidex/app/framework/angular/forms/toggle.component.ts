@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, forwardRef } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import { Types } from '@app/framework/internal';
@@ -28,12 +28,21 @@ export class ToggleComponent implements ControlValueAccessor {
     public isChecked: boolean | null = null;
     public isDisabled = false;
 
+    constructor(
+        private readonly changeDetector: ChangeDetectorRef
+    ) {
+    }
+
     public writeValue(obj: any) {
         this.isChecked = Types.isBoolean(obj) ? obj : null;
+
+        this.changeDetector.detectChanges();
     }
 
     public setDisabledState(isDisabled: boolean): void {
         this.isDisabled = isDisabled;
+
+        this.changeDetector.detectChanges();
     }
 
     public registerOnChange(fn: any) {

@@ -195,9 +195,7 @@ export class AssetsService {
     public uploadFile(appName: string, file: File, user: string, now: DateTime): Observable<number | AssetDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets`);
 
-        const req = new HttpRequest('POST', url, getFormData(file), {
-            reportProgress: true
-        });
+        const req = new HttpRequest('POST', url, getFormData(file), { reportProgress: true });
 
         return this.http.request<any>(req).pipe(
                 filter(event =>
@@ -237,7 +235,7 @@ export class AssetsService {
                         throw 'Invalid';
                     }
                 }),
-                tap(dto => {
+                tap(() => {
                     this.analytics.trackEvent('Asset', 'Uploaded', appName);
                 }),
                 pretifyError('Failed to upload asset. Please reload.'));
@@ -276,12 +274,7 @@ export class AssetsService {
     public replaceFile(appName: string, id: string, file: File, version: Version): Observable<number | Versioned<AssetReplacedDto>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/${id}/content`);
 
-        const req = new HttpRequest('PUT', url, getFormData(file), {
-            headers: new HttpHeaders({
-                'If-Match': version.value
-            }),
-            reportProgress: true
-        });
+        const req = new HttpRequest('PUT', url, getFormData(file), { headers: new HttpHeaders().set('If-Match', version.value), reportProgress: true });
 
         return this.http.request(req).pipe(
                 filter(event =>

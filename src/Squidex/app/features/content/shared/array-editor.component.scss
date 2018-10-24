@@ -4,16 +4,11 @@
 .array-container {
     background: $color-border;
     padding: 1rem;
+    padding-bottom: 1px;
     position: relative;
     margin-bottom: 1rem;
 }
 
 .item {
-    & {
-        margin-bottom: 1rem;
-    }
-
-    &:last-child {
-        margin-bottom: 0;
-    }
+    margin-bottom: 1rem;
 }

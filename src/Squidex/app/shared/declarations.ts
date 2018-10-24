@@ -9,6 +9,8 @@ export * from './components/app-form.component';
 export * from './components/asset.component';
 export * from './components/assets-list.component';
 export * from './components/assets-selector.component';
+export * from './components/comment.component';
+export * from './components/comments.component';
 export * from './components/help.component';
 export * from './components/geolocation-editor.component';
 export * from './components/history.component';

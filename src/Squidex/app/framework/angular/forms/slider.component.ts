@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, ElementRef, forwardRef, Input, Renderer2, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, Renderer2, ViewChild } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import { Types } from '@app/framework/internal';
@@ -31,8 +31,6 @@ export class SliderComponent implements ControlValueAccessor {
     private value: number;
     private isDragging = false;
 
-    public isDisabled = false;
-
     @ViewChild('bar')
     public bar: ElementRef;
 
@@ -48,16 +46,26 @@ export class SliderComponent implements ControlValueAccessor {
     @Input()
     public step = 1;
 
-    constructor(private readonly renderer: Renderer2) { }
+    public isDisabled = false;
+
+    constructor(
+        private readonly changeDetector: ChangeDetectorRef,
+        private readonly renderer: Renderer2
+    ) {
+    }
 
     public writeValue(obj: any) {
         this.lastValue = this.value = Types.isNumber(obj) ? obj : 0;
 
         this.updateThumbPosition();
+
+        this.changeDetector.detectChanges();
     }
 
     public setDisabledState(isDisabled: boolean): void {
         this.isDisabled = isDisabled;
+
+        this.changeDetector.detectChanges();
     }
 
     public registerOnChange(fn: any) {

@@ -13,6 +13,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {
     AnalyticsService,
     AutocompleteComponent,
+    CachingInterceptor,
     CanDeactivateGuard,
     ClipboardService,
     ConfirmClickDirective,
@@ -232,6 +233,11 @@ export class SqxFrameworkModule {
                 {
                     provide: HTTP_INTERCEPTORS,
                     useClass: LoadingInterceptor,
+                    multi: true
+                },
+                {
+                    provide: HTTP_INTERCEPTORS,
+                    useClass: CachingInterceptor,
                     multi: true
                 }
             ]

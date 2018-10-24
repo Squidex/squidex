@@ -87,7 +87,7 @@ export class RulesState extends State<Snapshot> {
 
     public delete(rule: RuleDto): Observable<any> {
         return this.rulesService.deleteRule(this.appName, rule.id, rule.version).pipe(
-            tap(dto => {
+            tap(() => {
                 this.next(s => {
                     const rules = s.rules.removeAll(x => x.id === rule.id);
 

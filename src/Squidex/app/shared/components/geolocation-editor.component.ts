@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, forwardRef, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, ViewChild } from '@angular/core';
 import { ControlValueAccessor, FormBuilder, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import {
@@ -71,6 +71,7 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
     public isDisabled = false;
 
     constructor(
+        private readonly changeDetector: ChangeDetectorRef,
         private readonly resourceLoader: ResourceLoaderService,
         private readonly formBuilder: FormBuilder,
         private readonly uiState: UIState
@@ -103,6 +104,8 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
         } else {
             this.geolocationForm.enable();
         }
+
+        this.changeDetector.detectChanges();
     }
 
     private setDisabledStateOSM(isDisabled: boolean): void {

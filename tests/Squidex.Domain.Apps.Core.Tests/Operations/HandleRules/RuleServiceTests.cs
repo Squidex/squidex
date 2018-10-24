@@ -253,5 +253,18 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
             Assert.Equal((ruleError.ToString(), RuleResult.Failed, TimeSpan.Zero), result);
         }
+
+        [Fact]
+        public async Task Should_not_create_if_rule_disabled()
+        {
+            var ruleConfig = new Rule(new ContentChangedTrigger(), new ValidAction());
+            var ruleEnvelope = Envelope.Create(new ContentCreated());
+
+            ruleConfig = ruleConfig.Disable();
+
+            var job = await sut.CreateJobAsync(ruleConfig, ruleEnvelope);
+
+            Assert.Null(job);
+        }
     }
 }

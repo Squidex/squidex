@@ -48,7 +48,7 @@ namespace Squidex.Domain.Apps.Core.GenerateEdmSchema
 
                 foreach (var partitionItem in partition)
                 {
-                    partitionType.AddStructuralProperty(partitionItem.Key, edmValueType);
+                    partitionType.AddStructuralProperty(partitionItem.Key.EscapeEdmField(), edmValueType);
                 }
 
                 edmType.AddStructuralProperty(field.Name.EscapeEdmField(), new EdmComplexTypeReference(partitionType, false));

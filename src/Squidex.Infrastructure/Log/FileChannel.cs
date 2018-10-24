@@ -13,7 +13,7 @@ namespace Squidex.Infrastructure.Log
     {
         private readonly FileLogProcessor processor;
         private readonly object lockObject = new object();
-        private bool isInitialized;
+        private volatile bool isInitialized;
 
         public FileChannel(string path)
         {

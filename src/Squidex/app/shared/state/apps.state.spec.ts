@@ -87,7 +87,7 @@ describe('AppsState', () => {
         appsService.setup(x => x.postApp(request))
             .returns(() => of(newApp));
 
-        appsState.create(request, now).subscribe();
+        appsState.create(request).subscribe();
 
         expect(appsState.snapshot.apps.values).toEqual([newApp, ...oldApps]);
     });
@@ -101,7 +101,7 @@ describe('AppsState', () => {
         appsService.setup(x => x.deleteApp(newApp.name))
             .returns(() => of({}));
 
-        appsState.create(request, now).subscribe();
+        appsState.create(request).subscribe();
 
         const appsAfterCreate = appsState.snapshot.apps.values;
 

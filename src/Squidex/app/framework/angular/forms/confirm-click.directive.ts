@@ -77,9 +77,7 @@ export class ConfirmClickDirective implements OnDestroy {
                         this.isOpen = false;
 
                         if (result) {
-                            if (result) {
-                                this.clickConfirmed.delayEmit();
-                            }
+                            this.clickConfirmed.delayEmit();
                         }
 
                         subscription.unsubscribe();

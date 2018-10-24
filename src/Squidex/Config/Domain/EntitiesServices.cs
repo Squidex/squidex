@@ -24,6 +24,8 @@ using Squidex.Domain.Apps.Entities.Apps.Templates;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.Backup;
+using Squidex.Domain.Apps.Entities.Comments;
+using Squidex.Domain.Apps.Entities.Comments.Commands;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Contents.Edm;
@@ -158,6 +160,9 @@ namespace Squidex.Config.Domain
                 .As<ICommandMiddleware>();
 
             services.AddSingletonAs<GrainCommandMiddleware<AppCommand, IAppGrain>>()
+                .As<ICommandMiddleware>();
+
+            services.AddSingletonAs<GrainCommandMiddleware<CommentsCommand, ICommentGrain>>()
                 .As<ICommandMiddleware>();
 
             services.AddSingletonAs<GrainCommandMiddleware<ContentCommand, IContentGrain>>()

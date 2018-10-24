@@ -10,7 +10,6 @@ import { Observable, of } from 'rxjs';
 import { distinctUntilChanged, map, tap } from 'rxjs/operators';
 
 import {
-    DateTime,
     DialogService,
     ImmutableArray,
     notify,
@@ -73,7 +72,7 @@ export class AppsState extends State<Snapshot> {
             }));
     }
 
-    public create(request: CreateAppDto, now?: DateTime): Observable<AppDto> {
+    public create(request: CreateAppDto): Observable<AppDto> {
         return this.appsService.postApp(request).pipe(
             tap(dto => {
                 this.next(s => {
@@ -86,7 +85,7 @@ export class AppsState extends State<Snapshot> {
 
     public delete(name: string): Observable<any> {
         return this.appsService.deleteApp(name).pipe(
-            tap(app => {
+            tap(() => {
                 this.next(s => {
                     const apps = s.apps.filter(x => x.name !== name);
 

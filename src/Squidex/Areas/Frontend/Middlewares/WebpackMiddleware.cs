@@ -7,6 +7,7 @@
 
 using System;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 
@@ -76,14 +77,14 @@ namespace Squidex.Areas.Frontend.Middlewares
                 return response;
             }
 
-            var stylesTag = string.Empty;
+            var sb = new StringBuilder();
 
             foreach (var file in Styles)
             {
-                stylesTag += $"<link href=\"http://{Host}:{Port}/{file}\" rel=\"stylesheet\">";
+                sb.AppendLine($"<link href=\"http://{Host}:{Port}/{file}\" rel=\"stylesheet\">");
             }
 
-            response = response.Replace("</head>", $"{stylesTag}</head>");
+            response = response.Replace("</head>", $"{sb}</head>");
 
             return response;
         }
@@ -95,14 +96,14 @@ namespace Squidex.Areas.Frontend.Middlewares
                 return response;
             }
 
-            var scriptsTag = string.Empty;
+            var sb = new StringBuilder();
 
             foreach (var file in Scripts)
             {
-                scriptsTag += $"<script type=\"text/javascript\" src=\"http://{Host}:{Port}/{file}\"></script>";
+                sb.AppendLine($"<script type=\"text/javascript\" src=\"http://{Host}:{Port}/{file}\"></script>");
             }
 
-            response = response.Replace("</body>", $"{scriptsTag}</body>");
+            response = response.Replace("</body>", $"{sb}</body>");
 
             return response;
         }

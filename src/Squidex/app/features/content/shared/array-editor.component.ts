@@ -6,7 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { FormArray } from '@angular/forms';
+import { AbstractControl, FormArray } from '@angular/forms';
 
 import {
     AppLanguageDto,
@@ -43,5 +43,11 @@ export class ArrayEditorComponent {
 
     public addItem() {
         this.form.insertArrayItem(this.field, this.language);
+    }
+
+    public sort(controls: AbstractControl[]) {
+        for (let i = 0; i < controls.length; i++) {
+            this.arrayControl.setControl(i, controls[i]);
+        }
     }
 }

@@ -21,13 +21,13 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
     {
         private const string TemplateName = "Blog";
         private const string SlugScript = @"
-            var data = ctx.data;
+var data = ctx.data;
     
-            if (data.title && data.title.iv) {
-                data.slug = { iv: slugify(data.title.iv) };
-            }
+if (data.title && data.title.iv) {
+    data.slug = { iv: slugify(data.title.iv) };
+}
 
-            replace(data);";
+replace(data);";
 
         public async Task HandleAsync(CommandContext context, Func<Task> next)
         {

@@ -49,7 +49,7 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         /// </summary>
         public long Version { get; set; }
 
-        public static AssetReplacedDto Create(UpdateAsset command, AssetSavedResult result)
+        public static AssetReplacedDto FromCommand(UpdateAsset command, AssetSavedResult result)
         {
             var response = new AssetReplacedDto
             {

@@ -34,7 +34,7 @@ export class OnboardingTooltipComponent implements OnDestroy, OnInit {
     public for: any;
 
     @Input()
-    public id: string;
+    public helpId: string;
 
     @Input()
     public after = 1000;
@@ -62,9 +62,9 @@ export class OnboardingTooltipComponent implements OnDestroy, OnInit {
     }
 
     public ngOnInit() {
-        if (this.for && this.id && Types.isFunction(this.for.addEventListener)) {
+        if (this.for && this.helpId && Types.isFunction(this.for.addEventListener)) {
             this.showTimer = setTimeout(() => {
-                if (this.onboardingService.shouldShow(this.id)) {
+                if (this.onboardingService.shouldShow(this.helpId)) {
                     const forRect = this.for.getBoundingClientRect();
 
                     const x = forRect.left + 0.5 * forRect.width;
@@ -81,14 +81,14 @@ export class OnboardingTooltipComponent implements OnDestroy, OnInit {
                             this.hideThis();
                         }, 10000);
 
-                        this.onboardingService.disable(this.id);
+                        this.onboardingService.disable(this.helpId);
                     }
                 }
             }, this.after);
 
             this.forMouseDownListener =
                 this.renderer.listen(this.for, 'mousedown', () => {
-                    this.onboardingService.disable(this.id);
+                    this.onboardingService.disable(this.helpId);
 
                     this.hideThis();
                 });
@@ -106,7 +106,7 @@ export class OnboardingTooltipComponent implements OnDestroy, OnInit {
     }
 
     public hideThis() {
-        this.onboardingService.disable(this.id);
+        this.onboardingService.disable(this.helpId);
 
         this.ngOnDestroy();
     }

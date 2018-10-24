@@ -140,7 +140,7 @@ export class SchemasState extends State<Snapshot> {
 
     public delete(schema: SchemaDto): Observable<any> {
         return this.schemasService.deleteSchema(this.appName, schema.name, schema.version).pipe(
-            tap(dto => {
+            tap(() => {
                 return this.next(s => {
                     const schemas = s.schemas.filter(x => x.id !== schema.id);
                     const selectedSchema = s.selectedSchema && s.selectedSchema.id === schema.id ? null : s.selectedSchema;

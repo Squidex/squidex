@@ -1,0 +1,11 @@
+@import '_vars';
+@import '_mixins';
+
+.grid-footer {
+    border-top-width: 1px;
+}
+
+.grid-body,
+.grid-footer {
+    padding: 1rem;
+}

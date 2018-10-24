@@ -114,7 +114,7 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
         if (!this.contentForm.form.dirty || !this.content) {
             return of(true);
         } else {
-            return this.dialogs.confirmUnsavedChanges();
+            return this.dialogs.confirm('Unsaved changes', 'You have unsaved changes, do you want to close the current content view and discard your changes?');
         }
     }
 
@@ -141,14 +141,14 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
             if (this.content) {
                 if (asProposal) {
                     this.contentsState.proposeUpdate(this.content, value)
-                        .subscribe(dto => {
+                        .subscribe(() => {
                             this.contentForm.submitCompleted();
                         }, error => {
                             this.contentForm.submitFailed(error);
                         });
                 } else {
                     this.contentsState.update(this.content, value)
-                        .subscribe(dto => {
+                        .subscribe(() => {
                             this.contentForm.submitCompleted();
                         }, error => {
                             this.contentForm.submitFailed(error);
@@ -156,7 +156,7 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
                 }
             } else {
                 this.contentsState.create(value, publish)
-                    .subscribe(dto => {
+                    .subscribe(() => {
                         this.back();
                     }, error => {
                         this.contentForm.submitFailed(error);
