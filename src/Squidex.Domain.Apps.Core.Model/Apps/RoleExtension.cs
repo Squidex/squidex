@@ -38,8 +38,8 @@ namespace Squidex.Domain.Apps.Core.Apps
                 case AppClientPermission.Reader:
                     return new PermissionSet(
                         Permissions.ForApp(Permissions.AppCommon, app),
-                        Permissions.ForSchema(Permissions.AppContentsRead, app, "*"),
-                        Permissions.ForSchema(Permissions.AppContentsGraphQL, app, "*"));
+                        Permissions.ForApp(Permissions.AppContentsRead, app),
+                        Permissions.ForApp(Permissions.AppContentsGraphQL, app));
             }
 
             return PermissionSet.Empty;
@@ -57,9 +57,10 @@ namespace Squidex.Domain.Apps.Core.Apps
                         Permissions.ForApp(Permissions.App, app));
                 case AppContributorPermission.Developer:
                     return new PermissionSet(
+                        Permissions.ForApp(Permissions.AppApi, app),
+                        Permissions.ForApp(Permissions.AppAssets, app),
                         Permissions.ForApp(Permissions.AppCommon, app),
                         Permissions.ForApp(Permissions.AppContents, app),
-                        Permissions.ForApp(Permissions.AppAssets, app),
                         Permissions.ForApp(Permissions.AppPatterns, app),
                         Permissions.ForApp(Permissions.AppRules, app),
                         Permissions.ForApp(Permissions.AppSchemas, app));

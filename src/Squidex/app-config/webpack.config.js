@@ -51,7 +51,7 @@ module.exports = {
           },{
             test: /\.ts$/,
             use: [{
-                loader: 'awesome-typescript-loader'
+                loader: 'awesome-typescript-loader', options: { useCache: true, useBabel: true }
             }, {
                 loader: 'angular-router-loader'
             }, {

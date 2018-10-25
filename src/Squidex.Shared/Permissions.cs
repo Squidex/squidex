@@ -35,8 +35,12 @@ namespace Squidex.Shared
         public const string AdminUsersLock = "squidex.admin.users.lock";
 
         public const string App = "squidex.apps.{app}";
+
         public const string AppDelete = "squidex.apps.{app}.delete";
+
         public const string AppCommon = "squidex.apps.{app}.common";
+
+        public const string AppApi = "squidex.apps.{app}.api";
 
         public const string AppClients = "squidex.apps.{app}.clients";
         public const string AppClientsRead = "squidex.apps.{app}.clients.read";
@@ -103,14 +107,7 @@ namespace Squidex.Shared
         public const string AppContentsUnpublish = "squidex.apps.{app}.contents.{name}.unpublish";
         public const string AppContentsDelete = "squidex.apps.{app}.contents.{name}.delete";
 
-        public static Permission ForApp(string id, string app = "*")
-        {
-            Guard.NotNull(id, nameof(id));
-
-            return new Permission(id.Replace("{app}", app ?? "*"));
-        }
-
-        public static Permission ForSchema(string id, string app = "*", string schema = "*")
+        public static Permission ForApp(string id, string app = "*", string schema = "*")
         {
             Guard.NotNull(id, nameof(id));
 
