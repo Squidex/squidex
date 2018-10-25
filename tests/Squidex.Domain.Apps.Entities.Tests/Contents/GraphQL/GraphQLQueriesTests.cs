@@ -268,6 +268,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                       myTags {
                         iv
                       }
+                      myLocalized {
+                        de_DE
+                      }
                       myArray {
                         iv {
                           nestedNumber
@@ -342,6 +345,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                                         "tag2"
                                     }
                                 },
+                                myLocalized = new
+                                {
+                                    de_DE = "de-DE"
+                                },
                                 myArray = new
                                 {
                                     iv = new[]
@@ -404,6 +411,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                         }
                         myTags {
                           iv
+                        }
+                        myLocalized {
+                          de_DE
                         }
                       }
                     }
@@ -476,6 +486,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                                             "tag1",
                                             "tag2"
                                         }
+                                    },
+                                    myLocalized = new
+                                    {
+                                        de_DE = "de-DE"
                                     }
                                 }
                             }
@@ -525,6 +539,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                       }}
                       myTags {{
                         iv
+                      }}
+                      myLocalized {{
+                        de_DE
                       }}
                     }}
                   }}
@@ -589,6 +606,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                                     "tag1",
                                     "tag2"
                                 }
+                            },
+                            myLocalized = new
+                            {
+                                de_DE = "de-DE"
                             }
                         }
                     }

@@ -18,6 +18,11 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             return new NamedId<Guid>(schema.Id, schema.Name);
         }
 
+        public static string EscapePartition(this string value)
+        {
+            return value.Replace('-', '_');
+        }
+
         public static string TypeName(this IField field)
         {
             return field.Name.ToPascalCase();
