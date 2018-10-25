@@ -52,7 +52,7 @@ export class Profile {
     constructor(
         public readonly user: User
     ) {
-        const permissions = this.user.profile['uri:squidex:permissions'];
+        const permissions = this.user.profile['urn:squidex:permissions'];
 
         if (Types.isArrayOfString(permissions)) {
             this.permissions = permissions.map(x => new Permission(x));
