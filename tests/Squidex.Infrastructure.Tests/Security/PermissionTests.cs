@@ -16,11 +16,10 @@ namespace Squidex.Infrastructure.Security
         [Fact]
         public void Should_generate_permissions()
         {
-            var sut = new Permission("app.contents", "App Contents");
+            var sut = new Permission("app.contents");
 
             Assert.Equal("app.contents", sut.ToString());
             Assert.Equal("app.contents", sut.Id);
-            Assert.Equal("App Contents", sut.Description);
         }
 
         [Fact]

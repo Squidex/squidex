@@ -29,6 +29,11 @@ namespace Squidex.Infrastructure.Security
         {
         }
 
+        public PermissionSet(IEnumerable<string> permissions)
+            : this(permissions?.Select(x => new Permission(x)))
+        {
+        }
+
         public PermissionSet(IEnumerable<Permission> permissions)
         {
             Guard.NotNull(permissions, nameof(permissions));

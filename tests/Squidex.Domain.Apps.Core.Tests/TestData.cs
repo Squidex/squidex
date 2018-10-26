@@ -42,6 +42,7 @@ namespace Squidex.Domain.Apps.Core
                     new NamedLongIdConverter(),
                     new NamedStringIdConverter(),
                     new RefTokenConverter(),
+                    new RolesConverter(),
                     new RuleConverter(),
                     new SchemaConverter(new FieldRegistry(typeNameRegistry)),
                     new StringEnumConverter()),

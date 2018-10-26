@@ -57,6 +57,7 @@ namespace Squidex.Config.Domain
                 new PropertiesBagConverter<EnvelopeHeaders>(),
                 new PropertiesBagConverter<PropertiesBag>(),
                 new RefTokenConverter(),
+                new RolesConverter(),
                 new RuleConverter(),
                 new SchemaConverter(FieldRegistry),
                 new StringEnumConverter());

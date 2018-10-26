@@ -16,7 +16,6 @@ namespace Squidex.Infrastructure.Security
         private const string Any = "*";
         private static readonly char[] MainSeparators = { '.' };
         private static readonly char[] AlternativeSeparators = { '|' };
-        private readonly string description;
         private readonly string id;
         private readonly Lazy<HashSet<string>[]> idParts;
 
@@ -25,16 +24,9 @@ namespace Squidex.Infrastructure.Security
             get { return id; }
         }
 
-        public string Description
-        {
-            get { return description; }
-        }
-
-        public Permission(string id, string description = null)
+        public Permission(string id)
         {
             Guard.NotNullOrEmpty(id, nameof(id));
-
-            this.description = description;
 
             this.id = id;
 
