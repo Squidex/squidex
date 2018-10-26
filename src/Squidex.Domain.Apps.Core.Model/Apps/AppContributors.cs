@@ -11,27 +11,27 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Apps
 {
-    public sealed class AppContributors : DictionaryWrapper<string, AppContributorPermission>
+    public sealed class AppContributors : DictionaryWrapper<string, string>
     {
         public static readonly AppContributors Empty = new AppContributors();
 
         private AppContributors()
-            : base(ImmutableDictionary<string, AppContributorPermission>.Empty)
+            : base(ImmutableDictionary<string, string>.Empty)
         {
         }
 
-        public AppContributors(ImmutableDictionary<string, AppContributorPermission> inner)
+        public AppContributors(ImmutableDictionary<string, string> inner)
             : base(inner)
         {
         }
 
         [Pure]
-        public AppContributors Assign(string contributorId, AppContributorPermission permission)
+        public AppContributors Assign(string contributorId, string role)
         {
             Guard.NotNullOrEmpty(contributorId, nameof(contributorId));
-            Guard.Enum(permission, nameof(permission));
+            Guard.NotNullOrEmpty(role, nameof(role));
 
-            return new AppContributors(Inner.SetItem(contributorId, permission));
+            return new AppContributors(Inner.SetItem(contributorId, role));
         }
 
         [Pure]

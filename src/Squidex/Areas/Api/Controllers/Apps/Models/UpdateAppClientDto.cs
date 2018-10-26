@@ -6,9 +6,6 @@
 // ==========================================================================
 
 using System.ComponentModel.DataAnnotations;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure.Reflection;
 
@@ -23,10 +20,9 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         public string Name { get; set; }
 
         /// <summary>
-        /// The permissions of the client.
+        /// The role of the client.
         /// </summary>
-        [JsonConverter(typeof(StringEnumConverter))]
-        public AppClientPermission? Permission { get; set; }
+        public string Role { get; set; }
 
         public UpdateClient ToCommand(string clientId)
         {

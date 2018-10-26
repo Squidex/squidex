@@ -20,6 +20,7 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Orleans;
+using Squidex.Infrastructure.Security;
 using Squidex.Shared;
 
 namespace Squidex.Domain.Apps.Entities
@@ -159,9 +160,10 @@ namespace Squidex.Domain.Apps.Entities
             });
         }
 
-        public Task<List<IAppEntity>> GetUserApps(string userId, string[] permissions)
+        public Task<List<IAppEntity>> GetUserApps(string userId, PermissionSet permissions)
         {
             Guard.NotNull(userId, nameof(userId));
+            Guard.NotNull(permissions, nameof(permissions));
 
             return localCache.GetOrCreateAsync($"GetUserApps({userId})", async () =>
             {

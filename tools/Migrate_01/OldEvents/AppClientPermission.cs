@@ -5,12 +5,15 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Core.Apps
+using System;
+
+namespace Migrate_01.OldEvents
 {
-    public enum AppContributorPermission
+    [Obsolete]
+    public enum AppClientPermission
     {
-        Owner,
         Developer,
-        Editor
+        Editor,
+        Reader
     }
 }

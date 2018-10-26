@@ -12,9 +12,9 @@ namespace Squidex.Domain.Apps.Core.Apps
 {
     public sealed class AppClient
     {
-        private readonly string secret;
         private readonly string name;
-        private readonly AppClientPermission permission;
+        private readonly string secret;
+        private readonly string role;
 
         public string Name
         {
@@ -26,28 +26,28 @@ namespace Squidex.Domain.Apps.Core.Apps
             get { return secret; }
         }
 
-        public AppClientPermission Permission
+        public string Role
         {
-            get { return permission; }
+            get { return role; }
         }
 
-        public AppClient(string name, string secret, AppClientPermission permission)
+        public AppClient(string name, string secret, string role)
         {
             Guard.NotNullOrEmpty(name, nameof(name));
             Guard.NotNullOrEmpty(secret, nameof(secret));
-            Guard.Enum(permission, nameof(permission));
+            Guard.NotNullOrEmpty(role, nameof(role));
 
             this.name = name;
+            this.role = role;
             this.secret = secret;
-            this.permission = permission;
         }
 
         [Pure]
-        public AppClient Update(AppClientPermission newPermission)
+        public AppClient Update(string newRole)
         {
-            Guard.Enum(newPermission, nameof(newPermission));
+            Guard.NotNullOrEmpty(newRole, nameof(newRole));
 
-            return new AppClient(name, secret, newPermission);
+            return new AppClient(name, secret, newRole);
         }
 
         [Pure]
@@ -55,7 +55,7 @@ namespace Squidex.Domain.Apps.Core.Apps
         {
             Guard.NotNullOrEmpty(newName, nameof(newName));
 
-            return new AppClient(newName, secret, permission);
+            return new AppClient(newName, secret, role);
         }
     }
 }

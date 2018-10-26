@@ -5,16 +5,15 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Events.Apps
 {
-    [EventType(nameof(AppClientUpdated))]
+    [EventType(nameof(AppClientUpdated), 2)]
     public sealed class AppClientUpdated : AppEvent
     {
         public string Id { get; set; }
 
-        public AppClientPermission Permission { get; set; }
+        public string Role { get; set; }
     }
 }

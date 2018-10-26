@@ -9,6 +9,7 @@ using System;
 using System.Linq;
 using System.Security.Claims;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Security;
 using Squidex.Shared.Identity;
 
 namespace Squidex.Shared.Users
@@ -100,14 +101,14 @@ namespace Squidex.Shared.Users
             return user.GetClaimValue(SquidexClaimTypes.DisplayName);
         }
 
-        public static string[] Permissions(this ClaimsPrincipal principal)
+        public static PermissionSet Permissions(this ClaimsPrincipal principal)
         {
-            return principal.Claims.Where(x => x.Type == SquidexClaimTypes.Permissions).Select(x => x.Value).ToArray();
+            return new PermissionSet(principal.Claims.Where(x => x.Type == SquidexClaimTypes.Permissions).Select(x => new Permission(x.Value)));
         }
 
-        public static string[] Permissions(this IUser user)
+        public static PermissionSet Permissions(this IUser user)
         {
-            return user.GetClaimValues(SquidexClaimTypes.Permissions);
+            return new PermissionSet(user.GetClaimValues(SquidexClaimTypes.Permissions).Select(x => new Permission(x)));
         }
 
         public static string GetClaimValue(this IUser user, string type)

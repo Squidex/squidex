@@ -226,9 +226,9 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 RaiseEvent(SimpleMapper.Map(command, new AppClientRenamed()));
             }
 
-            if (command.Permission.HasValue)
+            if (command.Role != null)
             {
-                RaiseEvent(SimpleMapper.Map(command, new AppClientUpdated { Permission = command.Permission.Value }));
+                RaiseEvent(SimpleMapper.Map(command, new AppClientUpdated { Role = command.Role }));
             }
         }
 
@@ -327,7 +327,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         private static AppContributorAssigned CreateInitialOwner(RefToken actor)
         {
-            return new AppContributorAssigned { ContributorId = actor.Identifier, Permission = AppContributorPermission.Owner };
+            return new AppContributorAssigned { ContributorId = actor.Identifier, Role = Role.Owner };
         }
 
         protected override AppState OnEvent(Envelope<IEvent> @event)

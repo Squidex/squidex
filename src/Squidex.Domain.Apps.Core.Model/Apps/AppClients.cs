@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Core.Apps
         {
             Guard.NotNullOrEmpty(id, nameof(id));
 
-            return new AppClients(Inner.Add(id, new AppClient(id, secret, AppClientPermission.Editor)));
+            return new AppClients(Inner.Add(id, new AppClient(id, secret, Role.Editor)));
         }
 
         [Pure]
@@ -64,7 +64,7 @@ namespace Squidex.Domain.Apps.Core.Apps
         }
 
         [Pure]
-        public AppClients Update(string id, AppClientPermission permission)
+        public AppClients Update(string id, string role)
         {
             Guard.NotNullOrEmpty(id, nameof(id));
 
@@ -73,7 +73,7 @@ namespace Squidex.Domain.Apps.Core.Apps
                 return this;
             }
 
-            return new AppClients(Inner.SetItem(id, client.Update(permission)));
+            return new AppClients(Inner.SetItem(id, client.Update(role)));
         }
     }
 }

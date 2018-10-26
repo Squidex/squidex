@@ -87,7 +87,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
                 .Returns(J.AsTask(appState));
 
             A.CallTo(() => appState.Contributors)
-                .Returns(AppContributors.Empty.Assign(userId, AppContributorPermission.Owner));
+                .Returns(AppContributors.Empty.Assign(userId, Role.Owner));
 
             var context =
                 new CommandContext(new ArchiveApp { AppId = appId }, commandBus)

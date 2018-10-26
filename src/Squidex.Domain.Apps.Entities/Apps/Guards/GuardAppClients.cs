@@ -58,14 +58,14 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                     e("Client id is required.", nameof(command.Id));
                 }
 
-                if (string.IsNullOrWhiteSpace(command.Name) && command.Permission == null)
+                if (string.IsNullOrWhiteSpace(command.Name) && command.Role == null)
                 {
-                    e("Either name or permission must be defined.", nameof(command.Name), nameof(command.Permission));
+                    e("Either name or role must be defined.", nameof(command.Name), nameof(command.Role));
                 }
 
-                if (command.Permission.HasValue && !command.Permission.Value.IsEnumValue())
+                if (command.Role != null && !Role.IsDefaultRole(command.Role))
                 {
-                    e("Permission is not valid.", nameof(command.Permission));
+                    e("Role is not valid.", nameof(command.Role));
                 }
 
                 if (client == null)
@@ -78,9 +78,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                     e("Client has already this name.", nameof(command.Name));
                 }
 
-                if (command.Permission == client.Permission)
+                if (command.Role == client.Role)
                 {
-                    e("Client has already this permission.", nameof(command.Permission));
+                    e("Client has already this role.", nameof(command.Role));
                 }
             });
         }

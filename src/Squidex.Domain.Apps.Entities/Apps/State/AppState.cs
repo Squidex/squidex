@@ -23,6 +23,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.State
         public string Name { get; set; }
 
         [JsonProperty]
+        public Roles Roles { get; set; } = Roles.Empty;
+
+        [JsonProperty]
         public AppPlan Plan { get; set; }
 
         [JsonProperty]
@@ -42,6 +45,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.State
 
         protected void On(AppCreated @event)
         {
+            Roles = Roles.CreateDefaults(@event.Name);
+
             SimpleMapper.Map(@event, this);
         }
 
@@ -52,7 +57,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.State
 
         protected void On(AppContributorAssigned @event)
         {
-            Contributors = Contributors.Assign(@event.ContributorId, @event.Permission);
+            Contributors = Contributors.Assign(@event.ContributorId, @event.Role);
         }
 
         protected void On(AppContributorRemoved @event)
@@ -67,7 +72,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.State
 
         protected void On(AppClientUpdated @event)
         {
-            Clients = Clients.Update(@event.Id, @event.Permission);
+            Clients = Clients.Update(@event.Id, @event.Role);
         }
 
         protected void On(AppClientRenamed @event)

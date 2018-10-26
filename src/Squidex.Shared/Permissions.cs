@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
@@ -114,19 +112,20 @@ namespace Squidex.Shared
             return new Permission(id.Replace("{app}", app ?? "*").Replace("{name}", schema ?? "*"));
         }
 
-        public static string[] ToAppPermissionIds(this IEnumerable<string> permissions, string app)
+        public static PermissionSet ToAppPermissions(this PermissionSet permissions, string app)
         {
-            var result = permissions.Where(x => x.StartsWith($"squidex.apps.{app}", StringComparison.OrdinalIgnoreCase)).ToArray();
+            var matching = permissions.Where(x => x.StartsWith($"squidex.apps.{app}"));
 
-            return result;
+            return new PermissionSet(matching);
         }
 
-        public static string[] ToAppNames(this IEnumerable<string> permissions)
+        public static string[] ToAppNames(this PermissionSet permissions)
         {
+            var matching = permissions.Where(x => x.StartsWith($"squidex.apps."));
+
             var result =
-                permissions
-                    .Where(x => x.StartsWith("squidex.apps.", StringComparison.OrdinalIgnoreCase))
-                    .Select(x => x.Split('.'))
+                matching
+                    .Select(x => x.Id.Split('.'))
                     .Select(x => x[2])
                     .Distinct()
                     .ToArray();

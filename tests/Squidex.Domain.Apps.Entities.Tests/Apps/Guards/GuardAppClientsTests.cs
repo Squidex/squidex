@@ -94,25 +94,25 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         }
 
         [Fact]
-        public void UpdateClient_should_throw_exception_if_client_has_no_name_and_permission()
+        public void UpdateClient_should_throw_exception_if_client_has_no_name_and_role()
         {
             var command = new UpdateClient { Id = "ios" };
 
             var clients_1 = clients_0.Add("ios", "secret");
 
             ValidationAssert.Throws(() => GuardAppClients.CanUpdate(clients_1, command),
-                new ValidationError("Either name or permission must be defined.", "Name", "Permission"));
+                new ValidationError("Either name or role must be defined.", "Name", "Role"));
         }
 
         [Fact]
-        public void UpdateClient_should_throw_exception_if_client_has_invalid_permission()
+        public void UpdateClient_should_throw_exception_if_client_has_invalid_role()
         {
-            var command = new UpdateClient { Id = "ios", Permission = (AppClientPermission)10 };
+            var command = new UpdateClient { Id = "ios", Role = "Invalid" };
 
             var clients_1 = clients_0.Add("ios", "secret");
 
             ValidationAssert.Throws(() => GuardAppClients.CanUpdate(clients_1, command),
-                new ValidationError("Permission is not valid.", "Permission"));
+                new ValidationError("Role is not valid.", "Role"));
         }
 
         [Fact]
@@ -127,20 +127,20 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         }
 
         [Fact]
-        public void UpdateClient_should_throw_exception_if_client_has_same_permission()
+        public void UpdateClient_should_throw_exception_if_client_has_same_role()
         {
-            var command = new UpdateClient { Id = "ios", Permission = AppClientPermission.Editor };
+            var command = new UpdateClient { Id = "ios", Role = Role.Editor };
 
             var clients_1 = clients_0.Add("ios", "secret");
 
             ValidationAssert.Throws(() => GuardAppClients.CanUpdate(clients_1, command),
-                new ValidationError("Client has already this permission.", "Permission"));
+                new ValidationError("Client has already this role.", "Role"));
         }
 
         [Fact]
         public void UpdateClient_should_not_throw_exception_if_command_is_valid()
         {
-            var command = new UpdateClient { Id = "ios", Name = "iOS", Permission = AppClientPermission.Reader };
+            var command = new UpdateClient { Id = "ios", Name = "iOS", Role = Role.Reader };
 
             var clients_1 = clients_0.Add("ios", "secret");
 

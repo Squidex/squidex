@@ -85,7 +85,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             LastEvents
                 .ShouldHaveSameEvents(
                     CreateEvent(new AppCreated { Name = AppName }),
-                    CreateEvent(new AppContributorAssigned { ContributorId = User.Identifier, Permission = AppContributorPermission.Owner }),
+                    CreateEvent(new AppContributorAssigned { ContributorId = User.Identifier, Role = Role.Owner }),
                     CreateEvent(new AppLanguageAdded { Language = Language.EN }),
                     CreateEvent(new AppPatternAdded { PatternId = patternId1, Name = "Number", Pattern = "[0-9]" }),
                     CreateEvent(new AppPatternAdded { PatternId = patternId2, Name = "Numbers", Pattern = "[0-9]*" })
@@ -158,7 +158,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         [Fact]
         public async Task AssignContributor_should_create_events_and_update_state()
         {
-            var command = new AssignContributor { ContributorId = contributorId, Permission = AppContributorPermission.Editor };
+            var command = new AssignContributor { ContributorId = contributorId, Role = Role.Editor };
 
             await ExecuteCreateAsync();
 
@@ -166,11 +166,11 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             result.ShouldBeEquivalent(EntityCreatedResult.Create(contributorId, 5));
 
-            Assert.Equal(AppContributorPermission.Editor, sut.Snapshot.Contributors[contributorId]);
+            Assert.Equal(Role.Editor, sut.Snapshot.Contributors[contributorId]);
 
             LastEvents
                 .ShouldHaveSameEvents(
-                    CreateEvent(new AppContributorAssigned { ContributorId = contributorId, Permission = AppContributorPermission.Editor })
+                    CreateEvent(new AppContributorAssigned { ContributorId = contributorId, Role = Role.Editor })
                 );
         }
 
@@ -236,7 +236,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         [Fact]
         public async Task UpdateClient_should_create_events_and_update_state()
         {
-            var command = new UpdateClient { Id = clientId, Name = clientNewName, Permission = AppClientPermission.Developer };
+            var command = new UpdateClient { Id = clientId, Name = clientNewName, Role = Role.Developer };
 
             await ExecuteCreateAsync();
             await ExecuteAttachClientAsync();
@@ -250,7 +250,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             LastEvents
                 .ShouldHaveSameEvents(
                     CreateEvent(new AppClientRenamed { Id = clientId, Name = clientNewName }),
-                    CreateEvent(new AppClientUpdated { Id = clientId, Permission = AppClientPermission.Developer })
+                    CreateEvent(new AppClientUpdated { Id = clientId, Role = Role.Developer })
                 );
         }
 
@@ -402,7 +402,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         private Task ExecuteAssignContributorAsync()
         {
-            return sut.ExecuteAsync(CreateCommand(new AssignContributor { ContributorId = contributorId, Permission = AppContributorPermission.Editor }));
+            return sut.ExecuteAsync(CreateCommand(new AssignContributor { ContributorId = contributorId, Role = Role.Editor }));
         }
 
         private Task ExecuteAttachClientAsync()

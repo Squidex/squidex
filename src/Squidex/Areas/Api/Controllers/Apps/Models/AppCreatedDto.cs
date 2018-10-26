@@ -48,7 +48,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
             var response = new AppCreatedDto
             {
                 Id = result.IdOrValue.ToString(),
-                Permissions = AppContributorPermission.Owner.ToPermissions(name).Select(x => x.Id).ToArray(),
+                Permissions = Role.CreateOwner(name).Permissions.ToIds().ToArray(),
                 PlanName = apps.GetPlan(null)?.Name,
                 PlanUpgrade = apps.GetPlanUpgrade(null)?.Name,
                 Version = result.Version

@@ -27,7 +27,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
             clients = clients.Add("3", "my-secret");
             clients = clients.Add("4", "my-secret");
 
-            clients = clients.Update("3", AppClientPermission.Editor);
+            clients = clients.Update("3", Role.Editor);
 
             clients = clients.Rename("3", "My Client 3");
             clients = clients.Rename("2", "My Client 2");

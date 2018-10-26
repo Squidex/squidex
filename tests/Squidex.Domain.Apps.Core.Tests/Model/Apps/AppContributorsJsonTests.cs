@@ -22,9 +22,9 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         {
             var contributors = AppContributors.Empty;
 
-            contributors = contributors.Assign("1", AppContributorPermission.Developer);
-            contributors = contributors.Assign("2", AppContributorPermission.Editor);
-            contributors = contributors.Assign("3", AppContributorPermission.Owner);
+            contributors = contributors.Assign("1", Role.Developer);
+            contributors = contributors.Assign("2", Role.Editor);
+            contributors = contributors.Assign("3", Role.Owner);
 
             var serialized = JToken.FromObject(contributors, serializer).ToObject<AppContributors>(serializer);
 

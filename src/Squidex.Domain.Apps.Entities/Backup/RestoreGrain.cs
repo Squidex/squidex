@@ -252,7 +252,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 AppId = CurrentJob.AppId,
                 ContributorId = actor.Identifier,
                 FromRestore = true,
-                Permission = AppContributorPermission.Developer
+                Role = Role.Developer
             });
         }
 

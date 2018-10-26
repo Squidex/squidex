@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Core.Apps;
+using Roles = Squidex.Domain.Apps.Core.Apps.Role;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Commands
 {
@@ -13,8 +13,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Commands
     {
         public string ContributorId { get; set; }
 
-        public bool FromRestore { get; set; }
+        public string Role { get; set; } = Roles.Developer;
 
-        public AppContributorPermission Permission { get; set; }
+        public bool FromRestore { get; set; }
     }
 }

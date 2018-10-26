@@ -10,7 +10,6 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Infrastructure.Security;
@@ -61,7 +60,7 @@ namespace Squidex.Pipeline
 
                 if (permissions.Count == 0)
                 {
-                    var set = new PermissionSet(user.Permissions().Select(x => new Permission(x)));
+                    var set = user.Permissions();
 
                     if (!set.Includes(Permissions.ForApp(Permissions.App, appName)))
                     {
@@ -87,9 +86,9 @@ namespace Squidex.Pipeline
         {
             var clientId = user.GetClientId();
 
-            if (clientId != null && app.Clients.TryGetValue(clientId, out var client))
+            if (clientId != null && app.Clients.TryGetValue(clientId, out var client) && app.Roles.TryGetValue(client.Role, out var role))
             {
-                return client.Permission.ToPermissions(app.Name);
+                return role.Permissions;
             }
 
             return PermissionSet.Empty;
@@ -99,9 +98,9 @@ namespace Squidex.Pipeline
         {
             var subjectId = user.OpenIdSubject();
 
-            if (subjectId != null && app.Contributors.TryGetValue(subjectId, out var permission))
+            if (subjectId != null && app.Contributors.TryGetValue(subjectId, out var roleName) && app.Roles.TryGetValue(roleName, out var role))
             {
-                return permission.ToPermissions(app.Name);
+                return role.Permissions;
             }
 
             return PermissionSet.Empty;

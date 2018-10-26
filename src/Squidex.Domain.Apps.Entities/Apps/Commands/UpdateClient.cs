@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Core.Apps;
-
 namespace Squidex.Domain.Apps.Entities.Apps.Commands
 {
     public sealed class UpdateClient : AppCommand
@@ -15,6 +13,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.Commands
 
         public string Name { get; set; }
 
-        public AppClientPermission? Permission { get; set; }
+        public string Role { get; set; }
     }
 }

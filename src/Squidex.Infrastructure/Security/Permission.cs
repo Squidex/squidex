@@ -18,7 +18,7 @@ namespace Squidex.Infrastructure.Security
         private static readonly char[] AlternativeSeparators = { '|' };
         private readonly string description;
         private readonly string id;
-        private readonly HashSet<string>[] idParts;
+        private readonly Lazy<HashSet<string>[]> idParts;
 
         public string Id
         {
@@ -38,7 +38,7 @@ namespace Squidex.Infrastructure.Security
 
             this.id = id;
 
-            idParts = id
+            idParts = new Lazy<HashSet<string>[]>(() => id
                 .Split(MainSeparators, StringSplitOptions.RemoveEmptyEntries)
                 .Select(x =>
                 {
@@ -51,7 +51,7 @@ namespace Squidex.Infrastructure.Security
 
                     return new HashSet<string>(alternatives, StringComparer.OrdinalIgnoreCase);
                 })
-                .ToArray();
+                .ToArray());
         }
 
         public bool Allows(Permission permission)
@@ -61,17 +61,20 @@ namespace Squidex.Infrastructure.Security
                 return false;
             }
 
-            if (idParts.Length > permission.idParts.Length)
+            var lhs = idParts.Value;
+            var rhs = permission.idParts.Value;
+
+            if (lhs.Length > rhs.Length)
             {
                 return false;
             }
 
-            for (var i = 0; i < idParts.Length; i++)
+            for (var i = 0; i < lhs.Length; i++)
             {
-                var lhs = idParts[i];
-                var rhs = permission.idParts[i];
+                var l = lhs[i];
+                var r = rhs[i];
 
-                if (lhs != null && (rhs == null || !lhs.Intersect(rhs).Any()))
+                if (l != null && (r == null || !l.Intersect(r).Any()))
                 {
                     return false;
                 }
@@ -87,18 +90,26 @@ namespace Squidex.Infrastructure.Security
                 return false;
             }
 
-            for (var i = 0; i < Math.Min(idParts.Length, permission.idParts.Length); i++)
-            {
-                var lhs = idParts[i];
-                var rhs = permission.idParts[i];
+            var lhs = idParts.Value;
+            var rhs = permission.idParts.Value;
 
-                if (lhs != null && rhs != null && !lhs.Intersect(rhs).Any())
+            for (var i = 0; i < Math.Min(lhs.Length, rhs.Length); i++)
+            {
+                var l = lhs[i];
+                var r = rhs[i];
+
+                if (l != null && r != null && !l.Intersect(r).Any())
                 {
                     return false;
                 }
             }
 
             return true;
+        }
+
+        public bool StartsWith(string id)
+        {
+            return id.StartsWith(id, StringComparison.OrdinalIgnoreCase);
         }
 
         public override bool Equals(object obj)

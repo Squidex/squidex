@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             : base(typeNameRegistry)
         {
             AddEventMessage<AppContributorAssigned>(
-                "assigned {user:[Contributor]} as {[Permission]}");
+                "assigned {user:[Contributor]} as {[Role]}");
 
             AddEventMessage<AppContributorRemoved>(
                 "removed {user:[Contributor]} from app");
@@ -74,7 +74,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             return Task.FromResult(
                 ForEvent(@event, channel)
-                    .AddParameter("Contributor", @event.ContributorId).AddParameter("Permission", @event.Permission));
+                    .AddParameter("Contributor", @event.ContributorId).AddParameter("Role", @event.Role));
         }
 
         protected Task<HistoryEventToStore> On(AppClientAttached @event)

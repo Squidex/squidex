@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Core.Apps.Json
         public string Secret { get; set; }
 
         [JsonProperty]
-        public AppClientPermission Permission { get; set; }
+        public string Role { get; set; }
 
         public JsonAppClient()
         {
@@ -32,7 +32,7 @@ namespace Squidex.Domain.Apps.Core.Apps.Json
 
         public AppClient ToClient()
         {
-            return new AppClient(Name, Secret, Permission);
+            return new AppClient(Name, Secret, Role);
         }
     }
 }

@@ -60,29 +60,29 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         }
 
         [Fact]
-        public Task CanAssign_should_throw_exception_if_permission_not_valid()
+        public Task CanAssign_should_throw_exception_if_role_not_valid()
         {
-            var command = new AssignContributor { ContributorId = "1", Permission = (AppContributorPermission)10 };
+            var command = new AssignContributor { ContributorId = "1", Role = "Invalid" };
 
             return ValidationAssert.ThrowsAsync(() => GuardAppContributors.CanAssign(contributors_0, command, users, appPlan),
-                new ValidationError("Permission is not valid.", "Permission"));
+                new ValidationError("Role is not valid.", "Role"));
         }
 
         [Fact]
-        public Task CanAssign_should_throw_exception_if_user_already_exists_with_same_permission()
+        public Task CanAssign_should_throw_exception_if_user_already_exists_with_same_role()
         {
-            var command = new AssignContributor { ContributorId = "1" };
+            var command = new AssignContributor { ContributorId = "1", Role = Role.Owner };
 
-            var contributors_1 = contributors_0.Assign("1", AppContributorPermission.Owner);
+            var contributors_1 = contributors_0.Assign("1", Role.Owner);
 
             return ValidationAssert.ThrowsAsync(() => GuardAppContributors.CanAssign(contributors_1, command, users, appPlan),
-                new ValidationError("Contributor has already this permission.", "Permission"));
+                new ValidationError("Contributor has already this role.", "Role"));
         }
 
         [Fact]
         public Task CanAssign_should_throw_exception_if_user_not_found()
         {
-            var command = new AssignContributor { ContributorId = "notfound", Permission = (AppContributorPermission)10 };
+            var command = new AssignContributor { ContributorId = "notfound", Role = Role.Owner };
 
             return Assert.ThrowsAsync<DomainObjectNotFoundException>(() => GuardAppContributors.CanAssign(contributors_0, command, users, appPlan));
         }
@@ -90,7 +90,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         [Fact]
         public Task CanAssign_should_throw_exception_if_user_is_actor()
         {
-            var command = new AssignContributor { ContributorId = "3", Permission = AppContributorPermission.Editor, Actor = new RefToken("user", "3") };
+            var command = new AssignContributor { ContributorId = "3", Role = Role.Editor, Actor = new RefToken("user", "3") };
 
             return Assert.ThrowsAsync<SecurityException>(() => GuardAppContributors.CanAssign(contributors_0, command, users, appPlan));
         }
@@ -103,8 +103,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             var command = new AssignContributor { ContributorId = "3" };
 
-            var contributors_1 = contributors_0.Assign("1", AppContributorPermission.Owner);
-            var contributors_2 = contributors_1.Assign("2", AppContributorPermission.Editor);
+            var contributors_1 = contributors_0.Assign("1", Role.Owner);
+            var contributors_2 = contributors_1.Assign("2", Role.Editor);
 
             return ValidationAssert.ThrowsAsync(() => GuardAppContributors.CanAssign(contributors_2, command, users, appPlan),
                 new ValidationError("You have reached the maximum number of contributors for your plan."));
@@ -129,25 +129,25 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         }
 
         [Fact]
-        public Task CanAssign_should_not_throw_exception_if_contributor_has_another_permission()
+        public Task CanAssign_should_not_throw_exception_if_contributor_has_another_role()
         {
-            var command = new AssignContributor { ContributorId = "1" };
+            var command = new AssignContributor { ContributorId = "1", Role = Role.Developer };
 
-            var contributors_1 = contributors_0.Assign("1", AppContributorPermission.Editor);
+            var contributors_1 = contributors_0.Assign("1", Role.Editor);
 
             return GuardAppContributors.CanAssign(contributors_1, command, users, appPlan);
         }
 
         [Fact]
-        public Task CanAssign_should_not_throw_exception_if_contributor_max_reached_but_permission_changed()
+        public Task CanAssign_should_not_throw_exception_if_contributor_max_reached_but_role_changed()
         {
             A.CallTo(() => appPlan.MaxContributors)
                 .Returns(2);
 
-            var command = new AssignContributor { ContributorId = "1" };
+            var command = new AssignContributor { ContributorId = "1", Role = Role.Developer };
 
-            var contributors_1 = contributors_0.Assign("1", AppContributorPermission.Editor);
-            var contributors_2 = contributors_1.Assign("2", AppContributorPermission.Editor);
+            var contributors_1 = contributors_0.Assign("1", Role.Editor);
+            var contributors_2 = contributors_1.Assign("2", Role.Editor);
 
             return GuardAppContributors.CanAssign(contributors_2, command, users, appPlan);
         }
@@ -174,8 +174,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             var command = new RemoveContributor { ContributorId = "1" };
 
-            var contributors_1 = contributors_0.Assign("1", AppContributorPermission.Owner);
-            var contributors_2 = contributors_1.Assign("2", AppContributorPermission.Editor);
+            var contributors_1 = contributors_0.Assign("1", Role.Owner);
+            var contributors_2 = contributors_1.Assign("2", Role.Editor);
 
             ValidationAssert.Throws(() => GuardAppContributors.CanRemove(contributors_2, command),
                 new ValidationError("Cannot remove the only owner."));
@@ -186,8 +186,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             var command = new RemoveContributor { ContributorId = "1" };
 
-            var contributors_1 = contributors_0.Assign("1", AppContributorPermission.Owner);
-            var contributors_2 = contributors_1.Assign("2", AppContributorPermission.Owner);
+            var contributors_1 = contributors_0.Assign("1", Role.Owner);
+            var contributors_2 = contributors_1.Assign("2", Role.Owner);
 
             GuardAppContributors.CanRemove(contributors_2, command);
         }

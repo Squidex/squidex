@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Shared.Users;
 
@@ -45,7 +46,9 @@ namespace Squidex.Areas.Api.Controllers.Users.Models
 
         public static UserDto FromUser(IUser user)
         {
-            return SimpleMapper.Map(user, new UserDto { DisplayName = user.DisplayName(), Permissions = user.Permissions() });
+            var permissions = user.Permissions().ToIds().ToArray();
+
+            return SimpleMapper.Map(user, new UserDto { DisplayName = user.DisplayName(), Permissions = permissions });
         }
     }
 }

@@ -6,13 +6,15 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using Newtonsoft.Json;
 using NodaTime;
-using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Services;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Infrastructure.Security;
 using Squidex.Pipeline;
 using Squidex.Shared;
 
@@ -62,19 +64,23 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// </summary>
         public string PlanUpgrade { get; set; }
 
-        public static AppDto FromApp(IAppEntity app, string userId, string[] permissions, IAppPlansProvider plans)
+        public static AppDto FromApp(IAppEntity app, string userId, PermissionSet userPermissions, IAppPlansProvider plans)
         {
+            var permissions = new List<Permission>();
+
+            if (app.Contributors.TryGetValue(userId, out var roleName) && app.Roles.TryGetValue(roleName, out var role))
+            {
+                permissions.AddRange(role.Permissions);
+            }
+
+            if (userPermissions != null)
+            {
+                permissions.AddRange(userPermissions.ToAppPermissions(app.Name));
+            }
+
             var response = SimpleMapper.Map(app, new AppDto());
 
-            if (app.Contributors.TryGetValue(userId, out var role))
-            {
-                response.Permissions = role.ToPermissionIds(app.Name);
-            }
-            else
-            {
-                response.Permissions = permissions.ToAppPermissionIds(app.Name);
-            }
-
+            response.Permissions = permissions.Select(x => x.Id).ToArray();
             response.PlanName = plans.GetPlanForApp(app)?.Name;
             response.PlanUpgrade = plans.GetPlanUpgradeForApp(app)?.Name;
 
