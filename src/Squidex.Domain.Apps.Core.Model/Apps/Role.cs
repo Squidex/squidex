@@ -70,8 +70,7 @@ namespace Squidex.Domain.Apps.Core.Apps
             return new Role(Reader,
                 P.ForApp(P.AppAssetsRead, app),
                 P.ForApp(P.AppCommon, app),
-                P.ForApp(P.AppContentsRead, app),
-                P.ForApp(P.AppContentsGraphQL, app));
+                P.ForApp(P.AppContentsRead, app));
         }
 
         public static Role CreateDeveloper(string app)

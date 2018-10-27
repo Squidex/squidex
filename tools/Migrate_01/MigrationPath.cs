@@ -16,7 +16,7 @@ namespace Migrate_01
 {
     public sealed class MigrationPath : IMigrationPath
     {
-        private const int CurrentVersion = 11;
+        private const int CurrentVersion = 12;
         private readonly IServiceProvider serviceProvider;
 
         public MigrationPath(IServiceProvider serviceProvider)
@@ -56,6 +56,12 @@ namespace Migrate_01
             if (version < 5)
             {
                 yield return serviceProvider.GetRequiredService<RebuildSnapshots>();
+            }
+
+            // Version 12: Introduce roles.
+            else if (version < 12)
+            {
+                yield return serviceProvider.GetRequiredService<RebuildApps>();
             }
 
             // Version 09: Grain indexes.

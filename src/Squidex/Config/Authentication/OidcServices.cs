@@ -24,6 +24,7 @@ namespace Squidex.Config.Authentication
                     options.Authority = identityOptions.OidcAuthority;
                     options.ClientId = identityOptions.OidcClient;
                     options.ClientSecret = identityOptions.OidcSecret;
+                    options.Scope.Add(Constants.PermissionsScope);
                     options.RequireHttpsMetadata = false;
                 });
             }

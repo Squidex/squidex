@@ -243,6 +243,9 @@ namespace Squidex.Config.Domain
             services.AddTransientAs<RebuildSnapshots>()
                 .As<IMigration>();
 
+            services.AddTransientAs<RebuildApps>()
+                .As<IMigration>();
+
             services.AddTransientAs<RebuildAssets>()
                 .As<IMigration>();
 

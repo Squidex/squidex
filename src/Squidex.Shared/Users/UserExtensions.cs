@@ -51,13 +51,13 @@ namespace Squidex.Shared.Users
             user.SetClaim(SquidexClaimTypes.ConsentForEmails, value.ToString());
         }
 
-        public static void SetPermissions(this IUser user, params string[] permissions)
+        public static void SetPermissions(this IUser user, PermissionSet permissions)
         {
             user.RemoveClaims(SquidexClaimTypes.Permissions);
 
             foreach (var permission in permissions)
             {
-                user.AddClaim(new Claim(SquidexClaimTypes.Permissions, permission));
+                user.AddClaim(new Claim(SquidexClaimTypes.Permissions, permission.Id));
             }
         }
 
@@ -99,11 +99,6 @@ namespace Squidex.Shared.Users
         public static string DisplayName(this IUser user)
         {
             return user.GetClaimValue(SquidexClaimTypes.DisplayName);
-        }
-
-        public static PermissionSet Permissions(this ClaimsPrincipal principal)
-        {
-            return new PermissionSet(principal.Claims.Where(x => x.Type == SquidexClaimTypes.Permissions).Select(x => new Permission(x.Value)));
         }
 
         public static PermissionSet Permissions(this IUser user)

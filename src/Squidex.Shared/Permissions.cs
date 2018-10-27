@@ -16,6 +16,7 @@ namespace Squidex.Shared
         public const string All = "squidex.*";
 
         public const string Admin = "squidex.admin.*";
+        public const string AdminOrleans = "squidex.admin.orleans";
 
         public const string AdminRestore = "squidex.admin.restore";
         public const string AdminRestoreRead = "squidex.admin.restore.read";

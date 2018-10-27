@@ -17,7 +17,6 @@ namespace Squidex.Areas.IdentityServer
     {
         public static void ConfigureIdentityServer(this IApplicationBuilder app)
         {
-            app.ApplicationServices.UseMyAdminRole();
             app.ApplicationServices.UseMyAdmin();
 
             var environment = app.ApplicationServices.GetRequiredService<IHostingEnvironment>();

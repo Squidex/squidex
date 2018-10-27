@@ -53,7 +53,7 @@ export class UsersDataSource implements AutocompleteSource {
     ]
 })
 export class ContributorsPageComponent implements OnInit {
-    public usersPermissions = [ 'Owner', 'Developer', 'Editor' ];
+    public usersRoles = [ 'Owner', 'Developer', 'Editor', 'Reader' ];
 
     public assignContributorForm = new AssignContributorForm(this.formBuilder);
 
@@ -77,8 +77,8 @@ export class ContributorsPageComponent implements OnInit {
         this.contributorsState.revoke(contributor).pipe(onErrorResumeNext()).subscribe();
     }
 
-    public changePermission(contributor: AppContributorDto, permission: string) {
-        this.contributorsState.assign(new AppContributorDto(contributor.contributorId, permission)).pipe(onErrorResumeNext()).subscribe();
+    public changeRole(contributor: AppContributorDto, role: string) {
+        this.contributorsState.assign(new AppContributorDto(contributor.contributorId, role)).pipe(onErrorResumeNext()).subscribe();
     }
 
     public assignContributor() {

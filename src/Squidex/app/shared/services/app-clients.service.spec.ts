@@ -59,13 +59,13 @@ describe('AppClientsService', () => {
                 id: 'client1',
                 name: 'Client 1',
                 secret: 'secret1',
-                permission: 'Editor'
+                role: 'Editor'
             },
             {
                 id: 'client2',
                 name: 'Client 2',
                 secret: 'secret2',
-                permission: 'Developer'
+                role: 'Developer'
             }
         ], {
             headers: {
@@ -96,7 +96,7 @@ describe('AppClientsService', () => {
         expect(req.request.method).toEqual('POST');
         expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
-        req.flush({ id: 'client1', name: 'Client 1', secret: 'secret1', permission: 'Developer' });
+        req.flush({ id: 'client1', name: 'Client 1', secret: 'secret1', role: 'Developer' });
 
         expect(client!).toEqual(new AppClientDto('client1', 'Client 1', 'secret1', 'Developer'));
     }));

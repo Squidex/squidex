@@ -17,6 +17,7 @@ using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Security;
 using Squidex.Pipeline;
 using Squidex.Shared;
+using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
 
 namespace Squidex.Areas.Api.Controllers.Apps

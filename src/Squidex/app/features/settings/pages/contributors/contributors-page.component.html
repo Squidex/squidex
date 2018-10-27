@@ -32,8 +32,8 @@
                                 <span class="user-name table-cell">{{contributorInfo.contributor.contributorId | sqxUserName}}</span>
                             </td>
                             <td class="cell-time">
-                                <select class="form-control" [ngModel]="contributorInfo.contributor.permission" (ngModelChange)="changePermission(contributorInfo.contributor, $event)" [disabled]="contributorInfo.isCurrentUser">
-                                    <option *ngFor="let permission of usersPermissions" [ngValue]="permission">{{permission}}</option>
+                                <select class="form-control" [ngModel]="contributorInfo.contributor.role" (ngModelChange)="changeRole(contributorInfo.contributor, $event)" [disabled]="contributorInfo.isCurrentUser">
+                                    <option *ngFor="let role of usersRoles" [ngValue]="role">{{role}}</option>
                                 </select>
                             </td>
                             <td class="cell-actions">

@@ -36,6 +36,13 @@ namespace Squidex.Domain.Apps.Entities.History
             texts[typeNameRegistry.GetName<TEvent>()] = message;
         }
 
+        protected void AddEventMessage(string type, string message)
+        {
+            Guard.NotNullOrEmpty(message, nameof(message));
+
+            texts[type] = message;
+        }
+
         protected bool HasEventText(IEvent @event)
         {
             var message = typeNameRegistry.GetName(@event.GetType());

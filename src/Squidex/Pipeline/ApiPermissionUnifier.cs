@@ -8,26 +8,26 @@
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Authentication;
 using Squidex.Shared;
 using Squidex.Shared.Identity;
 
 namespace Squidex.Pipeline
 {
-    public sealed class ApiPermissionUnifier : IAsyncActionFilter
+    public sealed class ApiPermissionUnifier : IClaimsTransformation
     {
-        public Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
+        private const string AdministratorRole = "ADMINISTRATOR";
+
+        public Task<ClaimsPrincipal> TransformAsync(ClaimsPrincipal principal)
         {
-            var user = context.HttpContext.User;
+            var identity = principal.Identities.First();
 
-            var identity = user.Identities.First();
-
-            if (string.Equals(identity.FindFirst(identity.RoleClaimType)?.Value, SquidexRoles.Administrator))
+            if (string.Equals(identity.FindFirst(identity.RoleClaimType)?.Value, AdministratorRole))
             {
                 identity.AddClaim(new Claim(SquidexClaimTypes.Permissions, Permissions.Admin));
             }
 
-            return next();
+            return Task.FromResult(principal);
         }
     }
 }

@@ -7,7 +7,6 @@
 
 using System;
 using System.Linq;
-using System.Security;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
@@ -47,7 +46,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
                 if (string.Equals(command.ContributorId, command.Actor?.Identifier, StringComparison.OrdinalIgnoreCase) && !command.FromRestore)
                 {
-                    throw new SecurityException("You cannot change your own role.");
+                    throw new DomainForbiddenException("You cannot change your own role.");
                 }
 
                 if (contributors.TryGetValue(command.ContributorId, out var existing))

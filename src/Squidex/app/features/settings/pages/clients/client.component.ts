@@ -32,7 +32,7 @@ export class ClientComponent implements OnChanges {
     @Input()
     public client: AppClientDto;
 
-    public clientPermissions = [ 'Developer', 'Editor', 'Reader' ];
+    public clientRoles = [ 'Owner', 'Developer', 'Editor', 'Reader' ];
 
     public isRenaming = false;
 
@@ -58,8 +58,8 @@ export class ClientComponent implements OnChanges {
         this.clientsState.revoke(this.client).pipe(onErrorResumeNext()).subscribe();
     }
 
-    public update(permission: string) {
-        this.clientsState.update(this.client, new UpdateAppClientDto(undefined, permission)).pipe(onErrorResumeNext()).subscribe();
+    public update(role: string) {
+        this.clientsState.update(this.client, new UpdateAppClientDto(undefined, role)).pipe(onErrorResumeNext()).subscribe();
     }
 
     public toggleRename() {

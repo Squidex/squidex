@@ -34,7 +34,7 @@ export class AppClientDto extends Model {
         public readonly id: string,
         public readonly name: string,
         public readonly secret: string,
-        public readonly permission: string
+        public readonly role: string
     ) {
         super();
     }
@@ -54,7 +54,7 @@ export class CreateAppClientDto {
 export class UpdateAppClientDto {
     constructor(
         public readonly name?: string,
-        public readonly permission?: string
+        public readonly role?: string
     ) {
     }
 }
@@ -90,7 +90,7 @@ export class AppClientsService {
                             item.id,
                             item.name || body.id,
                             item.secret,
-                            item.permission);
+                            item.role);
                     });
 
                     return new AppClientsDto(clients, response.version);
@@ -109,7 +109,7 @@ export class AppClientsService {
                         body.id,
                         body.name || body.id,
                         body.secret,
-                        body.permission);
+                        body.role);
 
                     return new Versioned(response.version, client);
                 }),

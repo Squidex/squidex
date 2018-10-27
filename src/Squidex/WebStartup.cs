@@ -41,10 +41,10 @@ namespace Squidex
         {
             app.ApplicationServices.LogConfiguration();
 
+            app.UseMyTracking();
             app.UseMyLocalCache();
             app.UseMyCors();
             app.UseMyForwardingRules();
-            app.UseMyTracking();
 
             app.ConfigureApi();
             app.ConfigurePortal();

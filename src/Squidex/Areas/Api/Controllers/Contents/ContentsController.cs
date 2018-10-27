@@ -57,7 +57,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [HttpGet]
         [HttpPost]
         [Route("content/{app}/graphql/")]
-        [ApiPermission(Permissions.AppContentsGraphQL)]
+        [ApiPermission]
         [ApiCosts(2)]
         public async Task<IActionResult> PostGraphQL(string app, [FromBody] GraphQLQuery query)
         {
@@ -88,7 +88,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [HttpGet]
         [HttpPost]
         [Route("content/{app}/graphql/batch")]
-        [ApiPermission(Permissions.AppContentsGraphQL)]
+        [ApiPermission]
         [ApiCosts(2)]
         public async Task<IActionResult> PostGraphQLBatch(string app, [FromBody] GraphQLQuery[] batch)
         {
@@ -120,7 +120,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// </remarks>
         [HttpGet]
         [Route("content/{app}/{name}/")]
-        [ApiPermission(Permissions.AppContentsRead)]
+        [ApiPermission]
         [ApiCosts(2)]
         public async Task<IActionResult> GetContents(string app, string name, [FromQuery] bool archived = false, [FromQuery] string ids = null)
         {
@@ -159,7 +159,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// </remarks>
         [HttpGet]
         [Route("content/{app}/{name}/{id}/")]
-        [ApiPermission(Permissions.AppContentsRead)]
+        [ApiPermission]
         [ApiCosts(1)]
         public async Task<IActionResult> GetContent(string app, string name, Guid id)
         {

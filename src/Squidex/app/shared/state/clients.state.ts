@@ -118,4 +118,4 @@ export class ClientsState extends State<Snapshot> {
 }
 
 const update = (client: AppClientDto, request: UpdateAppClientDto) =>
-    client.with({ name: request.name || client.name, permission: request.permission || client.permission });
+    client.with({ name: request.name || client.name, role: request.role || client.role });

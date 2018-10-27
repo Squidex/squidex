@@ -75,7 +75,7 @@ namespace Squidex.Areas.Api.Controllers.Users
         [ApiPermission(Permissions.AdminUsersCreate)]
         public async Task<IActionResult> PostUser([FromBody] CreateUserDto request)
         {
-            var user = await userManager.CreateAsync(userFactory, request.Email, request.DisplayName, request.Password, request.Permissions);
+            var user = await userManager.CreateAsync(userFactory, request.Email, request.DisplayName, request.Password, new PermissionSet(request.Permissions));
 
             var response = new UserCreatedDto { Id = user.Id };
 
@@ -87,7 +87,7 @@ namespace Squidex.Areas.Api.Controllers.Users
         [ApiPermission(Permissions.AdminUsersUpdate)]
         public async Task<IActionResult> PutUser(string id, [FromBody] UpdateUserDto request)
         {
-            await userManager.UpdateAsync(id, request.Email, request.DisplayName, request.Password, request.Permissions);
+            await userManager.UpdateAsync(id, request.Email, request.DisplayName, request.Password, new PermissionSet(request.Permissions));
 
             return NoContent();
         }

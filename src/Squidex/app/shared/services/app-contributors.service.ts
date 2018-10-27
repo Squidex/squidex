@@ -33,7 +33,7 @@ export class AppContributorsDto extends Model {
 export class AppContributorDto extends Model {
     constructor(
         public readonly contributorId: string,
-        public readonly permission: string
+        public readonly role: string
     ) {
         super();
     }
@@ -68,7 +68,7 @@ export class AppContributorsService {
                         items.map(item => {
                             return new AppContributorDto(
                                 item.contributorId,
-                                item.permission);
+                                item.role);
                         }),
                         body.maxContributors, response.version);
                 }),

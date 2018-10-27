@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Config.Domain;
 using Squidex.Pipeline;
@@ -18,10 +19,10 @@ namespace Squidex.Config.Web
             services.AddSingletonAs<FileCallbackResultExecutor>()
                 .AsSelf();
 
-            services.AddSingletonAs<AppResolver>()
+            services.AddSingletonAs<ApiCostsFilter>()
                 .AsSelf();
 
-            services.AddSingletonAs<ApiCostsFilter>()
+            services.AddSingletonAs<AppResolver>()
                 .AsSelf();
 
             services.AddSingletonAs<EnforceHttpsMiddleware>()
@@ -33,10 +34,12 @@ namespace Squidex.Config.Web
             services.AddSingletonAs<RequestLogPerformanceMiddleware>()
                 .AsSelf();
 
+            services.AddSingletonAs<ApiPermissionUnifier>()
+                .As<IClaimsTransformation>();
+
             services.AddMvc(options =>
             {
                 options.Filters.Add<ETagFilter>();
-                options.Filters.Add<ApiPermissionUnifier>();
                 options.Filters.Add<AppResolver>();
             }).AddMySerializers();
 

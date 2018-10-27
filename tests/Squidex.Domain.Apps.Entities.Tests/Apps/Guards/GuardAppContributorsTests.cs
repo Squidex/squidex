@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Security;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.Apps;
@@ -92,7 +91,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             var command = new AssignContributor { ContributorId = "3", Role = Role.Editor, Actor = new RefToken("user", "3") };
 
-            return Assert.ThrowsAsync<SecurityException>(() => GuardAppContributors.CanAssign(contributors_0, command, users, appPlan));
+            return Assert.ThrowsAsync<DomainForbiddenException>(() => GuardAppContributors.CanAssign(contributors_0, command, users, appPlan));
         }
 
         [Fact]

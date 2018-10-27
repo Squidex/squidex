@@ -11,6 +11,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Security;
 using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Users
@@ -45,7 +46,7 @@ namespace Squidex.Domain.Users
             return result;
         }
 
-        public static async Task<IUser> CreateAsync(this UserManager<IUser> userManager, IUserFactory factory, string email, string displayName, string password, string[] permissions = null)
+        public static async Task<IUser> CreateAsync(this UserManager<IUser> userManager, IUserFactory factory, string email, string displayName, string password, PermissionSet permissions = null)
         {
             var user = factory.Create(email);
 
@@ -85,7 +86,7 @@ namespace Squidex.Domain.Users
             return userManager.UpdateAsync(user);
         }
 
-        public static async Task UpdateAsync(this UserManager<IUser> userManager, string id, string email, string displayName, string password, string[] permissions = null)
+        public static async Task UpdateAsync(this UserManager<IUser> userManager, string id, string email, string displayName, string password, PermissionSet permissions = null)
         {
             var user = await userManager.FindByIdAsync(id);
 
