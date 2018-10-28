@@ -15,19 +15,14 @@ namespace Squidex.Pipeline
 {
     public class FileCallbackResult : FileResult
     {
-        private readonly Func<Stream, Task> callback;
-
-        public Func<Stream, Task> Callback
-        {
-            get { return callback; }
-        }
+        public Func<Stream, Task> Callback { get; }
 
         public FileCallbackResult(string contentType, string name, Func<Stream, Task> callback)
             : base(contentType)
         {
             FileDownloadName = name;
 
-            this.callback = callback;
+            Callback = callback;
         }
 
         public override Task ExecuteResultAsync(ActionContext context)

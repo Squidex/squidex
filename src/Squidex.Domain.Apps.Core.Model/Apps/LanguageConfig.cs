@@ -13,14 +13,12 @@ namespace Squidex.Domain.Apps.Core.Apps
 {
     public sealed class LanguageConfig : IFieldPartitionItem
     {
+        private static readonly Language[] DefaultFallback = new Language[0];
         private readonly Language language;
         private readonly Language[] languageFallbacks;
         private readonly bool isOptional;
 
-        public bool IsOptional
-        {
-            get { return isOptional; }
-        }
+        public bool IsOptional { get; }
 
         public Language Language
         {
@@ -56,10 +54,10 @@ namespace Squidex.Domain.Apps.Core.Apps
         {
             Guard.NotNull(language, nameof(language));
 
-            this.isOptional = isOptional;
+            IsOptional = isOptional;
 
             this.language = language;
-            this.languageFallbacks = fallback ?? new Language[0];
+            this.languageFallbacks = fallback ?? DefaultFallback;
         }
     }
 }

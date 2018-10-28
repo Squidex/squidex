@@ -12,7 +12,7 @@ using P = Squidex.Shared.Permissions;
 
 namespace Squidex.Domain.Apps.Core.Apps
 {
-    public sealed class Role
+    public sealed class Role : Named
     {
         public const string Editor = "Editor";
         public const string Developer = "Developer";
@@ -27,16 +27,12 @@ namespace Squidex.Domain.Apps.Core.Apps
             Reader
         };
 
-        public string Name { get; }
-
         public PermissionSet Permissions { get; }
 
         public Role(string name, PermissionSet permissions)
+            : base(name)
         {
-            Guard.NotNullOrEmpty(name, nameof(name));
             Guard.NotNull(permissions, nameof(permissions));
-
-            Name = name;
 
             Permissions = permissions;
         }
@@ -60,9 +56,9 @@ namespace Squidex.Domain.Apps.Core.Apps
         public static Role CreateEditor(string app)
         {
             return new Role(Editor,
+                P.ForApp(P.AppAssets, app),
                 P.ForApp(P.AppCommon, app),
-                P.ForApp(P.AppContents, app),
-                P.ForApp(P.AppAssets, app));
+                P.ForApp(P.AppContents, app));
         }
 
         public static Role CreateReader(string app)

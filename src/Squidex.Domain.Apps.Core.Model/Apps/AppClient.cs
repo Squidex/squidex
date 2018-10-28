@@ -10,36 +10,21 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Apps
 {
-    public sealed class AppClient
+    public sealed class AppClient : Named
     {
-        private readonly string name;
-        private readonly string secret;
-        private readonly string role;
+        public string Role { get; }
 
-        public string Name
-        {
-            get { return name; }
-        }
-
-        public string Secret
-        {
-            get { return secret; }
-        }
-
-        public string Role
-        {
-            get { return role; }
-        }
+        public string Secret { get; }
 
         public AppClient(string name, string secret, string role)
+            : base(name)
         {
-            Guard.NotNullOrEmpty(name, nameof(name));
             Guard.NotNullOrEmpty(secret, nameof(secret));
             Guard.NotNullOrEmpty(role, nameof(role));
+            
+            Role = role;
 
-            this.name = name;
-            this.role = role;
-            this.secret = secret;
+            Secret = secret;
         }
 
         [Pure]
@@ -47,7 +32,7 @@ namespace Squidex.Domain.Apps.Core.Apps
         {
             Guard.NotNullOrEmpty(newRole, nameof(newRole));
 
-            return new AppClient(name, secret, newRole);
+            return new AppClient(Name, Secret, newRole);
         }
 
         [Pure]
@@ -55,7 +40,7 @@ namespace Squidex.Domain.Apps.Core.Apps
         {
             Guard.NotNullOrEmpty(newName, nameof(newName));
 
-            return new AppClient(newName, secret, role);
+            return new AppClient(newName, Secret, Role);
         }
     }
 }
