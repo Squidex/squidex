@@ -48,7 +48,11 @@ module.exports = {
             test: /\.mjs$/,
             type: "javascript/auto",
             include: [/node_modules/],
-          },{
+          }, {
+            test: /[\/\\]@angular[\/\\]core[\/\\].+\.js$/, // Remove warning from angular6
+            parser: { system: true },
+            include: [/node_modules/],
+          }, {
             test: /\.ts$/,
             use: [{
                 loader: 'awesome-typescript-loader', options: { useCache: true, useBabel: true }
@@ -140,6 +144,7 @@ module.exports = {
         }),
         
         new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, /en/),
+        new webpack.ContextReplacementPlugin(/\@angular(\\|\/)core(\\|\/)fesm5/, helpers.root('app')), // Remove warning from angular6
 
         /**
          * Shim additional libraries

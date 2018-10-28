@@ -58,7 +58,7 @@ namespace Squidex.Pipeline
                     FindByOpenIdSubject(app, user) ??
                     FindByOpenIdClient(app, user);
 
-                if (permissions.Count == 0)
+                if (permissions == null || permissions.Count == 0)
                 {
                     var set = user.Permissions();
 
@@ -69,11 +69,14 @@ namespace Squidex.Pipeline
                     }
                 }
 
-                var identity = user.Identities.First();
-
-                foreach (var permission in permissions)
+                if (permissions != null)
                 {
-                    identity.AddClaim(new Claim(SquidexClaimTypes.Permissions, permission.Id));
+                    var identity = user.Identities.First();
+
+                    foreach (var permission in permissions)
+                    {
+                        identity.AddClaim(new Claim(SquidexClaimTypes.Permissions, permission.Id));
+                    }
                 }
 
                 context.HttpContext.Features.Set<IAppFeature>(new AppFeature(app));
@@ -91,7 +94,7 @@ namespace Squidex.Pipeline
                 return role.Permissions;
             }
 
-            return PermissionSet.Empty;
+            return null;
         }
 
         private static PermissionSet FindByOpenIdSubject(IAppEntity app, ClaimsPrincipal user)
@@ -103,7 +106,7 @@ namespace Squidex.Pipeline
                 return role.Permissions;
             }
 
-            return PermissionSet.Empty;
+            return null;
         }
     }
 }

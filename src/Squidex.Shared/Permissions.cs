@@ -53,7 +53,6 @@ namespace Squidex.Shared
         public const string AppContributorsRevoke = "squidex.apps.{app}.contributors.revoke";
 
         public const string AppLanguages = "squidex.apps.{app}.languages";
-        public const string AppLanguagesRead = "squidex.apps.{app}.languages.read";
         public const string AppLanguagesCreate = "squidex.apps.{app}.languages.create";
         public const string AppLanguagesUpdate = "squidex.apps.{app}.languages.update";
         public const string AppLanguagesDelete = "squidex.apps.{app}.languages.delete";

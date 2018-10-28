@@ -104,6 +104,10 @@ export class SchemaCategoryComponent implements OnInit, OnChanges {
         this.schemasState.changeCategory(schema, this.name).pipe(onErrorResumeNext()).subscribe();
     }
 
+    public schemaPermission(schema: SchemaDto) {
+        return `?squidex.apps.{app}.schemas.${schema.name}.*;squidex.apps.{app}.contents.${schema.name}.*`;
+    }
+
     public schemaRoute(schema: SchemaDto) {
         return schema.isSingleton && this.routeSingletonToContent ? [schema.name, schema.id] : [schema.name];
     }
