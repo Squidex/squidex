@@ -70,13 +70,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                         new GeolocationFieldProperties())
                     .AddTags(11, "my-tags", Partitioning.Invariant,
                         new TagsFieldProperties())
-                    .AddArray(12, "my-array", Partitioning.Invariant, f => f
+                    .AddString(12, "my-localized", Partitioning.Language,
+                        new StringFieldProperties())
+                    .AddArray(13, "my-array", Partitioning.Invariant, f => f
                         .AddBoolean(121, "nested-boolean")
                         .AddNumber(122, "nested-number"));
 
             A.CallTo(() => app.Id).Returns(appId);
             A.CallTo(() => app.Name).Returns(appName);
-            A.CallTo(() => app.LanguagesConfig).Returns(LanguagesConfig.Build(Language.DE));
+            A.CallTo(() => app.LanguagesConfig).Returns(LanguagesConfig.Build(Language.DE, Language.GermanGermany));
 
             context = QueryContext.Create(app, user);
 
@@ -126,6 +128,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     .AddField("my-json",
                         new ContentFieldData()
                             .AddValue("iv", JToken.FromObject(new { value = 1 })))
+                    .AddField("my-localized",
+                        new ContentFieldData()
+                            .AddValue("de-DE", "de-DE"))
                     .AddField("my-array",
                         new ContentFieldData()
                             .AddValue("iv", new JArray(
