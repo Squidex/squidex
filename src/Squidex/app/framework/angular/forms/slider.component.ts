@@ -32,10 +32,10 @@ export class SliderComponent implements ControlValueAccessor {
     private isDragging = false;
 
     @ViewChild('bar')
-    public bar: ElementRef;
+    public bar: ElementRef<Element>;
 
     @ViewChild('thumb')
-    public thumb: ElementRef;
+    public thumb: ElementRef<Element>;
 
     @Input()
     public min = 0;

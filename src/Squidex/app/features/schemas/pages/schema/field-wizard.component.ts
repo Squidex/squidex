@@ -24,7 +24,7 @@ import {
 })
 export class FieldWizardComponent implements OnInit {
     @ViewChild('nameInput')
-    public nameInput: ElementRef;
+    public nameInput: ElementRef<HTMLElement>;
 
     @Input()
     public schema: SchemaDetailsDto;
