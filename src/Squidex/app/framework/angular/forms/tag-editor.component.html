@@ -9,6 +9,9 @@
 
         <input type="text" class="blank" #input
             (blur)="markTouched()"
+            (cut)="onCut($event)"
+            (copy)="onCopy($event)"
+            (paste)="onPaste($event)"
             (focus)="focus()"
             (keydown)="onKeyDown($event)"
             [formControl]="addInput"

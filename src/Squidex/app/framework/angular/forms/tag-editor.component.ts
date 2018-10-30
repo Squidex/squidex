@@ -115,10 +115,10 @@ export class TagEditorComponent implements AfterViewInit, ControlValueAccessor, 
     public inputName = 'tag-editor';
 
     @ViewChild('form')
-    public formElement: ElementRef;
+    public formElement: ElementRef<Element>;
 
     @ViewChild('input')
-    public inputElement: ElementRef;
+    public inputElement: ElementRef<HTMLInputElement>;
 
     public hasFocus = false;
 
@@ -338,6 +338,51 @@ export class TagEditorComponent implements AfterViewInit, ControlValueAccessor, 
 
     private down() {
         this.selectIndex(this.suggestedIndex + 1);
+    }
+
+    public onCut(event: ClipboardEvent) {
+        if (!this.hasSelection()) {
+            this.onCopy(event);
+
+            this.updateItems([]);
+        }
+    }
+
+    public onCopy(event: ClipboardEvent) {
+        if (!this.hasSelection()) {
+            event.clipboardData.setData('text/plain', this.items.filter(x => !!x).join(','));
+
+            event.preventDefault();
+        }
+    }
+
+    public onPaste(event: ClipboardEvent) {
+        const value = event.clipboardData.getData('text/plain');
+
+        if (value) {
+            this.resetForm();
+
+            const values = [...this.items];
+
+            for (let part of value.split(',')) {
+                const converted = this.converter.convert(part);
+
+                if (converted) {
+                    values.push(converted);
+                }
+            }
+
+            this.updateItems(values);
+        }
+
+        event.preventDefault();
+    }
+
+    private hasSelection() {
+        const s = this.inputElement.nativeElement.selectionStart;
+        const e = this.inputElement.nativeElement.selectionEnd;
+
+        return s && e && (e - s) > 0;
     }
 
     private updateItems(items: any[]) {

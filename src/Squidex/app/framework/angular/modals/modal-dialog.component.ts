@@ -47,10 +47,10 @@ export class ModalDialogComponent implements AfterViewInit {
     public closed = new EventEmitter();
 
     @ViewChild('tabsElement')
-    public tabsElement: ElementRef;
+    public tabsElement: ElementRef<ParentNode>;
 
     @ViewChild('footerElement')
-    public footerElement: ElementRef;
+    public footerElement: ElementRef<ParentNode>;
 
     public hasTabs = false;
     public hasFooter = false;

@@ -32,7 +32,7 @@ export class IFrameEditorComponent implements ControlValueAccessor, AfterViewIni
     private plugin: HTMLIFrameElement;
 
     @ViewChild('iframe')
-    public iframe: ElementRef;
+    public iframe: ElementRef<HTMLIFrameElement>;
 
     @Input()
     public set url(value: string) {

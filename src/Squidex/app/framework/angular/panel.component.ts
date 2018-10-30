@@ -59,7 +59,7 @@ export class PanelComponent implements AfterViewInit, OnDestroy, OnInit {
     public sidebarClass = '';
 
     @ViewChild('panel')
-    public panel: ElementRef;
+    public panel: ElementRef<HTMLElement>;
 
     constructor(
         private readonly container: PanelContainerDirective,
