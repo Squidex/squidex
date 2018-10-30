@@ -56,6 +56,8 @@ export class Profile {
 
         if (Types.isArrayOfString(permissions)) {
             this.permissions = permissions.map(x => new Permission(x));
+        } else if (Types.isString(permissions)) {
+            this.permissions = [new Permission(permissions)];
         } else {
             this.permissions = [];
         }

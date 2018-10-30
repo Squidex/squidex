@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 #pragma warning disable 4014
@@ -46,7 +47,7 @@ namespace Squidex.Infrastructure
             IDisposable subscription = null;
             try
             {
-                var receiveTask = new TaskCompletionSource<TResponse>();
+                var receiveTask = new TaskCompletionSource<TResponse>(TaskCreationOptions.RunContinuationsAsynchronously);
 
                 subscription = pubsub.Subscribe<Response<TResponse>>(response =>
                 {
@@ -58,15 +59,21 @@ namespace Squidex.Infrastructure
 
                 Task.Run(() => pubsub.Publish(request, self));
 
-                var firstTask = await Task.WhenAny(receiveTask.Task, Task.Delay(timeout));
+                using (var cts = new CancellationTokenSource())
+                {
+                    var delayTask = Task.Delay(timeout, cts.Token);
 
-                if (firstTask.Id != receiveTask.Task.Id)
-                {
-                    throw new TaskCanceledException();
-                }
-                else
-                {
-                    return await receiveTask.Task;
+                    var resultTask = await Task.WhenAny(receiveTask.Task, delayTask);
+                    if (resultTask == delayTask)
+                    {
+                        throw new TaskCanceledException();
+                    }
+                    else
+                    {
+                        cts.Cancel();
+
+                        return await receiveTask.Task;
+                    }
                 }
             }
             finally
