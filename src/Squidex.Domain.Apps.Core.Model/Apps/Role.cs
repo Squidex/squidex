@@ -8,6 +8,7 @@
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using P = Squidex.Shared.Permissions;
 
 namespace Squidex.Domain.Apps.Core.Apps
@@ -40,6 +41,12 @@ namespace Squidex.Domain.Apps.Core.Apps
         public Role(string name, params Permission[] permissions)
             : this(name, new PermissionSet(permissions))
         {
+        }
+
+        [Pure]
+        public Role Update(string[] permissions)
+        {
+            return new Role(Name, new PermissionSet(permissions));
         }
 
         public static bool IsDefaultRole(string role)

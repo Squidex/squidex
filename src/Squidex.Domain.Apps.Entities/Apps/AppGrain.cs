@@ -133,10 +133,34 @@ namespace Squidex.Domain.Apps.Entities.Apps
                         UpdateLanguage(c);
                     });
 
+                case AddRole addRole:
+                    return UpdateAsync(addRole, c =>
+                    {
+                        GuardAppRoles.CanAdd(Snapshot.Roles, c);
+
+                        AddRole(c);
+                    });
+
+                case DeleteRole deleteRole:
+                    return UpdateAsync(deleteRole, c =>
+                    {
+                        GuardAppRoles.CanDelete(Snapshot.Roles, c, Snapshot.Contributors, Snapshot.Clients);
+
+                        DeleteRole(c);
+                    });
+
+                case UpdateRole updateRole:
+                    return UpdateAsync(updateRole, c =>
+                    {
+                        GuardAppRoles.CanUpdate(Snapshot.Roles, c);
+
+                        UpdateRole(c);
+                    });
+
                 case AddPattern addPattern:
                     return UpdateAsync(addPattern, c =>
                     {
-                        GuardAppPattern.CanAdd(Snapshot.Patterns, c);
+                        GuardAppPatterns.CanAdd(Snapshot.Patterns, c);
 
                         AddPattern(c);
                     });
@@ -144,7 +168,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 case DeletePattern deletePattern:
                     return UpdateAsync(deletePattern, c =>
                     {
-                        GuardAppPattern.CanDelete(Snapshot.Patterns, c);
+                        GuardAppPatterns.CanDelete(Snapshot.Patterns, c);
 
                         DeletePattern(c);
                     });
@@ -152,7 +176,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 case UpdatePattern updatePattern:
                     return UpdateAsync(updatePattern, c =>
                     {
-                        GuardAppPattern.CanUpdate(Snapshot.Patterns, c);
+                        GuardAppPatterns.CanUpdate(Snapshot.Patterns, c);
 
                         UpdatePattern(c);
                     });
@@ -285,6 +309,21 @@ namespace Squidex.Domain.Apps.Entities.Apps
         public void UpdatePattern(UpdatePattern command)
         {
             RaiseEvent(SimpleMapper.Map(command, new AppPatternUpdated()));
+        }
+
+        public void AddRole(AddRole command)
+        {
+            RaiseEvent(SimpleMapper.Map(command, new AppRoleAdded()));
+        }
+
+        public void DeleteRole(DeleteRole command)
+        {
+            RaiseEvent(SimpleMapper.Map(command, new AppRoleDeleted()));
+        }
+
+        public void UpdateRole(UpdateRole command)
+        {
+            RaiseEvent(SimpleMapper.Map(command, new AppRoleUpdated()));
         }
 
         public void ArchiveApp(ArchiveApp command)

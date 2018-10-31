@@ -16,7 +16,6 @@ namespace Squidex.Domain.Apps.Core.Apps
         private static readonly Language[] DefaultFallback = new Language[0];
         private readonly Language language;
         private readonly Language[] languageFallbacks;
-        private readonly bool isOptional;
 
         public bool IsOptional { get; }
 

@@ -100,6 +100,21 @@ namespace Squidex.Domain.Apps.Entities.Apps.State
             Patterns = Patterns.Update(@event.PatternId, @event.Name, @event.Pattern, @event.Message);
         }
 
+        protected void On(AppRoleAdded @event)
+        {
+            Roles = Roles.Add(@event.Name);
+        }
+
+        protected void On(AppRoleDeleted @event)
+        {
+            Roles = Roles.Remove(@event.Name);
+        }
+
+        protected void On(AppRoleUpdated @event)
+        {
+            Roles = Roles.Update(@event.Name, @event.Permissions);
+        }
+
         protected void On(AppLanguageAdded @event)
         {
             LanguagesConfig = LanguagesConfig.Set(new LanguageConfig(@event.Language));

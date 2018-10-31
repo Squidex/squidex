@@ -12,7 +12,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Guards
 {
-    public static class GuardAppPattern
+    public static class GuardAppPatterns
     {
         public static void CanAdd(AppPatterns patterns, AddPattern command)
         {
