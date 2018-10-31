@@ -66,7 +66,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [ProducesResponseType(typeof(ErrorDto), 400)]
         [ApiPermission(Permissions.AppLanguagesCreate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PostLanguage(string app, [FromBody] AddAppLanguageDto request)
+        public async Task<IActionResult> PostLanguage(string app, [FromBody] AddLanguageDto request)
         {
             var command = request.ToCommand();
 
@@ -92,7 +92,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [Route("apps/{app}/languages/{language}/")]
         [ApiPermission(Permissions.AppLanguagesUpdate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> Update(string app, string language, [FromBody] UpdateAppLanguageDto request)
+        public async Task<IActionResult> Update(string app, string language, [FromBody] UpdateLanguageDto request)
         {
             await CommandBus.PublishAsync(request.ToCommand(ParseLanguage(language)));
 

@@ -6,23 +6,28 @@
 // ==========================================================================
 
 using System.ComponentModel.DataAnnotations;
+using Newtonsoft.Json;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models
 {
-    public sealed class AddAppLanguageDto
+    public sealed class AssignContributorDto
     {
         /// <summary>
-        /// The language to add.
+        /// The id or email of the user to add to the app.
         /// </summary>
         [Required]
-        public Language Language { get; set; }
+        public string ContributorId { get; set; }
 
-        public AddLanguage ToCommand()
+        /// <summary>
+        /// The role of the contributor.
+        /// </summary>
+        public string Role { get; set; }
+
+        public AssignContributor ToCommand()
         {
-            return SimpleMapper.Map(this, new AddLanguage());
+            return SimpleMapper.Map(this, new AssignContributor());
         }
     }
 }

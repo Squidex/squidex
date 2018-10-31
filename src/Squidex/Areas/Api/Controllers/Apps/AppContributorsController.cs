@@ -68,7 +68,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [ProducesResponseType(typeof(ErrorDto), 400)]
         [ApiPermission(Permissions.AppContributorsAssign)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PostContributor(string app, [FromBody] AssignAppContributorDto request)
+        public async Task<IActionResult> PostContributor(string app, [FromBody] AssignContributorDto request)
         {
             var command = request.ToCommand();
             var context = await CommandBus.PublishAsync(command);

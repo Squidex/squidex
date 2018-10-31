@@ -54,7 +54,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         }
 
         /// <summary>
-        /// Create a new app patterm.
+        /// Create a new app pattern.
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="request">Pattern to be added to the app.</param>
@@ -80,7 +80,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         }
 
         /// <summary>
-        /// Update an existing app patterm.
+        /// Update an existing app pattern.
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="id">The id of the pattern to be updated.</param>

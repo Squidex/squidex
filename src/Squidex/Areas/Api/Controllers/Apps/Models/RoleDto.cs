@@ -1,32 +1,33 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using System.ComponentModel.DataAnnotations;
-using Squidex.Domain.Apps.Entities.Apps.Commands;
-using Squidex.Infrastructure.Reflection;
+using System.Linq;
+using Squidex.Domain.Apps.Core.Apps;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models
 {
-    public sealed class UpdateAppClientDto
+    public sealed class RoleDto
     {
         /// <summary>
-        /// The new display name of the client.
+        /// The role name.
         /// </summary>
-        [StringLength(20)]
+        [Required]
         public string Name { get; set; }
 
         /// <summary>
-        /// The role of the client.
+        /// Associated list of permissions.
         /// </summary>
-        public string Role { get; set; }
+        [Required]
+        public string[] Permissions { get; set; }
 
-        public UpdateClient ToCommand(string clientId)
+        public static RoleDto FromRole(Role role)
         {
-            return SimpleMapper.Map(this, new UpdateClient { Id = clientId });
+            return new RoleDto { Name = role.Name, Permissions = role.Permissions.Select(x => x.Id).ToArray() };
         }
     }
 }

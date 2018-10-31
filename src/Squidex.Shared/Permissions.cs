@@ -5,7 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
 
@@ -13,6 +16,19 @@ namespace Squidex.Shared
 {
     public static class Permissions
     {
+        private static readonly List<string> ForAppsNonSchemaList = new List<string>();
+        private static readonly List<string> ForAppsSchemaList = new List<string>();
+
+        public static IReadOnlyList<string> ForAppsNonSchema
+        {
+            get { return ForAppsNonSchemaList; }
+        }
+
+        public static IReadOnlyList<string> ForAppsSchema
+        {
+            get { return ForAppsSchemaList; }
+        }
+
         public const string All = "squidex.*";
 
         public const string Admin = "squidex.admin.*";
@@ -34,12 +50,9 @@ namespace Squidex.Shared
         public const string AdminUsersLock = "squidex.admin.users.lock";
 
         public const string App = "squidex.apps.{app}";
-
-        public const string AppDelete = "squidex.apps.{app}.delete";
-
         public const string AppCommon = "squidex.apps.{app}.common";
 
-        public const string AppApi = "squidex.apps.{app}.api";
+        public const string AppDelete = "squidex.apps.{app}.delete";
 
         public const string AppClients = "squidex.apps.{app}.clients";
         public const string AppClientsRead = "squidex.apps.{app}.clients.read";
@@ -56,6 +69,12 @@ namespace Squidex.Shared
         public const string AppLanguagesCreate = "squidex.apps.{app}.languages.create";
         public const string AppLanguagesUpdate = "squidex.apps.{app}.languages.update";
         public const string AppLanguagesDelete = "squidex.apps.{app}.languages.delete";
+
+        public const string AppRoles = "squidex.apps.{app}.roles";
+        public const string AppRolesRead = "squidex.apps.{app}.roles.read";
+        public const string AppRolesCreate = "squidex.apps.{app}.roles.create";
+        public const string AppRolesUpdate = "squidex.apps.{app}.roles.update";
+        public const string AppRolesDelete = "squidex.apps.{app}.roles.delete";
 
         public const string AppPatterns = "squidex.apps.{app}.patterns";
         public const string AppPatternsRead = "squidex.apps.{app}.patterns.read";
@@ -104,6 +123,31 @@ namespace Squidex.Shared
         public const string AppContentsPublish = "squidex.apps.{app}.contents.{name}.publish";
         public const string AppContentsUnpublish = "squidex.apps.{app}.contents.{name}.unpublish";
         public const string AppContentsDelete = "squidex.apps.{app}.contents.{name}.delete";
+
+        public const string AppApi = "squidex.apps.{app}.api";
+
+        static Permissions()
+        {
+            foreach (var field in typeof(Permissions).GetFields(BindingFlags.Public | BindingFlags.Static))
+            {
+                if (field.IsLiteral && !field.IsInitOnly)
+                {
+                    var value = (string)field.GetValue(null);
+
+                    if (value.StartsWith(App, StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (value.IndexOf("{name}", App.Length, StringComparison.OrdinalIgnoreCase) >= 0)
+                        {
+                            ForAppsSchemaList.Add(value);
+                        }
+                        else
+                        {
+                            ForAppsNonSchemaList.Add(value);
+                        }
+                    }
+                }
+            }
+        }
 
         public static Permission ForApp(string id, string app = "*", string schema = "*")
         {

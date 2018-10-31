@@ -70,7 +70,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [ProducesResponseType(typeof(ClientDto), 201)]
         [ApiPermission(Permissions.AppClientsCreate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PostClient(string app, [FromBody] CreateAppClientDto request)
+        public async Task<IActionResult> PostClient(string app, [FromBody] CreateClientDto request)
         {
             var command = request.ToCommand();
 
@@ -99,7 +99,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [Route("apps/{app}/clients/{clientId}/")]
         [ApiPermission(Permissions.AppClientsUpdate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PutClient(string app, string clientId, [FromBody] UpdateAppClientDto request)
+        public async Task<IActionResult> PutClient(string app, string clientId, [FromBody] UpdateClientDto request)
         {
             await CommandBus.PublishAsync(request.ToCommand(clientId));
 

@@ -13,7 +13,8 @@ namespace Squidex.Infrastructure.Security
 {
     public sealed class Permission : IComparable<Permission>, IEquatable<Permission>
     {
-        private const string Any = "*";
+        public const string Any = "*";
+
         private static readonly char[] MainSeparators = { '.' };
         private static readonly char[] AlternativeSeparators = { '|' };
         private readonly string id;

@@ -112,7 +112,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.State
 
         protected void On(AppRoleUpdated @event)
         {
-            Roles = Roles.Update(@event.Name, @event.Permissions);
+            Roles = Roles.Update(@event.Name, @event.Permissions.Prefix(Name));
         }
 
         protected void On(AppLanguageAdded @event)
