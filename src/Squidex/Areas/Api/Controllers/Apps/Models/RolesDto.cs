@@ -20,16 +20,11 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         [Required]
         public RoleDto[] Roles { get; set; }
 
-        /// <summary>
-        /// Suggested permissions.
-        /// </summary>
-        public string[] AllPermissions { get; set; }
-
-        public static RolesDto FromApp(IAppEntity app, List<string> permissions)
+        public static RolesDto FromApp(IAppEntity app)
         {
-            var roles = app.Roles.Values.Select(RoleDto.FromRole).ToArray();
+            var roles = app.Roles.Values.Select(x => RoleDto.FromRole(x, app.Name)).ToArray();
 
-            return new RolesDto { Roles = roles, AllPermissions = permissions.ToList() };
+            return new RolesDto { Roles = roles };
         }
     }
 }

@@ -91,6 +91,9 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<SchemaHistoryEventsCreator>()
                 .As<IHistoryEventsCreator>();
 
+            services.AddSingletonAs<RolePermissionsProvider>()
+                .AsSelf();
+
             services.AddSingletonAs<EdmModelBuilder>()
                 .AsSelf();
 

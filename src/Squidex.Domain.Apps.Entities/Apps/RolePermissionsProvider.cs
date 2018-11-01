@@ -27,10 +27,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         public async Task<List<string>> GetPermissionsAsync(IAppEntity app)
         {
-            var schemas = await appProvider.GetSchemasAsync(app.Id);
-            var schemaNames = schemas.Select(x => x.Name).ToList();
-
-            schemaNames.Insert(0, Permission.Any);
+            var schemaNames = await GetSchemaNamesAsync(app);
 
             var result = new List<string> { Permission.Any };
 
@@ -60,6 +57,18 @@ namespace Squidex.Domain.Apps.Entities.Apps
             }
 
             return result;
+        }
+
+        private async Task<List<string>> GetSchemaNamesAsync(IAppEntity app)
+        {
+            var schemas = await appProvider.GetSchemasAsync(app.Id);
+
+            var schemaNames = new List<string>(); ;
+
+            schemaNames.Add(Permission.Any);
+            schemaNames.AddRange(schemas.Select(x => x.Name));
+
+            return schemaNames;
         }
     }
 }

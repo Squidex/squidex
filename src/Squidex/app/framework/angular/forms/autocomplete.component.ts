@@ -109,10 +109,10 @@ export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, O
         if (!obj) {
             this.resetForm();
         } else {
-            const item = this.suggestedItems.find(i => i === obj);
-
-            if (item) {
-                this.queryInput.setValue(obj.title || '');
+            if (this.displayProperty && this.displayProperty.length > 0) {
+                this.queryInput.setValue(obj[this.displayProperty]);
+            } else {
+                this.queryInput.setValue(obj.toString());
             }
         }
 

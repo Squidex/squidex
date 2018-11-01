@@ -22,7 +22,7 @@
             </ng-container>
             
             <ng-container *ngIf="contributorsState.contributors | async; let contributors">
-                <table class="table table-items table-fixed">
+                <table class="table table-items table-fixed" *ngIf="rolesState.roles | async; let roles">
                     <tbody *ngFor="let contributorInfo of contributors; trackBy: trackByContributor">
                         <tr>
                             <td class="cell-user">
@@ -33,7 +33,7 @@
                             </td>
                             <td class="cell-time">
                                 <select class="form-control" [ngModel]="contributorInfo.contributor.role" (ngModelChange)="changeRole(contributorInfo.contributor, $event)" [disabled]="contributorInfo.isCurrentUser">
-                                    <option *ngFor="let role of usersRoles" [ngValue]="role">{{role}}</option>
+                                    <option *ngFor="let role of roles" [ngValue]="role.name">{{role.name}}</option>
                                 </select>
                             </td>
                             <td class="cell-actions">

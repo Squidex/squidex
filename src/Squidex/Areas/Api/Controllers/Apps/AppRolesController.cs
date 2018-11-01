@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Squidex.Areas.Api.Controllers.Apps.Models;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Pipeline;
 using Squidex.Shared;
@@ -43,11 +44,33 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [ProducesResponseType(typeof(RolesDto), 200)]
         [ApiPermission(Permissions.AppRolesRead)]
         [ApiCosts(0)]
-        public async Task<IActionResult> GetRoles(string app)
+        public IActionResult GetRoles(string app)
         {
-            var response = RolesDto.FromApp(App, await permissionsProvider.GetPermissionsAsync(App));
+            var response = RolesDto.FromApp(App);
 
             Response.Headers["ETag"] = App.Version.ToString();
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Get app permissions.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <returns>
+        /// 200 => App permissions returned.
+        /// 404 => App not found.
+        /// </returns>
+        [HttpGet]
+        [Route("apps/{app}/roles/permissions")]
+        [ProducesResponseType(typeof(string[]), 200)]
+        [ApiPermission(Permissions.AppRolesRead)]
+        [ApiCosts(0)]
+        public async Task<IActionResult> GetPermissions(string app)
+        {
+            var response = await permissionsProvider.GetPermissionsAsync(App);
+
+            Response.Headers["ETag"] = string.Join(";", response).Sha256Base64();
 
             return Ok(response);
         }

@@ -8,6 +8,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Domain.Apps.Entities.Apps;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models
 {
@@ -25,9 +26,11 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         [Required]
         public string[] Permissions { get; set; }
 
-        public static RoleDto FromRole(Role role)
+        public static RoleDto FromRole(Role role, string appName)
         {
-            return new RoleDto { Name = role.Name, Permissions = role.Permissions.Select(x => x.Id).ToArray() };
+            var permissions = role.Permissions.WithoutApp(appName);
+
+            return new RoleDto { Name = role.Name, Permissions = permissions.ToIds().ToArray() };
         }
     }
 }

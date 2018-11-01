@@ -5,6 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
+using System.Linq;
+using Squidex.Infrastructure.Security;
 using Squidex.Shared;
 
 namespace Squidex.Domain.Apps.Entities.Apps
@@ -30,6 +33,29 @@ namespace Squidex.Domain.Apps.Entities.Apps
             permissions = result;
 
             return permissions;
+        }
+
+        public static PermissionSet WithoutApp(this PermissionSet set, string name)
+        {
+            var prefix = Permissions.ForApp(Permissions.App, name).Id;
+
+            return new PermissionSet(set.Select(x =>
+            {
+                var id = x.Id;
+
+                if (string.Equals(id, prefix, StringComparison.OrdinalIgnoreCase))
+                {
+                    return Permission.Any;
+                }
+                else if (id.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+                {
+                    return id.Substring(prefix.Length + 1);
+                }
+                else
+                {
+                    return id;
+                }
+            }));
         }
     }
 }

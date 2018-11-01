@@ -1,0 +1,22 @@
+@import '_vars';
+@import '_mixins';
+
+.form-group {
+    & {
+        margin-bottom: .375rem;
+    }
+
+    &:last-child {
+        margin: 0;
+    }
+}
+
+.built {
+    font-weight: bold;
+}
+
+.table-items-row-details {
+    &::before {
+        right: 4.4rem;
+    }
+}

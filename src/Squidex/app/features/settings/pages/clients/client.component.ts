@@ -13,6 +13,7 @@ import {
     AccessTokenDto,
     AppClientDto,
     AppClientsService,
+    AppRoleDto,
     AppsState,
     ClientsState,
     DialogModel,
@@ -32,7 +33,8 @@ export class ClientComponent implements OnChanges {
     @Input()
     public client: AppClientDto;
 
-    public clientRoles = [ 'Owner', 'Developer', 'Editor', 'Reader' ];
+    @Input()
+    public clientRoles: AppRoleDto[];
 
     public isRenaming = false;
 

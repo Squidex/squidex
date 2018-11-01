@@ -71,7 +71,7 @@
         </div>
         <div class="col">
             <select class="form-control" [ngModel]="client.role" (ngModelChange)="update($event)">
-                <option *ngFor="let role of clientRoles" [ngValue]="role">{{role}}</option>
+                <option *ngFor="let role of clientRoles" [ngValue]="role.name">{{role.name}}</option>
             </select>
         </div>
         <div class="col col-auto cell-actions">

@@ -1,0 +1,54 @@
+<div class="table-items-row table-items-row-expandable"> 
+    <div class="table-items-row-summary">        
+        <div class="row">
+            <div class="col" [class.built]="isDefaultRole">
+                {{role.name}}
+            </div>
+            <div class="col col-options">
+                <div class="float-right">
+                    <button type="button" class="btn btn-secondary table-items-edit-button" [class.active]="isEditing" (click)="toggleEditing()">
+                        <i class="icon-settings"></i>
+                    </button>
+
+                    <button type="button" class="btn btn-link btn-danger" [class.invisible]="isDefaultRole"
+                        (sqxConfirmClick)="remove()"
+                        confirmTitle="Delete role" 
+                        confirmText="Do you really want to delete the language?">
+                        <i class="icon-bin2"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-items-row-details" *ngIf="isEditing">
+        <form [formGroup]="editForm.form" (ngSubmit)="save()">
+            <div class="table-items-row-details-tabs clearfix">
+                <div class="float-right">
+                    <button type="reset" class="btn btn-link" (click)="toggleEditing()">Cancel</button>
+                    <button type="submit" class="btn btn-primary" *ngIf="!isDefaultRole">Save</button>
+                </div>
+            </div>
+
+            <div class="table-items-row-details-tab">
+                <div class="form-group row no-gutters" *ngFor="let control of editForm.form.controls; let i = index">
+                    <div class="col">
+                        <sqx-control-errors [for]="control" [fieldName]="'Permission'" [submitted]="editForm.submitted | async"></sqx-control-errors>
+
+                        <sqx-autocomplete [formControl]="control" [source]="allPermissions"></sqx-autocomplete>
+                    </div>
+                    <div class="col col-auto" *ngIf="!isDefaultRole">
+                        <button type="button" class="btn btn-link btn-danger" (click)="removePermission(i)">
+                            <i class="icon-bin2"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="form-group" *ngIf="!isDefaultRole">
+                    <button type="button" class="btn btn-success btn-sm" (click)="addPermission()">
+                        Add Permission
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
