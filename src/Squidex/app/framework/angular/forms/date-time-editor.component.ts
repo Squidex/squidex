@@ -122,7 +122,7 @@ export class DateTimeEditorComponent implements ControlValueAccessor, OnDestroy,
             this.timeControl.enable({ emitEvent: false });
         }
 
-        this.changeDetector.detectChanges();
+        this.changeDetector.markForCheck();
     }
 
     public registerOnChange(fn: any) {
@@ -144,7 +144,7 @@ export class DateTimeEditorComponent implements ControlValueAccessor, OnDestroy,
                 this.updateValue();
                 this.touched();
 
-                this.changeDetector.detectChanges();
+                this.changeDetector.markForCheck();
             }
         });
 

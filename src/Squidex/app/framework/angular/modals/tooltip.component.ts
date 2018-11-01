@@ -54,7 +54,7 @@ export class TooltipComponent implements OnDestroy, OnInit {
                 this.renderer.listen(this.target, 'mouseenter', () => {
                     this.modal.show();
 
-                    this.changeDetector.detectChanges();
+                    this.changeDetector.markForCheck();
                 });
 
             this.targetMouseLeaveListener =

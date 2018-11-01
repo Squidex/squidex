@@ -105,7 +105,7 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
             this.geolocationForm.enable();
         }
 
-        this.changeDetector.detectChanges();
+        this.changeDetector.markForCheck();
     }
 
     private setDisabledStateOSM(isDisabled: boolean): void {

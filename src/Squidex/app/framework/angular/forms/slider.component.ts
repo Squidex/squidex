@@ -59,13 +59,13 @@ export class SliderComponent implements ControlValueAccessor {
 
         this.updateThumbPosition();
 
-        this.changeDetector.detectChanges();
+        this.changeDetector.markForCheck();
     }
 
     public setDisabledState(isDisabled: boolean): void {
         this.isDisabled = isDisabled;
 
-        this.changeDetector.detectChanges();
+        this.changeDetector.markForCheck();
     }
 
     public registerOnChange(fn: any) {

@@ -36,13 +36,13 @@ export class ToggleComponent implements ControlValueAccessor {
     public writeValue(obj: any) {
         this.isChecked = Types.isBoolean(obj) ? obj : null;
 
-        this.changeDetector.detectChanges();
+        this.changeDetector.markForCheck();
     }
 
     public setDisabledState(isDisabled: boolean): void {
         this.isDisabled = isDisabled;
 
-        this.changeDetector.detectChanges();
+        this.changeDetector.markForCheck();
     }
 
     public registerOnChange(fn: any) {

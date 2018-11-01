@@ -57,7 +57,7 @@ export class ProfileMenuComponent implements OnDestroy, OnInit {
 
                     this.isAdmin = user!.isAdmin;
 
-                    this.changeDetector.detectChanges();
+                    this.changeDetector.markForCheck();
                 });
     }
 

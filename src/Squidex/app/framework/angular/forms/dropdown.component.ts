@@ -68,13 +68,13 @@ export class DropdownComponent implements AfterContentInit, ControlValueAccessor
     public writeValue(obj: any) {
         this.selectIndex(this.items && obj ? this.items.indexOf(obj) : 0);
 
-        this.changeDetector.detectChanges();
+        this.changeDetector.markForCheck();
     }
 
     public setDisabledState(isDisabled: boolean): void {
         this.isDisabled = isDisabled;
 
-        this.changeDetector.detectChanges();
+        this.changeDetector.markForCheck();
     }
 
     public registerOnChange(fn: any) {

@@ -65,24 +65,24 @@ export class AssetsEditorComponent implements ControlValueAccessor {
                             this.updateValue();
                         }
 
-                        this.changeDetector.detectChanges();
+                        this.changeDetector.markForCheck();
                     }, () => {
                         this.oldAssets = ImmutableArray.empty();
 
-                        this.changeDetector.detectChanges();
+                        this.changeDetector.markForCheck();
                     });
             }
         } else {
             this.oldAssets = ImmutableArray.empty();
 
-            this.changeDetector.detectChanges();
+            this.changeDetector.markForCheck();
         }
     }
 
     public setDisabledState(isDisabled: boolean): void {
         this.isDisabled = isDisabled;
 
-        this.changeDetector.detectChanges();
+        this.changeDetector.markForCheck();
     }
 
     public registerOnChange(fn: any) {
@@ -140,7 +140,7 @@ export class AssetsEditorComponent implements ControlValueAccessor {
         this.callTouched();
         this.callChange(ids);
 
-        this.changeDetector.detectChanges();
+        this.changeDetector.markForCheck();
     }
 
     public sort(assets: AssetDto[]) {

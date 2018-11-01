@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { onErrorResumeNext } from 'rxjs/operators';
 
@@ -32,7 +32,7 @@ import {
         fadeAnimation
     ]
 })
-export class FieldComponent implements OnInit {
+export class FieldComponent implements OnChanges {
     @Input()
     public field: NestedFieldDto | RootFieldDto;
 
@@ -50,7 +50,7 @@ export class FieldComponent implements OnInit {
     public isEditing = false;
     public selectedTab = 0;
 
-    public editForm: EditFieldForm;
+    public editForm = new EditFieldForm(this.formBuilder);
 
     public addFieldDialog = new DialogModel();
 
@@ -60,25 +60,33 @@ export class FieldComponent implements OnInit {
     ) {
     }
 
-    public ngOnInit() {
-        this.editForm = new EditFieldForm(this.formBuilder);
-        this.editForm.load(this.field.properties);
+    public ngOnChanges(changes: SimpleChanges) {
+        if (changes['field']) {
+            this.editForm.load(this.field.properties);
 
-        if (this.field.isLocked) {
-            this.editForm.form.disable();
+            if (this.field.isLocked) {
+                this.editForm.form.disable();
+            }
         }
-    }
 
-    public toggleEditing() {
-        this.isEditing = !this.isEditing;
+        if (changes['schema']) {
+            this.isEditing = false;
+
+            this.selectedTab = 0;
+        }
     }
 
     public selectTab(tab: number) {
         this.selectedTab = tab;
     }
 
+    public toggleEditing() {
+        this.isEditing = !this.isEditing;
+    }
+
     public cancel() {
         this.isEditing = false;
+
         this.editForm.load(this.field);
     }
 

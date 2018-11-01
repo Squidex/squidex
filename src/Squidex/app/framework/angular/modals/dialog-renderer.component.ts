@@ -56,7 +56,7 @@ export class DialogRendererComponent implements OnDestroy, OnInit {
                 if (!isOpen) {
                     this.cancel();
 
-                    this.changeDetector.detectChanges();
+                    this.changeDetector.markForCheck();
                 }
             });
 
@@ -70,7 +70,7 @@ export class DialogRendererComponent implements OnDestroy, OnInit {
                     }, notification.displayTime);
                 }
 
-                this.changeDetector.detectChanges();
+                this.changeDetector.markForCheck();
             });
 
         this.dialogsSubscription =
@@ -81,7 +81,7 @@ export class DialogRendererComponent implements OnDestroy, OnInit {
                     this.dialogRequest = request;
                     this.dialogView.show();
 
-                    this.changeDetector.detectChanges();
+                    this.changeDetector.markForCheck();
                 });
     }
 
@@ -107,7 +107,7 @@ export class DialogRendererComponent implements OnDestroy, OnInit {
         if (index >= 0) {
             this.notifications.splice(index, 1);
 
-            this.changeDetector.detectChanges();
+            this.changeDetector.markForCheck();
         }
     }
 }
