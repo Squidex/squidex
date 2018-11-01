@@ -52,7 +52,7 @@ export class ProfileMenuComponent implements OnDestroy, OnInit {
                 .subscribe(user => {
                     this.profileId = user!.id;
                     this.profileDisplayName = user!.displayName;
-					
+
                     this.changeDetector.markForCheck();
                 });
     }

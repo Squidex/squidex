@@ -11,6 +11,18 @@
     }
 }
 
+.rule-name {
+    @include truncate;
+}
+
+.text-decent {
+    color: $color-text-decent;
+}
+
+.text-force {
+    color: $color-text;
+}
+
 .built {
     font-weight: bold;
 }

@@ -18,13 +18,13 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 {
     public static class GuardAppContributors
     {
-        public static Task CanAssign(AppContributors contributors, AssignContributor command, IUserResolver users, IAppLimitsPlan plan)
+        public static Task CanAssign(AppContributors contributors, AssignContributor command, IUserResolver users, IAppLimitsPlan plan, Roles roles)
         {
             Guard.NotNull(command, nameof(command));
 
             return Validate.It(() => "Cannot assign contributor.", async e =>
             {
-                if (!Role.IsDefaultRole(command.Role))
+                if (!roles.ContainsKey(command.Role))
                 {
                     e("Role is not valid.", nameof(command.Role));
                 }

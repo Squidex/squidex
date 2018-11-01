@@ -26,8 +26,8 @@ describe('RolesState', () => {
     const newVersion = new Version('2');
 
     const oldRoles = [
-        new AppRoleDto('Role1', ['P1']),
-        new AppRoleDto('Role2', ['P2'])
+        new AppRoleDto('Role1', 3, 5, ['P1']),
+        new AppRoleDto('Role2', 7, 9, ['P2'])
     ];
 
     let dialogs: IMock<DialogService>;
@@ -69,7 +69,7 @@ describe('RolesState', () => {
     });
 
     it('should add role to snapshot when added', () => {
-        const newRole = new AppRoleDto('Role3', ['P3']);
+        const newRole = new AppRoleDto('Role3', 0, 0, ['P3']);
 
         const request = new CreateAppRoleDto('Role3');
 

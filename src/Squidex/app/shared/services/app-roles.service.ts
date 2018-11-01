@@ -32,6 +32,8 @@ export class AppRolesDto extends Model {
 export class AppRoleDto extends Model {
     constructor(
         public readonly name: string,
+        public readonly numClients: number,
+        public readonly numContributors: number,
         public readonly permissions: string[]
     ) {
         super();
@@ -77,6 +79,8 @@ export class AppRolesService {
                     const roles = items.map(item => {
                         return new AppRoleDto(
                             item.name,
+                            item.numClients,
+                            item.numContributors,
                             item.permissions);
                     });
 
@@ -90,7 +94,7 @@ export class AppRolesService {
 
         return HTTP.postVersioned<any>(this.http, url, dto, version).pipe(
                 map(response => {
-                    const role = new AppRoleDto(dto.name, []);
+                    const role = new AppRoleDto(dto.name, 0, 0, []);
 
                     return new Versioned(response.version, role);
                 }),

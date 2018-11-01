@@ -7,7 +7,7 @@
             <div class="col col-6" [class.language-optional]="language.isOptional" [class.language-master]="language.isMaster">
                 {{language.englishName}}
             </div>
-            <div class="col col-options">
+            <div class="col col-auto">
                 <div class="float-right">
                     <button type="button" class="btn btn-secondary table-items-edit-button" [class.active]="isEditing" (click)="toggleEditing()" *ngIf="!language.isMaster">
                         <i class="icon-settings"></i>

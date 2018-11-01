@@ -45,7 +45,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             });
         }
 
-        public static void CanUpdate(AppClients clients, UpdateClient command)
+        public static void CanUpdate(AppClients clients, UpdateClient command, Roles roles)
         {
             Guard.NotNull(command, nameof(command));
 
@@ -63,7 +63,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                     e("Either name or role must be defined.", nameof(command.Name), nameof(command.Role));
                 }
 
-                if (command.Role != null && !Role.IsDefaultRole(command.Role))
+                if (command.Role != null && !roles.ContainsKey(command.Role))
                 {
                     e("Role is not valid.", nameof(command.Role));
                 }

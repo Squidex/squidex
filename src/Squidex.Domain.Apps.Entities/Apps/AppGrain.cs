@@ -70,7 +70,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 case AssignContributor assigneContributor:
                     return UpdateReturnAsync(assigneContributor, async c =>
                     {
-                        await GuardAppContributors.CanAssign(Snapshot.Contributors, c, userResolver, appPlansProvider.GetPlan(Snapshot.Plan?.PlanId));
+                        await GuardAppContributors.CanAssign(Snapshot.Contributors, c, userResolver, appPlansProvider.GetPlan(Snapshot.Plan?.PlanId), Snapshot.Roles);
 
                         AssignContributor(c);
 
@@ -96,7 +96,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 case UpdateClient updateClient:
                     return UpdateAsync(updateClient, c =>
                     {
-                        GuardAppClients.CanUpdate(Snapshot.Clients, c);
+                        GuardAppClients.CanUpdate(Snapshot.Clients, c, Snapshot.Roles);
 
                         UpdateClient(c);
                     });

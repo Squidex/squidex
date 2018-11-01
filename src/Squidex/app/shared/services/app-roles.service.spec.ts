@@ -75,9 +75,13 @@ describe('AppRolesService', () => {
         req.flush({
             roles: [{
                 name: 'Role1',
+                numClients: 3,
+                numContributors: 5,
                 permissions: ['P1']
             }, {
                 name: 'Role2',
+                numClients: 7,
+                numContributors: 9,
                 permissions: ['P2']
             }]
         }, {
@@ -88,8 +92,8 @@ describe('AppRolesService', () => {
 
         expect(roles!).toEqual(
             new AppRolesDto([
-                new AppRoleDto('Role1', ['P1']),
-                new AppRoleDto('Role2', ['P2'])
+                new AppRoleDto('Role1', 3, 5, ['P1']),
+                new AppRoleDto('Role2', 7, 9, ['P2'])
             ],
             new Version('2')));
     }));
@@ -112,7 +116,7 @@ describe('AppRolesService', () => {
 
         req.flush({});
 
-        expect(role!).toEqual(new AppRoleDto('Role3', []));
+        expect(role!).toEqual(new AppRoleDto('Role3', 0, 0, []));
     }));
 
     it('should make put request to update role',

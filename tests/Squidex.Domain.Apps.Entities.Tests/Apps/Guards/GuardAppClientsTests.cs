@@ -18,6 +18,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
     public class GuardAppClientsTests
     {
         private readonly AppClients clients_0 = AppClients.Empty;
+        private readonly Roles roles = Roles.CreateDefaults("my-app");
 
         [Fact]
         public void CanAttach_should_throw_execption_if_client_id_is_null()
@@ -81,7 +82,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             var command = new UpdateClient { Name = "iOS" };
 
-            ValidationAssert.Throws(() => GuardAppClients.CanUpdate(clients_0, command),
+            ValidationAssert.Throws(() => GuardAppClients.CanUpdate(clients_0, command, Roles.Empty),
                 new ValidationError("Client id is required.", "Id"));
         }
 
@@ -90,7 +91,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             var command = new UpdateClient { Id = "ios", Name = "iOS" };
 
-            Assert.Throws<DomainObjectNotFoundException>(() => GuardAppClients.CanUpdate(clients_0, command));
+            Assert.Throws<DomainObjectNotFoundException>(() => GuardAppClients.CanUpdate(clients_0, command, Roles.Empty));
         }
 
         [Fact]
@@ -100,7 +101,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             var clients_1 = clients_0.Add("ios", "secret");
 
-            ValidationAssert.Throws(() => GuardAppClients.CanUpdate(clients_1, command),
+            ValidationAssert.Throws(() => GuardAppClients.CanUpdate(clients_1, command, roles),
                 new ValidationError("Either name or role must be defined.", "Name", "Role"));
         }
 
@@ -111,7 +112,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             var clients_1 = clients_0.Add("ios", "secret");
 
-            ValidationAssert.Throws(() => GuardAppClients.CanUpdate(clients_1, command),
+            ValidationAssert.Throws(() => GuardAppClients.CanUpdate(clients_1, command, roles),
                 new ValidationError("Role is not valid.", "Role"));
         }
 
@@ -122,7 +123,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             var clients_1 = clients_0.Add("ios", "secret");
 
-            ValidationAssert.Throws(() => GuardAppClients.CanUpdate(clients_1, command),
+            ValidationAssert.Throws(() => GuardAppClients.CanUpdate(clients_1, command, roles),
                 new ValidationError("Client has already this name.", "Name"));
         }
 
@@ -133,7 +134,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             var clients_1 = clients_0.Add("ios", "secret");
 
-            ValidationAssert.Throws(() => GuardAppClients.CanUpdate(clients_1, command),
+            ValidationAssert.Throws(() => GuardAppClients.CanUpdate(clients_1, command, roles),
                 new ValidationError("Client has already this role.", "Role"));
         }
 
@@ -144,7 +145,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             var clients_1 = clients_0.Add("ios", "secret");
 
-            GuardAppClients.CanUpdate(clients_1, command);
+            GuardAppClients.CanUpdate(clients_1, command, roles);
         }
     }
 }

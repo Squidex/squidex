@@ -1,16 +1,22 @@
 <div class="table-items-row table-items-row-expandable"> 
     <div class="table-items-row-summary">        
         <div class="row">
-            <div class="col" [class.built]="isDefaultRole">
-                {{role.name}}
+            <div class="col col-5" [class.built]="isDefaultRole">
+                <span class="role-name">{{role.name}}</span>
             </div>
-            <div class="col col-options">
+            <div class="col text-decent">
+                Clients: <span [class.text-force]="role.numClients > 0">{{role.numClients}}</span>
+            </div>
+            <div class="col text-decent">
+                Users: <span [class.text-force]="role.numContributors > 0">{{role.numContributors}}</span>
+            </div>
+            <div class="col col-auto">
                 <div class="float-right">
                     <button type="button" class="btn btn-secondary table-items-edit-button" [class.active]="isEditing" (click)="toggleEditing()">
                         <i class="icon-settings"></i>
                     </button>
 
-                    <button type="button" class="btn btn-link btn-danger" [class.invisible]="isDefaultRole"
+                    <button type="button" class="btn btn-link btn-danger" [class.invisible]="isDefaultRole || role.numClients > 0 || role.numContributors > 0"
                         (sqxConfirmClick)="remove()"
                         confirmTitle="Delete role" 
                         confirmText="Do you really want to delete the language?">
