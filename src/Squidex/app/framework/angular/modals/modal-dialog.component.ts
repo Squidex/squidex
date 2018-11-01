@@ -64,6 +64,6 @@ export class ModalDialogComponent implements AfterViewInit {
         this.hasTabs = this.tabsElement.nativeElement.children.length > 0;
         this.hasFooter = this.footerElement.nativeElement.children.length > 0;
 
-        this.changeDetector.detectChanges();
+        this.changeDetector.markForCheck();
     }
 }

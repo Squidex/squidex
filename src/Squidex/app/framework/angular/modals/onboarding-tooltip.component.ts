@@ -75,7 +75,7 @@ export class OnboardingTooltipComponent implements OnDestroy, OnInit {
                     if (this.isSameOrParent(fromPoint)) {
                         this.tooltipModal.show();
 
-                        this.changeDetector.detectChanges();
+                        this.changeDetector.markForCheck();
 
                         this.closeTimer = setTimeout(() => {
                             this.hideThis();

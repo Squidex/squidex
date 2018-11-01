@@ -152,6 +152,6 @@ export class ControlErrorsComponent implements OnChanges, OnDestroy {
 
         this.errorMessages = errors;
 
-        this.changeDetector.detectChanges();
+        this.changeDetector.markForCheck();
     }
 }

@@ -185,7 +185,7 @@ export class TagEditorComponent implements AfterViewInit, ControlValueAccessor, 
             this.items = [];
         }
 
-        this.changeDetector.detectChanges();
+        this.changeDetector.markForCheck();
     }
 
     public setDisabledState(isDisabled: boolean): void {
