@@ -51,8 +51,10 @@
         <sqx-assets-list [state]="assetsState" [isListView]="isListView"></sqx-assets-list>
     </ng-container>
 
-    <ng-container sidebar>    
+    <ng-container sidebar>            
         <div class="sidebar-section">
+            <h3>Tags</h3>
+
             <a class="sidebar-item" (click)="resetTags()" [class.active]="assetsState.isTagSelectionEmpty()">
                 <div class="row">
                     <div class="col">
@@ -60,10 +62,6 @@
                     </div>
                 </div>
             </a>
-        </div>
-        
-        <div class="sidebar-section">
-            <h3>Tags</h3>
     
             <a class="sidebar-item" *ngFor="let tag of assetsState.tags | async" (click)="toggleTag(tag.name)" [class.active]="assetsState.isTagSelected(tag.name)">
                 <div class="row">
