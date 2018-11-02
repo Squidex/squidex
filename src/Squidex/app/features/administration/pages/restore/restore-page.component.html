@@ -50,7 +50,7 @@
         </ng-container>
         
         <div class="table-items-row">
-            <form [formGroup]="restoreForm.form" (submit)="restore()">
+            <form [formGroup]="restoreForm.form" (ngSubmit)="restore()">
                 <div class="row no-gutters">
                     <div class="col">
                         <input class="form-control" name="url" formControlName="url" placeholder="Url to backup" />

@@ -19,7 +19,7 @@
                     <button type="button" class="btn btn-link btn-danger" [class.invisible]="isDefaultRole || role.numClients > 0 || role.numContributors > 0"
                         (sqxConfirmClick)="remove()"
                         confirmTitle="Delete role" 
-                        confirmText="Do you really want to delete the language?">
+                        confirmText="Do you really want to delete the role?">
                         <i class="icon-bin2"></i>
                     </button>
                 </div>
@@ -43,17 +43,23 @@
 
                         <sqx-autocomplete [formControl]="control" [source]="allPermissions"></sqx-autocomplete>
                     </div>
-                    <div class="col col-auto" *ngIf="!isDefaultRole">
+                    <div class="col col-auto pl-1" *ngIf="!isDefaultRole">
                         <button type="button" class="btn btn-link btn-danger" (click)="removePermission(i)">
                             <i class="icon-bin2"></i>
                         </button>
                     </div>
                 </div>
-                <div class="form-group" *ngIf="!isDefaultRole">
-                    <button type="button" class="btn btn-success btn-sm" (click)="addPermission()">
-                        Add Permission
-                    </button>
-                </div>
+
+                <form class="form-group row no-gutters" [formGroup]="addPermissionForm.form" (ngSubmit)="addPermission()" *ngIf="!isDefaultRole">
+                    <div class="col">
+                        <sqx-autocomplete formControlName="permission" [source]="allPermissions" #addInput></sqx-autocomplete>
+                    </div>
+                    <div class="col col-auto pl-1">
+                        <button type="submit" class="btn btn-success">
+                            <i class="icon-plus"></i>
+                        </button>
+                    </div>
+                </form>
             </div>
         </form>
     </div>

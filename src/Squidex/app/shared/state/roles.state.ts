@@ -76,7 +76,7 @@ export class RolesState extends State<Snapshot> {
         return this.appRolesService.postRole(this.appName, request, this.version).pipe(
             tap(dto => {
                 this.next(s => {
-                    const roles = s.roles.push(dto.payload);
+                    const roles = s.roles.push(dto.payload).sortByStringAsc(x => x.name);
 
                     return { ...s, roles, version: dto.version };
                 });

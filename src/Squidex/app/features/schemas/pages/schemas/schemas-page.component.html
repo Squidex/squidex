@@ -28,7 +28,7 @@
             (removing)="removeCategory(category)">
         </sqx-schema-category>
 
-        <form [formGroup]="addCategoryForm.form" (submit)="addCategory()">
+        <form [formGroup]="addCategoryForm.form" (ngSubmit)="addCategory()">
             <input class="form-control form-control-dark new-category-input" formControlName="name" placeholder="Create new category..." />
         </form>
     </ng-container>

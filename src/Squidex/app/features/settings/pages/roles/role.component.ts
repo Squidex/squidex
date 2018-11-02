@@ -5,11 +5,14 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input, OnChanges } from '@angular/core';
+import { Component, Input, OnChanges, ViewChild } from '@angular/core';
+import { FormBuilder } from '@angular/forms';
 import { onErrorResumeNext } from 'rxjs/operators';
 
 import {
+    AddPermissionForm,
     AppRoleDto,
+    AutocompleteComponent,
     AutocompleteSource,
     EditPermissionsForm,
     fadeAnimation,
@@ -39,12 +42,18 @@ export class RoleComponent implements OnChanges {
     @Input()
     public allPermissions: AutocompleteSource;
 
+    @ViewChild('addInput')
+    public addPermissionInput: AutocompleteComponent;
+
     public isEditing = false;
     public isDefaultRole = false;
+
+    public addPermissionForm = new AddPermissionForm(this.formBuilder);
 
     public editForm = new EditPermissionsForm();
 
     constructor(
+        private readonly formBuilder: FormBuilder,
         private readonly rolesState: RolesState
     ) {
     }
@@ -63,16 +72,23 @@ export class RoleComponent implements OnChanges {
         this.isEditing = !this.isEditing;
     }
 
-    public addPermission() {
-        this.editForm.add();
-    }
-
     public removePermission(index: number) {
         this.editForm.remove(index);
     }
 
     public remove() {
         this.rolesState.delete(this.role).pipe(onErrorResumeNext()).subscribe();
+    }
+
+    public addPermission() {
+        const value = this.addPermissionForm.submit();
+
+        if (value) {
+            this.editForm.add(value.permission);
+
+            this.addPermissionForm.submitCompleted({});
+            this.addPermissionInput.focus();
+        }
     }
 
     public save() {

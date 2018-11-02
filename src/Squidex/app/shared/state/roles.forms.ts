@@ -15,8 +15,8 @@ export class EditPermissionsForm extends Form<FormArray> {
         super(new FormArray([]));
     }
 
-    public add() {
-        this.form.push(new FormControl(undefined, Validators.required));
+    public add(value?: string) {
+        this.form.push(new FormControl(value, Validators.required));
     }
 
     public remove(index: number) {
@@ -33,6 +33,21 @@ export class EditPermissionsForm extends Form<FormArray> {
         }
 
         super.load(permissions);
+    }
+}
+
+export class AddPermissionForm extends Form<FormGroup> {
+    public hasPermission =
+        this.form.controls['permission'].valueChanges.pipe(startWith(''), map(x => !x || x.length === 0));
+
+    constructor(formBuilder: FormBuilder) {
+        super(formBuilder.group({
+            permission: [null,
+                [
+                    Validators.required
+                ]
+            ]
+        }));
     }
 }
 

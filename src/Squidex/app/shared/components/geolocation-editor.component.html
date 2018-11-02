@@ -4,7 +4,7 @@
         <input [class.hidden]="!isGoogleMaps" class="form-control search-control" type="text" [disabled]="isDisabled" placeholder="Search Google Maps" #searchBox />
     </form>
     <div>
-        <form class="form-inline no-gutters" [formGroup]="geolocationForm" (change)="updateValueByInput()" (submit)="updateValueByInput()">
+        <form class="form-inline no-gutters" [formGroup]="geolocationForm" (change)="updateValueByInput()" (ngSubmit)="updateValueByInput()">
             <div class="form-group col-auto pr-2">
                 <label for="latitude">Latitude: </label>
             </div>

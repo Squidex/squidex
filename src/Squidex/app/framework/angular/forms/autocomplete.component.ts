@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, ContentChild, forwardRef, Input, OnDestroy, OnInit, TemplateRef } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ContentChild, ElementRef, forwardRef, Input, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { Observable, of, Subscription } from 'rxjs';
 import { catchError, debounceTime, distinctUntilChanged, filter, map, switchMap, tap } from 'rxjs/operators';
@@ -49,6 +49,9 @@ export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, O
 
     @ContentChild(TemplateRef)
     public itemTemplate: TemplateRef<any>;
+
+    @ViewChild('input')
+    public inputControl: ElementRef<HTMLInputElement>;
 
     public suggestedItems: any[] = [];
     public suggestedIndex = -1;
@@ -95,8 +98,7 @@ export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, O
                 this.reset();
                 return false;
             case KEY_ENTER:
-                if (this.suggestedItems.length > 0) {
-                    this.selectItem();
+                if (this.suggestedItems.length > 0 && this.selectItem()) {
                     return false;
                 }
                 break;
@@ -136,12 +138,16 @@ export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, O
         this.callTouched = fn;
     }
 
+    public focus() {
+        this.inputControl.nativeElement.focus();
+    }
+
     public blur() {
         this.reset();
         this.callTouched();
     }
 
-    public selectItem(selection: any | null = null) {
+    public selectItem(selection: any | null = null): boolean {
         if (!selection) {
             selection = this.suggestedItems[this.suggestedIndex];
         }
@@ -161,7 +167,11 @@ export class AutocompleteComponent implements ControlValueAccessor, OnDestroy, O
             } finally {
                 this.reset();
             }
+
+            return true;
         }
+
+        return false;
     }
 
     public selectIndex(selection: number) {

@@ -30,7 +30,7 @@
         </div>
         
         <ng-container *ngIf="step === 2 && schemas">
-            <form [formGroup]="triggerForm.form" (submit)="saveTrigger()">  
+            <form [formGroup]="triggerForm.form" (ngSubmit)="saveTrigger()">  
                 <h3 class="wizard-title">{{ruleTriggers[triggerType].display}}</h3>
 
                 <ng-container [ngSwitch]="triggerType">
@@ -62,7 +62,7 @@
         </div>
     
         <ng-container *ngIf="step === 4">
-            <form [formGroup]="actionForm.form" (submit)="saveAction()">
+            <form [formGroup]="actionForm.form" (ngSubmit)="saveAction()">
                     <h3 class="wizard-title">{{ruleActions[actionType].display}}</h3>
 
                 <ng-container [ngSwitch]="actionType">
