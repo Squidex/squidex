@@ -8,7 +8,7 @@
 using MongoDB.Driver;
 using Squidex.Infrastructure.Queries;
 
-namespace Squidex.Infrastructure.MongoDb.OData
+namespace Squidex.Infrastructure.MongoDb.Queries
 {
     public static class FilterBuilder
     {
