@@ -59,24 +59,24 @@ export class AssetsEditorComponent implements ControlValueAccessor {
 
                 this.assetsService.getAssets(this.appsState.appName, 0, 0, undefined, undefined, obj)
                     .subscribe(dtos => {
-                        this.oldAssets = ImmutableArray.of(assetIds.map(id => dtos.items.find(x => x.id === id)).filter(a => !!a).map(a => a!));
+                        this.setAssets(ImmutableArray.of(assetIds.map(id => dtos.items.find(x => x.id === id)!).filter(a => !!a)));
 
                         if (this.oldAssets.length !== assetIds.length) {
                             this.updateValue();
                         }
-
-                        this.changeDetector.markForCheck();
                     }, () => {
-                        this.oldAssets = ImmutableArray.empty();
-
-                        this.changeDetector.markForCheck();
+                        this.setAssets(ImmutableArray.empty());
                     });
             }
         } else {
-            this.oldAssets = ImmutableArray.empty();
-
-            this.changeDetector.markForCheck();
+            this.setAssets(ImmutableArray.empty());
         }
+    }
+
+    public setAssets(asset: ImmutableArray<AssetDto>) {
+        this.oldAssets = asset;
+
+        this.changeDetector.markForCheck();
     }
 
     public setDisabledState(isDisabled: boolean): void {
@@ -99,7 +99,7 @@ export class AssetsEditorComponent implements ControlValueAccessor {
         }
     }
 
-    public onAssetsSelected(assets: AssetDto[]) {
+    public selectAssets(assets: AssetDto[]) {
         for (let asset of assets) {
             this.oldAssets = this.oldAssets.push(asset);
         }
@@ -111,7 +111,16 @@ export class AssetsEditorComponent implements ControlValueAccessor {
         this.assetsDialog.hide();
     }
 
-    public onAssetRemoving(asset: AssetDto) {
+    public addAsset(file: File, asset: AssetDto) {
+        if (asset && file) {
+            this.newAssets = this.newAssets.remove(file);
+            this.oldAssets = this.oldAssets.pushFront(asset);
+
+            this.updateValue();
+        }
+    }
+
+    public removeLoadedAsset(asset: AssetDto) {
         if (asset) {
             this.oldAssets = this.oldAssets.remove(asset);
 
@@ -119,15 +128,22 @@ export class AssetsEditorComponent implements ControlValueAccessor {
         }
     }
 
-    public onAssetLoaded(file: File, asset: AssetDto) {
+    public removeLoadingAsset(file: File) {
         this.newAssets = this.newAssets.remove(file);
-        this.oldAssets = this.oldAssets.pushFront(asset);
-
-        this.updateValue();
     }
 
-    public onAssetFailed(file: File) {
-        this.newAssets = this.newAssets.remove(file);
+    public changeView(isListView: boolean) {
+        this.localStore.set('assetView', isListView ? 'List' : 'Grid');
+
+        this.isListView = isListView;
+    }
+
+    public sortAssets(assets: AssetDto[]) {
+        if (assets) {
+            this.oldAssets = ImmutableArray.of(assets);
+
+            this.updateValue();
+        }
     }
 
     private updateValue() {
@@ -141,19 +157,5 @@ export class AssetsEditorComponent implements ControlValueAccessor {
         this.callChange(ids);
 
         this.changeDetector.markForCheck();
-    }
-
-    public sort(assets: AssetDto[]) {
-        if (assets) {
-            this.oldAssets = ImmutableArray.of(assets);
-
-            this.updateValue();
-        }
-    }
-
-    public changeView(isListView: boolean) {
-        this.localStore.set('assetView', isListView ? 'List' : 'Grid');
-
-        this.isListView = isListView;
     }
 }

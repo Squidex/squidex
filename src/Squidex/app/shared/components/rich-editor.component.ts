@@ -137,7 +137,7 @@ export class RichEditorComponent implements ControlValueAccessor, AfterViewInit,
         this.callTouched = fn;
     }
 
-    public onAssetsSelected(assets: AssetDto[]) {
+    public insertAssets(assets: AssetDto[]) {
         let content = '';
 
         for (let asset of assets) {

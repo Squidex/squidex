@@ -37,7 +37,7 @@
 <ng-container *sqxModalView="addSchemaDialog;onRoot:true">
     <sqx-schema-form [import]="import"
         (cancelled)="addSchemaDialog.hide()"
-        (created)="onSchemaCreated($event)">
+        (created)="redirectSchema($event)">
     </sqx-schema-form>
 </ng-container>
 

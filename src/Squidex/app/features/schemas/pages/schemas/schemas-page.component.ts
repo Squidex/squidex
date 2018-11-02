@@ -86,7 +86,7 @@ export class SchemasPageComponent implements OnDestroy, OnInit {
         }
     }
 
-    public onSchemaCreated(schema: SchemaDto) {
+    public redirectSchema(schema: SchemaDto) {
         this.router.navigate([schema.name], { relativeTo: this.route });
 
         this.addSchemaDialog.hide();
