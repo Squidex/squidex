@@ -14,7 +14,7 @@ using Squidex.Domain.Apps.Entities.MongoDb.Assets;
 using Squidex.Domain.Apps.Entities.MongoDb.Assets.Visitors;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
-using Squidex.Infrastructure.MongoDb.OData;
+using Squidex.Infrastructure.MongoDb.Queries;
 using Squidex.Infrastructure.Queries;
 using Xunit;
 using FilterBuilder = Squidex.Infrastructure.Queries.FilterBuilder;

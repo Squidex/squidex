@@ -11,7 +11,7 @@ using System.Linq;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.MongoDb.OData;
+using Squidex.Infrastructure.MongoDb.Queries;
 using Squidex.Infrastructure.Queries;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Assets.Visitors

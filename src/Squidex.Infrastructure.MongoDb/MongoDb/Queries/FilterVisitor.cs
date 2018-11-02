@@ -12,7 +12,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Infrastructure.Queries;
 
-namespace Squidex.Infrastructure.MongoDb.OData
+namespace Squidex.Infrastructure.MongoDb.Queries
 {
     public sealed class FilterVisitor<T> : FilterNodeVisitor<FilterDefinition<T>>
     {
@@ -52,7 +52,7 @@ namespace Squidex.Infrastructure.MongoDb.OData
             switch (nodeIn.Operator)
             {
                 case FilterOperator.StartsWith:
-                    return Filter.Regex(propertyName, BuildRegex(nodeIn, s => "$" + s));
+                    return Filter.Regex(propertyName, BuildRegex(nodeIn, s => "^" + s));
                 case FilterOperator.Contains:
                     return Filter.Regex(propertyName, BuildRegex(nodeIn, s => s));
                 case FilterOperator.EndsWith:
